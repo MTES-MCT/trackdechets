@@ -1,0 +1,33 @@
+.WasteCode {
+  .WasteCode-item {
+    width: 80px;
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .WasteCode-item--star {
+    width: 40px;
+  }
+
+  .list-inline {
+    display: inline-block;
+  }
+
+  .input-error {
+    border-color: #d63626;
+  }
+
+  .input-error-message {
+    color: #d63626;
+  }
+
+  .text-quote {
+    margin: 10px 0;
+  }
+
+  .light-background {
+    background-color: #fff;
+    border: 1px solid #adb9c9;
+    padding: 1em;
+  }
+}

@@ -1,0 +1,44 @@
+.CompanySelector {
+  .company-bookmarks {
+    list-style: none;
+    padding: 0;
+  }
+
+  h6 {
+    margin: 10px 0;
+  }
+
+  .company-bookmarks__item {
+    background-color: #ebeff3;
+    margin: 10px 0;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    .content {
+      flex: 1;
+
+      p,
+      h6 {
+        margin: 0;
+      }
+    }
+
+    .icon {
+      color: #8393a7;
+      width: 30px;
+      height: 30px;
+    }
+
+    &:hover .icon,
+    &.is-selected .icon {
+      color: #03bd5b;
+    }
+
+    &.is-selected {
+      border: 1px solid #03bd5b;
+      background-color: #daf5e7;
+    }
+  }
+}

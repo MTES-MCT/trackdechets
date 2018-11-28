@@ -1,0 +1,155 @@
+<html>
+  <head>
+    <style>
+      p {
+        margin: 0.5em 0;
+      }
+      .title {
+        text-align: center;
+      }
+      .grid-container {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        padding: 10px;
+        grid-column-gap: 10px;
+        grid-row-gap: 15px;
+        grid-template-areas:
+          "number number"
+          "emitter receiver"
+          "waste-info waste-info"
+          "transporter transporter"
+          "infos infos";
+      }
+      .grid-item {
+        border: 1px solid rgba(0, 0, 0, 0.8);
+        padding: 20px;
+      }
+
+      .item-title {
+        font-weight: 600;
+      }
+
+      .number {
+        grid-area: number;
+      }
+      .emitter {
+        grid-area: emitter;
+      }
+      .receiver {
+        grid-area: receiver;
+      }
+      .waste-info {
+        grid-area: waste-info;
+      }
+      .transporter {
+        grid-area: transporter;
+      }
+      .infos {
+        grid-area: infos;
+        text-align: center;
+      }
+
+      .columns {
+        display: flex;
+        justify-content: space-between;
+      }
+      .column {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="title">
+      <h1>Bordereau de suivi des déchets</h1>
+      <h2>Bordereau édité par l'outil Trackdéchets</h2>
+    </div>
+
+    <div class="grid-container">
+      <div class="number grid-item">Bordereau numéro: S18000000001</div>
+
+      <div class="emitter grid-item">
+        <div class="item-title">Emétetteur du bordereau:</div>
+        <p class="checkboxes">
+          <input type="checkbox" /> Producteur du déchets
+          <input type="checkbox" checked /> Autre producteur
+        </p>
+        <p>Numéro SIRET: 001 001 001 0001</p>
+        <p>John Doe</p>
+        <p>1 avenue Inconnue, 75001 Paris</p>
+        <p>01 01 01 01 01</p>
+        <p>Personne à contacter: Doe Doe</p>
+      </div>
+
+      <div class="receiver grid-item">
+        <div class="item-title">
+          Installation de destination ou d'entreposage ou de reconditionnement:
+        </div>
+        <p>Numéro SIRET: 001 001 001 0001</p>
+        <p>John Doe</p>
+        <p>1 avenue Inconnue, 75001 Paris</p>
+        <p>01 01 01 01 01</p>
+        <p>Personne à contacter: Doe Doe</p>
+      </div>
+
+      <div class="waste-info grid-item">
+        <div class="item-title">Description du déchet</div>
+        <div class="columns">
+          <div class="column">
+            <p>Rubrique déchet: 20 01 19 *</p>
+            <p>Dénomination du déchet: Filtes à huile</p>
+          </div>
+          <div class="column">
+            <p>
+              <label>
+                Consistance du déchet <input type="checkbox" /> Solide
+                <input type="checkbox" /> Liquide
+              </label>
+            </p>
+          </div>
+        </div>
+        <p>
+          <label>
+            Conditionnement: <input type="checkbox" /> benne
+            <input type="checkbox" checked /> citerne
+            <input type="checkbox" /> GRV <input type="checkbox" /> fût
+            <input type="checkbox" /> autre
+          </label>
+        </p>
+        <p>Nombre de colis: 3</p>
+        <div class="columns">
+          <div class="column"><p>Quantité: 12,4 tonnes</p></div>
+          <div class="column">
+            <input type="checkbox" checked /> estimée
+            <input type="checkbox" checked /> réelle
+          </div>
+        </div>
+      </div>
+
+      <div class="transporter grid-item">
+        <div class="item-title">Collecteur / transporteur:</div>
+        <div class="columns">
+          <div class="column">
+            <p>Numéro SIRET: 001 001 001 0001</p>
+            <p>John Doe</p>
+            <p>1 avenue Inconnue, 75001 Paris</p>
+            <p>01 01 01 01 01</p>
+            <p>Personne à contacter: Doe Doe</p>
+          </div>
+          <div class="column">
+            <p>Récipissé numéro: 12345</p>
+            <p>Limite de validité: 01/12/2019</p>
+            <p>Département: île de France</p>
+            <p>Mode de transport: Camion</p>
+            <p>01 01 01 01 01</p>
+            <p>Personne à contacter: Doe Doe</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="infos">
+        Nous vous invitons à dévouvrir le nouvel outil de gestion des bordereaux
+        sur le site trackdéchets.beta.gouv
+      </div>
+    </div>
+  </body>
+</html>

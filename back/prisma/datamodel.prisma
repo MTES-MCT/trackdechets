@@ -1,0 +1,15 @@
+type User {
+  id: ID! @unique
+  email: String! @unique
+  password: String!
+  name: String
+  phone: String
+  company: Company
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Company {
+  siret: Int! @unique
+}
