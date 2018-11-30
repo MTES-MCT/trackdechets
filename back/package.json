@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,9 +14,13 @@
     "bcrypt": "^3.0.2",
     "graphql-yoga": "^1.16.7",
     "jsonwebtoken": "^8.4.0",
+    "merge-graphql-schemas": "^1.5.8",
     "prisma-client-lib": "^1.21.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/jsonwebtoken": "^8.3.0",
+    "prisma": "^1.21.1",
     "ts-node": "^7.0.1",
     "typescript": "^3.1.6"
   }

@@ -18,4 +18,3 @@ export function getUserId(context: Context) {
     return verifiedToken && verifiedToken.userId;
   }
 }
-

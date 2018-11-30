@@ -1,30 +1,26 @@
-type User {
-  id: ID! @unique
-  email: String! @unique
-  password: String!
-  name: String
-  phone: String
-  company: Company!
+scalar DateTime
 
-  createdAt: DateTime!
-  updatedAt: DateTime!
+type Query {
+  forms: [Form]
 }
 
-type Company {
-  siret: Int! @unique
+type Mutation {
+  createForm(formInput: FormInput!): Form
+  deleteForm(id: ID!): Form
 }
 
 type Form {
-  id: ID! @unique
-
-  owner: User!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  id: ID
 
   emitter: Emitter
   recipient: Recipient
   transporter: Transporter
   wasteDetails: WasteDetails
+
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  ownerId: Int
 }
 
 type FormCompany {
@@ -45,33 +41,18 @@ type Emitter {
   type: EmitterType
   pickupSite: String
 
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
+  company: FormCompany
 }
 
 type Recipient {
   cap: String
   processingOperation: String
 
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
+  company: FormCompany
 }
 
 type Transporter {
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
+  company: FormCompany
 
   receipt: String
   department: String

@@ -9,7 +9,7 @@ export default function Recipient() {
       <h4>Certificat d'acceptation préalable</h4>
       <div className="form__group">
         <label>
-          Numéro de CAP:
+          Numéro de CAP: (le cas échéant)
           <input type="text" />
         </label>
       </div>
