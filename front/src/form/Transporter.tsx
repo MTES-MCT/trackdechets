@@ -1,50 +1,38 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
+import { Field } from "formik";
 
 export default function Transporter() {
   return (
     <React.Fragment>
       <h4>Transporteur</h4>
-      <CompanySelector value={null} />
-
-      <h4>Informations complémentaires</h4>
-      <div className="form__group">
-        <label>
-          Personne à contacter:
-          <input type="text" />
-        </label>
-
-        <label>
-          Téléphone ou Fax:
-          <input type="text" />
-        </label>
-
-        <label>
-          Mail:
-          <input type="text" />
-        </label>
-      </div>
+      <CompanySelector name="transporter" />
 
       <h4>Autorisations</h4>
       <div className="form__group">
         <label>
           Numéro de récépissé:
-          <input type="text" />
+          <Field type="text" name="transporter.receipt"/>
         </label>
 
         <label>
          Département:
-          <input type="text" />
+          <Field type="text" name="transporter.department" />
         </label>
 
         <label>
           Limite de validité
-          <input type="date" />
+          <Field type="date" name="transporter.validityLimit" />
         </label>
 
         <label>
           Personne à contacter:
-          <input type="text" />
+          <Field type="text" name="transporter.contact" />
+        </label>
+
+        <label>
+          Immatriculation:
+          <Field type="text" name="transporter.numberPlate" />
         </label>
       </div>
     </React.Fragment>

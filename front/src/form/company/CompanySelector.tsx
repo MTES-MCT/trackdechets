@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Field, connect } from "formik";
 import "./CompanySelector.scss";
 import useDebounce from "../../utils/use-debounce";
 
@@ -41,11 +42,10 @@ function fakeSearch(clue: string) {
 
 type Company = { siret: string; name: string; address: string };
 interface IProps {
-  value: Company | null;
-  onChange?: (selectedCompany: Company) => void;
+  name: string;
 }
 
-export default function CompanySelector(props: IProps) {
+export default connect<IProps>(function CompanySelector(props) {
   const [clue, setClue] = useState("");
   const debouncedClue = useDebounce(clue, 200);
 
@@ -72,9 +72,18 @@ export default function CompanySelector(props: IProps) {
   );
   useEffect(
     () => {
-      props.onChange &&
-        selectedCompany != null &&
-        props.onChange(selectedCompany);
+      props.formik.setFieldValue(
+        `${props.name}.siret`,
+        selectedCompany ? selectedCompany.siret : ""
+      );
+      props.formik.setFieldValue(
+        `${props.name}.name`,
+        selectedCompany ? selectedCompany.name : ""
+      );
+      props.formik.setFieldValue(
+        `${props.name}.address`,
+        selectedCompany ? selectedCompany.address : ""
+      );
     },
     [selectedCompany]
   );
@@ -138,6 +147,23 @@ export default function CompanySelector(props: IProps) {
           </li>
         ))}
       </ul>
+
+      <div className="form__group">
+        <label>
+          Personne à contacter:
+          <Field type="text" name={`${props.name}.contact`} />
+        </label>
+
+        <label>
+          Téléphone ou Fax:
+          <Field type="text" name={`${props.name}.phone`} />
+        </label>
+
+        <label>
+          Mail:
+          <Field type="email" name={`${props.name}.mail`} />
+        </label>
+      </div>
     </div>
   );
-}
+});

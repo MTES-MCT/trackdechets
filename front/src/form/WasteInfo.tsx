@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import WasteCode from "./waste-code/WasteCode";
+import { Field } from "formik";
+import { wasteCodeValidator } from "./waste-code/waste-code.validator";
 
 export default function WasteInfo() {
   const [isChecked, setIsChecked] = useState(false);
@@ -8,7 +10,7 @@ export default function WasteInfo() {
     <React.Fragment>
       <h4>Description du déchet</h4>
       <div className="form__group">
-          <WasteCode value="" />
+        <Field component={WasteCode} name="wasteDetails.wasteCode" validate={wasteCodeValidator} />
       </div>
 
       <div className="form__group">
@@ -23,29 +25,45 @@ export default function WasteInfo() {
         <fieldset>
           <legend>Conditionnement du déchet:</legend>
           <label className="label-inline">
-            <input type="checkbox" name="checkbox" value="benne" />
+            <Field
+              type="checkbox"
+              name="wasteDetails.packaging[0]"
+              value="benne"
+            />
             Benne
           </label>
           <br />
           <label className="label-inline">
-            <input type="checkbox" name="checkbox" value="citerne" />
+            <Field
+              type="checkbox"
+              name="wasteDetails.packaging[1]"
+              value="citerne"
+            />
             Citerne
           </label>
           <br />
           <label className="label-inline">
-            <input type="checkbox" name="checkbox" value="GRV" />
+            <Field
+              type="checkbox"
+              name="wasteDetails.packaging[2]"
+              value="GRV"
+            />
             GRV
           </label>
           <br />
           <label htmlFor="checkbox-ananas" className="label-inline">
-            <input type="checkbox" name="checkbox" value="fût" />
+            <Field
+              type="checkbox"
+              name="wasteDetails.packaging[3]"
+              value="fût"
+            />
             Fût
           </label>
           <br />
           <label className="label-inline">
-            <input
+            <Field
               type="checkbox"
-              name="checkbox"
+              name="wasteDetails.packaging[4]"
               value="other"
               onChange={() => setIsChecked(!isChecked)}
             />
@@ -61,7 +79,7 @@ export default function WasteInfo() {
 
         <label>
           Nombre de colis:
-          <input type="number" />
+          <Field type="number" name="wasteDetails.numberOfPackages" />
         </label>
       </div>
 
@@ -69,17 +87,17 @@ export default function WasteInfo() {
       <div className="form__group">
         <label>
           Quantité (en tonnes):
-          <input type="number" step="0.001" />
+          <Field type="number" step="0.001" name="wasteDetails.quantity" />
         </label>
 
         <fieldset>
           <legend>Cette quantité est</legend>
           <label className="label-inline">
-            <input type="radio" name="radio" value="1" />
+            <input type="radio" name="wasteDetails.quantityType" value="1" />
             Réelle
           </label>
           <label className="label-inline">
-            <input type="radio" name="radio" value="0" />
+            <input type="radio" name="wasteDetails.quantityType" value="0" />
             Estimée
           </label>
         </fieldset>

@@ -1,6 +1,7 @@
 import React, { useState, ReactElement, useEffect } from "react";
 import { Step, IStepContainerProps } from "./Step";
 import "./StepList.scss";
+import { Formik } from "formik";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
@@ -44,7 +45,17 @@ export default function StepList(props: IProps) {
           </li>
         ))}
       </ul>
-      <div className="step-content">{children}</div>
+      <div className="step-content">
+        <Formik
+          initialValues={{ emitter: {contact: '', mail: '', phone: ''}, wasteDetails: { wasteCode: ''} }}
+          enableReinitialize={false}
+          validate={values => console.log("validate", values)}
+          onSubmit={values => console.log("sumbit", values)}
+          render={({ values, handleSubmit, isSubmitting, handleReset }) => (
+            <form onSubmit={handleSubmit}>{children}</form>
+          )}
+        />
+      </div>
     </div>
   );
 }

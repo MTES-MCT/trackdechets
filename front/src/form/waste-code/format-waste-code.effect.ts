@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-export default function wasteCodeDisplayEffect(
+export default function formatWasteCodeEffect(
   wasteCode: string,
   setWasteCode: Dispatch<SetStateAction<string>>
 ) {

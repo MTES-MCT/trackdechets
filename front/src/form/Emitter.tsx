@@ -1,5 +1,6 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
+import { Field } from "formik";
 
 export default function Emitter() {
   return (
@@ -10,36 +11,18 @@ export default function Emitter() {
         <fieldset>
           <legend>L'émetteur est:</legend>
           <label className="label-inline">
-            <input type="radio" name="radio" value="1" checked readOnly />
+            <Field type="radio" name="emitter.type" value="1" />
             Producteur du déchet
           </label>
           <label className="label-inline">
-            <input type="radio" name="radio" value="0" />
+            <Field type="radio" name="emitter.type" value="0" />
             Autre détenteur
           </label>
         </fieldset>
       </div>
 
       <h4>Entreprise émettrice</h4>
-      <CompanySelector value={null} />
-
-      <h4>Informations complémentaires</h4>
-      <div className="form__group">
-        <label>
-          Personne à contacter:
-          <input type="text" />
-        </label>
-
-        <label>
-          Téléphone ou Fax:
-          <input type="text" />
-        </label>
-
-        <label>
-          Mail:
-          <input type="text" />
-        </label>
-      </div>
+      <CompanySelector name="emitter"/>
     </React.Fragment>
   );
 }

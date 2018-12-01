@@ -2,18 +2,11 @@ import React from "react";
 import CompanySelector from "./company/CompanySelector";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
+import { Field } from "formik";
 
 export default function Recipient() {
   return (
     <React.Fragment>
-      <h4>Certificat d'acceptation préalable</h4>
-      <div className="form__group">
-        <label>
-          Numéro de CAP: (le cas échéant)
-          <input type="text" />
-        </label>
-      </div>
-
       <h4>Entreprise de destination</h4>
 
       <div className="text-quote recipient">
@@ -26,28 +19,18 @@ export default function Recipient() {
         </p>
       </div>
 
-      <CompanySelector value={null} />
+      <CompanySelector name="recipient" />
 
       <h4>Informations complémentaires</h4>
 
       <div className="form__group">
-        <ProcessingOperation />
+        <Field component={ProcessingOperation} name="recipient.processingOperation" />
       </div>
 
       <div className="form__group">
         <label>
-          Personne à contacter:
-          <input type="text" />
-        </label>
-
-        <label>
-          Téléphone ou Fax:
-          <input type="text" />
-        </label>
-
-        <label>
-          Mail:
-          <input type="text" />
+          Numéro de CAP: (le cas échéant)
+          <Field type="text" name="recipient.cap" />
         </label>
       </div>
     </React.Fragment>

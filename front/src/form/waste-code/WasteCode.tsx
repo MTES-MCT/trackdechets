@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./WasteCode.scss";
-import { wasteCodeValidator, WasteCodeStatus } from "./waste-code.validator";
-import wasteCodeDisplayEffect from "./waste-code-display.effect";
+import { connect, ErrorMessage, FieldProps, getIn } from "formik";
+import React, { useEffect, useState } from "react";
 import WasteCodeLookup from "./nomenclature-dechets.json";
+import formatWasteCodeEffect from "./format-waste-code.effect";
+import "./WasteCode.scss";
 
 const tempBookmarks = [
   {
@@ -20,33 +20,26 @@ const tempBookmarks = [
   }
 ];
 
-interface IProps {
-  value: string;
-  onChange?: (wasteCode: string) => void;
-}
+type Bookmark = {
+  code: string;
+  description: string;
+};
 
-export default function WasteCode(props: IProps) {
-  const [wasteCode, setWasteCode] = useState(props.value);
-  const [error, setError] = useState("");
-  const [isPristine, setIsPristine] = useState(true);
+export default function WasteCode(props: FieldProps) {
+  const [wasteCode, setWasteCode] = useState(props.field.value);
   const [bookmarks, setBookmarks] = useState(tempBookmarks); // TODO
-
-  useEffect(() => wasteCodeDisplayEffect(wasteCode, setWasteCode), [wasteCode]);
 
   useEffect(
     () => {
-      switch (wasteCodeValidator(wasteCode)) {
-        case WasteCodeStatus.Ok:
-          props.onChange && props.onChange(wasteCode);
-          return setError("");
-        default:
-          return setError("Le code déchet saisi n'existe pas.");
-      }
+      props.form.setFieldValue(props.field.name, wasteCode);
+      formatWasteCodeEffect(wasteCode, setWasteCode);
     },
     [wasteCode]
   );
 
   const wasteCodeDetail = WasteCodeLookup.find(l => l.code === wasteCode);
+  const isDangerous = wasteCode.indexOf("*") > -1;
+  const isTouched = getIn(props.form.touched, props.field.name);
 
   return (
     <div className="WasteCode">
@@ -64,36 +57,47 @@ export default function WasteCode(props: IProps) {
         Code déchet:
         <input
           type="text"
-          list="wasteCodes"
+          name={props.field.name}
           value={wasteCode}
-          className={!isPristine && error.length > 0 ? "input-error" : ""}
-          onBlur={() => setIsPristine(false)}
+          className={
+            isTouched && getIn(props.form.errors, props.field.name)
+              ? "input-error"
+              : ""
+          }
+          onBlur={e => props.form.handleBlur(e)}
           onChange={e => setWasteCode(e.target.value)}
         />
       </label>
-      {!isPristine && error.length > 0 && (
-        <div className="input-error-message">{error}</div>
-      )}
 
-      <span>Codes favoris:</span>
-      <ul className="label-list list-inline">
-        {bookmarks.map(bookmark => (
-          <li
-            className="label"
-            key={bookmark.code}
-            onClick={() => setWasteCode(bookmark.code)}
-          >
-            <a>{bookmark.code}</a>
-          </li>
-        ))}
-      </ul>
+      <ErrorMessage
+        name={props.field.name}
+        render={msg => <div className="input-error-message">{msg}</div>}
+      />
+
+      {bookmarks.length && (
+        <React.Fragment>
+          <span>Codes récents:</span>
+          <ul className="label-list list-inline">
+            {bookmarks.map(bookmark => (
+              <li
+                className="label"
+                key={bookmark.code}
+                onClick={() => setWasteCode(bookmark.code)}
+              >
+                <a>{bookmark.code}</a>
+              </li>
+            ))}
+          </ul>
+        </React.Fragment>
+      )}
 
       {wasteCodeDetail != null && (
         <div className="notification success">
-          Vous avez sélectionné le code déchet suivant:{" "}
-          <em>{wasteCodeDetail.description}</em>
+          Vous avez sélectionné le code déchet{" "}
+          <strong>{isDangerous ? "dangereux" : "non dangereux"}</strong>{" "}
+          suivant: <em>{wasteCodeDetail.description}</em>
         </div>
       )}
     </div>
   );
-}
+};
