@@ -1,8 +1,8 @@
 import React from "react";
-import { StepContainer } from "../stepper/Step";
-import StepList from "../stepper/StepList";
 import Emitter from "./Emitter";
 import Recipient from "./Recipient";
+import { StepContainer } from "./stepper/Step";
+import StepList from "./stepper/StepList";
 import Transporter from "./Transporter";
 import WasteInfo from "./WasteInfo";
 

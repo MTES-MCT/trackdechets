@@ -10,7 +10,7 @@ export default function WasteInfo() {
     <React.Fragment>
       <h4>Description du déchet</h4>
       <div className="form__group">
-        <Field component={WasteCode} name="wasteDetails.wasteCode" validate={wasteCodeValidator} />
+        <Field component={WasteCode} name="wasteDetails.code" validate={wasteCodeValidator} />
       </div>
 
       <div className="form__group">

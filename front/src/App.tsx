@@ -4,6 +4,7 @@ import "./App.css";
 import FormIntro from "./form/FormIntro";
 import Home from "./Home";
 import Dashboard from "./dashboard/Dashboard";
+import Login from "./login/Login";
 
 class App extends Component {
   render() {
@@ -11,6 +12,7 @@ class App extends Component {
       <Router>
         <div className="App">
           <Route exact path="/" component={Home} />
+          <Route exact path="/login" component={Login} />
           <Route path="/form" component={FormIntro} />
           <Route path="/dashboard" component={Dashboard} />
         </div>
