@@ -5,12 +5,15 @@ type Query {
 input SignupInput {
   email: String!
   password: String!
-  name: String
+  name: String!
+  phone: String
+  siret: String!
 }
 
 type Mutation {
   signup(payload: SignupInput): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
+  changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
 }
 
 type AuthPayload {

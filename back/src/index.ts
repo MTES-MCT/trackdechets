@@ -1,6 +1,8 @@
+import { shield } from "graphql-shield";
 import { GraphQLServer } from "graphql-yoga";
 import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import { prisma } from "./generated/prisma-client";
+import { merge } from "./utils";
 
 const port = 4000;
 
@@ -12,9 +14,13 @@ const resolversArray = fileLoader(`${__dirname}/**/resolvers.ts`, {
 });
 const resolvers = mergeResolvers(resolversArray);
 
+const rulesArray = fileLoader(`${__dirname}/**/rules.ts`, { recursive: true });
+const permissions = shield(rulesArray.reduce((prev, cur) => merge(prev, cur)));
+
 const server = new GraphQLServer({
   typeDefs,
   resolvers,
+  middlewares: [permissions],
   context: {
     prisma
   }

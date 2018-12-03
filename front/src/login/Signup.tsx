@@ -12,7 +12,7 @@ const handleSumbit = (
 ) => {
   props.signup({ variables: payload }).then(response => {
     response &&
-      window.localStorage.setItem("td-token", response.data.login.token);
+      window.localStorage.setItem("td-token", response.data.signup.token);
     props.history.push("/dashboard");
   });
 };
