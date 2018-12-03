@@ -1,5 +1,14 @@
 version: "3"
 services:
+  reverse-proxy:
+    image: traefik:1.7.4
+    command: --docker
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   prisma:
     image: prismagraphql/prisma:1.21
     restart: always
@@ -25,6 +34,26 @@ services:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
       - postgres:/var/lib/postgresql/data
+
+  td-api:
+    image: td-api
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    labels:
+      - "traefik.frontend.rule=Host:$API_HOST"
+
+  td-ui:
+    image: td-ui
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    labels:
+      - "traefik.frontend.rule=Host:$UI_HOST"
 
 volumes:
   postgres:

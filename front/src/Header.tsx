@@ -12,7 +12,7 @@ export default function Header() {
         <nav>
           <ul className="nav__links">
             <li className="nav__item">
-              <Link to="/slips">Mon espace</Link>
+              <Link to="/dashboard/slips">Mon espace</Link>
             </li>
           </ul>
         </nav>
