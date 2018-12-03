@@ -19,11 +19,11 @@ export default {
     login: async (parent, { email, password }, context) => {
       const user = await context.prisma.user({ email });
       if (!user) {
-        throw new Error(`No user found for email: ${email}`);
+        throw new Error(`Aucun utilisateur trouvé avec l'email ${email}`);
       }
       const passwordValid = await compare(password, user.password);
       if (!passwordValid) {
-        throw new Error("Invalid password");
+        throw new Error("Mot de passe incorrect");
       }
       return {
         token: sign({ userId: user.id }, APP_SECRET),

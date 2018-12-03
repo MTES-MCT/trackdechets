@@ -1,5 +1,7 @@
 .dashboard-menu.side-menu {
   background-color: #ebeff3;
+  flex: initial;
+  padding: 0 20px 10px 0;
 
   .company-title {
     margin: 30px 10px;
@@ -7,7 +9,7 @@
       font-size: 1.2em;
     }
     p {
-        font-size: .9em
+      font-size: 0.9em;
     }
 
     p,

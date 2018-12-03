@@ -13,9 +13,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "lib": ["dom", "es6"]
+    "lib": ["dom", "es6", "esnext.asynciterable"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

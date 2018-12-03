@@ -1,5 +1,6 @@
 import { GraphQLServer } from "graphql-yoga";
-import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
+import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
+import { prisma } from "./generated/prisma-client";
 
 const port = 4000;
 
@@ -13,7 +14,10 @@ const resolvers = mergeResolvers(resolversArray);
 
 const server = new GraphQLServer({
   typeDefs,
-  resolvers
+  resolvers,
+  context: {
+    prisma
+  }
 });
 
 server.express.get("/ping", (_, res) => res.send("Pong!"));

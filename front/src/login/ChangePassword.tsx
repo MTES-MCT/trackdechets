@@ -4,14 +4,18 @@ import { Mutation, MutationFn } from "react-apollo";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { LOGIN } from "./mutations";
 
-type Values = { email: string; password: string; form: string };
+type Values = {
+  oldPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
+};
 const handleSubmit = (
   payload: Values,
   props: FormikActions<Values> & { login: MutationFn } & RouteComponentProps
 ) => {
-  const { email, password } = payload;
+  const { oldPassword, newPassword } = payload;
   props
-    .login({ variables: { email, password } })
+    .login({ variables: { oldPassword, newPassword } })
     .then(response => {
       response &&
         window.localStorage.setItem("td-token", response.data.login.token);
@@ -22,7 +26,7 @@ const handleSubmit = (
         (error: { message: string }) => error.message
       );
       props.setSubmitting(false);
-      props.setErrors({ email: " ", password: " ", form: errors });
+      props.setErrors({ oldPassword: "Erreur. Vérifiez la saisie de votre ancien mot de passe." });
     });
 };
 
@@ -33,7 +37,11 @@ export default withRouter(function Login(
     <Mutation mutation={LOGIN}>
       {(login, { data }) => (
         <Formik
-          initialValues={{ email: "", password: "", form: "" }}
+          initialValues={{
+            oldPassword: "",
+            newPassword: "",
+            newPasswordConfirmation: ""
+          }}
           onSubmit={(values, formikActions) => {
             handleSubmit(values, {
               login,
@@ -41,46 +49,50 @@ export default withRouter(function Login(
               ...routeComponentProps
             });
           }}
+          validate={values => {
+            let errors: any = {};
+            if (values.newPassword !== values.newPasswordConfirmation) {
+              errors.newPasswordConfirmation =
+                "Les deux mots de passe ne sont pas identiques.";
+            }
+            return errors;
+          }}
         >
           {({ isSubmitting }) => (
-            <div className="container">
-              <Form>
-                <h1>Connexion</h1>
+            <Form>
+              <div className="container">
                 <div className="form__group">
                   <label>
-                    Email:
-                    <Field type="text" name="email" />
+                    Ancien mot de passe:
+                    <Field type="password" name="oldPassword" />
+                  </label>
+                  <ErrorMessage name="oldPassword" component="div" />
+                </div>
+
+                <div className="form__group">
+                  <label>
+                    Nouveau mot de passe:
+                    <Field type="password" name="newPassword" />
                   </label>
                 </div>
 
                 <div className="form__group">
                   <label>
-                    Mot de passe:
-                    <Field type="password" name="password" />
+                    Confirmation du nouveau mot de passe:
+                    <Field type="password" name="newPasswordConirmation" />
                   </label>
+                  <ErrorMessage name="newPasswordConirmation" component="div" />
                 </div>
-
-                <ErrorMessage
-                  name="form"
-                  render={msg => (
-                    <div className="input-error-message">{msg}</div>
-                  )}
-                />
 
                 <button
                   className="button"
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  Se connecter
+                  Enregistrer
                 </button>
-
-                <p>
-                  Vous n'avez pas encore de compte ?{" "}
-                  <Link to="/signup">Inscrivez vous maintenant</Link>
-                </p>
-              </Form>
-            </div>
+              </div>
+            </Form>
           )}
         </Formik>
       )}
