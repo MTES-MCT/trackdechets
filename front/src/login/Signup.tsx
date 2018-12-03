@@ -45,6 +45,10 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               ? (errors.name = "Le nom et prénom sont obligatoires")
               : null;
 
+            values.siret.replace(/\s/g, "").length !== 14
+              ? (errors.siret = "Le SIRET doit faire 14 caractères")
+              : null;
+
             return errors;
           }}
         >
@@ -106,6 +110,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     Numéro SIRET de l'entreprise que vous administrez:
                     <Field type="text" name="siret" />
                   </label>
+
+                  <ErrorMessage name="siret" component="div" />
                 </div>
 
                 <button

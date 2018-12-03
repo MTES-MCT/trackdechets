@@ -1,4 +1,4 @@
-import ApolloClient from "apollo-boost";
+import ApolloClient from "apollo-client";
 import React, { Component } from "react";
 import { ApolloProvider } from "react-apollo";
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -8,10 +8,8 @@ import FormIntro from "./form/FormIntro";
 import Home from "./Home";
 import Login from "./login/Login";
 import Signup from "./login/Signup";
-
-const client = new ApolloClient({
-  uri: "http://localhost:4000"
-});
+import ChangePassword from "./login/ChangePassword";
+import client from "./graphql-client";
 
 class App extends Component {
   render() {
@@ -22,6 +20,7 @@ class App extends Component {
             <Route exact path="/" component={Home} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
+            <Route exact path="/password" component={ChangePassword} />
             <Route path="/form" component={FormIntro} />
             <Route path="/dashboard" component={Dashboard} />
           </div>

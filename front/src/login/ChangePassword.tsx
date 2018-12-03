@@ -2,7 +2,7 @@ import { ErrorMessage, Field, Form, Formik, FormikActions } from "formik";
 import React from "react";
 import { Mutation, MutationFn } from "react-apollo";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import { LOGIN } from "./mutations";
+import { LOGIN, CHANGEPASSWORD } from "./mutations";
 
 type Values = {
   oldPassword: string;
@@ -11,22 +11,19 @@ type Values = {
 };
 const handleSubmit = (
   payload: Values,
-  props: FormikActions<Values> & { login: MutationFn } & RouteComponentProps
+  props: FormikActions<Values> & {
+    changePassword: MutationFn;
+  } & RouteComponentProps
 ) => {
   const { oldPassword, newPassword } = payload;
   props
-    .login({ variables: { oldPassword, newPassword } })
-    .then(response => {
-      response &&
-        window.localStorage.setItem("td-token", response.data.login.token);
-      props.history.push("/dashboard");
-    })
+    .changePassword({ variables: { oldPassword, newPassword } })
+    .then(_ => props.history.push("/dashboard"))
     .catch(e => {
-      const errors = e.graphQLErrors.map(
-        (error: { message: string }) => error.message
-      );
       props.setSubmitting(false);
-      props.setErrors({ oldPassword: "Erreur. Vérifiez la saisie de votre ancien mot de passe." });
+      props.setErrors({
+        oldPassword: "Erreur. Vérifiez la saisie de votre ancien mot de passe."
+      });
     });
 };
 
@@ -34,8 +31,8 @@ export default withRouter(function Login(
   routeComponentProps: RouteComponentProps
 ) {
   return (
-    <Mutation mutation={LOGIN}>
-      {(login, { data }) => (
+    <Mutation mutation={CHANGEPASSWORD}>
+      {changePassword => (
         <Formik
           initialValues={{
             oldPassword: "",
@@ -44,7 +41,7 @@ export default withRouter(function Login(
           }}
           onSubmit={(values, formikActions) => {
             handleSubmit(values, {
-              login,
+              changePassword,
               ...formikActions,
               ...routeComponentProps
             });
@@ -79,9 +76,12 @@ export default withRouter(function Login(
                 <div className="form__group">
                   <label>
                     Confirmation du nouveau mot de passe:
-                    <Field type="password" name="newPasswordConirmation" />
+                    <Field type="password" name="newPasswordConfirmation" />
                   </label>
-                  <ErrorMessage name="newPasswordConirmation" component="div" />
+                  <ErrorMessage
+                    name="newPasswordConfirmation"
+                    component="div"
+                  />
                 </div>
 
                 <button
