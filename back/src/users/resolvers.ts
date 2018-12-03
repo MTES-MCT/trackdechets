@@ -19,7 +19,7 @@ export default {
       const hashedPassword = await hash(payload.password, 10);
       const user = await context.prisma.createUser({
         name: payload.name,
-        email: payload.name,
+        email: payload.email,
         password: hashedPassword,
         company: {
           create: { siret: payload.siret }
