@@ -33,7 +33,7 @@ export default function Emitter() {
           defaultChecked={pickupSite}
           onChange={() => setPickupSite(!pickupSite)}
         />
-        Je souhaite ajouter une adresse de chantier ou de retrait
+        Je souhaite ajouter une adresse de chantier ou de collecte
       </label>
       {pickupSite && <Field component="textarea" name="emitter.pickupSite" />}
     </React.Fragment>
