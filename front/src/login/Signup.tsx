@@ -4,16 +4,16 @@ import { Mutation, MutationFn } from "react-apollo";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import { SIGNUP } from "./mutations";
+import { localAuthService } from "./auth.service";
 
 type Values = {};
 const handleSumbit = (
   payload: Values,
   props: FormikActions<Values> & { signup: MutationFn } & RouteComponentProps
 ) => {
-  props.signup({ variables: payload }).then(response => {
-    response &&
-      window.localStorage.setItem("td-token", response.data.signup.token);
-    props.history.push("/dashboard");
+  props.signup({ variables: { payload } }).then(response => {
+    response && localAuthService.locallyAutheticate(response.data.signup.token);
+    props.history.push("/dashboard/slips");
   });
 };
 
@@ -30,9 +30,10 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
             passwordConfirmation: "",
             siret: ""
           }}
-          onSubmit={(values, formikActions) =>
-            handleSumbit(values, { ...routerProps, ...formikActions, signup })
-          }
+          onSubmit={(values, formikActions) => {
+            const { passwordConfirmation, ...payload } = values;
+            handleSumbit(payload, { ...routerProps, ...formikActions, signup });
+          }}
           validate={values => {
             let errors: any = {};
             if (values.password !== values.passwordConfirmation) {

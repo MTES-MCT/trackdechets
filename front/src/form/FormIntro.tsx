@@ -29,7 +29,7 @@ export default function FormIntro({ match }: RouteComponentProps) {
           )}
         />
 
-        <Route path={`${match.path}/steps`} component={FormContainer} />
+        <Route path={`${match.path}/steps/:id?`} component={FormContainer} />
       </div>
     </main>
   );

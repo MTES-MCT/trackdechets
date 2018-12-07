@@ -1,8 +1,8 @@
 import { ErrorMessage, Field, Form, Formik, FormikActions } from "formik";
 import React from "react";
 import { Mutation, MutationFn } from "react-apollo";
-import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import { LOGIN, CHANGEPASSWORD } from "./mutations";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import { CHANGEPASSWORD } from "./mutations";
 
 type Values = {
   oldPassword: string;

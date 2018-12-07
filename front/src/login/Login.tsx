@@ -3,6 +3,7 @@ import React from "react";
 import { Mutation, MutationFn } from "react-apollo";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { LOGIN } from "./mutations";
+import { localAuthService } from "./auth.service";
 
 type Values = { email: string; password: string; form: string };
 const handleSubmit = (
@@ -13,9 +14,8 @@ const handleSubmit = (
   props
     .login({ variables: { email, password } })
     .then(response => {
-      response &&
-        window.localStorage.setItem("td-token", response.data.login.token);
-      props.history.push("/dashboard");
+      response && localAuthService.locallyAutheticate(response.data.login.token);
+      props.history.push("/dashboard/slips");
     })
     .catch(e => {
       const errors = e.graphQLErrors.map(

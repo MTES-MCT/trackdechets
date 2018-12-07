@@ -11,7 +11,7 @@ type User {
 }
 
 type Company {
-  siret: Int! @unique
+  siret: String! @unique
 }
 
 type Form {
@@ -21,19 +21,49 @@ type Form {
   createdAt: DateTime!
   updatedAt: DateTime!
 
-  emitter: Emitter
-  recipient: Recipient
-  transporter: Transporter
-  wasteDetails: WasteDetails
-}
+  # Emitter fields
+  emitterType: EmitterType
+  emitterPickupSite: String
 
-type FormCompany {
-  name: String
-  siret: String
-  address: String
-  contact: String
-  phone: Int
-  mail: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: Int
+  emitterCompanyMail: String
+
+  # Recipient fields
+  recipientCap: String
+  recipientProcessingOperation: String
+
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: Int
+  recipientCompanyMail: String
+
+  # Transporter fields
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: Int
+  transporterCompanyMail: String
+
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterContact: String
+  transporterNumberPlate: String
+
+  # Waste details fields
+  wasteDetailsCode: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
 }
 
 enum EmitterType {
@@ -41,55 +71,7 @@ enum EmitterType {
   OTHER
 }
 
-type Emitter {
-  type: EmitterType
-  pickupSite: String
-
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-type Recipient {
-  cap: String
-  processingOperation: String
-
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-type Transporter {
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-
-  receipt: String
-  department: String
-  validityLimit: DateTime
-  contact: String
-  numberPlate: String
-}
-
 enum QuantityType {
   REAL
   ESTIMATED
-}
-
-type WasteDetails {
-  code: String
-  onuCode: String
-  packaging: String
-  numberOfPackages: Int
-  quantity: Float
-  quantityType: QuantityType
 }

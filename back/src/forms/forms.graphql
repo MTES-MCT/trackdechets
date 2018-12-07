@@ -1,11 +1,12 @@
 scalar DateTime
 
 type Query {
+  form(id: ID): Form
   forms: [Form]
 }
 
 type Mutation {
-  createForm(formInput: FormInput!): Form
+  saveForm(formInput: FormInput!): Form
   deleteForm(id: ID!): Form
 }
 

@@ -156,7 +156,7 @@ export default connect<IProps>(function CompanySelector(props) {
 
         <label>
           Téléphone ou Fax:
-          <Field type="text" name={`${props.name}.phone`} />
+          <Field type="number" name={`${props.name}.phone`} />
         </label>
 
         <label>

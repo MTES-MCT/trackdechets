@@ -1,13 +1,14 @@
 export default {
   emitter: {
-    type: "",
+    type: "PRODUCER",
     pickupSite: "Nom:\nAdresse:\nMail:",
     company: {
       siret: "",
       name: "",
+      address: "",
       contact: "",
       mail: "",
-      phone: ""
+      phone: 0
     }
   },
   recipient: {
@@ -16,9 +17,10 @@ export default {
     company: {
       siret: "",
       name: "",
+      address: "",
       contact: "",
       mail: "",
-      phone: ""
+      phone: 0
     }
   },
   transporter: {
@@ -30,17 +32,18 @@ export default {
     company: {
       siret: "",
       name: "",
+      address: "",
       contact: "",
       mail: "",
-      phone: ""
+      phone: 0
     }
   },
   wasteDetails: {
     code: "",
     onuCode: "",
     packaging: "",
-    numberOfPackages: "",
-    quantity: "",
-    quantityType: ""
+    numberOfPackages: 1,
+    quantity: 0.0,
+    quantityType: "ESTIMATED"
   }
 };

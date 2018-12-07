@@ -13,11 +13,11 @@ export default function Emitter() {
         <fieldset>
           <legend>L'émetteur est:</legend>
           <label className="label-inline">
-            <Field type="radio" name="emitter.type" value="1" />
+            <Field type="radio" name="emitter.type" value="PRODUCER" />
             Producteur du déchet
           </label>
           <label className="label-inline">
-            <Field type="radio" name="emitter.type" value="0" />
+            <Field type="radio" name="emitter.type" value="OTHER" />
             Autre détenteur
           </label>
         </fieldset>

@@ -6,7 +6,7 @@ import { prisma } from "../generated/prisma-client";
 
 export default {
   Mutation: {
-    signup: async (parent, payload, context: Context) => {
+    signup: async (parent, { payload }, context: Context) => {
       const existingCompany = await context.prisma.company({
         siret: payload.siret
       });

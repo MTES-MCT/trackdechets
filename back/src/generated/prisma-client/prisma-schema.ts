@@ -2,31 +2,11 @@ export const typeDefs = /* GraphQL */ `type AggregateCompany {
   count: Int!
 }
 
-type AggregateEmitter {
-  count: Int!
-}
-
 type AggregateForm {
   count: Int!
 }
 
-type AggregateFormCompany {
-  count: Int!
-}
-
-type AggregateRecipient {
-  count: Int!
-}
-
-type AggregateTransporter {
-  count: Int!
-}
-
 type AggregateUser {
-  count: Int!
-}
-
-type AggregateWasteDetails {
   count: Int!
 }
 
@@ -35,7 +15,7 @@ type BatchPayload {
 }
 
 type Company {
-  siret: Int!
+  siret: String!
 }
 
 type CompanyConnection {
@@ -45,7 +25,7 @@ type CompanyConnection {
 }
 
 input CompanyCreateInput {
-  siret: Int!
+  siret: String!
 }
 
 input CompanyCreateOneInput {
@@ -70,7 +50,7 @@ enum CompanyOrderByInput {
 }
 
 type CompanyPreviousValues {
-  siret: Int!
+  siret: String!
 }
 
 type CompanySubscriptionPayload {
@@ -92,23 +72,21 @@ input CompanySubscriptionWhereInput {
 }
 
 input CompanyUpdateDataInput {
-  siret: Int
+  siret: String
 }
 
 input CompanyUpdateInput {
-  siret: Int
+  siret: String
 }
 
 input CompanyUpdateManyMutationInput {
-  siret: Int
+  siret: String
 }
 
-input CompanyUpdateOneInput {
+input CompanyUpdateOneRequiredInput {
   create: CompanyCreateInput
   update: CompanyUpdateDataInput
   upsert: CompanyUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
   connect: CompanyWhereUniqueInput
 }
 
@@ -118,370 +96,6 @@ input CompanyUpsertNestedInput {
 }
 
 input CompanyWhereInput {
-  siret: Int
-  siret_not: Int
-  siret_in: [Int!]
-  siret_not_in: [Int!]
-  siret_lt: Int
-  siret_lte: Int
-  siret_gt: Int
-  siret_gte: Int
-  AND: [CompanyWhereInput!]
-  OR: [CompanyWhereInput!]
-  NOT: [CompanyWhereInput!]
-}
-
-input CompanyWhereUniqueInput {
-  siret: Int
-}
-
-scalar DateTime
-
-type Emitter {
-  type: EmitterType
-  pickupSite: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-type EmitterConnection {
-  pageInfo: PageInfo!
-  edges: [EmitterEdge]!
-  aggregate: AggregateEmitter!
-}
-
-input EmitterCreateInput {
-  type: EmitterType
-  pickupSite: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-input EmitterCreateOneInput {
-  create: EmitterCreateInput
-}
-
-type EmitterEdge {
-  node: Emitter!
-  cursor: String!
-}
-
-enum EmitterOrderByInput {
-  type_ASC
-  type_DESC
-  pickupSite_ASC
-  pickupSite_DESC
-  companyName_ASC
-  companyName_DESC
-  companySiret_ASC
-  companySiret_DESC
-  companyAddress_ASC
-  companyAddress_DESC
-  companyContact_ASC
-  companyContact_DESC
-  companyPhone_ASC
-  companyPhone_DESC
-  companyMail_ASC
-  companyMail_DESC
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-}
-
-type EmitterPreviousValues {
-  type: EmitterType
-  pickupSite: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-type EmitterSubscriptionPayload {
-  mutation: MutationType!
-  node: Emitter
-  updatedFields: [String!]
-  previousValues: EmitterPreviousValues
-}
-
-input EmitterSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: EmitterWhereInput
-  AND: [EmitterSubscriptionWhereInput!]
-  OR: [EmitterSubscriptionWhereInput!]
-  NOT: [EmitterSubscriptionWhereInput!]
-}
-
-enum EmitterType {
-  PRODUCER
-  OTHER
-}
-
-input EmitterUpdateDataInput {
-  type: EmitterType
-  pickupSite: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-input EmitterUpdateManyMutationInput {
-  type: EmitterType
-  pickupSite: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-input EmitterUpdateOneInput {
-  create: EmitterCreateInput
-  update: EmitterUpdateDataInput
-  upsert: EmitterUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-}
-
-input EmitterUpsertNestedInput {
-  update: EmitterUpdateDataInput!
-  create: EmitterCreateInput!
-}
-
-input EmitterWhereInput {
-  type: EmitterType
-  type_not: EmitterType
-  type_in: [EmitterType!]
-  type_not_in: [EmitterType!]
-  pickupSite: String
-  pickupSite_not: String
-  pickupSite_in: [String!]
-  pickupSite_not_in: [String!]
-  pickupSite_lt: String
-  pickupSite_lte: String
-  pickupSite_gt: String
-  pickupSite_gte: String
-  pickupSite_contains: String
-  pickupSite_not_contains: String
-  pickupSite_starts_with: String
-  pickupSite_not_starts_with: String
-  pickupSite_ends_with: String
-  pickupSite_not_ends_with: String
-  companyName: String
-  companyName_not: String
-  companyName_in: [String!]
-  companyName_not_in: [String!]
-  companyName_lt: String
-  companyName_lte: String
-  companyName_gt: String
-  companyName_gte: String
-  companyName_contains: String
-  companyName_not_contains: String
-  companyName_starts_with: String
-  companyName_not_starts_with: String
-  companyName_ends_with: String
-  companyName_not_ends_with: String
-  companySiret: String
-  companySiret_not: String
-  companySiret_in: [String!]
-  companySiret_not_in: [String!]
-  companySiret_lt: String
-  companySiret_lte: String
-  companySiret_gt: String
-  companySiret_gte: String
-  companySiret_contains: String
-  companySiret_not_contains: String
-  companySiret_starts_with: String
-  companySiret_not_starts_with: String
-  companySiret_ends_with: String
-  companySiret_not_ends_with: String
-  companyAddress: String
-  companyAddress_not: String
-  companyAddress_in: [String!]
-  companyAddress_not_in: [String!]
-  companyAddress_lt: String
-  companyAddress_lte: String
-  companyAddress_gt: String
-  companyAddress_gte: String
-  companyAddress_contains: String
-  companyAddress_not_contains: String
-  companyAddress_starts_with: String
-  companyAddress_not_starts_with: String
-  companyAddress_ends_with: String
-  companyAddress_not_ends_with: String
-  companyContact: String
-  companyContact_not: String
-  companyContact_in: [String!]
-  companyContact_not_in: [String!]
-  companyContact_lt: String
-  companyContact_lte: String
-  companyContact_gt: String
-  companyContact_gte: String
-  companyContact_contains: String
-  companyContact_not_contains: String
-  companyContact_starts_with: String
-  companyContact_not_starts_with: String
-  companyContact_ends_with: String
-  companyContact_not_ends_with: String
-  companyPhone: Int
-  companyPhone_not: Int
-  companyPhone_in: [Int!]
-  companyPhone_not_in: [Int!]
-  companyPhone_lt: Int
-  companyPhone_lte: Int
-  companyPhone_gt: Int
-  companyPhone_gte: Int
-  companyMail: String
-  companyMail_not: String
-  companyMail_in: [String!]
-  companyMail_not_in: [String!]
-  companyMail_lt: String
-  companyMail_lte: String
-  companyMail_gt: String
-  companyMail_gte: String
-  companyMail_contains: String
-  companyMail_not_contains: String
-  companyMail_starts_with: String
-  companyMail_not_starts_with: String
-  companyMail_ends_with: String
-  companyMail_not_ends_with: String
-  AND: [EmitterWhereInput!]
-  OR: [EmitterWhereInput!]
-  NOT: [EmitterWhereInput!]
-}
-
-type Form {
-  id: ID!
-  owner: User!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  emitter: Emitter
-  recipient: Recipient
-  transporter: Transporter
-  wasteDetails: WasteDetails
-}
-
-type FormCompany {
-  name: String
-  siret: String
-  address: String
-  contact: String
-  phone: Int
-  mail: String
-}
-
-type FormCompanyConnection {
-  pageInfo: PageInfo!
-  edges: [FormCompanyEdge]!
-  aggregate: AggregateFormCompany!
-}
-
-input FormCompanyCreateInput {
-  name: String
-  siret: String
-  address: String
-  contact: String
-  phone: Int
-  mail: String
-}
-
-type FormCompanyEdge {
-  node: FormCompany!
-  cursor: String!
-}
-
-enum FormCompanyOrderByInput {
-  name_ASC
-  name_DESC
-  siret_ASC
-  siret_DESC
-  address_ASC
-  address_DESC
-  contact_ASC
-  contact_DESC
-  phone_ASC
-  phone_DESC
-  mail_ASC
-  mail_DESC
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-}
-
-type FormCompanyPreviousValues {
-  name: String
-  siret: String
-  address: String
-  contact: String
-  phone: Int
-  mail: String
-}
-
-type FormCompanySubscriptionPayload {
-  mutation: MutationType!
-  node: FormCompany
-  updatedFields: [String!]
-  previousValues: FormCompanyPreviousValues
-}
-
-input FormCompanySubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: FormCompanyWhereInput
-  AND: [FormCompanySubscriptionWhereInput!]
-  OR: [FormCompanySubscriptionWhereInput!]
-  NOT: [FormCompanySubscriptionWhereInput!]
-}
-
-input FormCompanyUpdateManyMutationInput {
-  name: String
-  siret: String
-  address: String
-  contact: String
-  phone: Int
-  mail: String
-}
-
-input FormCompanyWhereInput {
-  name: String
-  name_not: String
-  name_in: [String!]
-  name_not_in: [String!]
-  name_lt: String
-  name_lte: String
-  name_gt: String
-  name_gte: String
-  name_contains: String
-  name_not_contains: String
-  name_starts_with: String
-  name_not_starts_with: String
-  name_ends_with: String
-  name_not_ends_with: String
   siret: String
   siret_not: String
   siret_in: [String!]
@@ -496,59 +110,60 @@ input FormCompanyWhereInput {
   siret_not_starts_with: String
   siret_ends_with: String
   siret_not_ends_with: String
-  address: String
-  address_not: String
-  address_in: [String!]
-  address_not_in: [String!]
-  address_lt: String
-  address_lte: String
-  address_gt: String
-  address_gte: String
-  address_contains: String
-  address_not_contains: String
-  address_starts_with: String
-  address_not_starts_with: String
-  address_ends_with: String
-  address_not_ends_with: String
-  contact: String
-  contact_not: String
-  contact_in: [String!]
-  contact_not_in: [String!]
-  contact_lt: String
-  contact_lte: String
-  contact_gt: String
-  contact_gte: String
-  contact_contains: String
-  contact_not_contains: String
-  contact_starts_with: String
-  contact_not_starts_with: String
-  contact_ends_with: String
-  contact_not_ends_with: String
-  phone: Int
-  phone_not: Int
-  phone_in: [Int!]
-  phone_not_in: [Int!]
-  phone_lt: Int
-  phone_lte: Int
-  phone_gt: Int
-  phone_gte: Int
-  mail: String
-  mail_not: String
-  mail_in: [String!]
-  mail_not_in: [String!]
-  mail_lt: String
-  mail_lte: String
-  mail_gt: String
-  mail_gte: String
-  mail_contains: String
-  mail_not_contains: String
-  mail_starts_with: String
-  mail_not_starts_with: String
-  mail_ends_with: String
-  mail_not_ends_with: String
-  AND: [FormCompanyWhereInput!]
-  OR: [FormCompanyWhereInput!]
-  NOT: [FormCompanyWhereInput!]
+  AND: [CompanyWhereInput!]
+  OR: [CompanyWhereInput!]
+  NOT: [CompanyWhereInput!]
+}
+
+input CompanyWhereUniqueInput {
+  siret: String
+}
+
+scalar DateTime
+
+enum EmitterType {
+  PRODUCER
+  OTHER
+}
+
+type Form {
+  id: ID!
+  owner: User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: Int
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: Int
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: Int
+  transporterCompanyMail: String
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterContact: String
+  transporterNumberPlate: String
+  wasteDetailsCode: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
 }
 
 type FormConnection {
@@ -559,10 +174,39 @@ type FormConnection {
 
 input FormCreateInput {
   owner: UserCreateOneInput!
-  emitter: EmitterCreateOneInput
-  recipient: RecipientCreateOneInput
-  transporter: TransporterCreateOneInput
-  wasteDetails: WasteDetailsCreateOneInput
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: Int
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: Int
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: Int
+  transporterCompanyMail: String
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterContact: String
+  transporterNumberPlate: String
+  wasteDetailsCode: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
 }
 
 type FormEdge {
@@ -577,12 +221,111 @@ enum FormOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  emitterType_ASC
+  emitterType_DESC
+  emitterPickupSite_ASC
+  emitterPickupSite_DESC
+  emitterCompanyName_ASC
+  emitterCompanyName_DESC
+  emitterCompanySiret_ASC
+  emitterCompanySiret_DESC
+  emitterCompanyAddress_ASC
+  emitterCompanyAddress_DESC
+  emitterCompanyContact_ASC
+  emitterCompanyContact_DESC
+  emitterCompanyPhone_ASC
+  emitterCompanyPhone_DESC
+  emitterCompanyMail_ASC
+  emitterCompanyMail_DESC
+  recipientCap_ASC
+  recipientCap_DESC
+  recipientProcessingOperation_ASC
+  recipientProcessingOperation_DESC
+  recipientCompanyName_ASC
+  recipientCompanyName_DESC
+  recipientCompanySiret_ASC
+  recipientCompanySiret_DESC
+  recipientCompanyAddress_ASC
+  recipientCompanyAddress_DESC
+  recipientCompanyContact_ASC
+  recipientCompanyContact_DESC
+  recipientCompanyPhone_ASC
+  recipientCompanyPhone_DESC
+  recipientCompanyMail_ASC
+  recipientCompanyMail_DESC
+  transporterCompanyName_ASC
+  transporterCompanyName_DESC
+  transporterCompanySiret_ASC
+  transporterCompanySiret_DESC
+  transporterCompanyAddress_ASC
+  transporterCompanyAddress_DESC
+  transporterCompanyContact_ASC
+  transporterCompanyContact_DESC
+  transporterCompanyPhone_ASC
+  transporterCompanyPhone_DESC
+  transporterCompanyMail_ASC
+  transporterCompanyMail_DESC
+  transporterReceipt_ASC
+  transporterReceipt_DESC
+  transporterDepartment_ASC
+  transporterDepartment_DESC
+  transporterValidityLimit_ASC
+  transporterValidityLimit_DESC
+  transporterContact_ASC
+  transporterContact_DESC
+  transporterNumberPlate_ASC
+  transporterNumberPlate_DESC
+  wasteDetailsCode_ASC
+  wasteDetailsCode_DESC
+  wasteDetailsOnuCode_ASC
+  wasteDetailsOnuCode_DESC
+  wasteDetailsPackaging_ASC
+  wasteDetailsPackaging_DESC
+  wasteDetailsNumberOfPackages_ASC
+  wasteDetailsNumberOfPackages_DESC
+  wasteDetailsQuantity_ASC
+  wasteDetailsQuantity_DESC
+  wasteDetailsQuantityType_ASC
+  wasteDetailsQuantityType_DESC
 }
 
 type FormPreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: Int
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: Int
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: Int
+  transporterCompanyMail: String
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterContact: String
+  transporterNumberPlate: String
+  wasteDetailsCode: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
 }
 
 type FormSubscriptionPayload {
@@ -605,10 +348,75 @@ input FormSubscriptionWhereInput {
 
 input FormUpdateInput {
   owner: UserUpdateOneRequiredInput
-  emitter: EmitterUpdateOneInput
-  recipient: RecipientUpdateOneInput
-  transporter: TransporterUpdateOneInput
-  wasteDetails: WasteDetailsUpdateOneInput
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: Int
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: Int
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: Int
+  transporterCompanyMail: String
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterContact: String
+  transporterNumberPlate: String
+  wasteDetailsCode: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+}
+
+input FormUpdateManyMutationInput {
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: Int
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: Int
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: Int
+  transporterCompanyMail: String
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterContact: String
+  transporterNumberPlate: String
+  wasteDetailsCode: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
 }
 
 input FormWhereInput {
@@ -643,10 +451,412 @@ input FormWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
-  emitter: EmitterWhereInput
-  recipient: RecipientWhereInput
-  transporter: TransporterWhereInput
-  wasteDetails: WasteDetailsWhereInput
+  emitterType: EmitterType
+  emitterType_not: EmitterType
+  emitterType_in: [EmitterType!]
+  emitterType_not_in: [EmitterType!]
+  emitterPickupSite: String
+  emitterPickupSite_not: String
+  emitterPickupSite_in: [String!]
+  emitterPickupSite_not_in: [String!]
+  emitterPickupSite_lt: String
+  emitterPickupSite_lte: String
+  emitterPickupSite_gt: String
+  emitterPickupSite_gte: String
+  emitterPickupSite_contains: String
+  emitterPickupSite_not_contains: String
+  emitterPickupSite_starts_with: String
+  emitterPickupSite_not_starts_with: String
+  emitterPickupSite_ends_with: String
+  emitterPickupSite_not_ends_with: String
+  emitterCompanyName: String
+  emitterCompanyName_not: String
+  emitterCompanyName_in: [String!]
+  emitterCompanyName_not_in: [String!]
+  emitterCompanyName_lt: String
+  emitterCompanyName_lte: String
+  emitterCompanyName_gt: String
+  emitterCompanyName_gte: String
+  emitterCompanyName_contains: String
+  emitterCompanyName_not_contains: String
+  emitterCompanyName_starts_with: String
+  emitterCompanyName_not_starts_with: String
+  emitterCompanyName_ends_with: String
+  emitterCompanyName_not_ends_with: String
+  emitterCompanySiret: String
+  emitterCompanySiret_not: String
+  emitterCompanySiret_in: [String!]
+  emitterCompanySiret_not_in: [String!]
+  emitterCompanySiret_lt: String
+  emitterCompanySiret_lte: String
+  emitterCompanySiret_gt: String
+  emitterCompanySiret_gte: String
+  emitterCompanySiret_contains: String
+  emitterCompanySiret_not_contains: String
+  emitterCompanySiret_starts_with: String
+  emitterCompanySiret_not_starts_with: String
+  emitterCompanySiret_ends_with: String
+  emitterCompanySiret_not_ends_with: String
+  emitterCompanyAddress: String
+  emitterCompanyAddress_not: String
+  emitterCompanyAddress_in: [String!]
+  emitterCompanyAddress_not_in: [String!]
+  emitterCompanyAddress_lt: String
+  emitterCompanyAddress_lte: String
+  emitterCompanyAddress_gt: String
+  emitterCompanyAddress_gte: String
+  emitterCompanyAddress_contains: String
+  emitterCompanyAddress_not_contains: String
+  emitterCompanyAddress_starts_with: String
+  emitterCompanyAddress_not_starts_with: String
+  emitterCompanyAddress_ends_with: String
+  emitterCompanyAddress_not_ends_with: String
+  emitterCompanyContact: String
+  emitterCompanyContact_not: String
+  emitterCompanyContact_in: [String!]
+  emitterCompanyContact_not_in: [String!]
+  emitterCompanyContact_lt: String
+  emitterCompanyContact_lte: String
+  emitterCompanyContact_gt: String
+  emitterCompanyContact_gte: String
+  emitterCompanyContact_contains: String
+  emitterCompanyContact_not_contains: String
+  emitterCompanyContact_starts_with: String
+  emitterCompanyContact_not_starts_with: String
+  emitterCompanyContact_ends_with: String
+  emitterCompanyContact_not_ends_with: String
+  emitterCompanyPhone: Int
+  emitterCompanyPhone_not: Int
+  emitterCompanyPhone_in: [Int!]
+  emitterCompanyPhone_not_in: [Int!]
+  emitterCompanyPhone_lt: Int
+  emitterCompanyPhone_lte: Int
+  emitterCompanyPhone_gt: Int
+  emitterCompanyPhone_gte: Int
+  emitterCompanyMail: String
+  emitterCompanyMail_not: String
+  emitterCompanyMail_in: [String!]
+  emitterCompanyMail_not_in: [String!]
+  emitterCompanyMail_lt: String
+  emitterCompanyMail_lte: String
+  emitterCompanyMail_gt: String
+  emitterCompanyMail_gte: String
+  emitterCompanyMail_contains: String
+  emitterCompanyMail_not_contains: String
+  emitterCompanyMail_starts_with: String
+  emitterCompanyMail_not_starts_with: String
+  emitterCompanyMail_ends_with: String
+  emitterCompanyMail_not_ends_with: String
+  recipientCap: String
+  recipientCap_not: String
+  recipientCap_in: [String!]
+  recipientCap_not_in: [String!]
+  recipientCap_lt: String
+  recipientCap_lte: String
+  recipientCap_gt: String
+  recipientCap_gte: String
+  recipientCap_contains: String
+  recipientCap_not_contains: String
+  recipientCap_starts_with: String
+  recipientCap_not_starts_with: String
+  recipientCap_ends_with: String
+  recipientCap_not_ends_with: String
+  recipientProcessingOperation: String
+  recipientProcessingOperation_not: String
+  recipientProcessingOperation_in: [String!]
+  recipientProcessingOperation_not_in: [String!]
+  recipientProcessingOperation_lt: String
+  recipientProcessingOperation_lte: String
+  recipientProcessingOperation_gt: String
+  recipientProcessingOperation_gte: String
+  recipientProcessingOperation_contains: String
+  recipientProcessingOperation_not_contains: String
+  recipientProcessingOperation_starts_with: String
+  recipientProcessingOperation_not_starts_with: String
+  recipientProcessingOperation_ends_with: String
+  recipientProcessingOperation_not_ends_with: String
+  recipientCompanyName: String
+  recipientCompanyName_not: String
+  recipientCompanyName_in: [String!]
+  recipientCompanyName_not_in: [String!]
+  recipientCompanyName_lt: String
+  recipientCompanyName_lte: String
+  recipientCompanyName_gt: String
+  recipientCompanyName_gte: String
+  recipientCompanyName_contains: String
+  recipientCompanyName_not_contains: String
+  recipientCompanyName_starts_with: String
+  recipientCompanyName_not_starts_with: String
+  recipientCompanyName_ends_with: String
+  recipientCompanyName_not_ends_with: String
+  recipientCompanySiret: String
+  recipientCompanySiret_not: String
+  recipientCompanySiret_in: [String!]
+  recipientCompanySiret_not_in: [String!]
+  recipientCompanySiret_lt: String
+  recipientCompanySiret_lte: String
+  recipientCompanySiret_gt: String
+  recipientCompanySiret_gte: String
+  recipientCompanySiret_contains: String
+  recipientCompanySiret_not_contains: String
+  recipientCompanySiret_starts_with: String
+  recipientCompanySiret_not_starts_with: String
+  recipientCompanySiret_ends_with: String
+  recipientCompanySiret_not_ends_with: String
+  recipientCompanyAddress: String
+  recipientCompanyAddress_not: String
+  recipientCompanyAddress_in: [String!]
+  recipientCompanyAddress_not_in: [String!]
+  recipientCompanyAddress_lt: String
+  recipientCompanyAddress_lte: String
+  recipientCompanyAddress_gt: String
+  recipientCompanyAddress_gte: String
+  recipientCompanyAddress_contains: String
+  recipientCompanyAddress_not_contains: String
+  recipientCompanyAddress_starts_with: String
+  recipientCompanyAddress_not_starts_with: String
+  recipientCompanyAddress_ends_with: String
+  recipientCompanyAddress_not_ends_with: String
+  recipientCompanyContact: String
+  recipientCompanyContact_not: String
+  recipientCompanyContact_in: [String!]
+  recipientCompanyContact_not_in: [String!]
+  recipientCompanyContact_lt: String
+  recipientCompanyContact_lte: String
+  recipientCompanyContact_gt: String
+  recipientCompanyContact_gte: String
+  recipientCompanyContact_contains: String
+  recipientCompanyContact_not_contains: String
+  recipientCompanyContact_starts_with: String
+  recipientCompanyContact_not_starts_with: String
+  recipientCompanyContact_ends_with: String
+  recipientCompanyContact_not_ends_with: String
+  recipientCompanyPhone: Int
+  recipientCompanyPhone_not: Int
+  recipientCompanyPhone_in: [Int!]
+  recipientCompanyPhone_not_in: [Int!]
+  recipientCompanyPhone_lt: Int
+  recipientCompanyPhone_lte: Int
+  recipientCompanyPhone_gt: Int
+  recipientCompanyPhone_gte: Int
+  recipientCompanyMail: String
+  recipientCompanyMail_not: String
+  recipientCompanyMail_in: [String!]
+  recipientCompanyMail_not_in: [String!]
+  recipientCompanyMail_lt: String
+  recipientCompanyMail_lte: String
+  recipientCompanyMail_gt: String
+  recipientCompanyMail_gte: String
+  recipientCompanyMail_contains: String
+  recipientCompanyMail_not_contains: String
+  recipientCompanyMail_starts_with: String
+  recipientCompanyMail_not_starts_with: String
+  recipientCompanyMail_ends_with: String
+  recipientCompanyMail_not_ends_with: String
+  transporterCompanyName: String
+  transporterCompanyName_not: String
+  transporterCompanyName_in: [String!]
+  transporterCompanyName_not_in: [String!]
+  transporterCompanyName_lt: String
+  transporterCompanyName_lte: String
+  transporterCompanyName_gt: String
+  transporterCompanyName_gte: String
+  transporterCompanyName_contains: String
+  transporterCompanyName_not_contains: String
+  transporterCompanyName_starts_with: String
+  transporterCompanyName_not_starts_with: String
+  transporterCompanyName_ends_with: String
+  transporterCompanyName_not_ends_with: String
+  transporterCompanySiret: String
+  transporterCompanySiret_not: String
+  transporterCompanySiret_in: [String!]
+  transporterCompanySiret_not_in: [String!]
+  transporterCompanySiret_lt: String
+  transporterCompanySiret_lte: String
+  transporterCompanySiret_gt: String
+  transporterCompanySiret_gte: String
+  transporterCompanySiret_contains: String
+  transporterCompanySiret_not_contains: String
+  transporterCompanySiret_starts_with: String
+  transporterCompanySiret_not_starts_with: String
+  transporterCompanySiret_ends_with: String
+  transporterCompanySiret_not_ends_with: String
+  transporterCompanyAddress: String
+  transporterCompanyAddress_not: String
+  transporterCompanyAddress_in: [String!]
+  transporterCompanyAddress_not_in: [String!]
+  transporterCompanyAddress_lt: String
+  transporterCompanyAddress_lte: String
+  transporterCompanyAddress_gt: String
+  transporterCompanyAddress_gte: String
+  transporterCompanyAddress_contains: String
+  transporterCompanyAddress_not_contains: String
+  transporterCompanyAddress_starts_with: String
+  transporterCompanyAddress_not_starts_with: String
+  transporterCompanyAddress_ends_with: String
+  transporterCompanyAddress_not_ends_with: String
+  transporterCompanyContact: String
+  transporterCompanyContact_not: String
+  transporterCompanyContact_in: [String!]
+  transporterCompanyContact_not_in: [String!]
+  transporterCompanyContact_lt: String
+  transporterCompanyContact_lte: String
+  transporterCompanyContact_gt: String
+  transporterCompanyContact_gte: String
+  transporterCompanyContact_contains: String
+  transporterCompanyContact_not_contains: String
+  transporterCompanyContact_starts_with: String
+  transporterCompanyContact_not_starts_with: String
+  transporterCompanyContact_ends_with: String
+  transporterCompanyContact_not_ends_with: String
+  transporterCompanyPhone: Int
+  transporterCompanyPhone_not: Int
+  transporterCompanyPhone_in: [Int!]
+  transporterCompanyPhone_not_in: [Int!]
+  transporterCompanyPhone_lt: Int
+  transporterCompanyPhone_lte: Int
+  transporterCompanyPhone_gt: Int
+  transporterCompanyPhone_gte: Int
+  transporterCompanyMail: String
+  transporterCompanyMail_not: String
+  transporterCompanyMail_in: [String!]
+  transporterCompanyMail_not_in: [String!]
+  transporterCompanyMail_lt: String
+  transporterCompanyMail_lte: String
+  transporterCompanyMail_gt: String
+  transporterCompanyMail_gte: String
+  transporterCompanyMail_contains: String
+  transporterCompanyMail_not_contains: String
+  transporterCompanyMail_starts_with: String
+  transporterCompanyMail_not_starts_with: String
+  transporterCompanyMail_ends_with: String
+  transporterCompanyMail_not_ends_with: String
+  transporterReceipt: String
+  transporterReceipt_not: String
+  transporterReceipt_in: [String!]
+  transporterReceipt_not_in: [String!]
+  transporterReceipt_lt: String
+  transporterReceipt_lte: String
+  transporterReceipt_gt: String
+  transporterReceipt_gte: String
+  transporterReceipt_contains: String
+  transporterReceipt_not_contains: String
+  transporterReceipt_starts_with: String
+  transporterReceipt_not_starts_with: String
+  transporterReceipt_ends_with: String
+  transporterReceipt_not_ends_with: String
+  transporterDepartment: String
+  transporterDepartment_not: String
+  transporterDepartment_in: [String!]
+  transporterDepartment_not_in: [String!]
+  transporterDepartment_lt: String
+  transporterDepartment_lte: String
+  transporterDepartment_gt: String
+  transporterDepartment_gte: String
+  transporterDepartment_contains: String
+  transporterDepartment_not_contains: String
+  transporterDepartment_starts_with: String
+  transporterDepartment_not_starts_with: String
+  transporterDepartment_ends_with: String
+  transporterDepartment_not_ends_with: String
+  transporterValidityLimit: DateTime
+  transporterValidityLimit_not: DateTime
+  transporterValidityLimit_in: [DateTime!]
+  transporterValidityLimit_not_in: [DateTime!]
+  transporterValidityLimit_lt: DateTime
+  transporterValidityLimit_lte: DateTime
+  transporterValidityLimit_gt: DateTime
+  transporterValidityLimit_gte: DateTime
+  transporterContact: String
+  transporterContact_not: String
+  transporterContact_in: [String!]
+  transporterContact_not_in: [String!]
+  transporterContact_lt: String
+  transporterContact_lte: String
+  transporterContact_gt: String
+  transporterContact_gte: String
+  transporterContact_contains: String
+  transporterContact_not_contains: String
+  transporterContact_starts_with: String
+  transporterContact_not_starts_with: String
+  transporterContact_ends_with: String
+  transporterContact_not_ends_with: String
+  transporterNumberPlate: String
+  transporterNumberPlate_not: String
+  transporterNumberPlate_in: [String!]
+  transporterNumberPlate_not_in: [String!]
+  transporterNumberPlate_lt: String
+  transporterNumberPlate_lte: String
+  transporterNumberPlate_gt: String
+  transporterNumberPlate_gte: String
+  transporterNumberPlate_contains: String
+  transporterNumberPlate_not_contains: String
+  transporterNumberPlate_starts_with: String
+  transporterNumberPlate_not_starts_with: String
+  transporterNumberPlate_ends_with: String
+  transporterNumberPlate_not_ends_with: String
+  wasteDetailsCode: String
+  wasteDetailsCode_not: String
+  wasteDetailsCode_in: [String!]
+  wasteDetailsCode_not_in: [String!]
+  wasteDetailsCode_lt: String
+  wasteDetailsCode_lte: String
+  wasteDetailsCode_gt: String
+  wasteDetailsCode_gte: String
+  wasteDetailsCode_contains: String
+  wasteDetailsCode_not_contains: String
+  wasteDetailsCode_starts_with: String
+  wasteDetailsCode_not_starts_with: String
+  wasteDetailsCode_ends_with: String
+  wasteDetailsCode_not_ends_with: String
+  wasteDetailsOnuCode: String
+  wasteDetailsOnuCode_not: String
+  wasteDetailsOnuCode_in: [String!]
+  wasteDetailsOnuCode_not_in: [String!]
+  wasteDetailsOnuCode_lt: String
+  wasteDetailsOnuCode_lte: String
+  wasteDetailsOnuCode_gt: String
+  wasteDetailsOnuCode_gte: String
+  wasteDetailsOnuCode_contains: String
+  wasteDetailsOnuCode_not_contains: String
+  wasteDetailsOnuCode_starts_with: String
+  wasteDetailsOnuCode_not_starts_with: String
+  wasteDetailsOnuCode_ends_with: String
+  wasteDetailsOnuCode_not_ends_with: String
+  wasteDetailsPackaging: String
+  wasteDetailsPackaging_not: String
+  wasteDetailsPackaging_in: [String!]
+  wasteDetailsPackaging_not_in: [String!]
+  wasteDetailsPackaging_lt: String
+  wasteDetailsPackaging_lte: String
+  wasteDetailsPackaging_gt: String
+  wasteDetailsPackaging_gte: String
+  wasteDetailsPackaging_contains: String
+  wasteDetailsPackaging_not_contains: String
+  wasteDetailsPackaging_starts_with: String
+  wasteDetailsPackaging_not_starts_with: String
+  wasteDetailsPackaging_ends_with: String
+  wasteDetailsPackaging_not_ends_with: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsNumberOfPackages_not: Int
+  wasteDetailsNumberOfPackages_in: [Int!]
+  wasteDetailsNumberOfPackages_not_in: [Int!]
+  wasteDetailsNumberOfPackages_lt: Int
+  wasteDetailsNumberOfPackages_lte: Int
+  wasteDetailsNumberOfPackages_gt: Int
+  wasteDetailsNumberOfPackages_gte: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantity_not: Float
+  wasteDetailsQuantity_in: [Float!]
+  wasteDetailsQuantity_not_in: [Float!]
+  wasteDetailsQuantity_lt: Float
+  wasteDetailsQuantity_lte: Float
+  wasteDetailsQuantity_gt: Float
+  wasteDetailsQuantity_gte: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsQuantityType_not: QuantityType
+  wasteDetailsQuantityType_in: [QuantityType!]
+  wasteDetailsQuantityType_not_in: [QuantityType!]
   AND: [FormWhereInput!]
   OR: [FormWhereInput!]
   NOT: [FormWhereInput!]
@@ -665,32 +875,18 @@ type Mutation {
   upsertCompany(where: CompanyWhereUniqueInput!, create: CompanyCreateInput!, update: CompanyUpdateInput!): Company!
   deleteCompany(where: CompanyWhereUniqueInput!): Company
   deleteManyCompanies(where: CompanyWhereInput): BatchPayload!
-  createEmitter(data: EmitterCreateInput!): Emitter!
-  updateManyEmitters(data: EmitterUpdateManyMutationInput!, where: EmitterWhereInput): BatchPayload!
-  deleteManyEmitters(where: EmitterWhereInput): BatchPayload!
   createForm(data: FormCreateInput!): Form!
   updateForm(data: FormUpdateInput!, where: FormWhereUniqueInput!): Form
+  updateManyForms(data: FormUpdateManyMutationInput!, where: FormWhereInput): BatchPayload!
   upsertForm(where: FormWhereUniqueInput!, create: FormCreateInput!, update: FormUpdateInput!): Form!
   deleteForm(where: FormWhereUniqueInput!): Form
   deleteManyForms(where: FormWhereInput): BatchPayload!
-  createFormCompany(data: FormCompanyCreateInput!): FormCompany!
-  updateManyFormCompanies(data: FormCompanyUpdateManyMutationInput!, where: FormCompanyWhereInput): BatchPayload!
-  deleteManyFormCompanies(where: FormCompanyWhereInput): BatchPayload!
-  createRecipient(data: RecipientCreateInput!): Recipient!
-  updateManyRecipients(data: RecipientUpdateManyMutationInput!, where: RecipientWhereInput): BatchPayload!
-  deleteManyRecipients(where: RecipientWhereInput): BatchPayload!
-  createTransporter(data: TransporterCreateInput!): Transporter!
-  updateManyTransporters(data: TransporterUpdateManyMutationInput!, where: TransporterWhereInput): BatchPayload!
-  deleteManyTransporters(where: TransporterWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   deleteUser(where: UserWhereUniqueInput!): User
   deleteManyUsers(where: UserWhereInput): BatchPayload!
-  createWasteDetails(data: WasteDetailsCreateInput!): WasteDetails!
-  updateManyWasteDetailses(data: WasteDetailsUpdateManyMutationInput!, where: WasteDetailsWhereInput): BatchPayload!
-  deleteManyWasteDetailses(where: WasteDetailsWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -719,567 +915,19 @@ type Query {
   company(where: CompanyWhereUniqueInput!): Company
   companies(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Company]!
   companiesConnection(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CompanyConnection!
-  emitters(where: EmitterWhereInput, orderBy: EmitterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Emitter]!
-  emittersConnection(where: EmitterWhereInput, orderBy: EmitterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): EmitterConnection!
   form(where: FormWhereUniqueInput!): Form
   forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form]!
   formsConnection(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FormConnection!
-  formCompanies(where: FormCompanyWhereInput, orderBy: FormCompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [FormCompany]!
-  formCompaniesConnection(where: FormCompanyWhereInput, orderBy: FormCompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FormCompanyConnection!
-  recipients(where: RecipientWhereInput, orderBy: RecipientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipient]!
-  recipientsConnection(where: RecipientWhereInput, orderBy: RecipientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RecipientConnection!
-  transporters(where: TransporterWhereInput, orderBy: TransporterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Transporter]!
-  transportersConnection(where: TransporterWhereInput, orderBy: TransporterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TransporterConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
-  wasteDetailses(where: WasteDetailsWhereInput, orderBy: WasteDetailsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WasteDetails]!
-  wasteDetailsesConnection(where: WasteDetailsWhereInput, orderBy: WasteDetailsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WasteDetailsConnection!
   node(id: ID!): Node
-}
-
-type Recipient {
-  cap: String
-  processingOperation: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-type RecipientConnection {
-  pageInfo: PageInfo!
-  edges: [RecipientEdge]!
-  aggregate: AggregateRecipient!
-}
-
-input RecipientCreateInput {
-  cap: String
-  processingOperation: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-input RecipientCreateOneInput {
-  create: RecipientCreateInput
-}
-
-type RecipientEdge {
-  node: Recipient!
-  cursor: String!
-}
-
-enum RecipientOrderByInput {
-  cap_ASC
-  cap_DESC
-  processingOperation_ASC
-  processingOperation_DESC
-  companyName_ASC
-  companyName_DESC
-  companySiret_ASC
-  companySiret_DESC
-  companyAddress_ASC
-  companyAddress_DESC
-  companyContact_ASC
-  companyContact_DESC
-  companyPhone_ASC
-  companyPhone_DESC
-  companyMail_ASC
-  companyMail_DESC
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-}
-
-type RecipientPreviousValues {
-  cap: String
-  processingOperation: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-type RecipientSubscriptionPayload {
-  mutation: MutationType!
-  node: Recipient
-  updatedFields: [String!]
-  previousValues: RecipientPreviousValues
-}
-
-input RecipientSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: RecipientWhereInput
-  AND: [RecipientSubscriptionWhereInput!]
-  OR: [RecipientSubscriptionWhereInput!]
-  NOT: [RecipientSubscriptionWhereInput!]
-}
-
-input RecipientUpdateDataInput {
-  cap: String
-  processingOperation: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-input RecipientUpdateManyMutationInput {
-  cap: String
-  processingOperation: String
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-}
-
-input RecipientUpdateOneInput {
-  create: RecipientCreateInput
-  update: RecipientUpdateDataInput
-  upsert: RecipientUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-}
-
-input RecipientUpsertNestedInput {
-  update: RecipientUpdateDataInput!
-  create: RecipientCreateInput!
-}
-
-input RecipientWhereInput {
-  cap: String
-  cap_not: String
-  cap_in: [String!]
-  cap_not_in: [String!]
-  cap_lt: String
-  cap_lte: String
-  cap_gt: String
-  cap_gte: String
-  cap_contains: String
-  cap_not_contains: String
-  cap_starts_with: String
-  cap_not_starts_with: String
-  cap_ends_with: String
-  cap_not_ends_with: String
-  processingOperation: String
-  processingOperation_not: String
-  processingOperation_in: [String!]
-  processingOperation_not_in: [String!]
-  processingOperation_lt: String
-  processingOperation_lte: String
-  processingOperation_gt: String
-  processingOperation_gte: String
-  processingOperation_contains: String
-  processingOperation_not_contains: String
-  processingOperation_starts_with: String
-  processingOperation_not_starts_with: String
-  processingOperation_ends_with: String
-  processingOperation_not_ends_with: String
-  companyName: String
-  companyName_not: String
-  companyName_in: [String!]
-  companyName_not_in: [String!]
-  companyName_lt: String
-  companyName_lte: String
-  companyName_gt: String
-  companyName_gte: String
-  companyName_contains: String
-  companyName_not_contains: String
-  companyName_starts_with: String
-  companyName_not_starts_with: String
-  companyName_ends_with: String
-  companyName_not_ends_with: String
-  companySiret: String
-  companySiret_not: String
-  companySiret_in: [String!]
-  companySiret_not_in: [String!]
-  companySiret_lt: String
-  companySiret_lte: String
-  companySiret_gt: String
-  companySiret_gte: String
-  companySiret_contains: String
-  companySiret_not_contains: String
-  companySiret_starts_with: String
-  companySiret_not_starts_with: String
-  companySiret_ends_with: String
-  companySiret_not_ends_with: String
-  companyAddress: String
-  companyAddress_not: String
-  companyAddress_in: [String!]
-  companyAddress_not_in: [String!]
-  companyAddress_lt: String
-  companyAddress_lte: String
-  companyAddress_gt: String
-  companyAddress_gte: String
-  companyAddress_contains: String
-  companyAddress_not_contains: String
-  companyAddress_starts_with: String
-  companyAddress_not_starts_with: String
-  companyAddress_ends_with: String
-  companyAddress_not_ends_with: String
-  companyContact: String
-  companyContact_not: String
-  companyContact_in: [String!]
-  companyContact_not_in: [String!]
-  companyContact_lt: String
-  companyContact_lte: String
-  companyContact_gt: String
-  companyContact_gte: String
-  companyContact_contains: String
-  companyContact_not_contains: String
-  companyContact_starts_with: String
-  companyContact_not_starts_with: String
-  companyContact_ends_with: String
-  companyContact_not_ends_with: String
-  companyPhone: Int
-  companyPhone_not: Int
-  companyPhone_in: [Int!]
-  companyPhone_not_in: [Int!]
-  companyPhone_lt: Int
-  companyPhone_lte: Int
-  companyPhone_gt: Int
-  companyPhone_gte: Int
-  companyMail: String
-  companyMail_not: String
-  companyMail_in: [String!]
-  companyMail_not_in: [String!]
-  companyMail_lt: String
-  companyMail_lte: String
-  companyMail_gt: String
-  companyMail_gte: String
-  companyMail_contains: String
-  companyMail_not_contains: String
-  companyMail_starts_with: String
-  companyMail_not_starts_with: String
-  companyMail_ends_with: String
-  companyMail_not_ends_with: String
-  AND: [RecipientWhereInput!]
-  OR: [RecipientWhereInput!]
-  NOT: [RecipientWhereInput!]
 }
 
 type Subscription {
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
-  emitter(where: EmitterSubscriptionWhereInput): EmitterSubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
-  formCompany(where: FormCompanySubscriptionWhereInput): FormCompanySubscriptionPayload
-  recipient(where: RecipientSubscriptionWhereInput): RecipientSubscriptionPayload
-  transporter(where: TransporterSubscriptionWhereInput): TransporterSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
-  wasteDetails(where: WasteDetailsSubscriptionWhereInput): WasteDetailsSubscriptionPayload
-}
-
-type Transporter {
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-  receipt: String
-  department: String
-  validityLimit: DateTime
-  contact: String
-  numberPlate: String
-}
-
-type TransporterConnection {
-  pageInfo: PageInfo!
-  edges: [TransporterEdge]!
-  aggregate: AggregateTransporter!
-}
-
-input TransporterCreateInput {
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-  receipt: String
-  department: String
-  validityLimit: DateTime
-  contact: String
-  numberPlate: String
-}
-
-input TransporterCreateOneInput {
-  create: TransporterCreateInput
-}
-
-type TransporterEdge {
-  node: Transporter!
-  cursor: String!
-}
-
-enum TransporterOrderByInput {
-  companyName_ASC
-  companyName_DESC
-  companySiret_ASC
-  companySiret_DESC
-  companyAddress_ASC
-  companyAddress_DESC
-  companyContact_ASC
-  companyContact_DESC
-  companyPhone_ASC
-  companyPhone_DESC
-  companyMail_ASC
-  companyMail_DESC
-  receipt_ASC
-  receipt_DESC
-  department_ASC
-  department_DESC
-  validityLimit_ASC
-  validityLimit_DESC
-  contact_ASC
-  contact_DESC
-  numberPlate_ASC
-  numberPlate_DESC
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-}
-
-type TransporterPreviousValues {
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-  receipt: String
-  department: String
-  validityLimit: DateTime
-  contact: String
-  numberPlate: String
-}
-
-type TransporterSubscriptionPayload {
-  mutation: MutationType!
-  node: Transporter
-  updatedFields: [String!]
-  previousValues: TransporterPreviousValues
-}
-
-input TransporterSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: TransporterWhereInput
-  AND: [TransporterSubscriptionWhereInput!]
-  OR: [TransporterSubscriptionWhereInput!]
-  NOT: [TransporterSubscriptionWhereInput!]
-}
-
-input TransporterUpdateDataInput {
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-  receipt: String
-  department: String
-  validityLimit: DateTime
-  contact: String
-  numberPlate: String
-}
-
-input TransporterUpdateManyMutationInput {
-  companyName: String
-  companySiret: String
-  companyAddress: String
-  companyContact: String
-  companyPhone: Int
-  companyMail: String
-  receipt: String
-  department: String
-  validityLimit: DateTime
-  contact: String
-  numberPlate: String
-}
-
-input TransporterUpdateOneInput {
-  create: TransporterCreateInput
-  update: TransporterUpdateDataInput
-  upsert: TransporterUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-}
-
-input TransporterUpsertNestedInput {
-  update: TransporterUpdateDataInput!
-  create: TransporterCreateInput!
-}
-
-input TransporterWhereInput {
-  companyName: String
-  companyName_not: String
-  companyName_in: [String!]
-  companyName_not_in: [String!]
-  companyName_lt: String
-  companyName_lte: String
-  companyName_gt: String
-  companyName_gte: String
-  companyName_contains: String
-  companyName_not_contains: String
-  companyName_starts_with: String
-  companyName_not_starts_with: String
-  companyName_ends_with: String
-  companyName_not_ends_with: String
-  companySiret: String
-  companySiret_not: String
-  companySiret_in: [String!]
-  companySiret_not_in: [String!]
-  companySiret_lt: String
-  companySiret_lte: String
-  companySiret_gt: String
-  companySiret_gte: String
-  companySiret_contains: String
-  companySiret_not_contains: String
-  companySiret_starts_with: String
-  companySiret_not_starts_with: String
-  companySiret_ends_with: String
-  companySiret_not_ends_with: String
-  companyAddress: String
-  companyAddress_not: String
-  companyAddress_in: [String!]
-  companyAddress_not_in: [String!]
-  companyAddress_lt: String
-  companyAddress_lte: String
-  companyAddress_gt: String
-  companyAddress_gte: String
-  companyAddress_contains: String
-  companyAddress_not_contains: String
-  companyAddress_starts_with: String
-  companyAddress_not_starts_with: String
-  companyAddress_ends_with: String
-  companyAddress_not_ends_with: String
-  companyContact: String
-  companyContact_not: String
-  companyContact_in: [String!]
-  companyContact_not_in: [String!]
-  companyContact_lt: String
-  companyContact_lte: String
-  companyContact_gt: String
-  companyContact_gte: String
-  companyContact_contains: String
-  companyContact_not_contains: String
-  companyContact_starts_with: String
-  companyContact_not_starts_with: String
-  companyContact_ends_with: String
-  companyContact_not_ends_with: String
-  companyPhone: Int
-  companyPhone_not: Int
-  companyPhone_in: [Int!]
-  companyPhone_not_in: [Int!]
-  companyPhone_lt: Int
-  companyPhone_lte: Int
-  companyPhone_gt: Int
-  companyPhone_gte: Int
-  companyMail: String
-  companyMail_not: String
-  companyMail_in: [String!]
-  companyMail_not_in: [String!]
-  companyMail_lt: String
-  companyMail_lte: String
-  companyMail_gt: String
-  companyMail_gte: String
-  companyMail_contains: String
-  companyMail_not_contains: String
-  companyMail_starts_with: String
-  companyMail_not_starts_with: String
-  companyMail_ends_with: String
-  companyMail_not_ends_with: String
-  receipt: String
-  receipt_not: String
-  receipt_in: [String!]
-  receipt_not_in: [String!]
-  receipt_lt: String
-  receipt_lte: String
-  receipt_gt: String
-  receipt_gte: String
-  receipt_contains: String
-  receipt_not_contains: String
-  receipt_starts_with: String
-  receipt_not_starts_with: String
-  receipt_ends_with: String
-  receipt_not_ends_with: String
-  department: String
-  department_not: String
-  department_in: [String!]
-  department_not_in: [String!]
-  department_lt: String
-  department_lte: String
-  department_gt: String
-  department_gte: String
-  department_contains: String
-  department_not_contains: String
-  department_starts_with: String
-  department_not_starts_with: String
-  department_ends_with: String
-  department_not_ends_with: String
-  validityLimit: DateTime
-  validityLimit_not: DateTime
-  validityLimit_in: [DateTime!]
-  validityLimit_not_in: [DateTime!]
-  validityLimit_lt: DateTime
-  validityLimit_lte: DateTime
-  validityLimit_gt: DateTime
-  validityLimit_gte: DateTime
-  contact: String
-  contact_not: String
-  contact_in: [String!]
-  contact_not_in: [String!]
-  contact_lt: String
-  contact_lte: String
-  contact_gt: String
-  contact_gte: String
-  contact_contains: String
-  contact_not_contains: String
-  contact_starts_with: String
-  contact_not_starts_with: String
-  contact_ends_with: String
-  contact_not_ends_with: String
-  numberPlate: String
-  numberPlate_not: String
-  numberPlate_in: [String!]
-  numberPlate_not_in: [String!]
-  numberPlate_lt: String
-  numberPlate_lte: String
-  numberPlate_gt: String
-  numberPlate_gte: String
-  numberPlate_contains: String
-  numberPlate_not_contains: String
-  numberPlate_starts_with: String
-  numberPlate_not_starts_with: String
-  numberPlate_ends_with: String
-  numberPlate_not_ends_with: String
-  AND: [TransporterWhereInput!]
-  OR: [TransporterWhereInput!]
-  NOT: [TransporterWhereInput!]
 }
 
 type User {
@@ -1288,7 +936,7 @@ type User {
   password: String!
   name: String
   phone: String
-  company: Company
+  company: Company!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -1304,7 +952,7 @@ input UserCreateInput {
   password: String!
   name: String
   phone: String
-  company: CompanyCreateOneInput
+  company: CompanyCreateOneInput!
 }
 
 input UserCreateOneInput {
@@ -1367,7 +1015,7 @@ input UserUpdateDataInput {
   password: String
   name: String
   phone: String
-  company: CompanyUpdateOneInput
+  company: CompanyUpdateOneRequiredInput
 }
 
 input UserUpdateInput {
@@ -1375,7 +1023,7 @@ input UserUpdateInput {
   password: String
   name: String
   phone: String
-  company: CompanyUpdateOneInput
+  company: CompanyUpdateOneRequiredInput
 }
 
 input UserUpdateManyMutationInput {
@@ -1493,185 +1141,5 @@ input UserWhereInput {
 input UserWhereUniqueInput {
   id: ID
   email: String
-}
-
-type WasteDetails {
-  code: String
-  onuCode: String
-  packaging: String
-  numberOfPackages: Int
-  quantity: Float
-  quantityType: QuantityType
-}
-
-type WasteDetailsConnection {
-  pageInfo: PageInfo!
-  edges: [WasteDetailsEdge]!
-  aggregate: AggregateWasteDetails!
-}
-
-input WasteDetailsCreateInput {
-  code: String
-  onuCode: String
-  packaging: String
-  numberOfPackages: Int
-  quantity: Float
-  quantityType: QuantityType
-}
-
-input WasteDetailsCreateOneInput {
-  create: WasteDetailsCreateInput
-}
-
-type WasteDetailsEdge {
-  node: WasteDetails!
-  cursor: String!
-}
-
-enum WasteDetailsOrderByInput {
-  code_ASC
-  code_DESC
-  onuCode_ASC
-  onuCode_DESC
-  packaging_ASC
-  packaging_DESC
-  numberOfPackages_ASC
-  numberOfPackages_DESC
-  quantity_ASC
-  quantity_DESC
-  quantityType_ASC
-  quantityType_DESC
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-}
-
-type WasteDetailsPreviousValues {
-  code: String
-  onuCode: String
-  packaging: String
-  numberOfPackages: Int
-  quantity: Float
-  quantityType: QuantityType
-}
-
-type WasteDetailsSubscriptionPayload {
-  mutation: MutationType!
-  node: WasteDetails
-  updatedFields: [String!]
-  previousValues: WasteDetailsPreviousValues
-}
-
-input WasteDetailsSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: WasteDetailsWhereInput
-  AND: [WasteDetailsSubscriptionWhereInput!]
-  OR: [WasteDetailsSubscriptionWhereInput!]
-  NOT: [WasteDetailsSubscriptionWhereInput!]
-}
-
-input WasteDetailsUpdateDataInput {
-  code: String
-  onuCode: String
-  packaging: String
-  numberOfPackages: Int
-  quantity: Float
-  quantityType: QuantityType
-}
-
-input WasteDetailsUpdateManyMutationInput {
-  code: String
-  onuCode: String
-  packaging: String
-  numberOfPackages: Int
-  quantity: Float
-  quantityType: QuantityType
-}
-
-input WasteDetailsUpdateOneInput {
-  create: WasteDetailsCreateInput
-  update: WasteDetailsUpdateDataInput
-  upsert: WasteDetailsUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-}
-
-input WasteDetailsUpsertNestedInput {
-  update: WasteDetailsUpdateDataInput!
-  create: WasteDetailsCreateInput!
-}
-
-input WasteDetailsWhereInput {
-  code: String
-  code_not: String
-  code_in: [String!]
-  code_not_in: [String!]
-  code_lt: String
-  code_lte: String
-  code_gt: String
-  code_gte: String
-  code_contains: String
-  code_not_contains: String
-  code_starts_with: String
-  code_not_starts_with: String
-  code_ends_with: String
-  code_not_ends_with: String
-  onuCode: String
-  onuCode_not: String
-  onuCode_in: [String!]
-  onuCode_not_in: [String!]
-  onuCode_lt: String
-  onuCode_lte: String
-  onuCode_gt: String
-  onuCode_gte: String
-  onuCode_contains: String
-  onuCode_not_contains: String
-  onuCode_starts_with: String
-  onuCode_not_starts_with: String
-  onuCode_ends_with: String
-  onuCode_not_ends_with: String
-  packaging: String
-  packaging_not: String
-  packaging_in: [String!]
-  packaging_not_in: [String!]
-  packaging_lt: String
-  packaging_lte: String
-  packaging_gt: String
-  packaging_gte: String
-  packaging_contains: String
-  packaging_not_contains: String
-  packaging_starts_with: String
-  packaging_not_starts_with: String
-  packaging_ends_with: String
-  packaging_not_ends_with: String
-  numberOfPackages: Int
-  numberOfPackages_not: Int
-  numberOfPackages_in: [Int!]
-  numberOfPackages_not_in: [Int!]
-  numberOfPackages_lt: Int
-  numberOfPackages_lte: Int
-  numberOfPackages_gt: Int
-  numberOfPackages_gte: Int
-  quantity: Float
-  quantity_not: Float
-  quantity_in: [Float!]
-  quantity_not_in: [Float!]
-  quantity_lt: Float
-  quantity_lte: Float
-  quantity_gt: Float
-  quantity_gte: Float
-  quantityType: QuantityType
-  quantityType_not: QuantityType
-  quantityType_in: [QuantityType!]
-  quantityType_not_in: [QuantityType!]
-  AND: [WasteDetailsWhereInput!]
-  OR: [WasteDetailsWhereInput!]
-  NOT: [WasteDetailsWhereInput!]
 }
 `

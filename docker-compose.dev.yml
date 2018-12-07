@@ -38,6 +38,9 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
+    command: npx nodemon -L --watch src --exec npm start
+    volumes:
+      - ./back/src:/usr/src/app/src
     environment:
       NODE_ENV: production
     labels:

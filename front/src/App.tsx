@@ -10,6 +10,7 @@ import Login from "./login/Login";
 import Signup from "./login/Signup";
 import ChangePassword from "./login/ChangePassword";
 import client from "./graphql-client";
+import PrivateRoute from "./login/PrivateRoute";
 
 class App extends Component {
   render() {
@@ -21,8 +22,8 @@ class App extends Component {
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
             <Route exact path="/password" component={ChangePassword} />
-            <Route path="/form" component={FormIntro} />
-            <Route path="/dashboard" component={Dashboard} />
+            <PrivateRoute path="/form" component={FormIntro} />
+            <PrivateRoute path="/dashboard" component={Dashboard} />
           </div>
         </Router>
       </ApolloProvider>

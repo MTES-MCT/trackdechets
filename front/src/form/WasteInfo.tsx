@@ -93,11 +93,11 @@ export default function WasteInfo() {
         <fieldset>
           <legend>Cette quantité est</legend>
           <label className="label-inline">
-            <input type="radio" name="wasteDetails.quantityType" value="1" />
+            <input type="radio" name="wasteDetails.quantityType" value="REAL" />
             Réelle
           </label>
           <label className="label-inline">
-            <input type="radio" name="wasteDetails.quantityType" value="0" />
+            <input type="radio" name="wasteDetails.quantityType" value="ESTIMATED" />
             Estimée
           </label>
         </fieldset>

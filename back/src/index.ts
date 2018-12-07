@@ -24,10 +24,10 @@ const server = new GraphQLServer({
   context: request => ({
     ...request,
     prisma
-  })
+  }),
 });
 
 server.express.get("/ping", (_, res) => res.send("Pong!"));
 server.start({ port }, () =>
-  console.log(`Server is running on localhost:${port}`)
+  console.log(`Server is running on port ${port}`)
 );
