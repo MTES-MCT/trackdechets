@@ -8,7 +8,6 @@ executors:
 
 jobs:
   build-docker-front:
-    working_directory: /front
     executor: node
     steps:
       - checkout
@@ -27,7 +26,6 @@ jobs:
           fi
 
   build-docker-back:
-    working_directory: /back
     executor: node
     steps:
       - checkout
