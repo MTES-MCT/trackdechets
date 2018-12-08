@@ -7,6 +7,11 @@ export default function Header() {
     <header className="navbar" role="navigation">
       <div className="navbar__container">
         <a className="navbar__home" href="index.html">
+          <img
+            className="navbar__logo"
+            src="/marianne.svg"
+            alt="trackdechets.data.gouv.fr"
+          />
           Track Déchets
         </a>
 
