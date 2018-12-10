@@ -60,7 +60,8 @@ type Form {
   # Waste details fields
   wasteDetailsCode: String
   wasteDetailsOnuCode: String
-  wasteDetailsPackaging: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType

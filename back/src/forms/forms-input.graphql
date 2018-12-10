@@ -39,7 +39,8 @@ input TransporterInput {
 input WasteDetailsInput {
   code: String
   onuCode: String
-  packaging: String
+  packagings: [Packagings]
+  otherPackaging: String
   numberOfPackages: Int
   quantity: Float
   quantityType: QuantityType

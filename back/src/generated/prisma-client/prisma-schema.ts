@@ -160,7 +160,8 @@ type Form {
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsOnuCode: String
-  wasteDetailsPackaging: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
@@ -203,7 +204,8 @@ input FormCreateInput {
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsOnuCode: String
-  wasteDetailsPackaging: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
@@ -279,8 +281,10 @@ enum FormOrderByInput {
   wasteDetailsCode_DESC
   wasteDetailsOnuCode_ASC
   wasteDetailsOnuCode_DESC
-  wasteDetailsPackaging_ASC
-  wasteDetailsPackaging_DESC
+  wasteDetailsPackagings_ASC
+  wasteDetailsPackagings_DESC
+  wasteDetailsOtherPackaging_ASC
+  wasteDetailsOtherPackaging_DESC
   wasteDetailsNumberOfPackages_ASC
   wasteDetailsNumberOfPackages_DESC
   wasteDetailsQuantity_ASC
@@ -322,7 +326,8 @@ type FormPreviousValues {
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsOnuCode: String
-  wasteDetailsPackaging: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
@@ -377,7 +382,8 @@ input FormUpdateInput {
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsOnuCode: String
-  wasteDetailsPackaging: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
@@ -413,7 +419,8 @@ input FormUpdateManyMutationInput {
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsOnuCode: String
-  wasteDetailsPackaging: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
@@ -823,20 +830,20 @@ input FormWhereInput {
   wasteDetailsOnuCode_not_starts_with: String
   wasteDetailsOnuCode_ends_with: String
   wasteDetailsOnuCode_not_ends_with: String
-  wasteDetailsPackaging: String
-  wasteDetailsPackaging_not: String
-  wasteDetailsPackaging_in: [String!]
-  wasteDetailsPackaging_not_in: [String!]
-  wasteDetailsPackaging_lt: String
-  wasteDetailsPackaging_lte: String
-  wasteDetailsPackaging_gt: String
-  wasteDetailsPackaging_gte: String
-  wasteDetailsPackaging_contains: String
-  wasteDetailsPackaging_not_contains: String
-  wasteDetailsPackaging_starts_with: String
-  wasteDetailsPackaging_not_starts_with: String
-  wasteDetailsPackaging_ends_with: String
-  wasteDetailsPackaging_not_ends_with: String
+  wasteDetailsOtherPackaging: String
+  wasteDetailsOtherPackaging_not: String
+  wasteDetailsOtherPackaging_in: [String!]
+  wasteDetailsOtherPackaging_not_in: [String!]
+  wasteDetailsOtherPackaging_lt: String
+  wasteDetailsOtherPackaging_lte: String
+  wasteDetailsOtherPackaging_gt: String
+  wasteDetailsOtherPackaging_gte: String
+  wasteDetailsOtherPackaging_contains: String
+  wasteDetailsOtherPackaging_not_contains: String
+  wasteDetailsOtherPackaging_starts_with: String
+  wasteDetailsOtherPackaging_not_starts_with: String
+  wasteDetailsOtherPackaging_ends_with: String
+  wasteDetailsOtherPackaging_not_ends_with: String
   wasteDetailsNumberOfPackages: Int
   wasteDetailsNumberOfPackages_not: Int
   wasteDetailsNumberOfPackages_in: [Int!]
@@ -865,6 +872,8 @@ input FormWhereInput {
 input FormWhereUniqueInput {
   id: ID
 }
+
+scalar Json
 
 scalar Long
 

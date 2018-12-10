@@ -67,10 +67,19 @@ enum QuantityType {
   ESTIMATED
 }
 
+enum Packagings {
+  FUT
+  GRV
+  CITERNE
+  BENNE
+  AUTRE
+}
+
 type WasteDetails {
   code: String
   onuCode: String
-  packaging: String
+  packagings: [Packagings]
+  otherPackaging: String
   numberOfPackages: Int
   quantity: Float
   quantityType: QuantityType
