@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./Header";
 import "./Home.scss";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -10,7 +11,7 @@ export default function Home() {
       <div className="hero">
         <div className="hero__container">
           <h1 className="hero__white-background">
-            Pour gérer la traçabilité de vos déchets en toute sérénité
+            Gérez la traçabilité de vos déchets en toute sérénité
           </h1>
           <p className="hero__white-background">
             Trackdéchets a vocation à simplifier la gestion de vos déchets
@@ -18,10 +19,12 @@ export default function Home() {
             informations regroupées sur un seul outil gratuit
           </p>
           <p>
-            <button className="button large warning">
-              Je teste Trackdéchets
-            </button>
-            <button className="button large">Je me connecte</button>
+            <Link to="/signup" className="button large warning">
+              Tester Trackdéchets
+            </Link>
+            <Link to="/login" className="button large">
+              Se connecter
+            </Link>
           </p>
         </div>
       </div>
