@@ -5,6 +5,19 @@ export const GET_SLIPS = gql`
     forms {
       id
       createdAt
+      emitter {
+        company {
+          name
+        }
+      }
+      recipient {
+        company {
+          name
+        }
+      }
+      wasteDetails {
+        code
+      }
     }
   }
 `;
