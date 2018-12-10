@@ -4,7 +4,11 @@ export function flattenInoutObjectForDb(
   dbObject = {}
 ) {
   Object.keys(input).forEach(key => {
-    if (typeof input[key] === "object") {
+    if (
+      input[key] &&
+      !Array.isArray(input[key]) &&
+      typeof input[key] === "object"
+    ) {
       return flattenInoutObjectForDb(
         input[key],
         [...previousKeys, key],

@@ -5,6 +5,7 @@ import { prisma } from "./generated/prisma-client";
 import { merge } from "./utils";
 
 const port = process.env.port || 80;
+const isProd = process.env.NODE_ENV === "production";
 
 const typesArray = fileLoader(`${__dirname}/**/*.graphql`, { recursive: true });
 const typeDefs = mergeTypes(typesArray, { all: true });
@@ -24,10 +25,10 @@ const server = new GraphQLServer({
   context: request => ({
     ...request,
     prisma
-  }),
+  })
 });
 
 server.express.get("/ping", (_, res) => res.send("Pong!"));
-server.start({ port }, () =>
+server.start({ port, debug: !isProd }, () =>
   console.log(`Server is running on port ${port}`)
 );

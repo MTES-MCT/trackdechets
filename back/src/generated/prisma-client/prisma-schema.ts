@@ -137,7 +137,7 @@ type Form {
   emitterCompanySiret: String
   emitterCompanyAddress: String
   emitterCompanyContact: String
-  emitterCompanyPhone: Int
+  emitterCompanyPhone: String
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
@@ -145,13 +145,13 @@ type Form {
   recipientCompanySiret: String
   recipientCompanyAddress: String
   recipientCompanyContact: String
-  recipientCompanyPhone: Int
+  recipientCompanyPhone: String
   recipientCompanyMail: String
   transporterCompanyName: String
   transporterCompanySiret: String
   transporterCompanyAddress: String
   transporterCompanyContact: String
-  transporterCompanyPhone: Int
+  transporterCompanyPhone: String
   transporterCompanyMail: String
   transporterReceipt: String
   transporterDepartment: String
@@ -181,7 +181,7 @@ input FormCreateInput {
   emitterCompanySiret: String
   emitterCompanyAddress: String
   emitterCompanyContact: String
-  emitterCompanyPhone: Int
+  emitterCompanyPhone: String
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
@@ -189,13 +189,13 @@ input FormCreateInput {
   recipientCompanySiret: String
   recipientCompanyAddress: String
   recipientCompanyContact: String
-  recipientCompanyPhone: Int
+  recipientCompanyPhone: String
   recipientCompanyMail: String
   transporterCompanyName: String
   transporterCompanySiret: String
   transporterCompanyAddress: String
   transporterCompanyContact: String
-  transporterCompanyPhone: Int
+  transporterCompanyPhone: String
   transporterCompanyMail: String
   transporterReceipt: String
   transporterDepartment: String
@@ -303,7 +303,7 @@ type FormPreviousValues {
   emitterCompanySiret: String
   emitterCompanyAddress: String
   emitterCompanyContact: String
-  emitterCompanyPhone: Int
+  emitterCompanyPhone: String
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
@@ -311,13 +311,13 @@ type FormPreviousValues {
   recipientCompanySiret: String
   recipientCompanyAddress: String
   recipientCompanyContact: String
-  recipientCompanyPhone: Int
+  recipientCompanyPhone: String
   recipientCompanyMail: String
   transporterCompanyName: String
   transporterCompanySiret: String
   transporterCompanyAddress: String
   transporterCompanyContact: String
-  transporterCompanyPhone: Int
+  transporterCompanyPhone: String
   transporterCompanyMail: String
   transporterReceipt: String
   transporterDepartment: String
@@ -359,7 +359,7 @@ input FormUpdateInput {
   emitterCompanySiret: String
   emitterCompanyAddress: String
   emitterCompanyContact: String
-  emitterCompanyPhone: Int
+  emitterCompanyPhone: String
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
@@ -367,13 +367,13 @@ input FormUpdateInput {
   recipientCompanySiret: String
   recipientCompanyAddress: String
   recipientCompanyContact: String
-  recipientCompanyPhone: Int
+  recipientCompanyPhone: String
   recipientCompanyMail: String
   transporterCompanyName: String
   transporterCompanySiret: String
   transporterCompanyAddress: String
   transporterCompanyContact: String
-  transporterCompanyPhone: Int
+  transporterCompanyPhone: String
   transporterCompanyMail: String
   transporterReceipt: String
   transporterDepartment: String
@@ -396,7 +396,7 @@ input FormUpdateManyMutationInput {
   emitterCompanySiret: String
   emitterCompanyAddress: String
   emitterCompanyContact: String
-  emitterCompanyPhone: Int
+  emitterCompanyPhone: String
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
@@ -404,13 +404,13 @@ input FormUpdateManyMutationInput {
   recipientCompanySiret: String
   recipientCompanyAddress: String
   recipientCompanyContact: String
-  recipientCompanyPhone: Int
+  recipientCompanyPhone: String
   recipientCompanyMail: String
   transporterCompanyName: String
   transporterCompanySiret: String
   transporterCompanyAddress: String
   transporterCompanyContact: String
-  transporterCompanyPhone: Int
+  transporterCompanyPhone: String
   transporterCompanyMail: String
   transporterReceipt: String
   transporterDepartment: String
@@ -532,14 +532,20 @@ input FormWhereInput {
   emitterCompanyContact_not_starts_with: String
   emitterCompanyContact_ends_with: String
   emitterCompanyContact_not_ends_with: String
-  emitterCompanyPhone: Int
-  emitterCompanyPhone_not: Int
-  emitterCompanyPhone_in: [Int!]
-  emitterCompanyPhone_not_in: [Int!]
-  emitterCompanyPhone_lt: Int
-  emitterCompanyPhone_lte: Int
-  emitterCompanyPhone_gt: Int
-  emitterCompanyPhone_gte: Int
+  emitterCompanyPhone: String
+  emitterCompanyPhone_not: String
+  emitterCompanyPhone_in: [String!]
+  emitterCompanyPhone_not_in: [String!]
+  emitterCompanyPhone_lt: String
+  emitterCompanyPhone_lte: String
+  emitterCompanyPhone_gt: String
+  emitterCompanyPhone_gte: String
+  emitterCompanyPhone_contains: String
+  emitterCompanyPhone_not_contains: String
+  emitterCompanyPhone_starts_with: String
+  emitterCompanyPhone_not_starts_with: String
+  emitterCompanyPhone_ends_with: String
+  emitterCompanyPhone_not_ends_with: String
   emitterCompanyMail: String
   emitterCompanyMail_not: String
   emitterCompanyMail_in: [String!]
@@ -638,14 +644,20 @@ input FormWhereInput {
   recipientCompanyContact_not_starts_with: String
   recipientCompanyContact_ends_with: String
   recipientCompanyContact_not_ends_with: String
-  recipientCompanyPhone: Int
-  recipientCompanyPhone_not: Int
-  recipientCompanyPhone_in: [Int!]
-  recipientCompanyPhone_not_in: [Int!]
-  recipientCompanyPhone_lt: Int
-  recipientCompanyPhone_lte: Int
-  recipientCompanyPhone_gt: Int
-  recipientCompanyPhone_gte: Int
+  recipientCompanyPhone: String
+  recipientCompanyPhone_not: String
+  recipientCompanyPhone_in: [String!]
+  recipientCompanyPhone_not_in: [String!]
+  recipientCompanyPhone_lt: String
+  recipientCompanyPhone_lte: String
+  recipientCompanyPhone_gt: String
+  recipientCompanyPhone_gte: String
+  recipientCompanyPhone_contains: String
+  recipientCompanyPhone_not_contains: String
+  recipientCompanyPhone_starts_with: String
+  recipientCompanyPhone_not_starts_with: String
+  recipientCompanyPhone_ends_with: String
+  recipientCompanyPhone_not_ends_with: String
   recipientCompanyMail: String
   recipientCompanyMail_not: String
   recipientCompanyMail_in: [String!]
@@ -716,14 +728,20 @@ input FormWhereInput {
   transporterCompanyContact_not_starts_with: String
   transporterCompanyContact_ends_with: String
   transporterCompanyContact_not_ends_with: String
-  transporterCompanyPhone: Int
-  transporterCompanyPhone_not: Int
-  transporterCompanyPhone_in: [Int!]
-  transporterCompanyPhone_not_in: [Int!]
-  transporterCompanyPhone_lt: Int
-  transporterCompanyPhone_lte: Int
-  transporterCompanyPhone_gt: Int
-  transporterCompanyPhone_gte: Int
+  transporterCompanyPhone: String
+  transporterCompanyPhone_not: String
+  transporterCompanyPhone_in: [String!]
+  transporterCompanyPhone_not_in: [String!]
+  transporterCompanyPhone_lt: String
+  transporterCompanyPhone_lte: String
+  transporterCompanyPhone_gt: String
+  transporterCompanyPhone_gte: String
+  transporterCompanyPhone_contains: String
+  transporterCompanyPhone_not_contains: String
+  transporterCompanyPhone_starts_with: String
+  transporterCompanyPhone_not_starts_with: String
+  transporterCompanyPhone_ends_with: String
+  transporterCompanyPhone_not_ends_with: String
   transporterCompanyMail: String
   transporterCompanyMail_not: String
   transporterCompanyMail_in: [String!]

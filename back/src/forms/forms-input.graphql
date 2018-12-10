@@ -12,7 +12,7 @@ input CompanyInput {
   address: String
   contact: String
   mail: String
-  phone: Int
+  phone: String
 }
 
 input EmitterInput {

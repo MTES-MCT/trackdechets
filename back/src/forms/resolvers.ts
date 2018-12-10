@@ -38,17 +38,18 @@ export default {
     saveForm: async (parent, { formInput }, context: Context) => {
       const userId = getUserId(context);
 
-      if (formInput.id) {
+      const { id, ...formContent } = formInput;
+      if (id) {
         return context.prisma.updateForm({
-          where: { id: formInput.id },
+          where: { id },
           data: {
-            ...flattenInoutObjectForDb(formInput)
+            ...flattenInoutObjectForDb(formContent)
           }
         });
       }
 
       return context.prisma.createForm({
-        ...flattenInoutObjectForDb(formInput),
+        ...flattenInoutObjectForDb(formContent),
         owner: { connect: { id: userId } }
       });
     },

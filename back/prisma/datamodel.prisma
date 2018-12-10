@@ -29,7 +29,7 @@ type Form {
   emitterCompanySiret: String
   emitterCompanyAddress: String
   emitterCompanyContact: String
-  emitterCompanyPhone: Int
+  emitterCompanyPhone: String
   emitterCompanyMail: String
 
   # Recipient fields
@@ -40,7 +40,7 @@ type Form {
   recipientCompanySiret: String
   recipientCompanyAddress: String
   recipientCompanyContact: String
-  recipientCompanyPhone: Int
+  recipientCompanyPhone: String
   recipientCompanyMail: String
 
   # Transporter fields
@@ -48,7 +48,7 @@ type Form {
   transporterCompanySiret: String
   transporterCompanyAddress: String
   transporterCompanyContact: String
-  transporterCompanyPhone: Int
+  transporterCompanyPhone: String
   transporterCompanyMail: String
 
   transporterReceipt: String

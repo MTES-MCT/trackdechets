@@ -29,7 +29,7 @@ type FormCompany {
   siret: String
   address: String
   contact: String
-  phone: Int
+  phone: String
   mail: String
 }
 
