@@ -11,7 +11,7 @@ export default function Emitter() {
 
       <div className="form__group">
         <fieldset>
-          <legend>L'émetteur est:</legend>
+          <legend>L'émetteur est</legend>
           <label className="label-inline">
             <Field type="radio" name="emitter.type" value="PRODUCER" />
             Producteur du déchet
@@ -26,7 +26,6 @@ export default function Emitter() {
       <h4>Entreprise émettrice</h4>
       <CompanySelector name="emitter.company" />
 
-      <h4>Adresse chantier</h4>
       <label>
         <input
           type="checkbox"
@@ -35,7 +34,12 @@ export default function Emitter() {
         />
         Je souhaite ajouter une adresse de chantier ou de collecte
       </label>
-      {pickupSite && <Field component="textarea" name="emitter.pickupSite" />}
+      {pickupSite && (
+        <React.Fragment>
+          <h4>Adresse chantier</h4>
+          <Field component="textarea" name="emitter.pickupSite" />
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 }

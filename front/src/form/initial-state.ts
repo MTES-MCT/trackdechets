@@ -8,7 +8,7 @@ export default {
       address: "",
       contact: "",
       mail: "",
-      phone: 0
+      phone: ""
     }
   },
   recipient: {
@@ -20,7 +20,7 @@ export default {
       address: "",
       contact: "",
       mail: "",
-      phone: 0
+      phone: ""
     }
   },
   transporter: {
@@ -35,15 +35,16 @@ export default {
       address: "",
       contact: "",
       mail: "",
-      phone: 0
+      phone: ""
     }
   },
   wasteDetails: {
     code: "",
     onuCode: "",
-    packaging: "",
-    numberOfPackages: 1,
-    quantity: 0.0,
+    packagings: [],
+    otherPackaging: "",
+    numberOfPackages: "",
+    quantity: "",
     quantityType: "ESTIMATED"
   }
 };

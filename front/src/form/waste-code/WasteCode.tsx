@@ -1,4 +1,4 @@
-import { connect, ErrorMessage, FieldProps, getIn } from "formik";
+import { ErrorMessage, FieldProps, getIn } from "formik";
 import React, { useEffect, useState } from "react";
 import WasteCodeLookup from "./nomenclature-dechets.json";
 import formatWasteCodeEffect from "./format-waste-code.effect";

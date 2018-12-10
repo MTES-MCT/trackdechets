@@ -150,17 +150,17 @@ export default connect<IProps>(function CompanySelector(props) {
 
       <div className="form__group">
         <label>
-          Personne à contacter:
-          <Field type="text" name={`${props.name}.contact`} />
+          Personne à contacter
+          <Field type="text" name={`${props.name}.contact`} placeholder="NOM Prénom" />
         </label>
 
         <label>
-          Téléphone ou Fax:
-          <Field type="number" name={`${props.name}.phone`} />
+          Téléphone ou Fax
+          <Field type="number" name={`${props.name}.phone`} placeholder="Numéro" />
         </label>
 
         <label>
-          Mail:
+          Mail
           <Field type="email" name={`${props.name}.mail`} />
         </label>
       </div>

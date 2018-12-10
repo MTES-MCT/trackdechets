@@ -1,84 +1,74 @@
 import React, { useState } from "react";
 import WasteCode from "./waste-code/WasteCode";
-import { Field } from "formik";
+import { Field, FieldArray, connect } from "formik";
 import { wasteCodeValidator } from "./waste-code/waste-code.validator";
 
-export default function WasteInfo() {
-  const [isChecked, setIsChecked] = useState(false);
+const packagings = [
+  { value: "benne", label: "Benne" },
+  { value: "citerne", label: "Citerne" },
+  { value: "grv", label: "GRV" },
+  { value: "fut", label: "Fût" },
+  { value: "autre", label: "Autre (à préciser)" }
+];
+
+type Values = {
+  wasteDetails: { code: string; packagings: string[] };
+};
+export default connect<{}, Values>(function WasteInfo(props) {
+  const values = props.formik.values;
 
   return (
     <React.Fragment>
       <h4>Description du déchet</h4>
       <div className="form__group">
-        <Field component={WasteCode} name="wasteDetails.code" validate={wasteCodeValidator} />
-      </div>
-
-      <div className="form__group">
-        <label>
-          Code ADR:
-          <input type="text" />
-        </label>
+        <Field
+          component={WasteCode}
+          name="wasteDetails.code"
+          validate={wasteCodeValidator}
+        />
       </div>
 
       <h4>Conditionnement</h4>
       <div className="form__group">
-        <fieldset>
-          <legend>Conditionnement du déchet:</legend>
-          <label className="label-inline">
-            <Field
-              type="checkbox"
-              name="wasteDetails.packaging[0]"
-              value="benne"
-            />
-            Benne
-          </label>
-          <br />
-          <label className="label-inline">
-            <Field
-              type="checkbox"
-              name="wasteDetails.packaging[1]"
-              value="citerne"
-            />
-            Citerne
-          </label>
-          <br />
-          <label className="label-inline">
-            <Field
-              type="checkbox"
-              name="wasteDetails.packaging[2]"
-              value="GRV"
-            />
-            GRV
-          </label>
-          <br />
-          <label htmlFor="checkbox-ananas" className="label-inline">
-            <Field
-              type="checkbox"
-              name="wasteDetails.packaging[3]"
-              value="fût"
-            />
-            Fût
-          </label>
-          <br />
-          <label className="label-inline">
-            <Field
-              type="checkbox"
-              name="wasteDetails.packaging[4]"
-              value="other"
-              onChange={() => setIsChecked(!isChecked)}
-            />
-            Autre (à préciser)
-          </label>
-        </fieldset>
+        <FieldArray
+          name="wasteDetails.packagings"
+          render={arrayHelpers => (
+            <fieldset>
+              {packagings.map(p => (
+                <label className="label-inline" key={p.value}>
+                  <input
+                    type="checkbox"
+                    name="wasteDetails.packagings"
+                    value={p.value}
+                    checked={
+                      values.wasteDetails.packagings.indexOf(p.value) > -1
+                    }
+                    onChange={e => {
+                      if (e.target.checked) arrayHelpers.push(p.value);
+                      else {
+                        const idx = values.wasteDetails.packagings.indexOf(
+                          p.value
+                        );
+                        arrayHelpers.remove(idx);
+                      }
+                    }}
+                  />
+                  {p.label}
+                  <br />
+                </label>
+              ))}
+            </fieldset>
+          )}
+        />
 
-        {isChecked && (
+        {values.wasteDetails.packagings.indexOf("autre") > -1 && (
           <label>
-            <input type="text" />
+            <Field name="wasteDetails.otherPackaging" type="text" placeholder="Détail de l'autre conditionnement" />
           </label>
         )}
 
         <label>
-          Nombre de colis:
+          Nombre de colis
           <Field type="number" name="wasteDetails.numberOfPackages" />
         </label>
       </div>
@@ -86,8 +76,13 @@ export default function WasteInfo() {
       <h4>Quantité</h4>
       <div className="form__group">
         <label>
-          Quantité (en tonnes):
-          <Field type="number" step="0.001" name="wasteDetails.quantity" />
+          Quantité
+          <Field
+            type="number"
+            step="0.001"
+            name="wasteDetails.quantity"
+            placeholder="En tonnes"
+          />
         </label>
 
         <fieldset>
@@ -97,11 +92,25 @@ export default function WasteInfo() {
             Réelle
           </label>
           <label className="label-inline">
-            <input type="radio" name="wasteDetails.quantityType" value="ESTIMATED" />
+            <input
+              type="radio"
+              name="wasteDetails.quantityType"
+              value="ESTIMATED"
+            />
             Estimée
           </label>
         </fieldset>
       </div>
+      {values.wasteDetails.code.includes("*") && (
+        <div className="form__group">
+          <div className="form__group">
+            <label>
+              Code ADR:
+              <input type="text" />
+            </label>
+          </div>
+        </div>
+      )}
     </React.Fragment>
   );
-}
+});
