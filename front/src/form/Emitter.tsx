@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field } from "formik";
+import RadioButton from "./radio-button/RadioButton";
 
 export default function Emitter() {
   const [pickupSite, setPickupSite] = useState(false);
@@ -12,14 +13,18 @@ export default function Emitter() {
       <div className="form__group">
         <fieldset>
           <legend>L'émetteur est</legend>
-          <label className="label-inline">
-            <Field type="radio" name="emitter.type" value="PRODUCER" />
-            Producteur du déchet
-          </label>
-          <label className="label-inline">
-            <Field type="radio" name="emitter.type" value="OTHER" />
-            Autre détenteur
-          </label>
+          <Field
+            name="emitter.type"
+            id="PRODUCER"
+            label="Producteur du déchet"
+            component={RadioButton}
+          />
+          <Field
+            name="emitter.type"
+            id="OTHER"
+            label="Autre détenteur"
+            component={RadioButton}
+          />
         </fieldset>
       </div>
 

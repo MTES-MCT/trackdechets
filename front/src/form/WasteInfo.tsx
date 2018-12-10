@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import WasteCode from "./waste-code/WasteCode";
 import { Field, FieldArray, connect } from "formik";
 import { wasteCodeValidator } from "./waste-code/waste-code.validator";
+import RadioButton from "./radio-button/RadioButton";
 
 const packagings = [
-  { value: "benne", label: "Benne" },
-  { value: "citerne", label: "Citerne" },
-  { value: "grv", label: "GRV" },
-  { value: "fut", label: "Fût" },
-  { value: "autre", label: "Autre (à préciser)" }
+  { value: "BENNE", label: "Benne" },
+  { value: "CITERNE", label: "Citerne" },
+  { value: "GRV", label: "GRV" },
+  { value: "FUT", label: "Fût" },
+  { value: "AUTRE", label: "Autre (à préciser)" }
 ];
 
 type Values = {
@@ -63,7 +64,11 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
         {values.wasteDetails.packagings.indexOf("autre") > -1 && (
           <label>
-            <Field name="wasteDetails.otherPackaging" type="text" placeholder="Détail de l'autre conditionnement" />
+            <Field
+              name="wasteDetails.otherPackaging"
+              type="text"
+              placeholder="Détail de l'autre conditionnement"
+            />
           </label>
         )}
 
@@ -87,18 +92,18 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
         <fieldset>
           <legend>Cette quantité est</legend>
-          <label className="label-inline">
-            <input type="radio" name="wasteDetails.quantityType" value="REAL" />
-            Réelle
-          </label>
-          <label className="label-inline">
-            <input
-              type="radio"
-              name="wasteDetails.quantityType"
-              value="ESTIMATED"
-            />
-            Estimée
-          </label>
+          <Field
+            name="wasteDetails.quantityType"
+            id="REAL"
+            label="Réelle"
+            component={RadioButton}
+          />
+          <Field
+            name="wasteDetails.quantityType"
+            id="ESTIMATED"
+            label="Estimée"
+            component={RadioButton}
+          />
         </fieldset>
       </div>
       {values.wasteDetails.code.includes("*") && (
