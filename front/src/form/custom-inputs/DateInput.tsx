@@ -1,5 +1,6 @@
 import React, { InputHTMLAttributes } from "react";
 import { FieldProps } from "formik";
+import { DateTime } from "luxon";
 
 export default function DateInput({
   field: { name, value, onChange, onBlur },
@@ -12,7 +13,7 @@ export default function DateInput({
       <input
         name={name}
         type="date"
-        value={!value ? "" : value}
+        value={!value ? "" : DateTime.fromISO(value).toISODate()}
         onChange={onChange}
         onBlur={onBlur}
         {...props}
