@@ -62,7 +62,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
           )}
         />
 
-        {values.wasteDetails.packagings.indexOf("autre") > -1 && (
+        {values.wasteDetails.packagings.indexOf("AUTRE") > -1 && (
           <label>
             <Field
               name="wasteDetails.otherPackaging"
