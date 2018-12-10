@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field } from "formik";
-import RadioButton from "./radio-button/RadioButton";
+import RadioButton from "./custom-inputs/RadioButton";
 
 export default function Emitter() {
   const [pickupSite, setPickupSite] = useState(false);

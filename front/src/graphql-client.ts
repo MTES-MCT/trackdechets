@@ -2,6 +2,8 @@ import { ApolloClient } from "apollo-client";
 import { createHttpLink } from "apollo-link-http";
 import { setContext } from "apollo-link-context";
 import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloLink } from "apollo-link";
+import { omitDeep } from "./utils/omit";
 
 const httpLink = createHttpLink({
   uri: "http://api-td.local"
@@ -17,7 +19,20 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const cleanTypenameLink = new ApolloLink((operation, forward) => {
+  if (!forward) {
+    console.log('ici ?')
+    return null;
+  }
+  if (operation.variables) {
+    operation.variables = omitDeep(operation.variables, "__typename");
+  }
+  return forward(operation).map(data => {
+    return data;
+  });
+});
+
 export default new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: ApolloLink.from([cleanTypenameLink, authLink, httpLink]),
   cache: new InMemoryCache()
 });

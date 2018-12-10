@@ -26,7 +26,7 @@ export default {
   transporter: {
     receipt: "",
     department: "",
-    validityLimit: "",
+    validityLimit: null,
     contact: "",
     numberPlate: "",
     company: {
@@ -43,8 +43,8 @@ export default {
     onuCode: "",
     packagings: [],
     otherPackaging: "",
-    numberOfPackages: "",
-    quantity: "",
+    numberOfPackages: null,
+    quantity: null,
     quantityType: "ESTIMATED"
   }
 };

@@ -1,5 +1,5 @@
 import { FieldProps } from "formik";
-import React, { useState } from "react";
+import React from "react";
 import Elimination from "./operations-elimination.json";
 import Valorisation from "./operations-valorisation.json";
 import "./ProcessingOperation.scss";
@@ -8,10 +8,10 @@ const Operations: { code: string; description: string }[] = Elimination.concat(
   Valorisation
 );
 
-export default function ProcessingOperation(props: FieldProps) {
-  const [operation, setOperation] = useState("");
-
-  const operationDetail = Operations.find(o => o.code === operation);
+export default function ProcessingOperation({
+  field: { value, name, onChange }
+}: FieldProps) {
+  const operationDetail = Operations.find(o => o.code === value);
 
   return (
     <div className="ProcessingOperation">
@@ -28,11 +28,9 @@ export default function ProcessingOperation(props: FieldProps) {
       <label>Opération de traitement prévue:</label>
       <select
         id="select"
-        name={props.field.name}
-        onChange={e => {
-          setOperation(e.target.value);
-          props.form.handleChange(e);
-        }}
+        name={name}
+        value={value}
+        onChange={onChange}
       >
         <option>Choisissez...</option>
         {Operations.map(o => (

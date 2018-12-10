@@ -38,7 +38,8 @@ export const GET_FORM = gql`
       wasteDetails {
         code
         onuCode
-        packaging
+        packagings
+        otherPackaging
         numberOfPackages
         quantity
         quantityType

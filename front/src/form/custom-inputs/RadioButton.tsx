@@ -1,12 +1,12 @@
-import React from "react";
+import React, { InputHTMLAttributes } from "react";
 import { FieldProps } from "formik";
 
 export default function RadioButton({
   field: { name, value, onChange, onBlur },
   id,
   label,
-  form
-}: FieldProps & { id: string; label: string }) {
+  ...props
+}: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="label-inline">
       <input
@@ -16,6 +16,7 @@ export default function RadioButton({
         checked={id === value}
         onChange={onChange}
         onBlur={onBlur}
+        {...props}
       />
       {label}
     </label>

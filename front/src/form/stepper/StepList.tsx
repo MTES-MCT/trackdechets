@@ -53,7 +53,11 @@ export default withRouter(function StepList(
         ))}
       </ul>
       <div className="step-content">
-        <Query query={GET_FORM} variables={{ formId: props.formId }}>
+        <Query
+          query={GET_FORM}
+          variables={{ formId: props.formId }}
+          fetchPolicy="network-only"
+        >
           {({ loading, error, data }) => {
             if (loading) return <p>Chargement...</p>;
             if (error) return <p>Erreur :(</p>;
@@ -68,7 +72,7 @@ export default withRouter(function StepList(
                     enableReinitialize={false}
                     onSubmit={(values, formikActions: FormikActions<any>) => {
                       saveForm({ variables: { formInput: values } })
-                        .then(_ => props.history.push("/dashboard"))
+                        .then(_ => props.history.push("/dashboard/slips"))
                         .catch(_ => formikActions.setSubmitting(false));
                     }}
                     render={({ handleSubmit }) => (

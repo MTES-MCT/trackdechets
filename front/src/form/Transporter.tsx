@@ -1,6 +1,7 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field } from "formik";
+import DateInput from "./custom-inputs/DateInput";
 
 export default function Transporter() {
   return (
@@ -12,27 +13,27 @@ export default function Transporter() {
       <div className="form__group">
         <label>
           Numéro de récépissé:
-          <Field type="text" name="transporter.receipt"/>
+          <Field type="text" name="transporter.receipt" />
         </label>
 
         <label>
-         Département:
-          <Field type="text" name="transporter.department" />
+          Département:
+          <Field type="text" name="transporter.department" placeholder="Ex: 83" />
         </label>
 
         <label>
           Limite de validité
-          <Field type="date" name="transporter.validityLimit" />
+          <Field component={DateInput} name="transporter.validityLimit" />
         </label>
 
         <label>
           Personne à contacter:
-          <Field type="text" name="transporter.contact" />
+          <Field type="text" name="transporter.contact" placeholder="NOM Prénom" />
         </label>
 
         <label>
           Immatriculation:
-          <Field type="text" name="transporter.numberPlate" />
+          <Field type="text" name="transporter.numberPlate" placeholder="Plaque d'immatriculation du véhicule" />
         </label>
       </div>
     </React.Fragment>

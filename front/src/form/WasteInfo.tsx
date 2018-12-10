@@ -1,22 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import WasteCode from "./waste-code/WasteCode";
 import { Field, FieldArray, connect } from "formik";
 import { wasteCodeValidator } from "./waste-code/waste-code.validator";
-import RadioButton from "./radio-button/RadioButton";
-
-const packagings = [
-  { value: "BENNE", label: "Benne" },
-  { value: "CITERNE", label: "Citerne" },
-  { value: "GRV", label: "GRV" },
-  { value: "FUT", label: "Fût" },
-  { value: "AUTRE", label: "Autre (à préciser)" }
-];
+import RadioButton from "./custom-inputs/RadioButton";
+import NumberInput from "./custom-inputs/NumberInput";
+import Packagings from "./packagings/Packagings";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
 };
 export default connect<{}, Values>(function WasteInfo(props) {
   const values = props.formik.values;
+
+  if (!values.wasteDetails.packagings) {
+    values.wasteDetails.packagings = [];
+  }
 
   return (
     <React.Fragment>
@@ -31,36 +29,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
       <h4>Conditionnement</h4>
       <div className="form__group">
-        <FieldArray
-          name="wasteDetails.packagings"
-          render={arrayHelpers => (
-            <fieldset>
-              {packagings.map(p => (
-                <label className="label-inline" key={p.value}>
-                  <input
-                    type="checkbox"
-                    name="wasteDetails.packagings"
-                    value={p.value}
-                    checked={
-                      values.wasteDetails.packagings.indexOf(p.value) > -1
-                    }
-                    onChange={e => {
-                      if (e.target.checked) arrayHelpers.push(p.value);
-                      else {
-                        const idx = values.wasteDetails.packagings.indexOf(
-                          p.value
-                        );
-                        arrayHelpers.remove(idx);
-                      }
-                    }}
-                  />
-                  {p.label}
-                  <br />
-                </label>
-              ))}
-            </fieldset>
-          )}
-        />
+        <Field name="wasteDetails.packagings" component={Packagings} />
 
         {values.wasteDetails.packagings.indexOf("AUTRE") > -1 && (
           <label>
@@ -72,23 +41,22 @@ export default connect<{}, Values>(function WasteInfo(props) {
           </label>
         )}
 
-        <label>
-          Nombre de colis
-          <Field type="number" name="wasteDetails.numberOfPackages" />
-        </label>
+        <Field
+          component={NumberInput}
+          name="wasteDetails.numberOfPackages"
+          label="Nombre de colis"
+        />
       </div>
 
       <h4>Quantité</h4>
       <div className="form__group">
-        <label>
-          Quantité
-          <Field
-            type="number"
-            step="0.001"
-            name="wasteDetails.quantity"
-            placeholder="En tonnes"
-          />
-        </label>
+        <Field
+          component={NumberInput}
+          name="wasteDetails.quantity"
+          label="Quantitié"
+          placeholder="En tonnes"
+          step="0.001"
+        />
 
         <fieldset>
           <legend>Cette quantité est</legend>
