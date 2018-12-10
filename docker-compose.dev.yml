@@ -42,7 +42,7 @@ services:
     volumes:
       - ./back/src:/usr/src/app/src
     environment:
-      NODE_ENV: production
+      NODE_ENV: dev
     labels:
       - "traefik.frontend.rule=Host:$API_HOST"
 
@@ -52,7 +52,7 @@ services:
       context: ./front
       dockerfile: Dockerfile
     environment:
-      NODE_ENV: production
+      NODE_ENV: dev
     labels:
       - "traefik.frontend.rule=Host:$UI_HOST"
 
