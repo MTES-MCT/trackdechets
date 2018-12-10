@@ -12,7 +12,7 @@ export default function Header() {
             src="/marianne.svg"
             alt="trackdechets.data.gouv.fr"
           />
-          Track Déchets
+          Trackdéchets
         </a>
 
         <nav>
