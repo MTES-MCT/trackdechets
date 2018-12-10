@@ -43,10 +43,28 @@ jobs:
             docker push betagouv/trackdechets-api:latest
           fi
 
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - run:
+          name: Deploy Over SSH
+          command: |
+            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-api:latest"
+            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-ui:latest"
+            ssh $SSH_USER@$SSH_HOST "cd /srv/trackdechets/ ; docker-compose up --force-recreate -d td-api td-ui"
+
 
 workflows:
   build_deploy:
     jobs:
       - build-docker-front
       - build-docker-back
+      - deploy:
+          requires:
+            - build-docker-front
+            - build-docker-back
+          filters:
+            branches:
+              only: master
 
