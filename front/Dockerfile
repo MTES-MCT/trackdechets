@@ -3,6 +3,8 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . ./
+ARG REACT_APP_API_ENDPOINT
+ENV REACT_APP_API_ENDPOINT ${REACT_APP_API_ENDPOINT}
 RUN npm run build
 
 FROM nginx:1.15-alpine

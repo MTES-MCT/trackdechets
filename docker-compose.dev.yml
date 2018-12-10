@@ -52,7 +52,7 @@ services:
       context: ./front
       dockerfile: Dockerfile
     environment:
-      NODE_ENV: dev
+      REACT_APP_API_ENDPOINT: $API_HOST
     labels:
       - "traefik.frontend.rule=Host:$UI_HOST"
 

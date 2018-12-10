@@ -6,7 +6,7 @@ import { ApolloLink } from "apollo-link";
 import { omitDeep } from "./utils/omit";
 
 const httpLink = createHttpLink({
-  uri: "http://api-td.local"
+  uri: `http://${process.env.REACT_APP_API_ENDPOINT}`
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -21,7 +21,6 @@ const authLink = setContext((_, { headers }) => {
 
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
   if (!forward) {
-    console.log('ici ?')
     return null;
   }
   if (operation.variables) {
