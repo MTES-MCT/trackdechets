@@ -34,22 +34,14 @@ services:
       - postgres:/var/lib/postgresql/data
 
   td-api:
-    image: td-api
-    build:
-      context: ./back
-      dockerfile: Dockerfile
+    image: betagouv/trackdechets-api:latest
     environment:
       NODE_ENV: production
     labels:
       - "traefik.frontend.rule=Host:$API_HOST"
 
   td-ui:
-    image: td-ui
-    build:
-      context: ./front
-      dockerfile: Dockerfile
-    environment:
-      REACT_APP_API_ENDPOINT: $API_HOST
+    image: betagouv/trackdechets-ui:latest
     labels:
       - "traefik.frontend.rule=Host:$UI_HOST"
 
