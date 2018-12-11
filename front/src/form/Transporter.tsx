@@ -12,12 +12,12 @@ export default function Transporter() {
       <h4>Autorisations</h4>
       <div className="form__group">
         <label>
-          Numéro de récépissé:
+          Numéro de récépissé
           <Field type="text" name="transporter.receipt" />
         </label>
 
         <label>
-          Département:
+          Département
           <Field type="text" name="transporter.department" placeholder="Ex: 83" />
         </label>
 
@@ -27,12 +27,12 @@ export default function Transporter() {
         </label>
 
         <label>
-          Personne à contacter:
+          Personne à contacter
           <Field type="text" name="transporter.contact" placeholder="NOM Prénom" />
         </label>
 
         <label>
-          Immatriculation:
+          Immatriculation
           <Field type="text" name="transporter.numberPlate" placeholder="Plaque d'immatriculation du véhicule" />
         </label>
       </div>

@@ -67,7 +67,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 </p>
                 <div className="form__group">
                   <label>
-                    Email*:
+                    Email*
                     <Field type="text" name="email" />
                   </label>
 
@@ -76,7 +76,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Nom et prénom*:
+                    Nom et prénom*
                     <Field type="text" name="name" />
                   </label>
 
@@ -85,21 +85,21 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Téléphone:
+                    Téléphone
                     <Field type="text" name="phone" />
                   </label>
                 </div>
 
                 <div className="form__group">
                   <label>
-                    Mot de passe:
+                    Mot de passe
                     <Field type="password" name="password" />
                   </label>
                 </div>
 
                 <div className="form__group">
                   <label>
-                    Vérification du mot de passe:
+                    Vérification du mot de passe
                     <Field type="password" name="passwordConfirmation" />
                   </label>
                 </div>
@@ -108,7 +108,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Numéro SIRET de l'entreprise que vous administrez:
+                    Numéro SIRET de l'entreprise que vous administrez
                     <Field type="text" name="siret" />
                   </label>
 

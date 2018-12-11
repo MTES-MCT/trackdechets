@@ -25,7 +25,7 @@ export default function ProcessingOperation({
         </p>
       </div>
 
-      <label>Opération de traitement prévue:</label>
+      <label>Opération de traitement prévue</label>
       <select
         id="select"
         name={name}

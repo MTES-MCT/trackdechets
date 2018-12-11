@@ -78,7 +78,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <div className="form__group">
           <div className="form__group">
             <label>
-              Code ADR:
+              Code ADR
               <input type="text" />
             </label>
           </div>

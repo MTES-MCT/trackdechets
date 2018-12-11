@@ -29,7 +29,7 @@ export default function Recipient() {
 
       <div className="form__group">
         <label>
-          Numéro de CAP: (le cas échéant)
+          Numéro de CAP (le cas échéant)
           <Field type="text" name="recipient.cap" />
         </label>
       </div>

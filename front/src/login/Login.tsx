@@ -48,14 +48,14 @@ export default withRouter(function Login(
                 <h1>Connexion</h1>
                 <div className="form__group">
                   <label>
-                    Email:
+                    Email
                     <Field type="text" name="email" />
                   </label>
                 </div>
 
                 <div className="form__group">
                   <label>
-                    Mot de passe:
+                    Mot de passe
                     <Field type="password" name="password" />
                   </label>
                 </div>

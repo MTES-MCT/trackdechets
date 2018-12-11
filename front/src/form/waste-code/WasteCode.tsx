@@ -54,7 +54,7 @@ export default function WasteCode(props: FieldProps) {
       </div>
 
       <label>
-        Code déchet:
+        Code déchet
         <input
           type="text"
           name={props.field.name}
