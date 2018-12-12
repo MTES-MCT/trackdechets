@@ -3,6 +3,7 @@ import { Query } from "react-apollo";
 import { GET_SLIPS } from "./query";
 import { RouteComponentProps, withRouter } from "react-router";
 import { DateTime } from "luxon";
+import { Link } from "react-router-dom";
 
 export default withRouter(function Slips(props: RouteComponentProps) {
   return (
@@ -34,11 +35,13 @@ export default withRouter(function Slips(props: RouteComponentProps) {
               );
 
             return data.forms.map((s: any) => (
-              <tr
-                key={s.id}
-                onClick={() => props.history.push(`/form/steps/${s.id}`)}
-              >
-                <td>{s.id}</td>
+              <tr key={s.id}>
+                <td>
+                  <div className="id">{s.id}</div>
+                  <div className="actions">
+                    <Link to={`/form/${s.id}`}>éditer</Link> | <Link to="#">valider</Link>
+                  </div>
+                </td>
                 <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
                 <td>{s.emitter.company.name}</td>
                 <td>{s.recipient.company.name}</td>

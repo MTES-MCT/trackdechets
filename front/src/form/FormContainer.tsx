@@ -11,11 +11,15 @@ export default function FormContainer({
   match
 }: RouteComponentProps<{ id: string }>) {
   return (
-    <StepList formId={match.params.id}>
-      <StepContainer component={Emitter} title="Emetteur" />
-      <StepContainer component={WasteInfo} title="Détail du déchet" />
-      <StepContainer component={Recipient} title="Destination" />
-      <StepContainer component={Transporter} title="Transporteur" />
-    </StepList>
+    <main className="main">
+      <div className="container">
+        <StepList formId={match.params.id}>
+          <StepContainer component={Emitter} title="Emetteur" />
+          <StepContainer component={WasteInfo} title="Détail du déchet" />
+          <StepContainer component={Recipient} title="Destination" />
+          <StepContainer component={Transporter} title="Transporteur" />
+        </StepList>
+      </div>
+    </main>
   );
 }

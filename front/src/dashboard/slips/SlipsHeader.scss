@@ -1,19 +1,22 @@
 .SlipsHeader {
-  display: flex;
   margin: 20px;
-  align-items: center;
-  justify-content: space-between;
 
-  .title {
+  .header-content {
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
-    h2 {
-      margin-right: 20px;
-    }
-    
-    .searchbar {
-      position: relative;
+    .title {
+      display: flex;
+      align-items: center;
+
+      h2 {
+        margin-right: 20px;
+      }
+
+      .searchbar {
+        position: relative;
+      }
     }
   }
 }

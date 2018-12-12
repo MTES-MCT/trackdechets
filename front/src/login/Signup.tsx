@@ -58,12 +58,13 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               <Form>
                 <h1>Inscription à Trackdéchets</h1>
                 <p>
-                  Blabla création de compte. Création de compte pour son
-                  entreprise afin d'administrer les bordereaux. Un seul compte
-                  par entreprise actuellement... Lorem ipsum dolor sit amet
-                  consectetur adipisicing elit. Eligendi sint, animi excepturi
-                  ipsam omnis magni cum veniam illo neque magnam quo placeat
-                  asperiores sit dignissimos ex aperiam, eum, ducimus quidem.
+                  Trackdéchets est destiné à simplifier l'édition d'un bordereau
+                  de déchet et à transmettre les informations dématérialisée
+                  pour validation. Il est destiné dans un premier temps pour
+                  être utilisé entre un producteur et un collecteur et/ou un
+                  producteur et une installation de traitement. Trackdéchets est
+                  un produit ouvert et utilisable par tous les acteurs de la
+                  filière déchets.
                 </p>
                 <div className="form__group">
                   <label>

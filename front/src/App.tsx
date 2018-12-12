@@ -4,13 +4,13 @@ import { ApolloProvider } from "react-apollo";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
 import Dashboard from "./dashboard/Dashboard";
-import FormIntro from "./form/FormIntro";
 import Home from "./Home";
 import Login from "./login/Login";
 import Signup from "./login/Signup";
 import ChangePassword from "./login/ChangePassword";
 import client from "./graphql-client";
 import PrivateRoute from "./login/PrivateRoute";
+import FormContainer from "./form/FormContainer";
 
 class App extends Component {
   render() {
@@ -22,7 +22,7 @@ class App extends Component {
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
             <Route exact path="/password" component={ChangePassword} />
-            <PrivateRoute path="/form" component={FormIntro} />
+            <PrivateRoute path="/form/:id?" component={FormContainer} />
             <PrivateRoute path="/dashboard" component={Dashboard} />
           </div>
         </Router>
