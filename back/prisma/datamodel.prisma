@@ -21,6 +21,17 @@ type Form {
   createdAt: DateTime!
   updatedAt: DateTime!
 
+  # Workflow fields
+  status: String @default(value: "DRAFT")
+  sentAt: DateTime
+  sentBy: String
+
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+
+  processingOperationDone: String
+
   # Emitter fields
   emitterType: EmitterType
   emitterPickupSite: String

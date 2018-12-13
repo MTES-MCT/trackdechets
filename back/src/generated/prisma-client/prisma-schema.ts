@@ -131,6 +131,13 @@ type Form {
   owner: User!
   createdAt: DateTime!
   updatedAt: DateTime!
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+  processingOperationDone: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -175,6 +182,13 @@ type FormConnection {
 
 input FormCreateInput {
   owner: UserCreateOneInput!
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+  processingOperationDone: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -223,6 +237,20 @@ enum FormOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  status_ASC
+  status_DESC
+  sentAt_ASC
+  sentAt_DESC
+  sentBy_ASC
+  sentBy_DESC
+  isAccepted_ASC
+  isAccepted_DESC
+  receivedAt_ASC
+  receivedAt_DESC
+  quantityReceived_ASC
+  quantityReceived_DESC
+  processingOperationDone_ASC
+  processingOperationDone_DESC
   emitterType_ASC
   emitterType_DESC
   emitterPickupSite_ASC
@@ -297,6 +325,13 @@ type FormPreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+  processingOperationDone: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -353,6 +388,13 @@ input FormSubscriptionWhereInput {
 
 input FormUpdateInput {
   owner: UserUpdateOneRequiredInput
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+  processingOperationDone: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -390,6 +432,13 @@ input FormUpdateInput {
 }
 
 input FormUpdateManyMutationInput {
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+  processingOperationDone: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -458,6 +507,74 @@ input FormWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  status: String
+  status_not: String
+  status_in: [String!]
+  status_not_in: [String!]
+  status_lt: String
+  status_lte: String
+  status_gt: String
+  status_gte: String
+  status_contains: String
+  status_not_contains: String
+  status_starts_with: String
+  status_not_starts_with: String
+  status_ends_with: String
+  status_not_ends_with: String
+  sentAt: DateTime
+  sentAt_not: DateTime
+  sentAt_in: [DateTime!]
+  sentAt_not_in: [DateTime!]
+  sentAt_lt: DateTime
+  sentAt_lte: DateTime
+  sentAt_gt: DateTime
+  sentAt_gte: DateTime
+  sentBy: String
+  sentBy_not: String
+  sentBy_in: [String!]
+  sentBy_not_in: [String!]
+  sentBy_lt: String
+  sentBy_lte: String
+  sentBy_gt: String
+  sentBy_gte: String
+  sentBy_contains: String
+  sentBy_not_contains: String
+  sentBy_starts_with: String
+  sentBy_not_starts_with: String
+  sentBy_ends_with: String
+  sentBy_not_ends_with: String
+  isAccepted: Boolean
+  isAccepted_not: Boolean
+  receivedAt: DateTime
+  receivedAt_not: DateTime
+  receivedAt_in: [DateTime!]
+  receivedAt_not_in: [DateTime!]
+  receivedAt_lt: DateTime
+  receivedAt_lte: DateTime
+  receivedAt_gt: DateTime
+  receivedAt_gte: DateTime
+  quantityReceived: Float
+  quantityReceived_not: Float
+  quantityReceived_in: [Float!]
+  quantityReceived_not_in: [Float!]
+  quantityReceived_lt: Float
+  quantityReceived_lte: Float
+  quantityReceived_gt: Float
+  quantityReceived_gte: Float
+  processingOperationDone: String
+  processingOperationDone_not: String
+  processingOperationDone_in: [String!]
+  processingOperationDone_not_in: [String!]
+  processingOperationDone_lt: String
+  processingOperationDone_lte: String
+  processingOperationDone_gt: String
+  processingOperationDone_gte: String
+  processingOperationDone_contains: String
+  processingOperationDone_not_contains: String
+  processingOperationDone_starts_with: String
+  processingOperationDone_not_starts_with: String
+  processingOperationDone_ends_with: String
+  processingOperationDone_not_ends_with: String
   emitterType: EmitterType
   emitterType_not: EmitterType
   emitterType_in: [EmitterType!]

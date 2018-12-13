@@ -1,3 +1,18 @@
+input SentFormInput {
+  sentAt: DateTime
+  sentBy: String
+}
+
+input ReceivedFormInput {
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+}
+
+input ProcessedFormInput {
+  processingOperationDone: String
+}
+
 input FormInput {
   id: ID
   emitter: EmitterInput

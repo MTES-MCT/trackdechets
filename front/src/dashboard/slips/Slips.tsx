@@ -4,6 +4,7 @@ import { GET_SLIPS } from "./query";
 import { RouteComponentProps, withRouter } from "react-router";
 import { DateTime } from "luxon";
 import { Link } from "react-router-dom";
+import SlipActions from "./SlipActions";
 
 export default withRouter(function Slips(props: RouteComponentProps) {
   return (
@@ -38,9 +39,7 @@ export default withRouter(function Slips(props: RouteComponentProps) {
               <tr key={s.id}>
                 <td>
                   <div className="id">{s.id}</div>
-                  <div className="actions">
-                    <Link to={`/form/${s.id}`}>éditer</Link> | <Link to="#">valider</Link>
-                  </div>
+                  <SlipActions currentUser={{siret: "XXX XXX XXX 0002"}} form={s}></SlipActions>
                 </td>
                 <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
                 <td>{s.emitter.company.name}</td>

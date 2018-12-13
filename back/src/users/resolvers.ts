@@ -71,5 +71,10 @@ export default {
       const userId = getUserId(context);
       return context.prisma.user({ id: userId });
     }
+  },
+  User: {
+    company: async (parent, args, context: Context) => {
+      return await context.prisma.user({ id: parent.id }).company();
+    }
   }
 };

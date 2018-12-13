@@ -36,7 +36,7 @@ export default function SlipsHeader() {
 
         <div className="buttons">
           <Link to="/form">
-            <button className="button secondary">Créer un borderau</button>
+            <button className="button secondary">Créer un bordereau</button>
           </Link>
         </div>
       </div>

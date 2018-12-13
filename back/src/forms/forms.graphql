@@ -8,6 +8,19 @@ type Query {
 type Mutation {
   saveForm(formInput: FormInput!): Form
   deleteForm(id: ID!): Form
+
+  markAsSealed(id: ID): Form
+  markAsSent(id: ID, sentInfo: SentFormInput!): Form
+  markAsReceived(id: ID, receivedInfo: ReceivedFormInput!): Form
+  markAsProcessed(id: ID, processedInfo: ProcessedFormInput!): Form
+}
+
+enum FormStatus {
+  DRAFT
+  SEALED
+  SENT
+  RECEIVED
+  PROCESSED
 }
 
 type Form {
@@ -22,6 +35,16 @@ type Form {
   updatedAt: DateTime
 
   ownerId: Int
+  status: FormStatus
+
+  sentAt: DateTime
+  sentBy: String
+
+  isAccepted: Boolean
+  receivedAt: DateTime
+  quantityReceived: Float
+
+  processingOperationDone: String
 }
 
 type FormCompany {

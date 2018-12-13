@@ -76,12 +76,10 @@ export default connect<{}, Values>(function WasteInfo(props) {
       </div>
       {values.wasteDetails.code.includes("*") && (
         <div className="form__group">
-          <div className="form__group">
-            <label>
-              Code ADR
-              <input type="text" />
-            </label>
-          </div>
+          <label>
+            Code ADR
+            <Field type="text" name="wasteDetails.onuCode" />
+          </label>
         </div>
       )}
     </React.Fragment>

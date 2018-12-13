@@ -1,19 +1,30 @@
 import React from "react";
+import { Me } from "../login/model";
 import "./DashboardMenu.scss";
+import { NavLink, RouteComponentProps, match } from "react-router-dom";
 
-export default function DashboardMenu() {
+interface IProps {
+  me: Me;
+  match: match<{}>;
+}
+
+export default function DashboardMenu({ me, match }: IProps) {
   return (
     <aside className="dashboard-menu side-menu" role="navigation">
       <div className="company-title">
-        <h3>Ma compagnie</h3>
-        <p>SIRET: 143 245 567 00013</p>
+        <h3>{me.name}</h3>
+        <p>SIRET: {me.company.siret}</p>
       </div>
       <ul>
         <li>
-          <a className="active">Mes bordereaux</a>
+          <NavLink to={`${match.url}/slips`} activeClassName="active">
+            Mes bordereaux
+          </NavLink>
         </li>
         <li>
-          <a>Mon compte</a>
+          <NavLink to={`${match.url}/account`} activeClassName="active">
+            Mon compte
+          </NavLink>
         </li>
       </ul>
     </aside>

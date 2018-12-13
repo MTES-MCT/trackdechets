@@ -185,8 +185,6 @@ export interface ClientConstructor<T> {
  * Types
  */
 
-export type EmitterType = "PRODUCER" | "OTHER";
-
 export type QuantityType = "REAL" | "ESTIMATED";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
@@ -198,6 +196,20 @@ export type FormOrderByInput =
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC"
+  | "status_ASC"
+  | "status_DESC"
+  | "sentAt_ASC"
+  | "sentAt_DESC"
+  | "sentBy_ASC"
+  | "sentBy_DESC"
+  | "isAccepted_ASC"
+  | "isAccepted_DESC"
+  | "receivedAt_ASC"
+  | "receivedAt_DESC"
+  | "quantityReceived_ASC"
+  | "quantityReceived_DESC"
+  | "processingOperationDone_ASC"
+  | "processingOperationDone_DESC"
   | "emitterType_ASC"
   | "emitterType_DESC"
   | "emitterPickupSite_ASC"
@@ -293,13 +305,7 @@ export type UserOrderByInput =
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
-export interface UserUpdateDataInput {
-  email?: String;
-  password?: String;
-  name?: String;
-  phone?: String;
-  company?: CompanyUpdateOneRequiredInput;
-}
+export type EmitterType = "PRODUCER" | "OTHER";
 
 export interface CompanyUpdateInput {
   siret?: String;
@@ -413,16 +419,22 @@ export interface FormSubscriptionWhereInput {
   NOT?: FormSubscriptionWhereInput[] | FormSubscriptionWhereInput;
 }
 
-export interface UserUpdateInput {
+export interface UserUpdateManyMutationInput {
   email?: String;
   password?: String;
   name?: String;
   phone?: String;
-  company?: CompanyUpdateOneRequiredInput;
 }
 
 export interface FormUpdateInput {
   owner?: UserUpdateOneRequiredInput;
+  status?: String;
+  sentAt?: DateTimeInput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedAt?: DateTimeInput;
+  quantityReceived?: Float;
+  processingOperationDone?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -459,18 +471,58 @@ export interface FormUpdateInput {
   wasteDetailsQuantityType?: QuantityType;
 }
 
-export type FormWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
+export interface FormUpdateManyMutationInput {
+  status?: String;
+  sentAt?: DateTimeInput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedAt?: DateTimeInput;
+  quantityReceived?: Float;
+  processingOperationDone?: String;
+  emitterType?: EmitterType;
+  emitterPickupSite?: String;
+  emitterCompanyName?: String;
+  emitterCompanySiret?: String;
+  emitterCompanyAddress?: String;
+  emitterCompanyContact?: String;
+  emitterCompanyPhone?: String;
+  emitterCompanyMail?: String;
+  recipientCap?: String;
+  recipientProcessingOperation?: String;
+  recipientCompanyName?: String;
+  recipientCompanySiret?: String;
+  recipientCompanyAddress?: String;
+  recipientCompanyContact?: String;
+  recipientCompanyPhone?: String;
+  recipientCompanyMail?: String;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeInput;
+  transporterContact?: String;
+  transporterNumberPlate?: String;
+  wasteDetailsCode?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+}
 
 export interface CompanyCreateOneInput {
   create?: CompanyCreateInput;
   connect?: CompanyWhereUniqueInput;
 }
 
-export interface CompanyUpsertNestedInput {
-  update: CompanyUpdateDataInput;
-  create: CompanyCreateInput;
+export interface UserUpsertNestedInput {
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
 }
 
 export interface UserCreateInput {
@@ -481,11 +533,8 @@ export interface UserCreateInput {
   company: CompanyCreateOneInput;
 }
 
-export interface CompanyUpdateOneRequiredInput {
-  create?: CompanyCreateInput;
-  update?: CompanyUpdateDataInput;
-  upsert?: CompanyUpsertNestedInput;
-  connect?: CompanyWhereUniqueInput;
+export interface CompanyUpdateDataInput {
+  siret?: String;
 }
 
 export type UserWhereUniqueInput = AtLeastOne<{
@@ -493,15 +542,12 @@ export type UserWhereUniqueInput = AtLeastOne<{
   email?: String;
 }>;
 
-export interface UserSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: UserWhereInput;
-  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
-  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
-  NOT?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+export interface UserUpdateDataInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  phone?: String;
+  company?: CompanyUpdateOneRequiredInput;
 }
 
 export interface CompanyWhereInput {
@@ -524,119 +570,16 @@ export interface CompanyWhereInput {
   NOT?: CompanyWhereInput[] | CompanyWhereInput;
 }
 
-export interface CompanySubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: CompanyWhereInput;
-  AND?: CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput;
-  OR?: CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput;
-  NOT?: CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput;
+export interface UserUpdateOneRequiredInput {
+  create?: UserCreateInput;
+  update?: UserUpdateDataInput;
+  upsert?: UserUpsertNestedInput;
+  connect?: UserWhereUniqueInput;
 }
 
 export interface UserCreateOneInput {
   create?: UserCreateInput;
   connect?: UserWhereUniqueInput;
-}
-
-export interface FormUpdateManyMutationInput {
-  emitterType?: EmitterType;
-  emitterPickupSite?: String;
-  emitterCompanyName?: String;
-  emitterCompanySiret?: String;
-  emitterCompanyAddress?: String;
-  emitterCompanyContact?: String;
-  emitterCompanyPhone?: String;
-  emitterCompanyMail?: String;
-  recipientCap?: String;
-  recipientProcessingOperation?: String;
-  recipientCompanyName?: String;
-  recipientCompanySiret?: String;
-  recipientCompanyAddress?: String;
-  recipientCompanyContact?: String;
-  recipientCompanyPhone?: String;
-  recipientCompanyMail?: String;
-  transporterCompanyName?: String;
-  transporterCompanySiret?: String;
-  transporterCompanyAddress?: String;
-  transporterCompanyContact?: String;
-  transporterCompanyPhone?: String;
-  transporterCompanyMail?: String;
-  transporterReceipt?: String;
-  transporterDepartment?: String;
-  transporterValidityLimit?: DateTimeInput;
-  transporterContact?: String;
-  transporterNumberPlate?: String;
-  wasteDetailsCode?: String;
-  wasteDetailsOnuCode?: String;
-  wasteDetailsPackagings?: Json;
-  wasteDetailsOtherPackaging?: String;
-  wasteDetailsNumberOfPackages?: Int;
-  wasteDetailsQuantity?: Float;
-  wasteDetailsQuantityType?: QuantityType;
-}
-
-export interface CompanyUpdateDataInput {
-  siret?: String;
-}
-
-export interface CompanyCreateInput {
-  siret: String;
-}
-
-export interface CompanyUpdateManyMutationInput {
-  siret?: String;
-}
-
-export interface FormCreateInput {
-  owner: UserCreateOneInput;
-  emitterType?: EmitterType;
-  emitterPickupSite?: String;
-  emitterCompanyName?: String;
-  emitterCompanySiret?: String;
-  emitterCompanyAddress?: String;
-  emitterCompanyContact?: String;
-  emitterCompanyPhone?: String;
-  emitterCompanyMail?: String;
-  recipientCap?: String;
-  recipientProcessingOperation?: String;
-  recipientCompanyName?: String;
-  recipientCompanySiret?: String;
-  recipientCompanyAddress?: String;
-  recipientCompanyContact?: String;
-  recipientCompanyPhone?: String;
-  recipientCompanyMail?: String;
-  transporterCompanyName?: String;
-  transporterCompanySiret?: String;
-  transporterCompanyAddress?: String;
-  transporterCompanyContact?: String;
-  transporterCompanyPhone?: String;
-  transporterCompanyMail?: String;
-  transporterReceipt?: String;
-  transporterDepartment?: String;
-  transporterValidityLimit?: DateTimeInput;
-  transporterContact?: String;
-  transporterNumberPlate?: String;
-  wasteDetailsCode?: String;
-  wasteDetailsOnuCode?: String;
-  wasteDetailsPackagings?: Json;
-  wasteDetailsOtherPackaging?: String;
-  wasteDetailsNumberOfPackages?: Int;
-  wasteDetailsQuantity?: Float;
-  wasteDetailsQuantityType?: QuantityType;
-}
-
-export interface UserUpdateManyMutationInput {
-  email?: String;
-  password?: String;
-  name?: String;
-  phone?: String;
-}
-
-export interface UserUpsertNestedInput {
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
 }
 
 export interface FormWhereInput {
@@ -671,6 +614,74 @@ export interface FormWhereInput {
   updatedAt_lte?: DateTimeInput;
   updatedAt_gt?: DateTimeInput;
   updatedAt_gte?: DateTimeInput;
+  status?: String;
+  status_not?: String;
+  status_in?: String[] | String;
+  status_not_in?: String[] | String;
+  status_lt?: String;
+  status_lte?: String;
+  status_gt?: String;
+  status_gte?: String;
+  status_contains?: String;
+  status_not_contains?: String;
+  status_starts_with?: String;
+  status_not_starts_with?: String;
+  status_ends_with?: String;
+  status_not_ends_with?: String;
+  sentAt?: DateTimeInput;
+  sentAt_not?: DateTimeInput;
+  sentAt_in?: DateTimeInput[] | DateTimeInput;
+  sentAt_not_in?: DateTimeInput[] | DateTimeInput;
+  sentAt_lt?: DateTimeInput;
+  sentAt_lte?: DateTimeInput;
+  sentAt_gt?: DateTimeInput;
+  sentAt_gte?: DateTimeInput;
+  sentBy?: String;
+  sentBy_not?: String;
+  sentBy_in?: String[] | String;
+  sentBy_not_in?: String[] | String;
+  sentBy_lt?: String;
+  sentBy_lte?: String;
+  sentBy_gt?: String;
+  sentBy_gte?: String;
+  sentBy_contains?: String;
+  sentBy_not_contains?: String;
+  sentBy_starts_with?: String;
+  sentBy_not_starts_with?: String;
+  sentBy_ends_with?: String;
+  sentBy_not_ends_with?: String;
+  isAccepted?: Boolean;
+  isAccepted_not?: Boolean;
+  receivedAt?: DateTimeInput;
+  receivedAt_not?: DateTimeInput;
+  receivedAt_in?: DateTimeInput[] | DateTimeInput;
+  receivedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  receivedAt_lt?: DateTimeInput;
+  receivedAt_lte?: DateTimeInput;
+  receivedAt_gt?: DateTimeInput;
+  receivedAt_gte?: DateTimeInput;
+  quantityReceived?: Float;
+  quantityReceived_not?: Float;
+  quantityReceived_in?: Float[] | Float;
+  quantityReceived_not_in?: Float[] | Float;
+  quantityReceived_lt?: Float;
+  quantityReceived_lte?: Float;
+  quantityReceived_gt?: Float;
+  quantityReceived_gte?: Float;
+  processingOperationDone?: String;
+  processingOperationDone_not?: String;
+  processingOperationDone_in?: String[] | String;
+  processingOperationDone_not_in?: String[] | String;
+  processingOperationDone_lt?: String;
+  processingOperationDone_lte?: String;
+  processingOperationDone_gt?: String;
+  processingOperationDone_gte?: String;
+  processingOperationDone_contains?: String;
+  processingOperationDone_not_contains?: String;
+  processingOperationDone_starts_with?: String;
+  processingOperationDone_not_starts_with?: String;
+  processingOperationDone_ends_with?: String;
+  processingOperationDone_not_ends_with?: String;
   emitterType?: EmitterType;
   emitterType_not?: EmitterType;
   emitterType_in?: EmitterType[] | EmitterType;
@@ -1100,11 +1111,103 @@ export interface FormWhereInput {
   NOT?: FormWhereInput[] | FormWhereInput;
 }
 
-export interface UserUpdateOneRequiredInput {
-  create?: UserCreateInput;
-  update?: UserUpdateDataInput;
-  upsert?: UserUpsertNestedInput;
-  connect?: UserWhereUniqueInput;
+export type FormWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface CompanyCreateInput {
+  siret: String;
+}
+
+export interface CompanyUpdateManyMutationInput {
+  siret?: String;
+}
+
+export interface FormCreateInput {
+  owner: UserCreateOneInput;
+  status?: String;
+  sentAt?: DateTimeInput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedAt?: DateTimeInput;
+  quantityReceived?: Float;
+  processingOperationDone?: String;
+  emitterType?: EmitterType;
+  emitterPickupSite?: String;
+  emitterCompanyName?: String;
+  emitterCompanySiret?: String;
+  emitterCompanyAddress?: String;
+  emitterCompanyContact?: String;
+  emitterCompanyPhone?: String;
+  emitterCompanyMail?: String;
+  recipientCap?: String;
+  recipientProcessingOperation?: String;
+  recipientCompanyName?: String;
+  recipientCompanySiret?: String;
+  recipientCompanyAddress?: String;
+  recipientCompanyContact?: String;
+  recipientCompanyPhone?: String;
+  recipientCompanyMail?: String;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeInput;
+  transporterContact?: String;
+  transporterNumberPlate?: String;
+  wasteDetailsCode?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+}
+
+export interface CompanyUpsertNestedInput {
+  update: CompanyUpdateDataInput;
+  create: CompanyCreateInput;
+}
+
+export interface UserUpdateInput {
+  email?: String;
+  password?: String;
+  name?: String;
+  phone?: String;
+  company?: CompanyUpdateOneRequiredInput;
+}
+
+export interface CompanySubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: CompanyWhereInput;
+  AND?: CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput;
+  OR?: CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput;
+  NOT?: CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput;
+}
+
+export interface UserSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: UserWhereInput;
+  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+  NOT?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+}
+
+export interface CompanyUpdateOneRequiredInput {
+  create?: CompanyCreateInput;
+  update?: CompanyUpdateDataInput;
+  upsert?: CompanyUpsertNestedInput;
+  connect?: CompanyWhereUniqueInput;
 }
 
 export interface NodeNode {
@@ -1245,6 +1348,13 @@ export interface Form {
   id: ID_Output;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  status?: String;
+  sentAt?: DateTimeOutput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedAt?: DateTimeOutput;
+  quantityReceived?: Float;
+  processingOperationDone?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -1286,6 +1396,13 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<String>;
+  sentAt: () => Promise<DateTimeOutput>;
+  sentBy: () => Promise<String>;
+  isAccepted: () => Promise<Boolean>;
+  receivedAt: () => Promise<DateTimeOutput>;
+  quantityReceived: () => Promise<Float>;
+  processingOperationDone: () => Promise<String>;
   emitterType: () => Promise<EmitterType>;
   emitterPickupSite: () => Promise<String>;
   emitterCompanyName: () => Promise<String>;
@@ -1329,6 +1446,13 @@ export interface FormSubscription
   owner: <T = UserSubscription>() => T;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  status: () => Promise<AsyncIterator<String>>;
+  sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  sentBy: () => Promise<AsyncIterator<String>>;
+  isAccepted: () => Promise<AsyncIterator<Boolean>>;
+  receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  quantityReceived: () => Promise<AsyncIterator<Float>>;
+  processingOperationDone: () => Promise<AsyncIterator<String>>;
   emitterType: () => Promise<AsyncIterator<EmitterType>>;
   emitterPickupSite: () => Promise<AsyncIterator<String>>;
   emitterCompanyName: () => Promise<AsyncIterator<String>>;
@@ -1451,6 +1575,13 @@ export interface FormPreviousValues {
   id: ID_Output;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  status?: String;
+  sentAt?: DateTimeOutput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedAt?: DateTimeOutput;
+  quantityReceived?: Float;
+  processingOperationDone?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -1493,6 +1624,13 @@ export interface FormPreviousValuesPromise
   id: () => Promise<ID_Output>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<String>;
+  sentAt: () => Promise<DateTimeOutput>;
+  sentBy: () => Promise<String>;
+  isAccepted: () => Promise<Boolean>;
+  receivedAt: () => Promise<DateTimeOutput>;
+  quantityReceived: () => Promise<Float>;
+  processingOperationDone: () => Promise<String>;
   emitterType: () => Promise<EmitterType>;
   emitterPickupSite: () => Promise<String>;
   emitterCompanyName: () => Promise<String>;
@@ -1535,6 +1673,13 @@ export interface FormPreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  status: () => Promise<AsyncIterator<String>>;
+  sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  sentBy: () => Promise<AsyncIterator<String>>;
+  isAccepted: () => Promise<AsyncIterator<Boolean>>;
+  receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  quantityReceived: () => Promise<AsyncIterator<Float>>;
+  processingOperationDone: () => Promise<AsyncIterator<String>>;
   emitterType: () => Promise<AsyncIterator<EmitterType>>;
   emitterPickupSite: () => Promise<AsyncIterator<String>>;
   emitterCompanyName: () => Promise<AsyncIterator<String>>;
@@ -1728,12 +1873,12 @@ export type String = string;
 
 export type Long = string;
 
+export type Json = any;
+
 /*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point). 
 */
 export type Float = number;
-
-export type Json = any;
 
 /*
 DateTime scalar input type, allowing Date
