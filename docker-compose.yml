@@ -2,6 +2,7 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:1.7.4
+    restart: always
     command: --docker
     ports:
       - 80:80
@@ -35,6 +36,7 @@ services:
 
   td-api:
     image: betagouv/trackdechets-api:latest
+    restart: always
     environment:
       NODE_ENV: production
     labels:
@@ -42,6 +44,7 @@ services:
 
   td-ui:
     image: betagouv/trackdechets-ui:latest
+    restart: always
     labels:
       - "traefik.frontend.rule=Host:$UI_HOST"
 
