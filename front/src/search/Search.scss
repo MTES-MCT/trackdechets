@@ -1,0 +1,19 @@
+.Search {
+  .search-box .search__input {
+    display: flex;
+    margin: 10px 0;
+
+    input {
+      width: auto;
+    }
+
+    input:first-child {
+      flex: 1;
+      margin-right: 10px;
+    }
+  }
+
+  .panel__approved {
+    text-align: center;
+  }
+}
