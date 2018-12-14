@@ -1,4 +1,3 @@
-import ApolloClient from "apollo-client";
 import React, { Component } from "react";
 import { ApolloProvider } from "react-apollo";
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -11,6 +10,7 @@ import ChangePassword from "./login/ChangePassword";
 import client from "./graphql-client";
 import PrivateRoute from "./login/PrivateRoute";
 import FormContainer from "./form/FormContainer";
+import WasteSelector from "./login/WasteSelector";
 
 class App extends Component {
   render() {
@@ -21,6 +21,7 @@ class App extends Component {
             <Route exact path="/" component={Home} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
+            <Route exact path="/signup/details" component={WasteSelector} />
             <Route exact path="/password" component={ChangePassword} />
             <PrivateRoute path="/form/:id?" component={FormContainer} />
             <PrivateRoute path="/dashboard" component={Dashboard} />
