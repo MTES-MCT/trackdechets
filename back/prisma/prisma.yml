@@ -4,5 +4,7 @@ generate:
   - generator: typescript-client
     output: ../src/generated/prisma-client/
 
+secret: trackdechets-prisma
+
 seed:
   import: seed.graphql

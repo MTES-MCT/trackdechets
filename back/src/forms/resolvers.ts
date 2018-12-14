@@ -67,7 +67,7 @@ export default {
 
       const userId = getUserId(context);
       const userCompany = await context.prisma.user({ id: userId }).company();
-      console.log(getNextStep(form, userCompany.siret))
+
       return context.prisma.updateForm({
         where: { id },
         data: { status: getNextStep(form, userCompany.siret) }

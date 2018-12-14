@@ -12,6 +12,8 @@ services:
   prisma:
     image: prismagraphql/prisma:1.21
     restart: always
+    ports:
+      - "4466:4466"
     environment:
       PRISMA_CONFIG: |
         port: 4466
@@ -55,6 +57,14 @@ services:
       REACT_APP_API_ENDPOINT: $API_HOST
     labels:
       - "traefik.frontend.rule=Host:$UI_HOST"
+
+  td-insee:
+    image: td-insee
+    build:
+      context: ./insee
+      dockerfile: Dockerfile
+    environment:
+        docker: "true"
 
 volumes:
   postgres:

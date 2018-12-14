@@ -1,3 +1,5 @@
 type Company {
   siret: String
+  name: String
+  address: String
 }
