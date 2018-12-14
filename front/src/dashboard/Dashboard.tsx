@@ -32,7 +32,10 @@ export default function Dashboard({ match }: RouteComponentProps) {
             <DashboardMenu me={data.me} match={match} />
 
             <div className="dashboard-content">
-              <Route path={`${match.path}/slips`} component={SlipsContainer} />
+              <Route
+                path={`${match.path}/slips`}
+                render={() => <SlipsContainer me={data.me} />}
+              />
               <Route
                 path={`${match.path}/account`}
                 render={() => <Account me={data.me} />}

@@ -1,12 +1,11 @@
 import React from "react";
-import { Query } from "react-apollo";
-import { GET_SLIPS } from "./query";
-import { RouteComponentProps, withRouter } from "react-router";
 import { DateTime } from "luxon";
-import { Link } from "react-router-dom";
 import SlipActions from "./SlipActions";
+import { Form } from "../../form/model";
+import { Me } from "../../login/model";
 
-export default withRouter(function Slips(props: RouteComponentProps) {
+type Props = { forms: Form[]; me: Me };
+export default function Slips({ forms, me }: Props) {
   return (
     <table className="table">
       <thead>
@@ -20,37 +19,20 @@ export default withRouter(function Slips(props: RouteComponentProps) {
         </tr>
       </thead>
       <tbody>
-        <Query query={GET_SLIPS}>
-          {({ loading, error, data }) => {
-            if (loading)
-              return (
-                <tr>
-                  <td>Chargement...</td>
-                </tr>
-              );
-            if (error)
-              return (
-                <tr>
-                  <td>Erreur :(</td>
-                </tr>
-              );
-
-            return data.forms.map((s: any) => (
-              <tr key={s.id}>
-                <td>
-                  <div className="id">{s.id}</div>
-                  <SlipActions currentUser={{siret: "XXX XXX XXX 0002"}} form={s}></SlipActions>
-                </td>
-                <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
-                <td>{s.emitter.company.name}</td>
-                <td>{s.recipient.company.name}</td>
-                <td>{s.wasteDetails && s.wasteDetails.code}</td>
-                <td>{s.status}</td>
-              </tr>
-            ));
-          }}
-        </Query>
+        {forms.map((s: any) => (
+          <tr key={s.id}>
+            <td>
+              <div className="id">{s.id}</div>
+              <SlipActions currentUser={me} form={s} />
+            </td>
+            <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
+            <td>{s.emitter.company.name}</td>
+            <td>{s.recipient.company.name}</td>
+            <td>{s.wasteDetails && s.wasteDetails.code}</td>
+            <td>{s.status}</td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );
-});
+}

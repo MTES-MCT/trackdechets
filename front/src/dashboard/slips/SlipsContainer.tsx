@@ -1,12 +1,17 @@
 import React from "react";
-import Slips from "./Slips";
 import SlipsHeader from "./SlipsHeader";
+import SlipsTabs from "./SlipsTabs";
+import { Me } from "../../login/model";
 
-export default function SlipsContainer() {
+type Props = {
+  me: Me;
+};
+
+export default function SlipsContainer({ me }: Props) {
   return (
     <React.Fragment>
       <SlipsHeader />
-      <Slips />
+      <SlipsTabs me={me} />
     </React.Fragment>
   );
 }

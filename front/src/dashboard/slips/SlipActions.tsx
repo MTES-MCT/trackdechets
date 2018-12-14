@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mutation } from "react-apollo";
 import mutations from "./slip-actions.mutations";
+import { Form } from "../../form/model";
+import { Me } from "../../login/model";
 
 interface IProps {
-  form: any;
-  currentUser: any;
+  form: Form;
+  currentUser: Me;
 }
 export default function SlipActions({ form, currentUser }: IProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +39,9 @@ export default function SlipActions({ form, currentUser }: IProps) {
                 <div className="modal">
                   <h2>{buttons[nextStep].title}</h2>
                   <p>{buttons[nextStep].content}</p>
-                  {error && <div className="notification error">{error.message}</div>}
+                  {error && (
+                    <div className="notification error">{error.message}</div>
+                  )}
                   <div className="form__group button__group">
                     <button
                       className="button"
@@ -73,8 +77,9 @@ const buttons = {
   PROCESSED: { title: "Marqué comme traité", content: "" }
 };
 
-function getNextStep(form: any, currentUser: any) {
-  const currentUserIsEmitter = form.emitter.company.siret === currentUser.siret;
+function getNextStep(form: Form, currentUser: Me) {
+  const currentUserIsEmitter =
+    form.emitter.company.siret === currentUser.company.siret;
 
   if (form.status === "DRAFT") return "SEALED";
 
