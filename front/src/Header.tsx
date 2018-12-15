@@ -24,14 +24,14 @@ export default function Header() {
             </li>
             {localAuthService.isAuthenticated ? (
               <li className="nav__item">
-                <NavLink to="/login" activeClassName="active">
-                  Me connecter
+                <NavLink to="/dashboard/slips" activeClassName="active">
+                  Mon espace
                 </NavLink>
               </li>
             ) : (
               <li className="nav__item">
-                <NavLink to="/search" activeClassName="active">
-                  Vérification prestataire
+                <NavLink to="/login" activeClassName="active">
+                  Me connecter
                 </NavLink>
               </li>
             )}
