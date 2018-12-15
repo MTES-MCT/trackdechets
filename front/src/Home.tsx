@@ -67,10 +67,21 @@ export default function Home() {
 
       <footer className="footer" role="contentinfo">
         <div className="container">
-          <div className="footer__logo" />
+          <div className="footer__logo">
+            <img src="/logo-mtes-mef.svg" />
+            <div className="footer__logo-text">
+              <img src="/logo-fabnum.svg" />
+              <small>
+                Trackdéchets est un service numérique de l'Etat incubé à la
+                Fabrique Numérique du Ministère de la Transition écologique et
+                solidaire, membre du réseau d’incubateurs{" "}
+                <a href="https://beta.gouv.fr">beta.gouv.fr</a>
+              </small>
+            </div>
+          </div>
           <ul className="footer__links">
             <li>
-              <h2>trackdechets.beta.gouv.fr</h2>
+              <h3>Trackdéchets</h3>
             </li>
             <li>
               <a href="#">Nous contacter</a>
@@ -79,10 +90,9 @@ export default function Home() {
               <a href="#">Conditions générales d'utilisation</a>
             </li>
             <li>
-              <a href="#">API</a>
+              <a href="http://api.trackdechets.beta.gouv.fr">API</a>
             </li>
           </ul>
-          <ul className="footer__links" />
         </div>
       </footer>
     </React.Fragment>

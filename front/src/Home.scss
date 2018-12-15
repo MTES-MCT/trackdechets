@@ -3,3 +3,15 @@
   background-size: 100%;
   padding: 40px 0;
 }
+
+.footer__logo-text {
+  display: flex;
+  align-items: center;
+
+  img {
+    margin-right: 10px;
+  }
+  a {
+    color: white;
+  }
+}
