@@ -19,12 +19,10 @@ function getEmitterNextStep(form: Form) {
   switch (form.status) {
     case "DRAFT":
       return "SEALED";
-    case "SENT":
+    case "SEALED":
       return "SENT";
-    case "SENT":
-      return "RECEIVED";
     default:
-      throw new Error("Il n'y a rien à valider. Le bordereau");
+      throw new Error("Il n'y a rien à valider.");
   }
 }
 

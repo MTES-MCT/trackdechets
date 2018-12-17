@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mutation } from "react-apollo";
-import mutations from "./slip-actions.mutations";
+import mutations from "./slips-actions/slip-actions.mutations";
 import { Form } from "../../form/model";
 import { Me } from "../../login/model";
+import "./SlipActions.scss";
+import Sent from "./slips-actions/Sent";
+import Sealed from "./slips-actions/Sealed";
+import Received from "./slips-actions/Received";
+
+export type SlipActionProps = {
+  onSubmit: (vars: any) => any;
+  onCancel: () => void;
+};
 
 interface IProps {
   form: Form;
@@ -12,13 +21,12 @@ interface IProps {
 export default function SlipActions({ form, currentUser }: IProps) {
   const [isOpen, setIsOpen] = useState(false);
   const nextStep = getNextStep(form, currentUser);
-  console.log(nextStep, form.status);
 
   return (
-    <div className="actions">
+    <div className="SlipActions">
       {form.status === "DRAFT" && (
-        <Link to={`/form/${form.id}`}>
-          <button className="button small">Editer</button>
+        <Link to={`/form/${form.id}`} className="button small">
+          Editer
         </Link>
       )}
       {nextStep && (
@@ -38,24 +46,14 @@ export default function SlipActions({ form, currentUser }: IProps) {
               >
                 <div className="modal">
                   <h2>{buttons[nextStep].title}</h2>
-                  <p>{buttons[nextStep].content}</p>
+                  {buttons[nextStep].component({
+                    onCancel: () => setIsOpen(false),
+                    onSubmit: vars =>
+                      mark({ variables: { id: form.id, ...vars } })
+                  })}
                   {error && (
                     <div className="notification error">{error.message}</div>
                   )}
-                  <div className="form__group button__group">
-                    <button
-                      className="button"
-                      onClick={() => mark({ variables: { id: form.id } })}
-                    >
-                      {buttons[nextStep].title}
-                    </button>
-                    <button
-                      className="button secondary"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Annuler
-                    </button>
-                  </div>
                 </div>
               </div>
             </React.Fragment>
@@ -67,14 +65,10 @@ export default function SlipActions({ form, currentUser }: IProps) {
 }
 
 const buttons = {
-  SEALED: {
-    title: "Finaliser",
-    content:
-      "Cette action aura pour effet de finaliser votre bordereau, c'est à dire qu'il ne sera plus éditable. Cette action est nécessaire pour générer un bordereau PDF et permet au bordereau d'entrer dans le circuit de validation."
-  },
-  SENT: { title: "Marqué comme envoyé", content: "" },
-  RECEIVED: { title: "Marqué comme reçu", content: "" },
-  PROCESSED: { title: "Marqué comme traité", content: "" }
+  SEALED: { title: "Finaliser", component: Sealed },
+  SENT: { title: "Marquer comme envoyé", component: Sent },
+  RECEIVED: { title: "Marquer comme reçu", component: Received },
+  PROCESSED: { title: "Marquer comme traité", component: Sent }
 };
 
 function getNextStep(form: Form, currentUser: Me) {

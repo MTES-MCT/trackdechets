@@ -15,6 +15,7 @@ export default function Slips({ forms, me }: Props) {
           <th>Emetteur</th>
           <th>Destinataire</th>
           <th>Code déchet</th>
+          <th>Quantité</th>
           <th>Statut</th>
         </tr>
       </thead>
@@ -29,6 +30,7 @@ export default function Slips({ forms, me }: Props) {
             <td>{s.emitter.company.name}</td>
             <td>{s.recipient.company.name}</td>
             <td>{s.wasteDetails && s.wasteDetails.code}</td>
+            <td>{s.wasteDetails && s.wasteDetails.quantity} t</td>
             <td>{s.status}</td>
           </tr>
         ))}
