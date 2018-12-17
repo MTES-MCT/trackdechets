@@ -14,6 +14,17 @@
   }
 
   .panel__approved {
-    text-align: center;
+    display: flex;
+    align-items: center;
+  }
+
+  .stamp {
+    margin: 20px;
+    padding: 5px 20px;
+    font-size: 3em;
+    font-weight: 600;
+    color: #03bd5b;
+    border: 8px solid #03bd5b;
+    border-radius: 10px;
   }
 }

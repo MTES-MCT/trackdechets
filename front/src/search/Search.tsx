@@ -51,16 +51,27 @@ export default function Search() {
 
           {show && (
             <div className="panel panel__approved">
-              <img src="https://mobile-cdn.123rf.com/300wm/123vector/123vector1412/123vector141200090/34531668-traduction-fran%C3%A7aise-de-timbre-ic%C3%B4ne-bleue-approuv%C3%A9e.jpg?ver=6" />
-              <p>
-                L'entreprise <strong>{company}</strong> est bien vérifiée comme
-                étant capable de prendre en charge le code déchet{" "}
-                <strong>{wasteCode}</strong>
-              </p>
+              <div>
+
+              <h3>
+                L'entreprise <strong>{company}</strong> est
+              </h3>
+              <ul>
+                <li>
+                  recensée dans la base des installations classées comme pouvant
+                  collecter des déchets
+                </li>
+                <li>
+                  capable de prendre en charge le code déchet{" "}
+                  <strong>{wasteCode}</strong>
+                </li>
+              </ul>
               <small>
                 Pour en savoir plus sur cette entreprise, accédez{" "}
                 <Link to="#">à sa fiche.</Link>
               </small>
+              </div>
+              <div className="stamp">Valide</div>
             </div>
           )}
         </div>
