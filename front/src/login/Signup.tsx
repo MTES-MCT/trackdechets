@@ -60,11 +60,24 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 <p>
                   Trackdéchets est destiné à simplifier l'édition d'un bordereau
                   de déchet et à transmettre les informations dématérialisée
-                  pour validation. Il est destiné dans un premier temps pour
-                  être utilisé entre un producteur et un collecteur et/ou un
-                  producteur et une installation de traitement. Trackdéchets est
-                  un produit ouvert et utilisable par tous les acteurs de la
-                  filière déchets.
+                  pour validation.
+                </p>
+
+                <p>
+                  Il va dans un premier temps être utilisé
+                  entre un producteur et un collecteur et/ou un producteur et
+                  une installation de traitement.
+                </p>
+
+                <p>
+                  C'est un produit libre d'utilisation et utilisable
+                  par tous les acteurs de la filière déchets.
+                </p>
+
+                <p>
+                  Trackdéchets permet également de s'assurer qu'une entreprise
+                  est bien autorisée pour effectuer la collecte ou le traitement
+                  d'un déchet (dangereux)
                 </p>
                 <div className="form__group">
                   <label>
