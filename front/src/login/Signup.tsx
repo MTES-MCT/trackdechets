@@ -13,7 +13,7 @@ const handleSumbit = (
 ) => {
   props.signup({ variables: { payload } }).then(response => {
     response && localAuthService.locallyAutheticate(response.data.signup.token);
-    props.history.push("/dashboard/slips");
+    props.history.push("/signup/details");
   });
 };
 

@@ -2,6 +2,7 @@ import React from "react";
 import Tree, { TreeNode } from "rc-tree";
 import "rc-tree/assets/index.css";
 import Wastes from "./nomenclature.json";
+import { Link } from "react-router-dom";
 
 type Node = { fullKey: string; title: string; children: Node[] };
 const loop = (data: Node[]) => {
@@ -20,9 +21,17 @@ const loop = (data: Node[]) => {
 export default function WasteSelector() {
   return (
     <div className="container">
+      <h2>Sélection des codes déchets autorisés</h2>
       <Tree className="myCls" showLine checkable>
         {loop(Wastes)}
       </Tree>
+
+      <Link to="/dashboard/slips" className="button secondary">
+        Ignorer
+      </Link>
+      <Link to="/dashboard/slips" className="button">
+        Valider
+      </Link>
     </div>
   );
 }
