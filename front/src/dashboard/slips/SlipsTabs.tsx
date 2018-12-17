@@ -20,8 +20,8 @@ export default function SlipsTabs({ me }: Props) {
           <Tabs>
             <TabList>
               <Tab>Brouillons</Tab>
-              <Tab>Déchets émis</Tab>
-              <Tab>Déchets reçus</Tab>
+              <Tab>Déchets que j'émets</Tab>
+              <Tab>Déchets que je reçois</Tab>
             </TabList>
 
             <TabPanel>
@@ -31,12 +31,22 @@ export default function SlipsTabs({ me }: Props) {
               />
             </TabPanel>
             <TabPanel>
+              <h4>Déchets prêts à être envoyés</h4>
               <Slips
                 me={me}
                 forms={data.forms.filter(
                   (f: Form) =>
                     f.emitter.company.siret === me.company.siret &&
-                    f.status !== "DRAFT"
+                    f.status === "SEALED"
+                )}
+              />
+              <h4>Déchets déjà émis</h4>
+              <Slips
+                me={me}
+                forms={data.forms.filter(
+                  (f: Form) =>
+                    f.emitter.company.siret === me.company.siret &&
+                    ["DRAFT", "SEALED"].indexOf(f.status) === -1
                 )}
               />
             </TabPanel>
