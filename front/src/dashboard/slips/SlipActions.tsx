@@ -29,6 +29,11 @@ export default function SlipActions({ form, currentUser }: IProps) {
           Editer
         </Link>
       )}
+      {form.status !== "DRAFT" && (
+        <button className="button small">
+          PDF
+        </button>
+      )}
       {nextStep && (
         <Mutation
           mutation={mutations[nextStep]}
