@@ -51,25 +51,27 @@ export default function Search() {
 
           {show && (
             <div className="panel panel__approved">
-              <div>
-
-              <h3>
-                L'entreprise <strong>{company}</strong> est
-              </h3>
-              <ul>
-                <li>
-                  recensée dans la base des installations classées comme pouvant
-                  collecter des déchets
-                </li>
-                <li>
-                  capable de prendre en charge le code déchet{" "}
-                  <strong>{wasteCode}</strong>
-                </li>
-              </ul>
-              <small>
-                Pour en savoir plus sur cette entreprise, accédez{" "}
-                <Link to="#">à sa fiche.</Link>
-              </small>
+              <div className="approved">
+                <h3>
+                  L'entreprise <strong>{company}</strong> est
+                </h3>
+                <ul>
+                  <li>
+                    autorisée au titre des{" "}
+                    <a href="http://www.installationsclassees.developpement-durable.gouv.fr/rechercheICForm.php">
+                      ICPE
+                    </a>{" "}
+                    à collecter et/ou traiter des déchets dangereux
+                  </li>
+                  <li>
+                    capable de prendre en charge le code déchet{" "}
+                    <strong>{wasteCode}</strong>
+                  </li>
+                </ul>
+                <small>
+                  Pour en savoir plus sur cette entreprise, accédez{" "}
+                  <Link to="#">à sa fiche.</Link>
+                </small>
               </div>
               <div className="stamp">Valide</div>
             </div>
