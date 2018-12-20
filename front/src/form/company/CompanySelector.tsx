@@ -7,9 +7,9 @@ import { GET_ME_AND_COMPANIES } from "./query";
 
 const bookmarkCompanies = [
   {
-    siret: "XXX XXX XXX 0002",
-    name: "A company 2",
-    address: "8 rue du Général de Gaulle"
+    siret: "333 284 909 00020",
+    name: "CHIMIREC-VALRECOISE",
+    address: "79 RUE AUGUSTE BONAMY, 60130 SAINT JUST EN CHAUSSEE"
   },
   {
     siret: "XXX XXX XXX 0003",

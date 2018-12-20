@@ -61,10 +61,12 @@ services:
   td-insee:
     image: td-insee
     build:
-      context: ./insee
+      context: ./insee-go
       dockerfile: Dockerfile
+    ports:
+      - "81:81"
     environment:
-        docker: "true"
+        INSEE_SECRET: $INSEE_SECRET
 
 volumes:
   postgres:

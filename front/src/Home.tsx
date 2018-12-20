@@ -11,7 +11,7 @@ export default function Home() {
       <div className="hero">
         <div className="hero__container">
           <h1 className="hero__white-background">
-            Gérez la traçabilité de vos déchets en toute sérénité
+            Gérez la traçabilité de vos déchets en toute sécurité
           </h1>
           <p className="hero__white-background">
             Trackdéchets a vocation à simplifier la gestion de vos déchets
