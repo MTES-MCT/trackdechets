@@ -8,6 +8,7 @@ import "./SlipActions.scss";
 import Sent from "./slips-actions/Sent";
 import Sealed from "./slips-actions/Sealed";
 import Received from "./slips-actions/Received";
+import { FaEdit, FaFilePdf, FaCheck, FaEnvelope, FaEnvelopeOpen, FaCog, FaClone } from "react-icons/fa";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -25,14 +26,12 @@ export default function SlipActions({ form, currentUser }: IProps) {
   return (
     <div className="SlipActions">
       {form.status === "DRAFT" && (
-        <Link to={`/form/${form.id}`} className="button small">
-          Editer
+        <Link to={`/form/${form.id}`} className="icon">
+          <FaEdit />
         </Link>
       )}
       {form.status !== "DRAFT" && (
-        <button className="button small">
-          PDF
-        </button>
+          <FaFilePdf />
       )}
       {nextStep && (
         <Mutation
@@ -41,9 +40,9 @@ export default function SlipActions({ form, currentUser }: IProps) {
         >
           {(mark, { error }) => (
             <React.Fragment>
-              <button className="button small" onClick={() => setIsOpen(true)}>
-                {buttons[nextStep].title}
-              </button>
+              <a className="icon" onClick={() => setIsOpen(true)}>
+                {buttons[nextStep].icon({})}
+              </a>
               <div
                 className="modal__backdrop"
                 id="modal"
@@ -65,15 +64,16 @@ export default function SlipActions({ form, currentUser }: IProps) {
           )}
         </Mutation>
       )}
+      <a><FaClone /></a>
     </div>
   );
 }
 
 const buttons = {
-  SEALED: { title: "Finaliser", component: Sealed },
-  SENT: { title: "Marquer comme envoyé", component: Sent },
-  RECEIVED: { title: "Marquer comme reçu", component: Received },
-  PROCESSED: { title: "Marquer comme traité", component: Sent }
+  SEALED: { title: "Finaliser", icon: FaCheck, component: Sealed },
+  SENT: { title: "Marquer comme envoyé", icon: FaEnvelope, component: Sent },
+  RECEIVED: { title: "Marquer comme reçu", icon: FaEnvelopeOpen,component: Received },
+  PROCESSED: { title: "Marquer comme traité", icon: FaCog, component: Sent }
 };
 
 function getNextStep(form: Form, currentUser: Me) {

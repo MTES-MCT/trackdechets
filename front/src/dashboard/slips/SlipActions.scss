@@ -1,4 +1,9 @@
 .SlipActions {
   display: flex;
   margin-top: 5px;
+
+  .icon {
+    font-size: larger;
+    margin: 0 5px;
+  }
 }
