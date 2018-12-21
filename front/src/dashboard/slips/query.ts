@@ -4,6 +4,7 @@ export const GET_SLIPS = gql`
   query GetSlips {
     forms {
       id
+      readableId
       createdAt
       status
       emitter {

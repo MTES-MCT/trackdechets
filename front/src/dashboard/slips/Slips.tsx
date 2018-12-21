@@ -23,7 +23,7 @@ export default function Slips({ forms, me }: Props) {
         {forms.map((s: any) => (
           <tr key={s.id}>
             <td>
-              <div className="id">{s.id}</div>
+              <div className="id">{s.readableId}</div>
               <SlipActions currentUser={me} form={s} />
             </td>
             <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>

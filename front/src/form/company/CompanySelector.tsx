@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Field, connect } from "formik";
+import { Field, connect, FieldProps } from "formik";
 import "./CompanySelector.scss";
 import useDebounce from "../../utils/use-debounce";
 import { Query } from "react-apollo";
@@ -25,6 +25,7 @@ const bookmarkCompanies = [
 
 // TODO query INSEE API
 function fakeSearch(clue: string) {
+
   return new Promise(res => {
     const response = [
       {
@@ -38,18 +39,15 @@ function fakeSearch(clue: string) {
 }
 
 type Company = { siret: string; name: string; address: string };
-interface IProps {
-  name: string;
-}
 
-export default connect<IProps>(function CompanySelector(props) {
+export default connect<FieldProps>(function CompanySelector(props) {
   const [clue, setClue] = useState("");
   const debouncedClue = useDebounce(clue, 200);
 
   const [searchResults, setSearchResults] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<Company>(props.field.value as Company);
 
   const searchCompanies = async (clue: string) => {
     setIsLoading(true);
@@ -71,15 +69,15 @@ export default connect<IProps>(function CompanySelector(props) {
   useEffect(
     () => {
       props.formik.setFieldValue(
-        `${props.name}.siret`,
+        `${props.field.name}.siret`,
         selectedCompany ? selectedCompany.siret : ""
       );
       props.formik.setFieldValue(
-        `${props.name}.name`,
+        `${props.field.name}.name`,
         selectedCompany ? selectedCompany.name : ""
       );
       props.formik.setFieldValue(
-        `${props.name}.address`,
+        `${props.field.name}.address`,
         selectedCompany ? selectedCompany.address : ""
       );
     },
@@ -123,7 +121,7 @@ export default connect<IProps>(function CompanySelector(props) {
               {[data.me.company, ...searchResults].map(c => (
                 <li
                   className={`company-bookmarks__item  ${
-                    selectedCompany === c ? "is-selected" : ""
+                    selectedCompany.name === c.name ? "is-selected" : ""
                   }`}
                   key={c.siret}
                   onClick={() => setSelectedCompany(c)}
@@ -157,7 +155,7 @@ export default connect<IProps>(function CompanySelector(props) {
                 Personne à contacter
                 <Field
                   type="text"
-                  name={`${props.name}.contact`}
+                  name={`${props.field.name}.contact`}
                   placeholder="NOM Prénom"
                 />
               </label>
@@ -166,14 +164,14 @@ export default connect<IProps>(function CompanySelector(props) {
                 Téléphone ou Fax
                 <Field
                   type="text"
-                  name={`${props.name}.phone`}
+                  name={`${props.field.name}.phone`}
                   placeholder="Numéro"
                 />
               </label>
 
               <label>
                 Mail
-                <Field type="email" name={`${props.name}.mail`} />
+                <Field type="email" name={`${props.field.name}.mail`} />
               </label>
             </div>
           </div>

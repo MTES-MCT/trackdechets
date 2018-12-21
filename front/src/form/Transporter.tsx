@@ -7,7 +7,7 @@ export default function Transporter() {
   return (
     <React.Fragment>
       <h4>Transporteur</h4>
-      <CompanySelector name="transporter.company" />
+      <Field component={CompanySelector} name="transporter.company" />
 
       <h4>Autorisations</h4>
       <div className="form__group">

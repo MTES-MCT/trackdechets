@@ -6,6 +6,7 @@ import {
 } from "./form-converter";
 import { formSchema } from "./validator";
 import { getNextStep } from "./workflow";
+import { getReadableId } from "./readable-id";
 
 export default {
   Query: {
@@ -51,6 +52,7 @@ export default {
 
       return context.prisma.createForm({
         ...flattenInoutObjectForDb(formContent),
+        readableId: await getReadableId(context),
         owner: { connect: { id: userId } }
       });
     },

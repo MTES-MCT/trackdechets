@@ -1,6 +1,6 @@
 import React from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import "react-tabs/style/react-tabs.css";
+import "./SlipsTabs.scss";
 import Slips from "./Slips";
 import { GET_SLIPS } from "./query";
 import { Query } from "react-apollo";
@@ -20,8 +20,8 @@ export default function SlipsTabs({ me }: Props) {
           <Tabs>
             <TabList>
               <Tab>Brouillons</Tab>
-              <Tab>Déchets que j'émets</Tab>
-              <Tab>Déchets que je reçois</Tab>
+              <Tab>Produits</Tab>
+              <Tab>Collectés / Traités</Tab>
             </TabList>
 
             <TabPanel>

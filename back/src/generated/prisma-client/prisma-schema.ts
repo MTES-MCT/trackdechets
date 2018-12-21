@@ -128,6 +128,7 @@ enum EmitterType {
 
 type Form {
   id: ID!
+  readableId: String!
   owner: User!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -181,6 +182,7 @@ type FormConnection {
 }
 
 input FormCreateInput {
+  readableId: String!
   owner: UserCreateOneInput!
   status: String
   sentAt: DateTime
@@ -233,6 +235,8 @@ type FormEdge {
 enum FormOrderByInput {
   id_ASC
   id_DESC
+  readableId_ASC
+  readableId_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -323,6 +327,7 @@ enum FormOrderByInput {
 
 type FormPreviousValues {
   id: ID!
+  readableId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   status: String
@@ -387,6 +392,7 @@ input FormSubscriptionWhereInput {
 }
 
 input FormUpdateInput {
+  readableId: String
   owner: UserUpdateOneRequiredInput
   status: String
   sentAt: DateTime
@@ -432,6 +438,7 @@ input FormUpdateInput {
 }
 
 input FormUpdateManyMutationInput {
+  readableId: String
   status: String
   sentAt: DateTime
   sentBy: String
@@ -490,6 +497,20 @@ input FormWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  readableId: String
+  readableId_not: String
+  readableId_in: [String!]
+  readableId_not_in: [String!]
+  readableId_lt: String
+  readableId_lte: String
+  readableId_gt: String
+  readableId_gte: String
+  readableId_contains: String
+  readableId_not_contains: String
+  readableId_starts_with: String
+  readableId_not_starts_with: String
+  readableId_ends_with: String
+  readableId_not_ends_with: String
   owner: UserWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
@@ -1006,6 +1027,7 @@ input FormWhereInput {
 
 input FormWhereUniqueInput {
   id: ID
+  readableId: String
 }
 
 scalar Json

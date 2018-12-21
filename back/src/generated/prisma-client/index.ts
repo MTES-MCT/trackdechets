@@ -192,6 +192,8 @@ export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 export type FormOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "readableId_ASC"
+  | "readableId_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -427,6 +429,7 @@ export interface UserUpdateManyMutationInput {
 }
 
 export interface FormUpdateInput {
+  readableId?: String;
   owner?: UserUpdateOneRequiredInput;
   status?: String;
   sentAt?: DateTimeInput;
@@ -472,6 +475,7 @@ export interface FormUpdateInput {
 }
 
 export interface FormUpdateManyMutationInput {
+  readableId?: String;
   status?: String;
   sentAt?: DateTimeInput;
   sentBy?: String;
@@ -597,6 +601,20 @@ export interface FormWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
+  readableId?: String;
+  readableId_not?: String;
+  readableId_in?: String[] | String;
+  readableId_not_in?: String[] | String;
+  readableId_lt?: String;
+  readableId_lte?: String;
+  readableId_gt?: String;
+  readableId_gte?: String;
+  readableId_contains?: String;
+  readableId_not_contains?: String;
+  readableId_starts_with?: String;
+  readableId_not_starts_with?: String;
+  readableId_ends_with?: String;
+  readableId_not_ends_with?: String;
   owner?: UserWhereInput;
   createdAt?: DateTimeInput;
   createdAt_not?: DateTimeInput;
@@ -1113,6 +1131,7 @@ export interface FormWhereInput {
 
 export type FormWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
+  readableId?: String;
 }>;
 
 export interface CompanyCreateInput {
@@ -1124,6 +1143,7 @@ export interface CompanyUpdateManyMutationInput {
 }
 
 export interface FormCreateInput {
+  readableId: String;
   owner: UserCreateOneInput;
   status?: String;
   sentAt?: DateTimeInput;
@@ -1346,6 +1366,7 @@ export interface UserPreviousValuesSubscription
 
 export interface Form {
   id: ID_Output;
+  readableId: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   status?: String;
@@ -1393,6 +1414,7 @@ export interface Form {
 
 export interface FormPromise extends Promise<Form>, Fragmentable {
   id: () => Promise<ID_Output>;
+  readableId: () => Promise<String>;
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -1443,6 +1465,7 @@ export interface FormSubscription
   extends Promise<AsyncIterator<Form>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  readableId: () => Promise<AsyncIterator<String>>;
   owner: <T = UserSubscription>() => T;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -1573,6 +1596,7 @@ export interface FormConnectionSubscription
 
 export interface FormPreviousValues {
   id: ID_Output;
+  readableId: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   status?: String;
@@ -1622,6 +1646,7 @@ export interface FormPreviousValuesPromise
   extends Promise<FormPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  readableId: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   status: () => Promise<String>;
@@ -1671,6 +1696,7 @@ export interface FormPreviousValuesSubscription
   extends Promise<AsyncIterator<FormPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  readableId: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   status: () => Promise<AsyncIterator<String>>;
@@ -1934,6 +1960,7 @@ export const models = [
 export const Prisma = makePrismaClientClass<ClientConstructor<Prisma>>({
   typeDefs,
   models,
-  endpoint: `http://prisma:4466`
+  endpoint: `http://prisma:4466`,
+  secret: `trackdechets-prisma`
 });
 export const prisma = new Prisma();

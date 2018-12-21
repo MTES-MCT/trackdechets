@@ -16,6 +16,7 @@ type Company {
 
 type Form {
   id: ID! @unique
+  readableId: String! @unique
 
   owner: User!
   createdAt: DateTime!

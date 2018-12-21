@@ -19,7 +19,7 @@ export default function Recipient() {
         </p>
       </div>
 
-      <CompanySelector name="recipient.company" />
+      <Field component={CompanySelector} name="recipient.company" />
 
       <h4>Informations complémentaires</h4>
 

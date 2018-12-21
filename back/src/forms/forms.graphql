@@ -25,6 +25,7 @@ enum FormStatus {
 
 type Form {
   id: ID
+  readableId: String
 
   emitter: Emitter
   recipient: Recipient

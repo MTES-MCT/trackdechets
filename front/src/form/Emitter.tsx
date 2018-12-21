@@ -29,7 +29,7 @@ export default function Emitter() {
       </div>
 
       <h4>Entreprise émettrice</h4>
-      <CompanySelector name="emitter.company" />
+      <Field component={CompanySelector} name="emitter.company" />
 
       <label>
         <input
