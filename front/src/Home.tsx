@@ -2,6 +2,7 @@ import React from "react";
 import Header from "./Header";
 import "./Home.scss";
 import { Link } from "react-router-dom";
+import { FaTasks, FaPenFancy, FaCheckCircle } from "react-icons/fa";
 
 export default function Home() {
   return (
@@ -11,12 +12,12 @@ export default function Home() {
       <div className="hero">
         <div className="hero__container">
           <h1 className="hero__white-background">
-            Gérez la traçabilité de vos déchets en toute sécurité
+            Gérer la traçabilité des déchets en toute sécurité
           </h1>
           <p className="hero__white-background">
             Trackdéchets a vocation à simplifier la gestion de vos déchets
             dangereux au quotidien : 0 papier, traçabilité en temps reél,
-            informations regroupées sur un seul outil gratuit
+            informations regroupées sur un outil unique
           </p>
           <p>
             <Link to="/signup" className="button large warning">
@@ -37,6 +38,9 @@ export default function Home() {
 
           <div className="row">
             <div>
+              <div className="feature-icon">
+                <FaPenFancy />
+              </div>
               <h3>Éditez simplement vos bordereaux</h3>
               <p>
                 Pour que la préparation des bordereaux ne soit plus d'une
@@ -44,17 +48,30 @@ export default function Home() {
               </p>
             </div>
             <div>
+              <div className="feature-icon">
+                <FaTasks />
+              </div>
               <h3>Suivez la vie de vos déchets en temps réel</h3>
               <p>
                 Fini les relances multiples pour savoir si vos déchets ont été
                 traités et le travail d'archivage des BSD
               </p>
             </div>
+            <div>
+              <div className="feature-icon">
+                <FaCheckCircle />
+              </div>
+              <h3>Vérifiez les autorisations</h3>
+              <p>
+                Vérifiez si une entreprise partenaire est bien autorisée à
+                traiter vos déchets
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="section section-color">
+      {/* <section className="section section-color">
         <div className="container">
           <p className="section__subtitle">
             Ce produit est actuellement en version béta et intégrera
@@ -63,7 +80,7 @@ export default function Home() {
             données, préparation GEREP, annexe 1, autres déchets dangereux)
           </p>
         </div>
-      </section>
+      </section> */}
 
       <footer className="footer" role="contentinfo">
         <div className="container">
@@ -84,7 +101,7 @@ export default function Home() {
               <h3>Trackdéchets</h3>
             </li>
             <li>
-              <a href="#">Nous contacter</a>
+              <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">Nous contacter</a>
             </li>
             <li>
               <a href="#">Conditions générales d'utilisation</a>
