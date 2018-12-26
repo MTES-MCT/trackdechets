@@ -1,14 +1,24 @@
 import gql from "graphql-tag";
 
-export const GET_ME_AND_COMPANIES = gql`
-  query MeAndCompanies {
-    me {
-      id
-      company {
-        siret
-        name
-        address
-      }
+export const FAVORITES = gql`
+  query Favorites($type: FavoriteType!) {
+    favorites(type: $type) {
+      siret
+      name
+      address
+      contact
+      phone
+      mail
+    }
+  }
+`;
+
+export const COMPANY_INFOS = gql`
+  query CompanyInfos($siret: String!) {
+    companyInfos(siret: $siret) {
+      siret
+      name
+      address
     }
   }
 `;

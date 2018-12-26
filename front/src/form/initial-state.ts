@@ -40,6 +40,7 @@ export default {
   },
   wasteDetails: {
     code: "",
+    name: "",
     onuCode: "",
     packagings: [],
     otherPackaging: "",

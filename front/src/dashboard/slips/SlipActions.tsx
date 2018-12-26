@@ -8,7 +8,15 @@ import "./SlipActions.scss";
 import Sent from "./slips-actions/Sent";
 import Sealed from "./slips-actions/Sealed";
 import Received from "./slips-actions/Received";
-import { FaEdit, FaFilePdf, FaCheck, FaEnvelope, FaEnvelopeOpen, FaCog, FaClone } from "react-icons/fa";
+import {
+  FaEdit,
+  FaFilePdf,
+  FaCheck,
+  FaEnvelope,
+  FaEnvelopeOpen,
+  FaCog,
+  FaClone
+} from "react-icons/fa";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -25,14 +33,14 @@ export default function SlipActions({ form, currentUser }: IProps) {
 
   return (
     <div className="SlipActions">
-      {form.status === "DRAFT" && (
+      {form.status === "DRAFT" ? (
         <Link to={`/form/${form.id}`} className="icon">
           <FaEdit />
         </Link>
+      ) : (
+        <FaFilePdf />
       )}
-      {form.status !== "DRAFT" && (
-          <FaFilePdf />
-      )}
+      <a><FaClone /></a>
       {nextStep && (
         <Mutation
           mutation={mutations[nextStep]}
@@ -64,7 +72,6 @@ export default function SlipActions({ form, currentUser }: IProps) {
           )}
         </Mutation>
       )}
-      <a><FaClone /></a>
     </div>
   );
 }
@@ -72,7 +79,11 @@ export default function SlipActions({ form, currentUser }: IProps) {
 const buttons = {
   SEALED: { title: "Finaliser", icon: FaCheck, component: Sealed },
   SENT: { title: "Marquer comme envoyé", icon: FaEnvelope, component: Sent },
-  RECEIVED: { title: "Marquer comme reçu", icon: FaEnvelopeOpen,component: Received },
+  RECEIVED: {
+    title: "Marquer comme reçu",
+    icon: FaEnvelopeOpen,
+    component: Received
+  },
   PROCESSED: { title: "Marquer comme traité", icon: FaCog, component: Sent }
 };
 

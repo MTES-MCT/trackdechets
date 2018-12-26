@@ -71,6 +71,7 @@ type Form {
 
   # Waste details fields
   wasteDetailsCode: String
+  wasteDetailsName: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String

@@ -1,71 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { Field, connect, FieldProps } from "formik";
+import ApolloClient from "apollo-client";
+import { connect, Field, FieldProps } from "formik";
+import React, { useEffect, useState } from "react";
+import { ApolloConsumer, Query } from "react-apollo";
+import { FaSearch, FaCheck } from "react-icons/fa";
 import "./CompanySelector.scss";
-import useDebounce from "../../utils/use-debounce";
-import { Query } from "react-apollo";
-import { GET_ME_AND_COMPANIES } from "./query";
-
-const bookmarkCompanies = [
-  {
-    siret: "333 284 909 00020",
-    name: "CHIMIREC-VALRECOISE",
-    address: "79 RUE AUGUSTE BONAMY, 60130 SAINT JUST EN CHAUSSEE"
-  },
-  {
-    siret: "XXX XXX XXX 0003",
-    name: "A company 3",
-    address: "8 rue du Général de Gaulle"
-  },
-  {
-    siret: "XXX XXX XXX 0004",
-    name: "A company 4",
-    address: "8 rue du Général de Gaulle"
-  }
-];
-
-// TODO query INSEE API
-function fakeSearch(clue: string) {
-
-  return new Promise(res => {
-    const response = [
-      {
-        siret: "111 XXX XXX 0004",
-        name: "A search result",
-        address: "42 rue d'Autre Part"
-      }
-    ];
-    setTimeout(() => res(response), 1000);
-  });
-}
+import { COMPANY_INFOS, FAVORITES } from "./query";
 
 type Company = { siret: string; name: string; address: string };
 
 export default connect<FieldProps>(function CompanySelector(props) {
-  const [clue, setClue] = useState("");
-  const debouncedClue = useDebounce(clue, 200);
-
   const [searchResults, setSearchResults] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [selectedCompany, setSelectedCompany] = useState<Company>(props.field.value as Company);
+  const [selectedCompany, setSelectedCompany] = useState<Company>(props.field
+    .value as Company);
 
-  const searchCompanies = async (clue: string) => {
+  const searchCompanies = async (
+    client: ApolloClient<Company>,
+    clue: string
+  ) => {
+    if (clue.length < 14) {
+      return;
+    }
+
     setIsLoading(true);
-    const apiResults = clue ? await fakeSearch(clue) : [];
+    const { data } = await client.query<{ companyInfos: Company }>({
+      query: COMPANY_INFOS,
+      variables: { siret: clue }
+    });
 
-    const filteredBookmarks = bookmarkCompanies.filter(
-      c => c.name.includes(clue) || c.siret.includes(clue)
-    );
-    setSearchResults(filteredBookmarks.concat(apiResults as any));
+    setSearchResults([data.companyInfos]);
     setIsLoading(false);
   };
 
-  useEffect(
-    () => {
-      searchCompanies(debouncedClue);
-    },
-    [debouncedClue]
-  );
   useEffect(
     () => {
       props.formik.setFieldValue(
@@ -85,40 +52,31 @@ export default connect<FieldProps>(function CompanySelector(props) {
   );
 
   return (
-    <Query query={GET_ME_AND_COMPANIES}>
+    <Query query={FAVORITES} variables={{ type: "EMITTER" }}>
       {({ loading, error, data }) => {
         if (loading) return <p>Chargement...</p>;
         if (error) return <p>Erreur :(</p>;
 
         return (
           <div className="CompanySelector">
-            <div className="search__group">
-              <input
-                type="text"
-                className=""
-                placeholder="Recherche par numéro de SIRET"
-                value={clue}
-                onChange={e => setClue(e.target.value)}
-              />
-              <button className="overlay-button" aria-label="Recherche">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  version="1.1"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"
+            <ApolloConsumer>
+              {client => (
+                <div className="search__group">
+                  <input
+                    type="text"
+                    placeholder="Recherche par numéro de SIRET"
+                    onChange={e => searchCompanies(client, e.target.value)}
                   />
-                </svg>
-              </button>
-            </div>
+                  <button className="overlay-button" aria-label="Recherche">
+                    <FaSearch />
+                  </button>
+                </div>
+              )}
+            </ApolloConsumer>
 
             {isLoading && <span>Chargement...</span>}
             <ul className="company-bookmarks">
-              {[data.me.company, ...searchResults].map(c => (
+              {[...searchResults, ...data.favorites].map(c => (
                 <li
                   className={`company-bookmarks__item  ${
                     selectedCompany.name === c.name ? "is-selected" : ""
@@ -133,18 +91,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
                     </p>
                   </div>
                   <div className="icon">
-                    <svg
-                      width="30"
-                      height="30"
-                      viewBox="0 0 16 16"
-                      version="1.1"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"
-                      />
-                    </svg>
+                    <FaCheck />
                   </div>
                 </li>
               ))}

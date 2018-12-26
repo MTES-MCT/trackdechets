@@ -27,6 +27,13 @@ export default connect<{}, Values>(function WasteInfo(props) {
         />
       </div>
 
+      <div className="form__group">
+        <label>
+          Désignation du déchet
+          <Field type="text" name="wasteDetails.name" />
+        </label>
+      </div>
+
       <h4>Conditionnement</h4>
       <div className="form__group">
         <Field name="wasteDetails.packagings" component={Packagings} />
