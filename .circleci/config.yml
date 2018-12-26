@@ -7,41 +7,74 @@ executors:
     working_directory: ~/project/trackdechets
 
 jobs:
-  build-docker-front:
+  check-docker:
     executor: node
     steps:
-      - checkout
-      - setup_remote_docker
       - run: |
-          if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
-            echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
-            exit 1
-          fi
-          docker build -t betagouv/trackdechets-ui:$CIRCLE_SHA1 ./front
-          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-          docker push betagouv/trackdechets-ui:$CIRCLE_SHA1
-          if [[ "$CIRCLE_BRANCH" = "master" ]]; then
-            docker tag betagouv/trackdechets-ui:$CIRCLE_SHA1 betagouv/trackdechets-ui:latest
-            docker push betagouv/trackdechets-ui:latest
-          fi
+        if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
+          echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
+          exit 1
+        fi
 
-  build-docker-back:
+  build-ui:
     executor: node
     steps:
       - checkout
       - setup_remote_docker
       - run: |
-          if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
-            echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
-            exit 1
-          fi
+        docker build -t betagouv/trackdechets-ui:$CIRCLE_SHA1 ./front
+        docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+        docker push betagouv/trackdechets-ui:$CIRCLE_SHA1
+      - run: |
+        if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          docker tag betagouv/trackdechets-ui:$CIRCLE_SHA1 betagouv/trackdechets-ui:latest
+          docker push betagouv/trackdechets-ui:latest
+        fi
+
+  build-api:
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
           docker build -t betagouv/trackdechets-api:$CIRCLE_SHA1 ./back
           echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
           docker push betagouv/trackdechets-api:$CIRCLE_SHA1
-          if [[ "$CIRCLE_BRANCH" = "master" ]]; then
-            docker tag betagouv/trackdechets-api:$CIRCLE_SHA1 betagouv/trackdechets-api:latest
-            docker push betagouv/trackdechets-api:latest
-          fi
+      - run: |
+        if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          docker tag betagouv/trackdechets-api:$CIRCLE_SHA1 betagouv/trackdechets-api:latest
+          docker push betagouv/trackdechets-api:latest
+        fi
+
+  build-insee:
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+        docker build -t betagouv/trackdechets-insee:$CIRCLE_SHA1 ./insee
+        echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+        docker push betagouv/trackdechets-insee:$CIRCLE_SHA1
+      - run: |
+        if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          docker tag betagouv/trackdechets-insee:$CIRCLE_SHA1 betagouv/trackdechets-insee:latest
+          docker push betagouv/trackdechets-insee:latest
+        fi
+
+  build-pdf:
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+        docker build -t betagouv/trackdechets-pdf:$CIRCLE_SHA1 ./pdf
+        echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+        docker push betagouv/trackdechets-pdf:$CIRCLE_SHA1
+      - run: |
+        if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          docker tag betagouv/trackdechets-pdf:$CIRCLE_SHA1 betagouv/trackdechets-pdf:latest
+          docker push betagouv/trackdechets-pdf:latest
+        fi
 
   deploy:
     machine:
@@ -58,12 +91,21 @@ jobs:
 workflows:
   build_deploy:
     jobs:
-      - build-docker-front
-      - build-docker-back
+      - check-docker
+      - build-ui:
+          requires:
+            - check-docker
+      - build-api:
+          requires:
+            - check-docker
+      - build-insee:
+          requires:
+            - check-docker
       - deploy:
           requires:
-            - build-docker-front
-            - build-docker-back
+            - build-api
+            - build-ui
+            - build-insee
           filters:
             branches:
               only: master

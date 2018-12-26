@@ -61,7 +61,7 @@ services:
   td-insee:
     image: td-insee
     build:
-      context: ./insee-go
+      context: ./insee
       dockerfile: Dockerfile
     ports:
       - "81:81"
