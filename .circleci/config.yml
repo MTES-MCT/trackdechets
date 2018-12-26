@@ -11,10 +11,10 @@ jobs:
     executor: node
     steps:
       - run: |
-        if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
-          echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
-          exit 1
-        fi
+          if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
+            echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
+            exit 1
+          fi
 
   build-ui:
     executor: node
@@ -22,14 +22,14 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: |
-        docker build -t betagouv/trackdechets-ui:$CIRCLE_SHA1 ./front
-        docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-        docker push betagouv/trackdechets-ui:$CIRCLE_SHA1
+          docker build -t betagouv/trackdechets-ui:$CIRCLE_SHA1 ./front
+          docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+          docker push betagouv/trackdechets-ui:$CIRCLE_SHA1
       - run: |
-        if [ "${CIRCLE_BRANCH}" == "master" ]; then
-          docker tag betagouv/trackdechets-ui:$CIRCLE_SHA1 betagouv/trackdechets-ui:latest
-          docker push betagouv/trackdechets-ui:latest
-        fi
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-ui:$CIRCLE_SHA1 betagouv/trackdechets-ui:latest
+            docker push betagouv/trackdechets-ui:latest
+          fi
 
   build-api:
     executor: node
@@ -41,10 +41,10 @@ jobs:
           echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
           docker push betagouv/trackdechets-api:$CIRCLE_SHA1
       - run: |
-        if [ "${CIRCLE_BRANCH}" == "master" ]; then
-          docker tag betagouv/trackdechets-api:$CIRCLE_SHA1 betagouv/trackdechets-api:latest
-          docker push betagouv/trackdechets-api:latest
-        fi
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-api:$CIRCLE_SHA1 betagouv/trackdechets-api:latest
+            docker push betagouv/trackdechets-api:latest
+          fi
 
   build-insee:
     executor: node
@@ -52,14 +52,14 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: |
-        docker build -t betagouv/trackdechets-insee:$CIRCLE_SHA1 ./insee
-        echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-        docker push betagouv/trackdechets-insee:$CIRCLE_SHA1
+          docker build -t betagouv/trackdechets-insee:$CIRCLE_SHA1 ./insee
+          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+          docker push betagouv/trackdechets-insee:$CIRCLE_SHA1
       - run: |
-        if [ "${CIRCLE_BRANCH}" == "master" ]; then
-          docker tag betagouv/trackdechets-insee:$CIRCLE_SHA1 betagouv/trackdechets-insee:latest
-          docker push betagouv/trackdechets-insee:latest
-        fi
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-insee:$CIRCLE_SHA1 betagouv/trackdechets-insee:latest
+            docker push betagouv/trackdechets-insee:latest
+          fi
 
   build-pdf:
     executor: node
@@ -67,14 +67,14 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: |
-        docker build -t betagouv/trackdechets-pdf:$CIRCLE_SHA1 ./pdf
-        echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-        docker push betagouv/trackdechets-pdf:$CIRCLE_SHA1
+          docker build -t betagouv/trackdechets-pdf:$CIRCLE_SHA1 ./pdf
+          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+          docker push betagouv/trackdechets-pdf:$CIRCLE_SHA1
       - run: |
-        if [ "${CIRCLE_BRANCH}" == "master" ]; then
-          docker tag betagouv/trackdechets-pdf:$CIRCLE_SHA1 betagouv/trackdechets-pdf:latest
-          docker push betagouv/trackdechets-pdf:latest
-        fi
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-pdf:$CIRCLE_SHA1 betagouv/trackdechets-pdf:latest
+            docker push betagouv/trackdechets-pdf:latest
+          fi
 
   deploy:
     machine:
