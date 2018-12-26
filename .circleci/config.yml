@@ -101,11 +101,15 @@ workflows:
       - build-insee:
           requires:
             - check-docker
+      - build-pdf:
+          requires:
+            - check-docker
       - deploy:
           requires:
             - build-api
             - build-ui
             - build-insee
+            - build-pdf
           filters:
             branches:
               only: master
