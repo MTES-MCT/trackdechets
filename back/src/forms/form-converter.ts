@@ -63,3 +63,24 @@ export function unflattenObjectFromDb(input, apiObject = {}) {
 
   return apiObject;
 }
+
+export function cleanUpNotDuplicatableFieldsInForm(form) {
+  const {
+    id,
+    createdAt,
+    updatedAt,
+    readableId,
+
+    status,
+    sentAt,
+    sentBy,
+
+    isAccepted,
+    receivedAt,
+    quantityReceived,
+    processingOperationDone,
+    ...rest
+  } = form;
+
+  return rest;
+}

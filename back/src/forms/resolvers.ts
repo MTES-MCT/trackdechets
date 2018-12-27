@@ -2,7 +2,8 @@ import { getUserId } from "../utils";
 import { Context } from "../types";
 import {
   flattenInoutObjectForDb,
-  unflattenObjectFromDb
+  unflattenObjectFromDb,
+  cleanUpNotDuplicatableFieldsInForm
 } from "./form-converter";
 import { formSchema } from "./validator";
 import { getNextStep } from "./workflow";
@@ -58,6 +59,21 @@ export default {
     },
     deleteForm: async (parent, { id }, context: Context) => {
       return context.prisma.deleteForm({ id });
+    },
+    duplicateForm: async (parent, { id }, context: Context) => {
+      const userId = getUserId(context);
+
+      const existingForm = await context.prisma.form({
+        id
+      });
+
+      const newForm = await context.prisma.createForm({
+        ...cleanUpNotDuplicatableFieldsInForm(existingForm),
+        readableId: await getReadableId(context),
+        owner: { connect: { id: userId } }
+      });
+
+      return unflattenObjectFromDb(newForm);
     },
     markAsSealed: async (parent, { id }, context: Context) => {
       const form = await context.prisma.form({ id });

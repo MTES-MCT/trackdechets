@@ -15,8 +15,9 @@ import {
   FaEnvelope,
   FaEnvelopeOpen,
   FaCog,
-  FaClone
 } from "react-icons/fa";
+import Duplicate from "./slips-actions/Duplicate";
+import Delete from "./slips-actions/Delete";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -34,13 +35,16 @@ export default function SlipActions({ form, currentUser }: IProps) {
   return (
     <div className="SlipActions">
       {form.status === "DRAFT" ? (
-        <Link to={`/form/${form.id}`} className="icon">
-          <FaEdit />
-        </Link>
+        <React.Fragment>
+          <Link to={`/form/${form.id}`} className="icon">
+            <FaEdit />
+          </Link>
+          <Delete formId={form.id} />
+        </React.Fragment>
       ) : (
         <FaFilePdf />
       )}
-      <a><FaClone /></a>
+      <Duplicate formId={form.id} />
       {nextStep && (
         <Mutation
           mutation={mutations[nextStep]}

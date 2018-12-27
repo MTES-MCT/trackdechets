@@ -8,6 +8,7 @@ type Query {
 type Mutation {
   saveForm(formInput: FormInput!): Form
   deleteForm(id: ID!): Form
+  duplicateForm(id: ID!): Form
 
   markAsSealed(id: ID): Form
   markAsSent(id: ID, sentInfo: SentFormInput!): Form

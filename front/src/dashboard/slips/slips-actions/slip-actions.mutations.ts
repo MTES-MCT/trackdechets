@@ -33,9 +33,46 @@ const MARK_PROCESSED = gql`
   }
 `;
 
+const DUPLICATE_FORM = gql`
+  mutation DuplicateForm($id: ID!) {
+    duplicateForm(id: $id) {
+      id
+      readableId
+      createdAt
+      status
+      emitter {
+        company {
+          name
+          siret
+        }
+      }
+      recipient {
+        company {
+          name
+          siret
+        }
+      }
+      wasteDetails {
+        code
+        quantity
+      }
+    }
+  }
+`;
+
+const DELETE_FORM = gql`
+  mutation DeleteForm($id: ID!) {
+    deleteForm(id: $id) {
+      id
+    }
+  }
+`;
+
 export default {
   SEALED: MARK_SEALED,
   SENT: MARK_SENT,
   RECEIVED: MARK_RECEIVED,
-  PROCESSED: MARK_PROCESSED
+  PROCESSED: MARK_PROCESSED,
+  DUPLICATE_FORM,
+  DELETE_FORM
 };
