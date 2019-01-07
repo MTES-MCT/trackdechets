@@ -24,7 +24,7 @@ export default {
           email: payload.email,
           password: hashedPassword,
           company: {
-            create: { siret: payload.siret }
+            create: { siret: payload.siret.replace(/\s+/g, "") }
           }
         })
         .catch(_ => {
