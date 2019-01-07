@@ -3,6 +3,8 @@ services:
   prisma:
     image: prismagraphql/prisma:1.21
     restart: always
+    ports:
+      - "4466:4466"
     environment:
       PRISMA_CONFIG: |
         port: 4466
@@ -40,6 +42,16 @@ services:
       VIRTUAL_HOST: $UI_HOST
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+
+  td-insee:
+    image: betagouv/trackdechets-insee:latest
+    restart: always
+    environment:
+        INSEE_SECRET: $INSEE_SECRET
+
+  td-pdf:
+    image: betagouv/trackdechets-pdf:latest
+    restart: always
 
 volumes:
   postgres:

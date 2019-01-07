@@ -6,7 +6,7 @@ import { ApolloLink } from "apollo-link";
 import { omitDeep } from "./utils/omit";
 
 const httpLink = createHttpLink({
-  uri: `http://${process.env.REACT_APP_API_ENDPOINT}`
+  uri: process.env.REACT_APP_API_ENDPOINT
 });
 
 const authLink = setContext((_, { headers }) => {

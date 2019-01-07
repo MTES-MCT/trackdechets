@@ -63,8 +63,6 @@ services:
     build:
       context: ./insee
       dockerfile: Dockerfile
-    ports:
-      - "81:81"
     environment:
         INSEE_SECRET: $INSEE_SECRET
 
