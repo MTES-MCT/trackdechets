@@ -129,6 +129,7 @@ enum EmitterType {
 type Form {
   id: ID!
   readableId: String!
+  isDeleted: Boolean
   owner: User!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -167,6 +168,7 @@ type Form {
   transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
+  wasteDetailsName: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -183,6 +185,7 @@ type FormConnection {
 
 input FormCreateInput {
   readableId: String!
+  isDeleted: Boolean
   owner: UserCreateOneInput!
   status: String
   sentAt: DateTime
@@ -219,6 +222,7 @@ input FormCreateInput {
   transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
+  wasteDetailsName: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -237,6 +241,8 @@ enum FormOrderByInput {
   id_DESC
   readableId_ASC
   readableId_DESC
+  isDeleted_ASC
+  isDeleted_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -311,6 +317,8 @@ enum FormOrderByInput {
   transporterNumberPlate_DESC
   wasteDetailsCode_ASC
   wasteDetailsCode_DESC
+  wasteDetailsName_ASC
+  wasteDetailsName_DESC
   wasteDetailsOnuCode_ASC
   wasteDetailsOnuCode_DESC
   wasteDetailsPackagings_ASC
@@ -328,6 +336,7 @@ enum FormOrderByInput {
 type FormPreviousValues {
   id: ID!
   readableId: String!
+  isDeleted: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
   status: String
@@ -365,6 +374,7 @@ type FormPreviousValues {
   transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
+  wasteDetailsName: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -393,6 +403,7 @@ input FormSubscriptionWhereInput {
 
 input FormUpdateInput {
   readableId: String
+  isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   status: String
   sentAt: DateTime
@@ -429,6 +440,7 @@ input FormUpdateInput {
   transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
+  wasteDetailsName: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -439,6 +451,7 @@ input FormUpdateInput {
 
 input FormUpdateManyMutationInput {
   readableId: String
+  isDeleted: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -474,6 +487,7 @@ input FormUpdateManyMutationInput {
   transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
+  wasteDetailsName: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -511,6 +525,8 @@ input FormWhereInput {
   readableId_not_starts_with: String
   readableId_ends_with: String
   readableId_not_ends_with: String
+  isDeleted: Boolean
+  isDeleted_not: Boolean
   owner: UserWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
@@ -972,6 +988,20 @@ input FormWhereInput {
   wasteDetailsCode_not_starts_with: String
   wasteDetailsCode_ends_with: String
   wasteDetailsCode_not_ends_with: String
+  wasteDetailsName: String
+  wasteDetailsName_not: String
+  wasteDetailsName_in: [String!]
+  wasteDetailsName_not_in: [String!]
+  wasteDetailsName_lt: String
+  wasteDetailsName_lte: String
+  wasteDetailsName_gt: String
+  wasteDetailsName_gte: String
+  wasteDetailsName_contains: String
+  wasteDetailsName_not_contains: String
+  wasteDetailsName_starts_with: String
+  wasteDetailsName_not_starts_with: String
+  wasteDetailsName_ends_with: String
+  wasteDetailsName_not_ends_with: String
   wasteDetailsOnuCode: String
   wasteDetailsOnuCode_not: String
   wasteDetailsOnuCode_in: [String!]

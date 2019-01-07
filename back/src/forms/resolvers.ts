@@ -31,7 +31,7 @@ export default {
       const userId = getUserId(context);
 
       const forms = await context.prisma.forms({
-        where: { owner: { id: userId } }
+        where: { owner: { id: userId }, isDeleted: false }
       });
 
       return forms.map(f => unflattenObjectFromDb(f));
@@ -58,7 +58,10 @@ export default {
       });
     },
     deleteForm: async (parent, { id }, context: Context) => {
-      return context.prisma.deleteForm({ id });
+      return context.prisma.updateForm({
+        where: { id },
+        data: { isDeleted: true }
+      });
     },
     duplicateForm: async (parent, { id }, context: Context) => {
       const userId = getUserId(context);
