@@ -76,6 +76,21 @@ jobs:
             docker push betagouv/trackdechets-pdf:latest
           fi
 
+  build-mail:
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          docker build -t betagouv/trackdechets-mail:$CIRCLE_SHA1 ./mail
+          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+          docker push betagouv/trackdechets-mail:$CIRCLE_SHA1
+      - run: |
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-mail:$CIRCLE_SHA1 betagouv/trackdechets-mail:latest
+            docker push betagouv/trackdechets-mail:latest
+          fi
+
   deploy:
     machine:
       enabled: true
@@ -86,7 +101,6 @@ jobs:
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-api:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-ui:latest"
             ssh $SSH_USER@$SSH_HOST "cd /srv/trackdechets/ ; docker-compose up --force-recreate -d td-api td-ui"
-
 
 workflows:
   build_deploy:
@@ -104,13 +118,16 @@ workflows:
       - build-pdf:
           requires:
             - check-docker
+      - build-mail:
+          requires:
+            - check-docker
       - deploy:
           requires:
             - build-api
             - build-ui
             - build-insee
             - build-pdf
+            - build-mail
           filters:
             branches:
               only: master
-

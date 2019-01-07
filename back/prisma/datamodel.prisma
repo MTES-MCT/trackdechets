@@ -1,5 +1,6 @@
 type User {
   id: ID! @unique
+  isActive: Boolean @default(value: "false")
   email: String! @unique
   password: String!
   name: String
@@ -10,6 +11,12 @@ type User {
   updatedAt: DateTime!
 }
 
+type UserActivationHash {
+  id: ID! @unique
+  user: User!
+  hash: String! @unique
+}
+
 type Company {
   siret: String! @unique
 }
@@ -17,7 +24,7 @@ type Company {
 type Form {
   id: ID! @unique
   readableId: String! @unique
-  isDeleted: Boolean @default(value: false)
+  isDeleted: Boolean @default(value: "false")
 
   owner: User!
   createdAt: DateTime!

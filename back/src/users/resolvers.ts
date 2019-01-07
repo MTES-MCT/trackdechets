@@ -1,3 +1,4 @@
+import axios from "axios";
 import { hash, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { APP_SECRET, getUserId } from "../utils";
@@ -17,13 +18,47 @@ export default {
       }
 
       const hashedPassword = await hash(payload.password, 10);
-      const user = await context.prisma.createUser({
-        name: payload.name,
-        email: payload.email,
-        password: hashedPassword,
-        company: {
-          create: { siret: payload.siret }
+      const user = await context.prisma
+        .createUser({
+          name: payload.name,
+          email: payload.email,
+          password: hashedPassword,
+          company: {
+            create: { siret: payload.siret }
+          }
+        })
+        .catch(_ => {
+          throw new Error(
+            "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
+          );
+        });
+
+      const activationHash = await hash(
+        new Date().valueOf().toString() + Math.random().toString(),
+        10
+      );
+      await context.prisma.createUserActivationHash({
+        hash: activationHash,
+        user: {
+          connect: { id: user.id }
         }
+      });
+
+      await axios.post("http://td-mail/send", {
+        toEmail: user.email,
+        toName: user.name,
+        subject: "Activer votre compte sur Trackdéchets",
+        title: "Activation de votre compte",
+        body: `Bonjour ${user.name},
+        <br>
+        Vous venez de créer un compte sur Trackdéchets ! Nous sommes ravis de vous compter parmi nous ! 🎉
+        <br>
+        Pour finaliser votre inscription, veuillez confirmer votre email en cliquant sur le lien suivant :
+        <a href="https://api.trackdechets.beta.gouv.fr/userActivation?hash=${activationHash}">https://api.trackdechets.beta.gouv.fr/userActivation?hash=${activationHash}</a>
+        <br>
+        Pour rappel, Trackdéchets est un site en béta conçu par la Fabrique Numérique du Ministère de l'Ecologie et des Territoires.
+        <br>
+        Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <emmanuel.flahaut@developpement-durable.gouv.fr>.`
       });
 
       return {
@@ -31,10 +66,15 @@ export default {
         user
       };
     },
-    login: async (parent, { email, password }, context) => {
+    login: async (parent, { email, password }, context: Context) => {
       const user = await context.prisma.user({ email });
       if (!user) {
         throw new Error(`Aucun utilisateur trouvé avec l'email ${email}`);
+      }
+      if (!user.isActive) {
+        throw new Error(
+          `Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support.`
+        );
       }
       const passwordValid = await compare(password, user.password);
       if (!passwordValid) {

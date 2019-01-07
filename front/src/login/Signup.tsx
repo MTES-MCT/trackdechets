@@ -5,16 +5,22 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import { SIGNUP } from "./mutations";
 import { localAuthService } from "./auth.service";
+import "./Signup.scss"
 
 type Values = {};
 const handleSumbit = (
   payload: Values,
   props: FormikActions<Values> & { signup: MutationFn } & RouteComponentProps
 ) => {
-  props.signup({ variables: { payload } }).then(response => {
-    response && localAuthService.locallyAutheticate(response.data.signup.token);
-    props.history.push("/signup/details");
-  });
+  props
+    .signup({ variables: { payload } })
+    .then(response => {
+      response &&
+        localAuthService.locallyAutheticate(response.data.signup.token);
+      props.history.push("/signup/details");
+    })
+    .catch(error => props.setStatus(error.message))
+    .then(_ => props.setSubmitting(false));
 };
 
 export default withRouter(function Signup(routerProps: RouteComponentProps) {
@@ -53,7 +59,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
             return errors;
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, status }) => (
             <div className="container">
               <Form>
                 <h1>Inscription à Trackdéchets</h1>
@@ -64,14 +70,14 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 </p>
 
                 <p>
-                  Il va dans un premier temps être utilisé
-                  entre un producteur et un collecteur et/ou un producteur et
-                  une installation de traitement.
+                  Il va dans un premier temps être utilisé entre un producteur
+                  et un collecteur et/ou un producteur et une installation de
+                  traitement.
                 </p>
 
                 <p>
-                  C'est un produit libre d'utilisation et utilisable
-                  par tous les acteurs de la filière déchets.
+                  C'est un produit libre d'utilisation et utilisable par tous
+                  les acteurs de la filière déchets.
                 </p>
 
                 <p>
@@ -136,6 +142,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 >
                   S'inscrire
                 </button>
+
+                {status && <p className="form-error-message">{status}</p>}
 
                 <p>
                   Vous avez déjà un compte ?{" "}

@@ -47,11 +47,18 @@ services:
     image: betagouv/trackdechets-insee:latest
     restart: always
     environment:
-        INSEE_SECRET: $INSEE_SECRET
+      INSEE_SECRET: $INSEE_SECRET
 
   td-pdf:
     image: betagouv/trackdechets-pdf:latest
     restart: always
+
+  td-mail:
+    image: betagouv/trackdechets-mail:latest
+    restart: always
+    environment:
+      MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
+      MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
 
 volumes:
   postgres:
@@ -60,4 +67,3 @@ networks:
   default:
     external:
       name: nginx-proxy
-

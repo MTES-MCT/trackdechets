@@ -3,6 +3,7 @@ import { GraphQLServer } from "graphql-yoga";
 import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import { prisma } from "./generated/prisma-client";
 import { merge } from "./utils";
+import { userActivationHandler } from "./users/activation";
 
 const port = process.env.port || 80;
 const isProd = process.env.NODE_ENV === "production";
@@ -29,6 +30,7 @@ const server = new GraphQLServer({
 });
 
 server.express.get("/ping", (_, res) => res.send("Pong!"));
+server.express.get("/userActivation", userActivationHandler);
 server.start({ port, debug: !isProd }, () =>
   console.log(`Server is running on port ${port}`)
 );

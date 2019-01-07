@@ -10,6 +10,10 @@ type AggregateUser {
   count: Int!
 }
 
+type AggregateUserActivationHash {
+  count: Int!
+}
+
 type BatchPayload {
   count: Long!
 }
@@ -1083,6 +1087,12 @@ type Mutation {
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   deleteUser(where: UserWhereUniqueInput!): User
   deleteManyUsers(where: UserWhereInput): BatchPayload!
+  createUserActivationHash(data: UserActivationHashCreateInput!): UserActivationHash!
+  updateUserActivationHash(data: UserActivationHashUpdateInput!, where: UserActivationHashWhereUniqueInput!): UserActivationHash
+  updateManyUserActivationHashes(data: UserActivationHashUpdateManyMutationInput!, where: UserActivationHashWhereInput): BatchPayload!
+  upsertUserActivationHash(where: UserActivationHashWhereUniqueInput!, create: UserActivationHashCreateInput!, update: UserActivationHashUpdateInput!): UserActivationHash!
+  deleteUserActivationHash(where: UserActivationHashWhereUniqueInput!): UserActivationHash
+  deleteManyUserActivationHashes(where: UserActivationHashWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -1117,6 +1127,9 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  userActivationHash(where: UserActivationHashWhereUniqueInput!): UserActivationHash
+  userActivationHashes(where: UserActivationHashWhereInput, orderBy: UserActivationHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [UserActivationHash]!
+  userActivationHashesConnection(where: UserActivationHashWhereInput, orderBy: UserActivationHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserActivationHashConnection!
   node(id: ID!): Node
 }
 
@@ -1124,10 +1137,12 @@ type Subscription {
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  userActivationHash(where: UserActivationHashSubscriptionWhereInput): UserActivationHashSubscriptionPayload
 }
 
 type User {
   id: ID!
+  isActive: Boolean
   email: String!
   password: String!
   name: String
@@ -1137,6 +1152,111 @@ type User {
   updatedAt: DateTime!
 }
 
+type UserActivationHash {
+  id: ID!
+  user: User!
+  hash: String!
+}
+
+type UserActivationHashConnection {
+  pageInfo: PageInfo!
+  edges: [UserActivationHashEdge]!
+  aggregate: AggregateUserActivationHash!
+}
+
+input UserActivationHashCreateInput {
+  user: UserCreateOneInput!
+  hash: String!
+}
+
+type UserActivationHashEdge {
+  node: UserActivationHash!
+  cursor: String!
+}
+
+enum UserActivationHashOrderByInput {
+  id_ASC
+  id_DESC
+  hash_ASC
+  hash_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type UserActivationHashPreviousValues {
+  id: ID!
+  hash: String!
+}
+
+type UserActivationHashSubscriptionPayload {
+  mutation: MutationType!
+  node: UserActivationHash
+  updatedFields: [String!]
+  previousValues: UserActivationHashPreviousValues
+}
+
+input UserActivationHashSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: UserActivationHashWhereInput
+  AND: [UserActivationHashSubscriptionWhereInput!]
+  OR: [UserActivationHashSubscriptionWhereInput!]
+  NOT: [UserActivationHashSubscriptionWhereInput!]
+}
+
+input UserActivationHashUpdateInput {
+  user: UserUpdateOneRequiredInput
+  hash: String
+}
+
+input UserActivationHashUpdateManyMutationInput {
+  hash: String
+}
+
+input UserActivationHashWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  user: UserWhereInput
+  hash: String
+  hash_not: String
+  hash_in: [String!]
+  hash_not_in: [String!]
+  hash_lt: String
+  hash_lte: String
+  hash_gt: String
+  hash_gte: String
+  hash_contains: String
+  hash_not_contains: String
+  hash_starts_with: String
+  hash_not_starts_with: String
+  hash_ends_with: String
+  hash_not_ends_with: String
+  AND: [UserActivationHashWhereInput!]
+  OR: [UserActivationHashWhereInput!]
+  NOT: [UserActivationHashWhereInput!]
+}
+
+input UserActivationHashWhereUniqueInput {
+  id: ID
+  hash: String
+}
+
 type UserConnection {
   pageInfo: PageInfo!
   edges: [UserEdge]!
@@ -1144,6 +1264,7 @@ type UserConnection {
 }
 
 input UserCreateInput {
+  isActive: Boolean
   email: String!
   password: String!
   name: String
@@ -1164,6 +1285,8 @@ type UserEdge {
 enum UserOrderByInput {
   id_ASC
   id_DESC
+  isActive_ASC
+  isActive_DESC
   email_ASC
   email_DESC
   password_ASC
@@ -1180,6 +1303,7 @@ enum UserOrderByInput {
 
 type UserPreviousValues {
   id: ID!
+  isActive: Boolean
   email: String!
   password: String!
   name: String
@@ -1207,6 +1331,7 @@ input UserSubscriptionWhereInput {
 }
 
 input UserUpdateDataInput {
+  isActive: Boolean
   email: String
   password: String
   name: String
@@ -1215,6 +1340,7 @@ input UserUpdateDataInput {
 }
 
 input UserUpdateInput {
+  isActive: Boolean
   email: String
   password: String
   name: String
@@ -1223,6 +1349,7 @@ input UserUpdateInput {
 }
 
 input UserUpdateManyMutationInput {
+  isActive: Boolean
   email: String
   password: String
   name: String
@@ -1256,6 +1383,8 @@ input UserWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  isActive: Boolean
+  isActive_not: Boolean
   email: String
   email_not: String
   email_in: [String!]

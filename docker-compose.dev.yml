@@ -63,8 +63,21 @@ services:
     build:
       context: ./insee
       dockerfile: Dockerfile
+    ports:
+      - 81:81
     environment:
-        INSEE_SECRET: $INSEE_SECRET
+      INSEE_SECRET: $INSEE_SECRET
+
+  td-mail:
+    image: td-mail
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+    ports:
+      - 82:80
+    environment:
+      MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
+      MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
 
 volumes:
   postgres:
