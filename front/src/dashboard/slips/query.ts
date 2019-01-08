@@ -21,6 +21,7 @@ export const GET_SLIPS = gql`
       }
       wasteDetails {
         code
+        name
         quantity
       }
     }

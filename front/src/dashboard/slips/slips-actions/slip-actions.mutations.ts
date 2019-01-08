@@ -54,6 +54,7 @@ const DUPLICATE_FORM = gql`
       }
       wasteDetails {
         code
+        name
         quantity
       }
     }

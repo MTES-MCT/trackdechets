@@ -108,14 +108,14 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Mot de passe
+                    Mot de passe*
                     <Field type="password" name="password" />
                   </label>
                 </div>
 
                 <div className="form__group">
                   <label>
-                    Vérification du mot de passe
+                    Vérification du mot de passe*
                     <Field type="password" name="passwordConfirmation" />
                   </label>
                 </div>
@@ -124,7 +124,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Numéro SIRET de l'entreprise que vous administrez
+                    Numéro SIRET de l'entreprise que vous administrez*
                     <Field type="text" name="siret" />
                   </label>
 

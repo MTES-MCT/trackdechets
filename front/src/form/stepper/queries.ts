@@ -43,6 +43,7 @@ export const GET_FORM = gql`
       }
       wasteDetails {
         code
+        name
         onuCode
         packagings
         otherPackaging
@@ -76,6 +77,7 @@ export const SAVE_FORM = gql`
       }
       wasteDetails {
         code
+        name
         quantity
       }
     }

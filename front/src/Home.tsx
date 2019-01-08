@@ -1,14 +1,11 @@
 import React from "react";
-import Header from "./Header";
-import "./Home.scss";
+import { FaCheckCircle, FaPenFancy, FaTasks } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { FaTasks, FaPenFancy, FaCheckCircle } from "react-icons/fa";
+import "./Home.scss";
 
 export default function Home() {
   return (
     <React.Fragment>
-      <Header />
-
       <div className="hero">
         <div className="hero__container">
           <h1 className="hero__white-background">
@@ -101,10 +98,12 @@ export default function Home() {
               <h3>Trackdéchets</h3>
             </li>
             <li>
-              <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">Nous contacter</a>
+              <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
+                Nous contacter
+              </a>
             </li>
             <li>
-              <a href="#">Conditions générales d'utilisation</a>
+              <Link to="/cgu">Conditions générales d'utilisation</Link>
             </li>
             <li>
               <a href="http://api.trackdechets.beta.gouv.fr">API</a>
