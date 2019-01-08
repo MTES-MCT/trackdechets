@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import { SIGNUP } from "./mutations";
 import { localAuthService } from "./auth.service";
-import "./Signup.scss"
+import "./Signup.scss";
 
 type Values = {};
 const handleSumbit = (
@@ -14,11 +14,7 @@ const handleSumbit = (
 ) => {
   props
     .signup({ variables: { payload } })
-    .then(response => {
-      response &&
-        localAuthService.locallyAutheticate(response.data.signup.token);
-      props.history.push("/signup/details");
-    })
+    .then(_ => props.history.push("/signup/details"))
     .catch(error => props.setStatus(error.message))
     .then(_ => props.setSubmitting(false));
 };

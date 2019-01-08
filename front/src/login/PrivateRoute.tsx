@@ -1,4 +1,4 @@
-import { Route, Redirect } from "react-router";
+import { Route, Redirect, RouteProps } from "react-router";
 import React from "react";
 import { localAuthService } from "./auth.service";
 interface IProps {
@@ -8,7 +8,7 @@ interface IProps {
 export default function PrivateRoute({
   component: Component,
   ...rest
-}: IProps): any {
+}: IProps & RouteProps): any {
   return (
     <Route
       {...rest}

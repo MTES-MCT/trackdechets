@@ -26,10 +26,10 @@ export default function WasteSelector() {
         {loop(Wastes)}
       </Tree>
 
-      <Link to="/dashboard/slips" className="button secondary">
+      <Link to="/signup/activation" className="button secondary">
         Ignorer
       </Link>
-      <Link to="/dashboard/slips" className="button">
+      <Link to="/signup/activation" className="button">
         Valider
       </Link>
     </div>

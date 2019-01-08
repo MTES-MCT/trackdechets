@@ -12,6 +12,7 @@ import PrivateRoute from "./login/PrivateRoute";
 import FormContainer from "./form/FormContainer";
 import WasteSelector from "./login/WasteSelector";
 import Search from "./search/Search";
+import SignupInfo from "./login/SignupInfos";
 
 class App extends Component {
   render() {
@@ -23,6 +24,7 @@ class App extends Component {
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
             <Route exact path="/signup/details" component={WasteSelector} />
+            <Route exact path="/signup/activation" component={SignupInfo} />
             <Route exact path="/password" component={ChangePassword} />
 
             <Route exact path="/search" component={Search} />
