@@ -1,12 +1,16 @@
 import React from "react";
 import { Me } from "../../login/model";
-import { Formik } from "formik";
+import { localAuthService } from "../../login/auth.service";
+import { RouteComponentProps, withRouter } from "react-router";
 
 interface IProps {
   me: Me;
 }
 
-export default function Account({ me }: IProps) {
+export default withRouter(function Account({
+  me,
+  history
+}: IProps & RouteComponentProps) {
   return (
     <div className="main">
       <div className="panel">
@@ -21,8 +25,16 @@ export default function Account({ me }: IProps) {
         <p>
           vous administrez la compagnie <strong>{me.company.siret}</strong>
         </p>
-        <button className="button">Me déconnecter</button>
+        <button
+          className="button"
+          onClick={() => {
+            localAuthService.locallySignOut();
+            history.push("/");
+          }}
+        >
+          Me déconnecter
+        </button>
       </div>
     </div>
   );
-}
+});

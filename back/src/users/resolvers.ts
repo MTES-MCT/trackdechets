@@ -58,7 +58,7 @@ export default {
         <br>
         Pour rappel, Trackdéchets est un site en béta conçu par la Fabrique Numérique du Ministère de l'Ecologie et des Territoires.
         <br>
-        Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <emmanuel.flahaut@developpement-durable.gouv.fr>.`
+        Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.`
       });
 
       return {

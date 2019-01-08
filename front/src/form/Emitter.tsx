@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field } from "formik";
 import RadioButton from "./custom-inputs/RadioButton";
+import "./Emitter.scss";
 
 export default function Emitter() {
   const [pickupSite, setPickupSite] = useState(false);
@@ -42,7 +43,12 @@ export default function Emitter() {
       {pickupSite && (
         <React.Fragment>
           <h4>Adresse chantier</h4>
-          <Field component="textarea" name="emitter.pickupSite" />
+          <Field
+            component="textarea"
+            className="textarea-pickup-site"
+            placeholder="Nom / Adresse / Précisions..."
+            name="emitter.pickupSite"
+          />
         </React.Fragment>
       )}
     </React.Fragment>

@@ -19,8 +19,8 @@ export default function SlipsTabs({ me }: Props) {
           <Tabs>
             <TabList>
               <Tab>Brouillons</Tab>
-              <Tab>Produits</Tab>
-              <Tab>Collectés / Traités</Tab>
+              <Tab>Emit</Tab>
+              <Tab>Reçus</Tab>
             </TabList>
 
             <TabPanel>
@@ -35,8 +35,8 @@ export default function SlipsTabs({ me }: Props) {
                 forms={data.forms
                   .filter(
                     (f: Form) =>
-                      f.emitter.company.siret === me.company.siret &&
-                      f.status !== "DRAFT"
+                      f.status !== "DRAFT" &&
+                      f.emitter.company.siret === me.company.siret
                   )
                   .sort((a: any, b: any) => a.status - b.status)}
               />
@@ -46,8 +46,8 @@ export default function SlipsTabs({ me }: Props) {
                 me={me}
                 forms={data.forms.filter(
                   (f: Form) =>
-                    f.recipient.company.siret === me.company.siret &&
-                    f.status !== "DRAFT"
+                    f.status !== "DRAFT" &&
+                    f.recipient.company.siret === me.company.siret
                 )}
               />
             </TabPanel>

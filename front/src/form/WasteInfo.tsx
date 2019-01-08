@@ -29,7 +29,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
       <div className="form__group">
         <label>
-          Désignation du déchet
+          Appellation du déchet
           <Field type="text" name="wasteDetails.name" />
         </label>
       </div>
@@ -60,7 +60,6 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <Field
           component={NumberInput}
           name="wasteDetails.quantity"
-          label="Quantitié"
           placeholder="En tonnes"
           step="0.001"
         />

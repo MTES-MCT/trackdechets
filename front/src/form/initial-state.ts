@@ -1,7 +1,7 @@
 export default {
   emitter: {
     type: "PRODUCER",
-    pickupSite: "Nom:\nAdresse:\nMail:",
+    pickupSite: "",
     company: {
       siret: "",
       name: "",

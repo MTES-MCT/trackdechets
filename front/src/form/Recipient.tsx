@@ -13,7 +13,10 @@ export default function Recipient() {
         <p>
           Pour vous assurer que l'entreprise de destination est autorisée à
           recevoir le déchet, vous pouvez consulter{" "}
-          <a href="http://www.installationsclassees.developpement-durable.gouv.fr/rechercheICForm.php">
+          <a
+            href="http://www.installationsclassees.developpement-durable.gouv.fr/rechercheICForm.php"
+            target="_blank"
+          >
             la liste des installation classées.
           </a>
         </p>
@@ -24,7 +27,10 @@ export default function Recipient() {
       <h4>Informations complémentaires</h4>
 
       <div className="form__group">
-        <Field component={ProcessingOperation} name="recipient.processingOperation" />
+        <Field
+          component={ProcessingOperation}
+          name="recipient.processingOperation"
+        />
       </div>
 
       <div className="form__group">

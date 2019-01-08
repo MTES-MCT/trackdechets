@@ -43,19 +43,23 @@ export default {
 
       const { id, ...formContent } = formInput;
       if (id) {
-        return context.prisma.updateForm({
+        const updatedForm = await context.prisma.updateForm({
           where: { id },
           data: {
             ...flattenInoutObjectForDb(formContent)
           }
         });
+
+        return unflattenObjectFromDb(updatedForm);
       }
 
-      return context.prisma.createForm({
+      const newForm = await context.prisma.createForm({
         ...flattenInoutObjectForDb(formContent),
         readableId: await getReadableId(context),
         owner: { connect: { id: userId } }
       });
+
+      return unflattenObjectFromDb(newForm);
     },
     deleteForm: async (parent, { id }, context: Context) => {
       return context.prisma.updateForm({

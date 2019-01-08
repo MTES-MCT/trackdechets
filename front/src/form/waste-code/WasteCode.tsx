@@ -47,7 +47,7 @@ export default function WasteCode(props: FieldProps) {
         <p>
           Vous hésitez sur le type de code déchet à choisir ? Vous pouvez
           consulter la liste de codification des déchets sur{" "}
-          <a href="https://aida.ineris.fr/consultation_document/10327">
+          <a href="https://aida.ineris.fr/consultation_document/10327" target="_blank">
             le site de l'Aida.
           </a>
         </p>

@@ -19,19 +19,17 @@ export default function ProcessingOperation({
         <p>
           Vous hésitez sur le type d'opération à choisir ? Vous pouvez consulter
           la liste de traitement des déchets sur{" "}
-          <a href="https://www.legifrance.gouv.fr/affichTexteArticle.do;jsessionid=DF38C3AD1F5E2888AF25D80D0A703E13.tpdila11v_3?idArticle=LEGIARTI000026902174&cidTexte=LEGITEXT000026918330&dateTexte=20160111">
+          <a
+            href="https://www.legifrance.gouv.fr/affichTexteArticle.do;jsessionid=DF38C3AD1F5E2888AF25D80D0A703E13.tpdila11v_3?idArticle=LEGIARTI000026902174&cidTexte=LEGITEXT000026918330&dateTexte=20160111"
+            target="_blank"
+          >
             le site legifrance.
           </a>
         </p>
       </div>
 
       <label>Opération de traitement prévue</label>
-      <select
-        id="select"
-        name={name}
-        value={value}
-        onChange={onChange}
-      >
+      <select id="select" name={name} value={value} onChange={onChange}>
         <option>Choisissez...</option>
         {Operations.map(o => (
           <option key={o.code} value={o.code}>

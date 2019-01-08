@@ -21,6 +21,6 @@ export const userActivationHandler = async (req, res) => {
   return res
     .set("Content-Type", "text/html")
     .send(
-      `Compte activé. <a href="/">Cliquez ici pour revenir sur le site</a>`
+      `Compte activé. <a href="https://trackdechets.beta.gouv.fr/">Cliquez ici pour revenir sur le site</a>`
     );
 };

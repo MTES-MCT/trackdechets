@@ -20,12 +20,16 @@ export const GET_FORM = gql`
       emitter {
         type
         pickupSite
-        company { ...CompanyFragment }
+        company {
+          ...CompanyFragment
+        }
       }
       recipient {
         cap
         processingOperation
-        company { ...CompanyFragment }
+        company {
+          ...CompanyFragment
+        }
       }
       transporter {
         receipt
@@ -33,7 +37,9 @@ export const GET_FORM = gql`
         validityLimit
         contact
         numberPlate
-        company { ...CompanyFragment }
+        company {
+          ...CompanyFragment
+        }
       }
       wasteDetails {
         code
@@ -53,6 +59,25 @@ export const SAVE_FORM = gql`
   mutation SaveForm($formInput: FormInput!) {
     saveForm(formInput: $formInput) {
       id
+      readableId
+      createdAt
+      status
+      emitter {
+        company {
+          name
+          siret
+        }
+      }
+      recipient {
+        company {
+          name
+          siret
+        }
+      }
+      wasteDetails {
+        code
+        quantity
+      }
     }
   }
 `;

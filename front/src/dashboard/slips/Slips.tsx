@@ -4,13 +4,13 @@ import SlipActions from "./SlipActions";
 import { Form } from "../../form/model";
 import { Me } from "../../login/model";
 
-const statusLabels: {[key: string]: string} = {
+const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente d'envoi",
   SENT: "En attente de réception",
   RECEIVED: "Reçu, en attente de traitement",
   PROCESSED: "Traité"
-}
+};
 
 type Props = { forms: Form[]; me: Me };
 export default function Slips({ forms, me }: Props) {
@@ -35,8 +35,8 @@ export default function Slips({ forms, me }: Props) {
               <div className="id">{s.readableId}</div>
             </td>
             <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
-            <td>{s.emitter.company.name}</td>
-            <td>{s.recipient.company.name}</td>
+            <td>{s.emitter.company && s.emitter.company.name}</td>
+            <td>{s.recipient.company && s.recipient.company.name}</td>
             <td>{s.wasteDetails && s.wasteDetails.code}</td>
             <td>{s.wasteDetails && `${s.wasteDetails.quantity} t`}</td>
             <td>{statusLabels[s.status]}</td>

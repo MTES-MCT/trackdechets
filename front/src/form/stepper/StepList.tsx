@@ -6,6 +6,8 @@ import initialState from "../initial-state";
 import { Query, Mutation } from "react-apollo";
 import { withRouter, RouteComponentProps } from "react-router";
 import { GET_FORM, SAVE_FORM } from "./queries";
+import { GET_SLIPS } from "../../dashboard/slips/query";
+import { Form } from "../model";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
@@ -65,7 +67,20 @@ export default withRouter(function StepList(
             const state = { ...initialState, ...data.form };
 
             return (
-              <Mutation mutation={SAVE_FORM}>
+              <Mutation
+                mutation={SAVE_FORM}
+                update={(store, { data: { saveForm } }) => {
+                  const data = store.readQuery<{ forms: Form[] }>({
+                    query: GET_SLIPS
+                  });
+                  if (!data || !data.forms) {
+                    return;
+                  }
+                  data.forms = data.forms.filter(f => f.id !== saveForm.id);
+                  data.forms.push(saveForm);
+                  store.writeQuery({ query: GET_SLIPS, data });
+                }}
+              >
                 {(saveForm, { loading, error }) => (
                   <Formik
                     initialValues={state}
