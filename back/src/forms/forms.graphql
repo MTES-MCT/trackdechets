@@ -102,6 +102,7 @@ enum Packagings {
 
 type WasteDetails {
   code: String
+  name: String
   onuCode: String
   packagings: [Packagings]
   otherPackaging: String

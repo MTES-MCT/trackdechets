@@ -53,6 +53,7 @@ input TransporterInput {
 
 input WasteDetailsInput {
   code: String
+  name: String
   onuCode: String
   packagings: [Packagings]
   otherPackaging: String
