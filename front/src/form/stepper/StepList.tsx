@@ -91,7 +91,19 @@ export default withRouter(function StepList(
                         .catch(_ => formikActions.setSubmitting(false));
                     }}
                     render={({ handleSubmit }) => (
-                      <form onSubmit={handleSubmit}>{children}</form>
+                      <form onSubmit={handleSubmit}>
+                        <div
+                          onKeyPress={e => {
+                            // Disable submit on Enter key press
+                            // We prevent it from bubbling further
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {children}
+                        </div>
+                      </form>
                     )}
                   />
                 )}
