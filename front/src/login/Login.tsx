@@ -14,7 +14,8 @@ const handleSubmit = (
   props
     .login({ variables: { email, password } })
     .then(response => {
-      response && localAuthService.locallyAutheticate(response.data.login.token);
+      response &&
+        localAuthService.locallyAutheticate(response.data.login.token);
       props.history.push("/dashboard/slips");
     })
     .catch(e => {
@@ -43,44 +44,46 @@ export default withRouter(function Login(
           }}
         >
           {({ isSubmitting }) => (
-            <div className="container">
-              <Form>
-                <h1>Connexion</h1>
-                <div className="form__group">
-                  <label>
-                    Email
-                    <Field type="text" name="email" />
-                  </label>
-                </div>
+            <section className="section section-white">
+              <div className="container">
+                <Form>
+                  <h1>Connexion</h1>
+                  <div className="form__group">
+                    <label>
+                      Email
+                      <Field type="text" name="email" />
+                    </label>
+                  </div>
 
-                <div className="form__group">
-                  <label>
-                    Mot de passe
-                    <Field type="password" name="password" />
-                  </label>
-                </div>
+                  <div className="form__group">
+                    <label>
+                      Mot de passe
+                      <Field type="password" name="password" />
+                    </label>
+                  </div>
 
-                <ErrorMessage
-                  name="form"
-                  render={msg => (
-                    <div className="input-error-message">{msg}</div>
-                  )}
-                />
+                  <ErrorMessage
+                    name="form"
+                    render={msg => (
+                      <div className="input-error-message">{msg}</div>
+                    )}
+                  />
 
-                <button
-                  className="button"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  Se connecter
-                </button>
+                  <button
+                    className="button"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    Se connecter
+                  </button>
 
-                <p>
-                  Vous n'avez pas encore de compte ?{" "}
-                  <Link to="/signup">Inscrivez vous maintenant</Link>
-                </p>
-              </Form>
-            </div>
+                  <p>
+                    Vous n'avez pas encore de compte ?{" "}
+                    <Link to="/signup">Inscrivez vous maintenant</Link>
+                  </p>
+                </Form>
+              </div>
+            </section>
           )}
         </Formik>
       )}

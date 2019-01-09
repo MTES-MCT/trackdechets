@@ -56,97 +56,99 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
           }}
         >
           {({ isSubmitting, status }) => (
-            <div className="container">
-              <Form>
-                <h1>Inscription à Trackdéchets</h1>
-                <p>
-                  Trackdéchets est destiné à simplifier l'édition d'un bordereau
-                  de déchet et à transmettre les informations dématérialisée
-                  pour validation.
-                </p>
+            <section className="section section-white">
+              <div className="container">
+                <Form>
+                  <h1>Inscription à Trackdéchets</h1>
+                  <p>
+                    Trackdéchets est destiné à simplifier l'édition d'un
+                    bordereau de déchet et à transmettre les informations
+                    dématérialisée pour validation.
+                  </p>
 
-                <p>
-                  Il va dans un premier temps être utilisé entre un producteur
-                  et un collecteur et/ou un producteur et une installation de
-                  traitement.
-                </p>
+                  <p>
+                    Il va dans un premier temps être utilisé entre un producteur
+                    et un collecteur et/ou un producteur et une installation de
+                    traitement.
+                  </p>
 
-                <p>
-                  C'est un produit libre d'utilisation et utilisable par tous
-                  les acteurs de la filière déchets.
-                </p>
+                  <p>
+                    C'est un produit libre d'utilisation et utilisable par tous
+                    les acteurs de la filière déchets.
+                  </p>
 
-                <p>
-                  Trackdéchets permet également de s'assurer qu'une entreprise
-                  est bien autorisée pour effectuer la collecte ou le traitement
-                  d'un déchet (dangereux)
-                </p>
-                <div className="form__group">
-                  <label>
-                    Email*
-                    <Field type="text" name="email" />
-                  </label>
+                  <p>
+                    Trackdéchets permet également de s'assurer qu'une entreprise
+                    est bien autorisée pour effectuer la collecte ou le
+                    traitement d'un déchet (dangereux)
+                  </p>
+                  <div className="form__group">
+                    <label>
+                      Email*
+                      <Field type="text" name="email" />
+                    </label>
 
-                  <ErrorMessage name="email" component="div" />
-                </div>
+                    <ErrorMessage name="email" component="div" />
+                  </div>
 
-                <div className="form__group">
-                  <label>
-                    Nom et prénom*
-                    <Field type="text" name="name" />
-                  </label>
+                  <div className="form__group">
+                    <label>
+                      Nom et prénom*
+                      <Field type="text" name="name" />
+                    </label>
 
-                  <ErrorMessage name="name" component="div" />
-                </div>
+                    <ErrorMessage name="name" component="div" />
+                  </div>
 
-                <div className="form__group">
-                  <label>
-                    Téléphone
-                    <Field type="text" name="phone" />
-                  </label>
-                </div>
+                  <div className="form__group">
+                    <label>
+                      Téléphone
+                      <Field type="text" name="phone" />
+                    </label>
+                  </div>
 
-                <div className="form__group">
-                  <label>
-                    Mot de passe*
-                    <Field type="password" name="password" />
-                  </label>
-                </div>
+                  <div className="form__group">
+                    <label>
+                      Mot de passe*
+                      <Field type="password" name="password" />
+                    </label>
+                  </div>
 
-                <div className="form__group">
-                  <label>
-                    Vérification du mot de passe*
-                    <Field type="password" name="passwordConfirmation" />
-                  </label>
-                </div>
+                  <div className="form__group">
+                    <label>
+                      Vérification du mot de passe*
+                      <Field type="password" name="passwordConfirmation" />
+                    </label>
+                  </div>
 
-                <ErrorMessage name="passwordConfirmation" component="div" />
+                  <ErrorMessage name="passwordConfirmation" component="div" />
 
-                <div className="form__group">
-                  <label>
-                    Numéro SIRET de l'entreprise que vous administrez*
-                    <Field type="text" name="siret" />
-                  </label>
+                  <div className="form__group">
+                    <label>
+                      Numéro SIRET de l'entreprise que vous administrez*
+                      <Field type="text" name="siret" />
+                    </label>
 
-                  <ErrorMessage name="siret" component="div" />
-                </div>
+                    <ErrorMessage name="siret" component="div" />
+                  </div>
 
-                <button
-                  className="button"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  S'inscrire
-                </button>
+                  <button
+                    className="button"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    S'inscrire
+                  </button>
 
-                {status && <p className="form-error-message">{status}</p>}
+                  {status && <p className="form-error-message">{status}</p>}
 
-                <p>
-                  Vous avez déjà un compte ?{" "}
-                  <Link to="/login">Connectez vous maintenant</Link>
-                </p>
-              </Form>
-            </div>
+                  <p>
+                    Vous avez déjà un compte ?{" "}
+                    <Link to="/login">Connectez vous maintenant</Link>
+                  </p>
+                </Form>
+              </div>
+            </section>
           )}
         </Formik>
       )}
