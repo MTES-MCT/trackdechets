@@ -65,38 +65,43 @@
     </div>
 
     <div class="grid-container">
-      <div class="number grid-item">Bordereau numéro: S18000000001</div>
+      <div class="number grid-item">Bordereau numéro: {{=it.readableId}}</div>
 
       <div class="emitter grid-item">
         <div class="item-title">Emétetteur du bordereau:</div>
         <p class="checkboxes">
-          <input type="checkbox" /> Producteur du déchets
-          <input type="checkbox" checked /> Autre producteur
+            {{? it.emitterType === "OTHER" }}
+            <input type="checkbox" /> Producteur du déchets
+            <input type="checkbox" checked /> Autre producteur
+            {{??}}
+            <input type="checkbox" checked /> Producteur du déchets
+            <input type="checkbox" /> Autre producteur
+            {{?}}
         </p>
-        <p>Numéro SIRET: 001 001 001 0001</p>
-        <p>John Doe</p>
-        <p>1 avenue Inconnue, 75001 Paris</p>
-        <p>01 01 01 01 01</p>
-        <p>Personne à contacter: Doe Doe</p>
+        <p>Numéro SIRET: {{=it.emitterCompanySiret}}</p>
+        <p>{{=it.emitterCompanyName}}</p>
+        <p>{{=it.emitterCompanyAddress}}</p>
+        <p>{{=it.emitterCompanyMail}} - {{=it.emitterCompanyPhone}}</p>
+        <p>Personne à contacter: {{=it.emitterCompanyContact}}</p>
       </div>
 
       <div class="receiver grid-item">
         <div class="item-title">
           Installation de destination ou d'entreposage ou de reconditionnement:
         </div>
-        <p>Numéro SIRET: 001 001 001 0001</p>
-        <p>John Doe</p>
-        <p>1 avenue Inconnue, 75001 Paris</p>
-        <p>01 01 01 01 01</p>
-        <p>Personne à contacter: Doe Doe</p>
+        <p>Numéro SIRET: {{=it.recipientCompanySiret}}</p>
+        <p>{{=it.recipientCompanyName}}</p>
+        <p>{{=it.recipientCompanyAddress}}</p>
+        <p>{{=it.recipientCompanyMail}} - {{=it.recipientCompanyPhone}}</p>
+        <p>Personne à contacter: {{=it.recipientCompanyContact}}</p>
       </div>
 
       <div class="waste-info grid-item">
         <div class="item-title">Description du déchet</div>
         <div class="columns">
           <div class="column">
-            <p>Rubrique déchet: 20 01 19 *</p>
-            <p>Dénomination du déchet: Filtes à huile</p>
+            <p>Rubrique déchet: {{=it.wasteDetailsCode}}</p>
+            <p>Dénomination du déchet: {{=it.wasteDetailsName}}</p>
           </div>
           <div class="column">
             <p>
@@ -110,17 +115,18 @@
         <p>
           <label>
             Conditionnement: <input type="checkbox" /> benne
-            <input type="checkbox" checked /> citerne
+            <input type="checkbox" /> citerne
             <input type="checkbox" /> GRV <input type="checkbox" /> fût
-            <input type="checkbox" /> autre
+            <input type="checkbox" {{? it.wasteDetailsOtherPackaging}}checked{{?}}/> autre
           </label>
+          {{=it.wasteDetailsOtherPackaging}}
         </p>
-        <p>Nombre de colis: 3</p>
+        <p>Nombre de colis: {{=it.wasteDetailsNumberOfPackages}}</p>
         <div class="columns">
-          <div class="column"><p>Quantité: 12,4 tonnes</p></div>
+          <div class="column"><p>Quantité: {{=it.wasteDetailsQuantity}} tonnes</p></div>
           <div class="column">
-            <input type="checkbox" checked /> estimée
-            <input type="checkbox" checked /> réelle
+            <input type="checkbox" {{? it.wasteDetailsQuantityType === "REAL"}}checked{{?}} /> estimée
+            <input type="checkbox" {{? it.wasteDetailsQuantityType === "ESTIMATED"}}checked{{?}} /> réelle
           </div>
         </div>
       </div>
@@ -129,19 +135,18 @@
         <div class="item-title">Collecteur / transporteur:</div>
         <div class="columns">
           <div class="column">
-            <p>Numéro SIRET: 001 001 001 0001</p>
-            <p>John Doe</p>
-            <p>1 avenue Inconnue, 75001 Paris</p>
-            <p>01 01 01 01 01</p>
-            <p>Personne à contacter: Doe Doe</p>
+            <p>Numéro SIRET: {{=it.transporterCompanySiret}}</p>
+            <p>{{=it.transporterCompanyName}}</p>
+            <p>{{=it.transporterCompanyAddress}}</p>
+            <p>{{=it.transporterCompanyMail}} - {{=it.transporterCompanyPhone}}</p>
+            <p>Personne à contacter: {{=it.transporterCompanyContact}}</p>
           </div>
           <div class="column">
-            <p>Récipissé numéro: 12345</p>
-            <p>Limite de validité: 01/12/2019</p>
-            <p>Département: île de France</p>
-            <p>Mode de transport: Camion</p>
-            <p>01 01 01 01 01</p>
-            <p>Personne à contacter: Doe Doe</p>
+            <p>Récipissé numéro: {{=it.transporterReceipt}}</p>
+            <p>Limite de validité: {{=it.transporterValidityLimit}}</p>
+            <p>Département: {{=it.transporterDepartment}}</p>
+            <p>Plaque: {{=it.transporterNumberPlate}}</p>
+            <p>Personne à contacter: {{=it.transporterContact}}</p>
           </div>
         </div>
       </div>
