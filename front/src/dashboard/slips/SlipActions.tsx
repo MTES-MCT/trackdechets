@@ -10,7 +10,6 @@ import Sealed from "./slips-actions/Sealed";
 import Received from "./slips-actions/Received";
 import {
   FaEdit,
-  FaFilePdf,
   FaCheck,
   FaEnvelope,
   FaEnvelopeOpen,
@@ -18,6 +17,7 @@ import {
 } from "react-icons/fa";
 import Duplicate from "./slips-actions/Duplicate";
 import Delete from "./slips-actions/Delete";
+import DownloadPdf from "./slips-actions/DownloadPdf";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -42,7 +42,7 @@ export default function SlipActions({ form, currentUser }: IProps) {
           <Delete formId={form.id} />
         </React.Fragment>
       ) : (
-        <FaFilePdf />
+        <DownloadPdf formId={form.id}/>
       )}
       <Duplicate formId={form.id} />
       {nextStep && (
