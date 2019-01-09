@@ -19,7 +19,7 @@ export default function SlipsTabs({ me }: Props) {
           <Tabs>
             <TabList>
               <Tab>Brouillons</Tab>
-              <Tab>Emit</Tab>
+              <Tab>Emis</Tab>
               <Tab>Reçus</Tab>
             </TabList>
 
