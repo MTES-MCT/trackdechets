@@ -8,6 +8,7 @@ import { withRouter, RouteComponentProps } from "react-router";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { GET_SLIPS } from "../../dashboard/slips/query";
 import { Form } from "../model";
+import { formSchema } from "../schema";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
@@ -84,6 +85,7 @@ export default withRouter(function StepList(
                 {(saveForm, { loading, error }) => (
                   <Formik
                     initialValues={state}
+                    validationSchema={formSchema}
                     enableReinitialize={false}
                     onSubmit={(values, formikActions: FormikActions<any>) => {
                       saveForm({ variables: { formInput: values } })
