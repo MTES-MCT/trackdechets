@@ -1,34 +1,5 @@
 .Search {
-  .search-box .search__input {
-    display: flex;
-    margin: 10px 0;
-
-    input {
-      width: auto;
-    }
-
-    input:first-child {
-      flex: 1;
-      margin-right: 10px;
-    }
-  }
-
-  .panel__approved {
-    display: flex;
-    align-items: center;
-  }
-
-  .stamp {
-    margin: 20px;
-    padding: 5px 20px;
-    font-size: 3em;
-    font-weight: 600;
-    color: #03bd5b;
-    border: 8px solid #03bd5b;
-    border-radius: 10px;
-  }
-
-  .approved {
-    flex: 1;
+  .typeform {
+    height: 600px;
   }
 }
