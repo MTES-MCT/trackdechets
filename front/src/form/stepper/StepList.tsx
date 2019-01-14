@@ -103,14 +103,22 @@ export default withRouter(function StepList(
                     ref={formikForm}
                     initialValues={state}
                     validationSchema={formSchema}
-                    onSubmit={(values, formikActions: FormikActions<any>) => {
-                      saveForm({ variables: { formInput: values } })
-                        .then(_ => props.history.push("/dashboard/slips"))
-                        .catch(_ => formikActions.setSubmitting(false));
-                    }}
-                    render={({ handleSubmit }) => {
+                    onSubmit={(values, formikActions: FormikActions<any>) =>
+                      null
+                    }
+                    render={({ values }) => {
                       return (
-                        <form onSubmit={handleSubmit}>
+                        <form
+                          onSubmit={e => {
+                            e.preventDefault();
+                            // As wer want to be able to save draft, we skip validation on submit
+                            // and don't use the classic Formik mechanism
+                            saveForm({ variables: { formInput: values } }).then(
+                              _ => props.history.push("/dashboard/slips")
+                            );
+                            return false;
+                          }}
+                        >
                           <div
                             onKeyPress={e => {
                               // Disable submit on Enter key press
