@@ -2,6 +2,8 @@ const polka = require("polka");
 const { json } = require("body-parser");
 const write = require("./generator");
 
+const PORT = 3201;
+
 const app = polka().use(json());
 
 app.get("ping", res => res.end("pong"));
@@ -23,7 +25,7 @@ app.post("/pdf", async (req, res) => {
   res.end(bufferPdf);
 });
 
-app.listen(3000, err => {
+app.listen(PORT, err => {
   if (err) throw err;
-  console.log(`> Running on localhost:3000`);
+  console.log(`> Running on localhost:${PORT}`);
 });

@@ -68,6 +68,14 @@ services:
     environment:
       INSEE_SECRET: $INSEE_SECRET
 
+  td-pdf:
+    image: td-pdf
+    build:
+      context: ./pdf
+      dockerfile: Dockerfile
+    ports:
+      - 3201:3201
+
   td-mail:
     image: td-mail
     build:

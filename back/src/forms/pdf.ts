@@ -12,7 +12,10 @@ export const pdfHandler = async (req, res) => {
   }
 
   return axios
-    .post("http://td-pdf:3000/pdf", form)
+    .post("http://td-pdf:3201/pdf", form, { responseType: "stream" })
     .then(response => response.data.pipe(res))
-    .catch(_ => res.status(500).send("Erreur lors de la génération du PDF"));
+    .catch(err => {
+      console.error(err);
+      res.status(500).send("Erreur lors de la génération du PDF");
+    });
 };
