@@ -36,7 +36,7 @@ export default function SlipActions({ form, currentUser }: IProps) {
     <div className="SlipActions">
       {form.status === "DRAFT" ? (
         <React.Fragment>
-          <Link to={`/form/${form.id}`} className="icon">
+          <Link to={`/form/${form.id}`} className="icon" title="Editer">
             <FaEdit />
           </Link>
           <Delete formId={form.id} />
@@ -52,7 +52,7 @@ export default function SlipActions({ form, currentUser }: IProps) {
         >
           {(mark, { error }) => (
             <React.Fragment>
-              <a className="icon" onClick={() => setIsOpen(true)}>
+              <a className="icon" onClick={() => setIsOpen(true)} title={buttons[nextStep].title}>
                 {buttons[nextStep].icon({})}
               </a>
               <div

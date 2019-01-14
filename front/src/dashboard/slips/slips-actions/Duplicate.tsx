@@ -13,6 +13,7 @@ export default function Duplicate({ formId }: Props) {
       {(duplicate, { error }) => (
         <a
           className="icon"
+          title="Dupliquer en brouillon"
           onClick={() =>
             duplicate({
               variables: { id: formId },

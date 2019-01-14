@@ -13,6 +13,7 @@ export default function Delete({ formId }: Props) {
       {(deleteForm, { error }) => (
         <a
           className="icon"
+          title="Supprimer définitivement"
           onClick={() =>
             deleteForm({
               variables: { id: formId },

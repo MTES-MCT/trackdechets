@@ -9,6 +9,7 @@ export default function DownloadPdf({ formId }: Props) {
       className="icon"
       href={`${process.env.REACT_APP_API_ENDPOINT}/pdf?id=${formId}`}
       target="_blank"
+      title="Télécharger le PDF"
     >
       <FaFilePdf />
     </a>
