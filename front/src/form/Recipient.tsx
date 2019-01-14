@@ -3,6 +3,7 @@ import CompanySelector from "./company/CompanySelector";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
 import { Field } from "formik";
+import RedErrorMessage from "./RedErrorMessage";
 
 export default function Recipient() {
   return (
@@ -31,6 +32,8 @@ export default function Recipient() {
           component={ProcessingOperation}
           name="recipient.processingOperation"
         />
+
+        <RedErrorMessage name="recipient.processingOperation" />
       </div>
 
       <div className="form__group">

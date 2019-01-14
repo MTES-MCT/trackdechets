@@ -1,4 +1,21 @@
-import { string, object, date, number, array } from "yup";
+import {
+  string,
+  object,
+  date,
+  number,
+  array,
+  setLocale,
+  LocaleObject
+} from "yup";
+
+setLocale({
+  mixed: {
+    notType: "Ce champ ne peut pas être nul"
+  },
+  number: {
+    min: "Deve ser maior que ${min}"
+  }
+} as LocaleObject);
 
 const companySchema = object().shape({
   name: string().required(),
@@ -8,7 +25,9 @@ const companySchema = object().shape({
   address: string().required(),
   contact: string().required("Le contact dans l'entreprise est obligatoire"),
   phone: string().required("Le téléphone de l'entreprise est obligatoire"),
-  mail: string().required("L'email de l'entreprise est obligatoire")
+  mail: string()
+    .email("L'email de l'entreprise est obligatoire")
+    .required("L'email est obligatoire")
 });
 
 const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
@@ -21,7 +40,13 @@ export const formSchema = object().shape({
     company: companySchema
   }),
   recipient: object().shape({
-    processingOperation: string().required(),
+    processingOperation: string()
+      .required()
+      .test(
+        "selected",
+        "Vous devez sélectionner une valeur",
+        (v: string) => v != ""
+      ),
     cap: string(),
     company: companySchema
   }),
@@ -39,6 +64,7 @@ export const formSchema = object().shape({
   }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
+    name: string().required("Appelation du déchet manquante"),
     onuCode: string(),
     packagings: array().of(packagingSchema),
     otherPackaging: string(),

@@ -1,7 +1,7 @@
-import React, { useState, ReactElement, useEffect } from "react";
+import React, { useState, ReactElement, useEffect, useRef } from "react";
 import { Step, IStepContainerProps } from "./Step";
 import "./StepList.scss";
-import { Formik, FormikActions } from "formik";
+import { Formik, FormikActions, setNestedObjectValues } from "formik";
 import initialState from "../initial-state";
 import { Query, Mutation } from "react-apollo";
 import { withRouter, RouteComponentProps } from "react-router";
@@ -21,6 +21,22 @@ export default withRouter(function StepList(
   const totalSteps = props.children.length - 1;
 
   useEffect(() => window.scrollTo(0, 0), [currentStep]);
+
+  // When we edit a draft we want to automatically display on error on init
+  const formikForm = useRef<any | null>(null);
+  useEffect(() => {
+    setTimeout(() => {
+      if (formikForm.current) {
+        const { state, setTouched } = formikForm.current;
+        if (
+          Object.keys(state.touched).length === 0 &&
+          state.values.id != null
+        ) {
+          setTouched(setNestedObjectValues(state.values, true));
+        }
+      }
+    }, 100);
+  });
 
   const children = React.Children.map(props.children, (child, index) => {
     return React.createElement(
@@ -84,29 +100,31 @@ export default withRouter(function StepList(
               >
                 {(saveForm, { loading, error }) => (
                   <Formik
+                    ref={formikForm}
                     initialValues={state}
                     validationSchema={formSchema}
-                    enableReinitialize={false}
                     onSubmit={(values, formikActions: FormikActions<any>) => {
                       saveForm({ variables: { formInput: values } })
                         .then(_ => props.history.push("/dashboard/slips"))
                         .catch(_ => formikActions.setSubmitting(false));
                     }}
-                    render={({ handleSubmit }) => (
-                      <form onSubmit={handleSubmit}>
-                        <div
-                          onKeyPress={e => {
-                            // Disable submit on Enter key press
-                            // We prevent it from bubbling further
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                            }
-                          }}
-                        >
-                          {children}
-                        </div>
-                      </form>
-                    )}
+                    render={({ handleSubmit }) => {
+                      return (
+                        <form onSubmit={handleSubmit}>
+                          <div
+                            onKeyPress={e => {
+                              // Disable submit on Enter key press
+                              // We prevent it from bubbling further
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                              }
+                            }}
+                          >
+                            {children}
+                          </div>
+                        </form>
+                      );
+                    }}
                   />
                 )}
               </Mutation>

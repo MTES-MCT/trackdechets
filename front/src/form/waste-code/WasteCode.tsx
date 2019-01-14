@@ -1,7 +1,8 @@
-import { ErrorMessage, FieldProps, getIn } from "formik";
+import { FieldProps, getIn } from "formik";
 import React, { useEffect, useState } from "react";
-import WasteCodeLookup from "./nomenclature-dechets.json";
+import RedErrorMessage from "../RedErrorMessage";
 import formatWasteCodeEffect from "./format-waste-code.effect";
+import WasteCodeLookup from "./nomenclature-dechets.json";
 import "./WasteCode.scss";
 
 const tempBookmarks = [
@@ -47,7 +48,10 @@ export default function WasteCode(props: FieldProps) {
         <p>
           Vous hésitez sur le type de code déchet à choisir ? Vous pouvez
           consulter la liste de codification des déchets sur{" "}
-          <a href="https://aida.ineris.fr/consultation_document/10327" target="_blank">
+          <a
+            href="https://aida.ineris.fr/consultation_document/10327"
+            target="_blank"
+          >
             le site de l'Aida.
           </a>
         </p>
@@ -69,10 +73,7 @@ export default function WasteCode(props: FieldProps) {
         />
       </label>
 
-      <ErrorMessage
-        name={props.field.name}
-        render={msg => <div className="input-error-message">{msg}</div>}
-      />
+      <RedErrorMessage name={props.field.name} />
 
       {bookmarks.length && (
         <React.Fragment>
@@ -100,4 +101,4 @@ export default function WasteCode(props: FieldProps) {
       )}
     </div>
   );
-};
+}

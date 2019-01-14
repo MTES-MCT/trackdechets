@@ -5,6 +5,7 @@ import { wasteCodeValidator } from "./waste-code/waste-code.validator";
 import RadioButton from "./custom-inputs/RadioButton";
 import NumberInput from "./custom-inputs/NumberInput";
 import Packagings from "./packagings/Packagings";
+import RedErrorMessage from "./RedErrorMessage";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
@@ -32,6 +33,8 @@ export default connect<{}, Values>(function WasteInfo(props) {
           Appellation du déchet
           <Field type="text" name="wasteDetails.name" />
         </label>
+
+        <RedErrorMessage name="wasteDetails.name" />
       </div>
 
       <h4>Conditionnement</h4>
@@ -53,6 +56,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
           name="wasteDetails.numberOfPackages"
           label="Nombre de colis"
         />
+        <RedErrorMessage name="wasteDetails.numberOfPackages" />
       </div>
 
       <h4>Quantité</h4>
@@ -63,6 +67,8 @@ export default connect<{}, Values>(function WasteInfo(props) {
           placeholder="En tonnes"
           step="0.001"
         />
+
+        <RedErrorMessage name="wasteDetails.quantity" />
 
         <fieldset>
           <legend>Cette quantité est</legend>
@@ -79,6 +85,8 @@ export default connect<{}, Values>(function WasteInfo(props) {
             component={RadioButton}
           />
         </fieldset>
+
+        <RedErrorMessage name="wasteDetails.quantityType" />
       </div>
       {values.wasteDetails.code.includes("*") && (
         <div className="form__group">

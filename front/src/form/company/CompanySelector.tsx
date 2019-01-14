@@ -5,6 +5,7 @@ import { ApolloConsumer, Query } from "react-apollo";
 import { FaSearch, FaCheck } from "react-icons/fa";
 import "./CompanySelector.scss";
 import { COMPANY_INFOS, FAVORITES } from "./query";
+import RedErrorMessage from "../RedErrorMessage";
 
 type Company = { siret: string; name: string; address: string };
 
@@ -91,7 +92,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
                     </p>
                   </div>
                   <div className="icon">
-                    <FaCheck />
+                    {selectedCompany.siret === c.siret && <FaCheck />}
                   </div>
                 </li>
               ))}
@@ -107,6 +108,8 @@ export default connect<FieldProps>(function CompanySelector(props) {
                 />
               </label>
 
+              <RedErrorMessage name={`${props.field.name}.contact`} />
+
               <label>
                 Téléphone ou Fax
                 <Field
@@ -116,10 +119,14 @@ export default connect<FieldProps>(function CompanySelector(props) {
                 />
               </label>
 
+              <RedErrorMessage name={`${props.field.name}.phone`} />
+
               <label>
                 Mail
                 <Field type="email" name={`${props.field.name}.mail`} />
               </label>
+
+              <RedErrorMessage name={`${props.field.name}.mail`} />
             </div>
           </div>
         );
