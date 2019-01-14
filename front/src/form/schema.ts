@@ -26,7 +26,7 @@ const companySchema = object().shape({
   contact: string().required("Le contact dans l'entreprise est obligatoire"),
   phone: string().required("Le téléphone de l'entreprise est obligatoire"),
   mail: string()
-    .email("L'email de l'entreprise est obligatoire")
+    .email("Le format d'adresse email est incorrect")
     .required("L'email est obligatoire")
 });
 
