@@ -18,6 +18,7 @@ import {
 import Duplicate from "./slips-actions/Duplicate";
 import Delete from "./slips-actions/Delete";
 import DownloadPdf from "./slips-actions/DownloadPdf";
+import { getNextStep } from "./slips-actions/next-step";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -91,18 +92,4 @@ const buttons = {
   PROCESSED: { title: "Marquer comme traité", icon: FaCog, component: Sent }
 };
 
-function getNextStep(form: Form, currentUser: Me) {
-  const currentUserIsEmitter =
-    form.emitter.company.siret === currentUser.company.siret;
 
-  if (form.status === "DRAFT") return "SEALED";
-
-  if (currentUserIsEmitter) {
-    if (form.status === "SEALED") return "SENT";
-    return null;
-  }
-
-  if (form.status === "SENT") return "RECEIVED";
-  if (form.status === "RECEIVED") return "PROCESSED";
-  return null;
-}
