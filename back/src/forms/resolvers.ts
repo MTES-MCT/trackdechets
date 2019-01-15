@@ -29,9 +29,17 @@ export default {
     },
     forms: async (parent, args, context: Context) => {
       const userId = getUserId(context);
+      const userCompany = await context.prisma.user({ id: userId }).company();
 
       const forms = await context.prisma.forms({
-        where: { owner: { id: userId }, isDeleted: false }
+        where: {
+          OR: [
+            { owner: { id: userId } },
+            { recipientCompanySiret: userCompany.siret },
+            { emitterCompanySiret: userCompany.siret }
+          ],
+          isDeleted: false
+        }
       });
 
       return forms.map(f => unflattenObjectFromDb(f));
