@@ -2,6 +2,7 @@ import React from "react";
 import { FaCheckCircle, FaPenFancy, FaTasks } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./Home.scss";
+import { localAuthService } from "./login/auth.service";
 
 export default function Home() {
   return (
@@ -16,14 +17,22 @@ export default function Home() {
             dangereux au quotidien : 0 papier, traçabilité en temps reél,
             informations regroupées sur un outil unique
           </p>
-          <p>
-            <Link to="/signup" className="button large warning">
-              Tester Trackdéchets
-            </Link>
-            <Link to="/login" className="button large">
-              Se connecter
-            </Link>
-          </p>
+          {localAuthService.isAuthenticated ? (
+            <p>
+              <Link to="/dashboard/slips" className="button large">
+                Accéder à mon espace
+              </Link>
+            </p>
+          ) : (
+            <p>
+              <Link to="/signup" className="button large warning">
+                Tester Trackdéchets
+              </Link>
+              <Link to="/login" className="button large">
+                Se connecter
+              </Link>
+            </p>
+          )}
         </div>
       </div>
 
