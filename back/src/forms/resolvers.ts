@@ -96,7 +96,9 @@ export default {
       const isValid = await formSchema.isValid(unflattenObjectFromDb(form));
 
       if (!isValid) {
-        throw new Error("Le borderau est incomplet, impossible de le valider.");
+        throw new Error(
+          "Erreur, le bordereau contient des champs obligatoires non renseignés. Merci de les compléter."
+        );
       }
 
       const userId = getUserId(context);
