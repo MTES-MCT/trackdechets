@@ -27,6 +27,7 @@ export default function SlipsTabs({ me }: Props) {
               <Slips
                 me={me}
                 forms={data.forms.filter((f: Form) => f.status === "DRAFT")}
+                showStatus={false}
               />
             </TabPanel>
             <TabPanel>

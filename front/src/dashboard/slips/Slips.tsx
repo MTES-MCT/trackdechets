@@ -12,8 +12,8 @@ const statusLabels: { [key: string]: string } = {
   PROCESSED: "Traité"
 };
 
-type Props = { forms: Form[]; me: Me };
-export default function Slips({ forms, me }: Props) {
+type Props = { forms: Form[]; me: Me; showStatus?: boolean };
+export default function Slips({ forms, me, showStatus = true }: Props) {
   return (
     <table className="table">
       <thead>
@@ -24,7 +24,7 @@ export default function Slips({ forms, me }: Props) {
           <th>Destinataire</th>
           <th>Code déchet</th>
           <th>Quantité</th>
-          <th>Statut</th>
+          {showStatus && <th>Statut</th>}
           <th>Actions</th>
         </tr>
       </thead>
@@ -39,7 +39,7 @@ export default function Slips({ forms, me }: Props) {
             <td>{s.recipient.company && s.recipient.company.name}</td>
             <td>{s.wasteDetails && s.wasteDetails.code}</td>
             <td>{s.wasteDetails && `${s.wasteDetails.quantity} t`}</td>
-            <td>{statusLabels[s.status]}</td>
+            {showStatus && <td>{statusLabels[s.status]}</td>}
             <td>
               <SlipActions currentUser={me} form={s} />
             </td>
