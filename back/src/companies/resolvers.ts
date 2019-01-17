@@ -44,10 +44,17 @@ export default {
       const userCompany = await context.prisma.user({ id: userId }).company();
 
       const forms = await context.prisma.forms({
-        where: { [`${lowerType}CompanySiret`]: userCompany.siret }
+        where: {
+          OR: [
+            { owner: { id: userId } },
+            { recipientCompanySiret: userCompany.siret },
+            { emitterCompanySiret: userCompany.siret }
+          ],
+          isDeleted: false
+        }
       });
 
-      const formsWithValue = forms.filter(f => f[`${lowerType}Siret`]);
+      const formsWithValue = forms.filter(f => f[`${lowerType}CompanySiret`]);
 
       if (!formsWithValue.length) {
         return [memoizeRequest(userCompany.siret)];
@@ -55,12 +62,12 @@ export default {
 
       return formsWithValue
         .map(f => ({
-          name: f[`${lowerType}Name`],
-          siret: f[`${lowerType}Siret`],
-          address: f[`${lowerType}Address`],
-          contact: f[`${lowerType}Contact`],
-          phone: f[`${lowerType}Phone`],
-          mail: f[`${lowerType}Mail`]
+          name: f[`${lowerType}CompanyName`],
+          siret: f[`${lowerType}CompanySiret`],
+          address: f[`${lowerType}CompanyAddress`],
+          contact: f[`${lowerType}CompanyContact`],
+          phone: f[`${lowerType}CompanyPhone`],
+          mail: f[`${lowerType}CompanyMail`]
         }))
         .filter(
           (thing, index, self) =>

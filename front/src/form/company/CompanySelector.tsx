@@ -52,8 +52,11 @@ export default connect<FieldProps>(function CompanySelector(props) {
     [selectedCompany]
   );
 
+  // Load different favorites depending on the object we are filling
+  const type = props.field.name.split(".")[0].toUpperCase();
+
   return (
-    <Query query={FAVORITES} variables={{ type: "EMITTER" }}>
+    <Query query={FAVORITES} variables={{ type }}>
       {({ loading, error, data }) => {
         if (loading) return <p>Chargement...</p>;
         if (error) return <p>Erreur :(</p>;
