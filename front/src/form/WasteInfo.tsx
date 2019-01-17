@@ -28,6 +28,13 @@ export default connect<{}, Values>(function WasteInfo(props) {
         />
       </div>
 
+      <div className="text-quote">
+        <p>
+          Cette appellation est propre à votre entreprise pour aider à retrouver
+          facilement le déchet concerné.
+        </p>
+      </div>
+
       <div className="form__group">
         <label>
           Appellation du déchet
