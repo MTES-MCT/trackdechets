@@ -1,18 +1,47 @@
 <html>
   <head>
     <style>
+      a {
+        text-decoration: underline;
+      }
       p {
         margin: 0.5em 0;
       }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
+      }
+      .cerfa-details {
+        font-size: 0.8em;
+        width: 260px;
+      }
+      .cerfa-details p {
+        margin: 0;
+      }
+      .cerfa-details img {
+        width: 80px;
+      }
+      .cerfa-details.right {
+        text-align: right;
+      }
       .title {
         text-align: center;
+      }
+      .title h1 {
+        text-decoration: underline;
+      }
+      .title h2 {
+        margin: 0;
+        font-size: 1em;
+        text-transform: uppercase;
       }
       .grid-container {
         display: grid;
         grid-template-columns: 50% 50%;
         padding: 10px;
-        grid-column-gap: 10px;
-        grid-row-gap: 15px;
+        grid-column-gap: 5px;
+        grid-row-gap: 5px;
         grid-template-areas:
           "number number"
           "emitter receiver"
@@ -31,6 +60,9 @@
 
       .number {
         grid-area: number;
+        padding: 5px;
+        font-weight: 600;
+        font-size: 1.1em;
       }
       .emitter {
         grid-area: emitter;
@@ -59,9 +91,20 @@
     </style>
   </head>
   <body>
-    <div class="title">
-      <h1>Bordereau de suivi des déchets</h1>
-      <h2>Bordereau édité par l'outil Trackdéchets</h2>
+    <div class="header">
+      <div class="cerfa-details">
+        <img src="./cerfa.svg" />
+        <p>Formulaire modélisé sur le CERFA n° 12571*01</p>
+        <p>Décret n°2005-635 du 30 mai 2005</p>
+        <p>Arrêté du 29 juillet</p>
+      </div>
+
+      <div class="title">
+        <h1>Bordereau de suivi des déchets</h1>
+        <h2>Bordereau édité par l'outil Trackdéchets</h2>
+      </div>
+
+      <div class="cerfa-details right"><img src="./logo-fabnum.svg" /></div>
     </div>
 
     <div class="grid-container">
@@ -70,13 +113,10 @@
       <div class="emitter grid-item">
         <div class="item-title">Emétetteur du bordereau:</div>
         <p class="checkboxes">
-            {{? it.emitterType === "OTHER" }}
-            <input type="checkbox" /> Producteur du déchets
-            <input type="checkbox" checked /> Autre producteur
-            {{??}}
-            <input type="checkbox" checked /> Producteur du déchets
-            <input type="checkbox" /> Autre producteur
-            {{?}}
+          {{? it.emitterType === "OTHER" }} <input type="checkbox" /> Producteur
+          du déchets <input type="checkbox" checked /> Autre producteur {{??}}
+          <input type="checkbox" checked /> Producteur du déchets
+          <input type="checkbox" /> Autre producteur {{?}}
         </p>
         <p>Numéro SIRET: {{=it.emitterCompanySiret}}</p>
         <p>{{=it.emitterCompanyName}}</p>
@@ -94,6 +134,7 @@
         <p>{{=it.recipientCompanyAddress}}</p>
         <p>{{=it.recipientCompanyMail}} - {{=it.recipientCompanyPhone}}</p>
         <p>Personne à contacter: {{=it.recipientCompanyContact}}</p>
+        <p>Numéro de CAP: {{=it.recipientCap}}</p>
       </div>
 
       <div class="waste-info grid-item">
@@ -110,23 +151,35 @@
                 <input type="checkbox" /> Liquide
               </label>
             </p>
+            <p>Code ONU / ADR: {{=it.wasteDetailsOnuCode}}</p>
           </div>
         </div>
         <p>
           <label>
-            Conditionnement: <input type="checkbox" /> benne
-            <input type="checkbox" /> citerne
-            <input type="checkbox" /> GRV <input type="checkbox" /> fût
-            <input type="checkbox" {{? it.wasteDetailsOtherPackaging}}checked{{?}}/> autre
+            Conditionnement: <input type="checkbox"
+            {{? it.wasteDetailsPackagings === "BENNE"}}checked{{?}}/> benne
+            <input type="checkbox"
+            {{? it.wasteDetailsPackagings === "CITERNE"}}checked{{?}} /> citerne
+            <input type="checkbox"
+            {{? it.wasteDetailsPackagings === "GRV"}}checked{{?}} /> GRV <input
+            type="checkbox"
+            {{? it.wasteDetailsPackagings === "FUT"}}checked{{?}} /> fût <input
+            type="checkbox"
+            {{? it.wasteDetailsPackagings === "AUTRE"}}checked{{?}} /> autre
           </label>
           {{=it.wasteDetailsOtherPackaging}}
         </p>
         <p>Nombre de colis: {{=it.wasteDetailsNumberOfPackages}}</p>
         <div class="columns">
-          <div class="column"><p>Quantité: {{=it.wasteDetailsQuantity}} tonnes</p></div>
           <div class="column">
-            <input type="checkbox" {{? it.wasteDetailsQuantityType === "REAL"}}checked{{?}} /> estimée
-            <input type="checkbox" {{? it.wasteDetailsQuantityType === "ESTIMATED"}}checked{{?}} /> réelle
+            <p>Quantité: {{=it.wasteDetailsQuantity}} tonnes</p>
+          </div>
+          <div class="column">
+            <input type="checkbox"
+            {{? it.wasteDetailsQuantityType === "REAL"}}checked{{?}} /> estimée
+            <input type="checkbox"
+            {{? it.wasteDetailsQuantityType === "ESTIMATED"}}checked{{?}} />
+            réelle
           </div>
         </div>
       </div>
@@ -138,7 +191,9 @@
             <p>Numéro SIRET: {{=it.transporterCompanySiret}}</p>
             <p>{{=it.transporterCompanyName}}</p>
             <p>{{=it.transporterCompanyAddress}}</p>
-            <p>{{=it.transporterCompanyMail}} - {{=it.transporterCompanyPhone}}</p>
+            <p>
+              {{=it.transporterCompanyMail}} - {{=it.transporterCompanyPhone}}
+            </p>
             <p>Personne à contacter: {{=it.transporterCompanyContact}}</p>
           </div>
           <div class="column">
@@ -152,8 +207,13 @@
       </div>
 
       <div class="infos">
-        Nous vous invitons à dévouvrir le nouvel outil de gestion des bordereaux
-        sur le site trackdéchets.beta.gouv
+        Ce document est édité à partir de <a>www.trackdechets.beta.gouv.fr</a
+        ><br />
+        Pour suivre ce bordereau, son statut ou pour le valider, connectez vous
+        sur le site. Il n'est pas nécessaire d'imprimer ce document pour
+        l'archiver ou le transmettre, il est automatiquement transmis et
+        enregistré sur les comptes des différents prestataires impliqués dans sa
+        traçabilité.
       </div>
     </div>
   </body>
