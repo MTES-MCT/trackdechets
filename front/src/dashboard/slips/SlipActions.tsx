@@ -42,11 +42,11 @@ export default function SlipActions({ form, currentUser }: IProps) {
             <FaEdit />
           </Link>
           <Delete formId={form.id} />
+          <Duplicate formId={form.id} />
         </React.Fragment>
       ) : (
         <DownloadPdf formId={form.id} />
       )}
-      <Duplicate formId={form.id} />
       {nextStep && (
         <Mutation
           mutation={mutations[nextStep]}
