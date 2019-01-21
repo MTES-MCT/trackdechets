@@ -7,7 +7,14 @@ import "./CompanySelector.scss";
 import { COMPANY_INFOS, FAVORITES } from "./query";
 import RedErrorMessage from "../RedErrorMessage";
 
-export type Company = { siret: string; name: string; address: string };
+export type Company = {
+  siret: string;
+  name: string;
+  address: string;
+  contact: string;
+  phone: string;
+  mail: string;
+};
 
 export default connect<FieldProps>(function CompanySelector(props) {
   const [searchResults, setSearchResults] = useState<Company[]>([]);
@@ -36,17 +43,16 @@ export default connect<FieldProps>(function CompanySelector(props) {
 
   useEffect(
     () => {
-      props.formik.setFieldValue(
-        `${props.field.name}.siret`,
-        selectedCompany ? selectedCompany.siret : ""
-      );
-      props.formik.setFieldValue(
-        `${props.field.name}.name`,
-        selectedCompany ? selectedCompany.name : ""
-      );
-      props.formik.setFieldValue(
-        `${props.field.name}.address`,
-        selectedCompany ? selectedCompany.address : ""
+      ["siret", "name", "address", "contact", "phone", "mail"].forEach(
+        field => {
+          if (!selectedCompany || !selectedCompany[field as keyof Company]) {
+            return;
+          }
+          props.formik.setFieldValue(
+            `${props.field.name}.${field}`,
+            selectedCompany[field as keyof Company]
+          );
+        }
       );
     },
     [selectedCompany]
