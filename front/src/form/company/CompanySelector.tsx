@@ -7,7 +7,7 @@ import "./CompanySelector.scss";
 import { COMPANY_INFOS, FAVORITES } from "./query";
 import RedErrorMessage from "../RedErrorMessage";
 
-type Company = { siret: string; name: string; address: string };
+export type Company = { siret: string; name: string; address: string };
 
 export default connect<FieldProps>(function CompanySelector(props) {
   const [searchResults, setSearchResults] = useState<Company[]>([]);

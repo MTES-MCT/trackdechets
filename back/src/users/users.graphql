@@ -8,6 +8,7 @@ input SignupInput {
   name: String!
   phone: String
   siret: String!
+  userType: [UserType]
 }
 
 type Mutation {
@@ -21,9 +22,16 @@ type AuthPayload {
   user: User!
 }
 
+enum UserType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+}
+
 type User {
   id: ID!
   email: String!
   name: String
   company: Company
+  userType: [UserType]
 }

@@ -22,7 +22,7 @@ export default function Slips({ forms, me, showStatus = true }: Props) {
           <th>Date de création</th>
           <th>Emetteur</th>
           <th>Destinataire</th>
-          <th>Code déchet</th>
+          <th>Déchet</th>
           <th>Quantité</th>
           {showStatus && <th>Statut</th>}
           <th>Actions</th>
@@ -37,7 +37,14 @@ export default function Slips({ forms, me, showStatus = true }: Props) {
             <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
             <td>{s.emitter.company && s.emitter.company.name}</td>
             <td>{s.recipient.company && s.recipient.company.name}</td>
-            <td>{s.wasteDetails && s.wasteDetails.code}</td>
+            <td>
+              {s.wasteDetails && (
+                <React.Fragment>
+                  <div>{s.wasteDetails.code}</div>
+                  <div>{s.wasteDetails.name}</div>
+                </React.Fragment>
+              )}
+            </td>
             <td>{s.wasteDetails && `${s.wasteDetails.quantity} t`}</td>
             {showStatus && <td>{statusLabels[s.status]}</td>}
             <td>

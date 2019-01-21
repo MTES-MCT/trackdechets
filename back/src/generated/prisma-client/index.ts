@@ -359,6 +359,8 @@ export type UserOrderByInput =
   | "name_DESC"
   | "phone_ASC"
   | "phone_DESC"
+  | "userType_ASC"
+  | "userType_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -490,6 +492,7 @@ export interface UserUpdateDataInput {
   name?: String;
   phone?: String;
   company?: CompanyUpdateOneRequiredInput;
+  userType?: Json;
 }
 
 export type CompanyWhereUniqueInput = AtLeastOne<{
@@ -536,6 +539,7 @@ export interface UserUpdateInput {
   name?: String;
   phone?: String;
   company?: CompanyUpdateOneRequiredInput;
+  userType?: Json;
 }
 
 export interface FormUpdateInput {
@@ -596,9 +600,8 @@ export interface CompanyCreateOneInput {
   connect?: CompanyWhereUniqueInput;
 }
 
-export interface CompanyUpsertNestedInput {
-  update: CompanyUpdateDataInput;
-  create: CompanyCreateInput;
+export interface UserActivationHashUpdateManyMutationInput {
+  hash?: String;
 }
 
 export type UserActivationHashWhereUniqueInput = AtLeastOne<{
@@ -1172,6 +1175,7 @@ export interface UserCreateInput {
   name?: String;
   phone?: String;
   company: CompanyCreateOneInput;
+  userType?: Json;
 }
 
 export interface FormSubscriptionWhereInput {
@@ -1253,6 +1257,7 @@ export interface UserUpdateManyMutationInput {
   password?: String;
   name?: String;
   phone?: String;
+  userType?: Json;
 }
 
 export interface UserCreateOneInput {
@@ -1260,8 +1265,9 @@ export interface UserCreateOneInput {
   connect?: UserWhereUniqueInput;
 }
 
-export interface UserActivationHashUpdateManyMutationInput {
-  hash?: String;
+export interface CompanyUpsertNestedInput {
+  update: CompanyUpdateDataInput;
+  create: CompanyCreateInput;
 }
 
 export interface UserActivationHashSubscriptionWhereInput {
@@ -1604,6 +1610,7 @@ export interface User {
   password: String;
   name?: String;
   phone?: String;
+  userType?: Json;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
@@ -1616,6 +1623,7 @@ export interface UserPromise extends Promise<User>, Fragmentable {
   name: () => Promise<String>;
   phone: () => Promise<String>;
   company: <T = CompanyPromise>() => T;
+  userType: () => Promise<Json>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -1630,6 +1638,7 @@ export interface UserSubscription
   name: () => Promise<AsyncIterator<String>>;
   phone: () => Promise<AsyncIterator<String>>;
   company: <T = CompanySubscription>() => T;
+  userType: () => Promise<AsyncIterator<Json>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -2108,6 +2117,7 @@ export interface UserPreviousValues {
   password: String;
   name?: String;
   phone?: String;
+  userType?: Json;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
@@ -2121,6 +2131,7 @@ export interface UserPreviousValuesPromise
   password: () => Promise<String>;
   name: () => Promise<String>;
   phone: () => Promise<String>;
+  userType: () => Promise<Json>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -2134,6 +2145,7 @@ export interface UserPreviousValuesSubscription
   password: () => Promise<AsyncIterator<String>>;
   name: () => Promise<AsyncIterator<String>>;
   phone: () => Promise<AsyncIterator<String>>;
+  userType: () => Promise<AsyncIterator<Json>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -2208,8 +2220,6 @@ export type String = string;
 
 export type Long = string;
 
-export type Json = any;
-
 /*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point). 
 */
@@ -2224,6 +2234,8 @@ export type DateTimeInput = Date | string;
 DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
+
+export type Json = any;
 
 /*
 The `Boolean` scalar type represents `true` or `false`.

@@ -1,11 +1,15 @@
-import { ErrorMessage, Field, Form, Formik, FormikActions } from "formik";
-import React from "react";
-import { Mutation, MutationFn } from "react-apollo";
+import ApolloClient from "apollo-client";
+import { Field, Form, Formik, FormikActions } from "formik";
+import React, { useState } from "react";
+import { ApolloConsumer, Mutation, MutationFn } from "react-apollo";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import { Company } from "../form/company/CompanySelector";
+import { COMPANY_INFOS } from "../form/company/query";
+import RedErrorMessage from "../form/RedErrorMessage";
 import { SIGNUP } from "./mutations";
-import { localAuthService } from "./auth.service";
 import "./Signup.scss";
+import UserType from "./UserType";
 
 type Values = {};
 const handleSumbit = (
@@ -20,6 +24,25 @@ const handleSumbit = (
 };
 
 export default withRouter(function Signup(routerProps: RouteComponentProps) {
+  const [searchResult, setSearchResult] = useState<Company | null>(null);
+  const searchCompanies = async (
+    client: ApolloClient<Company>,
+    clue: string
+  ) => {
+    if (clue.length < 14) {
+      return;
+    }
+
+    const { data } = await client.query<{ companyInfos: Company }>({
+      query: COMPANY_INFOS,
+      variables: { siret: clue }
+    });
+
+    setSearchResult(data.companyInfos);
+
+    return data.companyInfos.name === "" ? "Entreprise inconnue" : null;
+  };
+
   return (
     <Mutation mutation={SIGNUP}>
       {signup => (
@@ -30,10 +53,13 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
             phone: "",
             password: "",
             passwordConfirmation: "",
-            siret: ""
+            siret: "",
+            userType: [],
+            isAllowed: false,
+            cgu: false
           }}
           onSubmit={(values, formikActions) => {
-            const { passwordConfirmation, ...payload } = values;
+            const { passwordConfirmation, isAllowed, cgu, ...payload } = values;
             handleSumbit(payload, { ...routerProps, ...formikActions, signup });
           }}
           validate={values => {
@@ -50,6 +76,15 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
             values.siret.replace(/\s/g, "").length !== 14
               ? (errors.siret = "Le SIRET doit faire 14 caractères")
+              : null;
+
+            !values.cgu
+              ? (errors.cgu =
+                  "Vous devez avoir lu les conditions générales d'utilisation")
+              : null;
+            !values.isAllowed
+              ? (errors.isAllowed =
+                  "Vous devez certifier être autorisé à créer ce compte pour votre entreprise")
               : null;
 
             return errors;
@@ -88,7 +123,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                       <Field type="text" name="email" />
                     </label>
 
-                    <ErrorMessage name="email" component="div" />
+                    <RedErrorMessage name="email" />
                   </div>
 
                   <div className="form__group">
@@ -97,7 +132,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                       <Field type="text" name="name" />
                     </label>
 
-                    <ErrorMessage name="name" component="div" />
+                    <RedErrorMessage name="name" />
                   </div>
 
                   <div className="form__group">
@@ -121,15 +156,57 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     </label>
                   </div>
 
-                  <ErrorMessage name="passwordConfirmation" component="div" />
+                  <RedErrorMessage name="passwordConfirmation" />
 
                   <div className="form__group">
                     <label>
                       Numéro SIRET de l'entreprise que vous administrez*
-                      <Field type="text" name="siret" />
+                      <ApolloConsumer>
+                        {client => (
+                          <Field
+                            type="text"
+                            name="siret"
+                            validate={(value: any) =>
+                              searchCompanies(client, value)
+                            }
+                          />
+                        )}
+                      </ApolloConsumer>
                     </label>
 
-                    <ErrorMessage name="siret" component="div" />
+                    {searchResult && searchResult.name != "" && (
+                      <p>
+                        Vous allez créer un compte pour l'entreprise{" "}
+                        <strong>{searchResult.name}</strong>.
+                      </p>
+                    )}
+
+                    <RedErrorMessage name="siret" />
+                  </div>
+
+                  <div className="form__group">
+                    <label>
+                      Vous êtes*
+                      <Field name="userType" component={UserType} />
+                    </label>
+                  </div>
+
+                  <div className="form__group">
+                    <label>
+                      <Field name="isAllowed" type="checkbox" />
+                      Je certifie disposer du pouvoir pour créer un compte au
+                      nom de mon entreprise*
+                    </label>
+
+                    <RedErrorMessage name="isAllowed" />
+
+                    <label>
+                      <Field name="cgu" type="checkbox" />
+                      Je certifie avoir lu les conditions générales
+                      d'utilisations*
+                    </label>
+
+                    <RedErrorMessage name="cgu" />
                   </div>
 
                   <button

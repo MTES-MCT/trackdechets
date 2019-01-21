@@ -1,5 +1,5 @@
-import React from "react";
-import { Route } from "react-router";
+import React, { useEffect } from "react";
+import { Route, withRouter } from "react-router";
 import Cgu from "./Cgu";
 import Dashboard from "./dashboard/Dashboard";
 import FormContainer from "./form/FormContainer";
@@ -13,8 +13,18 @@ import SignupInfo from "./login/SignupInfos";
 import WasteSelector from "./login/WasteSelector";
 import Search from "./search/Search";
 import WasteTree from "./search/WasteTree";
+import { trackPageView } from "./tracker";
 
-export default function LayoutContainer() {
+export default withRouter(function LayoutContainer({ history }) {
+  if (process.env.NODE_ENV === "production") {
+    useEffect(() => {
+      const unlisten = history.listen((location, action) =>
+        trackPageView(location.pathname)
+      );
+      return () => unlisten();
+    });
+  }
+
   return (
     <React.Fragment>
       <Header />
@@ -34,4 +44,4 @@ export default function LayoutContainer() {
       <PrivateRoute path="/dashboard" component={Dashboard} />
     </React.Fragment>
   );
-}
+});

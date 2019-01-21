@@ -23,6 +23,8 @@ export default {
           name: payload.name,
           email: payload.email,
           password: hashedPassword,
+          phone: payload.phone,
+          userType: payload.userType,
           company: {
             create: { siret: payload.siret.replace(/\s+/g, "") }
           }

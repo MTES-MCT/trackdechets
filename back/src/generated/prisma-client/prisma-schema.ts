@@ -1148,6 +1148,7 @@ type User {
   name: String
   phone: String
   company: Company!
+  userType: Json
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -1270,6 +1271,7 @@ input UserCreateInput {
   name: String
   phone: String
   company: CompanyCreateOneInput!
+  userType: Json
 }
 
 input UserCreateOneInput {
@@ -1295,6 +1297,8 @@ enum UserOrderByInput {
   name_DESC
   phone_ASC
   phone_DESC
+  userType_ASC
+  userType_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -1308,6 +1312,7 @@ type UserPreviousValues {
   password: String!
   name: String
   phone: String
+  userType: Json
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -1337,6 +1342,7 @@ input UserUpdateDataInput {
   name: String
   phone: String
   company: CompanyUpdateOneRequiredInput
+  userType: Json
 }
 
 input UserUpdateInput {
@@ -1346,6 +1352,7 @@ input UserUpdateInput {
   name: String
   phone: String
   company: CompanyUpdateOneRequiredInput
+  userType: Json
 }
 
 input UserUpdateManyMutationInput {
@@ -1354,6 +1361,7 @@ input UserUpdateManyMutationInput {
   password: String
   name: String
   phone: String
+  userType: Json
 }
 
 input UserUpdateOneRequiredInput {

@@ -6,6 +6,7 @@ type User {
   name: String
   phone: String
   company: Company!
+  userType: Json
 
   createdAt: DateTime!
   updatedAt: DateTime!
