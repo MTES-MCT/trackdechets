@@ -47,6 +47,7 @@
           "emitter receiver"
           "waste-info waste-info"
           "transporter transporter"
+          "sent sent"
           "infos infos";
       }
       .grid-item {
@@ -75,6 +76,9 @@
       }
       .transporter {
         grid-area: transporter;
+      }
+      .sent {
+        grid-area: sent;
       }
       .infos {
         grid-area: infos;
@@ -202,6 +206,22 @@
             <p>Département: {{=it.transporterDepartment}}</p>
             <p>Plaque: {{=it.transporterNumberPlate}}</p>
             <p>Personne à contacter: {{=it.transporterContact}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sent grid-item">
+        <div class="item-title">Déclaration d'émission:</div>
+        <div class="columns">
+          <div class="column">
+            <p>
+              Je soussigné certifie que les renseignements portés dans les
+              cadres ci-dessus sont exacts et établis de bonne foi.
+            </p>
+          </div>
+          <div class="column">
+            <p>Nom: {{=it.sentBy}}</p>
+            <p>Date: {{=it.sentAt}}</p>
           </div>
         </div>
       </div>
