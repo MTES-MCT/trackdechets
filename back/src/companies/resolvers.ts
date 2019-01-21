@@ -5,10 +5,12 @@ import { getUserId } from "../utils";
 const requests = {};
 function memoizeRequest(siret) {
   if (!(siret in requests)) {
-    requests[siret] = axios.get<Company>(`http://td-insee:81/siret/${siret}`); // TODO
+    requests[siret] = axios.get<Company>(`http://td-insee:81/siret/${siret}`);
   }
 
-  return requests[siret].then(v => v.data);
+  return requests[siret]
+    .then(v => v.data)
+    .catch(err => console.error("Error while querying INSEE servie", err));
 }
 
 type Company = {
