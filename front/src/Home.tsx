@@ -14,8 +14,9 @@ export default function Home() {
           </h1>
           <p className="hero__white-background">
             Trackdéchets a vocation à simplifier la gestion de vos déchets
-            dangereux au quotidien : 0 papier, traçabilité en temps reél,
-            informations regroupées sur un outil unique
+            dangereux au quotidien : 0 papier, traçabilité en temps réel,
+            informations regroupées sur un outil unique, vérification des
+            prestataires
           </p>
           {localAuthService.isAuthenticated ? (
             <p>
@@ -39,7 +40,8 @@ export default function Home() {
       <section className="section section-white">
         <div className="container">
           <h2 className="section__title">
-            Un produit là pour vous simplifier la vie
+            Un produit pour simplifier votre gestion quotidienne de la
+            traçabilité et pour favoriser la transparence du secteur
           </h2>
 
           <div className="row">
@@ -47,7 +49,7 @@ export default function Home() {
               <div className="feature-icon">
                 <FaPenFancy />
               </div>
-              <h3>Éditez simplement vos bordereaux</h3>
+              <h3>Éditez et transmettez simplement vos bordereaux</h3>
               <p>
                 Pour que la préparation des bordereaux ne soit plus d'une
                 complexité inutile
