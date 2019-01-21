@@ -383,7 +383,9 @@
           </div>
           <div class="column">
             <p>Récipissé numéro: {{=it.transporterReceipt}}</p>
-            <p>Limite de validité: {{=it.transporterValidityLimit}}</p>
+            <p>
+              Limite de validité: {{=it.toDate(it.transporterValidityLimit)}}
+            </p>
             <p>Département: {{=it.transporterDepartment}}</p>
             <p>Plaque: {{=it.transporterNumberPlate}}</p>
             <p>Personne à contacter: {{=it.transporterContact}}</p>
@@ -402,7 +404,7 @@
           </div>
           <div class="column">
             <p>Nom: {{=it.sentBy}}</p>
-            <p>Date: {{=it.sentAt}}</p>
+            <p>Date: {{=it.toDate(it.sentAt)}}</p>
           </div>
         </div>
       </div>

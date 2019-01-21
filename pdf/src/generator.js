@@ -4,8 +4,13 @@ const doT = require("dot");
 const html = require("fs").readFileSync("./models/bsd.html", "utf8");
 const tempFn = doT.template(html);
 
+const toDate = string => {
+  const date = new Date(string);
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+};
+
 async function write(params) {
-  const pageContent = tempFn(params);
+  const pageContent = tempFn({ toDate, ...params });
 
   const browser = await puppeteer
     .launch({
