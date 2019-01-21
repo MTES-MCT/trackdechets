@@ -269,6 +269,8 @@ export type FormOrderByInput =
   | "sentBy_DESC"
   | "isAccepted_ASC"
   | "isAccepted_DESC"
+  | "receivedBy_ASC"
+  | "receivedBy_DESC"
   | "receivedAt_ASC"
   | "receivedAt_DESC"
   | "quantityReceived_ASC"
@@ -550,6 +552,7 @@ export interface FormUpdateInput {
   sentAt?: DateTimeInput;
   sentBy?: String;
   isAccepted?: Boolean;
+  receivedBy?: String;
   receivedAt?: DateTimeInput;
   quantityReceived?: Float;
   processingOperationDone?: String;
@@ -695,6 +698,20 @@ export interface FormWhereInput {
   sentBy_not_ends_with?: String;
   isAccepted?: Boolean;
   isAccepted_not?: Boolean;
+  receivedBy?: String;
+  receivedBy_not?: String;
+  receivedBy_in?: String[] | String;
+  receivedBy_not_in?: String[] | String;
+  receivedBy_lt?: String;
+  receivedBy_lte?: String;
+  receivedBy_gt?: String;
+  receivedBy_gte?: String;
+  receivedBy_contains?: String;
+  receivedBy_not_contains?: String;
+  receivedBy_starts_with?: String;
+  receivedBy_not_starts_with?: String;
+  receivedBy_ends_with?: String;
+  receivedBy_not_ends_with?: String;
   receivedAt?: DateTimeInput;
   receivedAt_not?: DateTimeInput;
   receivedAt_in?: DateTimeInput[] | DateTimeInput;
@@ -1303,6 +1320,7 @@ export interface FormCreateInput {
   sentAt?: DateTimeInput;
   sentBy?: String;
   isAccepted?: Boolean;
+  receivedBy?: String;
   receivedAt?: DateTimeInput;
   quantityReceived?: Float;
   processingOperationDone?: String;
@@ -1365,6 +1383,7 @@ export interface FormUpdateManyMutationInput {
   sentAt?: DateTimeInput;
   sentBy?: String;
   isAccepted?: Boolean;
+  receivedBy?: String;
   receivedAt?: DateTimeInput;
   quantityReceived?: Float;
   processingOperationDone?: String;
@@ -1440,6 +1459,7 @@ export interface Form {
   sentAt?: DateTimeOutput;
   sentBy?: String;
   isAccepted?: Boolean;
+  receivedBy?: String;
   receivedAt?: DateTimeOutput;
   quantityReceived?: Float;
   processingOperationDone?: String;
@@ -1491,6 +1511,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
   isAccepted: () => Promise<Boolean>;
+  receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
   processingOperationDone: () => Promise<String>;
@@ -1544,6 +1565,7 @@ export interface FormSubscription
   sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   sentBy: () => Promise<AsyncIterator<String>>;
   isAccepted: () => Promise<AsyncIterator<Boolean>>;
+  receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;
@@ -1653,6 +1675,7 @@ export interface FormPreviousValues {
   sentAt?: DateTimeOutput;
   sentBy?: String;
   isAccepted?: Boolean;
+  receivedBy?: String;
   receivedAt?: DateTimeOutput;
   quantityReceived?: Float;
   processingOperationDone?: String;
@@ -1705,6 +1728,7 @@ export interface FormPreviousValuesPromise
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
   isAccepted: () => Promise<Boolean>;
+  receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
   processingOperationDone: () => Promise<String>;
@@ -1757,6 +1781,7 @@ export interface FormPreviousValuesSubscription
   sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   sentBy: () => Promise<AsyncIterator<String>>;
   isAccepted: () => Promise<AsyncIterator<Boolean>>;
+  receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;

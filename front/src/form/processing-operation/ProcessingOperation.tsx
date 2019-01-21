@@ -4,7 +4,7 @@ import Elimination from "./operations-elimination.json";
 import Valorisation from "./operations-valorisation.json";
 import "./ProcessingOperation.scss";
 
-const Operations: { code: string; description: string }[] = Elimination.concat(
+export const Operations: { code: string; description: string }[] = Elimination.concat(
   Valorisation
 );
 

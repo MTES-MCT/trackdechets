@@ -18,7 +18,7 @@ const MARK_SENT = gql`
 `;
 const MARK_RECEIVED = gql`
   mutation MarkAsReceived($id: ID, $info: ReceivedFormInput!) {
-    markAsReceived(id: ID, receivedInfo: $info) {
+    markAsReceived(id: $id, receivedInfo: $info) {
       id
       status
     }
@@ -26,7 +26,7 @@ const MARK_RECEIVED = gql`
 `;
 const MARK_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID, $info: ProcessedFormInput!) {
-    markAsProcessed(id: ID, processedInfo: $info) {
+    markAsProcessed(id: $id, processedInfo: $info) {
       id
       status
     }

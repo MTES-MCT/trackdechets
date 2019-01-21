@@ -1,24 +1,25 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { Mutation } from "react-apollo";
-import mutations from "./slips-actions/slip-actions.mutations";
+import {
+  FaCheck,
+  FaCog,
+  FaEdit,
+  FaEnvelope,
+  FaEnvelopeOpen
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { Form } from "../../form/model";
 import { Me } from "../../login/model";
 import "./SlipActions.scss";
-import Sent from "./slips-actions/Sent";
-import Sealed from "./slips-actions/Sealed";
-import Received from "./slips-actions/Received";
-import {
-  FaEdit,
-  FaCheck,
-  FaEnvelope,
-  FaEnvelopeOpen,
-  FaCog,
-} from "react-icons/fa";
-import Duplicate from "./slips-actions/Duplicate";
 import Delete from "./slips-actions/Delete";
 import DownloadPdf from "./slips-actions/DownloadPdf";
+import Duplicate from "./slips-actions/Duplicate";
 import { getNextStep } from "./slips-actions/next-step";
+import Processed from "./slips-actions/Processed";
+import Received from "./slips-actions/Received";
+import Sealed from "./slips-actions/Sealed";
+import Sent from "./slips-actions/Sent";
+import mutations from "./slips-actions/slip-actions.mutations";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -43,7 +44,7 @@ export default function SlipActions({ form, currentUser }: IProps) {
           <Delete formId={form.id} />
         </React.Fragment>
       ) : (
-        <DownloadPdf formId={form.id}/>
+        <DownloadPdf formId={form.id} />
       )}
       <Duplicate formId={form.id} />
       {nextStep && (
@@ -53,7 +54,11 @@ export default function SlipActions({ form, currentUser }: IProps) {
         >
           {(mark, { error }) => (
             <React.Fragment>
-              <a className="icon" onClick={() => setIsOpen(true)} title={buttons[nextStep].title}>
+              <a
+                className="icon"
+                onClick={() => setIsOpen(true)}
+                title={buttons[nextStep].title}
+              >
                 {buttons[nextStep].icon({})}
               </a>
               <div
@@ -69,7 +74,10 @@ export default function SlipActions({ form, currentUser }: IProps) {
                       mark({ variables: { id: form.id, ...vars } })
                   })}
                   {error && (
-                    <div className="notification error">{error.message}</div>
+                    <div
+                      className="notification error"
+                      dangerouslySetInnerHTML={{ __html: error.message }}
+                    />
                   )}
                 </div>
               </div>
@@ -89,7 +97,9 @@ const buttons = {
     icon: FaEnvelopeOpen,
     component: Received
   },
-  PROCESSED: { title: "Marquer comme traité", icon: FaCog, component: Sent }
+  PROCESSED: {
+    title: "Marquer comme traité",
+    icon: FaCog,
+    component: Processed
+  }
 };
-
-

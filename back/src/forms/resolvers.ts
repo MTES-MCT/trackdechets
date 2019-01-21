@@ -97,7 +97,7 @@ export default {
 
       if (!isValid) {
         throw new Error(
-          "Erreur, le bordereau contient des champs obligatoires non renseignés. Merci de les compléter."
+          `Erreur, le bordereau contient des champs obligatoires non renseignés. Merci de les compléter <a href="/form/${id}">en éditant le formulaire</a>.`
         );
       }
 

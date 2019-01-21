@@ -141,6 +141,7 @@ type Form {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
   processingOperationDone: String
@@ -195,6 +196,7 @@ input FormCreateInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
   processingOperationDone: String
@@ -259,6 +261,8 @@ enum FormOrderByInput {
   sentBy_DESC
   isAccepted_ASC
   isAccepted_DESC
+  receivedBy_ASC
+  receivedBy_DESC
   receivedAt_ASC
   receivedAt_DESC
   quantityReceived_ASC
@@ -347,6 +351,7 @@ type FormPreviousValues {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
   processingOperationDone: String
@@ -413,6 +418,7 @@ input FormUpdateInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
   processingOperationDone: String
@@ -460,6 +466,7 @@ input FormUpdateManyMutationInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
   processingOperationDone: String
@@ -586,6 +593,20 @@ input FormWhereInput {
   sentBy_not_ends_with: String
   isAccepted: Boolean
   isAccepted_not: Boolean
+  receivedBy: String
+  receivedBy_not: String
+  receivedBy_in: [String!]
+  receivedBy_not_in: [String!]
+  receivedBy_lt: String
+  receivedBy_lte: String
+  receivedBy_gt: String
+  receivedBy_gte: String
+  receivedBy_contains: String
+  receivedBy_not_contains: String
+  receivedBy_starts_with: String
+  receivedBy_not_starts_with: String
+  receivedBy_ends_with: String
+  receivedBy_not_ends_with: String
   receivedAt: DateTime
   receivedAt_not: DateTime
   receivedAt_in: [DateTime!]

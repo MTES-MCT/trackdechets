@@ -5,6 +5,7 @@ input SentFormInput {
 
 input ReceivedFormInput {
   isAccepted: Boolean
+  receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
 }
