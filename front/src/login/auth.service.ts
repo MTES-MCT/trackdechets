@@ -1,3 +1,5 @@
+import client from "../graphql-client";
+
 export const localAuthService = {
   isAuthenticated: false,
   locallyAutheticate(token: string) {
@@ -6,6 +8,7 @@ export const localAuthService = {
   },
   locallySignOut() {
     this.isAuthenticated = false;
+    client.resetStore();
     window.localStorage.removeItem("td-token");
   },
   init() {
