@@ -59,7 +59,7 @@ export const formSchema = object().shape({
     ),
     validityLimit: date(),
     contact: string().required("Le contact du transporteur est obligatoire"),
-    numberPlate: string().required("La plaque du transporteur est obligatoire"),
+    numberPlate: string(),
     company: companySchema
   }),
   wasteDetails: object().shape({
