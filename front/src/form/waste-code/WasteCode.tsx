@@ -5,22 +5,6 @@ import formatWasteCodeEffect from "./format-waste-code.effect";
 import WasteCodeLookup from "./nomenclature-dechets.json";
 import "./WasteCode.scss";
 
-const tempBookmarks = [
-  {
-    code: "01 01 02",
-    description:
-      "déchets provenant de l'extraction des minéraux non métallifères"
-  },
-  {
-    code: "01 03 04*",
-    description: "stériles acidogènes provenant de la transformation du sulfure"
-  },
-  {
-    code: "01 03 05*",
-    description: "autres stériles contenant des substances dangereuses"
-  }
-];
-
 type Bookmark = {
   code: string;
   description: string;
@@ -28,7 +12,7 @@ type Bookmark = {
 
 export default function WasteCode(props: FieldProps) {
   const [wasteCode, setWasteCode] = useState(props.field.value);
-  const [bookmarks, setBookmarks] = useState(tempBookmarks); // TODO
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]); // TODO
 
   useEffect(
     () => {
@@ -46,13 +30,9 @@ export default function WasteCode(props: FieldProps) {
     <div className="WasteCode">
       <div className="text-quote">
         <p>
-          Vous hésitez sur le type de code déchet à choisir ? Vous pouvez
-          consulter la liste de codification des déchets sur{" "}
-          <a
-            href="https://aida.ineris.fr/consultation_document/10327"
-            target="_blank"
-          >
-            le site de l'Aida.
+          Vous hésitez sur le type de code déchet à choisir ? Consulter la{" "}
+          <a href="/wasteTree" target="_blank">
+            liste des codes déchets
           </a>
         </p>
       </div>
@@ -75,7 +55,7 @@ export default function WasteCode(props: FieldProps) {
 
       <RedErrorMessage name={props.field.name} />
 
-      {bookmarks.length && (
+      {bookmarks.length > 0 && (
         <React.Fragment>
           <span>Codes récents:</span>
           <ul className="label-list list-inline">
