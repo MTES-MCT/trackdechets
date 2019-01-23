@@ -12,12 +12,6 @@ export default function Home() {
           <h1 className="hero__white-background">
             Gérer la traçabilité des déchets en toute sécurité
           </h1>
-          <p className="hero__white-background">
-            Trackdéchets a vocation à simplifier la gestion de vos déchets
-            dangereux au quotidien : 0 papier, traçabilité en temps réel,
-            informations regroupées sur un outil unique, vérification des
-            prestataires
-          </p>
           {localAuthService.isAuthenticated ? (
             <p>
               <Link to="/dashboard/slips" className="button large">
@@ -40,8 +34,10 @@ export default function Home() {
       <section className="section section-white">
         <div className="container">
           <h2 className="section__title">
-            Un produit pour simplifier votre gestion quotidienne de la
-            traçabilité et pour favoriser la transparence du secteur
+            Trackdéchets a vocation à simplifier la gestion de vos déchets
+            dangereux au quotidien : 0 papier, traçabilité en temps réel,
+            informations regroupées sur un outil unique, vérification des
+            prestataires
           </h2>
 
           <div className="row">
