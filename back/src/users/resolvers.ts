@@ -8,9 +8,19 @@ import { prisma } from "../generated/prisma-client";
 export default {
   Mutation: {
     signup: async (parent, { payload }, context: Context) => {
-      const existingCompany = await context.prisma.company({
-        siret: payload.siret
-      });
+      const trimedSiret = payload.siret.replace(/\s+/g, "");
+
+      const existingCompany = await context.prisma
+        .company({
+          siret: trimedSiret
+        })
+        .catch(err => {
+          console.error("Error while checking company", err);
+          throw new Error(
+            "Erreur lors de la vérification du SIRET. Merci de réessayer."
+          );
+        });
+
       if (existingCompany) {
         throw new Error(
           "Cette entreprise a déjà un administrateur. Si vous pensez que c'est une erreur vous pouvez contacter le support."
@@ -26,10 +36,11 @@ export default {
           phone: payload.phone,
           userType: payload.userType,
           company: {
-            create: { siret: payload.siret.replace(/\s+/g, "") }
+            create: { siret: trimedSiret }
           }
         })
-        .catch(_ => {
+        .catch(err => {
+          console.error("Error while creating user", err);
           throw new Error(
             "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
           );
@@ -39,12 +50,17 @@ export default {
         new Date().valueOf().toString() + Math.random().toString(),
         10
       );
-      await context.prisma.createUserActivationHash({
-        hash: activationHash,
-        user: {
-          connect: { id: user.id }
-        }
-      });
+      await context.prisma
+        .createUserActivationHash({
+          hash: activationHash,
+          user: {
+            connect: { id: user.id }
+          }
+        })
+        .catch(err => {
+          console.error("Error while creating user activation hash", err);
+          throw new Error("Erreur technique. Le support a été informé.");
+        });
 
       await axios.post("http://td-mail/send", {
         toEmail: user.email,
