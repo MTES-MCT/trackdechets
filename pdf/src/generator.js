@@ -14,7 +14,13 @@ async function write(params) {
 
   const browser = await puppeteer
     .launch({
-      args: ["--no-sandbox"]
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        // This will write shared memory files into /tmp instead of /dev/shm,
+        // because Docker’s default for /dev/shm is 64MB
+        "--disable-dev-shm-usage"
+      ]
     })
     .catch(err => console.error("Cannot launch puppeteer", err));
   const page = await browser
