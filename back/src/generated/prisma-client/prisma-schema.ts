@@ -19,6 +19,7 @@ type BatchPayload {
 }
 
 type Company {
+  id: ID!
   siret: String!
 }
 
@@ -43,10 +44,10 @@ type CompanyEdge {
 }
 
 enum CompanyOrderByInput {
-  siret_ASC
-  siret_DESC
   id_ASC
   id_DESC
+  siret_ASC
+  siret_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -54,6 +55,7 @@ enum CompanyOrderByInput {
 }
 
 type CompanyPreviousValues {
+  id: ID!
   siret: String!
 }
 
@@ -100,6 +102,20 @@ input CompanyUpsertNestedInput {
 }
 
 input CompanyWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   siret: String
   siret_not: String
   siret_in: [String!]
@@ -120,6 +136,7 @@ input CompanyWhereInput {
 }
 
 input CompanyWhereUniqueInput {
+  id: ID
   siret: String
 }
 

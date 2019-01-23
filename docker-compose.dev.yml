@@ -10,7 +10,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   prisma:
-    image: prismagraphql/prisma:1.21
+    image: prismagraphql/prisma:1.25
     restart: always
     ports:
       - "4466:4466"
