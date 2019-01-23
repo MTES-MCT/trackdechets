@@ -26,9 +26,15 @@ export default function SlipsTabs({ me }: Props) {
           .sort((a: any, b: any) => a.status - b.status);
         const status = data.forms
           .filter(
-            (f: Form) => f.status !== "DRAFT" && getNextStep(f, me) == null
+            (f: Form) =>
+              f.status !== "DRAFT" &&
+              f.status !== "PROCESSED" &&
+              getNextStep(f, me) == null
           )
           .sort((a: any, b: any) => a.status - b.status);
+        const history = data.forms
+          .filter((f: Form) => f.status === "PROCESSED")
+          .sort((a: any, b: any) => a.createdAt - b.createdAt);
 
         return (
           <Tabs>
@@ -36,6 +42,7 @@ export default function SlipsTabs({ me }: Props) {
               <Tab>Brouillons</Tab>
               <Tab>En attente de signature</Tab>
               <Tab>Statut du déchet</Tab>
+              <Tab>Archives</Tab>
             </TabList>
 
             <TabPanel>
@@ -46,6 +53,9 @@ export default function SlipsTabs({ me }: Props) {
             </TabPanel>
             <TabPanel>
               <Slips me={me} forms={status} />
+            </TabPanel>
+            <TabPanel>
+              <Slips me={me} forms={history} />
             </TabPanel>
           </Tabs>
         );
