@@ -10,7 +10,7 @@ export default {
     signup: async (parent, { payload }, context: Context) => {
       const trimedSiret = payload.siret.replace(/\s+/g, "");
 
-      const existingCompany = await context.prisma
+      const existingCompany = await context.prisma.$exists
         .company({
           siret: trimedSiret
         })
