@@ -3,6 +3,7 @@ import { FaCheckCircle, FaPenFancy, FaTasks } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./Home.scss";
 import { localAuthService } from "./login/auth.service";
+import { trackEvent } from "./tracker";
 
 export default function Home() {
   return (
@@ -20,10 +21,18 @@ export default function Home() {
             </p>
           ) : (
             <p>
-              <Link to="/signup" className="button large warning">
+              <Link
+                to="/signup"
+                className="button large warning"
+                onClick={() => trackEvent("home", "cta-test")}
+              >
                 Tester Trackdéchets
               </Link>
-              <Link to="/login" className="button large">
+              <Link
+                to="/login"
+                className="button large"
+                onClick={() => trackEvent("home", "cta-login")}
+              >
                 Se connecter
               </Link>
             </p>

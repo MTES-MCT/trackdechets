@@ -48,3 +48,10 @@ export function trackPageView(pageTitle: string) {
     tracker.trackPageView(pageTitle);
   }
 }
+
+export function trackEvent(category: string, action: string, name?: string, value?: number) {
+  const tracker = getTracker();
+  if (tracker) {
+    tracker.trackEvent(category, action);
+  }
+}
