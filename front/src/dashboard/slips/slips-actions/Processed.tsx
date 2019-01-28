@@ -19,20 +19,15 @@ export default function Processed(props: SlipActionProps) {
           <Form>
             <label>
               Opération de traitement effectuée
-              <Field
-                name="processingOperationDone"
-                render={(field: any) => (
-                  <select id="select" {...field}>
-                    <option value="">Choisissez...</option>
-                    {Operations.map(o => (
-                      <option key={o.code} value={o.code}>
-                        {o.code} - {o.description.substr(0, 50)}
-                        {o.description.length > 50 ? "..." : ""}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              />
+              <Field component="select" name="processingOperationDone">
+                <option value="">Choisissez...</option>
+                {Operations.map(o => (
+                  <option key={o.code} value={o.code}>
+                    {o.code} - {o.description.substr(0, 50)}
+                    {o.description.length > 50 ? "..." : ""}
+                  </option>
+                ))}
+              </Field>
             </label>
             <div className="form__group button__group">
               <button
