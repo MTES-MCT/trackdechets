@@ -20,7 +20,8 @@ type TokenInfo struct {
 
 func readToken() string {
 	jsonFile, err := os.Open("./key.json")
-	check(err)
+  check(err)
+  defer jsonFile.Close()
 	byteValue, err := ioutil.ReadAll(jsonFile)
 	check(err)
 
