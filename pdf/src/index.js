@@ -6,7 +6,7 @@ const PORT = 3201;
 
 const app = polka().use(json());
 
-app.get("ping", res => res.end("pong"));
+app.get("ping", (_, res) => res.end("pong"));
 
 app.post("/pdf", async (req, res) => {
   const bufferPdf = await write(req.body);

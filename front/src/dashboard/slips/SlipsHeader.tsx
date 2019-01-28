@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./SlipsHeader.scss";
+import { trackEvent } from "../../tracker";
 
 export default function SlipsHeader() {
   const [clue, setClue] = useState("");
@@ -16,6 +17,7 @@ export default function SlipsHeader() {
               className=""
               value={clue}
               onChange={e => setClue(e.target.value)}
+              onBlur={() => trackEvent("dashboard", "search-blur")}
             />
             <button className="overlay-button" aria-label="Recherche">
               <svg

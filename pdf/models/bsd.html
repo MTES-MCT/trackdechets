@@ -48,11 +48,12 @@
           "waste-info waste-info"
           "transporter transporter"
           "sent sent"
+          "recipient recipient"
           "infos infos";
       }
       .grid-item {
         border: 1px solid rgba(0, 0, 0, 0.8);
-        padding: 20px;
+        padding: 5px 10px;
       }
 
       .item-title {
@@ -79,6 +80,9 @@
       }
       .sent {
         grid-area: sent;
+      }
+      .recipient {
+        grid-area: recipient;
       }
       .infos {
         grid-area: infos;
@@ -408,6 +412,30 @@
           </div>
         </div>
       </div>
+
+      {{? it.receivedBy }}
+      <div class="recipient grid-item">
+        <div class="columns">
+          <div class="column">
+            <div class="item-title">Réception:</div>
+            <p>
+              Lot accepté:
+              <input type="checkbox" {{? it.isAccepted }}checked{{?}} /> oui
+              <input type="checkbox" {{? !it.isAccepted}}checked{{?}} /> non
+            </p>
+            <p>Nom: {{=it.receivedBy}}</p>
+            <p>Date: {{=it.toDate(it.receivedAt)}}</p>
+          </div>
+          <div class="column">
+            <div class="item-title">Réalisation de l'opération:</div>
+            <p>
+              Je soussigné certifie que l'opération ci-dessous a été réalisée.
+            </p>
+            <p>Code D/R: {{=it.processingOperationDone}}</p>
+          </div>
+        </div>
+      </div>
+      {{?}}
 
       <div class="infos">
         Ce document est édité à partir de <a>www.trackdechets.beta.gouv.fr</a

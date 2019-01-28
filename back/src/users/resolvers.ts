@@ -4,6 +4,8 @@ import { sign } from "jsonwebtoken";
 import { APP_SECRET, getUserId } from "../utils";
 import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
+import { sendMail } from "../common/mails.helper";
+import { userMails } from "./mails";
 
 export default {
   Mutation: {
@@ -62,22 +64,7 @@ export default {
           throw new Error("Erreur technique. Le support a été informé.");
         });
 
-      await axios.post("http://td-mail/send", {
-        toEmail: user.email,
-        toName: user.name,
-        subject: "Activer votre compte sur Trackdéchets",
-        title: "Activation de votre compte",
-        body: `Bonjour ${user.name},
-        <br>
-        Vous venez de créer un compte sur Trackdéchets ! Nous sommes ravis de vous compter parmi nous ! 🎉
-        <br>
-        Pour finaliser votre inscription, veuillez confirmer votre email en cliquant sur le lien suivant :
-        <a href="https://api.trackdechets.beta.gouv.fr/userActivation?hash=${activationHash}">https://api.trackdechets.beta.gouv.fr/userActivation?hash=${activationHash}</a>
-        <br>
-        Pour rappel, Trackdéchets est un site en béta conçu par la Fabrique Numérique du Ministère de l'Ecologie et des Territoires.
-        <br>
-        Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.`
-      });
+      await sendMail(userMails.onSignup(user, activationHash));
 
       return {
         token: sign({ userId: user.id }, APP_SECRET),

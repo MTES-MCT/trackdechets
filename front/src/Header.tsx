@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, Link } from "react-router-dom";
 import { localAuthService } from "./login/auth.service";
+import { trackEvent } from "./tracker";
 
 export default function Header() {
   return (
@@ -18,19 +19,31 @@ export default function Header() {
         <nav>
           <ul className="nav__links">
             <li className="nav__item">
-              <NavLink to="/search" activeClassName="active">
+              <NavLink
+                to="/search"
+                activeClassName="active"
+                onClick={() => trackEvent("navbar", "check-presta")}
+              >
                 Vérification prestataire
               </NavLink>
             </li>
             {localAuthService.isAuthenticated ? (
               <li className="nav__item">
-                <NavLink to="/dashboard/slips" activeClassName="active">
+                <NavLink
+                  to="/dashboard/slips"
+                  activeClassName="active"
+                  onClick={() => trackEvent("navbar", "mon-espace")}
+                >
                   Mon espace
                 </NavLink>
               </li>
             ) : (
               <li className="nav__item">
-                <NavLink to="/login" activeClassName="active">
+                <NavLink
+                  to="/login"
+                  activeClassName="active"
+                  onClick={() => trackEvent("navbar", "login")}
+                >
                   Me connecter
                 </NavLink>
               </li>
