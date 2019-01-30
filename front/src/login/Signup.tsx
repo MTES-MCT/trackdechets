@@ -18,7 +18,7 @@ const handleSumbit = (
 ) => {
   props
     .signup({ variables: { payload } })
-    .then(_ => props.history.push("/signup/details"))
+    .then(_ => props.history.push("/signup/activation"))
     .catch(error => props.setStatus(error.message))
     .then(_ => props.setSubmitting(false));
 };
@@ -202,8 +202,11 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                     <label>
                       <Field name="cgu" type="checkbox" />
-                      Je certifie avoir lu les conditions générales
-                      d'utilisations*
+                      Je certifie avoir lu les{" "}
+                      <Link to="cgu" target="_blank">
+                        conditions générales d'utilisation
+                      </Link>
+                      *
                     </label>
 
                     <RedErrorMessage name="cgu" />
