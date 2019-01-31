@@ -46,7 +46,7 @@ export default function SlipsTabs({ me }: Props) {
             </TabList>
 
             <TabPanel>
-              <Slips me={me} forms={drafts} showStatus={false} />
+              <Slips me={me} forms={drafts} hiddenFields={['status', 'readableId']} />
             </TabPanel>
             <TabPanel>
               <Slips me={me} forms={toSign} />

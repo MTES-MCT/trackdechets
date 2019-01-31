@@ -25,7 +25,7 @@ type Company {
 
 type Form {
   id: ID! @unique
-  readableId: String! @unique
+  readableId: String @unique
   isDeleted: Boolean @default(value: "false")
 
   owner: User!

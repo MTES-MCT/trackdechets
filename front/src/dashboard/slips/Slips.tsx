@@ -12,28 +12,30 @@ const statusLabels: { [key: string]: string } = {
   PROCESSED: "Traité"
 };
 
-type Props = { forms: Form[]; me: Me; showStatus?: boolean };
-export default function Slips({ forms, me, showStatus = true }: Props) {
+type Props = { forms: Form[]; me: Me; hiddenFields?: string[] };
+export default function Slips({ forms, me, hiddenFields = [] }: Props) {
   return (
     <table className="table">
       <thead>
         <tr>
-          <th>Numéro</th>
+          {hiddenFields.indexOf("readableId") === -1 && <th>Numéro</th>}
           <th>Date de création</th>
           <th>Emetteur</th>
           <th>Destinataire</th>
           <th>Déchet</th>
           <th>Quantité</th>
-          {showStatus && <th>Statut</th>}
+          {hiddenFields.indexOf("status") === -1 && <th>Statut</th>}
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {forms.map((s: any) => (
           <tr key={s.id}>
-            <td>
-              <div className="id">{s.readableId}</div>
-            </td>
+            {hiddenFields.indexOf("readableId") === -1 && (
+              <td>
+                <div className="id">{s.readableId}</div>
+              </td>
+            )}
             <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
             <td>{s.emitter.company && s.emitter.company.name}</td>
             <td>{s.recipient.company && s.recipient.company.name}</td>
@@ -46,7 +48,9 @@ export default function Slips({ forms, me, showStatus = true }: Props) {
               )}
             </td>
             <td>{s.wasteDetails && `${s.wasteDetails.quantity} t`}</td>
-            {showStatus && <td>{statusLabels[s.status]}</td>}
+            {hiddenFields.indexOf("status") === -1 && (
+              <td>{statusLabels[s.status]}</td>
+            )}
             <td>
               <SlipActions currentUser={me} form={s} />
             </td>

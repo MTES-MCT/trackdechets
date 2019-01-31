@@ -149,7 +149,7 @@ enum EmitterType {
 
 type Form {
   id: ID!
-  readableId: String!
+  readableId: String
   isDeleted: Boolean
   owner: User!
   createdAt: DateTime!
@@ -206,7 +206,7 @@ type FormConnection {
 }
 
 input FormCreateInput {
-  readableId: String!
+  readableId: String
   isDeleted: Boolean
   owner: UserCreateOneInput!
   status: String
@@ -360,7 +360,7 @@ enum FormOrderByInput {
 
 type FormPreviousValues {
   id: ID!
-  readableId: String!
+  readableId: String
   isDeleted: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
