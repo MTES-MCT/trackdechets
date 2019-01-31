@@ -7,6 +7,9 @@ export type Form = {
   recipient: {
     company: FormCompany;
   };
+  wasteDetails: {
+    quantity: number;
+  }
 };
 
 type FormCompany = {

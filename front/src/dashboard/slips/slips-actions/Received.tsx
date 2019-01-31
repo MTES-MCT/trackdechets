@@ -17,11 +17,15 @@ export default function Received(props: SlipActionProps) {
         }}
         onSubmit={values => props.onSubmit({ info: values })}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, values }) => (
           <Form>
             <label>
+              <Field
+                type="checkbox"
+                checked={values.isAccepted}
+                name="isAccepted"
+              />
               Acceptation du déchet
-              <Field type="checkbox" name="isAccepted" />
             </label>
             <label>
               Nom du responsable
@@ -38,6 +42,9 @@ export default function Received(props: SlipActionProps) {
                 name="quantityReceived"
                 placeholder="En tonnes"
               />
+              <span>
+                Poids indicatif émis: {props.form.wasteDetails.quantity} tonnes
+              </span>
             </label>
             <p>
               En validant, je confirme la réception des déchets indiqués dans ce

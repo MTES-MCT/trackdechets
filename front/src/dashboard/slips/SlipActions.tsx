@@ -24,6 +24,7 @@ import mutations from "./slips-actions/slip-actions.mutations";
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
   onCancel: () => void;
+  form: Form;
 };
 
 interface IProps {
@@ -71,7 +72,8 @@ export default function SlipActions({ form, currentUser }: IProps) {
                   {buttons[nextStep].component({
                     onCancel: () => setIsOpen(false),
                     onSubmit: vars =>
-                      mark({ variables: { id: form.id, ...vars } })
+                      mark({ variables: { id: form.id, ...vars } }),
+                    form
                   })}
                   {error && (
                     <div
