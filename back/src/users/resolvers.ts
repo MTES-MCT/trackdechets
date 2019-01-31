@@ -109,6 +109,24 @@ export default {
         token: sign({ userId: user.id }, APP_SECRET),
         user
       };
+    },
+    editProfile: (_, { name, phone, email }, context) => {
+      const userId = getUserId(context);
+
+      return prisma
+        .updateUser({
+          where: { id: userId },
+          data: { name, phone }
+        })
+        .catch(err => {
+          console.error(
+            `Error while editing profile from user #${userId} with values ${JSON.stringify(
+              { name, phone, email }
+            )}`,
+            err
+          );
+          throw new Error("Impossible de mettre lr profil à jour");
+        });
     }
   },
   Query: {

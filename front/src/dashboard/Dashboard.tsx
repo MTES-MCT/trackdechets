@@ -13,8 +13,11 @@ const GET_ME = gql`
       id
       name
       email
+      phone
       company {
         siret
+        name
+        address
       }
     }
   }
