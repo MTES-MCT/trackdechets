@@ -63,6 +63,10 @@ func Siret(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	check(err)
 
+	if resp.StatusCode != 200 {
+		fmt.Println("Error while querying INSEE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
+	}
+
 	responseData, err := ioutil.ReadAll(resp.Body)
 	check(err)
 
