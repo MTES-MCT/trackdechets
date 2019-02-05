@@ -6,6 +6,7 @@ import { merge } from "./utils";
 import { userActivationHandler } from "./users/activation";
 import { pdfHandler } from "./forms/pdf";
 import { initSubsriptions } from "./subscriptions";
+import { csvExportHandler } from "./forms/exports";
 
 const port = process.env.port || 80;
 const isProd = process.env.NODE_ENV === "production";
@@ -34,6 +35,7 @@ const server = new GraphQLServer({
 server.express.get("/ping", (_, res) => res.send("Pong!"));
 server.express.get("/userActivation", userActivationHandler);
 server.express.get("/pdf", pdfHandler);
+server.express.get("/exports", csvExportHandler);
 server.start({ port, debug: !isProd }, () =>
   console.log(`Server is running on port ${port}`)
 );

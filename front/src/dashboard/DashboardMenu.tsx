@@ -26,6 +26,11 @@ export default function DashboardMenu({ me, match }: IProps) {
             Mon compte
           </NavLink>
         </li>
+        <li>
+          <NavLink to={`${match.url}/exports`} activeClassName="active">
+            Exports
+          </NavLink>
+        </li>
       </ul>
     </aside>
   );

@@ -43,6 +43,36 @@ export default {
       });
 
       return forms.map(f => unflattenObjectFromDb(f));
+    },
+    stats: async (parent, args, context: Context) => {
+      const userId = getUserId(context);
+      const userCompany = await context.prisma.user({ id: userId }).company();
+
+      const forms = await context.prisma.forms({
+        where: {
+          OR: [
+            { owner: { id: userId } },
+            { recipientCompanySiret: userCompany.siret },
+            { emitterCompanySiret: userCompany.siret }
+          ],
+          status: "PROCESSED",
+          isDeleted: false
+        }
+      });
+
+      const stats = forms.reduce((prev, cur) => {
+        prev[cur.wasteDetailsCode] = prev[cur.wasteDetailsCode] || {
+          wasteCode: cur.wasteDetailsCode,
+          incoming: 0,
+          outgoing: 0
+        };
+        cur.recipientCompanySiret === userCompany.siret
+          ? (prev[cur.wasteDetailsCode].incoming += cur.quantityReceived)
+          : (prev[cur.wasteDetailsCode].outgoing += cur.quantityReceived);
+        return prev;
+      }, {});
+
+      return Object.keys(stats).map(key => stats[key]);
     }
   },
   Mutation: {

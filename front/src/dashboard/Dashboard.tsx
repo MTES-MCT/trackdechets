@@ -6,6 +6,7 @@ import Account from "./account/Account";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import SlipsContainer from "./slips/SlipsContainer";
+import Exports from "./exports/exports";
 
 const GET_ME = gql`
   {
@@ -42,6 +43,10 @@ export default function Dashboard({ match }: RouteComponentProps) {
               <Route
                 path={`${match.path}/account`}
                 render={() => <Account me={data.me} />}
+              />
+              <Route
+                path={`${match.path}/exports`}
+                render={() => <Exports me={data.me} />}
               />
             </div>
           </div>

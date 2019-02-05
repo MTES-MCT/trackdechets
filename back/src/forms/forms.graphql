@@ -3,6 +3,7 @@ scalar DateTime
 type Query {
   form(id: ID): Form
   forms: [Form]
+  stats: [Stat]
 }
 
 type Mutation {
@@ -110,4 +111,10 @@ type WasteDetails {
   numberOfPackages: Int
   quantity: Float
   quantityType: QuantityType
+}
+
+type Stat {
+  wasteCode: String
+  incoming: Float
+  outgoing: Float
 }
