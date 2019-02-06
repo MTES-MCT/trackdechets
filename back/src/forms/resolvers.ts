@@ -93,6 +93,7 @@ export default {
 
       const newForm = await context.prisma.createForm({
         ...flattenInoutObjectForDb(formContent),
+        readableId: await getReadableId(context),
         owner: { connect: { id: userId } }
       });
 
@@ -135,8 +136,7 @@ export default {
       return context.prisma.updateForm({
         where: { id },
         data: {
-          status: getNextStep(form, userCompany.siret),
-          readableId: await getReadableId(context)
+          status: getNextStep(form, userCompany.siret)
         }
       });
     },
