@@ -300,7 +300,7 @@
       <div class="number grid-item">Bordereau numéro: {{=it.readableId}}</div>
 
       <div class="emitter grid-item">
-        <div class="item-title">Emétetteur du bordereau:</div>
+        <div class="item-title">Emetteur du bordereau:</div>
         <p class="checkboxes">
           {{? it.emitterType === "OTHER" }} <input type="checkbox" /> Producteur
           du déchets <input type="checkbox" checked /> Autre producteur {{??}}
@@ -392,7 +392,7 @@
               Limite de validité: {{=it.toDate(it.transporterValidityLimit)}}
             </p>
             <p>Département: {{=it.transporterDepartment}}</p>
-            <p>Plaque: {{=it.transporterNumberPlate}}</p>
+            <p>Immatriculation: {{=it.transporterNumberPlate}}</p>
             <p>Personne à contacter: {{=it.transporterContact}}</p>
           </div>
         </div>
