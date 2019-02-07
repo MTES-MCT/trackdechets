@@ -100,7 +100,10 @@ jobs:
           command: |
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-api:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-ui:latest"
-            ssh $SSH_USER@$SSH_HOST "cd /srv/trackdechets/ ; docker-compose up --force-recreate -d td-api td-ui"
+            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-pdf:latest"
+            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-insee:latest"
+            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-mail:latest"
+            ssh $SSH_USER@$SSH_HOST "cd /srv/trackdechets/ ; docker-compose up -d"
 
 workflows:
   build_deploy:
