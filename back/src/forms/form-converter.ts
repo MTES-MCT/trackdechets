@@ -71,11 +71,14 @@ export function cleanUpNotDuplicatableFieldsInForm(form) {
     updatedAt,
     readableId,
 
+    transporterNumberPlate,
+
     status,
     sentAt,
     sentBy,
 
     isAccepted,
+    receivedBy,
     receivedAt,
     quantityReceived,
     processingOperationDone,
