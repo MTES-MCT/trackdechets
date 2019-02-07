@@ -8,7 +8,7 @@ import DashboardMenu from "./DashboardMenu";
 import SlipsContainer from "./slips/SlipsContainer";
 import Exports from "./exports/exports";
 
-const GET_ME = gql`
+export const GET_ME = gql`
   {
     me {
       id

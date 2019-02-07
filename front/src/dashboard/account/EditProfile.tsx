@@ -4,11 +4,14 @@ import { Me } from "../../login/model";
 import "./EditProfile.scss";
 import { Mutation } from "react-apollo";
 import gql from "graphql-tag";
+import { GET_ME } from "../Dashboard";
 
 const EDIT_PROFILE = gql`
   mutation EditProfile($name: String!, $phone: String!, $email: String!) {
     editProfile(name: $name, phone: $phone, email: $email) {
-      id
+      name
+      email
+      phone
     }
   }
 `;
@@ -17,7 +20,19 @@ type Props = { me: Me; onSubmit: () => void };
 export default function EditProfile({ me, onSubmit }: Props) {
   return (
     <div className="EditProfile">
-      <Mutation mutation={EDIT_PROFILE}>
+      <Mutation
+        mutation={EDIT_PROFILE}
+        update={(cache, { data: { editProfile } }) => {
+          const query = cache.readQuery<{ me: Me }>({ query: GET_ME });
+          if (!query || !query.me) {
+            return;
+          }
+          cache.writeQuery({
+            query: GET_ME,
+            data: { me: { ...query.me, ...editProfile } }
+          });
+        }}
+      >
         {(editProfile, { data }) => (
           <Formik
             initialValues={{ name: me.name, email: me.email, phone: me.phone }}
