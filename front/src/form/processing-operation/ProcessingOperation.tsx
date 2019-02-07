@@ -33,8 +33,8 @@ export default function ProcessingOperation({
         <option value="">Choisissez...</option>
         {Operations.map(o => (
           <option key={o.code} value={o.code}>
-            {o.code} - {o.description.substr(0, 50)}
-            {o.description.length > 50 ? "..." : ""}
+            {o.code} - {o.description.substr(0, 120)}
+            {o.description.length > 120 ? "..." : ""}
           </option>
         ))}
       </select>
