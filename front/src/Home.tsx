@@ -122,6 +122,11 @@ export default function Home() {
               <Link to="/cgu">Conditions générales d'utilisation</Link>
             </li>
             <li>
+              <a href="/Politique de confidentialité.pdf" target="_blank">
+                Politique de confidentialité
+              </a>
+            </li>
+            <li>
               <a href="http://api.trackdechets.beta.gouv.fr">API</a>
             </li>
           </ul>
