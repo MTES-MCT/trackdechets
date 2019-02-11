@@ -66,6 +66,26 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <RedErrorMessage name="wasteDetails.numberOfPackages" />
       </div>
 
+      <div className="form__group">
+        <fieldset>
+          <legend>Consistance</legend>
+          <Field
+            name="wasteDetails.consistence"
+            id="SOLID"
+            label="Solide"
+            component={RadioButton}
+          />
+          <Field
+            name="wasteDetails.consistence"
+            id="LIQUID"
+            label="Liquide"
+            component={RadioButton}
+          />
+        </fieldset>
+
+        <RedErrorMessage name="wasteDetails.consistence" />
+      </div>
+
       <h4>Quantité</h4>
       <div className="form__group">
         <Field

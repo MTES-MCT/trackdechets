@@ -46,6 +46,7 @@ export default {
     otherPackaging: "",
     numberOfPackages: null,
     quantity: null,
-    quantityType: "ESTIMATED"
+    quantityType: "ESTIMATED",
+    consistence: "SOLID"
   }
 };

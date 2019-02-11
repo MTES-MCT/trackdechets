@@ -50,6 +50,7 @@ export const GET_FORM = gql`
         numberOfPackages
         quantity
         quantityType
+        consistence
       }
     }
   }

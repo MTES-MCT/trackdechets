@@ -61,4 +61,5 @@ input WasteDetailsInput {
   numberOfPackages: Int
   quantity: Float
   quantityType: QuantityType
+  consistence: Consistence
 }

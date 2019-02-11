@@ -89,6 +89,7 @@ type Form {
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
 }
 
 enum EmitterType {
@@ -99,4 +100,9 @@ enum EmitterType {
 enum QuantityType {
   REAL
   ESTIMATED
+}
+
+enum Consistence {
+  SOLID
+  LIQUID
 }

@@ -102,6 +102,11 @@ enum Packagings {
   AUTRE
 }
 
+enum Consistence {
+  SOLID
+  LIQUID
+}
+
 type WasteDetails {
   code: String
   name: String
@@ -111,6 +116,7 @@ type WasteDetails {
   numberOfPackages: Int
   quantity: Float
   quantityType: QuantityType
+  consistence: Consistence
 }
 
 type Stat {

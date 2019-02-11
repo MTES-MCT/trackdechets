@@ -140,6 +140,11 @@ input CompanyWhereUniqueInput {
   siret: String
 }
 
+enum Consistence {
+  SOLID
+  LIQUID
+}
+
 scalar DateTime
 
 enum EmitterType {
@@ -197,6 +202,7 @@ type Form {
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
 }
 
 type FormConnection {
@@ -252,6 +258,7 @@ input FormCreateInput {
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
 }
 
 type FormEdge {
@@ -356,6 +363,8 @@ enum FormOrderByInput {
   wasteDetailsQuantity_DESC
   wasteDetailsQuantityType_ASC
   wasteDetailsQuantityType_DESC
+  wasteDetailsConsistence_ASC
+  wasteDetailsConsistence_DESC
 }
 
 type FormPreviousValues {
@@ -407,6 +416,7 @@ type FormPreviousValues {
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
 }
 
 type FormSubscriptionPayload {
@@ -474,6 +484,7 @@ input FormUpdateInput {
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
 }
 
 input FormUpdateManyMutationInput {
@@ -522,6 +533,7 @@ input FormUpdateManyMutationInput {
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
 }
 
 input FormWhereInput {
@@ -1092,6 +1104,10 @@ input FormWhereInput {
   wasteDetailsQuantityType_not: QuantityType
   wasteDetailsQuantityType_in: [QuantityType!]
   wasteDetailsQuantityType_not_in: [QuantityType!]
+  wasteDetailsConsistence: Consistence
+  wasteDetailsConsistence_not: Consistence
+  wasteDetailsConsistence_in: [Consistence!]
+  wasteDetailsConsistence_not_in: [Consistence!]
   AND: [FormWhereInput!]
   OR: [FormWhereInput!]
   NOT: [FormWhereInput!]
