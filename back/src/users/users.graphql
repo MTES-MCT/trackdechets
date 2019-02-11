@@ -1,5 +1,6 @@
 type Query {
   me: User
+  apiKey: String
 }
 
 input SignupInput {

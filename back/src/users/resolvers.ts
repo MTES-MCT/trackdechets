@@ -133,6 +133,10 @@ export default {
     me: async (parent, _, context) => {
       const userId = getUserId(context);
       return context.prisma.user({ id: userId });
+    },
+    apiKey: (parent, args, context: Context) => {
+      const userId = getUserId(context);
+      return sign({ userId: userId }, APP_SECRET);
     }
   },
   User: {
