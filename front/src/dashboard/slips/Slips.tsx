@@ -47,7 +47,7 @@ export default function Slips({ forms, me, hiddenFields = [] }: Props) {
                 </React.Fragment>
               )}
             </td>
-            <td>{s.wasteDetails && `${s.wasteDetails.quantity} t`}</td>
+            <td>{s.wasteDetails && `${s.quantityReceived || s.wasteDetails.quantity || '?'} t`}</td>
             {hiddenFields.indexOf("status") === -1 && (
               <td>{statusLabels[s.status]}</td>
             )}
