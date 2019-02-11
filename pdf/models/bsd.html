@@ -336,8 +336,8 @@
           <div class="column">
             <p>
               <label>
-                Consistance du déchet <input type="checkbox" /> Solide
-                <input type="checkbox" /> Liquide
+                Consistance du déchet <input type="checkbox" {{? it.consistence === "SOLID"}}checked{{?}} /> Solide
+                <input type="checkbox" {{? it.consistence === "LIQUID"}}checked{{?}} /> Liquide
               </label>
             </p>
             <p>Code ONU / ADR: {{=it.wasteDetailsOnuCode}}</p>
