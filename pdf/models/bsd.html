@@ -14,10 +14,11 @@
       }
       .cerfa-details {
         font-size: 0.8em;
-        width: 260px;
+        width: 180px;
       }
       .cerfa-details p {
         margin: 0;
+        font-size: 0.7em;
       }
       .cerfa-details svg {
         width: 80px;
@@ -30,11 +31,12 @@
       }
       .title h1 {
         text-decoration: underline;
-        margin: 5px 0;
+        margin: 10px 0;
+        font-size: 1.5em;
       }
       .title h2 {
         margin: 0;
-        font-size: 1em;
+        font-size: 0.9em;
         text-transform: uppercase;
       }
       .grid-container {
@@ -103,7 +105,7 @@
   <body>
     <div class="header">
       <div class="cerfa-details">
-        <!-- <svg
+        <svg
           xmlns:svg="http://www.w3.org/2000/svg"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 50 30"
@@ -160,10 +162,9 @@
               </g>
             </g>
           </g>
-        </svg> -->
+        </svg>
         <p>Formulaire modélisé sur le CERFA n° 12571*01</p>
-        <p>Décret n°2005-635 du 30 mai 2005</p>
-        <p>Arrêté du 29 juillet</p>
+        <p>Décret n°2005-635 du 30 mai 2005, Arrêté du 29 juillet</p>
       </div>
 
       <div class="title">
@@ -425,7 +426,10 @@
         <div class="columns">
           <div class="column">
             <div class="item-title">Réception:</div>
-            <p>Reçu par: {{=it.recipientCompanyName}} ({{=it.recipientCompanySiret}})</p>
+            <p>
+              Reçu par:
+              {{=it.recipientCompanyName}} ({{=it.recipientCompanySiret}})
+            </p>
             <p>
               Lot accepté:
               <input type="checkbox" {{? it.isAccepted }}checked{{?}} /> oui
