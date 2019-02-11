@@ -2,7 +2,7 @@ import ApolloClient from "apollo-client";
 import { connect, Field, FieldProps } from "formik";
 import React, { useEffect, useState } from "react";
 import { ApolloConsumer, Query } from "react-apollo";
-import { FaSearch, FaCheck } from "react-icons/fa";
+import { FaSearch, FaCheck, FaRegCircle } from "react-icons/fa";
 import "./CompanySelector.scss";
 import { COMPANY_INFOS, FAVORITES } from "./query";
 import RedErrorMessage from "../RedErrorMessage";
@@ -101,7 +101,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
                     </p>
                   </div>
                   <div className="icon">
-                    {selectedCompany.siret === c.siret && <FaCheck />}
+                    {selectedCompany.siret === c.siret ? <FaCheck /> : <FaRegCircle />}
                   </div>
                 </li>
               ))}
