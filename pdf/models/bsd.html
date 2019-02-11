@@ -30,6 +30,7 @@
       }
       .title h1 {
         text-decoration: underline;
+        margin: 5px 0;
       }
       .title h2 {
         margin: 0;
@@ -102,7 +103,7 @@
   <body>
     <div class="header">
       <div class="cerfa-details">
-        <svg
+        <!-- <svg
           xmlns:svg="http://www.w3.org/2000/svg"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 50 30"
@@ -159,7 +160,7 @@
               </g>
             </g>
           </g>
-        </svg>
+        </svg> -->
         <p>Formulaire modélisé sur le CERFA n° 12571*01</p>
         <p>Décret n°2005-635 du 30 mai 2005</p>
         <p>Arrêté du 29 juillet</p>
@@ -336,8 +337,10 @@
           <div class="column">
             <p>
               <label>
-                Consistance du déchet <input type="checkbox" {{? it.consistence === "SOLID"}}checked{{?}} /> Solide
-                <input type="checkbox" {{? it.consistence === "LIQUID"}}checked{{?}} /> Liquide
+                Consistance du déchet <input type="checkbox"
+                {{? it.consistence === "SOLID"}}checked{{?}} /> Solide <input
+                type="checkbox" {{? it.consistence === "LIQUID"}}checked{{?}} />
+                Liquide
               </label>
             </p>
             <p>Code ONU / ADR: {{=it.wasteDetailsOnuCode}}</p>
@@ -394,6 +397,7 @@
             <p>Département: {{=it.transporterDepartment}}</p>
             <p>Immatriculation: {{=it.transporterNumberPlate}}</p>
             <p>Personne à contacter: {{=it.transporterContact}}</p>
+            <p>Signature:</p>
           </div>
         </div>
       </div>
@@ -421,6 +425,7 @@
         <div class="columns">
           <div class="column">
             <div class="item-title">Réception:</div>
+            <p>Reçu par: {{=it.recipientCompanyName}} ({{=it.recipientCompanySiret}})</p>
             <p>
               Lot accepté:
               <input type="checkbox" {{? it.isAccepted }}checked{{?}} /> oui
@@ -428,18 +433,22 @@
             </p>
             <p>Nom: {{=it.receivedBy}}</p>
             <p>Date: {{=it.toDate(it.receivedAt)}}</p>
+            <p>Poids à l'arrivée: {{=it.quantityReceived}} tonnes</p>
           </div>
           <div class="column">
+            {{? it.processingOperationDone != null }}
             <div class="item-title">Réalisation de l'opération:</div>
             <p>
               Je soussigné certifie que l'opération ci-dessous a été réalisée.
             </p>
             <p>Code D/R: {{=it.processingOperationDone}}</p>
+            {{?}}
           </div>
         </div>
       </div>
       {{?}}
 
+      {{? it.receivedBy == null }}
       <div class="infos">
         Ce document est édité à partir de <a>www.trackdechets.beta.gouv.fr</a
         ><br />
@@ -449,6 +458,7 @@
         enregistré sur les comptes des différents prestataires impliqués dans sa
         traçabilité.
       </div>
+      {{?}}
     </div>
   </body>
 </html>
