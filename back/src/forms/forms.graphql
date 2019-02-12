@@ -17,6 +17,17 @@ type Mutation {
   markAsProcessed(id: ID, processedInfo: ProcessedFormInput!): Form
 }
 
+type Subscription {
+  forms(token: String!): FormSubscription
+}
+
+type FormSubscription {
+  mutation: String
+  node: Form
+  updatedFields: [String]
+  previousValues: Form
+}
+
 enum FormStatus {
   DRAFT
   SEALED

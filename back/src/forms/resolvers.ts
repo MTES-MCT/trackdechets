@@ -1,4 +1,4 @@
-import { getUserId } from "../utils";
+import { getUserId, getUserIdFromToken } from "../utils";
 import { Context } from "../types";
 import {
   flattenInoutObjectForDb,
@@ -147,6 +147,26 @@ export default {
       markForm(id, receivedInfo, context),
     markAsProcessed: async (parent, { id, processedInfo }, context: Context) =>
       markForm(id, processedInfo, context)
+  },
+  Subscription: {
+    forms: {
+      subscribe: async (parent, { token }, context: Context) => {
+        // Web socket has no headers so we pass the token as a param
+        const userId = getUserIdFromToken(token);
+        const userCompany = await context.prisma.user({ id: userId }).company();
+
+        return context.prisma.$subscribe.form({
+          OR: [
+            { node: { emitterCompanySiret: userCompany.siret } },
+            { node: { recipientCompanySiret: userCompany.siret } },
+            { node: { owner: { id: userId } } }
+          ]
+        });
+      },
+      resolve: payload => {
+        return payload;
+      }
+    }
   }
 };
 
