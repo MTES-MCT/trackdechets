@@ -79,7 +79,7 @@ export default withRouter(function Account({
           <div className="form__group">
             <label>Token</label>
             <div className="input__group">
-              <input type="text" value={apiKey} ref={tokenRef} />
+              <input type="text" value={apiKey} ref={tokenRef} readOnly />
               <button
                 className="button icon-button"
                 onClick={copyTokenToClipboard}
