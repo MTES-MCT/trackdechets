@@ -42,7 +42,13 @@ type Form {
   receivedAt: DateTime
   quantityReceived: Float
 
+  processedBy: String
+  processedAt: String
   processingOperationDone: String
+
+  # Next destination fields (frame 12)
+  nextDestinationProcessingOperation: String
+  nextDestinationDetails: String
 
   # Emitter fields
   emitterType: EmitterType
@@ -105,4 +111,5 @@ enum QuantityType {
 enum Consistence {
   SOLID
   LIQUID
+  GASEOUS
 }

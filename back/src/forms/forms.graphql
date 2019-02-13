@@ -60,6 +60,10 @@ type Form {
   quantityReceived: Float
 
   processingOperationDone: String
+  processedBy: String
+  processedAt: DateTime
+  nextDestinationProcessingOperation: String
+  nextDestinationDetails: String
 }
 
 type FormCompany {
@@ -116,6 +120,7 @@ enum Packagings {
 enum Consistence {
   SOLID
   LIQUID
+  GASEOUS
 }
 
 type WasteDetails {

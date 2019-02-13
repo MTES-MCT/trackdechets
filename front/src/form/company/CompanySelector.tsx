@@ -37,32 +37,38 @@ export default connect<FieldProps>(function CompanySelector(props) {
       variables: { siret: clue }
     });
 
-    setSearchResults([data.companyInfos]);
+    if (data.companyInfos) {
+      setSearchResults([data.companyInfos]);
+      setSelectedCompany(data.companyInfos);
+    }
     setIsLoading(false);
   };
 
-  useEffect(
-    () => {
-      ["siret", "name", "address", "contact", "phone", "mail"].forEach(
-        field => {
-          if (!selectedCompany || !selectedCompany[field as keyof Company]) {
-            return;
-          }
-          props.formik.setFieldValue(
-            `${props.field.name}.${field}`,
-            selectedCompany[field as keyof Company]
-          );
-        }
+  useEffect(() => {
+    ["siret", "name", "address", "contact", "phone", "mail"].forEach(field => {
+      if (!selectedCompany || !selectedCompany[field as keyof Company]) {
+        return;
+      }
+      props.formik.setFieldValue(
+        `${props.field.name}.${field}`,
+        selectedCompany[field as keyof Company]
       );
-    },
-    [selectedCompany]
-  );
+    });
+  }, [selectedCompany]);
 
   // Load different favorites depending on the object we are filling
   const type = props.field.name.split(".")[0].toUpperCase();
 
   return (
-    <Query query={FAVORITES} variables={{ type }}>
+    <Query
+      query={FAVORITES}
+      variables={{ type }}
+      onCompleted={data =>
+        selectedCompany.siret == ""
+          ? setSelectedCompany(data.favorites[0])
+          : null
+      }
+    >
       {({ loading, error, data }) => {
         if (loading) return <p>Chargement...</p>;
         if (error) return <p>Erreur :(</p>;
@@ -101,11 +107,17 @@ export default connect<FieldProps>(function CompanySelector(props) {
                     </p>
                   </div>
                   <div className="icon">
-                    {selectedCompany.siret === c.siret ? <FaCheck /> : <FaRegCircle />}
+                    {selectedCompany.siret === c.siret ? (
+                      <FaCheck />
+                    ) : (
+                      <FaRegCircle />
+                    )}
                   </div>
                 </li>
               ))}
             </ul>
+
+            <RedErrorMessage name={`${props.field.name}.siret`} />
 
             <div className="form__group">
               <label>

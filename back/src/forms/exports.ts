@@ -67,11 +67,9 @@ async function getExportDataForIncomingForms(siret: string) {
   const data = forms.map(f => ({
     date: f.receivedAt,
     wasteCode: f.wasteDetailsCode,
-    quantity: f.wasteDetailsQuantity,
-    fromName: f.emitterCompanyName,
-    fromAddress: f.emitterCompanyAddress,
-    transportName: f.transporterCompanyName,
-    transporterAddress: f.transporterCompanyAddress,
+    quantity: f.quantityReceived,
+    to: `${f.emitterCompanyName}, ${f.emitterCompanyAddress}`,
+    transporter: `${f.transporterCompanyName}, ${f.transporterCompanyAddress}`,
     number: f.readableId,
     code: f.processingOperationDone
   }));
@@ -97,7 +95,7 @@ async function getExportDataForOutgoingForms(siret: string) {
   const data = forms.map(f => ({
     date: f.sentAt,
     wasteCode: f.wasteDetailsCode,
-    quantity: f.wasteDetailsQuantity,
+    quantity: f.quantityReceived,
     to: `${f.recipientCompanyName} - ${f.recipientCompanyAddress}`,
     transporter: `${f.transporterCompanyName} - ${f.transporterCompanyAddress}`,
     number: f.readableId,

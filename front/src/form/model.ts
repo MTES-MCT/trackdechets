@@ -6,6 +6,7 @@ export type Form = {
   };
   recipient: {
     company: FormCompany;
+    processingOperation: String;
   };
   wasteDetails: {
     quantity: number;

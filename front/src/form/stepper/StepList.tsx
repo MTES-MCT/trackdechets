@@ -124,7 +124,7 @@ export default withRouter(function StepList(
                               // Disable submit on Enter key press
                               // We prevent it from bubbling further
                               if (e.key === "Enter") {
-                                e.preventDefault();
+                                e.stopPropagation();
                               }
                             }}
                           >

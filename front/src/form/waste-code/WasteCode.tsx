@@ -14,13 +14,10 @@ export default function WasteCode(props: FieldProps) {
   const [wasteCode, setWasteCode] = useState(props.field.value);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]); // TODO
 
-  useEffect(
-    () => {
-      props.form.setFieldValue(props.field.name, wasteCode);
-      formatWasteCodeEffect(wasteCode, setWasteCode);
-    },
-    [wasteCode]
-  );
+  useEffect(() => {
+    props.form.setFieldValue(props.field.name, wasteCode);
+    formatWasteCodeEffect(wasteCode, setWasteCode);
+  }, [wasteCode]);
 
   const wasteCodeDetail = WasteCodeLookup.find(l => l.code === wasteCode);
   const isDangerous = wasteCode.indexOf("*") > -1;
@@ -29,12 +26,15 @@ export default function WasteCode(props: FieldProps) {
   return (
     <div className="WasteCode">
       <div className="text-quote">
-        <p>
-          Vous hésitez sur le type de code déchet à choisir ? Consulter la{" "}
-          <a href="/wasteTree" target="_blank">
-            liste des codes déchets
-          </a>
-        </p>
+        <ul>
+          <li>
+            Vous hésitez sur le type de code déchet à choisir ? Consulter la{" "}
+            <a href="/wasteTree" target="_blank">
+              liste des codes déchets
+            </a>
+          </li>
+          <li>Pour les codes déchets dangereux n'oubliez pas l'astérisque</li>
+        </ul>
       </div>
 
       <label>

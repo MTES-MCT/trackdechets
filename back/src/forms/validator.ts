@@ -49,6 +49,10 @@ export const formSchema = object().shape({
     quantityType: string().matches(
       /(REAL|ESTIMATED)/,
       "Le type de quantité (réelle ou estimée) doit être précisé"
+    ),
+    consistence: string().matches(
+      /(SOLID|LIQUID|GASEOUS)/,
+      "La consistance du déchet doit être précisée"
     )
   })
 });

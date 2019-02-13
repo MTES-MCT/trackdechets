@@ -20,7 +20,7 @@ setLocale({
 const companySchema = object().shape({
   name: string().required(),
   siret: string().required(
-    "La sélection d'une entreprise par SIRET est obligatoire"
+    "La sélection d'une entreprise est obligatoire"
   ),
   address: string().required(),
   contact: string().required("Le contact dans l'entreprise est obligatoire"),
@@ -59,7 +59,7 @@ export const formSchema = object().shape({
     ),
     validityLimit: date(),
     contact: string().required("Le contact du transporteur est obligatoire"),
-    numberPlate: string(),
+    numberPlate: string().nullable(true),
     company: companySchema
   }),
   wasteDetails: object().shape({
@@ -77,7 +77,7 @@ export const formSchema = object().shape({
       "Le type de quantité (réelle ou estimée) doit être précisé"
     ),
     consistence: string().matches(
-      /(SOLID|LIQUID)/,
+      /(SOLID|LIQUID|GASEOUS)/,
       "La consistance du déchet doit être précisée"
     )
   })

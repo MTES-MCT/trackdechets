@@ -18,6 +18,7 @@ export const GET_SLIPS = gql`
           name
           siret
         }
+        processingOperation
       }
       wasteDetails {
         code

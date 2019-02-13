@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
-import { Field } from "formik";
+import { Field, connect } from "formik";
 import RadioButton from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
 
-export default function Emitter() {
-  const [pickupSite, setPickupSite] = useState(false);
+type Values = {
+  emitter: { pickupSite: string };
+};
+export default connect<{}, Values>(function Emitter({ formik }) {
+  const [pickupSite, setPickupSite] = useState(
+    formik.values.emitter.pickupSite != ""
+  );
 
   return (
     <React.Fragment>
@@ -53,4 +58,4 @@ export default function Emitter() {
       )}
     </React.Fragment>
   );
-}
+});
