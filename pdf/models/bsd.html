@@ -52,6 +52,7 @@
           "transporter transporter"
           "sent sent"
           "recipient recipient"
+          "nextDestination nextDestination"
           "infos infos";
       }
       .grid-item {
@@ -86,6 +87,9 @@
       }
       .recipient {
         grid-area: recipient;
+      }
+      .nextDestination {
+        grid-area: nextDestination;
       }
       .infos {
         grid-area: infos;
@@ -338,10 +342,14 @@
           <div class="column">
             <p>
               <label>
-                Consistance du déchet <input type="checkbox"
-                {{? it.consistence === "SOLID"}}checked{{?}} /> Solide <input
-                type="checkbox" {{? it.consistence === "LIQUID"}}checked{{?}} />
-                Liquide
+                Consistance du déchet: <br />
+                <input type="checkbox"
+                {{? it.wasteDetailsConsistence === "SOLID"}}checked{{?}} />
+                Solide <input type="checkbox"
+                {{? it.wasteDetailsConsistence === "LIQUID"}}checked{{?}} />
+                Liquide <input type="checkbox"
+                {{? it.wasteDetailsConsistence === "GASEOUS"}}checked{{?}} />
+                Gazeux
               </label>
             </p>
             <p>Code ONU / ADR: {{=it.wasteDetailsOnuCode}}</p>
@@ -447,6 +455,23 @@
             </p>
             <p>Code D/R: {{=it.processingOperationDone}}</p>
             {{?}}
+          </div>
+        </div>
+      </div>
+      {{?}}
+
+      {{? it.nextDestinationProcessingOperation != null }}
+      <div class="nextDestination grid-item">
+        <div class="item-title">Destination ultérieure prévue:</div>
+        <div class="columns">
+          <div class="column">
+            <p>
+              Traitement prévu (code D/R):
+              {{=it.nextDestinationProcessingOperation}}
+            </p>
+          </div>
+          <div class="column">
+            <p>Entreprise: {{=it.nextDestinationDetails}}</p>
           </div>
         </div>
       </div>
