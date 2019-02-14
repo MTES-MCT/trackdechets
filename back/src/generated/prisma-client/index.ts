@@ -230,7 +230,7 @@ export type EmitterType = "PRODUCER" | "OTHER";
 
 export type QuantityType = "REAL" | "ESTIMATED";
 
-export type Consistence = "SOLID" | "LIQUID";
+export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -259,8 +259,16 @@ export type FormOrderByInput =
   | "receivedAt_DESC"
   | "quantityReceived_ASC"
   | "quantityReceived_DESC"
+  | "processedBy_ASC"
+  | "processedBy_DESC"
+  | "processedAt_ASC"
+  | "processedAt_DESC"
   | "processingOperationDone_ASC"
   | "processingOperationDone_DESC"
+  | "nextDestinationProcessingOperation_ASC"
+  | "nextDestinationProcessingOperation_DESC"
+  | "nextDestinationDetails_ASC"
+  | "nextDestinationDetails_DESC"
   | "emitterType_ASC"
   | "emitterType_DESC"
   | "emitterPickupSite_ASC"
@@ -490,6 +498,34 @@ export interface FormWhereInput {
   quantityReceived_lte?: Float;
   quantityReceived_gt?: Float;
   quantityReceived_gte?: Float;
+  processedBy?: String;
+  processedBy_not?: String;
+  processedBy_in?: String[] | String;
+  processedBy_not_in?: String[] | String;
+  processedBy_lt?: String;
+  processedBy_lte?: String;
+  processedBy_gt?: String;
+  processedBy_gte?: String;
+  processedBy_contains?: String;
+  processedBy_not_contains?: String;
+  processedBy_starts_with?: String;
+  processedBy_not_starts_with?: String;
+  processedBy_ends_with?: String;
+  processedBy_not_ends_with?: String;
+  processedAt?: String;
+  processedAt_not?: String;
+  processedAt_in?: String[] | String;
+  processedAt_not_in?: String[] | String;
+  processedAt_lt?: String;
+  processedAt_lte?: String;
+  processedAt_gt?: String;
+  processedAt_gte?: String;
+  processedAt_contains?: String;
+  processedAt_not_contains?: String;
+  processedAt_starts_with?: String;
+  processedAt_not_starts_with?: String;
+  processedAt_ends_with?: String;
+  processedAt_not_ends_with?: String;
   processingOperationDone?: String;
   processingOperationDone_not?: String;
   processingOperationDone_in?: String[] | String;
@@ -504,6 +540,34 @@ export interface FormWhereInput {
   processingOperationDone_not_starts_with?: String;
   processingOperationDone_ends_with?: String;
   processingOperationDone_not_ends_with?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationProcessingOperation_not?: String;
+  nextDestinationProcessingOperation_in?: String[] | String;
+  nextDestinationProcessingOperation_not_in?: String[] | String;
+  nextDestinationProcessingOperation_lt?: String;
+  nextDestinationProcessingOperation_lte?: String;
+  nextDestinationProcessingOperation_gt?: String;
+  nextDestinationProcessingOperation_gte?: String;
+  nextDestinationProcessingOperation_contains?: String;
+  nextDestinationProcessingOperation_not_contains?: String;
+  nextDestinationProcessingOperation_starts_with?: String;
+  nextDestinationProcessingOperation_not_starts_with?: String;
+  nextDestinationProcessingOperation_ends_with?: String;
+  nextDestinationProcessingOperation_not_ends_with?: String;
+  nextDestinationDetails?: String;
+  nextDestinationDetails_not?: String;
+  nextDestinationDetails_in?: String[] | String;
+  nextDestinationDetails_not_in?: String[] | String;
+  nextDestinationDetails_lt?: String;
+  nextDestinationDetails_lte?: String;
+  nextDestinationDetails_gt?: String;
+  nextDestinationDetails_gte?: String;
+  nextDestinationDetails_contains?: String;
+  nextDestinationDetails_not_contains?: String;
+  nextDestinationDetails_starts_with?: String;
+  nextDestinationDetails_not_starts_with?: String;
+  nextDestinationDetails_ends_with?: String;
+  nextDestinationDetails_not_ends_with?: String;
   emitterType?: EmitterType;
   emitterType_not?: EmitterType;
   emitterType_in?: EmitterType[] | EmitterType;
@@ -1040,7 +1104,11 @@ export interface FormUpdateManyMutationInput {
   receivedBy?: String;
   receivedAt?: DateTimeInput;
   quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
   processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -1090,7 +1158,11 @@ export interface FormUpdateInput {
   receivedBy?: String;
   receivedAt?: DateTimeInput;
   quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
   processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -1373,7 +1445,11 @@ export interface FormCreateInput {
   receivedBy?: String;
   receivedAt?: DateTimeInput;
   quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
   processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -1473,7 +1549,11 @@ export interface Form {
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
   quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
   processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -1526,7 +1606,11 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
+  processedBy: () => Promise<String>;
+  processedAt: () => Promise<String>;
   processingOperationDone: () => Promise<String>;
+  nextDestinationProcessingOperation: () => Promise<String>;
+  nextDestinationDetails: () => Promise<String>;
   emitterType: () => Promise<EmitterType>;
   emitterPickupSite: () => Promise<String>;
   emitterCompanyName: () => Promise<String>;
@@ -1581,7 +1665,11 @@ export interface FormSubscription
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
+  processedBy: () => Promise<AsyncIterator<String>>;
+  processedAt: () => Promise<AsyncIterator<String>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;
+  nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
+  nextDestinationDetails: () => Promise<AsyncIterator<String>>;
   emitterType: () => Promise<AsyncIterator<EmitterType>>;
   emitterPickupSite: () => Promise<AsyncIterator<String>>;
   emitterCompanyName: () => Promise<AsyncIterator<String>>;
@@ -1976,7 +2064,11 @@ export interface FormPreviousValues {
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
   quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
   processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
   emitterCompanyName?: String;
@@ -2030,7 +2122,11 @@ export interface FormPreviousValuesPromise
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
+  processedBy: () => Promise<String>;
+  processedAt: () => Promise<String>;
   processingOperationDone: () => Promise<String>;
+  nextDestinationProcessingOperation: () => Promise<String>;
+  nextDestinationDetails: () => Promise<String>;
   emitterType: () => Promise<EmitterType>;
   emitterPickupSite: () => Promise<String>;
   emitterCompanyName: () => Promise<String>;
@@ -2084,7 +2180,11 @@ export interface FormPreviousValuesSubscription
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
+  processedBy: () => Promise<AsyncIterator<String>>;
+  processedAt: () => Promise<AsyncIterator<String>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;
+  nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
+  nextDestinationDetails: () => Promise<AsyncIterator<String>>;
   emitterType: () => Promise<AsyncIterator<EmitterType>>;
   emitterPickupSite: () => Promise<AsyncIterator<String>>;
   emitterCompanyName: () => Promise<AsyncIterator<String>>;

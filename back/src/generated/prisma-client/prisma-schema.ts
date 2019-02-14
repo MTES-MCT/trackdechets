@@ -143,6 +143,7 @@ input CompanyWhereUniqueInput {
 enum Consistence {
   SOLID
   LIQUID
+  GASEOUS
 }
 
 scalar DateTime
@@ -166,7 +167,11 @@ type Form {
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
+  processedBy: String
+  processedAt: String
   processingOperationDone: String
+  nextDestinationProcessingOperation: String
+  nextDestinationDetails: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -222,7 +227,11 @@ input FormCreateInput {
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
+  processedBy: String
+  processedAt: String
   processingOperationDone: String
+  nextDestinationProcessingOperation: String
+  nextDestinationDetails: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -291,8 +300,16 @@ enum FormOrderByInput {
   receivedAt_DESC
   quantityReceived_ASC
   quantityReceived_DESC
+  processedBy_ASC
+  processedBy_DESC
+  processedAt_ASC
+  processedAt_DESC
   processingOperationDone_ASC
   processingOperationDone_DESC
+  nextDestinationProcessingOperation_ASC
+  nextDestinationProcessingOperation_DESC
+  nextDestinationDetails_ASC
+  nextDestinationDetails_DESC
   emitterType_ASC
   emitterType_DESC
   emitterPickupSite_ASC
@@ -380,7 +397,11 @@ type FormPreviousValues {
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
+  processedBy: String
+  processedAt: String
   processingOperationDone: String
+  nextDestinationProcessingOperation: String
+  nextDestinationDetails: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -448,7 +469,11 @@ input FormUpdateInput {
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
+  processedBy: String
+  processedAt: String
   processingOperationDone: String
+  nextDestinationProcessingOperation: String
+  nextDestinationDetails: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -497,7 +522,11 @@ input FormUpdateManyMutationInput {
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
+  processedBy: String
+  processedAt: String
   processingOperationDone: String
+  nextDestinationProcessingOperation: String
+  nextDestinationDetails: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -652,6 +681,34 @@ input FormWhereInput {
   quantityReceived_lte: Float
   quantityReceived_gt: Float
   quantityReceived_gte: Float
+  processedBy: String
+  processedBy_not: String
+  processedBy_in: [String!]
+  processedBy_not_in: [String!]
+  processedBy_lt: String
+  processedBy_lte: String
+  processedBy_gt: String
+  processedBy_gte: String
+  processedBy_contains: String
+  processedBy_not_contains: String
+  processedBy_starts_with: String
+  processedBy_not_starts_with: String
+  processedBy_ends_with: String
+  processedBy_not_ends_with: String
+  processedAt: String
+  processedAt_not: String
+  processedAt_in: [String!]
+  processedAt_not_in: [String!]
+  processedAt_lt: String
+  processedAt_lte: String
+  processedAt_gt: String
+  processedAt_gte: String
+  processedAt_contains: String
+  processedAt_not_contains: String
+  processedAt_starts_with: String
+  processedAt_not_starts_with: String
+  processedAt_ends_with: String
+  processedAt_not_ends_with: String
   processingOperationDone: String
   processingOperationDone_not: String
   processingOperationDone_in: [String!]
@@ -666,6 +723,34 @@ input FormWhereInput {
   processingOperationDone_not_starts_with: String
   processingOperationDone_ends_with: String
   processingOperationDone_not_ends_with: String
+  nextDestinationProcessingOperation: String
+  nextDestinationProcessingOperation_not: String
+  nextDestinationProcessingOperation_in: [String!]
+  nextDestinationProcessingOperation_not_in: [String!]
+  nextDestinationProcessingOperation_lt: String
+  nextDestinationProcessingOperation_lte: String
+  nextDestinationProcessingOperation_gt: String
+  nextDestinationProcessingOperation_gte: String
+  nextDestinationProcessingOperation_contains: String
+  nextDestinationProcessingOperation_not_contains: String
+  nextDestinationProcessingOperation_starts_with: String
+  nextDestinationProcessingOperation_not_starts_with: String
+  nextDestinationProcessingOperation_ends_with: String
+  nextDestinationProcessingOperation_not_ends_with: String
+  nextDestinationDetails: String
+  nextDestinationDetails_not: String
+  nextDestinationDetails_in: [String!]
+  nextDestinationDetails_not_in: [String!]
+  nextDestinationDetails_lt: String
+  nextDestinationDetails_lte: String
+  nextDestinationDetails_gt: String
+  nextDestinationDetails_gte: String
+  nextDestinationDetails_contains: String
+  nextDestinationDetails_not_contains: String
+  nextDestinationDetails_starts_with: String
+  nextDestinationDetails_not_starts_with: String
+  nextDestinationDetails_ends_with: String
+  nextDestinationDetails_not_ends_with: String
   emitterType: EmitterType
   emitterType_not: EmitterType
   emitterType_in: [EmitterType!]
