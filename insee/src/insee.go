@@ -36,6 +36,12 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 
 // Siret Interroge l'API de l'insee pour récupérer des informations sur un SIRET
 func Siret(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if r := recover(); r != nil {
+			http.Error(w, "Error, cannot reach INSEE.", http.StatusInternalServerError)
+		}
+	}()
+
 	vars := mux.Vars(r)
 	siret := vars["siret"]
 
