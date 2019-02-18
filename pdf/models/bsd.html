@@ -321,6 +321,9 @@
         <p>{{=it.emitterCompanyAddress}}</p>
         <p>{{=it.emitterCompanyMail}} - {{=it.emitterCompanyPhone}}</p>
         <p>Personne à contacter: {{=it.emitterCompanyContact}}</p>
+        {{? it.emitterPickupSite != null }}
+        <p>Adresse chantier: {{=it.emitterPickupSite}}</p>
+        {{?}}
       </div>
 
       <div class="receiver grid-item">
