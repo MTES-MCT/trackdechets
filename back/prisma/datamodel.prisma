@@ -83,7 +83,6 @@ type Form {
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
-  transporterContact: String
   transporterNumberPlate: String
 
   # Waste details fields

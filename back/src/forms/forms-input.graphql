@@ -51,7 +51,6 @@ input TransporterInput {
   receipt: String
   department: String
   validityLimit: DateTime
-  contact: String
   numberPlate: String
   company: CompanyInput
 }

@@ -197,7 +197,6 @@ type Form {
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
-  transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsName: String
@@ -257,7 +256,6 @@ input FormCreateInput {
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
-  transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsName: String
@@ -360,8 +358,6 @@ enum FormOrderByInput {
   transporterDepartment_DESC
   transporterValidityLimit_ASC
   transporterValidityLimit_DESC
-  transporterContact_ASC
-  transporterContact_DESC
   transporterNumberPlate_ASC
   transporterNumberPlate_DESC
   wasteDetailsCode_ASC
@@ -427,7 +423,6 @@ type FormPreviousValues {
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
-  transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsName: String
@@ -499,7 +494,6 @@ input FormUpdateInput {
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
-  transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsName: String
@@ -552,7 +546,6 @@ input FormUpdateManyMutationInput {
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
-  transporterContact: String
   transporterNumberPlate: String
   wasteDetailsCode: String
   wasteDetailsName: String
@@ -1085,20 +1078,6 @@ input FormWhereInput {
   transporterValidityLimit_lte: DateTime
   transporterValidityLimit_gt: DateTime
   transporterValidityLimit_gte: DateTime
-  transporterContact: String
-  transporterContact_not: String
-  transporterContact_in: [String!]
-  transporterContact_not_in: [String!]
-  transporterContact_lt: String
-  transporterContact_lte: String
-  transporterContact_gt: String
-  transporterContact_gte: String
-  transporterContact_contains: String
-  transporterContact_not_contains: String
-  transporterContact_starts_with: String
-  transporterContact_not_starts_with: String
-  transporterContact_ends_with: String
-  transporterContact_not_ends_with: String
   transporterNumberPlate: String
   transporterNumberPlate_not: String
   transporterNumberPlate_in: [String!]

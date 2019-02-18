@@ -5,6 +5,9 @@ const html = require("fs").readFileSync("./models/bsd.html", "utf8");
 const tempFn = doT.template(html);
 
 const toDate = string => {
+  if (!string) {
+    return "";
+  }
   const date = new Date(string);
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 };

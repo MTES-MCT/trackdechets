@@ -27,7 +27,6 @@ export default {
     receipt: "",
     department: "",
     validityLimit: null,
-    contact: "",
     numberPlate: "",
     company: {
       siret: "",

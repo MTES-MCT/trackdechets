@@ -319,8 +319,6 @@ export type FormOrderByInput =
   | "transporterDepartment_DESC"
   | "transporterValidityLimit_ASC"
   | "transporterValidityLimit_DESC"
-  | "transporterContact_ASC"
-  | "transporterContact_DESC"
   | "transporterNumberPlate_ASC"
   | "transporterNumberPlate_DESC"
   | "wasteDetailsCode_ASC"
@@ -902,20 +900,6 @@ export interface FormWhereInput {
   transporterValidityLimit_lte?: DateTimeInput;
   transporterValidityLimit_gt?: DateTimeInput;
   transporterValidityLimit_gte?: DateTimeInput;
-  transporterContact?: String;
-  transporterContact_not?: String;
-  transporterContact_in?: String[] | String;
-  transporterContact_not_in?: String[] | String;
-  transporterContact_lt?: String;
-  transporterContact_lte?: String;
-  transporterContact_gt?: String;
-  transporterContact_gte?: String;
-  transporterContact_contains?: String;
-  transporterContact_not_contains?: String;
-  transporterContact_starts_with?: String;
-  transporterContact_not_starts_with?: String;
-  transporterContact_ends_with?: String;
-  transporterContact_not_ends_with?: String;
   transporterNumberPlate?: String;
   transporterNumberPlate_not?: String;
   transporterNumberPlate_in?: String[] | String;
@@ -1134,7 +1118,6 @@ export interface FormUpdateManyMutationInput {
   transporterReceipt?: String;
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeInput;
-  transporterContact?: String;
   transporterNumberPlate?: String;
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
@@ -1188,7 +1171,6 @@ export interface FormUpdateInput {
   transporterReceipt?: String;
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeInput;
-  transporterContact?: String;
   transporterNumberPlate?: String;
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
@@ -1475,7 +1457,6 @@ export interface FormCreateInput {
   transporterReceipt?: String;
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeInput;
-  transporterContact?: String;
   transporterNumberPlate?: String;
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
@@ -1579,7 +1560,6 @@ export interface Form {
   transporterReceipt?: String;
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
-  transporterContact?: String;
   transporterNumberPlate?: String;
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
@@ -1636,7 +1616,6 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   transporterReceipt: () => Promise<String>;
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
-  transporterContact: () => Promise<String>;
   transporterNumberPlate: () => Promise<String>;
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
@@ -1695,7 +1674,6 @@ export interface FormSubscription
   transporterReceipt: () => Promise<AsyncIterator<String>>;
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-  transporterContact: () => Promise<AsyncIterator<String>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
   wasteDetailsCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsName: () => Promise<AsyncIterator<String>>;
@@ -2094,7 +2072,6 @@ export interface FormPreviousValues {
   transporterReceipt?: String;
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
-  transporterContact?: String;
   transporterNumberPlate?: String;
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
@@ -2152,7 +2129,6 @@ export interface FormPreviousValuesPromise
   transporterReceipt: () => Promise<String>;
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
-  transporterContact: () => Promise<String>;
   transporterNumberPlate: () => Promise<String>;
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
@@ -2210,7 +2186,6 @@ export interface FormPreviousValuesSubscription
   transporterReceipt: () => Promise<AsyncIterator<String>>;
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-  transporterContact: () => Promise<AsyncIterator<String>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
   wasteDetailsCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsName: () => Promise<AsyncIterator<String>>;

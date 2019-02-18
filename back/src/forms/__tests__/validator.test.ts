@@ -30,7 +30,6 @@ const form = {
     receipt: "sdfg",
     department: "82",
     validityLimit: "2018-12-11T00:00:00.000Z",
-    contact: "Transporteur",
     numberPlate: "12345",
     company: {
       name: "A company 4",

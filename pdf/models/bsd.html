@@ -1,6 +1,9 @@
 <html>
   <head>
     <style>
+      html {
+        font-size: 14px;
+      }
       a {
         text-decoration: underline;
       }
@@ -309,8 +312,8 @@
         <div class="item-title">Emetteur du bordereau:</div>
         <p class="checkboxes">
           {{? it.emitterType === "OTHER" }} <input type="checkbox" /> Producteur
-          du déchets <input type="checkbox" checked /> Autre producteur {{??}}
-          <input type="checkbox" checked /> Producteur du déchets
+          du déchet <input type="checkbox" checked /> Autre producteur {{??}}
+          <input type="checkbox" checked /> Producteur du déchet
           <input type="checkbox" /> Autre producteur {{?}}
         </p>
         <p>Numéro SIRET: {{=it.emitterCompanySiret}}</p>
@@ -337,13 +340,12 @@
         <div class="columns">
           <div class="column">
             <p>Rubrique déchet: {{=it.wasteDetailsCode}}</p>
-            <p>Dénomination du déchet: {{=it.wasteDetailsName}}</p>
+            <p>Dénomination usuelle: {{=it.wasteDetailsName}}</p>
           </div>
           <div class="column">
             <p>
               <label>
-                Consistance du déchet: <br />
-                <input type="checkbox"
+                Consistance: <input type="checkbox"
                 {{? it.wasteDetailsConsistence === "SOLID"}}checked{{?}} />
                 Solide <input type="checkbox"
                 {{? it.wasteDetailsConsistence === "LIQUID"}}checked{{?}} />
@@ -352,9 +354,12 @@
                 Gazeux
               </label>
             </p>
-            <p>Code ONU / ADR: {{=it.wasteDetailsOnuCode}}</p>
           </div>
         </div>
+        <p>
+          Mentions au titre des règlements ADR, RID, ADNR, IMDG: <br />
+          {{=it.wasteDetailsOnuCode}}
+        </p>
         <p>
           <label>
             Conditionnement: <input type="checkbox"
@@ -374,14 +379,16 @@
         <p>Nombre de colis: {{=it.wasteDetailsNumberOfPackages}}</p>
         <div class="columns">
           <div class="column">
-            <p>Quantité: {{=it.wasteDetailsQuantity}} tonnes</p>
+            <p>
+              Quantité: <input type="checkbox"
+              {{? it.wasteDetailsQuantityType === "REAL"}}checked{{?}} />
+              estimée <input type="checkbox"
+              {{? it.wasteDetailsQuantityType === "ESTIMATED"}}checked{{?}} />
+              réelle
+            </p>
           </div>
           <div class="column">
-            <input type="checkbox"
-            {{? it.wasteDetailsQuantityType === "REAL"}}checked{{?}} /> estimée
-            <input type="checkbox"
-            {{? it.wasteDetailsQuantityType === "ESTIMATED"}}checked{{?}} />
-            réelle
+            <p>{{=it.wasteDetailsQuantity}} tonne(s)</p>
           </div>
         </div>
       </div>
@@ -400,12 +407,12 @@
           </div>
           <div class="column">
             <p>Récipissé numéro: {{=it.transporterReceipt}}</p>
+            <p>Département: {{=it.transporterDepartment}}</p>
             <p>
               Limite de validité: {{=it.toDate(it.transporterValidityLimit)}}
             </p>
-            <p>Département: {{=it.transporterDepartment}}</p>
             <p>Immatriculation: {{=it.transporterNumberPlate}}</p>
-            <p>Personne à contacter: {{=it.transporterContact}}</p>
+            <p>Date de prise en charge: {{=it.toDate(it.sentAt)}}</p>
             <p>Signature:</p>
           </div>
         </div>
@@ -413,7 +420,9 @@
 
       {{? it.sentBy != null }}
       <div class="sent grid-item">
-        <div class="item-title">Déclaration d'émission:</div>
+        <div class="item-title">
+          Déclaration générale de l’émetteur du bordereau:
+        </div>
         <div class="columns">
           <div class="column">
             <p>
@@ -433,7 +442,12 @@
       <div class="recipient grid-item">
         <div class="columns">
           <div class="column">
-            <div class="item-title">Réception:</div>
+            <div class="item-title">
+              Expédition reçue à l’installation de destination:
+            </div>
+            <p>Numéro SIRET: {{=it.recipientCompanySiret}}</p>
+            <p>{{=it.recipientCompanyName}}</p>
+            <p>{{=it.recipientCompanyAddress}}</p>
             <p>
               Reçu par:
               {{=it.recipientCompanyName}} ({{=it.recipientCompanySiret}})
@@ -443,13 +457,13 @@
               <input type="checkbox" {{? it.isAccepted }}checked{{?}} /> oui
               <input type="checkbox" {{? !it.isAccepted}}checked{{?}} /> non
             </p>
-            <p>Nom: {{=it.receivedBy}}</p>
+            <p>Personne à contacter: {{=it.receivedBy}}</p>
+            <p>Quantité réelle présentée: {{=it.quantityReceived}} tonne(s)</p>
             <p>Date: {{=it.toDate(it.receivedAt)}}</p>
-            <p>Poids à l'arrivée: {{=it.quantityReceived}} tonnes</p>
           </div>
           <div class="column">
             {{? it.processingOperationDone != null }}
-            <div class="item-title">Réalisation de l'opération:</div>
+            <div class="item-title">Réalisation de l’opération:</div>
             <p>
               Je soussigné certifie que l'opération ci-dessous a été réalisée.
             </p>

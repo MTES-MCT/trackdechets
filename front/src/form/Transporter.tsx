@@ -34,13 +34,6 @@ export default function Transporter() {
         <RedErrorMessage name="transporter.validityLimit" />
 
         <label>
-          Personne à contacter
-          <Field type="text" name="transporter.contact" placeholder="NOM Prénom" />
-        </label>
-
-        <RedErrorMessage name="transporter.contact" />
-
-        <label>
           Immatriculation
           <Field type="text" name="transporter.numberPlate" placeholder="Plaque d'immatriculation du véhicule" />
         </label>
