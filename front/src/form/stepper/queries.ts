@@ -35,7 +35,6 @@ export const GET_FORM = gql`
         receipt
         department
         validityLimit
-        contact
         numberPlate
         company {
           ...CompanyFragment
