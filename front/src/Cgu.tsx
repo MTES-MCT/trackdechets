@@ -36,21 +36,16 @@ export default function Cgu() {
           collecteur ou un producteur et une installation de traitement;
         </li>
         <li>
-          de conserver et d’archiver les bordereaux , de façon à éviter les
+          de conserver et d’archiver les bordereaux, de façon à éviter les
           éditions papier;
         </li>
         <li>
           de faciliter le reporting des données, par la création d’un
           registre(*);
         </li>
-        <li>
-          de sécuriser la démarche par la vérification des acteurs par les
-          autorités administratives;
-        </li>
         <li>l’accès à un tableau de bord par compte (*);</li>
-        <li>l’accès à un tableau de bord général (*).</li>
       </ul>
-      <p>(*) fonctionnalités futures</p>
+      <p>(*) fonctionnalités futures ou en cours de développement</p>
       <p>L’utilisation de la plateforme est libre, facultative et gratuite.</p>
       <p>
         Les frais éventuels de connection à un réseau sont à la charge de
@@ -90,21 +85,21 @@ export default function Cgu() {
       <ul>
         <li>
           ​
-          <a href="https://www.google.com/url?q=https://franceconnect.gouv.fr/&amp;sa=D&amp;ust=1548071018670000">
+          <a href="https://www.google.com/url?q=https://franceconnect.gouv.fr/&amp;sa=D&amp;ust=1550489703506000">
             FranceConnect
           </a>
           ​
         </li>
         <li>
           ​
-          <a href="https://www.google.com/url?q=https://adresse.data.gouv.fr/&amp;sa=D&amp;ust=1548071018670000">
+          <a href="https://www.google.com/url?q=https://adresse.data.gouv.fr/&amp;sa=D&amp;ust=1550489703507000">
             Base d’adresse nationale
           </a>
           &nbsp;​
         </li>
         <li>
           ​
-          <a href="https://www.google.com/url?q=https://api.gouv.fr/api/api-entreprise.html&amp;sa=D&amp;ust=1548071018670000">
+          <a href="https://www.google.com/url?q=https://api.gouv.fr/api/api-entreprise.html&amp;sa=D&amp;ust=1550489703507000">
             API entreprise
           </a>
           ​
@@ -205,6 +200,15 @@ export default function Cgu() {
         La validation consiste à confirmer le nom, la date du départ du déchet.
       </p>
       <p>
+        Cliquer sur “Je Valide”, équivaut à valider les informations et apposer
+        sa signature.
+      </p>
+      <p>
+        Si les champs requis ne sont pas tous complété, le service invite à
+        revenir corriger des champs manquants ou erronés sur le bordereau. La
+        validation n’est possible que si les erreurs sont corrigées.
+      </p>
+      <p>
         Pour des raisons pratiques, il est possible de dupliquer un bordereau
         existant. Ce bordereau se retrouve alors dans les brouillons de façon à
         pouvoir modifier certains paramètres (conditionnement ou quantité de
@@ -217,9 +221,14 @@ export default function Cgu() {
         réglementaires en l’attente d’évolutions dans ce domaine.
       </p>
       <p>
+        Le transporteur dispose sa signature physique sur l’espace réservé à son
+        emplacement sur le bordereau, valant prise en charge du déchet.
+      </p>
+      <p>
         Le Bordereau comporte les informations nécessaires pour que le
         destinataire puisse se rendre sur le service et valider la prise en
-        charge (ou non ) du déchet.
+        charge (ou non ) du déchet. (lien de connection, SIRET de l'émetteur,
+        numéro du BSD, etc)
       </p>
       <h3>
         Validation par le prestataire (installation de collecte et/ou
@@ -227,7 +236,7 @@ export default function Cgu() {
       </h3>
       <p>
         Les installations destinataires &nbsp;d’un Bordereau retrouvent ce
-        bordereau en attente:
+        bordereau en attente :
       </p>
       <p>d’arrivée sur site</p>
       <p>de traitement</p>
@@ -236,8 +245,10 @@ export default function Cgu() {
         <li>
           &nbsp;confirmer l’arrivée du déchet sur leur site en indiquant le nom
           de la personne responsable de la prise en charge, la date et le poid à
-          l’arrivée sur site, confirmant l’acceptation du déchet
+          l’arrivée sur site, confirmant l’acceptation du déchet.
         </li>
+      </ul>
+      <ul>
         <li>
           confirmer du traitement du déchet en indiquant le nom de la personne
           responsable du traitement, la date et le code du traitement.
@@ -247,6 +258,10 @@ export default function Cgu() {
         Ces actions ont un impact sur le statut du déchet indiqué sur le
         bordereau.
       </p>
+      <p>
+        Dans les deux cas, cliquer sur “Je Valide”, équivaut à valider les
+        informations et apposer sa signature.
+      </p>
       <h3>Archivage</h3>
       <p>
         Les bordereaux qui indiquent le traitement effectif des déchets peuvent
@@ -254,7 +269,7 @@ export default function Cgu() {
       </p>
       <p>
         Ils restent disponibles durant une durée de 5 ans (à compter de la date
-        de traitement) et peuvent être édités si besoin
+        de traitement) et peuvent être édités si besoin.
       </p>
       <h3>Vérification d’un prestataire</h3>
       <p>
