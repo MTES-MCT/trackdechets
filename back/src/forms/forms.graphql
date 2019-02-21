@@ -44,6 +44,7 @@ type Form {
   recipient: Recipient
   transporter: Transporter
   wasteDetails: WasteDetails
+  trader: Trader
 
   createdAt: DateTime
   updatedAt: DateTime
@@ -132,6 +133,14 @@ type WasteDetails {
   quantity: Float
   quantityType: QuantityType
   consistence: Consistence
+}
+
+type Trader {
+  company: FormCompany
+
+  receipt: String
+  department: String
+  validityLimit: DateTime
 }
 
 type Stat {

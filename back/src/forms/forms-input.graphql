@@ -24,6 +24,7 @@ input FormInput {
   recipient: RecipientInput
   transporter: TransporterInput
   wasteDetails: WasteDetailsInput
+  trader: TraderInput
 }
 
 input CompanyInput {
@@ -52,6 +53,13 @@ input TransporterInput {
   department: String
   validityLimit: DateTime
   numberPlate: String
+  company: CompanyInput
+}
+
+input TraderInput {
+  receipt: String
+  department: String
+  validityLimit: DateTime
   company: CompanyInput
 }
 

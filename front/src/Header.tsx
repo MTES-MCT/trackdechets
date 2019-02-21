@@ -1,9 +1,10 @@
 import React from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, withRouter } from "react-router-dom";
 import { localAuthService } from "./login/auth.service";
 import { trackEvent } from "./tracker";
+import { FaPowerOff } from "react-icons/fa";
 
-export default function Header() {
+export default withRouter(function Header({ history }) {
   return (
     <header className="navbar" role="navigation">
       <div className="navbar__container">
@@ -28,15 +29,28 @@ export default function Header() {
               </NavLink>
             </li>
             {localAuthService.isAuthenticated ? (
-              <li className="nav__item">
-                <NavLink
-                  to="/dashboard/slips"
-                  activeClassName="active"
-                  onClick={() => trackEvent("navbar", "mon-espace")}
-                >
-                  Mon espace
-                </NavLink>
-              </li>
+              <React.Fragment>
+                <li className="nav__item">
+                  <NavLink
+                    to="/dashboard/slips"
+                    activeClassName="active"
+                    onClick={() => trackEvent("navbar", "mon-espace")}
+                  >
+                    Mon espace
+                  </NavLink>
+                </li>
+                <li className="nav__item">
+                  <a
+                    title="Se déconnecter"
+                    onClick={() => {
+                      localAuthService.locallySignOut();
+                      history.push("/");
+                    }}
+                  >
+                    <FaPowerOff />
+                  </a>
+                </li>
+              </React.Fragment>
             ) : (
               <li className="nav__item">
                 <NavLink
@@ -53,4 +67,4 @@ export default function Header() {
       </div>
     </header>
   );
-}
+});

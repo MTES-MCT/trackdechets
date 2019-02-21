@@ -40,6 +40,14 @@ export const GET_FORM = gql`
           ...CompanyFragment
         }
       }
+      trader {
+        receipt
+        department
+        validityLimit
+        company {
+          ...CompanyFragment
+        }
+      }
       wasteDetails {
         code
         name
@@ -74,6 +82,7 @@ export const SAVE_FORM = gql`
           name
           siret
         }
+        processingOperation
       }
       wasteDetails {
         code

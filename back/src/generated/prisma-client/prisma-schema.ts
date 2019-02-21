@@ -207,6 +207,15 @@ type Form {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
 }
 
 type FormConnection {
@@ -266,6 +275,15 @@ input FormCreateInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
 }
 
 type FormEdge {
@@ -378,6 +396,24 @@ enum FormOrderByInput {
   wasteDetailsQuantityType_DESC
   wasteDetailsConsistence_ASC
   wasteDetailsConsistence_DESC
+  traderCompanyName_ASC
+  traderCompanyName_DESC
+  traderCompanySiret_ASC
+  traderCompanySiret_DESC
+  traderCompanyAddress_ASC
+  traderCompanyAddress_DESC
+  traderCompanyContact_ASC
+  traderCompanyContact_DESC
+  traderCompanyPhone_ASC
+  traderCompanyPhone_DESC
+  traderCompanyMail_ASC
+  traderCompanyMail_DESC
+  traderReceipt_ASC
+  traderReceipt_DESC
+  traderDepartment_ASC
+  traderDepartment_DESC
+  traderValidityLimit_ASC
+  traderValidityLimit_DESC
 }
 
 type FormPreviousValues {
@@ -433,6 +469,15 @@ type FormPreviousValues {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
 }
 
 type FormSubscriptionPayload {
@@ -504,6 +549,15 @@ input FormUpdateInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
 }
 
 input FormUpdateManyMutationInput {
@@ -556,6 +610,15 @@ input FormUpdateManyMutationInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
 }
 
 input FormWhereInput {
@@ -1172,6 +1235,126 @@ input FormWhereInput {
   wasteDetailsConsistence_not: Consistence
   wasteDetailsConsistence_in: [Consistence!]
   wasteDetailsConsistence_not_in: [Consistence!]
+  traderCompanyName: String
+  traderCompanyName_not: String
+  traderCompanyName_in: [String!]
+  traderCompanyName_not_in: [String!]
+  traderCompanyName_lt: String
+  traderCompanyName_lte: String
+  traderCompanyName_gt: String
+  traderCompanyName_gte: String
+  traderCompanyName_contains: String
+  traderCompanyName_not_contains: String
+  traderCompanyName_starts_with: String
+  traderCompanyName_not_starts_with: String
+  traderCompanyName_ends_with: String
+  traderCompanyName_not_ends_with: String
+  traderCompanySiret: String
+  traderCompanySiret_not: String
+  traderCompanySiret_in: [String!]
+  traderCompanySiret_not_in: [String!]
+  traderCompanySiret_lt: String
+  traderCompanySiret_lte: String
+  traderCompanySiret_gt: String
+  traderCompanySiret_gte: String
+  traderCompanySiret_contains: String
+  traderCompanySiret_not_contains: String
+  traderCompanySiret_starts_with: String
+  traderCompanySiret_not_starts_with: String
+  traderCompanySiret_ends_with: String
+  traderCompanySiret_not_ends_with: String
+  traderCompanyAddress: String
+  traderCompanyAddress_not: String
+  traderCompanyAddress_in: [String!]
+  traderCompanyAddress_not_in: [String!]
+  traderCompanyAddress_lt: String
+  traderCompanyAddress_lte: String
+  traderCompanyAddress_gt: String
+  traderCompanyAddress_gte: String
+  traderCompanyAddress_contains: String
+  traderCompanyAddress_not_contains: String
+  traderCompanyAddress_starts_with: String
+  traderCompanyAddress_not_starts_with: String
+  traderCompanyAddress_ends_with: String
+  traderCompanyAddress_not_ends_with: String
+  traderCompanyContact: String
+  traderCompanyContact_not: String
+  traderCompanyContact_in: [String!]
+  traderCompanyContact_not_in: [String!]
+  traderCompanyContact_lt: String
+  traderCompanyContact_lte: String
+  traderCompanyContact_gt: String
+  traderCompanyContact_gte: String
+  traderCompanyContact_contains: String
+  traderCompanyContact_not_contains: String
+  traderCompanyContact_starts_with: String
+  traderCompanyContact_not_starts_with: String
+  traderCompanyContact_ends_with: String
+  traderCompanyContact_not_ends_with: String
+  traderCompanyPhone: String
+  traderCompanyPhone_not: String
+  traderCompanyPhone_in: [String!]
+  traderCompanyPhone_not_in: [String!]
+  traderCompanyPhone_lt: String
+  traderCompanyPhone_lte: String
+  traderCompanyPhone_gt: String
+  traderCompanyPhone_gte: String
+  traderCompanyPhone_contains: String
+  traderCompanyPhone_not_contains: String
+  traderCompanyPhone_starts_with: String
+  traderCompanyPhone_not_starts_with: String
+  traderCompanyPhone_ends_with: String
+  traderCompanyPhone_not_ends_with: String
+  traderCompanyMail: String
+  traderCompanyMail_not: String
+  traderCompanyMail_in: [String!]
+  traderCompanyMail_not_in: [String!]
+  traderCompanyMail_lt: String
+  traderCompanyMail_lte: String
+  traderCompanyMail_gt: String
+  traderCompanyMail_gte: String
+  traderCompanyMail_contains: String
+  traderCompanyMail_not_contains: String
+  traderCompanyMail_starts_with: String
+  traderCompanyMail_not_starts_with: String
+  traderCompanyMail_ends_with: String
+  traderCompanyMail_not_ends_with: String
+  traderReceipt: String
+  traderReceipt_not: String
+  traderReceipt_in: [String!]
+  traderReceipt_not_in: [String!]
+  traderReceipt_lt: String
+  traderReceipt_lte: String
+  traderReceipt_gt: String
+  traderReceipt_gte: String
+  traderReceipt_contains: String
+  traderReceipt_not_contains: String
+  traderReceipt_starts_with: String
+  traderReceipt_not_starts_with: String
+  traderReceipt_ends_with: String
+  traderReceipt_not_ends_with: String
+  traderDepartment: String
+  traderDepartment_not: String
+  traderDepartment_in: [String!]
+  traderDepartment_not_in: [String!]
+  traderDepartment_lt: String
+  traderDepartment_lte: String
+  traderDepartment_gt: String
+  traderDepartment_gte: String
+  traderDepartment_contains: String
+  traderDepartment_not_contains: String
+  traderDepartment_starts_with: String
+  traderDepartment_not_starts_with: String
+  traderDepartment_ends_with: String
+  traderDepartment_not_ends_with: String
+  traderValidityLimit: DateTime
+  traderValidityLimit_not: DateTime
+  traderValidityLimit_in: [DateTime!]
+  traderValidityLimit_not_in: [DateTime!]
+  traderValidityLimit_lt: DateTime
+  traderValidityLimit_lte: DateTime
+  traderValidityLimit_gt: DateTime
+  traderValidityLimit_gte: DateTime
   AND: [FormWhereInput!]
   OR: [FormWhereInput!]
   NOT: [FormWhereInput!]

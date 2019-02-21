@@ -28,7 +28,7 @@ export default function Delete({ formId }: Props) {
           >
             <div className="modal">
               <h3>Confirmer la suppression ?</h3>
-              <p>Cette action supprimera le brouillon et est irréversible.</p>
+              <p>Cette action est irréversible.</p>
               <button
                 className="button warning"
                 onClick={() => setIsOpen(false)}

@@ -338,7 +338,25 @@ export type FormOrderByInput =
   | "wasteDetailsQuantityType_ASC"
   | "wasteDetailsQuantityType_DESC"
   | "wasteDetailsConsistence_ASC"
-  | "wasteDetailsConsistence_DESC";
+  | "wasteDetailsConsistence_DESC"
+  | "traderCompanyName_ASC"
+  | "traderCompanyName_DESC"
+  | "traderCompanySiret_ASC"
+  | "traderCompanySiret_DESC"
+  | "traderCompanyAddress_ASC"
+  | "traderCompanyAddress_DESC"
+  | "traderCompanyContact_ASC"
+  | "traderCompanyContact_DESC"
+  | "traderCompanyPhone_ASC"
+  | "traderCompanyPhone_DESC"
+  | "traderCompanyMail_ASC"
+  | "traderCompanyMail_DESC"
+  | "traderReceipt_ASC"
+  | "traderReceipt_DESC"
+  | "traderDepartment_ASC"
+  | "traderDepartment_DESC"
+  | "traderValidityLimit_ASC"
+  | "traderValidityLimit_DESC";
 
 export type CompanyOrderByInput =
   | "id_ASC"
@@ -994,6 +1012,126 @@ export interface FormWhereInput {
   wasteDetailsConsistence_not?: Consistence;
   wasteDetailsConsistence_in?: Consistence[] | Consistence;
   wasteDetailsConsistence_not_in?: Consistence[] | Consistence;
+  traderCompanyName?: String;
+  traderCompanyName_not?: String;
+  traderCompanyName_in?: String[] | String;
+  traderCompanyName_not_in?: String[] | String;
+  traderCompanyName_lt?: String;
+  traderCompanyName_lte?: String;
+  traderCompanyName_gt?: String;
+  traderCompanyName_gte?: String;
+  traderCompanyName_contains?: String;
+  traderCompanyName_not_contains?: String;
+  traderCompanyName_starts_with?: String;
+  traderCompanyName_not_starts_with?: String;
+  traderCompanyName_ends_with?: String;
+  traderCompanyName_not_ends_with?: String;
+  traderCompanySiret?: String;
+  traderCompanySiret_not?: String;
+  traderCompanySiret_in?: String[] | String;
+  traderCompanySiret_not_in?: String[] | String;
+  traderCompanySiret_lt?: String;
+  traderCompanySiret_lte?: String;
+  traderCompanySiret_gt?: String;
+  traderCompanySiret_gte?: String;
+  traderCompanySiret_contains?: String;
+  traderCompanySiret_not_contains?: String;
+  traderCompanySiret_starts_with?: String;
+  traderCompanySiret_not_starts_with?: String;
+  traderCompanySiret_ends_with?: String;
+  traderCompanySiret_not_ends_with?: String;
+  traderCompanyAddress?: String;
+  traderCompanyAddress_not?: String;
+  traderCompanyAddress_in?: String[] | String;
+  traderCompanyAddress_not_in?: String[] | String;
+  traderCompanyAddress_lt?: String;
+  traderCompanyAddress_lte?: String;
+  traderCompanyAddress_gt?: String;
+  traderCompanyAddress_gte?: String;
+  traderCompanyAddress_contains?: String;
+  traderCompanyAddress_not_contains?: String;
+  traderCompanyAddress_starts_with?: String;
+  traderCompanyAddress_not_starts_with?: String;
+  traderCompanyAddress_ends_with?: String;
+  traderCompanyAddress_not_ends_with?: String;
+  traderCompanyContact?: String;
+  traderCompanyContact_not?: String;
+  traderCompanyContact_in?: String[] | String;
+  traderCompanyContact_not_in?: String[] | String;
+  traderCompanyContact_lt?: String;
+  traderCompanyContact_lte?: String;
+  traderCompanyContact_gt?: String;
+  traderCompanyContact_gte?: String;
+  traderCompanyContact_contains?: String;
+  traderCompanyContact_not_contains?: String;
+  traderCompanyContact_starts_with?: String;
+  traderCompanyContact_not_starts_with?: String;
+  traderCompanyContact_ends_with?: String;
+  traderCompanyContact_not_ends_with?: String;
+  traderCompanyPhone?: String;
+  traderCompanyPhone_not?: String;
+  traderCompanyPhone_in?: String[] | String;
+  traderCompanyPhone_not_in?: String[] | String;
+  traderCompanyPhone_lt?: String;
+  traderCompanyPhone_lte?: String;
+  traderCompanyPhone_gt?: String;
+  traderCompanyPhone_gte?: String;
+  traderCompanyPhone_contains?: String;
+  traderCompanyPhone_not_contains?: String;
+  traderCompanyPhone_starts_with?: String;
+  traderCompanyPhone_not_starts_with?: String;
+  traderCompanyPhone_ends_with?: String;
+  traderCompanyPhone_not_ends_with?: String;
+  traderCompanyMail?: String;
+  traderCompanyMail_not?: String;
+  traderCompanyMail_in?: String[] | String;
+  traderCompanyMail_not_in?: String[] | String;
+  traderCompanyMail_lt?: String;
+  traderCompanyMail_lte?: String;
+  traderCompanyMail_gt?: String;
+  traderCompanyMail_gte?: String;
+  traderCompanyMail_contains?: String;
+  traderCompanyMail_not_contains?: String;
+  traderCompanyMail_starts_with?: String;
+  traderCompanyMail_not_starts_with?: String;
+  traderCompanyMail_ends_with?: String;
+  traderCompanyMail_not_ends_with?: String;
+  traderReceipt?: String;
+  traderReceipt_not?: String;
+  traderReceipt_in?: String[] | String;
+  traderReceipt_not_in?: String[] | String;
+  traderReceipt_lt?: String;
+  traderReceipt_lte?: String;
+  traderReceipt_gt?: String;
+  traderReceipt_gte?: String;
+  traderReceipt_contains?: String;
+  traderReceipt_not_contains?: String;
+  traderReceipt_starts_with?: String;
+  traderReceipt_not_starts_with?: String;
+  traderReceipt_ends_with?: String;
+  traderReceipt_not_ends_with?: String;
+  traderDepartment?: String;
+  traderDepartment_not?: String;
+  traderDepartment_in?: String[] | String;
+  traderDepartment_not_in?: String[] | String;
+  traderDepartment_lt?: String;
+  traderDepartment_lte?: String;
+  traderDepartment_gt?: String;
+  traderDepartment_gte?: String;
+  traderDepartment_contains?: String;
+  traderDepartment_not_contains?: String;
+  traderDepartment_starts_with?: String;
+  traderDepartment_not_starts_with?: String;
+  traderDepartment_ends_with?: String;
+  traderDepartment_not_ends_with?: String;
+  traderValidityLimit?: DateTimeInput;
+  traderValidityLimit_not?: DateTimeInput;
+  traderValidityLimit_in?: DateTimeInput[] | DateTimeInput;
+  traderValidityLimit_not_in?: DateTimeInput[] | DateTimeInput;
+  traderValidityLimit_lt?: DateTimeInput;
+  traderValidityLimit_lte?: DateTimeInput;
+  traderValidityLimit_gt?: DateTimeInput;
+  traderValidityLimit_gte?: DateTimeInput;
   AND?: FormWhereInput[] | FormWhereInput;
   OR?: FormWhereInput[] | FormWhereInput;
   NOT?: FormWhereInput[] | FormWhereInput;
@@ -1128,6 +1266,15 @@ export interface FormUpdateManyMutationInput {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeInput;
 }
 
 export interface FormUpdateInput {
@@ -1181,6 +1328,15 @@ export interface FormUpdateInput {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeInput;
 }
 
 export interface CompanyUpsertNestedInput {
@@ -1467,6 +1623,15 @@ export interface FormCreateInput {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeInput;
 }
 
 export interface CompanyUpdateDataInput {
@@ -1570,6 +1735,15 @@ export interface Form {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeOutput;
 }
 
 export interface FormPromise extends Promise<Form>, Fragmentable {
@@ -1626,6 +1800,15 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   wasteDetailsQuantity: () => Promise<Float>;
   wasteDetailsQuantityType: () => Promise<QuantityType>;
   wasteDetailsConsistence: () => Promise<Consistence>;
+  traderCompanyName: () => Promise<String>;
+  traderCompanySiret: () => Promise<String>;
+  traderCompanyAddress: () => Promise<String>;
+  traderCompanyContact: () => Promise<String>;
+  traderCompanyPhone: () => Promise<String>;
+  traderCompanyMail: () => Promise<String>;
+  traderReceipt: () => Promise<String>;
+  traderDepartment: () => Promise<String>;
+  traderValidityLimit: () => Promise<DateTimeOutput>;
 }
 
 export interface FormSubscription
@@ -1684,6 +1867,15 @@ export interface FormSubscription
   wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
   wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
   wasteDetailsConsistence: () => Promise<AsyncIterator<Consistence>>;
+  traderCompanyName: () => Promise<AsyncIterator<String>>;
+  traderCompanySiret: () => Promise<AsyncIterator<String>>;
+  traderCompanyAddress: () => Promise<AsyncIterator<String>>;
+  traderCompanyContact: () => Promise<AsyncIterator<String>>;
+  traderCompanyPhone: () => Promise<AsyncIterator<String>>;
+  traderCompanyMail: () => Promise<AsyncIterator<String>>;
+  traderReceipt: () => Promise<AsyncIterator<String>>;
+  traderDepartment: () => Promise<AsyncIterator<String>>;
+  traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface UserActivationHashPreviousValues {
@@ -2082,6 +2274,15 @@ export interface FormPreviousValues {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeOutput;
 }
 
 export interface FormPreviousValuesPromise
@@ -2139,6 +2340,15 @@ export interface FormPreviousValuesPromise
   wasteDetailsQuantity: () => Promise<Float>;
   wasteDetailsQuantityType: () => Promise<QuantityType>;
   wasteDetailsConsistence: () => Promise<Consistence>;
+  traderCompanyName: () => Promise<String>;
+  traderCompanySiret: () => Promise<String>;
+  traderCompanyAddress: () => Promise<String>;
+  traderCompanyContact: () => Promise<String>;
+  traderCompanyPhone: () => Promise<String>;
+  traderCompanyMail: () => Promise<String>;
+  traderReceipt: () => Promise<String>;
+  traderDepartment: () => Promise<String>;
+  traderValidityLimit: () => Promise<DateTimeOutput>;
 }
 
 export interface FormPreviousValuesSubscription
@@ -2196,6 +2406,15 @@ export interface FormPreviousValuesSubscription
   wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
   wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
   wasteDetailsConsistence: () => Promise<AsyncIterator<Consistence>>;
+  traderCompanyName: () => Promise<AsyncIterator<String>>;
+  traderCompanySiret: () => Promise<AsyncIterator<String>>;
+  traderCompanyAddress: () => Promise<AsyncIterator<String>>;
+  traderCompanyContact: () => Promise<AsyncIterator<String>>;
+  traderCompanyPhone: () => Promise<AsyncIterator<String>>;
+  traderCompanyMail: () => Promise<AsyncIterator<String>>;
+  traderReceipt: () => Promise<AsyncIterator<String>>;
+  traderDepartment: () => Promise<AsyncIterator<String>>;
+  traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface CompanyPreviousValues {

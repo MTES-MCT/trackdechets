@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
-import { Field } from "formik";
+import { Field, connect } from "formik";
 import RedErrorMessage from "./RedErrorMessage";
+import DateInput from "./custom-inputs/DateInput";
 
-export default function Recipient() {
+type Values = {
+  trader: { company: { siret: string } };
+};
+
+export default connect<{}, Values>(function Recipient({ formik }) {
+  const [hasTrader, setHasTrader] = useState(
+    formik.values.trader.company.siret != ""
+  );
   return (
     <React.Fragment>
       <h4>Entreprise de destination</h4>
@@ -42,6 +50,50 @@ export default function Recipient() {
           <Field type="text" name="recipient.cap" />
         </label>
       </div>
+
+      <div className="form__group">
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked={hasTrader}
+            onChange={() => setHasTrader(!hasTrader)}
+          />
+          Je suis passé par un négociant
+        </label>
+      </div>
+      {hasTrader && (
+        <React.Fragment>
+          <h4>Négociant</h4>
+          <Field component={CompanySelector} name="trader.company" />
+
+          <div className="form__group">
+            <label>
+              Numéro de récépissé
+              <Field type="text" name="trader.receipt" />
+            </label>
+
+            <RedErrorMessage name="trader.receipt" />
+
+            <label>
+              Département
+              <Field
+                type="text"
+                name="trader.department"
+                placeholder="Ex: 83"
+              />
+            </label>
+
+            <RedErrorMessage name="trader.department" />
+
+            <label>
+              Limite de validité
+              <Field component={DateInput} name="trader.validityLimit" />
+            </label>
+
+            <RedErrorMessage name="trader.validityLimit" />
+          </div>
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
-}
+});

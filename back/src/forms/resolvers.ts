@@ -1,7 +1,7 @@
 import { getUserId, getUserIdFromToken } from "../utils";
 import { Context } from "../types";
 import {
-  flattenInoutObjectForDb,
+  flattenObjectForDb,
   unflattenObjectFromDb,
   cleanUpNotDuplicatableFieldsInForm
 } from "./form-converter";
@@ -84,7 +84,7 @@ export default {
         const updatedForm = await context.prisma.updateForm({
           where: { id },
           data: {
-            ...flattenInoutObjectForDb(formContent)
+            ...flattenObjectForDb(formContent)
           }
         });
 
@@ -92,7 +92,7 @@ export default {
       }
 
       const newForm = await context.prisma.createForm({
-        ...flattenInoutObjectForDb(formContent),
+        ...flattenObjectForDb(formContent),
         readableId: await getReadableId(context),
         owner: { connect: { id: userId } }
       });

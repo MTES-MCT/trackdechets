@@ -16,4 +16,5 @@ enum FavoriteType {
   EMITTER
   TRANSPORTER
   RECIPIENT
+  TRADER
 }

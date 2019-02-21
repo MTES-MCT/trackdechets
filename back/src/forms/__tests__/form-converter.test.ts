@@ -1,4 +1,4 @@
-import { flattenInoutObjectForDb, unflattenObjectFromDb } from "../form-converter";
+import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
 
 const apiShape = {
   emitter: {
@@ -26,7 +26,7 @@ const dbShape = {
 
 describe('flattenInoutObjectForDb', () => {
   test("flattenObject deeply flatten objects", () => {
-    expect(flattenInoutObjectForDb(apiShape)).toEqual(dbShape);
+    expect(flattenObjectForDb(apiShape)).toEqual(dbShape);
   });
 })
 

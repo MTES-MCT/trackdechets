@@ -1,4 +1,4 @@
-export function flattenInoutObjectForDb(
+export function flattenObjectForDb(
   input,
   previousKeys = [],
   dbObject = {}
@@ -9,7 +9,7 @@ export function flattenInoutObjectForDb(
       !Array.isArray(input[key]) &&
       typeof input[key] === "object"
     ) {
-      return flattenInoutObjectForDb(
+      return flattenObjectForDb(
         input[key],
         [...previousKeys, key],
         dbObject
@@ -36,6 +36,7 @@ export function unflattenObjectFromDb(input, apiObject = {}) {
     "emitter",
     "recipient",
     "transporter",
+    "trader",
     "wasteDetails",
     "company"
   ];

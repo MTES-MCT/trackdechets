@@ -95,6 +95,18 @@ type Form {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+
+  # Trader fields
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
 }
 
 enum EmitterType {

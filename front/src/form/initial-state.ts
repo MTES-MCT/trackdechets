@@ -37,6 +37,19 @@ export default {
       phone: ""
     }
   },
+  trader: {
+    receipt: "",
+    department: "",
+    validityLimit: null,
+    company: {
+      siret: "",
+      name: "",
+      address: "",
+      contact: "",
+      mail: "",
+      phone: ""
+    }
+  },
   wasteDetails: {
     code: "",
     name: "",

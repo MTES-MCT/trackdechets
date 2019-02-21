@@ -51,6 +51,7 @@ const DUPLICATE_FORM = gql`
           name
           siret
         }
+        processingOperation
       }
       wasteDetails {
         code
