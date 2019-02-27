@@ -92,9 +92,10 @@ jobs:
           fi
 
   deploy-validation:
-    executor: node
+    machine:
+      enabled: true
+    working_directory: ~/project/trackdechets
     steps:
-      - add_ssh_keys
       - checkout
       - run:
           name: Deploy to validation over SSH
