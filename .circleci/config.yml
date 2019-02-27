@@ -91,6 +91,21 @@ jobs:
             docker push betagouv/trackdechets-mail:latest
           fi
 
+  deploy-validation:
+    machine:
+      enabled: true
+    steps:
+      - run:
+          name: Deploy Over SSH
+          command: |
+            scp docker-compose.yml $SSH_USER@$SSH_HOST_BU:/srv/trackdechets/
+            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-api:latest"
+            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-ui:latest"
+            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-pdf:latest"
+            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-insee:latest"
+            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-mail:latest"
+            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/ ; docker-compose up -d"
+
   deploy:
     machine:
       enabled: true
@@ -124,13 +139,21 @@ workflows:
       - build-mail:
           requires:
             - check-docker
-      - deploy:
+      - deploy-validation:
           requires:
             - build-api
             - build-ui
             - build-insee
             - build-pdf
             - build-mail
-          filters:
-            branches:
-              only: master
+            filters:
+              branches:
+                only:
+                  - dev
+                  - master
+      - deploy:
+          requires:
+            - deploy-validation
+            filters:
+              branches:
+                only: master
