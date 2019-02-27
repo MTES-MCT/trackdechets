@@ -92,9 +92,9 @@ jobs:
           fi
 
   deploy-validation:
-    machine:
-      enabled: true
+    executor: node
     steps:
+      - checkout
       - run:
           name: Deploy to validation over SSH
           command: |
