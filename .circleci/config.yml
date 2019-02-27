@@ -94,6 +94,7 @@ jobs:
   deploy-validation:
     executor: node
     steps:
+      - add_ssh_keys
       - checkout
       - run:
           name: Deploy to validation over SSH
