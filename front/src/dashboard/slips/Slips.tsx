@@ -11,7 +11,7 @@ const statusLabels: { [key: string]: string } = {
   RECEIVED: "Reçu, en attente de traitement",
   PROCESSED: "Traité",
   AWAITING_GROUP: "Traité, en attente de regroupement",
-  GROUPED: "Annexé à un bordereau de regroupement"
+  GROUPED: "Traité, annexé à un bordereau de regroupement"
 };
 
 type Props = { forms: Form[]; me: Me; hiddenFields?: string[] };
