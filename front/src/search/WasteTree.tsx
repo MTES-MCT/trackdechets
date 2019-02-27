@@ -17,7 +17,7 @@ const loop = (data: Node[]) => {
   });
 };
 
-type Props = { checkable?: boolean };
+type Props = { checkable?: boolean; onSelect?: (selectedKeys: any) => void };
 export default function WasteTree(props: Props) {
   return (
     <Tree className="myCls" showLine {...props}>

@@ -4,6 +4,7 @@ import RedErrorMessage from "../RedErrorMessage";
 import formatWasteCodeEffect from "./format-waste-code.effect";
 import WasteCodeLookup from "./nomenclature-dechets.json";
 import "./WasteCode.scss";
+import WasteTreeModal from "../../search/WasteTreeModal";
 
 type Bookmark = {
   code: string;
@@ -23,15 +24,26 @@ export default function WasteCode(props: FieldProps) {
   const isDangerous = wasteCode.indexOf("*") > -1;
   const isTouched = getIn(props.form.touched, props.field.name);
 
+  const [openModal, setOpenModal] = useState(false);
   return (
     <div className="WasteCode">
       <div className="text-quote">
         <ul>
           <li>
-            Vous hésitez sur le type de code déchet à choisir ? Consulter la{" "}
-            <a href="/wasteTree" target="_blank">
+            Vous hésitez sur le type de code déchet à choisir ? Sélectionnez un
+            code via la{" "}
+            <button
+              type="button"
+              className="button-outline small primary"
+              onClick={() => setOpenModal(true)}
+            >
               liste des codes déchets
-            </a>
+            </button>
+            <WasteTreeModal
+              open={openModal}
+              onClose={() => setOpenModal(false)}
+              onSelect={codes => setWasteCode(codes[0])}
+            />
           </li>
           <li>Pour les codes déchets dangereux n'oubliez pas l'astérisque</li>
         </ul>
