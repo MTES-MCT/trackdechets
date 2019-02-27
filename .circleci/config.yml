@@ -96,7 +96,7 @@ jobs:
       enabled: true
     steps:
       - run:
-          name: Deploy Over SSH
+          name: Deploy to validation over SSH
           command: |
             scp docker-compose.yml $SSH_USER@$SSH_HOST_BU:/srv/trackdechets/
             ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-api:latest"
@@ -146,14 +146,14 @@ workflows:
             - build-insee
             - build-pdf
             - build-mail
-            filters:
-              branches:
-                only:
-                  - dev
-                  - master
+          filters:
+            branches:
+              only:
+                - dev
+                - master
       - deploy:
           requires:
             - deploy-validation
-            filters:
-              branches:
-                only: master
+          filters:
+            branches:
+              only: master
