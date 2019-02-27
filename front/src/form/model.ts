@@ -1,5 +1,6 @@
 export type Form = {
-  id: string
+  id: string;
+  readableId: string;
   status: string;
   emitter: {
     company: FormCompany;
@@ -10,7 +11,11 @@ export type Form = {
   };
   wasteDetails: {
     quantity: number;
-  }
+  };
+
+  receivedAt: string;
+  quantityReceived: number;
+  processingOperationDone: string;
 };
 
 type FormCompany = {

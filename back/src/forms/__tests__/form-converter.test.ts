@@ -11,7 +11,8 @@ const apiShape = {
   number: 2,
   flat: "flat",
   null: null,
-  array: [1]
+  array: [1],
+  arrayOfObject: [{foo: "bar"}]
 };
 
 const dbShape = {
@@ -21,7 +22,8 @@ const dbShape = {
   number: 2,
   flat: "flat",
   null: null,
-  array: [1]
+  array: [1],
+  arrayOfObject: [{foo: "bar"}]
 };
 
 describe('flattenInoutObjectForDb', () => {

@@ -25,6 +25,12 @@ input FormInput {
   transporter: TransporterInput
   wasteDetails: WasteDetailsInput
   trader: TraderInput
+
+  appendix2Forms: [AppendixFormInput]
+}
+
+input AppendixFormInput {
+  readableId: ID
 }
 
 input CompanyInput {

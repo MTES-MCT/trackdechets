@@ -60,5 +60,6 @@ export default {
     quantity: null,
     quantityType: "ESTIMATED",
     consistence: "SOLID"
-  }
+  },
+  appendix2Forms: []
 };

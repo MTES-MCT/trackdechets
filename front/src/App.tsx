@@ -4,6 +4,9 @@ import { BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
 import client from "./graphql-client";
 import LayoutContainer from "./LayoutContainer";
+import { Settings } from "luxon";
+
+Settings.defaultLocale = "fr";
 
 export default function App() {
   return (

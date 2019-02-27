@@ -10,6 +10,11 @@ import { getNextStep } from "./workflow";
 import { getReadableId } from "./readable-id";
 
 export default {
+  Form: {
+    appendix2Forms: (parent, args, context: Context) => {
+      return context.prisma.form({ id: parent.id }).appendix2Forms();
+    }
+  },
   Query: {
     form: async (parent, { id }, context: Context) => {
       if (!id) {
@@ -73,6 +78,21 @@ export default {
       }, {});
 
       return Object.keys(stats).map(key => stats[key]);
+    },
+    appendixForms: async (parent, { wasteCode }, context: Context) => {
+      const userId = getUserId(context);
+      const userCompany = await context.prisma.user({ id: userId }).company();
+
+      const forms = await context.prisma.forms({
+        where: {
+          wasteDetailsCode: wasteCode,
+          recipientCompanySiret: userCompany.siret,
+          status: "AWAITING_GROUP",
+          isDeleted: false
+        }
+      });
+
+      return forms.map(f => unflattenObjectFromDb(f));
     }
   },
   Mutation: {
@@ -84,7 +104,8 @@ export default {
         const updatedForm = await context.prisma.updateForm({
           where: { id },
           data: {
-            ...flattenObjectForDb(formContent)
+            ...flattenObjectForDb(formContent),
+            appendix2Forms: { connect: formContent.appendix2Forms }
           }
         });
 
@@ -93,6 +114,7 @@ export default {
 
       const newForm = await context.prisma.createForm({
         ...flattenObjectForDb(formContent),
+        appendix2Forms: { connect: formContent.appendix2Forms },
         readableId: await getReadableId(context),
         owner: { connect: { id: userId } }
       });
@@ -134,6 +156,14 @@ export default {
       const userId = getUserId(context);
       const userCompany = await context.prisma.user({ id: userId }).company();
 
+      const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
+      if (appendix2Forms.length) {
+        await context.prisma.updateManyForms({
+          where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
+          data: { status: "GROUPED" }
+        });
+      }
+
       return context.prisma.updateForm({
         where: { id },
         data: {
@@ -145,8 +175,25 @@ export default {
       markForm(id, sentInfo, context),
     markAsReceived: async (parent, { id, receivedInfo }, context: Context) =>
       markForm(id, receivedInfo, context),
-    markAsProcessed: async (parent, { id, processedInfo }, context: Context) =>
-      markForm(id, processedInfo, context)
+    markAsProcessed: async (parent, { id, processedInfo }, context: Context) => {
+      const form = await context.prisma.form({ id });
+
+      const userId = getUserId(context);
+      const userCompany = await context.prisma.user({ id: userId }).company();
+
+      const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
+      if (appendix2Forms.length) {
+        await context.prisma.updateManyForms({
+          where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
+          data: { status: "PROCESSED" }
+        });
+      }
+
+      return context.prisma.updateForm({
+        where: { id },
+        data: { status: getNextStep(form, userCompany.siret), ...processedInfo }
+      });
+    }
   },
   Subscription: {
     forms: {

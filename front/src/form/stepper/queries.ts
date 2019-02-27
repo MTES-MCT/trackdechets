@@ -59,6 +59,9 @@ export const GET_FORM = gql`
         quantityType
         consistence
       }
+      appendix2Forms {
+        readableId
+      }
     }
   }
   ${fragments.company}

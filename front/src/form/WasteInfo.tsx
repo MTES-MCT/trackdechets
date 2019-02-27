@@ -6,9 +6,11 @@ import RadioButton from "./custom-inputs/RadioButton";
 import NumberInput from "./custom-inputs/NumberInput";
 import Packagings from "./packagings/Packagings";
 import RedErrorMessage from "./RedErrorMessage";
+import FormsSelector from "./appendix/FormsSelector";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
+  emitter: { type: string };
 };
 export default connect<{}, Values>(function WasteInfo(props) {
   const values = props.formik.values;
@@ -43,6 +45,13 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
         <RedErrorMessage name="wasteDetails.name" />
       </div>
+
+      {values.emitter.type === "APPENDIX2" && (
+        <FormsSelector
+          wasteCode={values.wasteDetails.code}
+          name="appendix2Forms"
+        />
+      )}
 
       <h4>Conditionnement</h4>
       <div className="form__group">

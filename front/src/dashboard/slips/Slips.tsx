@@ -9,7 +9,9 @@ const statusLabels: { [key: string]: string } = {
   SEALED: "En attente d'envoi",
   SENT: "En attente de réception",
   RECEIVED: "Reçu, en attente de traitement",
-  PROCESSED: "Traité"
+  PROCESSED: "Traité",
+  AWAITING_GROUP: "Traité, en attente de regroupement",
+  GROUPED: "Annexé à un bordereau de regroupement"
 };
 
 type Props = { forms: Form[]; me: Me; hiddenFields?: string[] };
@@ -36,7 +38,7 @@ export default function Slips({ forms, me, hiddenFields = [] }: Props) {
                 <div className="id">{s.readableId}</div>
               </td>
             )}
-            <td>{DateTime.fromISO(s.createdAt).toISODate()}</td>
+            <td>{DateTime.fromISO(s.createdAt).toLocaleString()}</td>
             <td>{s.emitter.company && s.emitter.company.name}</td>
             <td>{s.recipient.company && s.recipient.company.name}</td>
             <td>

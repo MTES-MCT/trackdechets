@@ -33,6 +33,9 @@ function getRecipientNextStep(form: Form) {
     case "SENT":
       return "RECEIVED";
     case "RECEIVED":
+      if (["D 13", "D 14", "D 15", "R 13"].indexOf(form.processingOperationDone) > -1) {
+        return "AWAITING_GROUP";
+      }
       return "PROCESSED";
     case "SEALED":
       throw new Error(

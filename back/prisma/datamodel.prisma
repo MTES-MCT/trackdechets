@@ -107,11 +107,15 @@ type Form {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+
+  appendix2Forms: [Form]
 }
 
 enum EmitterType {
   PRODUCER
   OTHER
+  APPENDIX1
+  APPENDIX2
 }
 
 enum QuantityType {
@@ -123,4 +127,14 @@ enum Consistence {
   SOLID
   LIQUID
   GASEOUS
+}
+
+enum Status {
+  DRAFT
+  SEALED
+  SENT
+  RECEIVED
+  PROCESSED
+  AWAITING_GROUP
+  GROUPED
 }

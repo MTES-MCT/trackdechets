@@ -16,7 +16,7 @@ const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
 export const formSchema = object().shape({
   id: string().required(),
   emitter: object().shape({
-    type: string().matches(/(PRODUCER|OTHER)/),
+    type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
     pickupSite: string(),
     company: companySchema
   }),

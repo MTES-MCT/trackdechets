@@ -226,13 +226,11 @@ export interface ClientConstructor<T> {
  * Types
  */
 
-export type EmitterType = "PRODUCER" | "OTHER";
+export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
 
 export type QuantityType = "REAL" | "ESTIMATED";
 
 export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
-
-export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
 export type FormOrderByInput =
   | "id_ASC"
@@ -397,6 +395,200 @@ export type UserActivationHashOrderByInput =
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC";
+
+export type MutationType = "CREATED" | "UPDATED" | "DELETED";
+
+export interface CompanyUpdateInput {
+  siret?: String;
+}
+
+export type CompanyWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+  siret?: String;
+}>;
+
+export interface FormUpsertWithWhereUniqueNestedInput {
+  where: FormWhereUniqueInput;
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
+}
+
+export interface FormCreateManyInput {
+  create?: FormCreateInput[] | FormCreateInput;
+  connect?: FormWhereUniqueInput[] | FormWhereUniqueInput;
+}
+
+export interface FormUpdateDataInput {
+  readableId?: String;
+  isDeleted?: Boolean;
+  owner?: UserUpdateOneRequiredInput;
+  status?: String;
+  sentAt?: DateTimeInput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedBy?: String;
+  receivedAt?: DateTimeInput;
+  quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
+  processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
+  emitterType?: EmitterType;
+  emitterPickupSite?: String;
+  emitterCompanyName?: String;
+  emitterCompanySiret?: String;
+  emitterCompanyAddress?: String;
+  emitterCompanyContact?: String;
+  emitterCompanyPhone?: String;
+  emitterCompanyMail?: String;
+  recipientCap?: String;
+  recipientProcessingOperation?: String;
+  recipientCompanyName?: String;
+  recipientCompanySiret?: String;
+  recipientCompanyAddress?: String;
+  recipientCompanyContact?: String;
+  recipientCompanyPhone?: String;
+  recipientCompanyMail?: String;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeInput;
+  transporterNumberPlate?: String;
+  wasteDetailsCode?: String;
+  wasteDetailsName?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+  wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeInput;
+  appendix2Forms?: FormUpdateManyInput;
+}
+
+export interface UserCreateOneInput {
+  create?: UserCreateInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export type UserActivationHashWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+  hash?: String;
+}>;
+
+export interface UserActivationHashSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: UserActivationHashWhereInput;
+  AND?:
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput;
+  OR?:
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput;
+  NOT?:
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput;
+}
+
+export interface FormUpdateWithWhereUniqueNestedInput {
+  where: FormWhereUniqueInput;
+  data: FormUpdateDataInput;
+}
+
+export interface FormSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: FormWhereInput;
+  AND?: FormSubscriptionWhereInput[] | FormSubscriptionWhereInput;
+  OR?: FormSubscriptionWhereInput[] | FormSubscriptionWhereInput;
+  NOT?: FormSubscriptionWhereInput[] | FormSubscriptionWhereInput;
+}
+
+export interface UserActivationHashWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  user?: UserWhereInput;
+  hash?: String;
+  hash_not?: String;
+  hash_in?: String[] | String;
+  hash_not_in?: String[] | String;
+  hash_lt?: String;
+  hash_lte?: String;
+  hash_gt?: String;
+  hash_gte?: String;
+  hash_contains?: String;
+  hash_not_contains?: String;
+  hash_starts_with?: String;
+  hash_not_starts_with?: String;
+  hash_ends_with?: String;
+  hash_not_ends_with?: String;
+  AND?: UserActivationHashWhereInput[] | UserActivationHashWhereInput;
+  OR?: UserActivationHashWhereInput[] | UserActivationHashWhereInput;
+  NOT?: UserActivationHashWhereInput[] | UserActivationHashWhereInput;
+}
+
+export interface UserActivationHashUpdateManyMutationInput {
+  hash?: String;
+}
+
+export interface FormUpdateManyInput {
+  create?: FormCreateInput[] | FormCreateInput;
+  update?:
+    | FormUpdateWithWhereUniqueNestedInput[]
+    | FormUpdateWithWhereUniqueNestedInput;
+  upsert?:
+    | FormUpsertWithWhereUniqueNestedInput[]
+    | FormUpsertWithWhereUniqueNestedInput;
+  delete?: FormWhereUniqueInput[] | FormWhereUniqueInput;
+  connect?: FormWhereUniqueInput[] | FormWhereUniqueInput;
+  disconnect?: FormWhereUniqueInput[] | FormWhereUniqueInput;
+  deleteMany?: FormScalarWhereInput[] | FormScalarWhereInput;
+  updateMany?:
+    | FormUpdateManyWithWhereNestedInput[]
+    | FormUpdateManyWithWhereNestedInput;
+}
+
+export interface UserActivationHashCreateInput {
+  user: UserCreateOneInput;
+  hash: String;
+}
+
+export interface UserUpsertNestedInput {
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
+}
 
 export interface FormWhereInput {
   id?: ID_Input;
@@ -1132,16 +1324,20 @@ export interface FormWhereInput {
   traderValidityLimit_lte?: DateTimeInput;
   traderValidityLimit_gt?: DateTimeInput;
   traderValidityLimit_gte?: DateTimeInput;
+  appendix2Forms_every?: FormWhereInput;
+  appendix2Forms_some?: FormWhereInput;
+  appendix2Forms_none?: FormWhereInput;
   AND?: FormWhereInput[] | FormWhereInput;
   OR?: FormWhereInput[] | FormWhereInput;
   NOT?: FormWhereInput[] | FormWhereInput;
 }
 
-export interface CompanyUpdateInput {
-  siret?: String;
+export interface CompanyUpsertNestedInput {
+  update: CompanyUpdateDataInput;
+  create: CompanyCreateInput;
 }
 
-export interface UserUpdateDataInput {
+export interface UserUpdateInput {
   isActive?: Boolean;
   email?: String;
   password?: String;
@@ -1151,22 +1347,77 @@ export interface UserUpdateDataInput {
   userType?: Json;
 }
 
-export type CompanyWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
+export interface CompanyUpdateDataInput {
   siret?: String;
-}>;
+}
+
+export interface FormUpdateManyDataInput {
+  readableId?: String;
+  isDeleted?: Boolean;
+  status?: String;
+  sentAt?: DateTimeInput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedBy?: String;
+  receivedAt?: DateTimeInput;
+  quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
+  processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
+  emitterType?: EmitterType;
+  emitterPickupSite?: String;
+  emitterCompanyName?: String;
+  emitterCompanySiret?: String;
+  emitterCompanyAddress?: String;
+  emitterCompanyContact?: String;
+  emitterCompanyPhone?: String;
+  emitterCompanyMail?: String;
+  recipientCap?: String;
+  recipientProcessingOperation?: String;
+  recipientCompanyName?: String;
+  recipientCompanySiret?: String;
+  recipientCompanyAddress?: String;
+  recipientCompanyContact?: String;
+  recipientCompanyPhone?: String;
+  recipientCompanyMail?: String;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeInput;
+  transporterNumberPlate?: String;
+  wasteDetailsCode?: String;
+  wasteDetailsName?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+  wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeInput;
+}
 
 export type UserWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
   email?: String;
 }>;
 
-export interface UserActivationHashCreateInput {
-  user: UserCreateOneInput;
-  hash: String;
-}
-
-export interface CompanyWhereInput {
+export interface FormScalarWhereInput {
   id?: ID_Input;
   id_not?: ID_Input;
   id_in?: ID_Input[] | ID_Input;
@@ -1181,261 +1432,731 @@ export interface CompanyWhereInput {
   id_not_starts_with?: ID_Input;
   id_ends_with?: ID_Input;
   id_not_ends_with?: ID_Input;
-  siret?: String;
-  siret_not?: String;
-  siret_in?: String[] | String;
-  siret_not_in?: String[] | String;
-  siret_lt?: String;
-  siret_lte?: String;
-  siret_gt?: String;
-  siret_gte?: String;
-  siret_contains?: String;
-  siret_not_contains?: String;
-  siret_starts_with?: String;
-  siret_not_starts_with?: String;
-  siret_ends_with?: String;
-  siret_not_ends_with?: String;
-  AND?: CompanyWhereInput[] | CompanyWhereInput;
-  OR?: CompanyWhereInput[] | CompanyWhereInput;
-  NOT?: CompanyWhereInput[] | CompanyWhereInput;
-}
-
-export interface UserUpdateManyMutationInput {
-  isActive?: Boolean;
-  email?: String;
-  password?: String;
-  name?: String;
-  phone?: String;
-  userType?: Json;
-}
-
-export interface UserUpdateOneRequiredInput {
-  create?: UserCreateInput;
-  update?: UserUpdateDataInput;
-  upsert?: UserUpsertNestedInput;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface FormUpdateManyMutationInput {
   readableId?: String;
+  readableId_not?: String;
+  readableId_in?: String[] | String;
+  readableId_not_in?: String[] | String;
+  readableId_lt?: String;
+  readableId_lte?: String;
+  readableId_gt?: String;
+  readableId_gte?: String;
+  readableId_contains?: String;
+  readableId_not_contains?: String;
+  readableId_starts_with?: String;
+  readableId_not_starts_with?: String;
+  readableId_ends_with?: String;
+  readableId_not_ends_with?: String;
   isDeleted?: Boolean;
+  isDeleted_not?: Boolean;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
   status?: String;
+  status_not?: String;
+  status_in?: String[] | String;
+  status_not_in?: String[] | String;
+  status_lt?: String;
+  status_lte?: String;
+  status_gt?: String;
+  status_gte?: String;
+  status_contains?: String;
+  status_not_contains?: String;
+  status_starts_with?: String;
+  status_not_starts_with?: String;
+  status_ends_with?: String;
+  status_not_ends_with?: String;
   sentAt?: DateTimeInput;
+  sentAt_not?: DateTimeInput;
+  sentAt_in?: DateTimeInput[] | DateTimeInput;
+  sentAt_not_in?: DateTimeInput[] | DateTimeInput;
+  sentAt_lt?: DateTimeInput;
+  sentAt_lte?: DateTimeInput;
+  sentAt_gt?: DateTimeInput;
+  sentAt_gte?: DateTimeInput;
   sentBy?: String;
+  sentBy_not?: String;
+  sentBy_in?: String[] | String;
+  sentBy_not_in?: String[] | String;
+  sentBy_lt?: String;
+  sentBy_lte?: String;
+  sentBy_gt?: String;
+  sentBy_gte?: String;
+  sentBy_contains?: String;
+  sentBy_not_contains?: String;
+  sentBy_starts_with?: String;
+  sentBy_not_starts_with?: String;
+  sentBy_ends_with?: String;
+  sentBy_not_ends_with?: String;
   isAccepted?: Boolean;
+  isAccepted_not?: Boolean;
   receivedBy?: String;
+  receivedBy_not?: String;
+  receivedBy_in?: String[] | String;
+  receivedBy_not_in?: String[] | String;
+  receivedBy_lt?: String;
+  receivedBy_lte?: String;
+  receivedBy_gt?: String;
+  receivedBy_gte?: String;
+  receivedBy_contains?: String;
+  receivedBy_not_contains?: String;
+  receivedBy_starts_with?: String;
+  receivedBy_not_starts_with?: String;
+  receivedBy_ends_with?: String;
+  receivedBy_not_ends_with?: String;
   receivedAt?: DateTimeInput;
+  receivedAt_not?: DateTimeInput;
+  receivedAt_in?: DateTimeInput[] | DateTimeInput;
+  receivedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  receivedAt_lt?: DateTimeInput;
+  receivedAt_lte?: DateTimeInput;
+  receivedAt_gt?: DateTimeInput;
+  receivedAt_gte?: DateTimeInput;
   quantityReceived?: Float;
+  quantityReceived_not?: Float;
+  quantityReceived_in?: Float[] | Float;
+  quantityReceived_not_in?: Float[] | Float;
+  quantityReceived_lt?: Float;
+  quantityReceived_lte?: Float;
+  quantityReceived_gt?: Float;
+  quantityReceived_gte?: Float;
   processedBy?: String;
+  processedBy_not?: String;
+  processedBy_in?: String[] | String;
+  processedBy_not_in?: String[] | String;
+  processedBy_lt?: String;
+  processedBy_lte?: String;
+  processedBy_gt?: String;
+  processedBy_gte?: String;
+  processedBy_contains?: String;
+  processedBy_not_contains?: String;
+  processedBy_starts_with?: String;
+  processedBy_not_starts_with?: String;
+  processedBy_ends_with?: String;
+  processedBy_not_ends_with?: String;
   processedAt?: String;
+  processedAt_not?: String;
+  processedAt_in?: String[] | String;
+  processedAt_not_in?: String[] | String;
+  processedAt_lt?: String;
+  processedAt_lte?: String;
+  processedAt_gt?: String;
+  processedAt_gte?: String;
+  processedAt_contains?: String;
+  processedAt_not_contains?: String;
+  processedAt_starts_with?: String;
+  processedAt_not_starts_with?: String;
+  processedAt_ends_with?: String;
+  processedAt_not_ends_with?: String;
   processingOperationDone?: String;
+  processingOperationDone_not?: String;
+  processingOperationDone_in?: String[] | String;
+  processingOperationDone_not_in?: String[] | String;
+  processingOperationDone_lt?: String;
+  processingOperationDone_lte?: String;
+  processingOperationDone_gt?: String;
+  processingOperationDone_gte?: String;
+  processingOperationDone_contains?: String;
+  processingOperationDone_not_contains?: String;
+  processingOperationDone_starts_with?: String;
+  processingOperationDone_not_starts_with?: String;
+  processingOperationDone_ends_with?: String;
+  processingOperationDone_not_ends_with?: String;
   nextDestinationProcessingOperation?: String;
+  nextDestinationProcessingOperation_not?: String;
+  nextDestinationProcessingOperation_in?: String[] | String;
+  nextDestinationProcessingOperation_not_in?: String[] | String;
+  nextDestinationProcessingOperation_lt?: String;
+  nextDestinationProcessingOperation_lte?: String;
+  nextDestinationProcessingOperation_gt?: String;
+  nextDestinationProcessingOperation_gte?: String;
+  nextDestinationProcessingOperation_contains?: String;
+  nextDestinationProcessingOperation_not_contains?: String;
+  nextDestinationProcessingOperation_starts_with?: String;
+  nextDestinationProcessingOperation_not_starts_with?: String;
+  nextDestinationProcessingOperation_ends_with?: String;
+  nextDestinationProcessingOperation_not_ends_with?: String;
   nextDestinationDetails?: String;
+  nextDestinationDetails_not?: String;
+  nextDestinationDetails_in?: String[] | String;
+  nextDestinationDetails_not_in?: String[] | String;
+  nextDestinationDetails_lt?: String;
+  nextDestinationDetails_lte?: String;
+  nextDestinationDetails_gt?: String;
+  nextDestinationDetails_gte?: String;
+  nextDestinationDetails_contains?: String;
+  nextDestinationDetails_not_contains?: String;
+  nextDestinationDetails_starts_with?: String;
+  nextDestinationDetails_not_starts_with?: String;
+  nextDestinationDetails_ends_with?: String;
+  nextDestinationDetails_not_ends_with?: String;
   emitterType?: EmitterType;
+  emitterType_not?: EmitterType;
+  emitterType_in?: EmitterType[] | EmitterType;
+  emitterType_not_in?: EmitterType[] | EmitterType;
   emitterPickupSite?: String;
+  emitterPickupSite_not?: String;
+  emitterPickupSite_in?: String[] | String;
+  emitterPickupSite_not_in?: String[] | String;
+  emitterPickupSite_lt?: String;
+  emitterPickupSite_lte?: String;
+  emitterPickupSite_gt?: String;
+  emitterPickupSite_gte?: String;
+  emitterPickupSite_contains?: String;
+  emitterPickupSite_not_contains?: String;
+  emitterPickupSite_starts_with?: String;
+  emitterPickupSite_not_starts_with?: String;
+  emitterPickupSite_ends_with?: String;
+  emitterPickupSite_not_ends_with?: String;
   emitterCompanyName?: String;
+  emitterCompanyName_not?: String;
+  emitterCompanyName_in?: String[] | String;
+  emitterCompanyName_not_in?: String[] | String;
+  emitterCompanyName_lt?: String;
+  emitterCompanyName_lte?: String;
+  emitterCompanyName_gt?: String;
+  emitterCompanyName_gte?: String;
+  emitterCompanyName_contains?: String;
+  emitterCompanyName_not_contains?: String;
+  emitterCompanyName_starts_with?: String;
+  emitterCompanyName_not_starts_with?: String;
+  emitterCompanyName_ends_with?: String;
+  emitterCompanyName_not_ends_with?: String;
   emitterCompanySiret?: String;
+  emitterCompanySiret_not?: String;
+  emitterCompanySiret_in?: String[] | String;
+  emitterCompanySiret_not_in?: String[] | String;
+  emitterCompanySiret_lt?: String;
+  emitterCompanySiret_lte?: String;
+  emitterCompanySiret_gt?: String;
+  emitterCompanySiret_gte?: String;
+  emitterCompanySiret_contains?: String;
+  emitterCompanySiret_not_contains?: String;
+  emitterCompanySiret_starts_with?: String;
+  emitterCompanySiret_not_starts_with?: String;
+  emitterCompanySiret_ends_with?: String;
+  emitterCompanySiret_not_ends_with?: String;
   emitterCompanyAddress?: String;
+  emitterCompanyAddress_not?: String;
+  emitterCompanyAddress_in?: String[] | String;
+  emitterCompanyAddress_not_in?: String[] | String;
+  emitterCompanyAddress_lt?: String;
+  emitterCompanyAddress_lte?: String;
+  emitterCompanyAddress_gt?: String;
+  emitterCompanyAddress_gte?: String;
+  emitterCompanyAddress_contains?: String;
+  emitterCompanyAddress_not_contains?: String;
+  emitterCompanyAddress_starts_with?: String;
+  emitterCompanyAddress_not_starts_with?: String;
+  emitterCompanyAddress_ends_with?: String;
+  emitterCompanyAddress_not_ends_with?: String;
   emitterCompanyContact?: String;
+  emitterCompanyContact_not?: String;
+  emitterCompanyContact_in?: String[] | String;
+  emitterCompanyContact_not_in?: String[] | String;
+  emitterCompanyContact_lt?: String;
+  emitterCompanyContact_lte?: String;
+  emitterCompanyContact_gt?: String;
+  emitterCompanyContact_gte?: String;
+  emitterCompanyContact_contains?: String;
+  emitterCompanyContact_not_contains?: String;
+  emitterCompanyContact_starts_with?: String;
+  emitterCompanyContact_not_starts_with?: String;
+  emitterCompanyContact_ends_with?: String;
+  emitterCompanyContact_not_ends_with?: String;
   emitterCompanyPhone?: String;
+  emitterCompanyPhone_not?: String;
+  emitterCompanyPhone_in?: String[] | String;
+  emitterCompanyPhone_not_in?: String[] | String;
+  emitterCompanyPhone_lt?: String;
+  emitterCompanyPhone_lte?: String;
+  emitterCompanyPhone_gt?: String;
+  emitterCompanyPhone_gte?: String;
+  emitterCompanyPhone_contains?: String;
+  emitterCompanyPhone_not_contains?: String;
+  emitterCompanyPhone_starts_with?: String;
+  emitterCompanyPhone_not_starts_with?: String;
+  emitterCompanyPhone_ends_with?: String;
+  emitterCompanyPhone_not_ends_with?: String;
   emitterCompanyMail?: String;
+  emitterCompanyMail_not?: String;
+  emitterCompanyMail_in?: String[] | String;
+  emitterCompanyMail_not_in?: String[] | String;
+  emitterCompanyMail_lt?: String;
+  emitterCompanyMail_lte?: String;
+  emitterCompanyMail_gt?: String;
+  emitterCompanyMail_gte?: String;
+  emitterCompanyMail_contains?: String;
+  emitterCompanyMail_not_contains?: String;
+  emitterCompanyMail_starts_with?: String;
+  emitterCompanyMail_not_starts_with?: String;
+  emitterCompanyMail_ends_with?: String;
+  emitterCompanyMail_not_ends_with?: String;
   recipientCap?: String;
+  recipientCap_not?: String;
+  recipientCap_in?: String[] | String;
+  recipientCap_not_in?: String[] | String;
+  recipientCap_lt?: String;
+  recipientCap_lte?: String;
+  recipientCap_gt?: String;
+  recipientCap_gte?: String;
+  recipientCap_contains?: String;
+  recipientCap_not_contains?: String;
+  recipientCap_starts_with?: String;
+  recipientCap_not_starts_with?: String;
+  recipientCap_ends_with?: String;
+  recipientCap_not_ends_with?: String;
   recipientProcessingOperation?: String;
+  recipientProcessingOperation_not?: String;
+  recipientProcessingOperation_in?: String[] | String;
+  recipientProcessingOperation_not_in?: String[] | String;
+  recipientProcessingOperation_lt?: String;
+  recipientProcessingOperation_lte?: String;
+  recipientProcessingOperation_gt?: String;
+  recipientProcessingOperation_gte?: String;
+  recipientProcessingOperation_contains?: String;
+  recipientProcessingOperation_not_contains?: String;
+  recipientProcessingOperation_starts_with?: String;
+  recipientProcessingOperation_not_starts_with?: String;
+  recipientProcessingOperation_ends_with?: String;
+  recipientProcessingOperation_not_ends_with?: String;
   recipientCompanyName?: String;
+  recipientCompanyName_not?: String;
+  recipientCompanyName_in?: String[] | String;
+  recipientCompanyName_not_in?: String[] | String;
+  recipientCompanyName_lt?: String;
+  recipientCompanyName_lte?: String;
+  recipientCompanyName_gt?: String;
+  recipientCompanyName_gte?: String;
+  recipientCompanyName_contains?: String;
+  recipientCompanyName_not_contains?: String;
+  recipientCompanyName_starts_with?: String;
+  recipientCompanyName_not_starts_with?: String;
+  recipientCompanyName_ends_with?: String;
+  recipientCompanyName_not_ends_with?: String;
   recipientCompanySiret?: String;
+  recipientCompanySiret_not?: String;
+  recipientCompanySiret_in?: String[] | String;
+  recipientCompanySiret_not_in?: String[] | String;
+  recipientCompanySiret_lt?: String;
+  recipientCompanySiret_lte?: String;
+  recipientCompanySiret_gt?: String;
+  recipientCompanySiret_gte?: String;
+  recipientCompanySiret_contains?: String;
+  recipientCompanySiret_not_contains?: String;
+  recipientCompanySiret_starts_with?: String;
+  recipientCompanySiret_not_starts_with?: String;
+  recipientCompanySiret_ends_with?: String;
+  recipientCompanySiret_not_ends_with?: String;
   recipientCompanyAddress?: String;
+  recipientCompanyAddress_not?: String;
+  recipientCompanyAddress_in?: String[] | String;
+  recipientCompanyAddress_not_in?: String[] | String;
+  recipientCompanyAddress_lt?: String;
+  recipientCompanyAddress_lte?: String;
+  recipientCompanyAddress_gt?: String;
+  recipientCompanyAddress_gte?: String;
+  recipientCompanyAddress_contains?: String;
+  recipientCompanyAddress_not_contains?: String;
+  recipientCompanyAddress_starts_with?: String;
+  recipientCompanyAddress_not_starts_with?: String;
+  recipientCompanyAddress_ends_with?: String;
+  recipientCompanyAddress_not_ends_with?: String;
   recipientCompanyContact?: String;
+  recipientCompanyContact_not?: String;
+  recipientCompanyContact_in?: String[] | String;
+  recipientCompanyContact_not_in?: String[] | String;
+  recipientCompanyContact_lt?: String;
+  recipientCompanyContact_lte?: String;
+  recipientCompanyContact_gt?: String;
+  recipientCompanyContact_gte?: String;
+  recipientCompanyContact_contains?: String;
+  recipientCompanyContact_not_contains?: String;
+  recipientCompanyContact_starts_with?: String;
+  recipientCompanyContact_not_starts_with?: String;
+  recipientCompanyContact_ends_with?: String;
+  recipientCompanyContact_not_ends_with?: String;
   recipientCompanyPhone?: String;
+  recipientCompanyPhone_not?: String;
+  recipientCompanyPhone_in?: String[] | String;
+  recipientCompanyPhone_not_in?: String[] | String;
+  recipientCompanyPhone_lt?: String;
+  recipientCompanyPhone_lte?: String;
+  recipientCompanyPhone_gt?: String;
+  recipientCompanyPhone_gte?: String;
+  recipientCompanyPhone_contains?: String;
+  recipientCompanyPhone_not_contains?: String;
+  recipientCompanyPhone_starts_with?: String;
+  recipientCompanyPhone_not_starts_with?: String;
+  recipientCompanyPhone_ends_with?: String;
+  recipientCompanyPhone_not_ends_with?: String;
   recipientCompanyMail?: String;
+  recipientCompanyMail_not?: String;
+  recipientCompanyMail_in?: String[] | String;
+  recipientCompanyMail_not_in?: String[] | String;
+  recipientCompanyMail_lt?: String;
+  recipientCompanyMail_lte?: String;
+  recipientCompanyMail_gt?: String;
+  recipientCompanyMail_gte?: String;
+  recipientCompanyMail_contains?: String;
+  recipientCompanyMail_not_contains?: String;
+  recipientCompanyMail_starts_with?: String;
+  recipientCompanyMail_not_starts_with?: String;
+  recipientCompanyMail_ends_with?: String;
+  recipientCompanyMail_not_ends_with?: String;
   transporterCompanyName?: String;
+  transporterCompanyName_not?: String;
+  transporterCompanyName_in?: String[] | String;
+  transporterCompanyName_not_in?: String[] | String;
+  transporterCompanyName_lt?: String;
+  transporterCompanyName_lte?: String;
+  transporterCompanyName_gt?: String;
+  transporterCompanyName_gte?: String;
+  transporterCompanyName_contains?: String;
+  transporterCompanyName_not_contains?: String;
+  transporterCompanyName_starts_with?: String;
+  transporterCompanyName_not_starts_with?: String;
+  transporterCompanyName_ends_with?: String;
+  transporterCompanyName_not_ends_with?: String;
   transporterCompanySiret?: String;
+  transporterCompanySiret_not?: String;
+  transporterCompanySiret_in?: String[] | String;
+  transporterCompanySiret_not_in?: String[] | String;
+  transporterCompanySiret_lt?: String;
+  transporterCompanySiret_lte?: String;
+  transporterCompanySiret_gt?: String;
+  transporterCompanySiret_gte?: String;
+  transporterCompanySiret_contains?: String;
+  transporterCompanySiret_not_contains?: String;
+  transporterCompanySiret_starts_with?: String;
+  transporterCompanySiret_not_starts_with?: String;
+  transporterCompanySiret_ends_with?: String;
+  transporterCompanySiret_not_ends_with?: String;
   transporterCompanyAddress?: String;
+  transporterCompanyAddress_not?: String;
+  transporterCompanyAddress_in?: String[] | String;
+  transporterCompanyAddress_not_in?: String[] | String;
+  transporterCompanyAddress_lt?: String;
+  transporterCompanyAddress_lte?: String;
+  transporterCompanyAddress_gt?: String;
+  transporterCompanyAddress_gte?: String;
+  transporterCompanyAddress_contains?: String;
+  transporterCompanyAddress_not_contains?: String;
+  transporterCompanyAddress_starts_with?: String;
+  transporterCompanyAddress_not_starts_with?: String;
+  transporterCompanyAddress_ends_with?: String;
+  transporterCompanyAddress_not_ends_with?: String;
   transporterCompanyContact?: String;
+  transporterCompanyContact_not?: String;
+  transporterCompanyContact_in?: String[] | String;
+  transporterCompanyContact_not_in?: String[] | String;
+  transporterCompanyContact_lt?: String;
+  transporterCompanyContact_lte?: String;
+  transporterCompanyContact_gt?: String;
+  transporterCompanyContact_gte?: String;
+  transporterCompanyContact_contains?: String;
+  transporterCompanyContact_not_contains?: String;
+  transporterCompanyContact_starts_with?: String;
+  transporterCompanyContact_not_starts_with?: String;
+  transporterCompanyContact_ends_with?: String;
+  transporterCompanyContact_not_ends_with?: String;
   transporterCompanyPhone?: String;
+  transporterCompanyPhone_not?: String;
+  transporterCompanyPhone_in?: String[] | String;
+  transporterCompanyPhone_not_in?: String[] | String;
+  transporterCompanyPhone_lt?: String;
+  transporterCompanyPhone_lte?: String;
+  transporterCompanyPhone_gt?: String;
+  transporterCompanyPhone_gte?: String;
+  transporterCompanyPhone_contains?: String;
+  transporterCompanyPhone_not_contains?: String;
+  transporterCompanyPhone_starts_with?: String;
+  transporterCompanyPhone_not_starts_with?: String;
+  transporterCompanyPhone_ends_with?: String;
+  transporterCompanyPhone_not_ends_with?: String;
   transporterCompanyMail?: String;
+  transporterCompanyMail_not?: String;
+  transporterCompanyMail_in?: String[] | String;
+  transporterCompanyMail_not_in?: String[] | String;
+  transporterCompanyMail_lt?: String;
+  transporterCompanyMail_lte?: String;
+  transporterCompanyMail_gt?: String;
+  transporterCompanyMail_gte?: String;
+  transporterCompanyMail_contains?: String;
+  transporterCompanyMail_not_contains?: String;
+  transporterCompanyMail_starts_with?: String;
+  transporterCompanyMail_not_starts_with?: String;
+  transporterCompanyMail_ends_with?: String;
+  transporterCompanyMail_not_ends_with?: String;
   transporterReceipt?: String;
+  transporterReceipt_not?: String;
+  transporterReceipt_in?: String[] | String;
+  transporterReceipt_not_in?: String[] | String;
+  transporterReceipt_lt?: String;
+  transporterReceipt_lte?: String;
+  transporterReceipt_gt?: String;
+  transporterReceipt_gte?: String;
+  transporterReceipt_contains?: String;
+  transporterReceipt_not_contains?: String;
+  transporterReceipt_starts_with?: String;
+  transporterReceipt_not_starts_with?: String;
+  transporterReceipt_ends_with?: String;
+  transporterReceipt_not_ends_with?: String;
   transporterDepartment?: String;
+  transporterDepartment_not?: String;
+  transporterDepartment_in?: String[] | String;
+  transporterDepartment_not_in?: String[] | String;
+  transporterDepartment_lt?: String;
+  transporterDepartment_lte?: String;
+  transporterDepartment_gt?: String;
+  transporterDepartment_gte?: String;
+  transporterDepartment_contains?: String;
+  transporterDepartment_not_contains?: String;
+  transporterDepartment_starts_with?: String;
+  transporterDepartment_not_starts_with?: String;
+  transporterDepartment_ends_with?: String;
+  transporterDepartment_not_ends_with?: String;
   transporterValidityLimit?: DateTimeInput;
+  transporterValidityLimit_not?: DateTimeInput;
+  transporterValidityLimit_in?: DateTimeInput[] | DateTimeInput;
+  transporterValidityLimit_not_in?: DateTimeInput[] | DateTimeInput;
+  transporterValidityLimit_lt?: DateTimeInput;
+  transporterValidityLimit_lte?: DateTimeInput;
+  transporterValidityLimit_gt?: DateTimeInput;
+  transporterValidityLimit_gte?: DateTimeInput;
   transporterNumberPlate?: String;
+  transporterNumberPlate_not?: String;
+  transporterNumberPlate_in?: String[] | String;
+  transporterNumberPlate_not_in?: String[] | String;
+  transporterNumberPlate_lt?: String;
+  transporterNumberPlate_lte?: String;
+  transporterNumberPlate_gt?: String;
+  transporterNumberPlate_gte?: String;
+  transporterNumberPlate_contains?: String;
+  transporterNumberPlate_not_contains?: String;
+  transporterNumberPlate_starts_with?: String;
+  transporterNumberPlate_not_starts_with?: String;
+  transporterNumberPlate_ends_with?: String;
+  transporterNumberPlate_not_ends_with?: String;
   wasteDetailsCode?: String;
+  wasteDetailsCode_not?: String;
+  wasteDetailsCode_in?: String[] | String;
+  wasteDetailsCode_not_in?: String[] | String;
+  wasteDetailsCode_lt?: String;
+  wasteDetailsCode_lte?: String;
+  wasteDetailsCode_gt?: String;
+  wasteDetailsCode_gte?: String;
+  wasteDetailsCode_contains?: String;
+  wasteDetailsCode_not_contains?: String;
+  wasteDetailsCode_starts_with?: String;
+  wasteDetailsCode_not_starts_with?: String;
+  wasteDetailsCode_ends_with?: String;
+  wasteDetailsCode_not_ends_with?: String;
   wasteDetailsName?: String;
+  wasteDetailsName_not?: String;
+  wasteDetailsName_in?: String[] | String;
+  wasteDetailsName_not_in?: String[] | String;
+  wasteDetailsName_lt?: String;
+  wasteDetailsName_lte?: String;
+  wasteDetailsName_gt?: String;
+  wasteDetailsName_gte?: String;
+  wasteDetailsName_contains?: String;
+  wasteDetailsName_not_contains?: String;
+  wasteDetailsName_starts_with?: String;
+  wasteDetailsName_not_starts_with?: String;
+  wasteDetailsName_ends_with?: String;
+  wasteDetailsName_not_ends_with?: String;
   wasteDetailsOnuCode?: String;
-  wasteDetailsPackagings?: Json;
+  wasteDetailsOnuCode_not?: String;
+  wasteDetailsOnuCode_in?: String[] | String;
+  wasteDetailsOnuCode_not_in?: String[] | String;
+  wasteDetailsOnuCode_lt?: String;
+  wasteDetailsOnuCode_lte?: String;
+  wasteDetailsOnuCode_gt?: String;
+  wasteDetailsOnuCode_gte?: String;
+  wasteDetailsOnuCode_contains?: String;
+  wasteDetailsOnuCode_not_contains?: String;
+  wasteDetailsOnuCode_starts_with?: String;
+  wasteDetailsOnuCode_not_starts_with?: String;
+  wasteDetailsOnuCode_ends_with?: String;
+  wasteDetailsOnuCode_not_ends_with?: String;
   wasteDetailsOtherPackaging?: String;
+  wasteDetailsOtherPackaging_not?: String;
+  wasteDetailsOtherPackaging_in?: String[] | String;
+  wasteDetailsOtherPackaging_not_in?: String[] | String;
+  wasteDetailsOtherPackaging_lt?: String;
+  wasteDetailsOtherPackaging_lte?: String;
+  wasteDetailsOtherPackaging_gt?: String;
+  wasteDetailsOtherPackaging_gte?: String;
+  wasteDetailsOtherPackaging_contains?: String;
+  wasteDetailsOtherPackaging_not_contains?: String;
+  wasteDetailsOtherPackaging_starts_with?: String;
+  wasteDetailsOtherPackaging_not_starts_with?: String;
+  wasteDetailsOtherPackaging_ends_with?: String;
+  wasteDetailsOtherPackaging_not_ends_with?: String;
   wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsNumberOfPackages_not?: Int;
+  wasteDetailsNumberOfPackages_in?: Int[] | Int;
+  wasteDetailsNumberOfPackages_not_in?: Int[] | Int;
+  wasteDetailsNumberOfPackages_lt?: Int;
+  wasteDetailsNumberOfPackages_lte?: Int;
+  wasteDetailsNumberOfPackages_gt?: Int;
+  wasteDetailsNumberOfPackages_gte?: Int;
   wasteDetailsQuantity?: Float;
+  wasteDetailsQuantity_not?: Float;
+  wasteDetailsQuantity_in?: Float[] | Float;
+  wasteDetailsQuantity_not_in?: Float[] | Float;
+  wasteDetailsQuantity_lt?: Float;
+  wasteDetailsQuantity_lte?: Float;
+  wasteDetailsQuantity_gt?: Float;
+  wasteDetailsQuantity_gte?: Float;
   wasteDetailsQuantityType?: QuantityType;
+  wasteDetailsQuantityType_not?: QuantityType;
+  wasteDetailsQuantityType_in?: QuantityType[] | QuantityType;
+  wasteDetailsQuantityType_not_in?: QuantityType[] | QuantityType;
   wasteDetailsConsistence?: Consistence;
+  wasteDetailsConsistence_not?: Consistence;
+  wasteDetailsConsistence_in?: Consistence[] | Consistence;
+  wasteDetailsConsistence_not_in?: Consistence[] | Consistence;
   traderCompanyName?: String;
+  traderCompanyName_not?: String;
+  traderCompanyName_in?: String[] | String;
+  traderCompanyName_not_in?: String[] | String;
+  traderCompanyName_lt?: String;
+  traderCompanyName_lte?: String;
+  traderCompanyName_gt?: String;
+  traderCompanyName_gte?: String;
+  traderCompanyName_contains?: String;
+  traderCompanyName_not_contains?: String;
+  traderCompanyName_starts_with?: String;
+  traderCompanyName_not_starts_with?: String;
+  traderCompanyName_ends_with?: String;
+  traderCompanyName_not_ends_with?: String;
   traderCompanySiret?: String;
+  traderCompanySiret_not?: String;
+  traderCompanySiret_in?: String[] | String;
+  traderCompanySiret_not_in?: String[] | String;
+  traderCompanySiret_lt?: String;
+  traderCompanySiret_lte?: String;
+  traderCompanySiret_gt?: String;
+  traderCompanySiret_gte?: String;
+  traderCompanySiret_contains?: String;
+  traderCompanySiret_not_contains?: String;
+  traderCompanySiret_starts_with?: String;
+  traderCompanySiret_not_starts_with?: String;
+  traderCompanySiret_ends_with?: String;
+  traderCompanySiret_not_ends_with?: String;
   traderCompanyAddress?: String;
+  traderCompanyAddress_not?: String;
+  traderCompanyAddress_in?: String[] | String;
+  traderCompanyAddress_not_in?: String[] | String;
+  traderCompanyAddress_lt?: String;
+  traderCompanyAddress_lte?: String;
+  traderCompanyAddress_gt?: String;
+  traderCompanyAddress_gte?: String;
+  traderCompanyAddress_contains?: String;
+  traderCompanyAddress_not_contains?: String;
+  traderCompanyAddress_starts_with?: String;
+  traderCompanyAddress_not_starts_with?: String;
+  traderCompanyAddress_ends_with?: String;
+  traderCompanyAddress_not_ends_with?: String;
   traderCompanyContact?: String;
+  traderCompanyContact_not?: String;
+  traderCompanyContact_in?: String[] | String;
+  traderCompanyContact_not_in?: String[] | String;
+  traderCompanyContact_lt?: String;
+  traderCompanyContact_lte?: String;
+  traderCompanyContact_gt?: String;
+  traderCompanyContact_gte?: String;
+  traderCompanyContact_contains?: String;
+  traderCompanyContact_not_contains?: String;
+  traderCompanyContact_starts_with?: String;
+  traderCompanyContact_not_starts_with?: String;
+  traderCompanyContact_ends_with?: String;
+  traderCompanyContact_not_ends_with?: String;
   traderCompanyPhone?: String;
+  traderCompanyPhone_not?: String;
+  traderCompanyPhone_in?: String[] | String;
+  traderCompanyPhone_not_in?: String[] | String;
+  traderCompanyPhone_lt?: String;
+  traderCompanyPhone_lte?: String;
+  traderCompanyPhone_gt?: String;
+  traderCompanyPhone_gte?: String;
+  traderCompanyPhone_contains?: String;
+  traderCompanyPhone_not_contains?: String;
+  traderCompanyPhone_starts_with?: String;
+  traderCompanyPhone_not_starts_with?: String;
+  traderCompanyPhone_ends_with?: String;
+  traderCompanyPhone_not_ends_with?: String;
   traderCompanyMail?: String;
+  traderCompanyMail_not?: String;
+  traderCompanyMail_in?: String[] | String;
+  traderCompanyMail_not_in?: String[] | String;
+  traderCompanyMail_lt?: String;
+  traderCompanyMail_lte?: String;
+  traderCompanyMail_gt?: String;
+  traderCompanyMail_gte?: String;
+  traderCompanyMail_contains?: String;
+  traderCompanyMail_not_contains?: String;
+  traderCompanyMail_starts_with?: String;
+  traderCompanyMail_not_starts_with?: String;
+  traderCompanyMail_ends_with?: String;
+  traderCompanyMail_not_ends_with?: String;
   traderReceipt?: String;
+  traderReceipt_not?: String;
+  traderReceipt_in?: String[] | String;
+  traderReceipt_not_in?: String[] | String;
+  traderReceipt_lt?: String;
+  traderReceipt_lte?: String;
+  traderReceipt_gt?: String;
+  traderReceipt_gte?: String;
+  traderReceipt_contains?: String;
+  traderReceipt_not_contains?: String;
+  traderReceipt_starts_with?: String;
+  traderReceipt_not_starts_with?: String;
+  traderReceipt_ends_with?: String;
+  traderReceipt_not_ends_with?: String;
   traderDepartment?: String;
+  traderDepartment_not?: String;
+  traderDepartment_in?: String[] | String;
+  traderDepartment_not_in?: String[] | String;
+  traderDepartment_lt?: String;
+  traderDepartment_lte?: String;
+  traderDepartment_gt?: String;
+  traderDepartment_gte?: String;
+  traderDepartment_contains?: String;
+  traderDepartment_not_contains?: String;
+  traderDepartment_starts_with?: String;
+  traderDepartment_not_starts_with?: String;
+  traderDepartment_ends_with?: String;
+  traderDepartment_not_ends_with?: String;
   traderValidityLimit?: DateTimeInput;
+  traderValidityLimit_not?: DateTimeInput;
+  traderValidityLimit_in?: DateTimeInput[] | DateTimeInput;
+  traderValidityLimit_not_in?: DateTimeInput[] | DateTimeInput;
+  traderValidityLimit_lt?: DateTimeInput;
+  traderValidityLimit_lte?: DateTimeInput;
+  traderValidityLimit_gt?: DateTimeInput;
+  traderValidityLimit_gte?: DateTimeInput;
+  AND?: FormScalarWhereInput[] | FormScalarWhereInput;
+  OR?: FormScalarWhereInput[] | FormScalarWhereInput;
+  NOT?: FormScalarWhereInput[] | FormScalarWhereInput;
 }
 
-export interface FormUpdateInput {
-  readableId?: String;
-  isDeleted?: Boolean;
-  owner?: UserUpdateOneRequiredInput;
-  status?: String;
-  sentAt?: DateTimeInput;
-  sentBy?: String;
-  isAccepted?: Boolean;
-  receivedBy?: String;
-  receivedAt?: DateTimeInput;
-  quantityReceived?: Float;
-  processedBy?: String;
-  processedAt?: String;
-  processingOperationDone?: String;
-  nextDestinationProcessingOperation?: String;
-  nextDestinationDetails?: String;
-  emitterType?: EmitterType;
-  emitterPickupSite?: String;
-  emitterCompanyName?: String;
-  emitterCompanySiret?: String;
-  emitterCompanyAddress?: String;
-  emitterCompanyContact?: String;
-  emitterCompanyPhone?: String;
-  emitterCompanyMail?: String;
-  recipientCap?: String;
-  recipientProcessingOperation?: String;
-  recipientCompanyName?: String;
-  recipientCompanySiret?: String;
-  recipientCompanyAddress?: String;
-  recipientCompanyContact?: String;
-  recipientCompanyPhone?: String;
-  recipientCompanyMail?: String;
-  transporterCompanyName?: String;
-  transporterCompanySiret?: String;
-  transporterCompanyAddress?: String;
-  transporterCompanyContact?: String;
-  transporterCompanyPhone?: String;
-  transporterCompanyMail?: String;
-  transporterReceipt?: String;
-  transporterDepartment?: String;
-  transporterValidityLimit?: DateTimeInput;
-  transporterNumberPlate?: String;
-  wasteDetailsCode?: String;
-  wasteDetailsName?: String;
-  wasteDetailsOnuCode?: String;
-  wasteDetailsPackagings?: Json;
-  wasteDetailsOtherPackaging?: String;
-  wasteDetailsNumberOfPackages?: Int;
-  wasteDetailsQuantity?: Float;
-  wasteDetailsQuantityType?: QuantityType;
-  wasteDetailsConsistence?: Consistence;
-  traderCompanyName?: String;
-  traderCompanySiret?: String;
-  traderCompanyAddress?: String;
-  traderCompanyContact?: String;
-  traderCompanyPhone?: String;
-  traderCompanyMail?: String;
-  traderReceipt?: String;
-  traderDepartment?: String;
-  traderValidityLimit?: DateTimeInput;
-}
-
-export interface CompanyUpsertNestedInput {
-  update: CompanyUpdateDataInput;
-  create: CompanyCreateInput;
-}
-
-export interface CompanyCreateOneInput {
-  create?: CompanyCreateInput;
-  connect?: CompanyWhereUniqueInput;
-}
-
-export interface UserActivationHashUpdateManyMutationInput {
-  hash?: String;
-}
-
-export type UserActivationHashWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-  hash?: String;
-}>;
-
-export interface UserActivationHashSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: UserActivationHashWhereInput;
-  AND?:
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput;
-  OR?:
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput;
-  NOT?:
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput;
-}
-
-export interface UserCreateInput {
-  isActive?: Boolean;
-  email: String;
-  password: String;
-  name?: String;
-  phone?: String;
-  company: CompanyCreateOneInput;
-  userType?: Json;
-}
-
-export interface FormSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: FormWhereInput;
-  AND?: FormSubscriptionWhereInput[] | FormSubscriptionWhereInput;
-  OR?: FormSubscriptionWhereInput[] | FormSubscriptionWhereInput;
-  NOT?: FormSubscriptionWhereInput[] | FormSubscriptionWhereInput;
-}
-
-export interface UserActivationHashWhereInput {
-  id?: ID_Input;
-  id_not?: ID_Input;
-  id_in?: ID_Input[] | ID_Input;
-  id_not_in?: ID_Input[] | ID_Input;
-  id_lt?: ID_Input;
-  id_lte?: ID_Input;
-  id_gt?: ID_Input;
-  id_gte?: ID_Input;
-  id_contains?: ID_Input;
-  id_not_contains?: ID_Input;
-  id_starts_with?: ID_Input;
-  id_not_starts_with?: ID_Input;
-  id_ends_with?: ID_Input;
-  id_not_ends_with?: ID_Input;
-  user?: UserWhereInput;
-  hash?: String;
-  hash_not?: String;
-  hash_in?: String[] | String;
-  hash_not_in?: String[] | String;
-  hash_lt?: String;
-  hash_lte?: String;
-  hash_gt?: String;
-  hash_gte?: String;
-  hash_contains?: String;
-  hash_not_contains?: String;
-  hash_starts_with?: String;
-  hash_not_starts_with?: String;
-  hash_ends_with?: String;
-  hash_not_ends_with?: String;
-  AND?: UserActivationHashWhereInput[] | UserActivationHashWhereInput;
-  OR?: UserActivationHashWhereInput[] | UserActivationHashWhereInput;
-  NOT?: UserActivationHashWhereInput[] | UserActivationHashWhereInput;
-}
-
-export interface CompanyUpdateOneRequiredInput {
-  create?: CompanyCreateInput;
-  update?: CompanyUpdateDataInput;
-  upsert?: CompanyUpsertNestedInput;
-  connect?: CompanyWhereUniqueInput;
+export interface CompanyCreateInput {
+  siret: String;
 }
 
 export interface UserSubscriptionWhereInput {
@@ -1449,24 +2170,20 @@ export interface UserSubscriptionWhereInput {
   NOT?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
 }
 
-export interface UserUpdateInput {
-  isActive?: Boolean;
-  email?: String;
-  password?: String;
-  name?: String;
-  phone?: String;
-  company?: CompanyUpdateOneRequiredInput;
-  userType?: Json;
-}
-
-export interface UserCreateOneInput {
-  create?: UserCreateInput;
-  connect?: UserWhereUniqueInput;
+export interface CompanyUpdateOneRequiredInput {
+  create?: CompanyCreateInput;
+  update?: CompanyUpdateDataInput;
+  upsert?: CompanyUpsertNestedInput;
+  connect?: CompanyWhereUniqueInput;
 }
 
 export interface UserActivationHashUpdateInput {
   user?: UserUpdateOneRequiredInput;
   hash?: String;
+}
+
+export interface CompanyUpdateManyMutationInput {
+  siret?: String;
 }
 
 export interface UserWhereInput {
@@ -1564,12 +2281,109 @@ export interface UserWhereInput {
   NOT?: UserWhereInput[] | UserWhereInput;
 }
 
-export interface CompanyCreateInput {
-  siret: String;
+export interface UserUpdateDataInput {
+  isActive?: Boolean;
+  email?: String;
+  password?: String;
+  name?: String;
+  phone?: String;
+  company?: CompanyUpdateOneRequiredInput;
+  userType?: Json;
 }
 
-export interface CompanyUpdateManyMutationInput {
-  siret?: String;
+export interface FormUpdateManyWithWhereNestedInput {
+  where: FormScalarWhereInput;
+  data: FormUpdateManyDataInput;
+}
+
+export interface UserUpdateOneRequiredInput {
+  create?: UserCreateInput;
+  update?: UserUpdateDataInput;
+  upsert?: UserUpsertNestedInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export type FormWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+  readableId?: String;
+}>;
+
+export interface CompanyCreateOneInput {
+  create?: CompanyCreateInput;
+  connect?: CompanyWhereUniqueInput;
+}
+
+export interface UserCreateInput {
+  isActive?: Boolean;
+  email: String;
+  password: String;
+  name?: String;
+  phone?: String;
+  company: CompanyCreateOneInput;
+  userType?: Json;
+}
+
+export interface FormUpdateInput {
+  readableId?: String;
+  isDeleted?: Boolean;
+  owner?: UserUpdateOneRequiredInput;
+  status?: String;
+  sentAt?: DateTimeInput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedBy?: String;
+  receivedAt?: DateTimeInput;
+  quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
+  processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
+  emitterType?: EmitterType;
+  emitterPickupSite?: String;
+  emitterCompanyName?: String;
+  emitterCompanySiret?: String;
+  emitterCompanyAddress?: String;
+  emitterCompanyContact?: String;
+  emitterCompanyPhone?: String;
+  emitterCompanyMail?: String;
+  recipientCap?: String;
+  recipientProcessingOperation?: String;
+  recipientCompanyName?: String;
+  recipientCompanySiret?: String;
+  recipientCompanyAddress?: String;
+  recipientCompanyContact?: String;
+  recipientCompanyPhone?: String;
+  recipientCompanyMail?: String;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeInput;
+  transporterNumberPlate?: String;
+  wasteDetailsCode?: String;
+  wasteDetailsName?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+  wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeInput;
+  appendix2Forms?: FormUpdateManyInput;
 }
 
 export interface FormCreateInput {
@@ -1632,10 +2446,7 @@ export interface FormCreateInput {
   traderReceipt?: String;
   traderDepartment?: String;
   traderValidityLimit?: DateTimeInput;
-}
-
-export interface CompanyUpdateDataInput {
-  siret?: String;
+  appendix2Forms?: FormCreateManyInput;
 }
 
 export interface CompanySubscriptionWhereInput {
@@ -1649,37 +2460,240 @@ export interface CompanySubscriptionWhereInput {
   NOT?: CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput;
 }
 
-export interface UserUpsertNestedInput {
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
+export interface CompanyWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  siret?: String;
+  siret_not?: String;
+  siret_in?: String[] | String;
+  siret_not_in?: String[] | String;
+  siret_lt?: String;
+  siret_lte?: String;
+  siret_gt?: String;
+  siret_gte?: String;
+  siret_contains?: String;
+  siret_not_contains?: String;
+  siret_starts_with?: String;
+  siret_not_starts_with?: String;
+  siret_ends_with?: String;
+  siret_not_ends_with?: String;
+  AND?: CompanyWhereInput[] | CompanyWhereInput;
+  OR?: CompanyWhereInput[] | CompanyWhereInput;
+  NOT?: CompanyWhereInput[] | CompanyWhereInput;
 }
 
-export type FormWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
+export interface FormUpdateManyMutationInput {
   readableId?: String;
-}>;
+  isDeleted?: Boolean;
+  status?: String;
+  sentAt?: DateTimeInput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  receivedBy?: String;
+  receivedAt?: DateTimeInput;
+  quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
+  processingOperationDone?: String;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
+  emitterType?: EmitterType;
+  emitterPickupSite?: String;
+  emitterCompanyName?: String;
+  emitterCompanySiret?: String;
+  emitterCompanyAddress?: String;
+  emitterCompanyContact?: String;
+  emitterCompanyPhone?: String;
+  emitterCompanyMail?: String;
+  recipientCap?: String;
+  recipientProcessingOperation?: String;
+  recipientCompanyName?: String;
+  recipientCompanySiret?: String;
+  recipientCompanyAddress?: String;
+  recipientCompanyContact?: String;
+  recipientCompanyPhone?: String;
+  recipientCompanyMail?: String;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeInput;
+  transporterNumberPlate?: String;
+  wasteDetailsCode?: String;
+  wasteDetailsName?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+  wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeInput;
+}
+
+export interface UserUpdateManyMutationInput {
+  isActive?: Boolean;
+  email?: String;
+  password?: String;
+  name?: String;
+  phone?: String;
+  userType?: Json;
+}
 
 export interface NodeNode {
   id: ID_Output;
 }
 
-export interface UserActivationHashEdge {
-  node: UserActivationHash;
+export interface UserActivationHashPreviousValues {
+  id: ID_Output;
+  hash: String;
+}
+
+export interface UserActivationHashPreviousValuesPromise
+  extends Promise<UserActivationHashPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  hash: () => Promise<String>;
+}
+
+export interface UserActivationHashPreviousValuesSubscription
+  extends Promise<AsyncIterator<UserActivationHashPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  hash: () => Promise<AsyncIterator<String>>;
+}
+
+export interface CompanyConnection {
+  pageInfo: PageInfo;
+  edges: CompanyEdge[];
+}
+
+export interface CompanyConnectionPromise
+  extends Promise<CompanyConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CompanyEdge>>() => T;
+  aggregate: <T = AggregateCompanyPromise>() => T;
+}
+
+export interface CompanyConnectionSubscription
+  extends Promise<AsyncIterator<CompanyConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<CompanyEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateCompanySubscription>() => T;
+}
+
+export interface CompanyEdge {
+  node: Company;
   cursor: String;
 }
 
-export interface UserActivationHashEdgePromise
-  extends Promise<UserActivationHashEdge>,
-    Fragmentable {
-  node: <T = UserActivationHashPromise>() => T;
+export interface CompanyEdgePromise extends Promise<CompanyEdge>, Fragmentable {
+  node: <T = CompanyPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface UserActivationHashEdgeSubscription
-  extends Promise<AsyncIterator<UserActivationHashEdge>>,
+export interface CompanyEdgeSubscription
+  extends Promise<AsyncIterator<CompanyEdge>>,
     Fragmentable {
-  node: <T = UserActivationHashSubscription>() => T;
+  node: <T = CompanySubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface PageInfo {
+  hasNextPage: Boolean;
+  hasPreviousPage: Boolean;
+  startCursor?: String;
+  endCursor?: String;
+}
+
+export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
+  hasNextPage: () => Promise<Boolean>;
+  hasPreviousPage: () => Promise<Boolean>;
+  startCursor: () => Promise<String>;
+  endCursor: () => Promise<String>;
+}
+
+export interface PageInfoSubscription
+  extends Promise<AsyncIterator<PageInfo>>,
+    Fragmentable {
+  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
+  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
+  startCursor: () => Promise<AsyncIterator<String>>;
+  endCursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateCompany {
+  count: Int;
+}
+
+export interface AggregateCompanyPromise
+  extends Promise<AggregateCompany>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateCompanySubscription
+  extends Promise<AsyncIterator<AggregateCompany>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface BatchPayload {
+  count: Long;
+}
+
+export interface BatchPayloadPromise
+  extends Promise<BatchPayload>,
+    Fragmentable {
+  count: () => Promise<Long>;
+}
+
+export interface BatchPayloadSubscription
+  extends Promise<AsyncIterator<BatchPayload>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Long>>;
+}
+
+export interface AggregateUserActivationHash {
+  count: Int;
+}
+
+export interface AggregateUserActivationHashPromise
+  extends Promise<AggregateUserActivationHash>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateUserActivationHashSubscription
+  extends Promise<AsyncIterator<AggregateUserActivationHash>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface Form {
@@ -1809,6 +2823,15 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   traderReceipt: () => Promise<String>;
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
+  appendix2Forms: <T = FragmentableArray<Form>>(args?: {
+    where?: FormWhereInput;
+    orderBy?: FormOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface FormSubscription
@@ -1876,113 +2899,15 @@ export interface FormSubscription
   traderReceipt: () => Promise<AsyncIterator<String>>;
   traderDepartment: () => Promise<AsyncIterator<String>>;
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface UserActivationHashPreviousValues {
-  id: ID_Output;
-  hash: String;
-}
-
-export interface UserActivationHashPreviousValuesPromise
-  extends Promise<UserActivationHashPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  hash: () => Promise<String>;
-}
-
-export interface UserActivationHashPreviousValuesSubscription
-  extends Promise<AsyncIterator<UserActivationHashPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  hash: () => Promise<AsyncIterator<String>>;
-}
-
-export interface AggregateCompany {
-  count: Int;
-}
-
-export interface AggregateCompanyPromise
-  extends Promise<AggregateCompany>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateCompanySubscription
-  extends Promise<AsyncIterator<AggregateCompany>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface AggregateUserActivationHash {
-  count: Int;
-}
-
-export interface AggregateUserActivationHashPromise
-  extends Promise<AggregateUserActivationHash>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserActivationHashSubscription
-  extends Promise<AsyncIterator<AggregateUserActivationHash>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface CompanyEdge {
-  node: Company;
-  cursor: String;
-}
-
-export interface CompanyEdgePromise extends Promise<CompanyEdge>, Fragmentable {
-  node: <T = CompanyPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface CompanyEdgeSubscription
-  extends Promise<AsyncIterator<CompanyEdge>>,
-    Fragmentable {
-  node: <T = CompanySubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface UserActivationHashConnection {
-  pageInfo: PageInfo;
-  edges: UserActivationHashEdge[];
-}
-
-export interface UserActivationHashConnectionPromise
-  extends Promise<UserActivationHashConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserActivationHashEdge>>() => T;
-  aggregate: <T = AggregateUserActivationHashPromise>() => T;
-}
-
-export interface UserActivationHashConnectionSubscription
-  extends Promise<AsyncIterator<UserActivationHashConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <
-    T = Promise<AsyncIterator<UserActivationHashEdgeSubscription>>
-  >() => T;
-  aggregate: <T = AggregateUserActivationHashSubscription>() => T;
-}
-
-export interface BatchPayload {
-  count: Long;
-}
-
-export interface BatchPayloadPromise
-  extends Promise<BatchPayload>,
-    Fragmentable {
-  count: () => Promise<Long>;
-}
-
-export interface BatchPayloadSubscription
-  extends Promise<AsyncIterator<BatchPayload>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Long>>;
+  appendix2Forms: <T = Promise<AsyncIterator<FormSubscription>>>(args?: {
+    where?: FormWhereInput;
+    orderBy?: FormOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface FormSubscriptionPayload {
@@ -2008,137 +2933,6 @@ export interface FormSubscriptionPayloadSubscription
   node: <T = FormSubscription>() => T;
   updatedFields: () => Promise<AsyncIterator<String[]>>;
   previousValues: <T = FormPreviousValuesSubscription>() => T;
-}
-
-export interface Company {
-  id: ID_Output;
-  siret: String;
-}
-
-export interface CompanyPromise extends Promise<Company>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  siret: () => Promise<String>;
-}
-
-export interface CompanySubscription
-  extends Promise<AsyncIterator<Company>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  siret: () => Promise<AsyncIterator<String>>;
-}
-
-export interface AggregateUser {
-  count: Int;
-}
-
-export interface AggregateUserPromise
-  extends Promise<AggregateUser>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserSubscription
-  extends Promise<AsyncIterator<AggregateUser>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface UserActivationHash {
-  id: ID_Output;
-  hash: String;
-}
-
-export interface UserActivationHashPromise
-  extends Promise<UserActivationHash>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  hash: () => Promise<String>;
-}
-
-export interface UserActivationHashSubscription
-  extends Promise<AsyncIterator<UserActivationHash>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  hash: () => Promise<AsyncIterator<String>>;
-}
-
-export interface AggregateForm {
-  count: Int;
-}
-
-export interface AggregateFormPromise
-  extends Promise<AggregateForm>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateFormSubscription
-  extends Promise<AsyncIterator<AggregateForm>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface UserEdge {
-  node: User;
-  cursor: String;
-}
-
-export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
-  node: <T = UserPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface UserEdgeSubscription
-  extends Promise<AsyncIterator<UserEdge>>,
-    Fragmentable {
-  node: <T = UserSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface FormConnection {
-  pageInfo: PageInfo;
-  edges: FormEdge[];
-}
-
-export interface FormConnectionPromise
-  extends Promise<FormConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<FormEdge>>() => T;
-  aggregate: <T = AggregateFormPromise>() => T;
-}
-
-export interface FormConnectionSubscription
-  extends Promise<AsyncIterator<FormConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateFormSubscription>() => T;
-}
-
-export interface PageInfo {
-  hasNextPage: Boolean;
-  hasPreviousPage: Boolean;
-  startCursor?: String;
-  endCursor?: String;
-}
-
-export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
-  hasNextPage: () => Promise<Boolean>;
-  hasPreviousPage: () => Promise<Boolean>;
-  startCursor: () => Promise<String>;
-  endCursor: () => Promise<String>;
-}
-
-export interface PageInfoSubscription
-  extends Promise<AsyncIterator<PageInfo>>,
-    Fragmentable {
-  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
-  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
-  startCursor: () => Promise<AsyncIterator<String>>;
-  endCursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface UserPreviousValues {
@@ -2181,44 +2975,167 @@ export interface UserPreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface User {
+export interface UserActivationHashConnection {
+  pageInfo: PageInfo;
+  edges: UserActivationHashEdge[];
+}
+
+export interface UserActivationHashConnectionPromise
+  extends Promise<UserActivationHashConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<UserActivationHashEdge>>() => T;
+  aggregate: <T = AggregateUserActivationHashPromise>() => T;
+}
+
+export interface UserActivationHashConnectionSubscription
+  extends Promise<AsyncIterator<UserActivationHashConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <
+    T = Promise<AsyncIterator<UserActivationHashEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateUserActivationHashSubscription>() => T;
+}
+
+export interface UserActivationHashEdge {
+  node: UserActivationHash;
+  cursor: String;
+}
+
+export interface UserActivationHashEdgePromise
+  extends Promise<UserActivationHashEdge>,
+    Fragmentable {
+  node: <T = UserActivationHashPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface UserActivationHashEdgeSubscription
+  extends Promise<AsyncIterator<UserActivationHashEdge>>,
+    Fragmentable {
+  node: <T = UserActivationHashSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateUser {
+  count: Int;
+}
+
+export interface AggregateUserPromise
+  extends Promise<AggregateUser>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateUserSubscription
+  extends Promise<AsyncIterator<AggregateUser>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface Company {
   id: ID_Output;
-  isActive?: Boolean;
-  email: String;
-  password: String;
-  name?: String;
-  phone?: String;
-  userType?: Json;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
+  siret: String;
 }
 
-export interface UserPromise extends Promise<User>, Fragmentable {
+export interface CompanyPromise extends Promise<Company>, Fragmentable {
   id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  company: <T = CompanyPromise>() => T;
-  userType: () => Promise<Json>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
+  siret: () => Promise<String>;
 }
 
-export interface UserSubscription
-  extends Promise<AsyncIterator<User>>,
+export interface CompanySubscription
+  extends Promise<AsyncIterator<Company>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  isActive: () => Promise<AsyncIterator<Boolean>>;
-  email: () => Promise<AsyncIterator<String>>;
-  password: () => Promise<AsyncIterator<String>>;
-  name: () => Promise<AsyncIterator<String>>;
-  phone: () => Promise<AsyncIterator<String>>;
-  company: <T = CompanySubscription>() => T;
-  userType: () => Promise<AsyncIterator<Json>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  siret: () => Promise<AsyncIterator<String>>;
+}
+
+export interface UserConnection {
+  pageInfo: PageInfo;
+  edges: UserEdge[];
+}
+
+export interface UserConnectionPromise
+  extends Promise<UserConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<UserEdge>>() => T;
+  aggregate: <T = AggregateUserPromise>() => T;
+}
+
+export interface UserConnectionSubscription
+  extends Promise<AsyncIterator<UserConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateUserSubscription>() => T;
+}
+
+export interface UserSubscriptionPayload {
+  mutation: MutationType;
+  node: User;
+  updatedFields: String[];
+  previousValues: UserPreviousValues;
+}
+
+export interface UserSubscriptionPayloadPromise
+  extends Promise<UserSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = UserPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserPreviousValuesPromise>() => T;
+}
+
+export interface UserSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserPreviousValuesSubscription>() => T;
+}
+
+export interface FormEdge {
+  node: Form;
+  cursor: String;
+}
+
+export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
+  node: <T = FormPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface FormEdgeSubscription
+  extends Promise<AsyncIterator<FormEdge>>,
+    Fragmentable {
+  node: <T = FormSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface UserActivationHashSubscriptionPayload {
+  mutation: MutationType;
+  node: UserActivationHash;
+  updatedFields: String[];
+  previousValues: UserActivationHashPreviousValues;
+}
+
+export interface UserActivationHashSubscriptionPayloadPromise
+  extends Promise<UserActivationHashSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = UserActivationHashPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
+}
+
+export interface UserActivationHashSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserActivationHashSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
 }
 
 export interface FormPreviousValues {
@@ -2461,121 +3378,120 @@ export interface CompanySubscriptionPayloadSubscription
   previousValues: <T = CompanyPreviousValuesSubscription>() => T;
 }
 
-export interface CompanyConnection {
-  pageInfo: PageInfo;
-  edges: CompanyEdge[];
+export interface User {
+  id: ID_Output;
+  isActive?: Boolean;
+  email: String;
+  password: String;
+  name?: String;
+  phone?: String;
+  userType?: Json;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
 }
 
-export interface CompanyConnectionPromise
-  extends Promise<CompanyConnection>,
+export interface UserPromise extends Promise<User>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
+  company: <T = CompanyPromise>() => T;
+  userType: () => Promise<Json>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserSubscription
+  extends Promise<AsyncIterator<User>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  isActive: () => Promise<AsyncIterator<Boolean>>;
+  email: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  phone: () => Promise<AsyncIterator<String>>;
+  company: <T = CompanySubscription>() => T;
+  userType: () => Promise<AsyncIterator<Json>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserActivationHash {
+  id: ID_Output;
+  hash: String;
+}
+
+export interface UserActivationHashPromise
+  extends Promise<UserActivationHash>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  hash: () => Promise<String>;
+}
+
+export interface UserActivationHashSubscription
+  extends Promise<AsyncIterator<UserActivationHash>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
+  hash: () => Promise<AsyncIterator<String>>;
+}
+
+export interface FormConnection {
+  pageInfo: PageInfo;
+  edges: FormEdge[];
+}
+
+export interface FormConnectionPromise
+  extends Promise<FormConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CompanyEdge>>() => T;
-  aggregate: <T = AggregateCompanyPromise>() => T;
+  edges: <T = FragmentableArray<FormEdge>>() => T;
+  aggregate: <T = AggregateFormPromise>() => T;
 }
 
-export interface CompanyConnectionSubscription
-  extends Promise<AsyncIterator<CompanyConnection>>,
+export interface FormConnectionSubscription
+  extends Promise<AsyncIterator<FormConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<CompanyEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateCompanySubscription>() => T;
+  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateFormSubscription>() => T;
 }
 
-export interface UserConnection {
-  pageInfo: PageInfo;
-  edges: UserEdge[];
+export interface AggregateForm {
+  count: Int;
 }
 
-export interface UserConnectionPromise
-  extends Promise<UserConnection>,
+export interface AggregateFormPromise
+  extends Promise<AggregateForm>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserEdge>>() => T;
-  aggregate: <T = AggregateUserPromise>() => T;
+  count: () => Promise<Int>;
 }
 
-export interface UserConnectionSubscription
-  extends Promise<AsyncIterator<UserConnection>>,
+export interface AggregateFormSubscription
+  extends Promise<AsyncIterator<AggregateForm>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateUserSubscription>() => T;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface UserSubscriptionPayload {
-  mutation: MutationType;
+export interface UserEdge {
   node: User;
-  updatedFields: String[];
-  previousValues: UserPreviousValues;
-}
-
-export interface UserSubscriptionPayloadPromise
-  extends Promise<UserSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserPreviousValuesPromise>() => T;
-}
-
-export interface UserSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserPreviousValuesSubscription>() => T;
-}
-
-export interface UserActivationHashSubscriptionPayload {
-  mutation: MutationType;
-  node: UserActivationHash;
-  updatedFields: String[];
-  previousValues: UserActivationHashPreviousValues;
-}
-
-export interface UserActivationHashSubscriptionPayloadPromise
-  extends Promise<UserActivationHashSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserActivationHashPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
-}
-
-export interface UserActivationHashSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserActivationHashSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
-}
-
-export interface FormEdge {
-  node: Form;
   cursor: String;
 }
 
-export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
-  node: <T = FormPromise>() => T;
+export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
+  node: <T = UserPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface FormEdgeSubscription
-  extends Promise<AsyncIterator<FormEdge>>,
+export interface UserEdgeSubscription
+  extends Promise<AsyncIterator<UserEdge>>,
     Fragmentable {
-  node: <T = FormSubscription>() => T;
+  node: <T = UserSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
-
-/*
-The `Boolean` scalar type represents `true` or `false`.
-*/
-export type Boolean = boolean;
-
-export type Long = string;
 
 /*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point). 
@@ -2583,9 +3499,22 @@ The `Float` scalar type represents signed double-precision fractional values as 
 export type Float = number;
 
 /*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+The `Boolean` scalar type represents `true` or `false`.
 */
-export type String = string;
+export type Boolean = boolean;
+
+/*
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
+*/
+export type Int = number;
+
+export type Long = string;
+
+/*
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+*/
+export type ID_Input = string | number;
+export type ID_Output = string;
 
 /*
 DateTime scalar input type, allowing Date
@@ -2597,18 +3526,12 @@ DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
 
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string;
+
 export type Json = any;
-
-/*
-The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
-*/
-export type ID_Input = string | number;
-export type ID_Output = string;
-
-/*
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
-*/
-export type Int = number;
 
 /**
  * Model Metadata

@@ -4,6 +4,7 @@ type Query {
   form(id: ID): Form
   forms: [Form]
   stats: [Stat]
+  appendixForms(wasteCode: String!): [Form]
 }
 
 type Mutation {
@@ -34,6 +35,8 @@ enum FormStatus {
   SENT
   RECEIVED
   PROCESSED
+  AWAITING_GROUP
+  GROUPED
 }
 
 type Form {
@@ -65,6 +68,8 @@ type Form {
   processedAt: DateTime
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+
+  appendix2Forms: [Form]
 }
 
 type FormCompany {
@@ -79,6 +84,8 @@ type FormCompany {
 enum EmitterType {
   PRODUCER
   OTHER
+  APPENDIX1
+  APPENDIX2
 }
 
 type Emitter {
