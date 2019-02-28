@@ -27,7 +27,7 @@ services:
       - postgres:/var/lib/postgresql/data
 
   td-api:
-     image: td-api
+    image: td-api
     build:
       context: ./back
       dockerfile: Dockerfile

@@ -121,15 +121,15 @@ workflows:
   validation:
     jobs:
       - deploy-validation:
-        filters:
-          branches:
-            only: dev
+          filters:
+            branches:
+              only: dev
   build_deploy:
     jobs:
       - check-docker:
-        filters:
-          branches:
-            only: master
+          filters:
+            branches:
+              only: master
       - build-ui:
           requires:
             - check-docker
