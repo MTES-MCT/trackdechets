@@ -91,30 +91,16 @@ jobs:
             docker push betagouv/trackdechets-mail:latest
           fi
 
-  deploy-validation:
+  deploy:
     machine:
       enabled: true
     working_directory: ~/project/trackdechets
     steps:
       - checkout
       - run:
-          name: Deploy to validation over SSH
-          command: |
-            scp docker-compose.yml $SSH_USER@$SSH_HOST_BU:/srv/trackdechets/
-            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-api:latest"
-            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-ui:latest"
-            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-pdf:latest"
-            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-insee:latest"
-            ssh $SSH_USER@$SSH_HOST_BU "docker pull betagouv/trackdechets-mail:latest"
-            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/ ; docker-compose up -d"
-
-  deploy:
-    machine:
-      enabled: true
-    steps:
-      - run:
           name: Deploy Over SSH
           command: |
+            scp docker-compose.yml $SSH_USER@$SSH_HOST:/srv/trackdechets/
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-api:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-ui:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-pdf:latest"
@@ -122,10 +108,28 @@ jobs:
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-mail:latest"
             ssh $SSH_USER@$SSH_HOST "cd /srv/trackdechets/ ; docker-compose up -d"
 
+  deploy-validation:
+    machine:
+      enabled: true
+    steps:
+      - run:
+          name: Deploy to validation over SSH
+          command: |
+            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/ ; git pull ; docker-compose -f docker-compose.val.yml build ; docker-compose -f docker-compose.val.yml up -d"
+
 workflows:
+  validation:
+    jobs:
+      - deploy-validation:
+        filters:
+          branches:
+            only: dev
   build_deploy:
     jobs:
-      - check-docker
+      - check-docker:
+        filters:
+          branches:
+            only: master
       - build-ui:
           requires:
             - check-docker
@@ -141,21 +145,13 @@ workflows:
       - build-mail:
           requires:
             - check-docker
-      - deploy-validation:
+      - deploy:
           requires:
             - build-api
             - build-ui
             - build-insee
             - build-pdf
             - build-mail
-          filters:
-            branches:
-              only:
-                - dev
-                - master
-      - deploy:
-          requires:
-            - deploy-validation
           filters:
             branches:
               only: master
