@@ -55,6 +55,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
             passwordConfirmation: "",
             siret: "",
             userType: [],
+            gerepId: "",
             isAllowed: false,
             cgu: false
           }}
@@ -188,6 +189,13 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     <label>
                       Vous êtes*
                       <Field name="userType" component={UserType} />
+                    </label>
+                  </div>
+
+                  <div className="form__group">
+                    <label>
+                      Identificant GEREP (si concerné)
+                      <Field type="text" name="gerepId" />
                     </label>
                   </div>
 

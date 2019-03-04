@@ -10,6 +10,7 @@ input SignupInput {
   phone: String
   siret: String!
   userType: [UserType]
+  gerepId: String
 }
 
 type Mutation {
@@ -37,4 +38,6 @@ type User {
   phone: String
   company: Company
   userType: [UserType]
+
+  gerepId: String
 }

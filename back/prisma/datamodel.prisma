@@ -8,6 +8,8 @@ type User {
   company: Company!
   userType: Json
 
+  gerepId: String
+
   createdAt: DateTime!
   updatedAt: DateTime!
 }
