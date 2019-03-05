@@ -24,7 +24,7 @@ export default function({
         <WasteTree onSelect={keys => setSelectedKeys(keys)} />
         <div>
           <p>
-            Vous aller sélectionner le(s) code(s): {selectedKeys.join(", ")}
+            Vous allez sélectionner le(s) code(s): {selectedKeys.join(", ")}
           </p>
           <button
             className="button secondary"
