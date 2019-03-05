@@ -10,8 +10,13 @@ type APIResponse struct {
 	Etablissement Etablissement `json:"etablissement"`
 }
 
+type APIMultiResponse struct {
+	Etablissements []Etablissement `json:"etablissements"`
+}
+
 // Etablissement Etablissement lié au SIRET
 type Etablissement struct {
+	Siret                string               `json:"siret"`
 	Siren                string               `json:"siren"`
 	UniteLegale          UniteLegale          `json:"uniteLegale"`
 	AdresseEtablissement AdresseEtablissement `json:"adresseEtablissement"`

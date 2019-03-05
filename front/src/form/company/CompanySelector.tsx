@@ -1,11 +1,12 @@
-import ApolloClient from "apollo-client";
 import { connect, Field, FieldProps } from "formik";
 import React, { useEffect, useState } from "react";
-import { ApolloConsumer, Query } from "react-apollo";
+import { Query } from "react-apollo";
 import { FaSearch, FaCheck, FaRegCircle } from "react-icons/fa";
 import "./CompanySelector.scss";
-import { COMPANY_INFOS, FAVORITES } from "./query";
+import { FAVORITES, SEARCH_COMPANIES } from "./query";
 import RedErrorMessage from "../RedErrorMessage";
+import useDebounce from "../../utils/use-debounce";
+import client from "../../graphql-client";
 
 export type Company = {
   siret: string;
@@ -17,29 +18,38 @@ export type Company = {
 };
 
 export default connect<FieldProps>(function CompanySelector(props) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [searchResults, setSearchResults] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [selectedCompany, setSelectedCompany] = useState<Company>(props.field
     .value as Company);
 
-  const searchCompanies = async (
-    client: ApolloClient<Company>,
-    clue: string
-  ) => {
-    if (clue.length < 14) {
+  useEffect(() => {
+    if (!debouncedSearchTerm) {
+      return;
+    }
+    searchCompanies(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
+
+  const searchCompanies = async (clue: string) => {
+    const isNumber = /^[0-9\s]+$/.test(clue);
+    if (isNumber && clue.length < 14) {
       return;
     }
 
     setIsLoading(true);
-    const { data } = await client.query<{ companyInfos: Company }>({
-      query: COMPANY_INFOS,
-      variables: { siret: clue }
+    const { data } = await client.query<{ searchCompanies: Company[] }>({
+      query: SEARCH_COMPANIES,
+      variables: { clue }
     });
 
-    if (data.companyInfos) {
-      setSearchResults([data.companyInfos]);
-      setSelectedCompany(data.companyInfos);
+    if (data.searchCompanies) {
+      setSearchResults(data.searchCompanies);
+      if (data.searchCompanies.length === 1) {
+        setSelectedCompany(data.searchCompanies[0]);
+      }
     }
     setIsLoading(false);
   };
@@ -75,20 +85,16 @@ export default connect<FieldProps>(function CompanySelector(props) {
 
         return (
           <div className="CompanySelector">
-            <ApolloConsumer>
-              {client => (
-                <div className="search__group">
-                  <input
-                    type="text"
-                    placeholder="Recherche par numéro de SIRET"
-                    onChange={e => searchCompanies(client, e.target.value)}
-                  />
-                  <button className="overlay-button" aria-label="Recherche">
-                    <FaSearch />
-                  </button>
-                </div>
-              )}
-            </ApolloConsumer>
+            <div className="search__group">
+              <input
+                type="text"
+                placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+              <button className="overlay-button" aria-label="Recherche">
+                <FaSearch />
+              </button>
+            </div>
 
             {isLoading && <span>Chargement...</span>}
             <ul className="company-bookmarks">

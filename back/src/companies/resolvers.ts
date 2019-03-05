@@ -10,7 +10,7 @@ function memoizeRequest(siret) {
 
   return requests[siret]
     .then(v => v.data)
-    .catch(err => console.error("Error while querying INSEE servie", err));
+    .catch(err => console.error("Error while querying INSEE service", err));
 }
 
 type Company = {
@@ -39,6 +39,25 @@ export default {
       }
 
       return await memoizeRequest(siret);
+    },
+    searchCompanies: async (parent, { clue }) => {
+      const isNumber = /^[0-9\s]+$/.test(clue);
+
+      if (!isNumber) {
+        const response: any = await axios
+          .get<Company>(`http://td-insee:81/search/${clue}`)
+          .catch(err =>
+            console.error("Error while querying INSEE service", err)
+          );
+
+        return response.data;
+      }
+
+      if (clue.length < 14) {
+        return;
+      }
+
+      return [await memoizeRequest(clue)];
     },
     favorites: async (parent, { type }, context: Context) => {
       const lowerType = type.toLowerCase();

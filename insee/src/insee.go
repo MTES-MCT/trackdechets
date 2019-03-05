@@ -26,6 +26,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/ping", Ping).Methods("GET")
 	router.HandleFunc("/siret/{siret}", Siret).Methods("GET")
+	router.HandleFunc("/search/{clue}", Search).Methods("GET")
 	log.Fatal(http.ListenAndServe(":81", router))
 }
 
@@ -56,12 +57,51 @@ func Siret(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	responseData := queryAPI("/" + strippedSiret)
+
+	var fullResponseObject APIResponse
+	json.Unmarshal(responseData, &fullResponseObject)
+
+	jsonReponse, err := json.Marshal(etablissementToResponse(fullResponseObject.Etablissement))
+
+	check(err)
+	w.Write(jsonReponse)
+}
+
+// Search Query INSEE by company name
+func Search(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if r := recover(); r != nil {
+			http.Error(w, "Error, cannot reach INSEE.", http.StatusInternalServerError)
+		}
+	}()
+
+	vars := mux.Vars(r)
+	clue := vars["clue"]
+
+	w.Header().Set("Content-Type", "application/json")
+	res := queryAPI(`?q=denominationUniteLegale:` + clue + `&nombre=5`)
+
+	var fullResponseObject APIMultiResponse
+	json.Unmarshal(res, &fullResponseObject)
+
+	var responses []Response
+	for _, item := range fullResponseObject.Etablissements {
+		responses = append(responses, etablissementToResponse(item))
+	}
+	jsonReponse, err := json.Marshal(responses)
+
+	check(err)
+	w.Write(jsonReponse)
+}
+
+func queryAPI(uri string) []byte {
 	// Ingnore certificate check (cf `curl -k`)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", "https://api.insee.fr/entreprises/sirene/V3/siret/"+strippedSiret, nil)
+	req, err := http.NewRequest("GET", "https://api.insee.fr/entreprises/sirene/V3/siret"+uri, nil)
 
 	req.Header.Add("Accept", `application/json`)
 	req.Header.Add("Authorization", `Bearer `+readToken())
@@ -76,18 +116,16 @@ func Siret(w http.ResponseWriter, r *http.Request) {
 	responseData, err := ioutil.ReadAll(resp.Body)
 	check(err)
 
-	var fullResponseObject APIResponse
-	json.Unmarshal(responseData, &fullResponseObject)
+	return responseData
+}
 
-	jsonReponse, err := json.Marshal(Response{strippedSiret,
-		fullResponseObject.Etablissement.Siren,
-		fullResponseObject.Etablissement.UniteLegale.DenominationUniteLegale,
-		fullResponseObject.Etablissement.AdresseEtablissement.NumeroVoieEtablissement + " " +
-			fullResponseObject.Etablissement.AdresseEtablissement.TypeVoieEtablissement + " " +
-			fullResponseObject.Etablissement.AdresseEtablissement.LibelleVoieEtablissement + ", " +
-			fullResponseObject.Etablissement.AdresseEtablissement.CodePostalEtablissement + " " +
-			fullResponseObject.Etablissement.AdresseEtablissement.LibelleCommuneEtablissement})
-
-	check(err)
-	w.Write(jsonReponse)
+func etablissementToResponse(item Etablissement) Response {
+	return Response{item.Siret,
+		item.Siren,
+		item.UniteLegale.DenominationUniteLegale,
+		item.AdresseEtablissement.NumeroVoieEtablissement + " " +
+			item.AdresseEtablissement.TypeVoieEtablissement + " " +
+			item.AdresseEtablissement.LibelleVoieEtablissement + ", " +
+			item.AdresseEtablissement.CodePostalEtablissement + " " +
+			item.AdresseEtablissement.LibelleCommuneEtablissement}
 }
