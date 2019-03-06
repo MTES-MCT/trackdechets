@@ -26,6 +26,8 @@ function getEmitterNextStep(form: Form) {
   }
 }
 
+const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
+
 function getRecipientNextStep(form: Form) {
   switch (form.status) {
     case "DRAFT":
@@ -33,7 +35,7 @@ function getRecipientNextStep(form: Form) {
     case "SENT":
       return "RECEIVED";
     case "RECEIVED":
-      if (["D 13", "D 14", "D 15", "R 13"].indexOf(form.processingOperationDone) > -1) {
+      if (GROUP_CODES.indexOf(form.processingOperationDone) > -1) {
         return "AWAITING_GROUP";
       }
       return "PROCESSED";

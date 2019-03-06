@@ -4,7 +4,6 @@ import DateInput from "../../../form/custom-inputs/DateInput";
 import { SlipActionProps } from "../SlipActions";
 import { Operations } from "../../../form/processing-operation/ProcessingOperation";
 import { DateTime } from "luxon";
-import { FaDivide } from "react-icons/fa";
 
 export default function Processed(props: SlipActionProps) {
   return (

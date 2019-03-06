@@ -175,7 +175,11 @@ export default {
       markForm(id, sentInfo, context),
     markAsReceived: async (parent, { id, receivedInfo }, context: Context) =>
       markForm(id, receivedInfo, context),
-    markAsProcessed: async (parent, { id, processedInfo }, context: Context) => {
+    markAsProcessed: async (
+      parent,
+      { id, processedInfo },
+      context: Context
+    ) => {
       const form = await context.prisma.form({ id });
 
       const userId = getUserId(context);
@@ -191,7 +195,10 @@ export default {
 
       return context.prisma.updateForm({
         where: { id },
-        data: { status: getNextStep(form, userCompany.siret), ...processedInfo }
+        data: {
+          status: getNextStep({ ...form, ...processedInfo }, userCompany.siret),
+          ...processedInfo
+        }
       });
     }
   },
