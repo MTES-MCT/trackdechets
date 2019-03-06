@@ -33,7 +33,7 @@ export const formSchema = object().shape({
       "Le département du transporteur est obligatoire"
     ),
     validityLimit: date(),
-    numberPlate: string(),
+    numberPlate: string().nullable(true),
     company: companySchema
   }),
   wasteDetails: object().shape({
