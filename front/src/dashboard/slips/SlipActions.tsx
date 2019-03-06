@@ -35,6 +35,8 @@ export default function SlipActions({ form, currentUser }: IProps) {
   const [isOpen, setIsOpen] = useState(false);
   const nextStep = getNextStep(form, currentUser);
 
+  const ButtonComponent = nextStep ? buttons[nextStep].component : null;
+
   return (
     <div className="SlipActions">
       {form.status === "DRAFT" ? (
@@ -69,12 +71,15 @@ export default function SlipActions({ form, currentUser }: IProps) {
               >
                 <div className="modal">
                   <h2>{buttons[nextStep].title}</h2>
-                  {buttons[nextStep].component({
-                    onCancel: () => setIsOpen(false),
-                    onSubmit: vars =>
-                      mark({ variables: { id: form.id, ...vars } }),
-                    form
-                  })}
+                  {ButtonComponent && (
+                    <ButtonComponent
+                      onCancel={() => setIsOpen(false)}
+                      onSubmit={vars =>
+                        mark({ variables: { id: form.id, ...vars } })
+                      }
+                      form={form}
+                    />
+                  )}
                   {error && (
                     <div
                       className="notification error"
