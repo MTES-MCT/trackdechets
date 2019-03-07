@@ -7,7 +7,9 @@ export function formsSubscriptionCallback(payload: FormSubscriptionPayload) {
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
-  const previousRecipientSiret = payload.previousValues.recipientCompanySiret;
+  const previousRecipientSiret = payload.previousValues
+    ? payload.previousValues.recipientCompanySiret
+    : null;
   const recipientSiret = payload.node.recipientCompanySiret;
   const recipientMail = payload.node.recipientCompanyMail;
   const recipientName =
