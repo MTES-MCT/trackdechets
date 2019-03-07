@@ -7,6 +7,10 @@ export function formsSubscriptionCallback(payload: FormSubscriptionPayload) {
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
+  if (payload.mutation === "DELETED") {
+    return;
+  }
+
   const previousRecipientSiret = payload.previousValues
     ? payload.previousValues.recipientCompanySiret
     : null;
@@ -24,7 +28,6 @@ async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
   }
 
   const companyExists = await prisma.$exists.company({ siret: recipientSiret });
-
   if (companyExists) {
     return;
   }
