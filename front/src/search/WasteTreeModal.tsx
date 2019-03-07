@@ -21,7 +21,9 @@ export default function({
       style={{ display: open ? "flex" : "none" }}
     >
       <div className="modal modal-large">
-        <WasteTree onSelect={keys => setSelectedKeys(keys)} />
+        <div className="tree">
+          <WasteTree onSelect={keys => setSelectedKeys(keys)} />
+        </div>
         <div>
           <p>
             Vous allez sélectionner le(s) code(s): {selectedKeys.join(", ")}
