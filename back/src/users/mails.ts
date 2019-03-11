@@ -17,7 +17,7 @@ export const userMails = {
   contentAwaitsGuest: (toEmail, toName) => ({
     toEmail,
     toName,
-    subject: "",
+    subject: "Un bordereau vous attend sur Trackdéchets",
     title: "Un bordereau vous attend sur Trackdéchets",
     body: `Bonjour ${toName},
     <br>
