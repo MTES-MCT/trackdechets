@@ -123,6 +123,11 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     ? (errors.name = "Le nom et prénom sont obligatoires")
                     : null;
 
+                  !values.password
+                    ? (errors.password =
+                        "Le mot de passe ne peut pas être vide")
+                    : null;
+
                   return errors;
                 }}
               >
