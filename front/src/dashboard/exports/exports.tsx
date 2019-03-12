@@ -48,7 +48,7 @@ export default function Exports({ me }: IProps) {
                     <td>{s.wasteCode}</td>
                     <td>{s.incoming}</td>
                     <td>{s.outgoing}</td>
-                    <td>{s.incoming - s.outgoing}</td>
+                    <td>{Math.round((s.incoming - s.outgoing) * 100) / 100}</td>
                   </tr>
                 ))}
               </tbody>
