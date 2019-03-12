@@ -72,12 +72,14 @@ export default {
           outgoing: 0
         };
         cur.recipientCompanySiret === userCompany.siret
-          ? (prev[cur.wasteDetailsCode].incoming = (
-              prev[cur.wasteDetailsCode].incoming + cur.quantityReceived
-            ).toFixed(2))
-          : (prev[cur.wasteDetailsCode].outgoing = (
-              prev[cur.wasteDetailsCode].outgoing + cur.quantityReceived
-            ).toFixed(2));
+          ? (prev[cur.wasteDetailsCode].incoming += cur.quantityReceived)
+          : (prev[cur.wasteDetailsCode].outgoing += cur.quantityReceived);
+
+        prev[cur.wasteDetailsCode].incoming =
+          Math.round(prev[cur.wasteDetailsCode].incoming * 100) / 100;
+        prev[cur.wasteDetailsCode].outgoing =
+          Math.round(prev[cur.wasteDetailsCode].outgoing * 100) / 100;
+
         return prev;
       }, {});
 
