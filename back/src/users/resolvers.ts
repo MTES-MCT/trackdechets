@@ -72,7 +72,7 @@ export default {
       };
     },
     login: async (parent, { email, password }, context: Context) => {
-      const user = await context.prisma.user({ email });
+      const user = await context.prisma.user({ email: email.trim() });
       if (!user) {
         throw new Error(`Aucun utilisateur trouvé avec l'email ${email}`);
       }
@@ -143,5 +143,8 @@ export default {
     company: async (parent, args, context: Context) => {
       return await context.prisma.user({ id: parent.id }).company();
     }
+    // companies: async (parent, args, context: Context) => {
+    //   return await context.prisma.user({ id: parent.id }).();
+    // },
   }
 };
