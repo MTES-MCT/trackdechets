@@ -10,7 +10,7 @@ import FormsSelector from "./appendix/FormsSelector";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
-  emitter: { type: string };
+  emitter: { company: { siret: string }; type: string };
 };
 export default connect<{}, Values>(function WasteInfo(props) {
   const values = props.formik.values;
@@ -48,6 +48,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
       {values.emitter.type === "APPENDIX2" && (
         <FormsSelector
+          emiterSiret={values.emitter.company.siret}
           wasteCode={values.wasteDetails.code}
           name="appendix2Forms"
         />

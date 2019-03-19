@@ -7,8 +7,8 @@ import { DateTime } from "luxon";
 import { connect, getIn, setIn, Formik } from "formik";
 
 const GET_APPENDIX_FORMS = gql`
-  query AppendixForms($wasteCode: String!) {
-    appendixForms(wasteCode: $wasteCode) {
+  query AppendixForms($emittersiret: String!, $wasteCode: String!) {
+    appendixForms(emitterSiret: $emitterSiret, wasteCode: $wasteCode) {
       readableId
       emitter {
         company {
@@ -21,7 +21,7 @@ const GET_APPENDIX_FORMS = gql`
     }
   }
 `;
-type Props = { wasteCode: string; name: string };
+type Props = { emiterSiret: string; wasteCode: string; name: string };
 
 export default connect<Props>(function FormsSelector(props) {
   if (wasteCodeValidator(props.wasteCode) != null) {
