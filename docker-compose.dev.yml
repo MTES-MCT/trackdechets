@@ -82,3 +82,8 @@ services:
 
 volumes:
   postgres:
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
