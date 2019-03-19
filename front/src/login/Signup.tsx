@@ -228,7 +228,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Identificant GEREP (si concerné)
+                    Identifiant GEREP (si concerné)
                     <Field type="text" name="gerepId" />
                   </label>
                 </div>
