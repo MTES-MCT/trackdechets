@@ -5,6 +5,8 @@ type Company {
   contact: String
   phone: String
   mail: String
+
+  admin: PublicUser
 }
 
 type Query {

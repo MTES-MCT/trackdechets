@@ -30,6 +30,7 @@ input FormInput {
 }
 
 input AppendixFormInput {
+  emitterSiret: String
   readableId: ID
 }
 

@@ -5,8 +5,10 @@ type User {
   password: String!
   name: String
   phone: String
-  company: Company!
+  # company: Company!
   userType: Json
+
+  companies: [Company]
 
   gerepId: String
 

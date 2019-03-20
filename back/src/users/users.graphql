@@ -36,8 +36,14 @@ type User {
   email: String!
   name: String
   phone: String
-  company: Company
   userType: [UserType]
 
+  companies: [Company]
+
   gerepId: String
+}
+
+type PublicUser {
+  id: ID!
+  name: String
 }

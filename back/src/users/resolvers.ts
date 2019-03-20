@@ -37,7 +37,7 @@ export default {
           password: hashedPassword,
           phone: payload.phone,
           userType: payload.userType,
-          company: {
+          companies: {
             create: { siret: trimedSiret }
           }
         })
@@ -140,8 +140,8 @@ export default {
     }
   },
   User: {
-    company: async (parent, args, context: Context) => {
-      return await context.prisma.user({ id: parent.id }).company();
+    companies: async (parent, args, context: Context) => {
+      return await context.prisma.user({ id: parent.id }).companies();
     }
   }
 };

@@ -62,14 +62,21 @@ export default {
     favorites: async (parent, { type }, context: Context) => {
       const lowerType = type.toLowerCase();
       const userId = getUserId(context);
-      const userCompany = await context.prisma.user({ id: userId }).company();
+      const userCompanies = await context.prisma
+        .user({ id: userId })
+        .companies();
+      if (!userCompanies.length) {
+        throw new Error(
+          `Vous n'appartenez à aucune entreprise, vous n'avez pas de favori.`
+        );
+      }
 
       const forms = await context.prisma.forms({
         where: {
           OR: [
             { owner: { id: userId } },
-            { recipientCompanySiret: userCompany.siret },
-            { emitterCompanySiret: userCompany.siret }
+            { recipientCompanySiret: userCompanies[0].siret },
+            { emitterCompanySiret: userCompanies[0].siret }
           ],
           isDeleted: false
         }
@@ -78,7 +85,7 @@ export default {
       const formsWithValue = forms.filter(f => f[`${lowerType}CompanySiret`]);
 
       if (!formsWithValue.length) {
-        return [memoizeRequest(userCompany.siret)];
+        return [memoizeRequest(userCompanies[0].siret)];
       }
 
       return formsWithValue
