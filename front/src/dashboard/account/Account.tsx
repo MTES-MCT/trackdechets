@@ -6,6 +6,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { localAuthService } from "../../login/auth.service";
 import { Me } from "../../login/model";
 import EditProfile from "./EditProfile";
+import ImportNewUser from "./InviteNewUser";
 
 interface IProps {
   me: Me;
@@ -61,13 +62,16 @@ export default withRouter(function Account({
 
         <h4>Entreprise(s) associée(s):</h4>
         {me.companies.map(c => (
-          <address key={c.siret}>
-            {c.name}
-            <br />
-            Numéro SIRET: {c.siret}
-            <br />
-            {c.address}
-          </address>
+          <React.Fragment key={c.siret}>
+            <address>
+              {c.name}
+              <br />
+              Numéro SIRET: {c.siret}
+              <br />
+              {c.address}
+            </address>
+            {c.admin.id === me.id && <ImportNewUser siret="c.siret" />}
+          </React.Fragment>
         ))}
 
         <h4>Intégration API</h4>

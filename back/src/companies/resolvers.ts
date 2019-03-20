@@ -30,6 +30,12 @@ export default {
     name: async parent => {
       const company = await memoizeRequest(parent.siret);
       return company.name;
+    },
+    admin: async (parent, _, context: Context) => {
+      return context.prisma
+        .company({ siret: parent.siret })
+        .admin()
+        .catch(_ => null);
     }
   },
   Query: {

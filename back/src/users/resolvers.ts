@@ -138,6 +138,18 @@ export default {
         );
       }
 
+      const existingUser = await context.prisma
+        .user({ email })
+        .catch(_ => null);
+
+      if (existingUser) {
+        await context.prisma.updateUser({
+          data: { companies: { connect: { siret } } },
+          where: { email }
+        });
+        return true;
+      }
+
       const userAccoutHash = await hash(
         new Date().valueOf().toString() + Math.random().toString(),
         10
