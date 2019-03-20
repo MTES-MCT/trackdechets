@@ -29,5 +29,19 @@ export const userMails = {
     <br>
     Vous pouvez créer votre compte en cliquant <a href="https://trackdechets.beta.gouv.fr/signup">sur ce lien</a> et en suivant la procédure d'inscription. Vous pourrez alors commencer à utiliser Trackdéchets.
   `
+  }),
+  inviteUserToJoin: (toEmail, companyAdmin, companyName, hash) => ({
+    toEmail,
+    toName: toEmail,
+    subject: "Vous avez été invité à rejoindre Trackdéchets",
+    title: `${companyAdmin} vous a invité à rejoindre Trackdéchets`,
+    body: `Bonjour Madame/Monsieur,
+    <br>
+    La personne en charge de la société <strong>${companyName}<.strong> vous a invité à rejoindre Trackdéchets.
+    <br>
+    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://trackdechets.beta.gouv.fr/invite/${hash}">sur ce lien</a> et renseignez les informations demandées.
+    <br>
+    Vous aurez accès à l'ensemble des informations concernant l'entreprise <strong>${companyName}</strong>.
+    `
   })
 };

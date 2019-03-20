@@ -14,6 +14,10 @@ type AggregateUser {
   count: Int!
 }
 
+type AggregateUserAccountHash {
+  count: Int!
+}
+
 type AggregateUserActivationHash {
   count: Int!
 }
@@ -25,6 +29,7 @@ type BatchPayload {
 type Company {
   id: ID!
   siret: String!
+  admin: User
 }
 
 type CompanyConnection {
@@ -35,11 +40,16 @@ type CompanyConnection {
 
 input CompanyCreateInput {
   siret: String!
+  admin: UserCreateOneWithoutCompaniesInput
 }
 
-input CompanyCreateManyInput {
-  create: [CompanyCreateInput!]
+input CompanyCreateManyWithoutAdminInput {
+  create: [CompanyCreateWithoutAdminInput!]
   connect: [CompanyWhereUniqueInput!]
+}
+
+input CompanyCreateWithoutAdminInput {
+  siret: String!
 }
 
 type CompanyEdge {
@@ -115,32 +125,29 @@ input CompanySubscriptionWhereInput {
   NOT: [CompanySubscriptionWhereInput!]
 }
 
-input CompanyUpdateDataInput {
-  siret: String
-}
-
 input CompanyUpdateInput {
   siret: String
+  admin: UserUpdateOneWithoutCompaniesInput
 }
 
 input CompanyUpdateManyDataInput {
   siret: String
 }
 
-input CompanyUpdateManyInput {
-  create: [CompanyCreateInput!]
-  update: [CompanyUpdateWithWhereUniqueNestedInput!]
-  upsert: [CompanyUpsertWithWhereUniqueNestedInput!]
+input CompanyUpdateManyMutationInput {
+  siret: String
+}
+
+input CompanyUpdateManyWithoutAdminInput {
+  create: [CompanyCreateWithoutAdminInput!]
   delete: [CompanyWhereUniqueInput!]
   connect: [CompanyWhereUniqueInput!]
   set: [CompanyWhereUniqueInput!]
   disconnect: [CompanyWhereUniqueInput!]
+  update: [CompanyUpdateWithWhereUniqueWithoutAdminInput!]
+  upsert: [CompanyUpsertWithWhereUniqueWithoutAdminInput!]
   deleteMany: [CompanyScalarWhereInput!]
   updateMany: [CompanyUpdateManyWithWhereNestedInput!]
-}
-
-input CompanyUpdateManyMutationInput {
-  siret: String
 }
 
 input CompanyUpdateManyWithWhereNestedInput {
@@ -148,15 +155,19 @@ input CompanyUpdateManyWithWhereNestedInput {
   data: CompanyUpdateManyDataInput!
 }
 
-input CompanyUpdateWithWhereUniqueNestedInput {
-  where: CompanyWhereUniqueInput!
-  data: CompanyUpdateDataInput!
+input CompanyUpdateWithoutAdminDataInput {
+  siret: String
 }
 
-input CompanyUpsertWithWhereUniqueNestedInput {
+input CompanyUpdateWithWhereUniqueWithoutAdminInput {
   where: CompanyWhereUniqueInput!
-  update: CompanyUpdateDataInput!
-  create: CompanyCreateInput!
+  data: CompanyUpdateWithoutAdminDataInput!
+}
+
+input CompanyUpsertWithWhereUniqueWithoutAdminInput {
+  where: CompanyWhereUniqueInput!
+  update: CompanyUpdateWithoutAdminDataInput!
+  create: CompanyCreateWithoutAdminInput!
 }
 
 input CompanyWhereInput {
@@ -188,6 +199,7 @@ input CompanyWhereInput {
   siret_not_starts_with: String
   siret_ends_with: String
   siret_not_ends_with: String
+  admin: UserWhereInput
   AND: [CompanyWhereInput!]
   OR: [CompanyWhereInput!]
   NOT: [CompanyWhereInput!]
@@ -2349,6 +2361,12 @@ type Mutation {
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   deleteUser(where: UserWhereUniqueInput!): User
   deleteManyUsers(where: UserWhereInput): BatchPayload!
+  createUserAccountHash(data: UserAccountHashCreateInput!): UserAccountHash!
+  updateUserAccountHash(data: UserAccountHashUpdateInput!, where: UserAccountHashWhereUniqueInput!): UserAccountHash
+  updateManyUserAccountHashes(data: UserAccountHashUpdateManyMutationInput!, where: UserAccountHashWhereInput): BatchPayload!
+  upsertUserAccountHash(where: UserAccountHashWhereUniqueInput!, create: UserAccountHashCreateInput!, update: UserAccountHashUpdateInput!): UserAccountHash!
+  deleteUserAccountHash(where: UserAccountHashWhereUniqueInput!): UserAccountHash
+  deleteManyUserAccountHashes(where: UserAccountHashWhereInput): BatchPayload!
   createUserActivationHash(data: UserActivationHashCreateInput!): UserActivationHash!
   updateUserActivationHash(data: UserActivationHashUpdateInput!, where: UserActivationHashWhereUniqueInput!): UserActivationHash
   updateManyUserActivationHashes(data: UserActivationHashUpdateManyMutationInput!, where: UserActivationHashWhereInput): BatchPayload!
@@ -2389,6 +2407,9 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  userAccountHash(where: UserAccountHashWhereUniqueInput!): UserAccountHash
+  userAccountHashes(where: UserAccountHashWhereInput, orderBy: UserAccountHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [UserAccountHash]!
+  userAccountHashesConnection(where: UserAccountHashWhereInput, orderBy: UserAccountHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserAccountHashConnection!
   userActivationHash(where: UserActivationHashWhereUniqueInput!): UserActivationHash
   userActivationHashes(where: UserActivationHashWhereInput, orderBy: UserActivationHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [UserActivationHash]!
   userActivationHashesConnection(where: UserActivationHashWhereInput, orderBy: UserActivationHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserActivationHashConnection!
@@ -2399,6 +2420,7 @@ type Subscription {
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
   userActivationHash(where: UserActivationHashSubscriptionWhereInput): UserActivationHashSubscriptionPayload
 }
 
@@ -2414,6 +2436,149 @@ type User {
   gerepId: String
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type UserAccountHash {
+  id: ID!
+  email: String!
+  companySiret: ID!
+  hash: String!
+}
+
+type UserAccountHashConnection {
+  pageInfo: PageInfo!
+  edges: [UserAccountHashEdge]!
+  aggregate: AggregateUserAccountHash!
+}
+
+input UserAccountHashCreateInput {
+  email: String!
+  companySiret: ID!
+  hash: String!
+}
+
+type UserAccountHashEdge {
+  node: UserAccountHash!
+  cursor: String!
+}
+
+enum UserAccountHashOrderByInput {
+  id_ASC
+  id_DESC
+  email_ASC
+  email_DESC
+  companySiret_ASC
+  companySiret_DESC
+  hash_ASC
+  hash_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type UserAccountHashPreviousValues {
+  id: ID!
+  email: String!
+  companySiret: ID!
+  hash: String!
+}
+
+type UserAccountHashSubscriptionPayload {
+  mutation: MutationType!
+  node: UserAccountHash
+  updatedFields: [String!]
+  previousValues: UserAccountHashPreviousValues
+}
+
+input UserAccountHashSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: UserAccountHashWhereInput
+  AND: [UserAccountHashSubscriptionWhereInput!]
+  OR: [UserAccountHashSubscriptionWhereInput!]
+  NOT: [UserAccountHashSubscriptionWhereInput!]
+}
+
+input UserAccountHashUpdateInput {
+  email: String
+  companySiret: ID
+  hash: String
+}
+
+input UserAccountHashUpdateManyMutationInput {
+  email: String
+  companySiret: ID
+  hash: String
+}
+
+input UserAccountHashWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  email_lt: String
+  email_lte: String
+  email_gt: String
+  email_gte: String
+  email_contains: String
+  email_not_contains: String
+  email_starts_with: String
+  email_not_starts_with: String
+  email_ends_with: String
+  email_not_ends_with: String
+  companySiret: ID
+  companySiret_not: ID
+  companySiret_in: [ID!]
+  companySiret_not_in: [ID!]
+  companySiret_lt: ID
+  companySiret_lte: ID
+  companySiret_gt: ID
+  companySiret_gte: ID
+  companySiret_contains: ID
+  companySiret_not_contains: ID
+  companySiret_starts_with: ID
+  companySiret_not_starts_with: ID
+  companySiret_ends_with: ID
+  companySiret_not_ends_with: ID
+  hash: String
+  hash_not: String
+  hash_in: [String!]
+  hash_not_in: [String!]
+  hash_lt: String
+  hash_lte: String
+  hash_gt: String
+  hash_gte: String
+  hash_contains: String
+  hash_not_contains: String
+  hash_starts_with: String
+  hash_not_starts_with: String
+  hash_ends_with: String
+  hash_not_ends_with: String
+  AND: [UserAccountHashWhereInput!]
+  OR: [UserAccountHashWhereInput!]
+  NOT: [UserAccountHashWhereInput!]
+}
+
+input UserAccountHashWhereUniqueInput {
+  id: ID
+  hash: String
 }
 
 type UserActivationHash {
@@ -2534,13 +2699,28 @@ input UserCreateInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyCreateManyInput
+  companies: CompanyCreateManyWithoutAdminInput
   gerepId: String
 }
 
 input UserCreateOneInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutCompaniesInput {
+  create: UserCreateWithoutCompaniesInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateWithoutCompaniesInput {
+  isActive: Boolean
+  email: String!
+  password: String!
+  name: String
+  phone: String
+  userType: Json
+  gerepId: String
 }
 
 type UserEdge {
@@ -2609,7 +2789,7 @@ input UserUpdateDataInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyUpdateManyInput
+  companies: CompanyUpdateManyWithoutAdminInput
   gerepId: String
 }
 
@@ -2620,7 +2800,7 @@ input UserUpdateInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyUpdateManyInput
+  companies: CompanyUpdateManyWithoutAdminInput
   gerepId: String
 }
 
@@ -2641,9 +2821,33 @@ input UserUpdateOneRequiredInput {
   connect: UserWhereUniqueInput
 }
 
+input UserUpdateOneWithoutCompaniesInput {
+  create: UserCreateWithoutCompaniesInput
+  update: UserUpdateWithoutCompaniesDataInput
+  upsert: UserUpsertWithoutCompaniesInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: UserWhereUniqueInput
+}
+
+input UserUpdateWithoutCompaniesDataInput {
+  isActive: Boolean
+  email: String
+  password: String
+  name: String
+  phone: String
+  userType: Json
+  gerepId: String
+}
+
 input UserUpsertNestedInput {
   update: UserUpdateDataInput!
   create: UserCreateInput!
+}
+
+input UserUpsertWithoutCompaniesInput {
+  update: UserUpdateWithoutCompaniesDataInput!
+  create: UserCreateWithoutCompaniesInput!
 }
 
 input UserWhereInput {

@@ -22,9 +22,18 @@ type UserActivationHash {
   hash: String! @unique
 }
 
+type UserAccountHash {
+  id: ID! @unique
+  email: String!
+  companySiret: ID!
+  hash: String! @unique
+}
+
 type Company {
   id: ID! @unique
   siret: String! @unique
+
+  admin: User
 }
 
 type Form {

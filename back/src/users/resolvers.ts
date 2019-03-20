@@ -127,6 +127,62 @@ export default {
           );
           throw new Error("Impossible de mettre lr profil à jour");
         });
+    },
+    inviteUserToCompany: async (_, { email, siret }, context: Context) => {
+      const userId = getUserId(context);
+      const admin = await prisma.company({ siret }).admin();
+
+      if (admin.id !== userId) {
+        throw new Error(
+          "Vous ne pouvez pas inviter un utilisateur dans cette entreprise."
+        );
+      }
+
+      const userAccoutHash = await hash(
+        new Date().valueOf().toString() + Math.random().toString(),
+        10
+      );
+      await prisma.createUserAccountHash({
+        hash: userAccoutHash,
+        email,
+        companySiret: siret
+      });
+
+      await sendMail(
+        userMails.inviteUserToJoin(email, admin.name, siret, userAccoutHash)
+      );
+
+      return true;
+    },
+    joinWithInvite: async (_, { hash, name, password }, context: Context) => {
+      const existingHash = await prisma.userAccountHash({ hash }).catch(_ => {
+        throw new Error(
+          `Cette invitation n'est plus valable. Contactez le responsable de votre société.`
+        );
+      });
+
+      const hashedPassword = await hash(password, 10);
+      const user = await context.prisma.createUser({
+        name: name,
+        email: existingHash.email,
+        password: hashedPassword,
+        phone: "",
+        userType: [],
+        companies: {
+          connect: { siret: existingHash.companySiret }
+        }
+      });
+
+      await prisma
+        .deleteUserAccountHash({ hash })
+        .catch(err =>
+          console.error(`Cannot delete user account hash ${hash}`, err)
+        );
+
+      return {
+        token: sign({ userId: user.id }, APP_SECRET),
+        user
+      };
     }
   },
   Query: {
