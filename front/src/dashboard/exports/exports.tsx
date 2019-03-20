@@ -8,18 +8,26 @@ interface IProps {
 }
 
 type Stats = {
-  wasteCode: string;
-  incoming: number;
-  outgoing: number;
-  awaiting: number;
+  company: { siret: string };
+  stats: {
+    wasteCode: string;
+    incoming: number;
+    outgoing: number;
+    awaiting: number;
+  }[];
 };
 
 const GET_STATS = gql`
   query GetStats {
     stats {
-      wasteCode
-      incoming
-      outgoing
+      company {
+        siret
+      }
+      stats {
+        wasteCode
+        incoming
+        outgoing
+      }
     }
   }
 `;
@@ -43,12 +51,17 @@ export default function Exports({ me }: IProps) {
                 </tr>
               </thead>
               <tbody>
-                {data.stats.map(s => (
+                {data.stats[0].stats.map(s => (
                   <tr key={s.wasteCode}>
                     <td>{s.wasteCode}</td>
                     <td>{s.incoming}</td>
                     <td>{s.outgoing}</td>
-                    <td>{Math.round((s.incoming - s.outgoing) * 100) / 100}</td>
+                    <td>
+                      {Math.max(
+                        0,
+                        Math.round((s.incoming - s.outgoing) * 100) / 100
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -69,7 +82,9 @@ export default function Exports({ me }: IProps) {
         target="_blank"
         href={`${
           process.env.REACT_APP_API_ENDPOINT
-        }/exports?exportType=OUTGOING&siret=${me.company.siret}`}
+        }/exports?exportType=OUTGOING&siret=${me.companies
+          .map(c => c.siret)
+          .join(",")}`}
       >
         Registre de déchets sortants
       </a>
@@ -78,7 +93,9 @@ export default function Exports({ me }: IProps) {
         target="_blank"
         href={`${
           process.env.REACT_APP_API_ENDPOINT
-        }/exports?exportType=INCOMING&siret=${me.company.siret}`}
+        }/exports?exportType=INCOMING&siret=${me.companies
+          .map(c => c.siret)
+          .join(",")}`}
       >
         Registre de déchets entrants
       </a>

@@ -13,7 +13,7 @@ export default function DashboardMenu({ me, match }: IProps) {
     <aside className="dashboard-menu side-menu" role="navigation">
       <div className="company-title">
         <h3>{me.name}</h3>
-        <p>SIRET: {me.company.siret}</p>
+        <p>{me.email}</p>
       </div>
       <ul>
         <li>

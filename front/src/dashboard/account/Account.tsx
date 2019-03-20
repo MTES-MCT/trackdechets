@@ -59,14 +59,16 @@ export default withRouter(function Account({
           />
         )}
 
-        <h4>Entreprise administrée:</h4>
-        <address>
-          {me.company.name}
-          <br />
-          Numéro SIRET: {me.company.siret}
-          <br />
-          {me.company.address}
-        </address>
+        <h4>Entreprise(s) associée(s):</h4>
+        {me.companies.map(c => (
+          <address key={c.siret}>
+            {c.name}
+            <br />
+            Numéro SIRET: {c.siret}
+            <br />
+            {c.address}
+          </address>
+        ))}
 
         <h4>Intégration API</h4>
         <p>
