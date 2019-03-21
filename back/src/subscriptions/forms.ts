@@ -9,7 +9,7 @@ export function formsSubscriptionCallback(payload: FormSubscriptionPayload) {
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
-  if (payload.mutation === "DELETED") {
+  if (payload.updatedFields && payload.updatedFields.includes("isDeleted")) {
     return;
   }
 
