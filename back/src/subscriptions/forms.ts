@@ -3,7 +3,9 @@ import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
 
 export function formsSubscriptionCallback(payload: FormSubscriptionPayload) {
-  mailToInexistantRecipient(payload);
+  mailToInexistantRecipient(payload).catch(err =>
+    console.error("Error on inexistant recipient subscription", err)
+  );
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
