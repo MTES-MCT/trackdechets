@@ -4,7 +4,7 @@ type Query {
   form(id: ID): Form
   forms: [Form]
   stats: [CompanyStat]
-  appendixForms(wasteCode: String!): [Form]
+  appendixForms(emitterSiret: String!, wasteCode: String!): [Form]
 }
 
 type Mutation {

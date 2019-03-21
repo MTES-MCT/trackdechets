@@ -7,7 +7,7 @@ import { DateTime } from "luxon";
 import { connect, getIn, setIn, Formik } from "formik";
 
 const GET_APPENDIX_FORMS = gql`
-  query AppendixForms($emittersiret: String!, $wasteCode: String!) {
+  query AppendixForms($emitterSiret: String!, $wasteCode: String!) {
     appendixForms(emitterSiret: $emitterSiret, wasteCode: $wasteCode) {
       readableId
       emitter {
@@ -21,7 +21,7 @@ const GET_APPENDIX_FORMS = gql`
     }
   }
 `;
-type Props = { emiterSiret: string; wasteCode: string; name: string };
+type Props = { emitterSiret: string; wasteCode: string; name: string };
 
 export default connect<Props>(function FormsSelector(props) {
   if (wasteCodeValidator(props.wasteCode) != null) {
@@ -63,7 +63,7 @@ export default connect<Props>(function FormsSelector(props) {
 
       <Query
         query={GET_APPENDIX_FORMS}
-        variables={{ wasteCode: props.wasteCode }}
+        variables={{ wasteCode: props.wasteCode, emitterSiret: props.emitterSiret }}
       >
         {({ loading, error, data }: QueryResult<{ appendixForms: Form[] }>) => {
           if (loading) return "Chargement...";

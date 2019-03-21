@@ -108,7 +108,7 @@ export default {
         .user({ id: userId })
         .companies();
 
-      if (!userCompanies.includes(emitterSiret)) {
+      if (!userCompanies.find(c => c.siret === emitterSiret)) {
         throw new Error(
           "Vous n'êtes pas autorisé à créer de bordereau de regroupement pour cette entreprise."
         );
