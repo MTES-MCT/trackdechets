@@ -132,7 +132,7 @@ export default {
       const userId = getUserId(context);
       const admin = await prisma.company({ siret }).admin();
 
-      if (admin.id !== userId) {
+      if (!admin || admin.id !== userId) {
         throw new Error(
           "Vous ne pouvez pas inviter un utilisateur dans cette entreprise."
         );

@@ -20,7 +20,6 @@ export const GET_ME = gql`
         siret
         name
         address
-        mail
       }
     }
   }

@@ -6,9 +6,7 @@ import gql from "graphql-tag";
 
 const INVITE_USER_TO_COMPANY = gql`
   mutation InviteUserToCompany($email: String!, $siret: String!) {
-    inviteUserToCompany(email: $email, siret: $siret) {
-
-    }
+    inviteUserToCompany(email: $email, siret: $siret)
   }
 `;
 type Props = { siret: string };

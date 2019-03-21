@@ -5,10 +5,9 @@ type User {
   password: String!
   name: String
   phone: String
-  # company: Company!
   userType: Json
 
-  companies: [Company]
+  companies: [Company] @relation(name: "UserCompanies")
 
   gerepId: String
 
@@ -33,7 +32,7 @@ type Company {
   id: ID! @unique
   siret: String! @unique
 
-  admin: User
+  admin: User @relation(name: "CompanyAdmin")
 }
 
 type Form {
