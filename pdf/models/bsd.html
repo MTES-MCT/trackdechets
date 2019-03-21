@@ -110,6 +110,9 @@
         flex: 1;
         margin-right: 8px;
       }
+      .appendix2-item {
+        border: 1px solid black;
+      }
     </style>
   </head>
   <body>
@@ -415,16 +418,21 @@
         </div>
         <div class="columns">
           <div class="column">
-            <p>N° SIRET: {{=it.traderCompanySiret}}</p>
-            <p>NOM: {{=it.traderCompanyName}}</p>
-            <p>Adresse: {{=it.traderCompanyAddress}}</p>
-            <p>Mèl: {{=it.traderCompanyMail}} - Téléphone: {{=it.traderCompanyPhone}}</p>
+            <p>N° SIRET: {{=it.traderCompanySiret || ''}}</p>
+            <p>NOM: {{=it.traderCompanyName || ''}}</p>
+            <p>Adresse: {{=it.traderCompanyAddress || ''}}</p>
+            <p>
+              Mèl: {{=it.traderCompanyMail || ''}} - Téléphone:
+              {{=it.traderCompanyPhone || ''}}
+            </p>
           </div>
           <div class="column">
-            <p>Récipissé numéro: {{=it.traderReceipt}}</p>
-            <p>Département: {{=it.traderDepartment}}</p>
-            <p>Limite de validité: {{=it.toDate(it.traderValidityLimit)}}</p>
-            <p>Personne à contacter: {{=it.traderCompanyContact}}</p>
+            <p>Récipissé numéro: {{=it.traderReceipt || ''}}</p>
+            <p>Département: {{=it.traderDepartment || ''}}</p>
+            <p>
+              Limite de validité: {{=it.toDate(it.traderValidityLimit || '')}}
+            </p>
+            <p>Personne à contacter: {{=it.traderCompanyContact || ''}}</p>
           </div>
         </div>
       </div>
@@ -539,5 +547,35 @@
       </div>
       {{?}}
     </div>
+
+    {{? it.appendix2Forms != null && it.appendix2Forms.length > 0 }}
+    <hr />
+    <h2>Annexe 2</h2>
+    <div class="appendix2-grid">
+      {{~it.appendix2Forms :value:index}}
+      <div class="appendix2-item">
+        <div class="columns">
+          <div class="column">
+            <h3>Expéditeur initial n° {{=index}}</h3>
+            <p>N° SIRET: {{=value.emitterCompanySiret}}</p>
+            <p>Nom: {{=value.emitterCompanyName}}</p>
+            <p>Adresse: {{=value.emitterCompanyAddress}}</p>
+            <p>Tel: {{=value.emitterCompanyPhone}}</p>
+            <p>Mel: {{=value.emitterCompanyMail}}</p>
+            <p>Personne à contacter: {{=value.emitterCompanyContact}}</p>
+          </div>
+          <div class="column">
+            <h3>Numéro du bordereau initial {{=value.readableId}}</h3>
+            <p>Rubrique déchet: {{=value.wasteDetailsCode}}</p>
+            <p>Dénomination usuelle des déchets: {{=value.wasteDetailsName}}</p>
+            <p>Quantité (en tonnes): {{=value.quantityReceived}}</p>
+            <p>Datee de remise: {{=it.toDate(value.receivedAt)}}</p>
+          </div>
+        </div>
+      </div>
+      {{=value}}!
+      {{~}}
+    </div>
+    {{?}}
   </body>
 </html>
