@@ -5,7 +5,7 @@ export default function Faq() {
     <div className="container">
       <h1>Foire Aux Questions</h1>
       <h2>Questions génériques sur Trackdéchets</h2>
-      <h3># Trackdéchets c’est un service public ?</h3>
+      <h3>Trackdéchets c’est un service public ?</h3>
       <p>
         Trackdéchets est un produit numérique conçu au sein de l’incubateur du
         Ministère de la Transition Écologique et Solidaire. Il est donc gratuit
@@ -13,7 +13,7 @@ export default function Faq() {
         co-construit avec les utilisateurs, les fonctionnalités sont donc
         amenées à évoluer.
       </p>
-      <h3># Trackdéchets, c’est un outil est à destination de qui ?</h3>
+      <h3>Trackdéchets, c’est un outil est à destination de qui ?</h3>
       <p>
         Ce produit est à destination de tous les acteurs de la chaîne du déchet
         dangereux (les déchets non dangereux peuvent également être suivis
@@ -21,9 +21,9 @@ export default function Faq() {
         traitement.
       </p>
       <p>
-        <img alt="image8" src="images/image8.png" />
+        <img src="image-faq.png" />
       </p>
-      <h3># Pourquoi utiliser Trackdéchets?</h3>
+      <h3>Pourquoi utiliser Trackdéchets?</h3>
       <p>
         Trackdechets a vocation a simplifier la gestion de vos bordereaux au
         quotidien: 0 papiers, informations et statuts de mes BSD sur un outils
@@ -33,7 +33,7 @@ export default function Faq() {
         Peu importe si vous travaillez avec de multiples prestataires, les
         informations concernant la traçabilité sont regroupées ici.
       </p>
-      <h3># SI mon collecteur n’est pas inscrit, que se passe-t-il?</h3>
+      <h3>SI mon collecteur n’est pas inscrit, que se passe-t-il?</h3>
       <p>
         Vous éditez le BSD à son attention (prestataire), et il reçoit un
         message de notification l’invitant à se rendre sur la plateforme pour
@@ -61,7 +61,7 @@ export default function Faq() {
           </tr>
         </tbody>
       </table>
-      <h3># Trackdéchets, c’est du travail en plus ?</h3>
+      <h3>Trackdéchets, c’est du travail en plus ?</h3>
       <p>
         Au contraire, vous allez vite vous rendre compte que vous pouvez
         dupliquer vos bordereaux habituels et réaliser un nouveau bordereau en 2
@@ -76,7 +76,7 @@ export default function Faq() {
         prestataire n’a rien à vous transmettre, scanner, imprimer, etc.
       </p>
       <h3>
-        # Sur Trackdéchets lorsque je signe mon BSD dématérialisé, est-il valide
+        Sur Trackdéchets lorsque je signe mon BSD dématérialisé, est-il valide
         juridiquement comme un BSD papier ?
       </h3>
       <p>
@@ -90,7 +90,7 @@ export default function Faq() {
         informations et à apposer sa signature.
       </p>
       <h3>
-        # Que faites vous des données que vous collectez dans Trackdéchets ?
+        Que faites vous des données que vous collectez dans Trackdéchets ?
       </h3>
       <p>
         Conformément aux normes européennes, Trackdéchets a une politique
@@ -101,7 +101,7 @@ export default function Faq() {
         </a>
         .<br />
       </p>
-      <h3># Trackdéchets peut-il s’interfacer avec d’autres outils ?</h3>
+      <h3>Trackdéchets peut-il s’interfacer avec d’autres outils ?</h3>
       <p>
         Oui ! Trackdéchets a été conçu en prévoyant les futures intégrations
         avec d’autres services. L’API est structurée et documentée : vous pouvez
@@ -110,7 +110,7 @@ export default function Faq() {
         utiliser l’API.
       </p>
       <h3>
-        # Comment m’assurer que l’entreprise qui va collecter et/ou traiter mon
+        Comment m’assurer que l’entreprise qui va collecter et/ou traiter mon
         déchet est habilitée (autorisée et/ou agréé par l’Etat) à recevoir mes
         déchets ?
       </h3>
@@ -149,7 +149,7 @@ export default function Faq() {
         transmettrez un BSD à un prestataire.
       </p>
       <p>Sur la réglementation des déchets dangereux</p>
-      <h3># Qu'est-ce qu'un déchet dangereux ?</h3>
+      <h3>Qu'est-ce qu'un déchet dangereux ?</h3>
       <p>
         Tout déchet qui présente un risque particulier pour l'homme et
         l'environnement car il est toxique, inflammable, explosif, corrosif,
@@ -158,7 +158,7 @@ export default function Faq() {
         produits, même vides, sont considérés comme des déchets dangereux.
       </p>
       <h3>
-        # Que dit la réglementation sur la gestion des déchets dangereux ?
+        Que dit la réglementation sur la gestion des déchets dangereux ?
       </h3>
       <p>
         Le déchet dangereux est sous la responsabilité du producteur jusqu’à son
@@ -168,7 +168,7 @@ export default function Faq() {
         l’élimination du déchet, le traitement ou la mise en décharge. Mais elle
         ne cesse pas au moment où l’entreprise remet ses déchets à un tiers.
       </p>
-      <h3># Que veut dire être producteur d’un déchet ?</h3>
+      <h3>Que veut dire être producteur d’un déchet ?</h3>
       <p>
         Il existe 2 types de producteurs de déchets (
         <a href="https://www.google.com/url?q=http://legifrance.gouv.fr/affichCodeArticle.do;jsessionid%3D94F3A4F6C0617DCEA040256E0B0C3E85.tpdila15v_3?idArticle%3DLEGIARTI000023248311%26cidTexte%3DLEGITEXT000006074220%26dateTexte%3D20150417&amp;sa=D&amp;ust=1553532450384000">
@@ -188,7 +188,7 @@ export default function Faq() {
         </li>
       </ul>
       <h3>
-        # En tant que producteur de déchets dangereux, quelles sont mes
+        En tant que producteur de déchets dangereux, quelles sont mes
         responsabilités ?
       </h3>
       <p>
@@ -223,7 +223,7 @@ export default function Faq() {
         de Regroupement Prétraitement ” précisant la destination finale du
         déchet.
       </p>
-      <h3># Qu’est ce qu’un BSD ? A quoi sert-il ?</h3>
+      <h3>Qu’est ce qu’un BSD ? A quoi sert-il ?</h3>
       <p>
         Le BSD est un formulaire qui a pour objet d’assurer la traçabilité des
         déchets dangereux et de constituer une preuve de leur élimination pour
@@ -241,7 +241,7 @@ export default function Faq() {
         Le producteur doit obligatoirement lire le BSD avant de le signer car il
         initie la traçabilité et acte de sa responsabilité.
       </p>
-      <h3># Comment qualifier mon déchet ?</h3>
+      <h3>Comment qualifier mon déchet ?</h3>
       <p>Comment rechercher le code de mon déchet sur Trackdéchets ?</p>
       <p>
         Aujourd’hui il n’y a pas encore de moteur de recherche simple mais il
