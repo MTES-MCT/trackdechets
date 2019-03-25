@@ -38,7 +38,7 @@ export const userMails = {
     subject: "Vous avez été invité à rejoindre Trackdéchets",
     title: `${companyAdmin} vous a invité à rejoindre Trackdéchets`,
     body: `Bonjour Madame/Monsieur,
-    <br>
+    <br><br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre Trackdéchets.
     <br>
     Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://trackdechets.beta.gouv.fr/invite?hash=${escape(
