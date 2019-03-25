@@ -4,6 +4,7 @@ import "./InviteNewUser.scss";
 import { Mutation, Query } from "react-apollo";
 import gql from "graphql-tag";
 import { Me } from "../../login/model";
+import RedErrorMessage from "../../form/RedErrorMessage";
 
 const INVITE_USER_TO_COMPANY = gql`
   mutation InviteUserToCompany($email: String!, $siret: String!) {
@@ -38,6 +39,13 @@ export default function ImportNewUser({ siret }: Props) {
         {(inviteUserToCompany, { data }) => (
           <Formik
             initialValues={{ email: "", siret }}
+            validate={(values: any) => {
+              let errors: any = {};
+              if (!values.email) {
+                errors.email = "L'email est obligatoire";
+              }
+              return errors;
+            }}
             onSubmit={(values, { setSubmitting, resetForm }) => {
               inviteUserToCompany({ variables: values })
                 .then(_ => {
@@ -62,6 +70,8 @@ export default function ImportNewUser({ siret }: Props) {
                 >
                   Inviter
                 </button>
+
+                <RedErrorMessage name="email" />
               </Form>
             )}
           </Formik>
