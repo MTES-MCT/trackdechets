@@ -119,6 +119,9 @@ export default function Home() {
               </a>
             </li>
             <li>
+              <Link to="/faq">Foire aux questions</Link>
+            </li>
+            <li>
               <Link to="/cgu">Conditions générales d'utilisation</Link>
             </li>
             <li>
