@@ -14,12 +14,14 @@ const JOIN_WITH_INVITE = gql`
 
 type Props = { hash: string };
 export default withRouter(function Invite(props: Props & RouteComponentProps) {
+  const hash = decodeURIComponent(props.location.search.replace("?hash=", ""));
+
   return (
     <Mutation mutation={JOIN_WITH_INVITE}>
       {(joinWithInvite, { data }) => (
         <Formik
           initialValues={{
-            hash: props.hash,
+            hash,
             name: "",
             password: "",
             passwordConfirmation: ""

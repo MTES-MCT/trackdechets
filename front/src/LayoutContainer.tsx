@@ -33,7 +33,7 @@ export default withRouter(function LayoutContainer({ history }) {
       <Route exact path="/" component={Home} />
       <Route exact path="/cgu" component={Cgu} />
       <Route exact path="/login" component={Login} />
-      <Route exact path="/invite/:hash" component={Invite} />
+      <Route exact path="/invite" component={Invite} />
       <Route exact path="/signup" component={Signup} />
       <Route exact path="/signup/details" component={WasteSelector} />
       <Route exact path="/signup/activation" component={SignupInfo} />

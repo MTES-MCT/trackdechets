@@ -1,3 +1,5 @@
+import { escape } from "querystring";
+
 export const userMails = {
   onSignup: (user, activationHash) => ({
     toEmail: user.email,
@@ -39,7 +41,9 @@ export const userMails = {
     <br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre Trackdéchets.
     <br>
-    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://trackdechets.beta.gouv.fr/invite?hash=${hash}">sur ce lien</a> et renseignez les informations demandées.
+    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://trackdechets.beta.gouv.fr/invite?hash=${escape(
+      hash
+    )}">sur ce lien</a> et renseignez les informations demandées.
     <br>
     Vous aurez accès à l'ensemble des informations concernant l'entreprise <strong>${companyName}</strong>.
     `
