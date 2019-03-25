@@ -46,6 +46,17 @@ export default {
 
       return await memoizeRequest(siret);
     },
+    companyUsers: async (_, { siret }, context: Context) => {
+      const companyAdmin = await context.prisma.company({ siret }).admin();
+
+      if (companyAdmin.id !== getUserId(context)) {
+        return [];
+      }
+
+      return context.prisma.users({
+        where: { companies_some: { siret: siret } }
+      });
+    },
     searchCompanies: async (parent, { clue }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
 

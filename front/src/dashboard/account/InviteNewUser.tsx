@@ -1,17 +1,28 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import "./InviteNewUser.scss";
-import { Mutation } from "react-apollo";
+import { Mutation, Query } from "react-apollo";
 import gql from "graphql-tag";
+import { Me } from "../../login/model";
 
 const INVITE_USER_TO_COMPANY = gql`
   mutation InviteUserToCompany($email: String!, $siret: String!) {
     inviteUserToCompany(email: $email, siret: $siret)
   }
 `;
+const COMPANY_USERS = gql`
+  query CompanyUsers($siret: String!) {
+    companyUsers(siret: $siret) {
+      id
+      name
+      email
+    }
+  }
+`;
 type Props = { siret: string };
 export default function ImportNewUser({ siret }: Props) {
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showCompanyUsers, setShowCompanyUsers] = useState(false);
 
   return (
     <div>
@@ -60,6 +71,33 @@ export default function ImportNewUser({ siret }: Props) {
         <div className="notification success">
           L'invitation a bien été envoyée
         </div>
+      )}
+
+      <p>
+        Vous souhaitez voir qui appartient déjà à cette entreprise ? Consultez
+        la liste en{" "}
+        <button
+          className="button-outline small primary"
+          onClick={() => setShowCompanyUsers(true)}
+        >
+          cliquant ici
+        </button>
+      </p>
+      {showCompanyUsers && (
+        <Query query={COMPANY_USERS} variables={{ siret }}>
+          {({ loading, error, data }) => {
+            if (loading) return "Chargement...";
+            if (error) return `Erreur ! ${error.message}`;
+
+            return (
+              <ul>
+                {data.companyUsers.map((u: any) => (
+                  <li key={u.id}>{u.name}</li>
+                ))}
+              </ul>
+            );
+          }}
+        </Query>
       )}
     </div>
   );

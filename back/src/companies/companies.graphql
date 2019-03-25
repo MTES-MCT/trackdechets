@@ -11,6 +11,7 @@ type Company {
 
 type Query {
   companyInfos(siret: String!): Company
+  companyUsers(siret: String!): [User]
   searchCompanies(clue: String!): [Company]
   favorites(type: FavoriteType!): [Company]
 }
