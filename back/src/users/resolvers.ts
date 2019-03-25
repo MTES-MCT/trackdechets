@@ -6,6 +6,7 @@ import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
+import companyResolver from "../companies/resolvers";
 
 export default {
   Mutation: {
@@ -160,8 +161,15 @@ export default {
         companySiret: siret
       });
 
+      const companyName = await companyResolver.Company.name({ siret });
+
       await sendMail(
-        userMails.inviteUserToJoin(email, admin.name, siret, userAccoutHash)
+        userMails.inviteUserToJoin(
+          email,
+          admin.name,
+          companyName,
+          userAccoutHash
+        )
       );
 
       return true;
