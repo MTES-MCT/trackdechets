@@ -49,6 +49,12 @@ export default {
           );
         });
 
+      // Set the new user as the company admin
+      await context.prisma.updateCompany({
+        where: { siret: trimedSiret },
+        data: { admin: { connect: { id: user.id } } }
+      });
+
       const activationHash = await hash(
         new Date().valueOf().toString() + Math.random().toString(),
         10
