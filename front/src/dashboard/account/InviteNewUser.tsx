@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import "./InviteNewUser.scss";
 import { Mutation } from "react-apollo";
@@ -11,12 +11,16 @@ const INVITE_USER_TO_COMPANY = gql`
 `;
 type Props = { siret: string };
 export default function ImportNewUser({ siret }: Props) {
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   return (
     <div>
       <p>
         Vous êtes administrateur de cette entreprise, vous pouvez ainsi inviter
-        des utilisateurs à rejoindre Trackdéchets et leur donner accès aux
-        informations de votre entreprise.
+        des utilisateurs à rejoindre Trackdéchets en leur donnant accès aux
+        informations de votre entreprise. Ils seront alors en mesure de créer
+        des bordereaux pour cette entreprise, et de consulter les bordereaux
+        déjà existants.
       </p>
 
       <Mutation mutation={INVITE_USER_TO_COMPANY}>
@@ -25,7 +29,11 @@ export default function ImportNewUser({ siret }: Props) {
             initialValues={{ email: "", siret }}
             onSubmit={(values, { setSubmitting, resetForm }) => {
               inviteUserToCompany({ variables: values })
-                .then(_ => resetForm())
+                .then(_ => {
+                  resetForm();
+                  setShowConfirmation(true);
+                  setTimeout(() => setShowConfirmation(false), 3000);
+                })
                 .then(_ => setSubmitting(false));
             }}
           >
@@ -48,6 +56,11 @@ export default function ImportNewUser({ siret }: Props) {
           </Formik>
         )}
       </Mutation>
+      {showConfirmation && (
+        <div className="notification success">
+          L'invitation a bien été envoyée
+        </div>
+      )}
     </div>
   );
 }
