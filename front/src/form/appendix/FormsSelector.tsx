@@ -52,12 +52,12 @@ export default connect<Props>(function FormsSelector(props) {
     <div>
       <h4>Annexe 2</h4>
       <p>
-        Vous êtes entrain de créer un bordereau de regroupement. Veuillez
+        Vous êtes en train de créer un bordereau de regroupement. Veuillez
         sélectionner ci-dessous les bordereaux à regrouper.
       </p>
       <p>
         Tous les bordereaux présentés ci-dessous correspondent au code déchet
-        que vous avez renseigné, et à des bordereaux pour lequel vous avez
+        que vous avez renseigné, et à des bordereaux pour lesquels vous avez
         effectué une opération de traitement de type D 13, D 14, D 15 ou R 13.
       </p>
 

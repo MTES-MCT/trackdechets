@@ -3,7 +3,6 @@ import { Formik, Form, Field } from "formik";
 import "./InviteNewUser.scss";
 import { Mutation, Query } from "react-apollo";
 import gql from "graphql-tag";
-import { Me } from "../../login/model";
 import RedErrorMessage from "../../form/RedErrorMessage";
 
 const INVITE_USER_TO_COMPANY = gql`
@@ -84,11 +83,11 @@ export default function ImportNewUser({ siret }: Props) {
       )}
 
       <p>
-        Vous souhaitez voir qui appartient déjà à cette entreprise ? Consultez
-        la liste en{" "}
+        Pour consulter la liste des utilisateurs déjà présents dans cette
+        entreprise,{" "}
         <button
           className="button-outline small primary"
-          onClick={() => setShowCompanyUsers(true)}
+          onClick={() => setShowCompanyUsers(!showCompanyUsers)}
         >
           cliquant ici
         </button>
