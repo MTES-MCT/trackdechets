@@ -17,14 +17,16 @@ export function initSubsriptions() {
   Object.keys(subscriptions)
     .map(key => subscriptions[key])
     .forEach(async sub => {
-      const asyncIterator = await sub.iterable;
+      const asyncIterator = await sub.iterable.catch(err =>
+        console.error("Cannot get subscription iterator", err)
+      );
 
-      for await (let payload of asyncIterator) {
-        sub.callback(payload);
+      try {
+        for await (let payload of asyncIterator) {
+          sub.callback(payload);
+        }
+      } catch (err) {
+        console.error("Error while iterating on subscription", err);
       }
-
-      // while (true) {
-      //   const payload = await asyncIterator.next();
-      // }
     });
 }
