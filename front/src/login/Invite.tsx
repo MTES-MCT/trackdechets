@@ -6,7 +6,7 @@ import { withRouter, RouteComponentProps } from "react-router";
 
 const JOIN_WITH_INVITE = gql`
   mutation JoinWithInvite($hash: String!, $name: String!, $password: String!) {
-    joinWithInvite(hash: $hash, name: $name, password: $password) {
+    joinWithInvite(inviteHash: $hash, name: $name, password: $password) {
       token
     }
   }

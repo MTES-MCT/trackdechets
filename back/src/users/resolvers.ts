@@ -180,12 +180,18 @@ export default {
 
       return true;
     },
-    joinWithInvite: async (_, { hash, name, password }, context: Context) => {
-      const existingHash = await prisma.userAccountHash({ hash }).catch(_ => {
-        throw new Error(
-          `Cette invitation n'est plus valable. Contactez le responsable de votre société.`
-        );
-      });
+    joinWithInvite: async (
+      _,
+      { inviteHash, name, password },
+      context: Context
+    ) => {
+      const existingHash = await prisma
+        .userAccountHash({ hash: inviteHash })
+        .catch(_ => {
+          throw new Error(
+            `Cette invitation n'est plus valable. Contactez le responsable de votre société.`
+          );
+        });
 
       const hashedPassword = await hash(password, 10);
       const user = await context.prisma.createUser({
@@ -200,9 +206,9 @@ export default {
       });
 
       await prisma
-        .deleteUserAccountHash({ hash })
+        .deleteUserAccountHash({ hash: inviteHash })
         .catch(err =>
-          console.error(`Cannot delete user account hash ${hash}`, err)
+          console.error(`Cannot delete user account hash ${inviteHash}`, err)
         );
 
       return {
