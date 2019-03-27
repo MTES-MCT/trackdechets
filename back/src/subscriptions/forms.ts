@@ -2,7 +2,9 @@ import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
 
-export function formsSubscriptionCallback(payload: FormSubscriptionPayload) {
+export async function formsSubscriptionCallback(
+  payload: FormSubscriptionPayload
+) {
   mailToInexistantRecipient(payload).catch(err =>
     console.error("Error on inexistant recipient subscription", err)
   );
