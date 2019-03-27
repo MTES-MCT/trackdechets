@@ -6,13 +6,11 @@ import { Form } from "../generated/prisma-client";
  *                        |        |
  * Collecteur: DRAFT -> SEALED -> RECEIVED -> PROCESSED
  * */
-export function getNextStep(form: Form, actorSiret: string) {
-  switch (actorSiret) {
-    case form.emitterCompanySiret:
-      return getEmitterNextStep(form);
-    case form.recipientCompanySiret:
-      return getRecipientNextStep(form);
+export function getNextStep(form: Form, actorSirets: string[]) {
+  if (actorSirets.includes(form.emitterCompanySiret)) {
+    return getEmitterNextStep(form);
   }
+  return getRecipientNextStep(form);
 }
 
 function getEmitterNextStep(form: Form) {

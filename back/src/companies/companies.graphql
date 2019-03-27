@@ -5,10 +5,13 @@ type Company {
   contact: String
   phone: String
   mail: String
+
+  admin: PublicUser
 }
 
 type Query {
   companyInfos(siret: String!): Company
+  companyUsers(siret: String!): [User]
   searchCompanies(clue: String!): [Company]
   favorites(type: FavoriteType!): [Company]
 }

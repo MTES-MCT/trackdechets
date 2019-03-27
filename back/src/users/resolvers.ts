@@ -6,6 +6,7 @@ import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
+import companyResolver from "../companies/resolvers";
 
 export default {
   Mutation: {
@@ -37,7 +38,7 @@ export default {
           password: hashedPassword,
           phone: payload.phone,
           userType: payload.userType,
-          company: {
+          companies: {
             create: { siret: trimedSiret }
           }
         })
@@ -47,6 +48,12 @@ export default {
             "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
           );
         });
+
+      // Set the new user as the company admin
+      await context.prisma.updateCompany({
+        where: { siret: trimedSiret },
+        data: { admin: { connect: { id: user.id } } }
+      });
 
       const activationHash = await hash(
         new Date().valueOf().toString() + Math.random().toString(),
@@ -127,6 +134,87 @@ export default {
           );
           throw new Error("Impossible de mettre lr profil à jour");
         });
+    },
+    inviteUserToCompany: async (_, { email, siret }, context: Context) => {
+      const userId = getUserId(context);
+      const admin = await prisma.company({ siret }).admin();
+
+      if (!admin || admin.id !== userId) {
+        throw new Error(
+          "Vous ne pouvez pas inviter un utilisateur dans cette entreprise."
+        );
+      }
+
+      const existingUser = await context.prisma
+        .user({ email })
+        .catch(_ => null);
+
+      if (existingUser) {
+        await context.prisma.updateUser({
+          data: { companies: { connect: { siret } } },
+          where: { email }
+        });
+        return true;
+      }
+
+      const userAccoutHash = await hash(
+        new Date().valueOf().toString() + Math.random().toString(),
+        10
+      );
+      await prisma.createUserAccountHash({
+        hash: userAccoutHash,
+        email,
+        companySiret: siret
+      });
+
+      const companyName = await companyResolver.Company.name({ siret });
+
+      await sendMail(
+        userMails.inviteUserToJoin(
+          email,
+          admin.name,
+          companyName,
+          userAccoutHash
+        )
+      );
+
+      return true;
+    },
+    joinWithInvite: async (
+      _,
+      { inviteHash, name, password },
+      context: Context
+    ) => {
+      const existingHash = await prisma
+        .userAccountHash({ hash: inviteHash })
+        .catch(_ => {
+          throw new Error(
+            `Cette invitation n'est plus valable. Contactez le responsable de votre société.`
+          );
+        });
+
+      const hashedPassword = await hash(password, 10);
+      const user = await context.prisma.createUser({
+        name: name,
+        email: existingHash.email,
+        password: hashedPassword,
+        phone: "",
+        userType: [],
+        companies: {
+          connect: { siret: existingHash.companySiret }
+        }
+      });
+
+      await prisma
+        .deleteUserAccountHash({ hash: inviteHash })
+        .catch(err =>
+          console.error(`Cannot delete user account hash ${inviteHash}`, err)
+        );
+
+      return {
+        token: sign({ userId: user.id }, APP_SECRET),
+        user
+      };
     }
   },
   Query: {
@@ -140,8 +228,8 @@ export default {
     }
   },
   User: {
-    company: async (parent, args, context: Context) => {
-      return await context.prisma.user({ id: parent.id }).company();
+    companies: async (parent, args, context: Context) => {
+      return await context.prisma.user({ id: parent.id }).companies();
     }
     // companies: async (parent, args, context: Context) => {
     //   return await context.prisma.user({ id: parent.id }).();

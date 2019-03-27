@@ -2,12 +2,17 @@ import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
 
-export function formsSubscriptionCallback(payload: FormSubscriptionPayload) {
-  mailToInexistantRecipient(payload);
+export async function formsSubscriptionCallback(
+  payload: FormSubscriptionPayload
+) {
+  mailToInexistantRecipient(payload).catch(err =>
+    console.error("Error on inexistant recipient subscription", err)
+  );
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
-  if (payload.mutation === "DELETED") {
+  console.info('SUB FORM "mailToInexistantRecipient" triggered');
+  if (payload.updatedFields && payload.updatedFields.includes("isDeleted")) {
     return;
   }
 

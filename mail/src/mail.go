@@ -59,7 +59,7 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 	messagesInfo := []mailjet.InfoMessagesV31{
 		mailjet.InfoMessagesV31{
 			From: &mailjet.RecipientV31{
-				Email: "orion.charlier@beta.gouv.fr",
+				Email: "noreply@trackdechets.fr",
 				Name:  "Noreply Trackdéchets",
 			},
 			To: &mailjet.RecipientsV31{

@@ -30,6 +30,12 @@ export default {
     name: async parent => {
       const company = await memoizeRequest(parent.siret);
       return company.name;
+    },
+    admin: async (parent, _, context: Context) => {
+      return context.prisma
+        .company({ siret: parent.siret })
+        .admin()
+        .catch(_ => null);
     }
   },
   Query: {
@@ -39,6 +45,17 @@ export default {
       }
 
       return await memoizeRequest(siret);
+    },
+    companyUsers: async (_, { siret }, context: Context) => {
+      const companyAdmin = await context.prisma.company({ siret }).admin();
+
+      if (companyAdmin.id !== getUserId(context)) {
+        return [];
+      }
+
+      return context.prisma.users({
+        where: { companies_some: { siret: siret } }
+      });
     },
     searchCompanies: async (parent, { clue }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
@@ -62,14 +79,21 @@ export default {
     favorites: async (parent, { type }, context: Context) => {
       const lowerType = type.toLowerCase();
       const userId = getUserId(context);
-      const userCompany = await context.prisma.user({ id: userId }).company();
+      const userCompanies = await context.prisma
+        .user({ id: userId })
+        .companies();
+      if (!userCompanies.length) {
+        throw new Error(
+          `Vous n'appartenez à aucune entreprise, vous n'avez pas de favori.`
+        );
+      }
 
       const forms = await context.prisma.forms({
         where: {
           OR: [
             { owner: { id: userId } },
-            { recipientCompanySiret: userCompany.siret },
-            { emitterCompanySiret: userCompany.siret }
+            { recipientCompanySiret: userCompanies[0].siret },
+            { emitterCompanySiret: userCompanies[0].siret }
           ],
           isDeleted: false
         }
@@ -78,7 +102,7 @@ export default {
       const formsWithValue = forms.filter(f => f[`${lowerType}CompanySiret`]);
 
       if (!formsWithValue.length) {
-        return [memoizeRequest(userCompany.siret)];
+        return [memoizeRequest(userCompanies[0].siret)];
       }
 
       return formsWithValue

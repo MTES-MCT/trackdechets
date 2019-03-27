@@ -18,6 +18,8 @@ type Mutation {
   login(email: String!, password: String!): AuthPayload!
   changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
   editProfile(name: String!, phone: String!, email: String!): User
+  inviteUserToCompany(email: String!, siret: String!): Boolean
+  joinWithInvite(inviteHash: String!, name: String!, password: String!): AuthPayload!
 }
 
 type AuthPayload {
@@ -36,8 +38,14 @@ type User {
   email: String!
   name: String
   phone: String
-  company: Company
   userType: [UserType]
 
+  companies: [Company]
+
   gerepId: String
+}
+
+type PublicUser {
+  id: ID!
+  name: String
 }

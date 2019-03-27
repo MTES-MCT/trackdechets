@@ -11,8 +11,13 @@ export const pdfHandler = async (req, res) => {
       .send("Impossible de générer un PDF pour un brouillon.");
   }
 
+  const appendix2Forms = await prisma.form({ id }).appendix2Forms();
   return axios
-    .post("http://td-pdf:3201/pdf", form, { responseType: "stream" })
+    .post(
+      "http://td-pdf:3201/pdf",
+      { ...form, appendix2Forms },
+      { responseType: "stream" }
+    )
     .then(response => response.data.pipe(res))
     .catch(err => {
       console.error(err);

@@ -14,6 +14,8 @@ import WasteSelector from "./login/WasteSelector";
 import Search from "./search/Search";
 import WasteTree from "./search/WasteTree";
 import { trackPageView } from "./tracker";
+import Invite from "./login/Invite";
+import Faq from "./Faq";
 
 export default withRouter(function LayoutContainer({ history }) {
   if (process.env.NODE_ENV === "production") {
@@ -31,7 +33,9 @@ export default withRouter(function LayoutContainer({ history }) {
 
       <Route exact path="/" component={Home} />
       <Route exact path="/cgu" component={Cgu} />
+      <Route exact path="/faq" component={Faq} />
       <Route exact path="/login" component={Login} />
+      <Route exact path="/invite" component={Invite} />
       <Route exact path="/signup" component={Signup} />
       <Route exact path="/signup/details" component={WasteSelector} />
       <Route exact path="/signup/activation" component={SignupInfo} />

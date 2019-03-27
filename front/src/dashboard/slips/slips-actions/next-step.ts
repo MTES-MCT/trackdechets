@@ -3,7 +3,9 @@ import { Me } from "../../../login/model";
 
 export function getNextStep(form: Form, currentUser: Me) {
   const currentUserIsEmitter =
-    form.emitter.company.siret === currentUser.company.siret;
+    currentUser.companies
+      .map(c => c.siret)
+      .indexOf(form.emitter.company.siret) > -1;
 
   if (form.status === "DRAFT") return "SEALED";
 

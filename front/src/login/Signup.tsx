@@ -107,6 +107,13 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   Vous avez déjà un compte ?{" "}
                   <Link to="/login">Connectez vous maintenant</Link>
                 </p>
+                <p>
+                  Vous souhaitez créer un compte pour rejoindre une entreprise
+                  déjà existante sur Trackdéchets ? Adressez vous à la personne
+                  qui a créé le compte pour l'entreprise, elle sera en mesure de
+                  vous inviter. Vous ne pourrez pas créer un compte pour
+                  l'entreprise via ce formulaire.
+                </p>
               </Wizard.Page>
               <Wizard.Page
                 validate={(values: any) => {
@@ -228,7 +235,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Identificant GEREP (si concerné)
+                    Identifiant GEREP (si concerné)
                     <Field type="text" name="gerepId" />
                   </label>
                 </div>

@@ -3,7 +3,12 @@ export type Me = {
   email: string;
   name: string;
   phone: string;
-  company: Company;
+  companies: Company[];
 };
 
-type Company = { siret: string; name: string; address: string };
+type Company = {
+  siret: string;
+  name: string;
+  address: string;
+  admin: { id: string; name: string };
+};

@@ -1,7 +1,7 @@
 version: "3"
 services:
   prisma:
-    image: prismagraphql/prisma:1.25
+    image: prismagraphql/prisma:1.29.1
     restart: always
     ports:
       - "4466:4466"
@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      NODE_ENV: production
+      NODE_ENV: dev
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT

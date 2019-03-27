@@ -3,8 +3,8 @@ scalar DateTime
 type Query {
   form(id: ID): Form
   forms: [Form]
-  stats: [Stat]
-  appendixForms(wasteCode: String!): [Form]
+  stats: [CompanyStat]
+  appendixForms(emitterSiret: String!, wasteCode: String!): [Form]
 }
 
 type Mutation {
@@ -148,6 +148,11 @@ type Trader {
   receipt: String
   department: String
   validityLimit: DateTime
+}
+
+type CompanyStat {
+  company: FormCompany
+  stats: [Stat]
 }
 
 type Stat {

@@ -5,8 +5,9 @@ type User {
   password: String!
   name: String
   phone: String
-  company: Company!
   userType: Json
+
+  companies: [Company] @relation(name: "UserCompanies")
 
   gerepId: String
 
@@ -20,9 +21,18 @@ type UserActivationHash {
   hash: String! @unique
 }
 
+type UserAccountHash {
+  id: ID! @unique
+  email: String!
+  companySiret: ID!
+  hash: String! @unique
+}
+
 type Company {
   id: ID! @unique
   siret: String! @unique
+
+  admin: User @relation(name: "CompanyAdmin")
 }
 
 type Form {

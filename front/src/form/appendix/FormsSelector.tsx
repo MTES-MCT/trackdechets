@@ -7,8 +7,8 @@ import { DateTime } from "luxon";
 import { connect, getIn, setIn, Formik } from "formik";
 
 const GET_APPENDIX_FORMS = gql`
-  query AppendixForms($wasteCode: String!) {
-    appendixForms(wasteCode: $wasteCode) {
+  query AppendixForms($emitterSiret: String!, $wasteCode: String!) {
+    appendixForms(emitterSiret: $emitterSiret, wasteCode: $wasteCode) {
       readableId
       emitter {
         company {
@@ -21,7 +21,7 @@ const GET_APPENDIX_FORMS = gql`
     }
   }
 `;
-type Props = { wasteCode: string; name: string };
+type Props = { emitterSiret: string; wasteCode: string; name: string };
 
 export default connect<Props>(function FormsSelector(props) {
   if (wasteCodeValidator(props.wasteCode) != null) {
@@ -52,18 +52,18 @@ export default connect<Props>(function FormsSelector(props) {
     <div>
       <h4>Annexe 2</h4>
       <p>
-        Vous êtes entrain de créer un bordereau de regroupement. Veuillez
+        Vous êtes en train de créer un bordereau de regroupement. Veuillez
         sélectionner ci-dessous les bordereaux à regrouper.
       </p>
       <p>
         Tous les bordereaux présentés ci-dessous correspondent au code déchet
-        que vous avez renseigné, et à des bordereaux pour lequel vous avez
+        que vous avez renseigné, et à des bordereaux pour lesquels vous avez
         effectué une opération de traitement de type D 13, D 14, D 15 ou R 13.
       </p>
 
       <Query
         query={GET_APPENDIX_FORMS}
-        variables={{ wasteCode: props.wasteCode }}
+        variables={{ wasteCode: props.wasteCode, emitterSiret: props.emitterSiret }}
       >
         {({ loading, error, data }: QueryResult<{ appendixForms: Form[] }>) => {
           if (loading) return "Chargement...";

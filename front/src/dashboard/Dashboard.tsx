@@ -15,7 +15,8 @@ export const GET_ME = gql`
       name
       email
       phone
-      company {
+      companies {
+        admin { id name }
         siret
         name
         address

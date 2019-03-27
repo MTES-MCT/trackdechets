@@ -1,16 +1,7 @@
 version: "3"
 services:
-  reverse-proxy:
-    image: traefik:1.7.4
-    command: --docker
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
   prisma:
-    image: prismagraphql/prisma:1.25
+    image: prismagraphql/prisma:1.29.1
     restart: always
     ports:
       - "4466:4466"
@@ -45,8 +36,9 @@ services:
       - ./back/src:/usr/src/app/src
     environment:
       NODE_ENV: dev
-    labels:
-      - "traefik.frontend.rule=Host:$API_HOST"
+      VIRTUAL_HOST: $API_HOST
+      LETSENCRYPT_HOST: $API_HOST
+      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
   td-ui:
     image: td-ui
@@ -55,8 +47,9 @@ services:
       dockerfile: Dockerfile
     environment:
       REACT_APP_API_ENDPOINT: $API_HOST
-    labels:
-      - "traefik.frontend.rule=Host:$UI_HOST"
+      VIRTUAL_HOST: $UI_HOST
+      LETSENCRYPT_HOST: $UI_HOST
+      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
   td-insee:
     image: td-insee
@@ -89,3 +82,8 @@ services:
 
 volumes:
   postgres:
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
