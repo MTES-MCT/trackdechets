@@ -117,6 +117,26 @@ export default {
         user
       };
     },
+    resetPassword: async (_, { email }, context: Context) => {
+      const user = await context.prisma.user({ email }).catch(_ => null);
+
+      if (!user) {
+        throw new Error(`Cet email n'existe pas sur notre plateforme.`);
+      }
+
+      const newPassword = Math.random()
+        .toString(36)
+        .slice(-10);
+      const hashedPassword = await hash(newPassword, 10);
+      await prisma.updateUser({
+        where: { id: user.id },
+        data: { password: hashedPassword }
+      });
+
+      await sendMail(
+        userMails.resetPassword(user.email, user.name, newPassword)
+      );
+    },
     editProfile: (_, { name, phone, email }, context) => {
       const userId = getUserId(context);
 

@@ -17,9 +17,14 @@ type Mutation {
   signup(payload: SignupInput): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
   changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
+  resetPassword(email: String!): Boolean
   editProfile(name: String!, phone: String!, email: String!): User
   inviteUserToCompany(email: String!, siret: String!): Boolean
-  joinWithInvite(inviteHash: String!, name: String!, password: String!): AuthPayload!
+  joinWithInvite(
+    inviteHash: String!
+    name: String!
+    password: String!
+  ): AuthPayload!
 }
 
 type AuthPayload {

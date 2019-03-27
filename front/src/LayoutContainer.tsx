@@ -16,6 +16,7 @@ import WasteTree from "./search/WasteTree";
 import { trackPageView } from "./tracker";
 import Invite from "./login/Invite";
 import Faq from "./Faq";
+import ResetPassword from "./login/ResetPassword";
 
 export default withRouter(function LayoutContainer({ history }) {
   if (process.env.NODE_ENV === "production") {
@@ -40,6 +41,7 @@ export default withRouter(function LayoutContainer({ history }) {
       <Route exact path="/signup/details" component={WasteSelector} />
       <Route exact path="/signup/activation" component={SignupInfo} />
       <Route exact path="/password" component={ChangePassword} />
+      <Route exact path="/reset-password" component={ResetPassword} />
 
       <Route exact path="/search" component={Search} />
       <Route exact path="/wasteTree" component={WasteTree} />

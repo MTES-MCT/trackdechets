@@ -81,6 +81,10 @@ export default withRouter(function Login(
                     Vous n'avez pas encore de compte ?{" "}
                     <Link to="/signup">Inscrivez vous maintenant</Link>
                   </p>
+                  <p>
+                    Vous avez perdu votre mot de passe ?{" "}
+                    <Link to="/reset-password">Réinitialisez le</Link>
+                  </p>
                 </Form>
               </div>
             </section>

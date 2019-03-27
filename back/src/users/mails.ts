@@ -47,5 +47,19 @@ export const userMails = {
     <br>
     Vous aurez accès à l'ensemble des informations concernant l'entreprise <strong>${companyName}</strong>.
     `
+  }),
+  resetPassword: (toEmail, toName, password) => ({
+    toEmail,
+    toName,
+    subject: "Ré-initialisation du mot de passe",
+    title:
+      "Vous avez demandé à réinitialiser votre mot de passe sur Trackdéchets",
+    body: `Bonjour ${toName}
+    <br><br>
+    Vous avez demandé à réinitialiser votre mot de passe sur Trackdéchets.<br>
+    Vous pouvez désormais vous connecter avec votre nouveau mot de passe qui vient d'être généré: <strong>${password}</strong>.<br>
+    Vous aurez la possibilité de modifier ce mot de passe sur la plateforme.<bt><br>
+    Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">par mail.</a>
+    `
   })
 };
