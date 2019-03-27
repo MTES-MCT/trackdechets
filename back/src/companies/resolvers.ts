@@ -10,7 +10,10 @@ function memoizeRequest(siret) {
 
   return requests[siret]
     .then(v => v.data)
-    .catch(err => console.error("Error while querying INSEE service", err));
+    .catch(err => {
+      delete requests[siret];
+      console.error("Error while querying INSEE service", err);
+    });
 }
 
 type Company = {
