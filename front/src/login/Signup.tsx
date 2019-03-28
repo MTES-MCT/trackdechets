@@ -11,6 +11,7 @@ import { SIGNUP } from "./mutations";
 import "./Signup.scss";
 import UserType from "./UserType";
 import { Wizard } from "./Wizard";
+import { FaEnvelope, FaLock, FaPhone, FaIdCard } from "react-icons/fa";
 
 type Values = {};
 const handleSumbit = (
@@ -148,10 +149,17 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               >
                 <h1>Informations utilisateur</h1>
                 <div className="form__group">
-                  <label>
-                    Email*
+                  <label>Email*</label>
+                  <div className="search__group">
                     <Field type="text" name="email" />
-                  </label>
+                    <button
+                      type="button"
+                      className="overlay-button"
+                      aria-label="Recherche"
+                    >
+                      <FaEnvelope />
+                    </button>
+                  </div>
 
                   <RedErrorMessage name="email" />
                 </div>
@@ -166,26 +174,47 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 </div>
 
                 <div className="form__group">
-                  <label>
-                    Nom et prénom*
+                  <label>Nom et prénom*</label>
+                  <div className="search__group">
                     <Field type="text" name="name" />
-                  </label>
+                    <button
+                      type="button"
+                      className="overlay-button"
+                      aria-label="Recherche"
+                    >
+                      <FaIdCard />
+                    </button>
+                  </div>
 
                   <RedErrorMessage name="name" />
                 </div>
 
                 <div className="form__group">
-                  <label>
-                    Téléphone
+                  <label>Téléphone</label>
+                  <div className="search__group">
                     <Field type="text" name="phone" />
-                  </label>
+                    <button
+                      type="button"
+                      className="overlay-button"
+                      aria-label="Recherche"
+                    >
+                      <FaPhone />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="form__group">
-                  <label>
-                    Mot de passe*
+                  <label>Mot de passe*</label>
+                  <div className="search__group">
                     <Field type="password" name="password" />
-                  </label>
+                    <button
+                      type="button"
+                      className="overlay-button"
+                      aria-label="Recherche"
+                    >
+                      <FaLock />
+                    </button>
+                  </div>
 
                   <RedErrorMessage name="password" />
                 </div>
