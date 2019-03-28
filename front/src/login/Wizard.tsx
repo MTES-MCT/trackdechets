@@ -53,43 +53,59 @@ export class Wizard extends React.Component<Props, State> {
     const activePage = React.Children.toArray(children)[page];
     const isLastPage = page === React.Children.count(children) - 1;
     return (
-      <Formik
-        initialValues={values}
-        enableReinitialize={false}
-        validate={this.validate}
-        onSubmit={this.handleSubmit}
-        render={({ values, handleSubmit, isSubmitting, handleReset }) => (
-          <form onSubmit={handleSubmit}>
-            {activePage}
-            <div className="buttons">
-              {page > 0 && (
-                <button
-                  type="button"
-                  className="button secondary"
-                  onClick={this.previous}
-                >
-                  Précédent
-                </button>
-              )}
+      <React.Fragment>
+        <ul className="step-header">
+          {React.Children.map(children, (child, index) => (
+            <li
+              className={
+                index === page ? "is-active" : page > index ? "is-complete" : ""
+              }
+              onClick={() => this.setState({ page: index })}
+            >
+              <span>{child.props.title}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="step-content">
+          <Formik
+            initialValues={values}
+            enableReinitialize={false}
+            validate={this.validate}
+            onSubmit={this.handleSubmit}
+            render={({ values, handleSubmit, isSubmitting, handleReset }) => (
+              <form onSubmit={handleSubmit}>
+                {activePage}
+                <div className="buttons">
+                  {page > 0 && (
+                    <button
+                      type="button"
+                      className="button secondary"
+                      onClick={this.previous}
+                    >
+                      Précédent
+                    </button>
+                  )}
 
-              {!isLastPage && (
-                <button className="button" type="submit">
-                  Suivant
-                </button>
-              )}
-              {isLastPage && (
-                <button
-                  type="submit"
-                  className="button"
-                  disabled={isSubmitting}
-                >
-                  S'inscrire
-                </button>
-              )}
-            </div>
-          </form>
-        )}
-      />
+                  {!isLastPage && (
+                    <button className="button" type="submit">
+                      Suivant
+                    </button>
+                  )}
+                  {isLastPage && (
+                    <button
+                      type="submit"
+                      className="button"
+                      disabled={isSubmitting}
+                    >
+                      S'inscrire
+                    </button>
+                  )}
+                </div>
+              </form>
+            )}
+          />
+        </div>
+      </React.Fragment>
     );
   }
 }

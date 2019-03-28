@@ -54,6 +54,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
             <Wizard
               initialValues={{
                 email: "",
+                emailConfirmation: "",
                 name: "",
                 phone: "",
                 password: "",
@@ -67,6 +68,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               onSubmit={(values: any, formikActions: any) => {
                 const {
                   passwordConfirmation,
+                  emailConfirmation,
                   isAllowed,
                   cgu,
                   ...payload
@@ -78,7 +80,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 });
               }}
             >
-              <Wizard.Page>
+              <Wizard.Page title="Bienvenue">
                 <h1>Inscription à Trackdéchets</h1>
                 <p>
                   Trackdéchets est destiné à simplifier l'édition d'un bordereau
@@ -116,11 +118,17 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 </p>
               </Wizard.Page>
               <Wizard.Page
+                title="Informations utilisateur"
                 validate={(values: any) => {
                   let errors: any = {};
                   if (values.password !== values.passwordConfirmation) {
                     errors.passwordConfirmation =
                       "Les deux mots de passe ne sont pas identiques.";
+                  }
+
+                  if (values.email !== values.emailConfirmation) {
+                    errors.emailConfirmation =
+                      "Les deux emails ne sont pas identiques.";
                   }
 
                   !values.email
@@ -138,7 +146,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   return errors;
                 }}
               >
-                <h1>Informations de base</h1>
+                <h1>Informations utilisateur</h1>
                 <div className="form__group">
                   <label>
                     Email*
@@ -146,6 +154,15 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   </label>
 
                   <RedErrorMessage name="email" />
+                </div>
+
+                <div className="form__group">
+                  <label>
+                    Confirmation de l'email*
+                    <Field type="text" name="emailConfirmation" />
+                  </label>
+
+                  <RedErrorMessage name="emailConfirmation" />
                 </div>
 
                 <div className="form__group">
@@ -169,6 +186,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     Mot de passe*
                     <Field type="password" name="password" />
                   </label>
+
+                  <RedErrorMessage name="password" />
                 </div>
 
                 <div className="form__group">
@@ -176,11 +195,12 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     Vérification du mot de passe*
                     <Field type="password" name="passwordConfirmation" />
                   </label>
-                </div>
 
-                <RedErrorMessage name="passwordConfirmation" />
+                  <RedErrorMessage name="passwordConfirmation" />
+                </div>
               </Wizard.Page>
               <Wizard.Page
+                title="Informations entreprise"
                 validate={(values: any) => {
                   let errors: any = {};
                   values.siret.replace(/\s/g, "").length !== 14
