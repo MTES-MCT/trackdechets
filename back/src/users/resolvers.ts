@@ -93,7 +93,7 @@ export default {
         throw new Error("Mot de passe incorrect");
       }
       return {
-        token: sign({ userId: user.id }, APP_SECRET),
+        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
         user
       };
     },
@@ -113,7 +113,7 @@ export default {
       });
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET),
+        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
         user
       };
     },
@@ -232,7 +232,7 @@ export default {
         );
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET),
+        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
         user
       };
     }

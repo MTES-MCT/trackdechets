@@ -1,8 +1,9 @@
-import { ApolloClient } from "apollo-client";
-import { createHttpLink } from "apollo-link-http";
-import { setContext } from "apollo-link-context";
 import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloClient } from "apollo-client";
 import { ApolloLink } from "apollo-link";
+import { setContext } from "apollo-link-context";
+import { createHttpLink } from "apollo-link-http";
+import { localAuthService } from "./login/auth.service";
 import { omitDeep } from "./utils/omit";
 
 const httpLink = createHttpLink({
@@ -10,7 +11,7 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem("td-token");
+  const token = localAuthService.getToken();
   return {
     headers: {
       ...headers,
