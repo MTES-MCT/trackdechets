@@ -235,6 +235,29 @@ export default {
         token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
         user
       };
+    },
+    removeUserFromCompany: async (_, { userId, siret }, context: Context) => {
+      const currentUserId = getUserId(context);
+      const admin = await prisma.company({ siret }).admin();
+
+      if (!admin || admin.id !== currentUserId) {
+        throw new Error(
+          "Vous ne pouvez pas retirer un utilisateur dans cette entreprise."
+        );
+      }
+
+      await prisma
+        .updateUser({
+          where: { id: userId },
+          data: { companies: { disconnect: { siret } } }
+        })
+        .catch(_ => {
+          throw new Error(
+            `Erreur, l'utilisateur n'a pa pu être retiré de l'entreprise`
+          );
+        });
+
+      return true;
     }
   },
   Query: {
