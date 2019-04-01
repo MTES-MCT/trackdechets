@@ -71,7 +71,7 @@ export default withRouter(function Account({
               {c.address}
             </address>
             {c.admin && c.admin.id === me.id && (
-              <ImportNewUser siret={c.siret} />
+              <ImportNewUser siret={c.siret} me={me} />
             )}
           </React.Fragment>
         ))}
