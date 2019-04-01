@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
+    "update": "ts-node prisma/scripts/index.ts",
     "test": "jest"
   },
   "keywords": [],
