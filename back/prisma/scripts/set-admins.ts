@@ -22,8 +22,8 @@ export class SetAdminUpdater implements Updater {
             `-> ${users.length} users identified to fill the admin roles`
           );
 
-          if (companies.length !== users.length) {
-            console.error("✗ numbers are different, aborting");
+          if (companies.length < users.length) {
+            console.error("✗ too many potential admins, aborting");
             return;
           }
 
