@@ -220,6 +220,7 @@ export default {
         password: hashedPassword,
         phone: "",
         userType: [],
+        isActive: true,
         companies: {
           connect: { siret: existingHash.companySiret }
         }
