@@ -28,7 +28,7 @@ export default function DashboardMenu({ me, match }: IProps) {
         </li>
         <li>
           <NavLink to={`${match.url}/exports`} activeClassName="active">
-            Exports
+            Registre
           </NavLink>
         </li>
       </ul>
