@@ -11,9 +11,16 @@ type Company {
 
 type Query {
   companyInfos(siret: String!): Company
-  companyUsers(siret: String!): [User]
+  companyUsers(siret: String!): [CompanyMember]
   searchCompanies(clue: String!): [Company]
   favorites(type: FavoriteType!): [Company]
+}
+
+type CompanyMember {
+  id: String
+  name: String
+  email: String
+  role: String
 }
 
 enum FavoriteType {

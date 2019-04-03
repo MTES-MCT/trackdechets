@@ -52,13 +52,36 @@ export default {
     companyUsers: async (_, { siret }, context: Context) => {
       const companyAdmin = await context.prisma.company({ siret }).admin();
 
-      if (companyAdmin.id !== getUserId(context)) {
+      const currentUserId = getUserId(context);
+      if (companyAdmin.id !== currentUserId) {
         return [];
       }
 
-      return context.prisma.users({
-        where: { companies_some: { siret: siret } }
-      });
+      const invitedUsers = await context.prisma
+        .userAccountHashes({ where: { companySiret: siret } })
+        .then(hashes =>
+          hashes.map(h => ({
+            id: h.email,
+            name: "Invité",
+            email: h.email,
+            role: "En attente"
+          }))
+        );
+
+      const users = await context.prisma
+        .users({
+          where: { companies_some: { siret: siret } }
+        })
+        .then(users =>
+          users.map(u => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            role: u.id === currentUserId ? "Administrateur" : "Membre"
+          }))
+        );
+
+      return [...users, ...invitedUsers];
     },
     searchCompanies: async (parent, { clue }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);

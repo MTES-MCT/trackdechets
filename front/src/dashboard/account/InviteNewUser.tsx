@@ -18,6 +18,7 @@ const COMPANY_USERS = gql`
       id
       name
       email
+      role
     }
   }
 `;
@@ -106,9 +107,9 @@ export default function ImportNewUser({ siret, me }: Props) {
                         <tr key={u.id}>
                           <td>{u.name}</td>
                           <td>{u.email}</td>
-                          <td>{me.id === u.id ? "Admin" : "Membre"}</td>
+                          <td>{u.role}</td>
                           <td className="right-column">
-                            {me.id !== u.id && (
+                            {me.id !== u.id && u.name !== "Invité" && (
                               <Mutation
                                 mutation={REMOVE_USER}
                                 update={proxy => {
