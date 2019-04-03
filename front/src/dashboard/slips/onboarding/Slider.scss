@@ -1,0 +1,14 @@
+.slider {
+  display: flex;
+
+  .navigation {
+    align-self: center;
+    padding: 15px;
+    font-size: xx-large;
+    cursor: pointer;
+  }
+
+  .navigation.hidden {
+    visibility: hidden;
+  }
+}
