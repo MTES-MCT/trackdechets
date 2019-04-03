@@ -48,6 +48,20 @@ export const userMails = {
     Vous aurez accès à l'ensemble des informations concernant l'entreprise <strong>${companyName}</strong>.
     `
   }),
+  notifyUserOfInvite: (toEmail, toName, companyAdmin, companyName) => ({
+    toEmail,
+    toName,
+    subject: "Vous avez été invité sur Trackdéchets",
+    title: `${companyAdmin} vous a invité à sur Trackdéchets`,
+    body: `Bonjour ${toName},
+    <br><br>
+    La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre son organisation sur Trackdéchets.
+    <br>
+    Vous pouvez dès à présent accéder aux informations de cette entreprise sur le <a href="https://trackdechets.beta.gouv.fr/">portail Trackdéchets</a>.
+    <br>
+    Vous aurez accès à l'ensemble des données concernant l'entreprise <strong>${companyName}</strong>.
+    `
+  }),
   resetPassword: (toEmail, toName, password) => ({
     toEmail,
     toName,

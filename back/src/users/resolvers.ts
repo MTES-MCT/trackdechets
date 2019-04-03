@@ -169,11 +169,22 @@ export default {
         .user({ email })
         .catch(_ => null);
 
+      const companyName = await companyResolver.Company.name({ siret });
+
       if (existingUser) {
-        await context.prisma.updateUser({
+        const updatedUser = await context.prisma.updateUser({
           data: { companies: { connect: { siret } } },
           where: { email }
         });
+
+        await sendMail(
+          userMails.notifyUserOfInvite(
+            updatedUser.email,
+            updatedUser.name,
+            admin.name,
+            companyName
+          )
+        );
         return true;
       }
 
@@ -186,8 +197,6 @@ export default {
         email,
         companySiret: siret
       });
-
-      const companyName = await companyResolver.Company.name({ siret });
 
       await sendMail(
         userMails.inviteUserToJoin(
