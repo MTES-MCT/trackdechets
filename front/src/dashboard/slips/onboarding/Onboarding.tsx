@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Slide from "./Slide";
 import "./Onboarding.scss";
 import Slider from "./Slider";
 
-export default function() {
-  const [isOpen, setIsOpen] = useState(true);
+export default function OnBoarding() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const slideShowShown = window.localStorage.getItem("td-slideshow");
+
+    if (!slideShowShown) {
+      setIsOpen(true);
+      window.localStorage.setItem("td-slideshow", "DONE");
+    }
+  }, []);
 
   return (
     <div
@@ -14,7 +23,7 @@ export default function() {
       onClick={() => setIsOpen(false)}
     >
       <div className="modal onboarding" onClick={e => e.stopPropagation()}>
-        <Slider>
+        <Slider onClose={() => setIsOpen(false)}>
           <Slide
             image="/onboarding/slide1.png"
             title="Éditez et transmettez simplement vos BSD"
