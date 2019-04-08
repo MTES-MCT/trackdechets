@@ -11,7 +11,8 @@ import { SIGNUP } from "./mutations";
 import "./Signup.scss";
 import UserType from "./UserType";
 import { Wizard } from "./Wizard";
-import { FaEnvelope, FaLock, FaPhone, FaIdCard } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaPhone, FaIdCard, FaEye } from "react-icons/fa";
+import PasswordMeter from "./PasswordMeter";
 
 type Values = {};
 const handleSumbit = (
@@ -27,6 +28,8 @@ const handleSumbit = (
 
 export default withRouter(function Signup(routerProps: RouteComponentProps) {
   const [searchResult, setSearchResult] = useState<Company | null>(null);
+  const [passwordType, setPasswordType] = useState("password");
+
   const searchCompanies = async (
     client: ApolloClient<Company>,
     clue: string
@@ -206,7 +209,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 <div className="form__group">
                   <label>Mot de passe*</label>
                   <div className="search__group">
-                    <Field type="password" name="password" />
+                    <Field type={passwordType} name="password" />
                     <button
                       type="button"
                       className="overlay-button"
@@ -214,6 +217,17 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     >
                       <FaLock />
                     </button>
+                    <span
+                      className="show-password"
+                      onClick={() =>
+                        setPasswordType(
+                          passwordType === "password" ? "input" : "password"
+                        )
+                      }
+                    >
+                      <FaEye /> Afficher le mot de passe
+                    </span>
+                    <PasswordMeter />
                   </div>
 
                   <RedErrorMessage name="password" />
