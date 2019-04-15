@@ -11,7 +11,6 @@ export async function formsSubscriptionCallback(
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
-  console.info('SUB FORM "mailToInexistantRecipient" triggered');
   if (payload.updatedFields && payload.updatedFields.includes("isDeleted")) {
     return;
   }
