@@ -11,7 +11,7 @@ type Contact = { Email: string; Name?: string };
 )
 export class SetContactsUpdater implements Updater {
   run() {
-    console.info("Starting script to set companies admins...");
+    console.info("Starting script to set contacts in mailjet...");
 
     try {
       return prisma.users({ orderBy: "createdAt_DESC" }).then(async users => {

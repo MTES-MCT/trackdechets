@@ -4,6 +4,7 @@ export type Me = {
   name: string;
   phone: string;
   companies: Company[];
+  userType: string[];
 };
 
 type Company = {

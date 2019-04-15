@@ -1,7 +1,8 @@
-import { ErrorMessage, Field, Form, Formik, FormikActions } from "formik";
+import { Field, Form, Formik, FormikActions } from "formik";
 import React from "react";
 import { Mutation, MutationFn } from "react-apollo";
 import { RouteComponentProps, withRouter } from "react-router-dom";
+import RedErrorMessage from "../form/RedErrorMessage";
 import { CHANGEPASSWORD } from "./mutations";
 
 type Values = {
@@ -18,7 +19,7 @@ const handleSubmit = (
   const { oldPassword, newPassword } = payload;
   props
     .changePassword({ variables: { oldPassword, newPassword } })
-    .then(_ => props.history.push("/dashboard"))
+    .then(_ => props.history.push("/dashboard/account"))
     .catch(e => {
       props.setSubmitting(false);
       props.setErrors({
@@ -63,7 +64,7 @@ export default withRouter(function Login(
                     Ancien mot de passe:
                     <Field type="password" name="oldPassword" />
                   </label>
-                  <ErrorMessage name="oldPassword" component="div" />
+                  <RedErrorMessage name="oldPassword" component="div" />
                 </div>
 
                 <div className="form__group">
@@ -78,7 +79,7 @@ export default withRouter(function Login(
                     Confirmation du nouveau mot de passe:
                     <Field type="password" name="newPasswordConfirmation" />
                   </label>
-                  <ErrorMessage
+                  <RedErrorMessage
                     name="newPasswordConfirmation"
                     component="div"
                   />

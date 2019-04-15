@@ -21,6 +21,7 @@ export const GET_ME = gql`
         name
         address
       }
+      userType
     }
   }
 `;

@@ -137,18 +137,18 @@ export default {
         userMails.resetPassword(user.email, user.name, newPassword)
       );
     },
-    editProfile: (_, { name, phone, email }, context) => {
+    editProfile: (_, { name, phone, email, userType }, context) => {
       const userId = getUserId(context);
 
       return prisma
         .updateUser({
           where: { id: userId },
-          data: { name, phone }
+          data: { name, phone, userType }
         })
         .catch(err => {
           console.error(
             `Error while editing profile from user #${userId} with values ${JSON.stringify(
-              { name, phone, email }
+              { name, phone, email, userType }
             )}`,
             err
           );
