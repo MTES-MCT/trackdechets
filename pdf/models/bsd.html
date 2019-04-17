@@ -116,8 +116,16 @@
       .appendix2-item {
         border: 1px solid black;
       }
+      .relative {
+        position: relative;
+      }
       .stamp svg {
         height: 80px;
+      }
+      .stamp.relative svg {
+        position: absolute;
+        bottom: 40px;
+        left: 200px;
       }
     </style>
   </head>
@@ -401,8 +409,10 @@
 
 
 
+
               }}/> benne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("CITERNE") > -1
+
 
 
 
@@ -556,7 +566,7 @@
                 Quantité réelle présentée: {{=it.quantityReceived}} tonne(s)
               </p>
               <p>Date: {{=it.toDate(it.receivedAt)}}</p>
-              <p class="stamp">
+              <p class="stamp relative">
                 <svg
                   width="200"
                   height="100"
