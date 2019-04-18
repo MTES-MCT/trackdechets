@@ -410,8 +410,10 @@
 
 
 
+
               }}/> benne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("CITERNE") > -1
+
 
 
 
@@ -597,6 +599,7 @@
                 Je soussigné certifie que l'opération ci-dessous a été réalisée.
               </p>
               <p>Code D/R: {{=it.processingOperationDone}}</p>
+              <p>Description: {{=it.processingOperationDescription}}</p>
               <p>Nom: {{=it.processedBy}}</p>
               <p>Date: {{=it.toDate(it.processedAt)}}</p>
               <p class="stamp">

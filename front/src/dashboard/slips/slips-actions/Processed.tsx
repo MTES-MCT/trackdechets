@@ -11,6 +11,7 @@ export default function Processed(props: SlipActionProps) {
       <Formik
         initialValues={{
           processingOperationDone: "",
+          processingOperationDescription: "",
           processedBy: "",
           processedAt: DateTime.local().toISODate(),
           nextDestinationProcessingOperation: "",
@@ -44,6 +45,10 @@ export default function Processed(props: SlipActionProps) {
                 Opération de traitement prévue:{" "}
                 {props.form.recipient.processingOperation}
               </span>
+            </label>
+            <label>
+              Description de l'Opération
+              <Field component="textarea" name="processingOperationDescription" />
             </label>
             {["D 13", "D 14", "D 15", "R 13"].indexOf(
               values.processingOperationDone

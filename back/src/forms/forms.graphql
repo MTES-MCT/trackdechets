@@ -65,6 +65,7 @@ type Form {
   quantityReceived: Float
 
   processingOperationDone: String
+  processingOperationDescription: String
   processedBy: String
   processedAt: DateTime
   noTraceability: Boolean

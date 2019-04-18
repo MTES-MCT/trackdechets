@@ -57,6 +57,7 @@ type Form {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
 
   # Next destination fields (frame 12)

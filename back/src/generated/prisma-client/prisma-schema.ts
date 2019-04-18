@@ -242,6 +242,7 @@ type Form {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
@@ -312,6 +313,7 @@ input FormCreateInput {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
@@ -403,6 +405,8 @@ enum FormOrderByInput {
   processedAt_DESC
   processingOperationDone_ASC
   processingOperationDone_DESC
+  processingOperationDescription_ASC
+  processingOperationDescription_DESC
   noTraceability_ASC
   noTraceability_DESC
   nextDestinationProcessingOperation_ASC
@@ -515,6 +519,7 @@ type FormPreviousValues {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
@@ -721,6 +726,20 @@ input FormScalarWhereInput {
   processingOperationDone_not_starts_with: String
   processingOperationDone_ends_with: String
   processingOperationDone_not_ends_with: String
+  processingOperationDescription: String
+  processingOperationDescription_not: String
+  processingOperationDescription_in: [String!]
+  processingOperationDescription_not_in: [String!]
+  processingOperationDescription_lt: String
+  processingOperationDescription_lte: String
+  processingOperationDescription_gt: String
+  processingOperationDescription_gte: String
+  processingOperationDescription_contains: String
+  processingOperationDescription_not_contains: String
+  processingOperationDescription_starts_with: String
+  processingOperationDescription_not_starts_with: String
+  processingOperationDescription_ends_with: String
+  processingOperationDescription_not_ends_with: String
   noTraceability: Boolean
   noTraceability_not: Boolean
   nextDestinationProcessingOperation: String
@@ -1336,6 +1355,7 @@ input FormUpdateDataInput {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
@@ -1400,6 +1420,7 @@ input FormUpdateInput {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
@@ -1463,6 +1484,7 @@ input FormUpdateManyDataInput {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
@@ -1537,6 +1559,7 @@ input FormUpdateManyMutationInput {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
@@ -1760,6 +1783,20 @@ input FormWhereInput {
   processingOperationDone_not_starts_with: String
   processingOperationDone_ends_with: String
   processingOperationDone_not_ends_with: String
+  processingOperationDescription: String
+  processingOperationDescription_not: String
+  processingOperationDescription_in: [String!]
+  processingOperationDescription_not_in: [String!]
+  processingOperationDescription_lt: String
+  processingOperationDescription_lte: String
+  processingOperationDescription_gt: String
+  processingOperationDescription_gte: String
+  processingOperationDescription_contains: String
+  processingOperationDescription_not_contains: String
+  processingOperationDescription_starts_with: String
+  processingOperationDescription_not_starts_with: String
+  processingOperationDescription_ends_with: String
+  processingOperationDescription_not_ends_with: String
   noTraceability: Boolean
   noTraceability_not: Boolean
   nextDestinationProcessingOperation: String

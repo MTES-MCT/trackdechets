@@ -352,6 +352,8 @@ export type FormOrderByInput =
   | "processedAt_DESC"
   | "processingOperationDone_ASC"
   | "processingOperationDone_DESC"
+  | "processingOperationDescription_ASC"
+  | "processingOperationDescription_DESC"
   | "noTraceability_ASC"
   | "noTraceability_DESC"
   | "nextDestinationProcessingOperation_ASC"
@@ -907,6 +909,20 @@ export interface FormWhereInput {
   processingOperationDone_not_starts_with?: String;
   processingOperationDone_ends_with?: String;
   processingOperationDone_not_ends_with?: String;
+  processingOperationDescription?: String;
+  processingOperationDescription_not?: String;
+  processingOperationDescription_in?: String[] | String;
+  processingOperationDescription_not_in?: String[] | String;
+  processingOperationDescription_lt?: String;
+  processingOperationDescription_lte?: String;
+  processingOperationDescription_gt?: String;
+  processingOperationDescription_gte?: String;
+  processingOperationDescription_contains?: String;
+  processingOperationDescription_not_contains?: String;
+  processingOperationDescription_starts_with?: String;
+  processingOperationDescription_not_starts_with?: String;
+  processingOperationDescription_ends_with?: String;
+  processingOperationDescription_not_ends_with?: String;
   noTraceability?: Boolean;
   noTraceability_not?: Boolean;
   nextDestinationProcessingOperation?: String;
@@ -1779,6 +1795,20 @@ export interface FormScalarWhereInput {
   processingOperationDone_not_starts_with?: String;
   processingOperationDone_ends_with?: String;
   processingOperationDone_not_ends_with?: String;
+  processingOperationDescription?: String;
+  processingOperationDescription_not?: String;
+  processingOperationDescription_in?: String[] | String;
+  processingOperationDescription_not_in?: String[] | String;
+  processingOperationDescription_lt?: String;
+  processingOperationDescription_lte?: String;
+  processingOperationDescription_gt?: String;
+  processingOperationDescription_gte?: String;
+  processingOperationDescription_contains?: String;
+  processingOperationDescription_not_contains?: String;
+  processingOperationDescription_starts_with?: String;
+  processingOperationDescription_not_starts_with?: String;
+  processingOperationDescription_ends_with?: String;
+  processingOperationDescription_not_ends_with?: String;
   noTraceability?: Boolean;
   noTraceability_not?: Boolean;
   nextDestinationProcessingOperation?: String;
@@ -2386,6 +2416,7 @@ export interface FormUpdateDataInput {
   processedBy?: String;
   processedAt?: String;
   processingOperationDone?: String;
+  processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
   nextDestinationDetails?: String;
@@ -2523,6 +2554,7 @@ export interface FormCreateInput {
   processedBy?: String;
   processedAt?: String;
   processingOperationDone?: String;
+  processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
   nextDestinationDetails?: String;
@@ -2586,6 +2618,7 @@ export interface FormUpdateManyMutationInput {
   processedBy?: String;
   processedAt?: String;
   processingOperationDone?: String;
+  processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
   nextDestinationDetails?: String;
@@ -2759,6 +2792,7 @@ export interface FormUpdateInput {
   processedBy?: String;
   processedAt?: String;
   processingOperationDone?: String;
+  processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
   nextDestinationDetails?: String;
@@ -2827,6 +2861,7 @@ export interface FormUpdateManyDataInput {
   processedBy?: String;
   processedAt?: String;
   processingOperationDone?: String;
+  processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
   nextDestinationDetails?: String;
@@ -3489,6 +3524,7 @@ export interface FormPreviousValues {
   processedBy?: String;
   processedAt?: String;
   processingOperationDone?: String;
+  processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
   nextDestinationDetails?: String;
@@ -3556,6 +3592,7 @@ export interface FormPreviousValuesPromise
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
   processingOperationDone: () => Promise<String>;
+  processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
   nextDestinationProcessingOperation: () => Promise<String>;
   nextDestinationDetails: () => Promise<String>;
@@ -3623,6 +3660,7 @@ export interface FormPreviousValuesSubscription
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;
+  processingOperationDescription: () => Promise<AsyncIterator<String>>;
   noTraceability: () => Promise<AsyncIterator<Boolean>>;
   nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   nextDestinationDetails: () => Promise<AsyncIterator<String>>;
@@ -3713,6 +3751,7 @@ export interface Form {
   processedBy?: String;
   processedAt?: String;
   processingOperationDone?: String;
+  processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
   nextDestinationDetails?: String;
@@ -3779,6 +3818,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
   processingOperationDone: () => Promise<String>;
+  processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
   nextDestinationProcessingOperation: () => Promise<String>;
   nextDestinationDetails: () => Promise<String>;
@@ -3858,6 +3898,7 @@ export interface FormSubscription
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;
+  processingOperationDescription: () => Promise<AsyncIterator<String>>;
   noTraceability: () => Promise<AsyncIterator<Boolean>>;
   nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   nextDestinationDetails: () => Promise<AsyncIterator<String>>;
