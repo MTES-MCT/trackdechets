@@ -57,6 +57,7 @@ type Form {
   processedBy: String
   processedAt: String
   processingOperationDone: String
+  noTraceability: Boolean
 
   # Next destination fields (frame 12)
   nextDestinationProcessingOperation: String
@@ -149,4 +150,5 @@ enum Status {
   PROCESSED
   AWAITING_GROUP
   GROUPED
+  NO_TRACEABILITY
 }

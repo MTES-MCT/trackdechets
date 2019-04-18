@@ -16,6 +16,7 @@ input ProcessedFormInput {
   processedAt: DateTime
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  noTraceability: Boolean
 }
 
 input FormInput {

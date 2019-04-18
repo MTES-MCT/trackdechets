@@ -37,6 +37,7 @@ enum FormStatus {
   PROCESSED
   AWAITING_GROUP
   GROUPED
+  NO_TRACEABILITY
 }
 
 type Form {
@@ -66,6 +67,7 @@ type Form {
   processingOperationDone: String
   processedBy: String
   processedAt: DateTime
+  noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
 

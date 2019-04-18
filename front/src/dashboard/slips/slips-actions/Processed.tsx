@@ -14,7 +14,8 @@ export default function Processed(props: SlipActionProps) {
           processedBy: "",
           processedAt: DateTime.local().toISODate(),
           nextDestinationProcessingOperation: "",
-          nextDestinationDetails: ""
+          nextDestinationDetails: "",
+          noTraceability: false
         }}
         onSubmit={values => props.onSubmit({ info: values })}
       >
@@ -44,10 +45,17 @@ export default function Processed(props: SlipActionProps) {
                 {props.form.recipient.processingOperation}
               </span>
             </label>
-            {["D 13", "D 14", "D 15", "R 13"].indexOf(values.processingOperationDone) >
-              -1 && (
+            {["D 13", "D 14", "D 15", "R 13"].indexOf(
+              values.processingOperationDone
+            ) > -1 && (
               <div>
                 <h4>Destination ultérieure prévue</h4>
+                <div>
+                  <label>
+                    <Field type="checkbox" name="noTraceability" />
+                    C'est un regroupement avec perte de traçabilité
+                  </label>
+                </div>
                 <label>
                   Opération de traitement
                   <Field

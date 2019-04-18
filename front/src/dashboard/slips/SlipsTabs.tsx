@@ -6,7 +6,7 @@ import { GET_SLIPS } from "./query";
 import { Query, QueryResult } from "react-apollo";
 import { Me } from "../../login/model";
 import { Form } from "../../form/model";
-import { getNextStep } from "./slips-actions/next-step";
+import { getNextStep, getTabForms, SlipTabs } from "./slips-actions/next-step";
 import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -18,25 +18,10 @@ export default function SlipsTabs({ me }: Props) {
         if (loading) return "Chargement...";
         if (error || !data) return "Erreur...";
 
-        const drafts = data.forms
-          .filter((f: Form) => f.status === "DRAFT")
-          .sort((a: any, b: any) => a.createdAt - b.createdAt);
-        const toSign = data.forms
-          .filter(
-            (f: Form) => f.status !== "DRAFT" && getNextStep(f, me) != null
-          )
-          .sort((a: any, b: any) => a.status - b.status);
-        const status = data.forms
-          .filter(
-            (f: Form) =>
-              f.status !== "DRAFT" &&
-              f.status !== "PROCESSED" &&
-              getNextStep(f, me) == null
-          )
-          .sort((a: any, b: any) => a.status - b.status);
-        const history = data.forms
-          .filter((f: Form) => f.status === "PROCESSED")
-          .sort((a: any, b: any) => a.createdAt - b.createdAt);
+        const drafts = getTabForms(SlipTabs.DRAFTS, data.forms, me);
+        const toSign = getTabForms(SlipTabs.TO_SIGN, data.forms, me);
+        const status = getTabForms(SlipTabs.STATUS, data.forms, me);
+        const history = getTabForms(SlipTabs.HISTORY, data.forms, me);
 
         return (
           <Tabs>
