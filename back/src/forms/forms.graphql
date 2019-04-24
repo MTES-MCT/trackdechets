@@ -1,20 +1,52 @@
 scalar DateTime
 
 type Query {
+  """
+  Renvoie un BSD, sélectionné par ID
+  """
   form(id: ID): Form
+  """
+  Renvoie tous mes BSD
+  """
   forms: [Form]
   stats: [CompanyStat]
+  """
+  Renvoie des BSD candidats à un regroupement dans une annexe 2
+  `EmitterSiret`: Siret d'une des entreprises que j'administre
+  `wasteCode`: Code déchet pour affiner
+  """
   appendixForms(emitterSiret: String!, wasteCode: String!): [Form]
 }
 
 type Mutation {
+  """
+  Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
+  """
   saveForm(formInput: FormInput!): Form
+  """
+  Supprime un BSD
+  """
   deleteForm(id: ID!): Form
+  """
+  Duplique un BSD
+  """
   duplicateForm(id: ID!): Form
 
+  """
+  Scelle un BSD
+  """
   markAsSealed(id: ID): Form
+  """
+  Valide l'envoi d'un BSD
+  """
   markAsSent(id: ID, sentInfo: SentFormInput!): Form
+  """
+  Valide la réception d'un BSD
+  """
   markAsReceived(id: ID, receivedInfo: ReceivedFormInput!): Form
+  """
+  Valide le traitement d'un BSD
+  """
   markAsProcessed(id: ID, processedInfo: ProcessedFormInput!): Form
 }
 
@@ -40,6 +72,9 @@ enum FormStatus {
   NO_TRACEABILITY
 }
 
+"""
+Représente un BSD
+"""
 type Form {
   id: ID
   readableId: String
