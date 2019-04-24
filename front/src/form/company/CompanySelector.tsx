@@ -101,7 +101,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
               {[...searchResults, ...data.favorites].map(c => (
                 <li
                   className={`company-bookmarks__item  ${
-                    selectedCompany.name === c.name ? "is-selected" : ""
+                    selectedCompany.siret === c.siret ? "is-selected" : ""
                   }`}
                   key={c.siret}
                   onClick={() => setSelectedCompany(c)}
