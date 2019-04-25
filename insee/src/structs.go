@@ -10,6 +10,7 @@ type APIResponse struct {
 	Etablissement Etablissement `json:"etablissement"`
 }
 
+// APIMultiResponse INSEE API response object
 type APIMultiResponse struct {
 	Etablissements []Etablissement `json:"etablissements"`
 }

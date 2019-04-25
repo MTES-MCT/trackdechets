@@ -79,8 +79,9 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	clue := vars["clue"]
 
-	w.Header().Set("Content-Type", "application/json")
-	res := queryAPI(`?q=denominationUniteLegale:` + clue + `&nombre=5`)
+  w.Header().Set("Content-Type", "application/json")
+  // Unfortunately, the API does not support lucene '*' on `denominationUniteLegale`
+	res := queryAPI(`?q=denominationUniteLegale:"` + clue + `"&nombre=7`)
 
 	var fullResponseObject APIMultiResponse
 	json.Unmarshal(res, &fullResponseObject)
@@ -110,7 +111,16 @@ func queryAPI(uri string) []byte {
 	check(err)
 
 	if resp.StatusCode != 200 {
-		fmt.Println("Error while querying INSEE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
+		log.Println("Error while querying INSEE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
+
+		bodyContent, err := ioutil.ReadAll(resp.Body)
+		check(err)
+		log.Println("Dumping error content...", bodyContent)
+
+		if resp.StatusCode == 401 {
+			log.Println("Trying to renew token for next time...")
+			generateTokenFromInsee()
+		}
 	}
 
 	responseData, err := ioutil.ReadAll(resp.Body)

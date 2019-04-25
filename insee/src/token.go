@@ -3,8 +3,8 @@ package main
 import (
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -20,8 +20,8 @@ type TokenInfo struct {
 
 func readToken() string {
 	jsonFile, err := os.Open("./key.json")
-  check(err)
-  defer jsonFile.Close()
+	check(err)
+	defer jsonFile.Close()
 	byteValue, err := ioutil.ReadAll(jsonFile)
 	check(err)
 
@@ -50,7 +50,7 @@ func generateTokenFromInsee() {
 	req.Header.Set("Authorization", "Basic "+os.Getenv("INSEE_SECRET"))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-  // Ingnore certificate check (cf `curl -k`)
+	// Ingnore certificate check (cf `curl -k`)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -62,5 +62,5 @@ func generateTokenFromInsee() {
 	err = ioutil.WriteFile("key.json", responseData, 0644)
 	check(err)
 
-	fmt.Printf("INSEE token updated at %s\n", time.Now().Format(time.RFC822))
+	log.Printf("INSEE token updated at %s\n", time.Now().Format(time.RFC822))
 }
