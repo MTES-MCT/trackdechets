@@ -116,7 +116,7 @@ export default {
 
       const forms = await context.prisma.forms({
         where: {
-          wasteDetailsCode: wasteCode,
+          ...(wasteCode && { wasteDetailsCode: wasteCode }),
           status: "AWAITING_GROUP",
           recipientCompanySiret: emitterSiret,
           isDeleted: false
@@ -195,7 +195,7 @@ export default {
         await context.prisma.updateManyForms({
           where: {
             status: "AWAITING_GROUP",
-            OR: appendix2Forms.map(f => ({ id: f.id })),
+            OR: appendix2Forms.map(f => ({ id: f.id }))
           },
           data: { status: "GROUPED" }
         });

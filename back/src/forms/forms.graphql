@@ -13,9 +13,9 @@ type Query {
   """
   Renvoie des BSD candidats à un regroupement dans une annexe 2
   `EmitterSiret`: Siret d'une des entreprises que j'administre
-  `wasteCode`: Code déchet pour affiner
+  `wasteCode`: Code déchet pour affiner la recherche, optionnel
   """
-  appendixForms(emitterSiret: String!, wasteCode: String!): [Form]
+  appendixForms(emitterSiret: String!, wasteCode: String): [Form]
 }
 
 type Mutation {

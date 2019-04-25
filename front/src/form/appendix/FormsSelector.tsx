@@ -1,13 +1,14 @@
 import gql from "graphql-tag";
 import React, { useState, useEffect } from "react";
 import { Query, QueryResult } from "react-apollo";
-import { wasteCodeValidator } from "../waste-code/waste-code.validator";
 import { Form } from "../model";
 import { DateTime } from "luxon";
 import { connect, getIn, setIn, Formik } from "formik";
+import useDebounce from "../../utils/use-debounce";
+import formatWasteCodeEffect from "../waste-code/format-waste-code.effect";
 
 const GET_APPENDIX_FORMS = gql`
-  query AppendixForms($emitterSiret: String!, $wasteCode: String!) {
+  query AppendixForms($emitterSiret: String!, $wasteCode: String) {
     appendixForms(emitterSiret: $emitterSiret, wasteCode: $wasteCode) {
       readableId
       emitter {
@@ -15,23 +16,23 @@ const GET_APPENDIX_FORMS = gql`
           name
         }
       }
+      wasteDetails {
+        code
+      }
       receivedAt
       quantityReceived
       processingOperationDone
     }
   }
 `;
-type Props = { emitterSiret: string; wasteCode: string; name: string };
+type Props = { emitterSiret: string; name: string };
 
 export default connect<Props>(function FormsSelector(props) {
-  if (wasteCodeValidator(props.wasteCode) != null) {
-    return (
-      <p>
-        Veuillez renseigner le code déchet avant de pouvoir associer des
-        bordereaux en annexe.
-      </p>
-    );
-  }
+  const [wasteCodeFilter, setWasteCodeFilter] = useState("");
+  useEffect(() => formatWasteCodeEffect(wasteCodeFilter, setWasteCodeFilter), [
+    wasteCodeFilter
+  ]);
+  const debouncedWasteCodeFilter = useDebounce(wasteCodeFilter, 500);
 
   const fieldValue: Form[] = getIn(props.formik.values, props.name);
   const [selected, setSelected] = useState(fieldValue.map(f => f.readableId));
@@ -56,14 +57,28 @@ export default connect<Props>(function FormsSelector(props) {
         sélectionner ci-dessous les bordereaux à regrouper.
       </p>
       <p>
-        Tous les bordereaux présentés ci-dessous correspondent au code déchet
-        que vous avez renseigné, et à des bordereaux pour lesquels vous avez
-        effectué une opération de traitement de type D 13, D 14, D 15 ou R 13.
+        Tous les bordereaux présentés ci-dessous correspondent à des bordereaux
+        pour lesquels vous avez effectué une opération de traitement de type D
+        13, D 14, D 15 ou R 13.
+      </p>
+
+      <p>
+        Pour affiner votre sélection, vous avez la possibilité de filtrer par
+        code déchet.
+        <input
+          type="text"
+          placeholder="Filtre optionnel..."
+          value={wasteCodeFilter}
+          onChange={e => setWasteCodeFilter(e.target.value)}
+        />
       </p>
 
       <Query
         query={GET_APPENDIX_FORMS}
-        variables={{ wasteCode: props.wasteCode, emitterSiret: props.emitterSiret }}
+        variables={{
+          wasteCode: debouncedWasteCodeFilter,
+          emitterSiret: props.emitterSiret
+        }}
       >
         {({ loading, error, data }: QueryResult<{ appendixForms: Form[] }>) => {
           if (loading) return "Chargement...";
@@ -75,7 +90,14 @@ export default connect<Props>(function FormsSelector(props) {
             return (
               <div className="notification error">
                 Vous n'avez actuellement aucun bordereau qui peut être inclus
-                dans ce regroupement.
+                dans ce regroupement.{" "}
+                {wasteCodeFilter && (
+                  <span>
+                    Essayez de vider le filtre sur le code déchet{" "}
+                    {wasteCodeFilter} pour identifier des bordereaux
+                    regroupables
+                  </span>
+                )}
               </div>
             );
           }
@@ -96,6 +118,7 @@ export default connect<Props>(function FormsSelector(props) {
                     />
                   </th>
                   <th>Numéro</th>
+                  <th>Code déchet</th>
                   <th>Expéditeur initial</th>
                   <th>Date de réception</th>
                   <th>Quantité</th>
@@ -116,6 +139,7 @@ export default connect<Props>(function FormsSelector(props) {
                       />
                     </td>
                     <td>{v.readableId}</td>
+                    <td>{v.wasteDetails.code}</td>
                     <td>{v.emitter.company.name}</td>
                     <td>{DateTime.fromISO(v.receivedAt).toLocaleString()}</td>
                     <td>{v.quantityReceived} tonnes</td>
