@@ -19,8 +19,8 @@ export const userMails = {
   contentAwaitsGuest: (toEmail, toName) => ({
     toEmail,
     toName,
-    subject: "Un bordereau vous attend sur Trackdéchets",
-    title: "Un bordereau vous attend sur Trackdéchets",
+    subject: "Un BSD numérique vous attend sur Trackdéchets",
+    title: "Un BSD numérique vous attend sur Trackdéchets",
     body: `Bonjour ${toName},
     <br>
     Vous avez reçu un BSD dématérialisé disponible sur <a href="https://trackdechets.beta.gouv.fr/">https://trackdechets.beta.gouv.fr</a><br>
