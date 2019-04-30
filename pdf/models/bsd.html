@@ -2,7 +2,7 @@
   <head>
     <style>
       html {
-        font-size: 13px;
+        font-size: 12px;
       }
       a {
         text-decoration: underline;
@@ -341,10 +341,12 @@
           <p>N° SIRET: {{=it.emitterCompanySiret}}</p>
           <p>NOM: {{=it.emitterCompanyName}}</p>
           <p>Adresse: {{=it.emitterCompanyAddress}}</p>
-          <p>{{=it.emitterCompanyMail}} - {{=it.emitterCompanyPhone}}</p>
+          <p>
+            Tél: {{=it.emitterCompanyPhone}} - Mél: {{=it.emitterCompanyMail}}
+          </p>
           <p>Personne à contacter: {{=it.emitterCompanyContact}}</p>
           {{? it.emitterPickupSite != null }}
-          <p>Adresse chantier: {{=it.emitterPickupSite}}</p>
+          <!-- <p>Adresse chantier: {{=it.emitterPickupSite}}</p> -->
           {{?}}
         </div>
 
@@ -362,9 +364,9 @@
           <p>Adresse: {{=it.recipientCompanyAddress}}</p>
           <p>{{=it.recipientCompanyMail}} - {{=it.recipientCompanyPhone}}</p>
           <p>Personne à contacter: {{=it.recipientCompanyContact}}</p>
-          <p>Numéro de CAP: {{=it.recipientCap}}</p>
+          <p>N° de CAP (le cas échéant): {{=it.recipientCap}}</p>
           <p>
-            Opération prévue (code D/R):
+            Opération d’élimination / valorisation prévue (code D/R):
             {{=it.recipientProcessingOperation}}
           </p>
         </div>
@@ -391,7 +393,8 @@
             </div>
           </div>
           <div class="item-title">
-            4. Mentions au titre des règlements ADR, RID, ADNR, IMDG:
+            4. Mentions au titre des règlements ADR, RID, ADNR, IMDG: (le cas
+            échéant)
           </div>
           <p>
             {{=it.wasteDetailsOnuCode}}
@@ -404,22 +407,8 @@
 
 
 
-
-
-
-
-
-
-
               }}/> benne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("CITERNE") > -1
-
-
-
-
-
-
-
 
 
 
@@ -431,7 +420,7 @@
               {{? it.wasteDetailsPackagings.indexOf("FUT") > -1}}checked{{?}} />
               fût <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("AUTRE") > -1}}checked{{?}}
-              /> autre
+              /> autre (préciser)
             </label>
             {{=it.wasteDetailsOtherPackaging}}
             <span class="ml-10"
@@ -457,16 +446,16 @@
           </div>
           <div class="columns">
             <div class="column">
-              <p>N° SIRET: {{=it.traderCompanySiret || ''}}</p>
+              <p>N° SIREN: {{=it.traderCompanySiret || ''}}</p>
               <p>NOM: {{=it.traderCompanyName || ''}}</p>
               <p>Adresse: {{=it.traderCompanyAddress || ''}}</p>
               <p>
-                Mèl: {{=it.traderCompanyMail || ''}} - Téléphone:
+                Mél: {{=it.traderCompanyMail || ''}} - Tél:
                 {{=it.traderCompanyPhone || ''}}
               </p>
             </div>
             <div class="column">
-              <p>Récipissé numéro: {{=it.traderReceipt || ''}}</p>
+              <p>Récépissé n°: {{=it.traderReceipt || ''}}</p>
               <p>Département: {{=it.traderDepartment || ''}}</p>
               <p>
                 Limite de validité: {{=it.toDate(it.traderValidityLimit || '')}}
@@ -480,23 +469,29 @@
           <div class="item-title">8. Collecteur / transporteur:</div>
           <div class="columns">
             <div class="column">
-              <p>N° SIRET: {{=it.transporterCompanySiret}}</p>
+              <p>N° SIREN: {{=it.transporterCompanySiret}}</p>
               <p>NOM: {{=it.transporterCompanyName}}</p>
               <p>Adresse: {{=it.transporterCompanyAddress}}</p>
               <p>
-                {{=it.transporterCompanyMail}} - {{=it.transporterCompanyPhone}}
+                Tél: {{=it.transporterCompanyPhone}} - Mél:
+                {{=it.transporterCompanyMail}}
               </p>
               <p>Personne à contacter: {{=it.transporterCompanyContact}}</p>
             </div>
             <div class="column">
-              <p>Récipissé numéro: {{=it.transporterReceipt}}</p>
+              <p>Récipissé n°: {{=it.transporterReceipt}}</p>
               <p>Département: {{=it.transporterDepartment}}</p>
               <p>
                 Limite de validité: {{=it.toDate(it.transporterValidityLimit)}}
               </p>
-              <p>Immatriculation: {{=it.transporterNumberPlate}}</p>
+              <p>Mode de transport:</p>
+              <!-- <p>Immatriculation: {{=it.transporterNumberPlate}}</p> -->
               <p>Date de prise en charge: {{=it.toDate(it.sentAt)}}</p>
               <p>Signature:</p>
+              <p>
+                <input type="checkbox" /> Transport multimodal (cadres 20 et 21
+                à remplir)
+              </p>
             </div>
           </div>
         </div>
@@ -554,20 +549,19 @@
               <p>N° SIRET: {{=it.recipientCompanySiret}}</p>
               <p>NOM: {{=it.recipientCompanyName}}</p>
               <p>Adresse: {{=it.recipientCompanyAddress}}</p>
+              <p>Personne à contacter: {{=it.receivedBy}}</p>
               <p>
-                Reçu par:
-                {{=it.recipientCompanyName}} ({{=it.recipientCompanySiret}})
+                Quantité réelle présentée: {{=it.quantityReceived}} tonne(s)
               </p>
+              <p>Date de présentation: {{=it.toDate(it.receivedAt)}}</p>
               <p>
                 Lot accepté:
                 <input type="checkbox" {{? it.isAccepted }}checked{{?}} /> oui
                 <input type="checkbox" {{? !it.isAccepted}}checked{{?}} /> non
               </p>
-              <p>Personne à contacter: {{=it.receivedBy}}</p>
-              <p>
-                Quantité réelle présentée: {{=it.quantityReceived}} tonne(s)
-              </p>
-              <p>Date: {{=it.toDate(it.receivedAt)}}</p>
+              <p>Motif de refus:</p>
+              <p>Signataire: {{=it.receivedBy}}</p>
+              <p>Date {{=it.toDate(it.receivedAt)}}</p>
               <p class="stamp relative">
                 <svg
                   width="200"
@@ -596,7 +590,7 @@
               {{? it.processingOperationDone != null }}
               <div class="item-title">11. Réalisation de l’opération:</div>
               <p>
-                Je soussigné certifie que l'opération ci-dessous a été réalisée.
+                Je soussigné certifie que l'opération ci-dessous a été effectuée
               </p>
               <p>Code D/R: {{=it.processingOperationDone}}</p>
               <p>Description: {{=it.processingOperationDescription}}</p>
@@ -633,7 +627,15 @@
 
         {{? it.nextDestinationProcessingOperation != null }}
         <div class="nextDestination grid-item">
-          <div class="item-title">12. Destination ultérieure prévue:</div>
+          <div class="item-title">
+            12. Destination ultérieure prévue:
+            <small
+              >(dans le cas d'une transformation ou d'un traitement aboutissant
+              à des déchets dont la provenance reste identifiable le nouveau
+              bordereau sera accompagné de l'annexe 2 du formulaire CERFA
+              n°12571*01)</small
+            >
+          </div>
           <div class="columns">
             <div class="column">
               <p>
