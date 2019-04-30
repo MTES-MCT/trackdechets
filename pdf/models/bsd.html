@@ -332,11 +332,18 @@
         <div class="emitter grid-item">
           <div class="item-title">1. Emetteur du bordereau:</div>
           <p class="checkboxes">
-            {{? it.emitterType === "OTHER" }}
-            <input type="checkbox" /> Producteur du déchet
-            <input type="checkbox" checked /> Autre producteur {{??}}
-            <input type="checkbox" checked /> Producteur du déchet
-            <input type="checkbox" /> Autre producteur {{?}}
+            <input type="checkbox"
+            {{? it.emitterType === "PRODUCER"}}checked{{?}}/> Producteur du
+            déchet <input type="checkbox"
+            {{? it.emitterType === "APPENDIX1"}}checked{{?}} /> Collecteur de
+            petites quantités de déchets relevant d’une même rubrique
+            <small>(joindre annexe 1)</small> <input type="checkbox"
+            {{? it.emitterType === "APPENDIX2"}}checked{{?}} /> Personne ayant
+            transformé ou Autre détenteur réalisé un traitement dont la
+            provenance des déchets reste identifiable
+            <small>(joindre annexe 2)</small>
+            <input type="checkbox"
+            {{? it.emitterType === "OTHER"}}checked{{?}} /> Autre producteur
           </p>
           <p>N° SIRET: {{=it.emitterCompanySiret}}</p>
           <p>NOM: {{=it.emitterCompanyName}}</p>
@@ -407,8 +414,14 @@
 
 
 
+
+
+
               }}/> benne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("CITERNE") > -1
+
+
+
 
 
 
