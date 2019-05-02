@@ -1,0 +1,11 @@
+site_name: Trackdéchets
+site_description: Gérer la traçabilité des déchets en toute sécurité.
+site_author: Orion Charlier
+site_url: https://trackdechets.beta.gouv.fr/
+
+repo_url: https://github.com/MTES-MCT/trackdechets
+theme: readthedocs
+nav:
+  - "Introduction": "index.md"
+  - "Mise en route": "getting-started.md"
+  - "Cycle de vie d'un BSD": "workflow.md"

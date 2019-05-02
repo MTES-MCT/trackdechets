@@ -77,6 +77,16 @@ services:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
 
+  td-doc:
+    image: td-doc
+    build:
+      context: ./documentation
+      dockerfile: Dockerfile
+    environment:
+      VIRTUAL_HOST: $DOC_HOST
+      LETSENCRYPT_HOST: $DOC_HOST
+      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+
 volumes:
   postgres:
 
