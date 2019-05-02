@@ -1,8 +1,6 @@
 FROM alpine:latest as build-deps
 
-ENV MKDOCS_VERSION="1.0.4" \
-  GIT_REPO='false' \
-  LIVE_RELOAD_SUPPORT='false'
+ENV MKDOCS_VERSION="1.0.4"
 
 RUN \
   apk add --update \
