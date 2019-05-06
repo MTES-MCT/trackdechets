@@ -348,9 +348,8 @@
           <p>N° SIRET: {{=it.emitterCompanySiret}}</p>
           <p>NOM: {{=it.emitterCompanyName}}</p>
           <p>Adresse: {{=it.emitterCompanyAddress}}</p>
-          <p>
-            Tél: {{=it.emitterCompanyPhone}} - Mél: {{=it.emitterCompanyMail}}
-          </p>
+          <p>Tél: {{=it.emitterCompanyPhone}} - Fax:</p>
+          <p>Mél: {{=it.emitterCompanyMail}}</p>
           <p>Personne à contacter: {{=it.emitterCompanyContact}}</p>
           {{? it.emitterPickupSite != null }}
           <!-- <p>Adresse chantier: {{=it.emitterPickupSite}}</p> -->
@@ -369,7 +368,8 @@
           <p>N° SIRET: {{=it.recipientCompanySiret}}</p>
           <p>NOM: {{=it.recipientCompanyName}}</p>
           <p>Adresse: {{=it.recipientCompanyAddress}}</p>
-          <p>Tél: {{=it.recipientCompanyPhone}} - Mél: {{=it.recipientCompanyMail}}</p>
+          <p>Tél: {{=it.recipientCompanyPhone}} - Fax:</p>
+          <p>Mél: {{=it.recipientCompanyMail}}</p>
           <p>Personne à contacter: {{=it.recipientCompanyContact}}</p>
           <p>N° de CAP (le cas échéant): {{=it.recipientCap}}</p>
           <p>
@@ -409,20 +409,9 @@
           <p>
             <label>
               <strong>5. Conditionnement:</strong> <input type="checkbox"
-              {{? it.wasteDetailsPackagings.indexOf("BENNE") > -1}}checked{{?
-
-
-
-
-
-
-
-              }}/> benne <input type="checkbox"
+              {{? it.wasteDetailsPackagings.indexOf("BENNE") > -1}}checked{{?}}
+              /> benne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("CITERNE") > -1
-
-
-
-
 
 
 
@@ -462,10 +451,8 @@
               <p>N° SIREN: {{=it.traderCompanySiret || ''}}</p>
               <p>NOM: {{=it.traderCompanyName || ''}}</p>
               <p>Adresse: {{=it.traderCompanyAddress || ''}}</p>
-              <p>
-                Mél: {{=it.traderCompanyMail || ''}} - Tél:
-                {{=it.traderCompanyPhone || ''}}
-              </p>
+              <p>Tél: {{=it.traderCompanyPhone || ''}} - Fax:</p>
+              <p>Mél: {{=it.traderCompanyMail || ''}}</p>
             </div>
             <div class="column">
               <p>Récépissé n°: {{=it.traderReceipt || ''}}</p>
@@ -485,10 +472,8 @@
               <p>N° SIREN: {{=it.transporterCompanySiret}}</p>
               <p>NOM: {{=it.transporterCompanyName}}</p>
               <p>Adresse: {{=it.transporterCompanyAddress}}</p>
-              <p>
-                Tél: {{=it.transporterCompanyPhone}} - Mél:
-                {{=it.transporterCompanyMail}}
-              </p>
+              <p>Tél: {{=it.transporterCompanyPhone}} - Fax:</p>
+              <p>Mél: {{=it.transporterCompanyMail}}</p>
               <p>Personne à contacter: {{=it.transporterCompanyContact}}</p>
             </div>
             <div class="column">
@@ -679,7 +664,27 @@
 
     {{? it.appendix2Forms != null && it.appendix2Forms.length > 0 }}
     <div class="page">
-      <h2>Annexe 2</h2>
+      <h2>
+        Document à joindre au bordereau de suivi des déchets lors d’une
+        réexpédition après transformation ou traitement aboutissant à des
+        déchets dont la provenance reste identifiable
+      </h2>
+      <div>
+        <h4>N° du bordereau de rattachement : {{=it.readableId}}</h4>
+        <div class="columns">
+          <div class="column">
+            <p>Emetteur du bordereau:</p>
+            <p>N° SIRET: {{=it.emitterCompanySiret}}</p>
+            <p>NOM: {{=it.emitterCompanyName}}</p>
+            <p>Adresse: {{=it.emitterCompanyAddress}}</p>
+          </div>
+          <div class="column">
+            <p>Personne à contacter: {{=it.emitterCompanyContact}}</p>
+            <p>Tél: {{=it.emitterCompanyPhone}} - Fax:</p>
+            <p>Mél: {{=it.emitterCompanyMail}}</p>
+          </div>
+        </div>
+      </div>
       <div class="appendix2-grid">
         {{~it.appendix2Forms :value:index}}
         <div class="appendix2-item">
