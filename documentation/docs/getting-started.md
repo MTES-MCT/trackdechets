@@ -24,12 +24,11 @@ Il est également possible de récupérer un token de manière programmatique en
 curl \
   -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <ACCESS_TOKEN>" \
   --data '{ "query":"mutation {  login(email: \"<MY_EMAIL>\", password: \"<MY_PASSWORD>\") { token }}" }' \
   https://api.trackdechets.beta.gouv.fr/
 ```
 
-On notera que c'est une mutation qui est utilisée ici et non une query pour suivre les conventions graphQl. Le token délivré **a une durée de vie de 24h**, il faut donc le renouveller chaque jour.
+On notera que c'est une mutation qui est utilisée ici et non une query pour suivre les conventions graphQL. Le token délivré **a une durée de vie de 24h**, il faut donc le renouveller chaque jour.
 
 Afin d'utiliser l'API de manière authentifiée, ce token est ensuite à insérer dans vos requêtes via le header HTTP `Authorization`:
 

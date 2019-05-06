@@ -9,4 +9,5 @@ nav:
   - "Introduction": "index.md"
   - "Mise en route": "getting-started.md"
   - "Cycle de vie d'un BSD": "workflow.md"
+  - "Cas d'usages": "use-cases.md"
   - "Lexique": "glossary.md"
