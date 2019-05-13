@@ -25,7 +25,8 @@ type Etablissement struct {
 
 // UniteLegale Unité légale liée au SIRET
 type UniteLegale struct {
-	DenominationUniteLegale string `json:"denominationUniteLegale"`
+	DenominationUniteLegale         string `json:"denominationUniteLegale"`
+	DenominationUsuelle1UniteLegale string `json:"denominationUsuelle1UniteLegale"`
 }
 
 // AdresseEtablissement Adresse et détail de l'établissement
