@@ -35,7 +35,7 @@ export default function ImportNewUser({ siret, me }: Props) {
   return (
     <React.Fragment>
       <button className="button" onClick={() => setShowAdmin(!showAdmin)}>
-        Administrer cette entreprise
+        Inviter des collaborateurs
       </button>
       {showAdmin && (
         <div>
