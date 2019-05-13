@@ -83,12 +83,14 @@ export default {
 
       return [...users, ...invitedUsers];
     },
-    searchCompanies: async (parent, { clue }) => {
+    searchCompanies: async (parent, { clue, department = '' }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
 
       if (!isNumber) {
         const response: any = await axios
-          .get<Company>(`http://td-insee:81/search/${clue}`)
+          .get<Company>(
+            `http://td-insee:81/search?clue=${clue}&department=${department}`
+          )
           .catch(err =>
             console.error("Error while querying INSEE service", err)
           );

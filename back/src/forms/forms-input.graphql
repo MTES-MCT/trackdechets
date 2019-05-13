@@ -12,10 +12,12 @@ input ReceivedFormInput {
 
 input ProcessedFormInput {
   processingOperationDone: String
+  processingOperationDescription: String
   processedBy: String
   processedAt: DateTime
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  noTraceability: Boolean
 }
 
 input FormInput {

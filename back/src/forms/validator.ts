@@ -43,7 +43,8 @@ export const formSchema = object().shape({
     otherPackaging: string(),
     numberOfPackages: number()
       .integer()
-      .min(1, "Le nombre de colis doit être supérieur à 0"),
+      .min(1, "Le nombre de colis doit être supérieur à 0")
+      .nullable(true),
     quantity: number().min(0, "La quantité doit être supérieure à 0"),
     quantityType: string().matches(
       /(REAL|ESTIMATED)/,

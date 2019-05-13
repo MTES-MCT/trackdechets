@@ -2,15 +2,19 @@ import { Form } from "../generated/prisma-client";
 
 /**
  * Workflow:
- * Producteur: DRAFT -> SENT ------
- *                        |        |
- * Collecteur: DRAFT -> SEALED -> RECEIVED -> PROCESSED
+ * See /docs/worflow.md for more details
  * */
 export function getNextStep(form: Form, actorSirets: string[]) {
-  if (actorSirets.includes(form.emitterCompanySiret)) {
+  if (
+    actorSirets.includes(form.emitterCompanySiret) &&
+    ["DRAFT", "SEALED"].includes(form.status) // To handle cases where you are both emitter & recipient
+  ) {
     return getEmitterNextStep(form);
   }
-  return getRecipientNextStep(form);
+  if (actorSirets.includes(form.recipientCompanySiret)) {
+    return getRecipientNextStep(form);
+  }
+  throw new Error("Vous ne pouvez pas changer le statut de ce bordereau.");
 }
 
 function getEmitterNextStep(form: Form) {
@@ -33,10 +37,13 @@ function getRecipientNextStep(form: Form) {
     case "SENT":
       return "RECEIVED";
     case "RECEIVED":
-      if (GROUP_CODES.indexOf(form.processingOperationDone) > -1) {
-        return "AWAITING_GROUP";
+      if (GROUP_CODES.indexOf(form.processingOperationDone) === -1) {
+        return "PROCESSED";
       }
-      return "PROCESSED";
+      if (form.noTraceability) {
+        return "NO_TRACEABILITY";
+      }
+      return "AWAITING_GROUP";
     case "SEALED":
       throw new Error(
         "En attente de la confirmation d'envoi des déchets par le producteur."

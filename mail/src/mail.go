@@ -33,6 +33,8 @@ func mustGetenv(k string) string {
 
 func main() {
 	http.HandleFunc("/send", sendEmail)
+	http.HandleFunc("/contact/", singleContactHandler)
+	http.HandleFunc("/contact", contactsHandler)
 	log.Fatal(http.ListenAndServe(":80", nil))
 }
 

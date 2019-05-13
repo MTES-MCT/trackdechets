@@ -18,22 +18,32 @@ export type Company = {
 };
 
 export default connect<FieldProps>(function CompanySelector(props) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<any>({
+    clue: "",
+    department: undefined
+  });
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [searchResults, setSearchResults] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [displayDepartment, setDisplayDepartment] = useState(false);
 
   const [selectedCompany, setSelectedCompany] = useState<Company>(props.field
     .value as Company);
 
   useEffect(() => {
-    if (!debouncedSearchTerm) {
+    if (!debouncedSearchTerm || debouncedSearchTerm.clue.length < 1) {
       return;
     }
     searchCompanies(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
-  const searchCompanies = async (clue: string) => {
+  const searchCompanies = async ({
+    clue,
+    department
+  }: {
+    clue: string;
+    department: number | undefined;
+  }) => {
     const isNumber = /^[0-9\s]+$/.test(clue);
     if (isNumber && clue.length < 14) {
       return;
@@ -42,7 +52,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
     setIsLoading(true);
     const { data } = await client.query<{ searchCompanies: Company[] }>({
       query: SEARCH_COMPANIES,
-      variables: { clue }
+      variables: { clue, department }
     });
 
     if (data.searchCompanies) {
@@ -89,19 +99,41 @@ export default connect<FieldProps>(function CompanySelector(props) {
               <input
                 type="text"
                 placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-                onChange={e => setSearchTerm(e.target.value)}
+                onChange={e =>
+                  setSearchTerm({ ...searchTerm, clue: e.target.value })
+                }
               />
               <button className="overlay-button" aria-label="Recherche">
                 <FaSearch />
               </button>
             </div>
+            <a onClick={e => setDisplayDepartment(!displayDepartment)}>
+              Affiner la recherche par département?
+            </a>
+            {displayDepartment && (
+              <div className="form__group">
+                <label>
+                  Département
+                  <input
+                    type="text"
+                    placeholder="Département ou code postal"
+                    onChange={e =>
+                      setSearchTerm({
+                        ...searchTerm,
+                        department: parseInt(e.target.value, 10)
+                      })
+                    }
+                  />
+                </label>
+              </div>
+            )}
 
             {isLoading && <span>Chargement...</span>}
             <ul className="company-bookmarks">
               {[...searchResults, ...data.favorites].map(c => (
                 <li
                   className={`company-bookmarks__item  ${
-                    selectedCompany.name === c.name ? "is-selected" : ""
+                    selectedCompany.siret === c.siret ? "is-selected" : ""
                   }`}
                   key={c.siret}
                   onClick={() => setSelectedCompany(c)}

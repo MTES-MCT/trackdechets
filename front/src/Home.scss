@@ -20,3 +20,27 @@
   font-size: 3em;
   text-align: center;
 }
+
+.description {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 50px;
+
+  .description-header {
+    width: 100%;
+    text-align: center;
+  }
+
+  .description-text,
+  .description-img {
+    flex: 1;
+  }
+
+  .description-img {
+    align-self: center;
+    margin-right: 30px;
+    img {
+      max-width: 100%;
+    }
+  }
+}

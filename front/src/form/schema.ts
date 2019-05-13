@@ -19,9 +19,7 @@ setLocale({
 
 const companySchema = object().shape({
   name: string().required(),
-  siret: string().required(
-    "La sélection d'une entreprise est obligatoire"
-  ),
+  siret: string().required("La sélection d'une entreprise est obligatoire"),
   address: string().required(),
   contact: string().required("Le contact dans l'entreprise est obligatoire"),
   phone: string().required("Le téléphone de l'entreprise est obligatoire"),
@@ -69,7 +67,8 @@ export const formSchema = object().shape({
     otherPackaging: string(),
     numberOfPackages: number()
       .integer()
-      .min(1, "Le nombre de colis doit être supérieur à 0"),
+      .min(1, "Le nombre de colis doit être supérieur à 0")
+      .nullable(true),
     quantity: number().min(0, "La quantité doit être supérieure à 0"),
     quantityType: string().matches(
       /(REAL|ESTIMATED)/,

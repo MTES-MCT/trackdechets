@@ -12,7 +12,7 @@ type Company {
 type Query {
   companyInfos(siret: String!): Company
   companyUsers(siret: String!): [CompanyMember]
-  searchCompanies(clue: String!): [Company]
+  searchCompanies(clue: String!, department: Int): [Company]
   favorites(type: FavoriteType!): [Company]
 }
 

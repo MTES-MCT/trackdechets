@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
     "target": "es5",
     "allowJs": true,
     "skipLibCheck": false,
@@ -15,7 +13,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "lib": ["dom", "es6", "esnext.asynciterable"]
+    "lib": [
+      "dom",
+      "es6",
+      "esnext.asynciterable"
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

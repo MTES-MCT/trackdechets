@@ -116,9 +116,9 @@ export default {
 
       const forms = await context.prisma.forms({
         where: {
-          wasteDetailsCode: wasteCode,
-          recipientCompanySiret: emitterSiret,
+          ...(wasteCode && { wasteDetailsCode: wasteCode }),
           status: "AWAITING_GROUP",
+          recipientCompanySiret: emitterSiret,
           isDeleted: false
         }
       });
@@ -193,7 +193,10 @@ export default {
       const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
       if (appendix2Forms.length) {
         await context.prisma.updateManyForms({
-          where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
+          where: {
+            status: "AWAITING_GROUP",
+            OR: appendix2Forms.map(f => ({ id: f.id }))
+          },
           data: { status: "GROUPED" }
         });
       }

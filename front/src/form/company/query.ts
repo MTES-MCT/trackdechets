@@ -24,8 +24,8 @@ export const COMPANY_INFOS = gql`
 `;
 
 export const SEARCH_COMPANIES = gql`
-  query SearchCompanies($clue: String!) {
-    searchCompanies(clue: $clue) {
+  query SearchCompanies($clue: String!, $department: Int) {
+    searchCompanies(clue: $clue, department: $department) {
       siret
       name
       address

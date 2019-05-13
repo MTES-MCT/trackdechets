@@ -7,6 +7,7 @@ import { localAuthService } from "../../login/auth.service";
 import { Me } from "../../login/model";
 import EditProfile from "./EditProfile";
 import ImportNewUser from "./InviteNewUser";
+import { USER_TYPES } from "../../login/UserType";
 
 interface IProps {
   me: Me;
@@ -44,6 +45,14 @@ export default withRouter(function Account({
           Email: {me.email}
           <br />
           Téléphone: {me.phone}
+          <br />
+          Profil de compte:{" "}
+          {me.userType
+            .map(ut => {
+              const obj = USER_TYPES.find(t => t.value === ut);
+              return obj ? obj.label : "";
+            })
+            .join(", ")}
         </p>
         {!showUserForm && (
           <button
@@ -59,6 +68,9 @@ export default withRouter(function Account({
             onSubmit={() => setShowUserForm(!showUserForm)}
           />
         )}
+        <button className="button" onClick={() => history.push("/password")}>
+          Changer de mot de passe
+        </button>
 
         <h4>Entreprise(s) associée(s):</h4>
         {me.companies.map(c => (

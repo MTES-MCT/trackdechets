@@ -1,7 +1,7 @@
 import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
 
-const userTypes = [
+export const USER_TYPES = [
   { value: "PRODUCER", label: "Producteur" },
   { value: "COLLECTOR", label: "Collecteur" },
   { value: "WASTEPROCESSOR", label: "Centre de traitement" }
@@ -18,7 +18,7 @@ export default function UserType({
       name={name}
       render={arrayHelpers => (
         <fieldset>
-          {userTypes.map(p => (
+          {USER_TYPES.map(p => (
             <label className="label-inline" key={p.value}>
               <input
                 type="checkbox"

@@ -11,7 +11,8 @@ const statusLabels: { [key: string]: string } = {
   RECEIVED: "Reçu, en attente de traitement",
   PROCESSED: "Traité",
   AWAITING_GROUP: "Traité, en attente de regroupement",
-  GROUPED: "Traité, annexé à un bordereau de regroupement"
+  GROUPED: "Traité, annexé à un bordereau de regroupement",
+  NO_TRACEABILITY: "Regroupé, avec autorisation de perte de traçabilité"
 };
 
 type Props = { forms: Form[]; me: Me; hiddenFields?: string[] };
@@ -49,7 +50,10 @@ export default function Slips({ forms, me, hiddenFields = [] }: Props) {
                 </React.Fragment>
               )}
             </td>
-            <td>{s.wasteDetails && `${s.quantityReceived || s.wasteDetails.quantity || '?'} t`}</td>
+            <td>
+              {s.wasteDetails &&
+                `${s.quantityReceived || s.wasteDetails.quantity || "?"} t`}
+            </td>
             {hiddenFields.indexOf("status") === -1 && (
               <td>{statusLabels[s.status]}</td>
             )}

@@ -91,6 +91,21 @@ jobs:
             docker push betagouv/trackdechets-mail:latest
           fi
 
+  build-doc:
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          docker build -t betagouv/trackdechets-doc:$CIRCLE_SHA1 ./documentation
+          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+          docker push betagouv/trackdechets-doc:$CIRCLE_SHA1
+      - run: |
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-doc:$CIRCLE_SHA1 betagouv/trackdechets-doc:latest
+            docker push betagouv/trackdechets-doc:latest
+          fi
+
   deploy:
     machine:
       enabled: true

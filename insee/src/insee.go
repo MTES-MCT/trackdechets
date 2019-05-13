@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"strings"
 
 	"encoding/json"
@@ -26,7 +28,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/ping", Ping).Methods("GET")
 	router.HandleFunc("/siret/{siret}", Siret).Methods("GET")
-	router.HandleFunc("/search/{clue}", Search).Methods("GET")
+	router.HandleFunc("/search", Search).Methods("GET")
 	log.Fatal(http.ListenAndServe(":81", router))
 }
 
@@ -76,11 +78,8 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	vars := mux.Vars(r)
-	clue := vars["clue"]
-
 	w.Header().Set("Content-Type", "application/json")
-	res := queryAPI(`?q=denominationUniteLegale:` + clue + `&nombre=5`)
+	res := queryAPI("?" + buildSearchParams(r.URL.Query()))
 
 	var fullResponseObject APIMultiResponse
 	json.Unmarshal(res, &fullResponseObject)
@@ -93,6 +92,28 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	check(err)
 	w.Write(jsonReponse)
+}
+
+func buildSearchParams(query url.Values) string {
+	params := url.Values{}
+	params.Set("nombre", "7")
+
+	clues, ok := query["clue"]
+	if !ok || len(clues[0]) < 1 {
+		log.Panicln("Url Param 'clue' is missing")
+	}
+	// Unfortunately, lucene '*' on `denominationUniteLegale` doesn't seem to be supported
+	params.Set("q", `denominationUniteLegale:"`+clues[0]+`"`)
+
+	departments, ok := query["department"]
+	if ok && len(departments[0]) > 1 {
+		params.Set("q", params.Get("q")+" AND codePostalEtablissement:"+departments[0])
+		if len(departments[0]) < 5 {
+			params.Set("q", params.Get("q")+"*")
+		}
+	}
+
+	return params.Encode()
 }
 
 func queryAPI(uri string) []byte {
@@ -110,7 +131,16 @@ func queryAPI(uri string) []byte {
 	check(err)
 
 	if resp.StatusCode != 200 {
-		fmt.Println("Error while querying INSEE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
+		log.Println("Error while querying INSEE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
+
+		requestDump, err := httputil.DumpRequest(req, true)
+		check(err)
+		log.Println("Dumping error content...", string(requestDump))
+
+		if resp.StatusCode == 401 {
+			log.Println("Trying to renew token for next time...")
+			generateTokenFromInsee()
+		}
 	}
 
 	responseData, err := ioutil.ReadAll(resp.Body)
@@ -122,7 +152,7 @@ func queryAPI(uri string) []byte {
 func etablissementToResponse(item Etablissement) Response {
 	return Response{item.Siret,
 		item.Siren,
-		item.UniteLegale.DenominationUniteLegale,
+		item.UniteLegale.DenominationUniteLegale + item.UniteLegale.DenominationUsuelle1UniteLegale,
 		item.AdresseEtablissement.NumeroVoieEtablissement + " " +
 			item.AdresseEtablissement.TypeVoieEtablissement + " " +
 			item.AdresseEtablissement.LibelleVoieEtablissement + ", " +

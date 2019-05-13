@@ -49,7 +49,6 @@ export default connect<{}, Values>(function WasteInfo(props) {
       {values.emitter.type === "APPENDIX2" && (
         <FormsSelector
           emitterSiret={values.emitter.company.siret}
-          wasteCode={values.wasteDetails.code}
           name="appendix2Forms"
         />
       )}

@@ -15,3 +15,11 @@ export function sendMail(mail: Mail) {
       console.error("Error while pushing mail to mail service", err)
     );
 }
+
+export function addContact({ email, name }: { email: string; name: string }) {
+  return axios
+    .post("http://td-mail/contact", { email, name })
+    .catch(err =>
+      console.error("Error while pushing new contact to mail service", err)
+    );
+}
