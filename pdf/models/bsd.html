@@ -10,6 +10,11 @@
       p {
         margin: 0 0 0.3em 0;
       }
+      p.name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .page {
         page-break-after: always;
       }
@@ -53,11 +58,12 @@
         grid-template-columns: 50% 50%;
         padding: 10px;
         grid-column-gap: 5px;
-        grid-row-gap: 3px;
+        grid-row-gap: 1px;
         grid-template-areas:
           "number number"
           "emitter receiver"
           "waste-info waste-info"
+          "trader trader"
           "transporter transporter"
           "sent sent"
           "recipient recipient"
@@ -87,6 +93,9 @@
       }
       .waste-info {
         grid-area: waste-info;
+      }
+      .trader {
+        grid-area: trader;
       }
       .transporter {
         grid-area: transporter;
@@ -331,22 +340,36 @@
 
         <div class="emitter grid-item">
           <div class="item-title">1. Emetteur du bordereau:</div>
-          <p class="checkboxes">
-            <input type="checkbox"
-            {{? it.emitterType === "PRODUCER"}}checked{{?}}/> Producteur du
-            déchet <input type="checkbox"
-            {{? it.emitterType === "APPENDIX1"}}checked{{?}} /> Collecteur de
-            petites quantités de déchets relevant d’une même rubrique
-            <small>(joindre annexe 1)</small> <input type="checkbox"
-            {{? it.emitterType === "APPENDIX2"}}checked{{?}} /> Personne ayant
-            transformé ou Autre détenteur réalisé un traitement dont la
-            provenance des déchets reste identifiable
-            <small>(joindre annexe 2)</small>
-            <input type="checkbox"
-            {{? it.emitterType === "OTHER"}}checked{{?}} /> Autre producteur
-          </p>
+          <div class="columns">
+            <div class="column">
+              <div>
+                <input type="checkbox"
+                {{? it.emitterType === "PRODUCER"}}checked{{?}}/> Producteur du
+                déchet
+              </div>
+              <div>
+                <input type="checkbox"
+                {{? it.emitterType === "APPENDIX2"}}checked{{?}} /> Personne
+                ayant transformé ou réalisé un traitement dont la provenance des
+                dechets reste identifiable
+                <small>(joindre annexe 2)</small>
+              </div>
+            </div>
+            <div class="column">
+              <div>
+                <input type="checkbox"
+                {{? it.emitterType === "APPENDIX1"}}checked{{?}} /> Collecteur
+                de petites quantités de déchets relevant d’une même rubrique
+                <small>(joindre annexe 1)</small>
+              </div>
+              <div>
+                <input type="checkbox"
+                {{? it.emitterType === "OTHER"}}checked{{?}} /> Autre détenteur
+              </div>
+            </div>
+          </div>
           <p>N° SIRET: {{=it.emitterCompanySiret}}</p>
-          <p>NOM: {{=it.emitterCompanyName}}</p>
+          <p class="name">NOM: {{=it.emitterCompanyName}}</p>
           <p>Adresse: {{=it.emitterCompanyAddress}}</p>
           <p>Tél: {{=it.emitterCompanyPhone}} - Fax:</p>
           <p>Mél: {{=it.emitterCompanyMail}}</p>
@@ -366,7 +389,7 @@
             <input type="checkbox" /> Oui <input type="checkbox" checked /> Non
           </p>
           <p>N° SIRET: {{=it.recipientCompanySiret}}</p>
-          <p>NOM: {{=it.recipientCompanyName}}</p>
+          <p class="name">NOM: {{=it.recipientCompanyName}}</p>
           <p>Adresse: {{=it.recipientCompanyAddress}}</p>
           <p>Tél: {{=it.recipientCompanyPhone}} - Fax:</p>
           <p>Mél: {{=it.recipientCompanyMail}}</p>
@@ -403,7 +426,7 @@
             4. Mentions au titre des règlements ADR, RID, ADNR, IMDG: (le cas
             échéant)
           </div>
-          <p>
+          <p class="name">
             {{=it.wasteDetailsOnuCode}}
           </p>
           <p>
@@ -412,9 +435,6 @@
               {{? it.wasteDetailsPackagings.indexOf("BENNE") > -1}}checked{{?}}
               /> benne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("CITERNE") > -1
-
-
-
               }}checked{{?}}
               /> citerne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("GRV") > -1}}checked{{?}} />
@@ -443,13 +463,15 @@
               <p>{{=it.wasteDetailsQuantity}} tonne(s)</p>
             </div>
           </div>
+        </div>
+        <div class="trader grid-item">
           <div class="item-title">
             7. Négociant
           </div>
           <div class="columns">
             <div class="column">
               <p>N° SIREN: {{=it.traderCompanySiret || ''}}</p>
-              <p>NOM: {{=it.traderCompanyName || ''}}</p>
+              <p class="name">NOM: {{=it.traderCompanyName || ''}}</p>
               <p>Adresse: {{=it.traderCompanyAddress || ''}}</p>
               <p>Tél: {{=it.traderCompanyPhone || ''}} - Fax:</p>
               <p>Mél: {{=it.traderCompanyMail || ''}}</p>
@@ -470,7 +492,7 @@
           <div class="columns">
             <div class="column">
               <p>N° SIREN: {{=it.transporterCompanySiret}}</p>
-              <p>NOM: {{=it.transporterCompanyName}}</p>
+              <p class="name">NOM: {{=it.transporterCompanyName}}</p>
               <p>Adresse: {{=it.transporterCompanyAddress}}</p>
               <p>Tél: {{=it.transporterCompanyPhone}} - Fax:</p>
               <p>Mél: {{=it.transporterCompanyMail}}</p>
@@ -545,7 +567,7 @@
                 10. Expédition reçue à l’installation de destination:
               </div>
               <p>N° SIRET: {{=it.recipientCompanySiret}}</p>
-              <p>NOM: {{=it.recipientCompanyName}}</p>
+              <p class="name">NOM: {{=it.recipientCompanyName}}</p>
               <p>Adresse: {{=it.recipientCompanyAddress}}</p>
               <p>Personne à contacter: {{=it.receivedBy}}</p>
               <p>
@@ -587,11 +609,11 @@
             <div class="column">
               {{? it.processingOperationDone != null }}
               <div class="item-title">11. Réalisation de l’opération:</div>
+              <p>Code D/R: {{=it.processingOperationDone}}</p>
+              <p>Description: {{=it.processingOperationDescription}}</p>
               <p>
                 Je soussigné certifie que l'opération ci-dessous a été effectuée
               </p>
-              <p>Code D/R: {{=it.processingOperationDone}}</p>
-              <p>Description: {{=it.processingOperationDescription}}</p>
               <p>Nom: {{=it.processedBy}}</p>
               <p>Date: {{=it.toDate(it.processedAt)}}</p>
               <p class="stamp">
@@ -690,11 +712,11 @@
         <div class="appendix2-item">
           <div class="columns">
             <div class="column">
-              <h3>Expéditeur initial n° {{=index}}</h3>
+              <h3>Expéditeur initial n° {{=index + 1}}</h3>
               <p>N° SIRET: {{=value.emitterCompanySiret}}</p>
               <p>Nom: {{=value.emitterCompanyName}}</p>
               <p>Adresse: {{=value.emitterCompanyAddress}}</p>
-              <p>Tel: {{=value.emitterCompanyPhone}}</p>
+              <p>Tel: {{=value.emitterCompanyPhone}} - Fax:</p>
               <p>Mel: {{=value.emitterCompanyMail}}</p>
               <p>Personne à contacter: {{=value.emitterCompanyContact}}</p>
             </div>
