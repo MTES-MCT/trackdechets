@@ -1,11 +1,12 @@
 import gql from "graphql-tag";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { Query, QueryResult } from "react-apollo";
 import { Form } from "../model";
 import { DateTime } from "luxon";
-import { connect, getIn, setIn, Formik } from "formik";
+import { connect, getIn, setIn } from "formik";
 import useDebounce from "../../utils/use-debounce";
 import formatWasteCodeEffect from "../waste-code/format-waste-code.effect";
+import useDidUpdateEffect from "../../utils/use-did-update";
 
 const GET_APPENDIX_FORMS = gql`
   query AppendixForms($emitterSiret: String!, $wasteCode: String) {
@@ -27,6 +28,37 @@ const GET_APPENDIX_FORMS = gql`
 `;
 type Props = { emitterSiret: string; name: string };
 
+function reducer(
+  state: { selected: string[]; quantity: number },
+  action: { type: string; payload: Form | Form[] }
+) {
+  switch (action.type) {
+    case "select":
+      const sp = action.payload as Form;
+      return {
+        selected: [sp.readableId, ...state.selected],
+        quantity: state.quantity + sp.quantityReceived
+      };
+    case "unselect":
+      const usp = action.payload as Form;
+      return {
+        selected: state.selected.filter(v => v !== usp.readableId),
+        quantity: state.quantity - usp.quantityReceived
+      };
+    case "selectAll":
+      const sap = action.payload as Form[];
+      return {
+        selected: sap.map((v: Form) => v.readableId),
+        quantity: sap.reduce(
+          (prev: number, cur: Form) => (prev += cur.quantityReceived),
+          0
+        )
+      };
+    default:
+      throw new Error();
+  }
+}
+
 export default connect<Props>(function FormsSelector(props) {
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
   useEffect(() => formatWasteCodeEffect(wasteCodeFilter, setWasteCodeFilter), [
@@ -35,19 +67,24 @@ export default connect<Props>(function FormsSelector(props) {
   const debouncedWasteCodeFilter = useDebounce(wasteCodeFilter, 500);
 
   const fieldValue: Form[] = getIn(props.formik.values, props.name);
-  const [selected, setSelected] = useState(fieldValue.map(f => f.readableId));
 
-  useEffect(() => {
+  const [state, dispatch] = useReducer(reducer, {
+    selected: fieldValue.map(f => f.readableId),
+    quantity: getIn(props.formik.values, "wasteDetails.quantity")
+  });
+
+  useDidUpdateEffect(() => {
     props.formik.setValues({
       ...props.formik.values,
-      [props.name]: selected.map(s => ({ readableId: s }))
+      ...setIn(props.formik.values, "wasteDetails.quantity", state.quantity),
+      [props.name]: state.selected.map(s => ({ readableId: s }))
     });
-  }, [selected]);
+  }, [state]);
 
-  const toggleSelected = (id: string) => {
-    selected.indexOf(id) > -1
-      ? setSelected(selected.filter(v => v !== id))
-      : setSelected([id, ...selected]);
+  const toggleSelected = (form: Form) => {
+    state.selected.find(s => s === form.readableId)
+      ? dispatch({ type: "unselect", payload: form })
+      : dispatch({ type: "select", payload: form });
   };
   return (
     <div>
@@ -109,11 +146,12 @@ export default connect<Props>(function FormsSelector(props) {
                   <th>
                     <input
                       type="checkbox"
-                      checked={selected.length === values.length}
+                      checked={state.selected.length === values.length}
                       onChange={e =>
-                        e.target.checked
-                          ? setSelected(values.map(v => v.readableId))
-                          : setSelected([])
+                        dispatch({
+                          type: "selectAll",
+                          payload: e.target.checked ? values : []
+                        })
                       }
                     />
                   </th>
@@ -127,15 +165,12 @@ export default connect<Props>(function FormsSelector(props) {
               </thead>
               <tbody>
                 {values.map(v => (
-                  <tr
-                    key={v.readableId}
-                    onClick={() => toggleSelected(v.readableId)}
-                  >
+                  <tr key={v.readableId} onClick={() => toggleSelected(v)}>
                     <td>
                       <input
                         type="checkbox"
-                        checked={selected.indexOf(v.readableId) > -1}
-                        onChange={() => toggleSelected(v.readableId)}
+                        checked={state.selected.indexOf(v.readableId) > -1}
+                        onChange={() => true}
                       />
                     </td>
                     <td>{v.readableId}</td>
