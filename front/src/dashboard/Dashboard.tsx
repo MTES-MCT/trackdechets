@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import React from "react";
+import React, { useState } from "react";
 import { Query } from "react-apollo";
 import { Route, RouteComponentProps } from "react-router";
 import Account from "./account/Account";
@@ -16,7 +16,10 @@ export const GET_ME = gql`
       email
       phone
       companies {
-        admin { id name }
+        admin {
+          id
+          name
+        }
         siret
         name
         address
@@ -27,6 +30,8 @@ export const GET_ME = gql`
 `;
 
 export default function Dashboard({ match }: RouteComponentProps) {
+  const [activeSiret, setActiveSiret] = useState("");
+
   return (
     <Query query={GET_ME}>
       {({ loading, error, data }) => {
@@ -35,12 +40,18 @@ export default function Dashboard({ match }: RouteComponentProps) {
 
         return (
           <div id="dashboard" className="dashboard">
-            <DashboardMenu me={data.me} match={match} />
+            <DashboardMenu
+              me={data.me}
+              match={match}
+              setActiveSiret={(v: string) => setActiveSiret(v)}
+            />
 
             <div className="dashboard-content">
               <Route
                 path={`${match.path}/slips`}
-                render={() => <SlipsContainer me={data.me} />}
+                render={() => (
+                  <SlipsContainer me={data.me} siret={activeSiret} />
+                )}
               />
               <Route
                 path={`${match.path}/account`}

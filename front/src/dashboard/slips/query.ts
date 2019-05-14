@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export const GET_SLIPS = gql`
-  query GetSlips {
-    forms {
+  query GetSlips($siret: String) {
+    forms(siret: $siret) {
       id
       readableId
       createdAt
