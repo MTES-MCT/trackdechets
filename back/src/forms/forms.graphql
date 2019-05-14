@@ -6,9 +6,9 @@ type Query {
   """
   form(id: ID): Form
   """
-  Renvoie tous mes BSD
+  Renvoie tous les BSDs de la compagnie sélectionnée (la première par défaut)
   """
-  forms: [Form]
+  forms(siret: String): [Form]
   stats: [CompanyStat]
   """
   Renvoie des BSD candidats à un regroupement dans une annexe 2

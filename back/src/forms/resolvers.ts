@@ -18,36 +18,46 @@ export default {
   Query: {
     form: async (parent, { id }, context: Context) => {
       if (!id) {
-        return null;
+        throw new Error("Vous devez préciser un identifiant valide.");
       }
 
-      const userId = getUserId(context);
-
-      const formPromise = context.prisma.form({ id });
-      // const formOwner = await form.owner();
-
-      // if (formOwner.id !== userId) {
-      //   return null;
-      // }
-
-      return formPromise.then(dbForm => unflattenObjectFromDb(dbForm));
-    },
-    forms: async (parent, args, context: Context) => {
       const userId = getUserId(context);
       const userCompanies = await context.prisma
         .user({ id: userId })
         .companies();
 
+      const dbForm = await context.prisma.form({ id });
+      const formOwner = await context.prisma.form({ id }).owner();
+      if (
+        formOwner.id !== userId ||
+        !userCompanies.find(
+          c =>
+            c.siret === dbForm.recipientCompanySiret ||
+            c.siret === dbForm.emitterCompanySiret
+        )
+      ) {
+        throw new Error("Vous n'êtes pas autorisé à visualiser ce bordereau.");
+      }
+
+      return unflattenObjectFromDb(dbForm);
+    },
+    forms: async (parent, { siret }, context: Context) => {
+      const userId = getUserId(context);
+      const userCompanies = await context.prisma
+        .user({ id: userId })
+        .companies();
+
+      // Find on userCompanies to make sure that the siret belongs to the current user
+      const selectedCompany =
+        userCompanies.find(uc => uc.siret === siret) ||
+        userCompanies.shift();
+
       const forms = await context.prisma.forms({
         where: {
           OR: [
             { owner: { id: userId } },
-            ...userCompanies.map(userCompany => ({
-              recipientCompanySiret: userCompany.siret
-            })),
-            ...userCompanies.map(userCompany => ({
-              emitterCompanySiret: userCompany.siret
-            }))
+            { recipientCompanySiret: selectedCompany.siret },
+            { emitterCompanySiret: selectedCompany.siret }
           ],
           isDeleted: false
         }
