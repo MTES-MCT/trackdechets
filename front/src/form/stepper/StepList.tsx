@@ -9,6 +9,7 @@ import { GET_FORM, SAVE_FORM } from "./queries";
 import { GET_SLIPS } from "../../dashboard/slips/query";
 import { Form } from "../model";
 import { formSchema } from "../schema";
+import { currentSiretService } from "../../dashboard/CompanySelector";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
@@ -88,14 +89,19 @@ export default withRouter(function StepList(
                 mutation={SAVE_FORM}
                 update={(store, { data: { saveForm } }) => {
                   const data = store.readQuery<{ forms: Form[] }>({
-                    query: GET_SLIPS
+                    query: GET_SLIPS,
+                    variables: { siret: currentSiretService.getSiret() }
                   });
                   if (!data || !data.forms) {
                     return;
                   }
                   data.forms = data.forms.filter(f => f.id !== saveForm.id);
                   data.forms.push(saveForm);
-                  store.writeQuery({ query: GET_SLIPS, data });
+                  store.writeQuery({
+                    query: GET_SLIPS,
+                    variables: { siret: currentSiretService.getSiret() },
+                    data
+                  });
                 }}
               >
                 {(saveForm, { loading, error }) => (

@@ -4,6 +4,7 @@ import { Mutation } from "react-apollo";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
 import { Form } from "../../../form/model";
+import { currentSiretService } from "../../CompanySelector";
 
 type Props = { formId: string };
 
@@ -42,7 +43,8 @@ export default function Delete({ formId }: Props) {
                     variables: { id: formId },
                     update: (store, { data: { deleteForm } }) => {
                       const data = store.readQuery<{ forms: Form[] }>({
-                        query: GET_SLIPS
+                        query: GET_SLIPS,
+                        variables: { siret: currentSiretService.getSiret() }
                       });
                       if (!data || !data.forms) {
                         return;
@@ -50,7 +52,11 @@ export default function Delete({ formId }: Props) {
                       data.forms = data.forms.filter(
                         f => f.id !== deleteForm.id
                       );
-                      store.writeQuery({ query: GET_SLIPS, data });
+                      store.writeQuery({
+                        query: GET_SLIPS,
+                        variables: { siret: currentSiretService.getSiret() },
+                        data
+                      });
                     }
                   })
                 }
