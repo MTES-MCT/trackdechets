@@ -18,7 +18,8 @@ export default {
   Query: {
     form: async (parent, { id }, context: Context) => {
       if (!id) {
-        throw new Error("Vous devez préciser un identifiant valide.");
+        // On form creation, there is no id
+        return null;
       }
 
       const userId = getUserId(context);
@@ -49,8 +50,7 @@ export default {
 
       // Find on userCompanies to make sure that the siret belongs to the current user
       const selectedCompany =
-        userCompanies.find(uc => uc.siret === siret) ||
-        userCompanies.shift();
+        userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
 
       const forms = await context.prisma.forms({
         where: {
