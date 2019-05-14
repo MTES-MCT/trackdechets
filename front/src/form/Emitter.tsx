@@ -37,6 +37,13 @@ export default connect<{}, Values>(function Emitter({ formik }) {
             label="Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable"
             component={RadioButton}
           />
+
+          <Field
+            name="emitter.type"
+            id="APPENDIX1"
+            label="Collecteur de petites quantités de déchets relevant d’une même rubrique"
+            component={RadioButton}
+          />
         </fieldset>
       </div>
 
