@@ -17,6 +17,7 @@
     "dataloader": "^1.4.0",
     "graphql-shield": "^4.1.0",
     "graphql-yoga": "^1.16.7",
+    "ioredis": "^4.9.3",
     "jsonwebtoken": "^8.4.0",
     "merge-graphql-schemas": "^1.5.8",
     "prisma-client-lib": "1.29.1",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
+    "@types/ioredis": "^4.0.10",
     "@types/jest": "^23.3.10",
     "@types/jsonwebtoken": "^8.3.0",
     "@types/yup": "^0.26.3",
