@@ -1,13 +1,14 @@
 import React, { lazy, Suspense, useEffect } from "react";
 import { Route, withRouter } from "react-router";
-import Dashboard from "./dashboard/Dashboard";
-import FormContainer from "./form/FormContainer";
 import Header from "./Header";
 import Home from "./Home";
 import PrivateRoute from "./login/PrivateRoute";
-import SignupInfo from "./login/SignupInfos";
 import { trackPageView } from "./tracker";
 
+const dashBoardPreload = import("./dashboard/Dashboard");
+const Dashboard = lazy(() => dashBoardPreload);
+const FormContainer = lazy(() => import("./form/FormContainer"));
+const SignupInfo = lazy(() => import("./login/SignupInfos"));
 const WasteSelector = lazy(() => import("./login/WasteSelector"));
 const Invite = lazy(() => import("./login/Invite"));
 const Faq = lazy(() => import("./Faq"));
@@ -44,7 +45,11 @@ export default withRouter(function LayoutContainer({ history }) {
         path="/signup/details"
         component={WaitingComponent(WasteSelector)}
       />
-      <Route exact path="/signup/activation" component={SignupInfo} />
+      <Route
+        exact
+        path="/signup/activation"
+        component={WaitingComponent(SignupInfo)}
+      />
       <Route
         exact
         path="/password"
@@ -59,8 +64,11 @@ export default withRouter(function LayoutContainer({ history }) {
       <Route exact path="/search" component={WaitingComponent(Search)} />
       <Route exact path="/wasteTree" component={WaitingComponent(WasteTree)} />
 
-      <PrivateRoute path="/form/:id?" component={FormContainer} />
-      <PrivateRoute path="/dashboard" component={Dashboard} />
+      <PrivateRoute
+        path="/form/:id?"
+        component={WaitingComponent(FormContainer)}
+      />
+      <PrivateRoute path="/dashboard" component={WaitingComponent(Dashboard)} />
     </React.Fragment>
   );
 });
