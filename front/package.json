@@ -48,6 +48,7 @@
     "not op_mini all"
   ],
   "reactSnap": {
+    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
     "inlineCss": true
   },
   "devDependencies": {
