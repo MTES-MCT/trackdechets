@@ -6,7 +6,7 @@ type Company {
   phone: String
   mail: String
 
-  admin: PublicUser
+  admins: [PublicUser]
 }
 
 type Query {

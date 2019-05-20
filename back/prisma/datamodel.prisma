@@ -32,7 +32,7 @@ type Company {
   id: ID! @unique
   siret: String! @unique
 
-  admin: User @relation(name: "CompanyAdmin")
+  admins: [User] @relation(name: "CompanyAdmins")
 }
 
 type Form {

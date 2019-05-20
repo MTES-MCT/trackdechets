@@ -16,7 +16,7 @@ export const GET_ME = gql`
       email
       phone
       companies {
-        admin {
+        admins {
           id
           name
         }

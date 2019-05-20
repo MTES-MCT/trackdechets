@@ -10,8 +10,13 @@ const updaters: {
   description: string;
 }[] = [];
 
-export function registerUpdater(name: string, description: string = "") {
+export function registerUpdater(
+  name: string,
+  description: string = "",
+  active: boolean = true
+) {
   return function(constructor: Function) {
+    if (!active) return;
     updaters.push({ constructor, name, description });
   };
 }

@@ -34,10 +34,10 @@ export default {
       const company = await memoizeRequest(parent.siret);
       return company.name;
     },
-    admin: async (parent, _, context: Context) => {
+    admins: async (parent, _, context: Context) => {
       return context.prisma
         .company({ siret: parent.siret })
-        .admin()
+        .admins()
         .catch(_ => null);
     }
   },
@@ -50,10 +50,10 @@ export default {
       return await memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
-      const companyAdmin = await context.prisma.company({ siret }).admin();
+      const companyAdmins = await context.prisma.company({ siret }).admins();
 
       const currentUserId = getUserId(context);
-      if (companyAdmin.id !== currentUserId) {
+      if (!companyAdmins.find(a => a.id === currentUserId)) {
         return [];
       }
 
@@ -83,7 +83,7 @@ export default {
 
       return [...users, ...invitedUsers];
     },
-    searchCompanies: async (parent, { clue, department = '' }) => {
+    searchCompanies: async (parent, { clue, department = "" }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
 
       if (!isNumber) {

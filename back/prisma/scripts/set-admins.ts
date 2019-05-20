@@ -3,7 +3,8 @@ import { Updater, registerUpdater } from ".";
 
 @registerUpdater(
   "Set admins",
-  `For companies that don't have an admin, use the only user in the company and give him the role`
+  `For companies that don't have an admin, use the only user in the company and give him the role`,
+  false
 )
 export class SetAdminUpdater implements Updater {
   run() {

@@ -52,7 +52,7 @@ export default {
       // Set the new user as the company admin
       await context.prisma.updateCompany({
         where: { siret: trimedSiret },
-        data: { admin: { connect: { id: user.id } } }
+        data: { admins: { connect: { id: user.id } } }
       });
 
       const activationHash = await hash(
@@ -157,9 +157,10 @@ export default {
     },
     inviteUserToCompany: async (_, { email, siret }, context: Context) => {
       const userId = getUserId(context);
-      const admin = await prisma.company({ siret }).admin();
+      const admins = await prisma.company({ siret }).admins();
+      const admin = admins.find(a => a.id === userId);
 
-      if (!admin || admin.id !== userId) {
+      if (!admin) {
         throw new Error(
           "Vous ne pouvez pas inviter un utilisateur dans cette entreprise."
         );
@@ -248,9 +249,9 @@ export default {
     },
     removeUserFromCompany: async (_, { userId, siret }, context: Context) => {
       const currentUserId = getUserId(context);
-      const admin = await prisma.company({ siret }).admin();
+      const admins = await prisma.company({ siret }).admins();
 
-      if (!admin || admin.id !== currentUserId) {
+      if (!admins || !admins.find(a => a.id === currentUserId)) {
         throw new Error(
           "Vous ne pouvez pas retirer un utilisateur dans cette entreprise."
         );
