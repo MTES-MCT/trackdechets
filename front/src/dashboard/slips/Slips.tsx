@@ -68,6 +68,42 @@ export default function Slips({ forms, me, hiddenFields = [] }: Props) {
           )}
           <th>Actions</th>
         </tr>
+        <tr>
+          {hiddenFields.indexOf("readableId") === -1 && (
+            <th>
+              <input
+                type="text"
+                onChange={e => filter("readableId", e.target.value)}
+                placeholder="Filtrer..."
+              />
+            </th>
+          )}
+          <th />
+          <th>
+            <input
+              type="text"
+              onChange={e => filter("emitter.company.name", e.target.value)}
+              placeholder="Filtrer..."
+            />
+          </th>
+          <th>
+            <input
+              type="text"
+              onChange={e => filter("recipient.company.name", e.target.value)}
+              placeholder="Filtrer..."
+            />
+          </th>
+          <th>
+            <input
+              type="text"
+              onChange={e => filter("wasteDetails.code", e.target.value)}
+              placeholder="Filtrer..."
+            />
+          </th>
+          <th />
+          {hiddenFields.indexOf("status") === -1 && <th />}
+          <th />
+        </tr>
       </thead>
       <tbody>
         {sortedForms.map((s: any) => (

@@ -34,7 +34,11 @@ export function useFormsTable(
     const newFilters = filters.filter(f => f.key !== key && f.value);
     newFilters.push({ key, value });
 
-    const newForms = forms.filter(f => getKey(f, key).indexOf(value) > -1);
+    const newForms = inputForms.filter(f =>
+      newFilters.every(
+        filter => getKey(f, filter.key).indexOf(filter.value) > -1
+      )
+    );
     setFilters(newFilters);
     setForms(newForms);
   }
