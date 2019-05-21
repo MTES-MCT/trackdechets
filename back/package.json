@@ -20,7 +20,7 @@
     "ioredis": "^4.9.3",
     "jsonwebtoken": "^8.4.0",
     "merge-graphql-schemas": "^1.5.8",
-    "prisma-client-lib": "1.29.1",
+    "prisma-client-lib": "1.33.0",
     "yup": "^0.26.6"
   },
   "devDependencies": {
@@ -31,7 +31,7 @@
     "@types/yup": "^0.26.3",
     "jest": "^23.6.0",
     "nodemon": "^1.18.7",
-    "prisma": "1.29.1",
+    "prisma": "1.33.0",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.1.6"

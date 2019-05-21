@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Context } from "../types";
 import { getUserId } from "../utils";
+import { prisma } from "../generated/prisma-client";
+import { getCompanyAdmins, getUserCompanies } from "./helper";
 
 const requests = {};
 function memoizeRequest(siret) {
@@ -34,11 +36,8 @@ export default {
       const company = await memoizeRequest(parent.siret);
       return company.name;
     },
-    admins: async (parent, _, context: Context) => {
-      return context.prisma
-        .company({ siret: parent.siret })
-        .admins()
-        .catch(_ => null);
+    admins: async (parent, _) => {
+      return getCompanyAdmins(parent.siret).catch(_ => null);
     }
   },
   Query: {
@@ -50,7 +49,7 @@ export default {
       return await memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
-      const companyAdmins = await context.prisma.company({ siret }).admins();
+      const companyAdmins = await getCompanyAdmins(siret);
 
       const currentUserId = getUserId(context);
       if (!companyAdmins.find(a => a.id === currentUserId)) {
@@ -107,9 +106,8 @@ export default {
     favorites: async (parent, { type }, context: Context) => {
       const lowerType = type.toLowerCase();
       const userId = getUserId(context);
-      const userCompanies = await context.prisma
-        .user({ id: userId })
-        .companies();
+      const userCompanies = await getUserCompanies(userId)
+
       if (!userCompanies.length) {
         throw new Error(
           `Vous n'appartenez à aucune entreprise, vous n'avez pas de favori.`

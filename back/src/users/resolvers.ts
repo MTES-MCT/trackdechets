@@ -7,6 +7,7 @@ import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
 import companyResolver from "../companies/resolvers";
+import { getCompanyAdmins, getUserCompanies } from "../companies/helper";
 
 export default {
   Mutation: {
@@ -31,6 +32,17 @@ export default {
       }
 
       const hashedPassword = await hash(payload.password, 10);
+      const company = await context.prisma
+        .createCompany({
+          siret: trimedSiret
+        })
+        .catch(err => {
+          console.error("Error while creating user company", err);
+          throw new Error(
+            "Impossible de créer cet utilisateur. Veuillez contacter le support."
+          );
+        });
+
       const user = await context.prisma
         .createUser({
           name: payload.name,
@@ -38,8 +50,11 @@ export default {
           password: hashedPassword,
           phone: payload.phone,
           userType: payload.userType,
-          companies: {
-            create: { siret: trimedSiret }
+          companyAssociations: {
+            create: {
+              role: "ADMIN",
+              company: { connect: { id: company.id } }
+            }
           }
         })
         .catch(err => {
@@ -48,12 +63,6 @@ export default {
             "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
           );
         });
-
-      // Set the new user as the company admin
-      await context.prisma.updateCompany({
-        where: { siret: trimedSiret },
-        data: { admins: { connect: { id: user.id } } }
-      });
 
       const activationHash = await hash(
         new Date().valueOf().toString() + Math.random().toString(),
@@ -157,7 +166,7 @@ export default {
     },
     inviteUserToCompany: async (_, { email, siret }, context: Context) => {
       const userId = getUserId(context);
-      const admins = await prisma.company({ siret }).admins();
+      const admins = await getCompanyAdmins(siret);
       const admin = admins.find(a => a.id === userId);
 
       if (!admin) {
@@ -173,15 +182,16 @@ export default {
       const companyName = await companyResolver.Company.name({ siret });
 
       if (existingUser) {
-        const updatedUser = await context.prisma.updateUser({
-          data: { companies: { connect: { siret } } },
-          where: { email }
+        await context.prisma.createCompanyAssociation({
+          user: { connect: { id: existingUser.id } },
+          role: "MEMBER",
+          company: { connect: { siret } }
         });
 
         await sendMail(
           userMails.notifyUserOfInvite(
-            updatedUser.email,
-            updatedUser.name,
+            existingUser.email,
+            existingUser.name,
             admin.name,
             companyName
           )
@@ -231,8 +241,11 @@ export default {
         phone: "",
         userType: [],
         isActive: true,
-        companies: {
-          connect: { siret: existingHash.companySiret }
+        companyAssociations: {
+          create: {
+            company: { connect: { siret: existingHash.companySiret } },
+            role: "MEMBER"
+          }
         }
       });
 
@@ -249,7 +262,7 @@ export default {
     },
     removeUserFromCompany: async (_, { userId, siret }, context: Context) => {
       const currentUserId = getUserId(context);
-      const admins = await prisma.company({ siret }).admins();
+      const admins = await getCompanyAdmins(siret);
 
       if (!admins || !admins.find(a => a.id === currentUserId)) {
         throw new Error(
@@ -258,9 +271,9 @@ export default {
       }
 
       await prisma
-        .updateUser({
-          where: { id: userId },
-          data: { companies: { disconnect: { siret } } }
+        .deleteManyCompanyAssociations({
+          user: { id: userId },
+          company: { siret: siret }
         })
         .catch(_ => {
           throw new Error(
@@ -282,11 +295,8 @@ export default {
     }
   },
   User: {
-    companies: async (parent, args, context: Context) => {
-      return await context.prisma.user({ id: parent.id }).companies();
+    companies: async parent => {
+      return await getUserCompanies(parent.id);
     }
-    // companies: async (parent, args, context: Context) => {
-    //   return await context.prisma.user({ id: parent.id }).();
-    // },
   }
 };
