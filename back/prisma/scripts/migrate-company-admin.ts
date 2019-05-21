@@ -20,12 +20,14 @@ export class SetAdminUpdater implements Updater {
         `
       );
 
-      const updates = companies.map(company =>
-        prisma.updateCompany({
-          where: { id: company.id },
-          data: { admins: { connect: { id: company.admin.id } } }
-        })
-      );
+      const updates = companies
+        .filter(c => c.admin)
+        .map(company =>
+          prisma.updateCompany({
+            where: { id: company.id },
+            data: { admins: { connect: { id: company.admin.id } } }
+          })
+        );
 
       return Promise.all(updates)
         .then(_ => console.info(`⚡ Update done.`))
