@@ -164,7 +164,11 @@ export default {
           throw new Error("Impossible de mettre lr profil à jour");
         });
     },
-    inviteUserToCompany: async (_, { email, siret }, context: Context) => {
+    inviteUserToCompany: async (
+      _,
+      { email, siret, role },
+      context: Context
+    ) => {
       const userId = getUserId(context);
       const admins = await getCompanyAdmins(siret);
       const admin = admins.find(a => a.id === userId);
@@ -184,7 +188,7 @@ export default {
       if (existingUser) {
         await context.prisma.createCompanyAssociation({
           user: { connect: { id: existingUser.id } },
-          role: "MEMBER",
+          role,
           company: { connect: { siret } }
         });
 
@@ -206,6 +210,7 @@ export default {
       await prisma.createUserAccountHash({
         hash: userAccoutHash,
         email,
+        role,
         companySiret: siret
       });
 
@@ -244,7 +249,7 @@ export default {
         companyAssociations: {
           create: {
             company: { connect: { siret: existingHash.companySiret } },
-            role: "MEMBER"
+            role: existingHash.role
           }
         }
       });

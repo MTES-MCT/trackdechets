@@ -2744,6 +2744,7 @@ type UserAccountHash {
   id: ID!
   email: String!
   companySiret: ID!
+  role: UserRole!
   hash: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -2759,6 +2760,7 @@ input UserAccountHashCreateInput {
   id: ID
   email: String!
   companySiret: ID!
+  role: UserRole!
   hash: String!
 }
 
@@ -2774,6 +2776,8 @@ enum UserAccountHashOrderByInput {
   email_DESC
   companySiret_ASC
   companySiret_DESC
+  role_ASC
+  role_DESC
   hash_ASC
   hash_DESC
   createdAt_ASC
@@ -2786,6 +2790,7 @@ type UserAccountHashPreviousValues {
   id: ID!
   email: String!
   companySiret: ID!
+  role: UserRole!
   hash: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -2812,12 +2817,14 @@ input UserAccountHashSubscriptionWhereInput {
 input UserAccountHashUpdateInput {
   email: String
   companySiret: ID
+  role: UserRole
   hash: String
 }
 
 input UserAccountHashUpdateManyMutationInput {
   email: String
   companySiret: ID
+  role: UserRole
   hash: String
 }
 
@@ -2864,6 +2871,10 @@ input UserAccountHashWhereInput {
   companySiret_not_starts_with: ID
   companySiret_ends_with: ID
   companySiret_not_ends_with: ID
+  role: UserRole
+  role_not: UserRole
+  role_in: [UserRole!]
+  role_not_in: [UserRole!]
   hash: String
   hash_not: String
   hash_in: [String!]

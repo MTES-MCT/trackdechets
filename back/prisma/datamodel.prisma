@@ -42,6 +42,7 @@ type UserAccountHash {
   id: ID! @id
   email: String!
   companySiret: ID!
+  role: UserRole!
   hash: String! @unique
 
   createdAt: DateTime! @createdAt

@@ -507,6 +507,8 @@ export type UserAccountHashOrderByInput =
   | "email_DESC"
   | "companySiret_ASC"
   | "companySiret_DESC"
+  | "role_ASC"
+  | "role_DESC"
   | "hash_ASC"
   | "hash_DESC"
   | "createdAt_ASC"
@@ -849,6 +851,7 @@ export interface UserAccountHashCreateInput {
   id?: Maybe<ID_Input>;
   email: String;
   companySiret: ID_Input;
+  role: UserRole;
   hash: String;
 }
 
@@ -1793,6 +1796,10 @@ export interface UserAccountHashWhereInput {
   companySiret_not_starts_with?: Maybe<ID_Input>;
   companySiret_ends_with?: Maybe<ID_Input>;
   companySiret_not_ends_with?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
   hash?: Maybe<String>;
   hash_not?: Maybe<String>;
   hash_in?: Maybe<String[] | String>;
@@ -2184,6 +2191,7 @@ export interface UserUpdateManyWithoutCompaniesInput {
 export interface UserAccountHashUpdateManyMutationInput {
   email?: Maybe<String>;
   companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
   hash?: Maybe<String>;
 }
 
@@ -3228,6 +3236,7 @@ export interface CompanyAssociationScalarWhereInput {
 export interface UserAccountHashUpdateInput {
   email?: Maybe<String>;
   companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
   hash?: Maybe<String>;
 }
 
@@ -3483,6 +3492,7 @@ export interface UserAccountHashPreviousValues {
   id: ID_Output;
   email: String;
   companySiret: ID_Output;
+  role: UserRole;
   hash: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
@@ -3494,6 +3504,7 @@ export interface UserAccountHashPreviousValuesPromise
   id: () => Promise<ID_Output>;
   email: () => Promise<String>;
   companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
   hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -3505,6 +3516,7 @@ export interface UserAccountHashPreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   email: () => Promise<AsyncIterator<String>>;
   companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
   hash: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -4413,6 +4425,7 @@ export interface UserAccountHash {
   id: ID_Output;
   email: String;
   companySiret: ID_Output;
+  role: UserRole;
   hash: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
@@ -4424,6 +4437,7 @@ export interface UserAccountHashPromise
   id: () => Promise<ID_Output>;
   email: () => Promise<String>;
   companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
   hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -4435,6 +4449,7 @@ export interface UserAccountHashSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   email: () => Promise<AsyncIterator<String>>;
   companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
   hash: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -4446,6 +4461,7 @@ export interface UserAccountHashNullablePromise
   id: () => Promise<ID_Output>;
   email: () => Promise<String>;
   companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
   hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
