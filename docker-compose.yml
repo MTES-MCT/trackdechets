@@ -31,6 +31,7 @@ services:
     restart: always
     environment:
       NODE_ENV: production
+      UI_HOST: $UI_HOST
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT

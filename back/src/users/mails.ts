@@ -1,5 +1,7 @@
 import { escape } from "querystring";
 
+const { UI_HOST, VIRTUAL_HOST } = process.env;
+
 export const userMails = {
   onSignup: (user, activationHash) => ({
     toEmail: user.email,
@@ -10,7 +12,7 @@ export const userMails = {
     <br>
     Vous venez de créer un compte sur Trackdéchets. Nous sommes ravis de vous compter parmi nous ! 🎉
     <br>
-    Pour finaliser votre inscription, veuillez confirmer votre email <a href="https://api.trackdechets.beta.gouv.fr/userActivation?hash=${activationHash}">en cliquant ici.</a>
+    Pour finaliser votre inscription, veuillez confirmer votre email <a href="https://${VIRTUAL_HOST}/userActivation?hash=${activationHash}">en cliquant ici.</a>
     <br>
     Pour rappel, Trackdéchets est un site en béta conçu par la Fabrique Numérique du Ministère de l'Ecologie et des Territoires.
     <br>
@@ -23,13 +25,13 @@ export const userMails = {
     title: "Un BSD numérique vous attend sur Trackdéchets",
     body: `Bonjour ${toName},
     <br>
-    L'entreprise ${fromCompanyName} vient de créer un BSD dématérialisé disponible sur <a href="https://trackdechets.beta.gouv.fr/">https://trackdechets.beta.gouv.fr</a> qui concerne votre entreprise ${toCompanyName}.<br>
+    L'entreprise ${fromCompanyName} vient de créer un BSD dématérialisé disponible sur <a href="https://${UI_HOST}/">https://trackdechets.beta.gouv.fr</a> qui concerne votre entreprise ${toCompanyName}.<br>
     Ce message vous est adressé car l'entreprise qui vous a transmis ce bordereau dispose d'un compte sur Trackdéchets et son bordereau est en attente d'une action de votre part.
     <br>
     Trackdéchets est un produit de la Fabrique Numérique du Ministère de la Transition Écologique et Solidaire.<br>
     Il permet entre autres, de dématérialiser la procédure liée aux bordereaux de suivi de déchets et de tracer le déchet jusqu'à son traitement final.
     <br>
-    Vous pouvez créer votre compte en cliquant <a href="https://trackdechets.beta.gouv.fr/signup">sur ce lien</a> et en suivant la procédure d'inscription. Vous pourrez alors commencer à utiliser Trackdéchets.<br>
+    Vous pouvez créer votre compte en cliquant <a href="https://${UI_HOST}/signup">sur ce lien</a> et en suivant la procédure d'inscription. Vous pourrez alors commencer à utiliser Trackdéchets.<br>
     Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.
   `
   }),
@@ -42,7 +44,7 @@ export const userMails = {
     <br><br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre Trackdéchets.
     <br>
-    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://trackdechets.beta.gouv.fr/invite?hash=${escape(
+    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://${UI_HOST}/invite?hash=${escape(
       hash
     )}">sur ce lien</a> et renseignez les informations demandées.
     <br>
@@ -58,7 +60,7 @@ export const userMails = {
     <br><br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre son organisation sur Trackdéchets.
     <br>
-    Vous pouvez dès à présent accéder aux informations de cette entreprise sur le <a href="https://trackdechets.beta.gouv.fr/">portail Trackdéchets</a>.
+    Vous pouvez dès à présent accéder aux informations de cette entreprise sur le <a href="https://${UI_HOST}/">portail Trackdéchets</a>.
     <br>
     Vous aurez accès à l'ensemble des données concernant l'entreprise <strong>${companyName}</strong>.
     `
