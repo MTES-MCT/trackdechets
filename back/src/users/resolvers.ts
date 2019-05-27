@@ -1,13 +1,15 @@
 import axios from "axios";
 import { hash, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { APP_SECRET, getUserId } from "../utils";
+import { getUserId } from "../utils";
 import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
 import companyResolver from "../companies/resolvers";
 import { getCompanyAdmins, getUserCompanies } from "../companies/helper";
+
+const { JWT_SECRET } = process.env;
 
 export default {
   Mutation: {
@@ -83,7 +85,7 @@ export default {
       await sendMail(userMails.onSignup(user, activationHash));
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET),
+        token: sign({ userId: user.id }, JWT_SECRET),
         user
       };
     },
@@ -102,7 +104,7 @@ export default {
         throw new Error("Mot de passe incorrect");
       }
       return {
-        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
+        token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
         user
       };
     },
@@ -122,7 +124,7 @@ export default {
       });
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
+        token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
         user
       };
     },
@@ -261,7 +263,7 @@ export default {
         );
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
+        token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
         user
       };
     },
@@ -296,7 +298,7 @@ export default {
     },
     apiKey: (parent, args, context: Context) => {
       const userId = getUserId(context);
-      return sign({ userId: userId }, APP_SECRET);
+      return sign({ userId: userId }, JWT_SECRET);
     }
   },
   User: {

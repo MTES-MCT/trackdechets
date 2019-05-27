@@ -1,6 +1,6 @@
 import { verify } from "jsonwebtoken";
 
-export const APP_SECRET = "TODO_APPSECRET";
+const { JWT_SECRET } = process.env;
 
 interface Token {
   userId: string;
@@ -19,7 +19,7 @@ export function getUserId(context: Context) {
 }
 
 export function getUserIdFromToken(token: string) {
-  const verifiedToken = verify(token, APP_SECRET) as Token;
+  const verifiedToken = verify(token, JWT_SECRET) as Token;
   return verifiedToken && verifiedToken.userId;
 }
 
