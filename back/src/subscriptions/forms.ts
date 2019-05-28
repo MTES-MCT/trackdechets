@@ -14,7 +14,10 @@ export async function formsSubscriptionCallback(
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
-  if (payload.updatedFields && payload.updatedFields.includes("isDeleted")) {
+  if (
+    (payload.updatedFields && payload.updatedFields.includes("isDeleted")) ||
+    !payload.node
+  ) {
     return;
   }
 
@@ -50,7 +53,10 @@ async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
 }
 
 async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
-  if (payload.updatedFields && payload.updatedFields.includes("isDeleted")) {
+  if (
+    (payload.updatedFields && payload.updatedFields.includes("isDeleted")) ||
+    !payload.node
+  ) {
     return;
   }
 

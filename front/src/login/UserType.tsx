@@ -4,7 +4,8 @@ import React, { InputHTMLAttributes } from "react";
 export const USER_TYPES = [
   { value: "PRODUCER", label: "Producteur" },
   { value: "COLLECTOR", label: "Collecteur" },
-  { value: "WASTEPROCESSOR", label: "Centre de traitement" }
+  { value: "WASTEPROCESSOR", label: "Centre de traitement" },
+  { value: "TRANSPORTER", label: "Transporteur" }
 ];
 
 export default function UserType({

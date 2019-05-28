@@ -1,8 +1,13 @@
 import axios from "axios";
 import { Context } from "../types";
-import { getUserId } from "../utils";
+import {
+  getUserId,
+  currentUserBelongsToCompany,
+  currentUserBelongsToCompanyAdmins,
+  randomNumber
+} from "../utils";
 import { prisma } from "../generated/prisma-client";
-import { getCompanyAdmins, getUserCompanies } from "./helper";
+import { getCompanyAdmins, getUserCompanies, getCompanyUsers } from "./helper";
 
 const requests = {};
 function memoizeRequest(siret) {
@@ -106,7 +111,7 @@ export default {
     favorites: async (parent, { type }, context: Context) => {
       const lowerType = type.toLowerCase();
       const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId)
+      const userCompanies = await getUserCompanies(userId);
 
       if (!userCompanies.length) {
         throw new Error(
@@ -144,6 +149,46 @@ export default {
           (thing, index, self) =>
             index === self.findIndex(t => t.name === thing.name)
         );
+    },
+    securityCode: async (_, { siret }, context: Context) => {
+      if (!currentUserBelongsToCompany(context, siret)) {
+        throw new Error(
+          "Vous n'êtes pas autorisé à consulter ce code de sécurité."
+        );
+      }
+
+      const existingCode = await context.prisma.securityCode(siret);
+
+      if (existingCode && existingCode.code) {
+        return existingCode.code;
+      }
+
+      const newCode = await context.prisma.createSecurityCode({
+        siret,
+        company: { connect: { siret } },
+        code: randomNumber(4)
+      });
+
+      return newCode.code;
+    }
+  },
+  Mutation: {
+    renewSecurityCode: async (_, { siret }, context: Context) => {
+      if (!currentUserBelongsToCompanyAdmins(context, siret)) {
+        throw new Error(
+          "Vous n'êtes pas autorisé à modifier ce code de sécurité."
+        );
+      }
+
+      return context.prisma.upsertSecurityCode({
+        where: { siret },
+        update: { code: randomNumber(4) },
+        create: {
+          siret,
+          company: { connect: { siret } },
+          code: randomNumber(4)
+        }
+      });
     }
   }
 };
