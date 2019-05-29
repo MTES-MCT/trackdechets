@@ -41,7 +41,7 @@ export default {
 
       return unflattenObjectFromDb(dbForm);
     },
-    forms: async (parent, { siret }, context: Context) => {
+    forms: async (parent, { siret, type }, context: Context) => {
       const userId = getUserId(context);
       const userCompanies = await getUserCompanies(userId);
 
@@ -49,13 +49,23 @@ export default {
       const selectedCompany =
         userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
 
-      const forms = await context.prisma.forms({
-        where: {
+      const formsFilter = {
+        ACTOR: {
           OR: [
             { owner: { id: userId } },
             { recipientCompanySiret: selectedCompany.siret },
             { emitterCompanySiret: selectedCompany.siret }
-          ],
+          ]
+        },
+        TRANSPORTER: {
+          transporterCompanySiret: selectedCompany.siret,
+          status: "SEALED"
+        }
+      };
+
+      const forms = await context.prisma.forms({
+        where: {
+          ...formsFilter[type],
           isDeleted: false
         }
       });
