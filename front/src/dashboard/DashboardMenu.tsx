@@ -24,6 +24,13 @@ export default function DashboardMenu({ me, match, setActiveSiret }: IProps) {
             Mes bordereaux
           </NavLink>
         </li>
+        {me.userType.indexOf("TRANSPORTER") > -1 && (
+          <li>
+            <NavLink to={`${match.url}/transport`} activeClassName="active">
+              Transport
+            </NavLink>
+          </li>
+        )}
         <li>
           <NavLink to={`${match.url}/account`} activeClassName="active">
             Mon compte
