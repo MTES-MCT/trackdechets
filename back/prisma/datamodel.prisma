@@ -56,15 +56,11 @@ type Company {
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
 
+  securityCode: Int!
+
   admin: User @relation(name: "CompanyAdmin", link: TABLE)
 
   user: [User] @relation(name: "UserCompanies")
-}
-
-type SecurityCode {
-  siret: ID! @id # The company siret is used as the identifier
-  company: Company!
-  code: Int!
 }
 
 type Form {

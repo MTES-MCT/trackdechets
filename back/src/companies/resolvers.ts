@@ -149,27 +149,6 @@ export default {
           (thing, index, self) =>
             index === self.findIndex(t => t.name === thing.name)
         );
-    },
-    securityCode: async (_, { siret }, context: Context) => {
-      if (!currentUserBelongsToCompany(context, siret)) {
-        throw new Error(
-          "Vous n'êtes pas autorisé à consulter ce code de sécurité."
-        );
-      }
-
-      const existingCode = await context.prisma.securityCode(siret);
-
-      if (existingCode && existingCode.code) {
-        return existingCode.code;
-      }
-
-      const newCode = await context.prisma.createSecurityCode({
-        siret,
-        company: { connect: { siret } },
-        code: randomNumber(4)
-      });
-
-      return newCode.code;
     }
   },
   Mutation: {
@@ -180,13 +159,10 @@ export default {
         );
       }
 
-      return context.prisma.upsertSecurityCode({
+      return context.prisma.updateCompany({
         where: { siret },
-        update: { code: randomNumber(4) },
-        create: {
-          siret,
-          company: { connect: { siret } },
-          code: randomNumber(4)
+        data: {
+          securityCode: randomNumber(4)
         }
       });
     }

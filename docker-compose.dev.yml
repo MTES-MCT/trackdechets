@@ -37,9 +37,6 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
-    depends_on:
-      - postgres
-      - prisma
     command: npx nodemon -L --watch src --exec npm start
     volumes:
       - ./back/src:/usr/src/app/src

@@ -14,10 +14,6 @@ type AggregateForm {
   count: Int!
 }
 
-type AggregateSecurityCode {
-  count: Int!
-}
-
 type AggregateUser {
   count: Int!
 }
@@ -39,6 +35,7 @@ type Company {
   siret: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  securityCode: Int!
   admin: User
   user(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
 }
@@ -219,6 +216,7 @@ type CompanyConnection {
 input CompanyCreateInput {
   id: ID
   siret: String!
+  securityCode: Int!
   admin: UserCreateOneInput
   user: UserCreateManyWithoutCompaniesInput
 }
@@ -236,6 +234,7 @@ input CompanyCreateOneInput {
 input CompanyCreateWithoutUserInput {
   id: ID
   siret: String!
+  securityCode: Int!
   admin: UserCreateOneInput
 }
 
@@ -253,6 +252,8 @@ enum CompanyOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  securityCode_ASC
+  securityCode_DESC
 }
 
 type CompanyPreviousValues {
@@ -260,6 +261,7 @@ type CompanyPreviousValues {
   siret: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  securityCode: Int!
 }
 
 input CompanyScalarWhereInput {
@@ -307,6 +309,14 @@ input CompanyScalarWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  securityCode: Int
+  securityCode_not: Int
+  securityCode_in: [Int!]
+  securityCode_not_in: [Int!]
+  securityCode_lt: Int
+  securityCode_lte: Int
+  securityCode_gt: Int
+  securityCode_gte: Int
   AND: [CompanyScalarWhereInput!]
   OR: [CompanyScalarWhereInput!]
   NOT: [CompanyScalarWhereInput!]
@@ -332,22 +342,26 @@ input CompanySubscriptionWhereInput {
 
 input CompanyUpdateDataInput {
   siret: String
+  securityCode: Int
   admin: UserUpdateOneInput
   user: UserUpdateManyWithoutCompaniesInput
 }
 
 input CompanyUpdateInput {
   siret: String
+  securityCode: Int
   admin: UserUpdateOneInput
   user: UserUpdateManyWithoutCompaniesInput
 }
 
 input CompanyUpdateManyDataInput {
   siret: String
+  securityCode: Int
 }
 
 input CompanyUpdateManyMutationInput {
   siret: String
+  securityCode: Int
 }
 
 input CompanyUpdateManyWithoutUserInput {
@@ -376,6 +390,7 @@ input CompanyUpdateOneRequiredInput {
 
 input CompanyUpdateWithoutUserDataInput {
   siret: String
+  securityCode: Int
   admin: UserUpdateOneInput
 }
 
@@ -440,6 +455,14 @@ input CompanyWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  securityCode: Int
+  securityCode_not: Int
+  securityCode_in: [Int!]
+  securityCode_not_in: [Int!]
+  securityCode_lt: Int
+  securityCode_lte: Int
+  securityCode_gt: Int
+  securityCode_gte: Int
   admin: UserWhereInput
   user_every: UserWhereInput
   user_some: UserWhereInput
@@ -2656,12 +2679,6 @@ type Mutation {
   upsertForm(where: FormWhereUniqueInput!, create: FormCreateInput!, update: FormUpdateInput!): Form!
   deleteForm(where: FormWhereUniqueInput!): Form
   deleteManyForms(where: FormWhereInput): BatchPayload!
-  createSecurityCode(data: SecurityCodeCreateInput!): SecurityCode!
-  updateSecurityCode(data: SecurityCodeUpdateInput!, where: SecurityCodeWhereUniqueInput!): SecurityCode
-  updateManySecurityCodes(data: SecurityCodeUpdateManyMutationInput!, where: SecurityCodeWhereInput): BatchPayload!
-  upsertSecurityCode(where: SecurityCodeWhereUniqueInput!, create: SecurityCodeCreateInput!, update: SecurityCodeUpdateInput!): SecurityCode!
-  deleteSecurityCode(where: SecurityCodeWhereUniqueInput!): SecurityCode
-  deleteManySecurityCodes(where: SecurityCodeWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -2714,9 +2731,6 @@ type Query {
   form(where: FormWhereUniqueInput!): Form
   forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form]!
   formsConnection(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FormConnection!
-  securityCode(where: SecurityCodeWhereUniqueInput!): SecurityCode
-  securityCodes(where: SecurityCodeWhereInput, orderBy: SecurityCodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [SecurityCode]!
-  securityCodesConnection(where: SecurityCodeWhereInput, orderBy: SecurityCodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): SecurityCodeConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -2729,106 +2743,10 @@ type Query {
   node(id: ID!): Node
 }
 
-type SecurityCode {
-  siret: ID!
-  company: Company!
-  code: Int!
-}
-
-type SecurityCodeConnection {
-  pageInfo: PageInfo!
-  edges: [SecurityCodeEdge]!
-  aggregate: AggregateSecurityCode!
-}
-
-input SecurityCodeCreateInput {
-  siret: ID
-  company: CompanyCreateOneInput!
-  code: Int!
-}
-
-type SecurityCodeEdge {
-  node: SecurityCode!
-  cursor: String!
-}
-
-enum SecurityCodeOrderByInput {
-  siret_ASC
-  siret_DESC
-  code_ASC
-  code_DESC
-}
-
-type SecurityCodePreviousValues {
-  siret: ID!
-  code: Int!
-}
-
-type SecurityCodeSubscriptionPayload {
-  mutation: MutationType!
-  node: SecurityCode
-  updatedFields: [String!]
-  previousValues: SecurityCodePreviousValues
-}
-
-input SecurityCodeSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: SecurityCodeWhereInput
-  AND: [SecurityCodeSubscriptionWhereInput!]
-  OR: [SecurityCodeSubscriptionWhereInput!]
-  NOT: [SecurityCodeSubscriptionWhereInput!]
-}
-
-input SecurityCodeUpdateInput {
-  company: CompanyUpdateOneRequiredInput
-  code: Int
-}
-
-input SecurityCodeUpdateManyMutationInput {
-  code: Int
-}
-
-input SecurityCodeWhereInput {
-  siret: ID
-  siret_not: ID
-  siret_in: [ID!]
-  siret_not_in: [ID!]
-  siret_lt: ID
-  siret_lte: ID
-  siret_gt: ID
-  siret_gte: ID
-  siret_contains: ID
-  siret_not_contains: ID
-  siret_starts_with: ID
-  siret_not_starts_with: ID
-  siret_ends_with: ID
-  siret_not_ends_with: ID
-  company: CompanyWhereInput
-  code: Int
-  code_not: Int
-  code_in: [Int!]
-  code_not_in: [Int!]
-  code_lt: Int
-  code_lte: Int
-  code_gt: Int
-  code_gte: Int
-  AND: [SecurityCodeWhereInput!]
-  OR: [SecurityCodeWhereInput!]
-  NOT: [SecurityCodeWhereInput!]
-}
-
-input SecurityCodeWhereUniqueInput {
-  siret: ID
-}
-
 type Subscription {
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   companyAssociation(where: CompanyAssociationSubscriptionWhereInput): CompanyAssociationSubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
-  securityCode(where: SecurityCodeSubscriptionWhereInput): SecurityCodeSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
   userActivationHash(where: UserActivationHashSubscriptionWhereInput): UserActivationHashSubscriptionPayload

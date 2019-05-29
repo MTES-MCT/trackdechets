@@ -1,7 +1,7 @@
 import axios from "axios";
 import { hash, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { getUserId } from "../utils";
+import { getUserId, randomNumber } from "../utils";
 import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
@@ -36,7 +36,8 @@ export default {
       const hashedPassword = await hash(payload.password, 10);
       const company = await context.prisma
         .createCompany({
-          siret: trimedSiret
+          siret: trimedSiret,
+          securityCode: randomNumber(4)
         })
         .catch(err => {
           console.error("Error while creating user company", err);
