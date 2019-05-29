@@ -37,6 +37,7 @@ enum UserType {
   PRODUCER
   COLLECTOR
   WASTEPROCESSOR
+  TRANSPORTER
 }
 
 enum UserRole {

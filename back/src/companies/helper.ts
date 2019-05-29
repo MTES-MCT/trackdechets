@@ -32,7 +32,7 @@ export function getUserCompanies(userId: string) {
 }
 
 const companyAssociationCompaniesFragment = `
-fragment CompanyWithAdmins on CompanyAssociation {
+fragment AssociationWithCompany on CompanyAssociation {
   company { id siret }
 }
 `;
