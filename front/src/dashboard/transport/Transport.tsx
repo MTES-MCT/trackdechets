@@ -51,12 +51,29 @@ export default function Transport({ me, siret }: Props) {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Colonne 1</th>
-                    <th>Colonne 2</th>
-                    <th>Colonne 3</th>
-                    <th>Colonne 4</th>
+                    <th>Numéro</th>
+                    <th>Emetteur</th>
+                    <th>Déchet</th>
+                    <th>Quantité estimée</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
+                <tbody>
+                  {data.forms.map(form => (
+                    <tr key={form.id}>
+                      <td>{form.readableId}</td>
+                      <td>
+                        {form.emitter.company && form.emitter.company.name}
+                      </td>
+                      <td>
+                        <div>{form.wasteDetails.code}</div>
+                        <div>{form.wasteDetails.name}</div>
+                      </td>
+                      <td>{form.wasteDetails.quantity} tonnes</td>
+                      <td>...</td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             );
           }}

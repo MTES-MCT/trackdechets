@@ -12,6 +12,7 @@ export type Form = {
   wasteDetails: {
     quantity: number;
     code: string;
+    name: string;
   };
 
   receivedAt: string;
