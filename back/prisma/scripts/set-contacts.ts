@@ -7,7 +7,8 @@ type Contact = { Email: string; Name?: string };
 
 @registerUpdater(
   "Set contacts in Mailjet",
-  `Add every user to Mailjet, so that the newsletter are automatically sent to everyone`
+  `Add every user to Mailjet, so that the newsletter are automatically sent to everyone`,
+  false
 )
 export class SetContactsUpdater implements Updater {
   run() {

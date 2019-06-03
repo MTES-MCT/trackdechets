@@ -6,13 +6,14 @@ import Onboarding from "./onboarding/Onboarding";
 
 type Props = {
   me: Me;
+  siret: string;
 };
 
-export default function SlipsContainer({ me }: Props) {
+export default function SlipsContainer({ me, siret }: Props) {
   return (
     <React.Fragment>
       <SlipsHeader />
-      <SlipsTabs me={me} />
+      <SlipsTabs me={me} siret={siret} />
       <Onboarding />
     </React.Fragment>
   );

@@ -1,6 +1,7 @@
 import { verify } from "jsonwebtoken";
+import { getCompanyUsers, getCompanyAdmins } from "./companies/helper";
 
-export const APP_SECRET = "TODO_APPSECRET";
+const { JWT_SECRET } = process.env;
 
 interface Token {
   userId: string;
@@ -19,8 +20,33 @@ export function getUserId(context: Context) {
 }
 
 export function getUserIdFromToken(token: string) {
-  const verifiedToken = verify(token, APP_SECRET) as Token;
+  const verifiedToken = verify(token, JWT_SECRET) as Token;
   return verifiedToken && verifiedToken.userId;
+}
+
+export async function currentUserBelongsToCompany(
+  context: Context,
+  siret: string
+) {
+  const companyUsers = await getCompanyUsers(siret);
+
+  const currentUserId = getUserId(context);
+  return !!companyUsers.find(a => a.id === currentUserId);
+}
+
+export async function currentUserBelongsToCompanyAdmins(
+  context: Context,
+  siret: string
+) {
+  const companyAdmins = await getCompanyAdmins(siret);
+
+  const currentUserId = getUserId(context);
+  return !!companyAdmins.find(a => a.id === currentUserId);
+}
+
+export function randomNumber(length: number = 4) {
+  const basis = Math.pow(10, length - 1)
+  return Math.floor(basis + Math.random() * 9 * basis)
 }
 
 export const merge = (target, source) => {

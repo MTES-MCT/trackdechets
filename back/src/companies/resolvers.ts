@@ -1,6 +1,13 @@
 import axios from "axios";
 import { Context } from "../types";
-import { getUserId } from "../utils";
+import {
+  getUserId,
+  currentUserBelongsToCompany,
+  currentUserBelongsToCompanyAdmins,
+  randomNumber
+} from "../utils";
+import { prisma } from "../generated/prisma-client";
+import { getCompanyAdmins, getUserCompanies, getCompanyUsers } from "./helper";
 
 const requests = {};
 function memoizeRequest(siret) {
@@ -34,11 +41,8 @@ export default {
       const company = await memoizeRequest(parent.siret);
       return company.name;
     },
-    admin: async (parent, _, context: Context) => {
-      return context.prisma
-        .company({ siret: parent.siret })
-        .admin()
-        .catch(_ => null);
+    admins: async (parent, _) => {
+      return getCompanyAdmins(parent.siret).catch(_ => null);
     }
   },
   Query: {
@@ -50,10 +54,10 @@ export default {
       return await memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
-      const companyAdmin = await context.prisma.company({ siret }).admin();
+      const companyAdmins = await getCompanyAdmins(siret);
 
       const currentUserId = getUserId(context);
-      if (companyAdmin.id !== currentUserId) {
+      if (!companyAdmins.find(a => a.id === currentUserId)) {
         return [];
       }
 
@@ -77,13 +81,13 @@ export default {
             id: u.id,
             name: u.name,
             email: u.email,
-            role: u.id === currentUserId ? "Administrateur" : "Membre"
+            role: u.id === currentUserId ? "Administrateur" : "Collaborateur"
           }))
         );
 
       return [...users, ...invitedUsers];
     },
-    searchCompanies: async (parent, { clue, department = '' }) => {
+    searchCompanies: async (parent, { clue, department = "" }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
 
       if (!isNumber) {
@@ -107,9 +111,8 @@ export default {
     favorites: async (parent, { type }, context: Context) => {
       const lowerType = type.toLowerCase();
       const userId = getUserId(context);
-      const userCompanies = await context.prisma
-        .user({ id: userId })
-        .companies();
+      const userCompanies = await getUserCompanies(userId);
+
       if (!userCompanies.length) {
         throw new Error(
           `Vous n'appartenez à aucune entreprise, vous n'avez pas de favori.`
@@ -146,6 +149,22 @@ export default {
           (thing, index, self) =>
             index === self.findIndex(t => t.name === thing.name)
         );
+    }
+  },
+  Mutation: {
+    renewSecurityCode: async (_, { siret }, context: Context) => {
+      if (!currentUserBelongsToCompanyAdmins(context, siret)) {
+        throw new Error(
+          "Vous n'êtes pas autorisé à modifier ce code de sécurité."
+        );
+      }
+
+      return context.prisma.updateCompany({
+        where: { siret },
+        data: {
+          securityCode: randomNumber(4)
+        }
+      });
     }
   }
 };

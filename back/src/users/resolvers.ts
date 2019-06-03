@@ -1,12 +1,15 @@
 import axios from "axios";
 import { hash, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { APP_SECRET, getUserId } from "../utils";
+import { getUserId, randomNumber } from "../utils";
 import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
 import companyResolver from "../companies/resolvers";
+import { getCompanyAdmins, getUserCompanies } from "../companies/helper";
+
+const { JWT_SECRET } = process.env;
 
 export default {
   Mutation: {
@@ -31,6 +34,18 @@ export default {
       }
 
       const hashedPassword = await hash(payload.password, 10);
+      const company = await context.prisma
+        .createCompany({
+          siret: trimedSiret,
+          securityCode: randomNumber(4)
+        })
+        .catch(err => {
+          console.error("Error while creating user company", err);
+          throw new Error(
+            "Impossible de créer cet utilisateur. Veuillez contacter le support."
+          );
+        });
+
       const user = await context.prisma
         .createUser({
           name: payload.name,
@@ -38,8 +53,11 @@ export default {
           password: hashedPassword,
           phone: payload.phone,
           userType: payload.userType,
-          companies: {
-            create: { siret: trimedSiret }
+          companyAssociations: {
+            create: {
+              role: "ADMIN",
+              company: { connect: { id: company.id } }
+            }
           }
         })
         .catch(err => {
@@ -48,12 +66,6 @@ export default {
             "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
           );
         });
-
-      // Set the new user as the company admin
-      await context.prisma.updateCompany({
-        where: { siret: trimedSiret },
-        data: { admin: { connect: { id: user.id } } }
-      });
 
       const activationHash = await hash(
         new Date().valueOf().toString() + Math.random().toString(),
@@ -74,7 +86,7 @@ export default {
       await sendMail(userMails.onSignup(user, activationHash));
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET),
+        token: sign({ userId: user.id }, JWT_SECRET),
         user
       };
     },
@@ -93,7 +105,7 @@ export default {
         throw new Error("Mot de passe incorrect");
       }
       return {
-        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
+        token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
         user
       };
     },
@@ -113,7 +125,7 @@ export default {
       });
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
+        token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
         user
       };
     },
@@ -155,11 +167,16 @@ export default {
           throw new Error("Impossible de mettre lr profil à jour");
         });
     },
-    inviteUserToCompany: async (_, { email, siret }, context: Context) => {
+    inviteUserToCompany: async (
+      _,
+      { email, siret, role },
+      context: Context
+    ) => {
       const userId = getUserId(context);
-      const admin = await prisma.company({ siret }).admin();
+      const admins = await getCompanyAdmins(siret);
+      const admin = admins.find(a => a.id === userId);
 
-      if (!admin || admin.id !== userId) {
+      if (!admin) {
         throw new Error(
           "Vous ne pouvez pas inviter un utilisateur dans cette entreprise."
         );
@@ -172,15 +189,16 @@ export default {
       const companyName = await companyResolver.Company.name({ siret });
 
       if (existingUser) {
-        const updatedUser = await context.prisma.updateUser({
-          data: { companies: { connect: { siret } } },
-          where: { email }
+        await context.prisma.createCompanyAssociation({
+          user: { connect: { id: existingUser.id } },
+          role,
+          company: { connect: { siret } }
         });
 
         await sendMail(
           userMails.notifyUserOfInvite(
-            updatedUser.email,
-            updatedUser.name,
+            existingUser.email,
+            existingUser.name,
             admin.name,
             companyName
           )
@@ -195,6 +213,7 @@ export default {
       await prisma.createUserAccountHash({
         hash: userAccoutHash,
         email,
+        role,
         companySiret: siret
       });
 
@@ -230,8 +249,11 @@ export default {
         phone: "",
         userType: [],
         isActive: true,
-        companies: {
-          connect: { siret: existingHash.companySiret }
+        companyAssociations: {
+          create: {
+            company: { connect: { siret: existingHash.companySiret } },
+            role: existingHash.role
+          }
         }
       });
 
@@ -242,24 +264,24 @@ export default {
         );
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET, { expiresIn: "1d" }),
+        token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
         user
       };
     },
     removeUserFromCompany: async (_, { userId, siret }, context: Context) => {
       const currentUserId = getUserId(context);
-      const admin = await prisma.company({ siret }).admin();
+      const admins = await getCompanyAdmins(siret);
 
-      if (!admin || admin.id !== currentUserId) {
+      if (!admins || !admins.find(a => a.id === currentUserId)) {
         throw new Error(
           "Vous ne pouvez pas retirer un utilisateur dans cette entreprise."
         );
       }
 
       await prisma
-        .updateUser({
-          where: { id: userId },
-          data: { companies: { disconnect: { siret } } }
+        .deleteManyCompanyAssociations({
+          user: { id: userId },
+          company: { siret: siret }
         })
         .catch(_ => {
           throw new Error(
@@ -277,15 +299,12 @@ export default {
     },
     apiKey: (parent, args, context: Context) => {
       const userId = getUserId(context);
-      return sign({ userId: userId }, APP_SECRET);
+      return sign({ userId: userId }, JWT_SECRET);
     }
   },
   User: {
-    companies: async (parent, args, context: Context) => {
-      return await context.prisma.user({ id: parent.id }).companies();
+    companies: async parent => {
+      return await getUserCompanies(parent.id);
     }
-    // companies: async (parent, args, context: Context) => {
-    //   return await context.prisma.user({ id: parent.id }).();
-    // },
   }
 };

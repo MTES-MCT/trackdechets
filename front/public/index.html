@@ -31,11 +31,6 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Trackdéchets | La tracabilité des déchets en toute sécurité</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css"
-    />
   </head>
   <body>
     <noscript>
@@ -55,7 +50,14 @@
 
     <!-- Outdated browsers -->
     <div id="outdated"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css"
+    />
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"
+    ></script>
     <script>
       function addLoadEvent(func) {
         var oldonload = window.onload;
@@ -72,27 +74,29 @@
       }
       //call plugin function after DOM ready
       addLoadEvent(function() {
+        // Outdated browsers
         outdatedBrowser({
           bgColor: "#f25648",
           color: "#ffffff",
           lowerThan: "transform",
           languagePath: "your_path/outdatedbrowser/lang/fr.html"
         });
+
+        // CRISP
+        window.$crisp = [];
+        window.CRISP_WEBSITE_ID = "11231caa-e6f1-436b-addc-eec1e0ddf040";
+        (function() {
+          d = document;
+          s = d.createElement("script");
+          s.src = "https://client.crisp.chat/l.js";
+          s.async = 1;
+          d.getElementsByTagName("head")[0].appendChild(s);
+        })();
       });
     </script>
     <!-- End Outdated browsers -->
 
     <!-- CRISP -->
-    <script type="text/javascript">
-      window.$crisp = [];
-      window.CRISP_WEBSITE_ID = "11231caa-e6f1-436b-addc-eec1e0ddf040";
-      (function() {
-        d = document;
-        s = d.createElement("script");
-        s.src = "https://client.crisp.chat/l.js";
-        s.async = 1;
-        d.getElementsByTagName("head")[0].appendChild(s);
-      })();
-    </script>
+    <script type="text/javascript"></script>
   </body>
 </html>

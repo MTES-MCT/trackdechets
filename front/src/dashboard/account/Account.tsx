@@ -74,7 +74,7 @@ export default withRouter(function Account({
 
         <h4>Entreprise(s) associée(s):</h4>
         {me.companies.map(c => (
-          <React.Fragment key={c.siret}>
+          <div className="panel" key={c.siret}>
             <address>
               {c.name}
               <br />
@@ -82,10 +82,10 @@ export default withRouter(function Account({
               <br />
               {c.address}
             </address>
-            {c.admin && c.admin.id === me.id && (
+            {c.admins.find(a => a.id === me.id) && (
               <ImportNewUser siret={c.siret} me={me} />
             )}
-          </React.Fragment>
+          </div>
         ))}
 
         <h4>Intégration API</h4>

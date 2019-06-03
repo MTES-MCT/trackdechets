@@ -1,5 +1,6 @@
 import React from "react";
 import { Formik, FormikActions } from "formik";
+import "./Wizard.scss";
 
 type Props = { initialValues: Object; children: any[]; onSubmit: Function };
 type State = { page: number; values: Object };

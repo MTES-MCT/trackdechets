@@ -4,6 +4,7 @@ import { Mutation } from "react-apollo";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
 import { Form } from "../../../form/model";
+import { currentSiretService } from "../../CompanySelector";
 
 type Props = { formId: string };
 
@@ -19,13 +20,18 @@ export default function Duplicate({ formId }: Props) {
               variables: { id: formId },
               update: (store, { data: { duplicateForm } }) => {
                 const data = store.readQuery<{ forms: Form[] }>({
-                  query: GET_SLIPS
+                  query: GET_SLIPS,
+                  variables: { siret: currentSiretService.getSiret() }
                 });
                 if (!data || !data.forms) {
                   return;
                 }
                 data.forms.push(duplicateForm);
-                store.writeQuery({ query: GET_SLIPS, data });
+                store.writeQuery({
+                  query: GET_SLIPS,
+                  variables: { siret: currentSiretService.getSiret() },
+                  data
+                });
               }
             })
           }

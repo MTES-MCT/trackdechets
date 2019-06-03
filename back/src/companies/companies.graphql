@@ -6,7 +6,7 @@ type Company {
   phone: String
   mail: String
 
-  admin: PublicUser
+  admins: [PublicUser]
 }
 
 type Query {
@@ -14,6 +14,10 @@ type Query {
   companyUsers(siret: String!): [CompanyMember]
   searchCompanies(clue: String!, department: Int): [Company]
   favorites(type: FavoriteType!): [Company]
+}
+
+type Mutation {
+  renewSecurityCode: Int
 }
 
 type CompanyMember {

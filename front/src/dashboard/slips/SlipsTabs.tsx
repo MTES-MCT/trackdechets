@@ -10,10 +10,10 @@ import { getNextStep, getTabForms, SlipTabs } from "./slips-actions/next-step";
 import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-type Props = { me: Me };
-export default function SlipsTabs({ me }: Props) {
+type Props = { me: Me, siret?: string };
+export default function SlipsTabs({ me, siret }: Props) {
   return (
-    <Query query={GET_SLIPS}>
+    <Query query={GET_SLIPS} variables={{ siret }}>
       {({ loading, error, data }: QueryResult<{ forms: Form[] }>) => {
         if (loading) return "Chargement...";
         if (error || !data) return "Erreur...";

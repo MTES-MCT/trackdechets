@@ -1,6 +1,6 @@
 type User {
-  id: ID! @unique
-  isActive: Boolean @default(value: "false")
+  id: ID! @id
+  isActive: Boolean @default(value: false)
   email: String! @unique
   password: String!
   name: String
@@ -8,41 +8,69 @@ type User {
   userType: Json
 
   companies: [Company] @relation(name: "UserCompanies")
+  companyAssociations: [CompanyAssociation]
 
   gerepId: String
 
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+}
+
+type CompanyAssociation {
+  id: ID! @id
+
+  user: User!
+  company: Company! @relation(link: INLINE)
+  role: UserRole!
+}
+
+enum UserRole {
+  MEMBER
+  ADMIN
 }
 
 type UserActivationHash {
-  id: ID! @unique
-  user: User!
+  id: ID! @id
+  user: User! @relation(link: TABLE)
   hash: String! @unique
+
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type UserAccountHash {
-  id: ID! @unique
+  id: ID! @id
   email: String!
   companySiret: ID!
+  role: UserRole!
   hash: String! @unique
+
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Company {
-  id: ID! @unique
+  id: ID! @id
   siret: String! @unique
 
-  admin: User @relation(name: "CompanyAdmin")
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+
+  securityCode: Int!
+
+  admin: User @relation(name: "CompanyAdmin", link: TABLE)
+
+  user: [User] @relation(name: "UserCompanies")
 }
 
 type Form {
-  id: ID! @unique
+  id: ID! @id
   readableId: String @unique
-  isDeleted: Boolean @default(value: "false")
+  isDeleted: Boolean @default(value: false)
 
-  owner: User!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  owner: User! @relation(link: TABLE)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 
   # Workflow fields
   status: String @default(value: "DRAFT")
@@ -89,11 +117,11 @@ type Form {
   # Transporter fields
   transporterCompanyName: String
   transporterCompanySiret: String
+
   transporterCompanyAddress: String
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
-
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -113,11 +141,11 @@ type Form {
   # Trader fields
   traderCompanyName: String
   traderCompanySiret: String
+
   traderCompanyAddress: String
   traderCompanyContact: String
   traderCompanyPhone: String
   traderCompanyMail: String
-
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime

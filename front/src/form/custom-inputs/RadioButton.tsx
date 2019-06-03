@@ -8,17 +8,19 @@ export default function RadioButton({
   ...props
 }: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <label className="label-inline">
-      <input
-        name={name}
-        type="radio"
-        value={id}
-        checked={id === value}
-        onChange={onChange}
-        onBlur={onBlur}
-        {...props}
-      />
-      {label}
-    </label>
+    <p>
+      <label className="label-inline">
+        <input
+          name={name}
+          type="radio"
+          value={id}
+          checked={id === value}
+          onChange={onChange}
+          onBlur={onBlur}
+          {...props}
+        />
+        {label}
+      </label>
+    </p>
   );
 }

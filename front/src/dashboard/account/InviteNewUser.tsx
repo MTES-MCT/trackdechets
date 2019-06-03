@@ -8,8 +8,8 @@ import { FaTimes } from "react-icons/fa";
 import { Me } from "../../login/model";
 
 const INVITE_USER_TO_COMPANY = gql`
-  mutation InviteUserToCompany($email: String!, $siret: String!) {
-    inviteUserToCompany(email: $email, siret: $siret)
+  mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!) {
+    inviteUserToCompany(email: $email, siret: $siret, role: $role)
   }
 `;
 const COMPANY_USERS = gql`
@@ -49,7 +49,7 @@ export default function ImportNewUser({ siret, me }: Props) {
           <Mutation mutation={INVITE_USER_TO_COMPANY}>
             {(inviteUserToCompany, { data }) => (
               <Formik
-                initialValues={{ email: "", siret }}
+                initialValues={{ email: "", siret, role: "MEMBER" }}
                 validate={(values: any) => {
                   let errors: any = {};
                   if (!values.email) {
@@ -74,6 +74,10 @@ export default function ImportNewUser({ siret, me }: Props) {
                       name="email"
                       placeholder="Email de la personne à inviter"
                     />
+                    <Field component="select" name="role">
+                      <option value="MEMBER">Collaborateur</option>
+                      <option value="ADMIN">Administrateur</option>
+                    </Field>
                     <button
                       type="submit"
                       className="button"

@@ -8,6 +8,7 @@ import {
 import { formSchema } from "./validator";
 import { getNextStep } from "./workflow";
 import { getReadableId } from "./readable-id";
+import { getUserCompanies } from "../companies/helper";
 
 export default {
   Form: {
@@ -18,37 +19,53 @@ export default {
   Query: {
     form: async (parent, { id }, context: Context) => {
       if (!id) {
+        // On form creation, there is no id
         return null;
       }
 
       const userId = getUserId(context);
+      const userCompanies = await getUserCompanies(userId);
 
-      const formPromise = context.prisma.form({ id });
-      // const formOwner = await form.owner();
+      const dbForm = await context.prisma.form({ id });
+      const formOwner = await context.prisma.form({ id }).owner();
+      if (
+        formOwner.id !== userId ||
+        !userCompanies.find(
+          c =>
+            c.siret === dbForm.recipientCompanySiret ||
+            c.siret === dbForm.emitterCompanySiret
+        )
+      ) {
+        throw new Error("Vous n'êtes pas autorisé à visualiser ce bordereau.");
+      }
 
-      // if (formOwner.id !== userId) {
-      //   return null;
-      // }
-
-      return formPromise.then(dbForm => unflattenObjectFromDb(dbForm));
+      return unflattenObjectFromDb(dbForm);
     },
-    forms: async (parent, args, context: Context) => {
+    forms: async (parent, { siret, type }, context: Context) => {
       const userId = getUserId(context);
-      const userCompanies = await context.prisma
-        .user({ id: userId })
-        .companies();
+      const userCompanies = await getUserCompanies(userId);
+
+      // Find on userCompanies to make sure that the siret belongs to the current user
+      const selectedCompany =
+        userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
+
+      const formsFilter = {
+        ACTOR: {
+          OR: [
+            { owner: { id: userId } },
+            { recipientCompanySiret: selectedCompany.siret },
+            { emitterCompanySiret: selectedCompany.siret }
+          ]
+        },
+        TRANSPORTER: {
+          transporterCompanySiret: selectedCompany.siret,
+          status: "SEALED"
+        }
+      };
 
       const forms = await context.prisma.forms({
         where: {
-          OR: [
-            { owner: { id: userId } },
-            ...userCompanies.map(userCompany => ({
-              recipientCompanySiret: userCompany.siret
-            })),
-            ...userCompanies.map(userCompany => ({
-              emitterCompanySiret: userCompany.siret
-            }))
-          ],
+          ...formsFilter[type],
           isDeleted: false
         }
       });
@@ -57,9 +74,7 @@ export default {
     },
     stats: async (parent, args, context: Context) => {
       const userId = getUserId(context);
-      const userCompanies = await context.prisma
-        .user({ id: userId })
-        .companies();
+      const userCompanies = await getUserCompanies(userId);
 
       return userCompanies.map(async userCompany => {
         const forms = await context.prisma.forms({
@@ -104,9 +119,7 @@ export default {
       context: Context
     ) => {
       const userId = getUserId(context);
-      const userCompanies = await context.prisma
-        .user({ id: userId })
-        .companies();
+      const userCompanies = await getUserCompanies(userId);
 
       if (!userCompanies.find(c => c.siret === emitterSiret)) {
         throw new Error(
@@ -185,9 +198,7 @@ export default {
       }
 
       const userId = getUserId(context);
-      const userCompanies = await context.prisma
-        .user({ id: userId })
-        .companies();
+      const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
       const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
@@ -220,9 +231,7 @@ export default {
       const form = await context.prisma.form({ id });
 
       const userId = getUserId(context);
-      const userCompanies = await context.prisma
-        .user({ id: userId })
-        .companies();
+      const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
       const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
@@ -247,9 +256,7 @@ export default {
       subscribe: async (parent, { token }, context: Context) => {
         // Web socket has no headers so we pass the token as a param
         const userId = getUserIdFromToken(token);
-        const userCompanies = await context.prisma
-          .user({ id: userId })
-          .companies();
+        const userCompanies = await getUserCompanies(userId);
 
         return context.prisma.$subscribe.form({
           OR: [
@@ -274,8 +281,8 @@ async function markForm(id, inputParams, context: Context) {
   const form = await context.prisma.form({ id });
 
   const userId = getUserId(context);
-  const userCompany = await context.prisma.user({ id: userId }).companies();
-  const sirets = userCompany.map(c => c.siret);
+  const userCompanies = await getUserCompanies(userId);
+  const sirets = userCompanies.map(c => c.siret);
 
   return context.prisma.updateForm({
     where: { id },

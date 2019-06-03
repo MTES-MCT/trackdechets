@@ -6,9 +6,11 @@ type Query {
   """
   form(id: ID): Form
   """
-  Renvoie tous mes BSD
+  Renvoie les BSDs de la compagnie sélectionnée (la première par défaut)
+  Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
+  On peut également demander les bordereaux pour lesquels on est transporteur
   """
-  forms: [Form]
+  forms(siret: String, type: FormType = ACTOR): [Form]
   stats: [CompanyStat]
   """
   Renvoie des BSD candidats à un regroupement dans une annexe 2
@@ -70,6 +72,16 @@ enum FormStatus {
   AWAITING_GROUP
   GROUPED
   NO_TRACEABILITY
+}
+
+"""
+On peut récupérer les BSD par type:
+- ACTOR: on est acteur du BSD, c'est à dire émetteur ou destinataire (cas par défaut)
+- TRANSPORTER: on est uniquement transporteur du déchet
+"""
+enum FormType {
+  ACTOR
+  TRANSPORTER
 }
 
 """

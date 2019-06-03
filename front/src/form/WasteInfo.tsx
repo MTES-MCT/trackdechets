@@ -7,6 +7,7 @@ import NumberInput from "./custom-inputs/NumberInput";
 import Packagings from "./packagings/Packagings";
 import RedErrorMessage from "./RedErrorMessage";
 import FormsSelector from "./appendix/FormsSelector";
+import AppendixInfo from "./appendix/AppendixInfo";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
@@ -45,6 +46,8 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
         <RedErrorMessage name="wasteDetails.name" />
       </div>
+
+      {values.emitter.type === "APPENDIX1" && <AppendixInfo />}
 
       {values.emitter.type === "APPENDIX2" && (
         <FormsSelector

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import "./Home.scss";
 import { localAuthService } from "./login/auth.service";
 import { trackEvent } from "./tracker";
+import LazyLoad from "react-lazyload";
 
 export default function Home() {
   return (
@@ -94,7 +95,9 @@ export default function Home() {
             </p>
           </div>
           <div className="description-img">
-            <img src="/onboarding/slide1.png" />
+            <LazyLoad height={330}>
+              <img src="/onboarding/slide1.png" />
+            </LazyLoad>
           </div>
           <div className="description-text">
             <h4>
@@ -145,7 +148,9 @@ export default function Home() {
             </ul>
           </div>
           <div className="description-img">
-            <img src="/onboarding/slide2.png" />
+            <LazyLoad height={330}>
+              <img src="/onboarding/slide2.png" />
+            </LazyLoad>
           </div>
         </div>
 
@@ -154,7 +159,9 @@ export default function Home() {
             <h3>Consultez et exportez votre registre déchets</h3>
           </div>
           <div className="description-img">
-            <img src="/onboarding/slide3.png" />
+            <LazyLoad height={330}>
+              <img src="/onboarding/slide3.png" />
+            </LazyLoad>
           </div>
           <div className="description-text">
             <h4>Registre automatisé (fini la double saisie !)</h4>
@@ -196,7 +203,9 @@ export default function Home() {
             </p>
           </div>
           <div className="description-img">
-            <img src="/onboarding/slide4.png" />
+            <LazyLoad height={330}>
+              <img src="/onboarding/slide4.png" />
+            </LazyLoad>
           </div>
         </div>
       </section>
@@ -215,9 +224,13 @@ export default function Home() {
       <footer className="footer" role="contentinfo">
         <div className="container">
           <div className="footer__logo">
-            <img src="/logo-mtes-mef.svg" />
+            <LazyLoad height={60}>
+              <img src="/logo-mtes-mef.svg" />
+            </LazyLoad>
             <div className="footer__logo-text">
-              <img src="/logo-fabnum.svg" />
+              <LazyLoad height={60}>
+                <img src="/logo-fabnum.svg" />
+              </LazyLoad>
               <small>
                 Trackdéchets est un service numérique de l'Etat incubé à la
                 Fabrique Numérique du Ministère de la Transition écologique et
