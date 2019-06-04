@@ -2,11 +2,9 @@ import { Updater, registerUpdater } from ".";
 import { prisma } from "../../src/generated/prisma-client";
 import { randomNumber } from "../../src/utils";
 
-
 @registerUpdater(
   "Set security code",
-  `New column securityCode in Company has to be set (0 otherwise for existing companies)`,
-  false
+  `New column securityCode in Company has to be set (0 otherwise for existing companies)`
 )
 export class SetSecurityCodeUpdater implements Updater {
   run() {

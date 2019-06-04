@@ -33,6 +33,6 @@ export function getUserCompanies(userId: string) {
 
 const companyAssociationCompaniesFragment = `
 fragment AssociationWithCompany on CompanyAssociation {
-  company { id siret }
+  company { id siret securityCode }
 }
 `;
