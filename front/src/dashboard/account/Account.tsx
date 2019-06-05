@@ -81,6 +81,8 @@ export default withRouter(function Account({
               Numéro SIRET: {c.siret}
               <br />
               {c.address}
+              <br />
+              Code de sécurité: {c.securityCode}
             </address>
             {c.admins.find(a => a.id === me.id) && (
               <ImportNewUser siret={c.siret} me={me} />
