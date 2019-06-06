@@ -3,6 +3,14 @@ input SentFormInput {
   sentBy: String
 }
 
+input TransporterSignatureFormInput {
+  sentAt: DateTime!
+  signedByTransporter: Boolean!
+  securityCode: Int
+  sentBy: String
+  signedByProducer: Boolean!
+}
+
 input ReceivedFormInput {
   isAccepted: Boolean
   receivedBy: String

@@ -73,6 +73,8 @@ type Form {
   updatedAt: DateTime! @updatedAt
 
   # Workflow fields
+  signedByTransporter: Boolean
+
   status: String @default(value: "DRAFT")
   sentAt: DateTime
   sentBy: String
