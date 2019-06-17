@@ -499,6 +499,7 @@ type Form {
   owner: User!
   createdAt: DateTime!
   updatedAt: DateTime!
+  signedByTransporter: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -571,6 +572,7 @@ input FormCreateInput {
   readableId: String
   isDeleted: Boolean
   owner: UserCreateOneInput!
+  signedByTransporter: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -653,6 +655,8 @@ enum FormOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  signedByTransporter_ASC
+  signedByTransporter_DESC
   status_ASC
   status_DESC
   sentAt_ASC
@@ -777,6 +781,7 @@ type FormPreviousValues {
   isDeleted: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
+  signedByTransporter: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -884,6 +889,8 @@ input FormScalarWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  signedByTransporter: Boolean
+  signedByTransporter_not: Boolean
   status: String
   status_not: String
   status_in: [String!]
@@ -1613,6 +1620,7 @@ input FormUpdateDataInput {
   readableId: String
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
+  signedByTransporter: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -1678,6 +1686,7 @@ input FormUpdateInput {
   readableId: String
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
+  signedByTransporter: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -1742,6 +1751,7 @@ input FormUpdateInput {
 input FormUpdateManyDataInput {
   readableId: String
   isDeleted: Boolean
+  signedByTransporter: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -1817,6 +1827,7 @@ input FormUpdateManyInput {
 input FormUpdateManyMutationInput {
   readableId: String
   isDeleted: Boolean
+  signedByTransporter: Boolean
   status: String
   sentAt: DateTime
   sentBy: String
@@ -1941,6 +1952,8 @@ input FormWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  signedByTransporter: Boolean
+  signedByTransporter_not: Boolean
   status: String
   status_not: String
   status_in: [String!]

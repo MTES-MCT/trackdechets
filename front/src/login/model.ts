@@ -11,5 +11,6 @@ type Company = {
   siret: string;
   name: string;
   address: string;
+  securityCode: string;
   admins: { id: string; name: string }[];
 };

@@ -385,6 +385,8 @@ export type FormOrderByInput =
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC"
+  | "signedByTransporter_ASC"
+  | "signedByTransporter_DESC"
   | "status_ASC"
   | "status_DESC"
   | "sentAt_ASC"
@@ -767,6 +769,7 @@ export interface UserUpdateDataInput {
 export interface FormUpdateManyMutationInput {
   readableId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
@@ -907,6 +910,8 @@ export interface FormScalarWhereInput {
   updatedAt_lte?: Maybe<DateTimeInput>;
   updatedAt_gt?: Maybe<DateTimeInput>;
   updatedAt_gte?: Maybe<DateTimeInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  signedByTransporter_not?: Maybe<Boolean>;
   status?: Maybe<String>;
   status_not?: Maybe<String>;
   status_in?: Maybe<String[] | String>;
@@ -1801,6 +1806,7 @@ export interface FormUpdateInput {
   readableId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
+  signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
@@ -1911,6 +1917,7 @@ export interface FormCreateInput {
   readableId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner: UserCreateOneInput;
+  signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
@@ -2271,6 +2278,8 @@ export interface FormWhereInput {
   updatedAt_lte?: Maybe<DateTimeInput>;
   updatedAt_gt?: Maybe<DateTimeInput>;
   updatedAt_gte?: Maybe<DateTimeInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  signedByTransporter_not?: Maybe<Boolean>;
   status?: Maybe<String>;
   status_not?: Maybe<String>;
   status_in?: Maybe<String[] | String>;
@@ -2995,6 +3004,7 @@ export interface UserUpdateWithoutCompaniesDataInput {
 export interface FormUpdateManyDataInput {
   readableId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
@@ -3406,6 +3416,7 @@ export interface FormUpdateDataInput {
   readableId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
+  signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
@@ -3862,6 +3873,7 @@ export interface Form {
   isDeleted?: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  signedByTransporter?: Boolean;
   status?: String;
   sentAt?: DateTimeOutput;
   sentBy?: String;
@@ -3929,6 +3941,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  signedByTransporter: () => Promise<Boolean>;
   status: () => Promise<String>;
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
@@ -4007,6 +4020,7 @@ export interface FormSubscription
   owner: <T = UserSubscription>() => T;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
   status: () => Promise<AsyncIterator<String>>;
   sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   sentBy: () => Promise<AsyncIterator<String>>;
@@ -4085,6 +4099,7 @@ export interface FormNullablePromise
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  signedByTransporter: () => Promise<Boolean>;
   status: () => Promise<String>;
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
@@ -4619,6 +4634,7 @@ export interface FormPreviousValues {
   isDeleted?: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  signedByTransporter?: Boolean;
   status?: String;
   sentAt?: DateTimeOutput;
   sentBy?: String;
@@ -4687,6 +4703,7 @@ export interface FormPreviousValuesPromise
   isDeleted: () => Promise<Boolean>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  signedByTransporter: () => Promise<Boolean>;
   status: () => Promise<String>;
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
@@ -4755,6 +4772,7 @@ export interface FormPreviousValuesSubscription
   isDeleted: () => Promise<AsyncIterator<Boolean>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
   status: () => Promise<AsyncIterator<String>>;
   sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   sentBy: () => Promise<AsyncIterator<String>>;

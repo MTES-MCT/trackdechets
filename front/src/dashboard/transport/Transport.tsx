@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Me } from "../../login/model";
 import "./Transport.scss";
 import { Query, QueryResult } from "react-apollo";
 import gql from "graphql-tag";
 import { Form } from "../../form/model";
+import TransportSignature from "./TransportSignature";
 
 type Props = {
   me: Me;
@@ -55,7 +56,7 @@ export default function Transport({ me, siret }: Props) {
                     <th>Emetteur</th>
                     <th>Déchet</th>
                     <th>Quantité estimée</th>
-                    <th>Actions</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -70,7 +71,9 @@ export default function Transport({ me, siret }: Props) {
                         <div>{form.wasteDetails.name}</div>
                       </td>
                       <td>{form.wasteDetails.quantity} tonnes</td>
-                      <td>...</td>
+                      <td>
+                        <TransportSignature form={form} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>

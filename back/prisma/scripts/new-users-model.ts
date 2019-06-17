@@ -8,7 +8,8 @@ type UsersInfos = {
 
 @registerUpdater(
   "Migrate to new users <-> companies model association",
-  `The model is evolving: CompanyAssociation has been introduced, lonking users and companies with the specfied role`
+  `The model is evolving: CompanyAssociation has been introduced, lonking users and companies with the specfied role`,
+  false
 )
 export class NewUserModelUpdater implements Updater {
   async run() {

@@ -50,6 +50,14 @@ type Mutation {
   Valide le traitement d'un BSD
   """
   markAsProcessed(id: ID, processedInfo: ProcessedFormInput!): Form
+
+  """
+  Valide la prise en charge par le transporteur, et peut valider l'envoi
+  """
+  signedByTransporter(
+    id: ID!
+    signingInfo: TransporterSignatureFormInput!
+  ): Form
 }
 
 type Subscription {
@@ -102,6 +110,8 @@ type Form {
 
   ownerId: Int
   status: FormStatus
+
+  signedByTransporter: Boolean
 
   sentAt: DateTime
   sentBy: String

@@ -21,6 +21,15 @@ export default withRouter(function Header({ history }) {
           <ul className="nav__links">
             <li className="nav__item">
               <NavLink
+                to="/faq"
+                activeClassName="active"
+                onClick={() => trackEvent("navbar", "faq")}
+              >
+                FAQ
+              </NavLink>
+            </li>
+            <li className="nav__item">
+              <NavLink
                 to="/search"
                 activeClassName="active"
                 onClick={() => trackEvent("navbar", "check-presta")}

@@ -249,6 +249,43 @@ export default {
           ...processedInfo
         }
       });
+    },
+    signedByTransporter: async (_, { id, signingInfo }, context: Context) => {
+      const form = await context.prisma.form({ id });
+
+      const userId = getUserId(context);
+      const userCompanies = await getUserCompanies(userId);
+      const sirets = userCompanies.map(c => c.siret);
+
+      if (!sirets.includes(form.transporterCompanySiret)) {
+        throw new Error(
+          "Vous n'êtes pas transporteur de ce bordereau. Vous ne pouvez pas réaliser cette action"
+        );
+      }
+
+      if (signingInfo.signedByProducer) {
+        const userCompanySecurityCode = userCompanies.find(
+          c => c.siret === form.transporterCompanySiret
+        ).securityCode;
+
+        if (userCompanySecurityCode !== signingInfo.securityCode) {
+          throw new Error(
+            "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'"
+          );
+        }
+      }
+
+      return context.prisma.updateForm({
+        where: { id },
+        data: {
+          sentAt: signingInfo.sentAt,
+          signedByTransporter: true,
+          ...(signingInfo.signedByProducer && {
+            sentBy: signingInfo.sentBy,
+            status: getNextStep(form, [form.emitterCompanySiret])
+          })
+        }
+      });
     }
   },
   Subscription: {

@@ -6,6 +6,8 @@ type Company {
   phone: String
   mail: String
 
+  securityCode: Int!
+
   admins: [PublicUser]
 }
 

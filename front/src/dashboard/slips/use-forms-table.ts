@@ -36,7 +36,7 @@ export function useFormsTable(
 
     const newForms = inputForms.filter(f =>
       newFilters.every(
-        filter => getKey(f, filter.key).indexOf(filter.value) > -1
+        filter => getKey(f, filter.key).toLowerCase().indexOf(filter.value.toLowerCase()) > -1
       )
     );
     setFilters(newFilters);
