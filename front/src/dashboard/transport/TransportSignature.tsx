@@ -119,6 +119,7 @@ export default function TransportSignature({ form }: Props) {
                       </div>
                     )}
                     <button
+                      type="button"
                       className="button warning"
                       onClick={() => setIsOpen(false)}
                     >
