@@ -51,7 +51,7 @@ export default function TransportSignature({ form }: Props) {
                 initialValues={{
                   sentAt: DateTime.local().toISODate(),
                   sentBy: "",
-                  securityCode: null,
+                  securityCode: "",
                   signedByTransporter: false,
                   signedByProducer: false
                 }}
@@ -80,12 +80,12 @@ export default function TransportSignature({ form }: Props) {
                     <p>
                       Si vous le désirez vous pouvez faire signer le producteur
                       du déchet pour attester de l'enlèvement. Pour se faire,{" "}
-                      <button
+                      <a
                         className="button-outline small primary"
                         onClick={() => setIsProducerSigning(!isProducerSigning)}
                       >
                         cliquez ici
-                      </button>
+                      </a>
                     </p>
                     {isProducerSigning && (
                       <div>
