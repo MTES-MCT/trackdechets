@@ -13,6 +13,9 @@
     }
     & select {
       width: 100%;
+      @media (min-width: 749px) {
+        max-width: 200px;
+      }
     }
 
     p,
