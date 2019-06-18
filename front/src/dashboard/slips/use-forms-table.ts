@@ -18,10 +18,11 @@ export function useFormsTable(
   inputForms: Form[]
 ): [Form[], (k: string) => void, (k: string, v: string) => void] {
   const [forms, setForms] = useState(inputForms);
-  useEffect(() => setForms(inputForms));
 
   const [sortKey, setSortKey] = useState("");
   const [filters, setFilters] = useState<{ key: string; value: string }[]>([]);
+
+  useEffect(() => setForms(inputForms), [inputForms]);
 
   function sortBy(key: string) {
     const sortedForms = [...forms];
