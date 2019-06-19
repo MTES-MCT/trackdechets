@@ -3,6 +3,7 @@ import { NavLink, Link, withRouter } from "react-router-dom";
 import { localAuthService } from "./login/auth.service";
 import { trackEvent } from "./tracker";
 import { FaPowerOff } from "react-icons/fa";
+import "./Header.scss";
 
 export default withRouter(function Header({ history }) {
   return (
@@ -23,6 +24,7 @@ export default withRouter(function Header({ history }) {
               <NavLink
                 to="/faq"
                 activeClassName="active"
+                className="highlighted-button"
                 onClick={() => trackEvent("navbar", "faq")}
               >
                 FAQ
