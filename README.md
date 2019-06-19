@@ -10,7 +10,17 @@
 ## Mise en route rapide
 
 - renommer le ficher `.env.model` en `.env` et le compléter
-- lancer `docker-compose up` à la racine
+- lancer `docker-compose up` à la racine, ou en dev `docker-compose -f ./docker-compose.dev.yml up`
+- ajouter les valeurs des variables d'environnement `API_HOST` et `UI_HOST` dans le fichier host
+
+Par exemple:
+
+```
+127.0.0.1	trackdechets.local
+127.0.0.1	api-trackdechets.local
+```
+
+> Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
 L'application est alors accessible aux URL décrites dans le fichier `.env`.
 
