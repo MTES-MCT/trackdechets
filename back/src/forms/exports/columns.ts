@@ -10,11 +10,6 @@ type ColumnDetail = {
 export const EXPORT_COLUMNS: {
   [key: string]: ColumnDetail;
 } = {
-  date: {
-    key: "date",
-    label: "Date d'expédition du déchet",
-    getter: f => new Date(f.sentAt).toLocaleDateString()
-  },
   number: { key: "number", label: "Numéro de BSD", getter: f => f.readableId },
   wasteCode: {
     key: "wasteCode",
@@ -50,6 +45,31 @@ export const EXPORT_COLUMNS: {
     key: "numberOfPackages",
     label: "Quantité réelle (en tonnes)",
     getter: f => f.wasteDetailsNumberOfPackages
+  },
+  onuCode: {
+    key: "onuCode",
+    label: "Code ADR",
+    getter: f => f.wasteDetailsOnuCode
+  },
+  date: {
+    key: "date",
+    label: "Date d'expédition du déchet",
+    getter: f => new Date(f.sentAt).toLocaleDateString()
+  },
+  emitterCompanyName: {
+    key: "emitterCompanyName",
+    label: "Nom de l'émetteur",
+    getter: f => f.emitterCompanyName
+  },
+  emitterCompanyAddress: {
+    key: "emitterCompanyAddress",
+    label: "Adresse de l'émetteur",
+    getter: f => f.emitterCompanyAddress
+  },
+  emitterCompanySiret: {
+    key: "emitterCompanySiret",
+    label: "Siret de l'émetteur",
+    getter: f => f.emitterCompanySiret
   },
   recipientCompanyName: {
     key: "recipientCompanyName",
