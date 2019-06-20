@@ -523,7 +523,6 @@
           </div>
         </div>
 
-        {{? it.sentBy != null }}
         <div class="sent grid-item">
           <div class="item-title">
             9. Déclaration générale de l’émetteur du bordereau:
@@ -534,7 +533,7 @@
                 Je soussigné certifie que les renseignements portés dans les
                 cadres ci-dessus sont exacts et établis de bonne foi.
               </p>
-              <p>Nom: {{=it.sentBy}}</p>
+              <p>Nom: {{=it.sentBy || ''}}</p>
               <p>Date: {{=it.toDate(it.sentAt)}}</p>
             </div>
             <div class="column">
@@ -564,9 +563,7 @@
             </div>
           </div>
         </div>
-        {{?}}
 
-        {{? it.receivedBy != null }}
         <div class="recipient grid-item">
           <div class="columns">
             <div class="column">
@@ -574,11 +571,11 @@
                 10. Expédition reçue à l’installation de destination:
               </div>
               <p>N° SIRET: {{=it.recipientCompanySiret}}</p>
-              <p class="name">NOM: {{=it.recipientCompanyName}}</p>
-              <p>Adresse: {{=it.recipientCompanyAddress}}</p>
-              <p>Personne à contacter: {{=it.receivedBy}}</p>
+              <p class="name">NOM: {{=it.recipientCompanyName || ''}}</p>
+              <p>Adresse: {{=it.recipientCompanyAddress || ''}}</p>
+              <p>Personne à contacter: {{=it.receivedBy || ''}}</p>
               <p>
-                Quantité réelle présentée: {{=it.quantityReceived}} tonne(s)
+                Quantité réelle présentée: {{=it.quantityReceived || ''}} tonne(s)
               </p>
               <p>Date de présentation: {{=it.toDate(it.receivedAt)}}</p>
               <p>
@@ -587,7 +584,7 @@
                 <input type="checkbox" {{? !it.isAccepted}}checked{{?}} /> non
               </p>
               <p>Motif de refus:</p>
-              <p>Signataire: {{=it.receivedBy}}</p>
+              <p>Signataire: {{=it.receivedBy || ''}}</p>
               <p>Date {{=it.toDate(it.receivedAt)}}</p>
               <p class="stamp relative">
                 <svg
@@ -614,14 +611,13 @@
               </p>
             </div>
             <div class="column">
-              {{? it.processingOperationDone != null }}
               <div class="item-title">11. Réalisation de l’opération:</div>
-              <p>Code D/R: {{=it.processingOperationDone}}</p>
-              <p>Description: {{=it.processingOperationDescription}}</p>
+              <p>Code D/R: {{=it.processingOperationDone || ''}}</p>
+              <p>Description: {{=it.processingOperationDescription || ''}}</p>
               <p>
                 Je soussigné certifie que l'opération ci-dessous a été effectuée
               </p>
-              <p>Nom: {{=it.processedBy}}</p>
+              <p>Nom: {{=it.processedBy || ''}}</p>
               <p>Date: {{=it.toDate(it.processedAt)}}</p>
               <p class="stamp">
                 <svg
@@ -646,13 +642,10 @@
                   />
                 </svg>
               </p>
-              {{?}}
             </div>
           </div>
         </div>
-        {{?}}
 
-        {{? it.nextDestinationProcessingOperation != null }}
         <div class="nextDestination grid-item">
           <div class="item-title">
             12. Destination ultérieure prévue:
@@ -667,15 +660,14 @@
             <div class="column">
               <p>
                 Traitement prévu (code D/R):
-                {{=it.nextDestinationProcessingOperation}}
+                {{=it.nextDestinationProcessingOperation || ''}}
               </p>
             </div>
             <div class="column">
-              <p>Entreprise: {{=it.nextDestinationDetails}}</p>
+              <p>Entreprise: {{=it.nextDestinationDetails || ''}}</p>
             </div>
           </div>
         </div>
-        {{?}}
 
         {{? it.receivedBy == null }}
         <div class="infos">
