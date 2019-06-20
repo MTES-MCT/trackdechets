@@ -72,10 +72,9 @@ export default function Exports({ me }: IProps) {
       <h2>Téléchargement de registres</h2>
       <p>
         Vous avez la possibilité de télécharger un registre des déchets entrants
-        et sortants de votre entreprise. Ce registre est basé uniquement sur les
-        déchets qui ont terminé leur cycle de vie, c'est à dire qui ne sont pas
-        en attente de réception ou de traitement par une entité. Cela correspond
-        aux bordereaux que vous retrouvez dans votre onglet "Archives"
+        et sortants de votre entreprise. Cet export est un document CSV au
+        format UTF-8. Assurez vous que vous l'ouvrez dans le bon format pour
+        éviter les problèmes d'accents.
       </p>
       <a
         className="button"
