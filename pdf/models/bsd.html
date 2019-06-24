@@ -442,6 +442,7 @@
 
 
 
+
               }}checked{{?}}
               /> citerne <input type="checkbox"
               {{? it.wasteDetailsPackagings.indexOf("GRV") > -1}}checked{{?}} />
@@ -575,7 +576,8 @@
               <p>Adresse: {{=it.recipientCompanyAddress || ''}}</p>
               <p>Personne à contacter: {{=it.receivedBy || ''}}</p>
               <p>
-                Quantité réelle présentée: {{=it.quantityReceived || ''}} tonne(s)
+                Quantité réelle présentée:
+                {{=it.quantityReceived || ''}} tonne(s)
               </p>
               <p>Date de présentation: {{=it.toDate(it.receivedAt)}}</p>
               <p>
@@ -586,6 +588,7 @@
               <p>Motif de refus:</p>
               <p>Signataire: {{=it.receivedBy || ''}}</p>
               <p>Date {{=it.toDate(it.receivedAt)}}</p>
+              {{? it.receivedBy != null }}
               <p class="stamp relative">
                 <svg
                   width="200"
@@ -609,6 +612,7 @@
                   />
                 </svg>
               </p>
+              {{?}}
             </div>
             <div class="column">
               <div class="item-title">11. Réalisation de l’opération:</div>
@@ -619,6 +623,7 @@
               </p>
               <p>Nom: {{=it.processedBy || ''}}</p>
               <p>Date: {{=it.toDate(it.processedAt)}}</p>
+              {{? it.processingOperationDone != null }}
               <p class="stamp">
                 <svg
                   width="200"
@@ -642,6 +647,7 @@
                   />
                 </svg>
               </p>
+              {{?}}
             </div>
           </div>
         </div>
