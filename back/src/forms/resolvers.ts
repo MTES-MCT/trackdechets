@@ -264,11 +264,11 @@ export default {
       }
 
       if (signingInfo.signedByProducer) {
-        const userCompanySecurityCode = userCompanies.find(
-          c => c.siret === form.transporterCompanySiret
-        ).securityCode;
+        const emitterCompany = await context.prisma.company({
+          siret: form.emitterCompanySiret
+        });
 
-        if (userCompanySecurityCode !== signingInfo.securityCode) {
+        if (emitterCompany.securityCode !== signingInfo.securityCode) {
           throw new Error(
             "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'"
           );
