@@ -9,9 +9,8 @@
 
 ## Mise en route rapide
 
-- renommer le ficher `.env.model` en `.env` et le compléter
-- lancer `docker-compose up` à la racine, ou en dev `docker-compose -f ./docker-compose.dev.yml up`
-- ajouter les valeurs des variables d'environnement `API_HOST` et `UI_HOST` dans le fichier host
+1. renommer le ficher `.env.model` en `.env` et le compléter
+2. ajouter les valeurs des variables d'environnement `API_HOST` et `UI_HOST` dans le fichier host
 
 Par exemple:
 
@@ -22,7 +21,28 @@ Par exemple:
 
 > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-L'application est alors accessible aux URL décrites dans le fichier `.env`.
+L'application sera accessible aux URL décrites dans le fichier `.env`.
+3. lancer `docker-compose up` à la racine, ou en dev `docker-compose -f ./docker-compose.dev.yml up`
+4. [Optionnel] restaurer un dump de la BDD
+
+Il est possible de restaurer un dump de la base pour avoir des données avec lesquelles travailler en local. Pour avoir un dump adapté, s'adresser au développeur en charge du projet, il vous fournira un fichier `file.dump`.
+
+Il faut alors se connecter à l'image postgre et y restaurer ce dump. Par exemple:
+
+```bash
+> docker cp /local/path/tofile.dump $(docker ps -aqf "name=postgres"):/path/to/file.dump
+> docker exec -it $(docker ps -aqf "name=postgres") bash
+> pg_restore /path/to/file.dump
+```
+
+5. lancer un déploiement Prisma
+
+```bash
+> docker exec -it $(docker ps -aqf "name=td-api") bash
+> npx prisma deploy
+```
+
+6. C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` pour commencer à utiliser l'application.
 
 ## Technologies
 
