@@ -260,7 +260,10 @@ export default function Home() {
               </a>
             </li>
             <li>
-              <a href="http://api.trackdechets.beta.gouv.fr">API</a>
+              <a href="http://api.trackdechets.beta.gouv.fr">API Playground</a>
+            </li>
+            <li>
+              <a href="http://doc.trackdechets.fr">Documentation API</a>
             </li>
           </ul>
         </div>
