@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+
+# VS code
+.vscode
+
+# s3ic data folder
+code/data/s3ic

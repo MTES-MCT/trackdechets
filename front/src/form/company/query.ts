@@ -18,7 +18,9 @@ export const COMPANY_INFOS = gql`
     companyInfos(siret: $siret) {
       siret
       name
-      address
+      address,
+      codeS3ic,
+      urlFiche
     }
   }
 `;
@@ -28,7 +30,9 @@ export const SEARCH_COMPANIES = gql`
     searchCompanies(clue: $clue, department: $department) {
       siret
       name
-      address
+      address,
+      codeS3ic,
+      urlFiche
     }
   }
 `;

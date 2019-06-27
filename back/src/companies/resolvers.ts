@@ -30,6 +30,8 @@ type Company = {
   contact?: string;
   phone?: string;
   mail?: string;
+  codeS3ic: String;
+  urlFiche: String;
 };
 export default {
   Company: {
@@ -41,6 +43,14 @@ export default {
       const company = await memoizeRequest(parent.siret);
       return company.name;
     },
+    codeS3ic: async parent => {
+      const company = await memoizeRequest(parent.siret);
+      return company.codeS3ic;
+    },
+    urlFiche: async parent => {
+      const company = await memoizeRequest(parent.siret);
+      return company.urlFiche;
+    },
     admins: async (parent, _) => {
       return getCompanyAdmins(parent.siret).catch(_ => null);
     }
@@ -50,7 +60,6 @@ export default {
       if (siret.length < 14) {
         return null;
       }
-
       return await memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
@@ -98,7 +107,6 @@ export default {
           .catch(err =>
             console.error("Error while querying INSEE service", err)
           );
-
         return response.data;
       }
 

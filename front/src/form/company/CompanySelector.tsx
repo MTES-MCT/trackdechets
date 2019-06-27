@@ -8,13 +8,16 @@ import RedErrorMessage from "../RedErrorMessage";
 import useDebounce from "../../utils/use-debounce";
 import client from "../../graphql-client";
 
+
 export type Company = {
-  siret: string;
-  name: string;
   address: string;
+  name: string;
+  siret: string;
   contact: string;
   phone: string;
   mail: string;
+  codeS3ic: String;
+  urlFiche: String;
 };
 
 export default connect<FieldProps>(function CompanySelector(props) {
@@ -142,6 +145,11 @@ export default connect<FieldProps>(function CompanySelector(props) {
                     <h6>{c.name}</h6>
                     <p>
                       {c.siret} - {c.address}
+                    </p>
+                    <p>
+                      {c.codeS3ic != "" &&
+                        <a href={c.urlFiche} target="_blank">Installation classée n° {c.codeS3ic}</a>
+                      }
                     </p>
                   </div>
                   <div className="icon">
