@@ -27,14 +27,14 @@ export default function Home() {
                 className="button large warning"
                 onClick={() => trackEvent("home", "cta-test")}
               >
-                Tester Trackdéchets
+                Je crée un compte
               </Link>
               <Link
                 to="/login"
                 className="button large"
                 onClick={() => trackEvent("home", "cta-login")}
               >
-                Se connecter
+                Je me connecte
               </Link>
             </p>
           )}
