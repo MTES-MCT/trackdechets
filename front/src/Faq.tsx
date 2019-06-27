@@ -1,4 +1,5 @@
 import React from "react";
+import "./Faq.scss";
 
 export default function Faq() {
   return (
@@ -20,7 +21,7 @@ export default function Faq() {
         dessus) : producteurs, collecteurs / regroupeurs, installations de
         traitement.
       </p>
-      <p>
+      <p className="image-container">
         <img src="image-faq.png" />
       </p>
       <h3>Pourquoi utiliser Trackdéchets?</h3>
@@ -42,19 +43,19 @@ export default function Faq() {
       <table>
         <tbody>
           <tr>
-            <td colSpan={1} rowSpan={1}>
+            <td className="faq-cell" colSpan={1} rowSpan={1}>
               <p>1</p>
               <p>Je rédige mon BSD</p>
             </td>
-            <td colSpan={1} rowSpan={1}>
+            <td className="faq-cell" colSpan={1} rowSpan={1}>
               <p>2</p>
               <p>Je le transmets à mon collecteur</p>
             </td>
-            <td colSpan={1} rowSpan={1}>
+            <td className="faq-cell" colSpan={1} rowSpan={1}>
               <p>3</p>
               <p>S’il n’est pas inscrit, il reçoit un mail d’information</p>
             </td>
-            <td colSpan={1} rowSpan={1}>
+            <td className="faq-cell" colSpan={1} rowSpan={1}>
               <p>4</p>
               <p>il s’inscrit et retrouve le BSD dans son tableau de bord</p>
             </td>
@@ -107,7 +108,8 @@ export default function Faq() {
         avec d’autres services. L’API est structurée et documentée : vous pouvez
         y accéder à tout moment. Une fois que vous aurez créé votre compte vous
         pourrez générer une clé d’API sur la page “Mon compte” et commencer à
-        utiliser l’API.
+        utiliser l’API. Une documentation dédié existe au lien suivant :
+        https://doc.trackdechets.fr/
       </p>
       <h3>
         Comment m’assurer que l’entreprise qui va collecter et/ou traiter mon
@@ -157,9 +159,7 @@ export default function Faq() {
         piles, les bombes aérosols... Par extension, les emballages de ces
         produits, même vides, sont considérés comme des déchets dangereux.
       </p>
-      <h3>
-        Que dit la réglementation sur la gestion des déchets dangereux ?
-      </h3>
+      <h3>Que dit la réglementation sur la gestion des déchets dangereux ?</h3>
       <p>
         Le déchet dangereux est sous la responsabilité du producteur jusqu’à son
         élimination finale. Attention, toute entreprise est donc responsable de
@@ -268,7 +268,7 @@ export default function Faq() {
         </a>{" "}
         et suivez les étapes suivantes:
       </p>
-      <p>Etape 1</p>
+      <p>Etape 1:</p>
       <ol>
         <li>
           Repérer la source produisant le déchet dans les chapitres 1 à 12 et 17
@@ -279,17 +279,17 @@ export default function Faq() {
           procédés thermiques)
         </li>
       </ol>
-      <p>Etape 2</p>
+      <p>Etape 2:</p>
       <p>
         Si aucun code approprié ne peut être trouvé à l’étape 1, alors chercher
         dans les rubr /iques 13 à 15.
       </p>
-      <p>Etape 3</p>
+      <p>Etape 3:</p>
       <p>
         Si aucun code n’a pu être trouvé dans les étapes précédentes, chercher
         dans le chapitre 16.
       </p>
-      <p>Etape 4</p>
+      <p>Etape 4:</p>
       <p>
         Au cas où le déchet ne relèverait pas des étapes ci-avant, alors le
         déchet sera classé sous la rubr /ique dont le code se termine par 99
@@ -302,6 +302,100 @@ export default function Faq() {
           https://www.ecologique-solidaire.gouv.fr/gestion-des-dechets-principes-generaux
         </a>
       </p>
+      <h3>Qui a accès aux données de mon compte Trackdéchets ?</h3>
+      <ul>
+        <li>
+          L'accès aux données personnelles d’inscription est lié au compte de
+          l'utilisateur. Seul l'utilisateur peut consulter ou modifier la donnée
+        </li>
+        <li>
+          L’accès aux données des BSD transmis par une entreprise est accessible
+          par toutes les personnes de l’entreprise.
+        </li>
+        <li>
+          Les autorités publiques pourront avoir accès à l’outil dans des cas de
+          contrôle
+        </li>
+        <li>
+          De la donnée agrégée anonymisée pourrait être utilisée à terme pour
+          faciliter la planification en matière de gestion des déchets
+        </li>
+        <li>
+          Pour aller plus loin, la politique de confidentialité de Trackdéchets
+          est disponible{" "}
+          <a href="https://trackdechets.beta.gouv.fr/Politique%20de%20confidentialit%C3%A9.pdf">
+            sur le site
+          </a>
+        </li>
+      </ul>
+      <h3>
+        Si j’interface mon outil métier avec Trackdéchets, quel est le niveau de
+        protection de mes données ?
+      </h3>
+      <p>
+        Les données transmises à Trackdéchets par API ne sont pas accessibles
+        par les autres utilisateurs, elles sont sécurisées par le recours à un
+        token d’authentification.
+      </p>
+      <h3>Terminologie: quel terme pour que acteur</h3>
+      <p>
+        Tout d'abord quelques rappels sur la terminologie tirés du code de
+        l'environnement:
+      </p>
+      <p>
+        <strong>Déchet :</strong> toute substance ou tout objet, ou plus
+        généralement tout bien meuble, dont le détenteur se défait ou dont il a
+        l'intention ou l'obligation de se défaire ;
+      </p>
+      <p>
+        <strong>Gestion des déchets :</strong> la collecte, le transport, la
+        valorisation et, l'élimination des déchets et, plus largement, toute
+        activité participant de l'organisation de la prise en charge des déchets
+        depuis leur production jusqu'à leur traitement final, y compris les
+        activités de négoce ou de courtage et la supervision de l'ensemble de
+        ces opérations ;
+      </p>
+      <p>
+        <strong>Producteur de déchets :</strong> toute personne dont l'activité
+        produit des déchets (producteur initial de déchets) ou toute personne
+        qui effectue des opérations de traitement des déchets conduisant à un
+        changement de la nature ou de la composition de ces déchets (producteur
+        subséquent de déchets) ;
+      </p>
+      <p>
+        <strong>Détenteur de déchets :</strong> producteur des déchets ou toute
+        autre personne qui se trouve en possession des déchets ;
+      </p>
+      <p>
+        <strong>Collecte :</strong> toute opération de ramassage des déchets en
+        vue de leur transport vers une installation de traitement des déchets ;
+      </p>
+      <p>
+        <strong>Traitement :</strong> toute opération de valorisation ou
+        d'élimination, y compris la préparation qui précède la valorisation ou
+        l'élimination ;
+      </p>
+      <p>Pour TD, on considère les profils suivant:</p>
+      <ul>
+        <li>
+          - Installation de traitement (installation d'élimination ou de
+          valorisation d'un déchet ultime)
+        </li>
+        <li>- Installation de Transit, Regroupement ou Tri de déchets</li>
+        <li>
+          - Installation de collecte de déchets apportés par le producteur
+          initial (déchetterie)
+        </li>
+        <li>
+          - Installation d'entreposage, dépollution, démontage, découpage de VHU
+          (casse automobile)
+        </li>
+        <li>- Producteur de déchets</li>
+        <li>
+          - Transporteurs (opération de transport de marchandise y compris
+          dangereuse) - Négociant en Déchets
+        </li>
+      </ul>
     </div>
   );
 }
