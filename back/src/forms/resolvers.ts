@@ -201,16 +201,7 @@ export default {
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
-      const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
-      if (appendix2Forms.length) {
-        await context.prisma.updateManyForms({
-          where: {
-            status: "AWAITING_GROUP",
-            OR: appendix2Forms.map(f => ({ id: f.id }))
-          },
-          data: { status: "GROUPED" }
-        });
-      }
+      await markFormAppendixAwaitingFormsAsGrouped(id, context)
 
       return context.prisma.updateForm({
         where: { id },
@@ -241,7 +232,9 @@ export default {
         // TODO alert emitter that markAsSent has been done by recipient
       }
 
-      logStatusChange(form.id, userId, "SENT", context);
+      await markFormAppendixAwaitingFormsAsGrouped(id, context)
+
+      logStatusChange(id, userId, "SENT", context);
 
       return context.prisma.updateForm({
         where: { id },
@@ -274,7 +267,7 @@ export default {
       }
 
       const status = getNextStep({ ...form, ...processedInfo }, sirets);
-      logStatusChange(form.id, userId, status, context);
+      logStatusChange(id, userId, status, context);
 
       return context.prisma.updateForm({
         where: { id },
@@ -315,7 +308,7 @@ export default {
           "Vous ne pouvez plus signer ce bordereau, il a dékà été marqué comme envoyé."
         );
       }
-      logStatusChange(form.id, userId, status, context);
+      logStatusChange(id, userId, status, context);
 
       return context.prisma.updateForm({
         where: { id },
@@ -386,4 +379,25 @@ function logStatusChange(formId, userId, status, context: Context) {
       );
       throw new Error("Problème technique, mercide réessayer plus tard.");
     });
+}
+
+async function markFormAppendixAwaitingFormsAsGrouped(
+  formId: string,
+  context: Context
+) {
+  const appendix2Forms = await context.prisma
+    .form({ id: formId })
+    .appendix2Forms();
+
+  if (!appendix2Forms.length) {
+    return;
+  }
+
+  return context.prisma.updateManyForms({
+    where: {
+      status: "AWAITING_GROUP",
+      OR: appendix2Forms.map(f => ({ id: f.id }))
+    },
+    data: { status: "GROUPED" }
+  });
 }
