@@ -219,8 +219,34 @@ export default {
         }
       });
     },
-    markAsSent: async (parent, { id, sentInfo }, context: Context) =>
-      markForm(id, sentInfo, context),
+    markAsSent: async (parent, { id, sentInfo }, context: Context) => {
+      const form = await context.prisma.form({ id });
+
+      if (!["DRAFT", "SEALED"].includes(form.status)) {
+        throw new Error("Impossible de marquer ce bordereau comme envoyé");
+      }
+
+      const userId = getUserId(context);
+      const userCompanies = await getUserCompanies(userId);
+      const sirets = userCompanies.map(c => c.siret);
+
+      const isEmitter = sirets.includes(form.emitterCompanySiret);
+      const isRecipient = sirets.includes(form.recipientCompanySiret);
+
+      if (!isEmitter && !isRecipient) {
+        throw new Error("Unauthorized.");
+      }
+
+      if (isRecipient) {
+        // TODO alert emitter that markAsSent has been done by recipient
+        // And log the info (log all markAs* infos with User + Status + DateTime)
+      }
+
+      return context.prisma.updateForm({
+        where: { id },
+        data: { status: "SENT", ...sentInfo }
+      });
+    },
     markAsReceived: async (parent, { id, receivedInfo }, context: Context) =>
       markForm(id, receivedInfo, context),
     markAsProcessed: async (
