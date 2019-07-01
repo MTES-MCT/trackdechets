@@ -183,3 +183,11 @@ enum Status {
   GROUPED
   NO_TRACEABILITY
 }
+
+type StatusLog {
+  id: ID! @id
+
+  user: User!
+  form: Form!
+  status: Status!
+}

@@ -239,8 +239,9 @@ export default {
 
       if (isRecipient) {
         // TODO alert emitter that markAsSent has been done by recipient
-        // And log the info (log all markAs* infos with User + Status + DateTime)
       }
+
+      logStatusChange(form.id, userId, "SENT", context);
 
       return context.prisma.updateForm({
         where: { id },
@@ -262,16 +263,23 @@ export default {
 
       const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
       if (appendix2Forms.length) {
+        appendix2Forms.map(f =>
+          logStatusChange(f.id, userId, "PROCESSED", context)
+        );
+
         await context.prisma.updateManyForms({
           where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
           data: { status: "PROCESSED" }
         });
       }
 
+      const status = getNextStep({ ...form, ...processedInfo }, sirets);
+      logStatusChange(form.id, userId, status, context);
+
       return context.prisma.updateForm({
         where: { id },
         data: {
-          status: getNextStep({ ...form, ...processedInfo }, sirets),
+          status,
           ...processedInfo
         }
       });
@@ -301,6 +309,14 @@ export default {
         }
       }
 
+      const status = getNextStep(form, [form.emitterCompanySiret]);
+      if (status !== "SENT") {
+        throw new Error(
+          "Vous ne pouvez plus signer ce bordereau, il a dékà été marqué comme envoyé."
+        );
+      }
+      logStatusChange(form.id, userId, status, context);
+
       return context.prisma.updateForm({
         where: { id },
         data: {
@@ -308,7 +324,7 @@ export default {
           signedByTransporter: true,
           ...(signingInfo.signedByProducer && {
             sentBy: signingInfo.sentBy,
-            status: getNextStep(form, [form.emitterCompanySiret])
+            status
           })
         }
       });
@@ -347,8 +363,27 @@ async function markForm(id, inputParams, context: Context) {
   const userCompanies = await getUserCompanies(userId);
   const sirets = userCompanies.map(c => c.siret);
 
+  const status = getNextStep(form, sirets);
+  logStatusChange(form.id, userId, status, context);
+
   return context.prisma.updateForm({
     where: { id },
-    data: { status: getNextStep(form, sirets), ...inputParams }
+    data: { status, ...inputParams }
   });
+}
+
+function logStatusChange(formId, userId, status, context: Context) {
+  return context.prisma
+    .createStatusLog({
+      form: { connect: { id: formId } },
+      user: { connect: { id: userId } },
+      status: status
+    })
+    .catch(err => {
+      console.error(
+        `Cannot log status change for form ${formId}, user ${userId}, status ${status}`,
+        err
+      );
+      throw new Error("Problème technique, mercide réessayer plus tard.");
+    });
 }
