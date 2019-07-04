@@ -21,12 +21,29 @@ export const GET_TRANSPORT_SLIPS = gql`
         company {
           name
           siret
+          address
+        }
+      }
+      recipient {
+        company {
+          name
+          siret
+          address
+        }
+      }
+      transporter {
+        company {
+          name
+          siret
+          address
         }
       }
       wasteDetails {
         code
         name
         quantity
+        packagings
+        onuCode
       }
     }
   }
