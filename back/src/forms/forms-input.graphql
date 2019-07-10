@@ -9,6 +9,10 @@ input TransporterSignatureFormInput {
   securityCode: Int
   sentBy: String
   signedByProducer: Boolean!
+
+  packagings: [Packagings]!
+  quantity: Float!
+  onuCode: String!
 }
 
 input ReceivedFormInput {

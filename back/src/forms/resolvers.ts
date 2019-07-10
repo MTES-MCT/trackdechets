@@ -201,7 +201,7 @@ export default {
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
-      await markFormAppendixAwaitingFormsAsGrouped(id, context)
+      await markFormAppendixAwaitingFormsAsGrouped(id, context);
 
       return context.prisma.updateForm({
         where: { id },
@@ -232,7 +232,7 @@ export default {
         // TODO alert emitter that markAsSent has been done by recipient
       }
 
-      await markFormAppendixAwaitingFormsAsGrouped(id, context)
+      await markFormAppendixAwaitingFormsAsGrouped(id, context);
 
       logStatusChange(id, userId, "SENT", context);
 
@@ -318,7 +318,10 @@ export default {
           ...(signingInfo.signedByProducer && {
             sentBy: signingInfo.sentBy,
             status
-          })
+          }),
+          wasteDetailsPackagings: signingInfo.packagings,
+          wasteDetailsQuantity: signingInfo.quantity,
+          wasteDetailsOnuCode: signingInfo.onuCode
         }
       });
     }
