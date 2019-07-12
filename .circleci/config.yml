@@ -16,6 +16,21 @@ jobs:
             exit 1
           fi
 
+  build-postgres:
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          docker build -t betagouv/trackdechets-postgres:$CIRCLE_SHA1 ./postgres
+          docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+          docker push betagouv/trackdechets-postgres:$CIRCLE_SHA1
+      - run: |
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-postgres:$CIRCLE_SHA1 betagouv/trackdechets-postgres:latest
+            docker push betagouv/trackdechets-postgres:latest
+          fi
+
   build-ui:
     executor: node
     steps:
@@ -106,6 +121,21 @@ jobs:
             docker push betagouv/trackdechets-doc:latest
           fi
 
+  build-etl:
+    executor: node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          docker build -t betagouv/trackdechets-etl:$CIRCLE_SHA1 ./etl
+          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
+          docker push betagouv/trackdechets-etl:$CIRCLE_SHA1
+      - run: |
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker tag betagouv/trackdechets-etl:$CIRCLE_SHA1 betagouv/trackdechets-etl:latest
+            docker push betagouv/trackdechets-etl:latest
+          fi
+
   deploy:
     machine:
       enabled: true
@@ -116,11 +146,13 @@ jobs:
           name: Deploy Over SSH
           command: |
             scp docker-compose.yml $SSH_USER@$SSH_HOST:/srv/trackdechets/
+            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-postgres:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-api:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-ui:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-pdf:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-insee:latest"
             ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-mail:latest"
+            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-etl:latest"
             ssh $SSH_USER@$SSH_HOST "cd /srv/trackdechets/ ; docker-compose up -d"
 
   deploy-validation:
@@ -145,6 +177,9 @@ workflows:
           filters:
             branches:
               only: master
+      - build-postgres:
+          requires:
+            - check-docker
       - build-ui:
           requires:
             - check-docker
@@ -160,13 +195,18 @@ workflows:
       - build-mail:
           requires:
             - check-docker
+      - build-etl:
+          requires:
+            - check-docker
       - deploy:
           requires:
+            - build-postgres
             - build-api
             - build-ui
             - build-insee
             - build-pdf
             - build-mail
+            - build-etl
           filters:
             branches:
               only: master

@@ -87,6 +87,7 @@ Il faut alors se connecter à l'image postgre et y restaurer ce dump. Par exempl
 - Emmanuel Flahaut, intrapreneur
 - Claire Vigier, coach
 - [Orion Charlier](https://github.com/riron), développeur
+- [Benoît Guigal](https://github.com/benoitguigal), data scientist
 
 ## Licence
 

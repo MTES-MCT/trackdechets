@@ -18,7 +18,7 @@ services:
             migrations: true
 
   postgres:
-    image: postgres:10.5
+    image: betagouv/trackdechets-postgres:latest
     restart: always
     environment:
       POSTGRES_USER: $POSTGRES_USER
@@ -50,6 +50,8 @@ services:
     restart: always
     environment:
       INSEE_SECRET: $INSEE_SECRET
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
   td-pdf:
     image: betagouv/trackdechets-pdf:latest
@@ -61,6 +63,19 @@ services:
     environment:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
+
+  td-etl:
+    image: betagouv/trackdechets-etl:latest
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY
+      AIRFLOW__CORE__LOGGING_LEVEL: ERROR
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@postgres:5432/airflow
+      AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$ETL_DB
+      AIRFLOW_CONN_POSTGRES_ETL_TEST: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/test_$ETL_DB
 
   metabase:
     image: metabase/metabase

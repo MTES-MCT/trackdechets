@@ -18,7 +18,10 @@ services:
             migrations: true
 
   postgres:
-    image: postgres:10.5
+    image: td-postgres
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
     restart: always
     ports:
       - 5432:5432
@@ -61,6 +64,8 @@ services:
     restart: always
     environment:
       INSEE_SECRET: $INSEE_SECRET
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
   td-pdf:
     image: td-pdf
@@ -88,6 +93,21 @@ services:
       VIRTUAL_HOST: $DOC_HOST
       LETSENCRYPT_HOST: $DOC_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+
+  td-etl:
+    image: td-etl
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY
+      AIRFLOW__CORE__LOGGING_LEVEL: ERROR
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@postgres:5432/airflow
+      AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$ETL_DB
+      AIRFLOW_CONN_POSTGRES_ETL_TEST: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/test_$ETL_DB
 
 volumes:
   postgres:

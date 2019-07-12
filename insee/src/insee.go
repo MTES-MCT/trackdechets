@@ -150,6 +150,16 @@ func queryAPI(uri string) []byte {
 }
 
 func etablissementToResponse(item Etablissement) Response {
+
+	icpe, ok := GetICPE(item.Siret)
+
+	var codeS3ic, urlFiche = "", ""
+
+	if ok {
+		codeS3ic = icpe.CodeS3ic
+		urlFiche = icpe.URLFiche
+	}
+
 	return Response{item.Siret,
 		item.Siren,
 		item.UniteLegale.DenominationUniteLegale + item.UniteLegale.DenominationUsuelle1UniteLegale,
@@ -157,5 +167,7 @@ func etablissementToResponse(item Etablissement) Response {
 			item.AdresseEtablissement.TypeVoieEtablissement + " " +
 			item.AdresseEtablissement.LibelleVoieEtablissement + ", " +
 			item.AdresseEtablissement.CodePostalEtablissement + " " +
-			item.AdresseEtablissement.LibelleCommuneEtablissement}
+			item.AdresseEtablissement.LibelleCommuneEtablissement,
+		codeS3ic,
+		urlFiche}
 }

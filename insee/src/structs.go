@@ -38,10 +38,18 @@ type AdresseEtablissement struct {
 	LibelleCommuneEtablissement string `json:"libelleCommuneEtablissement"`
 }
 
+// ICPE Installation classée pour la protection de l'environnement
+type ICPE struct {
+	CodeS3ic string `json:"codeS3ic"`
+	URLFiche string `json:"urlFiche"`
+}
+
 // Response La réponse donnée par l'API
 type Response struct {
-	Siret   string `json:"siret"`
-	Siren   string `json:"siren"`
-	Name    string `json:"name"`
-	Address string `json:"address"`
+	Siret    string `json:"siret"`
+	Siren    string `json:"siren"`
+	Name     string `json:"name"`
+	Address  string `json:"address"`
+	CodeS3ic string `json:"codeS3ic"`
+	URLFiche string `json:"urlFiche"`
 }

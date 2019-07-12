@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+
+# VS code
+.vscode
+
+Dockerfile*
+.dockerignore
+.git
+.gitignore
+code/data/s3ic

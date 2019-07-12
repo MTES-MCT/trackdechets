@@ -1,0 +1,4 @@
+beautifulsoup4==4.7.1
+html5lib==1.0.1
+pandas==0.24.2
+requests==2.22.0
