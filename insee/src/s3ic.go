@@ -11,7 +11,8 @@ import (
 )
 
 var db *sql.DB
-var stmt *sql.Stmt
+var stmt1 *sql.Stmt
+var stmt2 *sql.Stmt
 var ready = false
 
 func ping() bool {
@@ -68,7 +69,24 @@ func init() {
 			WHERE num_siret = $1
 			OR irep_numero_siret = $1`
 
-		stmt, err = db.Prepare(queryStr)
+		stmt1, err = db.Prepare(queryStr)
+
+		if err != nil {
+			connectionFailed()
+			return
+		}
+
+		queryStr = `
+			SELECT DISTINCT
+				rubrique,
+				regime_autorise as regimeAutorise,
+				activite
+			FROM etl.rubrique
+			WHERE code_s3ic = $1
+			AND etat_activite = 'En fonct.'
+		`
+
+		stmt2, err = db.Prepare(queryStr)
 
 		if err != nil {
 			connectionFailed()
@@ -87,9 +105,10 @@ func GetICPE(siret string) (*ICPE, bool) {
 	var err error
 
 	if ready {
+
 		var icpe ICPE
 
-		err = stmt.QueryRow(siret).Scan(&icpe.CodeS3ic, &icpe.URLFiche)
+		err = stmt1.QueryRow(siret).Scan(&icpe.CodeS3ic, &icpe.URLFiche)
 
 		if err == sql.ErrNoRows {
 			return nil, false
@@ -97,6 +116,33 @@ func GetICPE(siret string) (*ICPE, bool) {
 			log.Println(err)
 			return nil, false
 		}
+
+		rows, err := stmt2.Query(icpe.CodeS3ic)
+
+		defer rows.Close()
+
+		if err != nil {
+			log.Println(err)
+			return &icpe, true
+		}
+
+		rubriques := make([]Rubrique, 0)
+
+		for rows.Next() {
+			rubrique := new(Rubrique)
+			rows.Scan(
+				&rubrique.Rubrique,
+				&rubrique.RegimeAutorise,
+				&rubrique.Activite)
+			rubriques = append(rubriques, *rubrique)
+		}
+
+		if err = rows.Err(); err != nil {
+			log.Println(err)
+			return &icpe, true
+		}
+
+		icpe.Rubriques = rubriques
 
 		return &icpe, true
 	}

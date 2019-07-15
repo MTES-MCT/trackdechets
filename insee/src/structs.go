@@ -41,17 +41,26 @@ type AdresseEtablissement struct {
 
 // ICPE Installation classée pour la protection de l'environnement
 type ICPE struct {
-	CodeS3ic string `json:"codeS3ic"`
-	URLFiche string `json:"urlFiche"`
+	CodeS3ic  string     `json:"codeS3ic"`
+	URLFiche  string     `json:"urlFiche"`
+	Rubriques []Rubrique `json:"rubriques"`
+}
+
+// Rubrique d'une ICPE
+type Rubrique struct {
+	Rubrique       string `json:"rubrique"`
+	RegimeAutorise string `json:"regime_autorise"`
+	Activite       string `json:"activite"`
 }
 
 // Response La réponse donnée par l'API
 type Response struct {
-	Siret    string `json:"siret"`
-	Siren    string `json:"siren"`
-	Name     string `json:"name"`
-	Naf      string `json:"naf"`
-	Address  string `json:"address"`
-	CodeS3ic string `json:"codeS3ic"`
-	URLFiche string `json:"urlFiche"`
+	Siret     string     `json:"siret"`
+	Siren     string     `json:"siren"`
+	Name      string     `json:"name"`
+	Naf       string     `json:"naf"`
+	Address   string     `json:"address"`
+	CodeS3ic  string     `json:"codeS3ic"`
+	URLFiche  string     `json:"urlFiche"`
+	Rubriques []Rubrique `json:"rubriques"`
 }

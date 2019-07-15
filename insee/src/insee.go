@@ -153,11 +153,12 @@ func etablissementToResponse(item Etablissement) Response {
 
 	icpe, ok := GetICPE(item.Siret)
 
-	var codeS3ic, urlFiche = "", ""
+	var codeS3ic, urlFiche, rubriques = "", "", make([]Rubrique, 0)
 
 	if ok {
 		codeS3ic = icpe.CodeS3ic
 		urlFiche = icpe.URLFiche
+		rubriques = icpe.Rubriques
 	}
 
 	return Response{item.Siret,
@@ -170,5 +171,6 @@ func etablissementToResponse(item Etablissement) Response {
 			item.AdresseEtablissement.CodePostalEtablissement + " " +
 			item.AdresseEtablissement.LibelleCommuneEtablissement,
 		codeS3ic,
-		urlFiche}
+		urlFiche,
+		rubriques}
 }
