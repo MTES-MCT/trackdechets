@@ -147,7 +147,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
                       {c.siret} - {c.address}
                     </p>
                     <p>
-                      {c.codeS3ic != "" &&
+                      {c.codeS3ic && c.urlFiche &&
                         <a href={c.urlFiche} target="_blank">Installation classée n° {c.codeS3ic}</a>
                       }
                     </p>
