@@ -54,6 +54,7 @@ Il faut alors se connecter à l'image postgre et y restaurer ce dump. Par exempl
 - [Node.js](https://nodejs.org/en/)
 - [Prisma](https://www.prisma.io/client/client-typescript/)
 - [Golang](https://golang.org/)
+- [Airflow](https://airflow.apache.org/)
 - [Docker](https://www.docker.com/)
 
 ## Organisation du projet
@@ -72,7 +73,9 @@ Il faut alors se connecter à l'image postgre et y restaurer ce dump. Par exempl
 │
 ├── mail           # Service interne d'envoi de mails via Mailjet (Golang)
 │
-└── pdf            # Service interne de génération de PDF (JS, basé sur Puppeteer)
+|── pdf            # Service interne de génération de PDF (JS, basé sur Puppeteer)
+│
+└── etl            # Service interne de consolidation des données s3ic
 
 ```
 
