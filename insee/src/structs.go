@@ -27,6 +27,7 @@ type Etablissement struct {
 type UniteLegale struct {
 	DenominationUniteLegale         string `json:"denominationUniteLegale"`
 	DenominationUsuelle1UniteLegale string `json:"denominationUsuelle1UniteLegale"`
+	ActivitePrincipaleUniteLegale   string `json:"activitePrincipaleUniteLegale"`
 }
 
 // AdresseEtablissement Adresse et détail de l'établissement
@@ -49,6 +50,7 @@ type Response struct {
 	Siret    string `json:"siret"`
 	Siren    string `json:"siren"`
 	Name     string `json:"name"`
+	Naf      string `json:"naf"`
 	Address  string `json:"address"`
 	CodeS3ic string `json:"codeS3ic"`
 	URLFiche string `json:"urlFiche"`

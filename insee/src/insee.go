@@ -163,6 +163,7 @@ func etablissementToResponse(item Etablissement) Response {
 	return Response{item.Siret,
 		item.Siren,
 		item.UniteLegale.DenominationUniteLegale + item.UniteLegale.DenominationUsuelle1UniteLegale,
+		item.UniteLegale.ActivitePrincipaleUniteLegale,
 		item.AdresseEtablissement.NumeroVoieEtablissement + " " +
 			item.AdresseEtablissement.TypeVoieEtablissement + " " +
 			item.AdresseEtablissement.LibelleVoieEtablissement + ", " +
