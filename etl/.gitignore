@@ -7,5 +7,9 @@ __pycache__/
 # VS code
 .vscode
 
-# s3ic data folder
+# data folders
 code/data/s3ic
+code/data/rubrique/
+
+#Mac OS
+__MACOSX

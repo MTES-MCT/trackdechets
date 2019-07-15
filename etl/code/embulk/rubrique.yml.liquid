@@ -1,0 +1,46 @@
+in:
+  type: file
+  path_prefix: {{ env.PATH_PREFIX }}
+  parser:
+    charset: UTF-8
+    newline: LF
+    type: csv
+    delimiter: ;
+    quote: '"'
+    escape: '"'
+    trim_if_not_quoted: false
+    skip_header_lines: 1
+    allow_extra_columns: false
+    allow_optional_columns: false
+    columns:
+    - {name: id, type: long}
+    - {name: code_s3ic, type: string}
+    - {name: rubrique, type: string}
+    - {name: alinea, type: string}
+    - {name: date_autorisation, type: string}
+    - {name: etat_activite, type: string}
+    - {name: regime_autorise, type: string}
+    - {name: activite, type: string}
+    - {name: volume, type: string}
+    - {name: unite, type: string}
+out:
+  type: postgresql
+  host: {{ env.POSTGRES_HOST }}
+  user: {{ env.POSTGRES_USER }}
+  password: {{ env.POSTGRES_PASSWORD }}
+  database: {{ env.POSTGRES_DATABASE }}
+  table: rubrique
+  schema: etl
+  options: {loglevel: 2}
+  mode: replace
+  column_options:
+    id: {type: SERIAL PRIMARY KEY}
+    code_s3ic: {type: varchar(255)}
+    rubrique: {type: varchar(255)}
+    alinea: {type: varchar(255)}
+    date_autorisation: {type: varchar(255)}
+    etat_activite: {type: varchar(255)}
+    regime_autorise: {type: varchar(255)}
+    activite: {type: TEXT}
+    volume: {type: varchar(255)}
+    unite: {type: varchar(255)}

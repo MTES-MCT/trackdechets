@@ -13,7 +13,7 @@ from operators.python_postgres import PythonPostgresOperator
 from operators.download import DownloadUnzipOperator
 
 from models import S3IC, Rubrique
-from config import SQL_DIR, EMBULK_DIR, DATA_DIR, S3IC_SHP_URL
+from config import SQL_DIR, EMBULK_DIR, DATA_DIR, S3IC_SHP_URL, RUBRIQUE_CSV_URL
 from recipes.scraper import scrap_rubriques
 
 
@@ -41,7 +41,8 @@ connection = 'postgres_etl'
 with DAG("consolidate",
          default_args=default_args,
          schedule_interval="@once",
-         template_searchpath=SQL_DIR) as dag:
+         template_searchpath=SQL_DIR,
+         dagrun_timeout=timedelta(hours=24)) as dag:
 
     start = DummyOperator(task_id="start")
 
@@ -68,7 +69,24 @@ with DAG("consolidate",
     #     task_id='scrap_rubriques',
     #     input_model=input_model,
     #     output_model=output_model,
-    #     python_callable=scrap_rubriques)
+    #     python_callable=scrap_rubriques,
+    #     execution_timeout=timedelta(hours=6))
+
+    # Download rubriques data
+    download_s3ic = DownloadUnzipOperator(
+        task_id="download_rubrique",
+        url=RUBRIQUE_CSV_URL,
+        path=DATA_DIR)
+
+    # Load rubriques ICPE
+    config = os.path.join(EMBULK_DIR, 'rubrique.yml.liquid')
+    path_prefix = os.path.join(DATA_DIR, 'rubrique')
+    env = {'PATH_PREFIX': path_prefix}
+    load_rubrique = EmbulkOperator(
+        task_id='load_rubrique',
+        config=config,
+        connection=connection,
+        env=env)
 
     # Filter s3ic on rubriques 27xx and 35xx
     # create_s3ic_filtered = PostgresOperator(

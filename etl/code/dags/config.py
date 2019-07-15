@@ -34,4 +34,7 @@ EMBULK_DIR = os.path.join(CWD, 'embulk')
 EMBULK_BIN = get_env_setting('EMBULK_BIN')
 
 # Data
+
 S3IC_SHP_URL = "https://benoitguigal.fra1.digitaloceanspaces.com/s3ic.zip"
+
+RUBRIQUE_CSV_URL = "https://benoitguigal.fra1.digitaloceanspaces.com/rubrique.zip"
