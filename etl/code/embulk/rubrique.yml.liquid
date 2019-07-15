@@ -44,3 +44,4 @@ out:
     activite: {type: TEXT}
     volume: {type: varchar(255)}
     unite: {type: varchar(255)}
+  after_load: CREATE index rubrique_idx on etl.rubrique (code_s3ic);
