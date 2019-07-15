@@ -73,7 +73,7 @@ with DAG("consolidate",
     #     execution_timeout=timedelta(hours=6))
 
     # Download rubriques data
-    download_s3ic = DownloadUnzipOperator(
+    download_rubrique = DownloadUnzipOperator(
         task_id="download_rubrique",
         url=RUBRIQUE_CSV_URL,
         path=DATA_DIR)
@@ -146,4 +146,6 @@ with DAG("consolidate",
     >> join_s3ic_irep \
     >> create_s3ic_consolidated \
     >> copy_to_s3ic_consolidated
+
+    start >> download_rubrique >> load_rubrique
 
