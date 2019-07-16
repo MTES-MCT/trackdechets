@@ -241,8 +241,22 @@ export default {
         data: { status: "SENT", ...sentInfo }
       });
     },
-    markAsReceived: async (parent, { id, receivedInfo }, context: Context) =>
-      markForm(id, receivedInfo, context),
+    markAsReceived: async (parent, { id, receivedInfo }, context: Context) => {
+      const form = await context.prisma.form({ id });
+
+      const userId = getUserId(context);
+      const userCompanies = await getUserCompanies(userId);
+      const sirets = userCompanies.map(c => c.siret);
+
+      form.isAccepted = receivedInfo.isAccepted;
+      const status = getNextStep(form, sirets);
+      logStatusChange(form.id, userId, status, context);
+
+      return context.prisma.updateForm({
+        where: { id },
+        data: { status, ...receivedInfo }
+      });
+    },
     markAsProcessed: async (
       parent,
       { id, processedInfo },

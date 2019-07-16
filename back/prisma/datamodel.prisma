@@ -182,6 +182,7 @@ enum Status {
   AWAITING_GROUP
   GROUPED
   NO_TRACEABILITY
+  REFUSED
 }
 
 type StatusLog {
