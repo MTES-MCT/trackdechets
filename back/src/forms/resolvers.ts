@@ -366,22 +366,6 @@ export default {
   }
 };
 
-async function markForm(id, inputParams, context: Context) {
-  const form = await context.prisma.form({ id });
-
-  const userId = getUserId(context);
-  const userCompanies = await getUserCompanies(userId);
-  const sirets = userCompanies.map(c => c.siret);
-
-  const status = getNextStep(form, sirets);
-  logStatusChange(form.id, userId, status, context);
-
-  return context.prisma.updateForm({
-    where: { id },
-    data: { status, ...inputParams }
-  });
-}
-
 function logStatusChange(formId, userId, status, context: Context) {
   return context.prisma
     .createStatusLog({
