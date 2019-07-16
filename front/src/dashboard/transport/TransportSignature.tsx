@@ -204,6 +204,11 @@ export default function TransportSignature({ form }: Props) {
                         <Field type="text" name="sentBy" />
                       </label>
                     </p>
+                    {error && (
+                      <div className="notification error">
+                        {error.message}
+                      </div>
+                    )}
                   </div>
                 </Wizard.Page>
               </Wizard>
