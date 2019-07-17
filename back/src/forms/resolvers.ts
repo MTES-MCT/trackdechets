@@ -29,7 +29,7 @@ export default {
       const dbForm = await context.prisma.form({ id });
       const formOwner = await context.prisma.form({ id }).owner();
       if (
-        formOwner.id !== userId ||
+        formOwner.id !== userId &&
         !userCompanies.find(
           c =>
             c.siret === dbForm.recipientCompanySiret ||
