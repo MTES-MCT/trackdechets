@@ -60,7 +60,10 @@ export default {
             }
           }
         })
-        .catch(err => {
+        .catch(async err => {
+          // No transactions in Prisma yet :(
+          await context.prisma.deleteCompany({ siret: trimedSiret });
+
           console.error("Error while creating user", err);
           throw new Error(
             "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
