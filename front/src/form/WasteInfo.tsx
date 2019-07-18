@@ -93,6 +93,12 @@ export default connect<{}, Values>(function WasteInfo(props) {
             label="Liquide"
             component={RadioButton}
           />
+          <Field
+            name="wasteDetails.consistence"
+            id="GASEOUS"
+            label="Gazeux"
+            component={RadioButton}
+          />
         </fieldset>
 
         <RedErrorMessage name="wasteDetails.consistence" />
