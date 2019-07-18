@@ -87,38 +87,31 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               <Wizard.Page title="Bienvenue">
                 <h1>Inscription à Trackdéchets</h1>
                 <p>
-                  Trackdéchets est destiné à simplifier l'édition d'un bordereau
-                  de déchet et à transmettre les informations dématérialisée
-                  pour validation.
+                  Trackdéchets est un produit du Ministère de la Transition
+                  Ecologique et Solidaire.
                 </p>
 
                 <p>
-                  Il va dans un premier temps être utilisé entre un producteur
-                  et un collecteur et/ou un producteur et une installation de
-                  traitement.
+                  Son objectif : simplifier la gestion des déchets dangereux au
+                  quotidien : 0 papier, traçabilité en temps réel, informations
+                  regroupées sur un outil unique, vérification de vos
+                  prestataires.
                 </p>
 
                 <p>
-                  C'est un produit libre d'utilisation et utilisable par tous
-                  les acteurs de la filière déchets.
+                  Il est libre d'utilisation et utilisable par tous les acteurs
+                  de la filière déchets. Rejoignez-nous !
                 </p>
 
                 <p>
-                  Trackdéchets permet également de s'assurer qu'une entreprise
-                  est bien autorisée pour effectuer la collecte ou le traitement
-                  d'un déchet (dangereux)
-                </p>
-
-                <p>
-                  Vous avez déjà un compte ?{" "}
+                  <strong>Vous avez déjà un compte ?</strong>{" "}
                   <Link to="/login">Connectez vous maintenant</Link>
                 </p>
                 <p>
-                  Vous souhaitez créer un compte pour rejoindre une entreprise
-                  déjà existante sur Trackdéchets ? Adressez vous à la personne
-                  qui a créé le compte pour l'entreprise, elle sera en mesure de
-                  vous inviter. Vous ne pourrez pas créer un compte pour
-                  l'entreprise via ce formulaire.
+                  <strong>Votre entreprise dispose déjà d'un compte ?</strong>{" "}
+                  Vous ne pourrez pas créer un compte pour l'entreprise via ce
+                  formulaire. Adressez vous à l'Administrateur de votre
+                  entreprise, elle pourra vous inviter via la page "Mon compte".
                 </p>
               </Wizard.Page>
               <Wizard.Page
