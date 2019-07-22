@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { Form as FormModel } from "../../form/model";
+import { Form as FormModel, Form } from "../../form/model";
 import { FaFileSignature } from "react-icons/fa";
-import { Formik, Form, Field } from "formik";
+import { Formik, Field } from "formik";
 import { DateTime } from "luxon";
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
 import Packagings from "../../form/packagings/Packagings";
 import { Wizard } from "./Wizard";
 import "./TransportSignature.scss";
+import RedErrorMessage from "../../form/RedErrorMessage";
+import { GET_TRANSPORT_SLIPS } from "./Transport";
+import { currentSiretService } from "../CompanySelector";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -62,7 +65,28 @@ export default function TransportSignature({ form }: Props) {
                 }}
                 onSubmit={(values: any) =>
                   signedByTransporter({
-                    variables: { id: form.id, signingInfo: values }
+                    variables: { id: form.id, signingInfo: values },
+                    update: (store, { data: { signedByTransporter } }) => {
+                      const data = store.readQuery<{ forms: Form[] }>({
+                        query: GET_TRANSPORT_SLIPS,
+                        variables: {
+                          siret: currentSiretService.getSiret(),
+                          type: "TRANSPORTER"
+                        }
+                      });
+                      if (!data || !data.forms) {
+                        return;
+                      }
+                      data.forms = data.forms.filter(f => f.id !== form.id);
+                      store.writeQuery({
+                        query: GET_TRANSPORT_SLIPS,
+                        variables: {
+                          siret: currentSiretService.getSiret(),
+                          type: "TRANSPORTER"
+                        },
+                        data
+                      });
+                    }
                   })
                 }
                 onCancel={() => setIsOpen(false)}
@@ -124,11 +148,16 @@ export default function TransportSignature({ form }: Props) {
 
                   <p>
                     <label>
-                      <Field type="checkbox" name="signedByTransporter" />
+                      <Field
+                        type="checkbox"
+                        name="signedByTransporter"
+                        required
+                      />
                       J'ai vérifié que les déchets à transporter correspondent
                       aux informations ci avant.
                     </label>
                   </p>
+                  <RedErrorMessage name="signedByTransporter" />
 
                   <p>
                     <small>
@@ -185,12 +214,17 @@ export default function TransportSignature({ form }: Props) {
 
                     <p>
                       <label>
-                        <Field type="checkbox" name="signedByProducer" />
+                        <Field
+                          type="checkbox"
+                          name="signedByProducer"
+                          required
+                        />
                         En tant que producteur du déchet, j'ai vérifié que les
                         déchets confiés au transporter correspondent au
                         informations vue ci-avant et je valide l'enlèvement.
                       </label>
                     </p>
+                    <RedErrorMessage name="signedByProducer" />
 
                     <p>
                       <label>
@@ -205,9 +239,7 @@ export default function TransportSignature({ form }: Props) {
                       </label>
                     </p>
                     {error && (
-                      <div className="notification error">
-                        {error.message}
-                      </div>
+                      <div className="notification error">{error.message}</div>
                     )}
                   </div>
                 </Wizard.Page>
