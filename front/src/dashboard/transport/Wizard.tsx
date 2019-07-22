@@ -7,7 +7,7 @@ type State = { page: number; values: Object };
 
 // Copied from Formik Doc - multi step wizard example
 export class Wizard extends React.Component<Props, State> {
-  static Page = ({ children }: Props & any) => children;
+  static Page = ({ children, values }: Props & any) => children(values);
 
   constructor(props: Props) {
     super(props);
@@ -75,7 +75,7 @@ export class Wizard extends React.Component<Props, State> {
             onSubmit={this.handleSubmit}
             render={({ values, handleSubmit, isSubmitting, handleReset }) => (
               <form onSubmit={handleSubmit}>
-                {activePage}
+                {React.cloneElement(activePage, { values, isSubmitting })}
                 <div className="buttons">
                   <button
                     type="button"
