@@ -19,7 +19,7 @@
     "graphql-yoga": "^1.16.7",
     "ioredis": "^4.9.3",
     "jsonwebtoken": "^8.4.0",
-    "merge-graphql-schemas": "^1.5.8",
+    "merge-graphql-schemas": "1.5.8",
     "prisma-client-lib": "1.33.0",
     "yup": "^0.26.6"
   },
