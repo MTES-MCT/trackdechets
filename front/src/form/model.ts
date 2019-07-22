@@ -9,10 +9,15 @@ export type Form = {
     company: FormCompany;
     processingOperation: String;
   };
+  transporter: {
+    company: FormCompany;
+  };
   wasteDetails: {
     quantity: number;
     code: string;
     name: string;
+    packagings: string[];
+    onuCode: string;
   };
 
   receivedAt: string;

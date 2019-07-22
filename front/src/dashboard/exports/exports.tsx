@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Me } from "../../login/model";
 import { Query, QueryResult } from "react-apollo";
 import gql from "graphql-tag";
@@ -33,6 +33,10 @@ const GET_STATS = gql`
 `;
 
 export default function Exports({ me }: IProps) {
+  const [sirets, setSirets] = useState(
+    me.companies.map(c => c.siret).join(",")
+  );
+
   return (
     <div className="main">
       <h2>Statistiques</h2>
@@ -72,19 +76,31 @@ export default function Exports({ me }: IProps) {
       <h2>Téléchargement de registres</h2>
       <p>
         Vous avez la possibilité de télécharger un registre des déchets entrants
-        et sortants de votre entreprise. Ce registre est basé uniquement sur les
-        déchets qui ont terminé leur cycle de vie, c'est à dire qui ne sont pas
-        en attente de réception ou de traitement par une entité. Cela correspond
-        aux bordereaux que vous retrouvez dans votre onglet "Archives"
+        et sortants de votre entreprise. Cet export est un document CSV au
+        format UTF-8. Assurez vous que vous l'ouvrez dans le bon format pour
+        éviter les problèmes d'accents.
       </p>
+      {me.companies.length > 1 && (
+        <p>
+          Pour quelle entreprise(s) souhaitez vous télécharger le registre ?{" "}
+          <select onChange={evt => setSirets(evt.target.value)}>
+            <option value={me.companies.map(c => c.siret).join(",")}>
+              Toutes
+            </option>
+            {me.companies.map(c => (
+              <option value={c.siret} key={c.siret}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </p>
+      )}
       <a
         className="button"
         target="_blank"
         href={`${
           process.env.REACT_APP_API_ENDPOINT
-        }/exports?exportType=OUTGOING&siret=${me.companies
-          .map(c => c.siret)
-          .join(",")}`}
+        }/exports?exportType=OUTGOING&siret=${sirets}`}
       >
         Registre de déchets sortants
       </a>
@@ -93,9 +109,7 @@ export default function Exports({ me }: IProps) {
         target="_blank"
         href={`${
           process.env.REACT_APP_API_ENDPOINT
-        }/exports?exportType=INCOMING&siret=${me.companies
-          .map(c => c.siret)
-          .join(",")}`}
+        }/exports?exportType=INCOMING&siret=${sirets}`}
       >
         Registre de déchets entrants
       </a>

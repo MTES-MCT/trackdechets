@@ -5,6 +5,8 @@ type Company {
   contact: String
   phone: String
   mail: String
+  codeS3ic: String
+  urlFiche: String
 
   securityCode: Int!
 

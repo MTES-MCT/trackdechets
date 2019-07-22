@@ -2,7 +2,7 @@ import { prisma, User, Company } from "../generated/prisma-client";
 
 const companyAssociationUserFragment = `
 fragment CompanyWithAdmins on CompanyAssociation {
-  user { id isActive email phone userType }
+  user { id isActive name email phone userType }
 }
 `;
 

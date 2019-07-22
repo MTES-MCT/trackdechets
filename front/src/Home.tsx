@@ -27,14 +27,14 @@ export default function Home() {
                 className="button large warning"
                 onClick={() => trackEvent("home", "cta-test")}
               >
-                Tester Trackdéchets
+                Je crée un compte
               </Link>
               <Link
                 to="/login"
                 className="button large"
                 onClick={() => trackEvent("home", "cta-login")}
               >
-                Se connecter
+                Je me connecte
               </Link>
             </p>
           )}
@@ -260,7 +260,10 @@ export default function Home() {
               </a>
             </li>
             <li>
-              <a href="http://api.trackdechets.beta.gouv.fr">API</a>
+              <a href="http://api.trackdechets.beta.gouv.fr">API Playground</a>
+            </li>
+            <li>
+              <a href="http://doc.trackdechets.fr">Documentation API</a>
             </li>
           </ul>
         </div>

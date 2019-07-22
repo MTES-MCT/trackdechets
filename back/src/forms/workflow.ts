@@ -35,6 +35,9 @@ function getRecipientNextStep(form: Form) {
     case "DRAFT":
       return "SEALED";
     case "SENT":
+      if (!form.isAccepted) {
+        return "REFUSED";
+      }
       return "RECEIVED";
     case "RECEIVED":
       if (GROUP_CODES.indexOf(form.processingOperationDone) === -1) {

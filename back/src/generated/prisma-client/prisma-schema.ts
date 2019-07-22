@@ -14,6 +14,10 @@ type AggregateForm {
   count: Int!
 }
 
+type AggregateStatusLog {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -637,6 +641,11 @@ input FormCreateInput {
 input FormCreateManyInput {
   create: [FormCreateInput!]
   connect: [FormWhereUniqueInput!]
+}
+
+input FormCreateOneInput {
+  create: FormCreateInput
+  connect: FormWhereUniqueInput
 }
 
 type FormEdge {
@@ -1893,9 +1902,21 @@ input FormUpdateManyWithWhereNestedInput {
   data: FormUpdateManyDataInput!
 }
 
+input FormUpdateOneRequiredInput {
+  create: FormCreateInput
+  update: FormUpdateDataInput
+  upsert: FormUpsertNestedInput
+  connect: FormWhereUniqueInput
+}
+
 input FormUpdateWithWhereUniqueNestedInput {
   where: FormWhereUniqueInput!
   data: FormUpdateDataInput!
+}
+
+input FormUpsertNestedInput {
+  update: FormUpdateDataInput!
+  create: FormCreateInput!
 }
 
 input FormUpsertWithWhereUniqueNestedInput {
@@ -2692,6 +2713,12 @@ type Mutation {
   upsertForm(where: FormWhereUniqueInput!, create: FormCreateInput!, update: FormUpdateInput!): Form!
   deleteForm(where: FormWhereUniqueInput!): Form
   deleteManyForms(where: FormWhereInput): BatchPayload!
+  createStatusLog(data: StatusLogCreateInput!): StatusLog!
+  updateStatusLog(data: StatusLogUpdateInput!, where: StatusLogWhereUniqueInput!): StatusLog
+  updateManyStatusLogs(data: StatusLogUpdateManyMutationInput!, where: StatusLogWhereInput): BatchPayload!
+  upsertStatusLog(where: StatusLogWhereUniqueInput!, create: StatusLogCreateInput!, update: StatusLogUpdateInput!): StatusLog!
+  deleteStatusLog(where: StatusLogWhereUniqueInput!): StatusLog
+  deleteManyStatusLogs(where: StatusLogWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -2744,6 +2771,9 @@ type Query {
   form(where: FormWhereUniqueInput!): Form
   forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form]!
   formsConnection(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FormConnection!
+  statusLog(where: StatusLogWhereUniqueInput!): StatusLog
+  statusLogs(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [StatusLog]!
+  statusLogsConnection(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): StatusLogConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -2756,10 +2786,117 @@ type Query {
   node(id: ID!): Node
 }
 
+enum Status {
+  DRAFT
+  SEALED
+  SENT
+  RECEIVED
+  PROCESSED
+  AWAITING_GROUP
+  GROUPED
+  NO_TRACEABILITY
+}
+
+type StatusLog {
+  id: ID!
+  user: User!
+  form: Form!
+  status: Status!
+}
+
+type StatusLogConnection {
+  pageInfo: PageInfo!
+  edges: [StatusLogEdge]!
+  aggregate: AggregateStatusLog!
+}
+
+input StatusLogCreateInput {
+  id: ID
+  user: UserCreateOneInput!
+  form: FormCreateOneInput!
+  status: Status!
+}
+
+type StatusLogEdge {
+  node: StatusLog!
+  cursor: String!
+}
+
+enum StatusLogOrderByInput {
+  id_ASC
+  id_DESC
+  status_ASC
+  status_DESC
+}
+
+type StatusLogPreviousValues {
+  id: ID!
+  status: Status!
+}
+
+type StatusLogSubscriptionPayload {
+  mutation: MutationType!
+  node: StatusLog
+  updatedFields: [String!]
+  previousValues: StatusLogPreviousValues
+}
+
+input StatusLogSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: StatusLogWhereInput
+  AND: [StatusLogSubscriptionWhereInput!]
+  OR: [StatusLogSubscriptionWhereInput!]
+  NOT: [StatusLogSubscriptionWhereInput!]
+}
+
+input StatusLogUpdateInput {
+  user: UserUpdateOneRequiredInput
+  form: FormUpdateOneRequiredInput
+  status: Status
+}
+
+input StatusLogUpdateManyMutationInput {
+  status: Status
+}
+
+input StatusLogWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  user: UserWhereInput
+  form: FormWhereInput
+  status: Status
+  status_not: Status
+  status_in: [Status!]
+  status_not_in: [Status!]
+  AND: [StatusLogWhereInput!]
+  OR: [StatusLogWhereInput!]
+  NOT: [StatusLogWhereInput!]
+}
+
+input StatusLogWhereUniqueInput {
+  id: ID
+}
+
 type Subscription {
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   companyAssociation(where: CompanyAssociationSubscriptionWhereInput): CompanyAssociationSubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
+  statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
   userActivationHash(where: UserActivationHashSubscriptionWhereInput): UserActivationHashSubscriptionPayload

@@ -2,10 +2,24 @@ import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
 
 export const USER_TYPES = [
-  { value: "PRODUCER", label: "Producteur" },
-  { value: "COLLECTOR", label: "Collecteur" },
-  { value: "WASTEPROCESSOR", label: "Centre de traitement" },
-  { value: "TRANSPORTER", label: "Transporteur" }
+  { value: "PRODUCER", label: "Producteur de déchets" },
+  {
+    value: "COLLECTOR",
+    label: "Installation de Transit, regroupement ou tri de déchets"
+  },
+  {
+    value: "WASTE_CENTER",
+    label:
+      "Installation de collecte de déchets apportés par le producteur initial"
+  },
+  {
+    value: "WASTE_VEHICLES",
+    label:
+      "Installation d'entreposage, dépollution, démontage, découpage de VHU"
+  },
+  { value: "WASTEPROCESSOR", label: "Installation de traitement" },
+  { value: "TRANSPORTER", label: "Transporteur" },
+  { value: "TRADER", label: "Négociant" }
 ];
 
 export default function UserType({

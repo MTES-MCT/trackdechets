@@ -1,4 +1,5 @@
 import { escape } from "querystring";
+import { Form } from "../generated/prisma-client";
 
 const { UI_HOST, VIRTUAL_HOST } = process.env;
 
@@ -78,5 +79,38 @@ export const userMails = {
     Vous aurez la possibilité de modifier ce mot de passe sur la plateforme.<bt><br>
     Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">par mail.</a>
     `
+  }),
+  formNotAccepted: (toEmail, toName, form: Form) => ({
+    toEmail,
+    toName,
+    subject: "Refus de prise en  charge de votre déchet",
+    title: "Un de vos déchet a été refusé à l'arrivée",
+    body: `Madame, Monsieur,
+    <br><br>
+    Nous vous informons que la société ${form.emitterCompanyName} a refusé le ${
+      form.receivedAt
+    }, le déchet de la société suivante :
+    <br><br>
+    <ul>
+    <li>Société XXX + adresse</li>
+    <li>Déchets :</li>
+    <ul>
+      <li>Numéro : ${form.readableId}</li>
+      <li>Appellation du déchet : ${form.wasteDetailsName}</li>
+      <li>Code déchet : ${form.wasteDetailsCode}*</li>
+      <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
+    </ul>
+     <li>Transporteur : ${form.transporterCompanyName}</li>
+     <li>Responsable du site : ${form.sentBy}</li>
+     </ul>
+     Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
+    <br><br>
+    Comme le prévoit la réglementation R541-45 du code de l'environnement, l'expéditeur initial du déchet, l'inspection des installations classées sont tenus informés de ce refus.
+    <br><br>
+    Bien cordialement,
+    <br><br>
+    L'équipe Trackdéchets,
+    <br><br>
+    <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`
   })
 };

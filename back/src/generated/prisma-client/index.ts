@@ -21,6 +21,7 @@ export interface Exists {
     where?: CompanyAssociationWhereInput
   ) => Promise<boolean>;
   form: (where?: FormWhereInput) => Promise<boolean>;
+  statusLog: (where?: StatusLogWhereInput) => Promise<boolean>;
   user: (where?: UserWhereInput) => Promise<boolean>;
   userAccountHash: (where?: UserAccountHashWhereInput) => Promise<boolean>;
   userActivationHash: (
@@ -106,6 +107,25 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => FormConnectionPromise;
+  statusLog: (where: StatusLogWhereUniqueInput) => StatusLogNullablePromise;
+  statusLogs: (args?: {
+    where?: StatusLogWhereInput;
+    orderBy?: StatusLogOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<StatusLog>;
+  statusLogsConnection: (args?: {
+    where?: StatusLogWhereInput;
+    orderBy?: StatusLogOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => StatusLogConnectionPromise;
   user: (where: UserWhereUniqueInput) => UserNullablePromise;
   users: (args?: {
     where?: UserWhereInput;
@@ -227,6 +247,22 @@ export interface Prisma {
   }) => FormPromise;
   deleteForm: (where: FormWhereUniqueInput) => FormPromise;
   deleteManyForms: (where?: FormWhereInput) => BatchPayloadPromise;
+  createStatusLog: (data: StatusLogCreateInput) => StatusLogPromise;
+  updateStatusLog: (args: {
+    data: StatusLogUpdateInput;
+    where: StatusLogWhereUniqueInput;
+  }) => StatusLogPromise;
+  updateManyStatusLogs: (args: {
+    data: StatusLogUpdateManyMutationInput;
+    where?: StatusLogWhereInput;
+  }) => BatchPayloadPromise;
+  upsertStatusLog: (args: {
+    where: StatusLogWhereUniqueInput;
+    create: StatusLogCreateInput;
+    update: StatusLogUpdateInput;
+  }) => StatusLogPromise;
+  deleteStatusLog: (where: StatusLogWhereUniqueInput) => StatusLogPromise;
+  deleteManyStatusLogs: (where?: StatusLogWhereInput) => BatchPayloadPromise;
   createUser: (data: UserCreateInput) => UserPromise;
   updateUser: (args: {
     data: UserUpdateInput;
@@ -305,6 +341,9 @@ export interface Subscription {
   form: (
     where?: FormSubscriptionWhereInput
   ) => FormSubscriptionPayloadSubscription;
+  statusLog: (
+    where?: StatusLogSubscriptionWhereInput
+  ) => StatusLogSubscriptionPayloadSubscription;
   user: (
     where?: UserSubscriptionWhereInput
   ) => UserSubscriptionPayloadSubscription;
@@ -324,9 +363,25 @@ export interface ClientConstructor<T> {
  * Types
  */
 
+export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
+
+export type CompanyAssociationOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "role_ASC"
+  | "role_DESC";
+
 export type QuantityType = "REAL" | "ESTIMATED";
 
-export type UserRole = "MEMBER" | "ADMIN";
+export type UserActivationHashOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "hash_ASC"
+  | "hash_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
 
 export type CompanyOrderByInput =
   | "id_ASC"
@@ -340,11 +395,7 @@ export type CompanyOrderByInput =
   | "securityCode_ASC"
   | "securityCode_DESC";
 
-export type CompanyAssociationOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "role_ASC"
-  | "role_DESC";
+export type UserRole = "MEMBER" | "ADMIN";
 
 export type UserOrderByInput =
   | "id_ASC"
@@ -370,9 +421,23 @@ export type UserOrderByInput =
 
 export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
 
-export type MutationType = "CREATED" | "UPDATED" | "DELETED";
+export type UserAccountHashOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "companySiret_ASC"
+  | "companySiret_DESC"
+  | "role_ASC"
+  | "role_DESC"
+  | "hash_ASC"
+  | "hash_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
 
-export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
+export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
 export type FormOrderByInput =
   | "id_ASC"
@@ -504,1220 +569,21 @@ export type FormOrderByInput =
   | "traderValidityLimit_ASC"
   | "traderValidityLimit_DESC";
 
-export type UserAccountHashOrderByInput =
+export type Status =
+  | "DRAFT"
+  | "SEALED"
+  | "SENT"
+  | "RECEIVED"
+  | "PROCESSED"
+  | "AWAITING_GROUP"
+  | "GROUPED"
+  | "NO_TRACEABILITY";
+
+export type StatusLogOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "email_ASC"
-  | "email_DESC"
-  | "companySiret_ASC"
-  | "companySiret_DESC"
-  | "role_ASC"
-  | "role_DESC"
-  | "hash_ASC"
-  | "hash_DESC"
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "updatedAt_ASC"
-  | "updatedAt_DESC";
-
-export type UserActivationHashOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "hash_ASC"
-  | "hash_DESC"
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "updatedAt_ASC"
-  | "updatedAt_DESC";
-
-export interface CompanyUpsertWithWhereUniqueWithoutUserInput {
-  where: CompanyWhereUniqueInput;
-  update: CompanyUpdateWithoutUserDataInput;
-  create: CompanyCreateWithoutUserInput;
-}
-
-export type CompanyWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  siret?: Maybe<String>;
-}>;
-
-export interface CompanyUpdateOneRequiredInput {
-  create?: Maybe<CompanyCreateInput>;
-  update?: Maybe<CompanyUpdateDataInput>;
-  upsert?: Maybe<CompanyUpsertNestedInput>;
-  connect?: Maybe<CompanyWhereUniqueInput>;
-}
-
-export interface CompanyAssociationWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  user?: Maybe<UserWhereInput>;
-  company?: Maybe<CompanyWhereInput>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
-  AND?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-  OR?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-  NOT?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-}
-
-export interface UserCreateInput {
-  id?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  email: String;
-  password: String;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  userType?: Maybe<Json>;
-  companies?: Maybe<CompanyCreateManyWithoutUserInput>;
-  companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
-}
-
-export interface UserCreateOneWithoutCompanyAssociationsInput {
-  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface CompanyCreateManyWithoutUserInput {
-  create?: Maybe<
-    CompanyCreateWithoutUserInput[] | CompanyCreateWithoutUserInput
-  >;
-  connect?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
-}
-
-export interface CompanyUpdateDataInput {
-  siret?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  admin?: Maybe<UserUpdateOneInput>;
-  user?: Maybe<UserUpdateManyWithoutCompaniesInput>;
-}
-
-export interface CompanyCreateWithoutUserInput {
-  id?: Maybe<ID_Input>;
-  siret: String;
-  securityCode: Int;
-  admin?: Maybe<UserCreateOneInput>;
-}
-
-export interface UserAccountHashSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<UserAccountHashWhereInput>;
-  AND?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyAssociationCreateManyWithoutUserInput {
-  create?: Maybe<
-    | CompanyAssociationCreateWithoutUserInput[]
-    | CompanyAssociationCreateWithoutUserInput
-  >;
-  connect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-}
-
-export interface FormSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<FormWhereInput>;
-  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-}
-
-export interface CompanyAssociationCreateWithoutUserInput {
-  id?: Maybe<ID_Input>;
-  company: CompanyCreateOneInput;
-  role: UserRole;
-}
-
-export interface CompanyAssociationSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyAssociationWhereInput>;
-  AND?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyCreateOneInput {
-  create?: Maybe<CompanyCreateInput>;
-  connect?: Maybe<CompanyWhereUniqueInput>;
-}
-
-export interface UserActivationHashUpdateManyMutationInput {
-  hash?: Maybe<String>;
-}
-
-export interface UserCreateManyWithoutCompaniesInput {
-  create?: Maybe<
-    UserCreateWithoutCompaniesInput[] | UserCreateWithoutCompaniesInput
-  >;
-  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-}
-
-export interface UserActivationHashUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  hash?: Maybe<String>;
-}
-
-export interface UserCreateWithoutCompaniesInput {
-  id?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  email: String;
-  password: String;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  userType?: Maybe<Json>;
-  companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
-}
-
-export interface UserAccountHashUpdateManyMutationInput {
-  email?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  hash?: Maybe<String>;
-}
-
-export interface CompanyUpdateInput {
-  siret?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  admin?: Maybe<UserUpdateOneInput>;
-  user?: Maybe<UserUpdateManyWithoutCompaniesInput>;
-}
-
-export interface UserAccountHashCreateInput {
-  id?: Maybe<ID_Input>;
-  email: String;
-  companySiret: ID_Input;
-  role: UserRole;
-  hash: String;
-}
-
-export interface UserUpdateOneInput {
-  create?: Maybe<UserCreateInput>;
-  update?: Maybe<UserUpdateDataInput>;
-  upsert?: Maybe<UserUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface UserUpdateManyMutationInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  userType?: Maybe<Json>;
-  gerepId?: Maybe<String>;
-}
-
-export interface UserUpdateDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  userType?: Maybe<Json>;
-  companies?: Maybe<CompanyUpdateManyWithoutUserInput>;
-  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
-}
-
-export interface FormUpdateManyMutationInput {
-  readableId?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  signedByTransporter?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  receivedBy?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-}
-
-export interface CompanyUpdateManyWithoutUserInput {
-  create?: Maybe<
-    CompanyCreateWithoutUserInput[] | CompanyCreateWithoutUserInput
-  >;
-  delete?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
-  connect?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
-  set?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
-  disconnect?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
-  update?: Maybe<
-    | CompanyUpdateWithWhereUniqueWithoutUserInput[]
-    | CompanyUpdateWithWhereUniqueWithoutUserInput
-  >;
-  upsert?: Maybe<
-    | CompanyUpsertWithWhereUniqueWithoutUserInput[]
-    | CompanyUpsertWithWhereUniqueWithoutUserInput
-  >;
-  deleteMany?: Maybe<CompanyScalarWhereInput[] | CompanyScalarWhereInput>;
-  updateMany?: Maybe<
-    | CompanyUpdateManyWithWhereNestedInput[]
-    | CompanyUpdateManyWithWhereNestedInput
-  >;
-}
-
-export type UserWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  email?: Maybe<String>;
-}>;
-
-export interface CompanyUpdateWithWhereUniqueWithoutUserInput {
-  where: CompanyWhereUniqueInput;
-  data: CompanyUpdateWithoutUserDataInput;
-}
-
-export interface FormScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
-  readableId_not?: Maybe<String>;
-  readableId_in?: Maybe<String[] | String>;
-  readableId_not_in?: Maybe<String[] | String>;
-  readableId_lt?: Maybe<String>;
-  readableId_lte?: Maybe<String>;
-  readableId_gt?: Maybe<String>;
-  readableId_gte?: Maybe<String>;
-  readableId_contains?: Maybe<String>;
-  readableId_not_contains?: Maybe<String>;
-  readableId_starts_with?: Maybe<String>;
-  readableId_not_starts_with?: Maybe<String>;
-  readableId_ends_with?: Maybe<String>;
-  readableId_not_ends_with?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  isDeleted_not?: Maybe<Boolean>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  signedByTransporter?: Maybe<Boolean>;
-  signedByTransporter_not?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  status_not?: Maybe<String>;
-  status_in?: Maybe<String[] | String>;
-  status_not_in?: Maybe<String[] | String>;
-  status_lt?: Maybe<String>;
-  status_lte?: Maybe<String>;
-  status_gt?: Maybe<String>;
-  status_gte?: Maybe<String>;
-  status_contains?: Maybe<String>;
-  status_not_contains?: Maybe<String>;
-  status_starts_with?: Maybe<String>;
-  status_not_starts_with?: Maybe<String>;
-  status_ends_with?: Maybe<String>;
-  status_not_ends_with?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentAt_not?: Maybe<DateTimeInput>;
-  sentAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  sentAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  sentAt_lt?: Maybe<DateTimeInput>;
-  sentAt_lte?: Maybe<DateTimeInput>;
-  sentAt_gt?: Maybe<DateTimeInput>;
-  sentAt_gte?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  sentBy_not?: Maybe<String>;
-  sentBy_in?: Maybe<String[] | String>;
-  sentBy_not_in?: Maybe<String[] | String>;
-  sentBy_lt?: Maybe<String>;
-  sentBy_lte?: Maybe<String>;
-  sentBy_gt?: Maybe<String>;
-  sentBy_gte?: Maybe<String>;
-  sentBy_contains?: Maybe<String>;
-  sentBy_not_contains?: Maybe<String>;
-  sentBy_starts_with?: Maybe<String>;
-  sentBy_not_starts_with?: Maybe<String>;
-  sentBy_ends_with?: Maybe<String>;
-  sentBy_not_ends_with?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  isAccepted_not?: Maybe<Boolean>;
-  receivedBy?: Maybe<String>;
-  receivedBy_not?: Maybe<String>;
-  receivedBy_in?: Maybe<String[] | String>;
-  receivedBy_not_in?: Maybe<String[] | String>;
-  receivedBy_lt?: Maybe<String>;
-  receivedBy_lte?: Maybe<String>;
-  receivedBy_gt?: Maybe<String>;
-  receivedBy_gte?: Maybe<String>;
-  receivedBy_contains?: Maybe<String>;
-  receivedBy_not_contains?: Maybe<String>;
-  receivedBy_starts_with?: Maybe<String>;
-  receivedBy_not_starts_with?: Maybe<String>;
-  receivedBy_ends_with?: Maybe<String>;
-  receivedBy_not_ends_with?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  receivedAt_not?: Maybe<DateTimeInput>;
-  receivedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  receivedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  receivedAt_lt?: Maybe<DateTimeInput>;
-  receivedAt_lte?: Maybe<DateTimeInput>;
-  receivedAt_gt?: Maybe<DateTimeInput>;
-  receivedAt_gte?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  quantityReceived_not?: Maybe<Float>;
-  quantityReceived_in?: Maybe<Float[] | Float>;
-  quantityReceived_not_in?: Maybe<Float[] | Float>;
-  quantityReceived_lt?: Maybe<Float>;
-  quantityReceived_lte?: Maybe<Float>;
-  quantityReceived_gt?: Maybe<Float>;
-  quantityReceived_gte?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedBy_not?: Maybe<String>;
-  processedBy_in?: Maybe<String[] | String>;
-  processedBy_not_in?: Maybe<String[] | String>;
-  processedBy_lt?: Maybe<String>;
-  processedBy_lte?: Maybe<String>;
-  processedBy_gt?: Maybe<String>;
-  processedBy_gte?: Maybe<String>;
-  processedBy_contains?: Maybe<String>;
-  processedBy_not_contains?: Maybe<String>;
-  processedBy_starts_with?: Maybe<String>;
-  processedBy_not_starts_with?: Maybe<String>;
-  processedBy_ends_with?: Maybe<String>;
-  processedBy_not_ends_with?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processedAt_not?: Maybe<String>;
-  processedAt_in?: Maybe<String[] | String>;
-  processedAt_not_in?: Maybe<String[] | String>;
-  processedAt_lt?: Maybe<String>;
-  processedAt_lte?: Maybe<String>;
-  processedAt_gt?: Maybe<String>;
-  processedAt_gte?: Maybe<String>;
-  processedAt_contains?: Maybe<String>;
-  processedAt_not_contains?: Maybe<String>;
-  processedAt_starts_with?: Maybe<String>;
-  processedAt_not_starts_with?: Maybe<String>;
-  processedAt_ends_with?: Maybe<String>;
-  processedAt_not_ends_with?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDone_not?: Maybe<String>;
-  processingOperationDone_in?: Maybe<String[] | String>;
-  processingOperationDone_not_in?: Maybe<String[] | String>;
-  processingOperationDone_lt?: Maybe<String>;
-  processingOperationDone_lte?: Maybe<String>;
-  processingOperationDone_gt?: Maybe<String>;
-  processingOperationDone_gte?: Maybe<String>;
-  processingOperationDone_contains?: Maybe<String>;
-  processingOperationDone_not_contains?: Maybe<String>;
-  processingOperationDone_starts_with?: Maybe<String>;
-  processingOperationDone_not_starts_with?: Maybe<String>;
-  processingOperationDone_ends_with?: Maybe<String>;
-  processingOperationDone_not_ends_with?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  processingOperationDescription_not?: Maybe<String>;
-  processingOperationDescription_in?: Maybe<String[] | String>;
-  processingOperationDescription_not_in?: Maybe<String[] | String>;
-  processingOperationDescription_lt?: Maybe<String>;
-  processingOperationDescription_lte?: Maybe<String>;
-  processingOperationDescription_gt?: Maybe<String>;
-  processingOperationDescription_gte?: Maybe<String>;
-  processingOperationDescription_contains?: Maybe<String>;
-  processingOperationDescription_not_contains?: Maybe<String>;
-  processingOperationDescription_starts_with?: Maybe<String>;
-  processingOperationDescription_not_starts_with?: Maybe<String>;
-  processingOperationDescription_ends_with?: Maybe<String>;
-  processingOperationDescription_not_ends_with?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  noTraceability_not?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationProcessingOperation_not?: Maybe<String>;
-  nextDestinationProcessingOperation_in?: Maybe<String[] | String>;
-  nextDestinationProcessingOperation_not_in?: Maybe<String[] | String>;
-  nextDestinationProcessingOperation_lt?: Maybe<String>;
-  nextDestinationProcessingOperation_lte?: Maybe<String>;
-  nextDestinationProcessingOperation_gt?: Maybe<String>;
-  nextDestinationProcessingOperation_gte?: Maybe<String>;
-  nextDestinationProcessingOperation_contains?: Maybe<String>;
-  nextDestinationProcessingOperation_not_contains?: Maybe<String>;
-  nextDestinationProcessingOperation_starts_with?: Maybe<String>;
-  nextDestinationProcessingOperation_not_starts_with?: Maybe<String>;
-  nextDestinationProcessingOperation_ends_with?: Maybe<String>;
-  nextDestinationProcessingOperation_not_ends_with?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
-  nextDestinationDetails_not?: Maybe<String>;
-  nextDestinationDetails_in?: Maybe<String[] | String>;
-  nextDestinationDetails_not_in?: Maybe<String[] | String>;
-  nextDestinationDetails_lt?: Maybe<String>;
-  nextDestinationDetails_lte?: Maybe<String>;
-  nextDestinationDetails_gt?: Maybe<String>;
-  nextDestinationDetails_gte?: Maybe<String>;
-  nextDestinationDetails_contains?: Maybe<String>;
-  nextDestinationDetails_not_contains?: Maybe<String>;
-  nextDestinationDetails_starts_with?: Maybe<String>;
-  nextDestinationDetails_not_starts_with?: Maybe<String>;
-  nextDestinationDetails_ends_with?: Maybe<String>;
-  nextDestinationDetails_not_ends_with?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterType_not?: Maybe<EmitterType>;
-  emitterType_in?: Maybe<EmitterType[] | EmitterType>;
-  emitterType_not_in?: Maybe<EmitterType[] | EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterPickupSite_not?: Maybe<String>;
-  emitterPickupSite_in?: Maybe<String[] | String>;
-  emitterPickupSite_not_in?: Maybe<String[] | String>;
-  emitterPickupSite_lt?: Maybe<String>;
-  emitterPickupSite_lte?: Maybe<String>;
-  emitterPickupSite_gt?: Maybe<String>;
-  emitterPickupSite_gte?: Maybe<String>;
-  emitterPickupSite_contains?: Maybe<String>;
-  emitterPickupSite_not_contains?: Maybe<String>;
-  emitterPickupSite_starts_with?: Maybe<String>;
-  emitterPickupSite_not_starts_with?: Maybe<String>;
-  emitterPickupSite_ends_with?: Maybe<String>;
-  emitterPickupSite_not_ends_with?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanyName_not?: Maybe<String>;
-  emitterCompanyName_in?: Maybe<String[] | String>;
-  emitterCompanyName_not_in?: Maybe<String[] | String>;
-  emitterCompanyName_lt?: Maybe<String>;
-  emitterCompanyName_lte?: Maybe<String>;
-  emitterCompanyName_gt?: Maybe<String>;
-  emitterCompanyName_gte?: Maybe<String>;
-  emitterCompanyName_contains?: Maybe<String>;
-  emitterCompanyName_not_contains?: Maybe<String>;
-  emitterCompanyName_starts_with?: Maybe<String>;
-  emitterCompanyName_not_starts_with?: Maybe<String>;
-  emitterCompanyName_ends_with?: Maybe<String>;
-  emitterCompanyName_not_ends_with?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanySiret_not?: Maybe<String>;
-  emitterCompanySiret_in?: Maybe<String[] | String>;
-  emitterCompanySiret_not_in?: Maybe<String[] | String>;
-  emitterCompanySiret_lt?: Maybe<String>;
-  emitterCompanySiret_lte?: Maybe<String>;
-  emitterCompanySiret_gt?: Maybe<String>;
-  emitterCompanySiret_gte?: Maybe<String>;
-  emitterCompanySiret_contains?: Maybe<String>;
-  emitterCompanySiret_not_contains?: Maybe<String>;
-  emitterCompanySiret_starts_with?: Maybe<String>;
-  emitterCompanySiret_not_starts_with?: Maybe<String>;
-  emitterCompanySiret_ends_with?: Maybe<String>;
-  emitterCompanySiret_not_ends_with?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyAddress_not?: Maybe<String>;
-  emitterCompanyAddress_in?: Maybe<String[] | String>;
-  emitterCompanyAddress_not_in?: Maybe<String[] | String>;
-  emitterCompanyAddress_lt?: Maybe<String>;
-  emitterCompanyAddress_lte?: Maybe<String>;
-  emitterCompanyAddress_gt?: Maybe<String>;
-  emitterCompanyAddress_gte?: Maybe<String>;
-  emitterCompanyAddress_contains?: Maybe<String>;
-  emitterCompanyAddress_not_contains?: Maybe<String>;
-  emitterCompanyAddress_starts_with?: Maybe<String>;
-  emitterCompanyAddress_not_starts_with?: Maybe<String>;
-  emitterCompanyAddress_ends_with?: Maybe<String>;
-  emitterCompanyAddress_not_ends_with?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyContact_not?: Maybe<String>;
-  emitterCompanyContact_in?: Maybe<String[] | String>;
-  emitterCompanyContact_not_in?: Maybe<String[] | String>;
-  emitterCompanyContact_lt?: Maybe<String>;
-  emitterCompanyContact_lte?: Maybe<String>;
-  emitterCompanyContact_gt?: Maybe<String>;
-  emitterCompanyContact_gte?: Maybe<String>;
-  emitterCompanyContact_contains?: Maybe<String>;
-  emitterCompanyContact_not_contains?: Maybe<String>;
-  emitterCompanyContact_starts_with?: Maybe<String>;
-  emitterCompanyContact_not_starts_with?: Maybe<String>;
-  emitterCompanyContact_ends_with?: Maybe<String>;
-  emitterCompanyContact_not_ends_with?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyPhone_not?: Maybe<String>;
-  emitterCompanyPhone_in?: Maybe<String[] | String>;
-  emitterCompanyPhone_not_in?: Maybe<String[] | String>;
-  emitterCompanyPhone_lt?: Maybe<String>;
-  emitterCompanyPhone_lte?: Maybe<String>;
-  emitterCompanyPhone_gt?: Maybe<String>;
-  emitterCompanyPhone_gte?: Maybe<String>;
-  emitterCompanyPhone_contains?: Maybe<String>;
-  emitterCompanyPhone_not_contains?: Maybe<String>;
-  emitterCompanyPhone_starts_with?: Maybe<String>;
-  emitterCompanyPhone_not_starts_with?: Maybe<String>;
-  emitterCompanyPhone_ends_with?: Maybe<String>;
-  emitterCompanyPhone_not_ends_with?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  emitterCompanyMail_not?: Maybe<String>;
-  emitterCompanyMail_in?: Maybe<String[] | String>;
-  emitterCompanyMail_not_in?: Maybe<String[] | String>;
-  emitterCompanyMail_lt?: Maybe<String>;
-  emitterCompanyMail_lte?: Maybe<String>;
-  emitterCompanyMail_gt?: Maybe<String>;
-  emitterCompanyMail_gte?: Maybe<String>;
-  emitterCompanyMail_contains?: Maybe<String>;
-  emitterCompanyMail_not_contains?: Maybe<String>;
-  emitterCompanyMail_starts_with?: Maybe<String>;
-  emitterCompanyMail_not_starts_with?: Maybe<String>;
-  emitterCompanyMail_ends_with?: Maybe<String>;
-  emitterCompanyMail_not_ends_with?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientCap_not?: Maybe<String>;
-  recipientCap_in?: Maybe<String[] | String>;
-  recipientCap_not_in?: Maybe<String[] | String>;
-  recipientCap_lt?: Maybe<String>;
-  recipientCap_lte?: Maybe<String>;
-  recipientCap_gt?: Maybe<String>;
-  recipientCap_gte?: Maybe<String>;
-  recipientCap_contains?: Maybe<String>;
-  recipientCap_not_contains?: Maybe<String>;
-  recipientCap_starts_with?: Maybe<String>;
-  recipientCap_not_starts_with?: Maybe<String>;
-  recipientCap_ends_with?: Maybe<String>;
-  recipientCap_not_ends_with?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientProcessingOperation_not?: Maybe<String>;
-  recipientProcessingOperation_in?: Maybe<String[] | String>;
-  recipientProcessingOperation_not_in?: Maybe<String[] | String>;
-  recipientProcessingOperation_lt?: Maybe<String>;
-  recipientProcessingOperation_lte?: Maybe<String>;
-  recipientProcessingOperation_gt?: Maybe<String>;
-  recipientProcessingOperation_gte?: Maybe<String>;
-  recipientProcessingOperation_contains?: Maybe<String>;
-  recipientProcessingOperation_not_contains?: Maybe<String>;
-  recipientProcessingOperation_starts_with?: Maybe<String>;
-  recipientProcessingOperation_not_starts_with?: Maybe<String>;
-  recipientProcessingOperation_ends_with?: Maybe<String>;
-  recipientProcessingOperation_not_ends_with?: Maybe<String>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanyName_not?: Maybe<String>;
-  recipientCompanyName_in?: Maybe<String[] | String>;
-  recipientCompanyName_not_in?: Maybe<String[] | String>;
-  recipientCompanyName_lt?: Maybe<String>;
-  recipientCompanyName_lte?: Maybe<String>;
-  recipientCompanyName_gt?: Maybe<String>;
-  recipientCompanyName_gte?: Maybe<String>;
-  recipientCompanyName_contains?: Maybe<String>;
-  recipientCompanyName_not_contains?: Maybe<String>;
-  recipientCompanyName_starts_with?: Maybe<String>;
-  recipientCompanyName_not_starts_with?: Maybe<String>;
-  recipientCompanyName_ends_with?: Maybe<String>;
-  recipientCompanyName_not_ends_with?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanySiret_not?: Maybe<String>;
-  recipientCompanySiret_in?: Maybe<String[] | String>;
-  recipientCompanySiret_not_in?: Maybe<String[] | String>;
-  recipientCompanySiret_lt?: Maybe<String>;
-  recipientCompanySiret_lte?: Maybe<String>;
-  recipientCompanySiret_gt?: Maybe<String>;
-  recipientCompanySiret_gte?: Maybe<String>;
-  recipientCompanySiret_contains?: Maybe<String>;
-  recipientCompanySiret_not_contains?: Maybe<String>;
-  recipientCompanySiret_starts_with?: Maybe<String>;
-  recipientCompanySiret_not_starts_with?: Maybe<String>;
-  recipientCompanySiret_ends_with?: Maybe<String>;
-  recipientCompanySiret_not_ends_with?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyAddress_not?: Maybe<String>;
-  recipientCompanyAddress_in?: Maybe<String[] | String>;
-  recipientCompanyAddress_not_in?: Maybe<String[] | String>;
-  recipientCompanyAddress_lt?: Maybe<String>;
-  recipientCompanyAddress_lte?: Maybe<String>;
-  recipientCompanyAddress_gt?: Maybe<String>;
-  recipientCompanyAddress_gte?: Maybe<String>;
-  recipientCompanyAddress_contains?: Maybe<String>;
-  recipientCompanyAddress_not_contains?: Maybe<String>;
-  recipientCompanyAddress_starts_with?: Maybe<String>;
-  recipientCompanyAddress_not_starts_with?: Maybe<String>;
-  recipientCompanyAddress_ends_with?: Maybe<String>;
-  recipientCompanyAddress_not_ends_with?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyContact_not?: Maybe<String>;
-  recipientCompanyContact_in?: Maybe<String[] | String>;
-  recipientCompanyContact_not_in?: Maybe<String[] | String>;
-  recipientCompanyContact_lt?: Maybe<String>;
-  recipientCompanyContact_lte?: Maybe<String>;
-  recipientCompanyContact_gt?: Maybe<String>;
-  recipientCompanyContact_gte?: Maybe<String>;
-  recipientCompanyContact_contains?: Maybe<String>;
-  recipientCompanyContact_not_contains?: Maybe<String>;
-  recipientCompanyContact_starts_with?: Maybe<String>;
-  recipientCompanyContact_not_starts_with?: Maybe<String>;
-  recipientCompanyContact_ends_with?: Maybe<String>;
-  recipientCompanyContact_not_ends_with?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyPhone_not?: Maybe<String>;
-  recipientCompanyPhone_in?: Maybe<String[] | String>;
-  recipientCompanyPhone_not_in?: Maybe<String[] | String>;
-  recipientCompanyPhone_lt?: Maybe<String>;
-  recipientCompanyPhone_lte?: Maybe<String>;
-  recipientCompanyPhone_gt?: Maybe<String>;
-  recipientCompanyPhone_gte?: Maybe<String>;
-  recipientCompanyPhone_contains?: Maybe<String>;
-  recipientCompanyPhone_not_contains?: Maybe<String>;
-  recipientCompanyPhone_starts_with?: Maybe<String>;
-  recipientCompanyPhone_not_starts_with?: Maybe<String>;
-  recipientCompanyPhone_ends_with?: Maybe<String>;
-  recipientCompanyPhone_not_ends_with?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  recipientCompanyMail_not?: Maybe<String>;
-  recipientCompanyMail_in?: Maybe<String[] | String>;
-  recipientCompanyMail_not_in?: Maybe<String[] | String>;
-  recipientCompanyMail_lt?: Maybe<String>;
-  recipientCompanyMail_lte?: Maybe<String>;
-  recipientCompanyMail_gt?: Maybe<String>;
-  recipientCompanyMail_gte?: Maybe<String>;
-  recipientCompanyMail_contains?: Maybe<String>;
-  recipientCompanyMail_not_contains?: Maybe<String>;
-  recipientCompanyMail_starts_with?: Maybe<String>;
-  recipientCompanyMail_not_starts_with?: Maybe<String>;
-  recipientCompanyMail_ends_with?: Maybe<String>;
-  recipientCompanyMail_not_ends_with?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanyName_not?: Maybe<String>;
-  transporterCompanyName_in?: Maybe<String[] | String>;
-  transporterCompanyName_not_in?: Maybe<String[] | String>;
-  transporterCompanyName_lt?: Maybe<String>;
-  transporterCompanyName_lte?: Maybe<String>;
-  transporterCompanyName_gt?: Maybe<String>;
-  transporterCompanyName_gte?: Maybe<String>;
-  transporterCompanyName_contains?: Maybe<String>;
-  transporterCompanyName_not_contains?: Maybe<String>;
-  transporterCompanyName_starts_with?: Maybe<String>;
-  transporterCompanyName_not_starts_with?: Maybe<String>;
-  transporterCompanyName_ends_with?: Maybe<String>;
-  transporterCompanyName_not_ends_with?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanySiret_not?: Maybe<String>;
-  transporterCompanySiret_in?: Maybe<String[] | String>;
-  transporterCompanySiret_not_in?: Maybe<String[] | String>;
-  transporterCompanySiret_lt?: Maybe<String>;
-  transporterCompanySiret_lte?: Maybe<String>;
-  transporterCompanySiret_gt?: Maybe<String>;
-  transporterCompanySiret_gte?: Maybe<String>;
-  transporterCompanySiret_contains?: Maybe<String>;
-  transporterCompanySiret_not_contains?: Maybe<String>;
-  transporterCompanySiret_starts_with?: Maybe<String>;
-  transporterCompanySiret_not_starts_with?: Maybe<String>;
-  transporterCompanySiret_ends_with?: Maybe<String>;
-  transporterCompanySiret_not_ends_with?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyAddress_not?: Maybe<String>;
-  transporterCompanyAddress_in?: Maybe<String[] | String>;
-  transporterCompanyAddress_not_in?: Maybe<String[] | String>;
-  transporterCompanyAddress_lt?: Maybe<String>;
-  transporterCompanyAddress_lte?: Maybe<String>;
-  transporterCompanyAddress_gt?: Maybe<String>;
-  transporterCompanyAddress_gte?: Maybe<String>;
-  transporterCompanyAddress_contains?: Maybe<String>;
-  transporterCompanyAddress_not_contains?: Maybe<String>;
-  transporterCompanyAddress_starts_with?: Maybe<String>;
-  transporterCompanyAddress_not_starts_with?: Maybe<String>;
-  transporterCompanyAddress_ends_with?: Maybe<String>;
-  transporterCompanyAddress_not_ends_with?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyContact_not?: Maybe<String>;
-  transporterCompanyContact_in?: Maybe<String[] | String>;
-  transporterCompanyContact_not_in?: Maybe<String[] | String>;
-  transporterCompanyContact_lt?: Maybe<String>;
-  transporterCompanyContact_lte?: Maybe<String>;
-  transporterCompanyContact_gt?: Maybe<String>;
-  transporterCompanyContact_gte?: Maybe<String>;
-  transporterCompanyContact_contains?: Maybe<String>;
-  transporterCompanyContact_not_contains?: Maybe<String>;
-  transporterCompanyContact_starts_with?: Maybe<String>;
-  transporterCompanyContact_not_starts_with?: Maybe<String>;
-  transporterCompanyContact_ends_with?: Maybe<String>;
-  transporterCompanyContact_not_ends_with?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyPhone_not?: Maybe<String>;
-  transporterCompanyPhone_in?: Maybe<String[] | String>;
-  transporterCompanyPhone_not_in?: Maybe<String[] | String>;
-  transporterCompanyPhone_lt?: Maybe<String>;
-  transporterCompanyPhone_lte?: Maybe<String>;
-  transporterCompanyPhone_gt?: Maybe<String>;
-  transporterCompanyPhone_gte?: Maybe<String>;
-  transporterCompanyPhone_contains?: Maybe<String>;
-  transporterCompanyPhone_not_contains?: Maybe<String>;
-  transporterCompanyPhone_starts_with?: Maybe<String>;
-  transporterCompanyPhone_not_starts_with?: Maybe<String>;
-  transporterCompanyPhone_ends_with?: Maybe<String>;
-  transporterCompanyPhone_not_ends_with?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterCompanyMail_not?: Maybe<String>;
-  transporterCompanyMail_in?: Maybe<String[] | String>;
-  transporterCompanyMail_not_in?: Maybe<String[] | String>;
-  transporterCompanyMail_lt?: Maybe<String>;
-  transporterCompanyMail_lte?: Maybe<String>;
-  transporterCompanyMail_gt?: Maybe<String>;
-  transporterCompanyMail_gte?: Maybe<String>;
-  transporterCompanyMail_contains?: Maybe<String>;
-  transporterCompanyMail_not_contains?: Maybe<String>;
-  transporterCompanyMail_starts_with?: Maybe<String>;
-  transporterCompanyMail_not_starts_with?: Maybe<String>;
-  transporterCompanyMail_ends_with?: Maybe<String>;
-  transporterCompanyMail_not_ends_with?: Maybe<String>;
-  transporterReceipt?: Maybe<String>;
-  transporterReceipt_not?: Maybe<String>;
-  transporterReceipt_in?: Maybe<String[] | String>;
-  transporterReceipt_not_in?: Maybe<String[] | String>;
-  transporterReceipt_lt?: Maybe<String>;
-  transporterReceipt_lte?: Maybe<String>;
-  transporterReceipt_gt?: Maybe<String>;
-  transporterReceipt_gte?: Maybe<String>;
-  transporterReceipt_contains?: Maybe<String>;
-  transporterReceipt_not_contains?: Maybe<String>;
-  transporterReceipt_starts_with?: Maybe<String>;
-  transporterReceipt_not_starts_with?: Maybe<String>;
-  transporterReceipt_ends_with?: Maybe<String>;
-  transporterReceipt_not_ends_with?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterDepartment_not?: Maybe<String>;
-  transporterDepartment_in?: Maybe<String[] | String>;
-  transporterDepartment_not_in?: Maybe<String[] | String>;
-  transporterDepartment_lt?: Maybe<String>;
-  transporterDepartment_lte?: Maybe<String>;
-  transporterDepartment_gt?: Maybe<String>;
-  transporterDepartment_gte?: Maybe<String>;
-  transporterDepartment_contains?: Maybe<String>;
-  transporterDepartment_not_contains?: Maybe<String>;
-  transporterDepartment_starts_with?: Maybe<String>;
-  transporterDepartment_not_starts_with?: Maybe<String>;
-  transporterDepartment_ends_with?: Maybe<String>;
-  transporterDepartment_not_ends_with?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterValidityLimit_not?: Maybe<DateTimeInput>;
-  transporterValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  transporterValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  transporterValidityLimit_lt?: Maybe<DateTimeInput>;
-  transporterValidityLimit_lte?: Maybe<DateTimeInput>;
-  transporterValidityLimit_gt?: Maybe<DateTimeInput>;
-  transporterValidityLimit_gte?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  transporterNumberPlate_not?: Maybe<String>;
-  transporterNumberPlate_in?: Maybe<String[] | String>;
-  transporterNumberPlate_not_in?: Maybe<String[] | String>;
-  transporterNumberPlate_lt?: Maybe<String>;
-  transporterNumberPlate_lte?: Maybe<String>;
-  transporterNumberPlate_gt?: Maybe<String>;
-  transporterNumberPlate_gte?: Maybe<String>;
-  transporterNumberPlate_contains?: Maybe<String>;
-  transporterNumberPlate_not_contains?: Maybe<String>;
-  transporterNumberPlate_starts_with?: Maybe<String>;
-  transporterNumberPlate_not_starts_with?: Maybe<String>;
-  transporterNumberPlate_ends_with?: Maybe<String>;
-  transporterNumberPlate_not_ends_with?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsCode_not?: Maybe<String>;
-  wasteDetailsCode_in?: Maybe<String[] | String>;
-  wasteDetailsCode_not_in?: Maybe<String[] | String>;
-  wasteDetailsCode_lt?: Maybe<String>;
-  wasteDetailsCode_lte?: Maybe<String>;
-  wasteDetailsCode_gt?: Maybe<String>;
-  wasteDetailsCode_gte?: Maybe<String>;
-  wasteDetailsCode_contains?: Maybe<String>;
-  wasteDetailsCode_not_contains?: Maybe<String>;
-  wasteDetailsCode_starts_with?: Maybe<String>;
-  wasteDetailsCode_not_starts_with?: Maybe<String>;
-  wasteDetailsCode_ends_with?: Maybe<String>;
-  wasteDetailsCode_not_ends_with?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsName_not?: Maybe<String>;
-  wasteDetailsName_in?: Maybe<String[] | String>;
-  wasteDetailsName_not_in?: Maybe<String[] | String>;
-  wasteDetailsName_lt?: Maybe<String>;
-  wasteDetailsName_lte?: Maybe<String>;
-  wasteDetailsName_gt?: Maybe<String>;
-  wasteDetailsName_gte?: Maybe<String>;
-  wasteDetailsName_contains?: Maybe<String>;
-  wasteDetailsName_not_contains?: Maybe<String>;
-  wasteDetailsName_starts_with?: Maybe<String>;
-  wasteDetailsName_not_starts_with?: Maybe<String>;
-  wasteDetailsName_ends_with?: Maybe<String>;
-  wasteDetailsName_not_ends_with?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsOnuCode_not?: Maybe<String>;
-  wasteDetailsOnuCode_in?: Maybe<String[] | String>;
-  wasteDetailsOnuCode_not_in?: Maybe<String[] | String>;
-  wasteDetailsOnuCode_lt?: Maybe<String>;
-  wasteDetailsOnuCode_lte?: Maybe<String>;
-  wasteDetailsOnuCode_gt?: Maybe<String>;
-  wasteDetailsOnuCode_gte?: Maybe<String>;
-  wasteDetailsOnuCode_contains?: Maybe<String>;
-  wasteDetailsOnuCode_not_contains?: Maybe<String>;
-  wasteDetailsOnuCode_starts_with?: Maybe<String>;
-  wasteDetailsOnuCode_not_starts_with?: Maybe<String>;
-  wasteDetailsOnuCode_ends_with?: Maybe<String>;
-  wasteDetailsOnuCode_not_ends_with?: Maybe<String>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsOtherPackaging_not?: Maybe<String>;
-  wasteDetailsOtherPackaging_in?: Maybe<String[] | String>;
-  wasteDetailsOtherPackaging_not_in?: Maybe<String[] | String>;
-  wasteDetailsOtherPackaging_lt?: Maybe<String>;
-  wasteDetailsOtherPackaging_lte?: Maybe<String>;
-  wasteDetailsOtherPackaging_gt?: Maybe<String>;
-  wasteDetailsOtherPackaging_gte?: Maybe<String>;
-  wasteDetailsOtherPackaging_contains?: Maybe<String>;
-  wasteDetailsOtherPackaging_not_contains?: Maybe<String>;
-  wasteDetailsOtherPackaging_starts_with?: Maybe<String>;
-  wasteDetailsOtherPackaging_not_starts_with?: Maybe<String>;
-  wasteDetailsOtherPackaging_ends_with?: Maybe<String>;
-  wasteDetailsOtherPackaging_not_ends_with?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_not?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_in?: Maybe<Int[] | Int>;
-  wasteDetailsNumberOfPackages_not_in?: Maybe<Int[] | Int>;
-  wasteDetailsNumberOfPackages_lt?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_lte?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_gt?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_gte?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantity_not?: Maybe<Float>;
-  wasteDetailsQuantity_in?: Maybe<Float[] | Float>;
-  wasteDetailsQuantity_not_in?: Maybe<Float[] | Float>;
-  wasteDetailsQuantity_lt?: Maybe<Float>;
-  wasteDetailsQuantity_lte?: Maybe<Float>;
-  wasteDetailsQuantity_gt?: Maybe<Float>;
-  wasteDetailsQuantity_gte?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsQuantityType_not?: Maybe<QuantityType>;
-  wasteDetailsQuantityType_in?: Maybe<QuantityType[] | QuantityType>;
-  wasteDetailsQuantityType_not_in?: Maybe<QuantityType[] | QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  wasteDetailsConsistence_not?: Maybe<Consistence>;
-  wasteDetailsConsistence_in?: Maybe<Consistence[] | Consistence>;
-  wasteDetailsConsistence_not_in?: Maybe<Consistence[] | Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanyName_not?: Maybe<String>;
-  traderCompanyName_in?: Maybe<String[] | String>;
-  traderCompanyName_not_in?: Maybe<String[] | String>;
-  traderCompanyName_lt?: Maybe<String>;
-  traderCompanyName_lte?: Maybe<String>;
-  traderCompanyName_gt?: Maybe<String>;
-  traderCompanyName_gte?: Maybe<String>;
-  traderCompanyName_contains?: Maybe<String>;
-  traderCompanyName_not_contains?: Maybe<String>;
-  traderCompanyName_starts_with?: Maybe<String>;
-  traderCompanyName_not_starts_with?: Maybe<String>;
-  traderCompanyName_ends_with?: Maybe<String>;
-  traderCompanyName_not_ends_with?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanySiret_not?: Maybe<String>;
-  traderCompanySiret_in?: Maybe<String[] | String>;
-  traderCompanySiret_not_in?: Maybe<String[] | String>;
-  traderCompanySiret_lt?: Maybe<String>;
-  traderCompanySiret_lte?: Maybe<String>;
-  traderCompanySiret_gt?: Maybe<String>;
-  traderCompanySiret_gte?: Maybe<String>;
-  traderCompanySiret_contains?: Maybe<String>;
-  traderCompanySiret_not_contains?: Maybe<String>;
-  traderCompanySiret_starts_with?: Maybe<String>;
-  traderCompanySiret_not_starts_with?: Maybe<String>;
-  traderCompanySiret_ends_with?: Maybe<String>;
-  traderCompanySiret_not_ends_with?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyAddress_not?: Maybe<String>;
-  traderCompanyAddress_in?: Maybe<String[] | String>;
-  traderCompanyAddress_not_in?: Maybe<String[] | String>;
-  traderCompanyAddress_lt?: Maybe<String>;
-  traderCompanyAddress_lte?: Maybe<String>;
-  traderCompanyAddress_gt?: Maybe<String>;
-  traderCompanyAddress_gte?: Maybe<String>;
-  traderCompanyAddress_contains?: Maybe<String>;
-  traderCompanyAddress_not_contains?: Maybe<String>;
-  traderCompanyAddress_starts_with?: Maybe<String>;
-  traderCompanyAddress_not_starts_with?: Maybe<String>;
-  traderCompanyAddress_ends_with?: Maybe<String>;
-  traderCompanyAddress_not_ends_with?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyContact_not?: Maybe<String>;
-  traderCompanyContact_in?: Maybe<String[] | String>;
-  traderCompanyContact_not_in?: Maybe<String[] | String>;
-  traderCompanyContact_lt?: Maybe<String>;
-  traderCompanyContact_lte?: Maybe<String>;
-  traderCompanyContact_gt?: Maybe<String>;
-  traderCompanyContact_gte?: Maybe<String>;
-  traderCompanyContact_contains?: Maybe<String>;
-  traderCompanyContact_not_contains?: Maybe<String>;
-  traderCompanyContact_starts_with?: Maybe<String>;
-  traderCompanyContact_not_starts_with?: Maybe<String>;
-  traderCompanyContact_ends_with?: Maybe<String>;
-  traderCompanyContact_not_ends_with?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyPhone_not?: Maybe<String>;
-  traderCompanyPhone_in?: Maybe<String[] | String>;
-  traderCompanyPhone_not_in?: Maybe<String[] | String>;
-  traderCompanyPhone_lt?: Maybe<String>;
-  traderCompanyPhone_lte?: Maybe<String>;
-  traderCompanyPhone_gt?: Maybe<String>;
-  traderCompanyPhone_gte?: Maybe<String>;
-  traderCompanyPhone_contains?: Maybe<String>;
-  traderCompanyPhone_not_contains?: Maybe<String>;
-  traderCompanyPhone_starts_with?: Maybe<String>;
-  traderCompanyPhone_not_starts_with?: Maybe<String>;
-  traderCompanyPhone_ends_with?: Maybe<String>;
-  traderCompanyPhone_not_ends_with?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderCompanyMail_not?: Maybe<String>;
-  traderCompanyMail_in?: Maybe<String[] | String>;
-  traderCompanyMail_not_in?: Maybe<String[] | String>;
-  traderCompanyMail_lt?: Maybe<String>;
-  traderCompanyMail_lte?: Maybe<String>;
-  traderCompanyMail_gt?: Maybe<String>;
-  traderCompanyMail_gte?: Maybe<String>;
-  traderCompanyMail_contains?: Maybe<String>;
-  traderCompanyMail_not_contains?: Maybe<String>;
-  traderCompanyMail_starts_with?: Maybe<String>;
-  traderCompanyMail_not_starts_with?: Maybe<String>;
-  traderCompanyMail_ends_with?: Maybe<String>;
-  traderCompanyMail_not_ends_with?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderReceipt_not?: Maybe<String>;
-  traderReceipt_in?: Maybe<String[] | String>;
-  traderReceipt_not_in?: Maybe<String[] | String>;
-  traderReceipt_lt?: Maybe<String>;
-  traderReceipt_lte?: Maybe<String>;
-  traderReceipt_gt?: Maybe<String>;
-  traderReceipt_gte?: Maybe<String>;
-  traderReceipt_contains?: Maybe<String>;
-  traderReceipt_not_contains?: Maybe<String>;
-  traderReceipt_starts_with?: Maybe<String>;
-  traderReceipt_not_starts_with?: Maybe<String>;
-  traderReceipt_ends_with?: Maybe<String>;
-  traderReceipt_not_ends_with?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderDepartment_not?: Maybe<String>;
-  traderDepartment_in?: Maybe<String[] | String>;
-  traderDepartment_not_in?: Maybe<String[] | String>;
-  traderDepartment_lt?: Maybe<String>;
-  traderDepartment_lte?: Maybe<String>;
-  traderDepartment_gt?: Maybe<String>;
-  traderDepartment_gte?: Maybe<String>;
-  traderDepartment_contains?: Maybe<String>;
-  traderDepartment_not_contains?: Maybe<String>;
-  traderDepartment_starts_with?: Maybe<String>;
-  traderDepartment_not_starts_with?: Maybe<String>;
-  traderDepartment_ends_with?: Maybe<String>;
-  traderDepartment_not_ends_with?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  traderValidityLimit_not?: Maybe<DateTimeInput>;
-  traderValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  traderValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  traderValidityLimit_lt?: Maybe<DateTimeInput>;
-  traderValidityLimit_lte?: Maybe<DateTimeInput>;
-  traderValidityLimit_gt?: Maybe<DateTimeInput>;
-  traderValidityLimit_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-  OR?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-  NOT?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-}
-
-export interface CompanyUpdateWithoutUserDataInput {
-  siret?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  admin?: Maybe<UserUpdateOneInput>;
-}
-
-export type UserAccountHashWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  hash?: Maybe<String>;
-}>;
-
-export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
-  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
-  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
-  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface UserAccountHashWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  email?: Maybe<String>;
-  email_not?: Maybe<String>;
-  email_in?: Maybe<String[] | String>;
-  email_not_in?: Maybe<String[] | String>;
-  email_lt?: Maybe<String>;
-  email_lte?: Maybe<String>;
-  email_gt?: Maybe<String>;
-  email_gte?: Maybe<String>;
-  email_contains?: Maybe<String>;
-  email_not_contains?: Maybe<String>;
-  email_starts_with?: Maybe<String>;
-  email_not_starts_with?: Maybe<String>;
-  email_ends_with?: Maybe<String>;
-  email_not_ends_with?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  companySiret_not?: Maybe<ID_Input>;
-  companySiret_in?: Maybe<ID_Input[] | ID_Input>;
-  companySiret_not_in?: Maybe<ID_Input[] | ID_Input>;
-  companySiret_lt?: Maybe<ID_Input>;
-  companySiret_lte?: Maybe<ID_Input>;
-  companySiret_gt?: Maybe<ID_Input>;
-  companySiret_gte?: Maybe<ID_Input>;
-  companySiret_contains?: Maybe<ID_Input>;
-  companySiret_not_contains?: Maybe<ID_Input>;
-  companySiret_starts_with?: Maybe<ID_Input>;
-  companySiret_not_starts_with?: Maybe<ID_Input>;
-  companySiret_ends_with?: Maybe<ID_Input>;
-  companySiret_not_ends_with?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
-  hash?: Maybe<String>;
-  hash_not?: Maybe<String>;
-  hash_in?: Maybe<String[] | String>;
-  hash_not_in?: Maybe<String[] | String>;
-  hash_lt?: Maybe<String>;
-  hash_lte?: Maybe<String>;
-  hash_gt?: Maybe<String>;
-  hash_gte?: Maybe<String>;
-  hash_contains?: Maybe<String>;
-  hash_not_contains?: Maybe<String>;
-  hash_starts_with?: Maybe<String>;
-  hash_not_starts_with?: Maybe<String>;
-  hash_ends_with?: Maybe<String>;
-  hash_not_ends_with?: Maybe<String>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
-  OR?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
-  NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
-}
+  | "status_ASC"
+  | "status_DESC";
 
 export interface CompanyScalarWhereInput {
   id?: Maybe<ID_Input>;
@@ -1777,226 +643,136 @@ export interface CompanyScalarWhereInput {
   NOT?: Maybe<CompanyScalarWhereInput[] | CompanyScalarWhereInput>;
 }
 
-export interface FormUpdateManyInput {
-  create?: Maybe<FormCreateInput[] | FormCreateInput>;
-  update?: Maybe<
-    | FormUpdateWithWhereUniqueNestedInput[]
-    | FormUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | FormUpsertWithWhereUniqueNestedInput[]
-    | FormUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  set?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  disconnect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  deleteMany?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-  updateMany?: Maybe<
-    FormUpdateManyWithWhereNestedInput[] | FormUpdateManyWithWhereNestedInput
-  >;
+export type CompanyWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  siret?: Maybe<String>;
+}>;
+
+export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
+  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
+  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
+  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
 }
 
-export interface CompanyUpdateManyWithWhereNestedInput {
-  where: CompanyScalarWhereInput;
-  data: CompanyUpdateManyDataInput;
-}
-
-export interface FormUpdateInput {
-  readableId?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  owner?: Maybe<UserUpdateOneRequiredInput>;
-  signedByTransporter?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  receivedBy?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  appendix2Forms?: Maybe<FormUpdateManyInput>;
-}
-
-export interface CompanyUpdateManyDataInput {
+export interface CompanyUpdateDataInput {
   siret?: Maybe<String>;
   securityCode?: Maybe<Int>;
+  admin?: Maybe<UserUpdateOneInput>;
+  user?: Maybe<UserUpdateManyWithoutCompaniesInput>;
 }
 
-export interface FormCreateManyInput {
-  create?: Maybe<FormCreateInput[] | FormCreateInput>;
-  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-}
-
-export interface CompanyAssociationUpdateManyWithoutUserInput {
-  create?: Maybe<
-    | CompanyAssociationCreateWithoutUserInput[]
-    | CompanyAssociationCreateWithoutUserInput
-  >;
-  delete?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  connect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  set?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  disconnect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  update?: Maybe<
-    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput[]
-    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput
-  >;
-  upsert?: Maybe<
-    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput[]
-    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput
-  >;
-  deleteMany?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-  updateMany?: Maybe<
-    | CompanyAssociationUpdateManyWithWhereNestedInput[]
-    | CompanyAssociationUpdateManyWithWhereNestedInput
-  >;
-}
-
-export interface FormCreateInput {
+export interface CompanyCreateInput {
   id?: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  owner: UserCreateOneInput;
-  signedByTransporter?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  receivedBy?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  appendix2Forms?: Maybe<FormCreateManyInput>;
+  siret: String;
+  securityCode: Int;
+  admin?: Maybe<UserCreateOneInput>;
+  user?: Maybe<UserCreateManyWithoutCompaniesInput>;
 }
 
-export interface CompanyAssociationUpdateWithWhereUniqueWithoutUserInput {
-  where: CompanyAssociationWhereUniqueInput;
-  data: CompanyAssociationUpdateWithoutUserDataInput;
-}
-
-export interface UserUpsertWithoutCompanyAssociationsInput {
-  update: UserUpdateWithoutCompanyAssociationsDataInput;
-  create: UserCreateWithoutCompanyAssociationsInput;
-}
-
-export interface CompanyAssociationUpdateWithoutUserDataInput {
-  company?: Maybe<CompanyUpdateOneRequiredInput>;
-  role?: Maybe<UserRole>;
+export interface UserAccountHashSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<UserAccountHashWhereInput>;
+  AND?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
 }
 
 export interface UserCreateOneInput {
   create?: Maybe<UserCreateInput>;
   connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface StatusLogSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<StatusLogWhereInput>;
+  AND?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+}
+
+export interface UserCreateInput {
+  id?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  email: String;
+  password: String;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  userType?: Maybe<Json>;
+  companies?: Maybe<CompanyCreateManyWithoutUserInput>;
+  companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
+  gerepId?: Maybe<String>;
+}
+
+export interface FormSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<FormWhereInput>;
+  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+}
+
+export interface CompanyCreateManyWithoutUserInput {
+  create?: Maybe<
+    CompanyCreateWithoutUserInput[] | CompanyCreateWithoutUserInput
+  >;
+  connect?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
+}
+
+export interface CompanySubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CompanyWhereInput>;
+  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+}
+
+export interface CompanyCreateWithoutUserInput {
+  id?: Maybe<ID_Input>;
+  siret: String;
+  securityCode: Int;
+  admin?: Maybe<UserCreateOneInput>;
+}
+
+export interface UserActivationHashUpdateManyMutationInput {
+  hash?: Maybe<String>;
+}
+
+export interface CompanyAssociationCreateManyWithoutUserInput {
+  create?: Maybe<
+    | CompanyAssociationCreateWithoutUserInput[]
+    | CompanyAssociationCreateWithoutUserInput
+  >;
+  connect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
 }
 
 export interface UserWhereInput {
@@ -2113,15 +889,483 @@ export interface UserWhereInput {
   NOT?: Maybe<UserWhereInput[] | UserWhereInput>;
 }
 
-export interface UserSubscriptionWhereInput {
+export interface CompanyAssociationCreateWithoutUserInput {
+  id?: Maybe<ID_Input>;
+  company: CompanyCreateOneInput;
+  role: UserRole;
+}
+
+export interface UserActivationHashCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneInput;
+  hash: String;
+}
+
+export interface CompanyCreateOneInput {
+  create?: Maybe<CompanyCreateInput>;
+  connect?: Maybe<CompanyWhereUniqueInput>;
+}
+
+export interface UserAccountHashUpdateManyMutationInput {
+  email?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  hash?: Maybe<String>;
+}
+
+export interface UserCreateManyWithoutCompaniesInput {
+  create?: Maybe<
+    UserCreateWithoutCompaniesInput[] | UserCreateWithoutCompaniesInput
+  >;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+}
+
+export interface UserAccountHashCreateInput {
+  id?: Maybe<ID_Input>;
+  email: String;
+  companySiret: ID_Input;
+  role: UserRole;
+  hash: String;
+}
+
+export interface UserCreateWithoutCompaniesInput {
+  id?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  email: String;
+  password: String;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  userType?: Maybe<Json>;
+  companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
+  gerepId?: Maybe<String>;
+}
+
+export type StatusLogWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface CompanyUpdateInput {
+  siret?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  admin?: Maybe<UserUpdateOneInput>;
+  user?: Maybe<UserUpdateManyWithoutCompaniesInput>;
+}
+
+export interface StatusLogUpdateManyMutationInput {
+  status?: Maybe<Status>;
+}
+
+export interface UserUpdateOneInput {
+  create?: Maybe<UserCreateInput>;
+  update?: Maybe<UserUpdateDataInput>;
+  upsert?: Maybe<UserUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface FormUpsertNestedInput {
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
+}
+
+export interface UserUpdateDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  userType?: Maybe<Json>;
+  companies?: Maybe<CompanyUpdateManyWithoutUserInput>;
+  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+  gerepId?: Maybe<String>;
+}
+
+export interface StatusLogUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  form?: Maybe<FormUpdateOneRequiredInput>;
+  status?: Maybe<Status>;
+}
+
+export interface CompanyUpdateManyWithoutUserInput {
+  create?: Maybe<
+    CompanyCreateWithoutUserInput[] | CompanyCreateWithoutUserInput
+  >;
+  delete?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
+  connect?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
+  set?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
+  disconnect?: Maybe<CompanyWhereUniqueInput[] | CompanyWhereUniqueInput>;
+  update?: Maybe<
+    | CompanyUpdateWithWhereUniqueWithoutUserInput[]
+    | CompanyUpdateWithWhereUniqueWithoutUserInput
+  >;
+  upsert?: Maybe<
+    | CompanyUpsertWithWhereUniqueWithoutUserInput[]
+    | CompanyUpsertWithWhereUniqueWithoutUserInput
+  >;
+  deleteMany?: Maybe<CompanyScalarWhereInput[] | CompanyScalarWhereInput>;
+  updateMany?: Maybe<
+    | CompanyUpdateManyWithWhereNestedInput[]
+    | CompanyUpdateManyWithWhereNestedInput
+  >;
+}
+
+export type UserWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  email?: Maybe<String>;
+}>;
+
+export interface CompanyUpdateWithWhereUniqueWithoutUserInput {
+  where: CompanyWhereUniqueInput;
+  data: CompanyUpdateWithoutUserDataInput;
+}
+
+export interface FormUpdateManyMutationInput {
+  readableId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationDetails?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+}
+
+export interface CompanyUpdateWithoutUserDataInput {
+  siret?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  admin?: Maybe<UserUpdateOneInput>;
+}
+
+export type UserAccountHashWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  hash?: Maybe<String>;
+}>;
+
+export interface CompanyUpsertWithWhereUniqueWithoutUserInput {
+  where: CompanyWhereUniqueInput;
+  update: CompanyUpdateWithoutUserDataInput;
+  create: CompanyCreateWithoutUserInput;
+}
+
+export interface UserAccountHashWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  companySiret_not?: Maybe<ID_Input>;
+  companySiret_in?: Maybe<ID_Input[] | ID_Input>;
+  companySiret_not_in?: Maybe<ID_Input[] | ID_Input>;
+  companySiret_lt?: Maybe<ID_Input>;
+  companySiret_lte?: Maybe<ID_Input>;
+  companySiret_gt?: Maybe<ID_Input>;
+  companySiret_gte?: Maybe<ID_Input>;
+  companySiret_contains?: Maybe<ID_Input>;
+  companySiret_not_contains?: Maybe<ID_Input>;
+  companySiret_starts_with?: Maybe<ID_Input>;
+  companySiret_not_starts_with?: Maybe<ID_Input>;
+  companySiret_ends_with?: Maybe<ID_Input>;
+  companySiret_not_ends_with?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  hash?: Maybe<String>;
+  hash_not?: Maybe<String>;
+  hash_in?: Maybe<String[] | String>;
+  hash_not_in?: Maybe<String[] | String>;
+  hash_lt?: Maybe<String>;
+  hash_lte?: Maybe<String>;
+  hash_gt?: Maybe<String>;
+  hash_gte?: Maybe<String>;
+  hash_contains?: Maybe<String>;
+  hash_not_contains?: Maybe<String>;
+  hash_starts_with?: Maybe<String>;
+  hash_not_starts_with?: Maybe<String>;
+  hash_ends_with?: Maybe<String>;
+  hash_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
+  OR?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
+  NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
+}
+
+export interface CompanyAssociationUpdateManyMutationInput {
+  role?: Maybe<UserRole>;
+}
+
+export interface FormUpsertWithWhereUniqueNestedInput {
+  where: FormWhereUniqueInput;
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
+}
+
+export interface CompanyUpdateManyWithWhereNestedInput {
+  where: CompanyScalarWhereInput;
+  data: CompanyUpdateManyDataInput;
+}
+
+export interface FormUpdateWithWhereUniqueNestedInput {
+  where: FormWhereUniqueInput;
+  data: FormUpdateDataInput;
+}
+
+export interface CompanyUpdateManyDataInput {
+  siret?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+}
+
+export interface FormUpdateManyInput {
+  create?: Maybe<FormCreateInput[] | FormCreateInput>;
+  update?: Maybe<
+    | FormUpdateWithWhereUniqueNestedInput[]
+    | FormUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | FormUpsertWithWhereUniqueNestedInput[]
+    | FormUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  set?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  disconnect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  deleteMany?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+  updateMany?: Maybe<
+    FormUpdateManyWithWhereNestedInput[] | FormUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface CompanyAssociationUpdateManyWithoutUserInput {
+  create?: Maybe<
+    | CompanyAssociationCreateWithoutUserInput[]
+    | CompanyAssociationCreateWithoutUserInput
+  >;
+  delete?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  connect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  set?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  disconnect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  update?: Maybe<
+    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput[]
+    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput
+  >;
+  upsert?: Maybe<
+    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput[]
+    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput
+  >;
+  deleteMany?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | CompanyAssociationUpdateManyWithWhereNestedInput[]
+    | CompanyAssociationUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface UserUpdateOneRequiredInput {
+  create?: Maybe<UserCreateInput>;
+  update?: Maybe<UserUpdateDataInput>;
+  upsert?: Maybe<UserUpsertNestedInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface CompanyAssociationUpdateWithWhereUniqueWithoutUserInput {
+  where: CompanyAssociationWhereUniqueInput;
+  data: CompanyAssociationUpdateWithoutUserDataInput;
+}
+
+export interface FormCreateManyInput {
+  create?: Maybe<FormCreateInput[] | FormCreateInput>;
+  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+}
+
+export interface CompanyAssociationUpdateWithoutUserDataInput {
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  role?: Maybe<UserRole>;
+}
+
+export interface UserActivationHashSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<UserWhereInput>;
-  AND?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
-  OR?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
-  NOT?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
+  node?: Maybe<UserActivationHashWhereInput>;
+  AND?: Maybe<
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput
+  >;
+}
+
+export interface CompanyUpdateOneRequiredInput {
+  create?: Maybe<CompanyCreateInput>;
+  update?: Maybe<CompanyUpdateDataInput>;
+  upsert?: Maybe<CompanyUpsertNestedInput>;
+  connect?: Maybe<CompanyWhereUniqueInput>;
+}
+
+export type CompanyAssociationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface CompanyAssociationWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  user?: Maybe<UserWhereInput>;
+  company?: Maybe<CompanyWhereInput>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  AND?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+  OR?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+  NOT?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+}
+
+export type FormWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  readableId?: Maybe<String>;
+}>;
+
+export interface UserUpdateManyWithoutCompaniesInput {
+  create?: Maybe<
+    UserCreateWithoutCompaniesInput[] | UserCreateWithoutCompaniesInput
+  >;
+  delete?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  set?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  disconnect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  update?: Maybe<
+    | UserUpdateWithWhereUniqueWithoutCompaniesInput[]
+    | UserUpdateWithWhereUniqueWithoutCompaniesInput
+  >;
+  upsert?: Maybe<
+    | UserUpsertWithWhereUniqueWithoutCompaniesInput[]
+    | UserUpsertWithWhereUniqueWithoutCompaniesInput
+  >;
+  deleteMany?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  updateMany?: Maybe<
+    UserUpdateManyWithWhereNestedInput[] | UserUpdateManyWithWhereNestedInput
+  >;
 }
 
 export interface CompanyWhereInput {
@@ -2186,48 +1430,437 @@ export interface CompanyWhereInput {
   NOT?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
 }
 
-export interface CompanySubscriptionWhereInput {
+export interface UserUpdateWithWhereUniqueWithoutCompaniesInput {
+  where: UserWhereUniqueInput;
+  data: UserUpdateWithoutCompaniesDataInput;
+}
+
+export interface UserAccountHashUpdateInput {
+  email?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  hash?: Maybe<String>;
+}
+
+export interface UserUpdateWithoutCompaniesDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  userType?: Maybe<Json>;
+  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+  gerepId?: Maybe<String>;
+}
+
+export interface UserUpdateInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  userType?: Maybe<Json>;
+  companies?: Maybe<CompanyUpdateManyWithoutUserInput>;
+  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+  gerepId?: Maybe<String>;
+}
+
+export interface UserUpsertWithWhereUniqueWithoutCompaniesInput {
+  where: UserWhereUniqueInput;
+  update: UserUpdateWithoutCompaniesDataInput;
+  create: UserCreateWithoutCompaniesInput;
+}
+
+export interface FormUpdateOneRequiredInput {
+  create?: Maybe<FormCreateInput>;
+  update?: Maybe<FormUpdateDataInput>;
+  upsert?: Maybe<FormUpsertNestedInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface UserScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  isActive_not?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  password?: Maybe<String>;
+  password_not?: Maybe<String>;
+  password_in?: Maybe<String[] | String>;
+  password_not_in?: Maybe<String[] | String>;
+  password_lt?: Maybe<String>;
+  password_lte?: Maybe<String>;
+  password_gt?: Maybe<String>;
+  password_gte?: Maybe<String>;
+  password_contains?: Maybe<String>;
+  password_not_contains?: Maybe<String>;
+  password_starts_with?: Maybe<String>;
+  password_not_starts_with?: Maybe<String>;
+  password_ends_with?: Maybe<String>;
+  password_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  phone?: Maybe<String>;
+  phone_not?: Maybe<String>;
+  phone_in?: Maybe<String[] | String>;
+  phone_not_in?: Maybe<String[] | String>;
+  phone_lt?: Maybe<String>;
+  phone_lte?: Maybe<String>;
+  phone_gt?: Maybe<String>;
+  phone_gte?: Maybe<String>;
+  phone_contains?: Maybe<String>;
+  phone_not_contains?: Maybe<String>;
+  phone_starts_with?: Maybe<String>;
+  phone_not_starts_with?: Maybe<String>;
+  phone_ends_with?: Maybe<String>;
+  phone_not_ends_with?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  gerepId_not?: Maybe<String>;
+  gerepId_in?: Maybe<String[] | String>;
+  gerepId_not_in?: Maybe<String[] | String>;
+  gerepId_lt?: Maybe<String>;
+  gerepId_lte?: Maybe<String>;
+  gerepId_gt?: Maybe<String>;
+  gerepId_gte?: Maybe<String>;
+  gerepId_contains?: Maybe<String>;
+  gerepId_not_contains?: Maybe<String>;
+  gerepId_starts_with?: Maybe<String>;
+  gerepId_not_starts_with?: Maybe<String>;
+  gerepId_ends_with?: Maybe<String>;
+  gerepId_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  OR?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  NOT?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+}
+
+export interface StatusLogCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneInput;
+  form: FormCreateOneInput;
+  status: Status;
+}
+
+export interface UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput;
+  data: UserUpdateManyDataInput;
+}
+
+export interface FormUpdateManyWithWhereNestedInput {
+  where: FormScalarWhereInput;
+  data: FormUpdateManyDataInput;
+}
+
+export interface UserUpdateManyDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  userType?: Maybe<Json>;
+  gerepId?: Maybe<String>;
+}
+
+export interface FormUpdateDataInput {
+  readableId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner?: Maybe<UserUpdateOneRequiredInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationDetails?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  appendix2Forms?: Maybe<FormUpdateManyInput>;
+}
+
+export interface CompanyUpsertNestedInput {
+  update: CompanyUpdateDataInput;
+  create: CompanyCreateInput;
+}
+
+export interface UserActivationHashWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  user?: Maybe<UserWhereInput>;
+  hash?: Maybe<String>;
+  hash_not?: Maybe<String>;
+  hash_in?: Maybe<String[] | String>;
+  hash_not_in?: Maybe<String[] | String>;
+  hash_lt?: Maybe<String>;
+  hash_lte?: Maybe<String>;
+  hash_gt?: Maybe<String>;
+  hash_gte?: Maybe<String>;
+  hash_contains?: Maybe<String>;
+  hash_not_contains?: Maybe<String>;
+  hash_starts_with?: Maybe<String>;
+  hash_not_starts_with?: Maybe<String>;
+  hash_ends_with?: Maybe<String>;
+  hash_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
+  OR?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
+  NOT?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
+}
+
+export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
+  where: CompanyAssociationWhereUniqueInput;
+  update: CompanyAssociationUpdateWithoutUserDataInput;
+  create: CompanyAssociationCreateWithoutUserInput;
+}
+
+export interface FormCreateInput {
+  id?: Maybe<ID_Input>;
+  readableId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner: UserCreateOneInput;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationDetails?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  appendix2Forms?: Maybe<FormCreateManyInput>;
+}
+
+export interface CompanyAssociationScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  AND?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  OR?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  NOT?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+}
+
+export interface CompanyAssociationSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyWhereInput>;
-  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-}
-
-export interface UserUpdateManyWithoutCompaniesInput {
-  create?: Maybe<
-    UserCreateWithoutCompaniesInput[] | UserCreateWithoutCompaniesInput
+  node?: Maybe<CompanyAssociationWhereInput>;
+  AND?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
   >;
-  delete?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  set?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  disconnect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  update?: Maybe<
-    | UserUpdateWithWhereUniqueWithoutCompaniesInput[]
-    | UserUpdateWithWhereUniqueWithoutCompaniesInput
+  OR?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
   >;
-  upsert?: Maybe<
-    | UserUpsertWithWhereUniqueWithoutCompaniesInput[]
-    | UserUpsertWithWhereUniqueWithoutCompaniesInput
-  >;
-  deleteMany?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  updateMany?: Maybe<
-    UserUpdateManyWithWhereNestedInput[] | UserUpdateManyWithWhereNestedInput
+  NOT?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
   >;
 }
 
-export interface UserActivationHashCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  hash: String;
-}
-
-export interface UserUpdateWithWhereUniqueWithoutCompaniesInput {
-  where: UserWhereUniqueInput;
-  data: UserUpdateWithoutCompaniesDataInput;
+export interface CompanyAssociationUpdateManyWithWhereNestedInput {
+  where: CompanyAssociationScalarWhereInput;
+  data: CompanyAssociationUpdateManyDataInput;
 }
 
 export interface FormWhereInput {
@@ -2990,15 +2623,39 @@ export interface FormWhereInput {
   NOT?: Maybe<FormWhereInput[] | FormWhereInput>;
 }
 
-export interface UserUpdateWithoutCompaniesDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  userType?: Maybe<Json>;
-  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
+export interface CompanyAssociationUpdateManyDataInput {
+  role?: Maybe<UserRole>;
+}
+
+export interface StatusLogWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  user?: Maybe<UserWhereInput>;
+  form?: Maybe<FormWhereInput>;
+  status?: Maybe<Status>;
+  status_not?: Maybe<Status>;
+  status_in?: Maybe<Status[] | Status>;
+  status_not_in?: Maybe<Status[] | Status>;
+  AND?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
+  OR?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
+  NOT?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
+}
+
+export interface UserUpsertNestedInput {
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
 }
 
 export interface FormUpdateManyDataInput {
@@ -3065,134 +2722,9 @@ export interface FormUpdateManyDataInput {
   traderValidityLimit?: Maybe<DateTimeInput>;
 }
 
-export interface UserUpsertWithWhereUniqueWithoutCompaniesInput {
-  where: UserWhereUniqueInput;
-  update: UserUpdateWithoutCompaniesDataInput;
-  create: UserCreateWithoutCompaniesInput;
-}
-
-export interface FormUpsertWithWhereUniqueNestedInput {
-  where: FormWhereUniqueInput;
-  update: FormUpdateDataInput;
-  create: FormCreateInput;
-}
-
-export interface UserScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  isActive_not?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  email_not?: Maybe<String>;
-  email_in?: Maybe<String[] | String>;
-  email_not_in?: Maybe<String[] | String>;
-  email_lt?: Maybe<String>;
-  email_lte?: Maybe<String>;
-  email_gt?: Maybe<String>;
-  email_gte?: Maybe<String>;
-  email_contains?: Maybe<String>;
-  email_not_contains?: Maybe<String>;
-  email_starts_with?: Maybe<String>;
-  email_not_starts_with?: Maybe<String>;
-  email_ends_with?: Maybe<String>;
-  email_not_ends_with?: Maybe<String>;
-  password?: Maybe<String>;
-  password_not?: Maybe<String>;
-  password_in?: Maybe<String[] | String>;
-  password_not_in?: Maybe<String[] | String>;
-  password_lt?: Maybe<String>;
-  password_lte?: Maybe<String>;
-  password_gt?: Maybe<String>;
-  password_gte?: Maybe<String>;
-  password_contains?: Maybe<String>;
-  password_not_contains?: Maybe<String>;
-  password_starts_with?: Maybe<String>;
-  password_not_starts_with?: Maybe<String>;
-  password_ends_with?: Maybe<String>;
-  password_not_ends_with?: Maybe<String>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  phone?: Maybe<String>;
-  phone_not?: Maybe<String>;
-  phone_in?: Maybe<String[] | String>;
-  phone_not_in?: Maybe<String[] | String>;
-  phone_lt?: Maybe<String>;
-  phone_lte?: Maybe<String>;
-  phone_gt?: Maybe<String>;
-  phone_gte?: Maybe<String>;
-  phone_contains?: Maybe<String>;
-  phone_not_contains?: Maybe<String>;
-  phone_starts_with?: Maybe<String>;
-  phone_not_starts_with?: Maybe<String>;
-  phone_ends_with?: Maybe<String>;
-  phone_not_ends_with?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  gerepId_not?: Maybe<String>;
-  gerepId_in?: Maybe<String[] | String>;
-  gerepId_not_in?: Maybe<String[] | String>;
-  gerepId_lt?: Maybe<String>;
-  gerepId_lte?: Maybe<String>;
-  gerepId_gt?: Maybe<String>;
-  gerepId_gte?: Maybe<String>;
-  gerepId_contains?: Maybe<String>;
-  gerepId_not_contains?: Maybe<String>;
-  gerepId_starts_with?: Maybe<String>;
-  gerepId_not_starts_with?: Maybe<String>;
-  gerepId_ends_with?: Maybe<String>;
-  gerepId_not_ends_with?: Maybe<String>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  OR?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  NOT?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-}
-
-export interface FormUpdateWithWhereUniqueNestedInput {
-  where: FormWhereUniqueInput;
-  data: FormUpdateDataInput;
-}
-
-export interface UserUpdateManyWithWhereNestedInput {
-  where: UserScalarWhereInput;
-  data: UserUpdateManyDataInput;
+export interface CompanyUpdateManyMutationInput {
+  siret?: Maybe<String>;
+  securityCode?: Maybe<Int>;
 }
 
 export type UserActivationHashWhereUniqueInput = AtLeastOne<{
@@ -3200,104 +2732,20 @@ export type UserActivationHashWhereUniqueInput = AtLeastOne<{
   hash?: Maybe<String>;
 }>;
 
-export interface UserUpdateManyDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  userType?: Maybe<Json>;
-  gerepId?: Maybe<String>;
+export interface UserUpsertWithoutCompanyAssociationsInput {
+  update: UserUpdateWithoutCompanyAssociationsDataInput;
+  create: UserCreateWithoutCompanyAssociationsInput;
 }
 
-export interface CompanyAssociationUpdateManyMutationInput {
-  role?: Maybe<UserRole>;
-}
-
-export interface CompanyUpsertNestedInput {
-  update: CompanyUpdateDataInput;
-  create: CompanyCreateInput;
-}
-
-export interface CompanyCreateInput {
-  id?: Maybe<ID_Input>;
-  siret: String;
-  securityCode: Int;
-  admin?: Maybe<UserCreateOneInput>;
-  user?: Maybe<UserCreateManyWithoutCompaniesInput>;
-}
-
-export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
-  where: CompanyAssociationWhereUniqueInput;
-  update: CompanyAssociationUpdateWithoutUserDataInput;
-  create: CompanyAssociationCreateWithoutUserInput;
-}
-
-export type CompanyAssociationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface CompanyAssociationScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
-  AND?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-  OR?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-  NOT?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-}
-
-export interface UserAccountHashUpdateInput {
-  email?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  hash?: Maybe<String>;
-}
-
-export interface CompanyAssociationUpdateManyWithWhereNestedInput {
-  where: CompanyAssociationScalarWhereInput;
-  data: CompanyAssociationUpdateManyDataInput;
-}
-
-export interface FormUpdateManyWithWhereNestedInput {
-  where: FormScalarWhereInput;
-  data: FormUpdateManyDataInput;
-}
-
-export interface CompanyAssociationUpdateManyDataInput {
-  role?: Maybe<UserRole>;
-}
-
-export interface UserUpdateOneRequiredInput {
-  create?: Maybe<UserCreateInput>;
-  update?: Maybe<UserUpdateDataInput>;
-  upsert?: Maybe<UserUpsertNestedInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface UserUpsertNestedInput {
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
+export interface UserSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<UserWhereInput>;
+  AND?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
+  OR?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
+  NOT?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
 }
 
 export interface UserUpdateWithoutCompanyAssociationsDataInput {
@@ -3311,11 +2759,20 @@ export interface UserUpdateWithoutCompanyAssociationsDataInput {
   gerepId?: Maybe<String>;
 }
 
-export interface CompanyAssociationCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneWithoutCompanyAssociationsInput;
-  company: CompanyCreateOneInput;
-  role: UserRole;
+export interface UserUpdateManyMutationInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  userType?: Maybe<Json>;
+  gerepId?: Maybe<String>;
+}
+
+export interface CompanyAssociationUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  role?: Maybe<UserRole>;
 }
 
 export interface UserCreateWithoutCompanyAssociationsInput {
@@ -3330,89 +2787,29 @@ export interface UserCreateWithoutCompanyAssociationsInput {
   gerepId?: Maybe<String>;
 }
 
-export interface CompanyAssociationUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
-  company?: Maybe<CompanyUpdateOneRequiredInput>;
-  role?: Maybe<UserRole>;
+export interface UserCreateOneWithoutCompanyAssociationsInput {
+  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
 }
 
-export interface CompanyUpdateManyMutationInput {
-  siret?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-}
-
-export interface UserActivationHashSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<UserActivationHashWhereInput>;
-  AND?: Maybe<
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput
-  >;
-}
-
-export interface UserActivationHashWhereInput {
+export interface CompanyAssociationCreateInput {
   id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  user?: Maybe<UserWhereInput>;
-  hash?: Maybe<String>;
-  hash_not?: Maybe<String>;
-  hash_in?: Maybe<String[] | String>;
-  hash_not_in?: Maybe<String[] | String>;
-  hash_lt?: Maybe<String>;
-  hash_lte?: Maybe<String>;
-  hash_gt?: Maybe<String>;
-  hash_gte?: Maybe<String>;
-  hash_contains?: Maybe<String>;
-  hash_not_contains?: Maybe<String>;
-  hash_starts_with?: Maybe<String>;
-  hash_not_starts_with?: Maybe<String>;
-  hash_ends_with?: Maybe<String>;
-  hash_not_ends_with?: Maybe<String>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
-  OR?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
-  NOT?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
+  user: UserCreateOneWithoutCompanyAssociationsInput;
+  company: CompanyCreateOneInput;
+  role: UserRole;
 }
 
-export interface FormUpdateDataInput {
+export interface FormCreateOneInput {
+  create?: Maybe<FormCreateInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface UserActivationHashUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  hash?: Maybe<String>;
+}
+
+export interface FormUpdateInput {
   readableId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
@@ -3478,22 +2875,761 @@ export interface FormUpdateDataInput {
   appendix2Forms?: Maybe<FormUpdateManyInput>;
 }
 
-export interface UserUpdateInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  userType?: Maybe<Json>;
-  companies?: Maybe<CompanyUpdateManyWithoutUserInput>;
-  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
-}
-
-export type FormWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
+export interface FormScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
   readableId?: Maybe<String>;
-}>;
+  readableId_not?: Maybe<String>;
+  readableId_in?: Maybe<String[] | String>;
+  readableId_not_in?: Maybe<String[] | String>;
+  readableId_lt?: Maybe<String>;
+  readableId_lte?: Maybe<String>;
+  readableId_gt?: Maybe<String>;
+  readableId_gte?: Maybe<String>;
+  readableId_contains?: Maybe<String>;
+  readableId_not_contains?: Maybe<String>;
+  readableId_starts_with?: Maybe<String>;
+  readableId_not_starts_with?: Maybe<String>;
+  readableId_ends_with?: Maybe<String>;
+  readableId_not_ends_with?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  isDeleted_not?: Maybe<Boolean>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  signedByTransporter_not?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  status_not?: Maybe<String>;
+  status_in?: Maybe<String[] | String>;
+  status_not_in?: Maybe<String[] | String>;
+  status_lt?: Maybe<String>;
+  status_lte?: Maybe<String>;
+  status_gt?: Maybe<String>;
+  status_gte?: Maybe<String>;
+  status_contains?: Maybe<String>;
+  status_not_contains?: Maybe<String>;
+  status_starts_with?: Maybe<String>;
+  status_not_starts_with?: Maybe<String>;
+  status_ends_with?: Maybe<String>;
+  status_not_ends_with?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentAt_not?: Maybe<DateTimeInput>;
+  sentAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  sentAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  sentAt_lt?: Maybe<DateTimeInput>;
+  sentAt_lte?: Maybe<DateTimeInput>;
+  sentAt_gt?: Maybe<DateTimeInput>;
+  sentAt_gte?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  sentBy_not?: Maybe<String>;
+  sentBy_in?: Maybe<String[] | String>;
+  sentBy_not_in?: Maybe<String[] | String>;
+  sentBy_lt?: Maybe<String>;
+  sentBy_lte?: Maybe<String>;
+  sentBy_gt?: Maybe<String>;
+  sentBy_gte?: Maybe<String>;
+  sentBy_contains?: Maybe<String>;
+  sentBy_not_contains?: Maybe<String>;
+  sentBy_starts_with?: Maybe<String>;
+  sentBy_not_starts_with?: Maybe<String>;
+  sentBy_ends_with?: Maybe<String>;
+  sentBy_not_ends_with?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  isAccepted_not?: Maybe<Boolean>;
+  receivedBy?: Maybe<String>;
+  receivedBy_not?: Maybe<String>;
+  receivedBy_in?: Maybe<String[] | String>;
+  receivedBy_not_in?: Maybe<String[] | String>;
+  receivedBy_lt?: Maybe<String>;
+  receivedBy_lte?: Maybe<String>;
+  receivedBy_gt?: Maybe<String>;
+  receivedBy_gte?: Maybe<String>;
+  receivedBy_contains?: Maybe<String>;
+  receivedBy_not_contains?: Maybe<String>;
+  receivedBy_starts_with?: Maybe<String>;
+  receivedBy_not_starts_with?: Maybe<String>;
+  receivedBy_ends_with?: Maybe<String>;
+  receivedBy_not_ends_with?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  receivedAt_not?: Maybe<DateTimeInput>;
+  receivedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  receivedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  receivedAt_lt?: Maybe<DateTimeInput>;
+  receivedAt_lte?: Maybe<DateTimeInput>;
+  receivedAt_gt?: Maybe<DateTimeInput>;
+  receivedAt_gte?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  quantityReceived_not?: Maybe<Float>;
+  quantityReceived_in?: Maybe<Float[] | Float>;
+  quantityReceived_not_in?: Maybe<Float[] | Float>;
+  quantityReceived_lt?: Maybe<Float>;
+  quantityReceived_lte?: Maybe<Float>;
+  quantityReceived_gt?: Maybe<Float>;
+  quantityReceived_gte?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedBy_not?: Maybe<String>;
+  processedBy_in?: Maybe<String[] | String>;
+  processedBy_not_in?: Maybe<String[] | String>;
+  processedBy_lt?: Maybe<String>;
+  processedBy_lte?: Maybe<String>;
+  processedBy_gt?: Maybe<String>;
+  processedBy_gte?: Maybe<String>;
+  processedBy_contains?: Maybe<String>;
+  processedBy_not_contains?: Maybe<String>;
+  processedBy_starts_with?: Maybe<String>;
+  processedBy_not_starts_with?: Maybe<String>;
+  processedBy_ends_with?: Maybe<String>;
+  processedBy_not_ends_with?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processedAt_not?: Maybe<String>;
+  processedAt_in?: Maybe<String[] | String>;
+  processedAt_not_in?: Maybe<String[] | String>;
+  processedAt_lt?: Maybe<String>;
+  processedAt_lte?: Maybe<String>;
+  processedAt_gt?: Maybe<String>;
+  processedAt_gte?: Maybe<String>;
+  processedAt_contains?: Maybe<String>;
+  processedAt_not_contains?: Maybe<String>;
+  processedAt_starts_with?: Maybe<String>;
+  processedAt_not_starts_with?: Maybe<String>;
+  processedAt_ends_with?: Maybe<String>;
+  processedAt_not_ends_with?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDone_not?: Maybe<String>;
+  processingOperationDone_in?: Maybe<String[] | String>;
+  processingOperationDone_not_in?: Maybe<String[] | String>;
+  processingOperationDone_lt?: Maybe<String>;
+  processingOperationDone_lte?: Maybe<String>;
+  processingOperationDone_gt?: Maybe<String>;
+  processingOperationDone_gte?: Maybe<String>;
+  processingOperationDone_contains?: Maybe<String>;
+  processingOperationDone_not_contains?: Maybe<String>;
+  processingOperationDone_starts_with?: Maybe<String>;
+  processingOperationDone_not_starts_with?: Maybe<String>;
+  processingOperationDone_ends_with?: Maybe<String>;
+  processingOperationDone_not_ends_with?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  processingOperationDescription_not?: Maybe<String>;
+  processingOperationDescription_in?: Maybe<String[] | String>;
+  processingOperationDescription_not_in?: Maybe<String[] | String>;
+  processingOperationDescription_lt?: Maybe<String>;
+  processingOperationDescription_lte?: Maybe<String>;
+  processingOperationDescription_gt?: Maybe<String>;
+  processingOperationDescription_gte?: Maybe<String>;
+  processingOperationDescription_contains?: Maybe<String>;
+  processingOperationDescription_not_contains?: Maybe<String>;
+  processingOperationDescription_starts_with?: Maybe<String>;
+  processingOperationDescription_not_starts_with?: Maybe<String>;
+  processingOperationDescription_ends_with?: Maybe<String>;
+  processingOperationDescription_not_ends_with?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  noTraceability_not?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationProcessingOperation_not?: Maybe<String>;
+  nextDestinationProcessingOperation_in?: Maybe<String[] | String>;
+  nextDestinationProcessingOperation_not_in?: Maybe<String[] | String>;
+  nextDestinationProcessingOperation_lt?: Maybe<String>;
+  nextDestinationProcessingOperation_lte?: Maybe<String>;
+  nextDestinationProcessingOperation_gt?: Maybe<String>;
+  nextDestinationProcessingOperation_gte?: Maybe<String>;
+  nextDestinationProcessingOperation_contains?: Maybe<String>;
+  nextDestinationProcessingOperation_not_contains?: Maybe<String>;
+  nextDestinationProcessingOperation_starts_with?: Maybe<String>;
+  nextDestinationProcessingOperation_not_starts_with?: Maybe<String>;
+  nextDestinationProcessingOperation_ends_with?: Maybe<String>;
+  nextDestinationProcessingOperation_not_ends_with?: Maybe<String>;
+  nextDestinationDetails?: Maybe<String>;
+  nextDestinationDetails_not?: Maybe<String>;
+  nextDestinationDetails_in?: Maybe<String[] | String>;
+  nextDestinationDetails_not_in?: Maybe<String[] | String>;
+  nextDestinationDetails_lt?: Maybe<String>;
+  nextDestinationDetails_lte?: Maybe<String>;
+  nextDestinationDetails_gt?: Maybe<String>;
+  nextDestinationDetails_gte?: Maybe<String>;
+  nextDestinationDetails_contains?: Maybe<String>;
+  nextDestinationDetails_not_contains?: Maybe<String>;
+  nextDestinationDetails_starts_with?: Maybe<String>;
+  nextDestinationDetails_not_starts_with?: Maybe<String>;
+  nextDestinationDetails_ends_with?: Maybe<String>;
+  nextDestinationDetails_not_ends_with?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterType_not?: Maybe<EmitterType>;
+  emitterType_in?: Maybe<EmitterType[] | EmitterType>;
+  emitterType_not_in?: Maybe<EmitterType[] | EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterPickupSite_not?: Maybe<String>;
+  emitterPickupSite_in?: Maybe<String[] | String>;
+  emitterPickupSite_not_in?: Maybe<String[] | String>;
+  emitterPickupSite_lt?: Maybe<String>;
+  emitterPickupSite_lte?: Maybe<String>;
+  emitterPickupSite_gt?: Maybe<String>;
+  emitterPickupSite_gte?: Maybe<String>;
+  emitterPickupSite_contains?: Maybe<String>;
+  emitterPickupSite_not_contains?: Maybe<String>;
+  emitterPickupSite_starts_with?: Maybe<String>;
+  emitterPickupSite_not_starts_with?: Maybe<String>;
+  emitterPickupSite_ends_with?: Maybe<String>;
+  emitterPickupSite_not_ends_with?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanyName_not?: Maybe<String>;
+  emitterCompanyName_in?: Maybe<String[] | String>;
+  emitterCompanyName_not_in?: Maybe<String[] | String>;
+  emitterCompanyName_lt?: Maybe<String>;
+  emitterCompanyName_lte?: Maybe<String>;
+  emitterCompanyName_gt?: Maybe<String>;
+  emitterCompanyName_gte?: Maybe<String>;
+  emitterCompanyName_contains?: Maybe<String>;
+  emitterCompanyName_not_contains?: Maybe<String>;
+  emitterCompanyName_starts_with?: Maybe<String>;
+  emitterCompanyName_not_starts_with?: Maybe<String>;
+  emitterCompanyName_ends_with?: Maybe<String>;
+  emitterCompanyName_not_ends_with?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanySiret_not?: Maybe<String>;
+  emitterCompanySiret_in?: Maybe<String[] | String>;
+  emitterCompanySiret_not_in?: Maybe<String[] | String>;
+  emitterCompanySiret_lt?: Maybe<String>;
+  emitterCompanySiret_lte?: Maybe<String>;
+  emitterCompanySiret_gt?: Maybe<String>;
+  emitterCompanySiret_gte?: Maybe<String>;
+  emitterCompanySiret_contains?: Maybe<String>;
+  emitterCompanySiret_not_contains?: Maybe<String>;
+  emitterCompanySiret_starts_with?: Maybe<String>;
+  emitterCompanySiret_not_starts_with?: Maybe<String>;
+  emitterCompanySiret_ends_with?: Maybe<String>;
+  emitterCompanySiret_not_ends_with?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyAddress_not?: Maybe<String>;
+  emitterCompanyAddress_in?: Maybe<String[] | String>;
+  emitterCompanyAddress_not_in?: Maybe<String[] | String>;
+  emitterCompanyAddress_lt?: Maybe<String>;
+  emitterCompanyAddress_lte?: Maybe<String>;
+  emitterCompanyAddress_gt?: Maybe<String>;
+  emitterCompanyAddress_gte?: Maybe<String>;
+  emitterCompanyAddress_contains?: Maybe<String>;
+  emitterCompanyAddress_not_contains?: Maybe<String>;
+  emitterCompanyAddress_starts_with?: Maybe<String>;
+  emitterCompanyAddress_not_starts_with?: Maybe<String>;
+  emitterCompanyAddress_ends_with?: Maybe<String>;
+  emitterCompanyAddress_not_ends_with?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyContact_not?: Maybe<String>;
+  emitterCompanyContact_in?: Maybe<String[] | String>;
+  emitterCompanyContact_not_in?: Maybe<String[] | String>;
+  emitterCompanyContact_lt?: Maybe<String>;
+  emitterCompanyContact_lte?: Maybe<String>;
+  emitterCompanyContact_gt?: Maybe<String>;
+  emitterCompanyContact_gte?: Maybe<String>;
+  emitterCompanyContact_contains?: Maybe<String>;
+  emitterCompanyContact_not_contains?: Maybe<String>;
+  emitterCompanyContact_starts_with?: Maybe<String>;
+  emitterCompanyContact_not_starts_with?: Maybe<String>;
+  emitterCompanyContact_ends_with?: Maybe<String>;
+  emitterCompanyContact_not_ends_with?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyPhone_not?: Maybe<String>;
+  emitterCompanyPhone_in?: Maybe<String[] | String>;
+  emitterCompanyPhone_not_in?: Maybe<String[] | String>;
+  emitterCompanyPhone_lt?: Maybe<String>;
+  emitterCompanyPhone_lte?: Maybe<String>;
+  emitterCompanyPhone_gt?: Maybe<String>;
+  emitterCompanyPhone_gte?: Maybe<String>;
+  emitterCompanyPhone_contains?: Maybe<String>;
+  emitterCompanyPhone_not_contains?: Maybe<String>;
+  emitterCompanyPhone_starts_with?: Maybe<String>;
+  emitterCompanyPhone_not_starts_with?: Maybe<String>;
+  emitterCompanyPhone_ends_with?: Maybe<String>;
+  emitterCompanyPhone_not_ends_with?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  emitterCompanyMail_not?: Maybe<String>;
+  emitterCompanyMail_in?: Maybe<String[] | String>;
+  emitterCompanyMail_not_in?: Maybe<String[] | String>;
+  emitterCompanyMail_lt?: Maybe<String>;
+  emitterCompanyMail_lte?: Maybe<String>;
+  emitterCompanyMail_gt?: Maybe<String>;
+  emitterCompanyMail_gte?: Maybe<String>;
+  emitterCompanyMail_contains?: Maybe<String>;
+  emitterCompanyMail_not_contains?: Maybe<String>;
+  emitterCompanyMail_starts_with?: Maybe<String>;
+  emitterCompanyMail_not_starts_with?: Maybe<String>;
+  emitterCompanyMail_ends_with?: Maybe<String>;
+  emitterCompanyMail_not_ends_with?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientCap_not?: Maybe<String>;
+  recipientCap_in?: Maybe<String[] | String>;
+  recipientCap_not_in?: Maybe<String[] | String>;
+  recipientCap_lt?: Maybe<String>;
+  recipientCap_lte?: Maybe<String>;
+  recipientCap_gt?: Maybe<String>;
+  recipientCap_gte?: Maybe<String>;
+  recipientCap_contains?: Maybe<String>;
+  recipientCap_not_contains?: Maybe<String>;
+  recipientCap_starts_with?: Maybe<String>;
+  recipientCap_not_starts_with?: Maybe<String>;
+  recipientCap_ends_with?: Maybe<String>;
+  recipientCap_not_ends_with?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientProcessingOperation_not?: Maybe<String>;
+  recipientProcessingOperation_in?: Maybe<String[] | String>;
+  recipientProcessingOperation_not_in?: Maybe<String[] | String>;
+  recipientProcessingOperation_lt?: Maybe<String>;
+  recipientProcessingOperation_lte?: Maybe<String>;
+  recipientProcessingOperation_gt?: Maybe<String>;
+  recipientProcessingOperation_gte?: Maybe<String>;
+  recipientProcessingOperation_contains?: Maybe<String>;
+  recipientProcessingOperation_not_contains?: Maybe<String>;
+  recipientProcessingOperation_starts_with?: Maybe<String>;
+  recipientProcessingOperation_not_starts_with?: Maybe<String>;
+  recipientProcessingOperation_ends_with?: Maybe<String>;
+  recipientProcessingOperation_not_ends_with?: Maybe<String>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanyName_not?: Maybe<String>;
+  recipientCompanyName_in?: Maybe<String[] | String>;
+  recipientCompanyName_not_in?: Maybe<String[] | String>;
+  recipientCompanyName_lt?: Maybe<String>;
+  recipientCompanyName_lte?: Maybe<String>;
+  recipientCompanyName_gt?: Maybe<String>;
+  recipientCompanyName_gte?: Maybe<String>;
+  recipientCompanyName_contains?: Maybe<String>;
+  recipientCompanyName_not_contains?: Maybe<String>;
+  recipientCompanyName_starts_with?: Maybe<String>;
+  recipientCompanyName_not_starts_with?: Maybe<String>;
+  recipientCompanyName_ends_with?: Maybe<String>;
+  recipientCompanyName_not_ends_with?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanySiret_not?: Maybe<String>;
+  recipientCompanySiret_in?: Maybe<String[] | String>;
+  recipientCompanySiret_not_in?: Maybe<String[] | String>;
+  recipientCompanySiret_lt?: Maybe<String>;
+  recipientCompanySiret_lte?: Maybe<String>;
+  recipientCompanySiret_gt?: Maybe<String>;
+  recipientCompanySiret_gte?: Maybe<String>;
+  recipientCompanySiret_contains?: Maybe<String>;
+  recipientCompanySiret_not_contains?: Maybe<String>;
+  recipientCompanySiret_starts_with?: Maybe<String>;
+  recipientCompanySiret_not_starts_with?: Maybe<String>;
+  recipientCompanySiret_ends_with?: Maybe<String>;
+  recipientCompanySiret_not_ends_with?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyAddress_not?: Maybe<String>;
+  recipientCompanyAddress_in?: Maybe<String[] | String>;
+  recipientCompanyAddress_not_in?: Maybe<String[] | String>;
+  recipientCompanyAddress_lt?: Maybe<String>;
+  recipientCompanyAddress_lte?: Maybe<String>;
+  recipientCompanyAddress_gt?: Maybe<String>;
+  recipientCompanyAddress_gte?: Maybe<String>;
+  recipientCompanyAddress_contains?: Maybe<String>;
+  recipientCompanyAddress_not_contains?: Maybe<String>;
+  recipientCompanyAddress_starts_with?: Maybe<String>;
+  recipientCompanyAddress_not_starts_with?: Maybe<String>;
+  recipientCompanyAddress_ends_with?: Maybe<String>;
+  recipientCompanyAddress_not_ends_with?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyContact_not?: Maybe<String>;
+  recipientCompanyContact_in?: Maybe<String[] | String>;
+  recipientCompanyContact_not_in?: Maybe<String[] | String>;
+  recipientCompanyContact_lt?: Maybe<String>;
+  recipientCompanyContact_lte?: Maybe<String>;
+  recipientCompanyContact_gt?: Maybe<String>;
+  recipientCompanyContact_gte?: Maybe<String>;
+  recipientCompanyContact_contains?: Maybe<String>;
+  recipientCompanyContact_not_contains?: Maybe<String>;
+  recipientCompanyContact_starts_with?: Maybe<String>;
+  recipientCompanyContact_not_starts_with?: Maybe<String>;
+  recipientCompanyContact_ends_with?: Maybe<String>;
+  recipientCompanyContact_not_ends_with?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyPhone_not?: Maybe<String>;
+  recipientCompanyPhone_in?: Maybe<String[] | String>;
+  recipientCompanyPhone_not_in?: Maybe<String[] | String>;
+  recipientCompanyPhone_lt?: Maybe<String>;
+  recipientCompanyPhone_lte?: Maybe<String>;
+  recipientCompanyPhone_gt?: Maybe<String>;
+  recipientCompanyPhone_gte?: Maybe<String>;
+  recipientCompanyPhone_contains?: Maybe<String>;
+  recipientCompanyPhone_not_contains?: Maybe<String>;
+  recipientCompanyPhone_starts_with?: Maybe<String>;
+  recipientCompanyPhone_not_starts_with?: Maybe<String>;
+  recipientCompanyPhone_ends_with?: Maybe<String>;
+  recipientCompanyPhone_not_ends_with?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  recipientCompanyMail_not?: Maybe<String>;
+  recipientCompanyMail_in?: Maybe<String[] | String>;
+  recipientCompanyMail_not_in?: Maybe<String[] | String>;
+  recipientCompanyMail_lt?: Maybe<String>;
+  recipientCompanyMail_lte?: Maybe<String>;
+  recipientCompanyMail_gt?: Maybe<String>;
+  recipientCompanyMail_gte?: Maybe<String>;
+  recipientCompanyMail_contains?: Maybe<String>;
+  recipientCompanyMail_not_contains?: Maybe<String>;
+  recipientCompanyMail_starts_with?: Maybe<String>;
+  recipientCompanyMail_not_starts_with?: Maybe<String>;
+  recipientCompanyMail_ends_with?: Maybe<String>;
+  recipientCompanyMail_not_ends_with?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyName_not?: Maybe<String>;
+  transporterCompanyName_in?: Maybe<String[] | String>;
+  transporterCompanyName_not_in?: Maybe<String[] | String>;
+  transporterCompanyName_lt?: Maybe<String>;
+  transporterCompanyName_lte?: Maybe<String>;
+  transporterCompanyName_gt?: Maybe<String>;
+  transporterCompanyName_gte?: Maybe<String>;
+  transporterCompanyName_contains?: Maybe<String>;
+  transporterCompanyName_not_contains?: Maybe<String>;
+  transporterCompanyName_starts_with?: Maybe<String>;
+  transporterCompanyName_not_starts_with?: Maybe<String>;
+  transporterCompanyName_ends_with?: Maybe<String>;
+  transporterCompanyName_not_ends_with?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanySiret_not?: Maybe<String>;
+  transporterCompanySiret_in?: Maybe<String[] | String>;
+  transporterCompanySiret_not_in?: Maybe<String[] | String>;
+  transporterCompanySiret_lt?: Maybe<String>;
+  transporterCompanySiret_lte?: Maybe<String>;
+  transporterCompanySiret_gt?: Maybe<String>;
+  transporterCompanySiret_gte?: Maybe<String>;
+  transporterCompanySiret_contains?: Maybe<String>;
+  transporterCompanySiret_not_contains?: Maybe<String>;
+  transporterCompanySiret_starts_with?: Maybe<String>;
+  transporterCompanySiret_not_starts_with?: Maybe<String>;
+  transporterCompanySiret_ends_with?: Maybe<String>;
+  transporterCompanySiret_not_ends_with?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyAddress_not?: Maybe<String>;
+  transporterCompanyAddress_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_not_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_lt?: Maybe<String>;
+  transporterCompanyAddress_lte?: Maybe<String>;
+  transporterCompanyAddress_gt?: Maybe<String>;
+  transporterCompanyAddress_gte?: Maybe<String>;
+  transporterCompanyAddress_contains?: Maybe<String>;
+  transporterCompanyAddress_not_contains?: Maybe<String>;
+  transporterCompanyAddress_starts_with?: Maybe<String>;
+  transporterCompanyAddress_not_starts_with?: Maybe<String>;
+  transporterCompanyAddress_ends_with?: Maybe<String>;
+  transporterCompanyAddress_not_ends_with?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyContact_not?: Maybe<String>;
+  transporterCompanyContact_in?: Maybe<String[] | String>;
+  transporterCompanyContact_not_in?: Maybe<String[] | String>;
+  transporterCompanyContact_lt?: Maybe<String>;
+  transporterCompanyContact_lte?: Maybe<String>;
+  transporterCompanyContact_gt?: Maybe<String>;
+  transporterCompanyContact_gte?: Maybe<String>;
+  transporterCompanyContact_contains?: Maybe<String>;
+  transporterCompanyContact_not_contains?: Maybe<String>;
+  transporterCompanyContact_starts_with?: Maybe<String>;
+  transporterCompanyContact_not_starts_with?: Maybe<String>;
+  transporterCompanyContact_ends_with?: Maybe<String>;
+  transporterCompanyContact_not_ends_with?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyPhone_not?: Maybe<String>;
+  transporterCompanyPhone_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_not_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_lt?: Maybe<String>;
+  transporterCompanyPhone_lte?: Maybe<String>;
+  transporterCompanyPhone_gt?: Maybe<String>;
+  transporterCompanyPhone_gte?: Maybe<String>;
+  transporterCompanyPhone_contains?: Maybe<String>;
+  transporterCompanyPhone_not_contains?: Maybe<String>;
+  transporterCompanyPhone_starts_with?: Maybe<String>;
+  transporterCompanyPhone_not_starts_with?: Maybe<String>;
+  transporterCompanyPhone_ends_with?: Maybe<String>;
+  transporterCompanyPhone_not_ends_with?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterCompanyMail_not?: Maybe<String>;
+  transporterCompanyMail_in?: Maybe<String[] | String>;
+  transporterCompanyMail_not_in?: Maybe<String[] | String>;
+  transporterCompanyMail_lt?: Maybe<String>;
+  transporterCompanyMail_lte?: Maybe<String>;
+  transporterCompanyMail_gt?: Maybe<String>;
+  transporterCompanyMail_gte?: Maybe<String>;
+  transporterCompanyMail_contains?: Maybe<String>;
+  transporterCompanyMail_not_contains?: Maybe<String>;
+  transporterCompanyMail_starts_with?: Maybe<String>;
+  transporterCompanyMail_not_starts_with?: Maybe<String>;
+  transporterCompanyMail_ends_with?: Maybe<String>;
+  transporterCompanyMail_not_ends_with?: Maybe<String>;
+  transporterReceipt?: Maybe<String>;
+  transporterReceipt_not?: Maybe<String>;
+  transporterReceipt_in?: Maybe<String[] | String>;
+  transporterReceipt_not_in?: Maybe<String[] | String>;
+  transporterReceipt_lt?: Maybe<String>;
+  transporterReceipt_lte?: Maybe<String>;
+  transporterReceipt_gt?: Maybe<String>;
+  transporterReceipt_gte?: Maybe<String>;
+  transporterReceipt_contains?: Maybe<String>;
+  transporterReceipt_not_contains?: Maybe<String>;
+  transporterReceipt_starts_with?: Maybe<String>;
+  transporterReceipt_not_starts_with?: Maybe<String>;
+  transporterReceipt_ends_with?: Maybe<String>;
+  transporterReceipt_not_ends_with?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterDepartment_not?: Maybe<String>;
+  transporterDepartment_in?: Maybe<String[] | String>;
+  transporterDepartment_not_in?: Maybe<String[] | String>;
+  transporterDepartment_lt?: Maybe<String>;
+  transporterDepartment_lte?: Maybe<String>;
+  transporterDepartment_gt?: Maybe<String>;
+  transporterDepartment_gte?: Maybe<String>;
+  transporterDepartment_contains?: Maybe<String>;
+  transporterDepartment_not_contains?: Maybe<String>;
+  transporterDepartment_starts_with?: Maybe<String>;
+  transporterDepartment_not_starts_with?: Maybe<String>;
+  transporterDepartment_ends_with?: Maybe<String>;
+  transporterDepartment_not_ends_with?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterValidityLimit_not?: Maybe<DateTimeInput>;
+  transporterValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_lt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_lte?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gte?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterNumberPlate_not?: Maybe<String>;
+  transporterNumberPlate_in?: Maybe<String[] | String>;
+  transporterNumberPlate_not_in?: Maybe<String[] | String>;
+  transporterNumberPlate_lt?: Maybe<String>;
+  transporterNumberPlate_lte?: Maybe<String>;
+  transporterNumberPlate_gt?: Maybe<String>;
+  transporterNumberPlate_gte?: Maybe<String>;
+  transporterNumberPlate_contains?: Maybe<String>;
+  transporterNumberPlate_not_contains?: Maybe<String>;
+  transporterNumberPlate_starts_with?: Maybe<String>;
+  transporterNumberPlate_not_starts_with?: Maybe<String>;
+  transporterNumberPlate_ends_with?: Maybe<String>;
+  transporterNumberPlate_not_ends_with?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsCode_not?: Maybe<String>;
+  wasteDetailsCode_in?: Maybe<String[] | String>;
+  wasteDetailsCode_not_in?: Maybe<String[] | String>;
+  wasteDetailsCode_lt?: Maybe<String>;
+  wasteDetailsCode_lte?: Maybe<String>;
+  wasteDetailsCode_gt?: Maybe<String>;
+  wasteDetailsCode_gte?: Maybe<String>;
+  wasteDetailsCode_contains?: Maybe<String>;
+  wasteDetailsCode_not_contains?: Maybe<String>;
+  wasteDetailsCode_starts_with?: Maybe<String>;
+  wasteDetailsCode_not_starts_with?: Maybe<String>;
+  wasteDetailsCode_ends_with?: Maybe<String>;
+  wasteDetailsCode_not_ends_with?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsName_not?: Maybe<String>;
+  wasteDetailsName_in?: Maybe<String[] | String>;
+  wasteDetailsName_not_in?: Maybe<String[] | String>;
+  wasteDetailsName_lt?: Maybe<String>;
+  wasteDetailsName_lte?: Maybe<String>;
+  wasteDetailsName_gt?: Maybe<String>;
+  wasteDetailsName_gte?: Maybe<String>;
+  wasteDetailsName_contains?: Maybe<String>;
+  wasteDetailsName_not_contains?: Maybe<String>;
+  wasteDetailsName_starts_with?: Maybe<String>;
+  wasteDetailsName_not_starts_with?: Maybe<String>;
+  wasteDetailsName_ends_with?: Maybe<String>;
+  wasteDetailsName_not_ends_with?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsOnuCode_not?: Maybe<String>;
+  wasteDetailsOnuCode_in?: Maybe<String[] | String>;
+  wasteDetailsOnuCode_not_in?: Maybe<String[] | String>;
+  wasteDetailsOnuCode_lt?: Maybe<String>;
+  wasteDetailsOnuCode_lte?: Maybe<String>;
+  wasteDetailsOnuCode_gt?: Maybe<String>;
+  wasteDetailsOnuCode_gte?: Maybe<String>;
+  wasteDetailsOnuCode_contains?: Maybe<String>;
+  wasteDetailsOnuCode_not_contains?: Maybe<String>;
+  wasteDetailsOnuCode_starts_with?: Maybe<String>;
+  wasteDetailsOnuCode_not_starts_with?: Maybe<String>;
+  wasteDetailsOnuCode_ends_with?: Maybe<String>;
+  wasteDetailsOnuCode_not_ends_with?: Maybe<String>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsOtherPackaging_not?: Maybe<String>;
+  wasteDetailsOtherPackaging_in?: Maybe<String[] | String>;
+  wasteDetailsOtherPackaging_not_in?: Maybe<String[] | String>;
+  wasteDetailsOtherPackaging_lt?: Maybe<String>;
+  wasteDetailsOtherPackaging_lte?: Maybe<String>;
+  wasteDetailsOtherPackaging_gt?: Maybe<String>;
+  wasteDetailsOtherPackaging_gte?: Maybe<String>;
+  wasteDetailsOtherPackaging_contains?: Maybe<String>;
+  wasteDetailsOtherPackaging_not_contains?: Maybe<String>;
+  wasteDetailsOtherPackaging_starts_with?: Maybe<String>;
+  wasteDetailsOtherPackaging_not_starts_with?: Maybe<String>;
+  wasteDetailsOtherPackaging_ends_with?: Maybe<String>;
+  wasteDetailsOtherPackaging_not_ends_with?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_not?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_in?: Maybe<Int[] | Int>;
+  wasteDetailsNumberOfPackages_not_in?: Maybe<Int[] | Int>;
+  wasteDetailsNumberOfPackages_lt?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_lte?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_gt?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_gte?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantity_not?: Maybe<Float>;
+  wasteDetailsQuantity_in?: Maybe<Float[] | Float>;
+  wasteDetailsQuantity_not_in?: Maybe<Float[] | Float>;
+  wasteDetailsQuantity_lt?: Maybe<Float>;
+  wasteDetailsQuantity_lte?: Maybe<Float>;
+  wasteDetailsQuantity_gt?: Maybe<Float>;
+  wasteDetailsQuantity_gte?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsQuantityType_not?: Maybe<QuantityType>;
+  wasteDetailsQuantityType_in?: Maybe<QuantityType[] | QuantityType>;
+  wasteDetailsQuantityType_not_in?: Maybe<QuantityType[] | QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsConsistence_not?: Maybe<Consistence>;
+  wasteDetailsConsistence_in?: Maybe<Consistence[] | Consistence>;
+  wasteDetailsConsistence_not_in?: Maybe<Consistence[] | Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanyName_not?: Maybe<String>;
+  traderCompanyName_in?: Maybe<String[] | String>;
+  traderCompanyName_not_in?: Maybe<String[] | String>;
+  traderCompanyName_lt?: Maybe<String>;
+  traderCompanyName_lte?: Maybe<String>;
+  traderCompanyName_gt?: Maybe<String>;
+  traderCompanyName_gte?: Maybe<String>;
+  traderCompanyName_contains?: Maybe<String>;
+  traderCompanyName_not_contains?: Maybe<String>;
+  traderCompanyName_starts_with?: Maybe<String>;
+  traderCompanyName_not_starts_with?: Maybe<String>;
+  traderCompanyName_ends_with?: Maybe<String>;
+  traderCompanyName_not_ends_with?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanySiret_not?: Maybe<String>;
+  traderCompanySiret_in?: Maybe<String[] | String>;
+  traderCompanySiret_not_in?: Maybe<String[] | String>;
+  traderCompanySiret_lt?: Maybe<String>;
+  traderCompanySiret_lte?: Maybe<String>;
+  traderCompanySiret_gt?: Maybe<String>;
+  traderCompanySiret_gte?: Maybe<String>;
+  traderCompanySiret_contains?: Maybe<String>;
+  traderCompanySiret_not_contains?: Maybe<String>;
+  traderCompanySiret_starts_with?: Maybe<String>;
+  traderCompanySiret_not_starts_with?: Maybe<String>;
+  traderCompanySiret_ends_with?: Maybe<String>;
+  traderCompanySiret_not_ends_with?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyAddress_not?: Maybe<String>;
+  traderCompanyAddress_in?: Maybe<String[] | String>;
+  traderCompanyAddress_not_in?: Maybe<String[] | String>;
+  traderCompanyAddress_lt?: Maybe<String>;
+  traderCompanyAddress_lte?: Maybe<String>;
+  traderCompanyAddress_gt?: Maybe<String>;
+  traderCompanyAddress_gte?: Maybe<String>;
+  traderCompanyAddress_contains?: Maybe<String>;
+  traderCompanyAddress_not_contains?: Maybe<String>;
+  traderCompanyAddress_starts_with?: Maybe<String>;
+  traderCompanyAddress_not_starts_with?: Maybe<String>;
+  traderCompanyAddress_ends_with?: Maybe<String>;
+  traderCompanyAddress_not_ends_with?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyContact_not?: Maybe<String>;
+  traderCompanyContact_in?: Maybe<String[] | String>;
+  traderCompanyContact_not_in?: Maybe<String[] | String>;
+  traderCompanyContact_lt?: Maybe<String>;
+  traderCompanyContact_lte?: Maybe<String>;
+  traderCompanyContact_gt?: Maybe<String>;
+  traderCompanyContact_gte?: Maybe<String>;
+  traderCompanyContact_contains?: Maybe<String>;
+  traderCompanyContact_not_contains?: Maybe<String>;
+  traderCompanyContact_starts_with?: Maybe<String>;
+  traderCompanyContact_not_starts_with?: Maybe<String>;
+  traderCompanyContact_ends_with?: Maybe<String>;
+  traderCompanyContact_not_ends_with?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyPhone_not?: Maybe<String>;
+  traderCompanyPhone_in?: Maybe<String[] | String>;
+  traderCompanyPhone_not_in?: Maybe<String[] | String>;
+  traderCompanyPhone_lt?: Maybe<String>;
+  traderCompanyPhone_lte?: Maybe<String>;
+  traderCompanyPhone_gt?: Maybe<String>;
+  traderCompanyPhone_gte?: Maybe<String>;
+  traderCompanyPhone_contains?: Maybe<String>;
+  traderCompanyPhone_not_contains?: Maybe<String>;
+  traderCompanyPhone_starts_with?: Maybe<String>;
+  traderCompanyPhone_not_starts_with?: Maybe<String>;
+  traderCompanyPhone_ends_with?: Maybe<String>;
+  traderCompanyPhone_not_ends_with?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderCompanyMail_not?: Maybe<String>;
+  traderCompanyMail_in?: Maybe<String[] | String>;
+  traderCompanyMail_not_in?: Maybe<String[] | String>;
+  traderCompanyMail_lt?: Maybe<String>;
+  traderCompanyMail_lte?: Maybe<String>;
+  traderCompanyMail_gt?: Maybe<String>;
+  traderCompanyMail_gte?: Maybe<String>;
+  traderCompanyMail_contains?: Maybe<String>;
+  traderCompanyMail_not_contains?: Maybe<String>;
+  traderCompanyMail_starts_with?: Maybe<String>;
+  traderCompanyMail_not_starts_with?: Maybe<String>;
+  traderCompanyMail_ends_with?: Maybe<String>;
+  traderCompanyMail_not_ends_with?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderReceipt_not?: Maybe<String>;
+  traderReceipt_in?: Maybe<String[] | String>;
+  traderReceipt_not_in?: Maybe<String[] | String>;
+  traderReceipt_lt?: Maybe<String>;
+  traderReceipt_lte?: Maybe<String>;
+  traderReceipt_gt?: Maybe<String>;
+  traderReceipt_gte?: Maybe<String>;
+  traderReceipt_contains?: Maybe<String>;
+  traderReceipt_not_contains?: Maybe<String>;
+  traderReceipt_starts_with?: Maybe<String>;
+  traderReceipt_not_starts_with?: Maybe<String>;
+  traderReceipt_ends_with?: Maybe<String>;
+  traderReceipt_not_ends_with?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderDepartment_not?: Maybe<String>;
+  traderDepartment_in?: Maybe<String[] | String>;
+  traderDepartment_not_in?: Maybe<String[] | String>;
+  traderDepartment_lt?: Maybe<String>;
+  traderDepartment_lte?: Maybe<String>;
+  traderDepartment_gt?: Maybe<String>;
+  traderDepartment_gte?: Maybe<String>;
+  traderDepartment_contains?: Maybe<String>;
+  traderDepartment_not_contains?: Maybe<String>;
+  traderDepartment_starts_with?: Maybe<String>;
+  traderDepartment_not_starts_with?: Maybe<String>;
+  traderDepartment_ends_with?: Maybe<String>;
+  traderDepartment_not_ends_with?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  traderValidityLimit_not?: Maybe<DateTimeInput>;
+  traderValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  traderValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  traderValidityLimit_lt?: Maybe<DateTimeInput>;
+  traderValidityLimit_lte?: Maybe<DateTimeInput>;
+  traderValidityLimit_gt?: Maybe<DateTimeInput>;
+  traderValidityLimit_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+  OR?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+  NOT?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+}
 
 export interface NodeNode {
   id: ID_Output;
@@ -3524,38 +3660,20 @@ export interface UserActivationHashPreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface UserAccountHashPreviousValues {
-  id: ID_Output;
-  email: String;
-  companySiret: ID_Output;
-  role: UserRole;
-  hash: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
+export interface AggregateForm {
+  count: Int;
 }
 
-export interface UserAccountHashPreviousValuesPromise
-  extends Promise<UserAccountHashPreviousValues>,
+export interface AggregateFormPromise
+  extends Promise<AggregateForm>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
+  count: () => Promise<Int>;
 }
 
-export interface UserAccountHashPreviousValuesSubscription
-  extends Promise<AsyncIterator<UserAccountHashPreviousValues>>,
+export interface AggregateFormSubscription
+  extends Promise<AsyncIterator<AggregateForm>>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  email: () => Promise<AsyncIterator<String>>;
-  companySiret: () => Promise<AsyncIterator<ID_Output>>;
-  role: () => Promise<AsyncIterator<UserRole>>;
-  hash: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface UserSubscriptionPayload {
@@ -3583,116 +3701,21 @@ export interface UserSubscriptionPayloadSubscription
   previousValues: <T = UserPreviousValuesSubscription>() => T;
 }
 
-export interface User {
-  id: ID_Output;
-  isActive?: Boolean;
-  email: String;
-  password: String;
-  name?: String;
-  phone?: String;
-  userType?: Json;
-  gerepId?: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
+export interface FormEdge {
+  node: Form;
+  cursor: String;
 }
 
-export interface UserPromise extends Promise<User>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  userType: () => Promise<Json>;
-  companies: <T = FragmentableArray<Company>>(args?: {
-    where?: CompanyWhereInput;
-    orderBy?: CompanyOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  gerepId: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
+export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
+  node: <T = FormPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface UserSubscription
-  extends Promise<AsyncIterator<User>>,
+export interface FormEdgeSubscription
+  extends Promise<AsyncIterator<FormEdge>>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  isActive: () => Promise<AsyncIterator<Boolean>>;
-  email: () => Promise<AsyncIterator<String>>;
-  password: () => Promise<AsyncIterator<String>>;
-  name: () => Promise<AsyncIterator<String>>;
-  phone: () => Promise<AsyncIterator<String>>;
-  userType: () => Promise<AsyncIterator<Json>>;
-  companies: <T = Promise<AsyncIterator<CompanySubscription>>>(args?: {
-    where?: CompanyWhereInput;
-    orderBy?: CompanyOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  companyAssociations: <
-    T = Promise<AsyncIterator<CompanyAssociationSubscription>>
-  >(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  gerepId: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface UserNullablePromise
-  extends Promise<User | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  userType: () => Promise<Json>;
-  companies: <T = FragmentableArray<Company>>(args?: {
-    where?: CompanyWhereInput;
-    orderBy?: CompanyOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  gerepId: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
+  node: <T = FormSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface CompanyAssociation {
@@ -3727,29 +3750,25 @@ export interface CompanyAssociationNullablePromise
   role: () => Promise<UserRole>;
 }
 
-export interface UserAccountHashSubscriptionPayload {
-  mutation: MutationType;
-  node: UserAccountHash;
-  updatedFields: String[];
-  previousValues: UserAccountHashPreviousValues;
+export interface FormConnection {
+  pageInfo: PageInfo;
+  edges: FormEdge[];
 }
 
-export interface UserAccountHashSubscriptionPayloadPromise
-  extends Promise<UserAccountHashSubscriptionPayload>,
+export interface FormConnectionPromise
+  extends Promise<FormConnection>,
     Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserAccountHashPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserAccountHashPreviousValuesPromise>() => T;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<FormEdge>>() => T;
+  aggregate: <T = AggregateFormPromise>() => T;
 }
 
-export interface UserAccountHashSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserAccountHashSubscriptionPayload>>,
+export interface FormConnectionSubscription
+  extends Promise<AsyncIterator<FormConnection>>,
     Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserAccountHashSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserAccountHashPreviousValuesSubscription>() => T;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateFormSubscription>() => T;
 }
 
 export interface AggregateUserActivationHash {
@@ -3807,27 +3826,29 @@ export interface UserActivationHashConnectionSubscription
   aggregate: <T = AggregateUserActivationHashSubscription>() => T;
 }
 
-export interface PageInfo {
-  hasNextPage: Boolean;
-  hasPreviousPage: Boolean;
-  startCursor?: String;
-  endCursor?: String;
+export interface UserAccountHashSubscriptionPayload {
+  mutation: MutationType;
+  node: UserAccountHash;
+  updatedFields: String[];
+  previousValues: UserAccountHashPreviousValues;
 }
 
-export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
-  hasNextPage: () => Promise<Boolean>;
-  hasPreviousPage: () => Promise<Boolean>;
-  startCursor: () => Promise<String>;
-  endCursor: () => Promise<String>;
-}
-
-export interface PageInfoSubscription
-  extends Promise<AsyncIterator<PageInfo>>,
+export interface UserAccountHashSubscriptionPayloadPromise
+  extends Promise<UserAccountHashSubscriptionPayload>,
     Fragmentable {
-  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
-  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
-  startCursor: () => Promise<AsyncIterator<String>>;
-  endCursor: () => Promise<AsyncIterator<String>>;
+  mutation: () => Promise<MutationType>;
+  node: <T = UserAccountHashPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserAccountHashPreviousValuesPromise>() => T;
+}
+
+export interface UserAccountHashSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserAccountHashSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserAccountHashSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserAccountHashPreviousValuesSubscription>() => T;
 }
 
 export interface UserActivationHash {
@@ -3865,6 +3886,48 @@ export interface UserActivationHashNullablePromise
   hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface PageInfo {
+  hasNextPage: Boolean;
+  hasPreviousPage: Boolean;
+  startCursor?: String;
+  endCursor?: String;
+}
+
+export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
+  hasNextPage: () => Promise<Boolean>;
+  hasPreviousPage: () => Promise<Boolean>;
+  startCursor: () => Promise<String>;
+  endCursor: () => Promise<String>;
+}
+
+export interface PageInfoSubscription
+  extends Promise<AsyncIterator<PageInfo>>,
+    Fragmentable {
+  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
+  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
+  startCursor: () => Promise<AsyncIterator<String>>;
+  endCursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface UserAccountHashEdge {
+  node: UserAccountHash;
+  cursor: String;
+}
+
+export interface UserAccountHashEdgePromise
+  extends Promise<UserAccountHashEdge>,
+    Fragmentable {
+  node: <T = UserAccountHashPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface UserAccountHashEdgeSubscription
+  extends Promise<AsyncIterator<UserAccountHashEdge>>,
+    Fragmentable {
+  node: <T = UserAccountHashSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface Form {
@@ -4169,41 +4232,6 @@ export interface FormNullablePromise
   }) => T;
 }
 
-export interface UserAccountHashEdge {
-  node: UserAccountHash;
-  cursor: String;
-}
-
-export interface UserAccountHashEdgePromise
-  extends Promise<UserAccountHashEdge>,
-    Fragmentable {
-  node: <T = UserAccountHashPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface UserAccountHashEdgeSubscription
-  extends Promise<AsyncIterator<UserAccountHashEdge>>,
-    Fragmentable {
-  node: <T = UserAccountHashSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface AggregateCompanyAssociation {
-  count: Int;
-}
-
-export interface AggregateCompanyAssociationPromise
-  extends Promise<AggregateCompanyAssociation>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateCompanyAssociationSubscription
-  extends Promise<AsyncIterator<AggregateCompanyAssociation>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
 export interface CompanyConnection {
   pageInfo: PageInfo;
   edges: CompanyEdge[];
@@ -4225,23 +4253,20 @@ export interface CompanyConnectionSubscription
   aggregate: <T = AggregateCompanySubscription>() => T;
 }
 
-export interface CompanyAssociationEdge {
-  node: CompanyAssociation;
-  cursor: String;
+export interface AggregateCompanyAssociation {
+  count: Int;
 }
 
-export interface CompanyAssociationEdgePromise
-  extends Promise<CompanyAssociationEdge>,
+export interface AggregateCompanyAssociationPromise
+  extends Promise<AggregateCompanyAssociation>,
     Fragmentable {
-  node: <T = CompanyAssociationPromise>() => T;
-  cursor: () => Promise<String>;
+  count: () => Promise<Int>;
 }
 
-export interface CompanyAssociationEdgeSubscription
-  extends Promise<AsyncIterator<CompanyAssociationEdge>>,
+export interface AggregateCompanyAssociationSubscription
+  extends Promise<AsyncIterator<AggregateCompanyAssociation>>,
     Fragmentable {
-  node: <T = CompanyAssociationSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface AggregateUser {
@@ -4349,20 +4374,22 @@ export interface CompanySubscriptionPayloadSubscription
   previousValues: <T = CompanyPreviousValuesSubscription>() => T;
 }
 
-export interface FormEdge {
-  node: Form;
+export interface StatusLogEdge {
+  node: StatusLog;
   cursor: String;
 }
 
-export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
-  node: <T = FormPromise>() => T;
+export interface StatusLogEdgePromise
+  extends Promise<StatusLogEdge>,
+    Fragmentable {
+  node: <T = StatusLogPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface FormEdgeSubscription
-  extends Promise<AsyncIterator<FormEdge>>,
+export interface StatusLogEdgeSubscription
+  extends Promise<AsyncIterator<StatusLogEdge>>,
     Fragmentable {
-  node: <T = FormSubscription>() => T;
+  node: <T = StatusLogSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
@@ -4394,118 +4421,87 @@ export interface CompanyPreviousValuesSubscription
   securityCode: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface UserActivationHashSubscriptionPayload {
-  mutation: MutationType;
-  node: UserActivationHash;
-  updatedFields: String[];
-  previousValues: UserActivationHashPreviousValues;
-}
-
-export interface UserActivationHashSubscriptionPayloadPromise
-  extends Promise<UserActivationHashSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserActivationHashPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
-}
-
-export interface UserActivationHashSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserActivationHashSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
-}
-
-export interface CompanyAssociationConnection {
-  pageInfo: PageInfo;
-  edges: CompanyAssociationEdge[];
-}
-
-export interface CompanyAssociationConnectionPromise
-  extends Promise<CompanyAssociationConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CompanyAssociationEdge>>() => T;
-  aggregate: <T = AggregateCompanyAssociationPromise>() => T;
-}
-
-export interface CompanyAssociationConnectionSubscription
-  extends Promise<AsyncIterator<CompanyAssociationConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <
-    T = Promise<AsyncIterator<CompanyAssociationEdgeSubscription>>
-  >() => T;
-  aggregate: <T = AggregateCompanyAssociationSubscription>() => T;
-}
-
-export interface Company {
+export interface UserAccountHashPreviousValues {
   id: ID_Output;
-  siret: String;
+  email: String;
+  companySiret: ID_Output;
+  role: UserRole;
+  hash: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
-  securityCode: Int;
 }
 
-export interface CompanyPromise extends Promise<Company>, Fragmentable {
+export interface UserAccountHashPreviousValuesPromise
+  extends Promise<UserAccountHashPreviousValues>,
+    Fragmentable {
   id: () => Promise<ID_Output>;
-  siret: () => Promise<String>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
-  securityCode: () => Promise<Int>;
-  admin: <T = UserPromise>() => T;
-  user: <T = FragmentableArray<User>>(args?: {
-    where?: UserWhereInput;
-    orderBy?: UserOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
 }
 
-export interface CompanySubscription
-  extends Promise<AsyncIterator<Company>>,
+export interface UserAccountHashPreviousValuesSubscription
+  extends Promise<AsyncIterator<UserAccountHashPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  siret: () => Promise<AsyncIterator<String>>;
+  email: () => Promise<AsyncIterator<String>>;
+  companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
+  hash: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  securityCode: () => Promise<AsyncIterator<Int>>;
-  admin: <T = UserSubscription>() => T;
-  user: <T = Promise<AsyncIterator<UserSubscription>>>(args?: {
-    where?: UserWhereInput;
-    orderBy?: UserOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
 }
 
-export interface CompanyNullablePromise
-  extends Promise<Company | null>,
+export interface CompanyAssociationEdge {
+  node: CompanyAssociation;
+  cursor: String;
+}
+
+export interface CompanyAssociationEdgePromise
+  extends Promise<CompanyAssociationEdge>,
+    Fragmentable {
+  node: <T = CompanyAssociationPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface CompanyAssociationEdgeSubscription
+  extends Promise<AsyncIterator<CompanyAssociationEdge>>,
+    Fragmentable {
+  node: <T = CompanyAssociationSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface StatusLog {
+  id: ID_Output;
+  status: Status;
+}
+
+export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  form: <T = FormPromise>() => T;
+  status: () => Promise<Status>;
+}
+
+export interface StatusLogSubscription
+  extends Promise<AsyncIterator<StatusLog>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
+  form: <T = FormSubscription>() => T;
+  status: () => Promise<AsyncIterator<Status>>;
+}
+
+export interface StatusLogNullablePromise
+  extends Promise<StatusLog | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  siret: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  securityCode: () => Promise<Int>;
-  admin: <T = UserPromise>() => T;
-  user: <T = FragmentableArray<User>>(args?: {
-    where?: UserWhereInput;
-    orderBy?: UserOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
+  user: <T = UserPromise>() => T;
+  form: <T = FormPromise>() => T;
+  status: () => Promise<Status>;
 }
 
 export interface CompanyAssociationSubscriptionPayload {
@@ -4533,25 +4529,23 @@ export interface CompanyAssociationSubscriptionPayloadSubscription
   previousValues: <T = CompanyAssociationPreviousValuesSubscription>() => T;
 }
 
-export interface UserAccountHashConnection {
-  pageInfo: PageInfo;
-  edges: UserAccountHashEdge[];
+export interface UserActivationHashEdge {
+  node: UserActivationHash;
+  cursor: String;
 }
 
-export interface UserAccountHashConnectionPromise
-  extends Promise<UserAccountHashConnection>,
+export interface UserActivationHashEdgePromise
+  extends Promise<UserActivationHashEdge>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserAccountHashEdge>>() => T;
-  aggregate: <T = AggregateUserAccountHashPromise>() => T;
+  node: <T = UserActivationHashPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface UserAccountHashConnectionSubscription
-  extends Promise<AsyncIterator<UserAccountHashConnection>>,
+export interface UserActivationHashEdgeSubscription
+  extends Promise<AsyncIterator<UserActivationHashEdge>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<UserAccountHashEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateUserAccountHashSubscription>() => T;
+  node: <T = UserActivationHashSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface CompanyAssociationPreviousValues {
@@ -4573,59 +4567,130 @@ export interface CompanyAssociationPreviousValuesSubscription
   role: () => Promise<AsyncIterator<UserRole>>;
 }
 
-export interface UserEdge {
-  node: User;
-  cursor: String;
+export interface AggregateUserAccountHash {
+  count: Int;
 }
 
-export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
-  node: <T = UserPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface UserEdgeSubscription
-  extends Promise<AsyncIterator<UserEdge>>,
+export interface AggregateUserAccountHashPromise
+  extends Promise<AggregateUserAccountHash>,
     Fragmentable {
-  node: <T = UserSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<Int>;
 }
 
-export interface FormConnection {
+export interface AggregateUserAccountHashSubscription
+  extends Promise<AsyncIterator<AggregateUserAccountHash>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface CompanyAssociationConnection {
   pageInfo: PageInfo;
-  edges: FormEdge[];
+  edges: CompanyAssociationEdge[];
 }
 
-export interface FormConnectionPromise
-  extends Promise<FormConnection>,
+export interface CompanyAssociationConnectionPromise
+  extends Promise<CompanyAssociationConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<FormEdge>>() => T;
-  aggregate: <T = AggregateFormPromise>() => T;
+  edges: <T = FragmentableArray<CompanyAssociationEdge>>() => T;
+  aggregate: <T = AggregateCompanyAssociationPromise>() => T;
 }
 
-export interface FormConnectionSubscription
-  extends Promise<AsyncIterator<FormConnection>>,
+export interface CompanyAssociationConnectionSubscription
+  extends Promise<AsyncIterator<CompanyAssociationConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateFormSubscription>() => T;
+  edges: <
+    T = Promise<AsyncIterator<CompanyAssociationEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateCompanyAssociationSubscription>() => T;
 }
 
-export interface CompanyEdge {
-  node: Company;
-  cursor: String;
+export interface UserAccountHash {
+  id: ID_Output;
+  email: String;
+  companySiret: ID_Output;
+  role: UserRole;
+  hash: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
 }
 
-export interface CompanyEdgePromise extends Promise<CompanyEdge>, Fragmentable {
-  node: <T = CompanyPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface CompanyEdgeSubscription
-  extends Promise<AsyncIterator<CompanyEdge>>,
+export interface UserAccountHashPromise
+  extends Promise<UserAccountHash>,
     Fragmentable {
-  node: <T = CompanySubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  id: () => Promise<ID_Output>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserAccountHashSubscription
+  extends Promise<AsyncIterator<UserAccountHash>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  email: () => Promise<AsyncIterator<String>>;
+  companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
+  hash: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserAccountHashNullablePromise
+  extends Promise<UserAccountHash | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface FormSubscriptionPayload {
+  mutation: MutationType;
+  node: Form;
+  updatedFields: String[];
+  previousValues: FormPreviousValues;
+}
+
+export interface FormSubscriptionPayloadPromise
+  extends Promise<FormSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = FormPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = FormPreviousValuesPromise>() => T;
+}
+
+export interface FormSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<FormSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = FormSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = FormPreviousValuesSubscription>() => T;
+}
+
+export interface AggregateStatusLog {
+  count: Int;
+}
+
+export interface AggregateStatusLogPromise
+  extends Promise<AggregateStatusLog>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateStatusLogSubscription
+  extends Promise<AsyncIterator<AggregateStatusLog>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface FormPreviousValues {
@@ -4833,29 +4898,243 @@ export interface FormPreviousValuesSubscription
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface FormSubscriptionPayload {
-  mutation: MutationType;
-  node: Form;
-  updatedFields: String[];
-  previousValues: FormPreviousValues;
+export interface User {
+  id: ID_Output;
+  isActive?: Boolean;
+  email: String;
+  password: String;
+  name?: String;
+  phone?: String;
+  userType?: Json;
+  gerepId?: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
 }
 
-export interface FormSubscriptionPayloadPromise
-  extends Promise<FormSubscriptionPayload>,
+export interface UserPromise extends Promise<User>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
+  userType: () => Promise<Json>;
+  companies: <T = FragmentableArray<Company>>(args?: {
+    where?: CompanyWhereInput;
+    orderBy?: CompanyOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  gerepId: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserSubscription
+  extends Promise<AsyncIterator<User>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  isActive: () => Promise<AsyncIterator<Boolean>>;
+  email: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  phone: () => Promise<AsyncIterator<String>>;
+  userType: () => Promise<AsyncIterator<Json>>;
+  companies: <T = Promise<AsyncIterator<CompanySubscription>>>(args?: {
+    where?: CompanyWhereInput;
+    orderBy?: CompanyOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  companyAssociations: <
+    T = Promise<AsyncIterator<CompanyAssociationSubscription>>
+  >(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  gerepId: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserNullablePromise
+  extends Promise<User | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
+  userType: () => Promise<Json>;
+  companies: <T = FragmentableArray<Company>>(args?: {
+    where?: CompanyWhereInput;
+    orderBy?: CompanyOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  gerepId: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface Company {
+  id: ID_Output;
+  siret: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  securityCode: Int;
+}
+
+export interface CompanyPromise extends Promise<Company>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  siret: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  securityCode: () => Promise<Int>;
+  admin: <T = UserPromise>() => T;
+  user: <T = FragmentableArray<User>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface CompanySubscription
+  extends Promise<AsyncIterator<Company>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  siret: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  securityCode: () => Promise<AsyncIterator<Int>>;
+  admin: <T = UserSubscription>() => T;
+  user: <T = Promise<AsyncIterator<UserSubscription>>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface CompanyNullablePromise
+  extends Promise<Company | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  siret: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  securityCode: () => Promise<Int>;
+  admin: <T = UserPromise>() => T;
+  user: <T = FragmentableArray<User>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface CompanyEdge {
+  node: Company;
+  cursor: String;
+}
+
+export interface CompanyEdgePromise extends Promise<CompanyEdge>, Fragmentable {
+  node: <T = CompanyPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface CompanyEdgeSubscription
+  extends Promise<AsyncIterator<CompanyEdge>>,
+    Fragmentable {
+  node: <T = CompanySubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface StatusLogPreviousValues {
+  id: ID_Output;
+  status: Status;
+}
+
+export interface StatusLogPreviousValuesPromise
+  extends Promise<StatusLogPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  status: () => Promise<Status>;
+}
+
+export interface StatusLogPreviousValuesSubscription
+  extends Promise<AsyncIterator<StatusLogPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  status: () => Promise<AsyncIterator<Status>>;
+}
+
+export interface StatusLogSubscriptionPayload {
+  mutation: MutationType;
+  node: StatusLog;
+  updatedFields: String[];
+  previousValues: StatusLogPreviousValues;
+}
+
+export interface StatusLogSubscriptionPayloadPromise
+  extends Promise<StatusLogSubscriptionPayload>,
     Fragmentable {
   mutation: () => Promise<MutationType>;
-  node: <T = FormPromise>() => T;
+  node: <T = StatusLogPromise>() => T;
   updatedFields: () => Promise<String[]>;
-  previousValues: <T = FormPreviousValuesPromise>() => T;
+  previousValues: <T = StatusLogPreviousValuesPromise>() => T;
 }
 
-export interface FormSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<FormSubscriptionPayload>>,
+export interface StatusLogSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<StatusLogSubscriptionPayload>>,
     Fragmentable {
   mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = FormSubscription>() => T;
+  node: <T = StatusLogSubscription>() => T;
   updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = FormPreviousValuesSubscription>() => T;
+  previousValues: <T = StatusLogPreviousValuesSubscription>() => T;
 }
 
 export interface AggregateCompany {
@@ -4874,104 +5153,94 @@ export interface AggregateCompanySubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface UserActivationHashEdge {
+export interface UserAccountHashConnection {
+  pageInfo: PageInfo;
+  edges: UserAccountHashEdge[];
+}
+
+export interface UserAccountHashConnectionPromise
+  extends Promise<UserAccountHashConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<UserAccountHashEdge>>() => T;
+  aggregate: <T = AggregateUserAccountHashPromise>() => T;
+}
+
+export interface UserAccountHashConnectionSubscription
+  extends Promise<AsyncIterator<UserAccountHashConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<UserAccountHashEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateUserAccountHashSubscription>() => T;
+}
+
+export interface UserActivationHashSubscriptionPayload {
+  mutation: MutationType;
   node: UserActivationHash;
+  updatedFields: String[];
+  previousValues: UserActivationHashPreviousValues;
+}
+
+export interface UserActivationHashSubscriptionPayloadPromise
+  extends Promise<UserActivationHashSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = UserActivationHashPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
+}
+
+export interface UserActivationHashSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserActivationHashSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
+}
+
+export interface StatusLogConnection {
+  pageInfo: PageInfo;
+  edges: StatusLogEdge[];
+}
+
+export interface StatusLogConnectionPromise
+  extends Promise<StatusLogConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<StatusLogEdge>>() => T;
+  aggregate: <T = AggregateStatusLogPromise>() => T;
+}
+
+export interface StatusLogConnectionSubscription
+  extends Promise<AsyncIterator<StatusLogConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<StatusLogEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateStatusLogSubscription>() => T;
+}
+
+export interface UserEdge {
+  node: User;
   cursor: String;
 }
 
-export interface UserActivationHashEdgePromise
-  extends Promise<UserActivationHashEdge>,
-    Fragmentable {
-  node: <T = UserActivationHashPromise>() => T;
+export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
+  node: <T = UserPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface UserActivationHashEdgeSubscription
-  extends Promise<AsyncIterator<UserActivationHashEdge>>,
+export interface UserEdgeSubscription
+  extends Promise<AsyncIterator<UserEdge>>,
     Fragmentable {
-  node: <T = UserActivationHashSubscription>() => T;
+  node: <T = UserSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface AggregateForm {
-  count: Int;
-}
-
-export interface AggregateFormPromise
-  extends Promise<AggregateForm>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateFormSubscription
-  extends Promise<AsyncIterator<AggregateForm>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface UserAccountHash {
-  id: ID_Output;
-  email: String;
-  companySiret: ID_Output;
-  role: UserRole;
-  hash: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-}
-
-export interface UserAccountHashPromise
-  extends Promise<UserAccountHash>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface UserAccountHashSubscription
-  extends Promise<AsyncIterator<UserAccountHash>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  email: () => Promise<AsyncIterator<String>>;
-  companySiret: () => Promise<AsyncIterator<ID_Output>>;
-  role: () => Promise<AsyncIterator<UserRole>>;
-  hash: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface UserAccountHashNullablePromise
-  extends Promise<UserAccountHash | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface AggregateUserAccountHash {
-  count: Int;
-}
-
-export interface AggregateUserAccountHashPromise
-  extends Promise<AggregateUserAccountHash>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserAccountHashSubscription
-  extends Promise<AsyncIterator<AggregateUserAccountHash>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export type Json = any;
+/*
+The `Boolean` scalar type represents `true` or `false`.
+*/
+export type Boolean = boolean;
 
 export type Long = string;
 
@@ -4996,10 +5265,7 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 */
 export type Int = number;
 
-/*
-The `Boolean` scalar type represents `true` or `false`.
-*/
-export type Boolean = boolean;
+export type Json = any;
 
 /*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point). 
@@ -5058,6 +5324,10 @@ export const models: Model[] = [
   },
   {
     name: "Status",
+    embedded: false
+  },
+  {
+    name: "StatusLog",
     embedded: false
   }
 ];

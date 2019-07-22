@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+
+# VS code
+.vscode
+
+# data folders
+code/data/s3ic
+code/data/rubrique/
+
+#Mac OS
+__MACOSX

@@ -1,5 +1,5 @@
 import { Form } from "../../form/model";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function getKey(object: any, key: string) {
   const splittedKey = key.split(".");
@@ -18,8 +18,11 @@ export function useFormsTable(
   inputForms: Form[]
 ): [Form[], (k: string) => void, (k: string, v: string) => void] {
   const [forms, setForms] = useState(inputForms);
+
   const [sortKey, setSortKey] = useState("");
   const [filters, setFilters] = useState<{ key: string; value: string }[]>([]);
+
+  useEffect(() => setForms(inputForms), [inputForms]);
 
   function sortBy(key: string) {
     const sortedForms = [...forms];
@@ -36,7 +39,10 @@ export function useFormsTable(
 
     const newForms = inputForms.filter(f =>
       newFilters.every(
-        filter => getKey(f, filter.key).toLowerCase().indexOf(filter.value.toLowerCase()) > -1
+        filter =>
+          getKey(f, filter.key)
+            .toLowerCase()
+            .indexOf(filter.value.toLowerCase()) > -1
       )
     );
     setFilters(newFilters);

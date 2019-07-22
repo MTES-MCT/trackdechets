@@ -18,11 +18,18 @@ services:
             migrations: true
 
   postgres:
-    image: postgres:10.5
+    image: td-postgres
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
     restart: always
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      AIRFLOW_POSTGRES_USER: $AIRFLOW_POSTGRES_USER
+      AIRFLOW_POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
+    ports:
+      - "5432:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
 
@@ -37,7 +44,7 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
-    command: npx nodemon -L --watch src --exec npm start
+    command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
     volumes:
       - ./back/src:/usr/src/app/src
     environment:
@@ -47,17 +54,21 @@ services:
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-
   td-ui:
-    image: td-ui
-    build:
-      context: ./front
-      dockerfile: Dockerfile
+    image: node:10.14-alpine
+    working_dir: /usr/src/front
+    command: sh -c "npm install && npm start"
+    expose:
+      - "3000"
     environment:
-      REACT_APP_API_ENDPOINT: $API_HOST
+      REACT_APP_API_ENDPOINT: http://$API_HOST
+      REACT_APP_HOSTNAME: http://$UI_HOST
       VIRTUAL_HOST: $UI_HOST
+      VIRTUAL_PORT: 3000
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+    volumes:
+      - ./front/:/usr/src/front
 
   td-insee:
     image: td-insee
@@ -68,6 +79,8 @@ services:
       - 81:81
     environment:
       INSEE_SECRET: $INSEE_SECRET
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
   td-pdf:
     image: td-pdf
@@ -97,6 +110,29 @@ services:
       VIRTUAL_HOST: $DOC_HOST
       LETSENCRYPT_HOST: $DOC_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+
+  td-etl:
+    image: td-etl
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
+    environment:
+      VIRTUAL_HOST: $ETL_HOST
+      VIRTUAL_PORT: 8080
+      LOAD_EX: y
+      POSTGRES_USER: $AIRFLOW_POSTGRES_USER
+      POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
+      AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@postgres:5432/airflow
+      AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$ETL_DB
+      AIRFLOW_CONN_POSTGRES_ETL_TEST: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/test_$ETL_DB
+    volumes:
+      - ./etl/code/dags:/usr/local/airflow/dags
+      - ./etl/code/data:/usr/local/airflow/data
+      - ./etl/code/embulk:/usr/local/airflow/embulk
+      - ./etl/code/sql:/usr/local/airflow/sql
+      - ./etl/code/tests:/usr/local/airflow/tests
 
 volumes:
   postgres:

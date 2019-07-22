@@ -182,4 +182,13 @@ enum Status {
   AWAITING_GROUP
   GROUPED
   NO_TRACEABILITY
+  REFUSED
+}
+
+type StatusLog {
+  id: ID! @id
+
+  user: User!
+  form: Form!
+  status: Status!
 }

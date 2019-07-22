@@ -7,6 +7,7 @@ repo_url: https://github.com/MTES-MCT/trackdechets
 theme: readthedocs
 nav:
   - "Introduction": "index.md"
+  - "Informations sur l'interopérabilité": "infos.md"
   - "Mise en route": "getting-started.md"
   - "Cycle de vie d'un BSD": "workflow.md"
   - "Cas d'usages": "use-cases.md"

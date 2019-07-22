@@ -19,6 +19,7 @@ const GET_APPENDIX_FORMS = gql`
       }
       wasteDetails {
         code
+        name
       }
       receivedAt
       quantityReceived
@@ -27,6 +28,10 @@ const GET_APPENDIX_FORMS = gql`
   }
 `;
 type Props = { emitterSiret: string; name: string };
+
+function round(value: number) {
+  return Math.round(value * 100) / 100;
+}
 
 function reducer(
   state: { selected: string[]; quantity: number },
@@ -37,21 +42,23 @@ function reducer(
       const sp = action.payload as Form;
       return {
         selected: [sp.readableId, ...state.selected],
-        quantity: state.quantity + sp.quantityReceived
+        quantity: round(state.quantity + sp.quantityReceived)
       };
     case "unselect":
       const usp = action.payload as Form;
       return {
         selected: state.selected.filter(v => v !== usp.readableId),
-        quantity: state.quantity - usp.quantityReceived
+        quantity: round(state.quantity - usp.quantityReceived)
       };
     case "selectAll":
       const sap = action.payload as Form[];
       return {
         selected: sap.map((v: Form) => v.readableId),
-        quantity: sap.reduce(
-          (prev: number, cur: Form) => (prev += cur.quantityReceived),
-          0
+        quantity: round(
+          sap.reduce(
+            (prev: number, cur: Form) => (prev += cur.quantityReceived),
+            0
+          )
         )
       };
     default:
@@ -174,7 +181,7 @@ export default connect<Props>(function FormsSelector(props) {
                       />
                     </td>
                     <td>{v.readableId}</td>
-                    <td>{v.wasteDetails.code}</td>
+                    <td>{v.wasteDetails.code} - {v.wasteDetails.name}</td>
                     <td>{v.emitter.company.name}</td>
                     <td>{DateTime.fromISO(v.receivedAt).toLocaleString()}</td>
                     <td>{v.quantityReceived} tonnes</td>

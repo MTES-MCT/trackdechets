@@ -1,6 +1,7 @@
 import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
+import { getCompanyAdmins } from "../companies/helper";
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
@@ -10,6 +11,9 @@ export async function formsSubscriptionCallback(
   );
   mailToInexistantEmitter(payload).catch(err =>
     console.error("Error on inexistant emitter subscription", err)
+  );
+  mailWhenFormIsDeclined(payload).catch(err =>
+    console.error("Error on declined form subscription", err)
   );
 }
 
@@ -82,6 +86,26 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
       emitterName,
       payload.node.emitterCompanyName,
       payload.node.recipientCompanyName
+    )
+  );
+}
+
+async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
+  if (
+    !payload.updatedFields ||
+    !payload.updatedFields.includes("isAccepted") ||
+    !payload.node ||
+    payload.node.isAccepted
+  ) {
+    return;
+  }
+
+  const form = await prisma.form({ id: payload.node.id });
+  const companyAdmins = await getCompanyAdmins(form.emitterCompanySiret);
+
+  return Promise.all(
+    companyAdmins.map(admin =>
+      sendMail(userMails.formNotAccepted(admin.email, admin.name, form))
     )
   );
 }
