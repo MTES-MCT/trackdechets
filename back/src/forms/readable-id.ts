@@ -1,8 +1,11 @@
 import { Context } from "../types";
-import { string } from "yup";
 
 export async function getReadableId(context: Context) {
   const beginningOfYear = new Date(new Date().getFullYear(), 0, 1);
+  const shortYear = beginningOfYear
+    .getFullYear()
+    .toString()
+    .slice(-2);
 
   const mostRecentForms = await context.prisma.forms({
     orderBy: "readableId_DESC",
@@ -12,10 +15,12 @@ export async function getReadableId(context: Context) {
   const latestFormReadableId = mostRecentForms[0].readableId;
   const latestReadableIdAsNumber = decodeNumber(latestFormReadableId.slice(-8));
 
-  return `TD-${beginningOfYear
-    .getFullYear()
-    .toString()
-    .slice(-2)}-${encodeNumber(latestReadableIdAsNumber + 1)}`;
+  const nextNumber =
+    shortYear === latestFormReadableId.slice(3, 5)
+      ? encodeNumber(latestReadableIdAsNumber + 1)
+      : 1;
+
+  return `TD-${shortYear}-${nextNumber}`;
 }
 
 // AAA12345
