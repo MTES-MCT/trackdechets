@@ -61,7 +61,7 @@ export default function EditProfile({ me, onSubmit }: Props) {
                 <div className="form__group">
                   <label>
                     Email
-                    <Field type="email" name="email" disabled />
+                    <Field type="email" name="email" />
                   </label>
                 </div>
                 <div className="form__group">
