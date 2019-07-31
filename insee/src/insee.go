@@ -103,7 +103,7 @@ func buildSearchParams(query url.Values) string {
 		log.Panicln("Url Param 'clue' is missing")
 	}
 	// Unfortunately, lucene '*' on `denominationUniteLegale` doesn't seem to be supported
-	params.Set("q", `denominationUniteLegale:"`+clues[0]+`"`)
+	params.Set("q", `denominationUniteLegale:"`+clues[0]+`" AND -periode(etatAdministratifEtablissement:F)`)
 
 	departments, ok := query["department"]
 	if ok && len(departments[0]) > 1 {
