@@ -32,13 +32,22 @@ export default withRouter(function Header({ history }) {
             </li>
             <li className="nav__item">
               <NavLink
+                to="/partners"
+                activeClassName="active"
+                onClick={() => trackEvent("navbar", "partners")}
+              >
+                Partenaires
+              </NavLink>
+            </li>
+            {/* <li className="nav__item">
+              <NavLink
                 to="/search"
                 activeClassName="active"
                 onClick={() => trackEvent("navbar", "check-presta")}
               >
                 Vérification prestataire
               </NavLink>
-            </li>
+            </li> */}
             {localAuthService.isAuthenticated ? (
               <React.Fragment>
                 <li className="nav__item">

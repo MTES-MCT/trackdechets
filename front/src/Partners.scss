@@ -1,0 +1,11 @@
+.Partners__logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  img {
+    width: 100px;
+    display: block;
+    margin: 20px;
+  }
+}
