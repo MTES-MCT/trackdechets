@@ -29,19 +29,17 @@ out:
   user: {{ env.POSTGRES_USER }}
   password: {{ env.POSTGRES_PASSWORD }}
   database: {{ env.POSTGRES_DATABASE }}
-  table: rubrique
+  table: rubriques
   schema: etl
   options: {loglevel: 2}
   mode: replace
   column_options:
-    id: {type: SERIAL PRIMARY KEY}
-    code_s3ic: {type: varchar(255)}
-    rubrique: {type: varchar(255)}
-    alinea: {type: varchar(255)}
-    date_autorisation: {type: varchar(255)}
-    etat_activite: {type: varchar(255)}
-    regime_autorise: {type: varchar(255)}
+    code_s3ic: {type: VARCHAR(255)}
+    rubrique: {type: VARCHAR(255)}
+    alinea: {type: VARCHAR(255)}
+    date_autorisation: {type: VARCHAR(255)}
+    etat_activite: {type: VARCHAR(255)}
+    regime_autorise: {type: VARCHAR(255)}
     activite: {type: TEXT}
-    volume: {type: varchar(255)}
-    unite: {type: varchar(255)}
-  after_load: CREATE index rubrique_idx on etl.rubrique (code_s3ic);
+    volume: {type: VARCHAR(255)}
+    unite: {type: VARCHAR(255)}

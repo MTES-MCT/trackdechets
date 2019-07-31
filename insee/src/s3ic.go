@@ -77,11 +77,11 @@ func init() {
 		}
 
 		queryStr = `
-			SELECT DISTINCT
+			SELECT
 				rubrique,
 				regime_autorise as regimeAutorise,
 				activite
-			FROM etl.rubrique
+			FROM etl.rubrique_prepared
 			WHERE code_s3ic = $1
 			AND etat_activite = 'En fonct.'
 		`

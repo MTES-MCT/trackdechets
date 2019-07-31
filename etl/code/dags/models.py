@@ -53,9 +53,19 @@ class S3IC(Model):
     table = 's3ic'
 
 
-class Rubrique(Model):
+class S3ICFiltered(Model):
 
-    table = 'rubrique'
+    table = 's3ic_filtered'
+
+
+class Rubriques(Model):
+
+    table = 'rubriques'
+
+
+class RubriquesScraped(Model):
+
+    table = 'rubriques_scraped'
 
 
 _models = dict([(model.table, model) for model in [S3IC]])
