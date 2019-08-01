@@ -4,7 +4,7 @@ import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
 import { getCompanyAdmins } from "../companies/helper";
 import { checkIsCompatible, notICPEAlert, rubriqueNotCompatibleAlert } from "../companies/verif";
-import { productionOnly } from "../utils";
+
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
