@@ -36,6 +36,8 @@ services:
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+      TRELLO_API_KEY: $TRELLO_API_KEY
+      TRELLO_TOKEN: $TRELLO_TOKEN
 
   td-ui:
     image: betagouv/trackdechets-ui:latest
@@ -70,6 +72,7 @@ services:
     ports:
       - 8080:8080
     environment:
+      ENV: production
       POSTGRES_USER: $AIRFLOW_POSTGRES_USER
       POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
       AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY

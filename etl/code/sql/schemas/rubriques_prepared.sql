@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS etl.rubrique;
+DROP TABLE IF EXISTS etl.rubriques_prepared;
 
-CREATE TABLE etl.rubrique
+CREATE TABLE etl.rubriques_prepared
 (
   id SERIAL PRIMARY KEY,
   code_s3ic VARCHAR(255),
@@ -13,3 +13,5 @@ CREATE TABLE etl.rubrique
   volume VARCHAR(255),
   unite VARCHAR(255)
 );
+
+CREATE INDEX code_s3ic_idx on etl.rubriques_prepared (code_s3ic);
