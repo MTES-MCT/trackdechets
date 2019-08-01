@@ -81,7 +81,7 @@ func init() {
 				rubrique,
 				regime_autorise as regimeAutorise,
 				activite
-			FROM etl.rubrique_prepared
+			FROM etl.rubriques_prepared
 			WHERE code_s3ic = $1
 			AND etat_activite = 'En fonct.'
 		`
