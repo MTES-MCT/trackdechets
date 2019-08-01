@@ -27,4 +27,4 @@ RUN $EMBULK_BIN gem install embulk-output-postgresql
 COPY --chown=airflow code/dags /usr/local/airflow/dags
 COPY --chown=airflow code/embulk /usr/local/airflow/embulk
 COPY --chown=airflow code/sql /usr/local/airflow/sql
-COPY --chown=airflow code/data /usr/local/airflow/data
+RUN mkdir /usr/local/airflow/data
