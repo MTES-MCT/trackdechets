@@ -8,8 +8,7 @@ __pycache__/
 .vscode
 
 # data folders
-code/data/s3ic
-code/data/rubrique/
+code/data/
 
 #Mac OS
 __MACOSX

@@ -14,6 +14,8 @@ def get_env_setting(setting):
         error_msg = "Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)
 
+# Environment
+ENV = get_env_setting('ENV')
 
 # Folder structure
 
@@ -35,6 +37,10 @@ EMBULK_BIN = get_env_setting('EMBULK_BIN')
 
 # Data
 
-S3IC_SHP_URL = "https://benoitguigal.fra1.digitaloceanspaces.com/s3ic.zip"
+base_url = "https://trackdechets.fra1.digitaloceanspaces.com"
 
-RUBRIQUE_CSV_URL = "https://benoitguigal.fra1.digitaloceanspaces.com/rubrique.zip"
+S3IC_SHP_URL = "%s/s3ic.zip" % base_url
+
+RUBRIQUE_SCRAPED_CSV_URL = "%s/rubriques_scraped.zip" % base_url
+
+IREP_CSV_URL = "%s/irep.zip" % base_url
