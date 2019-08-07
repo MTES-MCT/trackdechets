@@ -4,15 +4,9 @@ import "./Partners.scss";
 export default function Partners() {
   return (
     <>
-      <div className="hero" role="banner">
-        <div className="hero__container">
-          <h1>Les partenaires Trackdéchets</h1>
-        </div>
-      </div>
-
       <section className="section section-grey">
         <div className="container">
-          <h2 className="section__title">Pourquoi un partenariat ?</h2>
+          <h2 className="section__title">Le Partenariat avec Trackdéchets</h2>
 
           <p>
             Trackdéchets est un outil de la Fabrique Numérique du MTES soutenu
@@ -42,7 +36,7 @@ export default function Partners() {
         <div className="container">
           <div className="row">
             <div>
-              <h3>Devenir partenaires : quels critères ?</h3>
+              <h3>Devenir partenaires : quels engagements ?</h3>
               <ul>
                 <li>
                   La chaine des BSD que vous gérez est 100% dématérialisée
