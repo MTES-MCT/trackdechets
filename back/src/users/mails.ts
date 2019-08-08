@@ -88,7 +88,7 @@ export const userMails = {
     body: `Madame, Monsieur,
     <br><br>
     Nous vous informons que la société ${form.recipientCompanyName} a refusé le ${
-      form.receivedAt
+      new Intl.DateTimeFormat('fr-FR').format(new Date(form.receivedAt))
     }, le déchet de la société suivante :
     <br><br>
     <ul>
