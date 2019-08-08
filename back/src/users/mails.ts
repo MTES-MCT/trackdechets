@@ -87,12 +87,12 @@ export const userMails = {
     title: "Un de vos déchet a été refusé à l'arrivée",
     body: `Madame, Monsieur,
     <br><br>
-    Nous vous informons que la société ${form.emitterCompanyName} a refusé le ${
+    Nous vous informons que la société ${form.recipientCompanyName} a refusé le ${
       form.receivedAt
     }, le déchet de la société suivante :
     <br><br>
     <ul>
-    <li>Société XXX + adresse</li>
+    <li>Société ${form.emitterCompanyName} - ${form.emitterCompanyAddress}/li>
     <li>Déchets :</li>
     <ul>
       <li>Numéro : ${form.readableId}</li>
@@ -101,7 +101,7 @@ export const userMails = {
       <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
     </ul>
      <li>Transporteur : ${form.transporterCompanyName}</li>
-     <li>Responsable du site : ${form.sentBy}</li>
+     <li>Responsable du site : ${form.sentBy || ''}</li>
      </ul>
      Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
     <br><br>
