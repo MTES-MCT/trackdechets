@@ -97,7 +97,7 @@ export const userMails = {
     <ul>
       <li>Numéro : ${form.readableId}</li>
       <li>Appellation du déchet : ${form.wasteDetailsName}</li>
-      <li>Code déchet : ${form.wasteDetailsCode}*</li>
+      <li>Code déchet : ${form.wasteDetailsCode}</li>
       <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
     </ul>
      <li>Transporteur : ${form.transporterCompanyName}</li>
