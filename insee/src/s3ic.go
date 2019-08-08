@@ -79,6 +79,7 @@ func init() {
 		queryStr = `
 			SELECT
 				rubrique,
+				alinea,
 				regime_autorise as regimeAutorise,
 				activite
 			FROM etl.rubriques_prepared
@@ -132,6 +133,7 @@ func GetICPE(siret string) (*ICPE, bool) {
 			rubrique := new(Rubrique)
 			rows.Scan(
 				&rubrique.Rubrique,
+				&rubrique.Alinea,
 				&rubrique.RegimeAutorise,
 				&rubrique.Activite)
 			rubriques = append(rubriques, *rubrique)

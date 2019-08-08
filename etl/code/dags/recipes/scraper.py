@@ -60,27 +60,6 @@ def parse_row(row):
         'unite': row[UNITE]}
 
 
-def scrap_rubriques(df):
-    urls = df['url_fiche'].tolist()
-    scrapers = [IcpeScraper(url) for url in urls]
-    fetch_parallel(scrapers)
-    for scraper in scrapers:
-        scraper.parse()
-        scraper.find_rubriques()
-    rubriques_list = [scraper.rubriques for scraper in scrapers]
-    codes_s3ic = df['code_s3ic'].tolist()
-    codes_s3ic_zip_rubriques = list(zip(codes_s3ic, rubriques_list))
-    rubriques = []
-    for (code_s3ic, rs) in codes_s3ic_zip_rubriques:
-        for r in rs:
-            parsed = parse_row(r)
-            if parsed['rubrique'] in rubriques_dechets:
-                row = {'code_s3ic': code_s3ic, **parsed}
-                rubriques.append(row)
-    df = pd.DataFrame.from_records(rubriques)
-    return df
-
-
 def fetch_parallel(scrapers):
 
     async def inner():
@@ -146,7 +125,7 @@ class IcpeScraper():
         """ parse the html using BeautifulSoup """
         if not self.html:
             raise HtmlNotSetException()
-        self.soup = BeautifulSoup(self.html, 'html5lib')
+        self.soup = BeautifulSoup(self.html, 'lxml')
 
     def find_rubriques(self):
         """ find the rubriques in the html tree """
@@ -154,12 +133,11 @@ class IcpeScraper():
             raise SoupNotSetException()
         h2 = self.soup.find('h2', text='Situation administrative')
         table = h2.find_next('table')
-        tbody = table.find('tbody')
-        ths = tbody.find_all('th')
+        ths = table.find_all('th')
         headers = []
         for th in ths:
             headers.append(th.text.strip())
-        trs = tbody.find_all('tr')
+        trs = table.find_all('tr')
         rows = []
         for tr in trs:
             tds = tr.find_all('td')
@@ -168,5 +146,5 @@ class IcpeScraper():
                 for td in tds:
                     cells.append(td.text)
                 row = dict(zip(headers, cells))
-                rows.append(row)
+                rows.append(parse_row(row))
         self.rubriques = rows

@@ -21,6 +21,7 @@
     "jsonwebtoken": "^8.4.0",
     "merge-graphql-schemas": "1.5.8",
     "prisma-client-lib": "1.33.0",
+    "request": "^2.88.0",
     "yup": "^0.26.6"
   },
   "devDependencies": {
