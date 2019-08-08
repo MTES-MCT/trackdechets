@@ -80,6 +80,7 @@ enum FormStatus {
   AWAITING_GROUP
   GROUPED
   NO_TRACEABILITY
+  REFUSED
 }
 
 """
