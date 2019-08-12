@@ -7,7 +7,7 @@ from airflow.operators.python_operator import PythonOperator, \
     BranchPythonOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
-
+from airflow.hooks.data_preparation import PostgresDataset
 
 from operators.shp2pgsql import Shp2pgsqlOperator
 from operators.embulk import EmbulkOperator
@@ -17,7 +17,8 @@ from operators.download import DownloadUnzipOperator
 from models import S3ICFiltered, RubriquesScraped
 from config import ENV, SQL_DIR, EMBULK_DIR, DATA_DIR, S3IC_SHP_URL, \
                    RUBRIQUE_SCRAPED_CSV_URL, IREP_CSV_URL
-from recipes.scraper import scrap_rubriques, download_rubriques
+from recipes.scraper import download_rubriques
+import python_recipes as recipes
 
 
 def get_default_args(conf):
@@ -72,7 +73,7 @@ with DAG("consolidate",
 
     # Load rubriques
     config = os.path.join(EMBULK_DIR, 'rubriques.yml.liquid')
-    path_prefix = os.path.join(DATA_DIR, 's3ic', 'rubrique')
+    path_prefix = os.path.join(DATA_DIR, 's3ic', 'rubriques')
     env = {'PATH_PREFIX': path_prefix}
     load_rubriques = EmbulkOperator(
         task_id='load_rubriques',
@@ -94,14 +95,10 @@ with DAG("consolidate",
 
     # Scrap rubriques for thoses installations
     # because we are missing some info
-    s3ic_filtered = S3ICFiltered(connection)
-    rubriques_scraped = RubriquesScraped(connection)
-    scrap_rubriques = PythonPostgresOperator(
+    scrap_rubriques = PythonOperator(
         task_id="scrap_rubriques",
-        input_model=s3ic_filtered,
-        output_model=rubriques_scraped,
-        batch=100,
-        python_callable=scrap_rubriques)
+        python_callable=recipes.scrap_rubriques
+    )
 
     # Download scraped rubriques data
     download_rubriques_scraped = DownloadUnzipOperator(
@@ -111,7 +108,7 @@ with DAG("consolidate",
 
     # Load scraped rubriques data
     config = os.path.join(EMBULK_DIR, 'rubriques_scraped.yml.liquid')
-    path_prefix = os.path.join(DATA_DIR, 's3ic', 'rubrique_scraped')
+    path_prefix = os.path.join(DATA_DIR, 's3ic', 'rubriques_scraped')
     env = {'PATH_PREFIX': path_prefix}
     load_rubriques_scraped = EmbulkOperator(
         task_id='load_rubriques_scraped',
@@ -153,7 +150,7 @@ with DAG("consolidate",
         sql="schemas/rubriques_prepared.sql",
         postgres_conn_id=connection)
 
-    # Copy data from ubriques_scraped_distinct into rubriques_prepared
+    # Copy data from rubriques_scraped_distinct into rubriques_prepared
     copy_to_rubriques_prepared = PostgresOperator(
         task_id="copy_to_rubriques_prepared",
         sql="recipes/copy_to_rubriques_prepared.sql",
@@ -221,14 +218,13 @@ with DAG("consolidate",
 
     filter_s3ic >> branching
 
-    branching >> scrap_rubriques >> join
+    branching >> scrap_rubriques >> create_rubriques_scraped_distinct >> \
+        set_rubriques_scraped_distinct >> join
 
     branching >> download_rubriques_scraped >> \
         load_rubriques_scraped >> join
 
-    join >> create_rubriques_scraped_distinct >> \
-        set_rubriques_scraped_distinct >> \
-        create_rubriques_prepared >> \
+    join >> create_rubriques_prepared >> \
         copy_to_rubriques_prepared
 
     [filter_s3ic, set_irep_distinct] >> create_s3ic_join_irep >> join_s3ic_irep
