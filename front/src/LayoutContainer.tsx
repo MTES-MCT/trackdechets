@@ -12,6 +12,7 @@ const SignupInfo = lazy(() => import("./login/SignupInfos"));
 const WasteSelector = lazy(() => import("./login/WasteSelector"));
 const Invite = lazy(() => import("./login/Invite"));
 const Faq = lazy(() => import("./Faq"));
+const Partners = lazy(() => import("./Partners"));
 const ResetPassword = lazy(() => import("./login/ResetPassword"));
 const Cgu = lazy(() => import("./Cgu"));
 const ChangePassword = lazy(() => import("./login/ChangePassword"));
@@ -37,6 +38,7 @@ export default withRouter(function LayoutContainer({ history }) {
       <Route exact path="/" component={Home} />
       <Route exact path="/cgu" component={WaitingComponent(Cgu)} />
       <Route exact path="/faq" component={WaitingComponent(Faq)} />
+      <Route exact path="/partners" component={WaitingComponent(Partners)} />
       <Route exact path="/login" component={WaitingComponent(Login)} />
       <Route exact path="/invite" component={WaitingComponent(Invite)} />
       <Route exact path="/signup" component={WaitingComponent(Signup)} />

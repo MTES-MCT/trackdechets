@@ -158,7 +158,7 @@ export default {
       return prisma
         .updateUser({
           where: { id: userId },
-          data: { name, phone, userType }
+          data: { name, phone, email, userType }
         })
         .catch(err => {
           console.error(

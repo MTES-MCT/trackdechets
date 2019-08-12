@@ -1,10 +1,12 @@
-import axios from "axios";
 import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
 import { getCompanyAdmins } from "../companies/helper";
-import { checkIsCompatible, notICPEAlert, rubriqueNotCompatibleAlert } from "../companies/verif";
-
+import { verifyPrestataire, anomalies } from "../companies/verif";
+import {
+  createNotICPEAlertCard,
+  createNotCompatibleRubriqueAlertCard
+} from "../common/trello";
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
@@ -18,7 +20,7 @@ export async function formsSubscriptionCallback(
   mailWhenFormIsDeclined(payload).catch(err =>
     console.error("Error on declined form subscription", err)
   );
-  verifiyPrestataire(payload).catch(err =>
+  verifiyPresta(payload).catch(err =>
     console.error("Error on prestataire verification form subscription", err)
   );
 }
@@ -117,35 +119,26 @@ async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
 }
 
 
-async function verifiyPrestataire(payload: FormSubscriptionPayload) {
+async function verifiyPresta(payload: FormSubscriptionPayload) {
 
   if (payload.mutation === "CREATED") {
 
-    // raise alert in production only
-    if (process.env.NODE_ENV === "production") {
+    const bsd = payload.node;
+    const siret = bsd.recipientCompanySiret;
+    const wasteCode = bsd.wasteDetailsCode;
 
-      const bsd = payload.node;
-      const siret = bsd.recipientCompanySiret;
-      const wasteCode = bsd.wasteDetailsCode;
+    const [company, anomaly] = await verifyPrestataire(siret, wasteCode)
 
-      // retrieves company information from insee and the
-      // consolidated database
-      const response = await axios.get(`http://td-insee:81/siret/${siret}`);
-      const company = response.data;
-
-      if (!company.codeS3ic) {
-        // the company is not an ICPE (installation classée pour
-        // la protection de l'environnement) => raise an alert
-        return notICPEAlert(company, bsd);
-      }
-
-      // company is an ICPE, check if its rubriques are compatible
-      // with the wasteCode
-      const isCompatible = checkIsCompatible(company, wasteCode);
-      if (!isCompatible) {
-        // raise an alert if not compatible
-        return rubriqueNotCompatibleAlert(company, bsd);
-      }
+    switch(anomaly) {
+      case anomalies.NOT_ICPE_27XX_35XX:
+        // Raise an internal alert => a producer is sending a waste
+        // to a company that is not ICPE
+        createNotICPEAlertCard(company, bsd);
+        break;
+      case anomalies.RUBRIQUES_INCOMPATIBLE:
+        // Raise an internal alert => a producer is sending a waste
+        // to a company that is not compatible with this type of waste
+        createNotCompatibleRubriqueAlertCard(company, bsd);
     }
   }
 }

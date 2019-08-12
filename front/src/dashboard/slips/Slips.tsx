@@ -15,7 +15,8 @@ const statusLabels: { [key: string]: string } = {
   PROCESSED: "Traité",
   AWAITING_GROUP: "Traité, en attente de regroupement",
   GROUPED: "Traité, annexé à un bordereau de regroupement",
-  NO_TRACEABILITY: "Regroupé, avec autorisation de perte de traçabilité"
+  NO_TRACEABILITY: "Regroupé, avec autorisation de perte de traçabilité",
+  REFUSED: "Refusé"
 };
 
 type Props = { forms: Form[]; me: Me; hiddenFields?: string[] };

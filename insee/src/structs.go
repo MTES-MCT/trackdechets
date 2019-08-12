@@ -49,6 +49,7 @@ type ICPE struct {
 // Rubrique d'une ICPE
 type Rubrique struct {
 	Rubrique       string `json:"rubrique"`
+	Alinea         string `json:"alinea"`
 	RegimeAutorise string `json:"regime_autorise"`
 	Activite       string `json:"activite"`
 }
