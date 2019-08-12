@@ -6,6 +6,25 @@
   img {
     width: 100px;
     display: block;
-    margin: 20px;
+  }
+
+  figure {
+    margin: 15px;
+  }
+
+  figcaption {
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .sarpi-veolia {
+    width: 150px;
+  }
+}
+
+.Partners__engagements_benefices {
+  li {
+    width: 450px;
+    text-align: justify;
   }
 }

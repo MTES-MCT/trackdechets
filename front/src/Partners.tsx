@@ -33,7 +33,7 @@ export default function Partners() {
       </section>
 
       <section className="section section-white">
-        <div className="container">
+        <div className="container Partners__engagements_benefices">
           <div className="row">
             <div>
               <h3>Devenir partenaires : quels engagements ?</h3>
@@ -82,15 +82,23 @@ export default function Partners() {
             <div>
               <h3>Nos partenaires actuels</h3>
               <div className="Partners__logos">
-                <img src="https://pbs.twimg.com/profile_images/956836094745698304/fCxf4RsJ_400x400.jpg" />
-                <img
-                  src="https://pbs.twimg.com/profile_images/2283544751/8w43fqie4g7b945a8kgr_400x400.gif"
-                  alt=""
-                />
-                <img
-                  src="https://media.glassdoor.com/sqll/1135704/sarp-industries-squarelogo-1456834982385.png"
-                  alt=""
-                />
+                <figure>
+                  <img src="/partners/kerlog.jpg" />
+                  <figcaption>Kerlog</figcaption>
+                </figure>
+                <figure>
+                  <img
+                    src="/partners/chimirec.gif"
+                    alt=""
+                  />
+                </figure>
+                <figure>
+                  <img
+                    className="sarpi-veolia"
+                    src="/partners/sarpi-veolia.png"
+                    alt=""
+                  />
+                </figure>
               </div>
             </div>
           </div>
