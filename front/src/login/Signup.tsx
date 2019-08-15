@@ -257,6 +257,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 }}
               >
                 <h1>Informations sur l'entreprise</h1>
+
                 <div className="form__group">
                   <label>
                     Numéro SIRET de l'entreprise que vous administrez*
@@ -292,7 +293,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                 <div className="form__group">
                   <label>
-                    Identifiant GEREP (si concerné)
+                    Identifiant GEREP (recommandé)
                     <Field type="text" name="gerepId" />
                   </label>
                 </div>

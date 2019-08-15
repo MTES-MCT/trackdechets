@@ -32,7 +32,7 @@ export default function UserType({
     <FieldArray
       name={name}
       render={arrayHelpers => (
-        <fieldset>
+        <fieldset className={name + "-fieldset"}>
           {USER_TYPES.map(p => (
             <label className="label-inline" key={p.value}>
               <input
