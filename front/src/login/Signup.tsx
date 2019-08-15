@@ -144,6 +144,23 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 }}
               >
                 <h1>Informations utilisateur</h1>
+
+                <div className="form__group">
+                  <label>Nom et prénom*</label>
+                  <div className="search__group">
+                    <Field type="text" name="name" />
+                    <button
+                      type="button"
+                      className="overlay-button"
+                      aria-label="Recherche"
+                    >
+                      <FaIdCard />
+                    </button>
+                  </div>
+
+                  <RedErrorMessage name="name" />
+                </div>
+
                 <div className="form__group">
                   <label>Email*</label>
                   <div className="search__group">
@@ -167,22 +184,6 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   </label>
 
                   <RedErrorMessage name="emailConfirmation" />
-                </div>
-
-                <div className="form__group">
-                  <label>Nom et prénom*</label>
-                  <div className="search__group">
-                    <Field type="text" name="name" />
-                    <button
-                      type="button"
-                      className="overlay-button"
-                      aria-label="Recherche"
-                    >
-                      <FaIdCard />
-                    </button>
-                  </div>
-
-                  <RedErrorMessage name="name" />
                 </div>
 
                 <div className="form__group">
