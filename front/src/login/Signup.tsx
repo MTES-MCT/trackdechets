@@ -286,6 +286,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                             {...field}
                             onBlur={async (ev) => {
                               ev.persist()
+                              field.onBlur(ev);
                               const siret = ev.target.value;
                               if (siret.length == 14) {
                                 // For some unkown reasons, the first Apollo call raises
@@ -312,14 +313,14 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                 }
 
                                 // auto-complete userType
-                                let userType = form.values.userType;
-                                userType = userType.concat(["PRODUCER"])
-                                userType = userType.filter((value, index, self) => {
-                                  return self.indexOf(value) === index;
-                                });
-                                form.setFieldValue("userType", userType);
+                                if (company_ && company_.rubriques) {
+                                  let categories = company_.rubriques.map(r => r.category)
+                                  const userType = categories.filter((value, index, self) => {
+                                    return self.indexOf(value) === index;
+                                  });
+                                  form.setFieldValue("userType", userType);
+                                }
                               }
-                              field.onBlur(ev);
                             }}
                           />
                         }

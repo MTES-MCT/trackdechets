@@ -21,7 +21,11 @@ export const COMPANY_INFOS = gql`
       address,
       codeS3ic,
       urlFiche,
-      naf
+      naf,
+      rubriques {
+        rubrique,
+        category
+      }
     }
   }
 `;

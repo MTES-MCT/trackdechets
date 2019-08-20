@@ -1,3 +1,12 @@
+
+type Rubrique {
+  rubrique: String
+  alinea: String
+  regime_autorise: String
+  activite: String
+  category: String
+}
+
 type Company {
   siret: String
   name: String
@@ -8,6 +17,7 @@ type Company {
   codeS3ic: String
   urlFiche: String
   naf: String
+  rubriques: [Rubrique]
 
   securityCode: Int!
 

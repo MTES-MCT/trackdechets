@@ -9,6 +9,14 @@ import useDebounce from "../../utils/use-debounce";
 import client from "../../graphql-client";
 
 
+export type Rubrique = {
+  rubrique: string;
+  alinea: string;
+  regime_autorise: string;
+  activite: string;
+  category: string;
+}
+
 export type Company = {
   address: string;
   name: string;
@@ -19,6 +27,7 @@ export type Company = {
   codeS3ic: string;
   urlFiche: string;
   naf: string;
+  rubriques: Rubrique[];
 };
 
 export default connect<FieldProps>(function CompanySelector(props) {
