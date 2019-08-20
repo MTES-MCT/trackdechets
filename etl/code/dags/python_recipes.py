@@ -56,3 +56,81 @@ def scrap_rubriques():
                             **rubrique}
 
                         writer.write_row_dict(row)
+
+
+COLLECTOR = "COLLECTOR"
+WASTE_CENTER = "WASTE_CENTER"
+WASTE_VEHICLES = "WASTE_VEHICLES"
+WASTEPROCESSOR = "WASTEPROCESSOR"
+
+
+RUBRIQUE_2_CATEGORY = {
+    "2710": WASTE_CENTER,
+    "2711": COLLECTOR,
+    "2712": WASTE_VEHICLES,
+    "2713": COLLECTOR,
+    "2714": COLLECTOR,
+    "2715": COLLECTOR,
+    "2716": COLLECTOR,
+    "2718": COLLECTOR,
+    "2719": COLLECTOR,
+    "2720": COLLECTOR,
+    "2730": WASTEPROCESSOR,
+    "2731": WASTE_CENTER,
+    "2740": WASTEPROCESSOR,
+    "2750": WASTEPROCESSOR,
+    "2751": WASTEPROCESSOR,
+    "2752": WASTEPROCESSOR,
+    "2760": COLLECTOR,
+    "2770": WASTEPROCESSOR,
+    "2771": WASTEPROCESSOR,
+    "2780": WASTEPROCESSOR,
+    "2781": WASTEPROCESSOR,
+    "2782": WASTEPROCESSOR,
+    "2790": WASTEPROCESSOR,
+    "2791": WASTEPROCESSOR,
+    "2792": WASTEPROCESSOR,
+    "2793": WASTEPROCESSOR,
+    "2794": WASTEPROCESSOR,
+    "2795": WASTEPROCESSOR,
+    "2797": WASTEPROCESSOR,
+    "2798": COLLECTOR,
+    "3510": WASTEPROCESSOR,
+    "3520": WASTEPROCESSOR,
+    "3531": WASTEPROCESSOR,
+    "3532": WASTEPROCESSOR,
+    "3540": COLLECTOR,
+    "3550": COLLECTOR,
+    "3560": COLLECTOR
+}
+
+
+def prepare_rubriques():
+
+    # Input dataset
+    rubriques_scraped_distinct = PostgresDataset(
+        'rubriques_scraped_distinct',
+        schema="etl",
+        postgres_conn_id="postgres_etl")
+
+    # Output dataset
+    rubriques_prepared = PostgresDataset(
+        'rubriques_prepared',
+        schema="etl",
+        postgres_conn_id="postgres_etl")
+
+    dtype = rubriques_scraped_distinct.read_dtype(primary_key="id")
+
+    out_dtype = [
+        Column("id", Integer, primary_key=True, autoincrement=True),
+        *dtype[1:],
+        Column("category", String)]
+    rubriques_prepared.write_dtype(out_dtype)
+
+    with rubriques_prepared.get_writer() as writer:
+
+        for row in rubriques_scraped_distinct.iter_rows():
+
+            row["category"] = RUBRIQUE_2_CATEGORY.get(row["rubrique"])
+
+            writer.write_row_dict(row)
