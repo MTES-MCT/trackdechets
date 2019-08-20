@@ -11,6 +11,8 @@ input SignupInput {
   siret: String!
   userType: [UserType]
   gerepId: String
+  codeNaf: String
+  companyName: String
 }
 
 type Mutation {
@@ -53,8 +55,6 @@ type User {
   userType: [UserType]
 
   companies: [Company]
-
-  gerepId: String
 }
 
 type PublicUser {

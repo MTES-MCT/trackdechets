@@ -388,6 +388,12 @@ export type CompanyOrderByInput =
   | "id_DESC"
   | "siret_ASC"
   | "siret_DESC"
+  | "name_ASC"
+  | "name_DESC"
+  | "gerepId_ASC"
+  | "gerepId_DESC"
+  | "codeNaf_ASC"
+  | "codeNaf_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -412,8 +418,6 @@ export type UserOrderByInput =
   | "phone_DESC"
   | "userType_ASC"
   | "userType_DESC"
-  | "gerepId_ASC"
-  | "gerepId_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -577,7 +581,8 @@ export type Status =
   | "PROCESSED"
   | "AWAITING_GROUP"
   | "GROUPED"
-  | "NO_TRACEABILITY";
+  | "NO_TRACEABILITY"
+  | "REFUSED";
 
 export type StatusLogOrderByInput =
   | "id_ASC"
@@ -614,6 +619,48 @@ export interface CompanyScalarWhereInput {
   siret_not_starts_with?: Maybe<String>;
   siret_ends_with?: Maybe<String>;
   siret_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  gerepId_not?: Maybe<String>;
+  gerepId_in?: Maybe<String[] | String>;
+  gerepId_not_in?: Maybe<String[] | String>;
+  gerepId_lt?: Maybe<String>;
+  gerepId_lte?: Maybe<String>;
+  gerepId_gt?: Maybe<String>;
+  gerepId_gte?: Maybe<String>;
+  gerepId_contains?: Maybe<String>;
+  gerepId_not_contains?: Maybe<String>;
+  gerepId_starts_with?: Maybe<String>;
+  gerepId_not_starts_with?: Maybe<String>;
+  gerepId_ends_with?: Maybe<String>;
+  gerepId_not_ends_with?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  codeNaf_not?: Maybe<String>;
+  codeNaf_in?: Maybe<String[] | String>;
+  codeNaf_not_in?: Maybe<String[] | String>;
+  codeNaf_lt?: Maybe<String>;
+  codeNaf_lte?: Maybe<String>;
+  codeNaf_gt?: Maybe<String>;
+  codeNaf_gte?: Maybe<String>;
+  codeNaf_contains?: Maybe<String>;
+  codeNaf_not_contains?: Maybe<String>;
+  codeNaf_starts_with?: Maybe<String>;
+  codeNaf_not_starts_with?: Maybe<String>;
+  codeNaf_ends_with?: Maybe<String>;
+  codeNaf_not_ends_with?: Maybe<String>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -657,6 +704,9 @@ export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
 
 export interface CompanyUpdateDataInput {
   siret?: Maybe<String>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
   admin?: Maybe<UserUpdateOneInput>;
   user?: Maybe<UserUpdateManyWithoutCompaniesInput>;
@@ -665,6 +715,9 @@ export interface CompanyUpdateDataInput {
 export interface CompanyCreateInput {
   id?: Maybe<ID_Input>;
   siret: String;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
   securityCode: Int;
   admin?: Maybe<UserCreateOneInput>;
   user?: Maybe<UserCreateManyWithoutCompaniesInput>;
@@ -722,7 +775,6 @@ export interface UserCreateInput {
   userType?: Maybe<Json>;
   companies?: Maybe<CompanyCreateManyWithoutUserInput>;
   companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
 }
 
 export interface FormSubscriptionWhereInput {
@@ -757,6 +809,9 @@ export interface CompanySubscriptionWhereInput {
 export interface CompanyCreateWithoutUserInput {
   id?: Maybe<ID_Input>;
   siret: String;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
   securityCode: Int;
   admin?: Maybe<UserCreateOneInput>;
 }
@@ -854,20 +909,6 @@ export interface UserWhereInput {
   companyAssociations_every?: Maybe<CompanyAssociationWhereInput>;
   companyAssociations_some?: Maybe<CompanyAssociationWhereInput>;
   companyAssociations_none?: Maybe<CompanyAssociationWhereInput>;
-  gerepId?: Maybe<String>;
-  gerepId_not?: Maybe<String>;
-  gerepId_in?: Maybe<String[] | String>;
-  gerepId_not_in?: Maybe<String[] | String>;
-  gerepId_lt?: Maybe<String>;
-  gerepId_lte?: Maybe<String>;
-  gerepId_gt?: Maybe<String>;
-  gerepId_gte?: Maybe<String>;
-  gerepId_contains?: Maybe<String>;
-  gerepId_not_contains?: Maybe<String>;
-  gerepId_starts_with?: Maybe<String>;
-  gerepId_not_starts_with?: Maybe<String>;
-  gerepId_ends_with?: Maybe<String>;
-  gerepId_not_ends_with?: Maybe<String>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -937,7 +978,6 @@ export interface UserCreateWithoutCompaniesInput {
   phone?: Maybe<String>;
   userType?: Maybe<Json>;
   companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
 }
 
 export type StatusLogWhereUniqueInput = AtLeastOne<{
@@ -946,6 +986,9 @@ export type StatusLogWhereUniqueInput = AtLeastOne<{
 
 export interface CompanyUpdateInput {
   siret?: Maybe<String>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
   admin?: Maybe<UserUpdateOneInput>;
   user?: Maybe<UserUpdateManyWithoutCompaniesInput>;
@@ -978,7 +1021,6 @@ export interface UserUpdateDataInput {
   userType?: Maybe<Json>;
   companies?: Maybe<CompanyUpdateManyWithoutUserInput>;
   companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
 }
 
 export interface StatusLogUpdateInput {
@@ -1086,6 +1128,9 @@ export interface FormUpdateManyMutationInput {
 
 export interface CompanyUpdateWithoutUserDataInput {
   siret?: Maybe<String>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
   admin?: Maybe<UserUpdateOneInput>;
 }
@@ -1205,6 +1250,9 @@ export interface FormUpdateWithWhereUniqueNestedInput {
 
 export interface CompanyUpdateManyDataInput {
   siret?: Maybe<String>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
 }
 
@@ -1397,6 +1445,48 @@ export interface CompanyWhereInput {
   siret_not_starts_with?: Maybe<String>;
   siret_ends_with?: Maybe<String>;
   siret_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  gerepId_not?: Maybe<String>;
+  gerepId_in?: Maybe<String[] | String>;
+  gerepId_not_in?: Maybe<String[] | String>;
+  gerepId_lt?: Maybe<String>;
+  gerepId_lte?: Maybe<String>;
+  gerepId_gt?: Maybe<String>;
+  gerepId_gte?: Maybe<String>;
+  gerepId_contains?: Maybe<String>;
+  gerepId_not_contains?: Maybe<String>;
+  gerepId_starts_with?: Maybe<String>;
+  gerepId_not_starts_with?: Maybe<String>;
+  gerepId_ends_with?: Maybe<String>;
+  gerepId_not_ends_with?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  codeNaf_not?: Maybe<String>;
+  codeNaf_in?: Maybe<String[] | String>;
+  codeNaf_not_in?: Maybe<String[] | String>;
+  codeNaf_lt?: Maybe<String>;
+  codeNaf_lte?: Maybe<String>;
+  codeNaf_gt?: Maybe<String>;
+  codeNaf_gte?: Maybe<String>;
+  codeNaf_contains?: Maybe<String>;
+  codeNaf_not_contains?: Maybe<String>;
+  codeNaf_starts_with?: Maybe<String>;
+  codeNaf_not_starts_with?: Maybe<String>;
+  codeNaf_ends_with?: Maybe<String>;
+  codeNaf_not_ends_with?: Maybe<String>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -1450,7 +1540,6 @@ export interface UserUpdateWithoutCompaniesDataInput {
   phone?: Maybe<String>;
   userType?: Maybe<Json>;
   companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
 }
 
 export interface UserUpdateInput {
@@ -1462,7 +1551,6 @@ export interface UserUpdateInput {
   userType?: Maybe<Json>;
   companies?: Maybe<CompanyUpdateManyWithoutUserInput>;
   companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
 }
 
 export interface UserUpsertWithWhereUniqueWithoutCompaniesInput {
@@ -1551,20 +1639,6 @@ export interface UserScalarWhereInput {
   phone_not_starts_with?: Maybe<String>;
   phone_ends_with?: Maybe<String>;
   phone_not_ends_with?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  gerepId_not?: Maybe<String>;
-  gerepId_in?: Maybe<String[] | String>;
-  gerepId_not_in?: Maybe<String[] | String>;
-  gerepId_lt?: Maybe<String>;
-  gerepId_lte?: Maybe<String>;
-  gerepId_gt?: Maybe<String>;
-  gerepId_gte?: Maybe<String>;
-  gerepId_contains?: Maybe<String>;
-  gerepId_not_contains?: Maybe<String>;
-  gerepId_starts_with?: Maybe<String>;
-  gerepId_not_starts_with?: Maybe<String>;
-  gerepId_ends_with?: Maybe<String>;
-  gerepId_not_ends_with?: Maybe<String>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -1610,7 +1684,6 @@ export interface UserUpdateManyDataInput {
   name?: Maybe<String>;
   phone?: Maybe<String>;
   userType?: Maybe<Json>;
-  gerepId?: Maybe<String>;
 }
 
 export interface FormUpdateDataInput {
@@ -2724,6 +2797,9 @@ export interface FormUpdateManyDataInput {
 
 export interface CompanyUpdateManyMutationInput {
   siret?: Maybe<String>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
 }
 
@@ -2756,7 +2832,6 @@ export interface UserUpdateWithoutCompanyAssociationsDataInput {
   phone?: Maybe<String>;
   userType?: Maybe<Json>;
   companies?: Maybe<CompanyUpdateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
 }
 
 export interface UserUpdateManyMutationInput {
@@ -2766,7 +2841,6 @@ export interface UserUpdateManyMutationInput {
   name?: Maybe<String>;
   phone?: Maybe<String>;
   userType?: Maybe<Json>;
-  gerepId?: Maybe<String>;
 }
 
 export interface CompanyAssociationUpdateInput {
@@ -2784,7 +2858,6 @@ export interface UserCreateWithoutCompanyAssociationsInput {
   phone?: Maybe<String>;
   userType?: Maybe<Json>;
   companies?: Maybe<CompanyCreateManyWithoutUserInput>;
-  gerepId?: Maybe<String>;
 }
 
 export interface UserCreateOneWithoutCompanyAssociationsInput {
@@ -4293,7 +4366,6 @@ export interface UserPreviousValues {
   name?: String;
   phone?: String;
   userType?: Json;
-  gerepId?: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
@@ -4308,7 +4380,6 @@ export interface UserPreviousValuesPromise
   name: () => Promise<String>;
   phone: () => Promise<String>;
   userType: () => Promise<Json>;
-  gerepId: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -4323,7 +4394,6 @@ export interface UserPreviousValuesSubscription
   name: () => Promise<AsyncIterator<String>>;
   phone: () => Promise<AsyncIterator<String>>;
   userType: () => Promise<AsyncIterator<Json>>;
-  gerepId: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -4396,6 +4466,9 @@ export interface StatusLogEdgeSubscription
 export interface CompanyPreviousValues {
   id: ID_Output;
   siret: String;
+  name?: String;
+  gerepId?: String;
+  codeNaf?: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   securityCode: Int;
@@ -4406,6 +4479,9 @@ export interface CompanyPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   siret: () => Promise<String>;
+  name: () => Promise<String>;
+  gerepId: () => Promise<String>;
+  codeNaf: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   securityCode: () => Promise<Int>;
@@ -4416,6 +4492,9 @@ export interface CompanyPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   siret: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  gerepId: () => Promise<AsyncIterator<String>>;
+  codeNaf: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   securityCode: () => Promise<AsyncIterator<Int>>;
@@ -4906,7 +4985,6 @@ export interface User {
   name?: String;
   phone?: String;
   userType?: Json;
-  gerepId?: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
@@ -4937,7 +5015,6 @@ export interface UserPromise extends Promise<User>, Fragmentable {
     first?: Int;
     last?: Int;
   }) => T;
-  gerepId: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -4972,7 +5049,6 @@ export interface UserSubscription
     first?: Int;
     last?: Int;
   }) => T;
-  gerepId: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -5005,7 +5081,6 @@ export interface UserNullablePromise
     first?: Int;
     last?: Int;
   }) => T;
-  gerepId: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -5013,6 +5088,9 @@ export interface UserNullablePromise
 export interface Company {
   id: ID_Output;
   siret: String;
+  name?: String;
+  gerepId?: String;
+  codeNaf?: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   securityCode: Int;
@@ -5021,6 +5099,9 @@ export interface Company {
 export interface CompanyPromise extends Promise<Company>, Fragmentable {
   id: () => Promise<ID_Output>;
   siret: () => Promise<String>;
+  name: () => Promise<String>;
+  gerepId: () => Promise<String>;
+  codeNaf: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   securityCode: () => Promise<Int>;
@@ -5041,6 +5122,9 @@ export interface CompanySubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   siret: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  gerepId: () => Promise<AsyncIterator<String>>;
+  codeNaf: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   securityCode: () => Promise<AsyncIterator<Int>>;
@@ -5061,6 +5145,9 @@ export interface CompanyNullablePromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   siret: () => Promise<String>;
+  name: () => Promise<String>;
+  gerepId: () => Promise<String>;
+  codeNaf: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   securityCode: () => Promise<Int>;
@@ -5261,14 +5348,14 @@ DateTime scalar output type, which is always a string
 export type DateTimeOutput = string;
 
 /*
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
 */
 export type Int = number;
 
 export type Json = any;
 
 /*
-The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point). 
+The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).
 */
 export type Float = number;
 

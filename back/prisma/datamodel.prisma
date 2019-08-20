@@ -10,8 +10,6 @@ type User {
   companies: [Company] @relation(name: "UserCompanies")
   companyAssociations: [CompanyAssociation]
 
-  gerepId: String
-
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
 }
@@ -52,6 +50,10 @@ type UserAccountHash {
 type Company {
   id: ID! @id
   siret: String! @unique
+
+  name: String
+  gerepId: String
+  codeNaf: String
 
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt

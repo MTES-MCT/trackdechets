@@ -37,6 +37,9 @@ type BatchPayload {
 type Company {
   id: ID!
   siret: String!
+  name: String
+  gerepId: String
+  codeNaf: String
   createdAt: DateTime!
   updatedAt: DateTime!
   securityCode: Int!
@@ -220,6 +223,9 @@ type CompanyConnection {
 input CompanyCreateInput {
   id: ID
   siret: String!
+  name: String
+  gerepId: String
+  codeNaf: String
   securityCode: Int!
   admin: UserCreateOneInput
   user: UserCreateManyWithoutCompaniesInput
@@ -238,6 +244,9 @@ input CompanyCreateOneInput {
 input CompanyCreateWithoutUserInput {
   id: ID
   siret: String!
+  name: String
+  gerepId: String
+  codeNaf: String
   securityCode: Int!
   admin: UserCreateOneInput
 }
@@ -252,6 +261,12 @@ enum CompanyOrderByInput {
   id_DESC
   siret_ASC
   siret_DESC
+  name_ASC
+  name_DESC
+  gerepId_ASC
+  gerepId_DESC
+  codeNaf_ASC
+  codeNaf_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -263,6 +278,9 @@ enum CompanyOrderByInput {
 type CompanyPreviousValues {
   id: ID!
   siret: String!
+  name: String
+  gerepId: String
+  codeNaf: String
   createdAt: DateTime!
   updatedAt: DateTime!
   securityCode: Int!
@@ -297,6 +315,48 @@ input CompanyScalarWhereInput {
   siret_not_starts_with: String
   siret_ends_with: String
   siret_not_ends_with: String
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  gerepId: String
+  gerepId_not: String
+  gerepId_in: [String!]
+  gerepId_not_in: [String!]
+  gerepId_lt: String
+  gerepId_lte: String
+  gerepId_gt: String
+  gerepId_gte: String
+  gerepId_contains: String
+  gerepId_not_contains: String
+  gerepId_starts_with: String
+  gerepId_not_starts_with: String
+  gerepId_ends_with: String
+  gerepId_not_ends_with: String
+  codeNaf: String
+  codeNaf_not: String
+  codeNaf_in: [String!]
+  codeNaf_not_in: [String!]
+  codeNaf_lt: String
+  codeNaf_lte: String
+  codeNaf_gt: String
+  codeNaf_gte: String
+  codeNaf_contains: String
+  codeNaf_not_contains: String
+  codeNaf_starts_with: String
+  codeNaf_not_starts_with: String
+  codeNaf_ends_with: String
+  codeNaf_not_ends_with: String
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -346,6 +406,9 @@ input CompanySubscriptionWhereInput {
 
 input CompanyUpdateDataInput {
   siret: String
+  name: String
+  gerepId: String
+  codeNaf: String
   securityCode: Int
   admin: UserUpdateOneInput
   user: UserUpdateManyWithoutCompaniesInput
@@ -353,6 +416,9 @@ input CompanyUpdateDataInput {
 
 input CompanyUpdateInput {
   siret: String
+  name: String
+  gerepId: String
+  codeNaf: String
   securityCode: Int
   admin: UserUpdateOneInput
   user: UserUpdateManyWithoutCompaniesInput
@@ -360,11 +426,17 @@ input CompanyUpdateInput {
 
 input CompanyUpdateManyDataInput {
   siret: String
+  name: String
+  gerepId: String
+  codeNaf: String
   securityCode: Int
 }
 
 input CompanyUpdateManyMutationInput {
   siret: String
+  name: String
+  gerepId: String
+  codeNaf: String
   securityCode: Int
 }
 
@@ -394,6 +466,9 @@ input CompanyUpdateOneRequiredInput {
 
 input CompanyUpdateWithoutUserDataInput {
   siret: String
+  name: String
+  gerepId: String
+  codeNaf: String
   securityCode: Int
   admin: UserUpdateOneInput
 }
@@ -443,6 +518,48 @@ input CompanyWhereInput {
   siret_not_starts_with: String
   siret_ends_with: String
   siret_not_ends_with: String
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  gerepId: String
+  gerepId_not: String
+  gerepId_in: [String!]
+  gerepId_not_in: [String!]
+  gerepId_lt: String
+  gerepId_lte: String
+  gerepId_gt: String
+  gerepId_gte: String
+  gerepId_contains: String
+  gerepId_not_contains: String
+  gerepId_starts_with: String
+  gerepId_not_starts_with: String
+  gerepId_ends_with: String
+  gerepId_not_ends_with: String
+  codeNaf: String
+  codeNaf_not: String
+  codeNaf_in: [String!]
+  codeNaf_not_in: [String!]
+  codeNaf_lt: String
+  codeNaf_lte: String
+  codeNaf_gt: String
+  codeNaf_gte: String
+  codeNaf_contains: String
+  codeNaf_not_contains: String
+  codeNaf_starts_with: String
+  codeNaf_not_starts_with: String
+  codeNaf_ends_with: String
+  codeNaf_not_ends_with: String
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -2795,6 +2912,7 @@ enum Status {
   AWAITING_GROUP
   GROUPED
   NO_TRACEABILITY
+  REFUSED
 }
 
 type StatusLog {
@@ -2912,7 +3030,6 @@ type User {
   userType: Json
   companies(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Company!]
   companyAssociations(where: CompanyAssociationWhereInput, orderBy: CompanyAssociationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CompanyAssociation!]
-  gerepId: String
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -3234,7 +3351,6 @@ input UserCreateInput {
   userType: Json
   companies: CompanyCreateManyWithoutUserInput
   companyAssociations: CompanyAssociationCreateManyWithoutUserInput
-  gerepId: String
 }
 
 input UserCreateManyWithoutCompaniesInput {
@@ -3261,7 +3377,6 @@ input UserCreateWithoutCompaniesInput {
   phone: String
   userType: Json
   companyAssociations: CompanyAssociationCreateManyWithoutUserInput
-  gerepId: String
 }
 
 input UserCreateWithoutCompanyAssociationsInput {
@@ -3273,7 +3388,6 @@ input UserCreateWithoutCompanyAssociationsInput {
   phone: String
   userType: Json
   companies: CompanyCreateManyWithoutUserInput
-  gerepId: String
 }
 
 type UserEdge {
@@ -3296,8 +3410,6 @@ enum UserOrderByInput {
   phone_DESC
   userType_ASC
   userType_DESC
-  gerepId_ASC
-  gerepId_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -3312,7 +3424,6 @@ type UserPreviousValues {
   name: String
   phone: String
   userType: Json
-  gerepId: String
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -3395,20 +3506,6 @@ input UserScalarWhereInput {
   phone_not_starts_with: String
   phone_ends_with: String
   phone_not_ends_with: String
-  gerepId: String
-  gerepId_not: String
-  gerepId_in: [String!]
-  gerepId_not_in: [String!]
-  gerepId_lt: String
-  gerepId_lte: String
-  gerepId_gt: String
-  gerepId_gte: String
-  gerepId_contains: String
-  gerepId_not_contains: String
-  gerepId_starts_with: String
-  gerepId_not_starts_with: String
-  gerepId_ends_with: String
-  gerepId_not_ends_with: String
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -3457,7 +3554,6 @@ input UserUpdateDataInput {
   userType: Json
   companies: CompanyUpdateManyWithoutUserInput
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
-  gerepId: String
 }
 
 input UserUpdateInput {
@@ -3469,7 +3565,6 @@ input UserUpdateInput {
   userType: Json
   companies: CompanyUpdateManyWithoutUserInput
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
-  gerepId: String
 }
 
 input UserUpdateManyDataInput {
@@ -3479,7 +3574,6 @@ input UserUpdateManyDataInput {
   name: String
   phone: String
   userType: Json
-  gerepId: String
 }
 
 input UserUpdateManyMutationInput {
@@ -3489,7 +3583,6 @@ input UserUpdateManyMutationInput {
   name: String
   phone: String
   userType: Json
-  gerepId: String
 }
 
 input UserUpdateManyWithoutCompaniesInput {
@@ -3540,7 +3633,6 @@ input UserUpdateWithoutCompaniesDataInput {
   phone: String
   userType: Json
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
-  gerepId: String
 }
 
 input UserUpdateWithoutCompanyAssociationsDataInput {
@@ -3551,7 +3643,6 @@ input UserUpdateWithoutCompanyAssociationsDataInput {
   phone: String
   userType: Json
   companies: CompanyUpdateManyWithoutUserInput
-  gerepId: String
 }
 
 input UserUpdateWithWhereUniqueWithoutCompaniesInput {
@@ -3654,20 +3745,6 @@ input UserWhereInput {
   companyAssociations_every: CompanyAssociationWhereInput
   companyAssociations_some: CompanyAssociationWhereInput
   companyAssociations_none: CompanyAssociationWhereInput
-  gerepId: String
-  gerepId_not: String
-  gerepId_in: [String!]
-  gerepId_not_in: [String!]
-  gerepId_lt: String
-  gerepId_lte: String
-  gerepId_gt: String
-  gerepId_gte: String
-  gerepId_contains: String
-  gerepId_not_contains: String
-  gerepId_starts_with: String
-  gerepId_not_starts_with: String
-  gerepId_ends_with: String
-  gerepId_not_ends_with: String
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]

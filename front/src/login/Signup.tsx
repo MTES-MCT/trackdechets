@@ -43,6 +43,7 @@ const handleSumbit = (
 export default withRouter(function Signup(routerProps: RouteComponentProps) {
   const [company, setCompany] = useState<Company | null>(null);
   const [passwordType, setPasswordType] = useState("password");
+  const [isSearching, setIsSearching] = useState(false)
 
   const fetchCompany = async (
     client: ApolloClient<Company>,
@@ -86,11 +87,18 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   cgu,
                   ...payload
                 } = values;
-                handleSumbit(payload, {
-                  ...routerProps,
-                  ...formikActions,
-                  signup
-                });
+
+                handleSumbit(
+                  {
+                    ...payload,
+                    companyName: company ? company.name : ""
+                  },
+                  {
+                    ...routerProps,
+                    ...formikActions,
+                    signup
+                  }
+                );
               }}
             >
               <Wizard.Page title="Bienvenue">
@@ -276,7 +284,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                           type="text"
                           name="siret"
                           validate={(value: any) => {
-                            if (!company) {
+                            if (!company && !isSearching) {
                               return "Entreprise inconnue"
                             }
                           }}
@@ -285,14 +293,17 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                           <input
                             {...field}
                             onBlur={async (ev) => {
+
                               ev.persist()
-                              field.onBlur(ev);
+
                               const siret = ev.target.value;
+
                               if (siret.length == 14) {
                                 // For some unkown reasons, the first Apollo call raises
                                 // Error: "Store reset while query was in flight(not completed in link chain)"
                                 // so we need to retry
                                 let company_ = null;
+                                setIsSearching(true);
                                 for (let i=0; i<=3; ++i) {
                                   try {
                                     company_ = await fetchCompany(client, siret);
@@ -301,7 +312,10 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                     console.log(err);
                                   }
                                 }
+                                setIsSearching(false);
                                 setCompany(company_);
+
+                                field.onBlur(ev);
 
                                 // auto-complete field gerepId
                                 if (company_ && company_.codeS3ic) {
@@ -328,6 +342,12 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                       )}
                     </ApolloConsumer>
                   </label>
+
+                  {isSearching && (
+                    <p>
+                      Recherche...
+                    </p>
+                  )}
 
                   {company && company.name != "" && (
                     <p>
