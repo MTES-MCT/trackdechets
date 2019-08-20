@@ -1,5 +1,5 @@
 import ApolloClient from "apollo-client";
-import { Field, Form, Formik, FormikActions, FieldProps, FormikProps } from "formik";
+import { Field, FormikActions, FieldProps } from "formik";
 import React, { useState } from "react";
 import { ApolloConsumer, Mutation, MutationFn } from "react-apollo";
 import { RouteComponentProps, withRouter } from "react-router";
@@ -301,12 +301,23 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                   }
                                 }
                                 setCompany(company_);
+
+                                // auto-complete field gerepId
                                 if (company_ && company_.codeS3ic) {
                                   form.setFieldValue("gerepId", company_.codeS3ic, false)
                                 }
+                                // auto-complete field codeNaf
                                 if (company_ && company_.naf) {
                                   form.setFieldValue("codeNaf", company_.naf, false)
                                 }
+
+                                // auto-complete userType
+                                let userType = form.values.userType;
+                                userType = userType.concat(["PRODUCER"])
+                                userType = userType.filter((value, index, self) => {
+                                  return self.indexOf(value) === index;
+                                });
+                                form.setFieldValue("userType", userType);
                               }
                               field.onBlur(ev);
                             }}

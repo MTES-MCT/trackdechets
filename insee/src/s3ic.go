@@ -81,7 +81,8 @@ func init() {
 				rubrique,
 				alinea,
 				regime_autorise as regimeAutorise,
-				activite
+				activite,
+				category
 			FROM etl.rubriques_prepared
 			WHERE code_s3ic = $1
 			AND etat_activite = 'En fonct.'
@@ -135,7 +136,8 @@ func GetICPE(siret string) (*ICPE, bool) {
 				&rubrique.Rubrique,
 				&rubrique.Alinea,
 				&rubrique.RegimeAutorise,
-				&rubrique.Activite)
+				&rubrique.Activite,
+				&rubrique.Category)
 			rubriques = append(rubriques, *rubrique)
 		}
 

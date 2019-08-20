@@ -52,6 +52,7 @@ type Rubrique struct {
 	Alinea         string `json:"alinea"`
 	RegimeAutorise string `json:"regime_autorise"`
 	Activite       string `json:"activite"`
+	Category       string `json:"category"`
 }
 
 // Response La réponse donnée par l'API
