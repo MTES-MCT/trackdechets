@@ -7,6 +7,7 @@ type Company {
   mail: String
   codeS3ic: String
   urlFiche: String
+  naf: String
 
   securityCode: Int!
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, FormikActions } from "formik";
+import { Formik, FormikActions, Form } from "formik";
 import "./Wizard.scss";
 
 type Props = { initialValues: Object; children: any[]; onSubmit: Function };
@@ -73,8 +73,8 @@ export class Wizard extends React.Component<Props, State> {
             enableReinitialize={false}
             validate={this.validate}
             onSubmit={this.handleSubmit}
-            render={({ values, handleSubmit, isSubmitting, handleReset }) => (
-              <form onSubmit={handleSubmit}>
+            render={({ isSubmitting, handleSubmit }) => (
+              <Form>
                 {activePage}
                 <div className="buttons">
                   {page > 0 && (
@@ -102,7 +102,7 @@ export class Wizard extends React.Component<Props, State> {
                     </button>
                   )}
                 </div>
-              </form>
+              </Form>
             )}
           />
         </div>

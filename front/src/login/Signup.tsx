@@ -1,5 +1,5 @@
 import ApolloClient from "apollo-client";
-import { Field, Form, Formik, FormikActions } from "formik";
+import { Field, Form, Formik, FormikActions, FieldProps, FormikProps } from "formik";
 import React, { useState } from "react";
 import { ApolloConsumer, Mutation, MutationFn } from "react-apollo";
 import { RouteComponentProps, withRouter } from "react-router";
@@ -14,7 +14,21 @@ import { Wizard } from "./Wizard";
 import { FaEnvelope, FaLock, FaPhone, FaIdCard, FaEye } from "react-icons/fa";
 import PasswordMeter from "./PasswordMeter";
 
-type Values = {};
+type Values = {
+  codeNaf: string;
+  gerepId: string;
+  email: string;
+  emailConfirmation: string,
+  name: string,
+  phone: string,
+  password: string,
+  passwordConfirmation: string,
+  siret: string,
+  userType: any[],
+  isAllowed: boolean,
+  cgu: boolean
+};
+
 const handleSumbit = (
   payload: Values,
   props: FormikActions<Values> & { signup: MutationFn } & RouteComponentProps
@@ -27,27 +41,21 @@ const handleSumbit = (
 };
 
 export default withRouter(function Signup(routerProps: RouteComponentProps) {
-  const [searchResult, setSearchResult] = useState<Company | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [passwordType, setPasswordType] = useState("password");
 
-  const searchCompanies = async (
+  const fetchCompany = async (
     client: ApolloClient<Company>,
     clue: string
   ) => {
-    if (clue.length < 14) {
-      return;
-    }
 
     const { data } = await client
       .query<{ companyInfos: Company }>({
         query: COMPANY_INFOS,
         variables: { siret: clue }
       })
-      .catch(_ => ({ data: { companyInfos: { name: "" } as Company } }));
 
-    setSearchResult(data.companyInfos);
-
-    return data.companyInfos.name === "" ? "Entreprise inconnue" : null;
+    return data.companyInfos
   };
 
   return (
@@ -66,6 +74,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 siret: "",
                 userType: [],
                 gerepId: "",
+                codeNaf: "",
                 isAllowed: false,
                 cgu: false
               }}
@@ -266,18 +275,59 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                         <Field
                           type="text"
                           name="siret"
-                          validate={(value: any) =>
-                            searchCompanies(client, value)
-                          }
-                        />
+                          validate={(value: any) => {
+                            if (!company) {
+                              return "Entreprise inconnue"
+                            }
+                          }}
+                        >
+                        {({field, form}: FieldProps<Values>) =>
+                          <input
+                            {...field}
+                            onBlur={async (ev) => {
+                              ev.persist()
+                              const siret = ev.target.value;
+                              if (siret.length == 14) {
+                                // For some unkown reasons, the first Apollo call raises
+                                // Error: "Store reset while query was in flight(not completed in link chain)"
+                                // so we need to retry
+                                let company_ = null;
+                                for (let i=0; i<=3; ++i) {
+                                  try {
+                                    company_ = await fetchCompany(client, siret);
+                                    break;
+                                  } catch(err) {
+                                    console.log(err);
+                                  }
+                                }
+                                setCompany(company_);
+                                if (company_ && company_.codeS3ic) {
+                                  form.setFieldValue("gerepId", company_.codeS3ic, false)
+                                }
+                                if (company_ && company_.naf) {
+                                  form.setFieldValue("codeNaf", company_.naf, false)
+                                }
+                              }
+                              field.onBlur(ev);
+                            }}
+                          />
+                        }
+                        </Field>
                       )}
                     </ApolloConsumer>
                   </label>
 
-                  {searchResult && searchResult.name != "" && (
+                  {company && company.name != "" && (
                     <p>
                       Vous allez créer un compte pour l'entreprise{" "}
-                      <strong>{searchResult.name}</strong>.
+                      <strong>{company.name}</strong>
+                      <span>
+                        {" "}
+                        (Installation classée{" "}
+                        <a href={company.urlFiche as string} target="_blank">
+                          n° {company.codeS3ic}
+                        </a>)
+                      </span>
                     </p>
                   )}
 
@@ -289,6 +339,13 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                     Vous êtes*
                     <Field name="userType" component={UserType} />
                   </label>
+                </div>
+
+                <div className="form__group">
+                    <label>
+                      Code NAF
+                      <Field type="text" name="codeNaf" />
+                    </label>
                 </div>
 
                 <div className="form__group">

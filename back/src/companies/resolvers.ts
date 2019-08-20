@@ -51,6 +51,10 @@ export default {
       const company = await memoizeRequest(parent.siret);
       return company.urlFiche;
     },
+    naf: async parent => {
+      const company = await memoizeRequest(parent.siret);
+      return company.naf;
+    },
     admins: async (parent, _) => {
       return getCompanyAdmins(parent.siret).catch(_ => null);
     }

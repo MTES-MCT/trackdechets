@@ -16,8 +16,9 @@ export type Company = {
   contact: string;
   phone: string;
   mail: string;
-  codeS3ic: String;
-  urlFiche: String;
+  codeS3ic: string;
+  urlFiche: string;
+  naf: string;
 };
 
 export default connect<FieldProps>(function CompanySelector(props) {

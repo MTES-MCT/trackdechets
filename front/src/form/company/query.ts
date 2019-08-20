@@ -20,7 +20,8 @@ export const COMPANY_INFOS = gql`
       name
       address,
       codeS3ic,
-      urlFiche
+      urlFiche,
+      naf
     }
   }
 `;
