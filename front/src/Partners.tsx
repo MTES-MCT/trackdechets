@@ -99,6 +99,13 @@ export default function Partners() {
                     alt=""
                   />
                 </figure>
+                <figure>
+                  <img
+                    className="seche"
+                    src="/partners/seche.png"
+                    alt=""
+                  />
+                </figure>
               </div>
             </div>
           </div>
