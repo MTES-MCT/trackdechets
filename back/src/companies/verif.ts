@@ -3,10 +3,18 @@ import axios from "axios";
 export const anomalies = {
   NO_ANOMALY: "no_anomaly",
   NOT_ICPE_27XX_35XX: "not_icpe_27XX_35XX",
-  RUBRIQUES_INCOMPATIBLE: "rubriques_incompatible"
+  RUBRIQUES_INCOMPATIBLE: "rubriques_incompatible",
+  SIRET_UNKNOWN: "siret_unkown"
 }
 
-export async function verifyPrestataire(siret, wasteCode) {
+
+/**
+ * Perform some verifications on a company and return
+ * anomalies if any.
+ * If a wasteCode is present, compatibility check between
+ * the company rubriques and the type of waste is performed
+ */
+export async function verifyPrestataire(siret, wasteCode = null) {
 
   // Liste d'ICPE au régime déclaratif mis à jour à la main
   // à partir des sites des préfectures.
@@ -23,16 +31,25 @@ export async function verifyPrestataire(siret, wasteCode) {
   const etsDecla = r1.data.etablissements;
   const company = r2.data;
 
-  if (!company.codeS3ic && !etsDecla[siret]) {
-    return [company, anomalies.NOT_ICPE_27XX_35XX];
+  if (!company.siret) {
+    return [siret, anomalies.SIRET_UNKNOWN];
   }
 
-  const isCompatible = checkIsCompatible(company.rubriques, wasteCode);
-
-  if (!isCompatible){
-    return [company, anomalies.RUBRIQUES_INCOMPATIBLE];
+  if (!company.s3ic) {
+    if (!etsDecla[siret]) {
+      return [company, anomalies.NOT_ICPE_27XX_35XX];
+    }
+    // update company rubriques from declaration
+    company.rubriques = etsDecla[siret].rubriques;
+    company.urlFiche = etsDecla[siret].url_declaration;
   }
 
+  if (wasteCode) {
+    const isCompatible = checkIsCompatible(company.rubriques, wasteCode);
+    if (!isCompatible){
+      return [company, anomalies.RUBRIQUES_INCOMPATIBLE];
+    }
+  }
   return [company, anomalies.NO_ANOMALY];
 }
 

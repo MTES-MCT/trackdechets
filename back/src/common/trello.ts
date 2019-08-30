@@ -78,6 +78,38 @@ function attachToCard(idCard, file, filename){
 const idAlertsList = process.env.TRELLO_ALERTS_LIST_ID;
 const notIcpeLabelId = "5d4131f3159c5f75617c81fc";
 const notCompatibleLabelId = "5c3c3b13a3a82f48728d9343";
+const siretUnknownLabelId = "5d68e9630969b733ef3dc1eb";
+
+
+export function createSiretUnknownAlertCard(siret, bsd) {
+
+  const cardName = siret;
+
+  getCards(idAlertsList).then(cards => {
+
+    const foundCard = cards.find(c =>{
+      return (c.name == cardName) && (c.labels[0].id == siretUnknownLabelId);
+    });
+
+    if (foundCard) {
+      return attachToCard(foundCard.id, JSON.stringify(bsd, null, 2), "bsd.json");
+    }
+
+    const desc = `Le siret ${siret} n'a pas été reconnu`;
+
+    const data = {
+      name: cardName,
+      idLabels: siretUnknownLabelId,
+      idList: idAlertsList,
+      desc
+    };
+
+    return createCard(data).then(card => {
+      return attachToCard(card.id, JSON.stringify(bsd, null, 2), "bsd.json");
+    });
+  });
+
+}
 
 /*
 * Create a card labelled "Non ICPE" in list "Alertes"
@@ -108,7 +140,7 @@ export function createNotICPEAlertCard(company, bsd){
   `;
 
     const data = {
-      name: `${company.name} (${company.siret})`,
+      name: cardName,
       idLabels: notIcpeLabelId,
       idList: idAlertsList,
       desc

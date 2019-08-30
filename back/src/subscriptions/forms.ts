@@ -4,6 +4,7 @@ import { userMails } from "../users/mails";
 import { getCompanyAdmins } from "../companies/helper";
 import { verifyPrestataire, anomalies } from "../companies/verif";
 import {
+  createSiretUnknownAlertCard,
   createNotICPEAlertCard,
   createNotCompatibleRubriqueAlertCard
 } from "../common/trello";
@@ -130,6 +131,10 @@ async function verifiyPresta(payload: FormSubscriptionPayload) {
     const [company, anomaly] = await verifyPrestataire(siret, wasteCode)
 
     switch(anomaly) {
+      case anomalies.SIRET_UNKNOWN:
+        // Raise an internal alert => the siret was not recognized
+        createSiretUnknownAlertCard(company, bsd);
+        break;
       case anomalies.NOT_ICPE_27XX_35XX:
         // Raise an internal alert => a producer is sending a waste
         // to a company that is not ICPE
@@ -139,6 +144,7 @@ async function verifiyPresta(payload: FormSubscriptionPayload) {
         // Raise an internal alert => a producer is sending a waste
         // to a company that is not compatible with this type of waste
         createNotCompatibleRubriqueAlertCard(company, bsd);
+
     }
   }
 }
