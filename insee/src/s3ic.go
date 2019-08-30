@@ -53,7 +53,7 @@ func init() {
 
 	go func() { connected <- ping() }()
 
-	timeout := time.After(10 * time.Second)
+	timeout := time.After(60 * time.Second)
 
 	select {
 	case <-timeout:
