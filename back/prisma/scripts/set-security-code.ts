@@ -4,7 +4,8 @@ import { randomNumber } from "../../src/utils";
 
 @registerUpdater(
   "Set security code",
-  `New column securityCode in Company has to be set (0 otherwise for existing companies)`
+  `New column securityCode in Company has to be set (0 otherwise for existing companies)`,
+  false
 )
 export class SetSecurityCodeUpdater implements Updater {
   run() {

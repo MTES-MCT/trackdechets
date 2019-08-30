@@ -3,7 +3,8 @@ import { prisma } from "../../src/generated/prisma-client";
 
 @registerUpdater(
   "Set userType",
-  `The userType property was added afterwards. We initialize it to an empty array instead of null`
+  `The userType property was added afterwards. We initialize it to an empty array instead of null`,
+  false
 )
 export class SetContactsUpdater implements Updater {
   run() {
