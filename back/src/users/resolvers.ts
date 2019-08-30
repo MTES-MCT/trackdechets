@@ -1,4 +1,3 @@
-import axios from "axios";
 import { hash, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { getUserId, randomNumber } from "../utils";

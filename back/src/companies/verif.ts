@@ -32,10 +32,10 @@ export async function verifyPrestataire(siret, wasteCode = null) {
   const company = r2.data;
 
   if (!company.siret) {
-    return [siret, anomalies.SIRET_UNKNOWN];
+    return [{siret}, anomalies.SIRET_UNKNOWN];
   }
 
-  if (!company.s3ic) {
+  if (!company.codeS3ic) {
     if (!etsDecla[siret]) {
       return [company, anomalies.NOT_ICPE_27XX_35XX];
     }
