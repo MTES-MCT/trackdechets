@@ -127,8 +127,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 <p>
                   <strong>Votre entreprise dispose déjà d'un compte ?</strong>{" "}
                   Vous ne pourrez pas créer un compte pour l'entreprise via ce
-                  formulaire. Adressez vous à l'Administrateur de votre
-                  entreprise, elle pourra vous inviter via la page "Mon compte".
+                  formulaire. Adressez vous à l'administrateur/trice de votre
+                  entreprise, il/elle pourra vous inviter via la page "Mon compte".
                 </p>
               </Wizard.Page>
               <Wizard.Page
@@ -318,13 +318,10 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                 field.onBlur(ev);
 
                                 // auto-complete field gerepId
-                                if (company_ && company_.codeS3ic) {
-                                  form.setFieldValue("gerepId", company_.codeS3ic, false)
-                                }
+                                form.setFieldValue("gerepId", company_ ? company_.codeS3ic : "")
+
                                 // auto-complete field codeNaf
-                                if (company_ && company_.naf) {
-                                  form.setFieldValue("codeNaf", company_.naf, false)
-                                }
+                                form.setFieldValue("codeNaf", company_ ? company_.naf : "")
 
                                 // auto-complete userType
                                 if (company_ && company_.rubriques) {
@@ -333,6 +330,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                     return self.indexOf(value) === index;
                                   });
                                   form.setFieldValue("userType", userType);
+                                } else {
+                                  form.setFieldValue("userType", []);
                                 }
                               }
                             }}
@@ -352,14 +351,15 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   {company && company.name != "" && (
                     <p>
                       Vous allez créer un compte pour l'entreprise{" "}
-                      <strong>{company.name}</strong>
-                      <span>
-                        {" "}
-                        (Installation classée{" "}
-                        <a href={company.urlFiche as string} target="_blank">
-                          n° {company.codeS3ic}
-                        </a>)
-                      </span>
+                      <strong className="text-green">{company.name}</strong>
+                      {company && company.codeS3ic != "" && (
+                        <span>
+                          {" "}
+                          (Installation classée{" "}
+                          <a href={company.urlFiche as string} target="_blank">
+                            n° {company.codeS3ic}
+                          </a>)
+                        </span>)}
                     </p>
                   )}
 
