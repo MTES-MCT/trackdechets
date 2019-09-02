@@ -3,6 +3,10 @@ import { Updater, registerUpdater } from ".";
 import { prisma } from "../../src/generated/prisma-client";
 
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 @registerUpdater(
   "Set company name, gerepid and code naf",
   `Populate fields name, gerepId and codeNaf on company records for analytics purpose`
@@ -45,6 +49,9 @@ export class SetCampanyNameGerepNafUpdater implements Updater {
         } catch (error) {
           console.log(error)
         }
+
+        // Wait some time to avoid 429 Too many requests
+        await sleep(1000)
       }
 
     } catch (err) {
