@@ -16,20 +16,30 @@ export class SetCampanyNameGerepNafUpdater implements Updater {
       return prisma.companies().then(async companies => {
 
         for (const company of companies) {
-          const response = await axios.get(`http://td-insee:81/siret/${company.siret}`);
-          if (response.status == 200) {
-            const companyInfo = response.data;
 
-            await prisma.updateCompany({
-              data: {
-                name: companyInfo.name,
-                gerepId: companyInfo.codeS3ic,
-                codeNaf: companyInfo.naf
-              },
-              where: {
-                id: company.id
-              }
-            });
+          try {
+            const response = await axios.get(`http://td-insee:81/siret/${company.siret}`);
+
+            if (response.status == 200) {
+              const companyInfo = response.data;
+
+              await prisma.updateCompany({
+                data: {
+                  name: companyInfo.name,
+                  gerepId: companyInfo.codeS3ic,
+                  codeNaf: companyInfo.naf
+                },
+                where: {
+                  id: company.id
+                }
+              });
+            } else {
+              console.log(
+                `Received status code ${response.status}`,
+                response)
+            }
+          } catch (error) {
+            console.log(error)
           }
         }
       });
