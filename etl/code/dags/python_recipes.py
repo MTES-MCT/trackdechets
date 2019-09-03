@@ -74,14 +74,14 @@ RUBRIQUE_2_CATEGORY = {
     "2716": COLLECTOR,
     "2718": COLLECTOR,
     "2719": COLLECTOR,
-    "2720": COLLECTOR,
+    "2720": WASTEPROCESSOR,
     "2730": WASTEPROCESSOR,
-    "2731": WASTE_CENTER,
+    "2731": COLLECTOR,
     "2740": WASTEPROCESSOR,
     "2750": WASTEPROCESSOR,
     "2751": WASTEPROCESSOR,
     "2752": WASTEPROCESSOR,
-    "2760": COLLECTOR,
+    "2760": WASTEPROCESSOR,
     "2770": WASTEPROCESSOR,
     "2771": WASTEPROCESSOR,
     "2780": WASTEPROCESSOR,
@@ -89,19 +89,34 @@ RUBRIQUE_2_CATEGORY = {
     "2782": WASTEPROCESSOR,
     "2790": WASTEPROCESSOR,
     "2791": WASTEPROCESSOR,
-    "2792": WASTEPROCESSOR,
-    "2793": WASTEPROCESSOR,
-    "2794": WASTEPROCESSOR,
+    "2792": {
+        "1a": COLLECTOR,
+        "1b": COLLECTOR,
+        "2": WASTEPROCESSOR
+    },
+    "2793": {
+        "1a": WASTE_CENTER,
+        "1b": WASTE_CENTER,
+        "1c": WASTE_CENTER,
+        "2a": COLLECTOR,
+        "2b": COLLECTOR,
+        "3a": WASTEPROCESSOR,
+        "3b": WASTEPROCESSOR,
+    },
+    "2794": COLLECTOR,
     "2795": WASTEPROCESSOR,
-    "2797": WASTEPROCESSOR,
+    "2797": {
+        "1": COLLECTOR,
+        "2": WASTEPROCESSOR
+    },
     "2798": COLLECTOR,
     "3510": WASTEPROCESSOR,
     "3520": WASTEPROCESSOR,
     "3531": WASTEPROCESSOR,
     "3532": WASTEPROCESSOR,
-    "3540": COLLECTOR,
-    "3550": COLLECTOR,
-    "3560": COLLECTOR
+    "3540": WASTEPROCESSOR,
+    "3550": WASTEPROCESSOR,
+    "3560": WASTEPROCESSOR
 }
 
 
@@ -131,6 +146,18 @@ def prepare_rubriques():
 
         for row in rubriques_scraped_distinct.iter_rows():
 
-            row["category"] = RUBRIQUE_2_CATEGORY.get(row["rubrique"])
+            rubrique = row["rubrique"]
+
+            if rubrique:
+                category = RUBRIQUE_2_CATEGORY.get(rubrique)
+
+                if type(category) == dict:
+                    alinea = row.get("alinea")
+
+                    if alinea:
+                        category = category.get(alinea)
+                        row["category"] = category
+                else:
+                    row["category"] = category
 
             writer.write_row_dict(row)
