@@ -35,30 +35,6 @@ type Company = {
 };
 export default {
   Company: {
-    address: async parent => {
-      const company = await memoizeRequest(parent.siret);
-      return company.address;
-    },
-    name: async parent => {
-      const company = await memoizeRequest(parent.siret);
-      return company.name;
-    },
-    codeS3ic: async parent => {
-      const company = await memoizeRequest(parent.siret);
-      return company.codeS3ic;
-    },
-    urlFiche: async parent => {
-      const company = await memoizeRequest(parent.siret);
-      return company.urlFiche;
-    },
-    naf: async parent => {
-      const company = await memoizeRequest(parent.siret);
-      return company.naf;
-    },
-    rubriques: async parent => {
-      const company = await memoizeRequest(parent.siret);
-      return company.rubriques;
-    },
     admins: async (parent, _) => {
       return getCompanyAdmins(parent.siret).catch(_ => null);
     }

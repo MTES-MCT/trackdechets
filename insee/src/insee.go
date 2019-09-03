@@ -23,8 +23,6 @@ func check(e error) {
 }
 
 func main() {
-	generateToken()
-
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/ping", Ping).Methods("GET")
 	router.HandleFunc("/siret/{siret}", Siret).Methods("GET")
@@ -59,7 +57,7 @@ func Siret(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseData := queryAPI("/" + strippedSiret)
+	responseData := queryAPI("/siret/" + strippedSiret)
 
 	var fullResponseObject APIResponse
 	json.Unmarshal(responseData, &fullResponseObject)
@@ -79,7 +77,10 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	w.Header().Set("Content-Type", "application/json")
-	res := queryAPI("?" + buildSearchParams(r.URL.Query()))
+
+	uri := buildSearchURI(r.URL.Query())
+
+	res := queryAPI(uri)
 
 	var fullResponseObject APIMultiResponse
 	json.Unmarshal(res, &fullResponseObject)
@@ -94,26 +95,30 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonReponse)
 }
 
-func buildSearchParams(query url.Values) string {
-	params := url.Values{}
-	params.Set("nombre", "7")
+func buildSearchURI(query url.Values) string {
+
+	uri := "/full_text"
 
 	clues, ok := query["clue"]
 	if !ok || len(clues[0]) < 1 {
 		log.Panicln("Url Param 'clue' is missing")
 	}
-	// Unfortunately, lucene '*' on `denominationUniteLegale` doesn't seem to be supported
-	params.Set("q", `denominationUniteLegale:"`+clues[0]+`" AND -periode(etatAdministratifEtablissement:F)`)
+
+	uri = uri + "/" + clues[0]
 
 	departments, ok := query["department"]
-	if ok && len(departments[0]) > 1 {
-		params.Set("q", params.Get("q")+" AND codePostalEtablissement:"+departments[0])
-		if len(departments[0]) < 5 {
-			params.Set("q", params.Get("q")+"*")
+
+	if ok {
+		params := url.Values{}
+		if len(departments[0]) == 2 {
+			params.Set("departement", departments[0])
+		} else if len(departments[0]) == 5 {
+			params.Set("code_postal", departments[0])
 		}
+		uri = uri + "?" + params.Encode()
 	}
 
-	return params.Encode()
+	return uri
 }
 
 func queryAPI(uri string) []byte {
@@ -122,25 +127,20 @@ func queryAPI(uri string) []byte {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", "https://api.insee.fr/entreprises/sirene/V3/siret"+uri, nil)
+	req, err := http.NewRequest("GET", "https://entreprise.data.gouv.fr/api/sirene/v1"+uri, nil)
 
 	req.Header.Add("Accept", `application/json`)
-	req.Header.Add("Authorization", `Bearer `+readToken())
 
 	resp, err := client.Do(req)
 	check(err)
 
 	if resp.StatusCode != 200 {
-		log.Println("Error while querying INSEE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
+		log.Println("Error while querying SIRENE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
 
 		requestDump, err := httputil.DumpRequest(req, true)
 		check(err)
 		log.Println("Dumping error content...", string(requestDump))
 
-		if resp.StatusCode == 401 {
-			log.Println("Trying to renew token for next time...")
-			generateTokenFromInsee()
-		}
 	}
 
 	responseData, err := ioutil.ReadAll(resp.Body)
@@ -163,13 +163,9 @@ func etablissementToResponse(item Etablissement) Response {
 
 	return Response{item.Siret,
 		item.Siren,
-		item.UniteLegale.DenominationUniteLegale + item.UniteLegale.DenominationUsuelle1UniteLegale,
-		item.UniteLegale.ActivitePrincipaleUniteLegale,
-		item.AdresseEtablissement.NumeroVoieEtablissement + " " +
-			item.AdresseEtablissement.TypeVoieEtablissement + " " +
-			item.AdresseEtablissement.LibelleVoieEtablissement + ", " +
-			item.AdresseEtablissement.CodePostalEtablissement + " " +
-			item.AdresseEtablissement.LibelleCommuneEtablissement,
+		item.NomRaisonSociale,
+		item.ActivitePrincipale,
+		item.GeoAdresse,
 		codeS3ic,
 		urlFiche,
 		rubriques}
