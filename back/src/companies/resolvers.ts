@@ -35,6 +35,24 @@ type Company = {
 };
 export default {
   Company: {
+    address: async parent => {
+      return parent.address;
+    },
+    name: async parent => {
+      return parent.name;
+    },
+    codeS3ic: async parent => {
+      return parent.codeS3ic;
+    },
+    urlFiche: async parent => {
+      return parent.urlFiche;
+    },
+    naf: async parent => {
+      return parent.naf;
+    },
+    rubriques: async parent => {
+      return parent.rubriques;
+    },
     admins: async (parent, _) => {
       return getCompanyAdmins(parent.siret).catch(_ => null);
     }
