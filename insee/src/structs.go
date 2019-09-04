@@ -38,6 +38,7 @@ type Rubrique struct {
 	RegimeAutorise string `json:"regime_autorise"`
 	Activite       string `json:"activite"`
 	Category       string `json:"category"`
+	WasteType      string `json:"waste_type"`
 }
 
 // Response La réponse donnée par l'API

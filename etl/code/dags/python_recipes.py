@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Integer, Text
 from airflow.hooks.data_preparation import PostgresDataset
 
 from recipes.scraper import fetch_parallel, IcpeScraper, rubriques_dechets
+from utils import get_rubrique_info
 
 
 def scrap_rubriques():
@@ -58,68 +59,6 @@ def scrap_rubriques():
                         writer.write_row_dict(row)
 
 
-COLLECTOR = "COLLECTOR"
-WASTE_CENTER = "WASTE_CENTER"
-WASTE_VEHICLES = "WASTE_VEHICLES"
-WASTEPROCESSOR = "WASTEPROCESSOR"
-
-
-RUBRIQUE_2_CATEGORY = {
-    "2710": WASTE_CENTER,
-    "2711": COLLECTOR,
-    "2712": WASTE_VEHICLES,
-    "2713": COLLECTOR,
-    "2714": COLLECTOR,
-    "2715": COLLECTOR,
-    "2716": COLLECTOR,
-    "2718": COLLECTOR,
-    "2719": COLLECTOR,
-    "2720": WASTEPROCESSOR,
-    "2730": WASTEPROCESSOR,
-    "2731": COLLECTOR,
-    "2740": WASTEPROCESSOR,
-    "2750": WASTEPROCESSOR,
-    "2751": WASTEPROCESSOR,
-    "2752": WASTEPROCESSOR,
-    "2760": WASTEPROCESSOR,
-    "2770": WASTEPROCESSOR,
-    "2771": WASTEPROCESSOR,
-    "2780": WASTEPROCESSOR,
-    "2781": WASTEPROCESSOR,
-    "2782": WASTEPROCESSOR,
-    "2790": WASTEPROCESSOR,
-    "2791": WASTEPROCESSOR,
-    "2792": {
-        "1a": COLLECTOR,
-        "1b": COLLECTOR,
-        "2": WASTEPROCESSOR
-    },
-    "2793": {
-        "1a": WASTE_CENTER,
-        "1b": WASTE_CENTER,
-        "1c": WASTE_CENTER,
-        "2a": COLLECTOR,
-        "2b": COLLECTOR,
-        "3a": WASTEPROCESSOR,
-        "3b": WASTEPROCESSOR,
-    },
-    "2794": COLLECTOR,
-    "2795": WASTEPROCESSOR,
-    "2797": {
-        "1": COLLECTOR,
-        "2": WASTEPROCESSOR
-    },
-    "2798": COLLECTOR,
-    "3510": WASTEPROCESSOR,
-    "3520": WASTEPROCESSOR,
-    "3531": WASTEPROCESSOR,
-    "3532": WASTEPROCESSOR,
-    "3540": WASTEPROCESSOR,
-    "3550": WASTEPROCESSOR,
-    "3560": WASTEPROCESSOR
-}
-
-
 def prepare_rubriques():
 
     # Input dataset
@@ -139,25 +78,23 @@ def prepare_rubriques():
     out_dtype = [
         Column("id", Integer, primary_key=True, autoincrement=True),
         *dtype[1:],
-        Column("category", String)]
+        Column("category", String),
+        Column("waste_type", String)]
     rubriques_prepared.write_dtype(out_dtype)
 
     with rubriques_prepared.get_writer() as writer:
 
         for row in rubriques_scraped_distinct.iter_rows():
 
+            row["category"] = row["waste_type"] = None
+
             rubrique = row["rubrique"]
+            alinea = row["alinea"]
 
-            if rubrique:
-                category = RUBRIQUE_2_CATEGORY.get(rubrique)
+            info = get_rubrique_info(rubrique, alinea)
 
-                if type(category) == dict:
-                    alinea = row.get("alinea")
-
-                    if alinea:
-                        category = category.get(alinea)
-                        row["category"] = category
-                else:
-                    row["category"] = category
+            if info:
+                row["category"] = info.category
+                row["waste_type"] = info.waste_type
 
             writer.write_row_dict(row)

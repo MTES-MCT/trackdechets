@@ -12,7 +12,7 @@ import { memoizeRequest } from "./cache";
 export default {
   Company: {
     name: async parent => {
-      // TODO find out why removing this field causes
+      // TODO find out why removing this field
       // causes a compilation error
       return parent.name;
     },
