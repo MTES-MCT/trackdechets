@@ -338,6 +338,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                   const userType = categories.filter((value, index, self) => {
                                     return self.indexOf(value) === index;
                                   });
+                                  console.log(userType)
                                   form.setFieldValue("userType", userType);
                                 } else {
                                   form.setFieldValue("userType", []);
