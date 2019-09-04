@@ -5,6 +5,7 @@ type Rubrique {
   regime_autorise: String
   activite: String
   category: String
+  waste_type: String
 }
 
 type Company {
