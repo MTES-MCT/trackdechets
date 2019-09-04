@@ -1,58 +1,16 @@
+
 import axios from "axios";
 import { Context } from "../types";
 import {
   getUserId,
-  currentUserBelongsToCompany,
   currentUserBelongsToCompanyAdmins,
   randomNumber
 } from "../utils";
-import { prisma } from "../generated/prisma-client";
-import { getCompanyAdmins, getUserCompanies, getCompanyUsers } from "./helper";
+import { getCompanyAdmins, getUserCompanies } from "./helper";
+import { memoizeRequest } from "./cache";
 
-const requests = {};
-function memoizeRequest(siret) {
-  if (!(siret in requests)) {
-    requests[siret] = axios.get<Company>(`http://td-insee:81/siret/${siret}`);
-  }
-
-  return requests[siret]
-    .then(v => v.data)
-    .catch(err => {
-      delete requests[siret];
-      console.error("Error while querying INSEE service", err);
-    });
-}
-
-type Company = {
-  address: string;
-  name: string;
-  siret: string;
-  contact?: string;
-  phone?: string;
-  mail?: string;
-  codeS3ic: String;
-  urlFiche: String;
-};
 export default {
   Company: {
-    address: async parent => {
-      return parent.address;
-    },
-    name: async parent => {
-      return parent.name;
-    },
-    codeS3ic: async parent => {
-      return parent.codeS3ic;
-    },
-    urlFiche: async parent => {
-      return parent.urlFiche;
-    },
-    naf: async parent => {
-      return parent.naf;
-    },
-    rubriques: async parent => {
-      return parent.rubriques;
-    },
     admins: async (parent, _) => {
       return getCompanyAdmins(parent.siret).catch(_ => null);
     }
@@ -103,7 +61,7 @@ export default {
 
       if (!isNumber) {
         const response: any = await axios
-          .get<Company>(
+          .get(
             `http://td-insee:81/search?clue=${clue}&department=${department}`
           )
           .catch(err =>
