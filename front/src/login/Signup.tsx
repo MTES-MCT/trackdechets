@@ -256,6 +256,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               <Wizard.Page
                 title="Informations entreprise"
                 validate={(values: any) => {
+
                   let errors: any = {};
                   values.siret.replace(/\s/g, "").length !== 14
                     ? (errors.siret = "Le SIRET doit faire 14 caractères")
@@ -284,7 +285,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                           type="text"
                           name="siret"
                           validate={(value: any) => {
-                            if (!company && !isSearching) {
+
+                            if (company && company.name == "") {
                               return "Entreprise inconnue"
                             }
                           }}
@@ -292,6 +294,14 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                         {({field, form}: FieldProps<Values>) =>
                           <input
                             {...field}
+                            onChange={async (ev) => {
+                              ev.persist()
+                              const siret = ev.target.value;
+                              if (siret.length !== 14) {
+                                setCompany(null);
+                              }
+                              field.onChange(ev);
+                            }}
                             onBlur={async (ev) => {
 
                               ev.persist()
@@ -312,16 +322,15 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                     console.log(err);
                                   }
                                 }
+
                                 setIsSearching(false);
                                 setCompany(company_);
 
-                                field.onBlur(ev);
-
                                 // auto-complete field gerepId
-                                form.setFieldValue("gerepId", company_ ? company_.codeS3ic : "")
+                                form.setFieldValue("gerepId", company_ ? company_.codeS3ic : "");
 
                                 // auto-complete field codeNaf
-                                form.setFieldValue("codeNaf", company_ ? company_.naf : "")
+                                form.setFieldValue("codeNaf", company_ ? company_.naf : "");
 
                                 // auto-complete userType
                                 if (company_ && company_.rubriques) {
@@ -334,6 +343,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                   form.setFieldValue("userType", []);
                                 }
                               }
+
+                              field.onBlur(ev);
                             }}
                           />
                         }
@@ -349,20 +360,19 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   )}
 
                   {company && company.name != "" && (
-                    <p>
-                      Vous allez créer un compte pour l'entreprise{" "}
+                    <h6>
+                      Vous allez créer un compte pour l'entreprise<br/>
                       <strong className="text-green">{company.name}</strong>
                       {company && company.codeS3ic != "" && (
                         <span>
-                          {" "}
-                          (Installation classée{" "}
+                          <br/>
+                          Installation classée n°
                           <a href={company.urlFiche as string} target="_blank">
-                            n° {company.codeS3ic}
-                          </a>)
+                             {company.codeS3ic}
+                          </a>
                         </span>)}
-                    </p>
+                    </h6>
                   )}
-
                   <RedErrorMessage name="siret" />
                 </div>
 
