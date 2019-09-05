@@ -27,14 +27,14 @@ export default function Faq() {
       <h3>Pourquoi utiliser Trackdéchets?</h3>
       <p>
         Trackdechets a vocation a simplifier la gestion de vos bordereaux au
-        quotidien: 0 papiers, informations et statuts de mes BSD sur un outils
+        quotidien: 0 papiers, informations et statuts de mes BSD sur un outil
         unique, reporting automatique.
       </p>
       <p>
         Peu importe si vous travaillez avec de multiples prestataires, les
         informations concernant la traçabilité sont regroupées ici.
       </p>
-      <h3>SI mon collecteur n’est pas inscrit, que se passe-t-il?</h3>
+      <h3>Si mon collecteur n’est pas inscrit, que se passe-t-il?</h3>
       <p>
         Vous éditez le BSD à son attention (prestataire), et il reçoit un
         message de notification l’invitant à se rendre sur la plateforme pour
@@ -82,7 +82,7 @@ export default function Faq() {
       </h3>
       <p>
         Comme spécifié{" "}
-        <a href="https://www.google.com/url?q=https://trackdechets.beta.gouv.fr/cgu&amp;sa=D&amp;ust=1553532450373000">
+        <a href="https://trackdechets.beta.gouv.fr/cgu">
           dans les CGU
         </a>
         , aux étapes clés de validation initialement réalisées par le biais
@@ -97,7 +97,7 @@ export default function Faq() {
         Conformément aux normes européennes, Trackdéchets a une politique
         stricte en matière de gestion des données personnelles que vous pouvez
         regarder en détail{" "}
-        <a href="https://www.google.com/url?q=https://trackdechets.beta.gouv.fr/Politique%2520de%2520confidentialit%25C3%25A9.pdf&amp;sa=D&amp;ust=1553532450375000">
+        <a href="https://trackdechets.beta.gouv.fr/Politique%20de%20confidentialit%C3%A9.pdf">
           ici
         </a>
         .<br />
@@ -108,8 +108,9 @@ export default function Faq() {
         avec d’autres services. L’API est structurée et documentée : vous pouvez
         y accéder à tout moment. Une fois que vous aurez créé votre compte vous
         pourrez générer une clé d’API sur la page “Mon compte” et commencer à
-        utiliser l’API. Une documentation dédié existe au lien suivant :
-        https://doc.trackdechets.fr/
+        utiliser l’API.
+        Vous pouvez consulter <a href="  https://doc.trackdechets.fr/">la documentation dédiée</a>.
+
       </p>
       <h3>
         Comment m’assurer que l’entreprise qui va collecter et/ou traiter mon
@@ -122,7 +123,7 @@ export default function Faq() {
           Toute installation de collecte et/ou de traitement des déchets est
           soumise à la réglementation des installations classées pour
           l’environnement et/ou nécessite de disposer d’un agrément
-          préfectoral.(Cf, ci-après)
+          préfectoral.(Cf. ci-après)
         </li>
         <li>
           Pour certaines catégories de déchets (VHU, pneus, huiles usagées,
@@ -140,7 +141,7 @@ export default function Faq() {
       <p>
         C’est aujourd’hui une démarche assez fastidieuse que Trackdéchets veut
         vous aider à simplifier :{" "}
-        <a href="https://www.google.com/url?q=https://trackdechets.beta.gouv.fr/search&amp;sa=D&amp;ust=1553532450379000">
+        <a href="https://trackdechets.beta.gouv.fr/search">
           https://trackdechets.beta.gouv.fr/search
         </a>
         .
@@ -150,7 +151,7 @@ export default function Faq() {
         un contrôle automatique des partenaires à chaque fois que vous
         transmettrez un BSD à un prestataire.
       </p>
-      <p>Sur la réglementation des déchets dangereux</p>
+      <h2>Sur la réglementation des déchets dangereux</h2>
       <h3>Qu'est-ce qu'un déchet dangereux ?</h3>
       <p>
         Tout déchet qui présente un risque particulier pour l'homme et
@@ -171,7 +172,7 @@ export default function Faq() {
       <h3>Que veut dire être producteur d’un déchet ?</h3>
       <p>
         Il existe 2 types de producteurs de déchets (
-        <a href="https://www.google.com/url?q=http://legifrance.gouv.fr/affichCodeArticle.do;jsessionid%3D94F3A4F6C0617DCEA040256E0B0C3E85.tpdila15v_3?idArticle%3DLEGIARTI000023248311%26cidTexte%3DLEGITEXT000006074220%26dateTexte%3D20150417&amp;sa=D&amp;ust=1553532450384000">
+        <a href="https://www.legifrance.gouv.fr/affichCodeArticle.do;jsessionid=94F3A4F6C0617DCEA040256E0B0C3E85.tpdila15v_3?idArticle=LEGIARTI000023248311&cidTexte=LEGITEXT000006074220&dateTexte=20150417">
           article L541-1 du Code de l’Environnement
         </a>
         ) :
@@ -184,7 +185,7 @@ export default function Faq() {
         <li>
           producteur subséquent de déchets : toute personne qui effectue des
           opérations de traitement des déchets conduisant à un changement de la
-          nature ou de la composition de ces déchet.
+          nature ou de la composition de ces déchets.
         </li>
       </ul>
       <h3>
@@ -263,12 +264,12 @@ export default function Faq() {
       </p>
       <p>
         Rendez vous sur la{" "}
-        <a href="https://www.google.com/url?q=https://trackdechets.beta.gouv.fr/wastetree&amp;sa=D&amp;ust=1553532450390000">
-          liste des déchets sur la plateforme trackdechets
+        <a href="https://trackdechets.beta.gouv.fr/wastetree">
+          liste des déchets sur la plateforme Trackdéchets
         </a>{" "}
         et suivez les étapes suivantes:
       </p>
-      <p>Etape 1:</p>
+      <p><strong>Étape 1:</strong></p>
       <ol>
         <li>
           Repérer la source produisant le déchet dans les chapitres 1 à 12 et 17
@@ -279,26 +280,26 @@ export default function Faq() {
           procédés thermiques)
         </li>
       </ol>
-      <p>Etape 2:</p>
+      <p><strong>Étape 2:</strong></p>
       <p>
         Si aucun code approprié ne peut être trouvé à l’étape 1, alors chercher
-        dans les rubr /iques 13 à 15.
+        dans les rubriques 13 à 15.
       </p>
-      <p>Etape 3:</p>
+      <p><strong>Étape 3:</strong></p>
       <p>
         Si aucun code n’a pu être trouvé dans les étapes précédentes, chercher
         dans le chapitre 16.
       </p>
-      <p>Etape 4:</p>
+      <p><strong>Étape 4:</strong></p>
       <p>
         Au cas où le déchet ne relèverait pas des étapes ci-avant, alors le
-        déchet sera classé sous la rubr /ique dont le code se termine par 99
+        déchet sera classé sous la rubrique dont le code se termine par 99
         (déchets non spécifiés par ailleurs) dans le chapitre de la liste
         correspondant à l’activité repérée à la première étape.
       </p>
       <p>
         Pour aller plus loin sur les aspects réglementaires :{" "}
-        <a href="https://www.google.com/url?q=https://www.ecologique-solidaire.gouv.fr/gestion-des-dechets-principes-generaux&amp;sa=D&amp;ust=1553532450393000">
+        <a href="https://www.ecologique-solidaire.gouv.fr/gestion-des-dechets-principes-generaux">
           https://www.ecologique-solidaire.gouv.fr/gestion-des-dechets-principes-generaux
         </a>
       </p>
@@ -310,7 +311,7 @@ export default function Faq() {
         </li>
         <li>
           L’accès aux données des BSD transmis par une entreprise est accessible
-          par toutes les personnes de l’entreprise.
+          par toutes les personnes de l’entreprise
         </li>
         <li>
           Les autorités publiques pourront avoir accès à l’outil dans des cas de
@@ -325,7 +326,7 @@ export default function Faq() {
           est disponible{" "}
           <a href="https://trackdechets.beta.gouv.fr/Politique%20de%20confidentialit%C3%A9.pdf">
             sur le site
-          </a>
+          </a>.
         </li>
       </ul>
       <h3>
@@ -337,7 +338,7 @@ export default function Faq() {
         par les autres utilisateurs, elles sont sécurisées par le recours à un
         token d’authentification.
       </p>
-      <h3>Terminologie: quel terme pour que acteur</h3>
+      <h3>Terminologie: quel terme pour quel acteur ?</h3>
       <p>
         Tout d'abord quelques rappels sur la terminologie tirés du code de
         l'environnement:
@@ -375,24 +376,24 @@ export default function Faq() {
         d'élimination, y compris la préparation qui précède la valorisation ou
         l'élimination ;
       </p>
-      <p>Pour TD, on considère les profils suivant:</p>
+      <p>Pour Trackdéchets, on considère les profils suivant:</p>
       <ul>
         <li>
-          - Installation de traitement (installation d'élimination ou de
+          Installation de traitement (installation d'élimination ou de
           valorisation d'un déchet ultime)
         </li>
-        <li>- Installation de Transit, Regroupement ou Tri de déchets</li>
+        <li>Installation de Transit, Regroupement ou Tri de déchets</li>
         <li>
-          - Installation de collecte de déchets apportés par le producteur
+          Installation de collecte de déchets apportés par le producteur
           initial (déchetterie)
         </li>
         <li>
-          - Installation d'entreposage, dépollution, démontage, découpage de VHU
+          Installation d'entreposage, dépollution, démontage, découpage de VHU
           (casse automobile)
         </li>
-        <li>- Producteur de déchets</li>
+        <li>Producteur de déchets</li>
         <li>
-          - Transporteurs (opération de transport de marchandise y compris
+          Transporteurs (opération de transport de marchandise y compris
           dangereuse) - Négociant en Déchets
         </li>
       </ul>
