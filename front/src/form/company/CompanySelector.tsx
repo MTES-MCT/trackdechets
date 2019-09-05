@@ -116,7 +116,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
                   setSearchTerm({ ...searchTerm, clue: e.target.value })
                 }
               />
-              <button className="overlay-button" aria-label="Recherche">
+              <button className="overlay-button search-icon" aria-label="Recherche" disabled={true}>
                 <FaSearch />
               </button>
             </div>
