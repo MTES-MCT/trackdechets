@@ -1,5 +1,5 @@
 import ApolloClient from "apollo-client";
-import { Field, Form, Formik, FormikActions } from "formik";
+import { Field, FormikActions, FieldProps } from "formik";
 import React, { useState } from "react";
 import { ApolloConsumer, Mutation, MutationFn } from "react-apollo";
 import { RouteComponentProps, withRouter } from "react-router";
@@ -14,7 +14,21 @@ import { Wizard } from "./Wizard";
 import { FaEnvelope, FaLock, FaPhone, FaIdCard, FaEye } from "react-icons/fa";
 import PasswordMeter from "./PasswordMeter";
 
-type Values = {};
+type Values = {
+  codeNaf: string;
+  gerepId: string;
+  email: string;
+  emailConfirmation: string,
+  name: string,
+  phone: string,
+  password: string,
+  passwordConfirmation: string,
+  siret: string,
+  userType: any[],
+  isAllowed: boolean,
+  cgu: boolean
+};
+
 const handleSumbit = (
   payload: Values,
   props: FormikActions<Values> & { signup: MutationFn } & RouteComponentProps
@@ -27,27 +41,22 @@ const handleSumbit = (
 };
 
 export default withRouter(function Signup(routerProps: RouteComponentProps) {
-  const [searchResult, setSearchResult] = useState<Company | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [passwordType, setPasswordType] = useState("password");
+  const [isSearching, setIsSearching] = useState(false)
 
-  const searchCompanies = async (
+  const fetchCompany = async (
     client: ApolloClient<Company>,
     clue: string
   ) => {
-    if (clue.length < 14) {
-      return;
-    }
 
     const { data } = await client
       .query<{ companyInfos: Company }>({
         query: COMPANY_INFOS,
         variables: { siret: clue }
       })
-      .catch(_ => ({ data: { companyInfos: { name: "" } as Company } }));
 
-    setSearchResult(data.companyInfos);
-
-    return data.companyInfos.name === "" ? "Entreprise inconnue" : null;
+    return data.companyInfos
   };
 
   return (
@@ -66,6 +75,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 siret: "",
                 userType: [],
                 gerepId: "",
+                codeNaf: "",
                 isAllowed: false,
                 cgu: false
               }}
@@ -77,11 +87,18 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   cgu,
                   ...payload
                 } = values;
-                handleSumbit(payload, {
-                  ...routerProps,
-                  ...formikActions,
-                  signup
-                });
+
+                handleSumbit(
+                  {
+                    ...payload,
+                    companyName: company ? company.name : ""
+                  },
+                  {
+                    ...routerProps,
+                    ...formikActions,
+                    signup
+                  }
+                );
               }}
             >
               <Wizard.Page title="Bienvenue">
@@ -110,8 +127,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 <p>
                   <strong>Votre entreprise dispose déjà d'un compte ?</strong>{" "}
                   Vous ne pourrez pas créer un compte pour l'entreprise via ce
-                  formulaire. Adressez vous à l'Administrateur de votre
-                  entreprise, elle pourra vous inviter via la page "Mon compte".
+                  formulaire. Adressez vous à l'administrateur/trice de votre
+                  entreprise, il/elle pourra vous inviter via la page "Mon compte".
                 </p>
               </Wizard.Page>
               <Wizard.Page
@@ -144,6 +161,23 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 }}
               >
                 <h1>Informations utilisateur</h1>
+
+                <div className="form__group">
+                  <label>Nom et prénom*</label>
+                  <div className="search__group">
+                    <Field type="text" name="name" />
+                    <button
+                      type="button"
+                      className="overlay-button"
+                      aria-label="Recherche"
+                    >
+                      <FaIdCard />
+                    </button>
+                  </div>
+
+                  <RedErrorMessage name="name" />
+                </div>
+
                 <div className="form__group">
                   <label>Email*</label>
                   <div className="search__group">
@@ -167,22 +201,6 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   </label>
 
                   <RedErrorMessage name="emailConfirmation" />
-                </div>
-
-                <div className="form__group">
-                  <label>Nom et prénom*</label>
-                  <div className="search__group">
-                    <Field type="text" name="name" />
-                    <button
-                      type="button"
-                      className="overlay-button"
-                      aria-label="Recherche"
-                    >
-                      <FaIdCard />
-                    </button>
-                  </div>
-
-                  <RedErrorMessage name="name" />
                 </div>
 
                 <div className="form__group">
@@ -238,6 +256,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               <Wizard.Page
                 title="Informations entreprise"
                 validate={(values: any) => {
+
                   let errors: any = {};
                   values.siret.replace(/\s/g, "").length !== 14
                     ? (errors.siret = "Le SIRET doit faire 14 caractères")
@@ -256,6 +275,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 }}
               >
                 <h1>Informations sur l'entreprise</h1>
+
                 <div className="form__group">
                   <label>
                     Numéro SIRET de l'entreprise que vous administrez*
@@ -264,21 +284,95 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                         <Field
                           type="text"
                           name="siret"
-                          validate={(value: any) =>
-                            searchCompanies(client, value)
-                          }
-                        />
+                          validate={(value: any) => {
+
+                            if (company && company.name == "") {
+                              return "Entreprise inconnue"
+                            }
+                          }}
+                        >
+                        {({field, form}: FieldProps<Values>) =>
+                          <input
+                            {...field}
+                            onChange={async (ev) => {
+                              ev.persist()
+                              const siret = ev.target.value;
+                              if (siret.length !== 14) {
+                                setCompany(null);
+                              }
+                              field.onChange(ev);
+                            }}
+                            onBlur={async (ev) => {
+
+                              ev.persist()
+
+                              const siret = ev.target.value;
+
+                              if (siret.length == 14) {
+                                // For some unkown reasons, the first Apollo call raises
+                                // Error: "Store reset while query was in flight(not completed in link chain)"
+                                // so we need to retry
+                                let company_ = null;
+                                setIsSearching(true);
+                                for (let i=0; i<=3; ++i) {
+                                  try {
+                                    company_ = await fetchCompany(client, siret);
+                                    break;
+                                  } catch(err) {
+                                    console.log(err);
+                                  }
+                                }
+
+                                setIsSearching(false);
+                                setCompany(company_);
+
+                                // auto-complete field gerepId
+                                form.setFieldValue("gerepId", company_ ? company_.codeS3ic : "");
+
+                                // auto-complete field codeNaf
+                                form.setFieldValue("codeNaf", company_ ? company_.naf : "");
+
+                                // auto-complete userType
+                                if (company_ && company_.rubriques) {
+                                  let categories = company_.rubriques.map(r => r.category)
+                                  const userType = categories.filter((value, index, self) => {
+                                    return self.indexOf(value) === index;
+                                  });
+                                  form.setFieldValue("userType", userType);
+                                } else {
+                                  form.setFieldValue("userType", []);
+                                }
+                              }
+
+                              field.onBlur(ev);
+                            }}
+                          />
+                        }
+                        </Field>
                       )}
                     </ApolloConsumer>
                   </label>
 
-                  {searchResult && searchResult.name != "" && (
+                  {isSearching && (
                     <p>
-                      Vous allez créer un compte pour l'entreprise{" "}
-                      <strong>{searchResult.name}</strong>.
+                      Recherche...
                     </p>
                   )}
 
+                  {company && company.name != "" && (
+                    <h6>
+                      Vous allez créer un compte pour l'entreprise<br/>
+                      <strong className="text-green">{company.name}</strong>
+                      {company && company.codeS3ic != "" && (
+                        <span>
+                          <br/>
+                          Installation classée n°
+                          <a href={company.urlFiche as string} target="_blank">
+                             {company.codeS3ic}
+                          </a>
+                        </span>)}
+                    </h6>
+                  )}
                   <RedErrorMessage name="siret" />
                 </div>
 
@@ -290,8 +384,15 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 </div>
 
                 <div className="form__group">
+                    <label>
+                      Code NAF
+                      <Field type="text" name="codeNaf" />
+                    </label>
+                </div>
+
+                <div className="form__group">
                   <label>
-                    Identifiant GEREP (si concerné)
+                    Identifiant GEREP (recommandé)
                     <Field type="text" name="gerepId" />
                   </label>
                 </div>

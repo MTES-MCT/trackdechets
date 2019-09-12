@@ -144,17 +144,10 @@ with DAG("consolidate",
         sql="recipes/set_rubriques_scraped_distinct.sql",
         postgres_conn_id=connection)
 
-    # Create table rubriques_prepared
-    create_rubriques_prepared = PostgresOperator(
-        task_id="create_rubriques_prepared",
-        sql="schemas/rubriques_prepared.sql",
-        postgres_conn_id=connection)
-
-    # Copy data from rubriques_scraped_distinct into rubriques_prepared
-    copy_to_rubriques_prepared = PostgresOperator(
-        task_id="copy_to_rubriques_prepared",
-        sql="recipes/copy_to_rubriques_prepared.sql",
-        postgres_conn_id=connection)
+    # add field category
+    prepare_rubriques = PythonOperator(
+        task_id="prepare_rubriques",
+        python_callable=recipes.prepare_rubriques)
 
     # Download IREP data
     download_irep = DownloadUnzipOperator(
@@ -224,8 +217,7 @@ with DAG("consolidate",
     branching >> download_rubriques_scraped >> \
         load_rubriques_scraped >> join
 
-    join >> create_rubriques_prepared >> \
-        copy_to_rubriques_prepared
+    join >> prepare_rubriques
 
     [filter_s3ic, set_irep_distinct] >> create_s3ic_join_irep >> join_s3ic_irep
 

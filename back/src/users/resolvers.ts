@@ -1,4 +1,3 @@
-import axios from "axios";
 import { hash, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { getUserId, randomNumber } from "../utils";
@@ -37,6 +36,9 @@ export default {
       const company = await context.prisma
         .createCompany({
           siret: trimedSiret,
+          codeNaf: payload.codeNaf,
+          gerepId: payload.gerepId,
+          name: payload.companyName,
           securityCode: randomNumber(4)
         })
         .catch(err => {

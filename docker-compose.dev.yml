@@ -57,6 +57,7 @@ services:
       TRELLO_API_KEY: $TRELLO_API_KEY
       TRELLO_TOKEN: $TRELLO_TOKEN
       TRELLO_ALERTS_LIST_ID: $TRELLO_ALERTS_LIST_ID
+
   td-ui:
     image: node:10.14-alpine
     working_dir: /usr/src/front

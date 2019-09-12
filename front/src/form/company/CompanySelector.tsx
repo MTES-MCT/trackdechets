@@ -9,6 +9,14 @@ import useDebounce from "../../utils/use-debounce";
 import client from "../../graphql-client";
 
 
+export type Rubrique = {
+  rubrique: string;
+  alinea: string;
+  regime_autorise: string;
+  activite: string;
+  category: string;
+}
+
 export type Company = {
   address: string;
   name: string;
@@ -16,8 +24,10 @@ export type Company = {
   contact: string;
   phone: string;
   mail: string;
-  codeS3ic: String;
-  urlFiche: String;
+  codeS3ic: string;
+  urlFiche: string;
+  naf: string;
+  rubriques: Rubrique[];
 };
 
 export default connect<FieldProps>(function CompanySelector(props) {
@@ -106,7 +116,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
                   setSearchTerm({ ...searchTerm, clue: e.target.value })
                 }
               />
-              <button className="overlay-button" aria-label="Recherche">
+              <button className="overlay-button search-icon" aria-label="Recherche" disabled={true}>
                 <FaSearch />
               </button>
             </div>

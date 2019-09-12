@@ -92,7 +92,7 @@ export const userMails = {
     }, le déchet de la société suivante :
     <br><br>
     <ul>
-    <li>Société ${form.emitterCompanyName} - ${form.emitterCompanyAddress}/li>
+    <li>Société ${form.emitterCompanyName} - ${form.emitterCompanyAddress}</li>
     <li>Déchets :</li>
     <ul>
       <li>Numéro : ${form.readableId}</li>

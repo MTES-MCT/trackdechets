@@ -53,7 +53,7 @@ func init() {
 
 	go func() { connected <- ping() }()
 
-	timeout := time.After(10 * time.Second)
+	timeout := time.After(60 * time.Second)
 
 	select {
 	case <-timeout:
@@ -81,7 +81,9 @@ func init() {
 				rubrique,
 				alinea,
 				regime_autorise as regimeAutorise,
-				activite
+				activite,
+				category,
+				waste_type as wasteType
 			FROM etl.rubriques_prepared
 			WHERE code_s3ic = $1
 			AND etat_activite = 'En fonct.'
@@ -135,7 +137,9 @@ func GetICPE(siret string) (*ICPE, bool) {
 				&rubrique.Rubrique,
 				&rubrique.Alinea,
 				&rubrique.RegimeAutorise,
-				&rubrique.Activite)
+				&rubrique.Activite,
+				&rubrique.Category,
+				&rubrique.WasteType)
 			rubriques = append(rubriques, *rubrique)
 		}
 

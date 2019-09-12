@@ -8,7 +8,8 @@ type Association = {
 };
 @registerUpdater(
   "Correct company associations",
-  `There should be no duplicates in the company associations. A problem with an updater created duplicates in the staging environemet`
+  `There should be no duplicates in the company associations. A problem with an updater created duplicates in the staging environemet`,
+  false
 )
 export class NewUserModelUpdater implements Updater {
   async run(): Promise<any> {

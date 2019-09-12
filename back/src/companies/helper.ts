@@ -1,4 +1,6 @@
 import { prisma, User, Company } from "../generated/prisma-client";
+import { memoizeRequest } from "./cache"
+
 
 const companyAssociationUserFragment = `
 fragment CompanyWithAdmins on CompanyAssociation {
@@ -24,11 +26,18 @@ function getUsersThroughCompanyAssociations(params: object) {
     .then(association => association.map(a => a.user));
 }
 
-export function getUserCompanies(userId: string) {
-  return prisma
+export async function getUserCompanies(userId: string) {
+
+  const companies = await prisma
     .companyAssociations({ where: { user: { id: userId } } })
     .$fragment<{ company: Company }[]>(companyAssociationCompaniesFragment)
-    .then(association => association.map(a => a.company));
+    .then(associations => associations.map(a => a.company));
+
+  return Promise.all(companies.map(company => {
+    return memoizeRequest(company.siret).then(companyInfo => {
+      return {...company, ...companyInfo};
+    });
+  }))
 }
 
 const companyAssociationCompaniesFragment = `

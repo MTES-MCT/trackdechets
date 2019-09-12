@@ -83,27 +83,23 @@ export default function Partners() {
               <h3>Nos partenaires actuels</h3>
               <div className="Partners__logos">
                 <figure>
-                  <img src="/partners/kerlog.jpg" />
-                  <figcaption>Kerlog</figcaption>
+                  <img src="/partners-logos/kerlog.svg" alt="Kerlog" />
                 </figure>
                 <figure>
-                  <img
-                    src="/partners/chimirec.gif"
-                    alt=""
-                  />
+                  <img src="/partners-logos/chimirec.png" alt="Chimirec" />
                 </figure>
                 <figure>
                   <img
                     className="sarpi-veolia"
-                    src="/partners/sarpi-veolia.png"
-                    alt=""
+                    src="/partners-logos/sarpi.png"
+                    alt="Sarpi-Veolia"
                   />
                 </figure>
                 <figure>
                   <img
                     className="seche"
-                    src="/partners/seche.png"
-                    alt=""
+                    src="/partners-logos/seche.png"
+                    alt="Séché Environnement"
                   />
                 </figure>
               </div>

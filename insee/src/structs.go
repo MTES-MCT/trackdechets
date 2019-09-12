@@ -12,31 +12,16 @@ type APIResponse struct {
 
 // APIMultiResponse INSEE API response object
 type APIMultiResponse struct {
-	Etablissements []Etablissement `json:"etablissements"`
+	Etablissements []Etablissement `json:"etablissement"`
 }
 
 // Etablissement Etablissement lié au SIRET
 type Etablissement struct {
-	Siret                string               `json:"siret"`
-	Siren                string               `json:"siren"`
-	UniteLegale          UniteLegale          `json:"uniteLegale"`
-	AdresseEtablissement AdresseEtablissement `json:"adresseEtablissement"`
-}
-
-// UniteLegale Unité légale liée au SIRET
-type UniteLegale struct {
-	DenominationUniteLegale         string `json:"denominationUniteLegale"`
-	DenominationUsuelle1UniteLegale string `json:"denominationUsuelle1UniteLegale"`
-	ActivitePrincipaleUniteLegale   string `json:"activitePrincipaleUniteLegale"`
-}
-
-// AdresseEtablissement Adresse et détail de l'établissement
-type AdresseEtablissement struct {
-	NumeroVoieEtablissement     string `json:"numeroVoieEtablissement"`
-	TypeVoieEtablissement       string `json:"typeVoieEtablissement"`
-	LibelleVoieEtablissement    string `json:"libelleVoieEtablissement"`
-	CodePostalEtablissement     string `json:"codePostalEtablissement"`
-	LibelleCommuneEtablissement string `json:"libelleCommuneEtablissement"`
+	Siret              string `json:"siret"`
+	Siren              string `json:"siren"`
+	NomRaisonSociale   string `json:"nom_raison_sociale"`
+	ActivitePrincipale string `json:"activite_principale"`
+	GeoAdresse         string `json:"geo_adresse"`
 }
 
 // ICPE Installation classée pour la protection de l'environnement
@@ -52,6 +37,8 @@ type Rubrique struct {
 	Alinea         string `json:"alinea"`
 	RegimeAutorise string `json:"regime_autorise"`
 	Activite       string `json:"activite"`
+	Category       string `json:"category"`
+	WasteType      string `json:"waste_type"`
 }
 
 // Response La réponse donnée par l'API
