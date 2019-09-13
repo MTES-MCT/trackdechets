@@ -1,0 +1,23 @@
+
+
+.section {
+  padding: 2em 0;
+}
+
+.row {
+  margin-top: 2em;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+  width: 70%;
+  margin: auto;
+}
