@@ -21,11 +21,19 @@ export default {
     }
   },
   Query: {
-    companyInfos: async (parent, { siret }) => {
+    companyInfos: async (parent, { siret }, context: Context) => {
       if (siret.length < 14) {
         return null;
       }
-      return await memoizeRequest(siret);
+      const company = await memoizeRequest(siret);
+
+      // check if this company is registered in TD
+      const tdCompany = await context.prisma
+        .company({ siret })
+
+      company.isRegistered = tdCompany ? true : false;
+
+      return company
     },
     companyUsers: async (_, { siret }, context: Context) => {
       const companyAdmins = await getCompanyAdmins(siret);

@@ -18,6 +18,7 @@ type Company {
   codeS3ic: String
   urlFiche: String
   naf: String
+  isRegistered: Boolean
   rubriques: [Rubrique]
 
   securityCode: Int!
