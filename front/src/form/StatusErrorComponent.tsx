@@ -8,7 +8,9 @@ import { connect } from "formik";
  */
 const StatusErrorMessage = (props: any) => {
   return props.formik.status ? (
-    <div className="input-error-message">{props.formik.status}</div>
+    <div className="form-error-message form-error-message--bold">
+      {props.formik.status}
+    </div>
   ) : null;
 };
 
