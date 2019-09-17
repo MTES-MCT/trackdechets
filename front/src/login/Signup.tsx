@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { Company } from "../form/company/CompanySelector";
 import { COMPANY_INFOS } from "../form/company/query";
 import RedErrorMessage from "../form/RedErrorMessage";
+import StatusErrorMessage from "../form/StatusErrorComponent";
 import { SIGNUP } from "./mutations";
 import "./Signup.scss";
 import UserType from "./UserType";
@@ -18,45 +19,45 @@ type Values = {
   codeNaf: string;
   gerepId: string;
   email: string;
-  emailConfirmation: string,
-  name: string,
-  phone: string,
-  password: string,
-  passwordConfirmation: string,
-  siret: string,
-  userType: any[],
-  isAllowed: boolean,
-  cgu: boolean
+  emailConfirmation: string;
+  name: string;
+  phone: string;
+  password: string;
+  passwordConfirmation: string;
+  siret: string;
+  userType: any[];
+  isAllowed: boolean;
+  cgu: boolean;
 };
 
-const handleSumbit = (
+const handleSubmit = (
   payload: Values,
   props: FormikActions<Values> & { signup: MutationFn } & RouteComponentProps
 ) => {
   props
     .signup({ variables: { payload } })
     .then(_ => props.history.push("/signup/activation"))
-    .catch(error => props.setStatus(error.message))
+    .catch(error => {
+      // graphQLErrors are returned as an array of objects, we map and join  them to a string
+      let errorMessages = error.graphQLErrors
+        .map(({ message }: { message: string }) => message)
+        .join("\n");
+      props.setStatus(errorMessages);
+    })
     .then(_ => props.setSubmitting(false));
 };
-
 export default withRouter(function Signup(routerProps: RouteComponentProps) {
   const [company, setCompany] = useState<Company | null>(null);
   const [passwordType, setPasswordType] = useState("password");
-  const [isSearching, setIsSearching] = useState(false)
+  const [isSearching, setIsSearching] = useState(false);
 
-  const fetchCompany = async (
-    client: ApolloClient<Company>,
-    clue: string
-  ) => {
+  const fetchCompany = async (client: ApolloClient<Company>, clue: string) => {
+    const { data } = await client.query<{ companyInfos: Company }>({
+      query: COMPANY_INFOS,
+      variables: { siret: clue }
+    });
 
-    const { data } = await client
-      .query<{ companyInfos: Company }>({
-        query: COMPANY_INFOS,
-        variables: { siret: clue }
-      })
-
-    return data.companyInfos
+    return data.companyInfos;
   };
 
   return (
@@ -88,7 +89,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   ...payload
                 } = values;
 
-                handleSumbit(
+                handleSubmit(
                   {
                     ...payload,
                     companyName: company ? company.name : ""
@@ -128,7 +129,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                   <strong>Votre entreprise dispose déjà d'un compte ?</strong>{" "}
                   Vous ne pourrez pas créer un compte pour l'entreprise via ce
                   formulaire. Adressez vous à l'administrateur/trice de votre
-                  entreprise, il/elle pourra vous inviter via la page "Mon compte".
+                  entreprise, il/elle pourra vous inviter via la page "Mon
+                  compte".
                 </p>
               </Wizard.Page>
               <Wizard.Page
@@ -256,7 +258,6 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               <Wizard.Page
                 title="Informations entreprise"
                 validate={(values: any) => {
-
                   let errors: any = {};
                   values.siret.replace(/\s/g, "").length !== 14
                     ? (errors.siret = "Le SIRET doit faire 14 caractères")
@@ -285,93 +286,101 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                           type="text"
                           name="siret"
                           validate={(value: any) => {
-
                             if (company && company.name == "") {
-                              return "Entreprise inconnue"
+                              return "Entreprise inconnue";
                             }
                           }}
                         >
-                        {({field, form}: FieldProps<Values>) =>
-                          <input
-                            {...field}
-                            onChange={async (ev) => {
-                              ev.persist()
-                              const siret = ev.target.value;
-                              if (siret.length !== 14) {
-                                setCompany(null);
-                              }
-                              field.onChange(ev);
-                            }}
-                            onBlur={async (ev) => {
+                          {({ field, form }: FieldProps<Values>) => (
+                            <input
+                              {...field}
+                              onChange={async ev => {
+                                ev.persist();
+                                const siret = ev.target.value;
+                                if (siret.length !== 14) {
+                                  setCompany(null);
+                                }
+                                field.onChange(ev);
+                              }}
+                              onBlur={async ev => {
+                                ev.persist();
 
-                              ev.persist()
+                                const siret = ev.target.value;
 
-                              const siret = ev.target.value;
+                                if (siret.length == 14) {
+                                  // For some unknown reasons, the first Apollo call raises
+                                  // Error: "Store reset while query was in flight(not completed in link chain)"
+                                  // so we need to retry
+                                  let company_ = null;
+                                  setIsSearching(true);
+                                  for (let i = 0; i <= 3; ++i) {
+                                    try {
+                                      company_ = await fetchCompany(
+                                        client,
+                                        siret
+                                      );
+                                      break;
+                                    } catch (err) {
+                                      console.log(err);
+                                    }
+                                  }
 
-                              if (siret.length == 14) {
-                                // For some unkown reasons, the first Apollo call raises
-                                // Error: "Store reset while query was in flight(not completed in link chain)"
-                                // so we need to retry
-                                let company_ = null;
-                                setIsSearching(true);
-                                for (let i=0; i<=3; ++i) {
-                                  try {
-                                    company_ = await fetchCompany(client, siret);
-                                    break;
-                                  } catch(err) {
-                                    console.log(err);
+                                  setIsSearching(false);
+                                  setCompany(company_);
+
+                                  // auto-complete field gerepId
+                                  form.setFieldValue(
+                                    "gerepId",
+                                    company_ ? company_.codeS3ic : ""
+                                  );
+
+                                  // auto-complete field codeNaf
+                                  form.setFieldValue(
+                                    "codeNaf",
+                                    company_ ? company_.naf : ""
+                                  );
+
+                                  // auto-complete userType
+                                  if (company_ && company_.rubriques) {
+                                    let categories = company_.rubriques.map(
+                                      r => r.category
+                                    );
+                                    const userType = categories.filter(
+                                      (value, index, self) => {
+                                        return self.indexOf(value) === index;
+                                      }
+                                    );
+                                    form.setFieldValue("userType", userType);
+                                  } else {
+                                    form.setFieldValue("userType", []);
                                   }
                                 }
 
-                                setIsSearching(false);
-                                setCompany(company_);
-
-                                // auto-complete field gerepId
-                                form.setFieldValue("gerepId", company_ ? company_.codeS3ic : "");
-
-                                // auto-complete field codeNaf
-                                form.setFieldValue("codeNaf", company_ ? company_.naf : "");
-
-                                // auto-complete userType
-                                if (company_ && company_.rubriques) {
-                                  let categories = company_.rubriques.map(r => r.category)
-                                  const userType = categories.filter((value, index, self) => {
-                                    return self.indexOf(value) === index;
-                                  });
-                                  console.log(userType)
-                                  form.setFieldValue("userType", userType);
-                                } else {
-                                  form.setFieldValue("userType", []);
-                                }
-                              }
-
-                              field.onBlur(ev);
-                            }}
-                          />
-                        }
+                                field.onBlur(ev);
+                              }}
+                            />
+                          )}
                         </Field>
                       )}
                     </ApolloConsumer>
                   </label>
 
-                  {isSearching && (
-                    <p>
-                      Recherche...
-                    </p>
-                  )}
+                  {isSearching && <p>Recherche...</p>}
 
                   {company && company.name != "" && (
                     <h6>
-                      Vous allez créer un compte pour l'entreprise<br/>
+                      Vous allez créer un compte pour l'entreprise
+                      <br />
                       <strong className="text-green">{company.name}</strong>
                       {company && company.codeS3ic != "" && (
                         <span>
-                          <br/>
+                          <br />
                           Installation classée n°
                           <a href={company.urlFiche as string} target="_blank">
-                             {company.codeS3ic}
+                            {company.codeS3ic}
                           </a>
-                        </span>)}
+                        </span>
+                      )}
                     </h6>
                   )}
                   <RedErrorMessage name="siret" />
@@ -385,10 +394,10 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 </div>
 
                 <div className="form__group">
-                    <label>
-                      Code NAF
-                      <Field type="text" name="codeNaf" />
-                    </label>
+                  <label>
+                    Code NAF
+                    <Field type="text" name="codeNaf" />
+                  </label>
                 </div>
 
                 <div className="form__group">
@@ -418,8 +427,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                   <RedErrorMessage name="cgu" />
                 </div>
-
-                {status && <p className="form-error-message">{status}</p>}
+                <StatusErrorMessage />
               </Wizard.Page>
             </Wizard>
           )}
