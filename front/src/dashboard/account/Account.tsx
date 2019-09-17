@@ -8,7 +8,8 @@ import { Me } from "../../login/model";
 import EditProfile from "./EditProfile";
 import ImportNewUser from "./InviteNewUser";
 import { USER_TYPES } from "../../login/UserType";
-
+import "./Account.scss";
+import "../../Utils.scss";
 interface IProps {
   me: Me;
 }
@@ -75,15 +76,18 @@ export default withRouter(function Account({
         <h4>Entreprise(s) associée(s):</h4>
         {me.companies.map(c => (
           <div className="panel" key={c.siret}>
-            <address>
-              {c.name}
-              <br />
-              Numéro SIRET: {c.siret}
-              <br />
-              {c.address}
-              <br />
-              Code de sécurité: {c.securityCode}
-            </address>
+            <div className="company-address">
+              <p className="mb-1">
+                <strong>{c.name}</strong>
+              </p>
+              <p>
+                Numéro SIRET : <strong>{c.siret}</strong>
+              </p>
+              <p>{c.address}</p>
+              <p>
+                Code de sécurité: <strong>{c.securityCode}</strong>
+              </p>
+            </div>
             {c.admins.find(a => a.id === me.id) && (
               <ImportNewUser siret={c.siret} me={me} />
             )}
