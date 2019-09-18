@@ -1,2 +1,3 @@
+cuid==0.3
 requests==2.22.0
 https://github.com/MTES-MCT/data-preparation-plugin/archive/v0.1.8.tar.gz

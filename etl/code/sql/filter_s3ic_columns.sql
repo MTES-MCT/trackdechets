@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS etl.s3ic_columns_filtered;
 CREATE TABLE etl.s3ic_columns_filtered (
+  id SERIAL PRIMARY KEY,
   code_s3ic VARCHAR(255),
   nom_ets VARCHAR(255),
   regime VARCHAR(255),
@@ -14,7 +15,20 @@ CREATE TABLE etl.s3ic_columns_filtered (
   sirene_numero_siret VARCHAR(255)
 );
 INSERT INTO
-  etl.s3ic_columns_filtered
+  etl.s3ic_columns_filtered (
+    code_s3ic,
+    nom_ets,
+    regime,
+    lib_regime,
+    seveso,
+    lib_seveso,
+    famille_ic,
+    url_fiche,
+    s3ic_numero_siret,
+    irep_numero_siret,
+    gerep_numero_siret,
+    sirene_numero_siret
+  )
 SELECT
   code_s3ic,
   nom_ets,

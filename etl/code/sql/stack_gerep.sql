@@ -6,7 +6,7 @@ CREATE TABLE etl.gerep_stacked (
 );
 
 INSERT INTO etl.gerep_stacked
-SELECT *, 'producteur' from etl.gerep_producteur;
+SELECT *, 'Producteur' from etl.gerep_producteur;
 
 INSERT INTO etl.gerep_stacked
-SELECT *, 'traiteur' from etl.gerep_producteur;
+SELECT *, 'Traiteur' from etl.gerep_producteur;

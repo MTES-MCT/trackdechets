@@ -18,7 +18,8 @@ def get_env_setting(setting):
 
 
 # Postgres
-CONN_ID = 'postgres_etl'
+POSTGRES_ETL_CONN_ID = 'postgres_etl'
+POSTGRES_PRISMA_CONN_ID = 'postgres_prisma'
 
 # Folder structure
 

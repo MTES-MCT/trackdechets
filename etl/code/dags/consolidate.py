@@ -1,5 +1,12 @@
 # -*- coding=utf-8 -*-
 
+"""
+This DAG is used to consolidate data from different
+databases: s3ic, irep, gerep, sirene
+The main goal is to identify every ICPE (Installation
+classée pour la protection de l'environnement) with
+its SIRET
+"""
 
 import os
 from datetime import datetime, timedelta
@@ -14,7 +21,7 @@ from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.python_operator import PythonOperator
 
 import python_recipes as recipes
-from config import CONN_ID, DATA_DIR, DOWNLOAD_URL, SQL_DIR
+from config import POSTGRES_ETL_CONN_ID, DATA_DIR, DOWNLOAD_URL, SQL_DIR
 from utils import connection_env
 
 
@@ -81,48 +88,48 @@ with DAG("consolidate",
         task_id='load_s3ic',
         shapefile=s3ic_shapefile,
         table='etl.s3ic_source',
-        connection=CONN_ID)
+        connection=POSTGRES_ETL_CONN_ID)
 
     # Load rubriques
     load_rubrique = EmbulkOperator(
         'rubrique.yml.liquid',
         task_id='load_rubrique',
-        env=connection_env(CONN_ID))
+        env=connection_env(POSTGRES_ETL_CONN_ID))
 
     # Load IREP data
     load_irep = EmbulkOperator(
         'irep.yml.liquid',
         task_id='load_irep',
-        env=connection_env(CONN_ID))
+        env=connection_env(POSTGRES_ETL_CONN_ID))
 
     # Load GEREP data
     load_gerep_traiteur = EmbulkOperator(
         'gerep_traiteur.yml.liquid',
         task_id='load_gerep_traiteur',
-        env=connection_env(CONN_ID))
+        env=connection_env(POSTGRES_ETL_CONN_ID))
 
     load_gerep_producteur = EmbulkOperator(
         'gerep_producteur.yml.liquid',
         task_id='load_gerep_producteur',
-        env=connection_env(CONN_ID))
+        env=connection_env(POSTGRES_ETL_CONN_ID))
 
     # Load s3ic_x_sirene (from themergemachine.com)
     load_s3ic_x_sirene = EmbulkOperator(
         's3ic_x_sirene.yml.liquid',
         task_id='load_s3ic_x_sirene',
-        env=connection_env(CONN_ID))
+        env=connection_env(POSTGRES_ETL_CONN_ID))
 
     # Select distinct records from rubriques
     dedup_rubrique = PostgresOperator(
         task_id="dedup_rubrique",
         sql="dedup_rubrique.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Filter rubrique on 27__ and 35__
     filter_rubrique = PostgresOperator(
         task_id="filter_rubrique",
         sql="filter_rubrique.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # add field category
     prepare_rubrique = PythonOperator(
@@ -133,76 +140,82 @@ with DAG("consolidate",
     filter_s3ic = PostgresOperator(
         task_id='filter_s3ic',
         sql='filter_s3ic.sql',
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Create IREP distinct
     dedup_irep = PostgresOperator(
         task_id="dedup_irep",
         sql="dedup_irep.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Stack GEREP producteurs and traiteurs
     stack_gerep = PostgresOperator(
         task_id="stack_gerep",
         sql="stack_gerep.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Extract GEREP distinct etablissements
     extract_gerep_etablissement = PostgresOperator(
         task_id="extract_gerep_etablissement",
         sql="extract_gerep_etablissement.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Join s3ic with IREP data
     join_s3ic_irep = PostgresOperator(
         task_id='join_s3ic_irep',
         sql='join_s3ic_irep.sql',
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Join s3ic with GEREP data
     join_s3ic_gerep = PostgresOperator(
         task_id="join_s3ic_gerep",
         sql="join_s3ic_gerep.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Join s3ic with s3ic_x_sirene
     join_s3ic_sirene = PostgresOperator(
         task_id="join_s3ic_sirene",
         sql="join_s3ic_sirene.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Rename and filter s3ic columns
     filter_s3ic_columns = PostgresOperator(
         task_id="filter_s3ic_columns",
         sql="filter_s3ic_columns.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Rename and filter gerep columns
     filter_gerep_columns = PostgresOperator(
         task_id="filter_gerep_columns",
         sql="filter_gerep_columns.sql",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # Add a '0' to code_s3ic
+    prepare_gerep = PostgresOperator(
+        task_id="prepare_gerep",
+        sql="prepare_gerep.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Stage table s3ic for deployment
     stage_s3ic = CopyTableOperator(
         task_id="stage_s3ic",
         source="etl.s3ic_columns_filtered",
         destination="etl.s3ic",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Stage table rubrique for deployment
     stage_rubrique = CopyTableOperator(
         task_id="stage_rubrique",
         source="etl.rubrique_prepared",
         destination="etl.rubrique",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Stage table gerep for deployment
     stage_gerep = CopyTableOperator(
         task_id="stage_gerep",
-        source="etl.gerep_columns_filtered",
+        source="etl.gerep_prepared",
         destination="etl.gerep",
-        postgres_conn_id=CONN_ID)
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     start >> [
         download_s3ic,
@@ -219,7 +232,7 @@ with DAG("consolidate",
     download_gerep >> [load_gerep_producteur, load_gerep_traiteur] \
         >> stack_gerep >> extract_gerep_etablissement
 
-    stack_gerep >> filter_gerep_columns >> stage_gerep
+    stack_gerep >> filter_gerep_columns >> prepare_gerep >> stage_gerep
 
     download_rubrique >> load_rubrique >> dedup_rubrique \
         >> filter_rubrique >> prepare_rubrique >> stage_rubrique
@@ -233,28 +246,3 @@ with DAG("consolidate",
     [join_s3ic_irep, extract_gerep_etablissement] >> join_s3ic_gerep
 
     [join_s3ic_gerep, load_s3ic_x_sirene] >> join_s3ic_sirene >> stage_s3ic
-
-    # start >> [download_s3ic, download_rubriques_op, download_irep]
-
-    # download_irep >> load_irep >> create_irep_distinct >> set_irep_distinct
-
-    # download_s3ic >> load_s3ic
-
-    # download_rubriques_op >> load_rubriques
-
-    # [load_s3ic, load_rubriques] >> filter_s3ic
-
-    # filter_s3ic >> branch
-
-    # set_rubriques_scraped_distinct >> join
-
-    # branching >> download_rubriques_scraped >> \
-    #     load_rubriques_scraped >> join
-
-    # join >> prepare_rubriques
-
-    # [filter_s3ic, set_irep_distinct] >> create_s3ic_join_irep >> join_s3ic_irep
-
-    # join_s3ic_irep >> create_s3ic_consolidated
-
-    # create_s3ic_consolidated >> copy_to_s3ic_consolidated
