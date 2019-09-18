@@ -1,6 +1,6 @@
 in:
   type: file
-  path_prefix: {{ env.PATH_PREFIX }}
+  path_prefix: {{ env.DATA_DIR }}/irep
   parser:
     charset: UTF-8
     newline: CRLF
@@ -33,7 +33,7 @@ out:
   user: {{ env.POSTGRES_USER }}
   password: {{ env.POSTGRES_PASSWORD }}
   database: {{ env.POSTGRES_DATABASE }}
-  table: irep
+  table: irep_source
   schema: etl
   options: {loglevel: 2}
   mode: replace

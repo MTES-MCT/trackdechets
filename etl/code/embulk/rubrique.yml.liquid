@@ -1,6 +1,6 @@
 in:
   type: file
-  path_prefix: {{ env.PATH_PREFIX }}
+  path_prefix: {{ env.DATA_DIR }}/s3ic/rubriques/rubriques.csv
   parser:
     charset: UTF-8
     newline: LF
@@ -13,7 +13,6 @@ in:
     allow_extra_columns: false
     allow_optional_columns: false
     columns:
-    - {name: id, type: long}
     - {name: code_s3ic, type: string}
     - {name: rubrique, type: string}
     - {name: alinea, type: string}
@@ -29,17 +28,7 @@ out:
   user: {{ env.POSTGRES_USER }}
   password: {{ env.POSTGRES_PASSWORD }}
   database: {{ env.POSTGRES_DATABASE }}
-  table: rubriques_scraped_distinct
+  table: rubrique_source
   schema: etl
   options: {loglevel: 2}
   mode: replace
-  column_options:
-    code_s3ic: {type: VARCHAR(255)}
-    rubrique: {type: VARCHAR(255)}
-    alinea: {type: VARCHAR(255)}
-    date_autorisation: {type: VARCHAR(255)}
-    etat_activite: {type: VARCHAR(255)}
-    regime_autorise: {type: VARCHAR(255)}
-    activite: {type: TEXT}
-    volume: {type: VARCHAR(255)}
-    unite: {type: VARCHAR(255)}
