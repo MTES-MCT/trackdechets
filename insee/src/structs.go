@@ -24,31 +24,11 @@ type Etablissement struct {
 	GeoAdresse         string `json:"geo_adresse"`
 }
 
-// ICPE Installation classée pour la protection de l'environnement
-type ICPE struct {
-	CodeS3ic  string     `json:"codeS3ic"`
-	URLFiche  string     `json:"urlFiche"`
-	Rubriques []Rubrique `json:"rubriques"`
-}
-
-// Rubrique d'une ICPE
-type Rubrique struct {
-	Rubrique       string `json:"rubrique"`
-	Alinea         string `json:"alinea"`
-	RegimeAutorise string `json:"regime_autorise"`
-	Activite       string `json:"activite"`
-	Category       string `json:"category"`
-	WasteType      string `json:"waste_type"`
-}
-
 // Response La réponse donnée par l'API
 type Response struct {
-	Siret     string     `json:"siret"`
-	Siren     string     `json:"siren"`
-	Name      string     `json:"name"`
-	Naf       string     `json:"naf"`
-	Address   string     `json:"address"`
-	CodeS3ic  string     `json:"codeS3ic"`
-	URLFiche  string     `json:"urlFiche"`
-	Rubriques []Rubrique `json:"rubriques"`
+	Siret   string `json:"siret"`
+	Siren   string `json:"siren"`
+	Name    string `json:"name"`
+	Naf     string `json:"naf"`
+	Address string `json:"address"`
 }
