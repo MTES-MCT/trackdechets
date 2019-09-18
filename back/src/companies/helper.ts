@@ -7,6 +7,36 @@ fragment CompanyWithAdmins on CompanyAssociation {
 }
 `;
 
+export function getCompanyInstallation(siret: string) {
+  return prisma
+    .installations({
+      where: {
+        OR: [
+          { s3icNumeroSiret: siret },
+          { irepNumeroSiret: siret },
+          { gerepNumeroSiret: siret },
+          { sireneNumeroSiret: siret }
+        ]
+      }
+    })
+    .then(installations => {
+      // return first installation if several match
+      return installations ? installations[0] : null;
+    });
+}
+
+export function getInstallationRubriques(codeS3ic: string) {
+  return prisma.rubriques({ where: { codeS3ic } });
+}
+
+export function getCompany(siret: string) {
+  return prisma.company({ siret });
+}
+
+export function getInstallationDeclarations(codeS3ic: string) {
+  return prisma.declarations({ where: { codeS3ic } });
+}
+
 export function getCompanyUsers(siret: string) {
   return getUsersThroughCompanyAssociations({ company: { siret: siret } });
 }

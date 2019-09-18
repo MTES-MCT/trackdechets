@@ -10,7 +10,19 @@ type AggregateCompanyAssociation {
   count: Int!
 }
 
+type AggregateDeclaration {
+  count: Int!
+}
+
 type AggregateForm {
+  count: Int!
+}
+
+type AggregateInstallation {
+  count: Int!
+}
+
+type AggregateRubrique {
   count: Int!
 }
 
@@ -605,6 +617,198 @@ enum Consistence {
 }
 
 scalar DateTime
+
+type Declaration {
+  id: ID!
+  codeS3ic: String
+  nomEts: String
+  annee: String
+  codeDechet: String
+  libDechet: String
+  gerepType: GerepType
+}
+
+type DeclarationConnection {
+  pageInfo: PageInfo!
+  edges: [DeclarationEdge]!
+  aggregate: AggregateDeclaration!
+}
+
+input DeclarationCreateInput {
+  id: ID
+  codeS3ic: String
+  nomEts: String
+  annee: String
+  codeDechet: String
+  libDechet: String
+  gerepType: GerepType
+}
+
+type DeclarationEdge {
+  node: Declaration!
+  cursor: String!
+}
+
+enum DeclarationOrderByInput {
+  id_ASC
+  id_DESC
+  codeS3ic_ASC
+  codeS3ic_DESC
+  nomEts_ASC
+  nomEts_DESC
+  annee_ASC
+  annee_DESC
+  codeDechet_ASC
+  codeDechet_DESC
+  libDechet_ASC
+  libDechet_DESC
+  gerepType_ASC
+  gerepType_DESC
+}
+
+type DeclarationPreviousValues {
+  id: ID!
+  codeS3ic: String
+  nomEts: String
+  annee: String
+  codeDechet: String
+  libDechet: String
+  gerepType: GerepType
+}
+
+type DeclarationSubscriptionPayload {
+  mutation: MutationType!
+  node: Declaration
+  updatedFields: [String!]
+  previousValues: DeclarationPreviousValues
+}
+
+input DeclarationSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: DeclarationWhereInput
+  AND: [DeclarationSubscriptionWhereInput!]
+  OR: [DeclarationSubscriptionWhereInput!]
+  NOT: [DeclarationSubscriptionWhereInput!]
+}
+
+input DeclarationUpdateInput {
+  codeS3ic: String
+  nomEts: String
+  annee: String
+  codeDechet: String
+  libDechet: String
+  gerepType: GerepType
+}
+
+input DeclarationUpdateManyMutationInput {
+  codeS3ic: String
+  nomEts: String
+  annee: String
+  codeDechet: String
+  libDechet: String
+  gerepType: GerepType
+}
+
+input DeclarationWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  codeS3ic: String
+  codeS3ic_not: String
+  codeS3ic_in: [String!]
+  codeS3ic_not_in: [String!]
+  codeS3ic_lt: String
+  codeS3ic_lte: String
+  codeS3ic_gt: String
+  codeS3ic_gte: String
+  codeS3ic_contains: String
+  codeS3ic_not_contains: String
+  codeS3ic_starts_with: String
+  codeS3ic_not_starts_with: String
+  codeS3ic_ends_with: String
+  codeS3ic_not_ends_with: String
+  nomEts: String
+  nomEts_not: String
+  nomEts_in: [String!]
+  nomEts_not_in: [String!]
+  nomEts_lt: String
+  nomEts_lte: String
+  nomEts_gt: String
+  nomEts_gte: String
+  nomEts_contains: String
+  nomEts_not_contains: String
+  nomEts_starts_with: String
+  nomEts_not_starts_with: String
+  nomEts_ends_with: String
+  nomEts_not_ends_with: String
+  annee: String
+  annee_not: String
+  annee_in: [String!]
+  annee_not_in: [String!]
+  annee_lt: String
+  annee_lte: String
+  annee_gt: String
+  annee_gte: String
+  annee_contains: String
+  annee_not_contains: String
+  annee_starts_with: String
+  annee_not_starts_with: String
+  annee_ends_with: String
+  annee_not_ends_with: String
+  codeDechet: String
+  codeDechet_not: String
+  codeDechet_in: [String!]
+  codeDechet_not_in: [String!]
+  codeDechet_lt: String
+  codeDechet_lte: String
+  codeDechet_gt: String
+  codeDechet_gte: String
+  codeDechet_contains: String
+  codeDechet_not_contains: String
+  codeDechet_starts_with: String
+  codeDechet_not_starts_with: String
+  codeDechet_ends_with: String
+  codeDechet_not_ends_with: String
+  libDechet: String
+  libDechet_not: String
+  libDechet_in: [String!]
+  libDechet_not_in: [String!]
+  libDechet_lt: String
+  libDechet_lte: String
+  libDechet_gt: String
+  libDechet_gte: String
+  libDechet_contains: String
+  libDechet_not_contains: String
+  libDechet_starts_with: String
+  libDechet_not_starts_with: String
+  libDechet_ends_with: String
+  libDechet_not_ends_with: String
+  gerepType: GerepType
+  gerepType_not: GerepType
+  gerepType_in: [GerepType!]
+  gerepType_not_in: [GerepType!]
+  AND: [DeclarationWhereInput!]
+  OR: [DeclarationWhereInput!]
+  NOT: [DeclarationWhereInput!]
+}
+
+input DeclarationWhereUniqueInput {
+  id: ID
+}
 
 enum EmitterType {
   PRODUCER
@@ -2807,6 +3011,329 @@ input FormWhereUniqueInput {
   readableId: String
 }
 
+enum GerepType {
+  Producteur
+  Traiteur
+}
+
+type Installation {
+  id: ID!
+  codeS3ic: String
+  nomEts: String
+  regime: String
+  libRegime: String
+  seveso: Seveso
+  libSeveso: String
+  familleIc: String
+  urlFiche: String
+  s3icNumeroSiret: String
+  irepNumeroSiret: String
+  gerepNumeroSiret: String
+  sireneNumeroSiret: String
+}
+
+type InstallationConnection {
+  pageInfo: PageInfo!
+  edges: [InstallationEdge]!
+  aggregate: AggregateInstallation!
+}
+
+input InstallationCreateInput {
+  id: ID
+  codeS3ic: String
+  nomEts: String
+  regime: String
+  libRegime: String
+  seveso: Seveso
+  libSeveso: String
+  familleIc: String
+  urlFiche: String
+  s3icNumeroSiret: String
+  irepNumeroSiret: String
+  gerepNumeroSiret: String
+  sireneNumeroSiret: String
+}
+
+type InstallationEdge {
+  node: Installation!
+  cursor: String!
+}
+
+enum InstallationOrderByInput {
+  id_ASC
+  id_DESC
+  codeS3ic_ASC
+  codeS3ic_DESC
+  nomEts_ASC
+  nomEts_DESC
+  regime_ASC
+  regime_DESC
+  libRegime_ASC
+  libRegime_DESC
+  seveso_ASC
+  seveso_DESC
+  libSeveso_ASC
+  libSeveso_DESC
+  familleIc_ASC
+  familleIc_DESC
+  urlFiche_ASC
+  urlFiche_DESC
+  s3icNumeroSiret_ASC
+  s3icNumeroSiret_DESC
+  irepNumeroSiret_ASC
+  irepNumeroSiret_DESC
+  gerepNumeroSiret_ASC
+  gerepNumeroSiret_DESC
+  sireneNumeroSiret_ASC
+  sireneNumeroSiret_DESC
+}
+
+type InstallationPreviousValues {
+  id: ID!
+  codeS3ic: String
+  nomEts: String
+  regime: String
+  libRegime: String
+  seveso: Seveso
+  libSeveso: String
+  familleIc: String
+  urlFiche: String
+  s3icNumeroSiret: String
+  irepNumeroSiret: String
+  gerepNumeroSiret: String
+  sireneNumeroSiret: String
+}
+
+type InstallationSubscriptionPayload {
+  mutation: MutationType!
+  node: Installation
+  updatedFields: [String!]
+  previousValues: InstallationPreviousValues
+}
+
+input InstallationSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: InstallationWhereInput
+  AND: [InstallationSubscriptionWhereInput!]
+  OR: [InstallationSubscriptionWhereInput!]
+  NOT: [InstallationSubscriptionWhereInput!]
+}
+
+input InstallationUpdateInput {
+  codeS3ic: String
+  nomEts: String
+  regime: String
+  libRegime: String
+  seveso: Seveso
+  libSeveso: String
+  familleIc: String
+  urlFiche: String
+  s3icNumeroSiret: String
+  irepNumeroSiret: String
+  gerepNumeroSiret: String
+  sireneNumeroSiret: String
+}
+
+input InstallationUpdateManyMutationInput {
+  codeS3ic: String
+  nomEts: String
+  regime: String
+  libRegime: String
+  seveso: Seveso
+  libSeveso: String
+  familleIc: String
+  urlFiche: String
+  s3icNumeroSiret: String
+  irepNumeroSiret: String
+  gerepNumeroSiret: String
+  sireneNumeroSiret: String
+}
+
+input InstallationWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  codeS3ic: String
+  codeS3ic_not: String
+  codeS3ic_in: [String!]
+  codeS3ic_not_in: [String!]
+  codeS3ic_lt: String
+  codeS3ic_lte: String
+  codeS3ic_gt: String
+  codeS3ic_gte: String
+  codeS3ic_contains: String
+  codeS3ic_not_contains: String
+  codeS3ic_starts_with: String
+  codeS3ic_not_starts_with: String
+  codeS3ic_ends_with: String
+  codeS3ic_not_ends_with: String
+  nomEts: String
+  nomEts_not: String
+  nomEts_in: [String!]
+  nomEts_not_in: [String!]
+  nomEts_lt: String
+  nomEts_lte: String
+  nomEts_gt: String
+  nomEts_gte: String
+  nomEts_contains: String
+  nomEts_not_contains: String
+  nomEts_starts_with: String
+  nomEts_not_starts_with: String
+  nomEts_ends_with: String
+  nomEts_not_ends_with: String
+  regime: String
+  regime_not: String
+  regime_in: [String!]
+  regime_not_in: [String!]
+  regime_lt: String
+  regime_lte: String
+  regime_gt: String
+  regime_gte: String
+  regime_contains: String
+  regime_not_contains: String
+  regime_starts_with: String
+  regime_not_starts_with: String
+  regime_ends_with: String
+  regime_not_ends_with: String
+  libRegime: String
+  libRegime_not: String
+  libRegime_in: [String!]
+  libRegime_not_in: [String!]
+  libRegime_lt: String
+  libRegime_lte: String
+  libRegime_gt: String
+  libRegime_gte: String
+  libRegime_contains: String
+  libRegime_not_contains: String
+  libRegime_starts_with: String
+  libRegime_not_starts_with: String
+  libRegime_ends_with: String
+  libRegime_not_ends_with: String
+  seveso: Seveso
+  seveso_not: Seveso
+  seveso_in: [Seveso!]
+  seveso_not_in: [Seveso!]
+  libSeveso: String
+  libSeveso_not: String
+  libSeveso_in: [String!]
+  libSeveso_not_in: [String!]
+  libSeveso_lt: String
+  libSeveso_lte: String
+  libSeveso_gt: String
+  libSeveso_gte: String
+  libSeveso_contains: String
+  libSeveso_not_contains: String
+  libSeveso_starts_with: String
+  libSeveso_not_starts_with: String
+  libSeveso_ends_with: String
+  libSeveso_not_ends_with: String
+  familleIc: String
+  familleIc_not: String
+  familleIc_in: [String!]
+  familleIc_not_in: [String!]
+  familleIc_lt: String
+  familleIc_lte: String
+  familleIc_gt: String
+  familleIc_gte: String
+  familleIc_contains: String
+  familleIc_not_contains: String
+  familleIc_starts_with: String
+  familleIc_not_starts_with: String
+  familleIc_ends_with: String
+  familleIc_not_ends_with: String
+  urlFiche: String
+  urlFiche_not: String
+  urlFiche_in: [String!]
+  urlFiche_not_in: [String!]
+  urlFiche_lt: String
+  urlFiche_lte: String
+  urlFiche_gt: String
+  urlFiche_gte: String
+  urlFiche_contains: String
+  urlFiche_not_contains: String
+  urlFiche_starts_with: String
+  urlFiche_not_starts_with: String
+  urlFiche_ends_with: String
+  urlFiche_not_ends_with: String
+  s3icNumeroSiret: String
+  s3icNumeroSiret_not: String
+  s3icNumeroSiret_in: [String!]
+  s3icNumeroSiret_not_in: [String!]
+  s3icNumeroSiret_lt: String
+  s3icNumeroSiret_lte: String
+  s3icNumeroSiret_gt: String
+  s3icNumeroSiret_gte: String
+  s3icNumeroSiret_contains: String
+  s3icNumeroSiret_not_contains: String
+  s3icNumeroSiret_starts_with: String
+  s3icNumeroSiret_not_starts_with: String
+  s3icNumeroSiret_ends_with: String
+  s3icNumeroSiret_not_ends_with: String
+  irepNumeroSiret: String
+  irepNumeroSiret_not: String
+  irepNumeroSiret_in: [String!]
+  irepNumeroSiret_not_in: [String!]
+  irepNumeroSiret_lt: String
+  irepNumeroSiret_lte: String
+  irepNumeroSiret_gt: String
+  irepNumeroSiret_gte: String
+  irepNumeroSiret_contains: String
+  irepNumeroSiret_not_contains: String
+  irepNumeroSiret_starts_with: String
+  irepNumeroSiret_not_starts_with: String
+  irepNumeroSiret_ends_with: String
+  irepNumeroSiret_not_ends_with: String
+  gerepNumeroSiret: String
+  gerepNumeroSiret_not: String
+  gerepNumeroSiret_in: [String!]
+  gerepNumeroSiret_not_in: [String!]
+  gerepNumeroSiret_lt: String
+  gerepNumeroSiret_lte: String
+  gerepNumeroSiret_gt: String
+  gerepNumeroSiret_gte: String
+  gerepNumeroSiret_contains: String
+  gerepNumeroSiret_not_contains: String
+  gerepNumeroSiret_starts_with: String
+  gerepNumeroSiret_not_starts_with: String
+  gerepNumeroSiret_ends_with: String
+  gerepNumeroSiret_not_ends_with: String
+  sireneNumeroSiret: String
+  sireneNumeroSiret_not: String
+  sireneNumeroSiret_in: [String!]
+  sireneNumeroSiret_not_in: [String!]
+  sireneNumeroSiret_lt: String
+  sireneNumeroSiret_lte: String
+  sireneNumeroSiret_gt: String
+  sireneNumeroSiret_gte: String
+  sireneNumeroSiret_contains: String
+  sireneNumeroSiret_not_contains: String
+  sireneNumeroSiret_starts_with: String
+  sireneNumeroSiret_not_starts_with: String
+  sireneNumeroSiret_ends_with: String
+  sireneNumeroSiret_not_ends_with: String
+  AND: [InstallationWhereInput!]
+  OR: [InstallationWhereInput!]
+  NOT: [InstallationWhereInput!]
+}
+
+input InstallationWhereUniqueInput {
+  id: ID
+}
+
 scalar Json
 
 scalar Long
@@ -2824,12 +3351,30 @@ type Mutation {
   upsertCompanyAssociation(where: CompanyAssociationWhereUniqueInput!, create: CompanyAssociationCreateInput!, update: CompanyAssociationUpdateInput!): CompanyAssociation!
   deleteCompanyAssociation(where: CompanyAssociationWhereUniqueInput!): CompanyAssociation
   deleteManyCompanyAssociations(where: CompanyAssociationWhereInput): BatchPayload!
+  createDeclaration(data: DeclarationCreateInput!): Declaration!
+  updateDeclaration(data: DeclarationUpdateInput!, where: DeclarationWhereUniqueInput!): Declaration
+  updateManyDeclarations(data: DeclarationUpdateManyMutationInput!, where: DeclarationWhereInput): BatchPayload!
+  upsertDeclaration(where: DeclarationWhereUniqueInput!, create: DeclarationCreateInput!, update: DeclarationUpdateInput!): Declaration!
+  deleteDeclaration(where: DeclarationWhereUniqueInput!): Declaration
+  deleteManyDeclarations(where: DeclarationWhereInput): BatchPayload!
   createForm(data: FormCreateInput!): Form!
   updateForm(data: FormUpdateInput!, where: FormWhereUniqueInput!): Form
   updateManyForms(data: FormUpdateManyMutationInput!, where: FormWhereInput): BatchPayload!
   upsertForm(where: FormWhereUniqueInput!, create: FormCreateInput!, update: FormUpdateInput!): Form!
   deleteForm(where: FormWhereUniqueInput!): Form
   deleteManyForms(where: FormWhereInput): BatchPayload!
+  createInstallation(data: InstallationCreateInput!): Installation!
+  updateInstallation(data: InstallationUpdateInput!, where: InstallationWhereUniqueInput!): Installation
+  updateManyInstallations(data: InstallationUpdateManyMutationInput!, where: InstallationWhereInput): BatchPayload!
+  upsertInstallation(where: InstallationWhereUniqueInput!, create: InstallationCreateInput!, update: InstallationUpdateInput!): Installation!
+  deleteInstallation(where: InstallationWhereUniqueInput!): Installation
+  deleteManyInstallations(where: InstallationWhereInput): BatchPayload!
+  createRubrique(data: RubriqueCreateInput!): Rubrique!
+  updateRubrique(data: RubriqueUpdateInput!, where: RubriqueWhereUniqueInput!): Rubrique
+  updateManyRubriques(data: RubriqueUpdateManyMutationInput!, where: RubriqueWhereInput): BatchPayload!
+  upsertRubrique(where: RubriqueWhereUniqueInput!, create: RubriqueCreateInput!, update: RubriqueUpdateInput!): Rubrique!
+  deleteRubrique(where: RubriqueWhereUniqueInput!): Rubrique
+  deleteManyRubriques(where: RubriqueWhereInput): BatchPayload!
   createStatusLog(data: StatusLogCreateInput!): StatusLog!
   updateStatusLog(data: StatusLogUpdateInput!, where: StatusLogWhereUniqueInput!): StatusLog
   updateManyStatusLogs(data: StatusLogUpdateManyMutationInput!, where: StatusLogWhereInput): BatchPayload!
@@ -2885,9 +3430,18 @@ type Query {
   companyAssociation(where: CompanyAssociationWhereUniqueInput!): CompanyAssociation
   companyAssociations(where: CompanyAssociationWhereInput, orderBy: CompanyAssociationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CompanyAssociation]!
   companyAssociationsConnection(where: CompanyAssociationWhereInput, orderBy: CompanyAssociationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CompanyAssociationConnection!
+  declaration(where: DeclarationWhereUniqueInput!): Declaration
+  declarations(where: DeclarationWhereInput, orderBy: DeclarationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Declaration]!
+  declarationsConnection(where: DeclarationWhereInput, orderBy: DeclarationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DeclarationConnection!
   form(where: FormWhereUniqueInput!): Form
   forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form]!
   formsConnection(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FormConnection!
+  installation(where: InstallationWhereUniqueInput!): Installation
+  installations(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Installation]!
+  installationsConnection(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InstallationConnection!
+  rubrique(where: RubriqueWhereUniqueInput!): Rubrique
+  rubriques(where: RubriqueWhereInput, orderBy: RubriqueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Rubrique]!
+  rubriquesConnection(where: RubriqueWhereInput, orderBy: RubriqueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RubriqueConnection!
   statusLog(where: StatusLogWhereUniqueInput!): StatusLog
   statusLogs(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [StatusLog]!
   statusLogsConnection(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): StatusLogConnection!
@@ -2901,6 +3455,309 @@ type Query {
   userActivationHashes(where: UserActivationHashWhereInput, orderBy: UserActivationHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [UserActivationHash]!
   userActivationHashesConnection(where: UserActivationHashWhereInput, orderBy: UserActivationHashOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserActivationHashConnection!
   node(id: ID!): Node
+}
+
+type Rubrique {
+  id: ID!
+  codeS3ic: String
+  rubrique: String
+  alinea: String
+  dateAutorisation: String
+  etatActivite: String
+  regimeAutorise: String
+  activite: String
+  volume: String
+  unite: String
+  category: String
+  wasteType: WasteType
+}
+
+type RubriqueConnection {
+  pageInfo: PageInfo!
+  edges: [RubriqueEdge]!
+  aggregate: AggregateRubrique!
+}
+
+input RubriqueCreateInput {
+  id: ID
+  codeS3ic: String
+  rubrique: String
+  alinea: String
+  dateAutorisation: String
+  etatActivite: String
+  regimeAutorise: String
+  activite: String
+  volume: String
+  unite: String
+  category: String
+  wasteType: WasteType
+}
+
+type RubriqueEdge {
+  node: Rubrique!
+  cursor: String!
+}
+
+enum RubriqueOrderByInput {
+  id_ASC
+  id_DESC
+  codeS3ic_ASC
+  codeS3ic_DESC
+  rubrique_ASC
+  rubrique_DESC
+  alinea_ASC
+  alinea_DESC
+  dateAutorisation_ASC
+  dateAutorisation_DESC
+  etatActivite_ASC
+  etatActivite_DESC
+  regimeAutorise_ASC
+  regimeAutorise_DESC
+  activite_ASC
+  activite_DESC
+  volume_ASC
+  volume_DESC
+  unite_ASC
+  unite_DESC
+  category_ASC
+  category_DESC
+  wasteType_ASC
+  wasteType_DESC
+}
+
+type RubriquePreviousValues {
+  id: ID!
+  codeS3ic: String
+  rubrique: String
+  alinea: String
+  dateAutorisation: String
+  etatActivite: String
+  regimeAutorise: String
+  activite: String
+  volume: String
+  unite: String
+  category: String
+  wasteType: WasteType
+}
+
+type RubriqueSubscriptionPayload {
+  mutation: MutationType!
+  node: Rubrique
+  updatedFields: [String!]
+  previousValues: RubriquePreviousValues
+}
+
+input RubriqueSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: RubriqueWhereInput
+  AND: [RubriqueSubscriptionWhereInput!]
+  OR: [RubriqueSubscriptionWhereInput!]
+  NOT: [RubriqueSubscriptionWhereInput!]
+}
+
+input RubriqueUpdateInput {
+  codeS3ic: String
+  rubrique: String
+  alinea: String
+  dateAutorisation: String
+  etatActivite: String
+  regimeAutorise: String
+  activite: String
+  volume: String
+  unite: String
+  category: String
+  wasteType: WasteType
+}
+
+input RubriqueUpdateManyMutationInput {
+  codeS3ic: String
+  rubrique: String
+  alinea: String
+  dateAutorisation: String
+  etatActivite: String
+  regimeAutorise: String
+  activite: String
+  volume: String
+  unite: String
+  category: String
+  wasteType: WasteType
+}
+
+input RubriqueWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  codeS3ic: String
+  codeS3ic_not: String
+  codeS3ic_in: [String!]
+  codeS3ic_not_in: [String!]
+  codeS3ic_lt: String
+  codeS3ic_lte: String
+  codeS3ic_gt: String
+  codeS3ic_gte: String
+  codeS3ic_contains: String
+  codeS3ic_not_contains: String
+  codeS3ic_starts_with: String
+  codeS3ic_not_starts_with: String
+  codeS3ic_ends_with: String
+  codeS3ic_not_ends_with: String
+  rubrique: String
+  rubrique_not: String
+  rubrique_in: [String!]
+  rubrique_not_in: [String!]
+  rubrique_lt: String
+  rubrique_lte: String
+  rubrique_gt: String
+  rubrique_gte: String
+  rubrique_contains: String
+  rubrique_not_contains: String
+  rubrique_starts_with: String
+  rubrique_not_starts_with: String
+  rubrique_ends_with: String
+  rubrique_not_ends_with: String
+  alinea: String
+  alinea_not: String
+  alinea_in: [String!]
+  alinea_not_in: [String!]
+  alinea_lt: String
+  alinea_lte: String
+  alinea_gt: String
+  alinea_gte: String
+  alinea_contains: String
+  alinea_not_contains: String
+  alinea_starts_with: String
+  alinea_not_starts_with: String
+  alinea_ends_with: String
+  alinea_not_ends_with: String
+  dateAutorisation: String
+  dateAutorisation_not: String
+  dateAutorisation_in: [String!]
+  dateAutorisation_not_in: [String!]
+  dateAutorisation_lt: String
+  dateAutorisation_lte: String
+  dateAutorisation_gt: String
+  dateAutorisation_gte: String
+  dateAutorisation_contains: String
+  dateAutorisation_not_contains: String
+  dateAutorisation_starts_with: String
+  dateAutorisation_not_starts_with: String
+  dateAutorisation_ends_with: String
+  dateAutorisation_not_ends_with: String
+  etatActivite: String
+  etatActivite_not: String
+  etatActivite_in: [String!]
+  etatActivite_not_in: [String!]
+  etatActivite_lt: String
+  etatActivite_lte: String
+  etatActivite_gt: String
+  etatActivite_gte: String
+  etatActivite_contains: String
+  etatActivite_not_contains: String
+  etatActivite_starts_with: String
+  etatActivite_not_starts_with: String
+  etatActivite_ends_with: String
+  etatActivite_not_ends_with: String
+  regimeAutorise: String
+  regimeAutorise_not: String
+  regimeAutorise_in: [String!]
+  regimeAutorise_not_in: [String!]
+  regimeAutorise_lt: String
+  regimeAutorise_lte: String
+  regimeAutorise_gt: String
+  regimeAutorise_gte: String
+  regimeAutorise_contains: String
+  regimeAutorise_not_contains: String
+  regimeAutorise_starts_with: String
+  regimeAutorise_not_starts_with: String
+  regimeAutorise_ends_with: String
+  regimeAutorise_not_ends_with: String
+  activite: String
+  activite_not: String
+  activite_in: [String!]
+  activite_not_in: [String!]
+  activite_lt: String
+  activite_lte: String
+  activite_gt: String
+  activite_gte: String
+  activite_contains: String
+  activite_not_contains: String
+  activite_starts_with: String
+  activite_not_starts_with: String
+  activite_ends_with: String
+  activite_not_ends_with: String
+  volume: String
+  volume_not: String
+  volume_in: [String!]
+  volume_not_in: [String!]
+  volume_lt: String
+  volume_lte: String
+  volume_gt: String
+  volume_gte: String
+  volume_contains: String
+  volume_not_contains: String
+  volume_starts_with: String
+  volume_not_starts_with: String
+  volume_ends_with: String
+  volume_not_ends_with: String
+  unite: String
+  unite_not: String
+  unite_in: [String!]
+  unite_not_in: [String!]
+  unite_lt: String
+  unite_lte: String
+  unite_gt: String
+  unite_gte: String
+  unite_contains: String
+  unite_not_contains: String
+  unite_starts_with: String
+  unite_not_starts_with: String
+  unite_ends_with: String
+  unite_not_ends_with: String
+  category: String
+  category_not: String
+  category_in: [String!]
+  category_not_in: [String!]
+  category_lt: String
+  category_lte: String
+  category_gt: String
+  category_gte: String
+  category_contains: String
+  category_not_contains: String
+  category_starts_with: String
+  category_not_starts_with: String
+  category_ends_with: String
+  category_not_ends_with: String
+  wasteType: WasteType
+  wasteType_not: WasteType
+  wasteType_in: [WasteType!]
+  wasteType_not_in: [WasteType!]
+  AND: [RubriqueWhereInput!]
+  OR: [RubriqueWhereInput!]
+  NOT: [RubriqueWhereInput!]
+}
+
+input RubriqueWhereUniqueInput {
+  id: ID
+}
+
+enum Seveso {
+  NS
+  SB
+  SH
 }
 
 enum Status {
@@ -3013,7 +3870,10 @@ input StatusLogWhereUniqueInput {
 type Subscription {
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   companyAssociation(where: CompanyAssociationSubscriptionWhereInput): CompanyAssociationSubscriptionPayload
+  declaration(where: DeclarationSubscriptionWhereInput): DeclarationSubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
+  installation(where: InstallationSubscriptionWhereInput): InstallationSubscriptionPayload
+  rubrique(where: RubriqueSubscriptionWhereInput): RubriqueSubscriptionPayload
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
@@ -3769,5 +4629,11 @@ input UserWhereInput {
 input UserWhereUniqueInput {
   id: ID
   email: String
+}
+
+enum WasteType {
+  INERTE
+  NOT_DANGEROUS
+  DANGEROUS
 }
 `

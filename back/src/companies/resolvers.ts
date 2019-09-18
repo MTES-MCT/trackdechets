@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { Context } from "../types";
 import {
@@ -6,17 +5,39 @@ import {
   currentUserBelongsToCompanyAdmins,
   randomNumber
 } from "../utils";
-import { getCompanyAdmins, getUserCompanies } from "./helper";
+import {
+  getCompanyAdmins,
+  getUserCompanies,
+  getCompanyInstallation,
+  getInstallationRubriques,
+  getInstallationDeclarations,
+  getCompany
+} from "./helper";
 import { memoizeRequest } from "./cache";
 
 export default {
+  Installation: {
+    rubriques: async parent => {
+      return getInstallationRubriques(parent.codeS3ic);
+    },
+    declarations: async parent => {
+      return getInstallationDeclarations(parent.codeS3ic);
+    }
+  },
   Company: {
     name: async parent => {
       // TODO find out why removing this field
       // causes a compilation error
       return parent.name;
     },
-    admins: async (parent, _) => {
+    installation: parent => {
+      return getCompanyInstallation(parent.siret);
+    },
+    isRegistered: async parent => {
+      const company = await getCompany(parent.siret);
+      return company ? true : false;
+    },
+    admins: parent => {
       return getCompanyAdmins(parent.siret).catch(_ => null);
     }
   },
@@ -25,15 +46,7 @@ export default {
       if (siret.length < 14) {
         return null;
       }
-      const company = await memoizeRequest(siret);
-
-      // check if this company is registered in TD
-      const tdCompany = await context.prisma
-        .company({ siret })
-
-      company.isRegistered = tdCompany ? true : false;
-
-      return company
+      return await memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
       const companyAdmins = await getCompanyAdmins(siret);
