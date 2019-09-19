@@ -45,6 +45,10 @@ export default {
       const userId = getUserId(context);
       const userCompanies = await getUserCompanies(userId);
 
+      if (!userCompanies.length) {
+        throw new Error("Vous n'êtes pas autorisé à consulter les bordereaux.");
+      }
+
       // Find on userCompanies to make sure that the siret belongs to the current user
       const selectedCompany =
         userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
