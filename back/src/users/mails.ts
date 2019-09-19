@@ -95,7 +95,7 @@ export const userMails = {
     Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">par mail.</a>
     `
   }),
-  formNotAccepted: (toEmail, toName, form: Form) => ({
+  formNotAccepted: (toEmail, toName, form: Form, attachment) => ({
     toEmail,
     toName,
     subject: "Refus de prise en  charge de votre déchet",
@@ -128,6 +128,7 @@ export const userMails = {
     <br><br>
     L'équipe Trackdéchets,
     <br><br>
-    <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`
+    <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
+    attachment: attachment
   })
 };
