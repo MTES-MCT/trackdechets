@@ -10,4 +10,10 @@
   .step-header {
     position: initial;
   }
+
+  @media only screen and (max-width: 480px) {
+    .step-header {
+      display: none;
+    }
+  }
 }
