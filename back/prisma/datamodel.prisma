@@ -67,7 +67,7 @@ type Company {
 
 """
 enum Seveso
-NS = Non Sevso
+NS = Non Seveso
 NB = Seveso Seuil Bas
 SH = Seveso Seuil Haut
 """

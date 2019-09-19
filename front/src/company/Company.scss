@@ -1,0 +1,40 @@
+
+p {
+  line-height: 1em;
+}
+
+.box {
+  width: 100%;
+  border-radius: 2px;
+  border: 1px solid #c9d3df;
+  padding: 0.4em
+}
+
+.columns {
+  display: flex;
+  justify-content: "space-around";
+  margin: 10px 0;
+}
+
+.columns > div {
+  margin: 5px;
+}
+
+.section {
+  padding: 2em 0;
+}
+
+.company__info {
+  margin-left: 50px;
+}
+
+.company__logo {
+  width: 150px;
+  height: auto;
+}
+
+
+.map {
+  width: 400px;
+  height: 300px;
+}

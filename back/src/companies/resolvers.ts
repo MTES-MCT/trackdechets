@@ -42,7 +42,7 @@ export default {
     }
   },
   Query: {
-    companyInfos: async (parent, { siret }, context: Context) => {
+    companyInfos: async (parent, { siret }) => {
       if (siret.length < 14) {
         return null;
       }

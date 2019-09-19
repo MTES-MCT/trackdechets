@@ -41,6 +41,7 @@ type Company {
   # Resolve from INSEE
   siren: String
   naf: String
+  libelleNaf: String
   name: String
   address: String
 

@@ -17,18 +17,20 @@ type APIMultiResponse struct {
 
 // Etablissement Etablissement lié au SIRET
 type Etablissement struct {
-	Siret              string `json:"siret"`
-	Siren              string `json:"siren"`
-	NomRaisonSociale   string `json:"nom_raison_sociale"`
-	ActivitePrincipale string `json:"activite_principale"`
-	GeoAdresse         string `json:"geo_adresse"`
+	Siret                     string `json:"siret"`
+	Siren                     string `json:"siren"`
+	NomRaisonSociale          string `json:"nom_raison_sociale"`
+	ActivitePrincipale        string `json:"activite_principale"`
+	LibelleActivitePrincipale string `json:"libelle_activite_principale"`
+	GeoAdresse                string `json:"geo_adresse"`
 }
 
 // Response La réponse donnée par l'API
 type Response struct {
-	Siret   string `json:"siret"`
-	Siren   string `json:"siren"`
-	Name    string `json:"name"`
-	Naf     string `json:"naf"`
-	Address string `json:"address"`
+	Siret      string `json:"siret"`
+	Siren      string `json:"siren"`
+	Name       string `json:"name"`
+	Naf        string `json:"naf"`
+	LibelleNaf string `json:"libelleNaf"`
+	Address    string `json:"address"`
 }
