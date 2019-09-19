@@ -2,3 +2,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+@media only screen and (max-width: 480px) {
+  .modal__backdrop .modal {
+    max-height: 100%;
+  }
+}
