@@ -56,7 +56,7 @@ export default function Transport({ me, siret }: Props) {
         <h2>Mes bordereaux à transporter</h2>
       </div>
 
-      <div>
+      <div className="transport-table">
         <Query
           query={GET_TRANSPORT_SLIPS}
           variables={{ siret, type: "TRANSPORTER" }}
