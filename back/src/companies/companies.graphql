@@ -5,6 +5,8 @@ type Rubrique {
   regimeAutorise: String
   activite: String
   category: String
+  volume: String
+  unite: String
   wasteType: WasteType
 }
 
@@ -44,6 +46,8 @@ type Company {
   libelleNaf: String
   name: String
   address: String
+  longitude: Float
+  latitude: Float
 
   # Resolve with BSD
   # (used in favorites only)
