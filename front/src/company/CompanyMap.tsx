@@ -10,14 +10,13 @@ type Props = {
 
 export default class CompanyMap extends React.Component<Props> {
   constructor(props: Props) {
-    console.log(props);
     super(props);
   }
 
   componentDidMount() {
     axios.get("/mapbox/style.json").then(response => {
       const style = response.data;
-      const mapOptions = {
+      const mapOptions: mapboxgl.MapboxOptions = {
         container: "map",
         style,
         center: this.getLngLat(),
@@ -29,7 +28,10 @@ export default class CompanyMap extends React.Component<Props> {
   }
 
   addEtablissementMarker(map: mapboxgl.Map) {
-    new mapboxgl.Marker().setLngLat(this.getLngLat()).addTo(map);
+    new mapboxgl.Marker()
+      .setLngLat(this.getLngLat())
+      .setPopup(new mapboxgl.Popup({ closeButton: true }))
+      .addTo(map);
   }
 
   getLngLat() {

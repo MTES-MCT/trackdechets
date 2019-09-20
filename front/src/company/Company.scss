@@ -7,7 +7,8 @@ p {
   width: 100%;
   border-radius: 2px;
   border: 1px solid #c9d3df;
-  padding: 0.4em
+  padding: 0.4em;
+
 }
 
 .columns {
@@ -33,8 +34,16 @@ p {
   height: auto;
 }
 
+table {
+  margin-top: 20px;
+}
 
-.map {
-  width: 400px;
-  height: 300px;
+.table__container {
+  max-height: 600px;
+  overflow: scroll;
+}
+
+.table__filter {
+  margin-top: 1em;
+  max-width: 20em;
 }
