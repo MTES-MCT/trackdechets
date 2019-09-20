@@ -155,5 +155,7 @@ func etablissementToResponse(item Etablissement) Response {
 		item.NomRaisonSociale,
 		item.ActivitePrincipale,
 		item.LibelleActivitePrincipale,
-		item.GeoAdresse}
+		item.GeoAdresse,
+		item.Longitude,
+		item.Latitude}
 }

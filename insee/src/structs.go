@@ -23,6 +23,8 @@ type Etablissement struct {
 	ActivitePrincipale        string `json:"activite_principale"`
 	LibelleActivitePrincipale string `json:"libelle_activite_principale"`
 	GeoAdresse                string `json:"geo_adresse"`
+	Longitude                 string `json:"longitude"`
+	Latitude                  string `json:"latitude"`
 }
 
 // Response La réponse donnée par l'API
@@ -33,4 +35,6 @@ type Response struct {
 	Naf        string `json:"naf"`
 	LibelleNaf string `json:"libelleNaf"`
 	Address    string `json:"address"`
+	Longitude  string `json:"longitude"`
+	Latitude   string `json:"latitude"`
 }
