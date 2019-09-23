@@ -19,6 +19,7 @@ const ChangePassword = lazy(() => import("./login/ChangePassword"));
 const Login = lazy(() => import("./login/Login"));
 const Signup = lazy(() => import("./login/Signup"));
 const Search = lazy(() => import("./search/Search"));
+const Company = lazy(() => import("./company/Company"));
 const Stats = lazy(() => import("./Stats"));
 const WasteTree = lazy(() => import("./search/WasteTree"));
 
@@ -66,6 +67,12 @@ export default withRouter(function LayoutContainer({ history }) {
       />
 
       <Route exact path="/search" component={WaitingComponent(Search)} />
+      <Route
+        exact
+        path="/company/:siret"
+        component={WaitingComponent(Company)}
+      />
+
       <Route exact path="/wasteTree" component={WaitingComponent(WasteTree)} />
 
       <PrivateRoute

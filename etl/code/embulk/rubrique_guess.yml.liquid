@@ -1,0 +1,24 @@
+in:
+  type: file
+  path_prefix: /Users/benoit/Workspace/trackdechets/etl/code/data/s3ic/rubriques/rubriques.csv
+  parser:
+    charset: UTF-8
+    newline: LF
+    type: csv
+    delimiter: ;
+    quote: '"'
+    escape: '"'
+    trim_if_not_quoted: false
+    skip_header_lines: 1
+    allow_extra_columns: false
+    allow_optional_columns: false
+    columns:
+    - {name: code_s3ic, type: string}
+    - {name: rubrique, type: string}
+    - {name: alinea, type: string}
+    - {name: date_autorisation, type: string}
+    - {name: etat_activite, type: string}
+    - {name: regime_autorise, type: string}
+    - {name: activite, type: string}
+    - {name: volume, type: string}
+    - {name: unite, type: string}

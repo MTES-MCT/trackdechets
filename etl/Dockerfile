@@ -17,6 +17,10 @@ COPY requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt && rm /requirements.txt
 
 ENV EMBULK_BIN /usr/local/bin/embulk
+ENV EMBULK_DIR $AIRFLOW_HOME/embulk
+ENV DATA_DIR $AIRFLOW_HOME/data
+ENV SQL_DIR $AIRFLOW_HOME/sql
+
 RUN curl -o $EMBULK_BIN -L "https://dl.embulk.org/embulk-0.9.9.jar"
 RUN chmod +x $EMBULK_BIN
 

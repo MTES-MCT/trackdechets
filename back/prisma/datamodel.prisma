@@ -65,6 +65,83 @@ type Company {
   user: [User] @relation(name: "UserCompanies")
 }
 
+"""
+enum Seveso
+NS = Non Seveso
+NB = Seveso Seuil Bas
+SH = Seveso Seuil Haut
+"""
+enum Seveso {
+  NS
+  SB
+  SH
+}
+
+"""
+Installation classées pour la protection de l'environnement (ICPE)
+"""
+type Installation {
+  id: ID! @id
+  codeS3ic: String
+  nomEts: String
+  regime: String
+  libRegime: String
+  seveso: Seveso
+  libSeveso: String
+  familleIc: String
+  urlFiche: String
+  s3icNumeroSiret: String
+  irepNumeroSiret: String
+  gerepNumeroSiret: String
+  sireneNumeroSiret: String
+}
+
+enum WasteType {
+  INERTE
+  NOT_DANGEROUS
+  DANGEROUS
+}
+
+"""
+Nomenclature ICPE
+A Rubrique is an authorization for a specific waste operation
+on a specific waste category and for a specific volume
+"""
+type Rubrique {
+  id: ID! @id
+  codeS3ic: String
+  rubrique: String
+  alinea: String
+  dateAutorisation: String
+  etatActivite: String
+  regimeAutorise: String
+  activite: String
+  volume: String
+  unite: String
+  category: String
+  wasteType: WasteType
+}
+
+enum GerepType {
+  Producteur
+  Traiteur
+}
+
+"""
+GEREP (Déclaration annuelle des émissions et des transferts
+de polluants)
+"""
+type Declaration {
+  id: ID! @id
+  codeS3ic: String
+  nomEts: String
+  annee: String
+  codeDechet: String
+  libDechet: String
+  gerepType: GerepType
+}
+
+
 type Form {
   id: ID! @id
   readableId: String @unique

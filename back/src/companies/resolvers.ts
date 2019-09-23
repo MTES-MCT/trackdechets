@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { Context } from "../types";
 import {
@@ -6,17 +5,45 @@ import {
   currentUserBelongsToCompanyAdmins,
   randomNumber
 } from "../utils";
-import { getCompanyAdmins, getUserCompanies } from "./helper";
+import {
+  getCompanyAdmins,
+  getUserCompanies,
+  getCompanyInstallation,
+  getInstallationRubriques,
+  getInstallationDeclarations,
+  getCompany
+} from "./helper";
 import { memoizeRequest } from "./cache";
 
 export default {
+  Installation: {
+    rubriques: async parent => {
+      return getInstallationRubriques(parent.codeS3ic);
+    },
+    declarations: async parent => {
+      return getInstallationDeclarations(parent.codeS3ic);
+    }
+  },
   Company: {
     name: async parent => {
       // TODO find out why removing this field
-      // causes a compilation error
+      // causes a compilation error in recette
       return parent.name;
     },
-    admins: async (parent, _) => {
+    latitude: parent => {
+      return parent.latitude ? parseFloat(parent.latitude) : null;
+    },
+    longitude: parent => {
+      return parent.latitude ? parseFloat(parent.longitude) : null;
+    },
+    installation: parent => {
+      return getCompanyInstallation(parent.siret);
+    },
+    isRegistered: async parent => {
+      const company = await getCompany(parent.siret);
+      return company ? true : false;
+    },
+    admins: parent => {
       return getCompanyAdmins(parent.siret).catch(_ => null);
     }
   },

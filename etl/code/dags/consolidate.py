@@ -1,24 +1,28 @@
+# -*- coding=utf-8 -*-
+
+"""
+This DAG is used to consolidate data from different
+databases: s3ic, irep, gerep, sirene
+The main goal is to identify every ICPE (Installation
+classée pour la protection de l'environnement) with
+its SIRET
+"""
 
 import os
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator, \
-    BranchPythonOperator
-from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.data_preparation import (CopyTableOperator,
+                                                DownloadUnzipOperator,
+                                                EmbulkOperator,
+                                                Shp2pgsqlOperator)
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.hooks.data_preparation import PostgresDataset
+from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.python_operator import PythonOperator
 
-from operators.shp2pgsql import Shp2pgsqlOperator
-from operators.embulk import EmbulkOperator
-from operators.python_postgres import PythonPostgresOperator
-from operators.download import DownloadUnzipOperator
-
-from models import S3ICFiltered, RubriquesScraped
-from config import ENV, SQL_DIR, EMBULK_DIR, DATA_DIR, S3IC_SHP_URL, \
-                   RUBRIQUE_SCRAPED_CSV_URL, IREP_CSV_URL
-from recipes.scraper import download_rubriques
 import python_recipes as recipes
+from config import POSTGRES_ETL_CONN_ID, DATA_DIR, DOWNLOAD_URL, SQL_DIR
+from utils import connection_env
 
 
 def get_default_args(conf):
@@ -39,9 +43,6 @@ default_args = get_default_args({
 })
 
 
-connection = 'postgres_etl'
-
-
 with DAG("consolidate",
          default_args=default_args,
          schedule_interval="@once",
@@ -53,174 +54,195 @@ with DAG("consolidate",
     # Download s3ic data from georisques
     download_s3ic = DownloadUnzipOperator(
         task_id="download_s3ic",
-        url=S3IC_SHP_URL,
-        path=DATA_DIR)
+        url="%s/s3ic.zip" % DOWNLOAD_URL,
+        dir_path=DATA_DIR)
+
+    # Download rubriques ICPE for 27xx and 35xx
+    # from installationsclassées
+    download_rubrique = DownloadUnzipOperator(
+        task_id="download_rubrique",
+        url="%s/rubriques.zip" % DOWNLOAD_URL,
+        dir_path="%s/s3ic" % DATA_DIR)
+
+    # Download IREP data
+    download_irep = DownloadUnzipOperator(
+        task_id="download_irep",
+        url="%s/irep.zip" % DOWNLOAD_URL,
+        dir_path=DATA_DIR)
+
+    # Download GEREP
+    download_gerep = DownloadUnzipOperator(
+        task_id="download_gerep",
+        url="%s/gerep.zip" % DOWNLOAD_URL,
+        dir_path=DATA_DIR)
+
+    # Download s3ic_x_sirene (from themergemachine.com)
+    download_sirene = DownloadUnzipOperator(
+        task_id="download_sirene",
+        url="%s/sirene.zip" % DOWNLOAD_URL,
+        dir_path=DATA_DIR)
 
     # Load s3ic data
     s3ic_shapefile = os.path.join(DATA_DIR, 's3ic', 'ICPE_4326.shp')
     load_s3ic = Shp2pgsqlOperator(
         task_id='load_s3ic',
         shapefile=s3ic_shapefile,
-        table='etl.s3ic',
-        connection=connection)
-
-    # Download rubriques ICPE for 27xx and 35xx
-    # from installationsclassées
-    download_rubriques_op = PythonOperator(
-        task_id="download_rubriques",
-        python_callable=download_rubriques,
-        op_args=[DATA_DIR])
+        table='etl.s3ic_source',
+        connection=POSTGRES_ETL_CONN_ID)
 
     # Load rubriques
-    config = os.path.join(EMBULK_DIR, 'rubriques.yml.liquid')
-    path_prefix = os.path.join(DATA_DIR, 's3ic', 'rubriques')
-    env = {'PATH_PREFIX': path_prefix}
-    load_rubriques = EmbulkOperator(
-        task_id='load_rubriques',
-        config=config,
-        connection=connection,
-        env=env)
+    load_rubrique = EmbulkOperator(
+        'rubrique.yml.liquid',
+        task_id='load_rubrique',
+        env=connection_env(POSTGRES_ETL_CONN_ID))
 
-    # Create table s3ic_filtered
-    create_s3ic_filtered = PostgresOperator(
-        task_id='create_s3ic_filtered',
-        sql='schemas/s3ic_filtered.sql',
-        postgres_conn_id=connection)
+    # Load IREP data
+    load_irep = EmbulkOperator(
+        'irep.yml.liquid',
+        task_id='load_irep',
+        env=connection_env(POSTGRES_ETL_CONN_ID))
+
+    # Load GEREP data
+    load_gerep_traiteur = EmbulkOperator(
+        'gerep_traiteur.yml.liquid',
+        task_id='load_gerep_traiteur',
+        env=connection_env(POSTGRES_ETL_CONN_ID))
+
+    load_gerep_producteur = EmbulkOperator(
+        'gerep_producteur.yml.liquid',
+        task_id='load_gerep_producteur',
+        env=connection_env(POSTGRES_ETL_CONN_ID))
+
+    # Load s3ic_x_sirene (from themergemachine.com)
+    load_s3ic_x_sirene = EmbulkOperator(
+        's3ic_x_sirene.yml.liquid',
+        task_id='load_s3ic_x_sirene',
+        env=connection_env(POSTGRES_ETL_CONN_ID))
+
+    # Select distinct records from rubriques
+    dedup_rubrique = PostgresOperator(
+        task_id="dedup_rubrique",
+        sql="dedup_rubrique.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # Filter rubrique on 27__ and 35__
+    filter_rubrique = PostgresOperator(
+        task_id="filter_rubrique",
+        sql="filter_rubrique.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # add field category
+    prepare_rubrique = PythonOperator(
+        task_id="prepare_rubrique",
+        python_callable=recipes.prepare_rubrique)
 
     # filter s3ic data on rubriques 27xx and 35xx
     filter_s3ic = PostgresOperator(
         task_id='filter_s3ic',
-        sql='recipes/filter_s3ic.sql',
-        postgres_conn_id=connection)
-
-    # Scrap rubriques for thoses installations
-    # because we are missing some info
-    scrap_rubriques = PythonOperator(
-        task_id="scrap_rubriques",
-        python_callable=recipes.scrap_rubriques
-    )
-
-    # Download scraped rubriques data
-    download_rubriques_scraped = DownloadUnzipOperator(
-        task_id="download_rubriques_scraped",
-        url=RUBRIQUE_SCRAPED_CSV_URL,
-        path=os.path.join(DATA_DIR, 's3ic'))
-
-    # Load scraped rubriques data
-    config = os.path.join(EMBULK_DIR, 'rubriques_scraped.yml.liquid')
-    path_prefix = os.path.join(DATA_DIR, 's3ic', 'rubriques_scraped')
-    env = {'PATH_PREFIX': path_prefix}
-    load_rubriques_scraped = EmbulkOperator(
-        task_id='load_rubriques_scraped',
-        config=config,
-        connection=connection,
-        env=env)
-
-    # Only scrap data in local mode (taking too much time)
-    # Otherwise download data from a previous build
-    def branch_func():
-        if ENV == "local":
-            return "scrap_rubriques"
-        else:
-            return "download_rubriques_scraped"
-
-    branching = BranchPythonOperator(
-        task_id="branching",
-        python_callable=branch_func)
-
-    join = DummyOperator(
-        task_id="join",
-        trigger_rule="one_success")
-
-    # Create table rubriques_scraped_distinct
-    create_rubriques_scraped_distinct = PostgresOperator(
-        task_id="create_rubriques_scraped_distinct",
-        sql="schemas/rubriques_scraped_distinct.sql",
-        postgres_conn_id=connection)
-
-    # Select distinct records from rubriques_scraped
-    set_rubriques_scraped_distinct = PostgresOperator(
-        task_id="set_rubriques_scraped_distinct",
-        sql="recipes/set_rubriques_scraped_distinct.sql",
-        postgres_conn_id=connection)
-
-    # add field category
-    prepare_rubriques = PythonOperator(
-        task_id="prepare_rubriques",
-        python_callable=recipes.prepare_rubriques)
-
-    # Download IREP data
-    download_irep = DownloadUnzipOperator(
-        task_id="download_irep",
-        url=IREP_CSV_URL,
-        path=DATA_DIR)
-
-    # Load IREP data
-    config = os.path.join(EMBULK_DIR, 'irep.yml.liquid')
-    path_prefix = os.path.join(DATA_DIR, 'irep')
-    env = {'PATH_PREFIX': path_prefix}
-    load_irep = EmbulkOperator(
-        task_id='load_irep',
-        config=config,
-        connection=connection,
-        env=env)
+        sql='filter_s3ic.sql',
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Create IREP distinct
-    create_irep_distinct = PostgresOperator(
-        task_id="create_irep_distinct",
-        sql="schemas/irep_distinct.sql",
-        postgres_conn_id=connection)
+    dedup_irep = PostgresOperator(
+        task_id="dedup_irep",
+        sql="dedup_irep.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
-    # Set IREP distinct
-    set_irep_distinct = PostgresOperator(
-        task_id="set_irep_distinct",
-        sql="recipes/set_irep_distinct.sql",
-        postgres_conn_id=connection)
+    # Stack GEREP producteurs and traiteurs
+    stack_gerep = PostgresOperator(
+        task_id="stack_gerep",
+        sql="stack_gerep.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # Extract GEREP distinct etablissements
+    extract_gerep_etablissement = PostgresOperator(
+        task_id="extract_gerep_etablissement",
+        sql="extract_gerep_etablissement.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
     # Join s3ic with IREP data
-    create_s3ic_join_irep = PostgresOperator(
-        task_id='create_s3ic_join_irep',
-        sql='schemas/s3ic_join_irep.sql',
-        postgres_conn_id=connection)
-
     join_s3ic_irep = PostgresOperator(
         task_id='join_s3ic_irep',
-        sql='recipes/join_s3ic_irep.sql',
-        postgres_conn_id=connection)
+        sql='join_s3ic_irep.sql',
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
-    # Insert data into final table
-    create_s3ic_consolidated = PostgresOperator(
-        task_id='create_s3ic_consolidated',
-        sql='schemas/s3ic_consolidated.sql',
-        postgres_conn_id=connection)
+    # Join s3ic with GEREP data
+    join_s3ic_gerep = PostgresOperator(
+        task_id="join_s3ic_gerep",
+        sql="join_s3ic_gerep.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
-    copy_to_s3ic_consolidated = PostgresOperator(
-        task_id='copy_to_s3ic_consolidated',
-        sql='recipes/copy_to_s3ic_consolidated.sql',
-        postgres_conn_id=connection)
+    # Join s3ic with s3ic_x_sirene
+    join_s3ic_sirene = PostgresOperator(
+        task_id="join_s3ic_sirene",
+        sql="join_s3ic_sirene.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
-    start >> [download_s3ic, download_rubriques_op, download_irep]
+    # Rename and filter s3ic columns
+    filter_s3ic_columns = PostgresOperator(
+        task_id="filter_s3ic_columns",
+        sql="filter_s3ic_columns.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
 
-    download_irep >> load_irep >> create_irep_distinct >> set_irep_distinct
+    # Rename and filter gerep columns
+    filter_gerep_columns = PostgresOperator(
+        task_id="filter_gerep_columns",
+        sql="filter_gerep_columns.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # Add a '0' to code_s3ic
+    prepare_gerep = PostgresOperator(
+        task_id="prepare_gerep",
+        sql="prepare_gerep.sql",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # Stage table s3ic for deployment
+    stage_s3ic = CopyTableOperator(
+        task_id="stage_s3ic",
+        source="etl.s3ic_columns_filtered",
+        destination="etl.s3ic",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # Stage table rubrique for deployment
+    stage_rubrique = CopyTableOperator(
+        task_id="stage_rubrique",
+        source="etl.rubrique_prepared",
+        destination="etl.rubrique",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    # Stage table gerep for deployment
+    stage_gerep = CopyTableOperator(
+        task_id="stage_gerep",
+        source="etl.gerep_prepared",
+        destination="etl.gerep",
+        postgres_conn_id=POSTGRES_ETL_CONN_ID)
+
+    start >> [
+        download_s3ic,
+        download_irep,
+        download_gerep,
+        download_rubrique,
+        download_sirene
+    ]
 
     download_s3ic >> load_s3ic
 
-    download_rubriques_op >> load_rubriques
+    download_irep >> load_irep >> dedup_irep
 
-    [load_s3ic, load_rubriques] >> create_s3ic_filtered >> filter_s3ic
+    download_gerep >> [load_gerep_producteur, load_gerep_traiteur] \
+        >> stack_gerep >> extract_gerep_etablissement
 
-    filter_s3ic >> branching
+    stack_gerep >> filter_gerep_columns >> prepare_gerep >> stage_gerep
 
-    branching >> scrap_rubriques >> create_rubriques_scraped_distinct >> \
-        set_rubriques_scraped_distinct >> join
+    download_rubrique >> load_rubrique >> dedup_rubrique \
+        >> filter_rubrique >> prepare_rubrique >> stage_rubrique
 
-    branching >> download_rubriques_scraped >> \
-        load_rubriques_scraped >> join
+    [load_s3ic, filter_rubrique] >> filter_s3ic >> filter_s3ic_columns
 
-    join >> prepare_rubriques
+    download_sirene >> load_s3ic_x_sirene
 
-    [filter_s3ic, set_irep_distinct] >> create_s3ic_join_irep >> join_s3ic_irep
+    [dedup_irep, filter_s3ic] >> join_s3ic_irep
 
-    join_s3ic_irep >> create_s3ic_consolidated
+    [join_s3ic_irep, extract_gerep_etablissement] >> join_s3ic_gerep
 
-    create_s3ic_consolidated >> copy_to_s3ic_consolidated
+    [join_s3ic_gerep, load_s3ic_x_sirene] >> join_s3ic_sirene >> stage_s3ic

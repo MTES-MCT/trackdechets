@@ -331,7 +331,9 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                   // auto-complete field gerepId
                                   form.setFieldValue(
                                     "gerepId",
-                                    company_ ? company_.codeS3ic : ""
+                                    company_ && company_.installation
+                                      ? company_.installation.codeS3ic
+                                      : ""
                                   );
 
                                   // auto-complete field codeNaf
@@ -341,8 +343,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                   );
 
                                   // auto-complete userType
-                                  if (company_ && company_.rubriques) {
-                                    let categories = company_.rubriques.map(
+                                  if (company_ && company_.installation) {
+                                    let categories = company_.installation.rubriques.map(
                                       r => r.category
                                     );
                                     const userType = categories.filter(
@@ -372,12 +374,15 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                       Vous allez créer un compte pour l'entreprise
                       <br />
                       <strong className="text-green">{company.name}</strong>
-                      {company && company.codeS3ic != "" && (
+                      {company && company.installation && (
                         <span>
                           <br />
                           Installation classée n°
-                          <a href={company.urlFiche as string} target="_blank">
-                            {company.codeS3ic}
+                          <a
+                            href={company.installation.urlFiche as string}
+                            target="_blank"
+                          >
+                            {company.installation.codeS3ic}
                           </a>
                         </span>
                       )}
