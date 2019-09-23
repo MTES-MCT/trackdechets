@@ -29,7 +29,7 @@ export default function DashboardMenu({ me, match, setActiveSiret }: IProps) {
     <aside className="dashboard-menu side-menu" role="navigation">
       {isMobileDevice && (
         <div
-          className="side-menu__mobileTrigger"
+          className="side-menu__mobile-trigger"
           onClick={() => setIsOpened(!isOpened)}
         >
           <FaBars /> Menu
