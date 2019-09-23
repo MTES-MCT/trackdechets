@@ -1,19 +1,11 @@
-export function flattenObjectForDb(
-  input,
-  previousKeys = [],
-  dbObject = {}
-) {
+export function flattenObjectForDb(input, previousKeys = [], dbObject = {}) {
   Object.keys(input).forEach(key => {
     if (
       input[key] &&
       !Array.isArray(input[key]) &&
       typeof input[key] === "object"
     ) {
-      return flattenObjectForDb(
-        input[key],
-        [...previousKeys, key],
-        dbObject
-      );
+      return flattenObjectForDb(input[key], [...previousKeys, key], dbObject);
     }
 
     const objectKey = [...previousKeys, key]
@@ -67,13 +59,20 @@ export function unflattenObjectFromDb(input, apiObject = {}) {
 
 export function cleanUpNotDuplicatableFieldsInForm(form) {
   const {
+    // Identifying fields
     id,
     createdAt,
     updatedAt,
     readableId,
 
+    // Fields we explicitly want to cleanup
     transporterNumberPlate,
+    wasteDetailsNumberOfPackages,
+    wasteDetailsQuantity,
+    wasteDetailsQuantityType,
+    wasteDetailsConsistence,
 
+    // Workflow fields
     status,
     sentAt,
     sentBy,
