@@ -2,32 +2,48 @@ import React from "react";
 import { Formik, FormikActions } from "formik";
 import "./Wizard.scss";
 
-type Props = { initialValues: Object; children: any[]; onSubmit: Function; onCancel: Function };
+type Props = {
+  initialValues: Object;
+  children: any[];
+  onSubmit: Function;
+  onCancel: Function;
+};
 type State = { page: number; values: Object };
 
 // Copied from Formik Doc - multi step wizard example
 export class Wizard extends React.Component<Props, State> {
   static Page = ({ children, values }: Props & any) => children(values);
+  contentRef: React.RefObject<any>;
 
   constructor(props: Props) {
     super(props);
+    this.contentRef = React.createRef();
     this.state = {
       page: 0,
       values: props.initialValues
     };
   }
 
-  next = (values: Object) =>
+  private scrollTop = () => {
+    this.contentRef.current &&
+      this.contentRef.current.parentNode &&
+      this.contentRef.current.parentNode.scrollTo(0, 0);
+  };
+
+  next = (values: Object) => {
+    this.scrollTop();
     this.setState(state => ({
       page: Math.min(state.page + 1, this.props.children.length - 1),
       values
     }));
+  };
 
-  previous = () =>
+  previous = () => {
+    this.scrollTop();
     this.setState(state => ({
       page: Math.max(state.page - 1, 0)
     }));
-
+  };
   validate = (values: Object) => {
     const activePage: any = React.Children.toArray(this.props.children)[
       this.state.page
@@ -67,7 +83,7 @@ export class Wizard extends React.Component<Props, State> {
             </li>
           ))}
         </ul>
-        <div className="step-content">
+        <div className="step-content" ref={this.contentRef}>
           <Formik
             initialValues={values}
             enableReinitialize={false}
