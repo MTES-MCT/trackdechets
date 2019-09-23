@@ -37,8 +37,8 @@ Chaque bordereau commence sa vie par l'état `DRAFT`. Le brouillons signifie plu
 Une fois que le brouillon est prêt on le "scelle". Il a alors les caractéristiques suivantes:
 
 - dans l'interface de Trackdéchets, il apparait dans
-  - l'onglet "En attente de signature" pour le producteur du déchet
-  - l'onglet "Statut du déchet" celui qui reçoit le déchet
+    - l'onglet "En attente de signature" pour le producteur du déchet
+    - l'onglet "Statut du déchet" celui qui reçoit le déchet
 - on ne peut plus le modifier
 - un BSD ne peut pas passer à l'état scellé s'il n'est pas valide (champs vides / manquants / incorrects)
 - on peut imprimer un PDF
