@@ -7,8 +7,9 @@ Le diagramme ci dessous retrace le cycle de vie d'un BSD dans Trackdéchets:
 
 <div class="mermaid">
 graph TD
-A[DRAFT] -->B(SEALED)
+A[DRAFT] -->|Optionnel| B(SEALED)
 B --> |Par l'émetteur| C(SENT)
+A --> |Par l'émetteur| C
 C -->|Par le receveur| D{RECEIVED}
 D -- Cas classique -->E(PROCESSED)
 D -- Regroupement et perte de traçabilite -->G(NO_TRACEABILITY)
@@ -36,8 +37,8 @@ Chaque bordereau commence sa vie par l'état `DRAFT`. Le brouillons signifie plu
 Une fois que le brouillon est prêt on le "scelle". Il a alors les caractéristiques suivantes:
 
 - dans l'interface de Trackdéchets, il apparait dans
-    - l'onglet "En attente de signature" pour le producteur du déchet
-    - l'onglet "Statut du déchet" celui qui reçoit le déchet
+  - l'onglet "En attente de signature" pour le producteur du déchet
+  - l'onglet "Statut du déchet" celui qui reçoit le déchet
 - on ne peut plus le modifier
 - un BSD ne peut pas passer à l'état scellé s'il n'est pas valide (champs vides / manquants / incorrects)
 - on peut imprimer un PDF
@@ -70,4 +71,3 @@ Celui qui reçoit le déchet va ensuite pouvoir déclarer le traitement effectu�
 - le cas échant la prochaine opération prévue
 - le cas échant la description du prochain centre de traitement (nom, adresse, contact...) dans un champ de texte libre
 - le cas échant préciser s'il y a perte de traçabilité pour ce BSD
-
