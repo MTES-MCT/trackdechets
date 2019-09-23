@@ -237,7 +237,7 @@ with DAG("consolidate",
     download_rubrique >> load_rubrique >> dedup_rubrique \
         >> filter_rubrique >> prepare_rubrique >> stage_rubrique
 
-    [load_s3ic, filter_rubrique] >> filter_s3ic >> filter_s3ic_columns
+    [load_s3ic, filter_rubrique] >> filter_s3ic
 
     download_sirene >> load_s3ic_x_sirene
 
@@ -245,4 +245,5 @@ with DAG("consolidate",
 
     [join_s3ic_irep, extract_gerep_etablissement] >> join_s3ic_gerep
 
-    [join_s3ic_gerep, load_s3ic_x_sirene] >> join_s3ic_sirene >> stage_s3ic
+    [join_s3ic_gerep, load_s3ic_x_sirene] >> join_s3ic_sirene >> \
+        filter_s3ic_columns >> stage_s3ic
