@@ -13,6 +13,13 @@ export default function CompanyActivity({ installation }: Props) {
     return 0;
   });
 
+  const categoryLabel: { [key: string]: string } = {
+    COLLECTOR: "Installation de tri transit gregroupement",
+    WASTE_CENTER: "Collecte de déchets apportés par le producteur initial",
+    WASTE_VEHICLES: "Collecte de déchets apportés par le producteur initial",
+    WASTEPROCESSOR: "Installation de traitement"
+  };
+
   return (
     <div className="columns">
       <div className="box">
@@ -22,44 +29,17 @@ export default function CompanyActivity({ installation }: Props) {
           <a href={installation.urlFiche}>n°{installation.codeS3ic}</a>
         </p>
 
-        {[
-          ...new Set(installation.rubriques.map((r: Rubrique) => r.category))
-        ].map((category, idx) => {
-          switch (category) {
-            case "COLLECTOR":
-              return (
-                <div className="label" key={idx}>
-                  Installation de tri transit regroupement
-                </div>
-              );
-            case "WASTE_CENTER":
-              return (
-                <div className="label" key={idx}>
-                  Collecte de déchets apportés par le producteur initial
-                </div>
-              );
-            case "WASTE_VEHICLES":
-              return (
-                <div className="label" key={idx}>
-                  Véhicules hors d'usage
-                </div>
-              );
-            case "WASTEPROCESSOR":
-              return (
-                <div className="label" key={idx}>
-                  Installation de traitement
-                </div>
-              );
-          }
-        })}
+        {[...new Set(installation.rubriques.map((r: Rubrique) => r.category))]
+          .filter(category => category !== null)
+          .map((category, idx) => {
+            console.log(category);
+            return (
+              <div className="label" key={idx}>
+                {categoryLabel[category]}
+              </div>
+            );
+          })}
 
-        {/* <div>
-          <input
-            className="table__filter"
-            type="text"
-            placeholder="Filtrer les rubriques"
-          />
-        </div> */}
         <div className="table__container">
           <table className="table">
             <thead>

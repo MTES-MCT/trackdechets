@@ -34,11 +34,6 @@ export default function CompanyWaste({ installation }: Props) {
           Liste indicative mais non exhaustive des déchets pouvant être pris en
           charge. Contactez l'entreprise pour plus de détail
         </div>
-        {/* <input
-          className="table__filter"
-          type="text"
-          placeholder="Filtrer les déchets"
-        /> */}
         <div className="table__container">
           <table className="table">
             <thead>
