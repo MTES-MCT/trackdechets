@@ -87,3 +87,73 @@ type Form {
   appendix2Forms: [Form]
 }
 ```
+
+## Champs obligatoires
+
+Lors de la création d'un bordereau aucun champ n'est obligatoire. En revanche, si on souhaite le faire rentrer dans le workflow de validation, c'est à dire lui faire quitter l'état `DRAFT`, la plupart des champs sont obligatoires. Le détail pour chaque champ du type `FormInput`, type attendu lors de la création d'un bordereau, est présenté ci-dessous.
+
+```bash
+input FormInput {
+  id: ID # Obligatoire ⚠ quand modification, non présent si création
+  emitter: EmitterInput # Obligatoire ⚠
+  recipient: RecipientInput # Obligatoire ⚠
+  transporter: TransporterInput # Obligatoire ⚠
+  wasteDetails: WasteDetailsInput # Obligatoire ⚠
+  trader: TraderInput # Optionnel ✔. Tous les bordereaux ne passent pas par un négociant
+
+  appendix2Forms: [AppendixFormInput] # Optionnel ✔. Utile uniquement lors de la création d'annexes 2
+}
+
+input EmitterInput {
+  type: EmitterType # Obligatoire ⚠, peut prendre les valeurs PRODUCER|OTHER|APPENDIX2
+  pickupSite: String # Optionnel ✔
+  company: CompanyInput # Obligatoire ⚠
+}
+
+input RecipientInput {
+  cap: String # Optionnel ✔
+  processingOperation: String # Obligatoire ⚠
+  company: CompanyInput # Obligatoire ⚠
+}
+
+input TransporterInput {
+  receipt: String # Obligatoire ⚠
+  department: String # Obligatoire ⚠
+  validityLimit: DateTime # Optionnel ✔
+  numberPlate: String # Optionnel ✔
+  company: CompanyInput # Obligatoire ⚠
+}
+
+input TraderInput {
+  receipt: String # Optionnel ✔
+  department: String # Optionnel ✔
+  validityLimit: DateTime # Optionnel ✔
+  company: CompanyInput # Optionnel ✔
+}
+
+input WasteDetailsInput {
+  code: String # Obligatoire ⚠
+  name: String # Obligatoire ⚠
+  onuCode: String # Obligatoire ⚠
+  packagings: [Packagings] # Obligatoire ⚠
+  otherPackaging: String # Optionnel ✔
+  numberOfPackages: Int # Obligatoire ⚠
+  quantity: Float # Obligatoire ⚠
+  quantityType: QuantityType # Obligatoire ⚠, peut prendre les valeurs REAL|ESTIMATED
+  consistence: Consistence # Obligatoire ⚠, peut prendre les valeurs SOLID|LIQUID|GASEOUS
+}
+
+input AppendixFormInput {
+  emitterSiret: String # Optionnel ✔
+  readableId: ID # Optionnel ✔
+}
+
+input CompanyInput {
+  siret: String # Obligatoire ⚠
+  name: String # Obligatoire ⚠
+  address: String # Obligatoire ⚠
+  contact: String # Obligatoire ⚠
+  mail: String # Obligatoire ⚠
+  phone: String # Obligatoire ⚠
+}
+```
