@@ -18,9 +18,11 @@ export default function CompanyActivity({ installation }: Props) {
   });
 
   const categoryLabel: { [key: string]: string } = {
-    COLLECTOR: "Installation de tri transit gregroupement",
-    WASTE_CENTER: "Collecte de déchets apportés par le producteur initial",
-    WASTE_VEHICLES: "Collecte de déchets apportés par le producteur initial",
+    COLLECTOR: "Installation de tri transit regroupement",
+    WASTE_CENTER:
+      "Installation de collecte de déchets apportés par le producteur initial",
+    WASTE_VEHICLES:
+      "Installation d'entreposage, dépollution, démontage, découpage de VHU",
     WASTEPROCESSOR: "Installation de traitement"
   };
 
