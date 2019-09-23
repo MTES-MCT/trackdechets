@@ -6,5 +6,5 @@ INSERT INTO etl.s3ic_filtered
 SELECT * FROM etl.s3ic_source
 WHERE code_s3ic IN (
     SELECT DISTINCT code_s3ic
-    FROM etl.rubrique_prepared
+    FROM etl.rubrique_filtered
 )
