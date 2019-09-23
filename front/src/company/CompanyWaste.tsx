@@ -7,8 +7,11 @@ type Props = {
 };
 
 export default function CompanyWaste({ installation }: Props) {
+  const dechetsTreated = installation.declarations.filter(
+    d => d.gerepType == "Traiteur"
+  );
   const dechetsUniques = [
-    ...new Set(installation.declarations.map((d: Declaration) => d.codeDechet))
+    ...new Set(dechetsTreated.map((d: Declaration) => d.codeDechet))
   ].map((codeDechet: string) => {
     let declaration = installation.declarations.find(
       (d: Declaration) => d.codeDechet === codeDechet
@@ -27,7 +30,7 @@ export default function CompanyWaste({ installation }: Props) {
     <div className="columns">
       <div className="box">
         <p style={{ fontSize: "1.2em", fontWeight: "bold" }}>
-          Déchets ayant fait l'object d'une déclaration GEREP
+          Déchets traités ayant fait l'object d'une déclaration GEREP
         </p>
         <p style={{ color: "#8393a7" }}>Source GEREP 2016-2017</p>
         <div className="notification warning">

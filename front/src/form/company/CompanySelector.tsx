@@ -160,13 +160,9 @@ export default connect<FieldProps>(function CompanySelector(props) {
                       {c.siret} - {c.address}
                     </p>
                     <p>
-                      {c.installation &&
-                        c.installation.codeS3ic &&
-                        c.installation.urlFiche && (
-                          <a href={c.installation.urlFiche} target="_blank">
-                            Installation classée n° {c.installation.codeS3ic}
-                          </a>
-                        )}
+                      <a href={`company/${c.siret}`} target="_blank">
+                        Information sur l'entreprise
+                      </a>
                     </p>
                   </div>
                   <div className="icon">

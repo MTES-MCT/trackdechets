@@ -54,15 +54,6 @@ export default function CompanyInfo({
         if (error) return `Error!: ${error}`;
         const company: Company = data.companyInfos;
 
-        let wastes = [];
-
-        if (company.installation) {
-          company.installation.declarations.forEach((d: Declaration) => {
-            if (d.gerepType == "Traiteur") {
-            }
-          });
-        }
-
         return (
           <div className="section">
             <div className="container">

@@ -12,7 +12,7 @@ export default function CompanyRegistration(props: Props) {
         style={{ width: "100%" }}
       >
         {props.isRegistered ? (
-          <span>Cette entreprise est inscrite sur Trackdéchets"</span>
+          <span>Cette entreprise est inscrite sur Trackdéchets</span>
         ) : (
           <>
             <span>

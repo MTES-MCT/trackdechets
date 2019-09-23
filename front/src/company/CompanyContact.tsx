@@ -16,19 +16,19 @@ export default function CompanyContact(props: Props) {
       <div className="company__item">
         <label className="company__item-key">Email</label>
         <span className="company__item-value" style={{ fontStyle: "italic" }}>
-          Inconnue
+          Inconnu
         </span>
       </div>
       <div className="company__item">
         <label className="company__item-key">Téléphone</label>
         <span className="company__item-value" style={{ fontStyle: "italic" }}>
-          Inconnue
+          Inconnu
         </span>
       </div>
       <div className="company__item">
         <label className="company__item-key">Site internet</label>
         <span className="company__item-value" style={{ fontStyle: "italic" }}>
-          Inconnue
+          Inconnu
         </span>
       </div>
     </div>
