@@ -1,6 +1,8 @@
 export type Rubrique = {
   rubrique: string;
   alinea: string;
+  etatActivite: string;
+  regimeAutorise: string;
   category: string;
   activite: string;
   volume: string;

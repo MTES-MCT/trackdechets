@@ -35,7 +35,7 @@ export default function CompanyWaste({ installation }: Props) {
         <p style={{ color: "#8393a7" }}>Source GEREP 2016-2017</p>
         <div className="notification warning">
           Liste indicative mais non exhaustive des déchets pouvant être pris en
-          charge. Contactez l'entreprise pour plus de détail
+          charge. Contactez l'entreprise pour plus de détail.
         </div>
         <div className="table__container">
           <table className="table">

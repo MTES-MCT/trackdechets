@@ -7,7 +7,11 @@ type Props = {
 };
 
 export default function CompanyActivity({ installation }: Props) {
-  const rubriquesSorted = [...installation.rubriques].sort((r1, r2) => {
+  const rubriquesInActivity = installation.rubriques.filter(
+    r => r.etatActivite === "En fonct."
+  );
+
+  const rubriquesSorted = [...rubriquesInActivity].sort((r1, r2) => {
     if (r1.rubrique < r2.rubrique) return -1;
     else if (r1.rubrique > r2.rubrique) return 1;
     return 0;
@@ -29,7 +33,7 @@ export default function CompanyActivity({ installation }: Props) {
           <a href={installation.urlFiche}>n°{installation.codeS3ic}</a>
         </p>
 
-        {[...new Set(installation.rubriques.map((r: Rubrique) => r.category))]
+        {[...new Set(rubriquesSorted.map((r: Rubrique) => r.category))]
           .filter(category => category !== null)
           .map((category, idx) => {
             return (
@@ -46,6 +50,7 @@ export default function CompanyActivity({ installation }: Props) {
                 <th>Rubrique</th>
                 <th>Alinéa</th>
                 <th>Activité</th>
+                <th>Régime autorisé</th>
                 <th>Volume</th>
               </tr>
             </thead>
@@ -56,6 +61,7 @@ export default function CompanyActivity({ installation }: Props) {
                     <td>{rubrique.rubrique}</td>
                     <td>{rubrique.alinea}</td>
                     <td>{rubrique.activite}</td>
+                    <td>{rubrique.regimeAutorise}</td>
                     <td>
                       {rubrique.volume} {rubrique.unite}
                     </td>

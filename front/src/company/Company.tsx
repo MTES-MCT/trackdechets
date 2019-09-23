@@ -29,6 +29,8 @@ const COMPANY_INFOS = gql`
         rubriques {
           rubrique
           alinea
+          etatActivite
+          regimeAutorise
           category
           activite
           volume
@@ -60,6 +62,7 @@ export default function CompanyInfo({
               <CompanyHeader
                 name={company.name}
                 siret={company.siret}
+                naf={company.naf}
                 libelleNaf={company.libelleNaf}
               />
 

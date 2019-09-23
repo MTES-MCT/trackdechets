@@ -1,7 +1,9 @@
 
+
 type Rubrique {
   rubrique: String
   alinea: String
+  etatActivite: String
   regimeAutorise: String
   activite: String
   category: String
