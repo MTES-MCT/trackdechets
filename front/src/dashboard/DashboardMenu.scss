@@ -24,4 +24,12 @@
       margin: 0;
     }
   }
+
+  .side-menu__mobile-trigger {
+    display: flex;
+    align-items: center;
+    font-size: 1.6em;
+    margin: 5px 10px;
+    cursor: pointer;
+  }
 }

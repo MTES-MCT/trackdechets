@@ -1,4 +1,12 @@
+@import "./Utils.scss";
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+@media only screen and (max-width: $breakpoint-mobile) {
+  .modal__backdrop .modal {
+    max-height: 100%;
+  }
 }

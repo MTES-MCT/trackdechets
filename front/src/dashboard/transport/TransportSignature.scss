@@ -1,3 +1,5 @@
+@import "../../Utils.scss";
+
 .modal {
   max-height: 90%;
   overflow: auto;
@@ -9,5 +11,11 @@
 
   .step-header {
     position: initial;
+  }
+
+  @media only screen and (max-width: $breakpoint-mobile) {
+    .step-header {
+      display: none;
+    }
   }
 }
