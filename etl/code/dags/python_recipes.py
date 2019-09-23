@@ -131,7 +131,7 @@ def deploy_gerep():
     generator = cuid.CuidGenerator()
 
     with gerep_prisma.get_writer() as writer:
-        for row in gerep_etl.iter_rows():
+        for row in gerep_etl.iter_rows(primary_key="id"):
             row["id"] = generator.cuid()
             # map snake_case to camelCase
             row["codeS3ic"] = row["code_s3ic"]
