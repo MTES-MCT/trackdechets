@@ -32,7 +32,6 @@ export default function CompanyActivity({ installation }: Props) {
         {[...new Set(installation.rubriques.map((r: Rubrique) => r.category))]
           .filter(category => category !== null)
           .map((category, idx) => {
-            console.log(category);
             return (
               <div className="label" key={idx}>
                 {categoryLabel[category]}
