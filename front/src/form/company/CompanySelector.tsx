@@ -160,7 +160,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
                       {c.siret} - {c.address}
                     </p>
                     <p>
-                      <a href={`company/${c.siret}`} target="_blank">
+                      <a href={`/company/${c.siret}`} target="_blank">
                         Information sur l'entreprise
                       </a>
                     </p>
