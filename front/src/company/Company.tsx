@@ -72,7 +72,9 @@ export default function CompanyInfo({
 
               <div className="columns">
                 <CompanyContact address={company.address} />
-                <CompanyMap lng={company.longitude} lat={company.latitude} />
+                {company.longitude && company.latitude && (
+                  <CompanyMap lng={company.longitude} lat={company.latitude} />
+                )}
               </div>
 
               {company.installation && (
