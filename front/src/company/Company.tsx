@@ -10,7 +10,6 @@ import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyContact from "./CompanyContact";
 import { Company, Declaration } from "./companyTypes";
 import CompanyActivity from "./CompanyActivity";
-import CompanyWaste from "./CompanyWaste";
 
 const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
@@ -50,11 +49,20 @@ export default function CompanyInfo({
   match
 }: RouteComponentProps<{ siret: string }>) {
   return (
-    <Query query={COMPANY_INFOS} variables={{ siret: match.params.siret }}>
+    <Query
+      query={COMPANY_INFOS}
+      variables={{ siret: match.params.siret }}
+      fetchPolicy="no-cache"
+    >
       {({ loading, error, data }) => {
         if (loading) return "Loading...";
         if (error) return `Error!: ${error}`;
+
         const company: Company = data.companyInfos;
+
+        if (!company.siret) {
+          return "Entreprise inconnue";
+        }
 
         return (
           <div className="section">
@@ -78,10 +86,7 @@ export default function CompanyInfo({
               </div>
 
               {company.installation && (
-                <>
-                  <CompanyActivity installation={company.installation} />
-                  <CompanyWaste installation={company.installation} />
-                </>
+                <CompanyActivity installation={company.installation} />
               )}
             </div>
           </div>
