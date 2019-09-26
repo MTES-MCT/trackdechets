@@ -9,7 +9,7 @@ type Values = {
 };
 export default connect<{}, Values>(function Emitter({ formik }) {
   const [pickupSite, setPickupSite] = useState(
-    formik.values.emitter.pickupSite != ""
+    !!formik.values.emitter.pickupSite
   );
 
   return (
