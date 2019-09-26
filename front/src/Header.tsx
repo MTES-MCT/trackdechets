@@ -32,15 +32,6 @@ export default withRouter(function Header({ history }) {
             </li>
             <li className="nav__item">
               <NavLink
-                to="/stats"
-                activeClassName="active"
-                onClick={() => trackEvent("navbar", "stats")}
-              >
-                Stats
-              </NavLink>
-            </li>
-            <li className="nav__item">
-              <NavLink
                 to="/partners"
                 activeClassName="active"
                 onClick={() => trackEvent("navbar", "partners")}
