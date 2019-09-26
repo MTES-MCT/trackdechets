@@ -68,7 +68,7 @@ export async function getUserCompanies(userId: string) {
   return Promise.all(
     companies.map(company => {
       return memoizeRequest(company.siret).then(companyInfo => {
-        return { ...company, ...companyInfo };
+        return { ...companyInfo, ...company };
       });
     })
   );
