@@ -89,7 +89,7 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 	if (data.Attachment.File != "") && (data.Attachment.Name != "") {
 		messagesInfoParams.Attachments = &mailjet.AttachmentsV31{
 			mailjet.AttachmentV31{
-				ContentType:   "text/plain",
+				ContentType:   "application/pdf",
 				Filename:      data.Attachment.Name,
 				Base64Content: data.Attachment.File,
 			},
