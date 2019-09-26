@@ -9,7 +9,7 @@ import {
   createNotCompatibleRubriqueAlertCard,
   alertTypes
 } from "../common/trello";
-import { pdfAttachment } from "../forms/pdf";
+import { pdfEmailAttachment } from "../forms/pdf";
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
@@ -113,7 +113,7 @@ async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
 
   const form = await prisma.form({ id: payload.node.id });
   // build pdf as a base64 string
-  let attachmentData = await pdfAttachment(payload.node.id);
+  let attachmentData = await pdfEmailAttachment(payload.node.id);
   const companyAdmins = await getCompanyAdmins(form.emitterCompanySiret);
 
   return Promise.all(

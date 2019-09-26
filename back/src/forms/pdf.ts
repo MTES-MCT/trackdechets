@@ -1,57 +1,77 @@
 import axios from "axios";
 import { prisma } from "../generated/prisma-client";
 
+type ResponseType = "arraybuffer" | "stream";
+
+/**
+ * Custom error to be handled
+ */
+class PdfDraftError extends Error {
+  constructor(message: string) {
+    super(message);
+    // Set the prototype explicitly
+    // cf. https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work.
+    Object.setPrototypeOf(this, PdfDraftError.prototype);
+  }
+}
+
+/**
+ * Build a pdf converted to base64 string to be sent via Mailjet API
+ * @param  form - A form instance queried from Prisma
+ * @param {ResponseType} responseType - arraybuffer or stream
+ * @return {Axios Promise}
+ */
+const buildPdf = async (form, responseType: ResponseType) => {
+  if (form.status === "DRAFT") {
+    throw new PdfDraftError("Impossible de générer un PDF pour un brouillon.");
+  }
+
+  const appendix2Forms = await prisma.form({ id: form.id }).appendix2Forms();
+  return axios.post(
+    "http://td-pdf:3201/pdf",
+    { ...form, appendix2Forms },
+    { responseType: responseType }
+  );
+};
+
+/**
+ * Render a form pdf as an HTTP response
+ */
 export const pdfHandler = async (req, res) => {
   const { id } = req.query;
   const form = await prisma.form({ id });
 
-  if (form.status === "DRAFT") {
-    return res
-      .status(500)
-      .send("Impossible de générer un PDF pour un brouillon.");
-  }
-
-  const appendix2Forms = await prisma.form({ id }).appendix2Forms();
-  return axios
-    .post(
-      "http://td-pdf:3201/pdf",
-      { ...form, appendix2Forms },
-      { responseType: "stream" }
-    )
-    .then(response => response.data.pipe(res))
+  return buildPdf(form, "stream")
+    .then(response => {
+      // set headers to keep downloaded file name on all browsers
+      return response.data.pipe(res).set(response.headers);
+    })
     .catch(err => {
       console.error(err);
+      if (err instanceof PdfDraftError) {
+        return res.status(500).send(err.message);
+      }
       res.status(500).send("Erreur lors de la génération du PDF");
     });
 };
 
 /**
- * Build a pdf converted to base64 string to be sent via Mailjet API
+ * Render a pdf converted to base64 string to be sent via Mailjet API
  * @param {string} id - form id
  * @return {Promise}
  */
-export const pdfAttachment = async id => {
+export const pdfEmailAttachment = async id => {
   // retrieve form
   const form = await prisma.form({ id });
 
-  if (form.status === "DRAFT") {
-    console.log("Impossible de générer un PDF pour un brouillon.");
-    return;
-  }
-
-  const appendix2Forms = await prisma.form({ id }).appendix2Forms();
-  // Request pdf to td-pdf service, then build a base64 string and return an object containing
-  // file and its name (readableID + pdf extension)
-  return axios
-    .post(
-      "http://td-pdf:3201/pdf",
-      { ...form, appendix2Forms },
-      { responseType: "arraybuffer" }
-    )
-    .then(response => ({
-      file: Buffer.from(response.data, "binary").toString("base64"),
-      name: `${form.readableId}.pdf`
-    }))
+  return buildPdf(form, "arraybuffer")
+    .then(response => {
+      console.log(response.data);
+      return {
+        file: Buffer.from(response.data, "binary").toString("base64"),
+        name: `${form.readableId}.pdf`
+      };
+    })
 
     .catch(err => {
       console.log("Erreur lors de la génération du PDF", err);
