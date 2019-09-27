@@ -1,11 +1,16 @@
 import axios from "axios";
 
+type Attachment = {
+  name: string;
+  file: string;
+};
 type Mail = {
   toEmail: string;
   toName: string;
   subject: string;
   title: string;
   body: string;
+  attachment?: Attachment;
 };
 
 export function sendMail(mail: Mail) {

@@ -20,7 +20,6 @@ const Login = lazy(() => import("./login/Login"));
 const Signup = lazy(() => import("./login/Signup"));
 const Search = lazy(() => import("./search/Search"));
 const Company = lazy(() => import("./company/Company"));
-const Stats = lazy(() => import("./Stats"));
 const WasteTree = lazy(() => import("./search/WasteTree"));
 
 export default withRouter(function LayoutContainer({ history }) {
@@ -44,7 +43,6 @@ export default withRouter(function LayoutContainer({ history }) {
       <Route exact path="/login" component={WaitingComponent(Login)} />
       <Route exact path="/invite" component={WaitingComponent(Invite)} />
       <Route exact path="/signup" component={WaitingComponent(Signup)} />
-      <Route exact path="/stats" component={WaitingComponent(Stats)} />
       <Route
         exact
         path="/signup/details"

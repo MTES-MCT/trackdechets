@@ -1,5 +1,6 @@
 import React from "react";
 import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./CompanyMap.scss";
 
 type Props = {
@@ -13,6 +14,19 @@ export default class CompanyMap extends React.Component<Props> {
   }
 
   componentDidMount() {
+    if (this.mapboxglSupported()) {
+      this.initMap();
+    }
+  }
+
+  addEtablissementMarker(map: mapboxgl.Map) {
+    new mapboxgl.Marker()
+      .setLngLat(this.getLngLat())
+      .setPopup(new mapboxgl.Popup({ closeButton: true }))
+      .addTo(map);
+  }
+
+  initMap() {
     fetch("/mapbox/style.json")
       .then(response => response.text())
       .then(style => {
@@ -24,21 +38,27 @@ export default class CompanyMap extends React.Component<Props> {
         };
         let map = new mapboxgl.Map(mapOptions);
         this.addEtablissementMarker(map);
-      });
-  }
-
-  addEtablissementMarker(map: mapboxgl.Map) {
-    new mapboxgl.Marker()
-      .setLngLat(this.getLngLat())
-      .setPopup(new mapboxgl.Popup({ closeButton: true }))
-      .addTo(map);
+    });
   }
 
   getLngLat() {
     return { lng: this.props.lng, lat: this.props.lat };
   }
 
+  mapboxglSupported() {
+    return mapboxgl.supported();
+  }
+
   render() {
-    return <div id="map"></div>;
+    if (this.mapboxglSupported()) {
+      return <div id="map"></div>;
+    } else {
+      return (
+        <div className="box" style={{ flex: 1 }}>
+          Votre navigateur ne supporte pas WebGL et ne peut afficher la carte de
+          l'établissement
+        </div>
+      );
+    }
   }
 }

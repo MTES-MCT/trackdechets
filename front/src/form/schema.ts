@@ -34,7 +34,7 @@ export const formSchema = object().shape({
   id: string().required(),
   emitter: object().shape({
     type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
-    pickupSite: string(),
+    pickupSite: string().nullable(true),
     company: companySchema
   }),
   recipient: object().shape({
@@ -45,7 +45,7 @@ export const formSchema = object().shape({
         "Vous devez sélectionner une valeur",
         (v: string) => v != ""
       ),
-    cap: string(),
+    cap: string().nullable(true),
     company: companySchema
   }),
   transporter: object().shape({
@@ -55,7 +55,7 @@ export const formSchema = object().shape({
     department: string().required(
       "Le département du transporteur est obligatoire"
     ),
-    validityLimit: date(),
+    validityLimit: date().nullable(true),
     numberPlate: string().nullable(true),
     company: companySchema
   }),
@@ -64,7 +64,7 @@ export const formSchema = object().shape({
     name: string().required("Appelation du déchet manquante"),
     onuCode: string(),
     packagings: array().of(packagingSchema),
-    otherPackaging: string(),
+    otherPackaging: string().nullable(true),
     numberOfPackages: number()
       .integer()
       .min(1, "Le nombre de colis doit être supérieur à 0")

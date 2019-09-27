@@ -10,12 +10,18 @@ import (
 	mailjet "github.com/mailjet/mailjet-apiv3-go"
 )
 
+type mailAttachment struct {
+	File string `json:"file"`
+	Name string `json:"name"`
+}
+
 type mail struct {
-	ToEmail string `json:"toEmail"`
-	ToName  string `json:"toName"`
-	Subject string `json:"subject"`
-	Title   string `json:"title"`
-	Body    string `json:"body"`
+	ToEmail    string         `json:"toEmail"`
+	ToName     string         `json:"toName"`
+	Subject    string         `json:"subject"`
+	Title      string         `json:"title"`
+	Body       string         `json:"body"`
+	Attachment mailAttachment `json:"attachment"`
 }
 
 var mailjetClient = mailjet.NewMailjetClient(
@@ -39,6 +45,7 @@ func main() {
 }
 
 func sendEmail(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method != "POST" {
 		http.Error(w, "Enpoint accessible uniquement en POST.", http.StatusNotFound)
 		return
@@ -58,27 +65,39 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	messagesInfo := []mailjet.InfoMessagesV31{
-		mailjet.InfoMessagesV31{
-			From: &mailjet.RecipientV31{
-				Email: "noreply@trackdechets.fr",
-				Name:  "Noreply Trackdéchets",
-			},
-			To: &mailjet.RecipientsV31{
-				mailjet.RecipientV31{
-					Email: data.ToEmail,
-					Name:  data.ToName,
-				},
-			},
-			Subject:          data.Subject,
-			TemplateID:       647957,
-			TemplateLanguage: true,
-			Variables: map[string]interface{}{
-				"subject": data.Subject,
-				"title":   data.Title,
-				"body":    data.Body,
+	messagesInfoParams := mailjet.InfoMessagesV31{
+		From: &mailjet.RecipientV31{
+			Email: "noreply@trackdechets.fr",
+			Name:  "Noreply Trackdéchets",
+		},
+		To: &mailjet.RecipientsV31{
+			mailjet.RecipientV31{
+				Email: data.ToEmail,
+				Name:  data.ToName,
 			},
 		},
+		Subject:          data.Subject,
+		TemplateID:       647957,
+		TemplateLanguage: true,
+		Variables: map[string]interface{}{
+			"subject": data.Subject,
+			"title":   data.Title,
+			"body":    data.Body,
+		},
+	}
+
+	if (data.Attachment.File != "") && (data.Attachment.Name != "") {
+		messagesInfoParams.Attachments = &mailjet.AttachmentsV31{
+			mailjet.AttachmentV31{
+				ContentType:   "application/pdf",
+				Filename:      data.Attachment.Name,
+				Base64Content: data.Attachment.File,
+			},
+		}
+	}
+
+	messagesInfo := []mailjet.InfoMessagesV31{
+		messagesInfoParams,
 	}
 	messages := mailjet.MessagesV31{Info: messagesInfo}
 	res, err := mailjetClient.SendMailV31(&messages)
