@@ -56,13 +56,12 @@ func Siret(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-  responseData, err := gouvAPIClient.queryAPI("/siret/" + strippedSiret)
+	responseData, err := gouvAPIClient.queryAPI("/siret/" + strippedSiret)
 	if err != nil {
-    w.WriteHeader(http.StatusInternalServerError)
-    w.Write([]byte(err.Error()))
-    return
-  }
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
 	var fullResponseObject APIResponse
 	json.Unmarshal(responseData, &fullResponseObject)
@@ -85,12 +84,12 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	uri := buildSearchURI(r.URL.Query())
 
-  res, err := gouvAPIClient.queryAPI(uri)
-  if err != nil {
-    w.Write([]byte(err.Error()))
-    w.WriteHeader(http.StatusInternalServerError)
-    return
-  }
+	res, err := gouvAPIClient.queryAPI(uri)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	var fullResponseObject APIMultiResponse
 	json.Unmarshal(res, &fullResponseObject)

@@ -2,20 +2,20 @@ package main
 
 import (
 	"errors"
-	"time"
 	"io/ioutil"
-	"net/http/httputil"
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"time"
 )
 
 const (
 	baseSireneURL = "https://entreprise.data.gouv.fr/api/sirene/v1"
 )
 
-// Client Http client to entreprise.data.gouv.fr
+// Client - Http client to entreprise.data.gouv.fr
 type Client struct {
-	httpClient  *http.Client
+	httpClient *http.Client
 }
 
 func (client *Client) queryAPI(uri string) ([]byte, error) {
@@ -23,10 +23,10 @@ func (client *Client) queryAPI(uri string) ([]byte, error) {
 
 	req.Header.Add("Accept", `application/json`)
 
-  resp, err := client.httpClient.Do(req)
+	resp, err := client.httpClient.Do(req)
 
 	if err != nil {
-    log.Println("Technical error while querying API", err)
+		log.Println("Technical error while querying API", err)
 		return nil, errors.New("Request failed - Technical error")
 	}
 
@@ -34,22 +34,20 @@ func (client *Client) queryAPI(uri string) ([]byte, error) {
 		log.Println("Error while querying SIRENE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
 
 		requestDump, _ := httputil.DumpRequest(req, true)
-    log.Println("Dumping error content...", string(requestDump))
+		log.Println("Dumping error content...", string(requestDump))
 
-    responseData, _ := ioutil.ReadAll(resp.Body)
-    return nil, errors.New(string(responseData))
+		responseData, _ := ioutil.ReadAll(resp.Body)
+		return nil, errors.New(string(responseData))
 	}
 
 	responseData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-    log.Println("Technical error while reading API result", err)
+		log.Println("Technical error while reading API result", err)
 		return nil, errors.New("Request failed - Could not read response")
 	}
 
 	return responseData, nil
 }
-
-
 
 func newClient(options ...func(*Client)) *Client {
 	cli := Client{
