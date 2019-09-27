@@ -13,6 +13,10 @@ export const localAuthService = {
     window.localStorage.removeItem("td-token");
   },
   getToken() {
+    if (!this.isAuthenticated) {
+      return null;
+    }
+
     const token = window.localStorage.getItem("td-token");
 
     if (isTokenValid(token)) {
