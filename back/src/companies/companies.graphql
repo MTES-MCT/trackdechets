@@ -1,28 +1,70 @@
 
+
 type Rubrique {
   rubrique: String
   alinea: String
-  regime_autorise: String
+  etatActivite: String
+  regimeAutorise: String
   activite: String
   category: String
-  waste_type: String
+  volume: String
+  unite: String
+  wasteType: WasteType
+}
+
+enum GerepType {
+  Producteur
+  Traiteur
+}
+
+enum WasteType {
+  INERTE
+  NOT_DANGEROUS
+  DANGEROUS
+}
+
+type Declaration {
+  annee: String
+  codeDechet: String,
+  libDechet: String
+  gerepType: GerepType
+}
+
+
+type Installation {
+  codeS3ic: String
+  urlFiche: String
+  rubriques: [Rubrique]
+  declarations: [Declaration]
 }
 
 type Company {
+
   siret: String
+
+  # Resolve from INSEE
+  siren: String
+  naf: String
+  libelleNaf: String
   name: String
   address: String
+  longitude: Float
+  latitude: Float
+
+  # Resolve with BSD
+  # (used in favorites only)
   contact: String
   phone: String
   mail: String
-  codeS3ic: String
-  urlFiche: String
-  naf: String
-  rubriques: [Rubrique]
+
+  # Resolve from s3ic data from ETL
+  installation: Installation
+
+  # Resolve from TD
+  isRegistered: Boolean
+  admins: [PublicUser]
 
   securityCode: Int!
-
-  admins: [PublicUser]
 }
 
 type Query {

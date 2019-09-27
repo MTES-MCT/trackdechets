@@ -17,38 +17,24 @@ type APIMultiResponse struct {
 
 // Etablissement Etablissement lié au SIRET
 type Etablissement struct {
-	Siret              string `json:"siret"`
-	Siren              string `json:"siren"`
-	NomRaisonSociale   string `json:"nom_raison_sociale"`
-	ActivitePrincipale string `json:"activite_principale"`
-	GeoAdresse         string `json:"geo_adresse"`
-}
-
-// ICPE Installation classée pour la protection de l'environnement
-type ICPE struct {
-	CodeS3ic  string     `json:"codeS3ic"`
-	URLFiche  string     `json:"urlFiche"`
-	Rubriques []Rubrique `json:"rubriques"`
-}
-
-// Rubrique d'une ICPE
-type Rubrique struct {
-	Rubrique       string `json:"rubrique"`
-	Alinea         string `json:"alinea"`
-	RegimeAutorise string `json:"regime_autorise"`
-	Activite       string `json:"activite"`
-	Category       string `json:"category"`
-	WasteType      string `json:"waste_type"`
+	Siret                     string `json:"siret"`
+	Siren                     string `json:"siren"`
+	NomRaisonSociale          string `json:"nom_raison_sociale"`
+	ActivitePrincipale        string `json:"activite_principale"`
+	LibelleActivitePrincipale string `json:"libelle_activite_principale"`
+	GeoAdresse                string `json:"geo_adresse"`
+	Longitude                 string `json:"longitude"`
+	Latitude                  string `json:"latitude"`
 }
 
 // Response La réponse donnée par l'API
 type Response struct {
-	Siret     string     `json:"siret"`
-	Siren     string     `json:"siren"`
-	Name      string     `json:"name"`
-	Naf       string     `json:"naf"`
-	Address   string     `json:"address"`
-	CodeS3ic  string     `json:"codeS3ic"`
-	URLFiche  string     `json:"urlFiche"`
-	Rubriques []Rubrique `json:"rubriques"`
+	Siret      string `json:"siret"`
+	Siren      string `json:"siren"`
+	Name       string `json:"name"`
+	Naf        string `json:"naf"`
+	LibelleNaf string `json:"libelleNaf"`
+	Address    string `json:"address"`
+	Longitude  string `json:"longitude"`
+	Latitude   string `json:"latitude"`
 }

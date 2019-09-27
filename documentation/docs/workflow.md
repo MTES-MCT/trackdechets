@@ -7,8 +7,9 @@ Le diagramme ci dessous retrace le cycle de vie d'un BSD dans Trackdéchets:
 
 <div class="mermaid">
 graph TD
-A[DRAFT] -->B(SEALED)
+A[DRAFT] -->|Optionnel| B(SEALED)
 B --> |Par l'émetteur| C(SENT)
+A --> |Par l'émetteur| C
 C -->|Par le receveur| D{RECEIVED}
 D -- Cas classique -->E(PROCESSED)
 D -- Regroupement et perte de traçabilite -->G(NO_TRACEABILITY)
@@ -70,4 +71,3 @@ Celui qui reçoit le déchet va ensuite pouvoir déclarer le traitement effectu�
 - le cas échant la prochaine opération prévue
 - le cas échant la description du prochain centre de traitement (nom, adresse, contact...) dans un champ de texte libre
 - le cas échant préciser s'il y a perte de traçabilité pour ce BSD
-

@@ -12,7 +12,7 @@ type Values = {
 
 export default connect<{}, Values>(function Recipient({ formik }) {
   const [hasTrader, setHasTrader] = useState(
-    formik.values.trader.company.siret != ""
+    !!formik.values.trader.company.siret
   );
   return (
     <React.Fragment>

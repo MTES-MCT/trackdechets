@@ -28,7 +28,11 @@ export default {
 
       if (existingCompany) {
         throw new Error(
-          "Cette entreprise a déjà un administrateur. Si vous pensez que c'est une erreur vous pouvez contacter le support."
+          "Un compte associé à ce SIRET existe déjà dans Trackdéchets. " +
+            "Pour créer votre compte Trackdéchets, vous devez contacter l'Administrateur afin qu'il vous invite à " +
+            "rejoindre l'organisation dans l'espace \"MON COMPTE\" de Trackdéchets " +
+            "(Rubrique : Entreprise associée, Action : Inviter des collaborateurs). " +
+            "Vous bénéficierez d'une inscription simplifiée en 3 clics."
         );
       }
 

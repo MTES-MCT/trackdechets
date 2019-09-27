@@ -1,7 +1,7 @@
 import { escape } from "querystring";
 import { Form } from "../generated/prisma-client";
 
-const { UI_HOST, VIRTUAL_HOST } = process.env;
+const { UI_HOST, VIRTUAL_HOST, DOC_HOST } = process.env;
 
 export const userMails = {
   onSignup: (user, activationHash) => ({
@@ -22,17 +22,32 @@ export const userMails = {
   contentAwaitsGuest: (toEmail, toName, toCompanyName, fromCompanyName) => ({
     toEmail,
     toName,
-    subject: "Un BSD numérique vous attend sur Trackdéchets",
-    title: "Un BSD numérique vous attend sur Trackdéchets",
+    subject:
+      "Un BSD numérique vous attend sur Trackdéchets : créez votre compte pour y accéder !",
+    title:
+      "Un BSD numérique vous attend sur Trackdéchets : créez votre compte pour y accéder !",
     body: `Bonjour ${toName},
+    <br><br>
+    L'entreprise ${fromCompanyName} vient de créer un BSD dématérialisé disponible sur <a href="https://${UI_HOST}/">https://trackdechets.beta.gouv.fr</a> qui concerne votre entreprise ${toCompanyName}.
+    <br><br>
+    <strong>Qu’est-ce que Trackdéchets ?</strong>
     <br>
-    L'entreprise ${fromCompanyName} vient de créer un BSD dématérialisé disponible sur <a href="https://${UI_HOST}/">https://trackdechets.beta.gouv.fr</a> qui concerne votre entreprise ${toCompanyName}.<br>
-    Ce message vous est adressé car l'entreprise qui vous a transmis ce bordereau dispose d'un compte sur Trackdéchets et son bordereau est en attente d'une action de votre part.
+    Un outil du Ministère de la Transition Écologique et Solidaire qui permet notamment de <strong>simplifier la gestion quotidienne de la traçabilité des déchets dangereux en permettant une dématérialisation de bout en bout de la chaîne de traitement 💪.</strong>
+    <br><br>
+    <strong>Trackdéchets c’est accessible à tous ?</strong><br>
+    Trackdéchets est gratuit et accessible à toutes les entreprises, générant ou traitant des déchets&nbsp;: producteurs, collecteurs / regroupeurs, transporteurs, installations de traitement.
+    <br><br>
+    <strong>Pourquoi Trackdéchets vous écrit aujourd’hui ?</strong><br>
+    Ce message vous est adressé car <strong>l'entreprise qui vous a transmis ce bordereau dispose d'un compte sur Trackdéchets</strong> et son bordereau est en attente d'une action de votre part.
+    <br><br>
+    <strong>Comment aller voir ce BSD ?</strong>
     <br>
-    Trackdéchets est un produit de la Fabrique Numérique du Ministère de la Transition Écologique et Solidaire.<br>
-    Il permet entre autres, de dématérialiser la procédure liée aux bordereaux de suivi de déchets et de tracer le déchet jusqu'à son traitement final.
+    Vous pouvez créer votre compte en cliquant <a href="https://${UI_HOST}/signup">sur ce lien</a> et en suivant la procédure d'inscription. C’est rapide, vous pouvez finaliser votre inscription en 3’ max une fois muni.e de votre SIRET. Vous pourrez alors commencer à utiliser Trackdéchets et découvrir ses fonctionnalités.
+    <br><br>
+    <strong>Vous avez déjà un outil de gestion des BSD, comment ça se passe?</strong>
     <br>
-    Vous pouvez créer votre compte en cliquant <a href="https://${UI_HOST}/signup">sur ce lien</a> et en suivant la procédure d'inscription. Vous pourrez alors commencer à utiliser Trackdéchets.<br>
+    Si vous disposez de votre propre solution, vous continuez comme avant et la mise en place des connections (via API) permettra de transmettre des BSD dématérialisés à vos clients et prestataires. Pour en <a href="https://doc.trackdechets.fr/">savoir plus</a>.
+    <br><br>
     Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.
   `
   }),
@@ -80,16 +95,18 @@ export const userMails = {
     Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">par mail.</a>
     `
   }),
-  formNotAccepted: (toEmail, toName, form: Form) => ({
+  formNotAccepted: (toEmail, toName, form: Form, attachment) => ({
     toEmail,
     toName,
     subject: "Refus de prise en  charge de votre déchet",
     title: "Un de vos déchet a été refusé à l'arrivée",
     body: `Madame, Monsieur,
     <br><br>
-    Nous vous informons que la société ${form.recipientCompanyName} a refusé le ${
-      new Intl.DateTimeFormat('fr-FR').format(new Date(form.receivedAt))
-    }, le déchet de la société suivante :
+    Nous vous informons que la société ${
+      form.recipientCompanyName
+    } a refusé le ${new Intl.DateTimeFormat("fr-FR").format(
+      new Date(form.receivedAt)
+    )}, le déchet de la société suivante :
     <br><br>
     <ul>
     <li>Société ${form.emitterCompanyName} - ${form.emitterCompanyAddress}</li>
@@ -101,7 +118,7 @@ export const userMails = {
       <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
     </ul>
      <li>Transporteur : ${form.transporterCompanyName}</li>
-     <li>Responsable du site : ${form.sentBy || ''}</li>
+     <li>Responsable du site : ${form.sentBy || ""}</li>
      </ul>
      Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
     <br><br>
@@ -111,6 +128,7 @@ export const userMails = {
     <br><br>
     L'équipe Trackdéchets,
     <br><br>
-    <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`
+    <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
+    attachment: attachment
   })
 };

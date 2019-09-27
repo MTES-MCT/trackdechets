@@ -8,26 +8,25 @@ import RedErrorMessage from "../RedErrorMessage";
 import useDebounce from "../../utils/use-debounce";
 import client from "../../graphql-client";
 
-
 export type Rubrique = {
   rubrique: string;
   alinea: string;
-  regime_autorise: string;
-  activite: string;
   category: string;
-}
+};
 
 export type Company = {
   address: string;
   name: string;
   siret: string;
+  naf: string;
   contact: string;
   phone: string;
   mail: string;
-  codeS3ic: string;
-  urlFiche: string;
-  naf: string;
-  rubriques: Rubrique[];
+  installation: {
+    codeS3ic: string;
+    urlFiche: string;
+    rubriques: Rubrique[];
+  };
 };
 
 export default connect<FieldProps>(function CompanySelector(props) {
@@ -116,7 +115,11 @@ export default connect<FieldProps>(function CompanySelector(props) {
                   setSearchTerm({ ...searchTerm, clue: e.target.value })
                 }
               />
-              <button className="overlay-button search-icon" aria-label="Recherche" disabled={true}>
+              <button
+                className="overlay-button search-icon"
+                aria-label="Recherche"
+                disabled={true}
+              >
                 <FaSearch />
               </button>
             </div>
@@ -157,9 +160,9 @@ export default connect<FieldProps>(function CompanySelector(props) {
                       {c.siret} - {c.address}
                     </p>
                     <p>
-                      {c.codeS3ic && c.urlFiche &&
-                        <a href={c.urlFiche} target="_blank">Installation classée n° {c.codeS3ic}</a>
-                      }
+                      <a href={`/company/${c.siret}`} target="_blank">
+                        Information sur l'entreprise
+                      </a>
                     </p>
                   </div>
                   <div className="icon">

@@ -51,6 +51,7 @@
 
     &--selected {
       display: block;
+      overflow-y: auto;
     }
   }
 
