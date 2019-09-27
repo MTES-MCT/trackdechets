@@ -1,12 +1,9 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 
@@ -21,6 +18,8 @@ func check(e error) {
 		panic(e)
 	}
 }
+
+var gouvAPIClient = newClient()
 
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
@@ -57,7 +56,13 @@ func Siret(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseData := queryAPI("/siret/" + strippedSiret)
+
+  responseData, err := gouvAPIClient.queryAPI("/siret/" + strippedSiret)
+	if err != nil {
+    w.WriteHeader(http.StatusInternalServerError)
+    w.Write([]byte(err.Error()))
+    return
+  }
 
 	var fullResponseObject APIResponse
 	json.Unmarshal(responseData, &fullResponseObject)
@@ -80,7 +85,12 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	uri := buildSearchURI(r.URL.Query())
 
-	res := queryAPI(uri)
+  res, err := gouvAPIClient.queryAPI(uri)
+  if err != nil {
+    w.Write([]byte(err.Error()))
+    w.WriteHeader(http.StatusInternalServerError)
+    return
+  }
 
 	var fullResponseObject APIMultiResponse
 	json.Unmarshal(res, &fullResponseObject)
@@ -119,34 +129,6 @@ func buildSearchURI(query url.Values) string {
 	}
 
 	return uri
-}
-
-func queryAPI(uri string) []byte {
-	// Ingnore certificate check (cf `curl -k`)
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", "https://entreprise.data.gouv.fr/api/sirene/v1"+uri, nil)
-
-	req.Header.Add("Accept", `application/json`)
-
-	resp, err := client.Do(req)
-	check(err)
-
-	if resp.StatusCode != 200 {
-		log.Println("Error while querying SIRENE API, received status code", resp.StatusCode, http.StatusText(resp.StatusCode))
-
-		requestDump, err := httputil.DumpRequest(req, true)
-		check(err)
-		log.Println("Dumping error content...", string(requestDump))
-
-	}
-
-	responseData, err := ioutil.ReadAll(resp.Body)
-	check(err)
-
-	return responseData
 }
 
 func etablissementToResponse(item Etablissement) Response {
