@@ -43,27 +43,15 @@ const sentryMiddleware = () =>
     }
   });
 
-/**
- * Build an array of yoga-compatible middlewares
- * Only sentry for now
- */
-const getMiddlewares = () => {
-  let middlewares = [];
-  if (!!sentryDsn) { // not set in dev
-    middlewares.push(sentryMiddleware());
-  }
-  return middlewares;
-};
-
 const server = new GraphQLServer({
   typeDefs,
   resolvers,
-  middlewares: getMiddlewares(),
+  middlewares: [...(sentryDsn ? [sentryMiddleware()] : [])],
   context: request => ({
     ...request,
     prisma
   })
-} as any);
+});
 
 server.express.get("/ping", (_, res) => res.send("Pong!"));
 server.express.get("/userActivation", userActivationHandler);
