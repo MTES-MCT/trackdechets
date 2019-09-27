@@ -1,6 +1,5 @@
 import React from "react";
 import mapboxgl from "mapbox-gl";
-import axios from "axios";
 import "./CompanyMap.scss";
 
 type Props = {
@@ -14,17 +13,18 @@ export default class CompanyMap extends React.Component<Props> {
   }
 
   componentDidMount() {
-    axios.get("/mapbox/style.json").then(response => {
-      const style = response.data;
-      const mapOptions: mapboxgl.MapboxOptions = {
-        container: "map",
-        style,
-        center: this.getLngLat(),
-        zoom: 13
-      };
-      let map = new mapboxgl.Map(mapOptions);
-      this.addEtablissementMarker(map);
-    });
+    fetch("/mapbox/style.json")
+      .then(response => response.text())
+      .then(style => {
+        const mapOptions: mapboxgl.MapboxOptions = {
+          container: "map",
+          style,
+          center: this.getLngLat(),
+          zoom: 13
+        };
+        let map = new mapboxgl.Map(mapOptions);
+        this.addEtablissementMarker(map);
+      });
   }
 
   addEtablissementMarker(map: mapboxgl.Map) {
