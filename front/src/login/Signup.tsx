@@ -319,7 +319,6 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                     console.log(err);
                                   }
 
-
                                   setIsSearching(false);
                                   setCompany(company_);
 
