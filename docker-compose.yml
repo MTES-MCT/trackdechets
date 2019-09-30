@@ -39,6 +39,7 @@ services:
       TRELLO_API_KEY: $TRELLO_API_KEY
       TRELLO_TOKEN: $TRELLO_TOKEN
       TRELLO_ALERTS_LIST_ID: $TRELLO_ALERTS_LIST_ID
+      SENTRY_DSN: $SENTRY_DSN
 
   td-ui:
     image: betagouv/trackdechets-ui:latest
