@@ -37,9 +37,10 @@ const handleSubmit = (
   props
     .signup({ variables: { payload } })
     .then(_ => props.history.push("/signup/activation"))
-    .catch(error => {
+    .catch(errors => {
       // graphQLErrors are returned as an array of objects, we map and join  them to a string
-      let errorMessages = error.graphQLErrors
+
+      let errorMessages = (errors.graphQLErrors || [])
         .map(({ message }: { message: string }) => message)
         .join("\n");
       props.setStatus(errorMessages);
@@ -338,9 +339,9 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
 
                                   // auto-complete userType
                                   if (company_ && company_.installation) {
-                                    let categories = company_.installation.rubriques.map(
-                                      r => r.category
-                                    );
+                                    let categories = company_.installation.rubriques
+                                      .filter(r => !!r.category) // null blocks form submitting
+                                      .map(r => r.category);
                                     const userType = categories.filter(
                                       (value, index, self) => {
                                         return self.indexOf(value) === index;
