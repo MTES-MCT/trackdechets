@@ -308,21 +308,15 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                 const siret = ev.target.value;
 
                                 if (siret.length == 14) {
-                                  // For some unknown reasons, the first Apollo call raises
-                                  // Error: "Store reset while query was in flight(not completed in link chain)"
-                                  // so we need to retry
                                   let company_ = null;
                                   setIsSearching(true);
-                                  for (let i = 0; i <= 3; ++i) {
-                                    try {
-                                      company_ = await fetchCompany(
-                                        client,
-                                        siret
-                                      );
-                                      break;
-                                    } catch (err) {
-                                      console.log(err);
-                                    }
+                                  try {
+                                    company_ = await fetchCompany(
+                                      client,
+                                      siret
+                                    );
+                                  } catch (err) {
+                                    console.log(err);
                                   }
 
                                   setIsSearching(false);
