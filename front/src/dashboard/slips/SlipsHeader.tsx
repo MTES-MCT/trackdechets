@@ -18,10 +18,10 @@ export default function SlipsHeader() {
         </div>
       </div>
       <div className="notification warning">
-        Dans un premier temps, Trackdéchets ne permet pas de prendre en compte
-        les déchets Amiante, DASRI, Fluides frigorigènes. Les annexes 1 et 3 ne
-        sont actuellement pas prises en compte, ainsi que le multimodal. Merci
-        de votre compréhension.
+        Actuellement, Trackdéchets ne permets pas de prendre en compte les
+        déchets d'amiante, les DASRI et les Fluides frigorigènes, ainsi que
+        l'annexe 3 (Spécifique Véhicules Hors d'Usage) et le multimodal. Merci
+        de votre compréhension
       </div>
     </div>
   );
