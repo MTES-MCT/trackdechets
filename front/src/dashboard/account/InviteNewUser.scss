@@ -1,6 +1,11 @@
 .invite-form {
   display: flex;
   margin: initial;
+  max-width: none;
+
+  input {
+    max-width: 350px;
+  }
 }
 
 .table td.right-column {
