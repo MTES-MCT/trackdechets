@@ -14,7 +14,7 @@ export const FAVORITES = gql`
 `;
 
 export const COMPANY_INFOS = gql`
-  query CompanyInfos($siret: String!) {
+  query SignupCompanyInfos($siret: String!) {
     companyInfos(siret: $siret) {
       siret
       name
