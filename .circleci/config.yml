@@ -86,32 +86,38 @@ workflows:
           name: build-postgres
           service-name: postgres
           folder-name: postgres
-          requires: check-docker
+          requires:
+            - check-docker
       - build-service:
           name: build-ui
           service-name: ui
           folder-name: front
-          requires: check-docker
+          requires:
+            - check-docker
       - build-service:
           name: build-api
           service-name: api
           folder-name: back
-          requires: check-docker
+          requires:
+            - check-docker
       - build-service:
           name: build-insee
           service-name: insee
           folder-name: insee
-          requires: check-docker
+          requires:
+            - check-docker
       - build-service:
           name: build-pdf
           service-name: pdf
           folder-name: pdf
-          requires: check-docker
+          requires:
+            - check-docker
       - build-service:
           name: build-mail
           service-name: mail
           folder-name: mail
-          requires: check-docker
+          requires:
+            - check-docker
       - build-service:
           name: build-etl
           service-name: etl
