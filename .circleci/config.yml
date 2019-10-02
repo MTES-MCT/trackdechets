@@ -124,7 +124,7 @@ workflows:
           folder-name: etl
           requires:
             - check-docker
-      - deploy-prod:
+      - deploy:
           requires:
             - build-postgres
             - build-api
