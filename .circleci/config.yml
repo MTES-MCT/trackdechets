@@ -23,6 +23,7 @@ jobs:
         type: string
       folder-name:
         type: string
+    executor: node
     steps:
       - checkout
       - setup_remote_docker
