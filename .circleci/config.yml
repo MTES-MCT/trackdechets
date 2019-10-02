@@ -122,7 +122,8 @@ workflows:
           name: build-etl
           service-name: etl
           folder-name: etl
-          requires: check-docker
+          requires:
+            - check-docker
       - deploy-prod:
           requires:
             - build-postgres
