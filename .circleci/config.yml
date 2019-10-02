@@ -16,124 +16,24 @@ jobs:
             exit 1
           fi
 
-  build-postgres:
-    executor: node
+  build-service:
+    description: "Build and push <service-name> (located in <folder-name>) to the Docker repository"
+    parameters:
+      service-name:
+        type: string
+      folder-name:
+        type: string
     steps:
       - checkout
       - setup_remote_docker
       - run: |
-          docker build -t betagouv/trackdechets-postgres:$CIRCLE_SHA1 ./postgres
+          docker build -t betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 ./<< parameters.folder-name >>
           docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-          docker push betagouv/trackdechets-postgres:$CIRCLE_SHA1
+          docker push betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1
       - run: |
           if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-postgres:$CIRCLE_SHA1 betagouv/trackdechets-postgres:latest
-            docker push betagouv/trackdechets-postgres:latest
-          fi
-
-  build-ui:
-    executor: node
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-ui:$CIRCLE_SHA1 ./front
-          docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-          docker push betagouv/trackdechets-ui:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-ui:$CIRCLE_SHA1 betagouv/trackdechets-ui:latest
-            docker push betagouv/trackdechets-ui:latest
-          fi
-
-  build-api:
-    executor: node
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-api:$CIRCLE_SHA1 ./back
-          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-          docker push betagouv/trackdechets-api:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-api:$CIRCLE_SHA1 betagouv/trackdechets-api:latest
-            docker push betagouv/trackdechets-api:latest
-          fi
-
-  build-insee:
-    executor: node
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-insee:$CIRCLE_SHA1 ./insee
-          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-          docker push betagouv/trackdechets-insee:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-insee:$CIRCLE_SHA1 betagouv/trackdechets-insee:latest
-            docker push betagouv/trackdechets-insee:latest
-          fi
-
-  build-pdf:
-    executor: node
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-pdf:$CIRCLE_SHA1 ./pdf
-          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-          docker push betagouv/trackdechets-pdf:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-pdf:$CIRCLE_SHA1 betagouv/trackdechets-pdf:latest
-            docker push betagouv/trackdechets-pdf:latest
-          fi
-
-  build-mail:
-    executor: node
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-mail:$CIRCLE_SHA1 ./mail
-          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-          docker push betagouv/trackdechets-mail:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-mail:$CIRCLE_SHA1 betagouv/trackdechets-mail:latest
-            docker push betagouv/trackdechets-mail:latest
-          fi
-
-  build-doc:
-    executor: node
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-doc:$CIRCLE_SHA1 ./documentation
-          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-          docker push betagouv/trackdechets-doc:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-doc:$CIRCLE_SHA1 betagouv/trackdechets-doc:latest
-            docker push betagouv/trackdechets-doc:latest
-          fi
-
-  build-etl:
-    executor: node
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-etl:$CIRCLE_SHA1 ./etl
-          echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_USER --password-stdin
-          docker push betagouv/trackdechets-etl:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-etl:$CIRCLE_SHA1 betagouv/trackdechets-etl:latest
-            docker push betagouv/trackdechets-etl:latest
+            docker tag betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 betagouv/trackdechets-<< parameters.service-name >>:latest
+            docker push betagouv/trackdechets-<< parameters.service-name >>:latest
           fi
 
   deploy:
@@ -162,43 +62,54 @@ jobs:
       - run:
           name: Deploy to validation over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/ ; git pull ; docker-compose -f docker-compose.val.yml build ; docker-compose -f docker-compose.val.yml up -d"
+            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/
+            git pull
+            docker-compose -f docker-compose.val.yml build
+            docker-compose -f docker-compose.val.yml up -d"
 
 workflows:
-  validation:
-    jobs:
-      - deploy-validation:
-          filters:
-            branches:
-              only: dev
-  build_deploy:
+  build-and-deploy:
     jobs:
       - check-docker:
           filters:
             branches:
               only: master
-      - build-postgres:
-          requires:
-            - check-docker
-      - build-ui:
-          requires:
-            - check-docker
-      - build-api:
-          requires:
-            - check-docker
-      - build-insee:
-          requires:
-            - check-docker
-      - build-pdf:
-          requires:
-            - check-docker
-      - build-mail:
-          requires:
-            - check-docker
-      - build-etl:
-          requires:
-            - check-docker
-      - deploy:
+      - build-service:
+          name: build-postgres
+          service-name: postgres
+          folder-name: postgres
+          requires: check-docker
+      - build-service:
+          name: build-ui
+          service-name: ui
+          folder-name: front
+          requires: check-docker
+      - build-service:
+          name: build-api
+          service-name: api
+          folder-name: back
+          requires: check-docker
+      - build-service:
+          name: build-insee
+          service-name: insee
+          folder-name: insee
+          requires: check-docker
+      - build-service:
+          name: build-pdf
+          service-name: pdf
+          folder-name: pdf
+          requires: check-docker
+      - build-service:
+          name: build-mail
+          service-name: mail
+          folder-name: mail
+          requires: check-docker
+      - build-service:
+          name: build-etl
+          service-name: etl
+          folder-name: etl
+          requires: check-docker
+      - deploy-prod:
           requires:
             - build-postgres
             - build-api
@@ -210,3 +121,10 @@ workflows:
           filters:
             branches:
               only: master
+
+  deploy-validation:
+    jobs:
+      - deploy-validation:
+          filters:
+            branches:
+              only: dev
