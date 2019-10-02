@@ -20,6 +20,7 @@ const Login = lazy(() => import("./login/Login"));
 const Signup = lazy(() => import("./login/Signup"));
 const Company = lazy(() => import("./company/Company"));
 const WasteTree = lazy(() => import("./search/WasteTree"));
+const Stats = lazy(() => import("./Stats"));
 
 export default withRouter(function LayoutContainer({ history }) {
   if (process.env.NODE_ENV === "production") {
@@ -70,7 +71,7 @@ export default withRouter(function LayoutContainer({ history }) {
       />
 
       <Route exact path="/wasteTree" component={WaitingComponent(WasteTree)} />
-
+      <Route exact path="/stats" component={WaitingComponent(Stats)} />
       <PrivateRoute
         path="/form/:id?"
         component={WaitingComponent(FormContainer)}
