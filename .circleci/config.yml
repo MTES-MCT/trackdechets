@@ -40,20 +40,27 @@ jobs:
     machine:
       enabled: true
     working_directory: ~/project/trackdechets
+    parameters:
+      user:
+        type: env_var_name
+        default: SSH_USER
+      host:
+        type: env_var_name
+        default: SSH_HOST
     steps:
       - checkout
       - run:
           name: Deploy Over SSH
           command: |
-            scp docker-compose.yml $SSH_USER@$SSH_HOST:/srv/trackdechets/
-            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-postgres:latest"
-            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-api:latest"
-            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-ui:latest"
-            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-pdf:latest"
-            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-insee:latest"
-            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-mail:latest"
-            ssh $SSH_USER@$SSH_HOST "docker pull betagouv/trackdechets-etl:latest"
-            ssh $SSH_USER@$SSH_HOST "cd /srv/trackdechets/ ; docker-compose up -d"
+            scp docker-compose.yml ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-postgres:latest"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-api:latest"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-ui:latest"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-pdf:latest"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-insee:latest"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-mail:latest"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-etl:latest"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/ ; docker-compose up -d"
 
   deploy-validation:
     machine:
