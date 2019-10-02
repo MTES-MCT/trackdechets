@@ -8,7 +8,11 @@ import { FaTimes } from "react-icons/fa";
 import { Me } from "../../login/model";
 
 const INVITE_USER_TO_COMPANY = gql`
-  mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!) {
+  mutation InviteUserToCompany(
+    $email: String!
+    $siret: String!
+    $role: UserRole!
+  ) {
     inviteUserToCompany(email: $email, siret: $siret, role: $role)
   }
 `;
@@ -68,26 +72,27 @@ export default function ImportNewUser({ siret, me }: Props) {
                 }}
               >
                 {({ isSubmitting }) => (
-                  <Form className="invite-form">
-                    <Field
-                      type="email"
-                      name="email"
-                      placeholder="Email de la personne à inviter"
-                    />
-                    <Field component="select" name="role">
-                      <option value="MEMBER">Collaborateur</option>
-                      <option value="ADMIN">Administrateur</option>
-                    </Field>
-                    <button
-                      type="submit"
-                      className="button"
-                      disabled={isSubmitting}
-                    >
-                      Inviter
-                    </button>
-
+                  <>
+                    <Form className="invite-form">
+                      <Field
+                        type="email"
+                        name="email"
+                        placeholder="Email de la personne à inviter"
+                      />
+                      <Field component="select" name="role">
+                        <option value="MEMBER">Collaborateur</option>
+                        <option value="ADMIN">Administrateur</option>
+                      </Field>
+                      <button
+                        type="submit"
+                        className="button"
+                        disabled={isSubmitting}
+                      >
+                        Inviter
+                      </button>
+                    </Form>
                     <RedErrorMessage name="email" />
-                  </Form>
+                  </>
                 )}
               </Formik>
             )}
