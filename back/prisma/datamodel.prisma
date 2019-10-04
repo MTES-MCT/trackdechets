@@ -203,6 +203,7 @@ type Form {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
