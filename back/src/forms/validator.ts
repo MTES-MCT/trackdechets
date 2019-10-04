@@ -1,4 +1,4 @@
-import { string, object, date, number, array } from "yup";
+import { string, object, date, number, array, boolean } from "yup";
 
 const companySchema = object().shape({
   name: string().required(),
@@ -26,11 +26,22 @@ export const formSchema = object().shape({
     company: companySchema
   }),
   transporter: object().shape({
-    receipt: string().required(
-      "Le numéro de récépissé du transporteur est obligatoire"
+    isExemptedOfReceipt: boolean().nullable(true),
+    receipt: string().when(
+      "isExemptedOfReceipt",
+      (isExemptedOfReceipt, schema) =>
+        isExemptedOfReceipt
+          ? schema.nullable(true)
+          : schema.required(
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+            )
     ),
-    department: string().required(
-      "Le département du transporteur est obligatoire"
+    department: string().when(
+      "isExemptedOfReceipt",
+      (isExemptedOfReceipt, schema) =>
+        isExemptedOfReceipt
+          ? schema.nullable(true)
+          : schema.required("Le département du transporteur est obligatoire")
     ),
     validityLimit: date().nullable(true),
     numberPlate: string().nullable(true),
