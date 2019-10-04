@@ -575,6 +575,8 @@ export type FormOrderByInput =
   | "transporterCompanyPhone_DESC"
   | "transporterCompanyMail_ASC"
   | "transporterCompanyMail_DESC"
+  | "transporterIsExemptedOfReceipt_ASC"
+  | "transporterIsExemptedOfReceipt_DESC"
   | "transporterReceipt_ASC"
   | "transporterReceipt_DESC"
   | "transporterDepartment_ASC"
@@ -1084,6 +1086,7 @@ export interface FormUpdateInput {
   transporterCompanyContact?: Maybe<String>;
   transporterCompanyPhone?: Maybe<String>;
   transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
   transporterReceipt?: Maybe<String>;
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
@@ -1190,6 +1193,7 @@ export interface FormCreateInput {
   transporterCompanyContact?: Maybe<String>;
   transporterCompanyPhone?: Maybe<String>;
   transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
   transporterReceipt?: Maybe<String>;
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
@@ -1768,6 +1772,7 @@ export interface FormUpdateManyDataInput {
   transporterCompanyContact?: Maybe<String>;
   transporterCompanyPhone?: Maybe<String>;
   transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
   transporterReceipt?: Maybe<String>;
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
@@ -2035,6 +2040,7 @@ export interface FormUpdateDataInput {
   transporterCompanyContact?: Maybe<String>;
   transporterCompanyPhone?: Maybe<String>;
   transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
   transporterReceipt?: Maybe<String>;
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
@@ -2383,6 +2389,7 @@ export interface FormUpdateManyMutationInput {
   transporterCompanyContact?: Maybe<String>;
   transporterCompanyPhone?: Maybe<String>;
   transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
   transporterReceipt?: Maybe<String>;
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
@@ -2913,6 +2920,8 @@ export interface FormScalarWhereInput {
   transporterCompanyMail_not_starts_with?: Maybe<String>;
   transporterCompanyMail_ends_with?: Maybe<String>;
   transporterCompanyMail_not_ends_with?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterIsExemptedOfReceipt_not?: Maybe<Boolean>;
   transporterReceipt?: Maybe<String>;
   transporterReceipt_not?: Maybe<String>;
   transporterReceipt_in?: Maybe<String[] | String>;
@@ -3710,6 +3719,8 @@ export interface FormWhereInput {
   transporterCompanyMail_not_starts_with?: Maybe<String>;
   transporterCompanyMail_ends_with?: Maybe<String>;
   transporterCompanyMail_not_ends_with?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterIsExemptedOfReceipt_not?: Maybe<Boolean>;
   transporterReceipt?: Maybe<String>;
   transporterReceipt_not?: Maybe<String>;
   transporterReceipt_in?: Maybe<String[] | String>;
@@ -5499,6 +5510,7 @@ export interface Form {
   transporterCompanyContact?: String;
   transporterCompanyPhone?: String;
   transporterCompanyMail?: String;
+  transporterIsExemptedOfReceipt?: Boolean;
   transporterReceipt?: String;
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
@@ -5567,6 +5579,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   transporterCompanyContact: () => Promise<String>;
   transporterCompanyPhone: () => Promise<String>;
   transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
   transporterReceipt: () => Promise<String>;
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
@@ -5646,6 +5659,7 @@ export interface FormSubscription
   transporterCompanyContact: () => Promise<AsyncIterator<String>>;
   transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
   transporterCompanyMail: () => Promise<AsyncIterator<String>>;
+  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
   transporterReceipt: () => Promise<AsyncIterator<String>>;
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -5725,6 +5739,7 @@ export interface FormNullablePromise
   transporterCompanyContact: () => Promise<String>;
   transporterCompanyPhone: () => Promise<String>;
   transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
   transporterReceipt: () => Promise<String>;
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
@@ -5861,6 +5876,7 @@ export interface FormPreviousValues {
   transporterCompanyContact?: String;
   transporterCompanyPhone?: String;
   transporterCompanyMail?: String;
+  transporterIsExemptedOfReceipt?: Boolean;
   transporterReceipt?: String;
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
@@ -5930,6 +5946,7 @@ export interface FormPreviousValuesPromise
   transporterCompanyContact: () => Promise<String>;
   transporterCompanyPhone: () => Promise<String>;
   transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
   transporterReceipt: () => Promise<String>;
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
@@ -5999,6 +6016,7 @@ export interface FormPreviousValuesSubscription
   transporterCompanyContact: () => Promise<AsyncIterator<String>>;
   transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
   transporterCompanyMail: () => Promise<AsyncIterator<String>>;
+  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
   transporterReceipt: () => Promise<AsyncIterator<String>>;
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
