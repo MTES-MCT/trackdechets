@@ -4,7 +4,7 @@ import { prisma } from "../generated/prisma-client";
 
 /**
  * Compute a past date relative to now
-
+ *
  * @param baseDate Date
  * @param daysAgo Integer
  * @return a date formatted as "YYYY-MM-DD"
@@ -16,46 +16,17 @@ export const xDaysAgo = (baseDate: Date, daysAgo: number): string => {
     .split("T")[0];
 };
 
-async function onboardingEmail(recipients, emailFunction) {
-  return Promise.all(
-    recipients.map(recipient => {
-      let payload = emailFunction(recipient.email, recipient.name);
-
-      return sendMail(payload);
-    })
-  );
-}
-
-async function firstOnboarding(recipients) {
-  return Promise.all(
-    recipients.map(recipient => {
-      let payload = userMails.onboardingFirstStep(
-        recipient.email,
-        recipient.name
-      );
-
-      return sendMail(payload);
-    })
-  );
-}
-async function secondOnboarding(recipients) {
-  return Promise.all(
-    recipients.map(recipient => {
-      let payload = userMails.onboardingSecondStep(
-        recipient.email,
-        recipient.name
-      );
-
-      return sendMail(payload);
-    })
-  );
-}
-
-export const sendOnboardingFirstStepMails = async () => {
+/**
+ * Send onboarding emails to relevant users
+ *
+ * @param daysAgo Integer when did our users subscribe
+ * @param emailFunction the function building relevant email content
+ */
+export const sendOnboardingEmails = async (daysAgo: number, emailFunction) => {
   const now = new Date();
 
-  const inscriptionDateGt = xDaysAgo(now, 1); //1 day ago
-  const inscriptionDateLt = xDaysAgo(now, 0); //0 day ago
+  const inscriptionDateGt = xDaysAgo(now, daysAgo);
+  const inscriptionDateLt = xDaysAgo(now, daysAgo - 1);
   // retrieve users whose account was created yesterday
   let recipients = await prisma.users({
     where: {
@@ -67,23 +38,25 @@ export const sendOnboardingFirstStepMails = async () => {
     }
   });
 
-  await onboardingEmail(recipients, userMails.onboardingFirstStep);
+  await Promise.all(
+    recipients.map(recipient => {
+      let payload = emailFunction(recipient.email, recipient.name);
+
+      return sendMail(payload);
+    })
+  );
 };
 
-export const sendOnboardingSecondStepMails = async () => {
-  const now = new Date();
-  const inscriptionDateGt = xDaysAgo(now, 3); // 3 days ago
-  const inscriptionDateLt = xDaysAgo(now, 2); // 2 days ago
-  // retrieve users whose account was created 3 days ago
-  let recipients = await prisma.users({
-    where: {
-      AND: [
-        { createdAt_gt: inscriptionDateGt },
-        { createdAt_lt: inscriptionDateLt }
-      ],
-      isActive: true
-    }
-  });
+/**
+ * Send first step onboarding email to active users who suscribed yesterday
+ */
+export const sendOnboardingFirstStepMails = async () => {
+  await sendOnboardingEmails(1, userMails.onboardingFirstStep);
+};
 
-  await onboardingEmail(recipients, userMails.onboardingSecondStep);
+/**
+ * Send second step onboarding email to active users who suscribed 3 days ago
+ */
+export const sendOnboardingSecondStepMails = async () => {
+  await sendOnboardingEmails(3, userMails.onboardingSecondStep);
 };
