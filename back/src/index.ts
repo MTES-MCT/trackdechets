@@ -36,6 +36,7 @@ const sentryMiddleware = () =>
       environment: process.env.NODE_ENV,
       integrations: [new CaptureConsole({ levels: ["error"] })]
     },
+    forwardErrors: true,
     withScope: (scope, error, context: any) => {
       scope.setExtra("body", context.request.body);
       scope.setExtra("origin", context.request.headers.origin);
