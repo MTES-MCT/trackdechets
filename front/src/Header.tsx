@@ -39,15 +39,6 @@ export default withRouter(function Header({ history }) {
                 Partenaires
               </NavLink>
             </li>
-            {/* <li className="nav__item">
-              <NavLink
-                to="/search"
-                activeClassName="active"
-                onClick={() => trackEvent("navbar", "check-presta")}
-              >
-                Vérification prestataire
-              </NavLink>
-            </li> */}
             {localAuthService.isAuthenticated ? (
               <React.Fragment>
                 <li className="nav__item">
