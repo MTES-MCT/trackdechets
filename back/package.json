@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "update": "ts-node prisma/scripts/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "onboard": "ts-node src/commands/send_onboarding_emails.ts"
   },
   "keywords": [],
   "author": "",

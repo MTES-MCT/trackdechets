@@ -1,7 +1,12 @@
 import { escape } from "querystring";
 import { Form } from "../generated/prisma-client";
 
-const { UI_HOST, VIRTUAL_HOST, DOC_HOST } = process.env;
+const {
+  UI_HOST,
+  VIRTUAL_HOST,
+  MJ_FIRST_ONBOARDING_TEMPLATE_ID,
+  MJ_SECOND_ONBOARDING_TEMPLATE_ID
+} = process.env;
 
 export const userMails = {
   onSignup: (user, activationHash) => ({
@@ -130,5 +135,21 @@ export const userMails = {
     <br><br>
     <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
     attachment: attachment
+  }),
+  onboardingFirstStep: (toEmail, toName) => ({
+    toEmail,
+    toName,
+    subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
+    title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
+    body: "_",
+    templateId: parseInt(MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10)
+  }),
+  onboardingSecondStep: (toEmail, toName) => ({
+    toEmail,
+    toName,
+    subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
+    title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
+    body: "_",
+    templateId: parseInt(MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10)
   })
 };
