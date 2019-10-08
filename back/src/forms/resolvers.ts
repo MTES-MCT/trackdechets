@@ -192,12 +192,18 @@ export default {
       return unflattenObjectFromDb(newForm);
     },
     markAsSealed: async (parent, { id }, context: Context) => {
-      const form = await context.prisma.form({ id });
-      const isValid = await formSchema.isValid(unflattenObjectFromDb(form));
+      const dbForm = await context.prisma.form({ id });
+      const formattedForm = unflattenObjectFromDb(dbForm);
+      const isValid = await formSchema.isValid(formattedForm);
 
       if (!isValid) {
+        const errors: string[] = await formSchema
+          .validate(formattedForm, { abortEarly: false })
+          .catch(err => err.errors);
         throw new Error(
-          `Erreur, le bordereau contient des champs obligatoires non renseignés. Ils apparaitront en rouge lorsque vous <a href="/form/${id}">éditez le formulaire</a>.`
+          `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés. Erreur(s): ${errors.join(
+            " // "
+          )}`
         );
       }
 
@@ -210,7 +216,7 @@ export default {
       return context.prisma.updateForm({
         where: { id },
         data: {
-          status: getNextStep(form, sirets)
+          status: getNextStep(dbForm, sirets)
         }
       });
     },
