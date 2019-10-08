@@ -1,5 +1,6 @@
 import { escape } from "querystring";
 import { Form } from "../generated/prisma-client";
+import { cleanupSpecialChars, toFrFormat } from "../common/mails.helper";
 
 const { UI_HOST, VIRTUAL_HOST, DOC_HOST } = process.env;
 
@@ -98,35 +99,35 @@ export const userMails = {
   formNotAccepted: (toEmail, toName, form: Form, attachment) => ({
     toEmail,
     toName,
-    subject: "Refus de prise en  charge de votre déchet",
-    title: "Un de vos déchet a été refusé à l'arrivée",
+    subject: "Refus de prise en charge de votre déchet",
+    title: "Refus de prise en charge de votre déchet",
     body: `Madame, Monsieur,
     <br><br>
-    Nous vous informons que la société ${
+    Nous vous informons que la société ${cleanupSpecialChars(
       form.recipientCompanyName
-    } a refusé le ${new Intl.DateTimeFormat("fr-FR").format(
+    )} a refusé le ${toFrFormat(
       new Date(form.receivedAt)
     )}, le déchet de la société suivante :
     <br><br>
+   
     <ul>
-    <li>Société ${form.emitterCompanyName} - ${form.emitterCompanyAddress}</li>
-    <li>Déchets :</li>
+    <li>${cleanupSpecialChars(form.emitterCompanyName)} - ${
+      form.emitterCompanyAddress
+    }
+    </li>
+    <li>Informations relatives aux déchets refusés :</li>
     <ul>
-      <li>Numéro : ${form.readableId}</li>
+      <li>Numéro du BSD: ${form.readableId}</li>
       <li>Appellation du déchet : ${form.wasteDetailsName}</li>
       <li>Code déchet : ${form.wasteDetailsCode}</li>
       <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
     </ul>
-     <li>Transporteur : ${form.transporterIsExemptedOfReceipt ? "Exemption relevant de l'article R.541-50 du code de l'Environnement" : form.transporterCompanyName}</li>
+     <li>Transporteur : ${form.transporterIsExemptedOfReceipt ? "Exemption relevant de l'article R.541-50 du code de l'Environnement" : cleanupSpecialChars(form.transporterCompanyName)}</li>
      <li>Responsable du site : ${form.sentBy || ""}</li>
      </ul>
      Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
     <br><br>
-    Comme le prévoit la réglementation R541-45 du code de l'environnement, l'expéditeur initial du déchet, l'inspection des installations classées sont tenus informés de ce refus.
-    <br><br>
-    Bien cordialement,
-    <br><br>
-    L'équipe Trackdéchets,
+    Comme le prévoit l'article R541-45 du code de l'environnement, l'expéditeur initial du déchet et l'inspection des installations classées sont tenus informés de ce refus.
     <br><br>
     <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
     attachment: attachment
