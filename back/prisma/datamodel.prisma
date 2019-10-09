@@ -7,7 +7,6 @@ type User {
   phone: String
   userType: Json
 
-  companies: [Company] @relation(name: "UserCompanies")
   companyAssociations: [CompanyAssociation]
 
   createdAt: DateTime! @createdAt
