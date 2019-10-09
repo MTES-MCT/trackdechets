@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<UserType /> UserType renders correctly 1`] = `
+<fieldset
+  class="my-field-fieldset"
+>
+  <div>
+    <label
+      style="display: inline-block;"
+    >
+      <input
+        name="my-field"
+        type="checkbox"
+        value="PRODUCER"
+      />
+      Producteur de déchets
+      <br />
+    </label>
+  </div>
+  <div>
+    <label
+      style="display: inline-block;"
+    >
+      <input
+        name="my-field"
+        type="checkbox"
+        value="COLLECTOR"
+      />
+      Installation de Transit, regroupement ou tri de déchets
+      <br />
+    </label>
+    <span
+      class="tooltip__container"
+    >
+      <span
+        class="tooltip__trigger"
+        role="button"
+      >
+        <img
+          alt="Aide"
+          height="32"
+          src="disposal-icon.jpg"
+        />
+      </span>
+    </span>
+  </div>
+  <div>
+    <label
+      style="display: inline-block;"
+    >
+      <input
+        name="my-field"
+        type="checkbox"
+        value="WASTE_CENTER"
+      />
+      Installation de collecte de déchets apportés par le producteur initial
+      <br />
+    </label>
+    <span
+      class="tooltip__container"
+    >
+      <span
+        class="tooltip__trigger"
+        role="button"
+      >
+        <img
+          alt="Aide"
+          height="32"
+          src="disposal-icon.jpg"
+        />
+      </span>
+    </span>
+  </div>
+  <div>
+    <label
+      style="display: inline-block;"
+    >
+      <input
+        name="my-field"
+        type="checkbox"
+        value="WASTE_VEHICLES"
+      />
+      Installation d'entreposage, dépollution, démontage, découpage de VHU
+      <br />
+    </label>
+    <span
+      class="tooltip__container"
+    >
+      <span
+        class="tooltip__trigger"
+        role="button"
+      >
+        <img
+          alt="Aide"
+          height="32"
+          src="disposal-icon.jpg"
+        />
+      </span>
+    </span>
+  </div>
+  <div>
+    <label
+      style="display: inline-block;"
+    >
+      <input
+        name="my-field"
+        type="checkbox"
+        value="WASTEPROCESSOR"
+      />
+      Installation de traitement
+      <br />
+    </label>
+  </div>
+  <div>
+    <label
+      style="display: inline-block;"
+    >
+      <input
+        name="my-field"
+        type="checkbox"
+        value="TRANSPORTER"
+      />
+      Transporteur
+      <br />
+    </label>
+    <span
+      class="tooltip__container"
+    >
+      <span
+        class="tooltip__trigger"
+        role="button"
+      >
+        <img
+          alt="Aide"
+          height="32"
+          src="disposal-icon.jpg"
+        />
+      </span>
+    </span>
+  </div>
+  <div>
+    <label
+      style="display: inline-block;"
+    >
+      <input
+        name="my-field"
+        type="checkbox"
+        value="TRADER"
+      />
+      Négociant
+      <br />
+    </label>
+    <span
+      class="tooltip__container"
+    >
+      <span
+        class="tooltip__trigger"
+        role="button"
+      >
+        <img
+          alt="Aide"
+          height="32"
+          src="disposal-icon.jpg"
+        />
+      </span>
+    </span>
+  </div>
+</fieldset>
+`;

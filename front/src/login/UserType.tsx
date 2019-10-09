@@ -44,6 +44,7 @@ export default function UserType({
   label,
   ...props
 }: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
+
   return (
     <FieldArray
       name={name}
