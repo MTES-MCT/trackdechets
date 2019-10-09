@@ -1,29 +1,42 @@
-import { string, object, date, number, array, boolean } from "yup";
+import { string, object, date, number, array, boolean, setLocale, LocaleObject } from "yup";
 
-const companySchema = object().shape({
-  name: string().required(),
-  siret: string().required(
-    "La sélection d'une entreprise par SIRET est obligatoire"
-  ),
-  address: string().required(),
-  contact: string().required("Le contact dans l'entreprise est obligatoire"),
-  phone: string().required("Le téléphone de l'entreprise est obligatoire"),
-  mail: string().required("L'email de l'entreprise est obligatoire")
-});
+setLocale({
+  mixed: {
+    default: '${path} est invalide',
+    required: '${path} est un champ requis et doit avoir une valeur',
+    notType: "${path} ne peut pas être null"
+  },
+} as LocaleObject);
+
+const companySchema = (type: string) =>
+  object().shape({
+    name: string().required(),
+    siret: string().required(
+      `${type}: La sélection d'une entreprise par SIRET est obligatoire`
+    ),
+    address: string().required(),
+    contact: string().required(
+      `${type}: Le contact dans l'entreprise est obligatoire`
+    ),
+    phone: string().required(
+      `${type}: Le téléphone de l'entreprise est obligatoire`
+    ),
+    mail: string().required(`${type}: L'email de l'entreprise est obligatoire`)
+  });
 
 const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
 
-export const formSchema = object().shape({
+export const formSchema = object<any>().shape({
   id: string().required(),
   emitter: object().shape({
     type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
     pickupSite: string().nullable(true),
-    company: companySchema
+    company: companySchema("Émetteur")
   }),
   recipient: object().shape({
     processingOperation: string().required(),
     cap: string().nullable(true),
-    company: companySchema
+    company: companySchema("Destinataire")
   }),
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(true),
@@ -45,7 +58,7 @@ export const formSchema = object().shape({
     ),
     validityLimit: date().nullable(true),
     numberPlate: string().nullable(true),
-    company: companySchema
+    company: companySchema("Transporteur")
   }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
