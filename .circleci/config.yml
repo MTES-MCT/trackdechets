@@ -57,7 +57,7 @@ jobs:
             ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
             docker-compose pull
             docker-compose up -d
-            docker exec $(docker ps -qf "name=td-api") npx prisma deploy"
+            docker exec $(docker ps -qf 'name=td-api') npx prisma deploy"
 
   deploy-validation:
     machine:
@@ -70,7 +70,7 @@ jobs:
             git pull
             docker-compose -f docker-compose.val.yml build
             docker-compose -f docker-compose.val.yml up -d
-            docker exec $(docker ps -qf "name=td-api") npx prisma deploy"
+            docker exec $(docker ps -qf 'name=td-api') npx prisma deploy"
 
 workflows:
   build-and-deploy:
