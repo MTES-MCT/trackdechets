@@ -82,7 +82,7 @@ export default function SlipActions({ form, currentUser }: IProps) {
                   )}
                   {error && (
                     <div
-                      className="notification error"
+                      className="notification error action-error"
                       dangerouslySetInnerHTML={{
                         __html: error.graphQLErrors[0].message
                       }}
