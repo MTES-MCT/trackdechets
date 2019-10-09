@@ -306,7 +306,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                               onBlur={async ev => {
                                 ev.persist();
 
-                                const siret = ev.target.value;
+                                const siret = ev.target.value.replace(/\s/g, '');
 
                                 if (siret.length == 14) {
                                   let company_ = null;
@@ -347,9 +347,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                         return self.indexOf(value) === index;
                                       }
                                     );
-                                    form.setFieldValue("userType", userType);
-                                  } else {
-                                    form.setFieldValue("userType", []);
+                                    const currentValue = form.values.userType
+                                    form.setFieldValue("userType", [...currentValue, ...userType]);
                                   }
                                 }
 
