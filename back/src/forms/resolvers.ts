@@ -201,8 +201,8 @@ export default {
           .validate(formattedForm, { abortEarly: false })
           .catch(err => err.errors);
         throw new Error(
-          `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés. Erreur(s): ${errors.join(
-            " // "
+          `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${errors.join(
+            "\n"
           )}`
         );
       }
