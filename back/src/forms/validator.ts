@@ -31,7 +31,7 @@ export const formSchema = object<any>().shape({
   emitter: object().shape({
     type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
     pickupSite: string().nullable(true),
-    company: companySchema("Emétteur")
+    company: companySchema("Émetteur")
   }),
   recipient: object().shape({
     processingOperation: string().required(),
