@@ -32,6 +32,7 @@ export const GET_FORM = gql`
         }
       }
       transporter {
+        isExemptedOfReceipt
         receipt
         department
         validityLimit

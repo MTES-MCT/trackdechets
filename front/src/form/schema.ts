@@ -4,8 +4,10 @@ import {
   date,
   number,
   array,
+  boolean,
   setLocale,
-  LocaleObject
+  LocaleObject,
+  StringSchema
 } from "yup";
 
 setLocale({
@@ -49,11 +51,22 @@ export const formSchema = object().shape({
     company: companySchema
   }),
   transporter: object().shape({
-    receipt: string().required(
-      "Le numéro de récépissé du transporteur est obligatoire"
+    isExemptedOfReceipt: boolean().nullable(true),
+    receipt: string().when(
+      "isExemptedOfReceipt",
+      (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+        isExemptedOfReceipt
+          ? schema.nullable(true)
+          : schema.required(
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+            )
     ),
-    department: string().required(
-      "Le département du transporteur est obligatoire"
+    department: string().when(
+      "isExemptedOfReceipt",
+      (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+        isExemptedOfReceipt
+          ? schema.nullable(true)
+          : schema.required("Le département du transporteur est obligatoire")
     ),
     validityLimit: date().nullable(true),
     numberPlate: string().nullable(true),

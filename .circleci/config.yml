@@ -54,14 +54,10 @@ jobs:
           name: Deploy Over SSH
           command: |
             scp docker-compose.yml ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-postgres:latest"
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-api:latest"
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-ui:latest"
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-pdf:latest"
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-insee:latest"
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-mail:latest"
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "docker pull betagouv/trackdechets-etl:latest"
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/ ; docker-compose up -d"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
+            docker-compose pull
+            docker-compose up -d
+            docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
 
   deploy-validation:
     machine:
@@ -73,7 +69,8 @@ jobs:
             ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/
             git pull
             docker-compose -f docker-compose.val.yml build
-            docker-compose -f docker-compose.val.yml up -d"
+            docker-compose -f docker-compose.val.yml up -d
+            docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
 
 workflows:
   build-and-deploy:
