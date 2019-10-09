@@ -53,6 +53,9 @@ export class Wizard extends React.Component<Props, State> {
     const { page, values } = this.state;
     const activePage: any = React.Children.toArray(children)[page];
     const isLastPage = page === React.Children.count(children) - 1;
+    const formProps = activePage.props.formClassName
+      ? { className: activePage.props.formClassName }
+      : {};
     return (
       <React.Fragment>
         <ul className="step-header">
@@ -74,7 +77,7 @@ export class Wizard extends React.Component<Props, State> {
             validate={this.validate}
             onSubmit={this.handleSubmit}
             render={({ isSubmitting, handleSubmit }) => (
-              <Form>
+              <Form {...formProps}>
                 {activePage}
                 <div className="buttons">
                   {page > 0 && (
