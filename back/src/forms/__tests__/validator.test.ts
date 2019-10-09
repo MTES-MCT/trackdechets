@@ -51,7 +51,66 @@ const form = {
   }
 };
 
-test("Validate form schema", async () => {
-  const isValid = await formSchema.isValid(form);
-  expect(isValid).toEqual(true);
+describe("Form is valid", () => {
+  test("when fully filled", async () => {
+    const isValid = await formSchema.isValid({ ...form });
+    expect(isValid).toEqual(true);
+  });
+
+  test("with empty strings for optionnal fields", async () => {
+    const testForm = {
+      ...form,
+      emitter: { ...form.emitter, pickupSite: "" },
+      recipient: { ...form.recipient, cap: "" },
+      transporter: { ...form.transporter, numberPlate: "" }
+    };
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test("with null values for optionnal fields", async () => {
+    const testForm = {
+      ...form,
+      emitter: { ...form.emitter, pickupSite: null },
+      recipient: { ...form.recipient, cap: null },
+      transporter: {
+        ...form.transporter,
+        validityLimit: null,
+        numberPlate: null
+      }
+    };
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test("with R.541-50 ticked and no transportation infos", async () => {
+    const testForm = {
+      ...form,
+      transporter: {
+        ...form.transporter,
+        isExemptedOfReceipt: true,
+        receipt: null,
+        department: null
+      }
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+});
+
+describe("Form is not valid", () => {
+  test("when there is no receipt exemption and no receipt", async () => {
+    const testForm = {
+      ...form,
+      transporter: {
+        ...form.transporter,
+        isExemptedOfReceipt: false,
+        receipt: null
+      }
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(false);
+  });
 });

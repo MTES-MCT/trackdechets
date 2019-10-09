@@ -861,6 +861,7 @@ type Form {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -934,6 +935,7 @@ input FormCreateInput {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -1059,6 +1061,8 @@ enum FormOrderByInput {
   transporterCompanyPhone_DESC
   transporterCompanyMail_ASC
   transporterCompanyMail_DESC
+  transporterIsExemptedOfReceipt_ASC
+  transporterIsExemptedOfReceipt_DESC
   transporterReceipt_ASC
   transporterReceipt_DESC
   transporterDepartment_ASC
@@ -1148,6 +1152,7 @@ type FormPreviousValues {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -1673,6 +1678,8 @@ input FormScalarWhereInput {
   transporterCompanyMail_not_starts_with: String
   transporterCompanyMail_ends_with: String
   transporterCompanyMail_not_ends_with: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterIsExemptedOfReceipt_not: Boolean
   transporterReceipt: String
   transporterReceipt_not: String
   transporterReceipt_in: [String!]
@@ -1987,6 +1994,7 @@ input FormUpdateDataInput {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -2053,6 +2061,7 @@ input FormUpdateInput {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -2118,6 +2127,7 @@ input FormUpdateManyDataInput {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -2194,6 +2204,7 @@ input FormUpdateManyMutationInput {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime
@@ -2748,6 +2759,8 @@ input FormWhereInput {
   transporterCompanyMail_not_starts_with: String
   transporterCompanyMail_ends_with: String
   transporterCompanyMail_not_ends_with: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterIsExemptedOfReceipt_not: Boolean
   transporterReceipt: String
   transporterReceipt_not: String
   transporterReceipt_in: [String!]

@@ -70,6 +70,7 @@ input RecipientInput {
 }
 
 input TransporterInput {
+  isExemptedOfReceipt: Boolean
   receipt: String
   department: String
   validityLimit: DateTime
