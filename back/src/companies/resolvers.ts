@@ -25,11 +25,6 @@ export default {
     }
   },
   Company: {
-    name: async parent => {
-      // TODO find out why removing this field
-      // causes a compilation error in recette
-      return parent.name;
-    },
     latitude: parent => {
       return parent.latitude ? parseFloat(parent.latitude) : null;
     },
