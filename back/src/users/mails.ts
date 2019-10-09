@@ -117,7 +117,7 @@ export const userMails = {
       <li>Code déchet : ${form.wasteDetailsCode}</li>
       <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
     </ul>
-     <li>Transporteur : ${form.transporterCompanyName}</li>
+     <li>Transporteur : ${form.transporterIsExemptedOfReceipt ? "Exemption relevant de l'article R.541-50 du code de l'Environnement" : form.transporterCompanyName}</li>
      <li>Responsable du site : ${form.sentBy || ""}</li>
      </ul>
      Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
