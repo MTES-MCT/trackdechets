@@ -22,7 +22,7 @@ const Tooltip = ({ msg }: Props) => {
         <img src="disposal-icon.jpg" height="32" alt="Aide" />
       </span>
 
-      {display ? <p className="tooltip__content"> {msg} </p> : null}
+      {display && <p className="tooltip__content"> {msg} </p>}
     </span>
   ) : null;
 };
