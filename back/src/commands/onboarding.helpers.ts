@@ -50,13 +50,13 @@ export const sendOnboardingEmails = async (daysAgo: number, emailFunction) => {
 /**
  * Send first step onboarding email to active users who suscribed yesterday
  */
-export const sendOnboardingFirstStepMails = async () => {
-  await sendOnboardingEmails(1, userMails.onboardingFirstStep);
+export const sendOnboardingFirstStepMails = () => {
+  sendOnboardingEmails(1, userMails.onboardingFirstStep);
 };
 
 /**
  * Send second step onboarding email to active users who suscribed 3 days ago
  */
-export const sendOnboardingSecondStepMails = async () => {
-  await sendOnboardingEmails(3, userMails.onboardingSecondStep);
+export const sendOnboardingSecondStepMails = () => {
+  sendOnboardingEmails(3, userMails.onboardingSecondStep);
 };
