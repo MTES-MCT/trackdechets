@@ -57,6 +57,9 @@
     "inlineCss": true
   },
   "devDependencies": {
+    "@testing-library/dom": "^6.6.0",
+    "@testing-library/jest-dom": "^4.1.1",
+    "@testing-library/react": "^9.3.0",
     "@types/graphql": "^14.0.3",
     "@types/jest": "^23.3.9",
     "@types/jwt-decode": "^2.2.1",
@@ -64,8 +67,8 @@
     "@types/node": "^10.12.9",
     "@types/node-fetch": "^2.1.4",
     "@types/rc-tree": "^1.11.2",
-    "@types/react": "^16.7.6",
-    "@types/react-dom": "^16.0.9",
+    "@types/react": "^16.9.5",
+    "@types/react-dom": "^16.9.1",
     "@types/react-lazyload": "^2.5.0",
     "@types/react-router-dom": "^4.3.1",
     "@types/react-tabs": "^2.3.0",

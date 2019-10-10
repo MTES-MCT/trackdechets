@@ -258,6 +258,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               </Wizard.Page>
               <Wizard.Page
                 title="Informations entreprise"
+                formClassName="form--wide"
                 validate={(values: any) => {
                   let errors: any = {};
                   values.siret.replace(/\s/g, "").length !== 14
