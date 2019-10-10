@@ -51,12 +51,6 @@ type Company {
   longitude: Float
   latitude: Float
 
-  # Resolve with BSD
-  # (used in favorites only)
-  contact: String
-  phone: String
-  mail: String
-
   # Resolve from s3ic data from ETL
   installation: Installation
 
@@ -67,11 +61,20 @@ type Company {
   securityCode: Int!
 }
 
+type CompanyFavorite {
+  name: String
+  siret: String
+  address: String
+  contact: String
+  phone: String
+  mail: String
+}
+
 type Query {
   companyInfos(siret: String!): Company
   companyUsers(siret: String!): [CompanyMember]
   searchCompanies(clue: String!, department: Int): [Company]
-  favorites(type: FavoriteType!): [Company]
+  favorites(type: FavoriteType!): [CompanyFavorite]
 }
 
 type Mutation {
