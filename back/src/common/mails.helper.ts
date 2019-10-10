@@ -1,4 +1,5 @@
 import axios from "axios";
+const { MJ_MAIN_TEMPLATE_ID } = process.env;
 
 type Attachment = {
   name: string;
@@ -10,10 +11,14 @@ type Mail = {
   subject: string;
   title: string;
   body: string;
+  templateId?: number;
   attachment?: Attachment;
 };
 
 export function sendMail(mail: Mail) {
+  if (!mail.templateId) {
+    mail.templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
+  }
   return axios
     .post("http://td-mail/send", mail)
     .catch(err =>
