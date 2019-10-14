@@ -55,8 +55,6 @@ type Company {
   createdAt: DateTime!
   updatedAt: DateTime!
   securityCode: Int!
-  admin: User
-  user(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
 }
 
 type CompanyAssociation {
@@ -239,28 +237,11 @@ input CompanyCreateInput {
   gerepId: String
   codeNaf: String
   securityCode: Int!
-  admin: UserCreateOneInput
-  user: UserCreateManyWithoutCompaniesInput
-}
-
-input CompanyCreateManyWithoutUserInput {
-  create: [CompanyCreateWithoutUserInput!]
-  connect: [CompanyWhereUniqueInput!]
 }
 
 input CompanyCreateOneInput {
   create: CompanyCreateInput
   connect: CompanyWhereUniqueInput
-}
-
-input CompanyCreateWithoutUserInput {
-  id: ID
-  siret: String!
-  name: String
-  gerepId: String
-  codeNaf: String
-  securityCode: Int!
-  admin: UserCreateOneInput
 }
 
 type CompanyEdge {
@@ -298,106 +279,6 @@ type CompanyPreviousValues {
   securityCode: Int!
 }
 
-input CompanyScalarWhereInput {
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  siret: String
-  siret_not: String
-  siret_in: [String!]
-  siret_not_in: [String!]
-  siret_lt: String
-  siret_lte: String
-  siret_gt: String
-  siret_gte: String
-  siret_contains: String
-  siret_not_contains: String
-  siret_starts_with: String
-  siret_not_starts_with: String
-  siret_ends_with: String
-  siret_not_ends_with: String
-  name: String
-  name_not: String
-  name_in: [String!]
-  name_not_in: [String!]
-  name_lt: String
-  name_lte: String
-  name_gt: String
-  name_gte: String
-  name_contains: String
-  name_not_contains: String
-  name_starts_with: String
-  name_not_starts_with: String
-  name_ends_with: String
-  name_not_ends_with: String
-  gerepId: String
-  gerepId_not: String
-  gerepId_in: [String!]
-  gerepId_not_in: [String!]
-  gerepId_lt: String
-  gerepId_lte: String
-  gerepId_gt: String
-  gerepId_gte: String
-  gerepId_contains: String
-  gerepId_not_contains: String
-  gerepId_starts_with: String
-  gerepId_not_starts_with: String
-  gerepId_ends_with: String
-  gerepId_not_ends_with: String
-  codeNaf: String
-  codeNaf_not: String
-  codeNaf_in: [String!]
-  codeNaf_not_in: [String!]
-  codeNaf_lt: String
-  codeNaf_lte: String
-  codeNaf_gt: String
-  codeNaf_gte: String
-  codeNaf_contains: String
-  codeNaf_not_contains: String
-  codeNaf_starts_with: String
-  codeNaf_not_starts_with: String
-  codeNaf_ends_with: String
-  codeNaf_not_ends_with: String
-  createdAt: DateTime
-  createdAt_not: DateTime
-  createdAt_in: [DateTime!]
-  createdAt_not_in: [DateTime!]
-  createdAt_lt: DateTime
-  createdAt_lte: DateTime
-  createdAt_gt: DateTime
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  updatedAt_not: DateTime
-  updatedAt_in: [DateTime!]
-  updatedAt_not_in: [DateTime!]
-  updatedAt_lt: DateTime
-  updatedAt_lte: DateTime
-  updatedAt_gt: DateTime
-  updatedAt_gte: DateTime
-  securityCode: Int
-  securityCode_not: Int
-  securityCode_in: [Int!]
-  securityCode_not_in: [Int!]
-  securityCode_lt: Int
-  securityCode_lte: Int
-  securityCode_gt: Int
-  securityCode_gte: Int
-  AND: [CompanyScalarWhereInput!]
-  OR: [CompanyScalarWhereInput!]
-  NOT: [CompanyScalarWhereInput!]
-}
-
 type CompanySubscriptionPayload {
   mutation: MutationType!
   node: Company
@@ -422,21 +303,9 @@ input CompanyUpdateDataInput {
   gerepId: String
   codeNaf: String
   securityCode: Int
-  admin: UserUpdateOneInput
-  user: UserUpdateManyWithoutCompaniesInput
 }
 
 input CompanyUpdateInput {
-  siret: String
-  name: String
-  gerepId: String
-  codeNaf: String
-  securityCode: Int
-  admin: UserUpdateOneInput
-  user: UserUpdateManyWithoutCompaniesInput
-}
-
-input CompanyUpdateManyDataInput {
   siret: String
   name: String
   gerepId: String
@@ -452,23 +321,6 @@ input CompanyUpdateManyMutationInput {
   securityCode: Int
 }
 
-input CompanyUpdateManyWithoutUserInput {
-  create: [CompanyCreateWithoutUserInput!]
-  delete: [CompanyWhereUniqueInput!]
-  connect: [CompanyWhereUniqueInput!]
-  set: [CompanyWhereUniqueInput!]
-  disconnect: [CompanyWhereUniqueInput!]
-  update: [CompanyUpdateWithWhereUniqueWithoutUserInput!]
-  upsert: [CompanyUpsertWithWhereUniqueWithoutUserInput!]
-  deleteMany: [CompanyScalarWhereInput!]
-  updateMany: [CompanyUpdateManyWithWhereNestedInput!]
-}
-
-input CompanyUpdateManyWithWhereNestedInput {
-  where: CompanyScalarWhereInput!
-  data: CompanyUpdateManyDataInput!
-}
-
 input CompanyUpdateOneRequiredInput {
   create: CompanyCreateInput
   update: CompanyUpdateDataInput
@@ -476,29 +328,9 @@ input CompanyUpdateOneRequiredInput {
   connect: CompanyWhereUniqueInput
 }
 
-input CompanyUpdateWithoutUserDataInput {
-  siret: String
-  name: String
-  gerepId: String
-  codeNaf: String
-  securityCode: Int
-  admin: UserUpdateOneInput
-}
-
-input CompanyUpdateWithWhereUniqueWithoutUserInput {
-  where: CompanyWhereUniqueInput!
-  data: CompanyUpdateWithoutUserDataInput!
-}
-
 input CompanyUpsertNestedInput {
   update: CompanyUpdateDataInput!
   create: CompanyCreateInput!
-}
-
-input CompanyUpsertWithWhereUniqueWithoutUserInput {
-  where: CompanyWhereUniqueInput!
-  update: CompanyUpdateWithoutUserDataInput!
-  create: CompanyCreateWithoutUserInput!
 }
 
 input CompanyWhereInput {
@@ -596,10 +428,6 @@ input CompanyWhereInput {
   securityCode_lte: Int
   securityCode_gt: Int
   securityCode_gte: Int
-  admin: UserWhereInput
-  user_every: UserWhereInput
-  user_some: UserWhereInput
-  user_none: UserWhereInput
   AND: [CompanyWhereInput!]
   OR: [CompanyWhereInput!]
   NOT: [CompanyWhereInput!]
@@ -3901,7 +3729,6 @@ type User {
   name: String
   phone: String
   userType: Json
-  companies(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Company!]
   companyAssociations(where: CompanyAssociationWhereInput, orderBy: CompanyAssociationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CompanyAssociation!]
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -4222,13 +4049,7 @@ input UserCreateInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyCreateManyWithoutUserInput
   companyAssociations: CompanyAssociationCreateManyWithoutUserInput
-}
-
-input UserCreateManyWithoutCompaniesInput {
-  create: [UserCreateWithoutCompaniesInput!]
-  connect: [UserWhereUniqueInput!]
 }
 
 input UserCreateOneInput {
@@ -4241,17 +4062,6 @@ input UserCreateOneWithoutCompanyAssociationsInput {
   connect: UserWhereUniqueInput
 }
 
-input UserCreateWithoutCompaniesInput {
-  id: ID
-  isActive: Boolean
-  email: String!
-  password: String!
-  name: String
-  phone: String
-  userType: Json
-  companyAssociations: CompanyAssociationCreateManyWithoutUserInput
-}
-
 input UserCreateWithoutCompanyAssociationsInput {
   id: ID
   isActive: Boolean
@@ -4260,7 +4070,6 @@ input UserCreateWithoutCompanyAssociationsInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyCreateManyWithoutUserInput
 }
 
 type UserEdge {
@@ -4306,100 +4115,6 @@ enum UserRole {
   ADMIN
 }
 
-input UserScalarWhereInput {
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  isActive: Boolean
-  isActive_not: Boolean
-  email: String
-  email_not: String
-  email_in: [String!]
-  email_not_in: [String!]
-  email_lt: String
-  email_lte: String
-  email_gt: String
-  email_gte: String
-  email_contains: String
-  email_not_contains: String
-  email_starts_with: String
-  email_not_starts_with: String
-  email_ends_with: String
-  email_not_ends_with: String
-  password: String
-  password_not: String
-  password_in: [String!]
-  password_not_in: [String!]
-  password_lt: String
-  password_lte: String
-  password_gt: String
-  password_gte: String
-  password_contains: String
-  password_not_contains: String
-  password_starts_with: String
-  password_not_starts_with: String
-  password_ends_with: String
-  password_not_ends_with: String
-  name: String
-  name_not: String
-  name_in: [String!]
-  name_not_in: [String!]
-  name_lt: String
-  name_lte: String
-  name_gt: String
-  name_gte: String
-  name_contains: String
-  name_not_contains: String
-  name_starts_with: String
-  name_not_starts_with: String
-  name_ends_with: String
-  name_not_ends_with: String
-  phone: String
-  phone_not: String
-  phone_in: [String!]
-  phone_not_in: [String!]
-  phone_lt: String
-  phone_lte: String
-  phone_gt: String
-  phone_gte: String
-  phone_contains: String
-  phone_not_contains: String
-  phone_starts_with: String
-  phone_not_starts_with: String
-  phone_ends_with: String
-  phone_not_ends_with: String
-  createdAt: DateTime
-  createdAt_not: DateTime
-  createdAt_in: [DateTime!]
-  createdAt_not_in: [DateTime!]
-  createdAt_lt: DateTime
-  createdAt_lte: DateTime
-  createdAt_gt: DateTime
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  updatedAt_not: DateTime
-  updatedAt_in: [DateTime!]
-  updatedAt_not_in: [DateTime!]
-  updatedAt_lt: DateTime
-  updatedAt_lte: DateTime
-  updatedAt_gt: DateTime
-  updatedAt_gte: DateTime
-  AND: [UserScalarWhereInput!]
-  OR: [UserScalarWhereInput!]
-  NOT: [UserScalarWhereInput!]
-}
-
 type UserSubscriptionPayload {
   mutation: MutationType!
   node: User
@@ -4425,7 +4140,6 @@ input UserUpdateDataInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyUpdateManyWithoutUserInput
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
 }
 
@@ -4436,17 +4150,7 @@ input UserUpdateInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyUpdateManyWithoutUserInput
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
-}
-
-input UserUpdateManyDataInput {
-  isActive: Boolean
-  email: String
-  password: String
-  name: String
-  phone: String
-  userType: Json
 }
 
 input UserUpdateManyMutationInput {
@@ -4456,32 +4160,6 @@ input UserUpdateManyMutationInput {
   name: String
   phone: String
   userType: Json
-}
-
-input UserUpdateManyWithoutCompaniesInput {
-  create: [UserCreateWithoutCompaniesInput!]
-  delete: [UserWhereUniqueInput!]
-  connect: [UserWhereUniqueInput!]
-  set: [UserWhereUniqueInput!]
-  disconnect: [UserWhereUniqueInput!]
-  update: [UserUpdateWithWhereUniqueWithoutCompaniesInput!]
-  upsert: [UserUpsertWithWhereUniqueWithoutCompaniesInput!]
-  deleteMany: [UserScalarWhereInput!]
-  updateMany: [UserUpdateManyWithWhereNestedInput!]
-}
-
-input UserUpdateManyWithWhereNestedInput {
-  where: UserScalarWhereInput!
-  data: UserUpdateManyDataInput!
-}
-
-input UserUpdateOneInput {
-  create: UserCreateInput
-  update: UserUpdateDataInput
-  upsert: UserUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-  connect: UserWhereUniqueInput
 }
 
 input UserUpdateOneRequiredInput {
@@ -4498,16 +4176,6 @@ input UserUpdateOneRequiredWithoutCompanyAssociationsInput {
   connect: UserWhereUniqueInput
 }
 
-input UserUpdateWithoutCompaniesDataInput {
-  isActive: Boolean
-  email: String
-  password: String
-  name: String
-  phone: String
-  userType: Json
-  companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
-}
-
 input UserUpdateWithoutCompanyAssociationsDataInput {
   isActive: Boolean
   email: String
@@ -4515,12 +4183,6 @@ input UserUpdateWithoutCompanyAssociationsDataInput {
   name: String
   phone: String
   userType: Json
-  companies: CompanyUpdateManyWithoutUserInput
-}
-
-input UserUpdateWithWhereUniqueWithoutCompaniesInput {
-  where: UserWhereUniqueInput!
-  data: UserUpdateWithoutCompaniesDataInput!
 }
 
 input UserUpsertNestedInput {
@@ -4531,12 +4193,6 @@ input UserUpsertNestedInput {
 input UserUpsertWithoutCompanyAssociationsInput {
   update: UserUpdateWithoutCompanyAssociationsDataInput!
   create: UserCreateWithoutCompanyAssociationsInput!
-}
-
-input UserUpsertWithWhereUniqueWithoutCompaniesInput {
-  where: UserWhereUniqueInput!
-  update: UserUpdateWithoutCompaniesDataInput!
-  create: UserCreateWithoutCompaniesInput!
 }
 
 input UserWhereInput {
@@ -4612,9 +4268,6 @@ input UserWhereInput {
   phone_not_starts_with: String
   phone_ends_with: String
   phone_not_ends_with: String
-  companies_every: CompanyWhereInput
-  companies_some: CompanyWhereInput
-  companies_none: CompanyWhereInput
   companyAssociations_every: CompanyAssociationWhereInput
   companyAssociations_some: CompanyAssociationWhereInput
   companyAssociations_none: CompanyAssociationWhereInput
