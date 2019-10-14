@@ -72,7 +72,7 @@ export default {
 
       const users = await context.prisma
         .users({
-          where: { companies_some: { siret: siret } }
+          where: { companyAssociations_some: { company: { siret: siret } } }
         })
         .then(users =>
           users.map(u => ({
