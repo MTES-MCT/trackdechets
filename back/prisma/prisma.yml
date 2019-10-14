@@ -6,9 +6,5 @@ generate:
 
 secret: trackdechets-prisma
 
-hooks:
-  post-deploy:
-    - prisma generate
-
 seed:
   import: seed.graphql

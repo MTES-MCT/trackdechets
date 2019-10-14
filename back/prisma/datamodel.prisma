@@ -58,10 +58,6 @@ type Company {
   updatedAt: DateTime! @updatedAt
 
   securityCode: Int!
-
-  admin: User @relation(name: "CompanyAdmin", link: TABLE)
-
-  user: [User] @relation(name: "UserCompanies")
 }
 
 """
