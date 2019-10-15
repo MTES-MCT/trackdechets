@@ -7,6 +7,7 @@ import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
 import companyResolver from "../companies/resolvers";
 import { getCompanyAdmins, getUserCompanies } from "../companies/helper";
+import { DomainError, ErrorCode } from "../common/errors";
 
 const { JWT_SECRET } = process.env;
 
@@ -102,11 +103,15 @@ export default {
     login: async (parent, { email, password }, context: Context) => {
       const user = await context.prisma.user({ email: email.trim() });
       if (!user) {
-        throw new Error(`Aucun utilisateur trouvé avec l'email ${email}`);
+        throw new DomainError(
+          `Aucun utilisateur trouvé avec l'email ${email}`,
+          ErrorCode.BAD_USER_INPUT
+        );
       }
       if (!user.isActive) {
-        throw new Error(
-          `Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support.`
+        throw new DomainError(
+          `Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support.`,
+          ErrorCode.FORBIDDEN
         );
       }
       const passwordValid = await compare(password, user.password);
