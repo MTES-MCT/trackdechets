@@ -25,6 +25,10 @@ export class DomainError extends Error implements GraphQLError {
   ) {
     super(message);
 
+    // Set the prototype explicitly
+    // cf. https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, DomainError.prototype);
+
     this.extensions = { isDomainError: true, code, ...properties };
   }
 }
