@@ -10,6 +10,10 @@ import {
   alertTypes
 } from "../common/trello";
 import { pdfEmailAttachment } from "../forms/pdf";
+import Dreals from "./dreals";
+
+import axios from "axios";
+import { trimSiret } from "../common/sirets";
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
@@ -100,7 +104,13 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
     )
   );
 }
-
+const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
+/**
+ * When form is declined, send mail to emitter, dreal(s) from emitter and recipient
+ * The relevant forms is attached
+ * Dreal notification can be toggled with NOTIFY_DREAL_WHEN_FORM_DECLINED setting
+ * @param payload
+ */
 async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   if (
     !payload.updatedFields ||
@@ -116,8 +126,38 @@ async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   let attachmentData = await pdfEmailAttachment(payload.node.id);
   const companyAdmins = await getCompanyAdmins(form.emitterCompanySiret);
 
+  const notifyDreals = true;
+
+  // retrieve departments by querying distant api
+  // we can not rely on parsing already stored address zip codes because some french cities
+  // have a zip code not matching their real department
+  const formDepartments = [];
+  for (let field of ["emitterCompanySiret", "recipientCompanySiret"]) {
+    if (!!form[field]) {
+      try {
+        let res = await axios.get(
+          `http://td-insee:81/siret/${trimSiret(form[field])}`
+        );
+
+        if (!!res.data.departement) {
+          formDepartments.push(res.data.departement);
+        }
+      } catch (e) {
+        console.log(
+          `Error while trying to retrieve data for siret: "${form[field]}"`
+        );
+      }
+    }
+  }
+  // get recipients from dreals list
+  const drealsRecipients = Dreals.filter(d => formDepartments.includes(d.Dept));
+
+  // include drealsRecipients if settings says so
+  const recipients = NOTIFY_DREAL_WHEN_FORM_DECLINED
+    ? [...companyAdmins, ...drealsRecipients]
+    : [...companyAdmins];
   return Promise.all(
-    companyAdmins.map(admin => {
+    recipients.map(admin => {
       let payload = userMails.formNotAccepted(
         admin.email,
         admin.name,
