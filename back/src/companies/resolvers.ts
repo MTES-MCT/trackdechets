@@ -13,7 +13,7 @@ import {
   getInstallationDeclarations,
   getCompany
 } from "./helper";
-import { memoizeRequest } from "./cache";
+import { getCachedCompanyInfos } from "./insee";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
@@ -49,7 +49,7 @@ export default {
       if (siret.length < 14) {
         return null;
       }
-      return memoizeRequest(siret);
+      return getCachedCompanyInfos(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
       const companyAdmins = await getCompanyAdmins(siret);
@@ -103,7 +103,7 @@ export default {
         return;
       }
 
-      return [await memoizeRequest(clue)];
+      return [await getCachedCompanyInfos(clue)];
     },
     favorites: async (
       parent,
@@ -156,7 +156,7 @@ export default {
       // If there is no data yet, propose his own companies as favorites
       // We won't have every props populated, but it's a start
       if (!favorites.length) {
-        return Promise.all(userCompanies.map(c => memoizeRequest(c.siret)));
+        return Promise.all(userCompanies.map(c => getCachedCompanyInfos(c.siret)));
       }
 
       return favorites;

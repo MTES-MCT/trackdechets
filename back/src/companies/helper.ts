@@ -1,5 +1,5 @@
 import { prisma, User, Company } from "../generated/prisma-client";
-import { memoizeRequest } from "./cache";
+import { getCachedCompanyInfos } from "./insee";
 
 const companyAssociationUserFragment = `
 fragment CompanyWithAdmins on CompanyAssociation {
@@ -67,7 +67,7 @@ export async function getUserCompanies(userId: string) {
 
   return Promise.all(
     companies.map(company => {
-      return memoizeRequest(company.siret).then(companyInfo => {
+      return getCachedCompanyInfos(company.siret).then(companyInfo => {
         return { ...companyInfo, ...company };
       });
     })
