@@ -267,6 +267,12 @@ const Dreals = [
   {
     DrealRegion: "DREAL Auvergne Rhone Alpes",
     name: "Unité interDépartementale Loire-Haute-Loire",
+    Dept: "42",
+    email: "ud-lhl.dreal-auvergne-rhone-alpes@developpement-durable.gouv.fr"
+  },
+  {
+    DrealRegion: "DREAL Auvergne Rhone Alpes",
+    name: "Unité interDépartementale Loire-Haute-Loire",
     Dept: "43",
     email: "ud-lhl.dreal-auvergne-rhone-alpes@developpement-durable.gouv.fr"
   },
