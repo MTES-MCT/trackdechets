@@ -104,14 +104,14 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
     )
   );
 }
-const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
+
 /**
  * When form is declined, send mail to emitter, dreal(s) from emitter and recipient
  * The relevant forms is attached
  * Dreal notification can be toggled with NOTIFY_DREAL_WHEN_FORM_DECLINED setting
  * @param payload
  */
-async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
+export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   if (
     !payload.updatedFields ||
     !payload.updatedFields.includes("isAccepted") ||
@@ -120,15 +120,14 @@ async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   ) {
     return;
   }
-
   const form = await prisma.form({ id: payload.node.id });
   // build pdf as a base64 string
+  const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
+
   let attachmentData = await pdfEmailAttachment(payload.node.id);
   const companyAdmins = await getCompanyAdmins(form.emitterCompanySiret);
 
-  const notifyDreals = true;
-
-  // retrieve departments by querying distant api
+  // retrieve departments by querying distant api entreprise.data.gouv through td-insee
   // we can not rely on parsing already stored address zip codes because some french cities
   // have a zip code not matching their real department
   const formDepartments = [];
@@ -138,24 +137,26 @@ async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
         let res = await axios.get(
           `http://td-insee:81/siret/${trimSiret(form[field])}`
         );
-
         if (!!res.data.departement) {
           formDepartments.push(res.data.departement);
         }
       } catch (e) {
-        console.log(
+        console.error(
           `Error while trying to retrieve data for siret: "${form[field]}"`
         );
       }
     }
   }
+
   // get recipients from dreals list
   const drealsRecipients = Dreals.filter(d => formDepartments.includes(d.Dept));
 
   // include drealsRecipients if settings says so
-  const recipients = NOTIFY_DREAL_WHEN_FORM_DECLINED
-    ? [...companyAdmins, ...drealsRecipients]
-    : [...companyAdmins];
+  const recipients =
+    NOTIFY_DREAL_WHEN_FORM_DECLINED === "true"
+      ? [...companyAdmins, ...drealsRecipients]
+      : [...companyAdmins];
+
   return Promise.all(
     recipients.map(admin => {
       let payload = userMails.formNotAccepted(
