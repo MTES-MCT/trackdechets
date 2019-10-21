@@ -1,5 +1,6 @@
 import client from "../graphql-client";
 import jwtDecoder from "jwt-decode";
+import { SIRET_STORAGE_KEY } from "../dashboard/CompanySelector";
 
 export const localAuthService = {
   isAuthenticated: false,
@@ -11,6 +12,7 @@ export const localAuthService = {
     this.isAuthenticated = false;
     client.resetStore();
     window.localStorage.removeItem("td-token");
+    window.localStorage.removeItem(SIRET_STORAGE_KEY);
   },
   getToken() {
     if (!this.isAuthenticated) {

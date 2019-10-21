@@ -46,9 +46,20 @@ type UserAccountHash {
   updatedAt: DateTime! @updatedAt
 }
 
+enum CompanyType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+  TRANSPORTER
+  WASTE_VEHICLES
+  WASTE_CENTER
+  TRADER
+}
+
 type Company {
   id: ID! @id
   siret: String! @unique
+  companyTypes: [CompanyType!]! @scalarList(strategy: RELATION)
 
   name: String
   gerepId: String

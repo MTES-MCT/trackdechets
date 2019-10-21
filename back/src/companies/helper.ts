@@ -76,6 +76,6 @@ export async function getUserCompanies(userId: string) {
 
 const companyAssociationCompaniesFragment = `
 fragment AssociationWithCompany on CompanyAssociation {
-  company { id siret securityCode }
+  company { id siret securityCode companyTypes }
 }
 `;

@@ -5,18 +5,25 @@ import { NavLink, match } from "react-router-dom";
 import CompanySelector from "./CompanySelector";
 import useWindowSize from "../utils/use-window-size";
 import { FaBars } from "react-icons/fa";
+import { Company } from "../login/model";
 
 interface IProps {
   me: Me;
   match: match<{}>;
-  setActiveSiret: (s: string) => void;
+  siret: string;
+  handleCompanyChange: (siret: string) => void;
 }
 
 const MEDIA_QUERIES = {
   mobile: 480
 };
 
-export default function DashboardMenu({ me, match, setActiveSiret }: IProps) {
+export default function DashboardMenu({
+  me,
+  match,
+  siret,
+  handleCompanyChange
+}: IProps) {
   const windowSize = useWindowSize();
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
@@ -24,6 +31,11 @@ export default function DashboardMenu({ me, match, setActiveSiret }: IProps) {
   useEffect(() => {
     setIsMobileDevice(windowSize.width < MEDIA_QUERIES.mobile);
   }, [windowSize]);
+
+  const company = me.companies.find((c: Company) => c.siret === siret);
+  const isTransporter = company
+    ? company.companyTypes.indexOf("TRANSPORTER") > -1
+    : false;
 
   return (
     <aside className="dashboard-menu side-menu" role="navigation">
@@ -40,7 +52,13 @@ export default function DashboardMenu({ me, match, setActiveSiret }: IProps) {
           <div className="company-title">
             <h3>{me.name}</h3>
             <p>{me.email}</p>
-            <CompanySelector me={me} setActiveSiret={setActiveSiret} />
+            {me.companies.length > 1 && (
+              <CompanySelector
+                siret={siret}
+                companies={me.companies}
+                handleCompanyChange={handleCompanyChange}
+              />
+            )}
           </div>
           <ul>
             <li>
@@ -48,7 +66,7 @@ export default function DashboardMenu({ me, match, setActiveSiret }: IProps) {
                 Mes bordereaux
               </NavLink>
             </li>
-            {me.userType.indexOf("TRANSPORTER") > -1 && (
+            {isTransporter && (
               <li>
                 <NavLink to={`${match.url}/transport`} activeClassName="active">
                   Transport

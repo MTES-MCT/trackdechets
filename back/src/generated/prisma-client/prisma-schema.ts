@@ -49,6 +49,7 @@ type BatchPayload {
 type Company {
   id: ID!
   siret: String!
+  companyTypes: [CompanyType!]!
   name: String
   gerepId: String
   codeNaf: String
@@ -230,9 +231,14 @@ type CompanyConnection {
   aggregate: AggregateCompany!
 }
 
+input CompanyCreatecompanyTypesInput {
+  set: [CompanyType!]
+}
+
 input CompanyCreateInput {
   id: ID
   siret: String!
+  companyTypes: CompanyCreatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String
@@ -271,6 +277,7 @@ enum CompanyOrderByInput {
 type CompanyPreviousValues {
   id: ID!
   siret: String!
+  companyTypes: [CompanyType!]!
   name: String
   gerepId: String
   codeNaf: String
@@ -297,8 +304,23 @@ input CompanySubscriptionWhereInput {
   NOT: [CompanySubscriptionWhereInput!]
 }
 
+enum CompanyType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+  TRANSPORTER
+  WASTE_VEHICLES
+  WASTE_CENTER
+  TRADER
+}
+
+input CompanyUpdatecompanyTypesInput {
+  set: [CompanyType!]
+}
+
 input CompanyUpdateDataInput {
   siret: String
+  companyTypes: CompanyUpdatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String
@@ -307,6 +329,7 @@ input CompanyUpdateDataInput {
 
 input CompanyUpdateInput {
   siret: String
+  companyTypes: CompanyUpdatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String
@@ -315,6 +338,7 @@ input CompanyUpdateInput {
 
 input CompanyUpdateManyMutationInput {
   siret: String
+  companyTypes: CompanyUpdatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String

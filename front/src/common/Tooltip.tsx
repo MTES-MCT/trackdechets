@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { IconContext } from "react-icons";
+import { FaQuestion } from "react-icons/fa";
 import "./Tooltip.scss";
 
 type Props = {
@@ -19,7 +21,9 @@ const Tooltip = ({ msg }: Props) => {
         onMouseOver={() => setDisplay(true)}
         onMouseLeave={() => setDisplay(false)}
       >
-        <img src="disposal-icon.jpg" height="32" alt="Aide" />
+        <IconContext.Provider value={{ className: "tooltip__icon" }}>
+          <FaQuestion role="icon" />
+        </IconContext.Provider>
       </span>
 
       {display && <p className="tooltip__content"> {msg} </p>}

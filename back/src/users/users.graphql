@@ -9,7 +9,7 @@ input SignupInput {
   name: String!
   phone: String
   siret: String!
-  userType: [UserType]
+  companyTypes: [CompanyType]
   gerepId: String
   codeNaf: String
   companyName: String
@@ -20,7 +20,7 @@ type Mutation {
   login(email: String!, password: String!): AuthPayload!
   changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
   resetPassword(email: String!): Boolean
-  editProfile(name: String!, phone: String!, email: String!, userType: [String]): User
+  editProfile(name: String!, phone: String!, email: String!): User
   inviteUserToCompany(email: String!, siret: String!, role: UserRole!): Boolean
   joinWithInvite(
     inviteHash: String!

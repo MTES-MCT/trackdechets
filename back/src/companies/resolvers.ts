@@ -13,6 +13,7 @@ import {
   getInstallationDeclarations,
   getCompany
 } from "./helper";
+import updateCompany from "./mutations/updateCompany";
 import { memoizeRequest } from "./cache";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
@@ -176,6 +177,7 @@ export default {
           securityCode: randomNumber(4)
         }
       });
-    }
+    },
+    updateCompany
   }
 };
