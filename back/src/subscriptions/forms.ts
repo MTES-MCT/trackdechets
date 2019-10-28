@@ -13,7 +13,7 @@ import { pdfEmailAttachment } from "../forms/pdf";
 import Dreals from "./dreals";
 
 import axios from "axios";
-import { trimSiret } from "../common/sirets";
+import { trim } from "../common/strings";
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
@@ -135,7 +135,7 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
     if (!!form[field]) {
       try {
         let res = await axios.get(
-          `http://td-insee:81/siret/${trimSiret(form[field])}`
+          `http://td-insee:81/siret/${trim(form[field])}`
         );
         if (!!res.data.departement) {
           formDepartments.push(res.data.departement);
