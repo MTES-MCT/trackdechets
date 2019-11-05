@@ -38,8 +38,19 @@ type Installation {
   declarations: [Declaration]
 }
 
+enum CompanyType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+  TRANSPORTER
+  WASTE_VEHICLES
+  WASTE_CENTER
+  TRADER
+}
+
 type Company {
 
+  id: ID!
   siret: String
 
   # Resolve from INSEE
@@ -57,6 +68,7 @@ type Company {
   # Resolve from TD
   isRegistered: Boolean
   admins: [PublicUser]
+  companyTypes: [CompanyType]
 
   securityCode: Int!
 }
@@ -79,6 +91,7 @@ type Query {
 
 type Mutation {
   renewSecurityCode: Int
+  updateCompany(siret: String, companyTypes: [CompanyType]): Company
 }
 
 type CompanyMember {

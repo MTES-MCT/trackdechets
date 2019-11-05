@@ -1,7 +1,8 @@
 import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
 import Tooltip from "../common/Tooltip";
-export const USER_TYPES = [
+
+export const COMPANY_TYPES = [
   { value: "PRODUCER", label: "Producteur de déchets" },
   {
     value: "COLLECTOR",
@@ -38,19 +39,18 @@ export const USER_TYPES = [
   }
 ];
 
-export default function UserType({
+export default function CompanyType({
   field: { name, value },
   id,
   label,
   ...props
 }: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
-
   return (
     <FieldArray
       name={name}
       render={arrayHelpers => (
         <fieldset className={name + "-fieldset"}>
-          {USER_TYPES.map((p, idx) => (
+          {COMPANY_TYPES.map((p, idx) => (
             <div key={idx}>
               <label style={{ display: "inline-block" }} key={p.value}>
                 <input
