@@ -6,8 +6,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { localAuthService } from "../../login/auth.service";
 import { Me } from "../../login/model";
 import EditProfile from "./EditProfile";
-import ImportNewUser from "./InviteNewUser";
-import { USER_TYPES } from "../../login/UserType";
+import Company from "./Company";
 import "./Account.scss";
 import "../../Utils.scss";
 interface IProps {
@@ -33,6 +32,15 @@ export default withRouter(function Account({
     document.execCommand("copy");
   }
 
+  // add isAdmin to company information
+  const companies = me.companies.map(company => {
+    const admins = company.admins.map(a => a.id);
+    const isAdmin = admins.indexOf(me.id) > -1;
+    const c = { ...company, isAdmin };
+    delete c.admins;
+    return c;
+  });
+
   return (
     <div className="main">
       <div className="panel">
@@ -47,13 +55,6 @@ export default withRouter(function Account({
           <br />
           Téléphone: {me.phone}
           <br />
-          Profil de compte:{" "}
-          {me.userType
-            .map(ut => {
-              const obj = USER_TYPES.find(t => t.value === ut);
-              return obj ? obj.label : "";
-            })
-            .join(", ")}
         </p>
         {!showUserForm && (
           <button
@@ -74,24 +75,8 @@ export default withRouter(function Account({
         </button>
 
         <h4>Entreprise(s) associée(s):</h4>
-        {me.companies.map(c => (
-          <div className="panel" key={c.siret}>
-            <div className="company-address">
-              <p className="mb-1">
-                <strong>{c.name}</strong>
-              </p>
-              <p>
-                Numéro SIRET : <strong>{c.siret}</strong>
-              </p>
-              <p>{c.address}</p>
-              <p>
-                Code de sécurité: <strong>{c.securityCode}</strong>
-              </p>
-            </div>
-            {c.admins.find(a => a.id === me.id) && (
-              <ImportNewUser siret={c.siret} me={me} />
-            )}
-          </div>
+        {companies.map((c, idx) => (
+          <Company key={idx} company={c} />
         ))}
 
         <h4>Intégration API</h4>

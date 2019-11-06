@@ -157,5 +157,6 @@ func etablissementToResponse(item Etablissement) Response {
 		item.LibelleActivitePrincipale,
 		item.GeoAdresse,
 		item.Longitude,
-		item.Latitude}
+		item.Latitude,
+		item.Departement}
 }

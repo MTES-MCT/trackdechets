@@ -16,11 +16,13 @@ type mailAttachment struct {
 }
 
 type mail struct {
+	TemplateID int64          `json:"templateId"`
 	ToEmail    string         `json:"toEmail"`
 	ToName     string         `json:"toName"`
 	Subject    string         `json:"subject"`
 	Title      string         `json:"title"`
 	Body       string         `json:"body"`
+	BaseURL    string         `json:"baseUrl"`
 	Attachment mailAttachment `json:"attachment"`
 }
 
@@ -59,7 +61,8 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if data.Body == "" || data.Subject == "" || data.Title == "" || data.ToEmail == "" || data.ToName == "" {
+
+	if data.Body == "" || data.Subject == "" || data.Title == "" || data.ToEmail == "" || data.ToName == "" || data.TemplateID == 0 {
 		msg := fmt.Sprintf("Données manquantes: %v", data)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
@@ -77,12 +80,13 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 		Subject:          data.Subject,
-		TemplateID:       647957,
+		TemplateID:       data.TemplateID,
 		TemplateLanguage: true,
 		Variables: map[string]interface{}{
 			"subject": data.Subject,
 			"title":   data.Title,
 			"body":    data.Body,
+			"baseurl": data.BaseURL,
 		},
 	}
 

@@ -10,7 +10,7 @@ import RedErrorMessage from "../form/RedErrorMessage";
 import StatusErrorMessage from "../form/StatusErrorComponent";
 import { SIGNUP } from "./mutations";
 import "./Signup.scss";
-import UserType from "./UserType";
+import CompanyType from "./CompanyType";
 import { Wizard } from "./Wizard";
 import { FaEnvelope, FaLock, FaPhone, FaIdCard, FaEye } from "react-icons/fa";
 import PasswordMeter from "./PasswordMeter";
@@ -25,7 +25,7 @@ type Values = {
   password: string;
   passwordConfirmation: string;
   siret: string;
-  userType: any[];
+  companyTypes: any[];
   isAllowed: boolean;
   cgu: boolean;
 };
@@ -75,7 +75,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 password: "",
                 passwordConfirmation: "",
                 siret: "",
-                userType: [],
+                companyTypes: [],
                 gerepId: "",
                 codeNaf: "",
                 isAllowed: false,
@@ -258,6 +258,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
               </Wizard.Page>
               <Wizard.Page
                 title="Informations entreprise"
+                formClassName="form--wide"
                 validate={(values: any) => {
                   let errors: any = {};
                   values.siret.replace(/\s/g, "").length !== 14
@@ -306,7 +307,10 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                               onBlur={async ev => {
                                 ev.persist();
 
-                                const siret = ev.target.value;
+                                const siret = ev.target.value.replace(
+                                  /\s/g,
+                                  ""
+                                );
 
                                 if (siret.length == 14) {
                                   let company_ = null;
@@ -337,19 +341,22 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                     company_ ? company_.naf : ""
                                   );
 
-                                  // auto-complete userType
+                                  // auto-complete companyTypes
                                   if (company_ && company_.installation) {
                                     let categories = company_.installation.rubriques
                                       .filter(r => !!r.category) // null blocks form submitting
                                       .map(r => r.category);
-                                    const userType = categories.filter(
+                                    const companyTypes = categories.filter(
                                       (value, index, self) => {
                                         return self.indexOf(value) === index;
                                       }
                                     );
-                                    form.setFieldValue("userType", userType);
-                                  } else {
-                                    form.setFieldValue("userType", []);
+                                    const currentValue =
+                                      form.values.companyTypes;
+                                    form.setFieldValue("companyTypes", [
+                                      ...currentValue,
+                                      ...companyTypes
+                                    ]);
                                   }
                                 }
 
@@ -389,7 +396,7 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 <div className="form__group">
                   <label>
                     Vous êtes*
-                    <Field name="userType" component={UserType} />
+                    <Field name="companyTypes" component={CompanyType} />
                   </label>
                 </div>
 

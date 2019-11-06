@@ -24,6 +24,7 @@ export default {
     }
   },
   transporter: {
+    isExemptedOfReceipt: false,
     receipt: "",
     department: "",
     validityLimit: null,

@@ -7,7 +7,6 @@ type User {
   phone: String
   userType: Json
 
-  companies: [Company] @relation(name: "UserCompanies")
   companyAssociations: [CompanyAssociation]
 
   createdAt: DateTime! @createdAt
@@ -47,9 +46,20 @@ type UserAccountHash {
   updatedAt: DateTime! @updatedAt
 }
 
+enum CompanyType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+  TRANSPORTER
+  WASTE_VEHICLES
+  WASTE_CENTER
+  TRADER
+}
+
 type Company {
   id: ID! @id
   siret: String! @unique
+  companyTypes: [CompanyType!]! @scalarList(strategy: RELATION)
 
   name: String
   gerepId: String
@@ -59,10 +69,6 @@ type Company {
   updatedAt: DateTime! @updatedAt
 
   securityCode: Int!
-
-  admin: User @relation(name: "CompanyAdmin", link: TABLE)
-
-  user: [User] @relation(name: "UserCompanies")
 }
 
 """
@@ -203,6 +209,7 @@ type Form {
   transporterCompanyContact: String
   transporterCompanyPhone: String
   transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
   transporterReceipt: String
   transporterDepartment: String
   transporterValidityLimit: DateTime

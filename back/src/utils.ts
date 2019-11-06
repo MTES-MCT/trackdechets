@@ -11,6 +11,12 @@ interface Context {
   request: any;
 }
 
+/** DEPRECATED !
+ * We should get userId directly from the context
+ * => const userId = context.user.id
+ * To be used in conjunction with permission isAuthenticated
+ * to ensure user is not null
+ */
 export function getUserId(context: Context) {
   const Authorization = context.request.get("Authorization");
   if (Authorization) {
@@ -45,16 +51,21 @@ export async function currentUserBelongsToCompanyAdmins(
 }
 
 export function randomNumber(length: number = 4) {
-  const basis = Math.pow(10, length - 1)
-  return Math.floor(basis + Math.random() * 9 * basis)
+  const basis = Math.pow(10, length - 1);
+  return Math.floor(basis + Math.random() * 9 * basis);
 }
 
-export const merge = (target, source) => {
-  for (let key of Object.keys(source)) {
-    if (source[key] instanceof Object)
-      Object.assign(source[key], merge(target[key], source[key]));
-  }
+/**
+ * Merge a list of graphql-shield permissions
+ * @param permissions
+ */
+export function mergePermissions(permissions) {
+  const merge = (r1, r2) => {
+    return {
+      Query: { ...r1.Query, ...r2.Query },
+      Mutation: { ...r1.Mutation, ...r2.Mutation }
+    };
+  };
 
-  Object.assign(target || {}, source);
-  return target;
-};
+  return permissions.reduce((prev, cur) => merge(prev, cur));
+}

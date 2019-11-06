@@ -166,6 +166,8 @@ type Recipient {
 type Transporter {
   company: FormCompany
 
+  isExemptedOfReceipt: Boolean
+
   receipt: String
   department: String
   validityLimit: DateTime

@@ -57,6 +57,10 @@ services:
       TRELLO_API_KEY: $TRELLO_API_KEY
       TRELLO_TOKEN: $TRELLO_TOKEN
       TRELLO_ALERTS_LIST_ID: $TRELLO_ALERTS_LIST_ID
+      MJ_MAIN_TEMPLATE_ID: $MJ_MAIN_TEMPLATE_ID
+      MJ_FIRST_ONBOARDING_TEMPLATE_ID: $MJ_FIRST_ONBOARDING_TEMPLATE_ID
+      MJ_SECOND_ONBOARDING_TEMPLATE_ID: $MJ_SECOND_ONBOARDING_TEMPLATE_ID
+      NOTIFY_DREAL_WHEN_FORM_DECLINED: $NOTIFY_DREAL_WHEN_FORM_DECLINED
 
   td-ui:
     image: node:10.14-alpine
@@ -65,8 +69,6 @@ services:
     expose:
       - "3000"
     environment:
-      REACT_APP_API_ENDPOINT: http://$API_HOST
-      REACT_APP_HOSTNAME: http://$UI_HOST
       VIRTUAL_HOST: $UI_HOST
       VIRTUAL_PORT: 3000
       LETSENCRYPT_HOST: $UI_HOST
@@ -139,8 +141,20 @@ services:
       - ./etl/code/sql:/usr/local/airflow/sql
       - ./etl/code/tests:/usr/local/airflow/tests
 
+  metabase:
+    image: metabase/metabase
+    volumes:
+      - metabase:/metabase-data
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+      - VIRTUAL_HOST=$METABASE_HOST
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=$METABASE_HOST
+      - LETSENCRYPT_EMAIL=$EMAIL_LETS_ENCRYPT
+
 volumes:
   postgres:
+  metabase:
 
 networks:
   default:

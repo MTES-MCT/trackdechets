@@ -13,7 +13,10 @@ import {
   getInstallationDeclarations,
   getCompany
 } from "./helper";
+import updateCompany from "./mutations/updateCompany";
 import { memoizeRequest } from "./cache";
+
+type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
 export default {
   Installation: {
@@ -25,11 +28,6 @@ export default {
     }
   },
   Company: {
-    name: async parent => {
-      // TODO find out why removing this field
-      // causes a compilation error in recette
-      return parent.name;
-    },
     latitude: parent => {
       return parent.latitude ? parseFloat(parent.latitude) : null;
     },
@@ -48,11 +46,11 @@ export default {
     }
   },
   Query: {
-    companyInfos: async (parent, { siret }) => {
+    companyInfos: (parent, { siret }) => {
       if (siret.length < 14) {
         return null;
       }
-      return await memoizeRequest(siret);
+      return memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
       const companyAdmins = await getCompanyAdmins(siret);
@@ -75,7 +73,7 @@ export default {
 
       const users = await context.prisma
         .users({
-          where: { companies_some: { siret: siret } }
+          where: { companyAssociations_some: { company: { siret: siret } } }
         })
         .then(users =>
           users.map(u => ({
@@ -108,7 +106,11 @@ export default {
 
       return [await memoizeRequest(clue)];
     },
-    favorites: async (parent, { type }, context: Context) => {
+    favorites: async (
+      parent,
+      { type }: { type: FavoriteType },
+      context: Context
+    ) => {
       const lowerType = type.toLowerCase();
       const userId = getUserId(context);
       const userCompanies = await getUserCompanies(userId);
@@ -127,16 +129,14 @@ export default {
             { emitterCompanySiret: userCompanies[0].siret }
           ],
           isDeleted: false
-        }
+        },
+        orderBy: "createdAt_DESC",
+        first: 50
       });
 
-      const formsWithValue = forms.filter(f => f[`${lowerType}CompanySiret`]);
-
-      if (!formsWithValue.length) {
-        return [memoizeRequest(userCompanies[0].siret)];
-      }
-
-      return formsWithValue
+      const favorites = forms
+        // Filter out forms with no data
+        .filter(f => f[`${lowerType}CompanySiret`])
         .map(f => ({
           name: f[`${lowerType}CompanyName`],
           siret: f[`${lowerType}CompanySiret`],
@@ -145,10 +145,22 @@ export default {
           phone: f[`${lowerType}CompanyPhone`],
           mail: f[`${lowerType}CompanyMail`]
         }))
-        .filter(
-          (thing, index, self) =>
-            index === self.findIndex(t => t.name === thing.name)
-        );
+        // Remove duplicates (by company names)
+        .reduce((prev, cur) => {
+          if (prev.findIndex(el => el.name === cur.name) === -1) {
+            prev.push(cur);
+          }
+          return prev;
+        }, [])
+        .slice(0, 10);
+
+      // If there is no data yet, propose his own companies as favorites
+      // We won't have every props populated, but it's a start
+      if (!favorites.length) {
+        return Promise.all(userCompanies.map(c => memoizeRequest(c.siret)));
+      }
+
+      return favorites;
     }
   },
   Mutation: {
@@ -165,6 +177,7 @@ export default {
           securityCode: randomNumber(4)
         }
       });
-    }
+    },
+    updateCompany
   }
 };

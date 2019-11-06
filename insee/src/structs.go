@@ -25,16 +25,18 @@ type Etablissement struct {
 	GeoAdresse                string `json:"geo_adresse"`
 	Longitude                 string `json:"longitude"`
 	Latitude                  string `json:"latitude"`
+	Departement               string `json:"departement"`
 }
 
 // Response La réponse donnée par l'API
 type Response struct {
-	Siret      string `json:"siret"`
-	Siren      string `json:"siren"`
-	Name       string `json:"name"`
-	Naf        string `json:"naf"`
-	LibelleNaf string `json:"libelleNaf"`
-	Address    string `json:"address"`
-	Longitude  string `json:"longitude"`
-	Latitude   string `json:"latitude"`
+	Siret       string `json:"siret"`
+	Siren       string `json:"siren"`
+	Name        string `json:"name"`
+	Naf         string `json:"naf"`
+	LibelleNaf  string `json:"libelleNaf"`
+	Address     string `json:"address"`
+	Longitude   string `json:"longitude"`
+	Latitude    string `json:"latitude"`
+	Departement string `json:"departement"`
 }
