@@ -28,7 +28,7 @@ export default class CompanyMap extends React.Component<Props> {
 
   initMap() {
     fetch("/mapbox/style.json")
-      .then(response => response.text())
+      .then(response => response.json())
       .then(style => {
         const mapOptions: mapboxgl.MapboxOptions = {
           container: "map",
@@ -38,7 +38,7 @@ export default class CompanyMap extends React.Component<Props> {
         };
         let map = new mapboxgl.Map(mapOptions);
         this.addEtablissementMarker(map);
-    });
+      });
   }
 
   getLngLat() {
