@@ -11,6 +11,7 @@
     "apollo-link-context": "^1.0.10",
     "apollo-link-error": "^1.1.2",
     "apollo-link-http": "^1.5.7",
+    "env-cmd": "^10.0.1",
     "formik": "^1.3.2",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
@@ -36,6 +37,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:recette": "env-cmd -f .env.recette npm run build",
+    "build:production": "npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
