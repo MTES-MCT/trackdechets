@@ -9,6 +9,8 @@ const {
   MJ_SECOND_ONBOARDING_TEMPLATE_ID
 } = process.env;
 
+const baseUrl = `https://${UI_HOST}`;
+
 export const userMails = {
   onSignup: (user, activationHash) => ({
     toEmail: user.email,
@@ -127,7 +129,11 @@ export const userMails = {
       <li>Code déchet : ${form.wasteDetailsCode}</li>
       <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
     </ul>
-     <li>Transporteur : ${form.transporterIsExemptedOfReceipt ? "Exemption relevant de l'article R.541-50 du code de l'Environnement" : cleanupSpecialChars(form.transporterCompanyName)}</li>
+     <li>Transporteur : ${
+       form.transporterIsExemptedOfReceipt
+         ? "Exemption relevant de l'article R.541-50 du code de l'Environnement"
+         : cleanupSpecialChars(form.transporterCompanyName)
+     }</li>
      <li>Responsable du site : ${form.sentBy || ""}</li>
      </ul>
      Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
@@ -143,7 +149,8 @@ export const userMails = {
     subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     body: "_",
-    templateId: parseInt(MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10)
+    templateId: parseInt(MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10),
+    baseUrl: baseUrl
   }),
   onboardingSecondStep: (toEmail, toName) => ({
     toEmail,
@@ -151,6 +158,7 @@ export const userMails = {
     subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     body: "_",
-    templateId: parseInt(MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10)
+    templateId: parseInt(MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10),
+    baseUrl: baseUrl
   })
 };

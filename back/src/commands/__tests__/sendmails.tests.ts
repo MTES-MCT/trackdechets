@@ -48,7 +48,8 @@ describe("sendOnboardingFirstStepMails", () => {
       templateId: 1006585, // hardcoded mailjet template ID, should match .env MJ_FIRST_ONBOARDING_TEMPLATE_ID
       title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
       toEmail: "user@example.com",
-      toName: "Rick Hunter"
+      toName: "Rick Hunter",
+      baseUrl: "https://ui-td.local"
     });
     mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
   });
@@ -73,7 +74,8 @@ describe("sendOnboardingSecondStepMails", () => {
       templateId: 1023698, // hardcoded mailjet template ID, should match .env MJ_SECOND_ONBOARDING_TEMPLATE_ID
       title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
       toEmail: "user@example.com",
-      toName: "Rick Hunter"
+      toName: "Rick Hunter",
+      baseUrl: "https://ui-td.local"
     });
   });
   mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
