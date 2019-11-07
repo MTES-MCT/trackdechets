@@ -1,63 +1,136 @@
-const puppeteer = require("puppeteer");
-const doT = require("dot");
+var path = require("path");
 
-const html = require("fs").readFileSync("./models/bsd.html", "utf8");
-const tempFn = doT.template(html);
+var hummus = require("hummus");
+var fillForm = require("./filler").fillForm;
+const imgParams = { transformation: { width: 90, proportional: true } };
 
-const toDate = string => {
-  if (!string) {
-    return "";
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+const getEmitterType = params => {
+  const { emitterType } = params;
+  if (emitterType === "PRODUCER") {
+    return { emitterTypeProducer: true };
   }
-  const date = new Date(string);
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  if (emitterType === "APPENDIX1") {
+    return { emitterTypeAppendix1: true };
+  }
+  if (emitterType === "APPENDIX2") {
+    return { emitterTypeAppendix2: true };
+  }
+  if (emitterType === "OTHER") {
+    return { emitterTypeOther: true };
+  }
 };
 
-let browserInstance = null;
-async function getBrowser() {
-  try {
-    browserInstance =
-      browserInstance ||
-      (await puppeteer.launch({
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          // This will write shared memory files into /tmp instead of /dev/shm,
-          // because Docker’s default for /dev/shm is 64MB
-          "--disable-dev-shm-usage"
-        ]
-      }));
-  } catch (err) {
-    return Promise.reject(err);
+const dateFmt = datestr => {
+  if (!datestr) {
+    return "";
+  }
+  const date = new Date(datestr);
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
+
+  if (day < 10) {
+    day = "0" + day;
+  }
+  if (month < 10) {
+    month = "0" + month;
   }
 
-  return browserInstance;
+  return `${day}/${month}/${year}`;
+};
+
+const getWasteDetailsConsistence = params => ({
+  [`wasteDetailsConsistence${capitalize(params.wasteDetailsConsistence)}`]: true
+});
+
+const renameAndFormatFields = params => ({
+  transporterValidityLimit: dateFmt(params.transporterValidityLimit),
+  traderValidityLimit: dateFmt(params.traderValidityLimit),
+  recipientCompanySiret10: params.recipientCompanySiret,
+  recipientCompanyName10: params.recipientCompanyName,
+  recipientCompanyAddress10: params.recipientCompanyAddress,
+  recipientCompanyPhone10: params.recipientCompanyPhone,
+  recipientCompanyMail10: params.recipientCompanyMail,
+  recipientCompanyContact10: params.recipientCompanyContact,
+  sentAt8: dateFmt(params.sentAt),
+  sentAt9: dateFmt(params.sentAt),
+  receivedAt1: dateFmt(params.receivedAt),
+  receivedAt2: dateFmt(params.receivedAt)
+});
+
+const getWasteDetailsPackagings = params =>
+  params.wasteDetailsPackagings.reduce(function(acc, elem) {
+    let key = `wasteDetailsPackagings${capitalize(elem)}`;
+    return {
+      ...acc,
+      [key]: true
+    };
+  }, {});
+
+const stringifyNumberFields = params => {
+  let data = { ...params };
+  for (let [k, v] of Object.entries(data)) {
+    if (typeof v === "number") {
+      data[k] = v.toString();
+    }
+  }
+  return data;
+};
+function process(params) {
+  const data = stringifyNumberFields(params);
+  return {
+    ...data,
+    ...getEmitterType(data),
+    ...getWasteDetailsConsistence(data),
+    ...getWasteDetailsPackagings(data),
+    ...renameAndFormatFields(data)
+  };
 }
 
-async function write(params) {
-  const browser = await getBrowser().catch(err =>
-    logAndRethrow("Cannot launch puppeteer", err)
+function write(params, res) {
+  let inputStream = new hummus.PDFRStreamForFile(
+    path.join(__dirname, "../templates/bsd.pdf")
   );
 
-  const pageContent = tempFn({ toDate, ...params });
+  let writer = hummus.createWriterToModify(
+    inputStream,
+    new hummus.PDFStreamForResponse(res)
+  );
+  const formData = process(params);
+  fillForm(writer, formData);
 
-  const page = await browser
-    .newPage()
-    .catch(err => logAndRethrow("Error while starting new page", err));
-  await page.setContent(pageContent);
+  let pageModifier = new hummus.PDFPageModifier(writer, 0, true);
+  let ctx = pageModifier.startContext().getContext();
+  if (!!formData.signedByTransporter) {
+    ctx.drawImage(
+      450,
+      310,
+      path.join(__dirname, "../medias/stamp.png"),
+      imgParams
+    );
+  }
+  if (!!formData.sentAt) {
+    ctx.drawImage(450, 248, "./medias/stamp.png", imgParams);
+  }
+  if (!!formData.processingOperationDone) {
+    ctx.drawImage(450, 110, "./medias/stamp.png", imgParams);
+  }
+  if (!!formData.receivedBy) {
+    ctx.drawImage(200, 110, "./medias/stamp.png", imgParams);
+  }
 
-  const buffer = await page
-    .pdf({ format: "A4" })
-    .catch(err => logAndRethrow("Error while generating PDF", err));
+  if (!!formData.transporterIsExemptedOfReceipt) {
+    ctx.drawImage(450, 345, "./medias/exempt.png", imgParams);
+  }
 
-  await page
-    .close()
-    .catch(err => logAndRethrow("Error while closing buffer", err));
-  return buffer;
-}
+  pageModifier.endContext().writePage();
 
-function logAndRethrow(message, err) {
-  console.error(message, err);
-  throw err;
+  writer.end();
+  res.end(writer);
 }
 
 module.exports = write;
