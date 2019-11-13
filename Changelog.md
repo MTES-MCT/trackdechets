@@ -5,6 +5,9 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+## [Prochaine version]
+* Mise à jour du service de génration de pdf pour se rapprocher du Cerfa officiel
+
 ## [2019.11.1] 06/11/2019
 
 * Rattachment du profil TD à l'entreprise (https://github.com/MTES-MCT/trackdechets/pull/57)
