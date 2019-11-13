@@ -45,6 +45,7 @@ const sentryMiddleware = () =>
       scope.setExtra("body", context.request.body);
       scope.setExtra("origin", context.request.headers.origin);
       scope.setExtra("user-agent", context.request.headers["user-agent"]);
+      scope.setTag("service", "api");
     }
   });
 
