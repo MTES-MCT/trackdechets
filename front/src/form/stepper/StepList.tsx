@@ -3,11 +3,10 @@ import { Step, IStepContainerProps } from "./Step";
 import "./StepList.scss";
 import { Formik, FormikActions, setNestedObjectValues } from "formik";
 import initialState from "../initial-state";
-import { Query, Mutation } from "react-apollo";
+import { Query, Mutation } from "@apollo/react-components";
 import { withRouter, RouteComponentProps } from "react-router";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { GET_SLIPS } from "../../dashboard/slips/query";
-import { Form } from "../model";
 import { formSchema } from "../schema";
 import { currentSiretService } from "../../dashboard/CompanySelector";
 
@@ -88,7 +87,7 @@ export default withRouter(function StepList(
               <Mutation
                 mutation={SAVE_FORM}
                 update={(store, { data: { saveForm } }) => {
-                  const data = store.readQuery<{ forms: Form[] }>({
+                  const data = store.readQuery({
                     query: GET_SLIPS,
                     variables: { siret: currentSiretService.getSiret() }
                   });
@@ -119,8 +118,10 @@ export default withRouter(function StepList(
                             e.preventDefault();
                             // As wer want to be able to save draft, we skip validation on submit
                             // and don't use the classic Formik mechanism
-                            saveForm({ variables: { formInput: values } }).then(
-                              _ => props.history.push("/dashboard/slips")
+                            saveForm({
+                              variables: { formInput: values }
+                            }).then(_ =>
+                              props.history.push("/dashboard/slips")
                             );
                             return false;
                           }}

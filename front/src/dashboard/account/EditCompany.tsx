@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import CompanyType from "../../login/CompanyType";
-import { Mutation, MutationFn, MutationResult } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import gql from "graphql-tag";
 
 export const UPDATE_COMPANY = gql`
@@ -20,7 +20,7 @@ export default function EditCompany({ siret, companyTypes, onSubmit }: Props) {
   return (
     <div className="account__form">
       <Mutation mutation={UPDATE_COMPANY}>
-        {(updateCompany: MutationFn, { loading }: MutationResult) => {
+        {(updateCompany, { loading }) => {
           return (
             <Formik
               initialValues={{ companyTypes }}

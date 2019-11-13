@@ -1,6 +1,6 @@
 import { connect, Field, FieldProps } from "formik";
 import React, { useEffect, useState } from "react";
-import { Query } from "react-apollo";
+import { Query } from "@apollo/react-components";
 import { FaSearch, FaCheck, FaRegCircle } from "react-icons/fa";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
@@ -39,8 +39,9 @@ export default connect<FieldProps>(function CompanySelector(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [displayDepartment, setDisplayDepartment] = useState(false);
 
-  const [selectedCompany, setSelectedCompany] = useState<Company>(props.field
-    .value as Company);
+  const [selectedCompany, setSelectedCompany] = useState<Company>(
+    props.field.value as Company
+  );
 
   useEffect(() => {
     if (!debouncedSearchTerm || debouncedSearchTerm.clue.length < 1) {

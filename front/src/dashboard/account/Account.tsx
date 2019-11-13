@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import React, { useRef, useState } from "react";
-import { ApolloConsumer } from "react-apollo";
+import { ApolloConsumer } from "@apollo/react-components";
 import { FaCopy } from "react-icons/fa";
 import { RouteComponentProps, withRouter } from "react-router";
 import { localAuthService } from "../../login/auth.service";

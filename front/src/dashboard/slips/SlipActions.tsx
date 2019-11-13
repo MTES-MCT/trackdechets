@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mutation } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import {
   FaCheck,
   FaCog,

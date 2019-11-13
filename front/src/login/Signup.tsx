@@ -1,7 +1,7 @@
 import ApolloClient from "apollo-client";
 import { Field, FormikActions, FieldProps } from "formik";
 import React, { useState } from "react";
-import { ApolloConsumer, Mutation, MutationFn } from "react-apollo";
+import { ApolloConsumer, Mutation } from "@apollo/react-components";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import { Company } from "../form/company/CompanySelector";
@@ -32,7 +32,7 @@ type Values = {
 
 const handleSubmit = (
   payload: Values,
-  props: FormikActions<Values> & { signup: MutationFn } & RouteComponentProps
+  props: FormikActions<Values> & { signup } & RouteComponentProps
 ) => {
   props
     .signup({ variables: { payload } })
@@ -52,8 +52,8 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
   const [passwordType, setPasswordType] = useState("password");
   const [isSearching, setIsSearching] = useState(false);
 
-  const fetchCompany = async (client: ApolloClient<Company>, clue: string) => {
-    const { data } = await client.query<{ companyInfos: Company }>({
+  const fetchCompany = async (client, clue: string): Promise<Company> => {
+    const { data } = await client.query({
       query: COMPANY_INFOS,
       variables: { siret: clue }
     });
@@ -313,50 +313,50 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                                 );
 
                                 if (siret.length == 14) {
-                                  let company_ = null;
                                   setIsSearching(true);
                                   try {
-                                    company_ = await fetchCompany(
+                                    const company_ = await fetchCompany(
                                       client,
                                       siret
                                     );
+                                    setIsSearching(false);
+                                    setCompany(company_);
+
+                                    // auto-complete field gerepId
+                                    form.setFieldValue(
+                                      "gerepId",
+                                      company_ && company_.installation
+                                        ? company_.installation.codeS3ic
+                                        : ""
+                                    );
+
+                                    // auto-complete field codeNaf
+                                    form.setFieldValue(
+                                      "codeNaf",
+                                      company_ ? company_.naf : ""
+                                    );
+
+                                    // auto-complete companyTypes
+                                    if (company_ && company_.installation) {
+                                      let categories = company_.installation.rubriques
+                                        .filter(r => !!r.category) // null blocks form submitting
+                                        .map(r => r.category);
+                                      const companyTypes = categories.filter(
+                                        (value, index, self) => {
+                                          return self.indexOf(value) === index;
+                                        }
+                                      );
+                                      const currentValue =
+                                        form.values.companyTypes;
+                                      form.setFieldValue("companyTypes", [
+                                        ...currentValue,
+                                        ...companyTypes
+                                      ]);
+                                    }
                                   } catch (err) {
                                     console.log(err);
-                                  }
-
-                                  setIsSearching(false);
-                                  setCompany(company_);
-
-                                  // auto-complete field gerepId
-                                  form.setFieldValue(
-                                    "gerepId",
-                                    company_ && company_.installation
-                                      ? company_.installation.codeS3ic
-                                      : ""
-                                  );
-
-                                  // auto-complete field codeNaf
-                                  form.setFieldValue(
-                                    "codeNaf",
-                                    company_ ? company_.naf : ""
-                                  );
-
-                                  // auto-complete companyTypes
-                                  if (company_ && company_.installation) {
-                                    let categories = company_.installation.rubriques
-                                      .filter(r => !!r.category) // null blocks form submitting
-                                      .map(r => r.category);
-                                    const companyTypes = categories.filter(
-                                      (value, index, self) => {
-                                        return self.indexOf(value) === index;
-                                      }
-                                    );
-                                    const currentValue =
-                                      form.values.companyTypes;
-                                    form.setFieldValue("companyTypes", [
-                                      ...currentValue,
-                                      ...companyTypes
-                                    ]);
+                                  } finally {
+                                    setIsSearching(false);
                                   }
                                 }
 
