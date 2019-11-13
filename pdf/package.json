@@ -10,9 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^5.8.0",
     "body-parser": "^1.19.0",
     "hummus": "^1.0.107",
-    "lodash": "^4.17.15",
     "polka": "^0.5.2"
+  },
+  "devDependencies": {
+    "axios": "^0.19.0",
+    "jest": "^24.9.0"
   }
 }

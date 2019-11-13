@@ -1,13 +1,19 @@
-var path = require("path");
+const path = require("path");
+const hummus = require("hummus");
+const fillForm = require("./filler").fillForm;
 
-var hummus = require("hummus");
-var fillForm = require("./filler").fillForm;
 const imgParams = { transformation: { width: 90, proportional: true } };
 
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
+const capitalize = string =>
+  string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 
+/**
+ * Returns either emitterTypeProducer|emitterTypeAppendix1|emitterTypeAppendix2|emitterTypeOther according to
+ * emitterType value
+ *
+ * @param {object} params -  the full request payload
+ * @returns {object}
+ */
 const getEmitterType = params => {
   const { emitterType } = params;
   if (emitterType === "PRODUCER") {
@@ -24,6 +30,11 @@ const getEmitterType = params => {
   }
 };
 
+/**
+ * Reformat a date
+ * @param {string } datestr - a date iso-formatted
+ * @returns {string} - date formatted as dd/mm/YYYY
+ */
 const dateFmt = datestr => {
   if (!datestr) {
     return "";
@@ -43,6 +54,13 @@ const dateFmt = datestr => {
   return `${day}/${month}/${year}`;
 };
 
+/**
+ * Return either wasteDetailsConsistenceLiquid: true | wasteDetailsConsistenceSolid: true etc according to
+ * wasteDetailsConsistence parameter
+ *
+ * @param {object} params -  the full request payload
+ * @returns {object}
+ */
 const getWasteDetailsConsistence = params => ({
   [`wasteDetailsConsistence${capitalize(params.wasteDetailsConsistence)}`]: true
 });
@@ -62,6 +80,13 @@ const renameAndFormatFields = params => ({
   receivedAt2: dateFmt(params.receivedAt)
 });
 
+/**
+ * Return an object according to wasteDetailsPackagings array
+ * {wasteDetailsPackagings : ["citerne", "fut"]} ->
+ *    {wasteDetailsPackagingsCiterne: true, wasteDetailsPackagingFut: true}
+ * @param {object} params -  the full request payload
+ * @returns {object}
+ */
 const getWasteDetailsPackagings = params =>
   params.wasteDetailsPackagings.reduce(function(acc, elem) {
     let key = `wasteDetailsPackagings${capitalize(elem)}`;
@@ -71,6 +96,11 @@ const getWasteDetailsPackagings = params =>
     };
   }, {});
 
+/**
+ * Transform numbers as strings to be accpeted by the pdf template
+ * @param params -  the full request payload
+ * @returns {object}
+ */
 const stringifyNumberFields = params => {
   let data = { ...params };
   for (let [k, v] of Object.entries(data)) {
@@ -80,6 +110,12 @@ const stringifyNumberFields = params => {
   }
   return data;
 };
+
+/**
+ * Apply transformers to payload
+ * @param params -  the full request payload
+ * @returns {object}
+ */
 function process(params) {
   const data = stringifyNumberFields(params);
   return {
@@ -91,6 +127,12 @@ function process(params) {
   };
 }
 
+/**
+ * Render a form as pdf
+ * It takes a pdf templates with dynamic fields, fills them and adds stamp images as overlays.
+ * @param params - payload
+ * @param res - response
+ */
 function write(params, res) {
   let inputStream = new hummus.PDFRStreamForFile(
     path.join(__dirname, "../templates/bsd.pdf")
