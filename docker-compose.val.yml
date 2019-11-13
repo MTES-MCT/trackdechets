@@ -81,6 +81,8 @@ services:
       context: ./pdf
       dockerfile: Dockerfile
     restart: always
+    environment:
+      SENTRY_DSN: $SENTRY_DSN
 
   td-mail:
     image: td-mail

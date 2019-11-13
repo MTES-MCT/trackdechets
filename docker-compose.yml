@@ -64,6 +64,8 @@ services:
   td-pdf:
     image: betagouv/trackdechets-pdf:latest
     restart: always
+    environment:
+      SENTRY_DSN: $SENTRY_DSN
 
   td-mail:
     image: betagouv/trackdechets-mail:latest
