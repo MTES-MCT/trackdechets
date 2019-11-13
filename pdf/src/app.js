@@ -31,7 +31,6 @@ app.post("/pdf", async (req, res) => {
     "Content-disposition": `attachment;filename=${fileName}.pdf`
   });
   try {
-      debugger;
     write(req.body, res);
   } catch (err) {
     if (!!sentryDsn) {
