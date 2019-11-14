@@ -201,10 +201,9 @@ export default {
         .catch(_ => null);
 
       // Dont get the company name through Prisma as the name is not stored in the DB
-      const { name: companyName } = await companyResolver.Query.companyInfos(
-        null,
-        { siret }
-      );
+      const {
+        name: companyName
+      } = await companyResolver.Query.companyInfos(null, { siret });
 
       if (existingUser) {
         await context.prisma.createCompanyAssociation({
@@ -265,7 +264,6 @@ export default {
         email: existingHash.email,
         password: hashedPassword,
         phone: "",
-        userType: [],
         isActive: true,
         companyAssociations: {
           create: {

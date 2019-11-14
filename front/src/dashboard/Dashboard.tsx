@@ -30,7 +30,6 @@ export const GET_ME = gql`
         securityCode
         companyTypes
       }
-      userType
     }
   }
 `;

@@ -55,7 +55,6 @@ type User {
   email: String!
   name: String
   phone: String
-  userType: [UserType]
 
   companies: [Company]
 }
