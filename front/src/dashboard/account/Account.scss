@@ -6,7 +6,22 @@
     max-width: 100%;
     margin: 20px 0;
   }
+
+  label {
+    margin-bottom: 0.5em;
+  }
+
+  .input__group {
+    align-items: stretch;
+
+    .icon-button {
+      padding: 0 0.7em;
+      margin: 0 0.7em;
+    }
+  }
+
 }
+
 
 .company__address {
   font-style: normal;
@@ -16,6 +31,11 @@
     margin: 0;
   }
 }
+
+
+
+
+
 
 
 

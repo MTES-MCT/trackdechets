@@ -87,7 +87,7 @@ export default withRouter(function Account({
         </p>
 
         {apiKey ? (
-          <div className="form__group">
+          <div className="form__group account__form">
             <label>Token</label>
             <div className="input__group">
               <input type="text" value={apiKey} ref={tokenRef} readOnly />
