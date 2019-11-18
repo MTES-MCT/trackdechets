@@ -4,6 +4,15 @@
   padding: 40px 0;
 }
 
+.hero__container {
+  min-height: 38vh;
+}
+
+.hero__white-background {
+  padding: 10px 1em;
+  background-color: white;
+}
+
 .footer__logo-text {
   display: flex;
   align-items: center;
@@ -44,3 +53,4 @@
     }
   }
 }
+

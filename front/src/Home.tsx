@@ -9,14 +9,14 @@ import LazyLoad from "react-lazyload";
 export default function Home() {
   return (
     <React.Fragment>
-      <div className="hero">
+      <div className="hero" role="banner">
         <div className="hero__container">
           <h1 className="hero__white-background">
             Gérer la traçabilité des déchets en toute sécurité
           </h1>
           {localAuthService.isAuthenticated ? (
             <p>
-              <Link to="/dashboard/slips" className="button large">
+              <Link to="/dashboard/slips" className="button">
                 Accéder à mon espace
               </Link>
             </p>
@@ -24,14 +24,14 @@ export default function Home() {
             <p>
               <Link
                 to="/signup"
-                className="button large warning"
+                className="button warning"
                 onClick={() => trackEvent("home", "cta-test")}
               >
                 Je crée un compte
               </Link>
               <Link
                 to="/login"
-                className="button large"
+                className="button"
                 onClick={() => trackEvent("home", "cta-login")}
               >
                 Je me connecte
