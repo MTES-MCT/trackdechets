@@ -3,7 +3,7 @@ import { memoizeRequest } from "./cache";
 
 const companyAssociationUserFragment = `
 fragment CompanyWithAdmins on CompanyAssociation {
-  user { id isActive name email phone userType }
+  user { id isActive name email phone }
 }
 `;
 

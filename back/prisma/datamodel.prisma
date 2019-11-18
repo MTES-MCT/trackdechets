@@ -5,7 +5,6 @@ type User {
   password: String!
   name: String
   phone: String
-  userType: Json
 
   companyAssociations: [CompanyAssociation]
 

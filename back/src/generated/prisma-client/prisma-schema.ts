@@ -3752,7 +3752,6 @@ type User {
   password: String!
   name: String
   phone: String
-  userType: Json
   companyAssociations(where: CompanyAssociationWhereInput, orderBy: CompanyAssociationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CompanyAssociation!]
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -4072,7 +4071,6 @@ input UserCreateInput {
   password: String!
   name: String
   phone: String
-  userType: Json
   companyAssociations: CompanyAssociationCreateManyWithoutUserInput
 }
 
@@ -4093,7 +4091,6 @@ input UserCreateWithoutCompanyAssociationsInput {
   password: String!
   name: String
   phone: String
-  userType: Json
 }
 
 type UserEdge {
@@ -4114,8 +4111,6 @@ enum UserOrderByInput {
   name_DESC
   phone_ASC
   phone_DESC
-  userType_ASC
-  userType_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -4129,7 +4124,6 @@ type UserPreviousValues {
   password: String!
   name: String
   phone: String
-  userType: Json
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -4163,7 +4157,6 @@ input UserUpdateDataInput {
   password: String
   name: String
   phone: String
-  userType: Json
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
 }
 
@@ -4173,7 +4166,6 @@ input UserUpdateInput {
   password: String
   name: String
   phone: String
-  userType: Json
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
 }
 
@@ -4183,7 +4175,6 @@ input UserUpdateManyMutationInput {
   password: String
   name: String
   phone: String
-  userType: Json
 }
 
 input UserUpdateOneRequiredInput {
@@ -4206,7 +4197,6 @@ input UserUpdateWithoutCompanyAssociationsDataInput {
   password: String
   name: String
   phone: String
-  userType: Json
 }
 
 input UserUpsertNestedInput {
