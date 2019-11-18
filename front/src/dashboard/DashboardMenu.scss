@@ -1,7 +1,4 @@
 .dashboard-menu.side-menu {
-  background-color: #ebeff3;
-  flex: 0 1 auto;
-  padding: 0 20px 10px 0;
 
   .company-title {
     margin: 30px 10px;
@@ -25,11 +22,4 @@
     }
   }
 
-  .side-menu__mobile-trigger {
-    display: flex;
-    align-items: center;
-    font-size: 1.6em;
-    margin: 5px 10px;
-    cursor: pointer;
-  }
 }

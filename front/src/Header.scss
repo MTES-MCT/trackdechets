@@ -1,12 +1,27 @@
-.nav__item a.highlighted-button {
-  color: #0053b3;
-  border: 1px solid #0053b3;
-}
 
-.nav__item a.highlighted-button.active {
-  color: #fff;
-}
 
 .navbar {
   border-bottom: 1px solid var(--theme-border-lighter);
+
+  .nav__links {
+    margin-right: 3em;
+  }
+
+  .nav__item {
+    margin: 0 0.1em;
+  }
+
+    .nav__item a.active {
+      background: none;
+      color: var(--theme-primary);
+    }
+
+    .nav__item a:hover {
+      background: none;
+      color: var(--theme-primary);
+    }
+
+    .nav__item.logout a:hover {
+      color: var(--orange)
+    }
 }

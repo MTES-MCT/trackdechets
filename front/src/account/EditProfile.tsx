@@ -1,9 +1,9 @@
 import { Field, Form, Formik } from "formik";
 import React from "react";
-import { Me } from "../../login/model";
+import { Me } from "../login/model";
 import { Mutation } from "@apollo/react-components";
 import gql from "graphql-tag";
-import { GET_ME } from "../Dashboard";
+import { GET_ME } from "./AccountContent";
 
 const EDIT_PROFILE = gql`
   mutation EditProfile($name: String!, $phone: String!, $email: String!) {
