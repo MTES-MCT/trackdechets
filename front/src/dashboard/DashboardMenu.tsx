@@ -3,7 +3,6 @@ import { Me } from "../login/model";
 import "./DashboardMenu.scss";
 import { NavLink, match } from "react-router-dom";
 import CompanySelector from "./CompanySelector";
-import { FaBars } from "react-icons/fa";
 import { Company } from "../login/model";
 import SideMenu from "../common/SideMenu";
 
