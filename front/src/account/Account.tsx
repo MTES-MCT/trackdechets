@@ -8,6 +8,7 @@ import Loader from "../common/Loader";
 import Error from "../common/Error";
 import AccountInfo from "./AccountInfo";
 import AccountIntegrationApi from "./AccountIntegrationApi";
+import AccountContentWrapper from "./AccountContentWrapper";
 
 const GET_ME = gql`
   {
@@ -36,11 +37,19 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
       <div className="dashboard-content">
         <Route
           path={`${match.path}/info`}
-          render={() => <AccountInfo me={data.me} />}
+          render={() => (
+            <AccountContentWrapper title="Informations générales">
+              <AccountInfo me={data.me} />
+            </AccountContentWrapper>
+          )}
         />
         <Route
           path={`${match.path}/integration`}
-          render={() => <AccountIntegrationApi />}
+          render={() => (
+            <AccountContentWrapper title="Intégration API">
+              <AccountIntegrationApi />
+            </AccountContentWrapper>
+          )}
         />
       </div>
     </div>
