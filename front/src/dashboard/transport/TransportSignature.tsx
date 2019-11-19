@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Form as FormModel, Form } from "../../form/model";
 import { FaFileSignature } from "react-icons/fa";
-import { Formik, Field } from "formik";
+import { Field } from "formik";
 import { DateTime } from "luxon";
 import gql from "graphql-tag";
-import { Mutation } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import Packagings from "../../form/packagings/Packagings";
 import { Wizard } from "./Wizard";
 import "./TransportSignature.scss";
@@ -67,7 +67,7 @@ export default function TransportSignature({ form }: Props) {
                   signedByTransporter({
                     variables: { id: form.id, signingInfo: values },
                     update: (store, { data: { signedByTransporter } }) => {
-                      const data = store.readQuery<{ forms: Form[] }>({
+                      const data = store.readQuery({
                         query: GET_TRANSPORT_SLIPS,
                         variables: {
                           siret: currentSiretService.getSiret(),
@@ -166,9 +166,7 @@ export default function TransportSignature({ form }: Props) {
                         <small>
                           Si vous le désirez, vous pouvez accéder à{" "}
                           <a
-                            href={`${
-                              process.env.REACT_APP_API_ENDPOINT
-                            }/pdf?id=${form.id}`}
+                            href={`${process.env.REACT_APP_API_ENDPOINT}/pdf?id=${form.id}`}
                             target="_blank"
                           >
                             une vue CERFA du bordereau

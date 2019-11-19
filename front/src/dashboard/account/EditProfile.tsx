@@ -1,7 +1,7 @@
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Me } from "../../login/model";
-import { Mutation } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import gql from "graphql-tag";
 import { GET_ME } from "../Dashboard";
 
@@ -22,7 +22,7 @@ export default function EditProfile({ me, onSubmit }: Props) {
       <Mutation
         mutation={EDIT_PROFILE}
         update={(cache, { data: { editProfile } }) => {
-          const query = cache.readQuery<{ me: Me }>({ query: GET_ME });
+          const query = cache.readQuery({ query: GET_ME });
           if (!query || !query.me) {
             return;
           }

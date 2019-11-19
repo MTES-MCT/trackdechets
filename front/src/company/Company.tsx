@@ -1,6 +1,6 @@
 import React from "react";
 import gql from "graphql-tag";
-import { Query } from "react-apollo";
+import { Query } from "@apollo/react-components";
 import { RouteComponentProps } from "react-router";
 import CompanyHeader from "./CompanyHeader";
 import CompanyMap from "./CompanyMap";
@@ -55,13 +55,13 @@ export default function CompanyInfo({
       fetchPolicy="no-cache"
     >
       {({ loading, error, data }) => {
-        if (loading) return "Loading...";
-        if (error) return `Error!: ${error}`;
+        if (loading) return <p>"Loading..."</p>;
+        if (error) return <p>{`Error!: ${error}`}</p>;
 
         const company: Company = data.companyInfos;
 
         if (!company.siret) {
-          return "Entreprise inconnue";
+          return <p>"Entreprise inconnue"</p>;
         }
 
         return (

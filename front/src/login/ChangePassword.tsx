@@ -1,6 +1,6 @@
 import { Field, Form, Formik, FormikActions } from "formik";
 import React from "react";
-import { Mutation, MutationFn } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import RedErrorMessage from "../form/RedErrorMessage";
 import { CHANGEPASSWORD } from "./mutations";
@@ -10,12 +10,15 @@ type Values = {
   newPassword: string;
   newPasswordConfirmation: string;
 };
-const handleSubmit = (
-  payload: Values,
+const handleSubmit = ({
+  payload,
+  props
+}: {
+  payload: Values;
   props: FormikActions<Values> & {
-    changePassword: MutationFn;
-  } & RouteComponentProps
-) => {
+    changePassword;
+  } & RouteComponentProps;
+}) => {
   const { oldPassword, newPassword } = payload;
   props
     .changePassword({ variables: { oldPassword, newPassword } })
@@ -41,10 +44,13 @@ export default withRouter(function Login(
             newPasswordConfirmation: ""
           }}
           onSubmit={(values, formikActions) => {
-            handleSubmit(values, {
-              changePassword,
-              ...formikActions,
-              ...routeComponentProps
+            handleSubmit({
+              payload: values,
+              props: {
+                changePassword,
+                ...formikActions,
+                ...routeComponentProps
+              }
             });
           }}
           validate={values => {

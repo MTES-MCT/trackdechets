@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import "./InviteNewUser.scss";
-import { Mutation, Query } from "react-apollo";
+import { Mutation, Query } from "@apollo/react-components";
 import gql from "graphql-tag";
 import RedErrorMessage from "../../form/RedErrorMessage";
 import { FaTimes } from "react-icons/fa";
@@ -97,9 +97,8 @@ export default function InviteNewUser({ siret }: Props) {
       )}
       <Query query={COMPANY_USERS} variables={{ siret }}>
         {({ loading, error, data }) => {
-          if (loading) return "Chargement...";
-          if (error) return `Erreur ! ${error.message}`;
-
+          if (loading) return <p>Chargement...</p>;
+          if (error) return <p>{`Erreur ! ${error.message}`}</p>;
           return (
             <div>
               <h5>Membres de l'équipe ({data.companyUsers.length})</h5>
@@ -115,9 +114,9 @@ export default function InviteNewUser({ siret }: Props) {
                           <Mutation
                             mutation={REMOVE_USER}
                             update={proxy => {
-                              const data = proxy.readQuery<{
-                                companyUsers: any[];
-                              }>({ query: COMPANY_USERS });
+                              const data = proxy.readQuery({
+                                query: COMPANY_USERS
+                              });
                               if (!data || !data.companyUsers) {
                                 return;
                               }
