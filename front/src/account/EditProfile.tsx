@@ -3,7 +3,29 @@ import React from "react";
 import { Me } from "../login/model";
 import { Mutation } from "@apollo/react-components";
 import gql from "graphql-tag";
-import { GET_ME } from "./AccountContent";
+
+const GET_ME = gql`
+  {
+    me {
+      id
+      name
+      email
+      phone
+      companies {
+        id
+        admins {
+          id
+          name
+        }
+        siret
+        name
+        address
+        securityCode
+        companyTypes
+      }
+    }
+  }
+`;
 
 const EDIT_PROFILE = gql`
   mutation EditProfile($name: String!, $phone: String!, $email: String!) {

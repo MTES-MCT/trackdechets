@@ -1,11 +1,30 @@
+import gql from "graphql-tag";
 import React from "react";
 import SideMenu from "../common/SideMenu";
-import { NavLink, match } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { match } from "react-router";
 
-export default function AccountMenu() {
+type Props = {
+  me: {
+    name: string;
+  };
+  match: match;
+};
+
+export default function AccountMenu({ me, match }: Props) {
   return (
     <SideMenu>
-      <NavLink to="/account">Paramètres du compte</NavLink>
+      <p>{me.name}</p>
+      <NavLink to={`${match.url}/info`}>Informations générales</NavLink>
+      <NavLink to={`${match.url}/integration`}>Intégration API</NavLink>
     </SideMenu>
   );
 }
+
+AccountMenu.fragments = {
+  me: gql`
+    fragment AccountMenuFragment on User {
+      name
+    }
+  `
+};
