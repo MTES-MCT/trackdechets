@@ -27,13 +27,19 @@ export default function DashboardMenu({
   return (
     <SideMenu>
       <>
-        <div className="company-title">
-          <CompanySelector
-            siret={siret}
-            companies={me.companies}
-            handleCompanyChange={handleCompanyChange}
-          />
-        </div>
+        {me.companies.length == 1 && (
+          <div className="company-title">{me.companies[0].name}</div>
+        )}
+        {me.companies.length > 1 && (
+          <div className="company-select">
+            <CompanySelector
+              siret={siret}
+              companies={me.companies}
+              handleCompanyChange={handleCompanyChange}
+            />
+          </div>
+        )}
+
         <ul>
           <li>
             <NavLink to={`${match.url}/slips`} activeClassName="active">
