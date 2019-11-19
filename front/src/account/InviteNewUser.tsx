@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import "./InviteNewUser.scss";
 import { Mutation, Query } from "@apollo/react-components";
 import gql from "graphql-tag";
-import RedErrorMessage from "../../form/RedErrorMessage";
+import RedErrorMessage from "../form/RedErrorMessage";
 import { FaTimes } from "react-icons/fa";
 
 const INVITE_USER_TO_COMPANY = gql`
@@ -44,7 +44,7 @@ export default function InviteNewUser({ siret }: Props) {
         déjà existants.
       </p>
       <Mutation mutation={INVITE_USER_TO_COMPANY}>
-        {(inviteUserToCompany, { data }) => (
+        {inviteUserToCompany => (
           <Formik
             initialValues={{ email: "", siret, role: "MEMBER" }}
             validate={(values: any) => {
@@ -97,8 +97,9 @@ export default function InviteNewUser({ siret }: Props) {
       )}
       <Query query={COMPANY_USERS} variables={{ siret }}>
         {({ loading, error, data }) => {
-          if (loading) return <p>Chargement...</p>;
+          if (loading) return <p>"Chargement..."</p>;
           if (error) return <p>{`Erreur ! ${error.message}`}</p>;
+
           return (
             <div>
               <h5>Membres de l'équipe ({data.companyUsers.length})</h5>

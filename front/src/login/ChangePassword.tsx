@@ -22,7 +22,7 @@ const handleSubmit = ({
   const { oldPassword, newPassword } = payload;
   props
     .changePassword({ variables: { oldPassword, newPassword } })
-    .then(_ => props.history.push("/dashboard/account"))
+    .then(_ => props.history.push("/account"))
     .catch(e => {
       props.setSubmitting(false);
       props.setErrors({

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import InviteNewUser from "./InviteNewUser";
 import EditCompany from "./EditCompany";
-import { COMPANY_TYPES } from "../../login/CompanyType";
+import { COMPANY_TYPES } from "../login/CompanyType";
 
 type Props = {
   company: {

@@ -7,6 +7,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 ## [Prochaine version]
 * Mise à jour du service de génération de pdf pour se rapprocher du Cerfa officiel
+* Relooking de la barre de navigation. Déplacement de "Mon Compte" au même niveau que "Mon espace".
+Ajout du SIRET en plus du nom dans le sélecteur d'entreprise [PR #80](https://github.com/MTES-MCT/trackdechets/pull/80)
+
 
 ## [2019.11.1] 06/11/2019
 

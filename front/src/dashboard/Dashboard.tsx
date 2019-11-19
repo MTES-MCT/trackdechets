@@ -2,7 +2,6 @@ import gql from "graphql-tag";
 import React from "react";
 import { Query } from "@apollo/react-components";
 import { Route, RouteComponentProps } from "react-router";
-import Account from "./account/Account";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import SlipsContainer from "./slips/SlipsContainer";
@@ -15,19 +14,10 @@ export const GET_ME = gql`
   {
     me {
       id
-      name
-      email
-      phone
       companies {
         id
-        admins {
-          id
-          name
-        }
-        siret
         name
-        address
-        securityCode
+        siret
         companyTypes
       }
     }
@@ -96,10 +86,6 @@ export default class Dashboard extends React.Component<RouteComponentProps, S> {
                   <Route
                     path={`${match.path}/transport`}
                     render={() => <Transport me={data.me} siret={siret} />}
-                  />
-                  <Route
-                    path={`${match.path}/account`}
-                    render={() => <Account me={data.me} />}
                   />
                   <Route
                     path={`${match.path}/exports`}

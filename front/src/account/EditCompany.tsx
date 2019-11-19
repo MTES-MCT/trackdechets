@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import CompanyType from "../../login/CompanyType";
+import CompanyType from "../login/CompanyType";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
