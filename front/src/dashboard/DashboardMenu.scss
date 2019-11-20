@@ -3,6 +3,9 @@
   .company-title {
     margin: 30px 30px;
     font-weight: bold;
+    @media (min-width: 749px) {
+      max-width: 200px;
+    }
   }
 
   .company-select {
