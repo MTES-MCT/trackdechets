@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import DateInput from "./custom-inputs/DateInput";
@@ -6,10 +6,12 @@ import RedErrorMessage from "./RedErrorMessage";
 
 type Values = {
   transporter: { isExemptedOfReceipt: boolean };
+  customId: string;
 };
 export default connect<{}, Values>(function Transporter(props) {
+  const [displayCustomId, setDisplayCustomId] = useState(!!props.formik.values.customId);
   return (
-    <React.Fragment>
+    <>
       <h4>Transporteur</h4>
       <Field component={CompanySelector} name="transporter.company" />
 
@@ -64,6 +66,26 @@ export default connect<{}, Values>(function Transporter(props) {
           <RedErrorMessage name="transporter.numberPlate" />
         </div>
       )}
-    </React.Fragment>
+      <div className="form__group">
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked={displayCustomId}
+            onChange={() => setDisplayCustomId(!displayCustomId)}
+          />
+          Je souhaite ajouter un numéro de BSD qui m'est propre
+        </label>
+        {displayCustomId && (
+          <>
+            <h4>Numéro Libre</h4>
+            <Field
+              type="text"
+              placeholder="Utilisez votre propre numéro de BSD si nécessaire."
+              name="customId"
+            />
+          </>
+        )}
+      </div>
+    </>
   );
 });

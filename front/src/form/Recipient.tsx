@@ -15,7 +15,7 @@ export default connect<{}, Values>(function Recipient({ formik }) {
     !!formik.values.trader.company.siret
   );
   return (
-    <React.Fragment>
+    <>
       <h4>Entreprise de destination</h4>
 
       <div className="text-quote recipient">
@@ -62,7 +62,7 @@ export default connect<{}, Values>(function Recipient({ formik }) {
         </label>
       </div>
       {hasTrader && (
-        <React.Fragment>
+        <>
           <h4>Négociant</h4>
           <Field component={CompanySelector} name="trader.company" />
 
@@ -92,8 +92,8 @@ export default connect<{}, Values>(function Recipient({ formik }) {
 
             <RedErrorMessage name="trader.validityLimit" />
           </div>
-        </React.Fragment>
+        </>
       )}
-    </React.Fragment>
+    </>
   );
 });

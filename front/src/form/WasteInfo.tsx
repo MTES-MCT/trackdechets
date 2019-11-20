@@ -21,7 +21,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
   }
 
   return (
-    <React.Fragment>
+    <>
       <h4>Description du déchet</h4>
       <div className="form__group">
         <Field
@@ -141,6 +141,6 @@ export default connect<{}, Values>(function WasteInfo(props) {
           </label>
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 });

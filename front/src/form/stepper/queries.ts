@@ -17,6 +17,7 @@ export const GET_FORM = gql`
   query Form($formId: ID) {
     form(id: $formId) {
       id
+      customId
       emitter {
         type
         pickupSite
@@ -72,6 +73,7 @@ export const SAVE_FORM = gql`
   mutation SaveForm($formInput: FormInput!) {
     saveForm(formInput: $formInput) {
       id
+      customId
       readableId
       createdAt
       status

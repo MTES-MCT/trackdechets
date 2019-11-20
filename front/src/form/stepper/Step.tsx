@@ -17,6 +17,7 @@ export interface IStepContainerProps {
   title: string;
 }
 export function StepContainer(props: IStepContainerProps) {
+  console.log(props)
   return props.component
     ? React.createElement(props.component)
     : props.children
