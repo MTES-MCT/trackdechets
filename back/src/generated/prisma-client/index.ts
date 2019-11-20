@@ -536,6 +536,8 @@ export type FormOrderByInput =
   | "id_DESC"
   | "readableId_ASC"
   | "readableId_DESC"
+  | "customId_ASC"
+  | "customId_DESC"
   | "isDeleted_ASC"
   | "isDeleted_DESC"
   | "createdAt_ASC"
@@ -804,6 +806,7 @@ export type StatusLogOrderByInput =
 
 export interface FormUpdateManyMutationInput {
   readableId?: Maybe<String>;
+  customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -869,6 +872,7 @@ export interface FormUpdateManyMutationInput {
 
 export interface FormUpdateInput {
   readableId?: Maybe<String>;
+  customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
@@ -936,6 +940,7 @@ export interface FormUpdateInput {
 
 export interface FormUpdateDataInput {
   readableId?: Maybe<String>;
+  customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
@@ -1456,6 +1461,20 @@ export interface FormWhereInput {
   readableId_not_starts_with?: Maybe<String>;
   readableId_ends_with?: Maybe<String>;
   readableId_not_ends_with?: Maybe<String>;
+  customId?: Maybe<String>;
+  customId_not?: Maybe<String>;
+  customId_in?: Maybe<String[] | String>;
+  customId_not_in?: Maybe<String[] | String>;
+  customId_lt?: Maybe<String>;
+  customId_lte?: Maybe<String>;
+  customId_gt?: Maybe<String>;
+  customId_gte?: Maybe<String>;
+  customId_contains?: Maybe<String>;
+  customId_not_contains?: Maybe<String>;
+  customId_starts_with?: Maybe<String>;
+  customId_not_starts_with?: Maybe<String>;
+  customId_ends_with?: Maybe<String>;
+  customId_not_ends_with?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   isDeleted_not?: Maybe<Boolean>;
   owner?: Maybe<UserWhereInput>;
@@ -2771,6 +2790,7 @@ export interface CompanyCreatecompanyTypesInput {
 
 export interface FormUpdateManyDataInput {
   readableId?: Maybe<String>;
+  customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -3133,6 +3153,20 @@ export interface FormScalarWhereInput {
   readableId_not_starts_with?: Maybe<String>;
   readableId_ends_with?: Maybe<String>;
   readableId_not_ends_with?: Maybe<String>;
+  customId?: Maybe<String>;
+  customId_not?: Maybe<String>;
+  customId_in?: Maybe<String[] | String>;
+  customId_not_in?: Maybe<String[] | String>;
+  customId_lt?: Maybe<String>;
+  customId_lte?: Maybe<String>;
+  customId_gt?: Maybe<String>;
+  customId_gte?: Maybe<String>;
+  customId_contains?: Maybe<String>;
+  customId_not_contains?: Maybe<String>;
+  customId_starts_with?: Maybe<String>;
+  customId_not_starts_with?: Maybe<String>;
+  customId_ends_with?: Maybe<String>;
+  customId_not_ends_with?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   isDeleted_not?: Maybe<Boolean>;
   createdAt?: Maybe<DateTimeInput>;
@@ -3949,6 +3983,7 @@ export interface InstallationSubscriptionWhereInput {
 export interface FormCreateInput {
   id?: Maybe<ID_Input>;
   readableId?: Maybe<String>;
+  customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
@@ -5176,6 +5211,7 @@ export interface UserActivationHashEdgeSubscription
 export interface FormPreviousValues {
   id: ID_Output;
   readableId?: String;
+  customId?: String;
   isDeleted?: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
@@ -5246,6 +5282,7 @@ export interface FormPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   readableId: () => Promise<String>;
+  customId: () => Promise<String>;
   isDeleted: () => Promise<Boolean>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -5316,6 +5353,7 @@ export interface FormPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   readableId: () => Promise<AsyncIterator<String>>;
+  customId: () => Promise<AsyncIterator<String>>;
   isDeleted: () => Promise<AsyncIterator<Boolean>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -5983,6 +6021,7 @@ export interface UserActivationHashSubscriptionPayloadSubscription
 export interface Form {
   id: ID_Output;
   readableId?: String;
+  customId?: String;
   isDeleted?: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
@@ -6051,6 +6090,7 @@ export interface Form {
 export interface FormPromise extends Promise<Form>, Fragmentable {
   id: () => Promise<ID_Output>;
   readableId: () => Promise<String>;
+  customId: () => Promise<String>;
   isDeleted: () => Promise<Boolean>;
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
@@ -6131,6 +6171,7 @@ export interface FormSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   readableId: () => Promise<AsyncIterator<String>>;
+  customId: () => Promise<AsyncIterator<String>>;
   isDeleted: () => Promise<AsyncIterator<Boolean>>;
   owner: <T = UserSubscription>() => T;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -6211,6 +6252,7 @@ export interface FormNullablePromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   readableId: () => Promise<String>;
+  customId: () => Promise<String>;
   isDeleted: () => Promise<Boolean>;
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
