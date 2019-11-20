@@ -23,7 +23,7 @@ AccountMenu.fragments = {
 export default function AccountMenu({ me, match }: Props) {
   return (
     <SideMenu>
-      <h5 className={styles["menu-title"]}>Mon Compte</h5>
+      <h5 className={styles.title}>Mon Compte</h5>
       <NavLink to={`${match.url}/info`}>Informations générales</NavLink>
       <NavLink to={`${match.url}/integration`}>Intégration API</NavLink>
     </SideMenu>

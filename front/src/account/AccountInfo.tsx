@@ -1,5 +1,6 @@
 import React from "react";
 import gql from "graphql-tag";
+import AccountField from "./AccountField";
 
 type Props = {
   me: {
@@ -8,7 +9,15 @@ type Props = {
 };
 
 export default function AccountInfo({ me }: Props) {
-  return <p>email: {me.email}</p>;
+  return (
+    <>
+      <AccountField>
+        <div>Email</div>
+        <div>{me.email}</div>
+        <div>Modifier</div>
+      </AccountField>
+    </>
+  );
 }
 
 AccountInfo.fragments = {
