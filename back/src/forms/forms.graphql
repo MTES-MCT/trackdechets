@@ -99,6 +99,7 @@ Représente un BSD
 type Form {
   id: ID
   readableId: String
+  customId: String
 
   emitter: Emitter
   recipient: Recipient
