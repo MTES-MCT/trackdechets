@@ -7,6 +7,7 @@ import { trackPageView } from "./tracker";
 
 const dashBoardPreload = import("./dashboard/Dashboard");
 const Dashboard = lazy(() => dashBoardPreload);
+const Account = lazy(() => import("./account/Account"));
 const FormContainer = lazy(() => import("./form/FormContainer"));
 const SignupInfo = lazy(() => import("./login/SignupInfos"));
 const WasteSelector = lazy(() => import("./login/WasteSelector"));
@@ -77,6 +78,7 @@ export default withRouter(function LayoutContainer({ history }) {
         component={WaitingComponent(FormContainer)}
       />
       <PrivateRoute path="/dashboard" component={WaitingComponent(Dashboard)} />
+      <PrivateRoute path="/account" component={WaitingComponent(Account)} />
     </React.Fragment>
   );
 });

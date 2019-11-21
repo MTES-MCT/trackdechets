@@ -78,7 +78,6 @@ const mockedCompanyAdmins = [
     email: "producer@example.com",
     id: "qsd678",
     isActive: true,
-    userType: [],
     phone: "06 18 33 22 33"
   }
 ];

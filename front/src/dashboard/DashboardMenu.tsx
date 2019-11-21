@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Me } from "../login/model";
 import "./DashboardMenu.scss";
 import { NavLink, match } from "react-router-dom";
 import CompanySelector from "./CompanySelector";
-import useWindowSize from "../utils/use-window-size";
-import { FaBars } from "react-icons/fa";
 import { Company } from "../login/model";
+import SideMenu from "../common/SideMenu";
 
 interface IProps {
   me: Me;
@@ -14,78 +13,53 @@ interface IProps {
   handleCompanyChange: (siret: string) => void;
 }
 
-const MEDIA_QUERIES = {
-  mobile: 480
-};
-
 export default function DashboardMenu({
   me,
   match,
   siret,
   handleCompanyChange
 }: IProps) {
-  const windowSize = useWindowSize();
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
-  const [isOpened, setIsOpened] = useState(false);
-
-  useEffect(() => {
-    setIsMobileDevice(windowSize.width < MEDIA_QUERIES.mobile);
-  }, [windowSize]);
-
   const company = me.companies.find((c: Company) => c.siret === siret);
   const isTransporter = company
     ? company.companyTypes.indexOf("TRANSPORTER") > -1
     : false;
 
   return (
-    <aside className="dashboard-menu side-menu" role="navigation">
-      {isMobileDevice && (
-        <div
-          className="side-menu__mobile-trigger"
-          onClick={() => setIsOpened(!isOpened)}
-        >
-          <FaBars /> Menu
-        </div>
-      )}
-      {(!isMobileDevice || isOpened) && (
-        <>
-          <div className="company-title">
-            <h3>{me.name}</h3>
-            <p>{me.email}</p>
-            {me.companies.length > 1 && (
-              <CompanySelector
-                siret={siret}
-                companies={me.companies}
-                handleCompanyChange={handleCompanyChange}
-              />
-            )}
+    <SideMenu>
+      <>
+        {me.companies.length == 1 && (
+          <div className="company-title">{me.companies[0].name}</div>
+        )}
+        {me.companies.length > 1 && (
+          <div className="company-select">
+            <CompanySelector
+              siret={siret}
+              companies={me.companies}
+              handleCompanyChange={handleCompanyChange}
+            />
           </div>
-          <ul>
+        )}
+
+        <ul>
+          <li>
+            <NavLink to={`${match.url}/slips`} activeClassName="active">
+              Mes bordereaux
+            </NavLink>
+          </li>
+          {isTransporter && (
             <li>
-              <NavLink to={`${match.url}/slips`} activeClassName="active">
-                Mes bordereaux
+              <NavLink to={`${match.url}/transport`} activeClassName="active">
+                Transport
               </NavLink>
             </li>
-            {isTransporter && (
-              <li>
-                <NavLink to={`${match.url}/transport`} activeClassName="active">
-                  Transport
-                </NavLink>
-              </li>
-            )}
-            <li>
-              <NavLink to={`${match.url}/account`} activeClassName="active">
-                Mon compte
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to={`${match.url}/exports`} activeClassName="active">
-                Registre
-              </NavLink>
-            </li>
-          </ul>
-        </>
-      )}
-    </aside>
+          )}
+          <li>
+            <NavLink to={`${match.url}/exports`} activeClassName="active">
+              Registre
+            </NavLink>
+          </li>
+        </ul>
+      </>
+    </SideMenu>
   );
 }

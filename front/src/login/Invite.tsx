@@ -1,5 +1,5 @@
 import React from "react";
-import { Mutation } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import gql from "graphql-tag";
 import { withRouter, RouteComponentProps } from "react-router";

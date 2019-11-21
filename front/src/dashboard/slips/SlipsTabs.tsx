@@ -3,20 +3,19 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "./SlipsTabs.scss";
 import Slips from "./Slips";
 import { GET_SLIPS } from "./query";
-import { Query, QueryResult } from "react-apollo";
+import { Query } from "@apollo/react-components";
 import { Me } from "../../login/model";
-import { Form } from "../../form/model";
-import { getNextStep, getTabForms, SlipTabs } from "./slips-actions/next-step";
+import { getTabForms, SlipTabs } from "./slips-actions/next-step";
 import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-type Props = { me: Me, siret?: string };
+type Props = { me: Me; siret?: string };
 export default function SlipsTabs({ me, siret }: Props) {
   return (
     <Query query={GET_SLIPS} variables={{ siret }}>
-      {({ loading, error, data }: QueryResult<{ forms: Form[] }>) => {
-        if (loading) return "Chargement...";
-        if (error || !data) return "Erreur...";
+      {({ loading, error, data }) => {
+        if (loading) return <p>"..."</p>;
+        if (error || !data) return <p>"Erreur..."</p>;
 
         const drafts = getTabForms(SlipTabs.DRAFTS, data.forms, me);
         const toSign = getTabForms(SlipTabs.TO_SIGN, data.forms, me);

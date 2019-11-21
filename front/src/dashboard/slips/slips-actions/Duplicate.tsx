@@ -1,9 +1,8 @@
 import React from "react";
 import { FaClone } from "react-icons/fa";
-import { Mutation } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
-import { Form } from "../../../form/model";
 import { currentSiretService } from "../../CompanySelector";
 
 type Props = { formId: string };
@@ -19,7 +18,7 @@ export default function Duplicate({ formId }: Props) {
             duplicate({
               variables: { id: formId },
               update: (store, { data: { duplicateForm } }) => {
-                const data = store.readQuery<{ forms: Form[] }>({
+                const data = store.readQuery({
                   query: GET_SLIPS,
                   variables: { siret: currentSiretService.getSiret() }
                 });

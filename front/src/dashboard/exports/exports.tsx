@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Me } from "../../login/model";
-import { Query, QueryResult } from "react-apollo";
+import { Query } from "@apollo/react-components";
 import gql from "graphql-tag";
 
 interface IProps {
@@ -41,9 +41,9 @@ export default function Exports({ me }: IProps) {
     <div className="main">
       <h2>Statistiques</h2>
       <Query query={GET_STATS}>
-        {({ loading, error, data }: QueryResult<{ stats: Stats[] }>) => {
-          if (loading) return "Chargement...";
-          if (error || !data) return "Erreur...";
+        {({ loading, error, data }) => {
+          if (loading) return <p>Chargement...</p>;
+          if (error || !data) return <p>"Erreur..."</p>;
           return (
             <table className="table">
               <thead>
@@ -98,18 +98,14 @@ export default function Exports({ me }: IProps) {
       <a
         className="button"
         target="_blank"
-        href={`${
-          process.env.REACT_APP_API_ENDPOINT
-        }/exports?exportType=OUTGOING&siret=${sirets}`}
+        href={`${process.env.REACT_APP_API_ENDPOINT}/exports?exportType=OUTGOING&siret=${sirets}`}
       >
         Registre de déchets sortants
       </a>
       <a
         className="button"
         target="_blank"
-        href={`${
-          process.env.REACT_APP_API_ENDPOINT
-        }/exports?exportType=INCOMING&siret=${sirets}`}
+        href={`${process.env.REACT_APP_API_ENDPOINT}/exports?exportType=INCOMING&siret=${sirets}`}
       >
         Registre de déchets entrants
       </a>

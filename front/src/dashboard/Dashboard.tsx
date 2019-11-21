@@ -1,8 +1,7 @@
 import gql from "graphql-tag";
 import React from "react";
-import { Query } from "react-apollo";
+import { Query } from "@apollo/react-components";
 import { Route, RouteComponentProps } from "react-router";
-import Account from "./account/Account";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import SlipsContainer from "./slips/SlipsContainer";
@@ -15,22 +14,12 @@ export const GET_ME = gql`
   {
     me {
       id
-      name
-      email
-      phone
       companies {
         id
-        admins {
-          id
-          name
-        }
-        siret
         name
-        address
-        securityCode
+        siret
         companyTypes
       }
-      userType
     }
   }
 `;
@@ -68,8 +57,8 @@ export default class Dashboard extends React.Component<RouteComponentProps, S> {
     return (
       <Query<MeData> query={GET_ME}>
         {({ loading, error, data }) => {
-          if (loading) return "Chargement...";
-          if (error) return `Erreur ! ${error.message}`;
+          if (loading) return <p>Chargement...</p>;
+          if (error) return <p>{`Erreur ! ${error.message}`}</p>;
 
           if (data) {
             // default to first company siret if it is not set
@@ -99,10 +88,6 @@ export default class Dashboard extends React.Component<RouteComponentProps, S> {
                     render={() => <Transport me={data.me} siret={siret} />}
                   />
                   <Route
-                    path={`${match.path}/account`}
-                    render={() => <Account me={data.me} />}
-                  />
-                  <Route
                     path={`${match.path}/exports`}
                     render={() => <Exports me={data.me} />}
                   />
@@ -110,6 +95,8 @@ export default class Dashboard extends React.Component<RouteComponentProps, S> {
               </div>
             );
           }
+
+          return null;
         }}
       </Query>
     );

@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Me } from "../../login/model";
 import "./Transport.scss";
-import { Query, QueryResult } from "react-apollo";
+import { Query } from "@apollo/react-components";
 import gql from "graphql-tag";
-import { Form } from "../../form/model";
 import TransportSignature from "./TransportSignature";
 
 type Props = {
@@ -61,9 +60,9 @@ export default function Transport({ me, siret }: Props) {
           query={GET_TRANSPORT_SLIPS}
           variables={{ siret, type: "TRANSPORTER" }}
         >
-          {({ loading, error, data }: QueryResult<{ forms: Form[] }>) => {
-            if (loading) return "Chargement...";
-            if (error || !data) return "Erreur...";
+          {({ loading, error, data }) => {
+            if (loading) return <p>Chargement...</p>;
+            if (error || !data) return <p>"Erreur..."</p>;
 
             return (
               <table className="table">

@@ -1,6 +1,6 @@
 import { ErrorMessage, Field, Form, Formik, FormikActions } from "formik";
 import React from "react";
-import { Mutation, MutationFn } from "react-apollo";
+import { Mutation } from "@apollo/react-components";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { LOGIN } from "./mutations";
 import { localAuthService } from "./auth.service";
@@ -8,7 +8,7 @@ import { localAuthService } from "./auth.service";
 type Values = { email: string; password: string; form: string };
 const handleSubmit = (
   payload: Values,
-  props: FormikActions<Values> & { login: MutationFn } & RouteComponentProps
+  props: FormikActions<Values> & { login } & RouteComponentProps
 ) => {
   const { email, password } = payload;
   props
@@ -32,7 +32,7 @@ export default withRouter(function Login(
 ) {
   return (
     <Mutation mutation={LOGIN}>
-      {(login, { data }) => (
+      {login => (
         <Formik
           initialValues={{ email: "", password: "", form: "" }}
           onSubmit={(values, formikActions) => {

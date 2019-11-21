@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+## [2019.11.2] 21/11/2019
+* Mise à jour du service de génération de pdf pour se rapprocher du Cerfa officiel
+* Relooking de la barre de navigation. Déplacement de "Mon Compte" au même niveau que "Mon espace".
+* Ajout du SIRET en plus du nom dans le sélecteur d'entreprise [PR #80](https://github.com/MTES-MCT/trackdechets/pull/80)
+
+
 ## [2019.11.1] 06/11/2019
 
 * Rattachment du profil TD à l'entreprise (https://github.com/MTES-MCT/trackdechets/pull/57)
