@@ -5,29 +5,36 @@ const fontkit = require("@pdf-lib/fontkit");
 
 const { PDFDocument } = pdflib;
 
-// coordinates and fontsize of each field
+// Object to configure field settings
+// coordinates: top/left, mandatory
+// fontsize: optional
+// maxLength: how many characters do we display, optional
+// lineBreakAt: at which position do we insert a linebreak (optional)
+// rightAlign: right align the content
 const fieldSettings = {
   emitterTypeProducer: { x: 53, y: 126, fontSize: 12 },
   emitterTypeAppendix1: { x: 157.5, y: 125.5, fontSize: 12 },
   emitterTypeAppendix2: { x: 51, y: 167, fontSize: 12 },
   emitterTypeOther: { x: 213.5, y: 167, fontSize: 12 },
   readableId: { x: 115, y: 104, fontSize: 10 },
+  customId: { x: 220, y: 104, fontSize: 10 },
 
   emitterCompanySiret: { x: 88, y: 210 },
-  emitterCompanyName: { x: 70, y: 219 },
-  emitterCompanyAddress: { x: 78, y: 230 },
+  emitterCompanyName: { x: 70, y: 219, maxLength: 50 },
+  emitterCompanyAddress: { x: 78, y: 230, lineBreakAt: 55, maxLength: 110 },
   emitterCompanyPhone: { x: 65, y: 250 },
   emitterCompanyMail: { x: 64, y: 261 },
   emitterCompanyContact: { x: 125, y: 271 },
 
   recipientCompanySiret: { x: 342, y: 178 },
-  recipientCompanyName: { x: 325, y: 189 },
-  recipientCompanyAddress: { x: 331, y: 198 },
+  recipientCompanyName: { x: 325, y: 189, maxLength: 50 },
+  recipientCompanyAddress: { x: 331, y: 198, lineBreakAt: 55, maxLength: 110 },
   recipientCompanyPhone: { x: 317, y: 219 },
   recipientCompanyMail: { x: 318, y: 229.5 },
   recipientCompanyContact: { x: 378, y: 240.5 },
   recipientCap: { x: 402, y: 261 },
   recipientProcessingOperation: { x: 507, y: 271 },
+  temporaryStorageNo: { x: 305, y: 159, fontSize: 12 },
 
   wasteDetailsCode: { x: 155, y: 292, fontSize: 10 },
   wasteDetailsConsistenceSolid: { x: 368, y: 293, fontSize: 12 },
@@ -44,13 +51,13 @@ const fieldSettings = {
   wasteDetailsPackagingsOther: { x: 324, y: 358, fontSize: 12 },
   wasteDetailsNumberOfPackages: { x: 505, y: 355 },
 
-  wasteDetailsQuantityReal: { x: 112, y: 380 },
-  wasteDetailsQuantityEstimated: { x: 170, y: 380 },
+  wasteDetailsQuantityReal: { x: 112, y: 380, fontSize: 12 },
+  wasteDetailsQuantityEstimated: { x: 170, y: 380, fontSize: 12 },
   wasteDetailsQuantity: { x: 248, y: 377, rightAlign: true },
 
   traderCompanySiret: { x: 87, y: 410 },
-  traderCompanyName: { x: 70, y: 420 },
-  traderCompanyAddress: { x: 78, y: 430 },
+  traderCompanyName: { x: 70, y: 420, maxLength: 50 },
+  traderCompanyAddress: { x: 78, y: 430, lineBreakAt: 55, maxLength: 110 },
   traderCompanyPhone: { x: 318, y: 428 },
   traderCompanyMail: { x: 319, y: 438.5 },
   traderCompanyContact: { x: 377, y: 418 },
@@ -59,8 +66,8 @@ const fieldSettings = {
   traderDepartment: { x: 468, y: 398 },
 
   transporterCompanySiret: { x: 87, y: 474 },
-  transporterCompanyName: { x: 70, y: 484 },
-  transporterCompanyAddress: { x: 78, y: 494 },
+  transporterCompanyName: { x: 70, y: 484, maxLength: 50 },
+  transporterCompanyAddress: { x: 78, y: 494, lineBreakAt: 55, maxLength: 110 },
   transporterCompanyPhone: { x: 64, y: 515 },
   transporterCompanyMail: { x: 65, y: 525 },
   transporterCompanyContact: { x: 122, y: 536 },
@@ -73,17 +80,17 @@ const fieldSettings = {
   senderSentAt: { x: 216, y: 588 },
 
   recipientCompanySiret10: { x: 86, y: 620 },
-  recipientCompanyName10: { x: 72, y: 632 },
-  recipientCompanyAddress10: { x: 78, y: 642 },
+  recipientCompanyName10: { x: 72, y: 632, maxLength: 50 },
+  recipientCompanyAddress10: { x: 78, y: 642, lineBreakAt: 55, maxLength: 110 },
   recipientCompanyContact10: { x: 124, y: 662 },
   recipientPhoneContact10: { x: 124, y: 662 },
   quantityReceived: { x: 198, y: 673, rightAlign: true },
   receivedBy10: { x: 85, y: 735 },
-  receivedAt1: { x: 65, y: 745 },
+  receivedAt1: { x: 122, y: 683 },
 
-  receivedAt2: { x: 66, y: 744 },
-  isAccepted: { x: 115, y: 696, fontSize: 12 },
-  isNotAccepted: { x: 160, y: 696, fontSize: 12 },
+  receivedAt2: { x: 66, y: 746 },
+  isAccepted: { x: 116, y: 696, fontSize: 12 },
+  isNotAccepted: { x: 161, y: 696, fontSize: 12 },
   processingOperationDone: { x: 338, y: 620 },
   processingOperationDescription: { x: 342, y: 640 },
   processedBy: { x: 322, y: 680 },
@@ -98,7 +105,9 @@ const pageHeight = 842;
 
 /**
  * Write text on the pdf by retrieving field params in fieldSettings object
- * @param fieldName - name of the field
+ *  Can right align, limit content length or split content according to fieldSettings params.
+ *
+ *  @param fieldName - name of the field
  * @param content - text to write
  * @param font - font object
  * @param page - page on which we want to write
@@ -113,12 +122,22 @@ const drawText = (fieldName, content, font, page) => {
       const contentWidth = font.widthOfTextAtSize(content, fontSize);
       x = x - contentWidth;
     }
+    if (!!params.maxLength) {
+      content = content.substring(0, params.maxLength);
+    }
+    if (!!params.lineBreakAt) {
+      content = `${content.substring(
+        0,
+        params.lineBreakAt
+      )}\n${content.substring(params.lineBreakAt)}`;
+    }
 
     page.drawText(content, {
       x: x,
       y: pageHeight - params.y,
       size: fontSize,
-      font: font
+      font: font,
+      lineHeight: fontSize * 1.2
     });
   }
 };
@@ -158,6 +177,7 @@ const drawImage = (locationName, image, page) => {
     height: 37
   });
 };
+
 const capitalize = string =>
   string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 
@@ -226,6 +246,31 @@ const getWasteDetailsConsistence = params => {
   };
 };
 
+/**
+ * Return either wasteDetailsQuantityEstimated: true | wasteDetailsQuantityReal: true etc according to
+ * wasteDetailsQuantityType parameter
+ *
+ * @param {object} params -  the full request payload
+ * @returns {object}
+ */
+const getWasteDetailsType = params => {
+  if (!params.wasteDetailsQuantityType) {
+    return {};
+  }
+  let field = {
+    ESTIMATED: "wasteDetailsQuantityEstimated",
+    REAL: "wasteDetailsQuantityReal"
+  }[params.wasteDetailsQuantityType];
+  return {
+    [field]: true
+  };
+};
+
+/**
+ * Format date fields to french fmt and copy some fields values to other fields
+ * @param params
+ * @returns {{traderValidityLimit: *, senderSentAt: *, transporterSentAt: *, recipientCompanyName10: *, transporterValidityLimit: *, recipientCompanySiret10: *, receivedAt2: *, recipientCompanyContact10: *, receivedAt1: *, recipientCompanyAddress10: *}}
+ */
 const renameAndFormatFields = params => ({
   transporterValidityLimit: dateFmt(params.transporterValidityLimit),
   traderValidityLimit: dateFmt(params.traderValidityLimit),
@@ -275,6 +320,16 @@ const stringifyNumberFields = params => {
 };
 
 /**
+ * If waste is not accepted, we get isAccepted: false (not null), so we have to insert the isNotAccepted field.
+ * @param params
+ * @returns object
+ */
+const getAcceptationStatus = params => {
+  if (params.isAccepted === false) return { isNotAccepted: true };
+  return {};
+};
+
+/**
  * Apply transformers to payload
  * @param params -  the full request payload
  * @returns {object}
@@ -286,7 +341,9 @@ function process(params) {
     ...getEmitterType(data),
     ...getWasteDetailsConsistence(data),
     ...getWasteDetailsPackagings(data),
-    ...renameAndFormatFields(data)
+    ...getWasteDetailsType(data),
+    ...renameAndFormatFields(data),
+    ...getAcceptationStatus(data)
   };
 }
 
@@ -298,7 +355,6 @@ function process(params) {
  */
 const write = async params => {
   const formData = process(params);
-
   const fontBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
 
   const existingPdfBytes = fs.readFileSync(
@@ -323,6 +379,7 @@ const write = async params => {
   );
   const exemptionStampImage = await pdfDoc.embedPng(exemptionStampBytes);
 
+  checkBox("temporaryStorageNo", customFont, firstPage);
   for (let [k, v] of Object.entries(formData)) {
     if (v === true) {
       checkBox(k, customFont, firstPage);
