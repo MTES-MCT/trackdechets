@@ -8,7 +8,7 @@ export const COMPANY_TYPES = [
     value: "COLLECTOR",
     label: "Installation de Transit, regroupement ou tri de déchets",
     helpText:
-      "Installations sur lesquelles sont regroupés, triés ou en transit les déchets dangereux et/ou non dangereux - installations relevant des rubrique de la nomenclature ICPE suivantes:  2711, 2713, 2714, 2715, 2716, 2718, 2719, 2731, 2792-1, 2793-1, 2793-2, 2797-1, 2798."
+      "Installations sur lesquelles sont regroupés, triés ou en transit les déchets dangereux et/ou non dangereux - installations relevant des rubriques suivantes de la nomenclature ICPE:  2711, 2713, 2714, 2715, 2716, 2718, 2719, 2731, 2792-1, 2793-1, 2793-2, 2797-1, 2798."
   },
   {
     value: "WASTE_CENTER",
@@ -28,7 +28,7 @@ export const COMPANY_TYPES = [
     value: "WASTEPROCESSOR",
     label: "Installation de traitement",
     helpText:
-      "Installations sur lesquelles sont traités les déchets, et relevant des rubrique de la nomenclature ICPE suivantes:  2720, 2730, 2740, 2750, 2751, 2752, 2760, 2770, 2771, 2780, 2781, 2782, 2790, 2791, 2792-2, 2793-3, 2794, 2795, 2797-2 et 3510, 3520, 3531, 3532, 3540, 3550, 3560."
+      "Installations sur lesquelles sont traités les déchets, et relevant des rubriques suivantes de la nomenclature ICPE :  2720, 2730, 2740, 2750, 2751, 2752, 2760, 2770, 2771, 2780, 2781, 2782, 2790, 2791, 2792-2, 2793-3, 2794, 2795, 2797-2 et 3510, 3520, 3531, 3532, 3540, 3550, 3560."
   },
   {
     value: "TRANSPORTER",
