@@ -17,7 +17,7 @@ const fieldSettings = {
   emitterTypeAppendix2: { x: 51, y: 167, fontSize: 12 },
   emitterTypeOther: { x: 213.5, y: 167, fontSize: 12 },
   readableId: { x: 115, y: 104, fontSize: 10 },
-  customId: { x: 220, y: 104, fontSize: 10 },
+  customId: { x: 300, y: 104, fontSize: 10 },
 
   emitterCompanySiret: { x: 88, y: 210 },
   emitterCompanyName: { x: 70, y: 219, maxLength: 50 },
@@ -101,6 +101,8 @@ const fieldSettings = {
   nextDestinationProcessingOperation: { x: 154, y: 776.5 },
   nextDestinationDetails: { x: 88, y: 788 }
 };
+
+const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
 
 // Standard page height in pixels
 const pageHeight = 842;
@@ -357,7 +359,10 @@ function process(params) {
  */
 const write = async params => {
   const formData = process(params);
-  const fontBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
+  const arialBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
+  const timesBoldBytes = fs.readFileSync(
+    path.join(__dirname, "./fonts/times-bold.ttf")
+  );
 
   const existingPdfBytes = fs.readFileSync(
     path.join(__dirname, "./templates/bsd.pdf")
@@ -366,7 +371,8 @@ const write = async params => {
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
 
   pdfDoc.registerFontkit(fontkit);
-  const customFont = await pdfDoc.embedFont(fontBytes);
+  const arialFont = await pdfDoc.embedFont(arialBytes);
+  const timesBoldFont = await pdfDoc.embedFont(timesBoldBytes);
 
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
@@ -381,13 +387,23 @@ const write = async params => {
   );
   const exemptionStampImage = await pdfDoc.embedPng(exemptionStampBytes);
 
-  checkBox("temporaryStorageNo", customFont, firstPage);
+  // customId does not belong to original cerfa, so we had to add our own field title and mimic font look and feel
+  if (!!formData.customId) {
+    firstPage.drawText("Autre n° libre :", {
+      x: customIdTitleParams.x,
+      y: pageHeight - customIdTitleParams.y,
+      size: customIdTitleParams.fontSize,
+      font: timesBoldFont
+    });
+  }
+
+  checkBox("temporaryStorageNo", arialFont, firstPage);
   for (let [k, v] of Object.entries(formData)) {
     if (v === true) {
-      checkBox(k, customFont, firstPage);
+      checkBox(k, arialFont, firstPage);
     }
     if (typeof v === "string") {
-      drawText(k, v, customFont, firstPage);
+      drawText(k, v, arialFont, firstPage);
     }
   }
 
