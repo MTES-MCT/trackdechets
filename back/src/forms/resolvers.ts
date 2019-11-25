@@ -388,7 +388,7 @@ function logStatusChange(formId, userId, status, context: Context) {
         `Cannot log status change for form ${formId}, user ${userId}, status ${status}`,
         err
       );
-      throw new Error("Problème technique, mercide réessayer plus tard.");
+      throw new Error("Problème technique, merci de réessayer plus tard.");
     });
 }
 

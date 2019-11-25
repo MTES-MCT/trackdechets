@@ -150,6 +150,7 @@ type Declaration {
 type Form {
   id: ID! @id
   readableId: String @unique
+  customId: String
   isDeleted: Boolean @default(value: false)
 
   owner: User! @relation(link: TABLE)

@@ -11,6 +11,7 @@ export const EXPORT_COLUMNS: {
   [key: string]: ColumnDetail;
 } = {
   number: { key: "number", label: "Numéro de BSD", getter: f => f.readableId },
+  customNumber: { key: "customNumber", label: "Numéro libre", getter: f => f.customId },
   wasteCode: {
     key: "wasteCode",
     label: "Code déchet",

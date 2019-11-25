@@ -66,7 +66,6 @@ export const pdfEmailAttachment = async id => {
 
   return buildPdf(form, "arraybuffer")
     .then(response => {
-      console.log(response.data);
       return {
         file: Buffer.from(response.data, "binary").toString("base64"),
         name: `${form.readableId}.pdf`

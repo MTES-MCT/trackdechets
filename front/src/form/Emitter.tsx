@@ -13,7 +13,7 @@ export default connect<{}, Values>(function Emitter({ formik }) {
   );
 
   return (
-    <React.Fragment>
+    <>
       <h4>Type d'émetteur</h4>
 
       <div className="form__group">
@@ -59,7 +59,7 @@ export default connect<{}, Values>(function Emitter({ formik }) {
         Je souhaite ajouter une adresse de chantier ou de collecte
       </label>
       {pickupSite && (
-        <React.Fragment>
+        <>
           <h4>Adresse chantier</h4>
           <Field
             component="textarea"
@@ -67,8 +67,8 @@ export default connect<{}, Values>(function Emitter({ formik }) {
             placeholder="Nom / Adresse / Précisions..."
             name="emitter.pickupSite"
           />
-        </React.Fragment>
+        </>
       )}
-    </React.Fragment>
+    </>
   );
 });

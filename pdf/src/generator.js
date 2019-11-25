@@ -90,7 +90,9 @@ const fieldSettings = {
 
   receivedAt2: { x: 66, y: 746 },
   isAccepted: { x: 116, y: 696, fontSize: 12 },
+
   isNotAccepted: { x: 161, y: 696, fontSize: 12 },
+
   processingOperationDone: { x: 338, y: 620 },
   processingOperationDescription: { x: 342, y: 640 },
   processedBy: { x: 322, y: 680 },

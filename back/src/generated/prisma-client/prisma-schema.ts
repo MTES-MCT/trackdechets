@@ -672,6 +672,7 @@ enum EmitterType {
 type Form {
   id: ID!
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: User!
   createdAt: DateTime!
@@ -748,6 +749,7 @@ type FormConnection {
 input FormCreateInput {
   id: ID
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
@@ -833,6 +835,8 @@ enum FormOrderByInput {
   id_DESC
   readableId_ASC
   readableId_DESC
+  customId_ASC
+  customId_DESC
   isDeleted_ASC
   isDeleted_DESC
   createdAt_ASC
@@ -964,6 +968,7 @@ enum FormOrderByInput {
 type FormPreviousValues {
   id: ID!
   readableId: String
+  customId: String
   isDeleted: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -1058,6 +1063,20 @@ input FormScalarWhereInput {
   readableId_not_starts_with: String
   readableId_ends_with: String
   readableId_not_ends_with: String
+  customId: String
+  customId_not: String
+  customId_in: [String!]
+  customId_not_in: [String!]
+  customId_lt: String
+  customId_lte: String
+  customId_gt: String
+  customId_gte: String
+  customId_contains: String
+  customId_not_contains: String
+  customId_starts_with: String
+  customId_not_starts_with: String
+  customId_ends_with: String
+  customId_not_ends_with: String
   isDeleted: Boolean
   isDeleted_not: Boolean
   createdAt: DateTime
@@ -1807,6 +1826,7 @@ input FormSubscriptionWhereInput {
 
 input FormUpdateDataInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
@@ -1874,6 +1894,7 @@ input FormUpdateDataInput {
 
 input FormUpdateInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
@@ -1941,6 +1962,7 @@ input FormUpdateInput {
 
 input FormUpdateManyDataInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   signedByTransporter: Boolean
   status: String
@@ -2018,6 +2040,7 @@ input FormUpdateManyInput {
 
 input FormUpdateManyMutationInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   signedByTransporter: Boolean
   status: String
@@ -2138,6 +2161,20 @@ input FormWhereInput {
   readableId_not_starts_with: String
   readableId_ends_with: String
   readableId_not_ends_with: String
+  customId: String
+  customId_not: String
+  customId_in: [String!]
+  customId_not_in: [String!]
+  customId_lt: String
+  customId_lte: String
+  customId_gt: String
+  customId_gte: String
+  customId_contains: String
+  customId_not_contains: String
+  customId_starts_with: String
+  customId_not_starts_with: String
+  customId_ends_with: String
+  customId_not_ends_with: String
   isDeleted: Boolean
   isDeleted_not: Boolean
   owner: UserWhereInput
