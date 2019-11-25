@@ -6,10 +6,8 @@ import RedErrorMessage from "./RedErrorMessage";
 
 type Values = {
   transporter: { isExemptedOfReceipt: boolean };
-  customId: string;
 };
 export default connect<{}, Values>(function Transporter(props) {
-  const [displayCustomId, setDisplayCustomId] = useState(!!props.formik.values.customId);
   return (
     <>
       <h4>Transporteur</h4>
@@ -23,8 +21,9 @@ export default connect<{}, Values>(function Transporter(props) {
             name="transporter.isExemptedOfReceipt"
             checked={props.formik.values.transporter.isExemptedOfReceipt}
           />
-          Je transporte moi même mon déchet vers une entreprise autorisée à les
-          prendre en charge et je rempli les conditions d'exemption de récépissé
+          Je transporte moi-même mon déchet vers une entreprise autorisée à les
+          prendre en charge et je remplis les conditions d'exemption de
+          récépissé
         </label>
       </div>
       {!props.formik.values.transporter.isExemptedOfReceipt && (
@@ -66,26 +65,6 @@ export default connect<{}, Values>(function Transporter(props) {
           <RedErrorMessage name="transporter.numberPlate" />
         </div>
       )}
-      <div className="form__group">
-        <label>
-          <input
-            type="checkbox"
-            defaultChecked={displayCustomId}
-            onChange={() => setDisplayCustomId(!displayCustomId)}
-          />
-          Je souhaite ajouter un numéro de BSD qui m'est propre
-        </label>
-        {displayCustomId && (
-          <>
-            <h4>Numéro Libre</h4>
-            <Field
-              type="text"
-              placeholder="Utilisez votre propre numéro de BSD si nécessaire."
-              name="customId"
-            />
-          </>
-        )}
-      </div>
     </>
   );
 });
