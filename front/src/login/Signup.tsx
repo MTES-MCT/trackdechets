@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import { Company } from "../form/company/CompanySelector";
 import { COMPANY_INFOS } from "../form/company/query";
-import RedErrorMessage from "../form/RedErrorMessage";
+import RedErrorMessage from "../common/RedErrorMessage";
 import StatusErrorMessage from "../form/StatusErrorComponent";
 import { SIGNUP } from "./mutations";
 import "./Signup.scss";

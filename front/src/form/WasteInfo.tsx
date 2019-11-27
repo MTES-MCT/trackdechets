@@ -5,7 +5,7 @@ import { wasteCodeValidator } from "./waste-code/waste-code.validator";
 import RadioButton from "./custom-inputs/RadioButton";
 import NumberInput from "./custom-inputs/NumberInput";
 import Packagings from "./packagings/Packagings";
-import RedErrorMessage from "./RedErrorMessage";
+import RedErrorMessage from "../common/RedErrorMessage";
 import FormsSelector from "./appendix/FormsSelector";
 import AppendixInfo from "./appendix/AppendixInfo";
 

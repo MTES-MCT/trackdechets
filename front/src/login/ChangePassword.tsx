@@ -2,7 +2,7 @@ import { Field, Form, Formik, FormikActions } from "formik";
 import React from "react";
 import { Mutation } from "@apollo/react-components";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import RedErrorMessage from "../form/RedErrorMessage";
+import RedErrorMessage from "../common/RedErrorMessage";
 import { CHANGEPASSWORD } from "./mutations";
 
 type Values = {

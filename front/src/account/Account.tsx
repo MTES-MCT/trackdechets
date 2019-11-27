@@ -39,7 +39,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
           path={`${match.path}/info`}
           render={() => (
             <AccountContentWrapper title="Informations générales">
-              <AccountInfo me={data.me} />
+              <AccountInfo me={filter(AccountInfo.fragments.me, data.me)} />
             </AccountContentWrapper>
           )}
         />

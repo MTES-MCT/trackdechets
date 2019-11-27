@@ -172,8 +172,6 @@ export default {
         ...(!!email ? { email } : {})
       };
 
-      throw new Error("Bang");
-
       return prisma
         .updateUser({
           where: { id: userId },

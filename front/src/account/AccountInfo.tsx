@@ -1,29 +1,32 @@
 import React from "react";
 import gql from "graphql-tag";
-import AccountField from "./AccountField";
+import { filter } from "graphql-anywhere";
+import AccountFieldEmail from "./fields/AccountFieldEmail";
+import AccountFieldPhone from "./fields/AccountFieldPhone";
 
 type Props = {
   me: {
     email: string;
+    phone: string;
   };
+};
+
+AccountInfo.fragments = {
+  me: gql`
+    fragment AccountInfoFragment on User {
+      ...AccountFieldEmailFragment
+      ...AccountFieldPhoneFragment
+    }
+    ${AccountFieldEmail.fragments.me},
+    ${AccountFieldPhone.fragments.me}
+  `
 };
 
 export default function AccountInfo({ me }: Props) {
   return (
     <>
-      <AccountField>
-        <div>Email</div>
-        <div>{me.email}</div>
-        <div>Modifier</div>
-      </AccountField>
+      <AccountFieldEmail me={filter(AccountFieldEmail.fragments.me, me)} />
+      <AccountFieldPhone me={filter(AccountFieldPhone.fragments.me, me)} />
     </>
   );
 }
-
-AccountInfo.fragments = {
-  me: gql`
-    fragment AccountInfoFragment on User {
-      email
-    }
-  `
-};

@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import "./InviteNewUser.scss";
 import { Mutation, Query } from "@apollo/react-components";
 import gql from "graphql-tag";
-import RedErrorMessage from "../form/RedErrorMessage";
+import RedErrorMessage from "../common/RedErrorMessage";
 import { FaTimes } from "react-icons/fa";
 
 const INVITE_USER_TO_COMPANY = gql`
