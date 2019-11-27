@@ -166,10 +166,18 @@ export default {
     editProfile: (_, { name, phone, email }, context) => {
       const userId = context.user.id;
 
+      const data = {
+        ...(!!name ? { name } : {}),
+        ...(!!phone ? { phone } : {}),
+        ...(!!email ? { email } : {})
+      };
+
+      throw new Error("Bang");
+
       return prisma
         .updateUser({
           where: { id: userId },
-          data: { name, phone, email }
+          data
         })
         .catch(err => {
           console.error(

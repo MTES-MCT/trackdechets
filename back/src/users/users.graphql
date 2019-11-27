@@ -20,7 +20,7 @@ type Mutation {
   login(email: String!, password: String!): AuthPayload!
   changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
   resetPassword(email: String!): Boolean
-  editProfile(name: String!, phone: String!, email: String!): User
+  editProfile(name: String, phone: String, email: String): User
   inviteUserToCompany(email: String!, siret: String!, role: UserRole!): Boolean
   joinWithInvite(
     inviteHash: String!
