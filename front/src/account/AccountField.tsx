@@ -5,10 +5,26 @@ type Props = {
   /**
    * Render prop
    */
-  render: (toggleEdition: any, state: { editing: boolean }) => ReactNode;
+  name: string;
+  label: string;
+  value: string | undefined;
+  renderForm: (toggleEdition: () => void) => ReactNode;
+  modifier: string;
 };
 
-export default function AccountField({ render }: Props) {
+export type Me = {
+  name?: string;
+  phone?: string;
+  email?: string;
+};
+
+export default function AccountField({
+  name,
+  label,
+  value,
+  renderForm,
+  modifier
+}: Props) {
   const [editing, setEditing] = useState(false);
 
   const toggleEdition = () => {
@@ -17,9 +33,18 @@ export default function AccountField({ render }: Props) {
 
   const classes = [styles.field, ...(editing ? [styles.editing] : [])];
 
+  const initialValues = {};
+  initialValues[name] = value;
+
+  const form = renderForm(toggleEdition);
+
   return (
     <div className={classes.join(" ")}>
-      {render(toggleEdition, { editing })}
+      <label htmlFor={name}>{label}</label>
+      <div id={name}>{!editing ? <span>{value}</span> : form}</div>
+      <div className={styles.modifier} onClick={toggleEdition}>
+        {!editing ? modifier : "Fermer"}
+      </div>
     </div>
   );
 }
