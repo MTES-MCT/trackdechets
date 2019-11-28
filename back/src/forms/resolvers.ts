@@ -17,31 +17,16 @@ export default {
     }
   },
   Query: {
-    form: async (parent, { id }, context: Context) => {
+    form: async (_, { id }, context: Context) => {
       if (!id) {
         // On form creation, there is no id
         return null;
       }
 
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-
       const dbForm = await context.prisma.form({ id });
-      const formOwner = await context.prisma.form({ id }).owner();
-      if (
-        formOwner.id !== userId &&
-        !userCompanies.find(
-          c =>
-            c.siret === dbForm.recipientCompanySiret ||
-            c.siret === dbForm.emitterCompanySiret
-        )
-      ) {
-        throw new Error("Vous n'êtes pas autorisé à visualiser ce bordereau.");
-      }
-
       return unflattenObjectFromDb(dbForm);
     },
-    forms: async (parent, { siret, type }, context: Context) => {
+    forms: async (_, { siret, type }, context: Context) => {
       const userId = getUserId(context);
       const userCompanies = await getUserCompanies(userId);
 
@@ -122,15 +107,6 @@ export default {
       { emitterSiret, wasteCode },
       context: Context
     ) => {
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-
-      if (!userCompanies.find(c => c.siret === emitterSiret)) {
-        throw new Error(
-          "Vous n'êtes pas autorisé à créer de bordereau de regroupement pour cette entreprise."
-        );
-      }
-
       const forms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),
@@ -220,26 +196,12 @@ export default {
         }
       });
     },
-    markAsSent: async (parent, { id, sentInfo }, context: Context) => {
+    markAsSent: async (_, { id, sentInfo }, context: Context) => {
+      const userId = getUserId(context);
       const form = await context.prisma.form({ id });
 
       if (!["DRAFT", "SEALED"].includes(form.status)) {
         throw new Error("Impossible de marquer ce bordereau comme envoyé");
-      }
-
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-      const sirets = userCompanies.map(c => c.siret);
-
-      const isEmitter = sirets.includes(form.emitterCompanySiret);
-      const isRecipient = sirets.includes(form.recipientCompanySiret);
-
-      if (!isEmitter && !isRecipient) {
-        throw new Error("Unauthorized.");
-      }
-
-      if (isRecipient) {
-        // TODO alert emitter that markAsSent has been done by recipient
       }
 
       await markFormAppendixAwaitingFormsAsGrouped(id, context);

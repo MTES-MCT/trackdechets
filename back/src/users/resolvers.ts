@@ -190,12 +190,6 @@ export default {
       const admins = await getCompanyAdmins(siret);
       const admin = admins.find(a => a.id === userId);
 
-      if (!admin) {
-        throw new Error(
-          "Vous ne pouvez pas inviter un utilisateur dans cette entreprise."
-        );
-      }
-
       const existingUser = await context.prisma
         .user({ email })
         .catch(_ => null);
@@ -284,16 +278,7 @@ export default {
         user
       };
     },
-    removeUserFromCompany: async (_, { userId, siret }, context: Context) => {
-      const currentUserId = getUserId(context);
-      const admins = await getCompanyAdmins(siret);
-
-      if (!admins || !admins.find(a => a.id === currentUserId)) {
-        throw new Error(
-          "Vous ne pouvez pas retirer un utilisateur dans cette entreprise."
-        );
-      }
-
+    removeUserFromCompany: async (_, { userId, siret }) => {
       await prisma
         .deleteManyCompanyAssociations({
           user: { id: userId },

@@ -33,7 +33,7 @@ describe("xDaysAgo", () => {
 describe("sendOnboardingFirstStepMails", () => {
   const mockedAxiosPost = jest.spyOn(axios, "post"); // spy on axios.post method
   it("should send a request to td mail service for onboarding first step", async () => {
-    (mockedAxiosPost as jest.Mock).mockImplementationOnce(() =>
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -41,7 +41,7 @@ describe("sendOnboardingFirstStepMails", () => {
 
     await sendOnboardingFirstStepMails();
 
-    expect(mockedAxiosPost as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
       body: "_",
       subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
@@ -59,7 +59,7 @@ describe("sendOnboardingSecondStepMails", () => {
   const mockedAxiosPost = jest.spyOn(axios, "post"); // spy on axios.post method
 
   it("should send a request to td mail service for onboarding second step", async () => {
-    (mockedAxiosPost as jest.Mock).mockImplementationOnce(() =>
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -67,7 +67,7 @@ describe("sendOnboardingSecondStepMails", () => {
 
     await sendOnboardingSecondStepMails();
 
-    expect(mockedAxiosPost as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
       body: "_",
       subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",

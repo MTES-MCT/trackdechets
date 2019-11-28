@@ -53,12 +53,7 @@ export default {
       return memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
-      const companyAdmins = await getCompanyAdmins(siret);
-
       const currentUserId = getUserId(context);
-      if (!companyAdmins.find(a => a.id === currentUserId)) {
-        return [];
-      }
 
       const invitedUsers = await context.prisma
         .userAccountHashes({ where: { companySiret: siret } })
@@ -165,12 +160,6 @@ export default {
   },
   Mutation: {
     renewSecurityCode: async (_, { siret }, context: Context) => {
-      if (!currentUserBelongsToCompanyAdmins(context, siret)) {
-        throw new Error(
-          "Vous n'êtes pas autorisé à modifier ce code de sécurité."
-        );
-      }
-
       return context.prisma.updateCompany({
         where: { siret },
         data: {
