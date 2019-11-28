@@ -5,6 +5,9 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+## [2019.11.3] 28/11/2019
+* Ajout d'un numéro de bordereau libre
+
 ## [2019.11.2] 21/11/2019
 * Mise à jour du service de génération de pdf pour se rapprocher du Cerfa officiel
 * Relooking de la barre de navigation. Déplacement de "Mon Compte" au même niveau que "Mon espace".
