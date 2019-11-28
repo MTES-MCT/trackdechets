@@ -1,6 +1,11 @@
 import { and, or } from "graphql-shield";
 
-import { canAccessForm, isFormRecipient, isFormEmitter } from "./rules";
+import {
+  canAccessForm,
+  isFormRecipient,
+  isFormEmitter,
+  isFormTransporter
+} from "./rules";
 import { isAuthenticated, isCompanyMember } from "../common/rules";
 
 export default {
@@ -17,6 +22,7 @@ export default {
     markAsSealed: canAccessForm,
     markAsSent: or(isFormRecipient, isFormEmitter),
     markAsReceived: canAccessForm,
-    markAsProcessed: canAccessForm
+    markAsProcessed: canAccessForm,
+    signedByTransporter: isFormTransporter
   }
 };

@@ -266,16 +266,6 @@ export default {
     signedByTransporter: async (_, { id, signingInfo }, context: Context) => {
       const form = await context.prisma.form({ id });
 
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-      const sirets = userCompanies.map(c => c.siret);
-
-      if (!sirets.includes(form.transporterCompanySiret)) {
-        throw new Error(
-          "Vous n'êtes pas transporteur de ce bordereau. Vous ne pouvez pas réaliser cette action"
-        );
-      }
-
       if (signingInfo.signedByProducer) {
         const emitterCompany = await context.prisma.company({
           siret: form.emitterCompanySiret
@@ -294,6 +284,8 @@ export default {
           "Vous ne pouvez plus signer ce bordereau, il a dékà été marqué comme envoyé."
         );
       }
+
+      const userId = getUserId(context);
       logStatusChange(id, userId, status, context);
 
       return context.prisma.updateForm({
