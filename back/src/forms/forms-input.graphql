@@ -34,6 +34,7 @@ input ProcessedFormInput {
 
 input FormInput {
   id: ID
+  customId: String
   emitter: EmitterInput
   recipient: RecipientInput
   transporter: TransporterInput

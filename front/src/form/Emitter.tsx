@@ -6,14 +6,38 @@ import "./Emitter.scss";
 
 type Values = {
   emitter: { pickupSite: string };
+  customId: string;
 };
 export default connect<{}, Values>(function Emitter({ formik }) {
   const [pickupSite, setPickupSite] = useState(
     !!formik.values.emitter.pickupSite
   );
+  const [displayCustomId, setDisplayCustomId] = useState(
+    !!formik.values.customId
+  );
 
   return (
-    <React.Fragment>
+    <>
+      <div className="form__group">
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked={displayCustomId}
+            onChange={() => setDisplayCustomId(!displayCustomId)}
+          />
+          Je souhaite ajouter un numéro de BSD qui m'est propre
+        </label>
+        {displayCustomId && (
+          <>
+            <h4>Autre Numéro Libre</h4>
+            <Field
+              type="text"
+              placeholder="Utilisez votre propre numéro de BSD si nécessaire."
+              name="customId"
+            />
+          </>
+        )}
+      </div>
       <h4>Type d'émetteur</h4>
 
       <div className="form__group">
@@ -59,7 +83,7 @@ export default connect<{}, Values>(function Emitter({ formik }) {
         Je souhaite ajouter une adresse de chantier ou de collecte
       </label>
       {pickupSite && (
-        <React.Fragment>
+        <>
           <h4>Adresse chantier</h4>
           <Field
             component="textarea"
@@ -67,8 +91,8 @@ export default connect<{}, Values>(function Emitter({ formik }) {
             placeholder="Nom / Adresse / Précisions..."
             name="emitter.pickupSite"
           />
-        </React.Fragment>
+        </>
       )}
-    </React.Fragment>
+    </>
   );
 });
