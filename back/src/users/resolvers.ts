@@ -187,8 +187,8 @@ export default {
       context: Context
     ) => {
       const userId = getUserId(context);
-      const admins = await getCompanyAdmins(siret);
-      const admin = admins.find(a => a.id === userId);
+      // Current user is necessarely admin, otherwise he can't invite another user (rule set in permissions file)
+      const admin = await context.prisma.user({ id: userId });
 
       const existingUser = await context.prisma
         .user({ email })
