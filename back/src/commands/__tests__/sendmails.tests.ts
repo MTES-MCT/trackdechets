@@ -5,7 +5,6 @@ import {
   sendOnboardingFirstStepMails,
   sendOnboardingSecondStepMails
 } from "../onboarding.helpers";
-import { eventNames } from "cluster";
 
 // Let's mock prima DB
 jest.mock("../../generated/prisma-client", () => ({
