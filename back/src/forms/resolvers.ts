@@ -104,14 +104,14 @@ export default {
     },
     appendixForms: async (
       parent,
-      { emitterSiret, wasteCode },
+      { siret, wasteCode },
       context: Context
     ) => {
       const forms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),
           status: "AWAITING_GROUP",
-          recipientCompanySiret: emitterSiret,
+          recipientCompanySiret: siret,
           isDeleted: false
         }
       });
