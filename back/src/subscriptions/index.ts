@@ -1,5 +1,5 @@
 import { prisma } from "../generated/prisma-client";
-import { usersSubscriptionCallback } from "./users";
+import { companiesSubscriptionCallback } from "./companies";
 import { formsSubscriptionCallback } from "./forms";
 
 const subscriptions = [
@@ -8,8 +8,8 @@ const subscriptions = [
     callback: formsSubscriptionCallback
   },
   {
-    iterable: () => prisma.$subscribe.user(),
-    callback: usersSubscriptionCallback
+    iterable: () => prisma.$subscribe.company(),
+    callback: companiesSubscriptionCallback
   }
 ];
 

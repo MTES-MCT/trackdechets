@@ -32,14 +32,14 @@ function loadTracker() {
 }
 
 export function getTracker() {
-  let tracker = null;
   if (typeof Piwik !== "undefined") {
-    tracker = Piwik.getAsyncTracker(
+    const tracker = Piwik.getAsyncTracker(
       `${process.env.REACT_APP_MATOMO_TRACKER_URL}piwik.php`,
       process.env.REACT_APP_MATOMO_TRACKER_SITE_ID
     );
+    return tracker;
   }
-  return tracker;
+  return null;
 }
 
 export function trackPageView(pageTitle: string) {
@@ -49,7 +49,12 @@ export function trackPageView(pageTitle: string) {
   }
 }
 
-export function trackEvent(category: string, action: string, name?: string, value?: number) {
+export function trackEvent(
+  category: string,
+  action: string,
+  name?: string,
+  value?: number
+) {
   const tracker = getTracker();
   if (tracker) {
     tracker.trackEvent(category, action);

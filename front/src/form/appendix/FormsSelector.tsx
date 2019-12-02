@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import React, { useState, useEffect, useReducer } from "react";
-import { Query, QueryResult } from "react-apollo";
+import { Query } from "@apollo/react-components";
 import { Form } from "../model";
 import { DateTime } from "luxon";
 import { connect, getIn, setIn } from "formik";
@@ -124,9 +124,10 @@ export default connect<Props>(function FormsSelector(props) {
           emitterSiret: props.emitterSiret
         }}
       >
-        {({ loading, error, data }: QueryResult<{ appendixForms: Form[] }>) => {
-          if (loading) return "Chargement...";
-          if (error || !data) return `Erreur! ${error && error.message}`;
+        {({ loading, error, data }) => {
+          if (loading) return <p>Chargement...</p>;
+          if (error || !data)
+            return <p>{`Erreur! ${error && error.message}`}</p>;
 
           const values = data.appendixForms;
 
@@ -181,7 +182,9 @@ export default connect<Props>(function FormsSelector(props) {
                       />
                     </td>
                     <td>{v.readableId}</td>
-                    <td>{v.wasteDetails.code} - {v.wasteDetails.name}</td>
+                    <td>
+                      {v.wasteDetails.code} - {v.wasteDetails.name}
+                    </td>
                     <td>{v.emitter.company.name}</td>
                     <td>{DateTime.fromISO(v.receivedAt).toLocaleString()}</td>
                     <td>{v.quantityReceived} tonnes</td>

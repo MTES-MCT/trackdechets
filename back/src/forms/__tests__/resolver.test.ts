@@ -17,7 +17,7 @@ describe("Forms -> markAsSealed mutation", () => {
       await FormsResolver.Mutation.markAsSealed(
         null,
         { id: "" },
-        { prisma, request: null }
+        { prisma, request: null, user: null }
       );
 
       expect(false).toBe("Should not have fallen here");
@@ -40,7 +40,7 @@ describe("Forms -> markAsSealed mutation", () => {
       await FormsResolver.Mutation.markAsSealed(
         null,
         { id: "" },
-        { prisma, request: null }
+        { prisma, request: null, user: null }
       );
 
       expect(false).toBe("Should not have fallen here");
@@ -66,7 +66,7 @@ describe("Forms -> markAsSealed mutation", () => {
       await FormsResolver.Mutation.markAsSealed(
         null,
         { id: "" },
-        { prisma, request: null }
+        { prisma, request: null, user: null }
       );
 
       expect(false).toBe("Should not have fallen here");

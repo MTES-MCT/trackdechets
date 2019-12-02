@@ -3,7 +3,7 @@ import { getCachedCompanyInfos } from "./insee";
 
 const companyAssociationUserFragment = `
 fragment CompanyWithAdmins on CompanyAssociation {
-  user { id isActive name email phone userType }
+  user { id isActive name email phone }
 }
 `;
 
@@ -76,6 +76,6 @@ export async function getUserCompanies(userId: string) {
 
 const companyAssociationCompaniesFragment = `
 fragment AssociationWithCompany on CompanyAssociation {
-  company { id siret securityCode }
+  company { id siret securityCode companyTypes }
 }
 `;

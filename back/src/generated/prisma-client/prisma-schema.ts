@@ -49,6 +49,7 @@ type BatchPayload {
 type Company {
   id: ID!
   siret: String!
+  companyTypes: [CompanyType!]!
   name: String
   gerepId: String
   codeNaf: String
@@ -230,9 +231,14 @@ type CompanyConnection {
   aggregate: AggregateCompany!
 }
 
+input CompanyCreatecompanyTypesInput {
+  set: [CompanyType!]
+}
+
 input CompanyCreateInput {
   id: ID
   siret: String!
+  companyTypes: CompanyCreatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String
@@ -271,6 +277,7 @@ enum CompanyOrderByInput {
 type CompanyPreviousValues {
   id: ID!
   siret: String!
+  companyTypes: [CompanyType!]!
   name: String
   gerepId: String
   codeNaf: String
@@ -297,8 +304,23 @@ input CompanySubscriptionWhereInput {
   NOT: [CompanySubscriptionWhereInput!]
 }
 
+enum CompanyType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+  TRANSPORTER
+  WASTE_VEHICLES
+  WASTE_CENTER
+  TRADER
+}
+
+input CompanyUpdatecompanyTypesInput {
+  set: [CompanyType!]
+}
+
 input CompanyUpdateDataInput {
   siret: String
+  companyTypes: CompanyUpdatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String
@@ -307,6 +329,7 @@ input CompanyUpdateDataInput {
 
 input CompanyUpdateInput {
   siret: String
+  companyTypes: CompanyUpdatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String
@@ -315,6 +338,7 @@ input CompanyUpdateInput {
 
 input CompanyUpdateManyMutationInput {
   siret: String
+  companyTypes: CompanyUpdatecompanyTypesInput
   name: String
   gerepId: String
   codeNaf: String
@@ -648,6 +672,7 @@ enum EmitterType {
 type Form {
   id: ID!
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: User!
   createdAt: DateTime!
@@ -724,6 +749,7 @@ type FormConnection {
 input FormCreateInput {
   id: ID
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
@@ -809,6 +835,8 @@ enum FormOrderByInput {
   id_DESC
   readableId_ASC
   readableId_DESC
+  customId_ASC
+  customId_DESC
   isDeleted_ASC
   isDeleted_DESC
   createdAt_ASC
@@ -940,6 +968,7 @@ enum FormOrderByInput {
 type FormPreviousValues {
   id: ID!
   readableId: String
+  customId: String
   isDeleted: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -1034,6 +1063,20 @@ input FormScalarWhereInput {
   readableId_not_starts_with: String
   readableId_ends_with: String
   readableId_not_ends_with: String
+  customId: String
+  customId_not: String
+  customId_in: [String!]
+  customId_not_in: [String!]
+  customId_lt: String
+  customId_lte: String
+  customId_gt: String
+  customId_gte: String
+  customId_contains: String
+  customId_not_contains: String
+  customId_starts_with: String
+  customId_not_starts_with: String
+  customId_ends_with: String
+  customId_not_ends_with: String
   isDeleted: Boolean
   isDeleted_not: Boolean
   createdAt: DateTime
@@ -1783,6 +1826,7 @@ input FormSubscriptionWhereInput {
 
 input FormUpdateDataInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
@@ -1850,6 +1894,7 @@ input FormUpdateDataInput {
 
 input FormUpdateInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
@@ -1917,6 +1962,7 @@ input FormUpdateInput {
 
 input FormUpdateManyDataInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   signedByTransporter: Boolean
   status: String
@@ -1994,6 +2040,7 @@ input FormUpdateManyInput {
 
 input FormUpdateManyMutationInput {
   readableId: String
+  customId: String
   isDeleted: Boolean
   signedByTransporter: Boolean
   status: String
@@ -2114,6 +2161,20 @@ input FormWhereInput {
   readableId_not_starts_with: String
   readableId_ends_with: String
   readableId_not_ends_with: String
+  customId: String
+  customId_not: String
+  customId_in: [String!]
+  customId_not_in: [String!]
+  customId_lt: String
+  customId_lte: String
+  customId_gt: String
+  customId_gte: String
+  customId_contains: String
+  customId_not_contains: String
+  customId_starts_with: String
+  customId_not_starts_with: String
+  customId_ends_with: String
+  customId_not_ends_with: String
   isDeleted: Boolean
   isDeleted_not: Boolean
   owner: UserWhereInput
@@ -3728,7 +3789,6 @@ type User {
   password: String!
   name: String
   phone: String
-  userType: Json
   companyAssociations(where: CompanyAssociationWhereInput, orderBy: CompanyAssociationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CompanyAssociation!]
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -4048,7 +4108,6 @@ input UserCreateInput {
   password: String!
   name: String
   phone: String
-  userType: Json
   companyAssociations: CompanyAssociationCreateManyWithoutUserInput
 }
 
@@ -4069,7 +4128,6 @@ input UserCreateWithoutCompanyAssociationsInput {
   password: String!
   name: String
   phone: String
-  userType: Json
 }
 
 type UserEdge {
@@ -4090,8 +4148,6 @@ enum UserOrderByInput {
   name_DESC
   phone_ASC
   phone_DESC
-  userType_ASC
-  userType_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -4105,7 +4161,6 @@ type UserPreviousValues {
   password: String!
   name: String
   phone: String
-  userType: Json
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -4139,7 +4194,6 @@ input UserUpdateDataInput {
   password: String
   name: String
   phone: String
-  userType: Json
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
 }
 
@@ -4149,7 +4203,6 @@ input UserUpdateInput {
   password: String
   name: String
   phone: String
-  userType: Json
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
 }
 
@@ -4159,7 +4212,6 @@ input UserUpdateManyMutationInput {
   password: String
   name: String
   phone: String
-  userType: Json
 }
 
 input UserUpdateOneRequiredInput {
@@ -4182,7 +4234,6 @@ input UserUpdateWithoutCompanyAssociationsDataInput {
   password: String
   name: String
   phone: String
-  userType: Json
 }
 
 input UserUpsertNestedInput {

@@ -44,6 +44,7 @@ export default {
           codeNaf: payload.codeNaf,
           gerepId: payload.gerepId,
           name: payload.companyName,
+          companyTypes: { set: payload.companyTypes },
           securityCode: randomNumber(4)
         })
         .catch(err => {
@@ -59,7 +60,6 @@ export default {
           email: payload.email,
           password: hashedPassword,
           phone: payload.phone,
-          userType: payload.userType,
           companyAssociations: {
             create: {
               role: "ADMIN",
@@ -163,22 +163,22 @@ export default {
         userMails.resetPassword(user.email, user.name, newPassword)
       );
     },
-    editProfile: (_, { name, phone, email, userType }, context) => {
+    editProfile: (_, { name, phone, email }, context) => {
       const userId = getUserId(context);
 
       return prisma
         .updateUser({
           where: { id: userId },
-          data: { name, phone, email, userType }
+          data: { name, phone, email }
         })
         .catch(err => {
           console.error(
             `Error while editing profile from user #${userId} with values ${JSON.stringify(
-              { name, phone, email, userType }
+              { name, phone, email }
             )}`,
             err
           );
-          throw new Error("Impossible de mettre lr profil à jour");
+          throw new Error("Impossible de mettre le profil à jour");
         });
     },
     inviteUserToCompany: async (
@@ -201,10 +201,9 @@ export default {
         .catch(_ => null);
 
       // Dont get the company name through Prisma as the name is not stored in the DB
-      const { name: companyName } = await companyResolver.Query.companyInfos(
-        null,
-        { siret }
-      );
+      const {
+        name: companyName
+      } = await companyResolver.Query.companyInfos(null, { siret });
 
       if (existingUser) {
         await context.prisma.createCompanyAssociation({
@@ -265,7 +264,6 @@ export default {
         email: existingHash.email,
         password: hashedPassword,
         phone: "",
-        userType: [],
         isActive: true,
         companyAssociations: {
           create: {

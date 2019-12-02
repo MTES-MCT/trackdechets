@@ -5,7 +5,6 @@ type User {
   password: String!
   name: String
   phone: String
-  userType: Json
 
   companyAssociations: [CompanyAssociation]
 
@@ -46,9 +45,20 @@ type UserAccountHash {
   updatedAt: DateTime! @updatedAt
 }
 
+enum CompanyType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+  TRANSPORTER
+  WASTE_VEHICLES
+  WASTE_CENTER
+  TRADER
+}
+
 type Company {
   id: ID! @id
   siret: String! @unique
+  companyTypes: [CompanyType!]! @scalarList(strategy: RELATION)
 
   name: String
   gerepId: String
@@ -140,6 +150,7 @@ type Declaration {
 type Form {
   id: ID! @id
   readableId: String @unique
+  customId: String
   isDeleted: Boolean @default(value: false)
 
   owner: User! @relation(link: TABLE)

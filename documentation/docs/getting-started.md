@@ -40,3 +40,38 @@ curl \
   --data '{ "query": "{ forms { id } }" }' \
   https://api.trackdechets.beta.gouv.fr/
 ```
+
+## Utilisation du playground
+
+Le playground est un utilitaire directement intégré à Trackdechets. 
+Il vous permet d'accéder à toutes les requetes disponibles de manière interactive
+
+
+### Autoriser les requêtes
+
+Pour utiliser le playground, vous devez renseigner les headers http (zone du bas) avec la clef d'api préalablement récupérée
+
+```
+    {"Authorization": "Bearer votre-cle-d-api"}
+```
+    
+![](images/playground.png)
+
+#### Votre premiere requete
+
+Dans la zone de gauche, copiez cette requête.
+
+```
+    query {
+      me {
+        id
+        email
+      }
+    }
+```
+
+En cliquant sur le bouton central, vous verrez la réponse dans la zone de droite.
+ 
+#### Documentation
+
+Un onglet docs à droite de la fenêtre vous présente une vue exhaustive des requêtes disponibles.

@@ -14,6 +14,7 @@ import {
   getCompany
 } from "./helper";
 import { getCachedCompanyInfos } from "./insee";
+import updateCompany from "./mutations/updateCompany";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
@@ -176,6 +177,7 @@ export default {
           securityCode: randomNumber(4)
         }
       });
-    }
+    },
+    updateCompany
   }
 };

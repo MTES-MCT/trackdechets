@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import DateInput from "./custom-inputs/DateInput";
@@ -9,7 +9,7 @@ type Values = {
 };
 export default connect<{}, Values>(function Transporter(props) {
   return (
-    <React.Fragment>
+    <>
       <h4>Transporteur</h4>
       <Field component={CompanySelector} name="transporter.company" />
 
@@ -21,8 +21,9 @@ export default connect<{}, Values>(function Transporter(props) {
             name="transporter.isExemptedOfReceipt"
             checked={props.formik.values.transporter.isExemptedOfReceipt}
           />
-          Je transporte moi même mon déchet vers une entreprise autorisée à les
-          prendre en charge et je rempli les conditions d'exemption de récépissé
+          Je transporte moi-même mon déchet vers une entreprise autorisée à les
+          prendre en charge et je remplis les conditions d'exemption de
+          récépissé
         </label>
       </div>
       {!props.formik.values.transporter.isExemptedOfReceipt && (
@@ -64,6 +65,6 @@ export default connect<{}, Values>(function Transporter(props) {
           <RedErrorMessage name="transporter.numberPlate" />
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 });

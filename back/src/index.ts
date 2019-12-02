@@ -2,13 +2,14 @@ import { shield } from "graphql-shield";
 import { GraphQLServer } from "graphql-yoga";
 import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import { prisma } from "./generated/prisma-client";
-import { merge } from "./utils";
+import { mergePermissions } from "./utils";
 import { userActivationHandler } from "./users/activation";
 import { pdfHandler } from "./forms/pdf";
 import { initSubsriptions } from "./subscriptions";
 import { csvExportHandler } from "./forms/exports/handler";
 import { sentry } from "graphql-middleware-sentry";
 import { CaptureConsole } from "@sentry/integrations";
+import { getUser } from "./auth";
 
 const port = process.env.port || 80;
 const isProd = process.env.NODE_ENV === "production";
@@ -22,8 +23,11 @@ const resolversArray = fileLoader(`${__dirname}/**/resolvers.ts`, {
 });
 const resolvers = mergeResolvers(resolversArray);
 
-const rulesArray = fileLoader(`${__dirname}/**/rules.ts`, { recursive: true });
-const permissions = shield(rulesArray.reduce((prev, cur) => merge(prev, cur)));
+const permissions = fileLoader(`${__dirname}/**/permissions.ts`, {
+  recursive: true
+});
+
+const shieldMiddleware = shield(mergePermissions(permissions));
 
 /**
  * Sentry configuration
@@ -41,15 +45,17 @@ const sentryMiddleware = () =>
       scope.setExtra("body", context.request.body);
       scope.setExtra("origin", context.request.headers.origin);
       scope.setExtra("user-agent", context.request.headers["user-agent"]);
+      scope.setTag("service", "api");
     }
   });
 
 const server = new GraphQLServer({
   typeDefs,
   resolvers,
-  middlewares: [...(sentryDsn ? [sentryMiddleware()] : [])],
-  context: request => ({
-    ...request,
+  middlewares: [shieldMiddleware, ...(sentryDsn ? [sentryMiddleware()] : [])],
+  context: async req => ({
+    ...req,
+    user: await getUser(req.request),
     prisma
   })
 });

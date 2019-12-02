@@ -2,7 +2,6 @@ import React from "react";
 import { NavLink, Link, withRouter } from "react-router-dom";
 import { localAuthService } from "./login/auth.service";
 import { trackEvent } from "./tracker";
-import { FaPowerOff } from "react-icons/fa";
 import "./Header.scss";
 
 export default withRouter(function Header({ history }) {
@@ -24,7 +23,6 @@ export default withRouter(function Header({ history }) {
               <NavLink
                 to="/faq"
                 activeClassName="active"
-                className="highlighted-button"
                 onClick={() => trackEvent("navbar", "faq")}
               >
                 FAQ
@@ -39,8 +37,11 @@ export default withRouter(function Header({ history }) {
                 Partenaires
               </NavLink>
             </li>
+            <li className="nav__item" role="separator">
+              |
+            </li>
             {localAuthService.isAuthenticated ? (
-              <React.Fragment>
+              <>
                 <li className="nav__item">
                   <NavLink
                     to="/dashboard/slips"
@@ -51,27 +52,46 @@ export default withRouter(function Header({ history }) {
                   </NavLink>
                 </li>
                 <li className="nav__item">
+                  <NavLink
+                    activeClassName="active"
+                    to="/account"
+                    onClick={() => trackEvent("navbar", "mon-compte")}
+                  >
+                    Mon compte
+                  </NavLink>
+                </li>
+                <li className="nav__item logout">
                   <a
-                    title="Se déconnecter"
                     onClick={() => {
                       localAuthService.locallySignOut();
                       history.push("/");
                     }}
                   >
-                    <FaPowerOff />
+                    Se déconnecter
                   </a>
                 </li>
-              </React.Fragment>
+              </>
             ) : (
-              <li className="nav__item">
-                <NavLink
-                  to="/login"
-                  activeClassName="active"
-                  onClick={() => trackEvent("navbar", "login")}
-                >
-                  Me connecter
-                </NavLink>
-              </li>
+              <>
+                <li className="nav__item">
+                  <NavLink
+                    to="/signup"
+                    activeClassName="active"
+                    onClick={() => trackEvent("navbar", "signup")}
+                  >
+                    S'inscrire
+                  </NavLink>
+                </li>
+                <li className="nav__item">
+                  <NavLink
+                    to="/login"
+                    activeClassName="active"
+                    onClick={() => trackEvent("navbar", "login")}
+                  >
+                    Se connecter
+                  </NavLink>
+                </li>
+              </>
             )}
           </ul>
         </nav>

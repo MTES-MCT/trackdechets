@@ -4,7 +4,7 @@ import "react-app-polyfill/ie11";
 
 import React from "react";
 import ReactDOM from "react-dom";
-import "template.data.gouv.fr/dist/style/main.css";
+import "template.data.gouv.fr/dist/main.min.css";
 import "./index.scss";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
