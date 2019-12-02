@@ -3,8 +3,8 @@ import { canAccessForm } from "../rules";
 
 describe("canAccessForm", () => {
   it("should be true if the user created the form", async () => {
-    const formFragment = jest.fn<any>();
-    const userFragment = jest.fn<any>();
+    const formFragment = jest.fn();
+    const userFragment = jest.fn();
     const prisma = {
       form: jest.fn(() => ({ $fragment: formFragment })),
       user: jest.fn(() => ({ $fragment: userFragment }))
@@ -99,8 +99,8 @@ describe("canAccessForm", () => {
 
 describe("isFormTransporter", () => {
   it("should be true if the user is the form transporter", async () => {
-    const formFragment = jest.fn<any>();
-    const userFragment = jest.fn<any>();
+    const formFragment = jest.fn();
+    const userFragment = jest.fn();
     const prisma = {
       form: jest.fn(() => ({ $fragment: formFragment })),
       user: jest.fn(() => ({ $fragment: userFragment }))
@@ -128,8 +128,8 @@ describe("isFormTransporter", () => {
 
 describe("isFormEmitter", () => {
   it("should be true if the user is the form emitter", async () => {
-    const formFragment = jest.fn<any>();
-    const userFragment = jest.fn<any>();
+    const formFragment = jest.fn();
+    const userFragment = jest.fn();
     const prisma = {
       form: jest.fn(() => ({ $fragment: formFragment })),
       user: jest.fn(() => ({ $fragment: userFragment }))
@@ -157,8 +157,8 @@ describe("isFormEmitter", () => {
 
 describe("isFormRecipient", () => {
   it("should be true if the user is the form emitter", async () => {
-    const formFragment = jest.fn<any>();
-    const userFragment = jest.fn<any>();
+    const formFragment = jest.fn();
+    const userFragment = jest.fn();
     const prisma = {
       form: jest.fn(() => ({ $fragment: formFragment })),
       user: jest.fn(() => ({ $fragment: userFragment }))
