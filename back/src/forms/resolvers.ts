@@ -1,4 +1,4 @@
-import { getUserId, getUserIdFromToken } from "../utils";
+import { getUserIdFromToken } from "../utils";
 import { Context } from "../types";
 import {
   flattenObjectForDb,
@@ -27,7 +27,7 @@ export default {
       return unflattenObjectFromDb(dbForm);
     },
     forms: async (_, { siret, type }, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       if (!userCompanies.length) {
@@ -62,7 +62,7 @@ export default {
       return forms.map(f => unflattenObjectFromDb(f));
     },
     stats: async (parent, args, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       return userCompanies.map(async userCompany => {
@@ -121,7 +121,7 @@ export default {
   },
   Mutation: {
     saveForm: async (parent, { formInput }, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
 
       const { id, ...formContent } = formInput;
       if (id) {
@@ -152,7 +152,7 @@ export default {
       });
     },
     duplicateForm: async (parent, { id }, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
 
       const existingForm = await context.prisma.form({
         id
@@ -183,7 +183,7 @@ export default {
         );
       }
 
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
@@ -197,7 +197,7 @@ export default {
       });
     },
     markAsSent: async (_, { id, sentInfo }, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const form = await context.prisma.form({ id });
 
       if (!["DRAFT", "SEALED"].includes(form.status)) {
@@ -216,7 +216,7 @@ export default {
     markAsReceived: async (parent, { id, receivedInfo }, context: Context) => {
       const form = await context.prisma.form({ id });
 
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
@@ -236,7 +236,7 @@ export default {
     ) => {
       const form = await context.prisma.form({ id });
 
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
@@ -285,7 +285,7 @@ export default {
         );
       }
 
-      const userId = getUserId(context);
+      const userId = context.user.id;
       logStatusChange(id, userId, status, context);
 
       return context.prisma.updateForm({

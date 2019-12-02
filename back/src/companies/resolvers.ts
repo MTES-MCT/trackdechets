@@ -1,10 +1,6 @@
 import axios from "axios";
 import { Context } from "../types";
-import {
-  getUserId,
-  currentUserBelongsToCompanyAdmins,
-  randomNumber
-} from "../utils";
+import { randomNumber } from "../utils";
 import {
   getCompanyAdmins,
   getUserCompanies,
@@ -53,7 +49,7 @@ export default {
       return memoizeRequest(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
-      const currentUserId = getUserId(context);
+      const currentUserId = context.user.id;
 
       const invitedUsers = await context.prisma
         .userAccountHashes({ where: { companySiret: siret } })
@@ -107,7 +103,7 @@ export default {
       context: Context
     ) => {
       const lowerType = type.toLowerCase();
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       if (!userCompanies.length) {

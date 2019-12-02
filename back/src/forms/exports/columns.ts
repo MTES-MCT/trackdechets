@@ -1,5 +1,4 @@
 import { Form } from "../../generated/prisma-client";
-import { currentUserBelongsToCompany } from "../../utils";
 
 type ColumnDetail = {
   key: string;
