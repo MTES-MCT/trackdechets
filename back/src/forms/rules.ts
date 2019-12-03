@@ -23,7 +23,6 @@ export const canAccessForm = and(
       ctx.user.id,
       ctx.prisma
     );
-
     return (
       formInfos.owner.id === ctx.user.id ||
       currentUserSirets.includes(formInfos.emitterCompanySiret) ||
@@ -111,7 +110,7 @@ async function getFormAccessInfos(
     recipientCompanySiret
     emitterCompanySiret
     transporterCompanySiret
-    owner { id }}
+    owner { id }
   }
 `);
 
