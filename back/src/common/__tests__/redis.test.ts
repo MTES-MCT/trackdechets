@@ -1,6 +1,5 @@
 import * as Redis from "ioredis";
-// import * as prismaClient from "../../generated/prisma-client";
-import { getByIdFromCache, generateKey } from "../redis";
+import { cachedGet, generateKey } from "../redis";
 
 jest.mock("../../generated/prisma-client", () => ({
   prisma: { foo: null }
@@ -11,50 +10,80 @@ const redisCache = {
   "foo:2000": JSON.stringify({ name: "foo" })
 };
 
+const mockRedisSet = jest.fn((key: string, value: string) => {
+  return Promise.resolve("OK");
+});
+
 jest.mock("ioredis", () => () => ({
   get: (key: string) => {
     return Promise.resolve(redisCache[key]).catch(_ => null);
   },
-  set: (key: string, value: string) => {
-    return Promise.resolve("OK");
-  }
+  set: (...args) => mockRedisSet(...args)
 }));
 
 const dbFooData = {
   "3000": "sqlBar"
 };
 
-const getterMock = ({ id }) => {
+const dbGetterMock = id => {
   return Promise.resolve(dbFooData[id]);
 };
 
-describe("getByIdFromCache", () => {
-  test("get numeric key in cache", async () => {
+describe("cachedGet", () => {
+  test("should be able to get numeric key in cache", async () => {
     const foo = () => null;
-    const res = await getByIdFromCache(foo, 1000);
+    const res = await cachedGet(foo, "foo", 1000);
 
     expect(res).toBe("redisBar");
   });
 
-  test("get string key in cache", async () => {
+  test("should be able to get string key in cache", async () => {
     const foo = () => null;
-    const res = await getByIdFromCache(foo, "1000");
+    const res = await cachedGet(foo, "foo", "1000");
 
     expect(res).toBe("redisBar");
   });
 
-  test("get json in cache", async () => {
+  test("should be able to get json in cache", async () => {
     const foo = () => null;
-    const res = await getByIdFromCache(foo, "2000", JSON);
+    const res = await cachedGet(foo, "foo", "2000", { parser: JSON });
 
     expect(res.name).toBe("foo");
   });
 
-  test("get string key in db", async () => {
-    const foo = params => getterMock(params);
-    const res = await getByIdFromCache(foo, "3000");
+  test("should use getter when key is not cached", async () => {
+    const res = await cachedGet(dbGetterMock, "foo", "3000");
 
     expect(res).toBe("sqlBar");
+  });
+
+  test("should throw if getter fails and value is not cached", async () => {
+    const throwMessage = "uh oh...";
+    try {
+      await cachedGet(() => Promise.reject(throwMessage), "foo", "3000");
+
+      expect(1).toBe(0);
+    } catch (err) {
+      expect(err).toBe(throwMessage);
+    }
+  });
+
+  test("should set cache for new values", async () => {
+    const res = await cachedGet(dbGetterMock, "foo", "3000");
+
+    expect(mockRedisSet).toHaveBeenCalledWith("foo:3000", res, []);
+  });
+
+  test("should accept caching options", async () => {
+    const res = await cachedGet(dbGetterMock, "foo", "3000", {
+      options: { EX: 1000 }
+    });
+
+    expect(mockRedisSet).toHaveBeenCalledWith(
+      "foo:3000",
+      res,
+      expect.arrayContaining(["EX", 1000])
+    );
   });
 });
 
