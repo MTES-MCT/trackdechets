@@ -13,7 +13,7 @@ export default {
     form: canAccessForm,
     forms: isAuthenticated,
     stats: isAuthenticated,
-    appendixForms: and(isAuthenticated, isCompanyMember) // TODO emitterSiret and not siret
+    appendixForms: and(isAuthenticated, isCompanyMember)
   },
   Mutation: {
     saveForm: isAuthenticated,
