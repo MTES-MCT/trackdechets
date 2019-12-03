@@ -1,6 +1,7 @@
-import { Rule } from "graphql-shield/dist/rules";
+import { Rule, RuleAnd } from "graphql-shield/dist/rules";
 
 import { isCompanyAdmin, isCompanyMember } from "../rules";
+import { GraphQLResolveInfo } from "graphql";
 
 describe("isCompanyAdmin", () => {
   it("should return true if the user is admin of the company", async () => {
@@ -29,7 +30,7 @@ describe("isCompanyAdmin", () => {
       { user: { id: "id" }, prisma }
     );
 
-    expect(result).toBe(false);
+    expect(result).toBeInstanceOf(Error);
   });
 
   it("should return false if the user does not belong to the company", async () => {
@@ -43,7 +44,7 @@ describe("isCompanyAdmin", () => {
       { siret: "85001946400013" },
       { user: { id: "id" }, prisma }
     );
-    expect(result).toBe(false);
+    expect(result).toBeInstanceOf(Error);
   });
 });
 
@@ -59,7 +60,7 @@ describe("isCompanyMember", () => {
       { siret: "85001946400013" },
       { user: { id: "id" }, prisma }
     );
-    expect(result).toBe(false);
+    expect(result).toBeInstanceOf(Error);
   });
 
   it("should return true if the user is member of the company", async () => {
@@ -88,11 +89,17 @@ describe("isCompanyMember", () => {
       { siret: "85001946400013" },
       { user: { id: "id" }, prisma }
     );
-    expect(result).toBe(false);
+    expect(result).toBeInstanceOf(Error);
   });
 });
 
-export function testRule(rule: Rule) {
+export function testRule(rule: Rule | RuleAnd) {
   return (parent, args, ctx) =>
-    rule.resolve(parent, args, ctx as any, null, {} as any);
+    rule.resolve(
+      parent,
+      args,
+      { _shield: { cache: {} }, ...ctx },
+      {} as GraphQLResolveInfo,
+      {} as any
+    );
 }

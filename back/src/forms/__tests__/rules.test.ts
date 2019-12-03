@@ -93,7 +93,7 @@ describe("canAccessForm", () => {
       { id: "12345" },
       { user: { id: "id" }, prisma }
     );
-    expect(result).toBe(false);
+    expect(result).toBeInstanceOf(Error);
   });
 });
 

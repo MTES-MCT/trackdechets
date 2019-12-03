@@ -1,6 +1,7 @@
-import { rule } from "graphql-shield";
+import { rule, and } from "graphql-shield";
 
 import { Prisma } from "../generated/prisma-client";
+import { DomainError, ErrorCode } from "./errors";
 
 /**************************
  * Common permissions rules
@@ -9,33 +10,64 @@ import { Prisma } from "../generated/prisma-client";
 export const isAuthenticated = rule({ cache: "contextual" })(
   async (_1, _2, ctx) => {
     const user = ctx.user;
-    return !!user;
+    return (
+      !!user ||
+      new DomainError(`Vous n'êtes pas connecté.`, ErrorCode.FORBIDDEN)
+    );
   }
 );
 
-export const isCompanyAdmin = rule()(async (_, { siret }, ctx) => {
-  if (ctx.user && siret) {
-    return await isUserInCompanyWithRole(
+export const isCompanyAdmin = and(
+  isAuthenticated,
+  rule()(async (_, { siret }, ctx) => {
+    ensureRuleParametersArePresent(siret);
+
+    const isCompanyAdmin = await isUserInCompanyWithRole(
       ctx.user.id,
       siret,
       "ADMIN",
       ctx.prisma
     );
-  }
-  return false;
-});
 
-export const isCompanyMember = rule()(async (_, { siret }, ctx) => {
-  if (ctx.user && siret) {
-    return await isUserInCompanyWithRole(
+    return (
+      isCompanyAdmin ||
+      new DomainError(
+        `Vous n'êtes pas administrateur de l'entreprise "${siret}".`,
+        ErrorCode.FORBIDDEN
+      )
+    );
+  })
+);
+
+export const isCompanyMember = and(
+  isAuthenticated,
+  rule()(async (_, { siret }, ctx) => {
+    ensureRuleParametersArePresent(siret);
+
+    const isCompanyMember = await isUserInCompanyWithRole(
       ctx.user.id,
       siret,
       "MEMBER",
       ctx.prisma
     );
+
+    return (
+      isCompanyMember ||
+      new DomainError(
+        `Vous ne faites pas partie de l'entreprise "${siret}".`,
+        ErrorCode.FORBIDDEN
+      )
+    );
+  })
+);
+
+export function ensureRuleParametersArePresent(...params: any[]) {
+  for (const param of params) {
+    if (!param) {
+      throw new Error(`⚠ A required rule parameter is missing!`);
+    }
   }
-  return false;
-});
+}
 
 /**
  * Checks if `userId` is in the company with `siret` as a `expectedRole`

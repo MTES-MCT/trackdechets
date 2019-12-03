@@ -13,7 +13,7 @@ export default {
     form: canAccessForm,
     forms: isAuthenticated,
     stats: isAuthenticated,
-    appendixForms: and(isAuthenticated, isCompanyMember)
+    appendixForms: isCompanyMember
   },
   Mutation: {
     saveForm: isAuthenticated,

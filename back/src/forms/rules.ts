@@ -1,5 +1,10 @@
-import { rule } from "graphql-shield";
+import { rule, and } from "graphql-shield";
 import { Prisma } from "../generated/prisma-client";
+import { DomainError, ErrorCode } from "../common/errors";
+import {
+  isAuthenticated,
+  ensureRuleParametersArePresent
+} from "../common/rules";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -8,61 +13,91 @@ type FormSiretsAndOwner = {
   owner: { id: string };
 };
 
-export const canAccessForm = rule()(async (_, { id }, ctx) => {
-  if (!ctx.user || !id) {
-    return false;
-  }
-  const { formInfos, currentUserSirets } = await getFormAccessInfos(
-    id,
-    ctx.user.id,
-    ctx.prisma
-  );
+export const canAccessForm = and(
+  isAuthenticated,
+  rule()(async (_, { id }, ctx) => {
+    ensureRuleParametersArePresent(id);
 
-  return (
-    formInfos.owner.id === ctx.user.id ||
-    currentUserSirets.includes(formInfos.emitterCompanySiret) ||
-    currentUserSirets.includes(formInfos.recipientCompanySiret)
-  );
-});
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
 
-export const isFormRecipient = rule()(async (_, { id }, ctx) => {
-  if (!ctx.user || !id) {
-    return false;
-  }
-  const { formInfos, currentUserSirets } = await getFormAccessInfos(
-    id,
-    ctx.user.id,
-    ctx.prisma
-  );
+    return (
+      formInfos.owner.id === ctx.user.id ||
+      currentUserSirets.includes(formInfos.emitterCompanySiret) ||
+      currentUserSirets.includes(formInfos.recipientCompanySiret) ||
+      new DomainError(
+        `Vous n'êtes pas autorisé à accéder à ce bordereau.`,
+        ErrorCode.FORBIDDEN
+      )
+    );
+  })
+);
 
-  return currentUserSirets.includes(formInfos.recipientCompanySiret);
-});
+export const isFormRecipient = and(
+  isAuthenticated,
+  rule()(async (_, { id }, ctx) => {
+    ensureRuleParametersArePresent(id);
 
-export const isFormEmitter = rule()(async (_, { id }, ctx) => {
-  if (!ctx.user || !id) {
-    return false;
-  }
-  const { formInfos, currentUserSirets } = await getFormAccessInfos(
-    id,
-    ctx.user.id,
-    ctx.prisma
-  );
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
 
-  return currentUserSirets.includes(formInfos.emitterCompanySiret);
-});
+    return (
+      currentUserSirets.includes(formInfos.recipientCompanySiret) ||
+      new DomainError(
+        `Vous n'êtes pas destinataire de ce bordereau.`,
+        ErrorCode.FORBIDDEN
+      )
+    );
+  })
+);
 
-export const isFormTransporter = rule()(async (_, { id }, ctx) => {
-  if (!ctx.user || !id) {
-    return false;
-  }
-  const { formInfos, currentUserSirets } = await getFormAccessInfos(
-    id,
-    ctx.user.id,
-    ctx.prisma
-  );
+export const isFormEmitter = and(
+  isAuthenticated,
+  rule()(async (_, { id }, ctx) => {
+    ensureRuleParametersArePresent(id);
 
-  return currentUserSirets.includes(formInfos.transporterCompanySiret);
-});
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    return (
+      currentUserSirets.includes(formInfos.emitterCompanySiret) ||
+      new DomainError(
+        `Vous n'êtes pas émetteur de ce bordereau.`,
+        ErrorCode.FORBIDDEN
+      )
+    );
+  })
+);
+
+export const isFormTransporter = and(
+  isAuthenticated,
+  rule()(async (_, { id }, ctx) => {
+    ensureRuleParametersArePresent(id);
+
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    return (
+      currentUserSirets.includes(formInfos.transporterCompanySiret) ||
+      new DomainError(
+        `Vous n'êtes pas transporteur de ce bordereau.`,
+        ErrorCode.FORBIDDEN
+      )
+    );
+  })
+);
 
 async function getFormAccessInfos(
   formId: string,

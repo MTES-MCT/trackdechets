@@ -10,7 +10,7 @@ export default {
   Mutation: {
     changePassword: isAuthenticated,
     editProfile: isAuthenticated,
-    inviteUserToCompany: and(isAuthenticated, isCompanyAdmin),
-    removeUserFromCompany: and(isAuthenticated, isCompanyAdmin)
+    inviteUserToCompany: isCompanyAdmin,
+    removeUserFromCompany: isCompanyAdmin
   }
 };
