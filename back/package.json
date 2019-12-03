@@ -18,7 +18,7 @@
     "bcrypt": "^3.0.2",
     "dataloader": "^1.4.0",
     "graphql-middleware-sentry": "^3.2.1",
-    "graphql-shield": "^4.1.0",
+    "graphql-shield": "^7.0.4",
     "graphql-yoga": "^1.16.7",
     "ioredis": "^4.9.3",
     "jsonwebtoken": "^8.4.0",

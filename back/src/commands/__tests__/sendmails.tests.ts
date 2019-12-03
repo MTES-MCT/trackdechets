@@ -30,10 +30,15 @@ describe("xDaysAgo", () => {
   });
 });
 
+const mockedAxiosPost = jest.spyOn(axios, "post"); // spy on axios.post method
+
+beforeEach(() => {
+  mockedAxiosPost.mockClear();
+});
+
 describe("sendOnboardingFirstStepMails", () => {
-  const mockedAxiosPost = jest.spyOn(axios, "post"); // spy on axios.post method
   it("should send a request to td mail service for onboarding first step", async () => {
-    (mockedAxiosPost as jest.Mock).mockImplementationOnce(() =>
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -41,25 +46,22 @@ describe("sendOnboardingFirstStepMails", () => {
 
     await sendOnboardingFirstStepMails();
 
-    expect(mockedAxiosPost as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
       body: "_",
       subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
-      templateId: 1006585, // hardcoded mailjet template ID, should match .env MJ_FIRST_ONBOARDING_TEMPLATE_ID
+      templateId: parseInt(process.env.MJ_FIRST_ONBOARDING_TEMPLATE_ID), // hardcoded mailjet template ID, should match .env MJ_FIRST_ONBOARDING_TEMPLATE_ID
       title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
       toEmail: "user@example.com",
       toName: "Rick Hunter",
-      baseUrl: "https://ui-td.local"
+      baseUrl: `https://${process.env.UI_HOST}`
     });
-    mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
   });
 });
 
 describe("sendOnboardingSecondStepMails", () => {
-  const mockedAxiosPost = jest.spyOn(axios, "post"); // spy on axios.post method
-
   it("should send a request to td mail service for onboarding second step", async () => {
-    (mockedAxiosPost as jest.Mock).mockImplementationOnce(() =>
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
       Promise.resolve({
         data: { results: "something" }
       })
@@ -67,16 +69,15 @@ describe("sendOnboardingSecondStepMails", () => {
 
     await sendOnboardingSecondStepMails();
 
-    expect(mockedAxiosPost as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
       body: "_",
       subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
-      templateId: 1023698, // hardcoded mailjet template ID, should match .env MJ_SECOND_ONBOARDING_TEMPLATE_ID
+      templateId: parseInt(process.env.MJ_SECOND_ONBOARDING_TEMPLATE_ID), // hardcoded mailjet template ID, should match .env MJ_SECOND_ONBOARDING_TEMPLATE_ID
       title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
       toEmail: "user@example.com",
       toName: "Rick Hunter",
-      baseUrl: "https://ui-td.local"
+      baseUrl: `https://${process.env.UI_HOST}`
     });
   });
-  mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
 });

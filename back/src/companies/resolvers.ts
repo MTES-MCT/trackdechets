@@ -1,10 +1,6 @@
 import axios from "axios";
 import { Context } from "../types";
-import {
-  getUserId,
-  currentUserBelongsToCompanyAdmins,
-  randomNumber
-} from "../utils";
+import { randomNumber } from "../utils";
 import {
   getCompanyAdmins,
   getUserCompanies,
@@ -53,12 +49,7 @@ export default {
       return getCachedCompanyInfos(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
-      const companyAdmins = await getCompanyAdmins(siret);
-
-      const currentUserId = getUserId(context);
-      if (!companyAdmins.find(a => a.id === currentUserId)) {
-        return [];
-      }
+      const currentUserId = context.user.id;
 
       const invitedUsers = await context.prisma
         .userAccountHashes({ where: { companySiret: siret } })
@@ -112,7 +103,7 @@ export default {
       context: Context
     ) => {
       const lowerType = type.toLowerCase();
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       if (!userCompanies.length) {
@@ -165,12 +156,6 @@ export default {
   },
   Mutation: {
     renewSecurityCode: async (_, { siret }, context: Context) => {
-      if (!currentUserBelongsToCompanyAdmins(context, siret)) {
-        throw new Error(
-          "Vous n'êtes pas autorisé à modifier ce code de sécurité."
-        );
-      }
-
       return context.prisma.updateCompany({
         where: { siret },
         data: {

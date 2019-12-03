@@ -10,7 +10,7 @@ import useDidUpdateEffect from "../../utils/use-did-update";
 
 const GET_APPENDIX_FORMS = gql`
   query AppendixForms($emitterSiret: String!, $wasteCode: String) {
-    appendixForms(emitterSiret: $emitterSiret, wasteCode: $wasteCode) {
+    appendixForms(siret: $emitterSiret, wasteCode: $wasteCode) {
       readableId
       emitter {
         company {

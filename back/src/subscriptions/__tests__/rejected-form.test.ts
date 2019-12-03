@@ -162,7 +162,7 @@ describe("mailWhenFormIsDeclined", () => {
     // spies on axios get and post methods
     const mockedAxiosGet = jest.spyOn(axios, "get");
     const mockedAxiosPost = jest.spyOn(axios, "post");
-    (mockedAxiosGet as jest.Mock)
+    (mockedAxiosGet as jest.Mock<any>)
       .mockImplementationOnce(() =>
         Promise.resolve({
           data: insee1
@@ -173,7 +173,7 @@ describe("mailWhenFormIsDeclined", () => {
           data: insee2
         })
       );
-    (mockedAxiosPost as jest.Mock).mockImplementation(() =>
+    (mockedAxiosPost as jest.Mock<any>).mockImplementation(() =>
       Promise.resolve({
         data: { result: "ok" }
       })
@@ -182,10 +182,10 @@ describe("mailWhenFormIsDeclined", () => {
     await mailWhenFormIsDeclined(formPayload);
 
     // get called twice for td-insee
-    expect(mockedAxiosGet as jest.Mock).toHaveBeenCalledTimes(2);
+    expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
 
     // post called 3 times for mail sending
-    expect(mockedAxiosPost as jest.Mock).toHaveBeenCalledTimes(3);
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(3);
 
     const args = mockedAxiosPost.mock.calls;
     // right service was calleds

@@ -1,4 +1,4 @@
-import { getUserId, getUserIdFromToken } from "../utils";
+import { getUserIdFromToken } from "../utils";
 import { Context } from "../types";
 import {
   flattenObjectForDb,
@@ -17,32 +17,17 @@ export default {
     }
   },
   Query: {
-    form: async (parent, { id }, context: Context) => {
+    form: async (_, { id }, context: Context) => {
       if (!id) {
         // On form creation, there is no id
         return null;
       }
 
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-
       const dbForm = await context.prisma.form({ id });
-      const formOwner = await context.prisma.form({ id }).owner();
-      if (
-        formOwner.id !== userId &&
-        !userCompanies.find(
-          c =>
-            c.siret === dbForm.recipientCompanySiret ||
-            c.siret === dbForm.emitterCompanySiret
-        )
-      ) {
-        throw new Error("Vous n'êtes pas autorisé à visualiser ce bordereau.");
-      }
-
       return unflattenObjectFromDb(dbForm);
     },
-    forms: async (parent, { siret, type }, context: Context) => {
-      const userId = getUserId(context);
+    forms: async (_, { siret, type }, context: Context) => {
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       if (!userCompanies.length) {
@@ -77,7 +62,7 @@ export default {
       return forms.map(f => unflattenObjectFromDb(f));
     },
     stats: async (parent, args, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       return userCompanies.map(async userCompany => {
@@ -119,23 +104,14 @@ export default {
     },
     appendixForms: async (
       parent,
-      { emitterSiret, wasteCode },
+      { siret, wasteCode },
       context: Context
     ) => {
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-
-      if (!userCompanies.find(c => c.siret === emitterSiret)) {
-        throw new Error(
-          "Vous n'êtes pas autorisé à créer de bordereau de regroupement pour cette entreprise."
-        );
-      }
-
       const forms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),
           status: "AWAITING_GROUP",
-          recipientCompanySiret: emitterSiret,
+          recipientCompanySiret: siret,
           isDeleted: false
         }
       });
@@ -145,7 +121,7 @@ export default {
   },
   Mutation: {
     saveForm: async (parent, { formInput }, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
 
       const { id, ...formContent } = formInput;
       if (id) {
@@ -176,7 +152,7 @@ export default {
       });
     },
     duplicateForm: async (parent, { id }, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
 
       const existingForm = await context.prisma.form({
         id
@@ -207,7 +183,7 @@ export default {
         );
       }
 
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
@@ -220,26 +196,12 @@ export default {
         }
       });
     },
-    markAsSent: async (parent, { id, sentInfo }, context: Context) => {
+    markAsSent: async (_, { id, sentInfo }, context: Context) => {
+      const userId = context.user.id;
       const form = await context.prisma.form({ id });
 
       if (!["DRAFT", "SEALED"].includes(form.status)) {
         throw new Error("Impossible de marquer ce bordereau comme envoyé");
-      }
-
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-      const sirets = userCompanies.map(c => c.siret);
-
-      const isEmitter = sirets.includes(form.emitterCompanySiret);
-      const isRecipient = sirets.includes(form.recipientCompanySiret);
-
-      if (!isEmitter && !isRecipient) {
-        throw new Error("Unauthorized.");
-      }
-
-      if (isRecipient) {
-        // TODO alert emitter that markAsSent has been done by recipient
       }
 
       await markFormAppendixAwaitingFormsAsGrouped(id, context);
@@ -254,7 +216,7 @@ export default {
     markAsReceived: async (parent, { id, receivedInfo }, context: Context) => {
       const form = await context.prisma.form({ id });
 
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
@@ -274,7 +236,7 @@ export default {
     ) => {
       const form = await context.prisma.form({ id });
 
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
       const sirets = userCompanies.map(c => c.siret);
 
@@ -304,16 +266,6 @@ export default {
     signedByTransporter: async (_, { id, signingInfo }, context: Context) => {
       const form = await context.prisma.form({ id });
 
-      const userId = getUserId(context);
-      const userCompanies = await getUserCompanies(userId);
-      const sirets = userCompanies.map(c => c.siret);
-
-      if (!sirets.includes(form.transporterCompanySiret)) {
-        throw new Error(
-          "Vous n'êtes pas transporteur de ce bordereau. Vous ne pouvez pas réaliser cette action"
-        );
-      }
-
       if (signingInfo.signedByProducer) {
         const emitterCompany = await context.prisma.company({
           siret: form.emitterCompanySiret
@@ -332,6 +284,8 @@ export default {
           "Vous ne pouvez plus signer ce bordereau, il a dékà été marqué comme envoyé."
         );
       }
+
+      const userId = context.user.id;
       logStatusChange(id, userId, status, context);
 
       return context.prisma.updateForm({
