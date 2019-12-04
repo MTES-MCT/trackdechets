@@ -16,7 +16,10 @@ type FormSiretsAndOwner = {
 export const canAccessForm = and(
   isAuthenticated,
   rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+    // this rule is called for form creation, so we have to allow it if form id is empty
+    if (!id) {
+      return true;
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
