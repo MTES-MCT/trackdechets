@@ -2,7 +2,11 @@ import { Context } from "../../types";
 import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getReadableId } from "../readable-id";
-import { Form } from "../../generated/prisma-client";
+import {
+  Form,
+  FormUpdateInput,
+  FormCreateInput
+} from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/helper";
 
 export async function saveForm(_, { formInput }, context: Context) {
@@ -17,7 +21,7 @@ export async function saveForm(_, { formInput }, context: Context) {
     const updatedForm = await context.prisma.updateForm({
       where: { id },
       data: {
-        ...form,
+        ...(form as FormUpdateInput),
         appendix2Forms: { connect: formContent.appendix2Forms }
       }
     });
@@ -26,7 +30,7 @@ export async function saveForm(_, { formInput }, context: Context) {
   }
 
   const newForm = await context.prisma.createForm({
-    ...form,
+    ...(form as FormCreateInput),
     appendix2Forms: { connect: formContent.appendix2Forms },
     readableId: await getReadableId(context),
     owner: { connect: { id: userId } }
@@ -60,7 +64,7 @@ async function checkThatUserIsPartOftheForm(
   const userCompanies = await getUserCompanies(userId);
   const userSirets = userCompanies.map(c => c.siret);
 
-  if (formSirets.some(siret => userSirets.includes(siret))) {
+  if (!formSirets.some(siret => userSirets.includes(siret))) {
     throw new DomainError(
       "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas.",
       ErrorCode.BAD_USER_INPUT
