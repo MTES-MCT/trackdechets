@@ -15,7 +15,7 @@ export async function saveForm(_, { formInput }, context: Context) {
   const { id, ...formContent } = formInput;
   const form = flattenObjectForDb(formContent);
 
-  await checkThatUserIsPartOftheForm(userId, form, context);
+  await checkThatUserIsPartOftheForm(userId, { ...form, id }, context);
 
   if (id) {
     const updatedForm = await context.prisma.updateForm({
@@ -53,9 +53,9 @@ async function checkThatUserIsPartOftheForm(
 ) {
   const isEdition = form.id != null;
   const formSirets = formSiretsGetter(form);
-  const hasMissingFormInfo = formSirets.some(siret => siret == null);
+  const hasPartialFormInput = formSirets.some(siret => siret == null);
 
-  if (isEdition && hasMissingFormInfo) {
+  if (isEdition && hasPartialFormInput) {
     const savedForm = await context.prisma.form({ id: form.id });
     const savedFormSirets = formSiretsGetter(savedForm);
     formSirets.push(...savedFormSirets);
