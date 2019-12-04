@@ -55,7 +55,14 @@ function getUsersThroughCompanyAssociations(params: object) {
     .then(association => association.map(a => a.user));
 }
 
-export async function getUserCompanies(userId: string) {
+type CompanyFragment = Pick<
+  Company,
+  "id" | "siret" | "securityCode" | "companyTypes"
+>;
+
+export async function getUserCompanies(
+  userId: string
+): Promise<CompanyFragment[]> {
   if (!userId) {
     return Promise.resolve([]);
   }
