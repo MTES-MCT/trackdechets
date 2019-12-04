@@ -50,7 +50,6 @@ describe("Forms -> saveForm mutation", () => {
 
       expect("Should throw").toBe("Error");
     } catch (err) {
-      console.log(err);
       expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
     }
   });
