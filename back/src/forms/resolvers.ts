@@ -1,7 +1,6 @@
 import { getUserIdFromToken } from "../utils";
 import { Context } from "../types";
 import {
-  flattenObjectForDb,
   unflattenObjectFromDb,
   cleanUpNotDuplicatableFieldsInForm
 } from "./form-converter";
@@ -9,6 +8,7 @@ import { formSchema } from "./validator";
 import { getNextStep } from "./workflow";
 import { getReadableId } from "./readable-id";
 import { getUserCompanies } from "../companies/helper";
+import { saveForm } from "./mutations/save-form";
 
 export default {
   Form: {
@@ -120,31 +120,7 @@ export default {
     }
   },
   Mutation: {
-    saveForm: async (parent, { formInput }, context: Context) => {
-      const userId = context.user.id;
-
-      const { id, ...formContent } = formInput;
-      if (id) {
-        const updatedForm = await context.prisma.updateForm({
-          where: { id },
-          data: {
-            ...flattenObjectForDb(formContent),
-            appendix2Forms: { connect: formContent.appendix2Forms }
-          }
-        });
-
-        return unflattenObjectFromDb(updatedForm);
-      }
-
-      const newForm = await context.prisma.createForm({
-        ...flattenObjectForDb(formContent),
-        appendix2Forms: { connect: formContent.appendix2Forms },
-        readableId: await getReadableId(context),
-        owner: { connect: { id: userId } }
-      });
-
-      return unflattenObjectFromDb(newForm);
-    },
+    saveForm,
     deleteForm: async (parent, { id }, context: Context) => {
       return context.prisma.updateForm({
         where: { id },
