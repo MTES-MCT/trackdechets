@@ -66,6 +66,7 @@ async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
       recipientMail,
       recipientName,
       payload.node.recipientCompanyName,
+      payload.node.recipientCompanySiret,
       payload.node.emitterCompanyName
     )
   );
@@ -100,6 +101,7 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
       emitterMail,
       emitterName,
       payload.node.emitterCompanyName,
+      payload.node.emitterCompanySiret,
       payload.node.recipientCompanyName
     )
   );
