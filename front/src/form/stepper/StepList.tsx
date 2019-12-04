@@ -1,14 +1,17 @@
-import React, { useState, ReactElement, useEffect, useRef } from "react";
-import { Step, IStepContainerProps } from "./Step";
-import "./StepList.scss";
+import { Mutation, Query } from "@apollo/react-components";
+import cogoToast from "cogo-toast";
 import { Formik, FormikActions, setNestedObjectValues } from "formik";
-import initialState from "../initial-state";
-import { Query, Mutation } from "@apollo/react-components";
-import { withRouter, RouteComponentProps } from "react-router";
-import { GET_FORM, SAVE_FORM } from "./queries";
-import { GET_SLIPS } from "../../dashboard/slips/query";
-import { formSchema } from "../schema";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
+import { RouteComponentProps, withRouter } from "react-router";
+
 import { currentSiretService } from "../../dashboard/CompanySelector";
+import { GET_SLIPS } from "../../dashboard/slips/query";
+import initialState from "../initial-state";
+import { formSchema } from "../schema";
+import { GET_FORM, SAVE_FORM } from "./queries";
+import { IStepContainerProps, Step } from "./Step";
+
+import "./StepList.scss";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
@@ -120,9 +123,11 @@ export default withRouter(function StepList(
                             // and don't use the classic Formik mechanism
                             saveForm({
                               variables: { formInput: values }
-                            }).then(_ =>
-                              props.history.push("/dashboard/slips")
-                            );
+                            })
+                              .then(_ => props.history.push("/dashboard/slips"))
+                              .catch(err => {
+                                cogoToast.error(err.message, { hideAfter: 7 });
+                              });
                             return false;
                           }}
                         >
