@@ -1,4 +1,3 @@
-import * as Redis from "ioredis";
 import { cachedGet, generateKey } from "../redis";
 
 jest.mock("../../generated/prisma-client", () => ({
@@ -10,7 +9,7 @@ const redisCache = {
   "foo:2000": JSON.stringify({ name: "foo" })
 };
 
-const mockRedisSet = jest.fn((key: string, value: string) => {
+const mockRedisSet = jest.fn((...args) => {
   return Promise.resolve("OK");
 });
 
