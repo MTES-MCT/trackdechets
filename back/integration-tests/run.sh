@@ -19,7 +19,7 @@ npx prisma seed -r
 
 echo "Run tests..."
 cd ../integration-tests
-npx jest integration-tests --forceExit
+npx jest integration-tests --forceExit --detectOpenHandles
 
 echo ">> Stoping containers..."
 docker-compose stop
