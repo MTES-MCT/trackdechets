@@ -1,10 +1,10 @@
-endpoint: http://prisma:4466
+endpoint: ${env:PRISMA_ENDPOINT}
 datamodel: datamodel.prisma
 generate:
   - generator: typescript-client
     output: ../src/generated/prisma-client/
 
-secret: trackdechets-prisma
+secret: ${env:PRISMA_SECRET}
 
 seed:
-  import: seed.graphql
+  run: npx ts-node ./seed.ts
