@@ -94,9 +94,5 @@ async function isUserInCompanyWithRole(
     }
   });
 
-  if (associations.length == 0) {
-    return false;
-  } else {
-    return associations.some(({ role }) => role === expectedRole);
-  }
+  return associations.some(({ role }) => role === expectedRole);
 }
