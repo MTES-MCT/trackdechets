@@ -11,7 +11,7 @@ import { sentry } from "graphql-middleware-sentry";
 import { CaptureConsole } from "@sentry/integrations";
 import { getUser } from "./auth";
 
-const port = process.env.port || 80;
+const port = process.env.BACK_PORT || 80;
 const isProd = process.env.NODE_ENV === "production";
 const sentryDsn = process.env.SENTRY_DSN;
 
@@ -49,7 +49,7 @@ const sentryMiddleware = () =>
     }
   });
 
-const server = new GraphQLServer({
+export const server = new GraphQLServer({
   typeDefs,
   resolvers,
   middlewares: [shieldMiddleware, ...(sentryDsn ? [sentryMiddleware()] : [])],
@@ -64,7 +64,8 @@ server.express.get("/ping", (_, res) => res.send("Pong!"));
 server.express.get("/userActivation", userActivationHandler);
 server.express.get("/pdf", pdfHandler);
 server.express.get("/exports", csvExportHandler);
-server.start({ port, debug: !isProd }, () =>
+
+export const httpServer = server.start({ port, debug: !isProd }, () =>
   console.log(`Server is running on port ${port}`)
 );
 
