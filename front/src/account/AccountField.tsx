@@ -43,7 +43,7 @@ export default function AccountField({
       <label htmlFor={name}>{label}</label>
       <div id={name}>{!editing ? <span>{value}</span> : form}</div>
       <div className={styles.modifier} onClick={toggleEdition}>
-        {!editing ? modifier : "Fermer"}
+        {!editing ? modifier : "Annuler"}
       </div>
     </div>
   );

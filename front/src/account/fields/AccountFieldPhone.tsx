@@ -41,7 +41,7 @@ export default function AccountFieldPhone({ me }: Props) {
           name="phone"
           type="tel"
           value={me.phone}
-          mutationTuple={useMutation(UPDATE_PHONE)}
+          mutation={UPDATE_PHONE}
           toggleEdition={() => {
             toggleEdition();
           }}

@@ -2,7 +2,6 @@ import React from "react";
 import gql from "graphql-tag";
 import AccountField from "../AccountField";
 import AccountSimpleFieldForm from "./forms/AccountSimpleFieldForm";
-import { useMutation } from "@apollo/react-hooks";
 
 type Me = {
   email: string;
@@ -41,7 +40,7 @@ export default function AccountFieldEmail({ me }: Props) {
           name="email"
           type="email"
           value={me.email}
-          mutationTuple={useMutation(UPDATE_EMAIL)}
+          mutation={UPDATE_EMAIL}
           toggleEdition={() => {
             toggleEdition();
           }}

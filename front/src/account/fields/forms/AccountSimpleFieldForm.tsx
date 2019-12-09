@@ -1,14 +1,14 @@
 import React from "react";
-import { Formik, Field, FormikProps } from "formik";
-import { MutationTuple } from "@apollo/react-hooks";
+import { Formik, Form, Field, FormikProps } from "formik";
+import { useMutation } from "@apollo/react-hooks";
 import RedErrorMessage from "../../../common/RedErrorMessage";
-import styles from "./AccountSimpleFieldForm.module.scss";
+import styles from "./AccountForm.module.scss";
 
 type Props = {
   name: string;
   type: string;
   value: string | undefined;
-  mutationTuple: MutationTuple<any, any>;
+  mutation: any;
   toggleEdition: () => void;
 };
 
@@ -16,12 +16,14 @@ export default function AccountSimpleFieldForm<T>({
   name,
   type,
   value,
-  mutationTuple,
+  mutation,
   toggleEdition
 }: Props) {
-  const [update, { loading, error }] = mutationTuple;
-
-  const validate = () => {};
+  const [update, { loading }] = useMutation(mutation, {
+    onCompleted: () => {
+      toggleEdition();
+    }
+  });
 
   const initialValues = {} as T;
   initialValues[name] = value;
@@ -29,38 +31,33 @@ export default function AccountSimpleFieldForm<T>({
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={values => {
-        update({ variables: values }).then(() => {
-          toggleEdition();
+      onSubmit={(values, { setFieldError, setSubmitting }) => {
+        update({ variables: values }).catch(() => {
+          setFieldError(name, "Erreur serveur");
+          setSubmitting(false);
         });
       }}
       validateOnChange={false}
     >
       {(props: FormikProps<T>) => (
-        <form onSubmit={props.handleSubmit}>
+        <Form>
           <div className="form__group">
-            <Field type={type} name={name} validate={validate}></Field>
-            {loading && <div>Envoi en cours...</div>}
-
-            {props.errors[name] && (
-              <RedErrorMessage name="phone">
-                {props.errors[name]}
-              </RedErrorMessage>
-            )}
-
-            {error && <div className="input-error-message">Erreur serveur</div>}
-            <button
-              className="button"
-              type="submit"
-              disabled={props.isSubmitting}
-            >
-              Valider
-            </button>
-            <div className={styles.cancel} onClick={toggleEdition}>
-              Annuler
-            </div>
+            <Field className={styles.input} type={type} name={name}></Field>
           </div>
-        </form>
+          {loading && <div>Envoi en cours...</div>}
+
+          {props.errors[name] && (
+            <RedErrorMessage name="phone">{props.errors[name]}</RedErrorMessage>
+          )}
+
+          <button
+            className="button"
+            type="submit"
+            disabled={props.isSubmitting}
+          >
+            Valider
+          </button>
+        </Form>
       )}
     </Formik>
   );

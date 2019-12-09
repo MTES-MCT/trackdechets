@@ -41,7 +41,7 @@ export default function AccountFieldName({ me }: Props) {
           name="name"
           type="text"
           value={me.name}
-          mutationTuple={useMutation(UPDATE_NAME)}
+          mutation={UPDATE_NAME}
           toggleEdition={() => {
             toggleEdition();
           }}
