@@ -1,7 +1,6 @@
 import React from "react";
 import gql from "graphql-tag";
-import { useMutation } from "@apollo/react-hooks";
-import AccountField from "../AccountField";
+import AccountField from "./AccountField";
 import AccountSimpleFieldForm from "./forms/AccountSimpleFieldForm";
 
 type Me = {

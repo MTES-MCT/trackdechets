@@ -1,5 +1,5 @@
 import React from "react";
-import AccountField from "../AccountField";
+import AccountField from "./AccountField";
 import AccountChangePasswordForm from "./forms/AccountChangePasswordForm";
 
 export default function AccountFieldPassword() {

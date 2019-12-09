@@ -3,7 +3,7 @@ import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import ToolTip from "../../common/Tooltip";
 import AccountApiKeyForm from "./forms/AccountApiKeyForm";
-import styles from "../AccountField.module.scss";
+import styles from "./AccountField.module.scss";
 
 const GET_API_KEY = gql`
   query ApiKey {
