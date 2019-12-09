@@ -5,7 +5,7 @@ import { prisma } from "./generated/prisma-client";
 import { mergePermissions } from "./utils";
 import { userActivationHandler } from "./users/activation";
 import { pdfHandler } from "./forms/pdf";
-import { initSubsriptions } from "./subscriptions";
+import { initSubscriptions } from "./subscriptions";
 import { csvExportHandler } from "./forms/exports/handler";
 import { sentry } from "graphql-middleware-sentry";
 import { CaptureConsole } from "@sentry/integrations";
@@ -69,4 +69,4 @@ export const httpServer = server.start({ port, debug: !isProd }, () =>
   console.log(`Server is running on port ${port}`)
 );
 
-initSubsriptions();
+initSubscriptions();
