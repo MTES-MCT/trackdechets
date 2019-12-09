@@ -15,11 +15,3 @@ export const LOGIN = gql`
     }
   }
 `;
-
-export const CHANGEPASSWORD = gql`
-  mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
-    changePassword(oldPassword: $oldPassword, newPassword: $newPassword) {
-      token
-    }
-  }
-`;

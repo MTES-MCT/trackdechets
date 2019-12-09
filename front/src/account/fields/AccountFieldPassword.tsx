@@ -1,8 +1,6 @@
 import React from "react";
-import gql from "graphql-tag";
 import AccountField from "../AccountField";
-import AccountSimpleFieldForm from "./forms/AccountSimpleFieldForm";
-import { useMutation } from "@apollo/react-hooks";
+import AccountChangePasswordForm from "./forms/AccountChangePasswordForm";
 
 export default function AccountFieldPassword() {
   return (
@@ -10,7 +8,9 @@ export default function AccountFieldPassword() {
       name="password"
       label="Mot de passe"
       value="**********"
-      renderForm={() => <div>form</div>}
+      renderForm={toggleEdition => (
+        <AccountChangePasswordForm toggleEdition={toggleEdition} />
+      )}
       modifier="Modifier"
     />
   );

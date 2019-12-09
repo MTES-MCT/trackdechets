@@ -129,7 +129,10 @@ export default {
       const user = await context.prisma.user({ id: userId });
       const passwordValid = await compare(oldPassword, user.password);
       if (!passwordValid) {
-        throw new Error("L'ancien mot de passe est incorrect.");
+        throw new DomainError(
+          "L'ancien mot de passe est incorrect.",
+          ErrorCode.BAD_USER_INPUT
+        );
       }
 
       const hashedPassword = await hash(newPassword, 10);
