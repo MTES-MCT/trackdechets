@@ -8,6 +8,7 @@ import Loader from "../common/Loader";
 import Error from "../common/Error";
 import AccountInfo from "./AccountInfo";
 import AccountIntegrationApi from "./AccountIntegrationApi";
+import AccountCompanies from "./AccountCompanies";
 import AccountContentWrapper from "./AccountContentWrapper";
 
 const GET_ME = gql`
@@ -15,10 +16,14 @@ const GET_ME = gql`
     me {
       ...AccountMenuFragment
       ...AccountInfoFragment
+      companies {
+        ...AccountCompaniesFragment
+      }
     }
   }
   ${AccountMenu.fragments.me}
   ${AccountInfo.fragments.me}
+  ${AccountCompanies.fragments.company}
 `;
 
 export default withRouter(function Account({ match }: RouteComponentProps) {
@@ -44,10 +49,23 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
           )}
         />
         <Route
-          path={`${match.path}/integration`}
+          path={`${match.path}/api`}
           render={() => (
             <AccountContentWrapper title="Intégration API">
               <AccountIntegrationApi />
+            </AccountContentWrapper>
+          )}
+        />
+        <Route
+          path={`${match.path}/etablissements`}
+          render={() => (
+            <AccountContentWrapper title="Établissements">
+              <AccountCompanies
+                companies={filter(
+                  AccountCompanies.fragments.company,
+                  data.me.companies
+                )}
+              />
             </AccountContentWrapper>
           )}
         />
