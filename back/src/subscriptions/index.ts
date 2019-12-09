@@ -18,7 +18,7 @@ const subscriptions: Subscription[] = [
   }
 ];
 
-export function initSubsriptions() {
+export function initSubscriptions() {
   subscriptions.map(async sub => {
     try {
       const asyncIterator = await sub.iterable();

@@ -1,4 +1,4 @@
-import { execute, closeServer } from "./helper";
+import { execute, closeServer, resetDatabase } from "./helper";
 import { prisma } from "../src/generated/prisma-client";
 import * as mailsHelper from "../src/common/mails.helper";
 import * as sub from "../src/subscriptions/index";
@@ -8,12 +8,13 @@ const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
 // No subscriptions
-const subSpy = jest.spyOn(sub, "initSubsriptions");
+const subSpy = jest.spyOn(sub, "initSubscriptions");
 subSpy.mockImplementation(() => null);
 
 describe("User endpoint", () => {
-  afterAll(done => {
-    closeServer(done);
+  afterAll(async () => {
+    await closeServer();
+    await resetDatabase();
   });
 
   test("login", async () => {
