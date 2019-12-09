@@ -13,7 +13,7 @@ import "./Signup.scss";
 import CompanyType from "./CompanyType";
 import { Wizard } from "./Wizard";
 import { FaEnvelope, FaLock, FaPhone, FaIdCard, FaEye } from "react-icons/fa";
-import PasswordMeter from "./PasswordMeter";
+import PasswordMeter from "../common/PasswordMeter";
 
 type Values = {
   codeNaf: string;
@@ -223,25 +223,35 @@ export default withRouter(function Signup(routerProps: RouteComponentProps) {
                 <div className="form__group">
                   <label>Mot de passe*</label>
                   <div className="search__group">
-                    <Field type={passwordType} name="password" />
-                    <button
-                      type="button"
-                      className="overlay-button"
-                      aria-label="Recherche"
-                    >
-                      <FaLock />
-                    </button>
-                    <span
-                      className="show-password"
-                      onClick={() =>
-                        setPasswordType(
-                          passwordType === "password" ? "input" : "password"
-                        )
-                      }
-                    >
-                      <FaEye /> Afficher le mot de passe
-                    </span>
-                    <PasswordMeter />
+                    <Field type={passwordType} name="password">
+                      {({ field }) => {
+                        return (
+                          <>
+                            <input type="password" {...field} />
+                            <button
+                              type="button"
+                              className="overlay-button"
+                              aria-label="Recherche"
+                            >
+                              <FaLock />
+                            </button>
+                            <span
+                              className="show-password"
+                              onClick={() =>
+                                setPasswordType(
+                                  passwordType === "password"
+                                    ? "input"
+                                    : "password"
+                                )
+                              }
+                            >
+                              <FaEye /> Afficher le mot de passe
+                            </span>
+                            <PasswordMeter password={field.value} />
+                          </>
+                        );
+                      }}
+                    </Field>
                   </div>
 
                   <RedErrorMessage name="password" />
