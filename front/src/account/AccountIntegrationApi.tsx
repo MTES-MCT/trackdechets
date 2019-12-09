@@ -1,5 +1,6 @@
 import React from "react";
+import AccountFieldApiKey from "./fields/AccountFieldApiKey";
 
 export default function AccountIntegrationApi() {
-  return <div>Intégration API</div>;
+  return <AccountFieldApiKey />;
 }
