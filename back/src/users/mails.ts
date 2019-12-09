@@ -27,7 +27,13 @@ export const userMails = {
     <br>
     Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.`
   }),
-  contentAwaitsGuest: (toEmail, toName, toCompanyName, fromCompanyName) => ({
+  contentAwaitsGuest: (
+    toEmail,
+    toName,
+    toCompanyName,
+    toCompanySiret,
+    fromCompanyName
+  ) => ({
     toEmail,
     toName,
     subject:
@@ -36,7 +42,7 @@ export const userMails = {
       "Un BSD numérique vous attend sur Trackdéchets : créez votre compte pour y accéder !",
     body: `Bonjour ${toName},
     <br><br>
-    L'entreprise ${fromCompanyName} vient de créer un BSD dématérialisé disponible sur <a href="https://${UI_HOST}/">https://trackdechets.beta.gouv.fr</a> qui concerne votre entreprise ${toCompanyName}.
+    L'entreprise ${fromCompanyName} vient de créer un BSD dématérialisé disponible sur <a href="https://${UI_HOST}/">https://trackdechets.beta.gouv.fr</a> qui concerne votre entreprise ${toCompanyName} (SIRET: ${toCompanySiret}).
     <br><br>
     <strong>Qu’est-ce que Trackdéchets ?</strong>
     <br>
@@ -116,7 +122,7 @@ export const userMails = {
       new Date(form.receivedAt)
     )}, le déchet de la société suivante :
     <br><br>
-   
+
     <ul>
     <li>${cleanupSpecialChars(form.emitterCompanyName)} - ${
       form.emitterCompanyAddress
