@@ -18,17 +18,35 @@ const subscriptions: Subscription[] = [
   }
 ];
 
+const activeSubscriptions: AsyncIterator<any>[] = [];
+
 export function initSubscriptions() {
   subscriptions.map(async sub => {
     try {
       const asyncIterator = await sub.iterable();
+      activeSubscriptions.push(asyncIterator);
 
       while (true) {
         const payload = await asyncIterator.next();
+        if (payload.done) {
+          break;
+        }
+
         sub.callback(payload.value);
       }
     } catch (err) {
       console.error("Error while setting up or triggering subscription", err);
     }
   });
+}
+
+export function closeSubscriptions() {
+  return Promise.all(
+    activeSubscriptions
+      .map(async asyncIterator => {
+        await asyncIterator.return(true);
+        return null;
+      })
+      .filter(Boolean)
+  );
 }
