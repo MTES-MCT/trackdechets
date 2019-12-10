@@ -1,10 +1,11 @@
 import { exec } from "child_process";
 import { promisify } from "util";
+import { Server as HttpServer } from "http";
+import { Server as HttpsServer } from "https";
 import { graphql } from "graphql";
 import { ExecutionResultDataDefault } from "graphql/execution/execute";
 import { prisma } from "../src/generated/prisma-client";
 import { server } from "../src/server";
-import { httpServer } from "../src";
 
 export async function execute<TData = ExecutionResultDataDefault>(
   query: string,
@@ -15,11 +16,31 @@ export async function execute<TData = ExecutionResultDataDefault>(
   return graphql<TData>(schema, query, null, context, variables);
 }
 
+let httpServerInfos: {
+  isRunning: boolean;
+  instancePromise: Promise<HttpServer | HttpsServer>;
+} = {
+  isRunning: false,
+  instancePromise: null
+};
+
+export function startServer() {
+  if (!httpServerInfos.isRunning) {
+    httpServerInfos.isRunning = true;
+    httpServerInfos.instancePromise = server.start();
+  }
+  return httpServerInfos.instancePromise;
+}
+
 export async function closeServer() {
-  const s = await httpServer;
+  if (!httpServerInfos.isRunning) {
+    return Promise.resolve();
+  }
+
+  const instance = await httpServerInfos.instancePromise;
   return new Promise(resolve => {
-    s.close(() => {
-      console.info("Server closed.");
+    instance.close(() => {
+      httpServerInfos.isRunning = false;
       resolve();
     });
   });
