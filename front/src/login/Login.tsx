@@ -15,7 +15,7 @@ const handleSubmit = (
     .login({ variables: { email, password } })
     .then(response => {
       response &&
-        localAuthService.locallyAutheticate(response.data.login.token);
+        localAuthService.locallyAuthenticate(response.data.login.token);
       props.history.push("/dashboard/slips");
     })
     .catch(e => {

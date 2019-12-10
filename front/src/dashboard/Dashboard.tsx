@@ -50,11 +50,12 @@ export default class Dashboard extends React.Component<RouteComponentProps, S> {
       <Query<MeData>
         query={GET_ME}
         onCompleted={data => {
-          // try to retrieve current siret from localstorage, if not set use siret from first associate company
+          // try to retrieve current siret from localstorage, if not set use siret from first associated company
           let currentSiret = currentSiretService.getSiret();
           if (!currentSiret) {
             const companies = data.me.companies;
-            currentSiret = companies[0].siret;
+            currentSiret =
+              companies.length > 0 ? data.me.companies[0].siret : "";
             currentSiretService.setSiret(currentSiret);
           }
           this.setState({ activeSiret: currentSiret });
