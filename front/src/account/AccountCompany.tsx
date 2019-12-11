@@ -4,7 +4,7 @@ import { filter } from "graphql-anywhere";
 import AccountCompanyMenu from "./AccountCompanyMenu";
 import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
-import AccountCompanyMembers from "./AccountCompanyMembers";
+import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyPage from "./AccountCompanyPage";
 import styles from "./AccountCompany.module.scss";
 
@@ -43,9 +43,11 @@ AccountCompany.fragments = {
       siret
       ...AccountCompanyInfoFragment
       ...AccountCompanySecurityFragment
+      ...AccountCompanyMemberListFragment
     }
     ${AccountCompanyInfo.fragments.company}
     ${AccountCompanySecurity.fragments.company}
+    ${AccountCompanyMemberList.fragments.company}
   `
 };
 
@@ -64,7 +66,11 @@ export default function AccountCompany({ company }: Props) {
     />
   );
 
-  const members = <AccountCompanyMembers />;
+  const members = (
+    <AccountCompanyMemberList
+      company={filter(AccountCompanyMemberList.fragments.company, company)}
+    />
+  );
 
   const page = <AccountCompanyPage />;
 
