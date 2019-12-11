@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:9.5
+    volumes:
+      - /var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: always
+  cachet:
+    image: docker pull cachethq/docker:2.3.12
+    ports:
+      - 80:8000
+    links:
+      - postgres:postgres
+    environment:
+      - DB_DRIVER=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_PREFIX=chq_
+      - APP_KEY=${APP_KEY:-null}
+      - APP_LOG=errorlog
+      - DEBUG=false
+    depends_on:
+      - postgres
+    restart: on-failure
+  monitor:
+    build:
+      context: ./cachet-monitor
+    volumes:
+      - ./cachet-monitor/config.json:/etc/cachet-monitor.config.json
