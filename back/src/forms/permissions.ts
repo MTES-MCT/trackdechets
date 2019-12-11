@@ -6,14 +6,18 @@ import {
   isFormEmitter,
   isFormTransporter
 } from "./rules";
-import { isAuthenticated, isCompanyMember } from "../common/rules";
+import {
+  isAuthenticated,
+  isCompanyMember,
+  isCompanyAdmin
+} from "../common/rules";
 
 export default {
   Query: {
     form: canAccessForm,
     forms: isAuthenticated,
     stats: isAuthenticated,
-    appendixForms: isCompanyMember
+    appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
     saveForm: isAuthenticated,
