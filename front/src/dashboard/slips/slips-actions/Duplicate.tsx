@@ -18,6 +18,7 @@ export default function Duplicate({ formId }: Props) {
             duplicate({
               variables: { id: formId },
               update: (store, { data: { duplicateForm } }) => {
+
                 const data = store.readQuery({
                   query: GET_SLIPS,
                   variables: { siret: currentSiretService.getSiret() }
@@ -25,11 +26,12 @@ export default function Duplicate({ formId }: Props) {
                 if (!data || !data.forms) {
                   return;
                 }
-                data.forms.push(duplicateForm);
                 store.writeQuery({
                   query: GET_SLIPS,
-                  variables: { siret: currentSiretService.getSiret() },
-                  data
+                  variables: { siret: currentSiretService.getSiret()},
+                  data : {
+                    forms: [...data.forms, duplicateForm]
+                  }
                 });
               }
             })

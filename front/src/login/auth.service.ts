@@ -4,7 +4,7 @@ import { SIRET_STORAGE_KEY } from "../dashboard/CompanySelector";
 
 export const localAuthService = {
   isAuthenticated: false,
-  locallyAutheticate(token: string) {
+  locallyAuthenticate(token: string) {
     this.isAuthenticated = true;
     window.localStorage.setItem("td-token", token);
   },
