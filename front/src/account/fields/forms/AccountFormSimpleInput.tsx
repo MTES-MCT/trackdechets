@@ -12,7 +12,7 @@ type Props = {
   toggleEdition: () => void;
 };
 
-export default function AccountSimpleFieldForm<T>({
+export default function AccountFormSimpleInput<T>({
   name,
   type,
   value,

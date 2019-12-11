@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import ToolTip from "../../common/Tooltip";
-import AccountApiKeyForm from "./forms/AccountApiKeyForm";
+import AccountFormApiKey from "./forms/AccountFormApiKey";
 import styles from "./AccountField.module.scss";
 
 const GET_API_KEY = gql`
@@ -31,7 +31,7 @@ export default function AccountFieldApiKey() {
         Clé d'API <ToolTip msg={tootlTip} />
       </label>
       {apiKey ? (
-        <AccountApiKeyForm apiKey={apiKey} />
+        <AccountFormApiKey apiKey={apiKey} />
       ) : (
         <span>********************</span>
       )}

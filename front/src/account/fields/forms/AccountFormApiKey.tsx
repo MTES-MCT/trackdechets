@@ -6,7 +6,7 @@ type Props = {
   apiKey: string;
 };
 
-export default function AccountApiKeyForm({ apiKey }: Props) {
+export default function AccountFormApiKey({ apiKey }: Props) {
   const copyApiKeyToClipboard = () => {
     const apiKeyRef = document.querySelector("#apiKey") as HTMLInputElement;
     apiKeyRef.select();

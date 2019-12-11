@@ -1,6 +1,6 @@
 import React from "react";
 import AccountField from "./AccountField";
-import AccountChangePasswordForm from "./forms/AccountChangePasswordForm";
+import AccountFormChangePassword from "./forms/AccountFormChangePassword";
 
 export default function AccountFieldPassword() {
   return (
@@ -9,7 +9,7 @@ export default function AccountFieldPassword() {
       label="Mot de passe"
       value="**********"
       renderForm={toggleEdition => (
-        <AccountChangePasswordForm toggleEdition={toggleEdition} />
+        <AccountFormChangePassword toggleEdition={toggleEdition} />
       )}
       modifier="Modifier"
     />

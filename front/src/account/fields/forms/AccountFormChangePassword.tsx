@@ -24,7 +24,7 @@ type V = {
   newPasswordConfirmation: string;
 };
 
-export default function AccountChangePasswordForm({ toggleEdition }: Props) {
+export default function AccountFormChangePassword({ toggleEdition }: Props) {
   const [changePassword, { loading }] = useMutation(CHANGE_PASSWORD, {
     onCompleted: () => {
       toggleEdition();

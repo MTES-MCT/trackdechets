@@ -1,7 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
-import AccountSimpleFieldForm from "./forms/AccountSimpleFieldForm";
+import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 
 type Me = {
   email: string;
@@ -36,7 +36,7 @@ export default function AccountFieldEmail({ me }: Props) {
       label="Email"
       value={me.email}
       renderForm={toggleEdition => (
-        <AccountSimpleFieldForm<{ email: string }>
+        <AccountFormSimpleInput<{ email: string }>
           name="email"
           type="email"
           value={me.email}
