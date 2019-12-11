@@ -8,22 +8,20 @@ import Loader from "../common/Loader";
 import Error from "../common/Error";
 import AccountInfo from "./AccountInfo";
 import AccountIntegrationApi from "./AccountIntegrationApi";
-import AccountCompanies from "./AccountCompanies";
+import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
 
 const GET_ME = gql`
   {
     me {
-      ...AccountMenuFragment
       ...AccountInfoFragment
       companies {
         ...AccountCompaniesFragment
       }
     }
   }
-  ${AccountMenu.fragments.me}
   ${AccountInfo.fragments.me}
-  ${AccountCompanies.fragments.company}
+  ${AccountCompanyList.fragments.company}
 `;
 
 export default withRouter(function Account({ match }: RouteComponentProps) {
@@ -35,10 +33,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
 
   return (
     <div id="account" className="account dashboard">
-      <AccountMenu
-        me={filter(AccountMenu.fragments.me, data.me)}
-        match={match}
-      />
+      <AccountMenu match={match} />
       <div className="dashboard-content">
         <Route
           path={`${match.path}/info`}
@@ -57,12 +52,12 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
           )}
         />
         <Route
-          path={`${match.path}/etablissements`}
+          path={`${match.path}/companies`}
           render={() => (
             <AccountContentWrapper title="Établissements">
-              <AccountCompanies
+              <AccountCompanyList
                 companies={filter(
-                  AccountCompanies.fragments.company,
+                  AccountCompanyList.fragments.company,
                   data.me.companies
                 )}
               />

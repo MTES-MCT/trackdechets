@@ -1,0 +1,24 @@
+
+
+.menu {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  a {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--theme-dark-text);
+    margin-right: 1.5em;
+  }
+
+  a:hover {
+    background: none;
+    color: var(--blue);
+  }
+
+  a.active {
+    color: var(--blue);
+    border-bottom: var(--blue) solid 2px;
+  }
+}

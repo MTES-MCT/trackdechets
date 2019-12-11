@@ -7,7 +7,7 @@ type Props = {
   companies: [Company];
 };
 
-AccountCompanies.fragments = {
+AccountCompanyList.fragments = {
   company: gql`
     fragment AccountCompaniesFragment on Company {
       ...AccountCompanyFragment
@@ -16,11 +16,12 @@ AccountCompanies.fragments = {
   `
 };
 
-export default function AccountCompanies({ companies }: Props) {
+export default function AccountCompanyList({ companies }: Props) {
   return (
     <>
       {companies.map(company => (
         <AccountCompany
+          key={company.siret}
           company={filter(AccountCompany.fragments.company, company)}
         />
       ))}
