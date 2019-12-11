@@ -21,6 +21,7 @@ export type Company = {
   libelleNaf: string;
   companyTypes: [string];
   installation: Installation;
+  securityCode: number;
 };
 
 type Props = {
@@ -41,8 +42,10 @@ AccountCompany.fragments = {
       name
       siret
       ...AccountCompanyInfoFragment
+      ...AccountCompanySecurityFragment
     }
     ${AccountCompanyInfo.fragments.company}
+    ${AccountCompanySecurity.fragments.company}
   `
 };
 
@@ -55,7 +58,11 @@ export default function AccountCompany({ company }: Props) {
     />
   );
 
-  const security = <AccountCompanySecurity />;
+  const security = (
+    <AccountCompanySecurity
+      company={filter(AccountCompanySecurity.fragments.company, company)}
+    />
+  );
 
   const members = <AccountCompanyMembers />;
 

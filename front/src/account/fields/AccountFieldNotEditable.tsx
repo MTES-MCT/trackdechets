@@ -1,24 +1,28 @@
 import React, { ReactNode } from "react";
 import styles from "./AccountField.module.scss";
+import ToolTip from "../../common/Tooltip";
 
 type Props = {
   name: string;
   label: string;
   value: string | ReactNode | undefined;
+  tooltip?: string;
 };
 
-export type Me = {
-  name?: string;
-  phone?: string;
-  email?: string;
-};
-
-export default function AccountFieldNotEditable({ name, label, value }: Props) {
+export default function AccountFieldNotEditable({
+  name,
+  label,
+  value,
+  tooltip
+}: Props) {
   const classes = [styles.field];
 
   return (
     <div className={classes.join(" ")}>
-      <label htmlFor={name}>{label}</label>
+      <label htmlFor={name}>
+        {label}
+        {tooltip && <ToolTip msg={tooltip} />}
+      </label>
       <div id={name} className={styles.field__value}>
         {value}
       </div>

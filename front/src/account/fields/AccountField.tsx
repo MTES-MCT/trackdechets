@@ -1,5 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import styles from "./AccountField.module.scss";
+import Tooltip from "../../common/Tooltip";
 
 type Props = {
   name: string;
@@ -9,7 +10,8 @@ type Props = {
    * Render prop
    */
   renderForm: (toggleEdition: () => void) => ReactNode;
-  modifier: string | undefined;
+  modifier?: string;
+  tooltip?: string;
 };
 
 export default function AccountField({
@@ -17,7 +19,8 @@ export default function AccountField({
   label,
   value,
   renderForm,
-  modifier
+  modifier,
+  tooltip
 }: Props) {
   const [editing, setEditing] = useState(false);
 
@@ -34,7 +37,10 @@ export default function AccountField({
 
   return (
     <div className={classes.join(" ")}>
-      <label htmlFor={name}>{label}</label>
+      <label htmlFor={name}>
+        {label}
+        {tooltip && <Tooltip msg={tooltip} />}
+      </label>
       <div id={name} className={styles.field__value}>
         {!editing ? value : form}
       </div>
