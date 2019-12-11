@@ -8,12 +8,19 @@ import AccountCompanyMembers from "./AccountCompanyMembers";
 import AccountCompanyPage from "./AccountCompanyPage";
 import styles from "./AccountCompany.module.scss";
 
+type Installation = {
+  codeS3ic: string;
+  urlFiche: string;
+};
+
 export type Company = {
-  id: string;
   name: string;
   siret: string;
+  address: string;
   naf: string;
+  libelleNaf: string;
   companyTypes: [string];
+  installation: Installation;
 };
 
 type Props = {
@@ -76,6 +83,7 @@ export default function AccountCompany({ company }: Props) {
       <h6>
         {company.name} ({company.siret})
       </h6>
+
       <AccountCompanyMenu
         activeLink={activeLink}
         setActiveLink={(link: Link) => setActiveLink(link)}
