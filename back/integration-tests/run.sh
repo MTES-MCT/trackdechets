@@ -7,10 +7,7 @@ export JWT_SECRET=any_secret
 export BACK_PORT=8383
 
 echo ">> Starting containers..."
-docker-compose up -d
-
-echo ">> Waiting 20sec for Prisma to be ready..."
-sleep 20
+docker-compose up --build -d
 
 echo ">> Deploy to prisma..."
 cd ../prisma
