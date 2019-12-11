@@ -15,9 +15,10 @@ npx prisma deploy
 npx prisma seed -r
 
 echo ">> Run tests..."
-cd ../integration-tests
-npx jest integration-tests -i --forceExit --detectOpenHandles
+cd ..
+npx jest --config ./integration-tests/jest.config.js  -i --forceExit --detectOpenHandles
 
 echo ">> Stoping containers..."
+cd ./integration-tests
 docker-compose stop
 

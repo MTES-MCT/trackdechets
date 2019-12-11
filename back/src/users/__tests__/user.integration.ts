@@ -1,6 +1,6 @@
-import { execute, resetDatabase } from "./helper";
-import { prisma } from "../src/generated/prisma-client";
-import * as mailsHelper from "../src/common/mails.helper";
+import { execute, resetDatabase } from "../../../integration-tests/helper";
+import { prisma } from "../../generated/prisma-client";
+import * as mailsHelper from "../../common/mails.helper";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
