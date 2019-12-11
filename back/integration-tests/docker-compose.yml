@@ -1,7 +1,7 @@
 version: "3"
 services:
   prisma:
-    image: prismagraphql/prisma:1.33.0
+    build: .
     ports:
       - 4467:4466
     environment:
@@ -15,6 +15,8 @@ services:
             user: test
             password: no_pass
             migrations: true
+    depends_on:
+      - "postgres"
 
   postgres:
     image: postgres:10-alpine
