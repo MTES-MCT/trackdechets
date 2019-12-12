@@ -24,9 +24,9 @@ services.map(service => {
   healthRouter.get(`/${service.name}`, async (_, res) => {
     try {
       const health = await service.check();
-      res.json(health);
+      res.status(health.ok ? 200 : 503).json(health);
     } catch (error) {
-      res.json({
+      res.status(503).json({
         name: service.name,
         ok: false,
         message: "Unknown error"
