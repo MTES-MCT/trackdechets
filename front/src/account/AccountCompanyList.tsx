@@ -9,7 +9,7 @@ type Props = {
 
 AccountCompanyList.fragments = {
   company: gql`
-    fragment AccountCompaniesFragment on Company {
+    fragment AccountCompaniesFragment on CompanyPrivate {
       ...AccountCompanyFragment
     }
     ${AccountCompany.fragments.company}

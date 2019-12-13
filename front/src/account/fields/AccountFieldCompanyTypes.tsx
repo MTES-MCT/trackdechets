@@ -11,7 +11,7 @@ type Props = {
 
 AccountFieldCompanyTypes.fragments = {
   company: gql`
-    fragment AccountFieldCompanyTypesFragment on Company {
+    fragment AccountFieldCompanyTypesFragment on CompanyPrivate {
       siret
       companyTypes
     }

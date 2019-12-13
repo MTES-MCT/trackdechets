@@ -7,7 +7,7 @@ type Props = { company: Company };
 
 AccountCompanySecurity.fragments = {
   company: gql`
-    fragment AccountCompanySecurityFragment on Company {
+    fragment AccountCompanySecurityFragment on CompanyPrivate {
       securityCode
     }
   `

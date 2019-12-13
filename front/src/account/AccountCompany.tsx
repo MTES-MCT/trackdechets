@@ -13,6 +13,20 @@ type Installation = {
   urlFiche: string;
 };
 
+export enum UserRole {
+  ADMIN = "ADMIN",
+  MEMBER = "MEMBER"
+}
+
+export type CompanyUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  isActive: boolean;
+  isPendingInvitation: boolean;
+};
+
 export type Company = {
   name: string;
   siret: string;
@@ -22,6 +36,8 @@ export type Company = {
   companyTypes: [string];
   installation: Installation;
   securityCode: number;
+  userRole: string;
+  users: [CompanyUser];
 };
 
 type Props = {
@@ -37,7 +53,7 @@ export enum Link {
 
 AccountCompany.fragments = {
   company: gql`
-    fragment AccountCompanyFragment on Company {
+    fragment AccountCompanyFragment on CompanyPrivate {
       id
       name
       siret
