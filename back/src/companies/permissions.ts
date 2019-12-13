@@ -4,7 +4,6 @@ import { isCompanyAdmin, isAuthenticated } from "../common/rules";
 
 export default {
   Query: {
-    companyUsers: isCompanyAdmin,
     favorites: isAuthenticated
   },
   Mutation: {

@@ -2,19 +2,63 @@ import axios from "axios";
 import { Context } from "../types";
 import { randomNumber } from "../utils";
 import {
-  getCompanyAdmins,
   getUserCompanies,
   getCompanyInstallation,
   getInstallationRubriques,
   getInstallationDeclarations,
-  getCompany
+  getCompany,
+  getUserRole,
+  getCompanyUsers
 } from "./helper";
-import { getCachedCompanyInfos } from "./insee";
+import { getCachedCompanySireneInfo, searchCompanies } from "./insee";
 import updateCompany from "./mutations/updateCompany";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
+const companyTrackdechetsInfoResolvers = {
+  // TODO add these fields in prisma
+  website: () => "",
+  phoneNumber: () => "",
+  email: () => ""
+};
+
+const companySireneInfoResolvers = {
+  latitude: parent => {
+    return parent.latitude ? parseFloat(parent.latitude) : null;
+  },
+  longitude: parent => {
+    return parent.latitude ? parseFloat(parent.longitude) : null;
+  }
+};
+
+const companyIcpeInfoResolvers = {
+  installation: parent => {
+    return getCompanyInstallation(parent.siret);
+  }
+};
+
 export default {
+  CompanyPrivate: {
+    ...companyTrackdechetsInfoResolvers,
+    ...companySireneInfoResolvers,
+    ...companyIcpeInfoResolvers,
+    users: async parent => {
+      return getCompanyUsers(parent.siret);
+    },
+    userRole: (parent, _, context: Context) => {
+      const userId = context.user.id;
+      return getUserRole(userId, parent.siret);
+    }
+  },
+  CompanyPublic: {
+    ...companyTrackdechetsInfoResolvers,
+    ...companySireneInfoResolvers,
+    ...companyIcpeInfoResolvers,
+    isRegistered: async parent => {
+      const company = await getCompany(parent.siret);
+      return company ? true : false;
+    }
+  },
   Installation: {
     rubriques: async parent => {
       return getInstallationRubriques(parent.codeS3ic);
@@ -23,79 +67,39 @@ export default {
       return getInstallationDeclarations(parent.codeS3ic);
     }
   },
-  Company: {
-    latitude: parent => {
-      return parent.latitude ? parseFloat(parent.latitude) : null;
-    },
-    longitude: parent => {
-      return parent.latitude ? parseFloat(parent.longitude) : null;
-    },
-    installation: parent => {
-      return getCompanyInstallation(parent.siret);
-    },
-    isRegistered: async parent => {
-      const company = await getCompany(parent.siret);
-      return company ? true : false;
-    },
-    admins: parent => {
-      return getCompanyAdmins(parent.siret).catch(_ => null);
-    }
-  },
   Query: {
-    companyInfos: (parent, { siret }) => {
+    companyInfos: async (_, { siret }) => {
       if (siret.length < 14) {
         return null;
       }
-      return getCachedCompanyInfos(siret);
+
+      const trackdechetsCompanyInfo = await getCompany(siret);
+      const sireneCompanyInfo = await getCachedCompanySireneInfo(siret);
+      const companyIcpeInfo = {
+        installation: await getCompanyInstallation(siret)
+      };
+
+      const company = {
+        ...companyIcpeInfo,
+        ...trackdechetsCompanyInfo,
+        ...sireneCompanyInfo
+      };
+
+      if (!!trackdechetsCompanyInfo) {
+        company.isRegistered = true;
+      }
+
+      return company;
     },
-    companyUsers: async (_, { siret }, context: Context) => {
-      const currentUserId = context.user.id;
-
-      const invitedUsers = await context.prisma
-        .userAccountHashes({ where: { companySiret: siret } })
-        .then(hashes =>
-          hashes.map(h => ({
-            id: h.email,
-            name: "Invité",
-            email: h.email,
-            role: "En attente"
-          }))
-        );
-
-      const users = await context.prisma
-        .users({
-          where: { companyAssociations_some: { company: { siret: siret } } }
-        })
-        .then(users =>
-          users.map(u => ({
-            id: u.id,
-            name: u.name,
-            email: u.email,
-            role: u.id === currentUserId ? "Administrateur" : "Collaborateur"
-          }))
-        );
-
-      return [...users, ...invitedUsers];
-    },
-    searchCompanies: async (parent, { clue, department = "" }) => {
+    searchCompanies: async (_, { clue, department = "" }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
-
       if (!isNumber) {
-        const response: any = await axios
-          .get(
-            `http://td-insee:81/search?clue=${clue}&department=${department}`
-          )
-          .catch(err =>
-            console.error("Error while querying INSEE service", err)
-          );
-        return response.data;
+        return searchCompanies(clue, department);
       }
-
       if (clue.length < 14) {
-        return;
+        return [];
       }
-
-      return [await getCachedCompanyInfos(clue)];
+      return [await getCachedCompanySireneInfo(clue)];
     },
     favorites: async (
       parent,
@@ -148,7 +152,9 @@ export default {
       // If there is no data yet, propose his own companies as favorites
       // We won't have every props populated, but it's a start
       if (!favorites.length) {
-        return Promise.all(userCompanies.map(c => getCachedCompanyInfos(c.siret)));
+        return Promise.all(
+          userCompanies.map(c => getCachedCompanySireneInfo(c.siret))
+        );
       }
 
       return favorites;

@@ -48,29 +48,84 @@ enum CompanyType {
   TRADER
 }
 
-type Company {
 
+# Private company type accessed by a user
+# who is member of the company. Is is typically
+# accessed through `query { user { companies } }`
+type CompanyPrivate {
+
+  # Company info in Prisma
+  ########################
   id: ID!
-  siret: String
+  companyTypes: [CompanyType]
+  gerepId: String
+  securityCode: Int!
+  # List of company members
+  users: [CompanyUser]
+  # Contact info
+  website: String
+  phoneNumber: String
+  email: String
+  # Role of the logged in user in the company
+  userRole: UserRole
 
-  # Resolve from INSEE
-  siren: String
+  # Company info from SIRENE
+  ##########################
+  siret: String
+  address: String
+  name: String
   naf: String
   libelleNaf: String
-  name: String
-  address: String
   longitude: Float
   latitude: Float
 
-  # Resolve from s3ic data from ETL
+  # Company info from ICPE database
+  #################################
+  installation: Installation
+}
+
+# Public company type that can be accessed
+# by a user who is not member of the company
+# (for example in the fiche entreprise)
+type CompanyPublic {
+
+  # Contact info (from prisma)
+  ###########################
+  website: String
+  phoneNumber: String
+  email: String
+
+  # Company info from SIRENE
+  ##########################
+  siret: String
+  address: String
+  name: String
+  naf: String
+  libelleNaf: String
+  longitude: Float
+  latitude: Float
+
+  # Company info from ICPE database
   installation: Installation
 
-  # Resolve from TD
+  # Whether or not this company is registered in TD
   isRegistered: Boolean
-  admins: [PublicUser]
-  companyTypes: [CompanyType]
+}
 
-  securityCode: Int!
+type CompanySearchResult {
+
+  # company info from SIRENE
+  siret: String
+  address: String
+  name: String
+  companyTypes: [CompanyType]
+  naf: String
+  libelleNaf: String
+  longitude: Float
+  latitude: Float
+
+  # company info from ICPE database
+  installation: Installation
 }
 
 type CompanyFavorite {
@@ -83,15 +138,14 @@ type CompanyFavorite {
 }
 
 type Query {
-  companyInfos(siret: String!): Company
-  companyUsers(siret: String!): [CompanyMember]
-  searchCompanies(clue: String!, department: Int): [Company]
+  companyInfos(siret: String!): CompanyPublic
+  searchCompanies(clue: String!, department: Int): [CompanySearchResult]
   favorites(type: FavoriteType!): [CompanyFavorite]
 }
 
 type Mutation {
   renewSecurityCode: Int
-  updateCompany(siret: String, companyTypes: [CompanyType]): Company
+  updateCompany(siret: String, gerepId: String, companyTypes: [CompanyType]): CompanyPrivate
 }
 
 type CompanyMember {

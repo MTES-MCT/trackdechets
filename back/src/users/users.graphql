@@ -56,10 +56,13 @@ type User {
   name: String
   phone: String
 
-  companies: [Company]
+  companies: [CompanyPrivate]
 }
 
-type PublicUser {
+type CompanyUser {
   id: ID!
+  email: String!
   name: String
+  role: UserRole
+  isActive: Boolean
 }

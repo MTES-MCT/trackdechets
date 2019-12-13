@@ -1,5 +1,5 @@
-import { prisma, User, Company } from "../generated/prisma-client";
-import { getCachedCompanyInfos } from "./insee";
+import { prisma, User, Company, UserRole } from "../generated/prisma-client";
+import { getCachedCompanySireneInfo } from "./insee";
 
 const companyAssociationUserFragment = `
 fragment CompanyWithAdmins on CompanyAssociation {
@@ -37,10 +37,6 @@ export function getInstallationDeclarations(codeS3ic: string) {
   return prisma.declarations({ where: { codeS3ic } });
 }
 
-export function getCompanyUsers(siret: string) {
-  return getUsersThroughCompanyAssociations({ company: { siret: siret } });
-}
-
 export function getCompanyAdmins(siret: string) {
   return getUsersThroughCompanyAssociations({
     company: { siret: siret },
@@ -53,6 +49,39 @@ function getUsersThroughCompanyAssociations(params: object) {
     .companyAssociations({ where: params })
     .$fragment<{ user: User }[]>(companyAssociationUserFragment)
     .then(association => association.map(a => a.user));
+}
+
+export async function getUserRole(userId: string, siret: string) {
+  const associations = await prisma.companyAssociations({
+    where: { user: { id: userId }, company: { siret: siret } }
+  });
+  if (associations.length > 0) {
+    return associations[0].role;
+  }
+  return null;
+}
+
+const companyUserFragment = `
+fragment CompanyUser on CompanyAssociation {
+  role,
+  user {
+    id
+    isActive
+    name
+    email
+  }
+}
+`;
+
+export function getCompanyUsers(siret: string) {
+  return prisma
+    .companyAssociations({ where: { company: { siret } } })
+    .$fragment<{ user: User; role: UserRole }[]>(companyUserFragment)
+    .then(associations =>
+      associations.map(a => {
+        return { role: a.role, ...a.user };
+      })
+    );
 }
 
 type CompanyFragment = Pick<
@@ -73,10 +102,12 @@ export async function getUserCompanies(
     .then(associations => associations.map(a => a.company));
 
   return Promise.all(
-    companies.map(company => {
-      return getCachedCompanyInfos(company.siret).then(companyInfo => {
-        return { ...companyInfo, ...company };
-      });
+    companies.map(async company => {
+      const companySireneInfo = await getCachedCompanySireneInfo(company.siret);
+      const companyIcpeInfo = {
+        installation: await getCompanyInstallation(company.siret)
+      };
+      return { ...companyIcpeInfo, ...companySireneInfo, ...company };
     })
   );
 }
