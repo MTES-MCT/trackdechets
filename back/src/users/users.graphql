@@ -65,4 +65,5 @@ type CompanyUser {
   name: String
   role: UserRole
   isActive: Boolean
+  isPendingInvitation: Boolean
 }

@@ -73,15 +73,35 @@ fragment CompanyUser on CompanyAssociation {
 }
 `;
 
-export function getCompanyUsers(siret: string) {
-  return prisma
+export async function getCompanyUsers(siret: string) {
+  const users = await prisma
     .companyAssociations({ where: { company: { siret } } })
     .$fragment<{ user: User; role: UserRole }[]>(companyUserFragment)
     .then(associations =>
       associations.map(a => {
-        return { role: a.role, ...a.user };
+        return { ...a.user, role: a.role, isPendingInvitation: false };
       })
     );
+
+  const invitedUsers = await getCompanyInvitedUsers(siret);
+
+  return [...users, ...invitedUsers];
+}
+
+async function getCompanyInvitedUsers(siret: string) {
+  const hashes = await prisma.userAccountHashes({
+    where: { companySiret: siret }
+  });
+  return hashes.map(h => {
+    return {
+      id: h.id,
+      name: "Invité",
+      email: h.email,
+      role: h.role,
+      isActive: false,
+      isPendingInvitation: true
+    };
+  });
 }
 
 type CompanyFragment = Pick<

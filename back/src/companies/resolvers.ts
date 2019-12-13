@@ -42,7 +42,7 @@ export default {
     ...companyTrackdechetsInfoResolvers,
     ...companySireneInfoResolvers,
     ...companyIcpeInfoResolvers,
-    users: async parent => {
+    users: parent => {
       return getCompanyUsers(parent.siret);
     },
     userRole: (parent, _, context: Context) => {
