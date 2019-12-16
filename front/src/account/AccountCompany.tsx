@@ -10,7 +10,6 @@ import styles from "./AccountCompany.module.scss";
 import { FaUserShield } from "react-icons/fa";
 
 type Installation = {
-  codeS3ic: string;
   urlFiche: string;
 };
 
@@ -38,6 +37,7 @@ export type Company = {
   installation: Installation;
   securityCode: number;
   userRole: string;
+  gerepId: string;
   users: [CompanyUser];
 };
 

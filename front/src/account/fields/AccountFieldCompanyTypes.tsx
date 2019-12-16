@@ -44,7 +44,6 @@ export default function AccountFieldCompanyTypes({ company }: Props) {
           toggleEdition={toggleEdition}
         />
       )}
-      modifier="Modifier"
     />
   );
 }

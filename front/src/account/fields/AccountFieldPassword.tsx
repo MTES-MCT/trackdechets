@@ -11,7 +11,6 @@ export default function AccountFieldPassword() {
       renderForm={toggleEdition => (
         <AccountFormChangePassword toggleEdition={toggleEdition} />
       )}
-      modifier="Modifier"
     />
   );
 }

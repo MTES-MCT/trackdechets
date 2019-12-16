@@ -40,13 +40,13 @@ export default function AccountFieldPhone({ me }: Props) {
           name="phone"
           type="tel"
           value={me.phone}
+          placeHolder="Téléphone"
           mutation={UPDATE_PHONE}
           toggleEdition={() => {
             toggleEdition();
           }}
         />
       )}
-      modifier="Modifier"
     />
   );
 }

@@ -40,13 +40,13 @@ export default function AccountFieldEmail({ me }: Props) {
           name="email"
           type="email"
           value={me.email}
+          placeHolder="Email"
           mutation={UPDATE_EMAIL}
           toggleEdition={() => {
             toggleEdition();
           }}
         />
       )}
-      modifier="Modifier"
     />
   );
 }

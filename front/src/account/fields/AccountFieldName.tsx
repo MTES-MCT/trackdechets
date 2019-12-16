@@ -40,13 +40,13 @@ export default function AccountFieldName({ me }: Props) {
           name="name"
           type="text"
           value={me.name}
+          placeHolder="Nom utilisateur"
           mutation={UPDATE_NAME}
           toggleEdition={() => {
             toggleEdition();
           }}
         />
       )}
-      modifier="Modifier"
     />
   );
 }

@@ -14,8 +14,8 @@ export default function AccountMenu({ match }: Props) {
     <SideMenu>
       <h5 className={styles.title}>Mon Compte</h5>
       <NavLink to={`${match.url}/info`}>Informations générales</NavLink>
-      <NavLink to={`${match.url}/api`}>Intégration API</NavLink>
       <NavLink to={`${match.url}/companies`}>Établissements</NavLink>
+      <NavLink to={`${match.url}/api`}>Intégration API</NavLink>
     </SideMenu>
   );
 }

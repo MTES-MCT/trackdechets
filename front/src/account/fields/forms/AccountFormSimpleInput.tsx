@@ -8,7 +8,9 @@ type Props = {
   name: string;
   type: string;
   value: string | undefined;
+  placeHolder: string;
   mutation: any;
+  mutationArgs?: Object;
   toggleEdition: () => void;
 };
 
@@ -16,7 +18,9 @@ export default function AccountFormSimpleInput<T>({
   name,
   type,
   value,
+  placeHolder,
   mutation,
+  mutationArgs = {},
   toggleEdition
 }: Props) {
   const [update, { loading }] = useMutation(mutation, {
@@ -32,7 +36,8 @@ export default function AccountFormSimpleInput<T>({
     <Formik
       initialValues={initialValues}
       onSubmit={(values, { setFieldError, setSubmitting }) => {
-        update({ variables: values }).catch(() => {
+        const variables = { ...values, ...mutationArgs };
+        update({ variables }).catch(() => {
           setFieldError(name, "Erreur serveur");
           setSubmitting(false);
         });
@@ -42,7 +47,12 @@ export default function AccountFormSimpleInput<T>({
       {(props: FormikProps<T>) => (
         <Form>
           <div className="form__group">
-            <Field className={styles.input} type={type} name={name}></Field>
+            <Field
+              className={styles.input}
+              type={type}
+              name={name}
+              placeholder={placeHolder}
+            ></Field>
           </div>
           {loading && <div>Envoi en cours...</div>}
 

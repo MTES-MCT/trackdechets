@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
 import AccountFieldCompanyTypes from "./fields/AccountFieldCompanyTypes";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
+import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import { Company } from "./AccountCompany";
 
 type Props = { company: Company };
@@ -15,12 +16,13 @@ AccountCompanyInfo.fragments = {
       naf
       libelleNaf
       ...AccountFieldCompanyTypesFragment
+      ...AccountFieldCompanyGerepIdFragment
       installation {
-        codeS3ic
         urlFiche
       }
     }
     ${AccountFieldCompanyTypes.fragments.company}
+    ${AccountFieldCompanyGerepId.fragments.company}
   `
 };
 
@@ -45,11 +47,6 @@ export default function AccountCompanyInfo({ company }: Props) {
       {company.installation && (
         <>
           <AccountFieldNotEditable
-            name="codeS3IC"
-            label="Identifiant GEREP"
-            value={company.installation.codeS3ic}
-          />
-          <AccountFieldNotEditable
             name="fiche_ic"
             label="Fiche ICPE"
             value={
@@ -60,6 +57,7 @@ export default function AccountCompanyInfo({ company }: Props) {
           />
         </>
       )}
+      <AccountFieldCompanyGerepId company={company} />
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
