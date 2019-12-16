@@ -1,16 +1,23 @@
 import React from "react";
 import gql from "graphql-tag";
 import { FaTimes } from "react-icons/fa";
-import { CompanyMember, UserRole } from "./AccountCompany";
+import { Company, CompanyMember, UserRole } from "./AccountCompany";
 import styles from "./AccountCompanyMember.module.scss";
+import { useMutation } from "@apollo/react-hooks";
 
 type Props = {
+  company: Company;
   user: CompanyMember;
 };
 
 AccountCompanyMember.fragments = {
+  company: gql`
+    fragment AccountCompanyMemberCompanyFragment on CompanyPrivate {
+      siret
+    }
+  `,
   user: gql`
-    fragment AccountCompanyMemberFragment on CompanyMember {
+    fragment AccountCompanyMemberUserFragment on CompanyMember {
       id
       isMe
       email
@@ -22,7 +29,23 @@ AccountCompanyMember.fragments = {
   `
 };
 
-export default function AccountCompanyMember({ user }: Props) {
+const REMOVE_USER_FROM_COMPANY = gql`
+  mutation RemoveUserFromCompany($userId: ID!, $siret: String!) {
+    removeUserFromCompany(userId: $userId, siret: $siret) {
+      id
+      users {
+        ...AccountCompanyMemberUserFragment
+      }
+    }
+  }
+  ${AccountCompanyMember.fragments.user}
+`;
+
+export default function AccountCompanyMember({ company, user }: Props) {
+  const [removeUserFromCompany, { loading }] = useMutation(
+    REMOVE_USER_FROM_COMPANY
+  );
+
   return (
     <>
       <tr key={user.id}>
@@ -42,7 +65,14 @@ export default function AccountCompanyMember({ user }: Props) {
         </td>
         {!user.isMe && !user.isPendingInvitation && (
           <td className={styles["right-column"]}>
-            <button className="button " onClick={() => {}}>
+            <button
+              className="button "
+              onClick={() => {
+                removeUserFromCompany({
+                  variables: { siret: company.siret, userId: user.id }
+                });
+              }}
+            >
               <FaTimes /> Retirer les droits
             </button>
           </td>

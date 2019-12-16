@@ -29,7 +29,7 @@ const INVITE_USER_TO_COMPANY = gql`
     inviteUserToCompany(email: $email, siret: $siret, role: $role) {
       id
       users {
-        ...AccountCompanyMemberFragment
+        ...AccountCompanyMemberUserFragment
       }
     }
   }

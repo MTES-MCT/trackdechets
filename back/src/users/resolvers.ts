@@ -296,7 +296,9 @@ export default {
           );
         });
 
-      return true;
+      const company = await prisma.company({ siret });
+
+      return { getCompanyUsers, ...company };
     }
   },
   Query: {

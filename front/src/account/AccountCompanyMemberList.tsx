@@ -10,12 +10,14 @@ type Props = { company: Company };
 AccountCompanyMemberList.fragments = {
   company: gql`
     fragment AccountCompanyMemberListFragment on CompanyPrivate {
+      ...AccountCompanyMemberCompanyFragment
       ...AccountFormCompanyInviteNewUserFragment
       users {
-        ...AccountCompanyMemberFragment
+        ...AccountCompanyMemberUserFragment
       }
     }
     ${AccountFormCompanyInviteNewUser.fragments.company}
+    ${AccountCompanyMember.fragments.company}
     ${AccountCompanyMember.fragments.user}
   `
 };
@@ -34,6 +36,7 @@ export default function AccountCompanyMemberList({ company }: Props) {
           {company.users.map((user: CompanyMember) => (
             <AccountCompanyMember
               key={user.id}
+              company={filter(AccountCompanyMember.fragments.company, company)}
               user={filter(AccountCompanyMember.fragments.user, user)}
             />
           ))}

@@ -27,7 +27,7 @@ type Mutation {
     name: String!
     password: String!
   ): AuthPayload!
-  removeUserFromCompany(userId: ID!, siret: String!):  Boolean
+  removeUserFromCompany(userId: ID!, siret: String!):  CompanyPrivate
 }
 
 type AuthPayload {
