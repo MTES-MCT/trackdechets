@@ -63,10 +63,12 @@ AccountCompany.fragments = {
       ...AccountCompanyInfoFragment
       ...AccountCompanySecurityFragment
       ...AccountCompanyMemberListFragment
+      ...AccountCompanyPageFragment
     }
     ${AccountCompanyInfo.fragments.company}
     ${AccountCompanySecurity.fragments.company}
     ${AccountCompanyMemberList.fragments.company}
+    ${AccountCompanyPage.fragments.company}
   `
 };
 
@@ -93,7 +95,11 @@ export default function AccountCompany({ company }: Props) {
     />
   );
 
-  const page = <AccountCompanyPage />;
+  const page = (
+    <AccountCompanyPage
+      company={filter(AccountCompanyPage.fragments.company, company)}
+    />
+  );
 
   let activeContent: ReactNode = null;
 
