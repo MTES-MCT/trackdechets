@@ -701,7 +701,13 @@ export type CompanyOrderByInput =
   | "updatedAt_ASC"
   | "updatedAt_DESC"
   | "securityCode_ASC"
-  | "securityCode_DESC";
+  | "securityCode_DESC"
+  | "contactEmail_ASC"
+  | "contactEmail_DESC"
+  | "contactPhone_ASC"
+  | "contactPhone_DESC"
+  | "website_ASC"
+  | "website_DESC";
 
 export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
 
@@ -2762,6 +2768,9 @@ export interface CompanyCreateInput {
   gerepId?: Maybe<String>;
   codeNaf?: Maybe<String>;
   securityCode: Int;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
 }
 
 export interface UserActivationHashSubscriptionWhereInput {
@@ -2861,6 +2870,9 @@ export interface CompanyUpdateInput {
   gerepId?: Maybe<String>;
   codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
 }
 
 export interface StatusLogWhereInput {
@@ -2905,6 +2917,9 @@ export interface CompanyUpdateManyMutationInput {
   gerepId?: Maybe<String>;
   codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
 }
 
 export interface FormUpsertWithWhereUniqueNestedInput {
@@ -3122,6 +3137,9 @@ export interface CompanyUpdateDataInput {
   gerepId?: Maybe<String>;
   codeNaf?: Maybe<String>;
   securityCode?: Maybe<Int>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
 }
 
 export interface FormScalarWhereInput {
@@ -4144,6 +4162,48 @@ export interface CompanyWhereInput {
   securityCode_lte?: Maybe<Int>;
   securityCode_gt?: Maybe<Int>;
   securityCode_gte?: Maybe<Int>;
+  contactEmail?: Maybe<String>;
+  contactEmail_not?: Maybe<String>;
+  contactEmail_in?: Maybe<String[] | String>;
+  contactEmail_not_in?: Maybe<String[] | String>;
+  contactEmail_lt?: Maybe<String>;
+  contactEmail_lte?: Maybe<String>;
+  contactEmail_gt?: Maybe<String>;
+  contactEmail_gte?: Maybe<String>;
+  contactEmail_contains?: Maybe<String>;
+  contactEmail_not_contains?: Maybe<String>;
+  contactEmail_starts_with?: Maybe<String>;
+  contactEmail_not_starts_with?: Maybe<String>;
+  contactEmail_ends_with?: Maybe<String>;
+  contactEmail_not_ends_with?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  contactPhone_not?: Maybe<String>;
+  contactPhone_in?: Maybe<String[] | String>;
+  contactPhone_not_in?: Maybe<String[] | String>;
+  contactPhone_lt?: Maybe<String>;
+  contactPhone_lte?: Maybe<String>;
+  contactPhone_gt?: Maybe<String>;
+  contactPhone_gte?: Maybe<String>;
+  contactPhone_contains?: Maybe<String>;
+  contactPhone_not_contains?: Maybe<String>;
+  contactPhone_starts_with?: Maybe<String>;
+  contactPhone_not_starts_with?: Maybe<String>;
+  contactPhone_ends_with?: Maybe<String>;
+  contactPhone_not_ends_with?: Maybe<String>;
+  website?: Maybe<String>;
+  website_not?: Maybe<String>;
+  website_in?: Maybe<String[] | String>;
+  website_not_in?: Maybe<String[] | String>;
+  website_lt?: Maybe<String>;
+  website_lte?: Maybe<String>;
+  website_gt?: Maybe<String>;
+  website_gte?: Maybe<String>;
+  website_contains?: Maybe<String>;
+  website_not_contains?: Maybe<String>;
+  website_starts_with?: Maybe<String>;
+  website_not_starts_with?: Maybe<String>;
+  website_ends_with?: Maybe<String>;
+  website_not_ends_with?: Maybe<String>;
   AND?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
   OR?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
   NOT?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
@@ -4615,6 +4675,9 @@ export interface CompanyPreviousValues {
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   securityCode: Int;
+  contactEmail?: String;
+  contactPhone?: String;
+  website?: String;
 }
 
 export interface CompanyPreviousValuesPromise
@@ -4629,6 +4692,9 @@ export interface CompanyPreviousValuesPromise
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   securityCode: () => Promise<Int>;
+  contactEmail: () => Promise<String>;
+  contactPhone: () => Promise<String>;
+  website: () => Promise<String>;
 }
 
 export interface CompanyPreviousValuesSubscription
@@ -4643,6 +4709,9 @@ export interface CompanyPreviousValuesSubscription
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   securityCode: () => Promise<AsyncIterator<Int>>;
+  contactEmail: () => Promise<AsyncIterator<String>>;
+  contactPhone: () => Promise<AsyncIterator<String>>;
+  website: () => Promise<AsyncIterator<String>>;
 }
 
 export interface StatusLogEdge {
@@ -5845,6 +5914,9 @@ export interface Company {
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   securityCode: Int;
+  contactEmail?: String;
+  contactPhone?: String;
+  website?: String;
 }
 
 export interface CompanyPromise extends Promise<Company>, Fragmentable {
@@ -5857,6 +5929,9 @@ export interface CompanyPromise extends Promise<Company>, Fragmentable {
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   securityCode: () => Promise<Int>;
+  contactEmail: () => Promise<String>;
+  contactPhone: () => Promise<String>;
+  website: () => Promise<String>;
 }
 
 export interface CompanySubscription
@@ -5871,6 +5946,9 @@ export interface CompanySubscription
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   securityCode: () => Promise<AsyncIterator<Int>>;
+  contactEmail: () => Promise<AsyncIterator<String>>;
+  contactPhone: () => Promise<AsyncIterator<String>>;
+  website: () => Promise<AsyncIterator<String>>;
 }
 
 export interface CompanyNullablePromise
@@ -5885,6 +5963,9 @@ export interface CompanyNullablePromise
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   securityCode: () => Promise<Int>;
+  contactEmail: () => Promise<String>;
+  contactPhone: () => Promise<String>;
+  website: () => Promise<String>;
 }
 
 export interface StatusLogPreviousValues {

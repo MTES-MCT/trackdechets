@@ -68,6 +68,11 @@ type Company {
   updatedAt: DateTime! @updatedAt
 
   securityCode: Int!
+
+  # Contact information for the "Fiche entreprise"
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 """
