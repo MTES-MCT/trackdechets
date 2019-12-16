@@ -1,15 +1,18 @@
-import { shield } from "graphql-shield";
-import { GraphQLServer } from "graphql-yoga";
-import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
-import { prisma } from "./generated/prisma-client";
-import { mergePermissions } from "./utils";
-import { userActivationHandler } from "./users/activation";
-import { pdfHandler } from "./forms/pdf";
-
-import { csvExportHandler } from "./forms/exports/handler";
-import { sentry } from "graphql-middleware-sentry";
 import { CaptureConsole } from "@sentry/integrations";
+import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
+import * as express from "express";
+import { applyMiddleware } from "graphql-middleware";
+import { sentry } from "graphql-middleware-sentry";
+import { shield } from "graphql-shield";
+import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
+
 import { getUser } from "./auth";
+import { csvExportHandler } from "./forms/exports/handler";
+import { pdfHandler } from "./forms/pdf";
+import { prisma } from "./generated/prisma-client";
+import { userActivationHandler } from "./users/activation";
+import { mergePermissions } from "./utils";
+
 
 const sentryDsn = process.env.SENTRY_DSN;
 
@@ -47,18 +50,25 @@ const sentryMiddleware = () =>
     }
   });
 
-export const server = new GraphQLServer({
-  typeDefs,
-  resolvers,
-  middlewares: [shieldMiddleware, ...(sentryDsn ? [sentryMiddleware()] : [])],
-  context: async req => ({
-    ...req,
-    user: await getUser(req.request),
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+const schemaWithMiddleware = applyMiddleware(
+  schema,
+  ...[shieldMiddleware, ...(sentryDsn ? [sentryMiddleware()] : [])]
+);
+
+export const server = new ApolloServer({
+  schema: schemaWithMiddleware,
+  context: async ctx => ({
+    ...ctx,
+    user: await getUser(ctx.req),
     prisma
   })
 });
 
-server.express.get("/ping", (_, res) => res.send("Pong!"));
-server.express.get("/userActivation", userActivationHandler);
-server.express.get("/pdf", pdfHandler);
-server.express.get("/exports", csvExportHandler);
+export const app = express();
+server.applyMiddleware({ app });
+
+app.get("/ping", (_, res) => res.send("Pong!"));
+app.get("/userActivation", userActivationHandler);
+app.get("/pdf", pdfHandler);
+app.get("/exports", csvExportHandler);

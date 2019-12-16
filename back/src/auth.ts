@@ -45,6 +45,10 @@ export function getUserIdFromToken(token: string) {
  * @param request
  */
 export function getUser(request) {
+  if (!request) {
+    return null;
+  }
+
   const authHeader = request.get("Authorization");
   if (!!authHeader) {
     const token = parseBearerToken(authHeader);

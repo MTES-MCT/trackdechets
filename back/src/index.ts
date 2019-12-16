@@ -1,11 +1,8 @@
 import { initSubscriptions } from "./subscriptions";
-import { server } from "./server";
+import { app } from "./server";
 
 const port = process.env.BACK_PORT || 80;
-const isProd = process.env.NODE_ENV === "production";
 
-server.start({ port, debug: !isProd }, () =>
-  console.log(`Server is running on port ${port}`)
-);
+app.listen(port, () => console.info(`Server is running on port ${port}`));
 
 initSubscriptions();

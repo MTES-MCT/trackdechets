@@ -9,6 +9,7 @@ export BACK_PORT=8383
 echo ">> Starting containers..."
 docker-compose up --build -d
 
+
 echo ">> Deploy to prisma..."
 cd ../prisma
 npx prisma deploy
