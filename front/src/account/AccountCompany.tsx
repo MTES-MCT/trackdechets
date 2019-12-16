@@ -47,10 +47,10 @@ type Props = {
 };
 
 export enum Link {
-  info,
-  security,
-  members,
-  company_page
+  Info = "Info",
+  Security = "Securité",
+  Members = "Membres",
+  CompanyPage = "Fiche Entreprise"
 }
 
 AccountCompany.fragments = {
@@ -71,7 +71,9 @@ AccountCompany.fragments = {
 };
 
 export default function AccountCompany({ company }: Props) {
-  const [activeLink, setActiveLink] = useState<Link>(Link.info);
+  const [activeLink, setActiveLink] = useState<Link>(Link.Info);
+
+  const isAdmin = company.userRole == UserRole.ADMIN;
 
   const info = (
     <AccountCompanyInfo
@@ -96,19 +98,23 @@ export default function AccountCompany({ company }: Props) {
   let activeContent: ReactNode = null;
 
   switch (activeLink) {
-    case Link.info:
+    case Link.Info:
       activeContent = info;
       break;
-    case Link.security:
+    case Link.Security:
       activeContent = security;
       break;
-    case Link.members:
+    case Link.Members:
       activeContent = members;
       break;
-    case Link.company_page:
+    case Link.CompanyPage:
       activeContent = page;
       break;
   }
+
+  const links = isAdmin
+    ? [Link.Info, Link.Security, Link.Members, Link.CompanyPage]
+    : [Link.Info, Link.Security, Link.CompanyPage];
 
   return (
     <div className={["panel", styles.company].join(" ")}>
@@ -116,7 +122,7 @@ export default function AccountCompany({ company }: Props) {
         <h6>
           {company.name} ({company.siret})
         </h6>
-        {company.userRole == UserRole.ADMIN && (
+        {isAdmin && (
           <h6 className={styles.admin}>
             Vous êtes administrateur
             <FaUserShield />
@@ -125,6 +131,7 @@ export default function AccountCompany({ company }: Props) {
       </div>
 
       <AccountCompanyMenu
+        links={links}
         activeLink={activeLink}
         setActiveLink={(link: Link) => setActiveLink(link)}
       />
