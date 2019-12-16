@@ -144,8 +144,8 @@ type Query {
 }
 
 type Mutation {
-  renewSecurityCode: Int
-  updateCompany(siret: String, gerepId: String, companyTypes: [CompanyType]): CompanyPrivate
+  renewSecurityCode(siret: String!): CompanyPrivate
+  updateCompany(siret: String!, gerepId: String, companyTypes: [CompanyType]): CompanyPrivate
 }
 
 type CompanyMember {

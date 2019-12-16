@@ -11,6 +11,7 @@ type Props = {
    */
   renderForm: (toggleEdition: () => void) => ReactNode;
   tooltip?: string;
+  modifier?: string;
 };
 
 export default function AccountField({
@@ -18,7 +19,8 @@ export default function AccountField({
   label,
   value,
   renderForm,
-  tooltip
+  tooltip,
+  modifier = "Modifier"
 }: Props) {
   const [editing, setEditing] = useState(false);
 
@@ -33,7 +35,7 @@ export default function AccountField({
 
   const form = renderForm(toggleEdition);
 
-  const modifier = !!value ? "Modifier" : "Ajouter";
+  const m = !!value ? modifier : "Ajouter";
 
   return (
     <div className={classes.join(" ")}>
@@ -46,7 +48,7 @@ export default function AccountField({
       </div>
       {modifier && (
         <div className={styles.modifier} onClick={toggleEdition}>
-          {!editing ? modifier : "Annuler"}
+          {!editing ? (!!value ? modifier : "Ajouter") : "Annuler"}
         </div>
       )}
     </div>

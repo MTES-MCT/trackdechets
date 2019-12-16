@@ -44,7 +44,6 @@ export default function AccountFormCompanyTypes({
     <Formik
       initialValues={initialValues}
       onSubmit={(values, { setFieldError, setSubmitting }) => {
-        console.log(values);
         update({ variables: { siret, ...values } }).catch(() => {
           setFieldError(name, "Erreur serveur");
           setSubmitting(false);

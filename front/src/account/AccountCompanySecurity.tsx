@@ -1,6 +1,6 @@
 import React from "react";
 import gql from "graphql-tag";
-import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
+import AccountCompanySecurityCodeField from "./fields/AccountFieldCompanySecurityCode";
 import { Company } from "./AccountCompany";
 
 type Props = { company: Company };
@@ -8,8 +8,9 @@ type Props = { company: Company };
 AccountCompanySecurity.fragments = {
   company: gql`
     fragment AccountCompanySecurityFragment on CompanyPrivate {
-      securityCode
+      ...AccountFielCompanySecurityCodeFragment
     }
+    ${AccountCompanySecurityCodeField.fragments.company}
   `
 };
 
@@ -19,14 +20,5 @@ const tooltip =
   du BSD. Ce numéro est unique et confidentiel";
 
 export default function AccountCompanySecurity({ company }: Props) {
-  return (
-    <>
-      <AccountFieldNotEditable
-        name="code_securite"
-        label="Code de sécurité"
-        value={company.securityCode}
-        tooltip={tooltip}
-      />
-    </>
-  );
+  return <AccountCompanySecurityCodeField company={company} />;
 }

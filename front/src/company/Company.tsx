@@ -55,13 +55,13 @@ export default function CompanyInfo({
       fetchPolicy="no-cache"
     >
       {({ loading, error, data }) => {
-        if (loading) return <p>"Loading..."</p>;
+        if (loading) return <p>Loading...</p>;
         if (error) return <p>{`Error!: ${error}`}</p>;
 
         const company: Company = data.companyInfos;
 
         if (!company.siret) {
-          return <p>"Entreprise inconnue"</p>;
+          return <p>Entreprise inconnue</p>;
         }
 
         return (
