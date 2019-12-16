@@ -7,6 +7,7 @@ import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyPage from "./AccountCompanyPage";
 import styles from "./AccountCompany.module.scss";
+import { FaUserShield } from "react-icons/fa";
 
 type Installation = {
   codeS3ic: string;
@@ -57,6 +58,7 @@ AccountCompany.fragments = {
       id
       name
       siret
+      userRole
       ...AccountCompanyInfoFragment
       ...AccountCompanySecurityFragment
       ...AccountCompanyMemberListFragment
@@ -109,9 +111,17 @@ export default function AccountCompany({ company }: Props) {
 
   return (
     <div className={["panel", styles.company].join(" ")}>
-      <h6>
-        {company.name} ({company.siret})
-      </h6>
+      <div className={styles.title}>
+        <h6>
+          {company.name} ({company.siret})
+        </h6>
+        {company.userRole == UserRole.ADMIN && (
+          <h6 className={styles.admin}>
+            Vous êtes administrateur
+            <FaUserShield />
+          </h6>
+        )}
+      </div>
 
       <AccountCompanyMenu
         activeLink={activeLink}

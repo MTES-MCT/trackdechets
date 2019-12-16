@@ -1,8 +1,27 @@
 
 .company {
 
-  h6 {
-    margin-bottom: 1em;
+  .title {
+    display: flex;
+    justify-content: space-between;
+
+    h6 {
+      margin-top: 0;
+      margin-bottom: 1em;
+    }
+
+    .admin {
+      font-style: italic;
+      font-weight: normal;
+      color: var(--darker-grey);
+      svg {
+        margin-left: 1em;
+        width: 20px;
+        height: auto;
+        vertical-align: sub;
+      }
+    }
+
   }
 
   .menu {

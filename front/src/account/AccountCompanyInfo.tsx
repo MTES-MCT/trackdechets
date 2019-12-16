@@ -14,7 +14,6 @@ AccountCompanyInfo.fragments = {
       address
       naf
       libelleNaf
-      userRole
       ...AccountFieldCompanyTypesFragment
       installation {
         codeS3ic
@@ -28,7 +27,6 @@ AccountCompanyInfo.fragments = {
 export default function AccountCompanyInfo({ company }: Props) {
   return (
     <>
-      <div>{company.userRole}</div>
       <AccountFieldNotEditable
         name="siret"
         label="Numéro SIRET"
