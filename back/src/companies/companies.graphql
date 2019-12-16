@@ -61,7 +61,7 @@ type CompanyPrivate {
   gerepId: String
   securityCode: Int!
   # List of company members
-  users: [CompanyUser]
+  users: [CompanyMember]
   # Contact info
   website: String
   phoneNumber: String
@@ -149,10 +149,13 @@ type Mutation {
 }
 
 type CompanyMember {
-  id: String
+  id: ID!
+  email: String!
   name: String
-  email: String
-  role: String
+  role: UserRole
+  isActive: Boolean
+  isPendingInvitation: Boolean
+  isMe: Boolean
 }
 
 enum FavoriteType {

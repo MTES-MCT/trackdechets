@@ -61,8 +61,8 @@ export async function getUserRole(userId: string, siret: string) {
   return null;
 }
 
-const companyUserFragment = `
-fragment CompanyUser on CompanyAssociation {
+const companyMemberFragment = `
+fragment CompanyMember on CompanyAssociation {
   role,
   user {
     id
@@ -76,7 +76,7 @@ fragment CompanyUser on CompanyAssociation {
 export async function getCompanyUsers(siret: string) {
   const users = await prisma
     .companyAssociations({ where: { company: { siret } } })
-    .$fragment<{ user: User; role: UserRole }[]>(companyUserFragment)
+    .$fragment<{ user: User; role: UserRole }[]>(companyMemberFragment)
     .then(associations =>
       associations.map(a => {
         return { ...a.user, role: a.role, isPendingInvitation: false };

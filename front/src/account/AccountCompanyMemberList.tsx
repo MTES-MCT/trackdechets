@@ -1,7 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
-import { Company, CompanyUser } from "./AccountCompany";
+import { Company, CompanyMember } from "./AccountCompany";
 import AccountCompanyInviteNewUser from "./AccountCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
 
@@ -28,7 +28,7 @@ export default function AccountCompanyMemberList({ company }: Props) {
       />
       <table className="table">
         <tbody>
-          {company.users.map((user: CompanyUser) => (
+          {company.users.map((user: CompanyMember) => (
             <AccountCompanyMember
               key={user.id}
               user={filter(AccountCompanyMember.fragments.user, user)}

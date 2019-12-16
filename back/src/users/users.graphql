@@ -58,12 +58,3 @@ type User {
 
   companies: [CompanyPrivate]
 }
-
-type CompanyUser {
-  id: ID!
-  email: String!
-  name: String
-  role: UserRole
-  isActive: Boolean
-  isPendingInvitation: Boolean
-}

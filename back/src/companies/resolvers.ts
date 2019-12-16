@@ -58,6 +58,11 @@ export default {
       return company ? true : false;
     }
   },
+  CompanyMember: {
+    isMe: (parent, _, context: Context) => {
+      return parent.id == context.user.id;
+    }
+  },
   Installation: {
     rubriques: async parent => {
       return getInstallationRubriques(parent.codeS3ic);

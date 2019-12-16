@@ -18,8 +18,9 @@ export enum UserRole {
   MEMBER = "MEMBER"
 }
 
-export type CompanyUser = {
+export type CompanyMember = {
   id: string;
+  isMe: boolean;
   email: string;
   name: string;
   role: UserRole;
@@ -38,7 +39,7 @@ export type Company = {
   securityCode: number;
   userRole: string;
   gerepId: string;
-  users: [CompanyUser];
+  users: [CompanyMember];
 };
 
 type Props = {
