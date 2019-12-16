@@ -1,7 +1,8 @@
 import React from "react";
 import gql from "graphql-tag";
-import { Company } from "../AccountCompany";
+import { Company, UserRole } from "../AccountCompany";
 import AccountField from "./AccountField";
+import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormCompanySecurityCode from "./forms/AccountFormCompanySecurityCode";
 
 type Props = {
@@ -13,6 +14,7 @@ AccountFielCompanySecurityCode.fragments = {
     fragment AccountFielCompanySecurityCodeFragment on CompanyPrivate {
       id
       siret
+      userRole
       securityCode
     }
   `
@@ -23,20 +25,34 @@ const tooltip =
   si le transporteur est équipé d'un outil permettant la dématérialisation \
   du BSD. Ce numéro est unique et confidentiel";
 
+const fieldName = "securityCode";
+const fieldLabel = "Code de sécurité";
+
 export default function AccountFielCompanySecurityCode({ company }: Props) {
   return (
-    <AccountField
-      name="securityCode"
-      label="Code de sécurité"
-      value={company.securityCode}
-      renderForm={toggleEdition => (
-        <AccountFormCompanySecurityCode
-          toggleEdition={toggleEdition}
-          mutationArgs={{ siret: company.siret }}
+    <>
+      {company.userRole == UserRole.ADMIN ? (
+        <AccountField
+          name={fieldName}
+          label={fieldLabel}
+          value={company.securityCode}
+          renderForm={toggleEdition => (
+            <AccountFormCompanySecurityCode
+              toggleEdition={toggleEdition}
+              mutationArgs={{ siret: company.siret }}
+            />
+          )}
+          tooltip={tooltip}
+          modifier="Renouveler"
+        />
+      ) : (
+        <AccountFieldNotEditable
+          name={fieldName}
+          label={fieldLabel}
+          value={company.securityCode}
+          tooltip={tooltip}
         />
       )}
-      tooltip={tooltip}
-      modifier="Renouveler"
-    />
+    </>
   );
 }
