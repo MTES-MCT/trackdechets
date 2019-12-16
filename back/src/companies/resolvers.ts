@@ -14,13 +14,6 @@ import updateCompany from "./mutations/updateCompany";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
-const companyTrackdechetsInfoResolvers = {
-  // TODO add these fields in prisma
-  website: () => "",
-  phoneNumber: () => "",
-  email: () => ""
-};
-
 const companySireneInfoResolvers = {
   latitude: parent => {
     return parent.latitude ? parseFloat(parent.latitude) : null;
@@ -38,7 +31,6 @@ const companyIcpeInfoResolvers = {
 
 export default {
   CompanyPrivate: {
-    ...companyTrackdechetsInfoResolvers,
     ...companySireneInfoResolvers,
     ...companyIcpeInfoResolvers,
     users: parent => {
@@ -50,13 +42,8 @@ export default {
     }
   },
   CompanyPublic: {
-    ...companyTrackdechetsInfoResolvers,
     ...companySireneInfoResolvers,
-    ...companyIcpeInfoResolvers,
-    isRegistered: async parent => {
-      const company = await getCompany(parent.siret);
-      return company ? true : false;
-    }
+    ...companyIcpeInfoResolvers
   },
   CompanyMember: {
     isMe: (parent, _, context: Context) => {

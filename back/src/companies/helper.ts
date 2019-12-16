@@ -106,7 +106,16 @@ async function getCompanyInvitedUsers(siret: string) {
 
 const companyFragment = `
 fragment Company on CompanyAssociation {
-  company { id siret securityCode gerepId companyTypes }
+  company {
+    id
+    siret
+    securityCode
+    gerepId
+    contactEmail
+    contactPhone
+    website
+    companyTypes
+  }
 }
 `;
 

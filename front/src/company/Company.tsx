@@ -8,7 +8,7 @@ import "./Company.scss";
 import CompanyRegistration from "./CompanyRegistration";
 import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyContact from "./CompanyContact";
-import { Company, Declaration } from "./companyTypes";
+import { Company } from "./companyTypes";
 import CompanyActivity from "./CompanyActivity";
 
 const COMPANY_INFOS = gql`
@@ -22,6 +22,9 @@ const COMPANY_INFOS = gql`
       naf
       libelleNaf
       isRegistered
+      contactEmail
+      contactPhone
+      website
       installation {
         codeS3ic
         urlFiche
@@ -34,11 +37,6 @@ const COMPANY_INFOS = gql`
           activite
           volume
           unite
-        }
-        declarations {
-          codeDechet
-          libDechet
-          gerepType
         }
       }
     }
@@ -79,7 +77,7 @@ export default function CompanyInfo({
               <CompanyDisclaimer />
 
               <div className="columns">
-                <CompanyContact address={company.address} />
+                <CompanyContact company={company} />
                 {company.longitude && company.latitude && (
                   <CompanyMap lng={company.longitude} lat={company.latitude} />
                 )}

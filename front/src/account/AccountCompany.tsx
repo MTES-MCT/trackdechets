@@ -40,6 +40,9 @@ export type Company = {
   userRole: string;
   gerepId: string;
   users: [CompanyMember];
+  contactEmail: string;
+  contactPhone: string;
+  website: string;
 };
 
 type Props = {

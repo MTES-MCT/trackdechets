@@ -60,12 +60,16 @@ type CompanyPrivate {
   companyTypes: [CompanyType]
   gerepId: String
   securityCode: Int!
+
+  # Contact info (from prisma)
+  ###########################
+  contactEmail: String
+  contactPhone: String
+  website: String
+
   # List of company members
   users: [CompanyMember]
-  # Contact info
-  website: String
-  phoneNumber: String
-  email: String
+
   # Role of the logged in user in the company
   userRole: UserRole
 
@@ -91,9 +95,9 @@ type CompanyPublic {
 
   # Contact info (from prisma)
   ###########################
+  contactEmail: String
+  contactPhone: String
   website: String
-  phoneNumber: String
-  email: String
 
   # Company info from SIRENE
   ##########################
@@ -145,7 +149,13 @@ type Query {
 
 type Mutation {
   renewSecurityCode(siret: String!): CompanyPrivate
-  updateCompany(siret: String!, gerepId: String, companyTypes: [CompanyType]): CompanyPrivate
+  updateCompany(
+    siret: String!,
+    gerepId: String,
+    contactEmail: String,
+    contactPhone: String,
+    website: String,
+    companyTypes: [CompanyType]): CompanyPrivate
 }
 
 type CompanyMember {
