@@ -2,7 +2,7 @@ import React from "react";
 import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
 import { Company, CompanyMember } from "./AccountCompany";
-import AccountCompanyInviteNewUser from "./AccountCompanyInviteNewUser";
+import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
 
 type Props = { company: Company };
@@ -10,12 +10,12 @@ type Props = { company: Company };
 AccountCompanyMemberList.fragments = {
   company: gql`
     fragment AccountCompanyMemberListFragment on CompanyPrivate {
-      ...AccountCompanyInviteNewUserFragment
+      ...AccountFormCompanyInviteNewUserFragment
       users {
         ...AccountCompanyMemberFragment
       }
     }
-    ${AccountCompanyInviteNewUser.fragments.company}
+    ${AccountFormCompanyInviteNewUser.fragments.company}
     ${AccountCompanyMember.fragments.user}
   `
 };
@@ -23,8 +23,11 @@ AccountCompanyMemberList.fragments = {
 export default function AccountCompanyMemberList({ company }: Props) {
   return (
     <>
-      <AccountCompanyInviteNewUser
-        company={filter(AccountCompanyInviteNewUser.fragments.company, company)}
+      <AccountFormCompanyInviteNewUser
+        company={filter(
+          AccountFormCompanyInviteNewUser.fragments.company,
+          company
+        )}
       />
       <table className="table">
         <tbody>

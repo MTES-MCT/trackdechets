@@ -6,7 +6,7 @@ import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
 import companyResolver from "../companies/resolvers";
-import { getUserCompanies } from "../companies/helper";
+import { getUserCompanies, getCompanyUsers } from "../companies/helper";
 import { DomainError, ErrorCode } from "../common/errors";
 
 const { JWT_SECRET } = process.env;
@@ -203,10 +203,7 @@ export default {
         .user({ email })
         .catch(_ => null);
 
-      // Dont get the company name through Prisma as the name is not stored in the DB
-      const {
-        name: companyName
-      } = await companyResolver.Query.companyInfos(null, { siret });
+      const company = await context.prisma.company({ siret });
 
       if (existingUser) {
         await context.prisma.createCompanyAssociation({
@@ -220,10 +217,10 @@ export default {
             existingUser.email,
             existingUser.name,
             admin.name,
-            companyName
+            company.name
           )
         );
-        return true;
+        return { users: getCompanyUsers(siret), ...company };
       }
 
       const userAccoutHash = await hash(
@@ -241,12 +238,12 @@ export default {
         userMails.inviteUserToJoin(
           email,
           admin.name,
-          companyName,
+          company.name,
           userAccoutHash
         )
       );
 
-      return true;
+      return { users: getCompanyUsers(siret), ...company };
     },
     joinWithInvite: async (
       _,
