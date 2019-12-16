@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Context } from "../types";
 import { randomNumber } from "../utils";
 import {

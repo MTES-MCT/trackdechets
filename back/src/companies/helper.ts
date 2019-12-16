@@ -104,6 +104,12 @@ async function getCompanyInvitedUsers(siret: string) {
   });
 }
 
+const companyFragment = `
+fragment Company on CompanyAssociation {
+  company { id siret securityCode gerepId companyTypes }
+}
+`;
+
 type CompanyFragment = Pick<
   Company,
   "id" | "siret" | "securityCode" | "companyTypes"
@@ -118,7 +124,7 @@ export async function getUserCompanies(
 
   const companies = await prisma
     .companyAssociations({ where: { user: { id: userId } } })
-    .$fragment<{ company: Company }[]>(companyAssociationCompaniesFragment)
+    .$fragment<{ company: Company }[]>(companyFragment)
     .then(associations => associations.map(a => a.company));
 
   return Promise.all(
@@ -131,9 +137,3 @@ export async function getUserCompanies(
     })
   );
 }
-
-const companyAssociationCompaniesFragment = `
-fragment AssociationWithCompany on CompanyAssociation {
-  company { id siret securityCode companyTypes }
-}
-`;
