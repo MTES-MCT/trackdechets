@@ -92,6 +92,7 @@ jobs:
           name: Run integration tests
           command: |
             cd integration-tests
+            sudo chmod +x ./run.sh
             ./run.sh
 
 workflows:
