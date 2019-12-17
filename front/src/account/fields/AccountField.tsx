@@ -3,17 +3,27 @@ import styles from "./AccountField.module.scss";
 import Tooltip from "../../common/Tooltip";
 
 type Props = {
+  // the name of the field
   name: string;
+  // the label of the field
   label: string;
-  value: string | ReactNode | undefined;
-  /**
-   * Render prop
-   */
+  // the value of the field
+  value: string | number | ReactNode;
+  // a render props for the form
   renderForm: (toggleEdition: () => void) => ReactNode;
+  // an optional tooltip to display next to the label
   tooltip?: string;
+  // an optional custom modifier text. Default is "Modifier"
   modifier?: string;
 };
 
+/**
+ * This component displays an editable account field
+ * Initially a label, a field value and modifier are present.
+ * When clicking the modifier, specific style is applied and
+ * the form should appear. The function `toggleEdition` is passed
+ * down to the form to close the edition mode.
+ */
 export default function AccountField({
   name,
   label,
@@ -34,8 +44,6 @@ export default function AccountField({
   initialValues[name] = value;
 
   const form = renderForm(toggleEdition);
-
-  const m = !!value ? modifier : "Ajouter";
 
   return (
     <div className={classes.join(" ")}>
