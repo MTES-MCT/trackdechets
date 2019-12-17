@@ -3,6 +3,7 @@ import { Formik, Form, Field, FormikProps } from "formik";
 import { useMutation } from "@apollo/react-hooks";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
+import * as Yup from "yup";
 
 type Props = {
   name: string;
@@ -10,7 +11,8 @@ type Props = {
   value: string | undefined;
   placeHolder: string;
   mutation: any;
-  mutationArgs?: Object;
+  mutationArgs?: object;
+  yupSchema?: object;
   toggleEdition: () => void;
 };
 
@@ -21,6 +23,7 @@ export default function AccountFormSimpleInput<T>({
   placeHolder,
   mutation,
   mutationArgs = {},
+  yupSchema = Yup.object(),
   toggleEdition
 }: Props) {
   const [update, { loading }] = useMutation(mutation, {
@@ -43,6 +46,7 @@ export default function AccountFormSimpleInput<T>({
         });
       }}
       validateOnChange={false}
+      validationSchema={yupSchema}
     >
       {(props: FormikProps<T>) => (
         <Form>
@@ -56,9 +60,7 @@ export default function AccountFormSimpleInput<T>({
           </div>
           {loading && <div>Envoi en cours...</div>}
 
-          {props.errors[name] && (
-            <RedErrorMessage name="phone">{props.errors[name]}</RedErrorMessage>
-          )}
+          <RedErrorMessage name={name}>{props.errors[name]}</RedErrorMessage>
 
           <button
             className="button"

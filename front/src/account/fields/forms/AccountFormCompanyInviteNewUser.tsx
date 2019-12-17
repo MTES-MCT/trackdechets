@@ -6,6 +6,7 @@ import { Company } from "../../AccountCompany";
 import styles from "./AccountCompanyInviteNewUser.module.scss";
 import { useMutation } from "@apollo/react-hooks";
 import AccountCompanyMember from "../../AccountCompanyMember";
+import { object, string } from "yup";
 
 type Props = {
   company: Company;
@@ -36,6 +37,10 @@ const INVITE_USER_TO_COMPANY = gql`
   ${AccountCompanyMember.fragments.user}
 `;
 
+const yupSchema = object().shape({
+  email: string().email()
+});
+
 export default function AccountFormCompanyInviteNewUser({ company }: Props) {
   const [inviteUserToCompany, { loading }] = useMutation(
     INVITE_USER_TO_COMPANY
@@ -63,6 +68,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
             setSubmitting(false);
           });
       }}
+      validationSchema={yupSchema}
     >
       {({ isSubmitting }) => (
         <div className={styles.invite__form}>

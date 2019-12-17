@@ -5,6 +5,7 @@ import { useMutation } from "@apollo/react-hooks";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import PasswordMeter from "../../../common/PasswordMeter";
 import styles from "./AccountForm.module.scss";
+import { object, string } from "yup";
 
 type Props = {
   toggleEdition: () => void;
@@ -40,6 +41,12 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
     }
   };
 
+  const yupSchema = object().shape({
+    oldPassword: string().required(),
+    newPassword: string().required(),
+    newPasswordConfirmation: string().required()
+  });
+
   const initialValues: V = {
     oldPassword: "",
     newPassword: "",
@@ -60,6 +67,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
       }}
       validateOnChange={false}
       validate={validate}
+      validationSchema={yupSchema}
     >
       {(props: FormikProps<V>) => (
         <Form>

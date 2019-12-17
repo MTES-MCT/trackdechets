@@ -2,6 +2,7 @@ import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
+import { object, string } from "yup";
 
 type Me = {
   name: string;
@@ -29,6 +30,10 @@ const UPDATE_NAME = gql`
   }
 `;
 
+const yupSchema = object().shape({
+  name: string().required()
+});
+
 export default function AccountFieldName({ me }: Props) {
   return (
     <AccountField
@@ -42,6 +47,7 @@ export default function AccountFieldName({ me }: Props) {
           value={me.name}
           placeHolder="Nom utilisateur"
           mutation={UPDATE_NAME}
+          yupSchema={yupSchema}
           toggleEdition={() => {
             toggleEdition();
           }}

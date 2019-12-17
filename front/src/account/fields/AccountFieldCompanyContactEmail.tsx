@@ -4,6 +4,7 @@ import AccountField from "./AccountField";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { Company, UserRole } from "../AccountCompany";
+import { object, string } from "yup";
 
 type Props = {
   company: Company;
@@ -30,6 +31,10 @@ const UPDATE_CONTACT_EMAIL = gql`
   }
 `;
 
+const yupSchema = object().shape({
+  contactEmail: string().email()
+});
+
 export default function AccountFielCompanyContactEmail({ company }: Props) {
   const fieldName = "contactEmail";
   const fieldLabel = "Email de contact";
@@ -49,6 +54,7 @@ export default function AccountFielCompanyContactEmail({ company }: Props) {
               placeHolder={fieldLabel}
               mutation={UPDATE_CONTACT_EMAIL}
               mutationArgs={{ siret: company.siret }}
+              yupSchema={yupSchema}
               toggleEdition={() => {
                 toggleEdition();
               }}

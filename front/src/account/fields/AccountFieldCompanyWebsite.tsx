@@ -4,6 +4,7 @@ import AccountField from "./AccountField";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { Company, UserRole } from "../AccountCompany";
+import { object, string } from "yup";
 
 type Props = {
   company: Company;
@@ -30,6 +31,10 @@ const UPDATE_WEBSITE = gql`
   }
 `;
 
+const yupSchema = object().shape({
+  website: string().url()
+});
+
 export default function AccountFielCompanyContactWebsite({ company }: Props) {
   const fieldName = "website";
   const fieldLabel = "Site web";
@@ -49,6 +54,7 @@ export default function AccountFielCompanyContactWebsite({ company }: Props) {
               placeHolder={fieldLabel}
               mutation={UPDATE_WEBSITE}
               mutationArgs={{ siret: company.siret }}
+              yupSchema={yupSchema}
               toggleEdition={() => {
                 toggleEdition();
               }}
