@@ -12,7 +12,7 @@ describe("Forms -> saveForm mutation", () => {
   };
 
   const getUserCompaniesMcock = jest.spyOn(helpers, "getUserCompanies");
-  getUserCompaniesMcock.mockResolvedValue([{ siret: "user siret" }]);
+  getUserCompaniesMcock.mockResolvedValue([{ id: "", securityCode: 123, companyTypes: [], siret: "user siret" }]);
 
   beforeEach(() => {
     formMock.mockReset();
