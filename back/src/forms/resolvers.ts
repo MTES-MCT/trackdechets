@@ -1,14 +1,19 @@
-import { getUserIdFromToken } from "../utils";
+import { getUserCompanies } from "../companies/helper";
 import { Context } from "../types";
+import { getUserIdFromToken } from "../utils";
 import {
-  unflattenObjectFromDb,
-  cleanUpNotDuplicatableFieldsInForm
+  cleanUpNotDuplicatableFieldsInForm,
+  unflattenObjectFromDb
 } from "./form-converter";
-import { formSchema } from "./validator";
-import { getNextStep } from "./workflow";
-import { getReadableId } from "./readable-id";
-import { getUserCompanies } from "../companies/queries";
+import {
+  markAsProcessed,
+  markAsReceived,
+  markAsSealed,
+  markAsSent,
+  signedByTransporter
+} from "./mutations/mark-as";
 import { saveForm } from "./mutations/save-form";
+import { getReadableId } from "./readable-id";
 
 export default {
   Form: {
@@ -139,142 +144,11 @@ export default {
 
       return unflattenObjectFromDb(newForm);
     },
-    markAsSealed: async (parent, { id }, context: Context) => {
-      const dbForm = await context.prisma.form({ id });
-      const formattedForm = unflattenObjectFromDb(dbForm);
-      const isValid = await formSchema.isValid(formattedForm);
-
-      if (!isValid) {
-        const errors: string[] = await formSchema
-          .validate(formattedForm, { abortEarly: false })
-          .catch(err => err.errors);
-        throw new Error(
-          `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${errors.join(
-            "\n"
-          )}`
-        );
-      }
-
-      const userId = context.user.id;
-      const userCompanies = await getUserCompanies(userId);
-      const sirets = userCompanies.map(c => c.siret);
-
-      await markFormAppendixAwaitingFormsAsGrouped(id, context);
-
-      return context.prisma.updateForm({
-        where: { id },
-        data: {
-          status: getNextStep(dbForm, sirets)
-        }
-      });
-    },
-    markAsSent: async (_, { id, sentInfo }, context: Context) => {
-      const userId = context.user.id;
-      const form = await context.prisma.form({ id });
-
-      if (!["DRAFT", "SEALED"].includes(form.status)) {
-        throw new Error("Impossible de marquer ce bordereau comme envoyé");
-      }
-
-      await markFormAppendixAwaitingFormsAsGrouped(id, context);
-
-      logStatusChange(id, userId, "SENT", context);
-
-      return context.prisma.updateForm({
-        where: { id },
-        data: { status: "SENT", ...sentInfo }
-      });
-    },
-    markAsReceived: async (parent, { id, receivedInfo }, context: Context) => {
-      const form = await context.prisma.form({ id });
-
-      const userId = context.user.id;
-      const userCompanies = await getUserCompanies(userId);
-      const sirets = userCompanies.map(c => c.siret);
-
-      form.isAccepted = receivedInfo.isAccepted;
-      const status = getNextStep(form, sirets);
-      logStatusChange(form.id, userId, status, context);
-
-      return context.prisma.updateForm({
-        where: { id },
-        data: { status, ...receivedInfo }
-      });
-    },
-    markAsProcessed: async (
-      parent,
-      { id, processedInfo },
-      context: Context
-    ) => {
-      const form = await context.prisma.form({ id });
-
-      const userId = context.user.id;
-      const userCompanies = await getUserCompanies(userId);
-      const sirets = userCompanies.map(c => c.siret);
-
-      const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
-      if (appendix2Forms.length) {
-        appendix2Forms.map(f =>
-          logStatusChange(f.id, userId, "PROCESSED", context)
-        );
-
-        await context.prisma.updateManyForms({
-          where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
-          data: { status: "PROCESSED" }
-        });
-      }
-
-      const status = getNextStep({ ...form, ...processedInfo }, sirets);
-      logStatusChange(id, userId, status, context);
-
-      return context.prisma.updateForm({
-        where: { id },
-        data: {
-          status,
-          ...processedInfo
-        }
-      });
-    },
-    signedByTransporter: async (_, { id, signingInfo }, context: Context) => {
-      const form = await context.prisma.form({ id });
-
-      if (signingInfo.signedByProducer) {
-        const emitterCompany = await context.prisma.company({
-          siret: form.emitterCompanySiret
-        });
-
-        if (emitterCompany.securityCode !== signingInfo.securityCode) {
-          throw new Error(
-            "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'"
-          );
-        }
-      }
-
-      const status = getNextStep(form, [form.emitterCompanySiret]);
-      if (status !== "SENT") {
-        throw new Error(
-          "Vous ne pouvez plus signer ce bordereau, il a dékà été marqué comme envoyé."
-        );
-      }
-
-      const userId = context.user.id;
-      logStatusChange(id, userId, status, context);
-
-      return context.prisma.updateForm({
-        where: { id },
-        data: {
-          sentAt: signingInfo.sentAt,
-          signedByTransporter: true,
-          ...(signingInfo.signedByProducer && {
-            sentBy: signingInfo.sentBy,
-            status
-          }),
-          wasteDetailsPackagings: signingInfo.packagings,
-          wasteDetailsQuantity: signingInfo.quantity,
-          wasteDetailsOnuCode: signingInfo.onuCode
-        }
-      });
-    }
+    markAsSealed,
+    markAsSent,
+    markAsReceived,
+    markAsProcessed,
+    signedByTransporter
   },
   Subscription: {
     forms: {
@@ -301,40 +175,3 @@ export default {
     }
   }
 };
-
-function logStatusChange(formId, userId, status, context: Context) {
-  return context.prisma
-    .createStatusLog({
-      form: { connect: { id: formId } },
-      user: { connect: { id: userId } },
-      status: status
-    })
-    .catch(err => {
-      console.error(
-        `Cannot log status change for form ${formId}, user ${userId}, status ${status}`,
-        err
-      );
-      throw new Error("Problème technique, merci de réessayer plus tard.");
-    });
-}
-
-async function markFormAppendixAwaitingFormsAsGrouped(
-  formId: string,
-  context: Context
-) {
-  const appendix2Forms = await context.prisma
-    .form({ id: formId })
-    .appendix2Forms();
-
-  if (!appendix2Forms.length) {
-    return;
-  }
-
-  return context.prisma.updateManyForms({
-    where: {
-      status: "AWAITING_GROUP",
-      OR: appendix2Forms.map(f => ({ id: f.id }))
-    },
-    data: { status: "GROUPED" }
-  });
-}

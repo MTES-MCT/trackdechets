@@ -1,57 +1,46 @@
 import { Form } from "../generated/prisma-client";
+import { Context } from "../types";
+import { getUserCompanies } from "../companies/helper";
+
+const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
 
 /**
  * Workflow:
  * See /docs/worflow.md for more details
  * */
-export function getNextStep(form: Form, actorSirets: string[]) {
-  if (
-    actorSirets.includes(form.emitterCompanySiret) &&
-    ["DRAFT", "SEALED"].includes(form.status) // To handle cases where you are both emitter & recipient
-  ) {
-    return getEmitterNextStep(form);
-  }
-  if (actorSirets.includes(form.recipientCompanySiret)) {
-    return getRecipientNextStep(form);
-  }
-  throw new Error("Vous ne pouvez pas changer le statut de ce bordereau.");
-}
+export async function getNextPossibleStatus(form: Form, context: Context) {
+  const userCompanies = await getUserCompanies(context.user.id);
+  const actorSirets = userCompanies.map(c => c.siret);
 
-function getEmitterNextStep(form: Form) {
+  const isEmitter = actorSirets.includes(form.emitterCompanySiret);
+  const isRecipient = actorSirets.includes(form.recipientCompanySiret);
+  const isTransporter = actorSirets.includes(form.transporterCompanySiret);
+
   switch (form.status) {
     case "DRAFT":
-      return "SEALED";
+      return isEmitter ? ["SEALED", "SENT"] : [];
+
     case "SEALED":
-      return "SENT";
-    default:
-      throw new Error("Il n'y a rien à valider.");
-  }
-}
+      // When both the transporter and the producer sign on the transporter device,
+      // a transporter can initiate a "SENT" status change
+      return isEmitter || isTransporter ? "SENT" : [];
 
-const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
-
-function getRecipientNextStep(form: Form) {
-  switch (form.status) {
-    case "DRAFT":
-      return "SEALED";
     case "SENT":
-      if (!form.isAccepted) {
-        return "REFUSED";
+      if (!isRecipient) {
+        return [];
       }
-      return "RECEIVED";
+      return form.isAccepted ? "RECEIVED" : "REFUSED";
+
     case "RECEIVED":
-      if (GROUP_CODES.indexOf(form.processingOperationDone) === -1) {
+      if (!isRecipient) {
+        return [];
+      }
+      if (!GROUP_CODES.includes(form.processingOperationDone)) {
         return "PROCESSED";
       }
-      if (form.noTraceability) {
-        return "NO_TRACEABILITY";
-      }
-      return "AWAITING_GROUP";
-    case "SEALED":
-      throw new Error(
-        "En attente de la confirmation d'envoi des déchets par le producteur."
-      );
+      return form.noTraceability ? "NO_TRACEABILITY" : "AWAITING_GROUP";
+
     default:
-      throw new Error("Il n'y a rien à valider");
+      return [];
   }
 }
