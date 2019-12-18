@@ -11,8 +11,8 @@ services:
         databases:
           default:
             connector: postgres
-            host: postgres
-            port: 5432
+            host: $POSTGRES_HOST
+            port: $POSTGRES_PORT
             user: $POSTGRES_USER
             password: $POSTGRES_PASSWORD
             migrations: true
@@ -90,6 +90,8 @@ services:
     environment:
       POSTGRES_USER: $AIRFLOW_POSTGRES_USER
       POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
+      POSTGRES_HOST: $POSTGRES_HOST
+      POSTGRES_PORT: $POSTGRES_PORT
       AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY
       AIRFLOW__CORE__LOGGING_LEVEL: ERROR
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
