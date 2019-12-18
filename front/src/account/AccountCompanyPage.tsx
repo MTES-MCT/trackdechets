@@ -33,11 +33,11 @@ export default function AccountCompanyPage({ company }: Props) {
   return (
     <>
       <div className="notification">
-        Ces éléments sont destinés à apparaitre sur votre{" "}
+        Ces informations de contact sont destinées à apparaitre sur votre{" "}
         <a href={companyPage} target="_blank">
           fiche entreprise
         </a>{" "}
-        consultable par les autres utilisateurs de Trackdéchets.
+        et sont consultables par n'importe qui.
       </div>
       <AccountFieldCompanyContactEmail
         company={filter(
