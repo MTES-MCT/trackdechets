@@ -7,15 +7,15 @@ import { getNextPossibleStatus } from "../workflow";
 
 export async function markAsSealed(_, { id }, context: Context) {
   return markAs("SEALED", { id }, context, async form => {
-    validateForm(form);
+    await validateForm(form);
     await markFormAppendixAwaitingFormsAsGrouped(form.id, context);
   });
 }
 
 export async function markAsSent(_, { id, sentInfo }, context: Context) {
-  return markAs("SENT", { id, input: sentInfo }, context, async form => {
-    await markFormAppendixAwaitingFormsAsGrouped(form.id, context);
-  });
+  return markAs("SENT", { id, input: sentInfo }, context, form =>
+    markFormAppendixAwaitingFormsAsGrouped(form.id, context)
+  );
 }
 
 export async function markAsReceived(
@@ -83,7 +83,7 @@ async function markAs(
   status: Status,
   { id, input = {} }: { id: string; input?: any },
   context: Context,
-  beforeSaveHook: (form: Form) => Promise<void> = () => Promise.resolve()
+  beforeSaveHook: (form: Form) => Promise<any> = () => Promise.resolve()
 ) {
   const form = await context.prisma.form({ id });
   const possibleStatus = await getNextPossibleStatus(
