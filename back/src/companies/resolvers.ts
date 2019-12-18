@@ -5,7 +5,9 @@ import {
   getCompanyInfos,
   getCompanyUsers,
   getUserRole,
-  getUserCompanies
+  getUserCompanies,
+  getDeclarations,
+  getRubriques
 } from "./queries";
 import { updateCompany, renewSecurityCode } from "./mutations";
 
@@ -40,18 +42,8 @@ export default {
     }
   },
   Installation: {
-    rubriques: async parent => {
-      if (parent.codeS3ic) {
-        return prisma.rubriques({ where: { codeS3ic: parent.codeS3ic } });
-      }
-      return [];
-    },
-    declarations: async parent => {
-      if (parent.codeS3ic) {
-        return prisma.declarations({ where: { codeS3ic: parent.codeS3ic } });
-      }
-      return [];
-    }
+    rubriques: async parent => getRubriques(parent.codeS3ic),
+    declarations: async parent => getDeclarations(parent.codeS3ic)
   },
   Query: {
     companyInfos: async (_, { siret }) => getCompanyInfos(siret),
