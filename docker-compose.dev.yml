@@ -47,20 +47,15 @@ services:
     command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
     volumes:
       - ./back/src:/usr/src/app/src
+    env_file:
+      - .env
     environment:
       NODE_ENV: dev
-      JWT_SECRET: $JWT_SECRET
-      UI_HOST: $UI_HOST
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      TRELLO_API_KEY: $TRELLO_API_KEY
-      TRELLO_TOKEN: $TRELLO_TOKEN
-      TRELLO_ALERTS_LIST_ID: $TRELLO_ALERTS_LIST_ID
-      MJ_MAIN_TEMPLATE_ID: $MJ_MAIN_TEMPLATE_ID
-      MJ_FIRST_ONBOARDING_TEMPLATE_ID: $MJ_FIRST_ONBOARDING_TEMPLATE_ID
-      MJ_SECOND_ONBOARDING_TEMPLATE_ID: $MJ_SECOND_ONBOARDING_TEMPLATE_ID
-      NOTIFY_DREAL_WHEN_FORM_DECLINED: $NOTIFY_DREAL_WHEN_FORM_DECLINED
+      PRISMA_ENDPOINT: $PRISMA_ENDPOINT
+      PRISMA_SECRET: $PRISMA_SECRET
 
   td-ui:
     image: node:10.14-alpine

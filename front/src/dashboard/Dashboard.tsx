@@ -38,14 +38,6 @@ export default class Dashboard extends React.Component<RouteComponentProps, S> {
     this.state = { activeSiret: "" };
   }
 
-  componentDidMount() {
-    // set activeSiret from localStorage if any
-    const cachedSiret = currentSiretService.getSiret();
-    if (cachedSiret) {
-      this.setState({ activeSiret: cachedSiret });
-    }
-  }
-
   handleCompanyChange(siret: string) {
     this.setState({ activeSiret: siret });
   }
@@ -55,37 +47,46 @@ export default class Dashboard extends React.Component<RouteComponentProps, S> {
     const { activeSiret } = this.state;
 
     return (
-      <Query<MeData> query={GET_ME}>
+      <Query<MeData>
+        query={GET_ME}
+        onCompleted={data => {
+          // try to retrieve current siret from localstorage, if not set use siret from first associated company
+          let currentSiret = currentSiretService.getSiret();
+          if (!currentSiret) {
+            const companies = data.me.companies;
+            currentSiret =
+              companies.length > 0 ? data.me.companies[0].siret : "";
+            currentSiretService.setSiret(currentSiret);
+          }
+          this.setState({ activeSiret: currentSiret });
+        }}
+      >
         {({ loading, error, data }) => {
           if (loading) return <p>Chargement...</p>;
           if (error) return <p>{`Erreur ! ${error.message}`}</p>;
 
           if (data) {
-            // default to first company siret if it is not set
-            // in the component state
-            const siret = !!activeSiret
-              ? activeSiret
-              : data.me.companies.length > 0
-              ? data.me.companies[0].siret
-              : "";
-
             return (
               <div id="dashboard" className="dashboard">
                 <DashboardMenu
                   me={data.me}
                   match={match}
-                  siret={siret}
+                  siret={activeSiret}
                   handleCompanyChange={this.handleCompanyChange.bind(this)}
                 />
 
                 <div className="dashboard-content">
                   <Route
                     path={`${match.path}/slips`}
-                    render={() => <SlipsContainer me={data.me} siret={siret} />}
+                    render={() => (
+                      <SlipsContainer me={data.me} siret={activeSiret} />
+                    )}
                   />
                   <Route
                     path={`${match.path}/transport`}
-                    render={() => <Transport me={data.me} siret={siret} />}
+                    render={() => (
+                      <Transport me={data.me} siret={activeSiret} />
+                    )}
                   />
                   <Route
                     path={`${match.path}/exports`}

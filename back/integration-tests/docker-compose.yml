@@ -1,0 +1,25 @@
+version: "3"
+services:
+  prisma:
+    build: .
+    ports:
+      - 4467:4466
+    environment:
+      PRISMA_CONFIG: |
+        port: 4466
+        databases:
+          default:
+            connector: postgres
+            host: postgres
+            port: 5432
+            user: test
+            password: no_pass
+            migrations: true
+    depends_on:
+      - "postgres"
+
+  postgres:
+    image: postgres:10-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: no_pass

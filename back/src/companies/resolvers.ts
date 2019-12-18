@@ -1,10 +1,6 @@
 import axios from "axios";
 import { Context } from "../types";
-import {
-  getUserId,
-  currentUserBelongsToCompanyAdmins,
-  randomNumber
-} from "../utils";
+import { randomNumber } from "../utils";
 import {
   getCompanyAdmins,
   getUserCompanies,
@@ -13,8 +9,8 @@ import {
   getInstallationDeclarations,
   getCompany
 } from "./helper";
+import { getCachedCompanyInfos } from "./insee";
 import updateCompany from "./mutations/updateCompany";
-import { memoizeRequest } from "./cache";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
@@ -50,15 +46,10 @@ export default {
       if (siret.length < 14) {
         return null;
       }
-      return memoizeRequest(siret);
+      return getCachedCompanyInfos(siret);
     },
     companyUsers: async (_, { siret }, context: Context) => {
-      const companyAdmins = await getCompanyAdmins(siret);
-
-      const currentUserId = getUserId(context);
-      if (!companyAdmins.find(a => a.id === currentUserId)) {
-        return [];
-      }
+      const currentUserId = context.user.id;
 
       const invitedUsers = await context.prisma
         .userAccountHashes({ where: { companySiret: siret } })
@@ -104,7 +95,7 @@ export default {
         return;
       }
 
-      return [await memoizeRequest(clue)];
+      return [await getCachedCompanyInfos(clue)];
     },
     favorites: async (
       parent,
@@ -112,7 +103,7 @@ export default {
       context: Context
     ) => {
       const lowerType = type.toLowerCase();
-      const userId = getUserId(context);
+      const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       if (!userCompanies.length) {
@@ -157,7 +148,7 @@ export default {
       // If there is no data yet, propose his own companies as favorites
       // We won't have every props populated, but it's a start
       if (!favorites.length) {
-        return Promise.all(userCompanies.map(c => memoizeRequest(c.siret)));
+        return Promise.all(userCompanies.map(c => getCachedCompanyInfos(c.siret)));
       }
 
       return favorites;
@@ -165,12 +156,6 @@ export default {
   },
   Mutation: {
     renewSecurityCode: async (_, { siret }, context: Context) => {
-      if (!currentUserBelongsToCompanyAdmins(context, siret)) {
-        throw new Error(
-          "Vous n'êtes pas autorisé à modifier ce code de sécurité."
-        );
-      }
-
       return context.prisma.updateCompany({
         where: { siret },
         data: {

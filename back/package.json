@@ -18,7 +18,7 @@
     "bcrypt": "^3.0.2",
     "dataloader": "^1.4.0",
     "graphql-middleware-sentry": "^3.2.1",
-    "graphql-shield": "^4.1.0",
+    "graphql-shield": "^7.0.4",
     "graphql-yoga": "^1.16.7",
     "ioredis": "^4.9.3",
     "jsonwebtoken": "^8.4.0",
@@ -30,13 +30,13 @@
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/ioredis": "^4.0.10",
-    "@types/jest": "^23.3.10",
+    "@types/jest": "^24.0.23",
     "@types/jsonwebtoken": "^8.3.0",
     "@types/yup": "^0.26.3",
-    "jest": "^23.6.0",
+    "jest": "^24.9.0",
     "nodemon": "^1.18.7",
     "prisma": "1.33.0",
-    "ts-jest": "^23.10.5",
+    "ts-jest": "^24.1.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.1.6"
   }

@@ -48,13 +48,15 @@ export default function Delete({ formId }: Props) {
                       if (!data || !data.forms) {
                         return;
                       }
-                      data.forms = data.forms.filter(
-                        f => f.id !== deleteForm.id
-                      );
+
                       store.writeQuery({
                         query: GET_SLIPS,
                         variables: { siret: currentSiretService.getSiret() },
-                        data
+                        data: {
+                          forms: [
+                            ...data.forms.filter(f => f.id !== deleteForm.id)
+                          ]
+                        }
                       });
                     }
                   })

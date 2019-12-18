@@ -1,12 +1,12 @@
 import { hash, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { getUserId, randomNumber } from "../utils";
+import { randomNumber } from "../utils";
 import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
 import companyResolver from "../companies/resolvers";
-import { getCompanyAdmins, getUserCompanies } from "../companies/helper";
+import { getUserCompanies } from "../companies/helper";
 import { DomainError, ErrorCode } from "../common/errors";
 
 const { JWT_SECRET } = process.env;
@@ -124,7 +124,7 @@ export default {
       };
     },
     changePassword: async (_, { oldPassword, newPassword }, context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
 
       const user = await context.prisma.user({ id: userId });
       const passwordValid = await compare(oldPassword, user.password);
@@ -164,7 +164,7 @@ export default {
       );
     },
     editProfile: (_, { name, phone, email }, context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
 
       return prisma
         .updateUser({
@@ -186,15 +186,9 @@ export default {
       { email, siret, role },
       context: Context
     ) => {
-      const userId = getUserId(context);
-      const admins = await getCompanyAdmins(siret);
-      const admin = admins.find(a => a.id === userId);
-
-      if (!admin) {
-        throw new Error(
-          "Vous ne pouvez pas inviter un utilisateur dans cette entreprise."
-        );
-      }
+      const userId = context.user.id;
+      // Current user is necessarely admin, otherwise he can't invite another user (rule set in permissions file)
+      const admin = await context.prisma.user({ id: userId });
 
       const existingUser = await context.prisma
         .user({ email })
@@ -284,16 +278,7 @@ export default {
         user
       };
     },
-    removeUserFromCompany: async (_, { userId, siret }, context: Context) => {
-      const currentUserId = getUserId(context);
-      const admins = await getCompanyAdmins(siret);
-
-      if (!admins || !admins.find(a => a.id === currentUserId)) {
-        throw new Error(
-          "Vous ne pouvez pas retirer un utilisateur dans cette entreprise."
-        );
-      }
-
+    removeUserFromCompany: async (_, { userId, siret }) => {
       await prisma
         .deleteManyCompanyAssociations({
           user: { id: userId },
@@ -310,11 +295,11 @@ export default {
   },
   Query: {
     me: async (parent, _, context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
       return context.prisma.user({ id: userId });
     },
     apiKey: (parent, args, context: Context) => {
-      const userId = getUserId(context);
+      const userId = context.user.id;
       return sign({ userId: userId }, JWT_SECRET);
     }
   },

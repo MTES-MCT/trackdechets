@@ -1,8 +1,10 @@
+import { Form } from "../generated/prisma-client";
+
 export function flattenObjectForDb(
   input,
   previousKeys = [],
   dbObject = {}
-) {
+): Partial<Form> {
   Object.keys(input).forEach(key => {
     if (
       input[key] &&

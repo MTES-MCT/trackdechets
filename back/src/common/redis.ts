@@ -1,5 +1,4 @@
 import * as Redis from "ioredis";
-import { prisma } from "../generated/prisma-client";
 export const redis = new Redis({ host: "redis" });
 
 /**
@@ -24,36 +23,53 @@ export function generateKey(
     .join(":");
 }
 
-const defaultParser = {
+type Parser = { parse: (s: string) => any; stringify: (v: any) => string };
+const defaultParser: Parser = {
   parse: v => v,
   stringify: v => v
 };
 
-export async function getByIdFromCache(
-  getter: Function,
-  id: string | number,
-  parser = defaultParser
+type SetOptions = {
+  EX?: number; // EX seconds -- Set the specified expire time, in seconds.
+  PX?: number; // PX milliseconds -- Set the specified expire time, in milliseconds.
+  NX?: boolean; // NX -- Only set the key if it does not already exist.
+  XX?: boolean; // XX -- Only set the key if it already exist.
+};
+
+export async function cachedGet(
+  getter: (itemKey) => Promise<any>,
+  objectType: string,
+  itemKey: string | number,
+  settings: { parser?: Parser; options?: SetOptions } = {}
 ) {
-  const objectType = getter.name;
+  const { parser = defaultParser, options = {} } = settings;
+  const cacheKey = generateKey(objectType, itemKey);
 
-  if (!(objectType in prisma))
-    throw new Error(`Unknown object type "${objectType}" in prisma model.`);
+  const redisValue = await redis.get(cacheKey).catch(_ => null);
 
-  const key = generateKey(objectType, id);
+  if (redisValue != null) {
+    return parser.parse(redisValue);
+  }
 
   try {
-    const redisValue = await redis.get(key).catch(_ => null);
+    const dbValue = await getter(itemKey);
 
-    if (redisValue != null) {
-      return parser.parse(redisValue);
-    }
+    const setOptions = Object.keys(options)
+      .map(key => {
+        const val = options[key];
+        // Some options don't have an associated value
+        if (isNaN(val)) {
+          return [key];
+        }
+        return [key, val];
+      })
+      .reduce((acc, val) => acc.concat(val), []);
 
-    const dbValue = await getter({ id });
     // No need to await the set, and it doesn't really matters if it fails
-    redis.set(key, parser.stringify(dbValue)).catch(_ => null);
+    redis.set(cacheKey, parser.stringify(dbValue), setOptions).catch(_ => null);
 
     return dbValue;
   } catch (err) {
-    return null;
+    throw err;
   }
 }
