@@ -50,8 +50,8 @@ type Props = {
 };
 
 export enum Link {
-  Info = "Info",
-  Security = "Securité",
+  Info = "Information",
+  Security = "Sécurité",
   Members = "Membres",
   CompanyPage = "Fiche Entreprise"
 }
