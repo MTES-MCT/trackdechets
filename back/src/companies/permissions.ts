@@ -7,7 +7,7 @@ export default {
     favorites: isAuthenticated
   },
   Mutation: {
-    updateCompany: isCompanyAdmin,
-    renewSecurityCode: isCompanyAdmin
+    updateCompany: isCompanyAdmin
+    //renewSecurityCode: isCompanyAdmin
   }
 };

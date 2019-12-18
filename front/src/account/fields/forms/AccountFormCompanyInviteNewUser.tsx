@@ -63,8 +63,8 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
             setSubmitting(false);
             resetForm();
           })
-          .catch(() => {
-            setFieldError("email", "Erreur serveur");
+          .catch(e => {
+            setFieldError("email", e.message);
             setSubmitting(false);
           });
       }}

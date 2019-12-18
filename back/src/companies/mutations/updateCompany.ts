@@ -1,7 +1,7 @@
 import { Context } from "../../types";
-import { CompanyType } from "../../generated/prisma-client";
+import { prisma, CompanyType } from "../../generated/prisma-client";
 
-type Paylod = {
+export type Paylod = {
   siret: string;
   gerepId?: string;
   contactEmail?: string;
@@ -10,11 +10,14 @@ type Paylod = {
   companyTypes?: CompanyType[];
 };
 
-export default function updateCompany(
-  _,
-  { siret, companyTypes, gerepId, contactEmail, contactPhone, website }: Paylod,
-  context: Context
-) {
+export default function updateCompany({
+  siret,
+  companyTypes,
+  gerepId,
+  contactEmail,
+  contactPhone,
+  website
+}: Paylod) {
   const data = {
     ...(companyTypes ? { companyTypes: { set: companyTypes } } : {}),
     ...(gerepId ? { gerepId } : {}),
@@ -22,7 +25,8 @@ export default function updateCompany(
     ...(contactPhone ? { contactPhone } : {}),
     ...(website ? { website } : {})
   };
-  return context.prisma.updateCompany({
+
+  return prisma.updateCompany({
     where: { siret },
     data
   });

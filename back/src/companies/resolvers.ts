@@ -1,16 +1,13 @@
 import { Context } from "../types";
-import { randomNumber } from "../utils";
-import {
-  getUserCompanies,
-  getCompanyInstallation,
-  getInstallationRubriques,
-  getInstallationDeclarations,
-  getCompany,
-  getUserRole,
-  getCompanyUsers
-} from "./helper";
+import { prisma } from "../generated/prisma-client";
 import { getCachedCompanySireneInfo, searchCompanies } from "./insee";
-import updateCompany from "./mutations/updateCompany";
+import {
+  getCompanyInfos,
+  getCompanyUsers,
+  getUserRole,
+  getUserCompanies
+} from "./queries";
+import { updateCompany, renewSecurityCode } from "./mutations";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
@@ -23,16 +20,9 @@ const companySireneInfoResolvers = {
   }
 };
 
-const companyIcpeInfoResolvers = {
-  installation: parent => {
-    return getCompanyInstallation(parent.siret);
-  }
-};
-
 export default {
   CompanyPrivate: {
     ...companySireneInfoResolvers,
-    ...companyIcpeInfoResolvers,
     users: parent => {
       return getCompanyUsers(parent.siret);
     },
@@ -42,8 +32,7 @@ export default {
     }
   },
   CompanyPublic: {
-    ...companySireneInfoResolvers,
-    ...companyIcpeInfoResolvers
+    ...companySireneInfoResolvers
   },
   CompanyMember: {
     isMe: (parent, _, context: Context) => {
@@ -52,36 +41,20 @@ export default {
   },
   Installation: {
     rubriques: async parent => {
-      return getInstallationRubriques(parent.codeS3ic);
+      if (parent.codeS3ic) {
+        return prisma.rubriques({ where: { codeS3ic: parent.codeS3ic } });
+      }
+      return [];
     },
     declarations: async parent => {
-      return getInstallationDeclarations(parent.codeS3ic);
+      if (parent.codeS3ic) {
+        return prisma.declarations({ where: { codeS3ic: parent.codeS3ic } });
+      }
+      return [];
     }
   },
   Query: {
-    companyInfos: async (_, { siret }) => {
-      if (siret.length < 14) {
-        return null;
-      }
-
-      const trackdechetsCompanyInfo = await getCompany(siret);
-      const sireneCompanyInfo = await getCachedCompanySireneInfo(siret);
-      const companyIcpeInfo = {
-        installation: await getCompanyInstallation(siret)
-      };
-
-      const company = {
-        ...companyIcpeInfo,
-        ...trackdechetsCompanyInfo,
-        ...sireneCompanyInfo
-      };
-
-      if (!!trackdechetsCompanyInfo) {
-        company.isRegistered = true;
-      }
-
-      return company;
-    },
+    companyInfos: async (_, { siret }) => getCompanyInfos(siret),
     searchCompanies: async (_, { clue, department = "" }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
       if (!isNumber) {
@@ -99,20 +72,20 @@ export default {
     ) => {
       const lowerType = type.toLowerCase();
       const userId = context.user.id;
-      const userCompanies = await getUserCompanies(userId);
+      const companies = await getUserCompanies(userId);
 
-      if (!userCompanies.length) {
+      if (!companies.length) {
         throw new Error(
           `Vous n'appartenez à aucune entreprise, vous n'avez pas de favori.`
         );
       }
 
-      const forms = await context.prisma.forms({
+      const forms = await prisma.forms({
         where: {
           OR: [
             { owner: { id: userId } },
-            { recipientCompanySiret: userCompanies[0].siret },
-            { emitterCompanySiret: userCompanies[0].siret }
+            { recipientCompanySiret: companies[0].siret },
+            { emitterCompanySiret: companies[0].siret }
           ],
           isDeleted: false
         },
@@ -144,7 +117,7 @@ export default {
       // We won't have every props populated, but it's a start
       if (!favorites.length) {
         return Promise.all(
-          userCompanies.map(c => getCachedCompanySireneInfo(c.siret))
+          companies.map(c => getCachedCompanySireneInfo(c.siret))
         );
       }
 
@@ -152,14 +125,7 @@ export default {
     }
   },
   Mutation: {
-    renewSecurityCode: async (_, { siret }, context: Context) => {
-      return context.prisma.updateCompany({
-        where: { siret },
-        data: {
-          securityCode: randomNumber(4)
-        }
-      });
-    },
-    updateCompany
+    renewSecurityCode: (_, { siret }) => renewSecurityCode(siret),
+    updateCompany: (_, payload) => updateCompany(payload)
   }
 };

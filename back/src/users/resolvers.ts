@@ -1,13 +1,14 @@
-import { hash, compare } from "bcrypt";
+import { compare, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { randomNumber } from "../utils";
 import { Context } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "./mails";
-import companyResolver from "../companies/resolvers";
-import { getUserCompanies, getCompanyUsers } from "../companies/helper";
+import { getUserCompanies } from "../companies/queries";
+import { hashPassword } from "./utils";
 import { DomainError, ErrorCode } from "../common/errors";
+import { changePassword, editProfile, inviteUserToCompany } from "./mutations";
 
 const { JWT_SECRET } = process.env;
 
@@ -37,7 +38,7 @@ export default {
         );
       }
 
-      const hashedPassword = await hash(payload.password, 10);
+      const hashedPassword = await hashPassword(payload.password);
       const company = await context.prisma
         .createCompany({
           siret: trimedSiret,
@@ -125,26 +126,7 @@ export default {
     },
     changePassword: async (_, { oldPassword, newPassword }, context) => {
       const userId = context.user.id;
-
-      const user = await context.prisma.user({ id: userId });
-      const passwordValid = await compare(oldPassword, user.password);
-      if (!passwordValid) {
-        throw new DomainError(
-          "L'ancien mot de passe est incorrect.",
-          ErrorCode.BAD_USER_INPUT
-        );
-      }
-
-      const hashedPassword = await hash(newPassword, 10);
-      await prisma.updateUser({
-        where: { id: userId },
-        data: { password: hashedPassword }
-      });
-
-      return {
-        token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
-        user
-      };
+      return changePassword(userId, oldPassword, newPassword);
     },
     resetPassword: async (_, { email }, context: Context) => {
       const user = await context.prisma.user({ email }).catch(_ => null);
@@ -156,7 +138,7 @@ export default {
       const newPassword = Math.random()
         .toString(36)
         .slice(-10);
-      const hashedPassword = await hash(newPassword, 10);
+      const hashedPassword = await hashPassword(newPassword);
       await prisma.updateUser({
         where: { id: user.id },
         data: { password: hashedPassword }
@@ -166,85 +148,12 @@ export default {
         userMails.resetPassword(user.email, user.name, newPassword)
       );
     },
-    editProfile: (_, { name, phone, email }, context) => {
+    editProfile: (_, payload, context) => {
       const userId = context.user.id;
-
-      const data = {
-        ...(!!name ? { name } : {}),
-        ...(!!phone ? { phone } : {}),
-        ...(!!email ? { email } : {})
-      };
-
-      return prisma
-        .updateUser({
-          where: { id: userId },
-          data
-        })
-        .catch(err => {
-          console.error(
-            `Error while editing profile from user #${userId} with values ${JSON.stringify(
-              { name, phone, email }
-            )}`,
-            err
-          );
-          throw new Error("Impossible de mettre le profil à jour");
-        });
+      return editProfile(userId, payload);
     },
-    inviteUserToCompany: async (
-      _,
-      { email, siret, role },
-      context: Context
-    ) => {
-      const userId = context.user.id;
-      // Current user is necessarely admin, otherwise he can't invite another user (rule set in permissions file)
-      const admin = await context.prisma.user({ id: userId });
-
-      const existingUser = await context.prisma
-        .user({ email })
-        .catch(_ => null);
-
-      const company = await context.prisma.company({ siret });
-
-      if (existingUser) {
-        await context.prisma.createCompanyAssociation({
-          user: { connect: { id: existingUser.id } },
-          role,
-          company: { connect: { siret } }
-        });
-
-        await sendMail(
-          userMails.notifyUserOfInvite(
-            existingUser.email,
-            existingUser.name,
-            admin.name,
-            company.name
-          )
-        );
-        return { users: getCompanyUsers(siret), ...company };
-      }
-
-      const userAccoutHash = await hash(
-        new Date().valueOf().toString() + Math.random().toString(),
-        10
-      );
-      await prisma.createUserAccountHash({
-        hash: userAccoutHash,
-        email,
-        role,
-        companySiret: siret
-      });
-
-      await sendMail(
-        userMails.inviteUserToJoin(
-          email,
-          admin.name,
-          company.name,
-          userAccoutHash
-        )
-      );
-
-      return { users: getCompanyUsers(siret), ...company };
-    },
+    inviteUserToCompany: async (_, { email, siret, role }, context: Context) =>
+      inviteUserToCompany(context.user, email, siret, role),
     joinWithInvite: async (
       _,
       { inviteHash, name, password },
@@ -258,7 +167,7 @@ export default {
           );
         });
 
-      const hashedPassword = await hash(password, 10);
+      const hashedPassword = await hashPassword(password);
       const user = await context.prisma.createUser({
         name: name,
         email: existingHash.email,
@@ -298,7 +207,7 @@ export default {
 
       const company = await prisma.company({ siret });
 
-      return { getCompanyUsers, ...company };
+      return company;
     }
   },
   Query: {

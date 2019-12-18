@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCompanyInstallation, getInstallationRubriques } from "./helper";
+import { getInstallation, getRubriques, getDeclarations } from "./queries";
 
 export const anomalies = {
   NO_ANOMALY: "no_anomaly",
@@ -35,7 +35,7 @@ export async function verifyPrestataire(siret, wasteCode = null) {
     return [{ siret }, anomalies.SIRET_UNKNOWN];
   }
 
-  const installation = await getCompanyInstallation(siret);
+  const installation = await getInstallation(siret);
 
   if (!installation) {
     if (!etsDecla[siret]) {
@@ -68,7 +68,7 @@ export async function checkIsCompatible(installation, wasteCode) {
 
     let canTakeDangerousWaste = false;
 
-    const rubriques = await getInstallationRubriques(installation.codeS3ic);
+    const rubriques = await getRubriques(installation.codeS3ic);
 
     for (let rubrique of rubriques) {
       if (rubrique.wasteType == "DANGEROUS") {
