@@ -1,5 +1,6 @@
 import { CaptureConsole } from "@sentry/integrations";
 import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
+import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import * as express from "express";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
@@ -42,10 +43,10 @@ const sentryMiddleware = () =>
       integrations: [new CaptureConsole({ levels: ["error"] })]
     },
     forwardErrors: true,
-    withScope: (scope, error, context: any) => {
-      scope.setExtra("body", context.request.body);
-      scope.setExtra("origin", context.request.headers.origin);
-      scope.setExtra("user-agent", context.request.headers["user-agent"]);
+    withScope: (scope, error, context: ExpressContext) => {
+      scope.setExtra("body", context.req.body);
+      scope.setExtra("origin", context.req.headers.origin);
+      scope.setExtra("user-agent", context.req.headers["user-agent"]);
       scope.setTag("service", "api");
     }
   });
