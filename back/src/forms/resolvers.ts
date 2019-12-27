@@ -7,7 +7,7 @@ import {
 import { formSchema } from "./validator";
 import { getNextStep } from "./workflow";
 import { getReadableId } from "./readable-id";
-import { getUserCompanies } from "../companies/helper";
+import { getUserCompanies } from "../companies/queries";
 import { saveForm } from "./mutations/save-form";
 
 export default {
@@ -102,11 +102,7 @@ export default {
         };
       });
     },
-    appendixForms: async (
-      parent,
-      { siret, wasteCode },
-      context: Context
-    ) => {
+    appendixForms: async (parent, { siret, wasteCode }, context: Context) => {
       const forms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),

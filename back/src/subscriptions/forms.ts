@@ -1,7 +1,7 @@
 import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
-import { getCompanyAdmins } from "../companies/helper";
+import { getCompanyAdminUsers } from "../companies/queries";
 import { verifyPrestataire, anomalies } from "../companies/verif";
 import {
   createSiretUnknownAlertCard,
@@ -127,7 +127,7 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
   let attachmentData = await pdfEmailAttachment(payload.node.id);
-  const companyAdmins = await getCompanyAdmins(form.emitterCompanySiret);
+  const companyAdmins = await getCompanyAdminUsers(form.emitterCompanySiret);
 
   // retrieve departments by querying distant api entreprise.data.gouv through td-insee
   // we can not rely on parsing already stored address zip codes because some french cities

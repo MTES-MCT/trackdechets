@@ -56,6 +56,9 @@ type Company {
   createdAt: DateTime!
   updatedAt: DateTime!
   securityCode: Int!
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 type CompanyAssociation {
@@ -243,6 +246,9 @@ input CompanyCreateInput {
   gerepId: String
   codeNaf: String
   securityCode: Int!
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 input CompanyCreateOneInput {
@@ -272,6 +278,12 @@ enum CompanyOrderByInput {
   updatedAt_DESC
   securityCode_ASC
   securityCode_DESC
+  contactEmail_ASC
+  contactEmail_DESC
+  contactPhone_ASC
+  contactPhone_DESC
+  website_ASC
+  website_DESC
 }
 
 type CompanyPreviousValues {
@@ -284,6 +296,9 @@ type CompanyPreviousValues {
   createdAt: DateTime!
   updatedAt: DateTime!
   securityCode: Int!
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 type CompanySubscriptionPayload {
@@ -325,6 +340,9 @@ input CompanyUpdateDataInput {
   gerepId: String
   codeNaf: String
   securityCode: Int
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 input CompanyUpdateInput {
@@ -334,6 +352,9 @@ input CompanyUpdateInput {
   gerepId: String
   codeNaf: String
   securityCode: Int
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 input CompanyUpdateManyMutationInput {
@@ -343,6 +364,9 @@ input CompanyUpdateManyMutationInput {
   gerepId: String
   codeNaf: String
   securityCode: Int
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 input CompanyUpdateOneRequiredInput {
@@ -452,6 +476,48 @@ input CompanyWhereInput {
   securityCode_lte: Int
   securityCode_gt: Int
   securityCode_gte: Int
+  contactEmail: String
+  contactEmail_not: String
+  contactEmail_in: [String!]
+  contactEmail_not_in: [String!]
+  contactEmail_lt: String
+  contactEmail_lte: String
+  contactEmail_gt: String
+  contactEmail_gte: String
+  contactEmail_contains: String
+  contactEmail_not_contains: String
+  contactEmail_starts_with: String
+  contactEmail_not_starts_with: String
+  contactEmail_ends_with: String
+  contactEmail_not_ends_with: String
+  contactPhone: String
+  contactPhone_not: String
+  contactPhone_in: [String!]
+  contactPhone_not_in: [String!]
+  contactPhone_lt: String
+  contactPhone_lte: String
+  contactPhone_gt: String
+  contactPhone_gte: String
+  contactPhone_contains: String
+  contactPhone_not_contains: String
+  contactPhone_starts_with: String
+  contactPhone_not_starts_with: String
+  contactPhone_ends_with: String
+  contactPhone_not_ends_with: String
+  website: String
+  website_not: String
+  website_in: [String!]
+  website_not_in: [String!]
+  website_lt: String
+  website_lte: String
+  website_gt: String
+  website_gte: String
+  website_contains: String
+  website_not_contains: String
+  website_starts_with: String
+  website_not_starts_with: String
+  website_ends_with: String
+  website_not_ends_with: String
   AND: [CompanyWhereInput!]
   OR: [CompanyWhereInput!]
   NOT: [CompanyWhereInput!]

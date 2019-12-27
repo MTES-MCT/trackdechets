@@ -16,7 +16,6 @@ const Faq = lazy(() => import("./Faq"));
 const Partners = lazy(() => import("./Partners"));
 const ResetPassword = lazy(() => import("./login/ResetPassword"));
 const Cgu = lazy(() => import("./Cgu"));
-const ChangePassword = lazy(() => import("./login/ChangePassword"));
 const Login = lazy(() => import("./login/Login"));
 const Signup = lazy(() => import("./login/Signup"));
 const Company = lazy(() => import("./company/Company"));
@@ -53,11 +52,6 @@ export default withRouter(function LayoutContainer({ history }) {
         exact
         path="/signup/activation"
         component={WaitingComponent(SignupInfo)}
-      />
-      <Route
-        exact
-        path="/password"
-        component={WaitingComponent(ChangePassword)}
       />
       <Route
         exact

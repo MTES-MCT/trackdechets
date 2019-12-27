@@ -20,14 +20,14 @@ type Mutation {
   login(email: String!, password: String!): AuthPayload!
   changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
   resetPassword(email: String!): Boolean
-  editProfile(name: String!, phone: String!, email: String!): User
-  inviteUserToCompany(email: String!, siret: String!, role: UserRole!): Boolean
+  editProfile(name: String, phone: String, email: String): User
+  inviteUserToCompany(email: String!, siret: String!, role: UserRole!): CompanyPrivate
   joinWithInvite(
     inviteHash: String!
     name: String!
     password: String!
   ): AuthPayload!
-  removeUserFromCompany(userId: ID!, siret: String!):  Boolean
+  removeUserFromCompany(userId: ID!, siret: String!):  CompanyPrivate
 }
 
 type AuthPayload {
@@ -56,10 +56,5 @@ type User {
   name: String
   phone: String
 
-  companies: [Company]
-}
-
-type PublicUser {
-  id: ID!
-  name: String
+  companies: [CompanyPrivate]
 }

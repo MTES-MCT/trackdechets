@@ -1,12 +1,12 @@
 import React from "react";
 import zxcvbn from "zxcvbn";
-import { connect } from "formik";
 import { FaAward } from "react-icons/fa";
 
-export default connect<{}, { password: string }>(function PasswordMeter({
-  formik
-}) {
-  const password = formik.values.password;
+type Props = {
+  password: string;
+};
+
+export default function PasswordMeter({ password }: Props) {
   if (!password) return <span />;
 
   const { score } = zxcvbn(password);
@@ -16,7 +16,7 @@ export default connect<{}, { password: string }>(function PasswordMeter({
       <FaAward /> Difficulté du mot de passe: {createPasswordLabel(score)}
     </span>
   );
-});
+}
 
 function createPasswordLabel(score: number): string {
   switch (score) {

@@ -8,7 +8,7 @@ import { Mutation } from "@apollo/react-components";
 import Packagings from "../../form/packagings/Packagings";
 import { Wizard } from "./Wizard";
 import "./TransportSignature.scss";
-import RedErrorMessage from "../../form/RedErrorMessage";
+import RedErrorMessage from "../../common/RedErrorMessage";
 import { GET_TRANSPORT_SLIPS } from "./Transport";
 import { currentSiretService } from "../CompanySelector";
 

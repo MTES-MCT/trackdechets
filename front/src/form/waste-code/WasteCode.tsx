@@ -1,6 +1,6 @@
 import { FieldProps, getIn } from "formik";
 import React, { useEffect, useState } from "react";
-import RedErrorMessage from "../RedErrorMessage";
+import RedErrorMessage from "../../common/RedErrorMessage";
 import formatWasteCodeEffect from "./format-waste-code.effect";
 import WasteCodeLookup from "./nomenclature-dechets.json";
 import "./WasteCode.scss";

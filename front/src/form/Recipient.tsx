@@ -3,7 +3,7 @@ import CompanySelector from "./company/CompanySelector";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
 import { Field, connect } from "formik";
-import RedErrorMessage from "./RedErrorMessage";
+import RedErrorMessage from "../common/RedErrorMessage";
 import DateInput from "./custom-inputs/DateInput";
 
 type Values = {

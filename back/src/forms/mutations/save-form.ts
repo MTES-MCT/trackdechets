@@ -7,7 +7,7 @@ import {
   FormUpdateInput,
   FormCreateInput
 } from "../../generated/prisma-client";
-import { getUserCompanies } from "../../companies/helper";
+import { getUserCompanies } from "../../companies/queries";
 
 export async function saveForm(_, { formInput }, context: Context) {
   const userId = context.user.id;

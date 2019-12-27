@@ -1,101 +1,61 @@
-import axios from "axios";
 import { Context } from "../types";
-import { randomNumber } from "../utils";
+import { prisma } from "../generated/prisma-client";
+import { getCachedCompanySireneInfo, searchCompanies } from "./insee";
 import {
-  getCompanyAdmins,
+  getCompanyInfos,
+  getCompanyUsers,
+  getUserRole,
   getUserCompanies,
-  getCompanyInstallation,
-  getInstallationRubriques,
-  getInstallationDeclarations,
-  getCompany
-} from "./helper";
-import { getCachedCompanyInfos } from "./insee";
-import updateCompany from "./mutations/updateCompany";
+  getDeclarations,
+  getRubriques
+} from "./queries";
+import { updateCompany, renewSecurityCode } from "./mutations";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
+const companySireneInfoResolvers = {
+  latitude: parent => {
+    return parent.latitude ? parseFloat(parent.latitude) : null;
+  },
+  longitude: parent => {
+    return parent.latitude ? parseFloat(parent.longitude) : null;
+  }
+};
+
 export default {
-  Installation: {
-    rubriques: async parent => {
-      return getInstallationRubriques(parent.codeS3ic);
+  CompanyPrivate: {
+    ...companySireneInfoResolvers,
+    users: parent => {
+      return getCompanyUsers(parent.siret);
     },
-    declarations: async parent => {
-      return getInstallationDeclarations(parent.codeS3ic);
+    userRole: (parent, _, context: Context) => {
+      const userId = context.user.id;
+      return getUserRole(userId, parent.siret);
     }
   },
-  Company: {
-    latitude: parent => {
-      return parent.latitude ? parseFloat(parent.latitude) : null;
-    },
-    longitude: parent => {
-      return parent.latitude ? parseFloat(parent.longitude) : null;
-    },
-    installation: parent => {
-      return getCompanyInstallation(parent.siret);
-    },
-    isRegistered: async parent => {
-      const company = await getCompany(parent.siret);
-      return company ? true : false;
-    },
-    admins: parent => {
-      return getCompanyAdmins(parent.siret).catch(_ => null);
+  CompanyPublic: {
+    ...companySireneInfoResolvers
+  },
+  CompanyMember: {
+    isMe: (parent, _, context: Context) => {
+      return parent.id == context.user.id;
     }
+  },
+  Installation: {
+    rubriques: async parent => getRubriques(parent.codeS3ic),
+    declarations: async parent => getDeclarations(parent.codeS3ic)
   },
   Query: {
-    companyInfos: (parent, { siret }) => {
-      if (siret.length < 14) {
-        return null;
-      }
-      return getCachedCompanyInfos(siret);
-    },
-    companyUsers: async (_, { siret }, context: Context) => {
-      const currentUserId = context.user.id;
-
-      const invitedUsers = await context.prisma
-        .userAccountHashes({ where: { companySiret: siret } })
-        .then(hashes =>
-          hashes.map(h => ({
-            id: h.email,
-            name: "Invité",
-            email: h.email,
-            role: "En attente"
-          }))
-        );
-
-      const users = await context.prisma
-        .users({
-          where: { companyAssociations_some: { company: { siret: siret } } }
-        })
-        .then(users =>
-          users.map(u => ({
-            id: u.id,
-            name: u.name,
-            email: u.email,
-            role: u.id === currentUserId ? "Administrateur" : "Collaborateur"
-          }))
-        );
-
-      return [...users, ...invitedUsers];
-    },
-    searchCompanies: async (parent, { clue, department = "" }) => {
+    companyInfos: async (_, { siret }) => getCompanyInfos(siret),
+    searchCompanies: async (_, { clue, department = "" }) => {
       const isNumber = /^[0-9\s]+$/.test(clue);
-
       if (!isNumber) {
-        const response: any = await axios
-          .get(
-            `http://td-insee:81/search?clue=${clue}&department=${department}`
-          )
-          .catch(err =>
-            console.error("Error while querying INSEE service", err)
-          );
-        return response.data;
+        return searchCompanies(clue, department);
       }
-
       if (clue.length < 14) {
-        return;
+        return [];
       }
-
-      return [await getCachedCompanyInfos(clue)];
+      return [await getCachedCompanySireneInfo(clue)];
     },
     favorites: async (
       parent,
@@ -104,20 +64,20 @@ export default {
     ) => {
       const lowerType = type.toLowerCase();
       const userId = context.user.id;
-      const userCompanies = await getUserCompanies(userId);
+      const companies = await getUserCompanies(userId);
 
-      if (!userCompanies.length) {
+      if (!companies.length) {
         throw new Error(
           `Vous n'appartenez à aucune entreprise, vous n'avez pas de favori.`
         );
       }
 
-      const forms = await context.prisma.forms({
+      const forms = await prisma.forms({
         where: {
           OR: [
             { owner: { id: userId } },
-            { recipientCompanySiret: userCompanies[0].siret },
-            { emitterCompanySiret: userCompanies[0].siret }
+            { recipientCompanySiret: companies[0].siret },
+            { emitterCompanySiret: companies[0].siret }
           ],
           isDeleted: false
         },
@@ -148,21 +108,16 @@ export default {
       // If there is no data yet, propose his own companies as favorites
       // We won't have every props populated, but it's a start
       if (!favorites.length) {
-        return Promise.all(userCompanies.map(c => getCachedCompanyInfos(c.siret)));
+        return Promise.all(
+          companies.map(c => getCachedCompanySireneInfo(c.siret))
+        );
       }
 
       return favorites;
     }
   },
   Mutation: {
-    renewSecurityCode: async (_, { siret }, context: Context) => {
-      return context.prisma.updateCompany({
-        where: { siret },
-        data: {
-          securityCode: randomNumber(4)
-        }
-      });
-    },
-    updateCompany
+    renewSecurityCode: (_, { siret }) => renewSecurityCode(siret),
+    updateCompany: (_, payload) => updateCompany(payload)
   }
 };

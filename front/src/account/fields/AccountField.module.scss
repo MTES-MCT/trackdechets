@@ -1,0 +1,42 @@
+
+.field {
+  width: 100%;
+  display: flex;
+  margin: auto;
+  padding: 1em;
+  justify-content: flex-start;
+  border-top: 1px solid var(--lighter-grey);
+
+  .field__value {
+    margin-left: 3em;
+    margin-right: 3em;
+
+    ul {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+}
+
+.field:last-of-type {
+  border-bottom: 1px solid var(--lighter-grey);
+}
+
+.editing {
+  border-left: 5px solid var(--theme-primary)
+}
+
+.field > label {
+  font-weight: bold;
+  min-width: 150px;
+}
+
+.modifier {
+  color: var(--blue);
+  margin-left: auto;
+}
+
+.modifier:hover {
+  cursor: pointer
+}
