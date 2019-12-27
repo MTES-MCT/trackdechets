@@ -55,8 +55,8 @@ export async function getCompanyInfos(siret: string) {
 
   const company = {
     ...companyIcpeInfo,
-    ...trackdechetsCompanyInfo,
     ...sireneCompanyInfo,
+    ...trackdechetsCompanyInfo,
     ...{ isRegistered }
   };
 
