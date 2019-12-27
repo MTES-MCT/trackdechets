@@ -35,7 +35,7 @@ export function getRubriques(codeS3ic: string) {
   if (codeS3ic) {
     return prisma.rubriques({ where: { codeS3ic } });
   }
-  return [];
+  return Promise.resolve([]);
 }
 
 /**
@@ -46,5 +46,5 @@ export function getDeclarations(codeS3ic: string) {
   if (codeS3ic) {
     return prisma.declarations({ where: { codeS3ic } });
   }
-  return [];
+  return Promise.resolve([]);
 }
