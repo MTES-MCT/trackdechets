@@ -16,9 +16,8 @@ export function getCachedCompanySireneInfo(siret) {
   });
 }
 
-export async function searchCompanies(clue: string, department: string = "") {
-  const response: any = await axios
+export function searchCompanies(clue: string, department: string = "") {
+  return axios
     .get(`${INSEE_URI}/search?clue=${clue}&department=${department}`)
-    .catch(err => console.error("Error while querying INSEE service", err));
-  return response.data;
+    .then(r => r.data);
 }
