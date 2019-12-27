@@ -13,10 +13,35 @@ jest.mock("../../../generated/prisma-client", () => ({
   }
 }));
 
+const mockHash = jest.fn();
+
+jest.mock("bcrypt", () => ({
+  hash: jest.fn((...args) => mockHash(...args))
+}));
+
 describe("createUserAccountHash", () => {
   beforeEach(() => {
     mockUserAccountHashes.mockReset();
     mockCreateUserAccountHash.mockReset();
+    mockHash.mockReset();
+  });
+
+  it("should return user account hash", async () => {
+    mockUserAccountHashes.mockResolvedValueOnce([]);
+    mockHash.mockResolvedValueOnce("hash");
+    mockCreateUserAccountHash.mockResolvedValueOnce("hash");
+    const hash = await createUserAccountHash(
+      "arya.starck@gmail.com",
+      "MEMBER",
+      "85001946400013"
+    );
+    expect(hash).toEqual("hash");
+    expect(mockCreateUserAccountHash).toHaveBeenCalledWith({
+      hash: "hash",
+      email: "arya.starck@gmail.com",
+      role: "MEMBER",
+      companySiret: "85001946400013"
+    });
   });
 
   it("should throw error if hash already exists", async () => {

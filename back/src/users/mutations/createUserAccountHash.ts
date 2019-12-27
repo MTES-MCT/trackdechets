@@ -30,7 +30,7 @@ export async function createUserAccountHash(
     new Date().valueOf().toString() + Math.random().toString(),
     10
   );
-  await prisma.createUserAccountHash({
+  return prisma.createUserAccountHash({
     hash: userAccoutHash,
     email,
     role,
