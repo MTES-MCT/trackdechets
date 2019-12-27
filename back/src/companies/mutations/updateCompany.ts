@@ -1,7 +1,6 @@
-import { Context } from "../../types";
 import { prisma, CompanyType } from "../../generated/prisma-client";
 
-export type Paylod = {
+export type Payload = {
   siret: string;
   gerepId?: string;
   contactEmail?: string;
@@ -17,7 +16,7 @@ export default function updateCompany({
   contactEmail,
   contactPhone,
   website
-}: Paylod) {
+}: Payload) {
   const data = {
     ...(companyTypes !== undefined
       ? { companyTypes: { set: companyTypes } }
