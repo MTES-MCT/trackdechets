@@ -33,5 +33,17 @@ describe("updateCompany", () => {
       where: { siret: "85001946400013" },
       data: { companyTypes: { set: ["PRODUCER"] } }
     });
+
+    payload = {
+      siret: "85001946400013",
+      website: ""
+    };
+
+    await updateCompany(payload);
+
+    expect(updateCompanyMock).toHaveBeenCalledWith({
+      where: { siret: "85001946400013" },
+      data: { website: "" }
+    });
   });
 });

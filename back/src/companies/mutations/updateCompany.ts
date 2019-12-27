@@ -19,11 +19,13 @@ export default function updateCompany({
   website
 }: Paylod) {
   const data = {
-    ...(companyTypes ? { companyTypes: { set: companyTypes } } : {}),
-    ...(gerepId ? { gerepId } : {}),
-    ...(contactEmail ? { contactEmail } : {}),
-    ...(contactPhone ? { contactPhone } : {}),
-    ...(website ? { website } : {})
+    ...(companyTypes !== undefined
+      ? { companyTypes: { set: companyTypes } }
+      : {}),
+    ...(gerepId !== undefined ? { gerepId } : {}),
+    ...(contactEmail !== undefined ? { contactEmail } : {}),
+    ...(contactPhone !== undefined ? { contactPhone } : {}),
+    ...(website !== undefined ? { website } : {})
   };
 
   return prisma.updateCompany({

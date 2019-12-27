@@ -17,9 +17,9 @@ export function editProfile(userId: string, payload: Payload) {
   const { name, phone, email } = payload;
 
   const data = {
-    ...(!!name ? { name } : {}),
-    ...(!!phone ? { phone } : {}),
-    ...(!!email ? { email } : {})
+    ...(name !== undefined ? { name } : {}),
+    ...(phone !== undefined ? { phone } : {}),
+    ...(email !== undefined ? { email } : {})
   };
 
   return prisma.updateUser({
