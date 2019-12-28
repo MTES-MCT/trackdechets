@@ -12,13 +12,13 @@ export async function getReadableId(context: Context) {
     first: 10
   });
 
-  const latestFormReadableId = mostRecentForms[0].readableId;
+  const latestFormReadableId = mostRecentForms[0]?.readableId || '';
   const latestReadableIdAsNumber = decodeNumber(latestFormReadableId.slice(-8));
 
   const nextNumber =
     shortYear === latestFormReadableId.slice(3, 5)
       ? encodeNumber(latestReadableIdAsNumber + 1)
-      : 1;
+      : 'AAA00001';
 
   return `TD-${shortYear}-${nextNumber}`;
 }
