@@ -14,7 +14,6 @@ import { prisma } from "./generated/prisma-client";
 import { userActivationHandler } from "./users/activation";
 import { mergePermissions } from "./utils";
 
-
 const sentryDsn = process.env.SENTRY_DSN;
 
 const typesArray = fileLoader(`${__dirname}/**/*.graphql`, { recursive: true });
@@ -67,6 +66,12 @@ export const server = new ApolloServer({
 });
 
 export const app = express();
+
+app.get("/ping", (_, res) => res.send("Pong!"));
+app.get("/userActivation", userActivationHandler);
+app.get("/pdf", pdfHandler);
+app.get("/exports", csvExportHandler);
+
 server.applyMiddleware({
   app,
   cors: {
@@ -77,8 +82,3 @@ server.applyMiddleware({
   },
   path: "/"
 });
-
-app.get("/ping", (_, res) => res.send("Pong!"));
-app.get("/userActivation", userActivationHandler);
-app.get("/pdf", pdfHandler);
-app.get("/exports", csvExportHandler);
