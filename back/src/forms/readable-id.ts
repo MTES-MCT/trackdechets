@@ -12,15 +12,17 @@ export async function getReadableId(context: Context) {
     first: 10
   });
 
-  const latestFormReadableId = mostRecentForms[0]?.readableId || '';
-  const latestReadableIdAsNumber = decodeNumber(latestFormReadableId.slice(-8));
+  const latestFormReadableId = mostRecentForms[0]?.readableId;
 
-  const nextNumber =
-    shortYear === latestFormReadableId.slice(3, 5)
-      ? encodeNumber(latestReadableIdAsNumber + 1)
-      : 'AAA00001';
+  if (shortYear === latestFormReadableId?.slice(3, 5)) {
+    const latestReadableIdAsNumber = decodeNumber(
+      latestFormReadableId.slice(-8)
+    );
+    const nextEncodedNumber = encodeNumber(latestReadableIdAsNumber + 1);
+    return `TD-${shortYear}-${nextEncodedNumber}`;
+  }
 
-  return `TD-${shortYear}-${nextNumber}`;
+  return `TD-${shortYear}-AAA00001`;
 }
 
 // AAA12345
