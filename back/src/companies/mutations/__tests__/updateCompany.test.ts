@@ -1,4 +1,4 @@
-import updateCompany, { Paylod } from "../updateCompany";
+import updateCompany, { Payload } from "../updateCompany";
 
 const updateCompanyMock = jest.fn();
 jest.mock("../../../generated/prisma-client", () => ({
@@ -12,7 +12,7 @@ describe("updateCompany", () => {
     updateCompanyMock.mockReset();
   });
   it("should call prisma.updateCompany with proper data", async () => {
-    let payload: Paylod = {
+    let payload: Payload = {
       siret: "85001946400013",
       gerepId: "gerepId"
     };
