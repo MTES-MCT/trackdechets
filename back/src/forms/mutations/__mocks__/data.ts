@@ -3,6 +3,7 @@ export const getNewValidForm = () =>
     {},
     {
       id: "cjplbvecc000d0766j32r19am",
+      status: "DRAFT",
       emitter: {
         type: "PRODUCER",
         pickupSite: "Nom:\nAdresse:\nMail:",
