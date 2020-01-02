@@ -99,11 +99,17 @@ describe("Forms -> signedByTransporter mutation", () => {
 
   it("should work when signingInfo are complete and correct", async () => {
     getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
-    prisma.form.mockResolvedValue({
-      id: 1,
-      status: "SEALED",
-      emitterCompanySiret: "a siret"
-    });
+    prisma.form
+      .mockReturnValue({
+        appendix2Forms: () => Promise.resolve([{ id: "appendix id" }])
+      } as any)
+      .mockReturnValueOnce(
+        Promise.resolve({
+          id: 1,
+          status: "SEALED",
+          emitterCompanySiret: "a siret"
+        })
+      );
     prisma.$exists.company.mockResolvedValue(true);
 
     await signedByTransporter(
@@ -115,5 +121,6 @@ describe("Forms -> signedByTransporter mutation", () => {
       defaultContext
     );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
+    expect(prisma.updateManyForms).toHaveBeenCalled();
   });
 });
