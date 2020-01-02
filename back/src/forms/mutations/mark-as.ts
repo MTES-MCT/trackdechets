@@ -1,20 +1,20 @@
+import { interpret, State } from "xstate";
 import { DomainError, ErrorCode } from "../../common/errors";
-import { Form, Status } from "../../generated/prisma-client";
+import { getUserCompanies } from "../../companies/helper";
 import { Context } from "../../types";
-import { unflattenObjectFromDb } from "../form-converter";
-import { formSchema } from "../validator";
-import { getNextPossibleStatus } from "../workflow";
+import { getError } from "../workflow/errors";
+import { getMachine } from "../workflow/helpers";
+import { FormState } from "../workflow/model";
 
 export async function markAsSealed(_, { id }, context: Context) {
-  return markAs("SEALED", { id }, context, async form => {
-    await validateForm(form);
-    await markFormAppendixAwaitingFormsAsGrouped(form.id, context);
-  });
+  return transitionForm(id, { eventType: "MARK_SEALED" }, context);
 }
 
 export async function markAsSent(_, { id, sentInfo }, context: Context) {
-  return markAs("SENT", { id, input: sentInfo }, context, form =>
-    markFormAppendixAwaitingFormsAsGrouped(form.id, context)
+  return transitionForm(
+    id,
+    { eventType: "MARK_SENT", eventParams: sentInfo },
+    context
   );
 }
 
@@ -23,7 +23,11 @@ export async function markAsReceived(
   { id, receivedInfo },
   context: Context
 ) {
-  return markAs("RECEIVED", { id, input: receivedInfo }, context);
+  return transitionForm(
+    id,
+    { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
+    context
+  );
 }
 
 export async function markAsProcessed(
@@ -31,17 +35,11 @@ export async function markAsProcessed(
   { id, processedInfo },
   context: Context
 ) {
-  return markAs("PROCESSED", { id, input: processedInfo }, context, async _ => {
-    const appendix2Forms = await context.prisma.form({ id }).appendix2Forms();
-    if (appendix2Forms.length) {
-      appendix2Forms.map(f => logStatusChange(f.id, "PROCESSED", context));
-
-      await context.prisma.updateManyForms({
-        where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
-        data: { status: "PROCESSED" }
-      });
-    }
-  });
+  return transitionForm(
+    id,
+    { eventType: "MARK_PROCESSED", eventParams: processedInfo },
+    context
+  );
 }
 
 export async function signedByTransporter(
@@ -50,64 +48,76 @@ export async function signedByTransporter(
   context: Context
 ) {
   const input = {
+    ...signingInfo,
     sentAt: signingInfo.sentAt,
-    signedByTransporter: true,
     sentBy: signingInfo.sentBy,
     wasteDetailsPackagings: signingInfo.packagings,
     wasteDetailsQuantity: signingInfo.quantity,
     wasteDetailsOnuCode: signingInfo.onuCode
   };
-  return markAs("SENT", { id, input }, context, async form => {
-    if (!signingInfo.signedByTransporter || !signingInfo.signedByProducer) {
-      throw new DomainError(
-        "Le transporteur et le producteur du déchet doivent tous deux valider l'enlèvement",
-        ErrorCode.BAD_USER_INPUT
-      );
-    }
 
-    const hasCorrectSecurityCode = await context.prisma.$exists.company({
-      siret: form.emitterCompanySiret,
-      securityCode: signingInfo.securityCode
-    });
-
-    if (!hasCorrectSecurityCode) {
-      throw new DomainError(
-        "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'",
-        ErrorCode.FORBIDDEN
-      );
-    }
-  });
-}
-
-async function markAs(
-  status: Status,
-  { id, input = {} }: { id: string; input?: any },
-  context: Context,
-  beforeSaveHook: (form: Form) => Promise<any> = () => Promise.resolve()
-) {
-  const form = await context.prisma.form({ id });
-  const possibleStatus = await getNextPossibleStatus(
-    { ...form, ...input },
+  return transitionForm(
+    id,
+    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: input },
     context
   );
+}
 
-  if (!possibleStatus.includes(status)) {
-    throw new DomainError(
-      `Vous ne pouvez pas passer ce bordereau à l'état "${status}".`,
-      ErrorCode.FORBIDDEN
-    );
+async function transitionForm(
+  formId: string,
+  { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
+  context: Context
+) {
+  const form = await context.prisma.form({ id: formId });
+
+  const userCompanies = await getUserCompanies(context.user.id);
+  const actorSirets = userCompanies.map(c => c.siret);
+
+  const formMachine = getMachine(form.status as FormState);
+  if (
+    !formMachine ||
+    !formMachine.initialState.nextEvents.includes(eventType)
+  ) {
+    throw new DomainError("Transition impossible", ErrorCode.FORBIDDEN);
   }
 
-  await logStatusChange(id, status, context);
-  await beforeSaveHook(form);
+  const startingState = State.from(form.status, {
+    form,
+    actorSirets,
+    requestContext: context
+  });
+  const formService = interpret(formMachine);
+  return new Promise((resolve, reject) => {
+    formService.start(startingState).onTransition(async state => {
+      if (!state.changed) {
+        return;
+      }
 
-  return context.prisma.updateForm({
-    where: { id },
-    data: { status, ...input }
+      if (state.matches("error")) {
+        const workflowError = state.meta[Object.keys(state.meta)[0]];
+        const error = await getError(workflowError, form);
+        reject(error);
+        formService.stop();
+      }
+
+      if (state.done) {
+        const newStatus = state.value;
+        await logStatusChange(formId, newStatus, context);
+
+        const updatedForm = context.prisma.updateForm({
+          where: { id: formId },
+          data: { status: newStatus, ...eventParams }
+        });
+        resolve(updatedForm);
+        formService.stop();
+      }
+    });
+
+    formService.send({ type: eventType, ...eventParams });
   });
 }
 
-function logStatusChange(formId, status, context: Context) {
+export function logStatusChange(formId, status, context: Context) {
   return context.prisma
     .createStatusLog({
       form: { connect: { id: formId } },
@@ -121,42 +131,4 @@ function logStatusChange(formId, status, context: Context) {
       );
       throw new Error("Problème technique, merci de réessayer plus tard.");
     });
-}
-
-async function validateForm(form: Form) {
-  const formattedForm = unflattenObjectFromDb(form);
-  const isValid = await formSchema.isValid(formattedForm);
-
-  if (!isValid) {
-    const errors: string[] = await formSchema
-      .validate(formattedForm, { abortEarly: false })
-      .catch(err => err.errors);
-    throw new DomainError(
-      `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${errors.join(
-        "\n"
-      )}`,
-      ErrorCode.BAD_USER_INPUT
-    );
-  }
-}
-
-async function markFormAppendixAwaitingFormsAsGrouped(
-  formId: string,
-  context: Context
-) {
-  const appendix2Forms = await context.prisma
-    .form({ id: formId })
-    .appendix2Forms();
-
-  if (!appendix2Forms.length) {
-    return;
-  }
-
-  return context.prisma.updateManyForms({
-    where: {
-      status: "AWAITING_GROUP",
-      OR: appendix2Forms.map(f => ({ id: f.id }))
-    },
-    data: { status: "GROUPED" }
-  });
 }

@@ -1,8 +1,9 @@
-import * as workflow from "../../workflow";
-import { markAsSent } from "../mark-as";
 import { ErrorCode } from "../../../common/errors";
-import { getNewValidForm } from "../__mocks__/data";
+import * as companiesHelpers from "../../../companies/helper";
 import { flattenObjectForDb } from "../../form-converter";
+import { FormState } from "../../workflow/model";
+import { markAsSent } from "../mark-as";
+import { getNewValidForm } from "../__mocks__/data";
 
 describe("Forms -> markAsSealed mutation", () => {
   const formMock = jest.fn();
@@ -14,10 +15,7 @@ describe("Forms -> markAsSealed mutation", () => {
     updateManyForms: jest.fn(() => Promise.resolve({}))
   };
 
-  const getNextPossibleStatusMock = jest.spyOn(
-    workflow,
-    "getNextPossibleStatus"
-  );
+  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
   const defaultContext = {
     prisma,
@@ -27,14 +25,14 @@ describe("Forms -> markAsSealed mutation", () => {
 
   beforeEach(() => {
     Object.keys(prisma).forEach(key => prisma[key].mockClear());
-    getNextPossibleStatusMock.mockReset();
+    getUserCompaniesMock.mockReset();
   });
 
   it("should fail when SENT is not a possible next step", async () => {
     expect.assertions(1);
     try {
-      getNextPossibleStatusMock.mockResolvedValue(["ANYTHING"]);
-      prisma.form.mockResolvedValue({ id: 1 });
+      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
+      prisma.form.mockResolvedValue({ id: 1, status: FormState.Sealed });
 
       await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
     } catch (err) {
@@ -45,8 +43,11 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should work when form is complete and has no appendix 2", async () => {
     expect.assertions(1);
     const form = getNewValidForm();
+    form.status = "SEALED";
 
-    getNextPossibleStatusMock.mockResolvedValue(["SENT"]);
+    getUserCompaniesMock.mockResolvedValue([
+      { siret: form.emitter.company.siret } as any
+    ]);
     prisma.form
       .mockReturnValue({
         appendix2Forms: () => Promise.resolve([])
@@ -59,8 +60,11 @@ describe("Forms -> markAsSealed mutation", () => {
 
   it("should work with appendix 2 and mark them as GROUPED", async () => {
     const form = getNewValidForm();
+    form.status = "SEALED";
 
-    getNextPossibleStatusMock.mockResolvedValue(["SENT"]);
+    getUserCompaniesMock.mockResolvedValue([
+      { siret: form.emitter.company.siret } as any
+    ]);
     prisma.form
       .mockReturnValue({
         appendix2Forms: () => Promise.resolve([{ id: "appendix id" }])

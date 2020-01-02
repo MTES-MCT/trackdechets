@@ -1,8 +1,8 @@
 import { ErrorCode } from "../../../common/errors";
-import * as workflow from "../../workflow";
 import { signedByTransporter } from "../mark-as";
+import * as companiesHelpers from "../../../companies/helper";
 
-describe("Forms -> markAsSealed mutation", () => {
+describe("Forms -> signedByTransporter mutation", () => {
   const formMock = jest.fn();
   const prisma = {
     form: formMock,
@@ -15,10 +15,7 @@ describe("Forms -> markAsSealed mutation", () => {
     }
   };
 
-  const getNextPossibleStatusMock = jest.spyOn(
-    workflow,
-    "getNextPossibleStatus"
-  );
+  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
   const defaultContext = {
     prisma,
@@ -30,14 +27,18 @@ describe("Forms -> markAsSealed mutation", () => {
     Object.keys(prisma).forEach(
       key => prisma[key].mockClear && prisma[key].mockClear()
     );
-    getNextPossibleStatusMock.mockReset();
+    getUserCompaniesMock.mockReset();
   });
 
   it("should fail when if its not signed by producer", async () => {
     expect.assertions(1);
     try {
-      getNextPossibleStatusMock.mockResolvedValue(["SENT"]);
-      prisma.form.mockResolvedValue({ id: 1 });
+      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
+      prisma.form.mockResolvedValue({
+        id: 1,
+        status: "SEALED",
+        emitterCompanySiret: "a siret"
+      });
 
       await signedByTransporter(
         null,
@@ -52,8 +53,12 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should fail when if its not signed by transporter", async () => {
     expect.assertions(1);
     try {
-      getNextPossibleStatusMock.mockResolvedValue(["SENT"]);
-      prisma.form.mockResolvedValue({ id: 1 });
+      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
+      prisma.form.mockResolvedValue({
+        id: 1,
+        status: "SEALED",
+        emitterCompanySiret: "a siret"
+      });
 
       await signedByTransporter(
         null,
@@ -68,14 +73,22 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should fail when security code is wrong", async () => {
     expect.assertions(1);
     try {
-      getNextPossibleStatusMock.mockResolvedValue(["SENT"]);
-      prisma.form.mockResolvedValue({ id: 1, emitterCompanySiret: "a siret" });
+      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
+      prisma.form.mockResolvedValue({
+        id: 1,
+        status: "SEALED",
+        emitterCompanySiret: "a siret"
+      });
 
       await signedByTransporter(
         null,
         {
           id: 1,
-          signingInfo: { signedByProducer: true, signedByTransporter: true }
+          signingInfo: {
+            signedByProducer: true,
+            signedByTransporter: true,
+            securityCode: ""
+          }
         },
         defaultContext
       );
@@ -85,8 +98,12 @@ describe("Forms -> markAsSealed mutation", () => {
   });
 
   it("should work when signingInfo are complete and correct", async () => {
-    getNextPossibleStatusMock.mockResolvedValue(["SENT"]);
-    prisma.form.mockResolvedValue({ id: 1, emitterCompanySiret: "a siret" });
+    getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
+    prisma.form.mockResolvedValue({
+      id: 1,
+      status: "SEALED",
+      emitterCompanySiret: "a siret"
+    });
     prisma.$exists.company.mockResolvedValue(true);
 
     await signedByTransporter(
