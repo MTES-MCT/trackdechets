@@ -11,6 +11,7 @@ import { getUser } from "./auth";
 import { csvExportHandler } from "./forms/exports/handler";
 import { pdfHandler } from "./forms/pdf";
 import { prisma } from "./generated/prisma-client";
+import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
 import { mergePermissions } from "./utils";
 
@@ -71,6 +72,7 @@ app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);
 app.get("/pdf", pdfHandler);
 app.get("/exports", csvExportHandler);
+app.use("/health", healthRouter);
 
 server.applyMiddleware({
   app,
