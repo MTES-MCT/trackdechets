@@ -7,8 +7,8 @@
   "date_format": "02/01/2006 15:04:05 MST",
   "monitors": [
     {
-      "name": "td-pdf",
-      "target": "https://api.trackdechets.beta.gouv.fr/health/td-pdf",
+      "name": "td-api",
+      "target": "https://api.trackdechets.beta.gouv.fr/health",
       "strict": true,
       "method": "GET",
       "component_id": 1,
@@ -19,12 +19,22 @@
       "expected_status_code": 200
     },
     {
+      "name": "td-pdf",
+      "target": "https://api.trackdechets.beta.gouv.fr/health/td-pdf",
+      "strict": true,
+      "method": "GET",
+      "component_id": 2,
+      "interval": 5,
+      "timeout": 5,
+      "threshold": 80,
+      "expected_status_code": 200
+    },
+    {
       "name": "td-insee",
       "target": "https://api.trackdechets.beta.gouv.fr/health/td-insee",
       "strict": true,
       "method": "GET",
-      "component_id": 2,
-      "metric_id": 2,
+      "component_id": 4,
       "interval": 5,
       "timeout": 5,
       "threshold": 80,
@@ -36,7 +46,6 @@
       "strict": true,
       "method": "GET",
       "component_id": 3,
-      "metric_id": 3,
       "interval": 5,
       "timeout": 5,
       "threshold": 80,
