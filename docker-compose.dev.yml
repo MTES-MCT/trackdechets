@@ -11,8 +11,8 @@ services:
         databases:
           default:
             connector: postgres
-            host: postgres
-            port: 5432
+            host: $POSTGRES_HOST
+            port: $POSTGRES_PORT
             user: $POSTGRES_USER
             password: $POSTGRES_PASSWORD
             migrations: true
@@ -122,6 +122,8 @@ services:
       VIRTUAL_HOST: $ETL_HOST
       VIRTUAL_PORT: 8080
       LOAD_EX: n
+      POSTGRES_HOST: $POSTGRES_HOST
+      POSTGRES_PORT: $POSTGRES_PORT
       POSTGRES_USER: $AIRFLOW_POSTGRES_USER
       POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
       AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY
