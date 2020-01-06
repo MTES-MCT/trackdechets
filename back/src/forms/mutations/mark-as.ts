@@ -1,6 +1,6 @@
 import { interpret, State } from "xstate";
 import { DomainError, ErrorCode } from "../../common/errors";
-import { getUserCompanies } from "../../companies/helper";
+import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { Context } from "../../types";
 import { getError } from "../workflow/errors";
 import { getMachine } from "../workflow/helpers";

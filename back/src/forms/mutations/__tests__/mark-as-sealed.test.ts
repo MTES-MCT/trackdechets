@@ -2,7 +2,7 @@ import { ErrorCode } from "../../../common/errors";
 import { markAsSealed } from "../mark-as";
 import { getNewValidForm } from "../__mocks__/data";
 import { flattenObjectForDb } from "../../form-converter";
-import * as companiesHelpers from "../../../companies/helper";
+import * as companiesHelpers from "../../../companies/queries/userCompanies";
 
 describe("Forms -> markAsSealed mutation", () => {
   const prisma = {
