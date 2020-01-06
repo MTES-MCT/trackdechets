@@ -13,6 +13,7 @@ fragment Company on CompanyAssociation {
     contactPhone
     website
     companyTypes
+    givenName
   }
 }
 `;
