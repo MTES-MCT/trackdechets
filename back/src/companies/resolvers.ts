@@ -42,6 +42,8 @@ export default {
     }
   },
   Installation: {
+    urlFiche: parent =>
+      `https://www.georisques.gouv.fr/dossiers/installations/donnees/details/${parent.codeS3ic}#/`,
     rubriques: async parent => getRubriques(parent.codeS3ic),
     declarations: async parent => getDeclarations(parent.codeS3ic)
   },
