@@ -166,5 +166,20 @@ export const userMails = {
     body: "_",
     templateId: parseInt(MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10),
     baseUrl: baseUrl
+  }),
+  formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({
+    toEmail,
+    toName,
+    subject: "Trackdéchets : Votre déchet a été traité",
+    title: "Trackdéchets : Votre déchet a été traité",
+    body: `Madame, Monsieur,<br><br>
+
+    Vous avez confié vos déchets à la société ${form.recipientCompanyName}.<br>
+    Ces déchets sont accompagnés par le bordereau n° ${form.readableId} et tracés dans Trackdéchets.<br>
+    La société ${form.recipientCompanyName} déclare être autorisée par arrêté préfectoral à une rupture de traçabilité pour le déchet suivant: ${form.wasteDetailsName} - ${form.wasteDetailsCode}
+    <br><br>
+    Aussi, je vous informe que le BSD est désormais disponible sur votre compte Trackdéchets, dans l'onglet "archives" et le restera durant 5 ans. Il n'est donc pas utile de l'imprimer.
+    <br><br>
+    Quelles conséquences pour vous? La responsabilité du déchet (au sens de l'article L541-2 du code de l'Env.) est transférée à la société ${form.recipientCompanyName}, votre registre est renseigné.`
   })
 };
