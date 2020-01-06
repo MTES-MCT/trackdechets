@@ -1,5 +1,5 @@
 import { ErrorCode } from "../../../common/errors";
-import * as companiesHelpers from "../../../companies/helper";
+import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { flattenObjectForDb } from "../../form-converter";
 import { FormState } from "../../workflow/model";
 import { markAsSent } from "../mark-as";

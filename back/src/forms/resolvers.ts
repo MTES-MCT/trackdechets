@@ -1,4 +1,3 @@
-import { getUserCompanies } from "../companies/helper";
 import { Context } from "../types";
 import { getUserIdFromToken } from "../utils";
 import {
@@ -14,6 +13,7 @@ import {
 } from "./mutations/mark-as";
 import { saveForm } from "./mutations/save-form";
 import { getReadableId } from "./readable-id";
+import { getUserCompanies } from "../companies/queries";
 
 export default {
   Form: {

@@ -1,6 +1,6 @@
 import { ErrorCode } from "../../../common/errors";
 import { signedByTransporter } from "../mark-as";
-import * as companiesHelpers from "../../../companies/helper";
+import * as companiesHelpers from "../../../companies/queries/userCompanies";
 
 describe("Forms -> signedByTransporter mutation", () => {
   const formMock = jest.fn();
