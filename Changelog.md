@@ -6,6 +6,9 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 # [Prochaine version] xx/xx/xx
+
+* Ajout d'un nom usuel pour les établissements [PR #112](https://github.com/MTES-MCT/trackdechets/pull/112)
+
 * Évolution du compte client [PR #106](https://github.com/MTES-MCT/trackdechets/pull/106)
   * Amélioration de l'UX
   * Possibilité d'éditer l'identifiant GEREP d'un établissement
