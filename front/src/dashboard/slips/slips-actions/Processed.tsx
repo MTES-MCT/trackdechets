@@ -41,14 +41,22 @@ export default function Processed(props: SlipActionProps) {
                   </option>
                 ))}
               </Field>
-              <span>
-                Opération de traitement prévue:{" "}
-                {props.form.recipient.processingOperation}
-              </span>
             </label>
+            <span>
+              Code de traitement initialement prévu par le producteur:{" "}
+              {props.form.recipient.processingOperation}
+            </span>
             <label>
               Description de l'Opération
-              <Field component="textarea" name="processingOperationDescription" />
+              <Field
+                component="textarea"
+                name="processingOperationDescription"
+              />
+            </label>
+            <label>
+              <Field type="checkbox" name="noTraceability" />
+              Rupture de traçabilité autorisée par arrêté préfectoral pour ce
+              déchet - la responsabilité du producteur du déchet est transférée
             </label>
             {["D 13", "D 14", "D 15", "R 13"].indexOf(
               values.processingOperationDone
