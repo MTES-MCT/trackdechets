@@ -1,4 +1,8 @@
-import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
+import {
+  FormSubscriptionPayload,
+  prisma,
+  FormSubscriptionPayloadSubscription
+} from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
 import { getCompanyAdminUsers } from "../companies/queries";
@@ -29,6 +33,9 @@ export async function formsSubscriptionCallback(
   );
   verifiyPresta(payload).catch(err =>
     console.error("Error on prestataire verification form subscription", err)
+  );
+  mailWhenFormTraceabilityIsBroken(payload).catch(err =>
+    console.error("Error on form traceability break subscription", err)
   );
 }
 
@@ -204,4 +211,26 @@ async function verifiyPresta(payload: FormSubscriptionPayload) {
         );
     }
   }
+}
+
+async function mailWhenFormTraceabilityIsBroken(
+  payload: FormSubscriptionPayload
+) {
+  if (
+    !payload.updatedFields ||
+    !payload.updatedFields.includes("noTraceability") ||
+    !payload.node ||
+    !payload.node.noTraceability
+  ) {
+    return;
+  }
+
+  const form = await prisma.form({ id: payload.node.id });
+  return sendMail(
+    userMails.formTraceabilityBreak(
+      form.emitterCompanyMail,
+      form.emitterCompanyContact,
+      form
+    )
+  );
 }
