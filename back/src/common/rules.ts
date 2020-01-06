@@ -21,7 +21,7 @@ export const isCompanyAdmin = and(
   isAuthenticated,
   rule()(async (_, { siret }, ctx) => {
     ensureRuleParametersArePresent(siret);
-
+    
     const isCompanyAdmin = await isUserInCompanyWithRole(
       ctx.user.id,
       siret,

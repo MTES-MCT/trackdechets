@@ -201,13 +201,22 @@ export default {
         })
         .catch(_ => {
           throw new Error(
-            `Erreur, l'utilisateur n'a pa pu être retiré de l'entreprise`
+            `Erreur, l'utilisateur n'a pas pu être retiré de l'entreprise`
           );
         });
 
       const company = await prisma.company({ siret });
 
       return company;
+    },
+
+    deleteInvitation: async (_, { userAccountHashId }) => {
+      const deletedAccountHash = await prisma
+        .deleteUserAccountHash({ id: userAccountHashId })
+        .catch(err => {
+          throw new Error(`Erreur, l'invitation n'a pas pu être supprimée`);
+        });
+      return prisma.company({ siret: deletedAccountHash.companySiret });
     }
   },
   Query: {
