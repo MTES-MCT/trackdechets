@@ -4,7 +4,10 @@ import { filter } from "graphql-anywhere";
 import AccountFieldCompanyTypes from "./fields/AccountFieldCompanyTypes";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
 import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
-import { Company } from "./AccountCompany";
+import AccountFieldCompanyGivenName, {
+  tooltip as givenNameTooltip
+} from "./fields/AccountFieldCompanyGivenName";
+import { Company, UserRole } from "./AccountCompany";
 
 type Props = { company: Company };
 
@@ -15,14 +18,18 @@ AccountCompanyInfo.fragments = {
       address
       naf
       libelleNaf
+      userRole
+      givenName
       ...AccountFieldCompanyTypesFragment
       ...AccountFieldCompanyGerepIdFragment
+      ...AccountFieldCompanyGivenNameFragment
       installation {
         urlFiche
       }
     }
     ${AccountFieldCompanyTypes.fragments.company}
     ${AccountFieldCompanyGerepId.fragments.company}
+    ${AccountFieldCompanyGivenName.fragments.company}
   `
 };
 
@@ -57,10 +64,29 @@ export default function AccountCompanyInfo({ company }: Props) {
           />
         </>
       )}
-      <AccountFieldCompanyGerepId company={company} />
+      <AccountFieldCompanyGerepId
+        company={filter(AccountFieldCompanyGerepId.fragments.company, company)}
+      />
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
+      {company.userRole == UserRole.ADMIN ? (
+        <AccountFieldCompanyGivenName
+          company={filter(
+            AccountFieldCompanyGivenName.fragments.company,
+            company
+          )}
+        />
+      ) : (
+        company.givenName && (
+          <AccountFieldNotEditable
+            name="givenName"
+            label="Nom usuel"
+            tooltip={givenNameTooltip}
+            value={company.givenName}
+          />
+        )
+      )}
     </>
   );
 }

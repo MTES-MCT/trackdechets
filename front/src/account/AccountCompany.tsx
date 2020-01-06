@@ -43,6 +43,7 @@ export type Company = {
   contactEmail: string;
   contactPhone: string;
   website: string;
+  givenName: string;
 };
 
 type Props = {

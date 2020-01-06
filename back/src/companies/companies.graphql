@@ -73,6 +73,9 @@ type CompanyPrivate {
   # Role of the logged in user in the company
   userRole: UserRole
 
+  # Given name used in company selector
+  givenName: String
+
   # Company info from SIRENE
   ##########################
   siret: String
@@ -155,7 +158,8 @@ type Mutation {
     contactEmail: String,
     contactPhone: String,
     website: String,
-    companyTypes: [CompanyType]): CompanyPrivate
+    companyTypes: [CompanyType],
+    givenName: String): CompanyPrivate
 }
 
 type CompanyMember {

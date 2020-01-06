@@ -17,6 +17,7 @@ export const GET_ME = gql`
       companies {
         id
         name
+        givenName
         siret
         companyTypes
       }

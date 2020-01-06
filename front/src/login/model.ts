@@ -11,6 +11,7 @@ export type Company = {
   siret: string;
   companyTypes: string[];
   name: string;
+  givenName: string;
   address: string;
   securityCode: string;
   admins: { id: string; name: string }[];

@@ -7,6 +7,7 @@ export type Payload = {
   contactPhone?: string;
   website?: string;
   companyTypes?: CompanyType[];
+  givenName?: string;
 };
 
 export default function updateCompany({
@@ -15,7 +16,8 @@ export default function updateCompany({
   gerepId,
   contactEmail,
   contactPhone,
-  website
+  website,
+  givenName
 }: Payload) {
   const data = {
     ...(companyTypes !== undefined
@@ -24,7 +26,8 @@ export default function updateCompany({
     ...(gerepId !== undefined ? { gerepId } : {}),
     ...(contactEmail !== undefined ? { contactEmail } : {}),
     ...(contactPhone !== undefined ? { contactPhone } : {}),
-    ...(website !== undefined ? { website } : {})
+    ...(website !== undefined ? { website } : {}),
+    ...(givenName !== undefined ? { givenName } : {})
   };
 
   return prisma.updateCompany({
