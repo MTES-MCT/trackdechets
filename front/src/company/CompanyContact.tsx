@@ -29,7 +29,13 @@ export default function CompanyContact({ company }: Props) {
       <div className="company__item">
         <label className="company__item-key">Site internet</label>
         <span className="company__item-value" style={{ fontStyle: "italic" }}>
-          {company.website ? company.website : "Inconnu"}
+          {company.website ? (
+            <a href={company.website} target="__blank">
+              {company.website}
+            </a>
+          ) : (
+            "Inconnu"
+          )}
         </span>
       </div>
     </div>
