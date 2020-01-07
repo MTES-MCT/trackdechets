@@ -10,5 +10,6 @@ def connection_env(connection):
         'POSTGRES_HOST': conn.host,
         'POSTGRES_USER': conn.login,
         'POSTGRES_DATABASE': conn.schema,
-        'POSTGRES_PASSWORD': conn.password
+        'POSTGRES_PASSWORD': conn.password,
+        'POSTGRES_PORT': str(conn.port)
     }
