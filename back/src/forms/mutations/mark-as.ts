@@ -3,8 +3,7 @@ import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { Context } from "../../types";
 import { getError } from "../workflow/errors";
-import { getMachine } from "../workflow/helpers";
-import { FormState } from "../workflow/model";
+import { formWorkflowMachine } from "../workflow/machine";
 
 export async function markAsSealed(_, { id }, context: Context) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
@@ -73,20 +72,22 @@ async function transitionForm(
   const userCompanies = await getUserCompanies(context.user.id);
   const actorSirets = userCompanies.map(c => c.siret);
 
-  const formMachine = getMachine(form.status as FormState);
+  const startingState = State.from(form.status, {
+    form,
+    actorSirets,
+    requestContext: context,
+    isStableState: true
+  });
+
   if (
-    !formMachine ||
-    !formMachine.initialState.nextEvents.includes(eventType)
+    !formWorkflowMachine
+      .resolveState(startingState)
+      .nextEvents.includes(eventType)
   ) {
     throw new DomainError("Transition impossible", ErrorCode.FORBIDDEN);
   }
 
-  const startingState = State.from(form.status, {
-    form,
-    actorSirets,
-    requestContext: context
-  });
-  const formService = interpret(formMachine);
+  const formService = interpret(formWorkflowMachine);
   return new Promise((resolve, reject) => {
     formService.start(startingState).onTransition(async state => {
       if (!state.changed) {
@@ -100,7 +101,7 @@ async function transitionForm(
         formService.stop();
       }
 
-      if (state.done) {
+      if (state.done || state.context.isStableState) {
         const newStatus = state.value;
         await logStatusChange(formId, newStatus, context);
 

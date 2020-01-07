@@ -6,7 +6,8 @@ export enum WorkflowError {
   InvalidForm,
   InvalidTransition,
   MissingSignature,
-  InvalidSecurityCode
+  InvalidSecurityCode,
+  AppendixError
 }
 
 export async function getError(error: WorkflowError, form: Form) {

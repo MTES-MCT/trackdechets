@@ -1,35 +1,8 @@
-import { AnyEventObject, StateMachine } from "xstate";
 import { Form } from "../../generated/prisma-client";
 import { Context } from "../../types";
 import { unflattenObjectFromDb } from "../form-converter";
 import { logStatusChange } from "../mutations/mark-as";
 import { formSchema } from "../validator";
-import { FormState } from "./model";
-import { draftMachine } from "./draft-machine";
-import { sealedMachine } from "./sealed-machine";
-import { sentMachine } from "./sent-machine";
-import { receivedMachine } from "./received-machine";
-
-export function getMachine(
-  formState: FormState
-): StateMachine<any, any, AnyEventObject> {
-  switch (formState) {
-    case FormState.Draft:
-      return draftMachine;
-
-    case FormState.Sealed:
-      return sealedMachine;
-
-    case FormState.Sent:
-      return sentMachine;
-
-    case FormState.Received:
-      return receivedMachine;
-
-    default:
-      return null;
-  }
-}
 
 export async function validateForm(form: Form) {
   const formattedForm = unflattenObjectFromDb(form);
