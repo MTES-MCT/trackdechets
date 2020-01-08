@@ -30,5 +30,5 @@ export async function resetDatabase() {
   // We need a longer than 5sec timeout...
   jest.setTimeout(10000);
 
-  await promisify(exec)("cd ../prisma && prisma seed -r");
+  await promisify(exec)("prisma seed -r");
 }

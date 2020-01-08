@@ -29,15 +29,26 @@ describe("User endpoint", () => {
   });
 
   test("signup", async () => {
+    const userIndex =
+      (await prisma
+        .usersConnection()
+        .aggregate()
+        .count()) + 1;
+    const companyIndex =
+      (await prisma
+        .companiesConnection()
+        .aggregate()
+        .count()) + 1;
+    const email = `newUser_${userIndex}@td.io`;
     const mutation = `
       mutation {
         signup(
           payload: {
-            email: "newUser@td.io"
+            email: "${email}"
             password: "newUser"
             name: "New User"
             phone: ""
-            siret: "22222222222222"
+            siret: "${companyIndex}"
             companyName: "The New One"
             codeNaf: ""
             gerepId: ""
@@ -51,11 +62,11 @@ describe("User endpoint", () => {
     const { data } = await mutate({ mutation });
     expect(data.token).not.toBeNull();
 
-    const newUserExists = await prisma.$exists.user({ email: "newUser@td.io" });
+    const newUserExists = await prisma.$exists.user({ email: email });
     expect(newUserExists).toBe(true);
 
     const newCompanyExists = await prisma.$exists.company({
-      siret: "22222222222222"
+      siret: `${companyIndex}`
     });
     expect(newCompanyExists).toBe(true);
   });
