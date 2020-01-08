@@ -15,7 +15,7 @@
     "@sentry/integrations": "^5.8.0",
     "@sentry/node": "^5.8.0",
     "apollo-server-express": "^2.9.13",
-    "axios": "^0.18.1",
+    "axios": "^0.19.1",
     "bcrypt": "^3.0.7",
     "dataloader": "^1.4.0",
     "express": "^4.17.1",
