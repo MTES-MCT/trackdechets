@@ -2,45 +2,25 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import { Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
-import { graphql } from "graphql";
-import { ExecutionResultDataDefault } from "graphql/execution/execute";
-import { prisma } from "../src/generated/prisma-client";
-import { server } from "../src/server";
+import { app } from "../src/server";
 
-export async function execute<TData = ExecutionResultDataDefault>(
-  query: string,
-  context = { prisma },
-  variables = {}
-) {
-  const schema = server.executableSchema;
-  return graphql<TData>(schema, query, null, context, variables);
-}
-
-let httpServerInfos: {
-  isRunning: boolean;
-  instancePromise: Promise<HttpServer | HttpsServer>;
-} = {
-  isRunning: false,
-  instancePromise: null
-};
+let httpServerInstance: HttpServer | HttpsServer = null;
 
 export function startServer() {
-  if (!httpServerInfos.isRunning) {
-    httpServerInfos.isRunning = true;
-    httpServerInfos.instancePromise = server.start();
+  if (!httpServerInstance) {
+    httpServerInstance = app.listen(process.env.BACK_PORT);
   }
-  return httpServerInfos.instancePromise;
+  return httpServerInstance;
 }
 
 export async function closeServer() {
-  if (!httpServerInfos.isRunning) {
+  if (!httpServerInstance) {
     return Promise.resolve();
   }
 
-  const instance = await httpServerInfos.instancePromise;
   return new Promise(resolve => {
-    instance.close(() => {
-      httpServerInfos.isRunning = false;
+    httpServerInstance.close(() => {
+      httpServerInstance = null;
       resolve();
     });
   });

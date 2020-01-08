@@ -1,11 +1,20 @@
-import { string, object, date, number, array, boolean, setLocale, LocaleObject } from "yup";
+import {
+  string,
+  object,
+  date,
+  number,
+  array,
+  boolean,
+  setLocale,
+  LocaleObject
+} from "yup";
 
 setLocale({
   mixed: {
-    default: '${path} est invalide',
-    required: '${path} est un champ requis et doit avoir une valeur',
+    default: "${path} est invalide",
+    required: "${path} est un champ requis et doit avoir une valeur",
     notType: "${path} ne peut pas être null"
-  },
+  }
 } as LocaleObject);
 
 const companySchema = (type: string) =>
@@ -14,7 +23,9 @@ const companySchema = (type: string) =>
     siret: string().required(
       `${type}: La sélection d'une entreprise par SIRET est obligatoire`
     ),
-    address: string().required(),
+    address: string().required(
+      `${type}: L'adresse' d'une entreprise par SIRET est obligatoire`
+    ),
     contact: string().required(
       `${type}: Le contact dans l'entreprise est obligatoire`
     ),
@@ -27,14 +38,16 @@ const companySchema = (type: string) =>
 const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
 
 export const formSchema = object<any>().shape({
-  id: string().required(),
+  id: string().label("Identifiant (id)").required(),
   emitter: object().shape({
     type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
     pickupSite: string().nullable(true),
     company: companySchema("Émetteur")
   }),
   recipient: object().shape({
-    processingOperation: string().required(),
+    processingOperation: string()
+      .label("Opération de traitement (recipient.processingOperation)")
+      .required(),
     cap: string().nullable(true),
     company: companySchema("Destinataire")
   }),

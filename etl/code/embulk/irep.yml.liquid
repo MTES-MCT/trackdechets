@@ -33,6 +33,7 @@ out:
   user: {{ env.POSTGRES_USER }}
   password: {{ env.POSTGRES_PASSWORD }}
   database: {{ env.POSTGRES_DATABASE }}
+  port: {{ env.POSTGRES_PORT }}
   table: irep_source
   schema: etl
   options: {loglevel: 2}

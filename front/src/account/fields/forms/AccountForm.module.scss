@@ -1,0 +1,25 @@
+
+.input__group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.input__group > * {
+  margin-left: 10px;
+}
+
+.icon {
+  width: 1.3em;
+  height: auto;
+  color: var(--blue)
+}
+
+.icon:hover {
+  cursor: pointer
+}
+
+.input {
+  min-width: 400px;
+}
+

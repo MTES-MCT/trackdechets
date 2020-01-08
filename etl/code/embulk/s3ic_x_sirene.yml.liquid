@@ -65,6 +65,7 @@ out:
   user: {{ env.POSTGRES_USER }}
   password: {{ env.POSTGRES_PASSWORD }}
   database: {{ env.POSTGRES_DATABASE }}
+  port: {{ env.POSTGRES_PORT }}
   table: s3ic_x_sirene
   schema: etl
   options: {loglevel: 2}

@@ -4,7 +4,7 @@ import { Query } from "@apollo/react-components";
 import { FaSearch, FaCheck, FaRegCircle } from "react-icons/fa";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
-import RedErrorMessage from "../RedErrorMessage";
+import RedErrorMessage from "../../common/RedErrorMessage";
 import useDebounce from "../../utils/use-debounce";
 import client from "../../graphql-client";
 

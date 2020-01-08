@@ -26,6 +26,9 @@ export type Company = {
   libelleNaf: string;
   isRegistered: boolean;
   installation: Installation;
+  contactEmail: string;
+  contactPhone: string;
+  website: string;
 };
 
 export type Declaration = {

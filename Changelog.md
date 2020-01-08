@@ -5,6 +5,20 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+## [2020.01.1] 08/01/2020
+
+* Mise en page de healthchecks compatibles avec une page de statut [PR #111](https://github.com/MTES-MCT/trackdechets/pull/111)
+
+* Ajout d'un nom usuel pour les établissements [PR #112](https://github.com/MTES-MCT/trackdechets/pull/112)
+
+* Évolution du compte client [PR #106](https://github.com/MTES-MCT/trackdechets/pull/106)
+  * Amélioration de l'UX
+  * Possibilité d'éditer l'identifiant GEREP d'un établissement
+  * Possibilité pour un admin de renouveller le code de sécurité d'un établissement
+  * Possibilité d'éditer les informations de contact de la fiche entreprise
+  * Correction d'un bug permettant d'inviter plusieurs fois le même utilisateur
+
+
 ## [2019.12.1] 18/12/2019
 * Corrections d'UI [PR #99](https://github.com/MTES-MCT/trackdechets/pull/99)
 * Renforcement des contrôles d'accès et permissions [PR #95](https://github.com/MTES-MCT/trackdechets/pull/95) et [PR #92](https://github.com/MTES-MCT/trackdechets/pull/92)

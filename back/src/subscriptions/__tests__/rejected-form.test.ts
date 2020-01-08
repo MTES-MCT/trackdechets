@@ -126,8 +126,8 @@ jest.mock("../../forms/pdf", () => ({
   pdfEmailAttachment: jest.fn(() => "base64xyz")
 }));
 // Mock a utils function that hits th db
-jest.mock("../../companies/helper", () => ({
-  getCompanyAdmins: jest.fn(() => mockedCompanyAdmins)
+jest.mock("../../companies/queries", () => ({
+  getCompanyAdminUsers: jest.fn(() => mockedCompanyAdmins)
 }));
 // Mock prima DB
 jest.mock("../../generated/prisma-client", () => ({

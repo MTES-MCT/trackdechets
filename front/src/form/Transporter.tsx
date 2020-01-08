@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import DateInput from "./custom-inputs/DateInput";
-import RedErrorMessage from "./RedErrorMessage";
+import RedErrorMessage from "../common/RedErrorMessage";
 
 type Values = {
   transporter: { isExemptedOfReceipt: boolean };

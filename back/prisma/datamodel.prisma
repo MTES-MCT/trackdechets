@@ -68,6 +68,14 @@ type Company {
   updatedAt: DateTime! @updatedAt
 
   securityCode: Int!
+
+  # Given name used in company selector
+  givenName: String
+
+  # Contact information for the "Fiche entreprise"
+  contactEmail: String
+  contactPhone: String
+  website: String
 }
 
 """

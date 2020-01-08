@@ -5,7 +5,8 @@ import { prisma, CompanyType } from "../../src/generated/prisma-client";
   "Set companyType",
   `The type of the company used to be set on the User (field userType).
   Set this information on the Company (field companyType).
-  If a company has several users, we merge the types of the different users`
+  If a company has several users, we merge the types of the different users`,
+  false
 )
 export class SetCompanyTypeUpdater implements Updater {
   run() {

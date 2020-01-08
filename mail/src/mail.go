@@ -40,10 +40,15 @@ func mustGetenv(k string) string {
 }
 
 func main() {
+	http.HandleFunc("/ping", pong)
 	http.HandleFunc("/send", sendEmail)
 	http.HandleFunc("/contact/", singleContactHandler)
 	http.HandleFunc("/contact", contactsHandler)
 	log.Fatal(http.ListenAndServe(":80", nil))
+}
+
+func pong(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Pong"))
 }
 
 func sendEmail(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +65,6 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Impossible de déséréaliser l'entrée.", http.StatusBadRequest)
 		return
 	}
-
 
 	if data.Body == "" || data.Subject == "" || data.Title == "" || data.ToEmail == "" || data.ToName == "" || data.TemplateID == 0 {
 		msg := fmt.Sprintf("Données manquantes: %v", data)

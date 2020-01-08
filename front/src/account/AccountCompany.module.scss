@@ -1,0 +1,52 @@
+
+.company {
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+
+    h6 {
+      margin-top: 0;
+      margin-bottom: 1em;
+    }
+
+    .admin {
+      font-style: italic;
+      font-weight: normal;
+      color: var(--darker-grey);
+      svg {
+        margin-left: 1em;
+        width: 20px;
+        height: auto;
+        vertical-align: sub;
+      }
+    }
+
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 1em;
+
+
+    a {
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--theme-dark-text);
+      margin-right: 1.5em;
+    }
+
+    a:hover {
+      background: none;
+      color: var(--blue);
+    }
+
+    a.active {
+      color: var(--blue);
+      border-bottom: var(--blue) solid 2px;
+    }
+  }
+}
+

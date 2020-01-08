@@ -54,7 +54,7 @@ export default withRouter(function Header({ history }) {
                 <li className="nav__item">
                   <NavLink
                     activeClassName="active"
-                    to="/account"
+                    to="/account/info"
                     onClick={() => trackEvent("navbar", "mon-compte")}
                   >
                     Mon compte

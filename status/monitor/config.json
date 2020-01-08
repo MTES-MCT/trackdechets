@@ -1,0 +1,55 @@
+{
+  "api": {
+    "url": "http://cachet:8000/api/v1",
+    "token": "5LWYCXWaUbLcgefjoNXh",
+    "insecure": true
+  },
+  "date_format": "02/01/2006 15:04:05 MST",
+  "monitors": [
+    {
+      "name": "td-api",
+      "target": "https://api.trackdechets.beta.gouv.fr/health",
+      "strict": true,
+      "method": "GET",
+      "component_id": 1,
+      "metric_id": 1,
+      "interval": 5,
+      "timeout": 5,
+      "threshold": 80,
+      "expected_status_code": 200
+    },
+    {
+      "name": "td-pdf",
+      "target": "https://api.trackdechets.beta.gouv.fr/health/td-pdf",
+      "strict": true,
+      "method": "GET",
+      "component_id": 2,
+      "interval": 5,
+      "timeout": 5,
+      "threshold": 80,
+      "expected_status_code": 200
+    },
+    {
+      "name": "td-insee",
+      "target": "https://api.trackdechets.beta.gouv.fr/health/td-insee",
+      "strict": true,
+      "method": "GET",
+      "component_id": 4,
+      "interval": 5,
+      "timeout": 5,
+      "threshold": 80,
+      "expected_status_code": 200
+    },
+    {
+      "name": "td-mail",
+      "target": "https://api.trackdechets.beta.gouv.fr/health/td-mail",
+      "strict": true,
+      "method": "GET",
+      "component_id": 3,
+      "interval": 5,
+      "timeout": 5,
+      "threshold": 80,
+      "expected_status_code": 200
+    }
+  ]
+}

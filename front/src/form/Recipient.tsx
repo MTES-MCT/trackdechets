@@ -3,7 +3,7 @@ import CompanySelector from "./company/CompanySelector";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
 import { Field, connect } from "formik";
-import RedErrorMessage from "./RedErrorMessage";
+import RedErrorMessage from "../common/RedErrorMessage";
 import DateInput from "./custom-inputs/DateInput";
 
 type Values = {
@@ -23,7 +23,7 @@ export default connect<{}, Values>(function Recipient({ formik }) {
           Pour vous assurer que l'entreprise de destination est autorisée à
           recevoir le déchet, vous pouvez consulter{" "}
           <a
-            href="http://www.installationsclassees.developpement-durable.gouv.fr/rechercheICForm.php"
+            href="https://www.georisques.gouv.fr/dossiers/installations/donnees#/"
             target="_blank"
           >
             la liste des installation classées.

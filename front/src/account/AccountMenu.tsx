@@ -1,11 +1,21 @@
+import gql from "graphql-tag";
 import React from "react";
 import SideMenu from "../common/SideMenu";
-import { NavLink, match } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { match } from "react-router";
+import styles from "./AccountMenu.module.scss";
 
-export default function AccountMenu() {
+type Props = {
+  match: match;
+};
+
+export default function AccountMenu({ match }: Props) {
   return (
     <SideMenu>
-      <NavLink to="/account">Paramètres du compte</NavLink>
+      <h5 className={styles.title}>Mon Compte</h5>
+      <NavLink to={`${match.url}/info`}>Informations générales</NavLink>
+      <NavLink to={`${match.url}/companies`}>Établissements</NavLink>
+      <NavLink to={`${match.url}/api`}>Intégration API</NavLink>
     </SideMenu>
   );
 }
