@@ -52,7 +52,7 @@ const sentryMiddleware = () =>
   });
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
-const schemaWithMiddleware = applyMiddleware(
+export const schemaWithMiddleware = applyMiddleware(
   schema,
   ...[shieldMiddleware, ...(sentryDsn ? [sentryMiddleware()] : [])]
 );
@@ -65,6 +65,8 @@ export const server = new ApolloServer({
     prisma
   })
 });
+
+
 
 export const app = express();
 

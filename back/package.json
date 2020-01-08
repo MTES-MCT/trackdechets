@@ -36,6 +36,7 @@
     "@types/jest": "^24.0.23",
     "@types/jsonwebtoken": "^8.3.0",
     "@types/yup": "^0.26.3",
+    "apollo-server-integration-testing": "^2.3.0",
     "apollo-server-testing": "^2.9.13",
     "jest": "^24.9.0",
     "nodemon": "^2.0.2",
