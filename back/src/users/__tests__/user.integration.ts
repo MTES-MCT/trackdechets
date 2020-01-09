@@ -4,10 +4,29 @@ import * as mailsHelper from "../../common/mails.helper";
 import { server } from "../../server";
 import { createTestClient } from "apollo-server-testing";
 import { gql } from "apollo-server-express";
+import { hash } from "bcrypt";
+import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
+
+async function seed() {
+  // John, admin of 000000000000
+  const p1 = await hash("john", 10);
+  await prisma.createUser({
+    email: "john@td.io",
+    name: "John",
+    password: p1,
+    isActive: true,
+    companyAssociations: {
+      create: {
+        company: { create: { siret: "00000000000000", securityCode: 1234 } },
+        role: "ADMIN"
+      }
+    }
+  });
+}
 
 describe("User endpoint", () => {
   afterAll(async () => {
@@ -15,11 +34,16 @@ describe("User endpoint", () => {
   });
 
   test("login", async () => {
+    // await seed();
+
+    const {user} = (await userWithCompanyFactory("ADMIN")) ;
+
+
     const { mutate } = createTestClient(server);
     const { data } = await mutate({
       mutation: gql`
         mutation {
-          login(email: "john@td.io", password: "john") {
+          login(email: "${user.email}" , password: "pass") {
             token
           }
         }

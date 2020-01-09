@@ -4,9 +4,7 @@ import {
   prisma,
   UserRole
 } from "../generated/prisma-client";
-import {hash} from "bcrypt";
-
-
+import { hash } from "bcrypt";
 
 /**
  * Create a user with name and email
@@ -23,6 +21,7 @@ export const userFactory = async (opt = {}) => {
     name: `User_${userIndex}`,
     email: `user_${userIndex}@td.io`,
     password: defaultPassword,
+    isActive: true,
     ...opt
   };
 
@@ -54,7 +53,7 @@ export const companyFactory = async (opt = {}) => {
  * Create a company and a member
  * @param role: user role in the company
  */
-export const userWithCompanyFactory = async (role) => {
+export const userWithCompanyFactory = async role => {
   const company = await companyFactory();
 
   const user = await userFactory({
