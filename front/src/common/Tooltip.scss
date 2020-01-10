@@ -12,8 +12,12 @@
   }
 
   &__icon {
-    width: 0.7em;
+    width: 1em;
     height: auto;
+    background-color: var(--blue);
+    color: white;
+    padding: 0.2em;
+    border-radius: 0.5em;
   }
 
   &__content {
