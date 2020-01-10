@@ -102,6 +102,13 @@ export default function Partners() {
                     alt="Séché Environnement"
                   />
                 </figure>
+                     <figure>
+                  <img
+                    className="trinov"
+                    src="/partners-logos/trinov.png"
+                    alt="Trinov"
+                  />
+                </figure>
               </div>
             </div>
           </div>
