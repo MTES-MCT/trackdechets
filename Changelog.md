@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+## [2020.01.2] 10/01/2020
+
+* Ajout d'un logo partenaire
+* Amélioration graphique des infobulles
+* Activation du playground en production
+
 ## [2020.01.1] 08/01/2020
 
 * Mise en page de healthchecks compatibles avec une page de statut [PR #111](https://github.com/MTES-MCT/trackdechets/pull/111)
