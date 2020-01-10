@@ -81,7 +81,7 @@ describe("renewSecurityCode", () => {
 
     const users = [
       { email: "john.snow@trackdechets.fr", name: "John Snow" },
-      { email: "arya.starck@trackdechets.fr", name: "Arya Starck" }
+      { email: "arya.stark@trackdechets.fr", name: "Arya Stark" }
     ];
     const mails = users.map(u =>
       companyMails.securityCodeRenewal(u.email, u.name, {
