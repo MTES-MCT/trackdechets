@@ -52,10 +52,10 @@ export default function Footer() {
             <h4>Développeurs</h4>
           </li>
           <li>
-            <a href="http://api.trackdechets.beta.gouv.fr">API Playground</a>
+            <a href={process.env.REACT_APP_DOC_ENDPOINT}>Documentation API</a>
           </li>
           <li>
-            <a href="http://doc.trackdechets.fr">Documentation API</a>
+            <a href={process.env.REACT_APP_API_ENDPOINT}>API Playground</a>
           </li>
           <li>
             <a href="https://forum.trackdechets.beta.gouv.fr/">

@@ -139,6 +139,12 @@ workflows:
           requires:
             - check-docker
       - build-service:
+          name: build-doc
+          service-name: doc
+          folder-name: documentation
+          requires:
+            - check-docker
+      - build-service:
           name: build-etl
           service-name: etl
           folder-name: etl
@@ -152,6 +158,7 @@ workflows:
             - build-insee
             - build-pdf
             - build-mail
+            - build-doc
             - build-etl
           filters:
             branches:
