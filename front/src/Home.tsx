@@ -241,7 +241,7 @@ export default function Home() {
           </div>
           <ul className="footer__links">
             <li>
-              <h3>Trackdéchets</h3>
+              <h4>À propos de Trackdéchets</h4>
             </li>
             <li>
               <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
@@ -260,10 +260,23 @@ export default function Home() {
               </a>
             </li>
             <li>
+              <Link to="/stats">Statistiques</Link>
+            </li>
+          </ul>
+          <ul className="footer__links">
+            <li>
+              <h4>Développeurs</h4>
+            </li>
+            <li>
               <a href="http://api.trackdechets.beta.gouv.fr">API Playground</a>
             </li>
             <li>
               <a href="http://doc.trackdechets.fr">Documentation API</a>
+            </li>
+            <li>
+              <a href="https://forum.trackdechets.beta.gouv.fr/">
+                Forum technique
+              </a>
             </li>
           </ul>
         </div>
