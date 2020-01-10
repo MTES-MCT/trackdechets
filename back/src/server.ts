@@ -59,6 +59,8 @@ const schemaWithMiddleware = applyMiddleware(
 
 export const server = new ApolloServer({
   schema: schemaWithMiddleware,
+  introspection: true, // used to enable the playground in production
+  playground: true, // used to enable the playground in production
   context: async ctx => ({
     ...ctx,
     user: await getUser(ctx.req),
