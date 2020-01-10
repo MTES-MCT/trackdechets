@@ -1,11 +1,13 @@
 import renewSecurityCode from "../renewSecurityCode";
 import { ErrorCode } from "../../../common/errors";
+import { companyMails } from "../../mails";
 
 const companyMock = jest.fn();
+const updateCompanyMock = jest.fn();
 jest.mock("../../../generated/prisma-client", () => ({
   prisma: {
     company: jest.fn((...args) => companyMock(...args)),
-    updateCompany: jest.fn(() => {})
+    updateCompany: jest.fn((...args) => updateCompanyMock(...args))
   }
 }));
 const randomNumberMock = jest.fn();
@@ -14,10 +16,25 @@ jest.mock("../../../utils", () => ({
   randomNumber: jest.fn(() => randomNumberMock())
 }));
 
+const sendMailMock = jest.fn();
+
+jest.mock("../../../common/mails.helper", () => ({
+  sendMail: jest.fn((...args) => sendMailMock(...args))
+}));
+
+const getCompanyActiveUsersMock = jest.fn();
+
+jest.mock("../../queries/companyUsers", () => ({
+  getCompanyActiveUsers: jest.fn(() => getCompanyActiveUsersMock())
+}));
+
 describe("renewSecurityCode", () => {
   beforeEach(() => {
     companyMock.mockReset();
+    updateCompanyMock.mockReset();
     randomNumberMock.mockReset();
+    sendMailMock.mockReset();
+    getCompanyActiveUsersMock.mockReset();
   });
 
   it("should throw BAD_USER_INPUT exception if siret is not 14 character long", async () => {
@@ -45,8 +62,45 @@ describe("renewSecurityCode", () => {
 
     randomNumberMock.mockReturnValueOnce("1234").mockReturnValueOnce("2345");
 
+    getCompanyActiveUsersMock.mockReturnValueOnce([]);
     await renewSecurityCode("85001946400013");
 
     expect(randomNumberMock).toHaveBeenCalledTimes(2);
+  });
+  it("should send a notification email to all users and return updated company", async () => {
+    companyMock.mockResolvedValueOnce({
+      securityCode: "1234"
+    });
+    randomNumberMock.mockReturnValueOnce("4567");
+
+    updateCompanyMock.mockReturnValueOnce({
+      siret: "85001946400013",
+      name: "Code en stock",
+      securityCode: "4567"
+    });
+
+    const users = [
+      { email: "john.snow@trackdechets.fr", name: "John Snow" },
+      { email: "arya.starck@trackdechets.fr", name: "Arya Starck" }
+    ];
+    const mails = users.map(u =>
+      companyMails.securityCodeRenewal(u.email, u.name, {
+        name: "Code en stock",
+        siret: "85001946400013"
+      })
+    );
+
+    getCompanyActiveUsersMock.mockReturnValueOnce(users);
+
+    const updatedCompany = await renewSecurityCode("85001946400013");
+
+    expect(sendMailMock).toHaveBeenCalledWith(mails[0]);
+    expect(sendMailMock).toHaveBeenCalledWith(mails[1]);
+
+    expect(updatedCompany).toEqual({
+      siret: "85001946400013",
+      name: "Code en stock",
+      securityCode: "4567"
+    });
   });
 });
