@@ -3,7 +3,7 @@ const pdflib = require("pdf-lib");
 const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 
-const { PDFDocument } = pdflib;
+const { PDFDocument, rgb } = pdflib;
 
 // Object to configure field settings
 // coordinates: top/left, mandatory
@@ -103,6 +103,7 @@ const fieldSettings = {
 };
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
+const noTraceabilityParams = { x: 150, y: 775, fontSize: 11, color: rgb(0.78, 0.36, 0.36) };
 
 // Standard page height in pixels
 const pageHeight = 842;
@@ -393,6 +394,16 @@ const write = async params => {
       x: customIdTitleParams.x,
       y: pageHeight - customIdTitleParams.y,
       size: customIdTitleParams.fontSize,
+      font: timesBoldFont
+    });
+  }
+
+  if (!!formData.noTraceability) {
+    firstPage.drawText("Rupture de traçabilité autorisée par arrêté préfectoral, transfert de responsabilité", {
+      x: noTraceabilityParams.x,
+      y: pageHeight - noTraceabilityParams.y,
+      size: noTraceabilityParams.fontSize,
+      color: noTraceabilityParams.color,
       font: timesBoldFont
     });
   }
