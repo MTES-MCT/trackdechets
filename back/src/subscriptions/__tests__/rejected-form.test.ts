@@ -204,11 +204,11 @@ describe("mailWhenFormIsDeclined", () => {
     expect(payload3.attachment).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
-    expect(payload1.toEmail).toEqual("producer@example.com");
-    expect(payload2.toEmail).toEqual(
+    expect(payload1.to[0].email).toEqual("producer@example.com");
+    expect(payload2.to[0].email).toEqual(
       "uid-11-66.dreal-occitanie@developpement-durable.gouv.fr"
     );
-    expect(payload3.toEmail).toEqual(
+    expect(payload3.to[0].email).toEqual(
       "ud77.driee-if@developpement-durable.gouv.fr"
     );
 

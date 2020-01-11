@@ -21,8 +21,7 @@ describe("userMails.formNotAccepted", () => {
     const {
       subject,
       title,
-      toEmail,
-      toName,
+      to,
       body,
       attachment
     } = userMails.formNotAccepted(
@@ -34,8 +33,8 @@ describe("userMails.formNotAccepted", () => {
     expect(attachment).toEqual("xyz");
     expect(subject).toEqual("Refus de prise en charge de votre déchet");
     expect(title).toEqual("Refus de prise en charge de votre déchet");
-    expect(toEmail).toEqual("marcel@recyclator.fr");
-    expect(toName).toEqual("Marcel Dubois");
+    expect(to[0].email).toEqual("marcel@recyclator.fr");
+    expect(to[0].name).toEqual("Marcel Dubois");
     // Check some key content is correctly onserted and formatted
     expect(body).toContain("refusé le 17 janvier 2019");
     expect(body).toContain("Numéro du BSD: TD-2019-XYZ");
@@ -55,8 +54,7 @@ describe("userMails.formNotAccepted", () => {
     const {
       subject,
       title,
-      toEmail,
-      toName,
+      to,
       body,
       attachment
     } = userMails.formNotAccepted(
@@ -65,7 +63,7 @@ describe("userMails.formNotAccepted", () => {
       formExemptedOfReceipt,
       "xyz"
     );
- 
+
     expect(body).toContain(
       "Exemption relevant de l'article R.541-50 du code de l'Environnement"
     );
