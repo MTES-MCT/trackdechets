@@ -103,7 +103,7 @@ const fieldSettings = {
 };
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
-const noTraceabilityParams = { x: 150, y: 775, fontSize: 11, color: rgb(0.78, 0.36, 0.36) };
+const noTraceabilityParams = { x: 155, y: 778, fontSize: 11, color: rgb(0.78, 0.36, 0.36) };
 
 // Standard page height in pixels
 const pageHeight = 842;
