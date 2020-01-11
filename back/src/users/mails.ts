@@ -161,6 +161,9 @@ export const userMails = {
   }),
   formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({
     to: [{ email: toEmail, name: toName }],
+    cc: [
+      { email: form.recipientCompanyMail, name: form.recipientCompanyContact }
+    ],
     subject: "Trackdéchets : Votre déchet a été traité",
     title: "Trackdéchets : Votre déchet a été traité",
     body: `Madame, Monsieur,<br><br>
