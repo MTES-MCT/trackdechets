@@ -1,8 +1,4 @@
-import {
-  FormSubscriptionPayload,
-  prisma,
-  FormSubscriptionPayloadSubscription
-} from "../generated/prisma-client";
+import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
 import { sendMail } from "../common/mails.helper";
 import { userMails } from "../users/mails";
 import { getCompanyAdminUsers } from "../companies/queries";
