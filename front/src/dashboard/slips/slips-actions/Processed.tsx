@@ -22,16 +22,24 @@ export default function Processed(props: SlipActionProps) {
       >
         {({ values }) => (
           <Form>
-            <label>
-              Nom du responsable
-              <Field type="text" name="processedBy" placeholder="NOM Prénom" />
-            </label>
-            <label>
-              Date de réception
-              <Field component={DateInput} name="processedAt" />
-            </label>
-            <label>
-              Opération de traitement effectuée
+            <div className="form__group">
+              <label>
+                Nom du responsable
+                <Field
+                  type="text"
+                  name="processedBy"
+                  placeholder="NOM Prénom"
+                />
+              </label>
+            </div>
+            <div className="form__group">
+              <label>
+                Date de réception
+                <Field component={DateInput} name="processedAt" />
+              </label>
+            </div>
+            <div className="form__group">
+              <label>Opération de traitement effectuée</label>
               <Field component="select" name="processingOperationDone">
                 <option value="">Choisissez...</option>
                 {Operations.map(o => (
@@ -41,23 +49,28 @@ export default function Processed(props: SlipActionProps) {
                   </option>
                 ))}
               </Field>
-            </label>
-            <span>
-              Code de traitement initialement prévu par le producteur:{" "}
-              {props.form.recipient.processingOperation}
-            </span>
-            <label>
-              Description de l'Opération
-              <Field
-                component="textarea"
-                name="processingOperationDescription"
-              />
-            </label>
-            <label>
-              <Field type="checkbox" name="noTraceability" />
-              Rupture de traçabilité autorisée par arrêté préfectoral pour ce
-              déchet - la responsabilité du producteur du déchet est transférée
-            </label>
+              <div>
+                Code de traitement initialement prévu par le producteur:{" "}
+                {props.form.recipient.processingOperation}
+              </div>
+            </div>
+            <div className="form__group">
+              <label>
+                Description de l'Opération
+                <Field
+                  component="textarea"
+                  name="processingOperationDescription"
+                />
+              </label>
+            </div>
+            <div className="form__group">
+              <label>
+                <Field type="checkbox" name="noTraceability" />
+                Rupture de traçabilité autorisée par arrêté préfectoral pour ce
+                déchet - la responsabilité du producteur du déchet est
+                transférée
+              </label>
+            </div>
             {["D 13", "D 14", "D 15", "R 13"].indexOf(
               values.processingOperationDone
             ) > -1 && (
