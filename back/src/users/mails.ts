@@ -13,8 +13,7 @@ const baseUrl = `https://${UI_HOST}`;
 
 export const userMails = {
   onSignup: (user, activationHash) => ({
-    toEmail: user.email,
-    toName: user.name,
+    to: [{ email: user.email, name: user.name }],
     subject: "Activer votre compte sur Trackdéchets",
     title: "Activation de votre compte",
     body: `Bonjour ${user.name},
@@ -34,8 +33,7 @@ export const userMails = {
     toCompanySiret,
     fromCompanyName
   ) => ({
-    toEmail,
-    toName,
+    to: [{ email: toEmail, name: toName }],
     subject:
       "Un BSD numérique vous attend sur Trackdéchets : créez votre compte pour y accéder !",
     title:
@@ -66,8 +64,7 @@ export const userMails = {
   `
   }),
   inviteUserToJoin: (toEmail, companyAdmin, companyName, hash) => ({
-    toEmail,
-    toName: toEmail,
+    to: [{ email: toEmail, name: toEmail }],
     subject: "Vous avez été invité à rejoindre Trackdéchets",
     title: `${companyAdmin} vous a invité à rejoindre Trackdéchets`,
     body: `Bonjour Madame/Monsieur,
@@ -82,8 +79,7 @@ export const userMails = {
     `
   }),
   notifyUserOfInvite: (toEmail, toName, companyAdmin, companyName) => ({
-    toEmail,
-    toName,
+    to: [{ email: toEmail, name: toName }],
     subject: "Vous avez été invité sur Trackdéchets",
     title: `${companyAdmin} vous a invité à sur Trackdéchets`,
     body: `Bonjour ${toName},
@@ -96,8 +92,7 @@ export const userMails = {
     `
   }),
   resetPassword: (toEmail, toName, password) => ({
-    toEmail,
-    toName,
+    to: [{ email: toEmail, name: toName }],
     subject: "Ré-initialisation du mot de passe",
     title:
       "Vous avez demandé à réinitialiser votre mot de passe sur Trackdéchets",
@@ -110,8 +105,7 @@ export const userMails = {
     `
   }),
   formNotAccepted: (toEmail, toName, form: Form, attachment) => ({
-    toEmail,
-    toName,
+    to: [{ email: toEmail, name: toName }],
     subject: "Refus de prise en charge de votre déchet",
     title: "Refus de prise en charge de votre déchet",
     body: `Madame, Monsieur,
@@ -150,8 +144,7 @@ export const userMails = {
     attachment: attachment
   }),
   onboardingFirstStep: (toEmail, toName) => ({
-    toEmail,
-    toName,
+    to: [{ email: toEmail, name: toName }],
     subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     body: "_",
@@ -159,8 +152,7 @@ export const userMails = {
     baseUrl: baseUrl
   }),
   onboardingSecondStep: (toEmail, toName) => ({
-    toEmail,
-    toName,
+    to: [{ email: toEmail, name: toName }],
     subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     body: "_",
@@ -168,8 +160,7 @@ export const userMails = {
     baseUrl: baseUrl
   }),
   formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({
-    toEmail,
-    toName,
+    to: [{ email: toEmail, name: toName }],
     subject: "Trackdéchets : Votre déchet a été traité",
     title: "Trackdéchets : Votre déchet a été traité",
     body: `Madame, Monsieur,<br><br>

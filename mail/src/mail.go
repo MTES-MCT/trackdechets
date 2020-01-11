@@ -17,14 +17,19 @@ type mailAttachment struct {
 
 type mail struct {
 	TemplateID int64                  `json:"templateId"`
-	ToEmail    string                 `json:"toEmail"`
-	ToName     string                 `json:"toName"`
+	To         []recipient            `json:"to"`
+	Cc         []recipient            `json:"cc"`
 	Subject    string                 `json:"subject"`
 	Title      string                 `json:"title"`
 	Body       string                 `json:"body"`
 	BaseURL    string                 `json:"baseUrl"`
 	Attachment mailAttachment         `json:"attachment"`
 	Vars       map[string]interface{} `json:"vars"`
+}
+
+type recipient struct {
+	Email string `json:",omitempty"`
+	Name  string `json:",omitempty"`
 }
 
 var mailjetClient = mailjet.NewMailjetClient(
@@ -90,12 +95,8 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 			Email: "noreply@trackdechets.fr",
 			Name:  "Noreply Trackdéchets",
 		},
-		To: &mailjet.RecipientsV31{
-			mailjet.RecipientV31{
-				Email: data.ToEmail,
-				Name:  data.ToName,
-			},
-		},
+		To:               getAsMailjetRecipients(data.To),
+		Cc:               getAsMailjetRecipients(data.Cc),
 		Subject:          data.Subject,
 		TemplateID:       data.TemplateID,
 		TemplateLanguage: true,
@@ -123,4 +124,16 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Printf("Data: %+v\n", res)
+}
+
+func getAsMailjetRecipients(recipients []recipient) *mailjet.RecipientsV31 {
+	var mjRecipients mailjet.RecipientsV31
+	for _, recipient := range recipients {
+		mjRecipients = append(mjRecipients, mailjet.RecipientV31{
+			Email: recipient.Email,
+			Name:  recipient.Name,
+		})
+	}
+
+	return &mjRecipients
 }
