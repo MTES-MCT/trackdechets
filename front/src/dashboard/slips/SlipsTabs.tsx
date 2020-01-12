@@ -14,8 +14,8 @@ export default function SlipsTabs({ me, siret }: Props) {
   return (
     <Query query={GET_SLIPS} variables={{ siret }}>
       {({ loading, error, data }) => {
-        if (loading) return <p>"..."</p>;
-        if (error || !data) return <p>"Erreur..."</p>;
+        if (loading) return <p>Chargement des bordereaux...</p>;
+        if (error || !data) return <p>Erreur...</p>;
 
         const drafts = getTabForms(SlipTabs.DRAFTS, data.forms, me);
         const toSign = getTabForms(SlipTabs.TO_SIGN, data.forms, me);
