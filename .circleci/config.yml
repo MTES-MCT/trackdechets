@@ -29,9 +29,11 @@ jobs:
     executor: node
     steps:
       - checkout
-      - run: |
-        cd ./<< parameters.folder-name >>
-        <<# parameters.run-tests >> npm test <</ parameters.run-tests >>
+      - run:
+          name: Run tests
+          command: |
+            cd ./<< parameters.folder-name >>
+            <<# parameters.run-tests >> npm test <</ parameters.run-tests >>
       - setup_remote_docker
       - run: |
           docker build -t betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 ./<< parameters.folder-name >>
