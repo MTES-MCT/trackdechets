@@ -23,9 +23,15 @@ jobs:
         type: string
       folder-name:
         type: string
+      run-tests:
+        type: boolean
+        default: false
     executor: node
     steps:
       - checkout
+      - run: |
+        cd ./<< parameters.folder-name >>
+        <<# parameters.run-tests >> npm test <</ parameters.run-tests >>
       - setup_remote_docker
       - run: |
           docker build -t betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 ./<< parameters.folder-name >>
@@ -66,7 +72,7 @@ jobs:
       - run:
           name: Deploy to validation over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/
+            ssh $SSH_USER@$SSH_HOST_ST "cd /srv/trackdechets/
             git pull
             docker-compose -f docker-compose.val.yml build
             docker-compose -f docker-compose.val.yml up -d
@@ -118,6 +124,7 @@ workflows:
           name: build-api
           service-name: api
           folder-name: back
+          run-tests: true
           requires:
             - check-docker
       - build-service:
@@ -151,6 +158,7 @@ workflows:
           requires:
             - check-docker
       - deploy:
+          name: deploy-prod
           requires:
             - build-postgres
             - build-api
@@ -163,6 +171,20 @@ workflows:
           filters:
             branches:
               only: master
+      - deploy:
+        name: deploy-validation
+        host: SSH_HOST_BU
+        requires:
+          - build-postgres
+          - build-api
+          - build-ui
+          - build-insee
+          - build-pdf
+          - build-mail
+          - build-etl
+        filters:
+          branches:
+            only: master
 
   deploy-validation:
     jobs:
