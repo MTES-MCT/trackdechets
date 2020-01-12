@@ -174,19 +174,19 @@ workflows:
             branches:
               only: master
       - deploy:
-        name: deploy-validation
-        host: SSH_HOST_BU
-        requires:
-          - build-postgres
-          - build-api
-          - build-ui
-          - build-insee
-          - build-pdf
-          - build-mail
-          - build-etl
-        filters:
-          branches:
-            only: master
+          name: deploy-validation
+          host: SSH_HOST_BU
+          requires:
+            - build-postgres
+            - build-api
+            - build-ui
+            - build-insee
+            - build-pdf
+            - build-mail
+            - build-etl
+          filters:
+            branches:
+              only: master
 
   deploy-validation:
     jobs:
