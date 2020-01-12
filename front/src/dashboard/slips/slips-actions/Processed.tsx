@@ -76,12 +76,6 @@ export default function Processed(props: SlipActionProps) {
             ) > -1 && (
               <div>
                 <h4>Destination ultérieure prévue</h4>
-                <div>
-                  <label>
-                    <Field type="checkbox" name="noTraceability" />
-                    C'est un regroupement avec perte de traçabilité
-                  </label>
-                </div>
                 <label>
                   Opération de traitement
                   <Field
