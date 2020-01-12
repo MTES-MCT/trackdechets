@@ -11,7 +11,11 @@ window._paq.push(["setDoNotTrack", true]);
 window._paq.push(["trackPageView"]);
 window._paq.push(["enableLinkTracking"]);
 
-if (process.env.NODE_ENV === "production") {
+if (
+  process.env.NODE_ENV === "production" &&
+  process.env.REACT_APP_MATOMO_TRACKER_SITE_ID != null &&
+  process.env.REACT_APP_MATOMO_TRACKER_URL != null
+) {
   loadTracker();
 }
 
