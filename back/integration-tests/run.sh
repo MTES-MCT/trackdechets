@@ -3,8 +3,7 @@
 export NODE_ENV=test
 export PRISMA_ENDPOINT=http://prisma:4467/default/staging
 export PRISMA_SECRET=any_secret
-export JWT_SECRET=any_secret
-export BACK_PORT=8383
+export COMPOSE_PROJECT_NAME=integration
 
 echo ">> Running integration test 🚀..."
 echo ">> Starting containers..."

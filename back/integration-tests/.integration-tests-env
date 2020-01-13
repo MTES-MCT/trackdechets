@@ -1,8 +1,5 @@
 NODE_ENV=test
-PRISMA_ENDPOINT=http://localhost:4467/default/staging
+PRISMA_ENDPOINT=http://prisma:4467/default/staging
 PRISMA_SECRET=any_secret
 JWT_SECRET=any_secret
-BACK_PORT=8383
-REDIS_HOST=localhost
 API_HOST=api-td.local
-
