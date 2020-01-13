@@ -8,11 +8,11 @@ export default function Footer() {
     <footer className="footer" role="contentinfo">
       <div className="container">
         <div className="footer__logo">
-          <LazyLoad height={60}>
-            <img src="/logo-mtes-mef.svg" />
+          <LazyLoad>
+            <img className={styles["full-width"]} src="/logo-mtes-mef.svg" />
           </LazyLoad>
           <div className={styles["logo-text"]}>
-            <LazyLoad height={60}>
+            <LazyLoad>
               <img src="/logo-fabnum.svg" />
             </LazyLoad>
             <small>
@@ -47,9 +47,9 @@ export default function Footer() {
             <Link to="/stats">Statistiques</Link>
           </li>
           <li>
-            <Link to="https://drive.google.com/open?id=1To5yrG6jO3-bh9jRqyi334mXT1LqGCjE">
+            <a href="https://drive.google.com/open?id=1To5yrG6jO3-bh9jRqyi334mXT1LqGCjE">
               Boite à outils communication
-            </Link>
+            </a>
           </li>
         </ul>
         <ul className="footer__links">
