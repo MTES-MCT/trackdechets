@@ -103,7 +103,6 @@ const fieldSettings = {
 };
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
-const noTraceabilityParams = { x: 155, y: 778, fontSize: 11, color: rgb(0.78, 0.36, 0.36) };
 
 // Standard page height in pixels
 const pageHeight = 842;
@@ -163,7 +162,8 @@ const imageLocations = {
   emitterSignature: { x: 450, y: 590 },
   processingSignature: { x: 450, y: 732 },
   receivedSignature: { x: 200, y: 732 },
-  exemptionStamp: { x: 450, y: 487 }
+  exemptionStamp: { x: 450, y: 487 },
+  noTraceabilityStamp: { x: 155, y: 810 }
 };
 
 /**
@@ -172,14 +172,18 @@ const imageLocations = {
  * @param image - which image we want to draw
  * @param page - page on which we want to write
  */
-const drawImage = (locationName, image, page) => {
+const drawImage = (
+  locationName,
+  image,
+  page,
+  dimensions = { width: 75, height: 37 }
+) => {
   location = imageLocations[locationName];
 
   page.drawImage(image, {
     x: location.x,
     y: pageHeight - location.y,
-    width: 75,
-    height: 37
+    ...dimensions
   });
 };
 
@@ -388,22 +392,17 @@ const write = async params => {
   );
   const exemptionStampImage = await pdfDoc.embedPng(exemptionStampBytes);
 
+  const noTraceabilityBytes = fs.readFileSync(
+    path.join(__dirname, "./medias/no-traceability.png")
+  );
+  const noTraceabilityImage = await pdfDoc.embedPng(noTraceabilityBytes);
+
   // customId does not belong to original cerfa, so we had to add our own field title and mimic font look and feel
   if (!!formData.customId) {
     firstPage.drawText("Autre n° libre :", {
       x: customIdTitleParams.x,
       y: pageHeight - customIdTitleParams.y,
       size: customIdTitleParams.fontSize,
-      font: timesBoldFont
-    });
-  }
-
-  if (!!formData.noTraceability) {
-    firstPage.drawText("Rupture de traçabilité autorisée par arrêté préfectoral, transfert de responsabilité", {
-      x: noTraceabilityParams.x,
-      y: pageHeight - noTraceabilityParams.y,
-      size: noTraceabilityParams.fontSize,
-      color: noTraceabilityParams.color,
       font: timesBoldFont
     });
   }
@@ -418,6 +417,12 @@ const write = async params => {
     }
   }
 
+  if (!!formData.noTraceability) {
+    drawImage("noTraceabilityStamp", noTraceabilityImage, firstPage, {
+      width: 100,
+      height: 50
+    });
+  }
   if (!!formData.signedByTransporter) {
     drawImage("transporterSignature", stampImage, firstPage);
   }
