@@ -16,14 +16,15 @@ type mailAttachment struct {
 }
 
 type mail struct {
-	TemplateID int64          `json:"templateId"`
-	ToEmail    string         `json:"toEmail"`
-	ToName     string         `json:"toName"`
-	Subject    string         `json:"subject"`
-	Title      string         `json:"title"`
-	Body       string         `json:"body"`
-	BaseURL    string         `json:"baseUrl"`
-	Attachment mailAttachment `json:"attachment"`
+	TemplateID int64                  `json:"templateId"`
+	ToEmail    string                 `json:"toEmail"`
+	ToName     string                 `json:"toName"`
+	Subject    string                 `json:"subject"`
+	Title      string                 `json:"title"`
+	Body       string                 `json:"body"`
+	BaseURL    string                 `json:"baseUrl"`
+	Attachment mailAttachment         `json:"attachment"`
+	Vars       map[string]interface{} `json:"vars"`
 }
 
 var mailjetClient = mailjet.NewMailjetClient(
@@ -72,6 +73,18 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	Variables := map[string]interface{}{
+		"subject": data.Subject,
+		"title":   data.Title,
+		"body":    data.Body,
+		"baseurl": data.BaseURL,
+	}
+
+	// Merge pre-defined variables with dynamic variables
+	for k, v := range data.Vars {
+		Variables[k] = v
+	}
+
 	messagesInfoParams := mailjet.InfoMessagesV31{
 		From: &mailjet.RecipientV31{
 			Email: "noreply@trackdechets.fr",
@@ -86,12 +99,7 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		Subject:          data.Subject,
 		TemplateID:       data.TemplateID,
 		TemplateLanguage: true,
-		Variables: map[string]interface{}{
-			"subject": data.Subject,
-			"title":   data.Title,
-			"body":    data.Body,
-			"baseurl": data.BaseURL,
-		},
+		Variables:        Variables,
 	}
 
 	if (data.Attachment.File != "") && (data.Attachment.Name != "") {

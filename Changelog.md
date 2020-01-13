@@ -8,6 +8,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 ## prochaine version
 
 * Ajout de liens dans le footer: statistiques, boite à outils communication ,forum technique, statut des applications
+* Notification email à tous les membres d'un établissement lors du renouvellement du code de sécurité
 
 ## [2020.01.2] 10/01/2020
 

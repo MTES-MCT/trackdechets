@@ -13,6 +13,7 @@ type Mail = {
   body: string;
   templateId?: number;
   attachment?: Attachment;
+  vars?: object;
 };
 
 export function sendMail(mail: Mail) {
