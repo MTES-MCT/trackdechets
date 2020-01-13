@@ -46,6 +46,11 @@ export default function Footer() {
           <li>
             <Link to="/stats">Statistiques</Link>
           </li>
+          <li>
+            <Link to="https://drive.google.com/open?id=1To5yrG6jO3-bh9jRqyi334mXT1LqGCjE">
+              Boite à outils communication
+            </Link>
+          </li>
         </ul>
         <ul className="footer__links">
           <li>
