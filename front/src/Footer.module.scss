@@ -1,0 +1,18 @@
+
+img.full-width {
+  width: 100%;
+  max-height: none;
+}
+
+.logo-text {
+  display: flex;
+  align-items: center;
+
+  img {
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+  a {
+    color: white;
+  }
+}

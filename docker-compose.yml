@@ -82,6 +82,14 @@ services:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
 
+  td-doc:
+    image: betagouv/trackdechets-doc:latest
+    restart: always
+    environment:
+      VIRTUAL_HOST: $DOC_HOST
+      LETSENCRYPT_HOST: $DOC_HOST
+      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+
   td-etl:
     image: betagouv/trackdechets-etl:latest
     restart: always
