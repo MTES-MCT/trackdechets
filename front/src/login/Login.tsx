@@ -1,5 +1,6 @@
 import { ErrorMessage, Field, Form, Formik, FormikActions } from "formik";
 import React from "react";
+import axios from "axios";
 import { Mutation } from "@apollo/react-components";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { LOGIN } from "./mutations";
@@ -31,66 +32,55 @@ export default withRouter(function Login(
   routeComponentProps: RouteComponentProps
 ) {
   return (
-    <Mutation mutation={LOGIN}>
-      {login => (
-        <Formik
-          initialValues={{ email: "", password: "", form: "" }}
-          onSubmit={(values, formikActions) => {
-            handleSubmit(values, {
-              login,
-              ...formikActions,
-              ...routeComponentProps
-            });
-          }}
-        >
-          {({ isSubmitting }) => (
-            <section className="section section-white">
-              <div className="container">
-                <Form>
-                  <h1>Connexion</h1>
-                  <div className="form__group">
-                    <label>
-                      Email
-                      <Field type="text" name="email" />
-                    </label>
-                  </div>
-
-                  <div className="form__group">
-                    <label>
-                      Mot de passe
-                      <Field type="password" name="password" />
-                    </label>
-                  </div>
-
-                  <ErrorMessage
-                    name="form"
-                    render={msg => (
-                      <div className="input-error-message">{msg}</div>
-                    )}
-                  />
-
-                  <button
-                    className="button"
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    Se connecter
-                  </button>
-
-                  <p>
-                    Vous n'avez pas encore de compte ?{" "}
-                    <Link to="/signup">Inscrivez vous maintenant</Link>
-                  </p>
-                  <p>
-                    Vous avez perdu votre mot de passe ?{" "}
-                    <Link to="/reset-password">Réinitialisez le</Link>
-                  </p>
-                </Form>
+    <Formik
+      initialValues={{ email: "", password: "", form: "" }}
+      onSubmit={values => {
+        const loginUrl = `${process.env.REACT_APP_API_ENDPOINT}/login`;
+        axios.post(loginUrl, values).then(resp => {
+          // redirect to /dashboard/slips if successful
+        });
+      }}
+    >
+      {({ isSubmitting }) => (
+        <section className="section section-white">
+          <div className="container">
+            <Form>
+              <h1>Connexion</h1>
+              <div className="form__group">
+                <label>
+                  Email
+                  <Field type="text" name="email" />
+                </label>
               </div>
-            </section>
-          )}
-        </Formik>
+
+              <div className="form__group">
+                <label>
+                  Mot de passe
+                  <Field type="password" name="password" />
+                </label>
+              </div>
+
+              <ErrorMessage
+                name="form"
+                render={msg => <div className="input-error-message">{msg}</div>}
+              />
+
+              <button className="button" type="submit" disabled={isSubmitting}>
+                Se connecter
+              </button>
+
+              <p>
+                Vous n'avez pas encore de compte ?{" "}
+                <Link to="/signup">Inscrivez vous maintenant</Link>
+              </p>
+              <p>
+                Vous avez perdu votre mot de passe ?{" "}
+                <Link to="/reset-password">Réinitialisez le</Link>
+              </p>
+            </Form>
+          </div>
+        </section>
       )}
-    </Mutation>
+    </Formik>
   );
 });
