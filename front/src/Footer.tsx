@@ -62,6 +62,11 @@ export default function Footer() {
               Forum technique
             </a>
           </li>
+          <li>
+            <a href="http://status.trackdechets.beta.gouv.fr/">
+              Statut des applications
+            </a>
+          </li>
         </ul>
       </div>
     </footer>
