@@ -1,5 +1,5 @@
 import { interpret, State } from "xstate";
-import { boolean, date, object, string } from "yup";
+import { boolean, date, object, string, number } from "yup";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { Context } from "../../types";
@@ -10,43 +10,60 @@ export async function markAsSealed(_, { id }, context: Context) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
 }
 
-export async function markAsSent(_, { id, sentInfo }, context: Context) {
-  return transitionForm(
-    id,
-    { eventType: "MARK_SENT", eventParams: sentInfo },
-    context
-  );
-}
+export const markAsSent = {
+  getValidationSchema: () =>
+    object().shape({
+      sentAt: date().required("Vous devez saisir une date d'envoi."),
+      sentBy: string().required("Vous devez saisir un responsable de l'envoi.")
+    }),
+  resolve: (_, { id, sentInfo }, context: Context) =>
+    transitionForm(
+      id,
+      { eventType: "MARK_SENT", eventParams: sentInfo },
+      context
+    )
+};
 
-export async function markAsReceived(
-  _,
-  { id, receivedInfo },
-  context: Context
-) {
-  return transitionForm(
-    id,
-    { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
-    context
-  );
-}
+export const markAsReceived = {
+  getValidationSchema: () =>
+    object().shape({
+      isAccepted: boolean().required(
+        "Vous devez préciser si vous acceptez ou non le déchet."
+      ),
+      receivedBy: string().required(
+        "Vous devez saisir un responsable de la réception."
+      ),
+      receivedAt: date().required("Vous devez saisir une date de réception."),
+      quantityReceived: number().positive(
+        "Vous devez saisir une quantité reçue supérieure à 0."
+      )
+    }),
+  resolve: (_, { id, receivedInfo }, context: Context) =>
+    transitionForm(
+      id,
+      { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
+      context
+    )
+};
 
 export const markAsProcessed = {
-  validationSchema: object({
-    processingOperationDone: string().matches(
-      /(R|D)\s\d{1,2}/,
-      "Cette opération de traitement n'existe pas."
-    ),
-    processingOperationDescription: string().required(
-      "Vous devez renseigner la description de l'opération."
-    ),
-    processedBy: string().required(
-      "Vous devez saisir un responsable de traitement."
-    ),
-    processedAt: date().required("Vous devez saisir la date de traitement."),
-    nextDestinationProcessingOperation: string().nullable(true),
-    nextDestinationDetails: string().nullable(true),
-    noTraceability: boolean().nullable(true)
-  }),
+  getValidationSchema: () =>
+    object().shape({
+      processingOperationDone: string().matches(
+        /(R|D)\s\d{1,2}/,
+        "Cette opération de traitement n'existe pas."
+      ),
+      processingOperationDescription: string().required(
+        "Vous devez renseigner la description de l'opération."
+      ),
+      processedBy: string().required(
+        "Vous devez saisir un responsable de traitement."
+      ),
+      processedAt: date().required("Vous devez saisir la date de traitement."),
+      nextDestinationProcessingOperation: string().nullable(true),
+      nextDestinationDetails: string().nullable(true),
+      noTraceability: boolean().nullable(true)
+    }),
   resolve: (_, { id, processedInfo }, context: Context) =>
     transitionForm(
       id,
@@ -54,8 +71,6 @@ export const markAsProcessed = {
       context
     )
 };
-
-console.log(markAsProcessed.validationSchema)
 
 export async function signedByTransporter(
   _,
