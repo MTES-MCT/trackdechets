@@ -34,7 +34,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
       prisma.form.mockResolvedValue({ id: 1, status: FormState.Sealed });
 
-      await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
+      await markAsSent.resolve(null, { id: 1, sentInfo: {} }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -54,7 +54,7 @@ describe("Forms -> markAsSealed mutation", () => {
       } as any)
       .mockReturnValueOnce(Promise.resolve(flattenObjectForDb(form)));
 
-    await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
+    await markAsSent.resolve(null, { id: 1, sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
@@ -71,7 +71,7 @@ describe("Forms -> markAsSealed mutation", () => {
       } as any)
       .mockReturnValueOnce(Promise.resolve(flattenObjectForDb(form)));
 
-    await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
+    await markAsSent.resolve(null, { id: 1, sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateManyForms).toHaveBeenCalledWith({
       where: {
