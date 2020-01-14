@@ -88,6 +88,9 @@ async function transitionForm(
   }
 
   const formService = interpret(formWorkflowMachine);
+
+  // Machine transitions are always synchronous
+  // We subscribe to the transitions and wait for a stable or final position before returning a result
   return new Promise((resolve, reject) => {
     formService.start(startingState).onTransition(async state => {
       if (!state.changed) {
@@ -101,6 +104,9 @@ async function transitionForm(
         formService.stop();
       }
 
+      // `done` means we reached a final state (xstate concept)
+      // `context.isStableState` is a concept introduced to differentiate form state with transient states (validation or side effects)
+      // If we reached one of those, we konow the transition is over and we can safely update the form and return
       if (state.done || state.context.isStableState) {
         const newStatus = state.value;
         await logStatusChange(formId, newStatus, context);
