@@ -4,12 +4,10 @@ const baseUrl = `https://${UI_HOST}`;
 
 export const companyMails = {
   securityCodeRenewal: (
-    toEmail,
-    toName,
+    recipients,
     company: { siret: string; name?: string }
   ) => ({
-    toEmail,
-    toName,
+    to: recipients,
     subject: "Renouvellement du code de sécurité sur Trackdéchets",
     title: "_",
     body: "_",

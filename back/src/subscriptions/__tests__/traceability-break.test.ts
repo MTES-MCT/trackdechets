@@ -39,6 +39,7 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
     };
 
     const mockedAxiosPost = jest.spyOn(axios, "post");
+    mockedAxiosPost.mockResolvedValue({} as any);
 
     await formsSubscriptionCallback(formPayload);
 

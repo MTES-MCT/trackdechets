@@ -60,6 +60,7 @@ describe("renewSecurityCode", () => {
       securityCode: "1234"
     });
 
+    updateCompanyMock.mockReturnValueOnce({})
     randomNumberMock.mockReturnValueOnce("1234").mockReturnValueOnce("2345");
 
     getCompanyActiveUsersMock.mockReturnValueOnce([]);
@@ -83,19 +84,20 @@ describe("renewSecurityCode", () => {
       { email: "john.snow@trackdechets.fr", name: "John Snow" },
       { email: "arya.stark@trackdechets.fr", name: "Arya Stark" }
     ];
-    const mails = users.map(u =>
-      companyMails.securityCodeRenewal(u.email, u.name, {
+
+    const mail = companyMails.securityCodeRenewal(
+      users.map(u => ({ email: u.email, name: u.name })),
+      {
         name: "Code en stock",
         siret: "85001946400013"
-      })
+      }
     );
 
     getCompanyActiveUsersMock.mockReturnValueOnce(users);
 
     const updatedCompany = await renewSecurityCode("85001946400013");
 
-    expect(sendMailMock).toHaveBeenCalledWith(mails[0]);
-    expect(sendMailMock).toHaveBeenCalledWith(mails[1]);
+    expect(sendMailMock).toHaveBeenCalledWith(mail);
 
     expect(updatedCompany).toEqual({
       siret: "85001946400013",

@@ -44,14 +44,13 @@ export default async function renewSecurityCode(siret: string) {
   });
 
   const users = await getCompanyActiveUsers(siret);
+  const recipients = users.map(({ email, name }) => ({ email, name }));
 
-  users.forEach(user => {
-    const email = companyMails.securityCodeRenewal(user.email, user.name, {
-      siret: updatedCompany.siret,
-      name: updatedCompany.name
-    });
-    sendMail(email);
+  const email = companyMails.securityCodeRenewal(recipients, {
+    siret: updatedCompany.siret,
+    name: updatedCompany.name
   });
+  sendMail(email);
 
   return updatedCompany;
 }
