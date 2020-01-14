@@ -1,9 +1,6 @@
 import { prisma } from "../../generated/prisma-client";
 import { hash, compare } from "bcrypt";
 import { DomainError, ErrorCode } from "../../common/errors";
-import { sign } from "jsonwebtoken";
-
-const { JWT_SECRET } = process.env;
 
 /**
  * Change user password
@@ -22,13 +19,8 @@ export async function changePassword(userId, oldPassword, newPassword) {
   }
 
   const hashedPassword = await hash(newPassword, 10);
-  await prisma.updateUser({
+  return await prisma.updateUser({
     where: { id: userId },
     data: { password: hashedPassword }
   });
-
-  return {
-    token: sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" }),
-    user
-  };
 }

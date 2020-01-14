@@ -2,4 +2,6 @@ NODE_ENV=test
 PRISMA_ENDPOINT=http://prisma:4467/default/staging
 PRISMA_SECRET=any_secret
 JWT_SECRET=any_secret
-API_HOST=api-td.local
+SESSION_SECRET=any_secret
+API_HOST=api.trackdechets.local
+UI_HOST=trackdechets.local

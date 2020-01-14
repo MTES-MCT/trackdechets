@@ -3,9 +3,10 @@ import { prisma } from "../../generated/prisma-client";
 import * as mailsHelper from "../../common/mails.helper";
 import { server } from "../../server";
 import { createTestClient } from "apollo-server-testing";
+import { createTestClient as createIntegrationTestClient } from "apollo-server-integration-testing";
 import { gql } from "apollo-server-express";
 import { hash } from "bcrypt";
-import { userWithCompanyFactory } from "../../__tests__/factories";
+import { userWithCompanyFactory, userFactory } from "../../__tests__/factories";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -33,6 +34,20 @@ describe("User endpoint", () => {
     await resetDatabase();
   });
 
+  test("apiKey", async () => {
+    const user = await userFactory();
+
+    const { query, setOptions } = createIntegrationTestClient({
+      apolloServer: server
+    });
+
+    setOptions({ request: { user } });
+
+    const { data } = await query("query { apiKey }");
+
+    expect(data.apiKey).toHaveLength(40);
+  });
+
   test("login", async () => {
     // await seed();
 
@@ -48,7 +63,15 @@ describe("User endpoint", () => {
         }
       `
     });
-    expect(data.token).not.toBeNull();
+
+    expect(data.login.token).toHaveLength(40);
+
+    // should have created an accessToken in db
+    const accessToken = await prisma.accessToken({
+      token: data.login.token
+    });
+    expect(accessToken).not.toBeNull();
+    expect(accessToken.token).toEqual(data.login.token);
   });
 
   test("signup", async () => {

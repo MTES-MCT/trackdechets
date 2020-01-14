@@ -7,7 +7,8 @@ import { withRouter, RouteComponentProps } from "react-router";
 const JOIN_WITH_INVITE = gql`
   mutation JoinWithInvite($hash: String!, $name: String!, $password: String!) {
     joinWithInvite(inviteHash: $hash, name: $name, password: $password) {
-      token
+      id
+      email
     }
   }
 `;
@@ -37,7 +38,7 @@ export default withRouter(function Invite(props: Props & RouteComponentProps) {
           onSubmit={(values, { setStatus, setSubmitting }) => {
             const { passwordConfirmation, ...payload } = values;
             joinWithInvite({ variables: payload })
-              .then(_ => props.history.push("/dashboard/slips"))
+              .then(_ => props.history.push("/login"))
               .catch(_ => setStatus("Erreur technique."))
               .then(_ => setSubmitting(false));
           }}

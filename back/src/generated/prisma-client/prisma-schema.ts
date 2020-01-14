@@ -2,7 +2,161 @@
   // Please don't change this file manually but run `prisma generate` to update it.
   // For more information, please read the docs: https://www.prisma.io/docs/prisma-client/
 
-export const typeDefs = /* GraphQL */ `type AggregateCompany {
+export const typeDefs = /* GraphQL */ `type AccessToken {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  token: String!
+  isRevoked: Boolean!
+  lastUsed: DateTime
+}
+
+type AccessTokenConnection {
+  pageInfo: PageInfo!
+  edges: [AccessTokenEdge]!
+  aggregate: AggregateAccessToken!
+}
+
+input AccessTokenCreateInput {
+  id: ID
+  user: UserCreateOneInput!
+  token: String!
+  isRevoked: Boolean
+  lastUsed: DateTime
+}
+
+type AccessTokenEdge {
+  node: AccessToken!
+  cursor: String!
+}
+
+enum AccessTokenOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  token_ASC
+  token_DESC
+  isRevoked_ASC
+  isRevoked_DESC
+  lastUsed_ASC
+  lastUsed_DESC
+}
+
+type AccessTokenPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  token: String!
+  isRevoked: Boolean!
+  lastUsed: DateTime
+}
+
+type AccessTokenSubscriptionPayload {
+  mutation: MutationType!
+  node: AccessToken
+  updatedFields: [String!]
+  previousValues: AccessTokenPreviousValues
+}
+
+input AccessTokenSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: AccessTokenWhereInput
+  AND: [AccessTokenSubscriptionWhereInput!]
+  OR: [AccessTokenSubscriptionWhereInput!]
+  NOT: [AccessTokenSubscriptionWhereInput!]
+}
+
+input AccessTokenUpdateInput {
+  user: UserUpdateOneRequiredInput
+  token: String
+  isRevoked: Boolean
+  lastUsed: DateTime
+}
+
+input AccessTokenUpdateManyMutationInput {
+  token: String
+  isRevoked: Boolean
+  lastUsed: DateTime
+}
+
+input AccessTokenWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  user: UserWhereInput
+  token: String
+  token_not: String
+  token_in: [String!]
+  token_not_in: [String!]
+  token_lt: String
+  token_lte: String
+  token_gt: String
+  token_gte: String
+  token_contains: String
+  token_not_contains: String
+  token_starts_with: String
+  token_not_starts_with: String
+  token_ends_with: String
+  token_not_ends_with: String
+  isRevoked: Boolean
+  isRevoked_not: Boolean
+  lastUsed: DateTime
+  lastUsed_not: DateTime
+  lastUsed_in: [DateTime!]
+  lastUsed_not_in: [DateTime!]
+  lastUsed_lt: DateTime
+  lastUsed_lte: DateTime
+  lastUsed_gt: DateTime
+  lastUsed_gte: DateTime
+  AND: [AccessTokenWhereInput!]
+  OR: [AccessTokenWhereInput!]
+  NOT: [AccessTokenWhereInput!]
+}
+
+input AccessTokenWhereUniqueInput {
+  id: ID
+  token: String
+}
+
+type AggregateAccessToken {
+  count: Int!
+}
+
+type AggregateCompany {
   count: Int!
 }
 
@@ -3343,6 +3497,12 @@ scalar Json
 scalar Long
 
 type Mutation {
+  createAccessToken(data: AccessTokenCreateInput!): AccessToken!
+  updateAccessToken(data: AccessTokenUpdateInput!, where: AccessTokenWhereUniqueInput!): AccessToken
+  updateManyAccessTokens(data: AccessTokenUpdateManyMutationInput!, where: AccessTokenWhereInput): BatchPayload!
+  upsertAccessToken(where: AccessTokenWhereUniqueInput!, create: AccessTokenCreateInput!, update: AccessTokenUpdateInput!): AccessToken!
+  deleteAccessToken(where: AccessTokenWhereUniqueInput!): AccessToken
+  deleteManyAccessTokens(where: AccessTokenWhereInput): BatchPayload!
   createCompany(data: CompanyCreateInput!): Company!
   updateCompany(data: CompanyUpdateInput!, where: CompanyWhereUniqueInput!): Company
   updateManyCompanies(data: CompanyUpdateManyMutationInput!, where: CompanyWhereInput): BatchPayload!
@@ -3428,6 +3588,9 @@ enum QuantityType {
 }
 
 type Query {
+  accessToken(where: AccessTokenWhereUniqueInput!): AccessToken
+  accessTokens(where: AccessTokenWhereInput, orderBy: AccessTokenOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [AccessToken]!
+  accessTokensConnection(where: AccessTokenWhereInput, orderBy: AccessTokenOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AccessTokenConnection!
   company(where: CompanyWhereUniqueInput!): Company
   companies(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Company]!
   companiesConnection(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CompanyConnection!
@@ -3872,6 +4035,7 @@ input StatusLogWhereUniqueInput {
 }
 
 type Subscription {
+  accessToken(where: AccessTokenSubscriptionWhereInput): AccessTokenSubscriptionPayload
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   companyAssociation(where: CompanyAssociationSubscriptionWhereInput): CompanyAssociationSubscriptionPayload
   declaration(where: DeclarationSubscriptionWhereInput): DeclarationSubscriptionPayload

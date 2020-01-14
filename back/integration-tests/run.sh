@@ -65,7 +65,7 @@ while getopts "hudp:r:" OPTION; do
         runtest $OPTARG
           exit 1
         ;;
- 
+
     p)
         all $OPTARG
         exit 1

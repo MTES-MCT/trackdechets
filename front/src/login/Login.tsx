@@ -1,96 +1,65 @@
-import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import React from "react";
-import { Mutation } from "@apollo/react-components";
-import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import { LOGIN } from "./mutations";
-import { localAuthService } from "./auth.service";
-
-type Values = { email: string; password: string; form: string };
-const handleSubmit = (
-  payload: Values,
-  props: FormikHelpers<Values> & { login } & RouteComponentProps
-) => {
-  const { email, password } = payload;
-  props
-    .login({ variables: { email, password } })
-    .then(response => {
-      response &&
-        localAuthService.locallyAuthenticate(response.data.login.token);
-      props.history.push("/dashboard/slips");
-    })
-    .catch(e => {
-      const errors = e.graphQLErrors.map(
-        (error: { message: string }) => error.message
-      );
-      props.setSubmitting(false);
-      props.setErrors({ email: " ", password: " ", form: errors });
-    });
-};
+import queryString from "query-string";
+import {
+  Link,
+  RouteComponentProps,
+  withRouter,
+  Redirect
+} from "react-router-dom";
+import styles from "./Login.module.scss";
 
 export default withRouter(function Login(
-  routeComponentProps: RouteComponentProps
+  routeProps: RouteComponentProps<{}, {}, { error: string }>
 ) {
+  const { REACT_APP_API_ENDPOINT } = process.env;
+
+  const queries = queryString.parse(routeProps.location.search);
+
+  if (queries.error) {
+    return (
+      <Redirect to={{ pathname: "/login", state: { error: queries.error } }} />
+    );
+  }
+
   return (
-    <Mutation mutation={LOGIN}>
-      {login => (
-        <Formik
-          initialValues={{ email: "", password: "", form: "" }}
-          onSubmit={(values, formikActions) => {
-            handleSubmit(values, {
-              login,
-              ...formikActions,
-              ...routeComponentProps
-            });
-          }}
-        >
-          {({ isSubmitting }) => (
-            <section className="section section-white">
-              <div className="container">
-                <Form>
-                  <h1>Connexion</h1>
-                  <div className="form__group">
-                    <label>
-                      Email
-                      <Field type="text" name="email" />
-                    </label>
-                  </div>
+    <section className="section section-white">
+      <div className="container">
+        <form action={`${REACT_APP_API_ENDPOINT}/login`} method="post">
+          <h1>Connexion</h1>
+          <div className="form__group">
+            <label>
+              Email
+              <input type="email" name="email" />
+            </label>
+          </div>
 
-                  <div className="form__group">
-                    <label>
-                      Mot de passe
-                      <Field type="password" name="password" />
-                    </label>
-                  </div>
+          <div className="form__group">
+            <label>
+              Mot de passe
+              <input type="password" name="password" />
+            </label>
+          </div>
 
-                  <ErrorMessage
-                    name="form"
-                    render={msg => (
-                      <div className="input-error-message">{msg}</div>
-                    )}
-                  />
-
-                  <button
-                    className="button"
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    Se connecter
-                  </button>
-
-                  <p>
-                    Vous n'avez pas encore de compte ?{" "}
-                    <Link to="/signup">Inscrivez vous maintenant</Link>
-                  </p>
-                  <p>
-                    Vous avez perdu votre mot de passe ?{" "}
-                    <Link to="/reset-password">Réinitialisez le</Link>
-                  </p>
-                </Form>
-              </div>
-            </section>
+          {routeProps.location.state && (
+            <div className={styles["form-error-message"]}>
+              {routeProps.location.state.error}
+            </div>
           )}
-        </Formik>
-      )}
-    </Mutation>
+
+          <button className="button" type="submit">
+            Se connecter
+          </button>
+
+          <p>
+            Vous n'avez pas encore de compte ?{" "}
+            <Link to="/signup">Inscrivez vous maintenant</Link>
+          </p>
+          <p>
+            Vous avez perdu votre mot de passe ?{" "}
+            <Link to="/reset-password">Réinitialisez le</Link>
+          </p>
+        </form>
+      </div>
+    </section>
   );
 });

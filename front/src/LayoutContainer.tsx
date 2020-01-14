@@ -1,9 +1,11 @@
 import React, { lazy, Suspense, useEffect } from "react";
 import { Route, withRouter } from "react-router";
+import { useAuth } from "./use-auth";
 import Header from "./Header";
 import Home from "./Home";
 import PrivateRoute from "./login/PrivateRoute";
 import { trackPageView } from "./tracker";
+import Loader from "./common/Loader";
 
 const dashBoardPreload = import("./dashboard/Dashboard");
 const Dashboard = lazy(() => dashBoardPreload);
@@ -33,11 +35,20 @@ export default withRouter(function LayoutContainer({ history }) {
     return () => unlisten();
   });
 
+  const { loading, isAuthenticated } = useAuth();
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <React.Fragment>
-      <Header />
-
-      <Route exact path="/" component={Home} />
+      <Header isAuthenticated={isAuthenticated} />
+      <Route
+        exact
+        path="/"
+        render={() => <Home isAuthenticated={isAuthenticated} />}
+      />
       <Route exact path="/cgu" component={WaitingComponent(Cgu)} />
       <Route exact path="/partners" component={WaitingComponent(Partners)} />
       <Route exact path="/login" component={WaitingComponent(Login)} />
@@ -69,10 +80,19 @@ export default withRouter(function LayoutContainer({ history }) {
       <Route exact path="/stats" component={WaitingComponent(Stats)} />
       <PrivateRoute
         path="/form/:id?"
+        isAuthenticated={isAuthenticated}
         component={WaitingComponent(FormContainer)}
       />
-      <PrivateRoute path="/dashboard" component={WaitingComponent(Dashboard)} />
-      <PrivateRoute path="/account" component={WaitingComponent(Account)} />
+      <PrivateRoute
+        path="/dashboard"
+        isAuthenticated={isAuthenticated}
+        component={WaitingComponent(Dashboard)}
+      />
+      <PrivateRoute
+        path="/account"
+        isAuthenticated={isAuthenticated}
+        component={WaitingComponent(Account)}
+      />
     </React.Fragment>
   );
 });

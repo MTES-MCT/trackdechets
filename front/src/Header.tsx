@@ -1,10 +1,24 @@
 import React from "react";
-import { NavLink, Link, withRouter } from "react-router-dom";
-import { localAuthService } from "./login/auth.service";
+import {
+  NavLink,
+  Link,
+  withRouter,
+  RouteComponentProps
+} from "react-router-dom";
 import { trackEvent } from "./tracker";
 import "./Header.scss";
+import { localAuthService } from "./login/auth.service";
 
-export default withRouter(function Header({ history }) {
+type Props = {
+  isAuthenticated: boolean;
+};
+
+export default withRouter(function Header({
+  history,
+  isAuthenticated
+}: RouteComponentProps & Props) {
+  const { REACT_APP_API_ENDPOINT } = process.env;
+
   return (
     <header className="navbar" role="navigation">
       <div className="navbar__container">
@@ -40,7 +54,7 @@ export default withRouter(function Header({ history }) {
             <li className="nav__item" role="separator">
               |
             </li>
-            {localAuthService.isAuthenticated ? (
+            {isAuthenticated ? (
               <>
                 <li className="nav__item">
                   <NavLink
@@ -61,15 +75,22 @@ export default withRouter(function Header({ history }) {
                   </NavLink>
                 </li>
                 <li className="nav__item logout">
-                  <button
-                    className="link"
-                    onClick={() => {
-                      localAuthService.locallySignOut();
-                      history.push("/");
-                    }}
+                  <form
+                    name="logout"
+                    action={`${REACT_APP_API_ENDPOINT}/logout`}
+                    method="post"
                   >
-                    Se déconnecter
-                  </button>
+                    <button
+                      className="link"
+                      onClick={() => {
+                        localAuthService.locallySignOut();
+                        document.forms["logout"].submit();
+                        return false;
+                      }}
+                    >
+                      Se déconnecter
+                    </button>
+                  </form>
                 </li>
               </>
             ) : (
