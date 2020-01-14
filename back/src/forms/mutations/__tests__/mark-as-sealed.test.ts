@@ -82,7 +82,7 @@ describe("Forms -> markAsSealed mutation", () => {
         /Émetteur: La sélection d'une entreprise par SIRET est obligatoire/
       );
       expect(err.message).toMatch(
-        /emitter.company.address est un champ requis et doit avoir une valeur/
+        /Émetteur: L'adresse d'une entreprise est obligatoire/
       );
     }
   });

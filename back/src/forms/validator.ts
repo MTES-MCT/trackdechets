@@ -24,7 +24,7 @@ const companySchema = (type: string) =>
       `${type}: La sélection d'une entreprise par SIRET est obligatoire`
     ),
     address: string().required(
-      `${type}: L'adresse' d'une entreprise par SIRET est obligatoire`
+      `${type}: L'adresse d'une entreprise est obligatoire`
     ),
     contact: string().required(
       `${type}: Le contact dans l'entreprise est obligatoire`
