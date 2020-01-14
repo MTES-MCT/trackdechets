@@ -72,7 +72,7 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if data.Body == "" || data.Subject == "" || data.Title == "" || data.ToEmail == "" || data.ToName == "" || data.TemplateID == 0 {
+	if data.Body == "" || data.Subject == "" || data.Title == "" || len(data.To) == 0 || data.TemplateID == 0 {
 		msg := fmt.Sprintf("Données manquantes: %v", data)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
