@@ -111,7 +111,7 @@ const pageHeight = 842;
  * Write text on the pdf by retrieving field params in fieldSettings object
  *  Can right align, limit content length or split content according to fieldSettings params.
  *
- *  @param fieldName - name of the field
+ * @param fieldName - name of the field
  * @param content - text to write
  * @param font - font object
  * @param page - page on which we want to write
@@ -162,8 +162,9 @@ const imageLocations = {
   emitterSignature: { x: 450, y: 590 },
   processingSignature: { x: 450, y: 732 },
   receivedSignature: { x: 200, y: 732 },
-  exemptionStamp: { x: 450, y: 487 },
+  exemptionStamp: { x: 400, y: 520 },
   noTraceabilityStamp: { x: 155, y: 810 }
+
 };
 
 /**
@@ -172,19 +173,23 @@ const imageLocations = {
  * @param image - which image we want to draw
  * @param page - page on which we want to write
  */
+
 const drawImage = (
   locationName,
   image,
   page,
   dimensions = { width: 75, height: 37 }
 ) => {
+
+
   location = imageLocations[locationName];
 
   page.drawImage(image, {
     x: location.x,
     y: pageHeight - location.y,
+
     ...dimensions
-  });
+  })
 };
 
 const capitalize = string =>
@@ -304,7 +309,7 @@ const getWasteDetailsPackagings = params => {
   if (!params.wasteDetailsPackagings) {
     return {};
   }
-  return params.wasteDetailsPackagings.reduce(function(acc, elem) {
+  return params.wasteDetailsPackagings.reduce(function (acc, elem) {
     let key = `wasteDetailsPackagings${capitalize(elem)}`;
     return {
       ...acc,
@@ -423,6 +428,7 @@ const write = async params => {
       height: 50
     });
   }
+
   if (!!formData.signedByTransporter) {
     drawImage("transporterSignature", stampImage, firstPage);
   }
@@ -437,9 +443,8 @@ const write = async params => {
   }
 
   if (!!formData.transporterIsExemptedOfReceipt) {
-    drawImage("exemptionStamp", exemptionStampImage, firstPage);
+    drawImage("exemptionStamp", exemptionStampImage, firstPage, { width: 150, height: 65 });
   }
-
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes.buffer);
 };
