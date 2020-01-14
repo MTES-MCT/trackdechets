@@ -186,7 +186,9 @@ export const formWorkflowMachine = Machine(
         markFormAppendixGroupedsAsProcessed(ctx.form.id, ctx.requestContext)
     },
     actions: {
+      // Stable = possible state for a form. Basically any of the FormState.* states
       setStable: assign({ isStableState: true }) as any,
+      // Unstable = transient state, can be sync or async. Basically any pending* state, which are used for validation & side effects
       setUnStable: assign({ isStableState: false }) as any
     },
     guards: {
