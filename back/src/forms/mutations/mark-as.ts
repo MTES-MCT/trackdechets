@@ -1,5 +1,5 @@
 import { interpret, State } from "xstate";
-import { boolean, date, object, string, number } from "yup";
+import { boolean, date, object, string, number, array } from "yup";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { Context } from "../../types";
@@ -72,26 +72,42 @@ export const markAsProcessed = {
     )
 };
 
-export async function signedByTransporter(
-  _,
-  { id, signingInfo },
-  context: Context
-) {
-  const input = {
-    ...signingInfo,
-    sentAt: signingInfo.sentAt,
-    sentBy: signingInfo.sentBy,
-    wasteDetailsPackagings: signingInfo.packagings,
-    wasteDetailsQuantity: signingInfo.quantity,
-    wasteDetailsOnuCode: signingInfo.onuCode
-  };
+export const signedByTransporter = {
+  getValidationSchema: () =>
+    object().shape({
+      sentAt: date().required("Vous devez saisir une date d'envoi."),
+      signedByTransporter: boolean().required(
+        "Voud devez indiquer si le transporteur a signé."
+      ),
+      securityCode: number().nullable(true),
+      sentBy: string().required("Vous devez saisir un responsable de l'envoi."),
+      signedByProducer: boolean().required(
+        "Voud devez indiquer si le producteur a signé."
+      ),
 
-  return transitionForm(
-    id,
-    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: input },
-    context
-  );
-}
+      packagings: array().of(string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/)),
+      quantity: number().positive(
+        "Vous devez saisir une quantité envoyée supérieure à 0."
+      ),
+      onuCode: string().required("Vous devez saisir un code ONU.")
+    }),
+  resolve: (_, { id, signingInfo }, context: Context) => {
+    const input = {
+      ...signingInfo,
+      sentAt: signingInfo.sentAt,
+      sentBy: signingInfo.sentBy,
+      wasteDetailsPackagings: signingInfo.packagings,
+      wasteDetailsQuantity: signingInfo.quantity,
+      wasteDetailsOnuCode: signingInfo.onuCode
+    };
+
+    return transitionForm(
+      id,
+      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: input },
+      context
+    );
+  }
+};
 
 async function transitionForm(
   formId: string,
