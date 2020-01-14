@@ -14,6 +14,7 @@ import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
 import { mergePermissions } from "./utils";
+import { mutationValidationMiddleware } from "./common/middlewares/mutation-validation.middleware";
 
 const sentryDsn = process.env.SENTRY_DSN;
 
@@ -54,7 +55,11 @@ const sentryMiddleware = () =>
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 export const schemaWithMiddleware = applyMiddleware(
   schema,
-  ...[shieldMiddleware, ...(sentryDsn ? [sentryMiddleware()] : [])]
+  ...[
+    shieldMiddleware,
+    ...(sentryDsn ? [sentryMiddleware()] : []),
+    mutationValidationMiddleware()
+  ]
 );
 
 export const server = new ApolloServer({

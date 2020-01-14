@@ -1,4 +1,5 @@
 import { interpret, State } from "xstate";
+import { boolean, date, object, string } from "yup";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { Context } from "../../types";
@@ -29,17 +30,32 @@ export async function markAsReceived(
   );
 }
 
-export async function markAsProcessed(
-  _,
-  { id, processedInfo },
-  context: Context
-) {
-  return transitionForm(
-    id,
-    { eventType: "MARK_PROCESSED", eventParams: processedInfo },
-    context
-  );
-}
+export const markAsProcessed = {
+  validationSchema: object({
+    processingOperationDone: string().matches(
+      /(R|D)\s\d{1,2}/,
+      "Cette opération de traitement n'existe pas."
+    ),
+    processingOperationDescription: string().required(
+      "Vous devez renseigner la description de l'opération."
+    ),
+    processedBy: string().required(
+      "Vous devez saisir un responsable de traitement."
+    ),
+    processedAt: date().required("Vous devez saisir la date de traitement."),
+    nextDestinationProcessingOperation: string().nullable(true),
+    nextDestinationDetails: string().nullable(true),
+    noTraceability: boolean().nullable(true)
+  }),
+  resolve: (_, { id, processedInfo }, context: Context) =>
+    transitionForm(
+      id,
+      { eventType: "MARK_PROCESSED", eventParams: processedInfo },
+      context
+    )
+};
+
+console.log(markAsProcessed.validationSchema)
 
 export async function signedByTransporter(
   _,
@@ -73,7 +89,7 @@ async function transitionForm(
   const actorSirets = userCompanies.map(c => c.siret);
 
   const startingState = State.from(form.status, {
-    form,
+    form: { ...form, ...eventParams },
     actorSirets,
     requestContext: context,
     isStableState: true
