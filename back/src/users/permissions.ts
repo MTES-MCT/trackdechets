@@ -11,6 +11,6 @@ export default {
     inviteUserToCompany: isCompanyAdmin,
     resendInvitation: isCompanyAdmin,
     removeUserFromCompany: isCompanyAdmin,
-    deleteInvitation: isCompanyAdmin,
+    deleteInvitation: isCompanyAdmin
   }
 };

@@ -1,23 +1,24 @@
-import { Route, Redirect, RouteProps } from "react-router";
 import React from "react";
-import { localAuthService } from "./auth.service";
+import { Route, Redirect, RouteProps } from "react-router";
+
 interface IProps {
   component: React.ComponentType<any>;
 }
 
+interface AuthProps {
+  isAuthenticated: boolean;
+}
+
 export default function PrivateRoute({
   component: Component,
+  isAuthenticated,
   ...rest
-}: IProps & RouteProps): any {
+}: IProps & AuthProps & RouteProps): any {
   return (
     <Route
       {...rest}
       render={props =>
-        localAuthService.isAuthenticated === true ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/login" />
-        )
+        isAuthenticated ? <Component {...props} /> : <Redirect to="/login" />
       }
     />
   );

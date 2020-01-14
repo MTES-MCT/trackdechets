@@ -1,5 +1,5 @@
 import { rule } from "graphql-shield";
-import { mergePermissions } from "../utils";
+import { mergePermissions, getUid } from "../utils";
 
 test("mergePermissions merge a list of graphql-shield permissions", () => {
   const isAuthenticated = rule()(() => true);
@@ -39,4 +39,9 @@ test("mergePermissions merge a list of graphql-shield permissions", () => {
   };
 
   expect(merged).toEqual(expected);
+});
+
+test("getUid returns a unique identifier of fixed length", () => {
+  const uid = getUid(10);
+  expect(uid).toHaveLength(10);
 });

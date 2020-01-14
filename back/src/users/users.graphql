@@ -13,7 +13,7 @@ input SignupInput {
 type Mutation {
   signup(userInfos: SignupInput!): User
   login(email: String!, password: String!): AuthPayload!
-  changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
+  changePassword(oldPassword: String!, newPassword: String!): User!
   resetPassword(email: String!): Boolean
   editProfile(name: String, phone: String, email: String): User
   inviteUserToCompany(email: String!, siret: String!, role: UserRole!): CompanyPrivate
@@ -22,7 +22,7 @@ type Mutation {
     inviteHash: String!
     name: String!
     password: String!
-  ): AuthPayload!
+  ): User!
   removeUserFromCompany(userId: ID!, siret: String!):  CompanyPrivate
   deleteInvitation(email: String!, siret: String!):  CompanyPrivate
 }
@@ -54,4 +54,8 @@ type User {
   phone: String
 
   companies: [CompanyPrivate]
+}
+
+type AccessToken {
+  token: String!
 }
