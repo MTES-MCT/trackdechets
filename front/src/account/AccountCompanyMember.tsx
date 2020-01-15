@@ -43,8 +43,8 @@ const REMOVE_USER_FROM_COMPANY = gql`
 `;
 
 const DELETE_INVITATION = gql`
-  mutation DeleteInvitation($userAccountHashId: ID!, $siret: String!) {
-    deleteInvitation(userAccountHashId: $userAccountHashId, siret: $siret) {
+  mutation DeleteInvitation($email: String!, $siret: String!) {
+    deleteInvitation(email: $email, siret: $siret) {
       id
       users {
         ...AccountCompanyMemberUserFragment
@@ -60,7 +60,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
   );
   const [deleteInvitation] = useMutation(DELETE_INVITATION, {
     onCompleted: () => {
-      cogoToast.success("Invitation supprimée", {hideAfter: 5});
+      cogoToast.success("Invitation supprimée", { hideAfter: 5 });
     }
   });
 
@@ -101,7 +101,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
               className="button small"
               onClick={() => {
                 deleteInvitation({
-                  variables: { userAccountHashId: user.id , siret: company.siret,}
+                  variables: { email: user.email, siret: company.siret }
                 });
               }}
             >
