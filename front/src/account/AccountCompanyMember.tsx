@@ -4,6 +4,7 @@ import { FaTimes } from "react-icons/fa";
 import { Company, CompanyMember, UserRole } from "./AccountCompany";
 import styles from "./AccountCompanyMember.module.scss";
 import { useMutation } from "@apollo/react-hooks";
+import cogoToast from "cogo-toast";
 
 type Props = {
   company: Company;
@@ -41,10 +42,27 @@ const REMOVE_USER_FROM_COMPANY = gql`
   ${AccountCompanyMember.fragments.user}
 `;
 
+const DELETE_INVITATION = gql`
+  mutation DeleteInvitation($email: String!, $siret: String!) {
+    deleteInvitation(email: $email, siret: $siret) {
+      id
+      users {
+        ...AccountCompanyMemberUserFragment
+      }
+    }
+  }
+  ${AccountCompanyMember.fragments.user}
+`;
+
 export default function AccountCompanyMember({ company, user }: Props) {
   const [removeUserFromCompany, { loading }] = useMutation(
     REMOVE_USER_FROM_COMPANY
   );
+  const [deleteInvitation] = useMutation(DELETE_INVITATION, {
+    onCompleted: () => {
+      cogoToast.success("Invitation supprimée", { hideAfter: 5 });
+    }
+  });
 
   return (
     <>
@@ -66,7 +84,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
         {!user.isMe && !user.isPendingInvitation && (
           <td className={styles["right-column"]}>
             <button
-              className="button "
+              className="button"
               onClick={() => {
                 removeUserFromCompany({
                   variables: { siret: company.siret, userId: user.id }
@@ -74,6 +92,20 @@ export default function AccountCompanyMember({ company, user }: Props) {
               }}
             >
               <FaTimes /> Retirer les droits
+            </button>
+          </td>
+        )}
+        {user.isPendingInvitation && (
+          <td className={styles["right-column"]}>
+            <button
+              className="button small"
+              onClick={() => {
+                deleteInvitation({
+                  variables: { email: user.email, siret: company.siret }
+                });
+              }}
+            >
+              <FaTimes /> Supprimer l'invitation
             </button>
           </td>
         )}

@@ -4,10 +4,29 @@ import * as mailsHelper from "../../common/mails.helper";
 import { server } from "../../server";
 import { createTestClient } from "apollo-server-testing";
 import { gql } from "apollo-server-express";
+import { hash } from "bcrypt";
+import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
+
+async function seed() {
+  // John, admin of 000000000000
+  const p1 = await hash("john", 10);
+  await prisma.createUser({
+    email: "john@td.io",
+    name: "John",
+    password: p1,
+    isActive: true,
+    companyAssociations: {
+      create: {
+        company: { create: { siret: "00000000000000", securityCode: 1234 } },
+        role: "ADMIN"
+      }
+    }
+  });
+}
 
 describe("User endpoint", () => {
   afterAll(async () => {
@@ -15,11 +34,16 @@ describe("User endpoint", () => {
   });
 
   test("login", async () => {
+    // await seed();
+
+    const {user} = (await userWithCompanyFactory("ADMIN")) ;
+
+
     const { mutate } = createTestClient(server);
     const { data } = await mutate({
       mutation: gql`
         mutation {
-          login(email: "john@td.io", password: "john") {
+          login(email: "${user.email}" , password: "pass") {
             token
           }
         }
@@ -29,15 +53,26 @@ describe("User endpoint", () => {
   });
 
   test("signup", async () => {
+    const userIndex =
+      (await prisma
+        .usersConnection()
+        .aggregate()
+        .count()) + 1;
+    const companyIndex =
+      (await prisma
+        .companiesConnection()
+        .aggregate()
+        .count()) + 1;
+    const email = `newUser_${userIndex}@td.io`;
     const mutation = `
       mutation {
         signup(
           payload: {
-            email: "newUser@td.io"
+            email: "${email}"
             password: "newUser"
             name: "New User"
             phone: ""
-            siret: "22222222222222"
+            siret: "${companyIndex}"
             companyName: "The New One"
             codeNaf: ""
             gerepId: ""
@@ -51,11 +86,11 @@ describe("User endpoint", () => {
     const { data } = await mutate({ mutation });
     expect(data.token).not.toBeNull();
 
-    const newUserExists = await prisma.$exists.user({ email: "newUser@td.io" });
+    const newUserExists = await prisma.$exists.user({ email: email });
     expect(newUserExists).toBe(true);
 
     const newCompanyExists = await prisma.$exists.company({
-      siret: "22222222222222"
+      siret: `${companyIndex}`
     });
     expect(newCompanyExists).toBe(true);
   });

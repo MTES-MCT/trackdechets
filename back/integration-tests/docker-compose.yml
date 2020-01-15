@@ -6,7 +6,7 @@ services:
       - 4467:4466
     environment:
       PRISMA_CONFIG: |
-        port: 4466
+        port: 4467
         databases:
           default:
             connector: postgres
@@ -23,3 +23,27 @@ services:
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: no_pass
+
+  redis:
+    image: redis:5.0-alpine
+    restart: always
+    sysctls:
+      - net.core.somaxconn=511
+    ports:
+      - 6379:6379
+  td-api:
+    image: td-api
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
+    volumes:
+      - ../src:/usr/src/app/src
+    env_file:
+      - .integration-tests-env
+    environment:
+      NODE_ENV: dev
+      VIRTUAL_HOST: $API_HOST
+      LETSENCRYPT_HOST: $API_HOST
+      PRISMA_ENDPOINT: $PRISMA_ENDPOINT
+      PRISMA_SECRET: $PRISMA_SECRET
