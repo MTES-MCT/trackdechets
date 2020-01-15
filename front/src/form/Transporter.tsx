@@ -21,9 +21,8 @@ export default connect<{}, Values>(function Transporter(props) {
             name="transporter.isExemptedOfReceipt"
             checked={props.formik.values.transporter.isExemptedOfReceipt}
           />
-          Je transporte moi-même mon déchet vers une entreprise autorisée à les
-          prendre en charge et je remplis les conditions d'exemption de
-          récépissé
+          Le transporteur déclare être exempté de récépissé conformément aux
+          dispositions de l'article R.541-50 du code de l'environnement.
         </label>
       </div>
       {!props.formik.values.transporter.isExemptedOfReceipt && (
