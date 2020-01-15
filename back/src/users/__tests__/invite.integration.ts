@@ -14,7 +14,6 @@ describe("Invitation removal", () => {
   });
 
   it("should delete a pending invitation", async () => {
-
     // set up an user, a company, its admin and an invitation (UserAccountHash)
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");
     const usrToInvite = await userFactory();
@@ -43,7 +42,7 @@ describe("Invitation removal", () => {
     // We pass company siret to allow permission to check requiring user is one admin fo this company
     const mutation = `
         mutation {
-          deleteInvitation(userAccountHashId: "${accountHash.id}", siret: "${company.siret}") {
+          deleteInvitation(email: "${usrToInvite.email}", siret: "${company.siret}") {
             id
           }
         }
@@ -57,13 +56,5 @@ describe("Invitation removal", () => {
     expect(userAccountHashExists).toBeFalsy();
 
     const assoc = await prisma.user({ id: admin.id }).companyAssociations();
-
-    // await prisma.deleteManyCompanyAssociations({
-    //   id_in: assoc.map(a => a.id)
-    // });
-    //
-    // await prisma.deleteUser({ id: admin.id });
-    // await prisma.deleteUser({ id: usrToInvite.id });
-    // await prisma.deleteCompany({ id: company.id });
   });
 });

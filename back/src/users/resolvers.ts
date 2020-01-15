@@ -210,13 +210,13 @@ export default {
       return company;
     },
 
-    deleteInvitation: async (_, { userAccountHashId }) => {
+    deleteInvitation: async (_, { email, siret }) => {
       const deletedAccountHash = await prisma
-        .deleteUserAccountHash({ id: userAccountHashId })
+        .deleteManyUserAccountHashes({ email, companySiret: siret })
         .catch(err => {
           throw new Error(`Erreur, l'invitation n'a pas pu être supprimée`);
         });
-      return prisma.company({ siret: deletedAccountHash.companySiret });
+      return prisma.company({ siret });
     }
   },
   Query: {
