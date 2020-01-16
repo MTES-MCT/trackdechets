@@ -1,4 +1,4 @@
-import { ErrorMessage, Field, Form, Formik, FormikActions } from "formik";
+import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import React from "react";
 import { Mutation } from "@apollo/react-components";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
@@ -8,7 +8,7 @@ import { localAuthService } from "./auth.service";
 type Values = { email: string; password: string; form: string };
 const handleSubmit = (
   payload: Values,
-  props: FormikActions<Values> & { login } & RouteComponentProps
+  props: FormikHelpers<Values> & { login } & RouteComponentProps
 ) => {
   const { email, password } = payload;
   props

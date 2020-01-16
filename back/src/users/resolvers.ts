@@ -19,67 +19,20 @@ const { JWT_SECRET } = process.env;
 
 export default {
   Mutation: {
-    signup: async (parent, { payload }, context: Context) => {
-      const trimedSiret = payload.siret.replace(/\s+/g, "");
-
-      const existingCompany = await context.prisma.$exists
-        .company({
-          siret: trimedSiret
-        })
-        .catch(err => {
-          console.error("Error while checking company", err);
-          throw new Error(
-            "Erreur lors de la vérification du SIRET. Merci de réessayer."
-          );
-        });
-
-      if (existingCompany) {
-        throw new Error(
-          "Un compte associé à ce SIRET existe déjà dans Trackdéchets. " +
-            "Pour créer votre compte Trackdéchets, vous devez contacter l'Administrateur afin qu'il vous invite à " +
-            "rejoindre l'organisation dans l'espace \"MON COMPTE\" de Trackdéchets " +
-            "(Rubrique : Entreprise associée, Action : Inviter des collaborateurs). " +
-            "Vous bénéficierez d'une inscription simplifiée en 3 clics."
-        );
-      }
-
-      const hashedPassword = await hashPassword(payload.password);
-      const company = await context.prisma
-        .createCompany({
-          siret: trimedSiret,
-          codeNaf: payload.codeNaf,
-          gerepId: payload.gerepId,
-          name: payload.companyName,
-          companyTypes: { set: payload.companyTypes },
-          securityCode: randomNumber(4)
-        })
-        .catch(err => {
-          console.error("Error while creating user company", err);
-          throw new Error(
-            "Impossible de créer cet utilisateur. Veuillez contacter le support."
-          );
-        });
+    signup: async (_, { userInfos }, context: Context) => {
+      const hashedPassword = await hashPassword(userInfos.password);
 
       const user = await context.prisma
         .createUser({
-          name: payload.name,
-          email: payload.email,
+          name: userInfos.name,
+          email: userInfos.email,
           password: hashedPassword,
-          phone: payload.phone,
-          companyAssociations: {
-            create: {
-              role: "ADMIN",
-              company: { connect: { id: company.id } }
-            }
-          }
+          phone: userInfos.phone
         })
-        .catch(async err => {
-          // No transactions in Prisma yet :(
-          await context.prisma.deleteCompany({ siret: trimedSiret });
-
-          console.error("Error while creating user", err);
-          throw new Error(
-            "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
+        .catch(async _ => {
+          throw new DomainError(
+            "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide.",
+            ErrorCode.BAD_USER_INPUT
           );
         });
 
@@ -94,17 +47,13 @@ export default {
             connect: { id: user.id }
           }
         })
-        .catch(err => {
-          console.error("Error while creating user activation hash", err);
+        .catch(_ => {
           throw new Error("Erreur technique. Le support a été informé.");
         });
 
       await sendMail(userMails.onSignup(user, activationHash));
 
-      return {
-        token: sign({ userId: user.id }, JWT_SECRET),
-        user
-      };
+      return true;
     },
     login: async (parent, { email, password }, context: Context) => {
       const user = await context.prisma.user({ email: email.trim() });

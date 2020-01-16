@@ -8,15 +8,10 @@ input SignupInput {
   password: String!
   name: String!
   phone: String
-  siret: String!
-  companyTypes: [CompanyType]
-  gerepId: String
-  codeNaf: String
-  companyName: String
 }
 
 type Mutation {
-  signup(payload: SignupInput): AuthPayload!
+  signup(userInfos: SignupInput!): Boolean
   login(email: String!, password: String!): AuthPayload!
   changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
   resetPassword(email: String!): Boolean

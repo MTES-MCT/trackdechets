@@ -10,6 +10,7 @@ import AccountInfo from "./AccountInfo";
 import AccountIntegrationApi from "./AccountIntegrationApi";
 import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
+import AccountCompanyAdd from "./AccountCompanyAdd";
 
 const GET_ME = gql`
   {
@@ -52,6 +53,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
           )}
         />
         <Route
+          exact
           path={`${match.path}/companies`}
           render={() => (
             <AccountContentWrapper title="Établissements">
@@ -64,6 +66,11 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
             </AccountContentWrapper>
           )}
         />
+        <Route path={`${match.path}/companies/new`}>
+          <AccountContentWrapper title="Création d'un nouvel établissement">
+            <AccountCompanyAdd />
+          </AccountContentWrapper>
+        </Route>
       </div>
     </div>
   );
