@@ -157,7 +157,7 @@ type Mutation {
   createCompany(companyInput: CompanyInput!): CompanyPrivate
 }
 
-input CmpanyInput {
+input CompanyInput {
   siret: String!
   gerepId: String
   companyTypes: [CompanyType]
