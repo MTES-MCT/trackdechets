@@ -2,6 +2,22 @@ import { GraphQLResolveInfo } from "graphql";
 import { ValidationError } from "yup";
 import { DomainError, ErrorCode } from "../errors";
 
+/**
+ * Middleware to validate mutations with Yup
+ * For every mutation, we look for a field called `getValidationSchema`.
+ * This field must be a function returning a Yup schema. We validate the
+ * input based on taht schema before resolving the mutation.
+ *
+ * eg: `{
+ *   Mutation {
+ *     noValidation: () => .... // mutation body
+ *     validation: {
+ *       getValidationSchema: object({...}) // Yup schema
+ *       resolve: () => .... // mutation body
+ *     }
+ *   }
+ * }
+ */
 export const mutationValidationMiddleware = () => ({
   async Mutation(
     resolve: Function,
