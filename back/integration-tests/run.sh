@@ -11,13 +11,14 @@ echo ">> Starting containers..."
 docker-compose up --build -d
 
 echo ">> Deploy to prisma..."
-
-docker exec -it $(docker ps -qf "name=td-api") bash /usr/src/app/integration-tests/wait-for-prisma.sh
-docker exec -it $(docker ps -qf "name=td-api") npx prisma deploy
-docker exec -it $(docker ps -qf "name=td-api") npx prisma reset --force
+api_container_id=$(docker ps -qf "name=integration_td-api")
+ 
+docker exec -it $api_container_id bash /usr/src/app/integration-tests/wait-for-prisma.sh
+docker exec -it $api_container_id npx prisma deploy
+docker exec -it $api_container_id npx prisma reset --force
 
 echo ">> Run tests..."
-docker exec -it $(docker ps -qf "name=td-api") npx jest --config integration.jest.config.js  -i --forceExit --detectOpenHandles
+docker exec -it $api_container_id npx jest --config integration.jest.config.js  -i --forceExit --detectOpenHandles
 
 echo ">> Stopping containers 🛏️ ..."
 
