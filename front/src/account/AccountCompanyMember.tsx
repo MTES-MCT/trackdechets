@@ -60,8 +60,7 @@ const RESEND_INVITATION = gql`
   }
 `;
 
-export default function AccountCompanyMember({ company, user, ...rst }: Props) {
-  console.log(rst);
+export default function AccountCompanyMember({ company, user }: Props) {
   const [removeUserFromCompany, { loading }] = useMutation(
     REMOVE_USER_FROM_COMPANY
   );

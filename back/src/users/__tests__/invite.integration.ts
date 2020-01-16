@@ -98,8 +98,7 @@ describe("Invitation resend", () => {
 
     const mutation = `
         mutation {
-          resendInvitation(email: "${usrToInvite.email}", siret: "${company.siret}")  
-            
+          resendInvitation(email: "${usrToInvite.email}", siret: "${company.siret}")           
         }
       `;
     const res = await mutate(mutation);

@@ -165,7 +165,7 @@ export default {
       _,
       { inviteHash, name, password },
       context: Context
-    ) =>   {
+    ) => {
       const existingHash = await prisma
         .userAccountHash({ hash: inviteHash })
         .catch(_ => {
