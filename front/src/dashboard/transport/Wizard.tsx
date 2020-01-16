@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, FormikActions } from "formik";
+import { Formik, FormikHelpers } from "formik";
 import "./Wizard.scss";
 
 type Props = {
@@ -51,15 +51,15 @@ export class Wizard extends React.Component<Props, State> {
     return activePage.props.validate ? activePage.props.validate(values) : {};
   };
 
-  handleSubmit = (values: Object, bag: FormikActions<Object>) => {
+  handleSubmit = (values: Object, helpers: FormikHelpers<any>) => {
     const { children, onSubmit } = this.props;
     const { page } = this.state;
     const isLastPage = page === React.Children.count(children) - 1;
     if (isLastPage) {
-      return onSubmit(values, bag);
+      return onSubmit(values, helpers);
     } else {
-      bag.setTouched({});
-      bag.setSubmitting(false);
+      helpers.setTouched({});
+      helpers.setSubmitting(false);
       this.next(values);
     }
   };

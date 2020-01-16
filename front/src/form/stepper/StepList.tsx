@@ -1,6 +1,6 @@
 import { Mutation, Query } from "@apollo/react-components";
 import cogoToast from "cogo-toast";
-import { Formik, FormikActions, setNestedObjectValues } from "formik";
+import { Formik, setNestedObjectValues, FormikHelpers } from "formik";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 
@@ -108,18 +108,16 @@ export default withRouter(function StepList(
               >
                 {(saveForm, { loading, error }) => (
                   <Formik
-                    ref={formikForm}
+                    // ref={formikForm} TODO
                     initialValues={state}
                     validationSchema={formSchema}
-                    onSubmit={(values, formikActions: FormikActions<any>) =>
-                      null
-                    }
+                    onSubmit={() => Promise.resolve()}
                     render={({ values }) => {
                       return (
                         <form
                           onSubmit={e => {
                             e.preventDefault();
-                            // As wer want to be able to save draft, we skip validation on submit
+                            // As we want to be able to save draft, we skip validation on submit
                             // and don't use the classic Formik mechanism
                             saveForm({
                               variables: { formInput: values }

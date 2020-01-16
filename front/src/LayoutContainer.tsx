@@ -23,14 +23,16 @@ const WasteTree = lazy(() => import("./search/WasteTree"));
 const Stats = lazy(() => import("./Stats"));
 
 export default withRouter(function LayoutContainer({ history }) {
-  if (process.env.NODE_ENV === "production") {
-    useEffect(() => {
-      const unlisten = history.listen((location, action) =>
-        trackPageView(location.pathname)
-      );
-      return () => unlisten();
-    });
-  }
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+
+    const unlisten = history.listen((location, action) =>
+      trackPageView(location.pathname)
+    );
+    return () => unlisten();
+  });
 
   return (
     <React.Fragment>
