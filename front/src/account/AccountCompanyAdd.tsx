@@ -1,7 +1,7 @@
 import { useLazyQuery, useMutation } from "@apollo/react-hooks";
 import { Field, Formik, useFormikContext, Form } from "formik";
 import gql from "graphql-tag";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { FaHourglassHalf } from "react-icons/fa";
 import RedErrorMessage from "../common/RedErrorMessage";
 import { Company } from "../form/company/CompanySelector";
@@ -184,6 +184,10 @@ export default function AccountCompanyAdd() {
 
 const UpdateSiretRelatedFields = ({ companyInfos }) => {
   const { values, setFieldValue } = useFormikContext<any>();
+  const latestValues = useRef(values);
+  useEffect(() => {
+    latestValues.current = values;
+  });
 
   useEffect(() => {
     if (companyInfos == null) {
@@ -207,7 +211,7 @@ const UpdateSiretRelatedFields = ({ companyInfos }) => {
       const companyTypes = categories.filter((value, index, self) => {
         return self.indexOf(value) === index;
       });
-      const currentValue = values.companyTypes;
+      const currentValue = latestValues.current.companyTypes;
       setFieldValue("companyTypes", [...currentValue, ...companyTypes]);
     }
   }, [companyInfos, setFieldValue]);
