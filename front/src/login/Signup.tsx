@@ -221,7 +221,7 @@ export default function Signup() {
               <label>
                 <Field name="cgu" type="checkbox" />
                 Je certifie avoir lu les{" "}
-                <Link to="cgu" target="_blank">
+                <Link to="cgu" target="_blank" rel="noopener noreferrer">
                   conditions générales d'utilisation
                 </Link>
                 *

@@ -46,7 +46,7 @@ export default function AccountFielCompanyContactPhone({ company }: Props) {
 
   return (
     <>
-      {company.userRole == UserRole.ADMIN ? (
+      {company.userRole === UserRole.ADMIN ? (
         <AccountField
           name={fieldName}
           label={fieldLabel}

@@ -57,13 +57,13 @@ export default function SlipActions({ form, currentUser }: IProps) {
         >
           {(mark, { error }) => (
             <React.Fragment>
-              <a
+              <button
                 className="icon"
                 onClick={() => setIsOpen(true)}
                 title={buttons[nextStep].title}
               >
                 {buttons[nextStep].icon({})}
-              </a>
+              </button>
               <div
                 className="modal__backdrop"
                 id="modal"

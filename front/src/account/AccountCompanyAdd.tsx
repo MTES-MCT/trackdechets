@@ -2,16 +2,18 @@ import { useLazyQuery, useMutation } from "@apollo/react-hooks";
 import { Field, Formik, useFormikContext, Form } from "formik";
 import gql from "graphql-tag";
 import React, { useEffect, useState } from "react";
-import { FaHourglassHalf, FaDivide } from "react-icons/fa";
+import { FaHourglassHalf } from "react-icons/fa";
 import RedErrorMessage from "../common/RedErrorMessage";
 import { Company } from "../form/company/CompanySelector";
 import { COMPANY_INFOS } from "../form/company/query";
 import CompanyType from "../login/CompanyType";
 import styles from "./AccountCompanyAdd.module.scss";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
+import Loader from "../common/Loader";
+import { useHistory } from "react-router-dom";
 
 const CREATE_COMPANY = gql`
-  mutation CreateCompany($companyInput: CompanyInput!) {
+  mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
       id
     }
@@ -19,7 +21,10 @@ const CREATE_COMPANY = gql`
 `;
 
 export default function AccountCompanyAdd() {
-  const [createCompany] = useMutation(CREATE_COMPANY);
+  const [
+    createCompany,
+    { loading: savingCompany, error: savingError }
+  ] = useMutation(CREATE_COMPANY);
   const [getCompanyInfos, { loading, data, error }] = useLazyQuery(
     COMPANY_INFOS
   );
@@ -32,8 +37,18 @@ export default function AccountCompanyAdd() {
     }
   }, [data]);
 
+  const history = useHistory();
+
+  if (savingCompany) {
+    return <Loader />;
+  }
+
   return (
     <div className="panel">
+      {savingError && (
+        <div className="notification error">{savingError.message}</div>
+      )}
+
       <Formik
         initialValues={{
           siret: "",
@@ -57,9 +72,10 @@ export default function AccountCompanyAdd() {
           };
         }}
         onSubmit={(values, { setSubmitting }) => {
-          console.log(values);
-          setSubmitting(false);
-          // createCompany({ variables: { companyInput: values}})
+          createCompany({ variables: { companyInput: values } }).then(_ => {
+            setSubmitting(false);
+            history.push("");
+          });
         }}
       >
         {({ values, isSubmitting }) => (
@@ -194,7 +210,7 @@ const UpdateSiretRelatedFields = ({ companyInfos }) => {
       const currentValue = values.companyTypes;
       setFieldValue("companyTypes", [...currentValue, ...companyTypes]);
     }
-  }, [companyInfos]);
+  }, [companyInfos, setFieldValue]);
 
   return null;
 };

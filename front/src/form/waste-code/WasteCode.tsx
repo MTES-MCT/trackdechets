@@ -13,12 +13,12 @@ type Bookmark = {
 
 export default function WasteCode(props: FieldProps) {
   const [wasteCode, setWasteCode] = useState(props.field.value);
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]); // TODO
+  const [bookmarks] = useState<Bookmark[]>([]); // TODO
 
   useEffect(() => {
     props.form.setFieldValue(props.field.name, wasteCode);
     formatWasteCodeEffect(wasteCode, setWasteCode);
-  }, [wasteCode]);
+  }, [wasteCode, props.field.name, props.form]);
 
   const wasteCodeDetail = WasteCodeLookup.find(l => l.code === wasteCode);
   const isDangerous = wasteCode.indexOf("*") > -1;
@@ -77,7 +77,7 @@ export default function WasteCode(props: FieldProps) {
                 key={bookmark.code}
                 onClick={() => setWasteCode(bookmark.code)}
               >
-                <a>{bookmark.code}</a>
+                <span>{bookmark.code}</span>
               </li>
             ))}
           </ul>

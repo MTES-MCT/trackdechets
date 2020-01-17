@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Form, FormikBag, FormikHelpers } from "formik";
+import { Formik, Form, FormikHelpers } from "formik";
 import "./Wizard.scss";
 
 type Props = { initialValues: Object; children: any[]; onSubmit: Function };

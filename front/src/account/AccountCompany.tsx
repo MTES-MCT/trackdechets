@@ -79,7 +79,7 @@ AccountCompany.fragments = {
 export default function AccountCompany({ company }: Props) {
   const [activeLink, setActiveLink] = useState<Link>(Link.Info);
 
-  const isAdmin = company.userRole == UserRole.ADMIN;
+  const isAdmin = company.userRole === UserRole.ADMIN;
 
   const info = (
     <AccountCompanyInfo

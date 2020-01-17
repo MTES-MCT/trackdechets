@@ -9,10 +9,6 @@ type Props = {
 };
 
 export default class CompanyMap extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props);
-  }
-
   componentDidMount() {
     if (this.mapboxglSupported()) {
       this.initMap();

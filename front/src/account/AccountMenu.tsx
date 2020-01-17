@@ -1,4 +1,3 @@
-import gql from "graphql-tag";
 import React from "react";
 import SideMenu from "../common/SideMenu";
 import { NavLink } from "react-router-dom";

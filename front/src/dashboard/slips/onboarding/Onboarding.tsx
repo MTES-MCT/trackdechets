@@ -35,7 +35,7 @@ export default function OnBoarding() {
               votre prestataire (ou il peut le préparer à votre place via son
               compte Trackdéchets).
             </p>
-            <p>On vous facilite la vie avec 💪 :</p>
+            <p>On vous facilite la vie avec <span role="img" aria-label="Fort">💪</span> :</p>
             <ul>
               <li>
                 un système de favoris (codes déchets, coordonnées prestataires,

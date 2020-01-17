@@ -17,13 +17,13 @@ export default function AccountCompanyMenu({
     <div className={styles.menu}>
       {links.map((link, idx) => {
         return (
-          <a
+          <button
             key={idx}
-            className={activeLink == link ? styles.active : ""}
+            className={`link ${activeLink === link ? styles.active : ""}`}
             onClick={() => setActiveLink(link)}
           >
             {link}
-          </a>
+          </button>
         );
       })}
     </div>

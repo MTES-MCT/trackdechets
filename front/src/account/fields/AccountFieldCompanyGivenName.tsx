@@ -28,9 +28,7 @@ const UPDATE_GIVEN_NAME = gql`
 `;
 
 export const tooltip =
-  "Nom usuel de l'établissement qui permet de différencier plusieurs \
-  établissements ayant le même nom dans le sélecteur de \
-  Mon espace;";
+  "Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant le même nom dans le sélecteur de Mon espace";
 
 export default function AccountFielCompanyGivenName({ company }: Props) {
   return (

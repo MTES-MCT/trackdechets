@@ -1,21 +1,12 @@
 import React, { useState } from "react";
 import { Me } from "../../login/model";
-import { Query } from "@apollo/react-components";
 import gql from "graphql-tag";
+import { useQuery } from "@apollo/react-hooks";
+import Loader from "../../common/Loader";
 
 interface IProps {
   me: Me;
 }
-
-type Stats = {
-  company: { siret: string };
-  stats: {
-    wasteCode: string;
-    incoming: number;
-    outgoing: number;
-    awaiting: number;
-  }[];
-};
 
 const GET_STATS = gql`
   query GetStats {
@@ -36,43 +27,40 @@ export default function Exports({ me }: IProps) {
   const [sirets, setSirets] = useState(
     me.companies.map(c => c.siret).join(",")
   );
+  const { loading, error, data } = useQuery(GET_STATS);
 
   return (
     <div className="main">
       <h2>Statistiques</h2>
-      <Query query={GET_STATS}>
-        {({ loading, error, data }) => {
-          if (loading) return <p>Chargement...</p>;
-          if (error || !data) return <p>"Erreur..."</p>;
-          return (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Code déchet</th>
-                  <th>Quantité totale entrée</th>
-                  <th>Quantité totale sortie</th>
-                  <th>En stock / attente</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.stats[0].stats.map(s => (
-                  <tr key={s.wasteCode}>
-                    <td>{s.wasteCode}</td>
-                    <td>{s.incoming}</td>
-                    <td>{s.outgoing}</td>
-                    <td>
-                      {Math.max(
-                        0,
-                        Math.round((s.incoming - s.outgoing) * 100) / 100
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          );
-        }}
-      </Query>
+      {loading && <Loader />}
+      {(error || !data) && <p>"Erreur..."</p>}
+      {data && (
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Code déchet</th>
+              <th>Quantité totale entrée</th>
+              <th>Quantité totale sortie</th>
+              <th>En stock / attente</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.stats[0].stats.map(s => (
+              <tr key={s.wasteCode}>
+                <td>{s.wasteCode}</td>
+                <td>{s.incoming}</td>
+                <td>{s.outgoing}</td>
+                <td>
+                  {Math.max(
+                    0,
+                    Math.round((s.incoming - s.outgoing) * 100) / 100
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <h2>Téléchargement de registres</h2>
       <p>
         Vous avez la possibilité de télécharger un registre des déchets entrants
@@ -98,6 +86,7 @@ export default function Exports({ me }: IProps) {
       <a
         className="button"
         target="_blank"
+        rel="noopener noreferrer"
         href={`${process.env.REACT_APP_API_ENDPOINT}/exports?exportType=OUTGOING&siret=${sirets}`}
       >
         Registre de déchets sortants
@@ -105,6 +94,7 @@ export default function Exports({ me }: IProps) {
       <a
         className="button"
         target="_blank"
+        rel="noopener noreferrer"
         href={`${process.env.REACT_APP_API_ENDPOINT}/exports?exportType=INCOMING&siret=${sirets}`}
       >
         Registre de déchets entrants

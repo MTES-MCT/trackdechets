@@ -14,13 +14,13 @@ export default function Delete({ formId }: Props) {
     <Mutation mutation={mutations.DELETE_FORM}>
       {(deleteForm, { error }) => (
         <React.Fragment>
-          <a
+          <button
             className="icon"
             title="Supprimer définitivement"
             onClick={() => setIsOpen(true)}
           >
             <FaTrash />
-          </a>
+          </button>
           <div
             className="modal__backdrop"
             id="modal"

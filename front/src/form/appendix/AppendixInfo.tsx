@@ -41,7 +41,12 @@ export default connect(function AppendixInfo(props) {
         )}
       </div>
       <p>
-        <a className="button" href="/notice_12571-1.pdf" target="_blank">
+        <a
+          className="button"
+          href="/notice_12571-1.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Imprimer une annexe 1
         </a>
       </p>

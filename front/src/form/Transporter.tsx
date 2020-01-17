@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import DateInput from "./custom-inputs/DateInput";
