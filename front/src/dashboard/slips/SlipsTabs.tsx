@@ -42,7 +42,7 @@ export default function SlipsTabs({ me, siret }: Props) {
                 />
               ) : (
                 <div className="empty-tab">
-                  <img src="/illu/illu_empty.svg" />
+                  <img src="/illu/illu_empty.svg" alt="" />
                   <h4>Il n'y a aucun bordereau en brouillon</h4>
                   <p>
                     Si vous le souhaitez, vous pouvez{" "}
@@ -62,7 +62,7 @@ export default function SlipsTabs({ me, siret }: Props) {
                 <Slips me={me} forms={toSign} />
               ) : (
                 <div className="empty-tab">
-                  <img src="/illu/illu_sent.svg" />
+                  <img src="/illu/illu_sent.svg" alt="" />
                   <h4>Il n'y a aucun bordereau à signer</h4>
                   <p>
                     Bonne nouvelle, vous n'avez aucun bordereau à signer ! Des
@@ -78,7 +78,7 @@ export default function SlipsTabs({ me, siret }: Props) {
                 <Slips me={me} forms={status} />
               ) : (
                 <div className="empty-tab">
-                  <img src="/illu/illu_transfer.svg" />
+                  <img src="/illu/illu_transfer.svg" alt="" />
                   <h4>Il n'y a aucun bordereau à suivre</h4>
                   <p>
                     Des bordereaux apparaissent dans cet onglet lorsqu'ils sont
@@ -95,7 +95,7 @@ export default function SlipsTabs({ me, siret }: Props) {
                 <Slips me={me} forms={history} />
               ) : (
                 <div className="empty-tab">
-                  <img src="/illu/illu_hello.svg" />
+                  <img src="/illu/illu_hello.svg" alt="" />
                   <h4>Il n'y a aucun bordereau en archive</h4>
                   <p>
                     Des bordereaux apparaissent dans cet onnglet lorsqu'ils

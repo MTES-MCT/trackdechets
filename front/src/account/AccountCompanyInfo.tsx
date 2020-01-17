@@ -57,7 +57,11 @@ export default function AccountCompanyInfo({ company }: Props) {
             name="fiche_ic"
             label="Fiche ICPE"
             value={
-              <a href={company.installation.urlFiche} target="_blank">
+              <a
+                href={company.installation.urlFiche}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Lien
               </a>
             }
@@ -70,7 +74,7 @@ export default function AccountCompanyInfo({ company }: Props) {
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
-      {company.userRole == UserRole.ADMIN ? (
+      {company.userRole === UserRole.ADMIN ? (
         <AccountFieldCompanyGivenName
           company={filter(
             AccountFieldCompanyGivenName.fragments.company,

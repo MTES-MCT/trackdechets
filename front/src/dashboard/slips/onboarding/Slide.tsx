@@ -1,5 +1,4 @@
 import React from "react";
-import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 import "./Slide.scss";
 
 type Props = { children: any; image: string; title: string };
@@ -9,7 +8,7 @@ export default function Slide({ children, image, title }: Props) {
       <h1>{title}</h1>
       <div className="content">
         <div className="image">
-          <img src={image} />
+          <img src={image} alt="" />
         </div>
         <div className="text">{children}</div>
       </div>

@@ -25,6 +25,7 @@ export default connect<{}, Values>(function Recipient({ formik }) {
           <a
             href="https://www.georisques.gouv.fr/dossiers/installations/donnees#/"
             target="_blank"
+            rel="noopener noreferrer"
           >
             la liste des installation classées.
           </a>

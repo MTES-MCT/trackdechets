@@ -34,7 +34,7 @@ export default function AccountCompanyPage({ company }: Props) {
     <>
       <div className="notification">
         Ces informations de contact sont destinées à apparaitre sur votre{" "}
-        <a href={companyPage} target="_blank">
+        <a href={companyPage} target="_blank" rel="noopener noreferrer">
           fiche entreprise
         </a>{" "}
         et sont consultables par n'importe qui.

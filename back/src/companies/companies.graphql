@@ -154,10 +154,10 @@ type Mutation {
     companyTypes: [CompanyType]
     givenName: String
   ): CompanyPrivate
-  createCompany(companyInput: CompanyInput!): CompanyPrivate
+  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate
 }
 
-input CompanyInput {
+input PrivateCompanyInput {
   siret: String!
   gerepId: String
   companyTypes: [CompanyType]

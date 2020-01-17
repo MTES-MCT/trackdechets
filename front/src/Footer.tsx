@@ -9,11 +9,11 @@ export default function Footer() {
       <div className="container">
         <div className="footer__logo">
           <LazyLoad>
-            <img className={styles["full-width"]} src="/logo-mtes-mef.svg" />
+            <img className={styles["full-width"]} src="/logo-mtes-mef.svg" alt="" />
           </LazyLoad>
           <div className={styles["logo-text"]}>
             <LazyLoad>
-              <img src="/logo-fabnum.svg" />
+              <img src="/logo-fabnum.svg" alt="" />
             </LazyLoad>
             <small>
               Trackdéchets est un service numérique de l'Etat incubé à la
@@ -39,7 +39,11 @@ export default function Footer() {
             <Link to="/cgu">Conditions générales d'utilisation</Link>
           </li>
           <li>
-            <a href="/Politique de confidentialité.pdf" target="_blank">
+            <a
+              href="/Politique de confidentialité.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Politique de confidentialité
             </a>
           </li>

@@ -22,7 +22,7 @@ export default function Faq() {
         traitement.
       </p>
       <p className="image-container">
-        <img src="image-faq.png" />
+        <img src="image-faq.png" alt="" />
       </p>
       <h3>Pourquoi utiliser Trackdéchets?</h3>
       <p>

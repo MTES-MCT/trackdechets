@@ -8,7 +8,11 @@ export default function AccountIntegrationApi() {
         L'API Trackdéchets permet d'utiliser Trackdéchets via une solution
         informatique tierce (ERP, SaaS déchets, etc). Pour en savoir plus, nous
         vous invitons à consulter{" "}
-        <a href="https://doc.trackdechets.fr" target="_blank">
+        <a
+          href="https://doc.trackdechets.fr"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           la documentation
         </a>
       </div>

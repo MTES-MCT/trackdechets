@@ -92,12 +92,12 @@ export default function Home() {
             <h3>Editez et transmettez simplement vos bsd</h3>
             <p>
               Pour que la préparation des bordereaux ne soit plus d'une
-              complexité inutile 💪.
+              complexité inutile <span role="img" aria-label="Fort">💪</span>.
             </p>
           </div>
           <div className="description-img">
             <LazyLoad height={330}>
-              <img src="/onboarding/slide1.png" />
+              <img src="/onboarding/slide1.png" alt="" />
             </LazyLoad>
           </div>
           <div className="description-text">
@@ -150,7 +150,7 @@ export default function Home() {
           </div>
           <div className="description-img">
             <LazyLoad height={330}>
-              <img src="/onboarding/slide2.png" />
+              <img src="/onboarding/slide2.png" alt="" />
             </LazyLoad>
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function Home() {
           </div>
           <div className="description-img">
             <LazyLoad height={330}>
-              <img src="/onboarding/slide3.png" />
+              <img src="/onboarding/slide3.png" alt="" />
             </LazyLoad>
           </div>
           <div className="description-text">
@@ -205,7 +205,7 @@ export default function Home() {
           </div>
           <div className="description-img">
             <LazyLoad height={330}>
-              <img src="/onboarding/slide4.png" />
+              <img src="/onboarding/slide4.png" alt="" />
             </LazyLoad>
           </div>
         </div>

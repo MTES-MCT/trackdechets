@@ -60,14 +60,15 @@ export default withRouter(function Header({ history }) {
                   </NavLink>
                 </li>
                 <li className="nav__item logout">
-                  <a
+                  <button
+                    className="link"
                     onClick={() => {
                       localAuthService.locallySignOut();
                       history.push("/");
                     }}
                   >
                     Se déconnecter
-                  </a>
+                  </button>
                 </li>
               </>
             ) : (

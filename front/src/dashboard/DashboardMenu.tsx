@@ -27,7 +27,7 @@ export default function DashboardMenu({
   return (
     <SideMenu>
       <>
-        {me.companies.length == 1 && (
+        {me.companies.length === 1 && (
           <div className="company-title">{me.companies[0].name}</div>
         )}
         {me.companies.length > 1 && (

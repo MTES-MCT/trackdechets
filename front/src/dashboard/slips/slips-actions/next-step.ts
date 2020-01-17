@@ -42,11 +42,11 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
       return forms
         .filter(
           (f: Form) =>
-            !(<any>[
+            !([
               FormStatus.DRAFT,
               FormStatus.PROCESSED,
               FormStatus.REFUSED
-            ]).includes(f.status) && getNextStep(f, currentUser) == null
+            ] as string[]).includes(f.status) && getNextStep(f, currentUser) == null
         )
         .sort((a: any, b: any) =>
           a.status > b.status
@@ -60,11 +60,11 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
         forms
           // filter from whose status is   PROCESSED|NO_TRACEABILITY|REFUSED
           .filter((f: Form) =>
-            (<any>[
+            ([
               FormStatus.PROCESSED,
               FormStatus.NO_TRACEABILITY,
               FormStatus.REFUSED
-            ]).includes(f.status)
+            ] as string[]).includes(f.status)
           )
           .sort((a: any, b: any) => a.createdAt - b.createdAt)
       );

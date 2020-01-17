@@ -27,9 +27,7 @@ export default function AccountFormCompanySecurityCode({
   });
 
   const cautionMessage =
-    "Attention, vous êtes sur le point de demander un nouveau code de sécurité qui \
-    va vous être attribuer de façon aléatoire, vous veillerez à en informer les \
-    personnes en charge de la validation du BSD auprès du transporteur";
+    "Attention, vous êtes sur le point de demander un nouveau code de sécurité qui va vous être attribuer de façon aléatoire, vous veillerez à en informer les personnes en charge de la validation du BSD auprès du transporteur";
 
   if (loading) {
     return <div>Renouvellement en cours...</div>;
