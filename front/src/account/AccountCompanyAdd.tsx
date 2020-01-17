@@ -72,7 +72,8 @@ export default function AccountCompanyAdd() {
           };
         }}
         onSubmit={(values, { setSubmitting }) => {
-          createCompany({ variables: { companyInput: values } }).then(_ => {
+          const { isAllowed, ...companyInput } = values;
+          createCompany({ variables: { companyInput } }).then(_ => {
             setSubmitting(false);
             history.push("");
           });
@@ -82,7 +83,7 @@ export default function AccountCompanyAdd() {
           <Form className={styles.companyForm}>
             <h5>Pour quelle entreprise voulez-vous créer un compte ?</h5>
             <div className={styles.field}>
-              <label>SIRET</label>
+              <label>SIRET*</label>
 
               <div className="form__group">
                 <Field type="text" name="siret" />
@@ -90,10 +91,11 @@ export default function AccountCompanyAdd() {
                   className="button secondary"
                   type="button"
                   onClick={() => {
-                    if (values.siret.replace(/\s/g, "").length !== 14) {
+                    const trimedSiret = values.siret.replace(/\s/g, "");
+                    if (trimedSiret.length !== 14) {
                       return;
                     }
-                    getCompanyInfos({ variables: { siret: values.siret } });
+                    getCompanyInfos({ variables: { siret: trimedSiret } });
                   }}
                 >
                   {loading ? <FaHourglassHalf /> : "Valider"}
