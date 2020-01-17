@@ -36,7 +36,7 @@ export default function AccountCompanyList({ companies }: Props) {
         <div className="notification success">
           <h5>Vous n'avez pas encore d'établissement</h5>
           <p>
-            Pour commencez à utiliser Trackdéchets vous devez appartenir à un
+            Pour commencer à utiliser Trackdéchets vous devez appartenir à un
             établissement.
           </p>
 
@@ -44,12 +44,13 @@ export default function AccountCompanyList({ companies }: Props) {
           <ul>
             <li>
               Votre entreprise n'existe pas encore sur Trackdéchets et vous en
-              etes responsable.{" "}
+              êtes responsable.{" "}
               <Link to={`${url}/new`}>Créez un établissement</Link>
             </li>
             <li>
               Votre entreprise existe déjà sur Trackdéchets. Demandez à
-              l'administrateur en charge de votre entreprise de vous inviter
+              l'administrateur du compte au sein de votre entreprise de vous
+              inviter
             </li>
           </ul>
 
