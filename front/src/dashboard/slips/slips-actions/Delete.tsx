@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
-import { Mutation } from "@apollo/react-components";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
 import { currentSiretService } from "../../CompanySelector";

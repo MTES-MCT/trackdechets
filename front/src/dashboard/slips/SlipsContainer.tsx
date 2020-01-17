@@ -11,10 +11,10 @@ type Props = {
 
 export default function SlipsContainer({ me, siret }: Props) {
   return (
-    <React.Fragment>
+    <>
       <SlipsHeader />
       <SlipsTabs me={me} siret={siret} />
       <Onboarding />
-    </React.Fragment>
+    </>
   );
 }

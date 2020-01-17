@@ -81,7 +81,9 @@ export default function AccountCompanyAdd() {
       >
         {({ values, isSubmitting }) => (
           <Form className={styles.companyForm}>
-            <h5>Pour quelle entreprise voulez-vous créer un compte ?</h5>
+            <h5>
+              Commencez par indiquer le SIRET de ce nouvel établissement...
+            </h5>
             <div className={styles.field}>
               <label>SIRET*</label>
 
