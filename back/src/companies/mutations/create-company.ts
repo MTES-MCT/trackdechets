@@ -16,7 +16,7 @@ export const createCompany = {
       codeNaf: string().nullable(true),
       companyName: string().nullable(true)
     }),
-  resolve: async (_, companyInput, context: Context) => {
+  resolve: async (_, { companyInput }, context: Context) => {
     const trimedSiret = companyInput.siret.replace(/\s+/g, "");
 
     const existingCompany = await context.prisma.$exists

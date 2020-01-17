@@ -10,6 +10,7 @@ import {
   getRubriques
 } from "./queries";
 import { updateCompany, renewSecurityCode } from "./mutations";
+import { createCompany } from "./mutations/create-company";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
@@ -120,6 +121,7 @@ export default {
   },
   Mutation: {
     renewSecurityCode: (_, { siret }) => renewSecurityCode(siret),
-    updateCompany: (_, payload) => updateCompany(payload)
+    updateCompany: (_, payload) => updateCompany(payload),
+    createCompany
   }
 };

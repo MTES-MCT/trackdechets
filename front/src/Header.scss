@@ -9,17 +9,26 @@
     margin: 0 0.1em;
   }
 
-  .nav__item a.active {
+  .nav__item button {
+    text-decoration: none;
+    color: var(--black);
+    padding: 0.4em 0.8em;
+    border-radius: 3px;
+  }
+
+  .nav__item a.active,
+  .nav__item button.active {
     background: none;
     color: var(--theme-primary);
   }
 
-  .nav__item a:hover {
+  .nav__item a:hover,
+  .nav__item button:hover {
     background: none;
     color: var(--theme-primary);
   }
 
-  .nav__item.logout a:hover {
+  .nav__item.logout button:hover {
     color: var(--orange);
   }
   &__container {
