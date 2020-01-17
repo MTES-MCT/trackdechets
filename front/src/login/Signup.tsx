@@ -26,23 +26,17 @@ export default function Signup() {
             phone: "",
             password: "",
             passwordConfirmation: "",
-            siret: "",
-            companyTypes: [],
-            gerepId: "",
-            codeNaf: "",
-            isAllowed: false,
             cgu: false
           }}
           onSubmit={(values: any, { setStatus, setSubmitting }) => {
             const {
               passwordConfirmation,
               emailConfirmation,
-              isAllowed,
               cgu,
-              ...payload
+              ...userInfos
             } = values;
 
-            signup({ variables: { payload } })
+            signup({ variables: { userInfos } })
               .then(_ => history.push("/signup/activation"))
               .catch(errors => {
                 // graphQLErrors are returned as an array of objects, we map and join  them to a string
@@ -51,12 +45,12 @@ export default function Signup() {
                   .map(({ message }: { message: string }) => message)
                   .join("\n");
                 setStatus(errorMessages);
-              })
-              .then(_ => setSubmitting(false));
+                setSubmitting(false);
+              });
           }}
         >
           <Wizard.Page title="Bienvenue">
-            <h1>Inscription à Trackdéchets</h1>
+            <h1>Bienvenue sur Trackdéchets</h1>
             <p>
               Trackdéchets est un produit du Ministère de la Transition
               Ecologique et Solidaire.
@@ -74,14 +68,14 @@ export default function Signup() {
             </p>
 
             <p>
+              Vous vous apprêtez à créer un compte personnel. Cette étape est un
+              prélable obligatoire à l'enregistrement ou au rattachement d'une
+              entreprise dans Trackdéchets.
+            </p>
+
+            <p>
               <strong>Vous avez déjà un compte ?</strong>{" "}
               <Link to="/login">Connectez vous maintenant</Link>
-            </p>
-            <p>
-              <strong>Votre entreprise dispose déjà d'un compte ?</strong> Créez
-              un compte, puis adressez vous à l'administrateur/trice de votre
-              entreprise. Il/elle pourra vous inviter via la page "Mon compte >
-              Etablissements".
             </p>
           </Wizard.Page>
           <Wizard.Page
