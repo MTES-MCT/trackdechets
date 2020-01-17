@@ -13,9 +13,6 @@ import {
 setLocale({
   mixed: {
     notType: "Ce champ ne peut pas être nul"
-  },
-  number: {
-    min: "Deve ser maior que ${min}"
   }
 } as LocaleObject);
 
