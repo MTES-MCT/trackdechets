@@ -11,6 +11,7 @@ import {
 } from "./queries";
 import { updateCompany, renewSecurityCode } from "./mutations";
 import { createCompany } from "./mutations/create-company";
+import { createUploadLink } from "./mutations/create-upload-link";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
@@ -122,6 +123,7 @@ export default {
   Mutation: {
     renewSecurityCode: (_, { siret }) => renewSecurityCode(siret),
     updateCompany: (_, payload) => updateCompany(payload),
-    createCompany
+    createCompany,
+    createUploadLink
   }
 };
