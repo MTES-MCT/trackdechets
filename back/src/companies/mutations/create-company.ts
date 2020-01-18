@@ -14,7 +14,8 @@ export const createCompany = {
         )
       ),
       codeNaf: string().nullable(true),
-      companyName: string().nullable(true)
+      companyName: string().nullable(true),
+      documentKeys: array().of(string())
     }),
   resolve: async (_, { companyInput }, context: Context) => {
     const trimedSiret = companyInput.siret.replace(/\s+/g, "");

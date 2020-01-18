@@ -1,16 +1,16 @@
 import { useLazyQuery, useMutation } from "@apollo/react-hooks";
-import { Field, Formik, useFormikContext, Form } from "formik";
+import { Field, Form, Formik, useFormikContext } from "formik";
 import gql from "graphql-tag";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaHourglassHalf } from "react-icons/fa";
+import { useHistory } from "react-router-dom";
+import Loader from "../common/Loader";
 import RedErrorMessage from "../common/RedErrorMessage";
 import { Company } from "../form/company/CompanySelector";
 import { COMPANY_INFOS } from "../form/company/query";
 import CompanyType from "../login/CompanyType";
 import styles from "./AccountCompanyAdd.module.scss";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
-import Loader from "../common/Loader";
-import { useHistory } from "react-router-dom";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -20,7 +20,20 @@ const CREATE_COMPANY = gql`
   }
 `;
 
+const CREATE_UPLOAD_LINK = gql`
+  mutation CreateUploadLink($fileName: String!, $fileType: String!) {
+    createUploadLink(fileName: $fileName, fileType: $fileType) {
+      signedUrl
+      key
+    }
+  }
+`;
+
 export default function AccountCompanyAdd() {
+  const history = useHistory();
+  const [companyInfos, setCompanyInfos] = useState<Company | null>(null);
+  const [uploadedFile, setUploadedFile] = useState();
+
   const [
     createCompany,
     { loading: savingCompany, error: savingError }
@@ -29,7 +42,9 @@ export default function AccountCompanyAdd() {
     COMPANY_INFOS
   );
 
-  const [companyInfos, setCompanyInfos] = useState<Company | null>(null);
+  const [createUploadLink, { data: uploadLinkData }] = useMutation<{
+    createUploadLink: { signedUrl: string; key: string };
+  }>(CREATE_UPLOAD_LINK);
 
   useEffect(() => {
     if (data?.companyInfos != null) {
@@ -37,7 +52,29 @@ export default function AccountCompanyAdd() {
     }
   }, [data]);
 
-  const history = useHistory();
+  // Once we have a signed URL to upload to, upload the file and update `uploadLinkData`
+  useEffect(() => {
+    if (
+      !uploadLinkData?.createUploadLink?.signedUrl ||
+      uploadedFile.key === uploadLinkData.createUploadLink.key
+    ) {
+      return;
+    }
+
+    fetch(uploadLinkData.createUploadLink.signedUrl, {
+      method: "PUT",
+      body: uploadedFile.file,
+      headers: {
+        "Content-Type": uploadedFile.fileType,
+        "x-amz-acl": "private"
+      }
+    }).then(_ =>
+      setUploadedFile({
+        ...uploadedFile,
+        key: uploadLinkData.createUploadLink.key
+      })
+    );
+  }, [uploadLinkData, uploadedFile]);
 
   if (savingCompany) {
     return <Loader />;
@@ -55,6 +92,7 @@ export default function AccountCompanyAdd() {
           companyTypes: [],
           gerepId: "",
           codeNaf: "",
+          documentKeys: [],
           isAllowed: false
         }}
         validate={values => {
@@ -71,11 +109,10 @@ export default function AccountCompanyAdd() {
             })
           };
         }}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={(values) => {
           const { isAllowed, ...companyInput } = values;
           createCompany({ variables: { companyInput } }).then(_ => {
-            setSubmitting(false);
-            history.push("");
+            history.push("/");
           });
         }}
       >
@@ -158,6 +195,42 @@ export default function AccountCompanyAdd() {
                 </div>
 
                 <div className={styles.field}>
+                  <label>Justificatif</label>
+                  <div className="form__group">
+                    <p className={styles.formDescription}>
+                      Pour nous aider à lutter contre la fraude, joignez un
+                      document justifiant de votre légitimité à créer cet
+                      établissement dans Trackdéchet (KBIS, justificatif du
+                      siège social de l'entreprise, CIN à défaut, ou autre...).
+                      Ce document est suceptible d'être vérifié par l'équipe
+                      Trackdéchets.
+                    </p>
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, .pdf"
+                      onChange={async event => {
+                        const file = event.currentTarget.files?.item(0);
+                        if (!file) {
+                          return;
+                        }
+                        const fileParts = file.name.split(".");
+                        const fileName = fileParts[0];
+                        const fileType = fileParts[1];
+
+                        setUploadedFile({ file, fileName, fileType });
+                        createUploadLink({ variables: { fileName, fileType } });
+                      }}
+                    />
+
+                    <span className={styles.acceptedFormats}>
+                      Formats acceptés: jpeg, png, pdf.
+                    </span>
+
+                    <UpdateFileField uploadedFile={uploadedFile} />
+                  </div>
+                </div>
+
+                <div className={styles.field}>
                   <label>Validation*</label>
                   <div className="form__group">
                     <label>
@@ -219,6 +292,16 @@ const UpdateSiretRelatedFields = ({ companyInfos }) => {
       setFieldValue("companyTypes", [...currentValue, ...companyTypes]);
     }
   }, [companyInfos, setFieldValue]);
+
+  return null;
+};
+
+const UpdateFileField = ({ uploadedFile }) => {
+  const { setFieldValue } = useFormikContext<any>();
+
+  useEffect(() => {
+    setFieldValue("documentKeys", [uploadedFile?.key].filter(Boolean));
+  }, [uploadedFile, setFieldValue]);
 
   return null;
 };

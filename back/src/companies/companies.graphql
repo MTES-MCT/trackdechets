@@ -155,6 +155,12 @@ type Mutation {
     givenName: String
   ): CompanyPrivate
   createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate
+  createUploadLink(fileName: String!, fileType: String!): UploadLink
+}
+
+type UploadLink {
+  signedUrl: String
+  key: String
 }
 
 input PrivateCompanyInput {
@@ -163,6 +169,7 @@ input PrivateCompanyInput {
   companyTypes: [CompanyType]
   codeNaf: String
   companyName: String
+  documentKeys: [String]
 }
 
 type CompanyMember {
