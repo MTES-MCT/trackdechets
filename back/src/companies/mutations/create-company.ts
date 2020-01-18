@@ -37,7 +37,7 @@ export const createCompany = {
       );
     }
 
-    return context.prisma
+    const company = await context.prisma
       .createCompany({
         siret: trimedSiret,
         codeNaf: companyInput.codeNaf,
@@ -51,5 +51,13 @@ export const createCompany = {
           "Impossible de créer cet utilisateur. Veuillez contacter le support."
         );
       });
+
+    await context.prisma.createCompanyAssociation({
+      user: { connect: { id: context.user.id } },
+      company: { connect: { id: company.id } },
+      role: "ADMIN"
+    });
+
+    return company;
   }
 };
