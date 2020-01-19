@@ -77,7 +77,7 @@ jobs:
       - run:
           name: Deploy to validation over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST_ST "cd /srv/trackdechets/
+            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/
             git pull
             docker-compose -f docker-compose.val.yml build
             docker-compose -f docker-compose.val.yml up -d
@@ -180,7 +180,7 @@ workflows:
               only: master
       - deploy:
           name: deploy-validation
-          host: SSH_HOST_BU
+          host: SSH_HOST_ST
           requires:
             - build-postgres
             - build-api
