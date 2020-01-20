@@ -9,6 +9,7 @@ export default {
     changePassword: isAuthenticated,
     editProfile: isAuthenticated,
     inviteUserToCompany: isCompanyAdmin,
+    resendInvitation: isCompanyAdmin,
     removeUserFromCompany: isCompanyAdmin,
     deleteInvitation: isCompanyAdmin,
   }

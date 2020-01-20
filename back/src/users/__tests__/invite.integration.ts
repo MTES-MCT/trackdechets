@@ -46,7 +46,7 @@ describe("Invitation removal", () => {
     });
 
     // Call the mutation to delete the invitation
-    // We pass company siret to allow permission to check requiring user is one admin fo this company
+    // We pass company siret to allow permission to check requiring user is one admin of this company
     const mutation = `
         mutation {
           deleteInvitation(email: "${usrToInvite.email}", siret: "${company.siret}") {
@@ -61,8 +61,65 @@ describe("Invitation removal", () => {
       id: accountHash.id
     });
     expect(userAccountHashExists).toBeFalsy();
+  });
+});
 
-    const assoc = await prisma.user({ id: admin.id }).companyAssociations();
+describe("Invitation resend", () => {
+  afterAll(async () => {
+    await resetDatabase();
+  });
+
+  it("should resend a pending invitation", async () => {
+    // set up an user, a company, its admin and an invitation (UserAccountHash)
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+    const usrToInvite = await userFactory();
+    const accountHash = await createUserAccountHash(
+      usrToInvite.email,
+      "MEMBER",
+      company.siret
+    );
+
+    // instantiate test client
+    const { mutate, setOptions } = createTestClient({
+      apolloServer: server
+    });
+
+    // Generate and pass token into Auth header
+    const token = sign({ userId: admin.id }, JWT_SECRET, { expiresIn: "1d" });
+    setOptions({
+      request: {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    });
+
+    // Call the mutation to resend the invitation
+
+    const mutation = `
+        mutation {
+          resendInvitation(email: "${usrToInvite.email}", siret: "${company.siret}")           
+        }
+      `;
+    const res = await mutate(mutation);
+
+    expect(res).toEqual({ data: { resendInvitation: true } });
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+
+    const postArgs = mockedAxiosPost.mock.calls[0];
+
+    expect(postArgs[0]).toEqual("http://td-mail/send");
+
+    //  Check To
+    expect(postArgs[1].to[0].email).toEqual(usrToInvite.email);
+    expect(postArgs[1].subject).toContain(
+      "Vous avez été invité à rejoindre Trackdéchets"
+    );
+
+    expect(postArgs[1].body).toContain(
+      "vous a invité à rejoindre Trackdéchets"
+    );
+    expect(postArgs[1].body).toContain(company.name);
   });
 });
 

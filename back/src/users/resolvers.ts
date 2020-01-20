@@ -8,7 +8,12 @@ import { userMails } from "./mails";
 import { getUserCompanies } from "../companies/queries";
 import { hashPassword } from "./utils";
 import { DomainError, ErrorCode } from "../common/errors";
-import { changePassword, editProfile, inviteUserToCompany } from "./mutations";
+import {
+  changePassword,
+  editProfile,
+  inviteUserToCompany,
+  resendInvitation
+} from "./mutations";
 
 const { JWT_SECRET } = process.env;
 
@@ -154,6 +159,8 @@ export default {
     },
     inviteUserToCompany: async (_, { email, siret, role }, context: Context) =>
       inviteUserToCompany(context.user, email, siret, role),
+    resendInvitation: async (_, { email, siret }, context: Context) =>
+      resendInvitation(context.user, email, siret),
     joinWithInvite: async (
       _,
       { inviteHash, name, password },

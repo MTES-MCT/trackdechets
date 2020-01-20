@@ -5,7 +5,7 @@ import { server } from "../../server";
 import { createTestClient } from "apollo-server-testing";
 import { gql } from "apollo-server-express";
 import { hash } from "bcrypt";
-import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
+import { userWithCompanyFactory } from "../../__tests__/factories";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
