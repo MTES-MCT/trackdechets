@@ -37,8 +37,11 @@ const buildPdf = async (form, responseType: ResponseType) => {
 /**
  * Render a form pdf as an HTTP response
  */
-export const pdfHandler = async (req, res) => {
-  const { id } = req.query;
+export async function downloadPdf(res, { id }) {
+  if (!id) {
+    return res.status(500).send("Identifiant du bordereau manquant.");
+  }
+
   const form = await prisma.form({ id });
 
   return buildPdf(form, "stream")
@@ -53,7 +56,7 @@ export const pdfHandler = async (req, res) => {
       }
       res.status(500).send("Erreur lors de la génération du PDF");
     });
-};
+}
 
 /**
  * Render a pdf converted to base64 string to be sent via Mailjet API

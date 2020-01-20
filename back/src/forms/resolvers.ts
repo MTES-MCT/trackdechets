@@ -15,6 +15,8 @@ import { saveForm } from "./mutations/save-form";
 import { getReadableId } from "./readable-id";
 import { getUserCompanies } from "../companies/queries";
 import { DomainError, ErrorCode } from "../common/errors";
+import { formPdf } from "./queries/form-pdf";
+import { formsRegister } from "./queries/forms-register";
 
 export default {
   Form: {
@@ -119,7 +121,9 @@ export default {
       });
 
       return forms.map(f => unflattenObjectFromDb(f));
-    }
+    },
+    formPdf,
+    formsRegister
   },
   Mutation: {
     saveForm,

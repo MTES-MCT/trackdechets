@@ -1,4 +1,4 @@
-import { and, or } from "graphql-shield";
+import { or } from "graphql-shield";
 
 import {
   canAccessForm,
@@ -15,6 +15,7 @@ import {
 export default {
   Query: {
     form: canAccessForm,
+    formPdf: canAccessForm,
     forms: isAuthenticated,
     stats: isAuthenticated,
     appendixForms: or(isCompanyMember, isCompanyAdmin)
