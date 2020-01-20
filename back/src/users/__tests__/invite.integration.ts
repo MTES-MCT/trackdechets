@@ -15,6 +15,10 @@ const { JWT_SECRET } = process.env;
 const mockedAxiosPost = jest.spyOn(axios, "post");
 mockedAxiosPost.mockResolvedValue({} as any);
 
+beforeEach(() => {
+  mockedAxiosPost.mockClear();
+});
+
 describe("Invitation removal", () => {
   afterAll(async () => {
     await resetDatabase();
