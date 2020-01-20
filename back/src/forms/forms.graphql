@@ -18,6 +18,16 @@ type Query {
   `wasteCode`: Code déchet pour affiner la recherche, optionnel
   """
   appendixForms(siret: String!, wasteCode: String): [Form]
+  """
+  Renvoie un token pour télécharger un pdf de bordereau
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  formPdf(id: ID): FileDownload
+  formsRegister(
+    sirets: [String]
+    exportType: FormsRegisterExportType
+  ): FileDownload
 }
 
 type Mutation {
@@ -224,4 +234,13 @@ type Stat {
   wasteCode: String
   incoming: Float
   outgoing: Float
+}
+
+type FileDownload {
+  token: String
+}
+
+enum FormsRegisterExportType {
+  INCOMING
+  OUTGOING
 }
