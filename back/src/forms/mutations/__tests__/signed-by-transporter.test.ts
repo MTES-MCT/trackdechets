@@ -2,6 +2,12 @@ import { ErrorCode } from "../../../common/errors";
 import { signedByTransporter } from "../mark-as";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 
+const getUserCompaniesMock = jest.fn();
+
+jest.mock("../../../companies/queries", () => ({
+  getUserCompanies: jest.fn(() => getUserCompaniesMock())
+}));
+
 describe("Forms -> signedByTransporter mutation", () => {
   const formMock = jest.fn();
   const prisma = {
@@ -14,8 +20,6 @@ describe("Forms -> signedByTransporter mutation", () => {
       company: jest.fn(() => Promise.resolve(false))
     }
   };
-
-  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
   const defaultContext = {
     prisma,

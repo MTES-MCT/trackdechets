@@ -1,7 +1,13 @@
 import { saveForm } from "../save-form";
 import { ErrorCode } from "../../../common/errors";
 
-import * as queries from "../../../companies/queries";
+jest.mock("../../../companies/queries", () => ({
+  getUserCompanies: jest.fn(() =>
+    Promise.resolve([
+      { id: "", securityCode: 123, companyTypes: [], siret: "user siret" }
+    ])
+  )
+}));
 
 describe("Forms -> saveForm mutation", () => {
   const formMock = jest.fn();
@@ -10,11 +16,6 @@ describe("Forms -> saveForm mutation", () => {
     updateForm: jest.fn(() => ({})),
     createForm: jest.fn(() => ({}))
   };
-
-  const getUserCompaniesMcock = jest.spyOn(queries, "getUserCompanies");
-  getUserCompaniesMcock.mockResolvedValue([
-    { id: "", securityCode: 123, companyTypes: [], siret: "user siret" }
-  ]);
 
   beforeEach(() => {
     formMock.mockReset();

@@ -5,6 +5,12 @@ import { FormState } from "../../workflow/model";
 import { markAsSent } from "../mark-as";
 import { getNewValidForm } from "../__mocks__/data";
 
+const getUserCompaniesMock = jest.fn();
+
+jest.mock("../../../companies/queries", () => ({
+  getUserCompanies: jest.fn(() => getUserCompaniesMock())
+}));
+
 describe("Forms -> markAsSealed mutation", () => {
   const formMock = jest.fn();
   const prisma = {
@@ -14,8 +20,6 @@ describe("Forms -> markAsSealed mutation", () => {
     createStatusLog: jest.fn(() => Promise.resolve({})),
     updateManyForms: jest.fn(() => Promise.resolve({}))
   };
-
-  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
   const defaultContext = {
     prisma,

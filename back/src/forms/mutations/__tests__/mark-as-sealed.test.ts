@@ -2,7 +2,12 @@ import { ErrorCode } from "../../../common/errors";
 import { markAsSealed } from "../mark-as";
 import { getNewValidForm } from "../__mocks__/data";
 import { flattenObjectForDb } from "../../form-converter";
-import * as companiesHelpers from "../../../companies/queries/userCompanies";
+
+const getUserCompaniesMock = jest.fn();
+
+jest.mock("../../../companies/queries", () => ({
+  getUserCompanies: jest.fn(() => getUserCompaniesMock())
+}));
 
 describe("Forms -> markAsSealed mutation", () => {
   const prisma = {
@@ -12,8 +17,6 @@ describe("Forms -> markAsSealed mutation", () => {
     createStatusLog: jest.fn(() => Promise.resolve({})),
     updateManyForms: jest.fn(() => Promise.resolve({}))
   };
-
-  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
   const defaultContext = {
     prisma,
@@ -32,10 +35,10 @@ describe("Forms -> markAsSealed mutation", () => {
       const form = getNewValidForm();
       // unvalidate form
       form.emitter.company.address = null;
-
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
+
       prisma.form.mockResolvedValue(flattenObjectForDb(form));
 
       await markAsSealed(null, { id: 1 }, defaultContext);
