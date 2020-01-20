@@ -14,8 +14,7 @@ import { sentry } from "graphql-middleware-sentry";
 import { shield } from "graphql-shield";
 import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import { authRouter } from "./routers/auth-router";
-import { csvExportHandler } from "./forms/exports/handler";
-import { pdfHandler } from "./forms/pdf";
+import { downloadFileHandler } from "./common/file-download";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
@@ -157,8 +156,7 @@ app.use(authRouter);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);
-app.get("/pdf", pdfHandler);
-app.get("/exports", csvExportHandler);
+app.get("/download", downloadFileHandler);
 app.use("/health", healthRouter);
 
 // GraphQL endpoint

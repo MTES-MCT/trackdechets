@@ -8,18 +8,20 @@ enum ExportType {
   OUTGOING = "OUTGOING"
 }
 
-export const csvExportHandler = async (req, res) => {
-  const { siret, exportType } = req.query;
+export async function downloadCsvExport(res, { sirets, exportType }) {
+  if (!sirets?.length || !exportType) {
+    return res.status(500).send("Paramètres invalides.");
+  }
 
   try {
-    const csv = await getCsvExport(siret.split(","), exportType);
+    const csv = await getCsvExport(sirets, exportType);
     res.setHeader("Content-disposition", "attachment; filename=export.csv");
     res.set("Content-Type", "text/csv");
     res.status(200).send(csv);
   } catch (e) {
     res.status(500).send(e.message);
   }
-};
+}
 
 async function getCsvExport(sirets: string[], exportType: ExportType) {
   const data = await getExportData(sirets, exportType);

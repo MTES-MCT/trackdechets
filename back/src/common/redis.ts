@@ -54,22 +54,30 @@ export async function cachedGet(
   try {
     const dbValue = await getter(itemKey);
 
-    const setOptions = Object.keys(options)
-      .map(key => {
-        const val = options[key];
-        // Some options don't have an associated value
-        if (isNaN(val)) {
-          return [key];
-        }
-        return [key, val];
-      })
-      .reduce((acc, val) => acc.concat(val), []);
-
     // No need to await the set, and it doesn't really matters if it fails
-    redis.set(cacheKey, parser.stringify(dbValue), setOptions).catch(_ => null);
+    setInCache(cacheKey, parser.stringify(dbValue), options).catch(_ => null);
 
     return dbValue;
   } catch (err) {
     throw err;
   }
+}
+
+export async function setInCache(
+  key: string,
+  value: any,
+  options: SetOptions = {}
+) {
+  const setOptions = Object.keys(options)
+    .map(key => {
+      const val = options[key];
+      // Some options don't have an associated value
+      if (isNaN(val)) {
+        return [key];
+      }
+      return [key, val];
+    })
+    .reduce((acc, val) => acc.concat(val), []);
+
+  return redis.set(key, value, setOptions);
 }
