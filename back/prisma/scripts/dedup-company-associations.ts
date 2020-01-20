@@ -10,7 +10,8 @@ type Association = {
 @registerUpdater(
   "Make company associations unique for a pair (company, user)",
   "Previously it was possible de create multiple associations between a user and a company. \
-  Keep only the most privileged association"
+  Keep only the most privileged association",
+  false
 )
 export class DedupCompanyAssociationsUpdater implements Updater {
   async run() {
