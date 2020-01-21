@@ -15,8 +15,15 @@ input TransporterSignatureFormInput {
   onuCode: String!
 }
 
+enum WasteAcceptationStatusInput {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}
+
 input ReceivedFormInput {
-  isAccepted: Boolean!
+  wasteAcceptationStatus: WasteAcceptationStatusInput!
+  wasteRefusalReason: String
   receivedBy: String!
   receivedAt: DateTime!
   quantityReceived: Float!
