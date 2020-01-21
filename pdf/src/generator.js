@@ -163,8 +163,7 @@ const imageLocations = {
   processingSignature: { x: 450, y: 732 },
   receivedSignature: { x: 200, y: 732 },
   exemptionStamp: { x: 400, y: 520 },
-  noTraceabilityStamp: { x: 155, y: 810 }
-
+  noTraceabilityStamp: { x: 300, y: 740 }
 };
 
 /**
@@ -180,8 +179,6 @@ const drawImage = (
   page,
   dimensions = { width: 75, height: 37 }
 ) => {
-
-
   location = imageLocations[locationName];
 
   page.drawImage(image, {
@@ -189,7 +186,7 @@ const drawImage = (
     y: pageHeight - location.y,
 
     ...dimensions
-  })
+  });
 };
 
 const capitalize = string =>
@@ -309,7 +306,7 @@ const getWasteDetailsPackagings = params => {
   if (!params.wasteDetailsPackagings) {
     return {};
   }
-  return params.wasteDetailsPackagings.reduce(function (acc, elem) {
+  return params.wasteDetailsPackagings.reduce(function(acc, elem) {
     let key = `wasteDetailsPackagings${capitalize(elem)}`;
     return {
       ...acc,
@@ -443,7 +440,10 @@ const write = async params => {
   }
 
   if (!!formData.transporterIsExemptedOfReceipt) {
-    drawImage("exemptionStamp", exemptionStampImage, firstPage, { width: 150, height: 65 });
+    drawImage("exemptionStamp", exemptionStampImage, firstPage, {
+      width: 150,
+      height: 65
+    });
   }
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes.buffer);
