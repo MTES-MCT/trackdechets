@@ -12,7 +12,7 @@ docker-compose up --build -d
 
 echo ">> Deploy to prisma..."
 api_container_id=$(docker ps -qf "name=integration_td-api")
- 
+
 docker exec -it $api_container_id bash /usr/src/app/integration-tests/wait-for-prisma.sh
 docker exec -it $api_container_id npx prisma deploy
 docker exec -it $api_container_id npx prisma reset --force

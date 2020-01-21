@@ -27,6 +27,7 @@ services:
     restart: always
     sysctls:
       - net.core.somaxconn=511
+
   td-api:
     image: td-api
     build:
