@@ -42,7 +42,7 @@ describe("inviteUserToCompany", () => {
   });
 
   it("should associate existing user to company if user exists", async () => {
-    const user = { id: "id", name: "Arya Starck" };
+    const user = { id: "id", name: "Arya Stark" };
     userMock.mockResolvedValueOnce(user);
 
     const company = { siret: "85001946400013", name: "Code en Stock" };
@@ -52,7 +52,7 @@ describe("inviteUserToCompany", () => {
 
     await inviteUserToCompany(
       adminUser,
-      "arya.starck@gmail.com",
+      "arya.stark@trackdechets.fr",
       "85001946400013",
       "MEMBER"
     );
@@ -65,8 +65,8 @@ describe("inviteUserToCompany", () => {
 
     expect(sendMailMock).toHaveBeenCalledWith(
       userMails.notifyUserOfInvite(
-        "arya.starck@gmail.com",
-        "Arya Starck",
+        "arya.stark@trackdechets.fr",
+        "Arya Stark",
         "John Snow",
         "Code en Stock"
       )
@@ -75,7 +75,12 @@ describe("inviteUserToCompany", () => {
 
   it("should create a temporary association if user does not exist", async () => {
     userMock.mockResolvedValueOnce(null);
-    createUserAccountHashMock.mockResolvedValueOnce("hash");
+    const userAccountHash = {
+      email: "arya.stark@trackdechets.fr",
+      hash: "hash",
+      role: "MEMBER"
+    };
+    createUserAccountHashMock.mockResolvedValueOnce(userAccountHash);
 
     const company = { siret: "85001946400013", name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
@@ -84,20 +89,20 @@ describe("inviteUserToCompany", () => {
 
     await inviteUserToCompany(
       adminUser,
-      "arya.starck@gmail.com",
+      "arya.stark@trackdechets.fr",
       "85001946400013",
       "MEMBER"
     );
 
     expect(createUserAccountHashMock).toHaveBeenCalledWith(
-      "arya.starck@gmail.com",
+      "arya.stark@trackdechets.fr",
       "MEMBER",
       "85001946400013"
     );
 
     expect(sendMailMock).toHaveBeenCalledWith(
       userMails.inviteUserToJoin(
-        "arya.starck@gmail.com",
+        "arya.stark@trackdechets.fr",
         "John Snow",
         "Code en Stock",
         "hash"
