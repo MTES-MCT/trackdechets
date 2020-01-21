@@ -38,7 +38,9 @@ const companySchema = (type: string) =>
 const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
 
 export const formSchema = object<any>().shape({
-  id: string().label("Identifiant (id)").required(),
+  id: string()
+    .label("Identifiant (id)")
+    .required(),
   emitter: object().shape({
     type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
     pickupSite: string().nullable(true),
@@ -92,4 +94,42 @@ export const formSchema = object<any>().shape({
       "La consistance du déchet doit être précisée"
     )
   })
+});
+
+export const receivedInfoSchema = object<any>().shape({
+  wasteAcceptationStatus: string()
+    .required()
+    .matches(/(ACCEPTED|REFUSED|PARTIALLY_REFUSED)/),
+  quantityReceived: number()
+    .required()
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.test(
+            "is-zero",
+            "Le champ quantityReceived doit être à 0 si le déchet est refusé",
+            v => v === 0
+          )
+        : schema
+    )
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.test(
+            "is-positive-or-zero",
+            "Le champ quantityReceived doit être un nombre supérieur ou égal 0",
+            v => v >= 0
+          )
+        : schema
+    ),
+
+  wasteRefusalReason: string().when(
+    "wasteAcceptationStatus",
+    (wasteAcceptationStatus, schema) =>
+      ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.required()
+        : schema.test(
+            "is-empty",
+            "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+            v => !v
+          )
+  )
 });
