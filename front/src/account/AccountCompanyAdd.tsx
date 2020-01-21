@@ -11,11 +11,16 @@ import { COMPANY_INFOS } from "../form/company/query";
 import CompanyType from "../login/CompanyType";
 import styles from "./AccountCompanyAdd.module.scss";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
+import { GET_ME } from "../dashboard/Dashboard";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
       id
+      name
+      givenName
+      siret
+      companyTypes
     }
   }
 `;
@@ -37,7 +42,21 @@ export default function AccountCompanyAdd() {
   const [
     createCompany,
     { loading: savingCompany, error: savingError }
-  ] = useMutation(CREATE_COMPANY);
+  ] = useMutation(CREATE_COMPANY, {
+    update(cache, { data: { createCompany } }) {
+      const getMeQuery = cache.readQuery<{ me: any }>({ query: GET_ME });
+      if (getMeQuery == null) {
+        return;
+      }
+      const { me } = getMeQuery;
+      me.companies = (me.companies || []).push(createCompany);
+
+      cache.writeQuery({
+        query: GET_ME,
+        data: { me }
+      });
+    }
+  });
   const [getCompanyInfos, { loading, data, error }] = useLazyQuery(
     COMPANY_INFOS
   );
@@ -109,7 +128,7 @@ export default function AccountCompanyAdd() {
             })
           };
         }}
-        onSubmit={(values) => {
+        onSubmit={values => {
           const { isAllowed, ...companyInput } = values;
           createCompany({ variables: { companyInput } }).then(_ => {
             history.push("/");
