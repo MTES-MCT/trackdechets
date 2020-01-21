@@ -1,5 +1,4 @@
 import { interpret, State } from "xstate";
-import { boolean, date, object, string, number, array } from "yup";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { Context } from "../../types";
@@ -10,120 +9,46 @@ export async function markAsSealed(_, { id }, context: Context) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
 }
 
-export const markAsSent = {
-  getValidationSchema: () =>
-    object().shape({
-      sentInfo: object({
-        sentAt: date().required("Vous devez saisir une date d'envoi."),
-        sentBy: string().required(
-          "Vous devez saisir un responsable de l'envoi."
-        )
-      })
-    }),
-  resolve: (_, { id, sentInfo }, context: Context) =>
-    transitionForm(
-      id,
-      { eventType: "MARK_SENT", eventParams: sentInfo },
-      context
-    )
-};
+export function markAsSent(_, { id, sentInfo }, context: Context) {
+  return transitionForm(
+    id,
+    { eventType: "MARK_SENT", eventParams: sentInfo },
+    context
+  );
+}
 
-export const markAsReceived = {
-  getValidationSchema: () =>
-    object().shape({
-      receivedInfo: object({
-        isAccepted: boolean().required(
-          "Vous devez préciser si vous acceptez ou non le déchet."
-        ),
-        receivedBy: string().required(
-          "Vous devez saisir un responsable de la réception."
-        ),
-        receivedAt: date().required("Vous devez saisir une date de réception."),
-        quantityReceived: number().positive(
-          "Vous devez saisir une quantité reçue supérieure à 0."
-        )
-      })
-    }),
-  resolve: (_, { id, receivedInfo }, context: Context) =>
-    transitionForm(
-      id,
-      { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
-      context
-    )
-};
+export function markAsReceived(_, { id, receivedInfo }, context: Context) {
+  return transitionForm(
+    id,
+    { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
+    context
+  );
+}
 
-export const markAsProcessed = {
-  getValidationSchema: () =>
-    object().shape({
-      processedInfo: object({
-        processingOperationDone: string().matches(
-          /(R|D)\s\d{1,2}/,
-          "Cette opération de traitement n'existe pas."
-        ),
-        processingOperationDescription: string().required(
-          "Vous devez renseigner la description de l'opération."
-        ),
-        processedBy: string().required(
-          "Vous devez saisir un responsable de traitement."
-        ),
-        processedAt: date().required(
-          "Vous devez saisir la date de traitement."
-        ),
-        nextDestinationProcessingOperation: string().nullable(true),
-        nextDestinationDetails: string().nullable(true),
-        noTraceability: boolean().nullable(true)
-      })
-    }),
-  resolve: (_, { id, processedInfo }, context: Context) =>
-    transitionForm(
-      id,
-      { eventType: "MARK_PROCESSED", eventParams: processedInfo },
-      context
-    )
-};
+export function markAsProcessed(_, { id, processedInfo }, context: Context) {
+  return transitionForm(
+    id,
+    { eventType: "MARK_PROCESSED", eventParams: processedInfo },
+    context
+  );
+}
 
-export const signedByTransporter = {
-  getValidationSchema: () =>
-    object().shape({
-      signingInfo: object({
-        sentAt: date().required("Vous devez saisir une date d'envoi."),
-        signedByTransporter: boolean().required(
-          "Voud devez indiquer si le transporteur a signé."
-        ),
-        securityCode: number().nullable(true),
-        sentBy: string().required(
-          "Vous devez saisir un responsable de l'envoi."
-        ),
-        signedByProducer: boolean().required(
-          "Voud devez indiquer si le producteur a signé."
-        ),
+export function signedByTransporter(_, { id, signingInfo }, context: Context) {
+  const input = {
+    ...signingInfo,
+    sentAt: signingInfo.sentAt,
+    sentBy: signingInfo.sentBy,
+    wasteDetailsPackagings: signingInfo.packagings,
+    wasteDetailsQuantity: signingInfo.quantity,
+    wasteDetailsOnuCode: signingInfo.onuCode
+  };
 
-        packagings: array().of(
-          string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/)
-        ),
-        quantity: number().positive(
-          "Vous devez saisir une quantité envoyée supérieure à 0."
-        ),
-        onuCode: string().required("Vous devez saisir un code ONU.")
-      })
-    }),
-  resolve: (_, { id, signingInfo }, context: Context) => {
-    const input = {
-      ...signingInfo,
-      sentAt: signingInfo.sentAt,
-      sentBy: signingInfo.sentBy,
-      wasteDetailsPackagings: signingInfo.packagings,
-      wasteDetailsQuantity: signingInfo.quantity,
-      wasteDetailsOnuCode: signingInfo.onuCode
-    };
-
-    return transitionForm(
-      id,
-      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: input },
-      context
-    );
-  }
-};
+  return transitionForm(
+    id,
+    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: input },
+    context
+  );
+}
 
 async function transitionForm(
   formId: string,
