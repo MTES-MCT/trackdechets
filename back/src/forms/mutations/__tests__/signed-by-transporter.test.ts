@@ -40,7 +40,7 @@ describe("Forms -> signedByTransporter mutation", () => {
         emitterCompanySiret: "a siret"
       });
 
-      await signedByTransporter.resolve(
+      await signedByTransporter(
         null,
         { id: 1, signingInfo: { signedByTransporter: true } },
         defaultContext
@@ -60,7 +60,7 @@ describe("Forms -> signedByTransporter mutation", () => {
         emitterCompanySiret: "a siret"
       });
 
-      await signedByTransporter.resolve(
+      await signedByTransporter(
         null,
         { id: 1, signingInfo: { signedByProducer: true } },
         defaultContext
@@ -80,7 +80,7 @@ describe("Forms -> signedByTransporter mutation", () => {
         emitterCompanySiret: "a siret"
       });
 
-      await signedByTransporter.resolve(
+      await signedByTransporter(
         null,
         {
           id: 1,
@@ -112,7 +112,7 @@ describe("Forms -> signedByTransporter mutation", () => {
       );
     prisma.$exists.company.mockResolvedValue(true);
 
-    await signedByTransporter.resolve(
+    await signedByTransporter(
       null,
       {
         id: 1,
