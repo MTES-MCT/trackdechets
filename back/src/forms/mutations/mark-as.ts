@@ -73,7 +73,7 @@ async function transitionForm(
   const actorSirets = userCompanies.map(c => c.siret);
 
   const startingState = State.from(form.status, {
-    form,
+    form: { ...form, ...eventParams },
     actorSirets,
     requestContext: context,
     isStableState: true
