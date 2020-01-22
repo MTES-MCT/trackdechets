@@ -72,7 +72,8 @@ async function transitionForm(
     form: { ...form, ...formPropsFromEvent },
     actorSirets,
     requestContext: context,
-    isStableState: true
+    isStableState: true,
+    eventParams
   });
 
   if (
