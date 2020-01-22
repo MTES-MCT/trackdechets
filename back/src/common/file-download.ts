@@ -34,7 +34,7 @@ export async function getFileDownloadToken(
   await setInCache(token, JSON.stringify({ type, params }), { EX: 10 });
   registerFileDownloader(type, downloadHandler);
 
-  return { token };
+  return { token, link: `https://${process.env.API_HOST}/download?token=${token}` };
 }
 
 /**
@@ -54,7 +54,7 @@ export async function downloadFileHandler(req: Request, res: Response) {
 
   const fileDownloader = fileDownloaders[type];
   if (!fileDownloader) {
-    return res.send(500).send("Type de fichier inconnu.");
+    return res.status(500).send("Type de fichier inconnu.");
   }
 
   return fileDownloader(res, params);
