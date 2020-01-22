@@ -1,60 +1,25 @@
-import { compare, hash } from "bcrypt";
+import { compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { randomNumber } from "../utils";
-import { Context } from "../types";
-import { prisma } from "../generated/prisma-client";
-import { sendMail } from "../common/mails.helper";
-import { userMails } from "./mails";
-import { getUserCompanies } from "../companies/queries";
-import { hashPassword } from "./utils";
 import { DomainError, ErrorCode } from "../common/errors";
+import { sendMail } from "../common/mails.helper";
+import { getUserCompanies } from "../companies/queries";
+import { prisma } from "../generated/prisma-client";
+import { Context } from "../types";
+import { userMails } from "./mails";
 import {
   changePassword,
   editProfile,
   inviteUserToCompany,
   resendInvitation
 } from "./mutations";
+import signup from "./queries/signup";
+import { hashPassword } from "./utils";
 
 const { JWT_SECRET } = process.env;
 
 export default {
   Mutation: {
-    signup: async (_, { userInfos }, context: Context) => {
-      const hashedPassword = await hashPassword(userInfos.password);
-
-      const user = await context.prisma
-        .createUser({
-          name: userInfos.name,
-          email: userInfos.email,
-          password: hashedPassword,
-          phone: userInfos.phone
-        })
-        .catch(async _ => {
-          throw new DomainError(
-            "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide.",
-            ErrorCode.BAD_USER_INPUT
-          );
-        });
-
-      const activationHash = await hash(
-        new Date().valueOf().toString() + Math.random().toString(),
-        10
-      );
-      await context.prisma
-        .createUserActivationHash({
-          hash: activationHash,
-          user: {
-            connect: { id: user.id }
-          }
-        })
-        .catch(_ => {
-          throw new Error("Erreur technique. Le support a été informé.");
-        });
-
-      await sendMail(userMails.onSignup(user, activationHash));
-
-      return true;
-    },
+    signup,
     login: async (parent, { email, password }, context: Context) => {
       const user = await context.prisma.user({ email: email.trim() });
       if (!user) {
