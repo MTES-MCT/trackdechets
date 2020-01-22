@@ -1,4 +1,5 @@
 import { useLazyQuery, useMutation } from "@apollo/react-hooks";
+import cogoToast from "cogo-toast";
 import { Field, Form, Formik, useFormikContext } from "formik";
 import gql from "graphql-tag";
 import React, { useEffect, useRef, useState } from "react";
@@ -6,12 +7,12 @@ import { FaHourglassHalf } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
 import Loader from "../common/Loader";
 import RedErrorMessage from "../common/RedErrorMessage";
+import { GET_ME } from "../dashboard/Dashboard";
 import { Company } from "../form/company/CompanySelector";
 import { COMPANY_INFOS } from "../form/company/query";
 import CompanyType from "../login/CompanyType";
 import styles from "./AccountCompanyAdd.module.scss";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
-import { GET_ME } from "../dashboard/Dashboard";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -66,9 +67,17 @@ export default function AccountCompanyAdd() {
   }>(CREATE_UPLOAD_LINK);
 
   useEffect(() => {
-    if (data?.companyInfos != null) {
-      setCompanyInfos(data.companyInfos);
+    if (data?.companyInfos == null) {
+      return;
     }
+    if (data.companyInfos.isRegistered) {
+      cogoToast.error(
+        "Ce SIRET existe déjà dans Trackdéchets, impossible de le re-créer."
+      );
+      return;
+    }
+
+    setCompanyInfos(data.companyInfos);
   }, [data]);
 
   // Once we have a signed URL to upload to, upload the file and update `uploadLinkData`
