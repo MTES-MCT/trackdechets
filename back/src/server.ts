@@ -172,6 +172,14 @@ app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
  * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
  */
 
+// TODO Remove
+app.get("/pdf", (_, res) =>
+  res.send("Route dépréciée, utilisez la query GraphQL `formPdf`")
+);
+app.get("/exports", (_, res) =>
+  res.send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
+);
+
 server.applyMiddleware({
   app,
   cors: {

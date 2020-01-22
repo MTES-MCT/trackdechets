@@ -238,6 +238,7 @@ type Stat {
 
 type FileDownload {
   token: String
+  downloadLink: String
 }
 
 enum FormsRegisterExportType {
