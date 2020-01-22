@@ -11,7 +11,7 @@ input SignupInput {
 }
 
 type Mutation {
-  signup(userInfos: SignupInput!): Boolean
+  signup(userInfos: SignupInput!): User
   login(email: String!, password: String!): AuthPayload!
   changePassword(oldPassword: String!, newPassword: String!): AuthPayload!
   resetPassword(email: String!): Boolean
