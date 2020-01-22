@@ -55,43 +55,46 @@ export default function SlipActions({ form, currentUser }: IProps) {
           mutation={mutations[nextStep]}
           onCompleted={() => setIsOpen(false)}
         >
-          {(mark, { error }) => (
-            <React.Fragment>
-              <button
-                className="icon"
-                onClick={() => setIsOpen(true)}
-                title={buttons[nextStep].title}
-              >
-                {buttons[nextStep].icon({})}
-              </button>
-              <div
-                className="modal__backdrop"
-                id="modal"
-                style={{ display: isOpen ? "flex" : "none" }}
-              >
-                <div className="modal">
-                  <h2>{buttons[nextStep].title}</h2>
-                  {ButtonComponent && (
-                    <ButtonComponent
-                      onCancel={() => setIsOpen(false)}
-                      onSubmit={vars =>
-                        mark({ variables: { id: form.id, ...vars } })
-                      }
-                      form={form}
-                    />
-                  )}
-                  {error && (
-                    <div
-                      className="notification error action-error"
-                      dangerouslySetInnerHTML={{
-                        __html: error.graphQLErrors[0].message
-                      }}
-                    />
-                  )}
+          {(mark, { error }) => {
+            return (
+              <React.Fragment>
+                <button
+                  className="icon"
+                  onClick={() => setIsOpen(true)}
+                  title={buttons[nextStep].title}
+                >
+                  {buttons[nextStep].icon({})}
+                </button>
+                <div
+                  className="modal__backdrop"
+                  id="modal"
+                  style={{ display: isOpen ? "flex" : "none" }}
+                >
+                  <div className="modal">
+                    <h2>{buttons[nextStep].title}</h2>
+                    {ButtonComponent && (
+                      <ButtonComponent
+                        onCancel={() => setIsOpen(false)}
+                        onSubmit={vars => {
+                          return mark({ variables: { id: form.id, ...vars } });
+                        }}
+                        form={form}
+                      />
+                    )}
+
+                    {error && (
+                      <div
+                        className="notification error action-error"
+                        dangerouslySetInnerHTML={{
+                          __html: error.graphQLErrors[0].message
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-            </React.Fragment>
-          )}
+              </React.Fragment>
+            );
+          }}
         </Mutation>
       )}
     </div>
@@ -102,7 +105,7 @@ const buttons = {
   SEALED: { title: "Finaliser", icon: FaCheck, component: Sealed },
   SENT: { title: "Marquer comme envoyé", icon: FaEnvelope, component: Sent },
   RECEIVED: {
-    title: "Marquer comme reçu",
+    title: "Réception du déchet",
     icon: FaEnvelopeOpen,
     component: Received
   },

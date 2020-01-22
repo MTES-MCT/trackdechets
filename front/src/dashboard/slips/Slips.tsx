@@ -125,10 +125,7 @@ export default function Slips({ forms, me, hiddenFields = [] }: Props) {
                 </React.Fragment>
               )}
             </td>
-            <td>
-              {s.wasteDetails &&
-                `${s.quantityReceived || s.wasteDetails.quantity || "?"} t`}
-            </td>
+            <td>{quantityToDisplay(s)}</td>
             {hiddenFields.indexOf("status") === -1 && (
               <td>{statusLabels[s.status]}</td>
             )}
@@ -141,3 +138,25 @@ export default function Slips({ forms, me, hiddenFields = [] }: Props) {
     </table>
   );
 }
+/**
+ * Return a properly formatted quantity according to form state
+ * No waste details -> nothing
+ * if wasteDetails.quantityReceived is provided -> quantityReceived
+ * if quantity is provided -> quantity
+ *
+ * @param slip
+ * @return string
+ */
+const quantityToDisplay = slip => {
+  if (!slip.wasteDetails) {
+    return "";
+  }
+  if (slip.quantityReceived !== null) {
+    return `${slip.quantityReceived} t`;
+  }
+  if (slip.wasteDetails.quantity) {
+    return `${slip.wasteDetails.quantity} t`;
+  }
+
+  return "? t";
+};
