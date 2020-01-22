@@ -24,7 +24,7 @@ export default function SignupInfo() {
         <p>
           Une fois connecté, vous aurez la possibilité de créer un établissement
           dans Trackéchets pour commencer à déclarer vos bordereaux. Si votre
-          établissement existe déjà, adressez vous àun administrateur de votre
+          établissement existe déjà, adressez vous à un administrateur de votre
           entreprise et demandez lui de vous inviter.
         </p>
 
