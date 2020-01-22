@@ -1,4 +1,4 @@
-import { createCompany } from "../create-company";
+import createCompany from "../create-company";
 import { ErrorCode } from "../../../common/errors";
 
 const context = {
@@ -24,7 +24,7 @@ describe("Create company resolver", () => {
     context.prisma.$exists.company.mockResolvedValue(true);
 
     try {
-      await createCompany.resolve(null, { companyInput }, context as any);
+      await createCompany(null, { companyInput }, context as any);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
     }
@@ -34,7 +34,7 @@ describe("Create company resolver", () => {
     const companyInput = { siret: "a siret" };
     context.prisma.$exists.company.mockResolvedValue(false);
 
-    await createCompany.resolve(null, { companyInput }, context as any);
+    await createCompany(null, { companyInput }, context as any);
 
     expect(context.prisma.createCompany).toHaveBeenCalledTimes(1);
     expect(context.prisma.createCompanyAssociation).toHaveBeenCalledTimes(1);
