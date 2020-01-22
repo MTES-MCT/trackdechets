@@ -27,7 +27,6 @@ const mockedForm = {
   emitterPickupSite: "",
   recipientCap: "",
   emitterCompanyPhone: "06 12 45 56 78",
-  isAccepted: false,
   emitterCompanyMail: "producer@example.com",
   wasteDetailsOtherPackaging: "",
   receivedBy: "john",
@@ -69,7 +68,8 @@ const mockedForm = {
   emitterCompanySiret: "12343606600011",
   processingOperationDone: null,
   readableId: "TD-19-AAA03488",
-  recipientCompanyName: "Dechet processor SA"
+  recipientCompanyName: "Dechet processor SA",
+  wasteAcceptationStatus: "REFUSED"
 };
 
 const mockedCompanyAdmins = [
@@ -82,22 +82,29 @@ const mockedCompanyAdmins = [
   }
 ];
 
-const formPayload: FormSubscriptionPayload = {
+const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
   node: {
     id: "xyz12345",
     createdAt: "2019-10-16T07:45:13.959Z",
-    updatedAt: "2019-10-16T07:45:13.959Z"
+    updatedAt: "2019-10-16T07:45:13.959Z",
+    wasteAcceptationStatus: wasteAcceptationStatus,
+    wasteRefusalReason: "Non conforme",
+    quantityReceived: 21.3
   },
-  updatedFields: ["isAccepted"],
+  updatedFields: [
+    "wasteAcceptationStatus",
+    "wasteRefusalReason",
+    "quantityReceived"
+  ],
   mutation: "UPDATED",
   previousValues: {
     id: "xyz12345",
     createdAt: "2019-10-16T07:45:13.959Z",
     updatedAt: "2019-10-16T07:45:13.959Z"
   }
-};
+});
 
-// entreprise.data.gouv responses, gicving 66 and 77 departements for companies involved in the form
+// entreprise.data.gouv responses, giving 66 and 77 departements for companies involved in the form
 const insee1 = {
   siret: "12346084400013",
   siren: "123460844",
@@ -129,6 +136,7 @@ jest.mock("../../forms/pdf", () => ({
 jest.mock("../../companies/queries", () => ({
   getCompanyAdminUsers: jest.fn(() => mockedCompanyAdmins)
 }));
+
 // Mock prima DB
 jest.mock("../../generated/prisma-client", () => ({
   prisma: {
@@ -148,6 +156,7 @@ const { MJ_MAIN_TEMPLATE_ID } = process.env;
 describe("mailWhenFormIsDeclined", () => {
   // tweak and restore process.env after each test
   const OLD_ENV = process.env;
+
   beforeEach(() => {
     jest.resetModules(); //   clears the cache
     process.env = { ...OLD_ENV };
@@ -157,7 +166,7 @@ describe("mailWhenFormIsDeclined", () => {
     process.env = OLD_ENV;
   });
 
-  it("should send a request to td mail service for onboarding first step", async () => {
+  it("should send mails if waste is refused", async () => {
     process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
     // spies on axios get and post methods
     const mockedAxiosGet = jest.spyOn(axios, "get");
@@ -179,7 +188,7 @@ describe("mailWhenFormIsDeclined", () => {
       })
     );
 
-    await mailWhenFormIsDeclined(formPayload);
+    await mailWhenFormIsDeclined(formPayload("REFUSED"));
 
     // get called twice for td-insee
     expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
@@ -188,7 +197,76 @@ describe("mailWhenFormIsDeclined", () => {
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(3);
 
     const args = mockedAxiosPost.mock.calls;
-    // right service was calleds
+    // right service was called
+
+    expect(args[0][0]).toEqual("http://td-mail/send");
+    expect(args[1][0]).toEqual("http://td-mail/send");
+    expect(args[2][0]).toEqual("http://td-mail/send");
+
+    let payload1 = args[0][1];
+    let payload2 = args[1][1];
+    let payload3 = args[2][1];
+
+    // pdf from was attached
+    expect(payload1.attachment).toEqual("base64xyz");
+    expect(payload2.attachment).toEqual("base64xyz");
+    expect(payload3.attachment).toEqual("base64xyz");
+
+    // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
+    expect(payload1.to[0].email).toEqual("producer@example.com");
+    expect(payload2.to[0].email).toEqual(
+      "uid-11-66.dreal-occitanie@developpement-durable.gouv.fr"
+    );
+    expect(payload3.to[0].email).toEqual(
+      "ud77.driee-if@developpement-durable.gouv.fr"
+    );
+
+    // check form readable id is in mail body
+    expect(payload1.body).toContain("TD-19-AAA03488");
+    expect(payload2.body).toContain("TD-19-AAA03488");
+    expect(payload3.body).toContain("TD-19-AAA03488");
+
+    const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
+    expect(payload1.templateId).toEqual(templateId);
+    expect(payload2.templateId).toEqual(templateId);
+    expect(payload3.templateId).toEqual(templateId);
+
+    mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
+    mockedAxiosGet.mockReset(); // removes calls, instances, returned values and implementations
+  });
+
+  it("should send mails if waste is partially refused", async () => {
+    process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
+    // spies on axios get and post methods
+    const mockedAxiosGet = jest.spyOn(axios, "get");
+    const mockedAxiosPost = jest.spyOn(axios, "post");
+    (mockedAxiosGet as jest.Mock<any>)
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          data: insee1
+        })
+      )
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          data: insee2
+        })
+      );
+    (mockedAxiosPost as jest.Mock<any>).mockImplementation(() =>
+      Promise.resolve({
+        data: { result: "ok" }
+      })
+    );
+
+    await mailWhenFormIsDeclined(formPayload("PARTIALLY_REFUSED"));
+
+    // get called twice for td-insee
+    expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
+
+    // post called 3 times for mail sending
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(3);
+
+    const args = mockedAxiosPost.mock.calls;
+    // right service was called
 
     expect(args[0][0]).toEqual("http://td-mail/send");
     expect(args[1][0]).toEqual("http://td-mail/send");

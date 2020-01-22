@@ -113,7 +113,7 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
 }
 
 /**
- * When form is declined, send mail to emitter, dreal(s) from emitter and recipient
+ * When form is refused or partially refused, send mail to emitter, dreal(s) from emitter and recipient
  * The relevant forms is attached
  * Dreal notification can be toggled with NOTIFY_DREAL_WHEN_FORM_DECLINED setting
  * @param payload
@@ -121,9 +121,11 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
 export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   if (
     !payload.updatedFields ||
-    !payload.updatedFields.includes("isAccepted") ||
+    !payload.updatedFields.includes("wasteAcceptationStatus") ||
     !payload.node ||
-    payload.node.isAccepted
+    !["REFUSED", "PARTIALLY_REFUSED"].includes(
+      payload.node.wasteAcceptationStatus
+    )
   ) {
     return;
   }
@@ -164,9 +166,15 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
       ? [...companyAdmins, ...drealsRecipients]
       : [...companyAdmins];
 
+  // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value 
+  const mailFunction = {
+    REFUSED: userMails.formNotAccepted,
+    PARTIALLY_REFUSED: userMails.formPartiallyRefused
+  }[payload.node.wasteAcceptationStatus];
+  
   return Promise.all(
     recipients.map(admin => {
-      let payload = userMails.formNotAccepted(
+      let payload = mailFunction(
         admin.email,
         admin.name,
         form,
