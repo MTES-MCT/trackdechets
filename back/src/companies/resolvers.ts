@@ -10,8 +10,8 @@ import {
   getRubriques
 } from "./queries";
 import { updateCompany, renewSecurityCode } from "./mutations";
-import { createCompany } from "./mutations/create-company";
-import { createUploadLink } from "./mutations/create-upload-link";
+import createCompany from "./mutations/create-company";
+import createUploadLink from "./mutations/create-upload-link";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
