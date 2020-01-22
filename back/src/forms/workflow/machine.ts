@@ -18,7 +18,8 @@ export const formWorkflowMachine = Machine(
       form: null,
       actorSirets: [],
       requestContext: null,
-      isStableState: true
+      isStableState: true,
+      eventParams: {} as any
     },
     states: {
       [FormState.Draft]: {
@@ -204,7 +205,11 @@ export const formWorkflowMachine = Machine(
       isExemptOfTraceability: ctx => ctx.form.noTraceability,
       awaitsGroup: ctx =>
         !GROUP_CODES.includes(ctx.form.processingOperationDone),
-      isFormAccepted: ctx => ctx.form.isAccepted
+      isFormAccepted: ctx => {
+        return ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+          ctx.eventParams.wasteAcceptationStatus
+        );
+      }
     }
   }
 );
