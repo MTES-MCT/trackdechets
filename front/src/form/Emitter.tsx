@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
-import RadioButton from "./custom-inputs/RadioButton";
+import { RadioButton } from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
 
 type Values = {

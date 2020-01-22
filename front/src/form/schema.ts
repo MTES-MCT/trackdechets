@@ -9,6 +9,7 @@ import {
   LocaleObject,
   StringSchema
 } from "yup";
+import { WasteAcceptationStatus } from "../Constants";
 
 setLocale({
   mixed: {
@@ -89,4 +90,37 @@ export const formSchema = object().shape({
       "La consistance du déchet doit être précisée"
     )
   })
+});
+
+export const receivedFormSchema = object().shape({
+  receivedBy: string().required("Le champ est requis"),
+  receivedAt: date().required("Le champ est requis"),
+  wasteAcceptationStatus: string().oneOf([
+    WasteAcceptationStatus.ACCEPTED,
+    WasteAcceptationStatus.REFUSED,
+    WasteAcceptationStatus.PARTIALLY_REFUSED
+  ]),
+  quantityReceived: number()
+    .required("Le champ est requis et doit être un nombre")
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.test(
+            "is-zero",
+            "Le champ doit être à 0 si le déchet est refusé",
+            v => v === 0
+          )
+        : schema.moreThan(0, "Le champ doit être un nombre supérieur à 0")
+    ),
+
+  wasteRefusalReason: string().when(
+    "wasteAcceptationStatus",
+    (wasteAcceptationStatus, schema) =>
+      ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.required("Le champ doit être renseigné")
+        : schema.test(
+            "is-empty",
+            "Le champ ne doit pas être renseigné si le déchet est accepté",
+            v => !v
+          )
+  )
 });

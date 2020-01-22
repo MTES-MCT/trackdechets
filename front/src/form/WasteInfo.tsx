@@ -2,7 +2,7 @@ import React from "react";
 import WasteCode from "./waste-code/WasteCode";
 import { Field, connect } from "formik";
 import { wasteCodeValidator } from "./waste-code/waste-code.validator";
-import RadioButton from "./custom-inputs/RadioButton";
+import { RadioButton } from "./custom-inputs/RadioButton";
 import NumberInput from "./custom-inputs/NumberInput";
 import Packagings from "./packagings/Packagings";
 import RedErrorMessage from "../common/RedErrorMessage";

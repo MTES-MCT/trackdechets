@@ -1,21 +1,12 @@
 import { Form } from "../../../form/model";
 import { Me } from "../../../login/model";
+import { FormStatus } from "../../../Constants";
 
 export enum SlipTabs {
   DRAFTS,
   TO_SIGN,
   STATUS,
   HISTORY
-}
-
-enum FormStatus {
-  DRAFT = "DRAFT",
-  SEALED = "SEALED",
-  SENT = "SENT",
-  NO_TRACEABILITY = "NO_TRACEABILITY",
-  PROCESSED = "PROCESSED",
-  RECEIVED = "RECEIVED",
-  REFUSED = "REFUSED"
 }
 
 export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
