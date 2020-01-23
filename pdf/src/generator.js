@@ -87,11 +87,12 @@ const fieldSettings = {
   quantityReceived: { x: 198, y: 673, rightAlign: true },
   receivedBy10: { x: 85, y: 735 },
   receivedAt1: { x: 122, y: 683 },
+  wasteRefusalReason: { x: 100, y: 704, lineBreakAt: 50 },
 
   receivedAt2: { x: 66, y: 746 },
-  isAccepted: { x: 116, y: 696, fontSize: 12 },
 
-  isNotAccepted: { x: 161, y: 696, fontSize: 12 },
+  wasteAccepted: { x: 116, y: 696, fontSize: 12 },
+  wasteNotAccepted: { x: 161, y: 696, fontSize: 12 },
 
   processingOperationDone: { x: 338, y: 620 },
   processingOperationDescription: { x: 342, y: 640 },
@@ -161,7 +162,7 @@ const imageLocations = {
   transporterSignature: { x: 450, y: 525 },
   emitterSignature: { x: 450, y: 590 },
   processingSignature: { x: 450, y: 732 },
-  receivedSignature: { x: 200, y: 732 },
+  receivedSignature: { x: 210, y: 742 },
   exemptionStamp: { x: 400, y: 520 },
   noTraceabilityStamp: { x: 300, y: 740 }
 };
@@ -292,7 +293,8 @@ const renameAndFormatFields = params => ({
   transporterSentAt: dateFmt(params.sentAt),
   senderSentAt: dateFmt(params.sentAt),
   receivedAt1: dateFmt(params.receivedAt),
-  receivedAt2: dateFmt(params.receivedAt)
+  receivedAt2: dateFmt(params.receivedAt),
+  receivedBy10: params.receivedBy
 });
 
 /**
@@ -306,7 +308,7 @@ const getWasteDetailsPackagings = params => {
   if (!params.wasteDetailsPackagings) {
     return {};
   }
-  return params.wasteDetailsPackagings.reduce(function(acc, elem) {
+  return params.wasteDetailsPackagings.reduce(function (acc, elem) {
     let key = `wasteDetailsPackagings${capitalize(elem)}`;
     return {
       ...acc,
@@ -316,7 +318,7 @@ const getWasteDetailsPackagings = params => {
 };
 
 /**
- * Transform numbers as strings to be accpeted by the pdf template
+ * Transform numbers as strings to be accepted by the pdf template
  * @param params -  the full request payload
  * @returns {object}
  */
@@ -331,14 +333,44 @@ const stringifyNumberFields = params => {
 };
 
 /**
- * If waste is not accepted, we get isAccepted: false (not null), so we have to insert the isNotAccepted field.
+ * We rely on wasteAcceptationStatus field which can take the following values: null|ACCEPTED|PARTIALLY_REFUSED
+ * we return either { wasteAccepted: true } or { wasteNotAccepted: true }
  * @param params
  * @returns object
  */
 const getAcceptationStatus = params => {
-  if (params.isAccepted === false) return { isNotAccepted: true };
+  if (["ACCEPTED", "PARTIALLY_REFUSED"].includes(params.wasteAcceptationStatus))
+    return { wasteAccepted: true };
+  if (params.wasteAcceptationStatus === "REFUSED")
+    return { wasteNotAccepted: true };
   return {};
 };
+
+/**
+ * Compute estimated refused quantity
+ * @param wasteDetailsQuantity
+ * @param quantityReceived
+ * @returns {string}
+ */
+const getWasteQuantityRefused = (wasteDetailsQuantity, quantityReceived) =>
+  (wasteDetailsQuantity.toFixed(3) - quantityReceived.toFixed(3)).toFixed(3);
+
+/**
+ * Reword wasteRefusalReason if waste is partially refused
+ * @param params
+ * @returns object
+ */
+const getWasteRefusalreason = params =>
+  params.wasteAcceptationStatus === "PARTIALLY_REFUSED"
+    ? {
+      wasteRefusalReason: `Refus partiel: ${
+        params.wasteRefusalReason
+        } - Tonnage estimé de refus : ${getWasteQuantityRefused(
+          params.wasteDetailsQuantity,
+          params.quantityReceived
+        )} tonnes`
+    }
+    : {};
 
 /**
  * Apply transformers to payload
@@ -346,6 +378,7 @@ const getAcceptationStatus = params => {
  * @returns {object}
  */
 function process(params) {
+  params = { ...params, ...getWasteRefusalreason(params) }; // compute refused quantity before converting number to strings
   const data = stringifyNumberFields(params);
   return {
     ...data,
