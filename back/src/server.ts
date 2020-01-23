@@ -6,6 +6,7 @@ import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
 import { shield } from "graphql-shield";
 import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
+import * as bodyParser from "body-parser-graphql";
 
 import { getUser } from "./auth";
 import { csvExportHandler } from "./forms/exports/handler";
@@ -68,16 +69,15 @@ export const server = new ApolloServer({
   })
 });
 
-
-
 export const app = express();
+app.use(bodyParser.graphql()); // allow application/graphql header
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);
 app.get("/pdf", pdfHandler);
 app.get("/exports", csvExportHandler);
 app.use("/health", healthRouter);
-
+ app.use(bodyParser.graphql());
 server.applyMiddleware({
   app,
   cors: {
