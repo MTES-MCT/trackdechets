@@ -20,13 +20,13 @@ describe("Perform api requests", () => {
 
     const res = await axios({
       method: "POST",
-      url: "http://td-api/account/api",
+      url: "http://td-api/",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
       },
       data: {
-        query: "{   me {    id   email } } "
+        query: "{ me { id email }}"
       }
     });
 
@@ -40,12 +40,12 @@ describe("Perform api requests", () => {
 
     const res = await axios({
       method: "POST",
-      url: "http://td-api/account/api",
+      url: "http://td-api/",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/graphql"
       },
-      data: "{   me {     id   email  } } "
+      data: "{ me { id email }}"
     });
 
     expect(res.data.data.me.email).toEqual(user2.email);
