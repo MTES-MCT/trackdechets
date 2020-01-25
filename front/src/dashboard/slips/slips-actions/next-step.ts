@@ -22,13 +22,13 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
   switch (tab) {
     case SlipTabs.DRAFTS:
       return forms
-        .filter((f: Form) => f.status === FormStatus.DRAFT)
+        .filter((f: Form) => isDraftStatus(f.status))
         .sort((a: any, b: any) => a.createdAt - b.createdAt);
     case SlipTabs.TO_SIGN:
       return forms
         .filter(
           (f: Form) =>
-            f.status !== FormStatus.DRAFT && getNextStep(f, currentUser) != null
+            !isDraftStatus(f.status) && getNextStep(f, currentUser) != null
         )
         .sort((a: any, b: any) =>
           a.status > b.status
@@ -38,15 +38,13 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
             : -1
         );
     case SlipTabs.STATUS:
-      // filter from whose status is not DRAFT|PROCESSED|REFUSED and from which there is no next step for current user
+      // filter from whose status is not DRAFT|PROCESSED|NO_TRACEABILITY|REFUSED and from which there is no next step for current user
       return forms
         .filter(
           (f: Form) =>
-            !([
-              FormStatus.DRAFT,
-              FormStatus.PROCESSED,
-              FormStatus.REFUSED
-            ] as string[]).includes(f.status) && getNextStep(f, currentUser) == null
+            !isDraftStatus(f.status) &&
+            !isHistoryStatus(f.status) &&
+            getNextStep(f, currentUser) == null
         )
         .sort((a: any, b: any) =>
           a.status > b.status
@@ -59,13 +57,7 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
       return (
         forms
           // filter from whose status is   PROCESSED|NO_TRACEABILITY|REFUSED
-          .filter((f: Form) =>
-            ([
-              FormStatus.PROCESSED,
-              FormStatus.NO_TRACEABILITY,
-              FormStatus.REFUSED
-            ] as string[]).includes(f.status)
-          )
+          .filter((f: Form) => isHistoryStatus(f.status))
           .sort((a: any, b: any) => a.createdAt - b.createdAt)
       );
   }
@@ -91,4 +83,16 @@ export function getNextStep(form: Form, currentUser: Me) {
   if (form.status === FormStatus.SENT) return FormStatus.RECEIVED;
   if (form.status === FormStatus.RECEIVED) return FormStatus.PROCESSED;
   return null;
+}
+
+function isDraftStatus(status: string) {
+  return status === FormStatus.DRAFT;
+}
+
+function isHistoryStatus(status: string) {
+  return [
+    FormStatus.PROCESSED,
+    FormStatus.NO_TRACEABILITY,
+    FormStatus.REFUSED
+  ].includes(status as FormStatus);
 }
