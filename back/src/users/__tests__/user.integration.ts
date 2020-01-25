@@ -68,13 +68,13 @@ describe("User endpoint", () => {
             name: "New User"
             phone: ""
           }
-        )
+        ) { id }
       }
     `;
     const { mutate } = createTestClient(server);
 
     const { data } = await mutate({ mutation });
-    expect(data.token).not.toBeNull();
+    expect(data.id).not.toBeNull();
 
     const newUserExists = await prisma.$exists.user({ email: email });
     expect(newUserExists).toBe(true);
