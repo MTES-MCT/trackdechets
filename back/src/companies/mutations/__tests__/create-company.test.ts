@@ -7,7 +7,9 @@ const context = {
       company: jest.fn(() => Promise.resolve(false))
     },
     createCompany: jest.fn(() => Promise.resolve({ id: "companyId" })),
-    createCompanyAssociation: jest.fn(() => Promise.resolve())
+    createCompanyAssociation: jest.fn(() => ({
+      company: jest.fn(() => Promise.resolve())
+    }))
   },
   user: { id: "USER_ID" }
 };
@@ -36,7 +38,6 @@ describe("Create company resolver", () => {
 
     await createCompany(null, { companyInput }, context as any);
 
-    expect(context.prisma.createCompany).toHaveBeenCalledTimes(1);
     expect(context.prisma.createCompanyAssociation).toHaveBeenCalledTimes(1);
   });
 });

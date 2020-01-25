@@ -2,7 +2,11 @@ import { DomainError, ErrorCode } from "../../common/errors";
 import { Context } from "../../types";
 import { randomNumber } from "../../utils";
 
-export default async function createCompany(_, { companyInput }, context: Context) {
+export default async function createCompany(
+  _,
+  { companyInput },
+  context: Context
+) {
   const trimedSiret = companyInput.siret.replace(/\s+/g, "");
 
   const existingCompany = await context.prisma.$exists
@@ -22,26 +26,20 @@ export default async function createCompany(_, { companyInput }, context: Contex
     );
   }
 
-  const company = await context.prisma
-    .createCompany({
-      siret: trimedSiret,
-      codeNaf: companyInput.codeNaf,
-      gerepId: companyInput.gerepId,
-      name: companyInput.companyName,
-      companyTypes: { set: companyInput.companyTypes },
-      securityCode: randomNumber(4)
-    })
-    .catch(_ => {
-      throw new Error(
-        "Impossible de créer cet utilisateur. Veuillez contacter le support."
-      );
-    });
-
-  await context.prisma.createCompanyAssociation({
+  const companyAssociationPromise = context.prisma.createCompanyAssociation({
     user: { connect: { id: context.user.id } },
-    company: { connect: { id: company.id } },
+    company: {
+      create: {
+        siret: trimedSiret,
+        codeNaf: companyInput.codeNaf,
+        gerepId: companyInput.gerepId,
+        name: companyInput.companyName,
+        companyTypes: { set: companyInput.companyTypes },
+        securityCode: randomNumber(4)
+      }
+    },
     role: "ADMIN"
   });
 
-  return company;
+  return companyAssociationPromise.company();
 }
