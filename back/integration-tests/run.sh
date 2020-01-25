@@ -19,7 +19,7 @@ docker exec -t $api_container_id npx prisma deploy
 docker exec -t $api_container_id npx prisma reset --force
 
 echo ">> Run tests..."
-docker exec -t $api_container_id npx jest --config ./integration-tests/jest.config.js -i --forceExit --detectOpenHandles
+docker exec -t $api_container_id npx jest --config ./integration-tests/jest.config.js -i --forceExit
 
 echo ">> Stopping containers 🛏️ ..."
 
