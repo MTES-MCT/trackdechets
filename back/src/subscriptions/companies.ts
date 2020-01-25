@@ -1,20 +1,31 @@
+import { sendMail } from "../common/mails.helper";
+import {
+  alertTypes,
+  createNotICPEAlertCard,
+  createSiretUnknownAlertCard
+} from "../common/trello";
+import { anomalies, verifyPrestataire } from "../companies/verif";
 import {
   CompanySubscriptionPayload,
-  CompanyType
+  CompanyType,
+  prisma
 } from "../generated/prisma-client";
-import { verifyPrestataire, anomalies } from "../companies/verif";
-import {
-  createSiretUnknownAlertCard,
-  createNotICPEAlertCard,
-  alertTypes
-} from "../common/trello";
 
 export async function companiesSubscriptionCallback(
   payload: CompanySubscriptionPayload
 ) {
-  verifyPresta(payload).catch(err => {
-    console.error("Error on company verification form subscription", err);
-  });
+  await Promise.all([
+    verifyPresta(payload).catch(err => {
+      console.error("Error on company verification form subscription", err);
+    }),
+
+    warnIfUserCreatesTooManyCompanies(payload).catch(err => {
+      console.error(
+        "Error on 'User creates too many Companies' subscription",
+        err
+      );
+    })
+  ]);
 }
 
 async function verifyPresta(payload: CompanySubscriptionPayload) {
@@ -52,4 +63,53 @@ async function verifyPresta(payload: CompanySubscriptionPayload) {
       }
     }
   }
+}
+
+const NB_OF_COMAPNIES_BEFORE_ALERT = 5;
+
+async function warnIfUserCreatesTooManyCompanies(
+  payload: CompanySubscriptionPayload
+) {
+  if (payload.mutation !== "CREATED") {
+    return Promise.resolve();
+  }
+
+  const company = payload.node;
+  const associationsUsers = await prisma.companyAssociations({
+    where: { company: { id: company.siret } }
+  }).$fragment<{ user: { id: string; name: string } }[]>(`
+    fragment Users on companyAssociations {
+      user { id name }
+    }
+  `);
+
+  if (associationsUsers.length !== 1) {
+    throw new Error(
+      "A newly created company should have exactly one association."
+    );
+  }
+
+  const user = associationsUsers[0].user;
+
+  const userCompaniesNumber = await prisma
+    .companyAssociationsConnection({ where: { user: { id: user.id } } })
+    .aggregate()
+    .count();
+
+  if (userCompaniesNumber <= NB_OF_COMAPNIES_BEFORE_ALERT) {
+    return Promise.resolve();
+  }
+
+  return sendMail({
+    body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
+    subject:
+      "Alerte: Grand mombre de compagnies créées par un même utilisateur",
+    title: "Alerte: Grand mombre de compagnies créées par un même utilisateur",
+    to: [
+      {
+        email: "tech@trackdechets.beta.gouv.fr ",
+        name: "Equipe Trackdéchets"
+      }
+    ]
+  });
 }
