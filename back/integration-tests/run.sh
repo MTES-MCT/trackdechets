@@ -14,12 +14,12 @@ docker-compose up --build -d
 echo ">> Deploy to prisma..."
 api_container_id=$(docker ps -qf "name=integration_td-api")
 
-docker exec -it $api_container_id bash integration-tests/wait-for-prisma.sh
-docker exec -it $api_container_id npx prisma deploy
-docker exec -it $api_container_id npx prisma reset --force
+docker exec -t $api_container_id bash integration-tests/wait-for-prisma.sh
+docker exec -t $api_container_id npx prisma deploy
+docker exec -t $api_container_id npx prisma reset --force
 
 echo ">> Run tests..."
-docker exec -it $api_container_id npx jest --config integration.jest.config.js  -i --forceExit --detectOpenHandles
+docker exec -t $api_container_id npx jest --config ./integration-tests/jest.config.js -i --forceExit --detectOpenHandles
 
 echo ">> Stopping containers 🛏️ ..."
 
