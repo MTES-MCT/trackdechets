@@ -5,6 +5,7 @@ export API_HOST=api-td.local
 export PRISMA_ENDPOINT=http://prisma:4467/default/staging
 export PRISMA_SECRET=any_secret
 export COMPOSE_PROJECT_NAME=integration
+export MSYS_NO_PATHCONV=1 # needed for windows
 
 echo ">> Running integration test 🚀..."
 echo ">> Starting containers..."
