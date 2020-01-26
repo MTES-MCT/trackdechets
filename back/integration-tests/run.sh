@@ -1,24 +1,26 @@
 #!/bin/sh
 
 export NODE_ENV=test
-export PRISMA_ENDPOINT=http://localhost:4467/default/staging
+export API_HOST=api-td.local
+export PRISMA_ENDPOINT=http://prisma:4467/default/staging
 export PRISMA_SECRET=any_secret
-export JWT_SECRET=any_secret
-export BACK_PORT=8383
+export COMPOSE_PROJECT_NAME=integration
 
+echo ">> Running integration test 🚀..."
 echo ">> Starting containers..."
 docker-compose up --build -d
 
 echo ">> Deploy to prisma..."
-cd ../prisma
-npx prisma deploy
-npx prisma seed -r
+api_container_id=$(docker ps -qf "name=integration_td-api")
+ 
+docker exec -it $api_container_id bash /usr/src/app/integration-tests/wait-for-prisma.sh
+docker exec -it $api_container_id npx prisma deploy
+docker exec -it $api_container_id npx prisma reset --force
 
 echo ">> Run tests..."
-cd ..
-npx jest --config ./integration-tests/jest.config.js  -i --forceExit --detectOpenHandles
+docker exec -it $api_container_id npx jest --config integration.jest.config.js  -i --forceExit --detectOpenHandles
 
-echo ">> Stoping containers..."
-cd ./integration-tests
+echo ">> Stopping containers 🛏️ ..."
+
 docker-compose stop
 

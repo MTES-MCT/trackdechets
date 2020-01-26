@@ -16,14 +16,20 @@ type mailAttachment struct {
 }
 
 type mail struct {
-	TemplateID int64          `json:"templateId"`
-	ToEmail    string         `json:"toEmail"`
-	ToName     string         `json:"toName"`
-	Subject    string         `json:"subject"`
-	Title      string         `json:"title"`
-	Body       string         `json:"body"`
-	BaseURL    string         `json:"baseUrl"`
-	Attachment mailAttachment `json:"attachment"`
+	TemplateID int64                  `json:"templateId"`
+	To         []recipient            `json:"to"`
+	Cc         []recipient            `json:"cc"`
+	Subject    string                 `json:"subject"`
+	Title      string                 `json:"title"`
+	Body       string                 `json:"body"`
+	BaseURL    string                 `json:"baseUrl"`
+	Attachment mailAttachment         `json:"attachment"`
+	Vars       map[string]interface{} `json:"vars"`
+}
+
+type recipient struct {
+	Email string `json:",omitempty"`
+	Name  string `json:",omitempty"`
 }
 
 var mailjetClient = mailjet.NewMailjetClient(
@@ -66,10 +72,22 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if data.Body == "" || data.Subject == "" || data.Title == "" || data.ToEmail == "" || data.ToName == "" || data.TemplateID == 0 {
+	if data.Body == "" || data.Subject == "" || data.Title == "" || len(data.To) == 0 || data.TemplateID == 0 {
 		msg := fmt.Sprintf("Données manquantes: %v", data)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
+	}
+
+	Variables := map[string]interface{}{
+		"subject": data.Subject,
+		"title":   data.Title,
+		"body":    data.Body,
+		"baseurl": data.BaseURL,
+	}
+
+	// Merge pre-defined variables with dynamic variables
+	for k, v := range data.Vars {
+		Variables[k] = v
 	}
 
 	messagesInfoParams := mailjet.InfoMessagesV31{
@@ -77,21 +95,12 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 			Email: "noreply@trackdechets.fr",
 			Name:  "Noreply Trackdéchets",
 		},
-		To: &mailjet.RecipientsV31{
-			mailjet.RecipientV31{
-				Email: data.ToEmail,
-				Name:  data.ToName,
-			},
-		},
+		To:               getAsMailjetRecipients(data.To),
+		Cc:               getAsMailjetRecipients(data.Cc),
 		Subject:          data.Subject,
 		TemplateID:       data.TemplateID,
 		TemplateLanguage: true,
-		Variables: map[string]interface{}{
-			"subject": data.Subject,
-			"title":   data.Title,
-			"body":    data.Body,
-			"baseurl": data.BaseURL,
-		},
+		Variables:        Variables,
 	}
 
 	if (data.Attachment.File != "") && (data.Attachment.Name != "") {
@@ -115,4 +124,16 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Printf("Data: %+v\n", res)
+}
+
+func getAsMailjetRecipients(recipients []recipient) *mailjet.RecipientsV31 {
+	var mjRecipients mailjet.RecipientsV31
+	for _, recipient := range recipients {
+		mjRecipients = append(mjRecipients, mailjet.RecipientV31{
+			Email: recipient.Email,
+			Name:  recipient.Name,
+		})
+	}
+
+	return &mjRecipients
 }

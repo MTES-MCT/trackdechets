@@ -22,12 +22,14 @@ type Mutation {
   resetPassword(email: String!): Boolean
   editProfile(name: String, phone: String, email: String): User
   inviteUserToCompany(email: String!, siret: String!, role: UserRole!): CompanyPrivate
+  resendInvitation(email: String!, siret: String!): Boolean
   joinWithInvite(
     inviteHash: String!
     name: String!
     password: String!
   ): AuthPayload!
   removeUserFromCompany(userId: ID!, siret: String!):  CompanyPrivate
+  deleteInvitation(email: String!, siret: String!):  CompanyPrivate
 }
 
 type AuthPayload {

@@ -7,4 +7,4 @@ generate:
 secret: ${env:PRISMA_SECRET}
 
 seed:
-  run: npx ts-node ./seed.ts
+  run: npx ts-node ./prisma/seed.ts

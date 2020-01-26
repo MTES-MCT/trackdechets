@@ -5,14 +5,19 @@ type Attachment = {
   name: string;
   file: string;
 };
+type Recipient = {
+  name: string;
+  email: string;
+};
 type Mail = {
-  toEmail: string;
-  toName: string;
+  to: Recipient[];
+  cc?: Recipient[];
   subject: string;
   title: string;
   body: string;
   templateId?: number;
   attachment?: Attachment;
+  vars?: object;
 };
 
 export function sendMail(mail: Mail) {

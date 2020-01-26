@@ -8,7 +8,12 @@ import { userMails } from "./mails";
 import { getUserCompanies } from "../companies/queries";
 import { hashPassword } from "./utils";
 import { DomainError, ErrorCode } from "../common/errors";
-import { changePassword, editProfile, inviteUserToCompany } from "./mutations";
+import {
+  changePassword,
+  editProfile,
+  inviteUserToCompany,
+  resendInvitation
+} from "./mutations";
 
 const { JWT_SECRET } = process.env;
 
@@ -154,6 +159,8 @@ export default {
     },
     inviteUserToCompany: async (_, { email, siret, role }, context: Context) =>
       inviteUserToCompany(context.user, email, siret, role),
+    resendInvitation: async (_, { email, siret }, context: Context) =>
+      resendInvitation(context.user, email, siret),
     joinWithInvite: async (
       _,
       { inviteHash, name, password },
@@ -201,13 +208,22 @@ export default {
         })
         .catch(_ => {
           throw new Error(
-            `Erreur, l'utilisateur n'a pa pu être retiré de l'entreprise`
+            `Erreur, l'utilisateur n'a pas pu être retiré de l'entreprise`
           );
         });
 
       const company = await prisma.company({ siret });
 
       return company;
+    },
+
+    deleteInvitation: async (_, { email, siret }) => {
+      const deletedAccountHash = await prisma
+        .deleteManyUserAccountHashes({ email, companySiret: siret })
+        .catch(err => {
+          throw new Error(`Erreur, l'invitation n'a pas pu être supprimée`);
+        });
+      return prisma.company({ siret });
     }
   },
   Query: {

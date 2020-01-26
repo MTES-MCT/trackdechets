@@ -1,6 +1,9 @@
 import { prisma } from "../../generated/prisma-client";
 import { randomNumber } from "../../utils";
 import { DomainError, ErrorCode } from "../../common/errors";
+import { companyMails } from "../mails";
+import { getCompanyActiveUsers } from "../queries/companyUsers";
+import { sendMail } from "../../common/mails.helper";
 
 /**
  * This function is used to renew the security code
@@ -33,10 +36,21 @@ export default async function renewSecurityCode(siret: string) {
     newSecurityCode = randomNumber(4);
   }
 
-  return prisma.updateCompany({
+  const updatedCompany = await prisma.updateCompany({
     where: { siret },
     data: {
       securityCode: newSecurityCode
     }
   });
+
+  const users = await getCompanyActiveUsers(siret);
+  const recipients = users.map(({ email, name }) => ({ email, name }));
+
+  const email = companyMails.securityCodeRenewal(recipients, {
+    siret: updatedCompany.siret,
+    name: updatedCompany.name
+  });
+  sendMail(email);
+
+  return updatedCompany;
 }

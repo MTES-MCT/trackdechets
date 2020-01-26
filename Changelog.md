@@ -5,6 +5,14 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2020.01.3] 26/01/2020
+
+* Ajout de la possibilité de déclarer une rupture de tracabilité au traitement d'un déchet [PR #129](https://github.com/MTES-MCT/trackdechets/pull/129)
+* Ajout de liens dans le footer: statistiques, boite à outils communication ,forum technique, statut des applications
+* Notification email à tous les membres d'un établissement lors du renouvellement du code de sécurité
+* Renvoi et suppression d'invitations en attente [PR #132](https://github.com/MTES-MCT/trackdechets/pull/132) et [PR #137](https://github.com/MTES-MCT/trackdechets/pull/137)
+* Corrections de rendu pdf [PR #135](https://github.com/MTES-MCT/trackdechets/pull/135)
+
 ## [2020.01.2] 10/01/2020
 
 * Ajout d'un logo partenaire

@@ -6,6 +6,7 @@ RUN go get && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/insee
 
 # final stage
 FROM alpine
+RUN apk update && apk add ca-certificates
 WORKDIR /app
 COPY --from=build-env /go/src/app/build/ .
 EXPOSE 81

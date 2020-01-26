@@ -1,5 +1,3 @@
-import { and } from "graphql-shield";
-
 import { isAuthenticated, isCompanyAdmin } from "../common/rules";
 
 export default {
@@ -11,6 +9,8 @@ export default {
     changePassword: isAuthenticated,
     editProfile: isAuthenticated,
     inviteUserToCompany: isCompanyAdmin,
-    removeUserFromCompany: isCompanyAdmin
+    resendInvitation: isCompanyAdmin,
+    removeUserFromCompany: isCompanyAdmin,
+    deleteInvitation: isCompanyAdmin,
   }
 };

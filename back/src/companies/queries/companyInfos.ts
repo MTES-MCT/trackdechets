@@ -11,13 +11,6 @@ import { getCachedCompanySireneInfo } from "../insee";
  * @param siret
  */
 export async function getCompanyInfos(siret: string) {
-  if (siret.length != 14) {
-    throw new DomainError(
-      "Le siret doit faire 14 caractères",
-      ErrorCode.BAD_USER_INPUT
-    );
-  }
-
   // retrieve cached info from SIRENE database
   const sireneCompanyInfo = await getCachedCompanySireneInfo(siret);
 

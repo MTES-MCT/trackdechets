@@ -3,7 +3,7 @@ const pdflib = require("pdf-lib");
 const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 
-const { PDFDocument } = pdflib;
+const { PDFDocument, rgb } = pdflib;
 
 // Object to configure field settings
 // coordinates: top/left, mandatory
@@ -111,7 +111,7 @@ const pageHeight = 842;
  * Write text on the pdf by retrieving field params in fieldSettings object
  *  Can right align, limit content length or split content according to fieldSettings params.
  *
- *  @param fieldName - name of the field
+ * @param fieldName - name of the field
  * @param content - text to write
  * @param font - font object
  * @param page - page on which we want to write
@@ -162,7 +162,8 @@ const imageLocations = {
   emitterSignature: { x: 450, y: 590 },
   processingSignature: { x: 450, y: 732 },
   receivedSignature: { x: 200, y: 732 },
-  exemptionStamp: { x: 450, y: 487 }
+  exemptionStamp: { x: 400, y: 520 },
+  noTraceabilityStamp: { x: 300, y: 740 }
 };
 
 /**
@@ -171,14 +172,20 @@ const imageLocations = {
  * @param image - which image we want to draw
  * @param page - page on which we want to write
  */
-const drawImage = (locationName, image, page) => {
+
+const drawImage = (
+  locationName,
+  image,
+  page,
+  dimensions = { width: 75, height: 37 }
+) => {
   location = imageLocations[locationName];
 
   page.drawImage(image, {
     x: location.x,
     y: pageHeight - location.y,
-    width: 75,
-    height: 37
+
+    ...dimensions
   });
 };
 
@@ -387,6 +394,11 @@ const write = async params => {
   );
   const exemptionStampImage = await pdfDoc.embedPng(exemptionStampBytes);
 
+  const noTraceabilityBytes = fs.readFileSync(
+    path.join(__dirname, "./medias/no-traceability.png")
+  );
+  const noTraceabilityImage = await pdfDoc.embedPng(noTraceabilityBytes);
+
   // customId does not belong to original cerfa, so we had to add our own field title and mimic font look and feel
   if (!!formData.customId) {
     firstPage.drawText("Autre n° libre :", {
@@ -407,6 +419,13 @@ const write = async params => {
     }
   }
 
+  if (!!formData.noTraceability) {
+    drawImage("noTraceabilityStamp", noTraceabilityImage, firstPage, {
+      width: 100,
+      height: 50
+    });
+  }
+
   if (!!formData.signedByTransporter) {
     drawImage("transporterSignature", stampImage, firstPage);
   }
@@ -421,9 +440,11 @@ const write = async params => {
   }
 
   if (!!formData.transporterIsExemptedOfReceipt) {
-    drawImage("exemptionStamp", exemptionStampImage, firstPage);
+    drawImage("exemptionStamp", exemptionStampImage, firstPage, {
+      width: 150,
+      height: 65
+    });
   }
-
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes.buffer);
 };

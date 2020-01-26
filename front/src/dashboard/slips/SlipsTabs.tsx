@@ -1,21 +1,23 @@
-import React from "react";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import "./SlipsTabs.scss";
-import Slips from "./Slips";
-import { GET_SLIPS } from "./query";
 import { Query } from "@apollo/react-components";
-import { Me } from "../../login/model";
-import { getTabForms, SlipTabs } from "./slips-actions/next-step";
+import React from "react";
 import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import Loader from "../../common/Loader";
+import { Me } from "../../login/model";
+import { GET_SLIPS } from "./query";
+import Slips from "./Slips";
+import { getTabForms, SlipTabs } from "./slips-actions/next-step";
+
+import "./SlipsTabs.scss";
 
 type Props = { me: Me; siret?: string };
 export default function SlipsTabs({ me, siret }: Props) {
   return (
     <Query query={GET_SLIPS} variables={{ siret }}>
       {({ loading, error, data }) => {
-        if (loading) return <p>"..."</p>;
-        if (error || !data) return <p>"Erreur..."</p>;
+        if (loading) return <Loader />;
+        if (error || !data) return <p>Erreur...</p>;
 
         const drafts = getTabForms(SlipTabs.DRAFTS, data.forms, me);
         const toSign = getTabForms(SlipTabs.TO_SIGN, data.forms, me);

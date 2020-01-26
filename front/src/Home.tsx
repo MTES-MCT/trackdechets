@@ -5,6 +5,7 @@ import "./Home.scss";
 import { localAuthService } from "./login/auth.service";
 import { trackEvent } from "./tracker";
 import LazyLoad from "react-lazyload";
+import Footer from "./Footer";
 
 export default function Home() {
   return (
@@ -220,54 +221,7 @@ export default function Home() {
           </p>
         </div>
       </section> */}
-
-      <footer className="footer" role="contentinfo">
-        <div className="container">
-          <div className="footer__logo">
-            <LazyLoad height={60}>
-              <img src="/logo-mtes-mef.svg" />
-            </LazyLoad>
-            <div className="footer__logo-text">
-              <LazyLoad height={60}>
-                <img src="/logo-fabnum.svg" />
-              </LazyLoad>
-              <small>
-                Trackdéchets est un service numérique de l'Etat incubé à la
-                Fabrique Numérique du Ministère de la Transition écologique et
-                solidaire, membre du réseau d’incubateurs{" "}
-                <a href="https://beta.gouv.fr">beta.gouv.fr</a>
-              </small>
-            </div>
-          </div>
-          <ul className="footer__links">
-            <li>
-              <h3>Trackdéchets</h3>
-            </li>
-            <li>
-              <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
-                Nous contacter
-              </a>
-            </li>
-            <li>
-              <Link to="/faq">Foire aux questions</Link>
-            </li>
-            <li>
-              <Link to="/cgu">Conditions générales d'utilisation</Link>
-            </li>
-            <li>
-              <a href="/Politique de confidentialité.pdf" target="_blank">
-                Politique de confidentialité
-              </a>
-            </li>
-            <li>
-              <a href="http://api.trackdechets.beta.gouv.fr">API Playground</a>
-            </li>
-            <li>
-              <a href="http://doc.trackdechets.fr">Documentation API</a>
-            </li>
-          </ul>
-        </div>
-      </footer>
+      <Footer />
     </React.Fragment>
   );
 }

@@ -28,15 +28,6 @@ describe("companyInfos", () => {
     installationMock.mockReset();
   });
 
-  it("should throw BAD_USER_INPUT error if \
-    the siret is not 14 character length", async () => {
-    expect.assertions(1);
-    try {
-      await getCompanyInfos("invalide");
-    } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-    }
-  });
   it("should throw NOT_FOUND error if the siret is not in sirene database", async () => {
     sireneMock.mockResolvedValueOnce({ siret: "" });
     expect.assertions(1);

@@ -11,10 +11,9 @@ export default withRouter(function Header({ history }) {
         <Link className="navbar__home" to="/">
           <img
             className="navbar__logo"
-            src="/marianne.svg"
+            src="/trackdechets.png"
             alt="trackdechets.data.gouv.fr"
           />
-          Trackdéchets
         </Link>
 
         <nav>
