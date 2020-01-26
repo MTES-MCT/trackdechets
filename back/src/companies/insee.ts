@@ -2,7 +2,7 @@ import axios from "axios";
 import { cachedGet } from "../common/redis";
 import { DomainError, ErrorCode } from "../common/errors";
 
-const COMPANY_INFOS_CACHE_KEY = "CompanyInfos";
+export const COMPANY_INFOS_CACHE_KEY = "CompanyInfos";
 const INSEE_URI = "http://td-insee:81";
 const EXPIRY_TIME = 60 * 60 * 24;
 

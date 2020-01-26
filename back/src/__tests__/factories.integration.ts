@@ -2,7 +2,8 @@ import { prisma } from "../generated/prisma-client";
 import {
   userFactory,
   companyFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  formFactory,
 } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
 
@@ -46,5 +47,17 @@ describe("Test Factories", () => {
     const companyAssociations = usr.companyAssociations;
     expect(companyAssociations.length).toBe(1);
     expect(companyAssociations[0].company.siret).toBe(company.siret);
+  });
+
+  test("should create a form", async () => {
+    const usr = await userFactory();
+
+    const newfrm = await formFactory({
+      ownerId: usr.id,
+      opt: { emitterCompanyName: "somecompany" }
+    });
+
+    expect(newfrm.id).toBeTruthy();
+    expect(newfrm.emitterCompanyName).toBe("somecompany");
   });
 });
