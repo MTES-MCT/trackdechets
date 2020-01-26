@@ -1,6 +1,9 @@
 import {
   CompanyCreatecompanyTypesInput,
   CompanyType,
+  Consistence,
+  EmitterType,
+  QuantityType,
   prisma,
   UserRole
 } from "../generated/prisma-client";
@@ -78,4 +81,79 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
     user: { connect: { id: user.id } }
   });
   return { user, accessToken };
+};
+
+const formdata = {
+  wasteDetailsQuantity: 22.5,
+  signedByTransporter: true,
+  emitterCompanyName: "WASTE PRODUCER",
+  transporterCompanyName: "WASTE TRANSPORTER",
+  traderCompanyAddress: "",
+  transporterReceipt: "33AA",
+  quantityReceived: null,
+  processedAt: null,
+  wasteDetailsOnuCode: "",
+  emitterType: "PRODUCER" as EmitterType,
+  traderValidityLimit: null,
+  traderCompanyContact: "",
+  wasteDetailsCode: "05 01 04*",
+  processedBy: null,
+  recipientCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+  nextDestinationDetails: null,
+  transporterDepartment: "86",
+  emitterPickupSite: "",
+  recipientCap: "",
+  emitterCompanyPhone: "06 18 76 02 96",
+  isAccepted: null,
+  emitterCompanyMail: "lp@providenz.fr",
+  wasteDetailsOtherPackaging: "",
+  receivedBy: null,
+  transporterCompanySiret: "9876",
+  processingOperationDescription: null,
+  transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+  nextDestinationProcessingOperation: null,
+  recipientCompanyPhone: "06 18 76 02 99",
+  traderCompanyName: "",
+  wasteAcceptationStatus: null,
+  customId: null,
+  isDeleted: false,
+  transporterCompanyContact: "transporter",
+  traderCompanyMail: "",
+  emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
+  sentBy: "signe",
+  status: "SENT",
+  wasteRefusalReason: "",
+  recipientCompanySiret: "5678",
+  transporterCompanyMail: "transporter@td.io",
+  wasteDetailsName: "Divers",
+  traderDepartment: "",
+  recipientCompanyContact: "Jean Dupont",
+  receivedAt: null,
+  transporterIsExemptedOfReceipt: false,
+  sentAt: "2019-11-20T00:00:00.000Z",
+  traderCompanySiret: "",
+  transporterNumberPlate: "aa22",
+  recipientProcessingOperation: "D 6",
+  wasteDetailsPackagings: ["CITERNE"],
+  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+  emitterCompanyContact: "Marc Martin",
+  traderReceipt: "",
+  wasteDetailsQuantityType: "ESTIMATED" as QuantityType,
+  transporterCompanyPhone: "06 18 76 02 66",
+  recipientCompanyMail: "recipient@td.io",
+  wasteDetailsConsistence: "SOLID" as Consistence,
+  wasteDetailsNumberOfPackages: 1,
+  traderCompanyPhone: "",
+  noTraceability: null,
+  emitterCompanySiret: "1234",
+  processingOperationDone: null,
+  recipientCompanyName: "WASTE COMPANY"
+};
+
+export const formFactory = async ({ ownerId, opt = {} }) => {
+  const formParams = { ...formdata, ...opt };
+  return prisma.createForm({
+    ...formParams,
+    owner: { connect: { id: ownerId } }
+  });
 };
