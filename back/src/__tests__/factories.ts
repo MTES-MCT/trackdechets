@@ -32,6 +32,24 @@ export const userFactory = async (opt = {}) => {
 };
 
 /**
+ * Left pad a given index with 0s
+ * @param index numerical index
+ */
+function siretify(index) {
+  const siretLength = 14;
+  let siret = `${index}`;
+  if (siret.length === siretLength) {
+    return siret;
+  }
+  if (siret.length > siretLength) {
+    throw Error("Generated siret is too long");
+  }
+  // polyfill for str.padStart
+  let padding = "0".repeat(siretLength - siret.length);
+  return padding + siret;
+}
+
+/**
  * Create a company with name, siret, security code and PORDUCER by default
  * @param opt: extram parameters
  */
@@ -42,7 +60,7 @@ export const companyFactory = async (opt = {}) => {
       .aggregate()
       .count()) + 1;
   return prisma.createCompany({
-    siret: `${companyIndex}`,
+    siret: siretify(companyIndex),
     companyTypes: {
       set: ["PRODUCER" as CompanyType]
     } as CompanyCreatecompanyTypesInput,

@@ -3,7 +3,7 @@ import {
   userFactory,
   companyFactory,
   userWithCompanyFactory,
-  formFactory,
+  formFactory
 } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
 
@@ -22,6 +22,7 @@ describe("Test Factories", () => {
     const company = await companyFactory();
 
     expect(company.id).toBeTruthy();
+    expect(company.siret.length).toBe(14);
   });
 
   test("should create a user with a company", async () => {
