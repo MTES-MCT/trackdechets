@@ -1,27 +1,22 @@
-import { createTestClient } from "apollo-server-integration-testing";
-import { prisma, UserRole } from "../generated/prisma-client";
+import { prisma, UserRole } from "../../generated/prisma-client";
 
-import * as mailsHelper from "../common/mails.helper";
+import * as mailsHelper from "../../common/mails.helper";
 
-import { cachedGet } from "../common/redis";
+import { cachedGet } from "../../common/redis";
+import makeClient from "../../__tests__/testClient";
 
-import { COMPANY_INFOS_CACHE_KEY } from "../companies/insee";
-import { server } from "../server";
-const { JWT_SECRET } = process.env;
-
-import { sign } from "jsonwebtoken";
-
-// No mails
-const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
-sendMailSpy.mockImplementation(() => Promise.resolve());
-
+import { COMPANY_INFOS_CACHE_KEY } from "../../companies/insee";
 import {
   formFactory,
   userFactory,
   userWithCompanyFactory,
   companyFactory
-} from "./factories";
-import { resetDatabase } from "../../integration-tests/helper";
+} from "../../__tests__/factories";
+import { resetDatabase } from "../../../integration-tests/helper";
+
+// No mails
+const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
+sendMailSpy.mockImplementation(() => Promise.resolve());
 
 const prepareDB = async () => {
   const {
@@ -101,21 +96,7 @@ describe("Test Form reception", () => {
       recipientCompany
     });
 
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-    // Generate and pass token into Auth header
-    const token = sign({ userId: recipient.id }, JWT_SECRET, {
-      expiresIn: "1d"
-    });
-    setOptions({
-      request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    });
+    const { mutate } = makeClient(recipient);
     const mutation = `
       mutation {
         markAsReceived(
@@ -153,21 +134,7 @@ describe("Test Form reception", () => {
       recipientCompany
     });
 
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-
-    const token = sign({ userId: recipient.id }, JWT_SECRET, {
-      expiresIn: "1d"
-    });
-    setOptions({
-      request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    });
+    const { mutate } = makeClient(recipient);
     // payload contains a negative quantity value, which must not be accepted
     const mutation = `
       mutation {
@@ -186,7 +153,46 @@ describe("Test Form reception", () => {
     await mutate(mutation);
 
     const frm = await prisma.form({ id: form.id });
-    // form was accepted
+    // form was not accepted, still sent
+    expect(frm.status).toBe("SENT");
+    expect(frm.wasteAcceptationStatus).toBe(null);
+    expect(frm.receivedBy).toBe(null);
+    expect(frm.quantityReceived).toBe(null);
+  });
+
+  it("should not accept 0 value when form is accepted", async () => {
+    const {
+      emitter,
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form
+    } = await prepareDB();
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    const { mutate } = makeClient(recipient);
+    // payload contains a null quantity value whereas wasteAcceptationStatus is ACCEPTED, which is invalid
+    const mutation = `
+      mutation {
+        markAsReceived(
+            id: "${form.id}",
+            receivedInfo: {
+            receivedBy: "Bill",
+            receivedAt :"2019-01-17T10:22:00+0100",
+            wasteAcceptationStatus: ACCEPTED,
+            quantityReceived: 0
+      }
+        ) { status }
+      }
+    `;
+
+    await mutate(mutation);
+
+    const frm = await prisma.form({ id: form.id });
+    // form was not accepted, still sent
     expect(frm.status).toBe("SENT");
     expect(frm.wasteAcceptationStatus).toBe(null);
     expect(frm.receivedBy).toBe(null);
@@ -204,20 +210,7 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipientCompany
     });
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-    const token = sign({ userId: recipient.id }, JWT_SECRET, {
-      expiresIn: "1d"
-    });
-    setOptions({
-      request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    });
+    const { mutate } = makeClient(recipient);
     const mutation = `
       mutation {
         markAsReceived(
@@ -257,21 +250,7 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipientCompany
     });
-
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-    const token = sign({ userId: recipient.id }, JWT_SECRET, {
-      expiresIn: "1d"
-    });
-    setOptions({
-      request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    });
+    const { mutate } = makeClient(recipient);
     const mutation = `
       mutation {
         markAsReceived(
@@ -322,21 +301,7 @@ describe("Test Form reception", () => {
         receivedBy: "Hugo"
       }
     });
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-    // Generate and pass token into Auth header
-    const token = sign({ userId: recipient.id }, JWT_SECRET, {
-      expiresIn: "1d"
-    });
-    setOptions({
-      request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    });
+    const { mutate } = makeClient(recipient);
     const mutation = `
       mutation {
         markAsReceived(
@@ -354,7 +319,6 @@ describe("Test Form reception", () => {
     `;
 
     await mutate(mutation);
-
 
     const frm = await prisma.form({ id: alreadyReceivedForm.id });
     // form is not updated by the last mutation
@@ -380,21 +344,7 @@ describe("Test Form reception", () => {
         }
       }
     });
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-    // Generate and pass token into Auth header
-    const token = sign({ userId: randomUser.id }, JWT_SECRET, {
-      expiresIn: "1d"
-    });
-    setOptions({
-      request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    });
+    const { mutate } = makeClient(randomUser);
     const mutation = `
       mutation {
         markAsReceived(
