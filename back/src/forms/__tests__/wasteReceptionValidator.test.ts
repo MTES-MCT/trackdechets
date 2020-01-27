@@ -1,9 +1,11 @@
-import { receivedInfoSchema } from "../validator";
+import { receivedInfoSchema } from "../schema-validation";
 
 const acceptedInfo = {
   wasteAcceptationStatus: "ACCEPTED",
   quantityReceived: 12.5,
-  wasteRefusalReason: ""
+  wasteRefusalReason: "",
+  receivedBy: "Jim",
+  receivedAt :"2020-01-17T10:12:00+0100"
 };
 
 describe("waste is accepted", () => {
@@ -43,13 +45,15 @@ describe("waste is accepted", () => {
 const refusedInfo = {
   wasteAcceptationStatus: "REFUSED",
   quantityReceived: 0,
-  wasteRefusalReason: "non conformity"
+  wasteRefusalReason: "non conformity",
+  receivedBy: "Joe",
+  receivedAt :"2020-01-17T10:12:00+0100"
 };
 
 describe("waste is refused", () => {
   const { wasteAcceptationStatus, quantityReceived } = refusedInfo;
 
-  it("should be valid when waste is refused", async () => {
+  it.only("should be valid when waste is refused", async () => {
     const isValid = await receivedInfoSchema.isValid(refusedInfo);
     expect(isValid).toEqual(true);
   });
@@ -79,7 +83,9 @@ describe("waste is refused", () => {
 const partiallyRefusedInfo = {
   wasteAcceptationStatus: "PARTIALLY_REFUSED",
   quantityReceived: 11,
-  wasteRefusalReason: "mixed waste"
+  wasteRefusalReason: "mixed waste",
+  receivedBy: "Bill",
+  receivedAt :"2020-01-17T10:12:00+0100"
 };
 describe("waste is partially accepted", () => {
   const { wasteAcceptationStatus, quantityReceived } = partiallyRefusedInfo;
