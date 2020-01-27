@@ -5,6 +5,10 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [Next release]
+
+* Amélioration du refus du déchet pour gérer le refus partiel et les motifs de refus éventuels
+ 
 # [2020.01.4] 30/01/2020
 
 * Scission inscription utilisateur et création de l'entreprise rattachée [PR #139](https://github.com/MTES-MCT/trackdechets/pull/139)
