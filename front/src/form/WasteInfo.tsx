@@ -100,12 +100,13 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <RedErrorMessage name="wasteDetails.consistence" />
       </div>
 
-      <h4>Quantité</h4>
+      <h4>Quantité en tonnes</h4>
       <div className="form__group">
         <Field
           component={NumberInput}
           name="wasteDetails.quantity"
           placeholder="En tonnes"
+          min="0"
           step="0.001"
         />
 
