@@ -12,15 +12,44 @@ export default {
     }),
     markAsReceived: object().shape({
       receivedInfo: object({
-        isAccepted: boolean().required(
-          "Vous devez préciser si vous acceptez ou non le déchet."
-        ),
+        wasteAcceptationStatus: string()
+          .required()
+          .matches(/(ACCEPTED|REFUSED|PARTIALLY_REFUSED)/, {
+            message: "Vous devez préciser si vous acceptez ou non le déchet."
+          }),
         receivedBy: string().required(
           "Vous devez saisir un responsable de la réception."
         ),
         receivedAt: date().required("Vous devez saisir une date de réception."),
-        quantityReceived: number().positive(
-          "Vous devez saisir une quantité reçue supérieure à 0."
+
+        quantityReceived: number()
+          .required()
+          // if waste is refused, we set quantityReceived to 0
+          .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+            ["REFUSED"].includes(wasteAcceptationStatus)
+              ? schema.transform(v => 0)
+              : schema
+          )
+          // if waste is partially or totally accepted, we check it is a positive value
+          .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+            ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+              ? schema.test(
+                  "is-positive-or-zero",
+                  "Vous devez saisir une quantité reçue supérieure à 0.",
+                  v => v > 0
+                )
+              : schema
+          ),
+        wasteRefusalReason: string().when(
+          "wasteAcceptationStatus",
+          (wasteAcceptationStatus, schema) =>
+            ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+              ? schema.required()
+              : schema.test(
+                  "is-empty",
+                  "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+                  v => !v
+                )
         )
       })
     }),
