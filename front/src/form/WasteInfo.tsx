@@ -133,7 +133,8 @@ export default connect<{}, Values>(function WasteInfo(props) {
       {values.wasteDetails.code.includes("*") && (
         <div className="form__group">
           <label>
-            Code ADR
+            Mentions au titre des règlements ADR, RID, ADNR, IMDG (le cas
+            échéant)
             <Field type="text" name="wasteDetails.onuCode" />
           </label>
         </div>
