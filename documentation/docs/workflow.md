@@ -55,8 +55,9 @@ Une fois que le déchet a quitté le site du producteur, il peut le marquer comm
 
 C'est ensuite à celui qui reçoit le déchet d'accuser réception du déchet (cadre 10). Il doit préciser:
 
-- s'il accepte ou non le déchet
-- le nom de celui quireçoit
+- s'il accepte le déchet dans sa totalité, s'il le refuse ou si il l'accepte partiellement
+- si le déchet est refusé totalement ou partiellement, le motif de refus
+- le nom de celui qui reçoit
 - la date de réception
 - la quantité reçue
 
