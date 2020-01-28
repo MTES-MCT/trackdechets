@@ -21,14 +21,14 @@ export default {
       codeNaf: string().nullable(true),
       companyName: string().nullable(true),
       documentKeys: array().of(string())
+    }),
+    createUploadLink: object({
+      fileName: string().required("Le non du fichier est obligatoire"),
+      fileType: string().test(
+        "fileType",
+        "Format de fichier non supporté",
+        type => SUPPORTED_FORMATS.includes(type)
+      )
     })
-  },
-  createUploadLink: object({
-    fileName: string().required("Le non du fichier est obligatoire"),
-    fileType: string().test(
-      "fileType",
-      "Format de fichier non supporté",
-      type => SUPPORTED_FORMATS.includes(type)
-    )
-  })
+  }
 };
