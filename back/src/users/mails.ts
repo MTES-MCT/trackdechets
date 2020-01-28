@@ -83,7 +83,7 @@ export const userMails = {
   notifyUserOfInvite: (toEmail, toName, companyAdmin, companyName) => ({
     to: [{ email: toEmail, name: toName }],
     subject: "Vous avez été invité sur Trackdéchets",
-    title: `${companyAdmin} vous a invité à sur Trackdéchets`,
+    title: `${companyAdmin} vous a invité sur Trackdéchets`,
     body: `Bonjour ${toName},
     <br><br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre son organisation sur Trackdéchets.
