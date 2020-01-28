@@ -11,16 +11,18 @@ const SUPPORTED_FORMATS = [
 export default {
   Mutation: {
     createCompany: object({
-      siret: string().required("Le SIRET de l'entreprise est obligatoire"),
-      gerepId: string().nullable(true),
-      companyTypes: array().of(
-        string().matches(
-          /(PRODUCER|COLLECTOR|WASTEPROCESSOR|TRANSPORTER|WASTE_VEHICLES|WASTE_CENTER|TRADER)/
-        )
-      ),
-      codeNaf: string().nullable(true),
-      companyName: string().nullable(true),
-      documentKeys: array().of(string())
+      companyInput: object({
+        siret: string().required("Le SIRET de l'entreprise est obligatoire"),
+        gerepId: string().nullable(true),
+        companyTypes: array().of(
+          string().matches(
+            /(PRODUCER|COLLECTOR|WASTEPROCESSOR|TRANSPORTER|WASTE_VEHICLES|WASTE_CENTER|TRADER)/
+          )
+        ),
+        codeNaf: string().nullable(true),
+        companyName: string().nullable(true),
+        documentKeys: array().of(string())
+      })
     }),
     createUploadLink: object({
       fileName: string().required("Le non du fichier est obligatoire"),

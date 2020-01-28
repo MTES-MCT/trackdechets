@@ -33,7 +33,8 @@ describe("warnIfUserCreatesTooManyCompanies subscription", () => {
         companyTypes: [],
         createdAt: "2019-10-16T07:45:13.959Z",
         updatedAt: "2019-10-16T07:45:13.959Z",
-        securityCode: 1234
+        securityCode: 1234,
+        documentKeys: []
       },
       previousValues: null,
       updatedFields: []
@@ -55,7 +56,8 @@ describe("warnIfUserCreatesTooManyCompanies subscription", () => {
         companyTypes: [],
         createdAt: "2019-10-16T07:45:13.959Z",
         updatedAt: "2019-10-16T07:45:13.959Z",
-        securityCode: 1234
+        securityCode: 1234,
+        documentKeys: []
       },
       previousValues: null,
       updatedFields: []
