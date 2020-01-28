@@ -58,6 +58,7 @@ const DUPLICATE_FORM = gql`
         name
         quantity
       }
+      quantityReceived
     }
   }
 `;
