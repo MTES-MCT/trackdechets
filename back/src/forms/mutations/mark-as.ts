@@ -33,35 +33,43 @@ export function markAsProcessed(_, { id, processedInfo }, context: Context) {
   );
 }
 
-export function signedByTransporter(_, { id, signingInfo }, context: Context) {
-  const input = {
-    ...signingInfo,
+export async function signedByTransporter(
+  _,
+  { id, signingInfo },
+  context: Context
+) {
+  const transformEventToFormParams = signingInfo => ({
+    signedByTransporter: signingInfo.signedByTransporter,
+    signedByProducer: signingInfo.signedByProducer,
     sentAt: signingInfo.sentAt,
     sentBy: signingInfo.sentBy,
     wasteDetailsPackagings: signingInfo.packagings,
     wasteDetailsQuantity: signingInfo.quantity,
     wasteDetailsOnuCode: signingInfo.onuCode
-  };
+  });
 
   return transitionForm(
     id,
-    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: input },
-    context
+    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
+    context,
+    transformEventToFormParams
   );
 }
 
 async function transitionForm(
   formId: string,
   { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
-  context: Context
+  context: Context,
+  transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
+  const formPropsFromEvent = transformEventToFormProps(eventParams);
 
   const userCompanies = await getUserCompanies(context.user.id);
   const actorSirets = userCompanies.map(c => c.siret);
 
   const startingState = State.from(form.status, {
-    form: { ...form, ...eventParams },
+    form: { ...form, ...formPropsFromEvent },
     actorSirets,
     requestContext: context,
     isStableState: true
@@ -101,7 +109,7 @@ async function transitionForm(
 
         const updatedForm = context.prisma.updateForm({
           where: { id: formId },
-          data: { status: newStatus, ...eventParams }
+          data: { status: newStatus, ...formPropsFromEvent }
         });
         resolve(updatedForm);
         formService.stop();
