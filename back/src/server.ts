@@ -7,8 +7,8 @@ import * as session from "express-session";
 import * as redisStore from "connect-redis";
 import * as Redis from "ioredis";
 import * as bodyParser from "body-parser";
-import * as graphqlBodyParser from "body-parser-graphql";
 import * as cors from "cors";
+import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
 import { shield } from "graphql-shield";
@@ -96,13 +96,16 @@ export const server = new ApolloServer({
 
 export const app = express();
 
-app.use(graphqlBodyParser.graphql()); // allow application/graphql header
+//app.use(graphqlBodyParser.graphql()); // allow application/graphql header
 
 /**
  * parse application/x-www-form-urlencoded
  * used when submitting login form
  */
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// allow application/graphql header
+app.use(graphqlBodyParser);
 
 /**
  * Set the following headers for cross-domain cookie
