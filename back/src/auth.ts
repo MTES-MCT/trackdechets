@@ -5,6 +5,7 @@ import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as LocalStrategy } from "passport-local";
 import { prisma, User } from "./generated/prisma-client";
 import { compare } from "bcrypt";
+import { AccessToken } from "./generated/prisma-client";
 
 const { JWT_SECRET } = process.env;
 
@@ -84,9 +85,26 @@ passport.use(
 passport.use(
   new BearerStrategy(async (token, done) => {
     try {
-      const accessToken = await prisma.accessToken({ token });
+      const fragment = `
+        fragment AccessTokenWithUser on AccessToken {
+          token
+          isRevoked
+          user {
+            id
+            isActive
+            email
+            name
+            phone
+            createdAt
+            updatedAt
+          }
+        }
+      `;
+      const accessToken = await prisma
+        .accessToken({ token })
+        .$fragment<AccessToken & { user: User }>(fragment);
       if (accessToken && !accessToken.isRevoked) {
-        const user = await prisma.accessToken({ token }).user();
+        const user = accessToken.user;
         await prisma.updateAccessToken({
           data: { lastUsed: new Date().toISOString() },
           where: { token }
