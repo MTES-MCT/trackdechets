@@ -83,7 +83,7 @@ export default function Partners() {
               <h3>Nos partenaires actuels</h3>
               <div className="Partners__logos">
                 <figure>
-                  <img src="/partners-logos/kerlog.svg" alt="Kerlog" />
+                  <img src="/partners-logos/kerlog.png" alt="Kerlog" />
                 </figure>
                 <figure>
                   <img src="/partners-logos/chimirec.png" alt="Chimirec" />
@@ -102,11 +102,18 @@ export default function Partners() {
                     alt="Séché Environnement"
                   />
                 </figure>
-                     <figure>
+                <figure>
                   <img
                     className="trinov"
                     src="/partners-logos/trinov.png"
                     alt="Trinov"
+                  />
+                </figure>
+                <figure>
+                  <img
+                    className="hensel"
+                    src="/partners-logos/hensel.png"
+                    alt="Hensel"
                   />
                 </figure>
               </div>
