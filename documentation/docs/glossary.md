@@ -50,9 +50,15 @@ type Form {
   # Personne ayant validé l'envoi, complété lors du remplissage du cadre 9 avec la mutation `markAsSent`
   sentBy: String              
   
-  # Défini si le déchet a été accepté à la réception, complété avec la mutation `markAsReceived`
+  # [Obsolete, remplacé par wasteAcceptationStatus] Définit si le déchet a été accepté à la réception, complété avec la mutation `markAsReceived`
   isAccepted: Boolean         
   
+  # Définit si le déchet a été accepté, refusé, partiellement refusé à la réception, complété avec la mutation `markAsReceived`
+  wasteAcceptationStatus: Enum (ACCEPTED|REFUSED|PARTIALLY_REFUSED)
+
+  # Décrit mle motif de refus ou refus partiel, requis dans ces 2 cas
+  # wasteRefusalReason: String
+
   # Personne ayant validé la reception, complété lors du remplissage du cadre 10 avec la mutation `markAsReceived`
   receivedBy: String          
   
