@@ -34,7 +34,10 @@ export async function getFileDownloadToken(
   await setInCache(token, JSON.stringify({ type, params }), { EX: 10 });
   registerFileDownloader(type, downloadHandler);
 
-  return { token, link: `https://${process.env.API_HOST}/download?token=${token}` };
+  return {
+    token,
+    downloadLink: `https://${process.env.API_HOST}/download?token=${token}`
+  };
 }
 
 /**
