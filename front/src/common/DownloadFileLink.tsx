@@ -15,7 +15,9 @@ export default function DownloadFileLink({
   children,
   ...props
 }: Props & any) {
-  const [downloadFile, { data }] = useLazyQuery(query);
+  const [downloadFile, { data }] = useLazyQuery(query, {
+    fetchPolicy: "network-only"
+  });
 
   useEffect(() => {
     if (!data) {
