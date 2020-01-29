@@ -1,18 +1,27 @@
 import React from "react";
 import { FaFilePdf } from "react-icons/fa";
+import DownloadFileLink from "../../../common/DownloadFileLink";
+import gql from "graphql-tag";
 
 type Props = { formId: string };
 
+export const FORMS_PDF = gql`
+  query FormPdf($id: ID) {
+    formPdf(id: $id) {
+      downloadLink
+      token
+    }
+  }
+`;
+
 export default function DownloadPdf({ formId }: Props) {
   return (
-    <a
-      className="icon"
-      href={`${process.env.REACT_APP_API_ENDPOINT}/pdf?id=${formId}`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <DownloadFileLink
+      query={FORMS_PDF}
+      params={{ id: formId }}
       title="Télécharger le PDF"
     >
       <FaFilePdf />
-    </a>
+    </DownloadFileLink>
   );
 }
