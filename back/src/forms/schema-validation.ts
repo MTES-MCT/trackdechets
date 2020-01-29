@@ -13,17 +13,21 @@ export const receivedInfoSchema = object({
 
   quantityReceived: number()
     .required()
-    // if waste is refused, we set quantityReceived to 0
+    // if waste is refused, quantityReceived must be 0
     .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
       ["REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.transform(v => 0)
+        ? schema.test(
+            "is-zero",
+            "Vous devez saisir une quantité reçue égale à 0.",
+            v => v === 0
+          )
         : schema
     )
     // if waste is partially or totally accepted, we check it is a positive value
     .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
       ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
         ? schema.test(
-            "is-positive-or-zero",
+            "is-strictly-positive",
             "Vous devez saisir une quantité reçue supérieure à 0.",
             v => v > 0
           )
