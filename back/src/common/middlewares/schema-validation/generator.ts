@@ -23,7 +23,7 @@ function generateFieldMiddlewareFromRule(rule: ValidationRule) {
   ) {
 
     try {
-        args = await rule.validate(args, {
+        await rule.validate(args, {
         abortEarly: false
       });
 

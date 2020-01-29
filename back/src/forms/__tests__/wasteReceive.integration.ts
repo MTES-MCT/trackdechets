@@ -220,7 +220,7 @@ describe("Test Form reception", () => {
             receivedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: REFUSED,
             wasteRefusalReason: "Lorem ipsum",
-            quantityReceived: 13
+            quantityReceived: 0
 
       }
         ) { status }
@@ -239,6 +239,46 @@ describe("Test Form reception", () => {
     expect(frm.quantityReceived).toBe(0); // quantityReceived is set to 0
   });
 
+  it("should not accept a non-zero quantity when waste is refused", async () => {
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form
+    } = await prepareDB();
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+    const { mutate } = makeClient(recipient);
+    // trying to refuse waste with a non-zero quantityReceived
+    const mutation = `
+      mutation {
+        markAsReceived(
+            id: "${form.id}",
+            receivedInfo: {
+            receivedBy: "Holden",
+            receivedAt :"2019-01-17T10:22:00+0100",
+            wasteAcceptationStatus: REFUSED,
+            wasteRefusalReason: "Lorem ipsum",
+            quantityReceived: 21
+      }
+        ) { status }
+      }
+    `;
+
+    await mutate(mutation);
+
+    const frm = await prisma.form({ id: form.id });
+
+    // form is still sent
+    expect(frm.status).toBe("SENT");
+    expect(frm.wasteAcceptationStatus).toBe("REFUSED");
+
+    expect(frm.wasteAcceptationStatus).toBe(null);
+    expect(frm.receivedBy).toBe(null);
+    expect(frm.quantityReceived).toBe(null);
+  });
   it("should mark a sent form as partially refused", async () => {
     const {
       emitterCompany,
