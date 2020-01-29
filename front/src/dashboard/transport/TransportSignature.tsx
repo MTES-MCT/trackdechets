@@ -4,10 +4,12 @@ import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React, { useState } from "react";
 import { FaFileSignature } from "react-icons/fa";
+import DownloadFileLink from "../../common/DownloadFileLink";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import { Form as FormModel } from "../../form/model";
 import Packagings from "../../form/packagings/Packagings";
 import { currentSiretService } from "../CompanySelector";
+import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS } from "./Transport";
 import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
@@ -165,13 +167,12 @@ export default function TransportSignature({ form }: Props) {
                       <p>
                         <small>
                           Si vous le désirez, vous pouvez accéder à{" "}
-                          <a
-                            href={`${process.env.REACT_APP_API_ENDPOINT}/pdf?id=${form.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <DownloadFileLink
+                            query={FORMS_PDF}
+                            params={{ id: form.id }}
                           >
                             une vue CERFA du bordereau
-                          </a>
+                          </DownloadFileLink>
                         </small>
                       </p>
                     </>

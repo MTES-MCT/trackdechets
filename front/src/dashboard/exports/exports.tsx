@@ -3,6 +3,7 @@ import { Me } from "../../login/model";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
 import Loader from "../../common/Loader";
+import DownloadFileLink from "../../common/DownloadFileLink";
 
 interface IProps {
   me: Me;
@@ -23,10 +24,16 @@ const GET_STATS = gql`
   }
 `;
 
+const FORMS_REGISTER = gql`
+  query FormsRegister($sirets: [String], $exportType: FormsRegisterExportType) {
+    formsRegister(sirets: $sirets, exportType: $exportType) {
+      downloadLink
+    }
+  }
+`;
+
 export default function Exports({ me }: IProps) {
-  const [sirets, setSirets] = useState(
-    me.companies.map(c => c.siret).join(",")
-  );
+  const [sirets, setSirets] = useState(me.companies.map(c => c.siret));
   const { loading, error, data } = useQuery(GET_STATS);
 
   return (
@@ -71,10 +78,8 @@ export default function Exports({ me }: IProps) {
       {me.companies.length > 1 && (
         <p>
           Pour quelle entreprise(s) souhaitez vous télécharger le registre ?{" "}
-          <select onChange={evt => setSirets(evt.target.value)}>
-            <option value={me.companies.map(c => c.siret).join(",")}>
-              Toutes
-            </option>
+          <select onChange={evt => setSirets([evt.target.value])}>
+            <option value={me.companies.map(c => c.siret)}>Toutes</option>
             {me.companies.map(c => (
               <option value={c.siret} key={c.siret}>
                 {c.name}
@@ -83,22 +88,20 @@ export default function Exports({ me }: IProps) {
           </select>
         </p>
       )}
-      <a
+      <DownloadFileLink
+        query={FORMS_REGISTER}
+        params={{ sirets, exportType: "OUTGOING" }}
         className="button"
-        target="_blank"
-        rel="noopener noreferrer"
-        href={`${process.env.REACT_APP_API_ENDPOINT}/exports?exportType=OUTGOING&siret=${sirets}`}
       >
         Registre de déchets sortants
-      </a>
-      <a
+      </DownloadFileLink>
+      <DownloadFileLink
+        query={FORMS_REGISTER}
+        params={{ sirets, exportType: "INCOMING" }}
         className="button"
-        target="_blank"
-        rel="noopener noreferrer"
-        href={`${process.env.REACT_APP_API_ENDPOINT}/exports?exportType=INCOMING&siret=${sirets}`}
       >
         Registre de déchets entrants
-      </a>
+      </DownloadFileLink>
     </div>
   );
 }
