@@ -96,8 +96,6 @@ export const server = new ApolloServer({
 
 export const app = express();
 
-//app.use(graphqlBodyParser.graphql()); // allow application/graphql header
-
 /**
  * parse application/x-www-form-urlencoded
  * used when submitting login form
