@@ -48,3 +48,22 @@ export function getUIBaseURL() {
   const scheme = NODE_ENV === "dev" ? "http" : "https";
   return `${scheme}://${UI_HOST}`;
 }
+
+/**
+ * Convert a date to midnight the same day
+ * @param date
+ */
+export function sameDayMidnight(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+/**
+ * Number of days between two dates
+ */
+export function daysBetween(date1: Date, date2: Date): number {
+  const millis1 = date1.getTime();
+  const millis2 = date2.getTime();
+  const dayMillis = 24 * 3600 * 1000; // number of milliseconds in one day
+  const numberOfdays = Math.trunc((millis1 - millis2) / dayMillis);
+  return numberOfdays;
+}
