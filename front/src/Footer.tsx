@@ -9,7 +9,11 @@ export default function Footer() {
       <div className="container">
         <div className="footer__logo">
           <LazyLoad>
-            <img className={styles["full-width"]} src="/logo-mtes-mef.svg" alt="" />
+            <img
+              className={styles["full-width"]}
+              src="/logo-mtes-mef.svg"
+              alt=""
+            />
           </LazyLoad>
           <div className={styles["logo-text"]}>
             <LazyLoad>
@@ -33,7 +37,7 @@ export default function Footer() {
             </a>
           </li>
           <li>
-            <Link to="/faq">Foire aux questions</Link>
+            <a href="https://faq.trackdechets.fr/">Foire aux questions</a>
           </li>
           <li>
             <Link to="/cgu">Conditions générales d'utilisation</Link>
