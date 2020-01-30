@@ -1,9 +1,8 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 import { FaCheck, FaRegCircle, FaSearch } from "react-icons/fa";
 import RedErrorMessage from "../../common/RedErrorMessage";
-import client from "../../graphql-client";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
 
@@ -33,7 +32,7 @@ function init(selectedCompany) {
     clue: "",
     department: null,
     displayDepartment: false,
-    isLoading: false,
+    searchLoading: false,
     searchResults: [],
     selectedCompany
   };
@@ -47,12 +46,8 @@ function reducer(state, action) {
       return { ...state, displayDepartment: action.payload };
     case "department_input":
       return { ...state, department: action.payload };
-    case "loading":
-      return { ...state, isLoading: true };
-    case "loaded":
-      return { ...state, isLoading: false };
-    case "search_done":
-      return { ...state, searchResults: action.payload };
+    case "search_change":
+      return { ...state, ...action.payload };
     case "company_selected":
       return { ...state, selectedCompany: action.payload };
     case "reset":
@@ -66,47 +61,47 @@ export default function CompanySelector(props) {
   const [field] = useField(props);
   const { setFieldValue } = useFormikContext();
   const [state, dispatch] = useReducer(reducer, field.value, init);
+  const [
+    searchCompaniesQuery,
+    { loading: searchLoading, data: searchData }
+  ] = useLazyQuery(SEARCH_COMPANIES);
+
+  useEffect(() => {
+    dispatch({
+      type: "search_change",
+      payload: {
+        searchResults: searchData?.searchCompanies ?? [],
+        searchLoading: searchLoading
+      }
+    });
+
+    if (searchData?.searchCompanies.length === 1) {
+      dispatch({
+        type: "company_selected",
+        payload: searchData.searchCompanies[0]
+      });
+    }
+  }, [searchData, searchLoading]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      async function searchCompanies({
-        clue,
-        department
-      }: {
-        clue: string;
-        department: number | undefined;
-      }) {
-        const isNumber = /^[0-9\s]+$/.test(clue);
-        if (isNumber && clue.length < 14) {
-          return;
-        }
-
-        dispatch({ type: "loading" });
-        const { data } = await client.query<{ searchCompanies: Company[] }>({
-          query: SEARCH_COMPANIES,
-          variables: { clue, department }
-        });
-
-        if (data.searchCompanies) {
-          dispatch({ type: "search_done", payload: data.searchCompanies });
-          if (data.searchCompanies.length === 1) {
-            dispatch({
-              type: "company_selected",
-              payload: data.searchCompanies[0]
-            });
-          }
-        }
-        dispatch({ type: "loaded" });
-      }
       if (!state.clue || state.clue.length < 1) {
         return;
       }
-      searchCompanies({ clue: state.clue, department: state.department });
+      const isNumber = /^[0-9\s]+$/.test(state.clue);
+      if (isNumber && state.clue.length < 14) {
+        return;
+      }
+
+      searchCompaniesQuery({
+        variables: { clue: state.clue, department: state.department }
+      });
     }, 300);
+
     return () => {
       clearTimeout(handler);
     };
-  }, [state.clue, state.department]);
+  }, [state.clue, state.department, searchCompaniesQuery]);
 
   useEffect(() => {
     ["siret", "name", "address", "contact", "phone", "mail"].forEach(key => {
@@ -179,7 +174,7 @@ export default function CompanySelector(props) {
         </div>
       )}
 
-      {state.isLoading && <span>Chargement...</span>}
+      {state.searchLoading && <span>Chargement...</span>}
       <ul className="company-bookmarks">
         {[...state.searchResults, ...data.favorites].map(c => (
           <li
@@ -215,7 +210,7 @@ export default function CompanySelector(props) {
         ))}
       </ul>
 
-      <RedErrorMessage name={`${field.name}.siret`} />
+      <RedErrorMessage name={field.name} />
 
       <div className="form__group">
         <label>
