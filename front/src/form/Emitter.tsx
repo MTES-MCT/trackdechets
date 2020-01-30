@@ -72,7 +72,7 @@ export default connect<{}, Values>(function Emitter({ formik }) {
       </div>
 
       <h4>Entreprise émettrice</h4>
-      <Field component={CompanySelector} name="emitter.company" />
+      <CompanySelector name="emitter.company" />
 
       <label>
         <input
