@@ -66,3 +66,16 @@ export const userWithCompanyFactory = async role => {
   });
   return { user, company };
 };
+
+/**
+ * Create a user and an accessToken
+ * @param opt : extram parameters for user
+ */
+export const userWithAccessTokenFactory = async (opt = {}) => {
+  const user = await userFactory(opt);
+  const accessToken = await prisma.createAccessToken({
+    token: "token",
+    user: { connect: { id: user.id } }
+  });
+  return { user, accessToken };
+};
