@@ -33,7 +33,7 @@ describe("POST /login", () => {
     // should send connect.sid cookie
     expect(login.header["set-cookie"]).toHaveLength(1);
     const cookieRegExp = new RegExp(
-      `connect.sid=.+; Domain=${UI_HOST}; Path=/; HttpOnly`
+      `connect.sid=.+; Domain=${UI_HOST}; Path=/; Expires=.+; HttpOnly`
     );
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
