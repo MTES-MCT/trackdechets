@@ -14,7 +14,7 @@ export function useAuth() {
         setIsAuthenticated(isAuthenticated);
         setIsLoading(false);
       })
-      .catch(err => {
+      .catch(_err => {
         setIsAuthenticated(false);
         setIsLoading(false);
       });

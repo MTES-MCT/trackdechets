@@ -6,6 +6,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { prisma, User } from "./generated/prisma-client";
 import { compare } from "bcrypt";
 import { AccessToken } from "./generated/prisma-client";
+import { sameDayMidnight, daysBetween } from "./utils";
 
 const { JWT_SECRET } = process.env;
 
@@ -82,6 +83,28 @@ passport.use(
   )
 );
 
+/**
+ * Update field lastUsed on AccessToken if it was never set
+ * or if it was set more than one day ago
+ * @param accessToken
+ */
+export function updateAccessTokenLastUsed(accessToken: AccessToken) {
+  // use new Date(Date.now()) instead of new Date()
+  // in order to mock Date.now in unit test auth.test.ts
+  const now = new Date(Date.now());
+  if (
+    !accessToken.lastUsed ||
+    daysBetween(now, new Date(accessToken.lastUsed)) > 0
+  ) {
+    return prisma.updateAccessToken({
+      data: { lastUsed: sameDayMidnight(now).toISOString() },
+      where: { token: accessToken.token }
+    });
+  } else {
+    return Promise.resolve();
+  }
+}
+
 passport.use(
   new BearerStrategy(async (token, done) => {
     try {
@@ -89,6 +112,7 @@ passport.use(
         fragment AccessTokenWithUser on AccessToken {
           token
           isRevoked
+          lastUsed
           user {
             id
             isActive
@@ -105,10 +129,7 @@ passport.use(
         .$fragment<AccessToken & { user: User }>(fragment);
       if (accessToken && !accessToken.isRevoked) {
         const user = accessToken.user;
-        await prisma.updateAccessToken({
-          data: { lastUsed: new Date().toISOString() },
-          where: { token }
-        });
+        await updateAccessTokenLastUsed(accessToken);
         return done(null, user);
       } else {
         return done(null, false);
