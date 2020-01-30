@@ -1,10 +1,9 @@
 import { useQuery } from "@apollo/react-hooks";
-import { connect, Field, FieldProps } from "formik";
-import React, { useEffect, useState } from "react";
+import { Field, useField, useFormikContext } from "formik";
+import React, { useEffect, useReducer } from "react";
 import { FaCheck, FaRegCircle, FaSearch } from "react-icons/fa";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import client from "../../graphql-client";
-import useDebounce from "../../utils/use-debounce";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
 
@@ -29,74 +28,103 @@ export type Company = {
   };
 };
 
-export default connect<FieldProps>(function CompanySelector(props) {
-  const [searchTerm, setSearchTerm] = useState<any>({
+function init(selectedCompany) {
+  return {
     clue: "",
-    department: undefined
-  });
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const [searchResults, setSearchResults] = useState<Company[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [displayDepartment, setDisplayDepartment] = useState(false);
-
-  const [selectedCompany, setSelectedCompany] = useState<Company>(
-    props.field.value as Company
-  );
-
-  useEffect(() => {
-    if (!debouncedSearchTerm || debouncedSearchTerm.clue.length < 1) {
-      return;
-    }
-    searchCompanies(debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
-
-  const searchCompanies = async ({
-    clue,
-    department
-  }: {
-    clue: string;
-    department: number | undefined;
-  }) => {
-    const isNumber = /^[0-9\s]+$/.test(clue);
-    if (isNumber && clue.length < 14) {
-      return;
-    }
-
-    setIsLoading(true);
-    const { data } = await client.query<{ searchCompanies: Company[] }>({
-      query: SEARCH_COMPANIES,
-      variables: { clue, department }
-    });
-
-    if (data.searchCompanies) {
-      setSearchResults(data.searchCompanies);
-      if (data.searchCompanies.length === 1) {
-        setSelectedCompany(data.searchCompanies[0]);
-      }
-    }
-    setIsLoading(false);
+    department: null,
+    displayDepartment: false,
+    isLoading: false,
+    searchResults: [],
+    selectedCompany
   };
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "search_input":
+      return { ...state, clue: action.payload };
+    case "department_filter":
+      return { ...state, displayDepartment: action.payload };
+    case "department_input":
+      return { ...state, department: action.payload };
+    case "loading":
+      return { ...state, isLoading: true };
+    case "loaded":
+      return { ...state, isLoading: false };
+    case "search_done":
+      return { ...state, searchResults: action.payload };
+    case "company_selected":
+      return { ...state, selectedCompany: action.payload };
+    case "reset":
+      return init(action.payload);
+    default:
+      throw new Error();
+  }
+}
+
+export default function CompanySelector(props) {
+  const [field] = useField(props);
+  const { setFieldValue } = useFormikContext();
+  const [state, dispatch] = useReducer(reducer, field.value, init);
 
   useEffect(() => {
-    ["siret", "name", "address", "contact", "phone", "mail"].forEach(field => {
-      if (!selectedCompany || !selectedCompany[field as keyof Company]) {
+    const handler = setTimeout(() => {
+      async function searchCompanies({
+        clue,
+        department
+      }: {
+        clue: string;
+        department: number | undefined;
+      }) {
+        const isNumber = /^[0-9\s]+$/.test(clue);
+        if (isNumber && clue.length < 14) {
+          return;
+        }
+
+        dispatch({ type: "loading" });
+        const { data } = await client.query<{ searchCompanies: Company[] }>({
+          query: SEARCH_COMPANIES,
+          variables: { clue, department }
+        });
+
+        if (data.searchCompanies) {
+          dispatch({ type: "search_done", payload: data.searchCompanies });
+          if (data.searchCompanies.length === 1) {
+            dispatch({
+              type: "company_selected",
+              payload: data.searchCompanies[0]
+            });
+          }
+        }
+        dispatch({ type: "loaded" });
+      }
+      if (!state.clue || state.clue.length < 1) {
         return;
       }
-      props.formik.setFieldValue(
-        `${props.field.name}.${field}`,
-        selectedCompany[field as keyof Company]
-      );
+      searchCompanies({ clue: state.clue, department: state.department });
+    }, 300);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [state.clue, state.department]);
+
+  useEffect(() => {
+    ["siret", "name", "address", "contact", "phone", "mail"].forEach(key => {
+      if (!state.selectedCompany?.[key]) {
+        return;
+      }
+      setFieldValue(`${field.name}.${key}`, state.selectedCompany[key]);
     });
-  }, [selectedCompany, props.formik, props.field.name]);
+  }, [state.selectedCompany, field.name, setFieldValue]);
 
   // Load different favorites depending on the object we are filling
-  const type = props.field.name.split(".")[0].toUpperCase();
+  const type = field.name.split(".")[0].toUpperCase();
 
   const { loading, error, data } = useQuery(FAVORITES, {
     variables: { type },
     onCompleted: data =>
-      selectedCompany.siret === ""
-        ? setSelectedCompany(data.favorites[0])
+      state.selectedCompany.siret === ""
+        ? dispatch({ type: "company_selected", payload: data.favorites[0] })
         : null
   });
 
@@ -109,7 +137,9 @@ export default connect<FieldProps>(function CompanySelector(props) {
         <input
           type="text"
           placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-          onChange={e => setSearchTerm({ ...searchTerm, clue: e.target.value })}
+          onChange={e =>
+            dispatch({ type: "search_input", payload: e.target.value })
+          }
         />
         <button
           className="overlay-button search-icon"
@@ -121,11 +151,17 @@ export default connect<FieldProps>(function CompanySelector(props) {
       </div>
       <button
         className="button-outline small primary"
-        onClick={e => setDisplayDepartment(!displayDepartment)}
+        type="button"
+        onClick={e =>
+          dispatch({
+            type: "department_filter",
+            payload: !state.displayDepartment
+          })
+        }
       >
         Affiner la recherche par département?
       </button>
-      {displayDepartment && (
+      {state.displayDepartment && (
         <div className="form__group">
           <label>
             Département
@@ -133,9 +169,9 @@ export default connect<FieldProps>(function CompanySelector(props) {
               type="text"
               placeholder="Département ou code postal"
               onChange={e =>
-                setSearchTerm({
-                  ...searchTerm,
-                  department: parseInt(e.target.value, 10)
+                dispatch({
+                  type: "department_input",
+                  payload: parseInt(e.target.value, 10)
                 })
               }
             />
@@ -143,15 +179,15 @@ export default connect<FieldProps>(function CompanySelector(props) {
         </div>
       )}
 
-      {isLoading && <span>Chargement...</span>}
+      {state.isLoading && <span>Chargement...</span>}
       <ul className="company-bookmarks">
-        {[...searchResults, ...data.favorites].map(c => (
+        {[...state.searchResults, ...data.favorites].map(c => (
           <li
             className={`company-bookmarks__item  ${
-              selectedCompany.siret === c.siret ? "is-selected" : ""
+              state.selectedCompany.siret === c.siret ? "is-selected" : ""
             }`}
             key={c.siret}
-            onClick={() => setSelectedCompany(c)}
+            onClick={() => dispatch({ type: "company_selected", payload: c })}
           >
             <div className="content">
               <h6>{c.name}</h6>
@@ -169,7 +205,7 @@ export default connect<FieldProps>(function CompanySelector(props) {
               </p>
             </div>
             <div className="icon">
-              {selectedCompany.siret === c.siret ? (
+              {state.selectedCompany.siret === c.siret ? (
                 <FaCheck />
               ) : (
                 <FaRegCircle />
@@ -179,38 +215,38 @@ export default connect<FieldProps>(function CompanySelector(props) {
         ))}
       </ul>
 
-      <RedErrorMessage name={`${props.field.name}.siret`} />
+      <RedErrorMessage name={`${field.name}.siret`} />
 
       <div className="form__group">
         <label>
           Personne à contacter
           <Field
             type="text"
-            name={`${props.field.name}.contact`}
+            name={`${field.name}.contact`}
             placeholder="NOM Prénom"
           />
         </label>
 
-        <RedErrorMessage name={`${props.field.name}.contact`} />
+        <RedErrorMessage name={`${field.name}.contact`} />
 
         <label>
           Téléphone ou Fax
           <Field
             type="text"
-            name={`${props.field.name}.phone`}
+            name={`${field.name}.phone`}
             placeholder="Numéro"
           />
         </label>
 
-        <RedErrorMessage name={`${props.field.name}.phone`} />
+        <RedErrorMessage name={`${field.name}.phone`} />
 
         <label>
           Mail
-          <Field type="email" name={`${props.field.name}.mail`} />
+          <Field type="email" name={`${field.name}.mail`} />
         </label>
 
-        <RedErrorMessage name={`${props.field.name}.mail`} />
+        <RedErrorMessage name={`${field.name}.mail`} />
       </div>
     </div>
   );
-});
+}

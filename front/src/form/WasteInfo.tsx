@@ -24,11 +24,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
     <>
       <h4>Description du déchet</h4>
       <div className="form__group">
-        <Field
-          component={WasteCode}
-          name="wasteDetails.code"
-          validate={wasteCodeValidator}
-        />
+        <WasteCode name="wasteDetails.code" validate={wasteCodeValidator} />
       </div>
 
       <div className="text-quote">
