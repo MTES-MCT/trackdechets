@@ -3,9 +3,6 @@ import { resetDatabase } from "../../../../integration-tests/helper";
 import { server } from "../../../server";
 import { prisma } from "../../../generated/prisma-client";
 import { createTestClient } from "apollo-server-integration-testing";
-import { sign } from "jsonwebtoken";
-
-const { JWT_SECRET } = process.env;
 
 describe("Create company endpoint", () => {
   afterAll(async () => {
@@ -28,12 +25,9 @@ describe("Create company endpoint", () => {
     }
   `;
     const { mutate, setOptions } = createTestClient({ apolloServer: server });
-    const token = sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" });
     setOptions({
       request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        user
       }
     });
 
