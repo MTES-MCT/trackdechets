@@ -31,19 +31,19 @@
     margin-bottom: 1em;
 
 
-    a {
+    button {
       cursor: pointer;
       text-decoration: none;
       color: var(--theme-dark-text);
       margin-right: 1.5em;
     }
 
-    a:hover {
+    button:hover {
       background: none;
       color: var(--blue);
     }
 
-    a.active {
+    button.active {
       color: var(--blue);
       border-bottom: var(--blue) solid 2px;
     }

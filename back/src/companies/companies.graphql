@@ -1,5 +1,3 @@
-
-
 type Rubrique {
   rubrique: String
   alinea: String
@@ -25,11 +23,10 @@ enum WasteType {
 
 type Declaration {
   annee: String
-  codeDechet: String,
+  codeDechet: String
   libDechet: String
   gerepType: GerepType
 }
-
 
 type Installation {
   codeS3ic: String
@@ -48,12 +45,10 @@ enum CompanyType {
   TRADER
 }
 
-
 # Private company type accessed by a user
 # who is member of the company. Is is typically
 # accessed through `query { user { companies } }`
 type CompanyPrivate {
-
   # Company info in Prisma
   ########################
   id: ID!
@@ -95,7 +90,6 @@ type CompanyPrivate {
 # by a user who is not member of the company
 # (for example in the fiche entreprise)
 type CompanyPublic {
-
   # Contact info (from prisma)
   ###########################
   contactEmail: String
@@ -120,7 +114,6 @@ type CompanyPublic {
 }
 
 type CompanySearchResult {
-
   # company info from SIRENE
   siret: String
   address: String
@@ -153,13 +146,30 @@ type Query {
 type Mutation {
   renewSecurityCode(siret: String!): CompanyPrivate
   updateCompany(
-    siret: String!,
-    gerepId: String,
-    contactEmail: String,
-    contactPhone: String,
-    website: String,
-    companyTypes: [CompanyType],
-    givenName: String): CompanyPrivate
+    siret: String!
+    gerepId: String
+    contactEmail: String
+    contactPhone: String
+    website: String
+    companyTypes: [CompanyType]
+    givenName: String
+  ): CompanyPrivate
+  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate
+  createUploadLink(fileName: String!, fileType: String!): UploadLink
+}
+
+type UploadLink {
+  signedUrl: String
+  key: String
+}
+
+input PrivateCompanyInput {
+  siret: String!
+  gerepId: String
+  companyTypes: [CompanyType]
+  codeNaf: String
+  companyName: String
+  documentKeys: [String]
 }
 
 type CompanyMember {

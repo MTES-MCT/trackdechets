@@ -61,7 +61,7 @@ const RESEND_INVITATION = gql`
 `;
 
 export default function AccountCompanyMember({ company, user }: Props) {
-  const [removeUserFromCompany, { loading }] = useMutation(
+  const [removeUserFromCompany] = useMutation(
     REMOVE_USER_FROM_COMPANY
   );
   const [deleteInvitation] = useMutation(DELETE_INVITATION, {
@@ -92,7 +92,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
         </td>
         <td>{user.email}</td>
         <td>
-          {user.role == UserRole.ADMIN ? "Administrateur" : "Collaborateur"}
+          {user.role === UserRole.ADMIN ? "Administrateur" : "Collaborateur"}
         </td>
         <td>
           {user.isPendingInvitation

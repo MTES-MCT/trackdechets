@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import DateInput from "./custom-inputs/DateInput";
@@ -11,7 +11,7 @@ export default connect<{}, Values>(function Transporter(props) {
   return (
     <>
       <h4>Transporteur</h4>
-      <Field component={CompanySelector} name="transporter.company" />
+      <CompanySelector name="transporter.company" />
 
       <h4>Autorisations</h4>
       <div className="form__group">

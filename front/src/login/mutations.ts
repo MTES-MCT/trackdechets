@@ -1,9 +1,9 @@
 import gql from "graphql-tag";
 
 export const SIGNUP = gql`
-  mutation Signup($payload: SignupInput) {
-    signup(payload: $payload) {
-      token
+  mutation Signup($userInfos: SignupInput!) {
+    signup(userInfos: $userInfos) {
+      id
     }
   }
 `;

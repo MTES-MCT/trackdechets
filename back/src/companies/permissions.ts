@@ -6,6 +6,8 @@ export default {
   },
   Mutation: {
     updateCompany: isCompanyAdmin,
-    renewSecurityCode: isCompanyAdmin
+    renewSecurityCode: isCompanyAdmin,
+    createCompany: isAuthenticated,
+    createUploadLink: isAuthenticated
   }
 };

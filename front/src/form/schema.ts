@@ -13,9 +13,6 @@ import {
 setLocale({
   mixed: {
     notType: "Ce champ ne peut pas être nul"
-  },
-  number: {
-    min: "Deve ser maior que ${min}"
   }
 } as LocaleObject);
 
@@ -45,7 +42,7 @@ export const formSchema = object().shape({
       .test(
         "selected",
         "Vous devez sélectionner une valeur",
-        (v: string) => v != ""
+        (v: string) => v !== ""
       ),
     cap: string().nullable(true),
     company: companySchema

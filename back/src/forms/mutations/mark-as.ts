@@ -9,7 +9,7 @@ export async function markAsSealed(_, { id }, context: Context) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
 }
 
-export async function markAsSent(_, { id, sentInfo }, context: Context) {
+export function markAsSent(_, { id, sentInfo }, context: Context) {
   return transitionForm(
     id,
     { eventType: "MARK_SENT", eventParams: sentInfo },
@@ -17,11 +17,7 @@ export async function markAsSent(_, { id, sentInfo }, context: Context) {
   );
 }
 
-export async function markAsReceived(
-  _,
-  { id, receivedInfo },
-  context: Context
-) {
+export function markAsReceived(_, { id, receivedInfo }, context: Context) {
   return transitionForm(
     id,
     { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
@@ -29,11 +25,7 @@ export async function markAsReceived(
   );
 }
 
-export async function markAsProcessed(
-  _,
-  { id, processedInfo },
-  context: Context
-) {
+export function markAsProcessed(_, { id, processedInfo }, context: Context) {
   return transitionForm(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
@@ -46,34 +38,38 @@ export async function signedByTransporter(
   { id, signingInfo },
   context: Context
 ) {
-  const input = {
-    ...signingInfo,
+  const transformEventToFormParams = signingInfo => ({
+    signedByTransporter: signingInfo.signedByTransporter,
+    signedByProducer: signingInfo.signedByProducer,
     sentAt: signingInfo.sentAt,
     sentBy: signingInfo.sentBy,
     wasteDetailsPackagings: signingInfo.packagings,
     wasteDetailsQuantity: signingInfo.quantity,
     wasteDetailsOnuCode: signingInfo.onuCode
-  };
+  });
 
   return transitionForm(
     id,
-    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: input },
-    context
+    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
+    context,
+    transformEventToFormParams
   );
 }
 
 async function transitionForm(
   formId: string,
   { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
-  context: Context
+  context: Context,
+  transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
+  const formPropsFromEvent = transformEventToFormProps(eventParams);
 
   const userCompanies = await getUserCompanies(context.user.id);
   const actorSirets = userCompanies.map(c => c.siret);
 
   const startingState = State.from(form.status, {
-    form: { ...form, ...eventParams },
+    form: { ...form, ...formPropsFromEvent },
     actorSirets,
     requestContext: context,
     isStableState: true
@@ -113,7 +109,7 @@ async function transitionForm(
 
         const updatedForm = context.prisma.updateForm({
           where: { id: formId },
-          data: { status: newStatus, ...eventParams }
+          data: { status: newStatus, ...formPropsFromEvent }
         });
         resolve(updatedForm);
         formService.stop();

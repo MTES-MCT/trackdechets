@@ -4,25 +4,41 @@ import { Link } from "react-router-dom";
 export default function SignupInfo() {
   return (
     <div className="container">
-      <h2>
-        Un mail de confirmation vous a été envoyé à l'adresse indiquée ! 📨
-      </h2>
-      <p>
-        Afin de finaliser votre inscription, veuillez cliquer dans le lien qui
-        vous a été envoyé par mail. Vous pourrez ensuite vous connecter à
-        Trackdéchets et commencer à utiliser ses différentes fonctionnalités !
-        🚀
-      </p>
-      <p>
-        Des questions, des interrogations, n'hésitez pas à nous contacter à
-        l'adresse suivante :{" "}
-        <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
-          emmanuel.flahaut@developpement-durable.gouv.fr
-        </a>
-      </p>
-      <Link to="/login" className="button">
-        Se connecter
-      </Link>
+      <section className="section section-white">
+        <h2>On y est presque !</h2>
+        <p className="lead-text">
+          Un mail de confirmation vous a été envoyé à l'adresse indiquée{" "}
+          <span role="img" aria-label="Valise">
+            📨
+          </span>
+        </p>
+        <p>
+          Afin de finaliser votre inscription, veuillez cliquer dans le lien qui
+          vous a été envoyé par mail. Vous pourrez ensuite vous connecter à
+          Trackdéchets.
+          <span role="img" aria-label="Fusée">
+            🚀
+          </span>
+        </p>
+
+        <p>
+          Une fois connecté, vous aurez la possibilité de créer un établissement
+          dans Trackéchets pour commencer à déclarer vos bordereaux. Si votre
+          établissement existe déjà, adressez vous à un administrateur de votre
+          entreprise et demandez lui de vous inviter.
+        </p>
+
+        <p>
+          Des questions, des interrogations ? N'hésitez pas à{" "}
+          <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
+            nous contacter
+          </a>
+          .
+        </p>
+        <Link to="/login" className="button">
+          Se connecter
+        </Link>
+      </section>
     </div>
   );
 }

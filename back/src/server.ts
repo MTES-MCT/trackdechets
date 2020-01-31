@@ -15,6 +15,10 @@ import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
 import { mergePermissions } from "./utils";
+import {
+  schemaValidation,
+  mergeValidationRules
+} from "./common/middlewares/schema-validation";
 
 const sentryDsn = process.env.SENTRY_DSN;
 
@@ -29,8 +33,14 @@ const resolvers = mergeResolvers(resolversArray);
 const permissions = fileLoader(`${__dirname}/**/permissions.ts`, {
   recursive: true
 });
-
 const shieldMiddleware = shield(mergePermissions(permissions));
+
+const schemas = fileLoader(`${__dirname}/**/schema-validation.ts`, {
+  recursive: true
+});
+const schemaValidationMiddleware = schemaValidation(
+  mergeValidationRules(schemas)
+);
 
 /**
  * Sentry configuration
@@ -55,7 +65,11 @@ const sentryMiddleware = () =>
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 export const schemaWithMiddleware = applyMiddleware(
   schema,
-  ...[shieldMiddleware, ...(sentryDsn ? [sentryMiddleware()] : [])]
+  ...[
+    shieldMiddleware,
+    ...(sentryDsn ? [sentryMiddleware()] : []),
+    schemaValidationMiddleware
+  ]
 );
 
 export const server = new ApolloServer({

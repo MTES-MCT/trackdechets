@@ -5,6 +5,18 @@ code {
     monospace;
 }
 
+button.link {
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--theme-primary);
+  font-family: Source Sans Pro, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5em;
+}
+
 @media only screen and (max-width: $breakpoint-mobile) {
   .modal__backdrop .modal {
     max-height: 100%;

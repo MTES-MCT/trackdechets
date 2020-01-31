@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { Form as FormModel, Form } from "../../form/model";
-import { FaFileSignature } from "react-icons/fa";
-import { Field } from "formik";
-import { DateTime } from "luxon";
-import gql from "graphql-tag";
 import { Mutation } from "@apollo/react-components";
-import Packagings from "../../form/packagings/Packagings";
-import { Wizard } from "./Wizard";
-import "./TransportSignature.scss";
+import { Field } from "formik";
+import gql from "graphql-tag";
+import { DateTime } from "luxon";
+import React, { useState } from "react";
+import { FaFileSignature } from "react-icons/fa";
 import RedErrorMessage from "../../common/RedErrorMessage";
-import { GET_TRANSPORT_SLIPS } from "./Transport";
+import { Form as FormModel } from "../../form/model";
+import Packagings from "../../form/packagings/Packagings";
 import { currentSiretService } from "../CompanySelector";
+import { GET_TRANSPORT_SLIPS } from "./Transport";
+import "./TransportSignature.scss";
+import { Wizard } from "./Wizard";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -31,13 +31,13 @@ export default function TransportSignature({ form }: Props) {
 
   return (
     <>
-      <a
-        className="icon"
+      <button
+        className="link icon"
         onClick={() => setIsOpen(true)}
         title="Signer ce bordereau"
       >
         <FaFileSignature />
-      </a>
+      </button>
       <div
         className="modal__backdrop"
         id="modal"
@@ -168,6 +168,7 @@ export default function TransportSignature({ form }: Props) {
                           <a
                             href={`${process.env.REACT_APP_API_ENDPOINT}/pdf?id=${form.id}`}
                             target="_blank"
+                            rel="noopener noreferrer"
                           >
                             une vue CERFA du bordereau
                           </a>

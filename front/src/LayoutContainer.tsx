@@ -12,7 +12,6 @@ const FormContainer = lazy(() => import("./form/FormContainer"));
 const SignupInfo = lazy(() => import("./login/SignupInfos"));
 const WasteSelector = lazy(() => import("./login/WasteSelector"));
 const Invite = lazy(() => import("./login/Invite"));
-const Faq = lazy(() => import("./Faq"));
 const Partners = lazy(() => import("./Partners"));
 const ResetPassword = lazy(() => import("./login/ResetPassword"));
 const Cgu = lazy(() => import("./Cgu"));
@@ -23,14 +22,16 @@ const WasteTree = lazy(() => import("./search/WasteTree"));
 const Stats = lazy(() => import("./Stats"));
 
 export default withRouter(function LayoutContainer({ history }) {
-  if (process.env.NODE_ENV === "production") {
-    useEffect(() => {
-      const unlisten = history.listen((location, action) =>
-        trackPageView(location.pathname)
-      );
-      return () => unlisten();
-    });
-  }
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+
+    const unlisten = history.listen((location, action) =>
+      trackPageView(location.pathname)
+    );
+    return () => unlisten();
+  });
 
   return (
     <React.Fragment>
@@ -38,7 +39,6 @@ export default withRouter(function LayoutContainer({ history }) {
 
       <Route exact path="/" component={Home} />
       <Route exact path="/cgu" component={WaitingComponent(Cgu)} />
-      <Route exact path="/faq" component={WaitingComponent(Faq)} />
       <Route exact path="/partners" component={WaitingComponent(Partners)} />
       <Route exact path="/login" component={WaitingComponent(Login)} />
       <Route exact path="/invite" component={WaitingComponent(Invite)} />

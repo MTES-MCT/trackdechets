@@ -25,13 +25,14 @@ export default connect<{}, Values>(function Recipient({ formik }) {
           <a
             href="https://www.georisques.gouv.fr/dossiers/installations/donnees#/"
             target="_blank"
+            rel="noopener noreferrer"
           >
             la liste des installation classées.
           </a>
         </p>
       </div>
 
-      <Field component={CompanySelector} name="recipient.company" />
+      <CompanySelector name="recipient.company" />
 
       <h4>Informations complémentaires</h4>
 
@@ -64,7 +65,7 @@ export default connect<{}, Values>(function Recipient({ formik }) {
       {hasTrader && (
         <>
           <h4>Négociant</h4>
-          <Field component={CompanySelector} name="trader.company" />
+          <CompanySelector name="trader.company" />
 
           <div className="form__group">
             <label>

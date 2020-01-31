@@ -19,13 +19,14 @@ export default withRouter(function Header({ history }) {
         <nav>
           <ul className="nav__links">
             <li className="nav__item">
-              <NavLink
+              {/* <NavLink
                 to="/faq"
                 activeClassName="active"
                 onClick={() => trackEvent("navbar", "faq")}
               >
                 FAQ
-              </NavLink>
+              </NavLink> */}
+              <a href="https://faq.trackdechets.fr/"> FAQ</a>
             </li>
             <li className="nav__item">
               <NavLink
@@ -60,14 +61,15 @@ export default withRouter(function Header({ history }) {
                   </NavLink>
                 </li>
                 <li className="nav__item logout">
-                  <a
+                  <button
+                    className="link"
                     onClick={() => {
                       localAuthService.locallySignOut();
                       history.push("/");
                     }}
                   >
                     Se déconnecter
-                  </a>
+                  </button>
                 </li>
               </>
             ) : (

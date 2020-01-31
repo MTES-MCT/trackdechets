@@ -1,28 +1,30 @@
-import { FieldProps, getIn } from "formik";
+import { useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
 import RedErrorMessage from "../../common/RedErrorMessage";
+import WasteTreeModal from "../../search/WasteTreeModal";
 import formatWasteCodeEffect from "./format-waste-code.effect";
 import WasteCodeLookup from "./nomenclature-dechets.json";
 import "./WasteCode.scss";
-import WasteTreeModal from "../../search/WasteTreeModal";
 
 type Bookmark = {
   code: string;
   description: string;
 };
 
-export default function WasteCode(props: FieldProps) {
-  const [wasteCode, setWasteCode] = useState(props.field.value);
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]); // TODO
+export default function WasteCode(props) {
+  const [field, meta] = useField(props);
+  const { setFieldValue } = useFormikContext();
+
+  const [wasteCode, setWasteCode] = useState(field.value);
+  const [bookmarks] = useState<Bookmark[]>([]); // TODO
 
   useEffect(() => {
-    props.form.setFieldValue(props.field.name, wasteCode);
+    setFieldValue(field.name, wasteCode);
     formatWasteCodeEffect(wasteCode, setWasteCode);
-  }, [wasteCode]);
+  }, [wasteCode, field.name, setFieldValue]);
 
   const wasteCodeDetail = WasteCodeLookup.find(l => l.code === wasteCode);
   const isDangerous = wasteCode.indexOf("*") > -1;
-  const isTouched = getIn(props.form.touched, props.field.name);
 
   const [openModal, setOpenModal] = useState(false);
   return (
@@ -53,19 +55,15 @@ export default function WasteCode(props: FieldProps) {
         Code déchet
         <input
           type="text"
-          name={props.field.name}
+          name={field.name}
           value={wasteCode}
-          className={
-            isTouched && getIn(props.form.errors, props.field.name)
-              ? "input-error"
-              : ""
-          }
-          onBlur={e => props.form.handleBlur(e)}
+          className={meta.touched && meta.error ? "input-error" : ""}
+          onBlur={field.onBlur}
           onChange={e => setWasteCode(e.target.value)}
         />
       </label>
 
-      <RedErrorMessage name={props.field.name} />
+      <RedErrorMessage name={field.name} />
 
       {bookmarks.length > 0 && (
         <React.Fragment>
@@ -77,7 +75,7 @@ export default function WasteCode(props: FieldProps) {
                 key={bookmark.code}
                 onClick={() => setWasteCode(bookmark.code)}
               >
-                <a>{bookmark.code}</a>
+                <span>{bookmark.code}</span>
               </li>
             ))}
           </ul>

@@ -10,5 +10,5 @@ export default function useDidUpdateEffect(
   useEffect(() => {
     if (didMountRef.current) fn();
     else didMountRef.current = true;
-  }, inputs);
+  }, [inputs, fn]);
 }

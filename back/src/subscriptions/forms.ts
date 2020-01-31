@@ -18,21 +18,23 @@ import { trim } from "../common/strings";
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
 ) {
-  mailToInexistantRecipient(payload).catch(err =>
-    console.error("Error on inexistant recipient subscription", err)
-  );
-  mailToInexistantEmitter(payload).catch(err =>
-    console.error("Error on inexistant emitter subscription", err)
-  );
-  mailWhenFormIsDeclined(payload).catch(err =>
-    console.error("Error on declined form subscription", err)
-  );
-  verifiyPresta(payload).catch(err =>
-    console.error("Error on prestataire verification form subscription", err)
-  );
-  mailWhenFormTraceabilityIsBroken(payload).catch(err =>
-    console.error("Error on form traceability break subscription", err)
-  );
+  await Promise.all([
+    mailToInexistantRecipient(payload).catch(err =>
+      console.error("Error on inexistant recipient subscription", err)
+    ),
+    mailToInexistantEmitter(payload).catch(err =>
+      console.error("Error on inexistant emitter subscription", err)
+    ),
+    mailWhenFormIsDeclined(payload).catch(err =>
+      console.error("Error on declined form subscription", err)
+    ),
+    verifiyPresta(payload).catch(err =>
+      console.error("Error on prestataire verification form subscription", err)
+    ),
+    mailWhenFormTraceabilityIsBroken(payload).catch(err =>
+      console.error("Error on form traceability break subscription", err)
+    )
+  ]);
 }
 
 async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {

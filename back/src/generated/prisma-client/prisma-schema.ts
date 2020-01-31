@@ -60,6 +60,7 @@ type Company {
   contactEmail: String
   contactPhone: String
   website: String
+  documentKeys: [String!]!
 }
 
 type CompanyAssociation {
@@ -239,6 +240,10 @@ input CompanyCreatecompanyTypesInput {
   set: [CompanyType!]
 }
 
+input CompanyCreatedocumentKeysInput {
+  set: [String!]
+}
+
 input CompanyCreateInput {
   id: ID
   siret: String!
@@ -251,6 +256,7 @@ input CompanyCreateInput {
   contactEmail: String
   contactPhone: String
   website: String
+  documentKeys: CompanyCreatedocumentKeysInput
 }
 
 input CompanyCreateOneInput {
@@ -304,6 +310,7 @@ type CompanyPreviousValues {
   contactEmail: String
   contactPhone: String
   website: String
+  documentKeys: [String!]!
 }
 
 type CompanySubscriptionPayload {
@@ -349,6 +356,11 @@ input CompanyUpdateDataInput {
   contactEmail: String
   contactPhone: String
   website: String
+  documentKeys: CompanyUpdatedocumentKeysInput
+}
+
+input CompanyUpdatedocumentKeysInput {
+  set: [String!]
 }
 
 input CompanyUpdateInput {
@@ -362,6 +374,7 @@ input CompanyUpdateInput {
   contactEmail: String
   contactPhone: String
   website: String
+  documentKeys: CompanyUpdatedocumentKeysInput
 }
 
 input CompanyUpdateManyMutationInput {
@@ -375,6 +388,7 @@ input CompanyUpdateManyMutationInput {
   contactEmail: String
   contactPhone: String
   website: String
+  documentKeys: CompanyUpdatedocumentKeysInput
 }
 
 input CompanyUpdateOneRequiredInput {

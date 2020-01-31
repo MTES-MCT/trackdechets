@@ -22,6 +22,8 @@ export const userMails = {
     <br>
     Pour finaliser votre inscription, veuillez confirmer votre email <a href="https://${VIRTUAL_HOST}/userActivation?hash=${activationHash}">en cliquant ici.</a>
     <br>
+    Une fois votre compte validé, vous pourrez créer votre établissement afin de commencer à gérer les bordereaux associés. Si l'établissement existe déjà, demandez à l'administrateur du compte au sein de votre entreprise de vous inviter à le rejoindre.
+    <br>
     Pour rappel, Trackdéchets est un site en béta conçu par la Fabrique Numérique du Ministère de l'Ecologie et des Territoires.
     <br>
     Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.`
@@ -81,7 +83,7 @@ export const userMails = {
   notifyUserOfInvite: (toEmail, toName, companyAdmin, companyName) => ({
     to: [{ email: toEmail, name: toName }],
     subject: "Vous avez été invité sur Trackdéchets",
-    title: `${companyAdmin} vous a invité à sur Trackdéchets`,
+    title: `${companyAdmin} vous a invité sur Trackdéchets`,
     body: `Bonjour ${toName},
     <br><br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre son organisation sur Trackdéchets.

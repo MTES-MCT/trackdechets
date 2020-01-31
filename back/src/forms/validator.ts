@@ -19,7 +19,7 @@ setLocale({
 
 const companySchema = (type: string) =>
   object().shape({
-    name: string().required(),
+    name: string().required(`${type}: Le nom de l'entreprise est obligatoire`),
     siret: string().required(
       `${type}: La sélection d'une entreprise par SIRET est obligatoire`
     ),
@@ -46,7 +46,7 @@ export const formSchema = object<any>().shape({
   }),
   recipient: object().shape({
     processingOperation: string()
-      .label("Opération de traitement (recipient.processingOperation)")
+      .label("Opération de traitement")
       .required(),
     cap: string().nullable(true),
     company: companySchema("Destinataire")

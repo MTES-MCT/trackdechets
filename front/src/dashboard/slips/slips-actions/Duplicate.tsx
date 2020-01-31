@@ -11,7 +11,7 @@ export default function Duplicate({ formId }: Props) {
   return (
     <Mutation mutation={mutations.DUPLICATE_FORM}>
       {(duplicate, { error }) => (
-        <a
+        <button
           className="icon"
           title="Dupliquer en brouillon"
           onClick={() =>
@@ -38,7 +38,7 @@ export default function Duplicate({ formId }: Props) {
           }
         >
           <FaClone />
-        </a>
+        </button>
       )}
     </Mutation>
   );

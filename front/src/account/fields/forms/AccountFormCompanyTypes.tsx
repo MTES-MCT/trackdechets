@@ -7,6 +7,7 @@ import RedErrorMessage from "../../../common/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
 
 type Props = {
+  name: string;
   siret: string;
   companyTypes: [string];
   toggleEdition: () => void;
@@ -27,6 +28,7 @@ export const UPDATE_COMPANY_TYPES = gql`
 `;
 
 export default function AccountFormCompanyTypes({
+  name,
   siret,
   companyTypes,
   toggleEdition

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import "./SlipsHeader.scss";
-import { trackEvent } from "../../tracker";
 
 export default function SlipsHeader() {
   return (

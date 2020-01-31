@@ -76,6 +76,8 @@ type Company {
   contactEmail: String
   contactPhone: String
   website: String
+
+  documentKeys: [String!] @scalarList(strategy: RELATION)
 }
 
 """
