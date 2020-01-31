@@ -26,7 +26,13 @@ import {
 import { mergePermissions, getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 
-const { SENTRY_DSN, SESSION_SECRET, UI_HOST, NODE_ENV } = process.env;
+const {
+  SENTRY_DSN,
+  SESSION_SECRET,
+  SESSION_COOKIE_HOST,
+  UI_HOST,
+  NODE_ENV
+} = process.env;
 
 const UI_BASE_URL = getUIBaseURL();
 
@@ -128,7 +134,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       secure: NODE_ENV === "dev" ? false : true,
-      domain: UI_HOST,
+      domain: SESSION_COOKIE_HOST || UI_HOST,
       maxAge: 24 * 3600 * 1000
     }
   })
