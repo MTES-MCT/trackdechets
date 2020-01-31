@@ -1,0 +1,28 @@
+
+
+.dialog-container {
+  margin: 50px auto;
+  width: 40%;
+  padding: 0
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex > * {
+  margin: 0 20px;
+}
+
+.hr {
+  margin-top: 10px 0;
+  border-bottom: 1px solid var(--light-grey);
+}
+
+.redirect {
+  margin-top: 20px;
+}
+
+

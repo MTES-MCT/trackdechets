@@ -1,5 +1,6 @@
 import * as express from "express";
 import * as passport from "passport";
+import * as querystring from "querystring";
 import { getUIBaseURL } from "../utils";
 
 const { UI_HOST } = process.env;
@@ -14,10 +15,17 @@ authRouter.post("/login", (req, res, next) => {
       return next(err);
     }
     if (!user) {
-      return res.redirect(`${UI_BASE_URL}/login?error=${info.message}`);
+      const queries = {
+        ...{ error: info.message },
+        ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})
+      };
+      return res.redirect(
+        `${UI_BASE_URL}/login?${querystring.stringify(queries)}`
+      );
     }
     req.login(user, () => {
-      return res.redirect(`${UI_BASE_URL}/dashboard/slips`);
+      const returnTo = req.body.returnTo || "/dashboard/slips";
+      return res.redirect(`${UI_BASE_URL}${returnTo}`);
     });
   })(req, res, next);
 });

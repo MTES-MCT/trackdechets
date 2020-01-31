@@ -94,8 +94,15 @@ export const userWithCompanyFactory = async role => {
  */
 export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
+
+  const accessTokenIndex =
+    (await prisma
+      .accessTokensConnection()
+      .aggregate()
+      .count()) + 1;
+
   const accessToken = await prisma.createAccessToken({
-    token: "token",
+    token: `token_${accessTokenIndex}`,
     user: { connect: { id: user.id } }
   });
   return { user, accessToken };
@@ -195,4 +202,23 @@ export const statusLogFactory = async ({
     updatedFields: updatedFields,
     ...opt
   });
+};
+
+export const applicationFactory = async () => {
+  const admin = await userFactory();
+
+  const applicationIndex =
+    (await prisma
+      .applicationsConnection()
+      .aggregate()
+      .count()) + 1;
+
+  const application = await prisma.createApplication({
+    admins: { connect: { id: admin.id } },
+    clientSecret: `Secret_${applicationIndex}`,
+    name: `Application_${applicationIndex}`,
+    redirectUris: { set: ["https://acme.inc/authorize"] }
+  });
+
+  return application;
 };
