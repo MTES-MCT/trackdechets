@@ -30,6 +30,7 @@ const {
   SENTRY_DSN,
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
+  SESSION_COOKIE_SECURE,
   UI_HOST,
   NODE_ENV
 } = process.env;
@@ -126,19 +127,25 @@ app.use(
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
 const redisClient = new Redis({ host: "redis" });
-app.use(
-  session({
-    store: new RedisStore({ client: redisClient }),
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: NODE_ENV === "dev" ? false : true,
-      domain: SESSION_COOKIE_HOST || UI_HOST,
-      maxAge: 24 * 3600 * 1000
-    }
-  })
-);
+
+const sess = {
+  store: new RedisStore({ client: redisClient }),
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    domain: SESSION_COOKIE_HOST || UI_HOST,
+    maxAge: 24 * 3600 * 1000
+  }
+};
+
+if (SESSION_COOKIE_SECURE === "true") {
+  app.set("trust proxy", 1); // trust first proxy
+  sess.cookie.secure = true; // serve secure cookies
+}
+
+app.use(session(sess));
 
 app.use(passport.initialize());
 app.use(passport.session());
