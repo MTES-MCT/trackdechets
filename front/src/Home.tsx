@@ -2,12 +2,12 @@ import React from "react";
 import { FaCheckCircle, FaPenFancy, FaTasks } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./Home.scss";
-import { localAuthService } from "./login/auth.service";
+
 import { trackEvent } from "./tracker";
 import LazyLoad from "react-lazyload";
 import Footer from "./Footer";
 
-export default function Home() {
+export default function Home({ isAuthenticated }) {
   return (
     <React.Fragment>
       <div className="hero" role="banner">
@@ -15,7 +15,7 @@ export default function Home() {
           <h1 className="hero__white-background">
             Gérer la traçabilité des déchets en toute sécurité
           </h1>
-          {localAuthService.isAuthenticated ? (
+          {isAuthenticated ? (
             <p>
               <Link to="/dashboard/slips" className="button">
                 Accéder à mon espace

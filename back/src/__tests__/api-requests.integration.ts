@@ -1,53 +1,34 @@
-import { sign } from "jsonwebtoken";
-import axios from "axios";
-
 import { resetDatabase } from "../../integration-tests/helper";
-import { server } from "../server";
-import { createTestClient } from "apollo-server-testing";
-import { userFactory } from "./factories";
+import { userWithAccessTokenFactory } from "./factories";
+import * as supertest from "supertest";
+import { app } from "../server";
 
-const { JWT_SECRET } = process.env;
+const request = supertest(app);
 
 describe("Perform api requests", () => {
-  afterAll(async () => {
+  afterEach(async () => {
     await resetDatabase();
   });
 
   test("query request with application/json header", async () => {
-    const user = await userFactory();
+    const { user, accessToken } = await userWithAccessTokenFactory();
+    const res = await request
+      .post("/")
+      .set("Authorization", `Bearer ${accessToken.token}`)
+      .send({ query: "{ me { email }}" });
 
-    const token = sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1d" });
-
-    const res = await axios({
-      method: "POST",
-      url: "http://td-api/",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      data: {
-        query: "{ me { id email }}"
-      }
-    });
-
-    expect(res.data.data.me.email).toEqual(user.email);
+    expect(res.body.data.me.email).toEqual(user.email);
   });
 
   test("query request with application/graphql header", async () => {
-    const user2 = await userFactory();
+    const { user, accessToken } = await userWithAccessTokenFactory();
 
-    const token = sign({ userId: user2.id }, JWT_SECRET, { expiresIn: "1d" });
+    const res = await request
+      .post("/")
+      .type("application/graphql")
+      .set("Authorization", `Bearer ${accessToken.token}`)
+      .send("{ me { email }}");
 
-    const res = await axios({
-      method: "POST",
-      url: "http://td-api/",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/graphql"
-      },
-      data: "{ me { id email }}"
-    });
-
-    expect(res.data.data.me.email).toEqual(user2.email);
+    expect(res.body.data.me.email).toEqual(user.email);
   });
 });

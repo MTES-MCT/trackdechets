@@ -1,5 +1,4 @@
 import { Context } from "../types";
-import { getUserIdFromToken } from "../utils";
 import {
   cleanUpNotDuplicatableFieldsInForm,
   unflattenObjectFromDb
@@ -11,9 +10,11 @@ import {
   markAsSent,
   signedByTransporter
 } from "./mutations/mark-as";
+import { prisma } from "../generated/prisma-client";
 import { saveForm } from "./mutations/save-form";
 import { getReadableId } from "./readable-id";
 import { getUserCompanies } from "../companies/queries";
+import { DomainError, ErrorCode } from "../common/errors";
 
 export default {
   Form: {
@@ -154,8 +155,14 @@ export default {
     forms: {
       subscribe: async (parent, { token }, context: Context) => {
         // Web socket has no headers so we pass the token as a param
-        const userId = getUserIdFromToken(token);
-        const userCompanies = await getUserCompanies(userId);
+
+        const user = await prisma.accessToken({ token }).user();
+
+        if (!user) {
+          throw new DomainError(ErrorCode.UNAUTHENTICATED);
+        }
+
+        const userCompanies = await getUserCompanies(user.id);
 
         return context.prisma.$subscribe.form({
           OR: [
@@ -165,7 +172,7 @@ export default {
             ...userCompanies.map(userCompany => ({
               node: { recipientCompanySiret: userCompany.siret }
             })),
-            { node: { owner: { id: userId } } }
+            { node: { owner: { id: user.id } } }
           ]
         });
       },

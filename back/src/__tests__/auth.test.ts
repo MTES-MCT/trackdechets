@@ -1,62 +1,71 @@
-import { parseBearerToken } from "../auth";
-import { sign } from "jsonwebtoken";
-import { ErrorCode } from "../common/errors";
+import { updateAccessTokenLastUsed } from "../auth";
+import { AccessToken } from "../generated/prisma-client";
 
-describe("parseBearerToken", () => {
-  it("parse token from a well formed Bearer authorization header", () => {
-    const authHeader = "Bearer myToken";
-    const token = parseBearerToken(authHeader);
-    expect(token).toEqual("myToken");
-  });
+const updateAccessTokenMock = jest.fn();
+jest.mock("../generated/prisma-client", () => ({
+  prisma: {
+    updateAccessToken: jest.fn((...args) => updateAccessTokenMock(...args))
+  }
+}));
 
-  it("return null if the authorization scheme is not Bearer", () => {
-    const authHeader = "Basic base64loginPwd";
-    const token = parseBearerToken(authHeader);
-    expect(token).toBe(null);
-  });
+describe("updateAccessTokenLastUsed", () => {
+  const RealDate = Date;
+  const now = new Date("2019-10-04T20:00:00.000Z");
 
-  it("return null if the header is malformed", () => {
-    const authHeader = "malformed";
-    const token = parseBearerToken(authHeader);
-    expect(token).toBe(null);
-  });
-});
-
-describe("getUserIdFromToken", () => {
-  // tweak and restore process.env after each test
-  const OLD_ENV = process.env;
-  beforeEach(() => {
-    jest.resetModules(); //   clears the cache
-    process.env = { ...OLD_ENV };
-  });
+  function mockDate() {
+    Date.now = jest.fn(() => now) as jest.Mock;
+  }
 
   afterEach(() => {
-    process.env = OLD_ENV;
+    updateAccessTokenMock.mockReset();
+    Date = RealDate;
   });
 
-  it("decode a valid token", () => {
-    process.env.JWT_SECRET = "secret";
+  it("should set lastUsed if it was never set", () => {
+    mockDate();
+    let accessToken: AccessToken = {
+      id: "",
+      createdAt: "",
+      updatedAt: "",
+      token: "token",
+      lastUsed: null,
+      isRevoked: false
+    };
 
-    // import function from each test to take into account
-    // tweaked process.env
-    const getUserIdFromToken = require("../auth").getUserIdFromToken;
-
-    const token = sign({ userId: "userId" }, "secret", { expiresIn: "1d" });
-    const userId = getUserIdFromToken(token);
-    expect(userId).toEqual("userId");
+    // it should set lastUsed if it was never set
+    updateAccessTokenLastUsed(accessToken);
+    expect(updateAccessTokenMock).toHaveBeenCalledWith({
+      data: { lastUsed: "2019-10-04T00:00:00.000Z" },
+      where: { token: "token" }
+    });
   });
 
-  it("returns null if the token is not valid", () => {
-    process.env.JWT_SECRET = "secret";
-    const getUserIdFromToken = require("../auth").getUserIdFromToken;
-
-    expect(getUserIdFromToken("invalidToken")).toBe(null);
+  it("should not set lastUsed if it was already set the same day", () => {
+    let accessToken: AccessToken = {
+      id: "",
+      createdAt: "",
+      updatedAt: "",
+      token: "token",
+      lastUsed: "2019-10-04T00:00:00.000Z",
+      isRevoked: false
+    };
+    updateAccessTokenLastUsed(accessToken);
+    expect(updateAccessTokenMock).not.toBeCalled();
   });
 
-  it("returns null if the token is expired", () => {
-    process.env.JWT_SECRET = "secret";
-    const getUserIdFromToken = require("../auth").getUserIdFromToken;
-    const token = sign({ userId: "userId" }, "secret", { expiresIn: "1ms" });
-    expect(getUserIdFromToken(token)).toBe(null);
+  it("should set lastUsed if it was set more than one day ago", () => {
+    let accessToken: AccessToken = {
+      id: "",
+      createdAt: "",
+      updatedAt: "",
+      token: "token",
+      lastUsed: "2019-10-02T00:00:00.000Z",
+      isRevoked: false
+    };
+    updateAccessTokenLastUsed(accessToken);
+    expect(updateAccessTokenMock).toHaveBeenCalledWith({
+      data: { lastUsed: "2019-10-04T00:00:00.000Z" },
+      where: { token: "token" }
+    });
   });
 });

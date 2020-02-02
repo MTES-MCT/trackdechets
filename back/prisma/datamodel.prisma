@@ -288,3 +288,17 @@ type StatusLog {
   form: Form!
   status: Status!
 }
+
+
+"""
+OAuth2 - Access token to a user resource
+"""
+type AccessToken {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  user: User!
+  token: String! @unique
+  isRevoked: Boolean! @default(value: false)
+  lastUsed: DateTime
+}

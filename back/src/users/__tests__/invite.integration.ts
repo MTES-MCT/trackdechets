@@ -4,12 +4,9 @@ import { resetDatabase } from "../../../integration-tests/helper";
 
 import { server } from "../../server";
 import { createTestClient } from "apollo-server-integration-testing";
-import { sign } from "jsonwebtoken";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { escape } from "querystring";
 import axios from "axios";
-
-const { JWT_SECRET } = process.env;
 
 // Intercept mail calls
 const mockedAxiosPost = jest.spyOn(axios, "post");
@@ -39,13 +36,10 @@ describe("Invitation removal", () => {
       apolloServer: server
     });
 
-    // Generate and pass token into Auth header
-    const token = sign({ userId: admin.id }, JWT_SECRET, { expiresIn: "1d" });
+    // Set authenticated user
     setOptions({
       request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        user: admin
       }
     });
 
@@ -88,13 +82,10 @@ describe("Invitation resend", () => {
       apolloServer: server
     });
 
-    // Generate and pass token into Auth header
-    const token = sign({ userId: admin.id }, JWT_SECRET, { expiresIn: "1d" });
+    // Set authenticated user
     setOptions({
       request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        user: admin
       }
     });
 
@@ -102,7 +93,7 @@ describe("Invitation resend", () => {
 
     const mutation = `
         mutation {
-          resendInvitation(email: "${usrToInvite.email}", siret: "${company.siret}")           
+          resendInvitation(email: "${usrToInvite.email}", siret: "${company.siret}")
         }
       `;
     const res = await mutate(mutation);
@@ -141,13 +132,10 @@ describe("Invitation sending", () => {
       apolloServer: server
     });
 
-    // Generate and pass token into Auth header
-    const token = sign({ userId: admin.id }, JWT_SECRET, { expiresIn: "1d" });
+    // Set authenticated user
     setOptions({
       request: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        user: admin
       }
     });
 
