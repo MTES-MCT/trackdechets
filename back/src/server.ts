@@ -31,8 +31,7 @@ const {
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
   SESSION_COOKIE_SECURE,
-  UI_HOST,
-  NODE_ENV
+  UI_HOST
 } = process.env;
 
 const UI_BASE_URL = getUIBaseURL();

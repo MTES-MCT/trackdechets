@@ -44,9 +44,9 @@ export function mergePermissions(permissions) {
 }
 
 export function getUIBaseURL() {
-  const { NODE_ENV, UI_HOST } = process.env;
-  const scheme = NODE_ENV === "dev" ? "http" : "https";
-  return `${scheme}://${UI_HOST}`;
+  let { UI_URL_SCHEME, UI_HOST } = process.env;
+  UI_URL_SCHEME = UI_URL_SCHEME || "http";
+  return `${UI_URL_SCHEME}://${UI_HOST}`;
 }
 
 /**
