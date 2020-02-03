@@ -97,11 +97,11 @@ export const formWorkflowMachine = Machine(
               cond: "isExemptOfTraceability"
             },
             {
-              target: FormState.Processed,
+              target: FormState.AwaitingGroup,
               cond: "awaitsGroup"
             },
             {
-              target: FormState.AwaitingGroup
+              target: FormState.Processed
             }
           ]
         }
@@ -203,7 +203,7 @@ export const formWorkflowMachine = Machine(
         !ctx.actorSirets.includes(ctx.form.recipientCompanySiret),
       isExemptOfTraceability: ctx => ctx.form.noTraceability,
       awaitsGroup: ctx =>
-        !GROUP_CODES.includes(ctx.form.processingOperationDone),
+        GROUP_CODES.includes(ctx.form.processingOperationDone),
       isFormAccepted: ctx => {
         return ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
           ctx.form.wasteAcceptationStatus
