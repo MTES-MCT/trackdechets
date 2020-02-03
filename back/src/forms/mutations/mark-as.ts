@@ -2,6 +2,7 @@ import { interpret, State } from "xstate";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { Context } from "../../types";
+import { flattenObjectForDb } from "../form-converter";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
 
@@ -29,7 +30,8 @@ export function markAsProcessed(_, { id, processedInfo }, context: Context) {
   return transitionForm(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
-    context
+    context,
+    processedInfo => flattenObjectForDb(processedInfo)
   );
 }
 

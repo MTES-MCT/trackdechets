@@ -1,4 +1,5 @@
 import { object, date, string, boolean, number, array } from "yup";
+import { companySchema } from "./validator";
 
 export const receivedInfoSchema = object({
   wasteAcceptationStatus: string()
@@ -74,8 +75,10 @@ export default {
         processedAt: date().required(
           "Vous devez saisir la date de traitement."
         ),
-        nextDestinationProcessingOperation: string().nullable(true),
-        nextDestinationDetails: string().nullable(true),
+        nextDestination: object({
+          processingOperation: string().nullable(true),
+          company: companySchema("Destination ultérieure prévue")
+        }),
         noTraceability: boolean().nullable(true)
       })
     }),
