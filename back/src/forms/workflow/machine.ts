@@ -8,7 +8,7 @@ import {
   markFormAppendixGroupedsAsProcessed
 } from "./helpers";
 
-const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
+export const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
 
 export const formWorkflowMachine = Machine(
   {
