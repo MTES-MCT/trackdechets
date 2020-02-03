@@ -5,6 +5,7 @@ import { FaCheck, FaRegCircle, FaSearch } from "react-icons/fa";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
+import { toMacroCase } from "../../common/helper";
 
 export type Rubrique = {
   rubrique: string;
@@ -113,7 +114,7 @@ export default function CompanySelector(props) {
   }, [state.selectedCompany, field.name, setFieldValue]);
 
   // Load different favorites depending on the object we are filling
-  const type = field.name.split(".")[0].toUpperCase();
+  const type = toMacroCase(field.name.split(".")[0]);
 
   const { loading, error, data } = useQuery(FAVORITES, {
     variables: { type },
