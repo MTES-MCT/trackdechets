@@ -273,7 +273,6 @@ describe("Test Form reception", () => {
 
     // form is still sent
     expect(frm.status).toBe("SENT");
-    expect(frm.wasteAcceptationStatus).toBe("REFUSED");
 
     expect(frm.wasteAcceptationStatus).toBe(null);
     expect(frm.receivedBy).toBe(null);

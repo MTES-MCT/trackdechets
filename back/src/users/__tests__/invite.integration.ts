@@ -7,9 +7,6 @@ import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { escape } from "querystring";
 import axios from "axios";
 
-import { escape } from "querystring";
-import axios from "axios";
-import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import makeClient from "../../__tests__/testClient";
 import { resetDatabase } from "../../../integration-tests/helper";
 
