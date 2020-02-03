@@ -6,11 +6,35 @@ type ColumnDetail = {
   getter: (form: Form) => string | number;
 };
 
+/**
+ * Format a date as fr format
+ * @param {string } datestr - a date iso-formatted
+ * @returns {string} - date formatted as dd/mm/YYYY
+ */
+const dateFmt = datestr => {
+  if (!datestr) {
+    return "";
+  }
+  const date = new Date(datestr);
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
+
+  let fmtDay = day < 10 ? `0${day}` : `${day}`;
+  let fmtMonth = month < 10 ? `0${month}` : `${month}`;
+
+  return `${fmtDay}/${fmtMonth}/${year}`;
+};
+
 export const EXPORT_COLUMNS: {
   [key: string]: ColumnDetail;
 } = {
   number: { key: "number", label: "Numéro de BSD", getter: f => f.readableId },
-  customNumber: { key: "customNumber", label: "Numéro libre", getter: f => f.customId },
+  customNumber: {
+    key: "customNumber",
+    label: "Numéro libre",
+    getter: f => f.customId
+  },
   wasteCode: {
     key: "wasteCode",
     label: "Code déchet",
@@ -43,7 +67,7 @@ export const EXPORT_COLUMNS: {
   },
   numberOfPackages: {
     key: "numberOfPackages",
-    label: "Quantité réelle (en tonnes)",
+    label: "Nombre de colis",
     getter: f => f.wasteDetailsNumberOfPackages
   },
   onuCode: {
@@ -54,7 +78,7 @@ export const EXPORT_COLUMNS: {
   date: {
     key: "date",
     label: "Date d'expédition du déchet",
-    getter: f => new Date(f.sentAt).toLocaleDateString()
+    getter: f => dateFmt(f.processedAt)
   },
   emitterCompanyName: {
     key: "emitterCompanyName",
@@ -114,7 +138,7 @@ export const EXPORT_COLUMNS: {
   processedAt: {
     key: "processedAt",
     label: "Date du traitement",
-    getter: f => new Date(f.processedAt).toLocaleDateString()
+    getter: f => dateFmt(f.processedAt)
   },
   processedBy: {
     key: "processedBy",

@@ -156,6 +156,11 @@ type Declaration {
   gerepType: GerepType
 }
 
+enum WasteAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}
 
 type Form {
   id: ID! @id
@@ -175,6 +180,8 @@ type Form {
   sentBy: String
 
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float

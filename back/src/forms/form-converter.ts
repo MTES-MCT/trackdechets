@@ -81,6 +81,8 @@ export function cleanUpNotDuplicatableFieldsInForm(form) {
     sentBy,
 
     isAccepted,
+    wasteAcceptationStatus,
+    wasteRefusalReason,
     receivedBy,
     receivedAt,
     quantityReceived,

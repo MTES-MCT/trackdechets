@@ -204,7 +204,11 @@ export const formWorkflowMachine = Machine(
       isExemptOfTraceability: ctx => ctx.form.noTraceability,
       awaitsGroup: ctx =>
         !GROUP_CODES.includes(ctx.form.processingOperationDone),
-      isFormAccepted: ctx => ctx.form.isAccepted
+      isFormAccepted: ctx => {
+        return ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+          ctx.form.wasteAcceptationStatus
+        );
+      }
     }
   }
 );

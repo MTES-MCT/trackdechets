@@ -23,6 +23,7 @@ export const csvExportHandler = async (req, res) => {
 
 async function getCsvExport(sirets: string[], exportType: ExportType) {
   const data = await getExportData(sirets, exportType);
+
   const exportContent = getExport(
     data,
     Object.keys(EXPORT_COLUMNS).map(key => EXPORT_COLUMNS[key])

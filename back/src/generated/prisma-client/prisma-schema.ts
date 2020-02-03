@@ -938,6 +938,8 @@ type Form {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
@@ -1013,6 +1015,8 @@ input FormCreateInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
@@ -1109,6 +1113,10 @@ enum FormOrderByInput {
   sentBy_DESC
   isAccepted_ASC
   isAccepted_DESC
+  wasteAcceptationStatus_ASC
+  wasteAcceptationStatus_DESC
+  wasteRefusalReason_ASC
+  wasteRefusalReason_DESC
   receivedBy_ASC
   receivedBy_DESC
   receivedAt_ASC
@@ -1233,6 +1241,8 @@ type FormPreviousValues {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
@@ -1391,6 +1401,24 @@ input FormScalarWhereInput {
   sentBy_not_ends_with: String
   isAccepted: Boolean
   isAccepted_not: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteAcceptationStatus_not: WasteAcceptationStatus
+  wasteAcceptationStatus_in: [WasteAcceptationStatus!]
+  wasteAcceptationStatus_not_in: [WasteAcceptationStatus!]
+  wasteRefusalReason: String
+  wasteRefusalReason_not: String
+  wasteRefusalReason_in: [String!]
+  wasteRefusalReason_not_in: [String!]
+  wasteRefusalReason_lt: String
+  wasteRefusalReason_lte: String
+  wasteRefusalReason_gt: String
+  wasteRefusalReason_gte: String
+  wasteRefusalReason_contains: String
+  wasteRefusalReason_not_contains: String
+  wasteRefusalReason_starts_with: String
+  wasteRefusalReason_not_starts_with: String
+  wasteRefusalReason_ends_with: String
+  wasteRefusalReason_not_ends_with: String
   receivedBy: String
   receivedBy_not: String
   receivedBy_in: [String!]
@@ -2090,6 +2118,8 @@ input FormUpdateDataInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
@@ -2158,6 +2188,8 @@ input FormUpdateInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
@@ -2225,6 +2257,8 @@ input FormUpdateManyDataInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
@@ -2303,6 +2337,8 @@ input FormUpdateManyMutationInput {
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float
@@ -2490,6 +2526,24 @@ input FormWhereInput {
   sentBy_not_ends_with: String
   isAccepted: Boolean
   isAccepted_not: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteAcceptationStatus_not: WasteAcceptationStatus
+  wasteAcceptationStatus_in: [WasteAcceptationStatus!]
+  wasteAcceptationStatus_not_in: [WasteAcceptationStatus!]
+  wasteRefusalReason: String
+  wasteRefusalReason_not: String
+  wasteRefusalReason_in: [String!]
+  wasteRefusalReason_not_in: [String!]
+  wasteRefusalReason_lt: String
+  wasteRefusalReason_lte: String
+  wasteRefusalReason_gt: String
+  wasteRefusalReason_gte: String
+  wasteRefusalReason_contains: String
+  wasteRefusalReason_not_contains: String
+  wasteRefusalReason_starts_with: String
+  wasteRefusalReason_not_starts_with: String
+  wasteRefusalReason_ends_with: String
+  wasteRefusalReason_not_ends_with: String
   receivedBy: String
   receivedBy_not: String
   receivedBy_in: [String!]
@@ -4612,6 +4666,12 @@ input UserWhereInput {
 input UserWhereUniqueInput {
   id: ID
   email: String
+}
+
+enum WasteAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
 }
 
 enum WasteType {

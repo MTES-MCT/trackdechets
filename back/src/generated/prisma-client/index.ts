@@ -600,6 +600,10 @@ export type FormOrderByInput =
   | "sentBy_DESC"
   | "isAccepted_ASC"
   | "isAccepted_DESC"
+  | "wasteAcceptationStatus_ASC"
+  | "wasteAcceptationStatus_DESC"
+  | "wasteRefusalReason_ASC"
+  | "wasteRefusalReason_DESC"
   | "receivedBy_ASC"
   | "receivedBy_DESC"
   | "receivedAt_ASC"
@@ -769,6 +773,24 @@ export type AccessTokenOrderByInput =
 
 export type UserRole = "MEMBER" | "ADMIN";
 
+export type QuantityType = "REAL" | "ESTIMATED";
+
+export type UserAccountHashOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "companySiret_ASC"
+  | "companySiret_DESC"
+  | "role_ASC"
+  | "role_DESC"
+  | "hash_ASC"
+  | "hash_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
 export type GerepType = "Producteur" | "Traiteur";
 
 export type DeclarationOrderByInput =
@@ -787,9 +809,18 @@ export type DeclarationOrderByInput =
   | "gerepType_ASC"
   | "gerepType_DESC";
 
+export type WasteAcceptationStatus =
+  | "ACCEPTED"
+  | "REFUSED"
+  | "PARTIALLY_REFUSED";
+
 export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
 
-export type QuantityType = "REAL" | "ESTIMATED";
+export type StatusLogOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "status_ASC"
+  | "status_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -847,28 +878,6 @@ export type RubriqueOrderByInput =
   | "wasteType_ASC"
   | "wasteType_DESC";
 
-export type StatusLogOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "status_ASC"
-  | "status_DESC";
-
-export type UserAccountHashOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "email_ASC"
-  | "email_DESC"
-  | "companySiret_ASC"
-  | "companySiret_DESC"
-  | "role_ASC"
-  | "role_DESC"
-  | "hash_ASC"
-  | "hash_DESC"
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "updatedAt_ASC"
-  | "updatedAt_DESC";
-
 export interface CompanyCreateOneInput {
   create?: Maybe<CompanyCreateInput>;
   connect?: Maybe<CompanyWhereUniqueInput>;
@@ -879,19 +888,10 @@ export type AccessTokenWhereUniqueInput = AtLeastOne<{
   token?: Maybe<String>;
 }>;
 
-export interface CompanyUpdatecompanyTypesInput {
-  set?: Maybe<CompanyType[] | CompanyType>;
-}
-
-export type CompanyWhereUniqueInput = AtLeastOne<{
+export type UserWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
-  siret?: Maybe<String>;
+  email?: Maybe<String>;
 }>;
-
-export interface FormUpdateManyWithWhereNestedInput {
-  where: FormScalarWhereInput;
-  data: FormUpdateManyDataInput;
-}
 
 export interface CompanyAssociationCreateInput {
   id?: Maybe<ID_Input>;
@@ -1001,6 +1001,28 @@ export interface FormScalarWhereInput {
   sentBy_not_ends_with?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
   isAccepted_not?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteAcceptationStatus_not?: Maybe<WasteAcceptationStatus>;
+  wasteAcceptationStatus_in?: Maybe<
+    WasteAcceptationStatus[] | WasteAcceptationStatus
+  >;
+  wasteAcceptationStatus_not_in?: Maybe<
+    WasteAcceptationStatus[] | WasteAcceptationStatus
+  >;
+  wasteRefusalReason?: Maybe<String>;
+  wasteRefusalReason_not?: Maybe<String>;
+  wasteRefusalReason_in?: Maybe<String[] | String>;
+  wasteRefusalReason_not_in?: Maybe<String[] | String>;
+  wasteRefusalReason_lt?: Maybe<String>;
+  wasteRefusalReason_lte?: Maybe<String>;
+  wasteRefusalReason_gt?: Maybe<String>;
+  wasteRefusalReason_gte?: Maybe<String>;
+  wasteRefusalReason_contains?: Maybe<String>;
+  wasteRefusalReason_not_contains?: Maybe<String>;
+  wasteRefusalReason_starts_with?: Maybe<String>;
+  wasteRefusalReason_not_starts_with?: Maybe<String>;
+  wasteRefusalReason_ends_with?: Maybe<String>;
+  wasteRefusalReason_not_ends_with?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedBy_not?: Maybe<String>;
   receivedBy_in?: Maybe<String[] | String>;
@@ -1672,8 +1694,8 @@ export interface FormScalarWhereInput {
   NOT?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
 }
 
-export interface CompanyUpdatedocumentKeysInput {
-  set?: Maybe<String[] | String>;
+export interface CompanyUpdatecompanyTypesInput {
+  set?: Maybe<CompanyType[] | CompanyType>;
 }
 
 export interface FormUpsertWithWhereUniqueNestedInput {
@@ -1682,25 +1704,9 @@ export interface FormUpsertWithWhereUniqueNestedInput {
   create: FormCreateInput;
 }
 
-export interface UserActivationHashSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<UserActivationHashWhereInput>;
-  AND?: Maybe<
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | UserActivationHashSubscriptionWhereInput[]
-    | UserActivationHashSubscriptionWhereInput
-  >;
-}
+export type CompanyAssociationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
 
 export interface FormUpdateDataInput {
   readableId?: Maybe<String>;
@@ -1712,6 +1718,8 @@ export interface FormUpdateDataInput {
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
@@ -1781,125 +1789,60 @@ export interface UserSubscriptionWhereInput {
   NOT?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
 }
 
-export type UserAccountHashWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  hash?: Maybe<String>;
-}>;
-
-export interface StatusLogSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<StatusLogWhereInput>;
-  AND?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
-  >;
-}
-
 export interface FormUpdateWithWhereUniqueNestedInput {
   where: FormWhereUniqueInput;
   data: FormUpdateDataInput;
 }
 
-export interface DeclarationWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  codeS3ic?: Maybe<String>;
-  codeS3ic_not?: Maybe<String>;
-  codeS3ic_in?: Maybe<String[] | String>;
-  codeS3ic_not_in?: Maybe<String[] | String>;
-  codeS3ic_lt?: Maybe<String>;
-  codeS3ic_lte?: Maybe<String>;
-  codeS3ic_gt?: Maybe<String>;
-  codeS3ic_gte?: Maybe<String>;
-  codeS3ic_contains?: Maybe<String>;
-  codeS3ic_not_contains?: Maybe<String>;
-  codeS3ic_starts_with?: Maybe<String>;
-  codeS3ic_not_starts_with?: Maybe<String>;
-  codeS3ic_ends_with?: Maybe<String>;
-  codeS3ic_not_ends_with?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  nomEts_not?: Maybe<String>;
-  nomEts_in?: Maybe<String[] | String>;
-  nomEts_not_in?: Maybe<String[] | String>;
-  nomEts_lt?: Maybe<String>;
-  nomEts_lte?: Maybe<String>;
-  nomEts_gt?: Maybe<String>;
-  nomEts_gte?: Maybe<String>;
-  nomEts_contains?: Maybe<String>;
-  nomEts_not_contains?: Maybe<String>;
-  nomEts_starts_with?: Maybe<String>;
-  nomEts_not_starts_with?: Maybe<String>;
-  nomEts_ends_with?: Maybe<String>;
-  nomEts_not_ends_with?: Maybe<String>;
-  annee?: Maybe<String>;
-  annee_not?: Maybe<String>;
-  annee_in?: Maybe<String[] | String>;
-  annee_not_in?: Maybe<String[] | String>;
-  annee_lt?: Maybe<String>;
-  annee_lte?: Maybe<String>;
-  annee_gt?: Maybe<String>;
-  annee_gte?: Maybe<String>;
-  annee_contains?: Maybe<String>;
-  annee_not_contains?: Maybe<String>;
-  annee_starts_with?: Maybe<String>;
-  annee_not_starts_with?: Maybe<String>;
-  annee_ends_with?: Maybe<String>;
-  annee_not_ends_with?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  codeDechet_not?: Maybe<String>;
-  codeDechet_in?: Maybe<String[] | String>;
-  codeDechet_not_in?: Maybe<String[] | String>;
-  codeDechet_lt?: Maybe<String>;
-  codeDechet_lte?: Maybe<String>;
-  codeDechet_gt?: Maybe<String>;
-  codeDechet_gte?: Maybe<String>;
-  codeDechet_contains?: Maybe<String>;
-  codeDechet_not_contains?: Maybe<String>;
-  codeDechet_starts_with?: Maybe<String>;
-  codeDechet_not_starts_with?: Maybe<String>;
-  codeDechet_ends_with?: Maybe<String>;
-  codeDechet_not_ends_with?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  libDechet_not?: Maybe<String>;
-  libDechet_in?: Maybe<String[] | String>;
-  libDechet_not_in?: Maybe<String[] | String>;
-  libDechet_lt?: Maybe<String>;
-  libDechet_lte?: Maybe<String>;
-  libDechet_gt?: Maybe<String>;
-  libDechet_gte?: Maybe<String>;
-  libDechet_contains?: Maybe<String>;
-  libDechet_not_contains?: Maybe<String>;
-  libDechet_starts_with?: Maybe<String>;
-  libDechet_not_starts_with?: Maybe<String>;
-  libDechet_ends_with?: Maybe<String>;
-  libDechet_not_ends_with?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-  gerepType_not?: Maybe<GerepType>;
-  gerepType_in?: Maybe<GerepType[] | GerepType>;
-  gerepType_not_in?: Maybe<GerepType[] | GerepType>;
-  AND?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
-  OR?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
-  NOT?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
+export type DeclarationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export type UserAccountHashWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  hash?: Maybe<String>;
+}>;
+
+export type CompanyWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  siret?: Maybe<String>;
+}>;
+
+export interface FormUpdateManyInput {
+  create?: Maybe<FormCreateInput[] | FormCreateInput>;
+  update?: Maybe<
+    | FormUpdateWithWhereUniqueNestedInput[]
+    | FormUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | FormUpsertWithWhereUniqueNestedInput[]
+    | FormUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  set?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  disconnect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  deleteMany?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+  updateMany?: Maybe<
+    FormUpdateManyWithWhereNestedInput[] | FormUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface InstallationSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<InstallationWhereInput>;
+  AND?: Maybe<
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
 }
 
 export interface UserAccountHashWhereInput {
@@ -1984,54 +1927,20 @@ export interface UserAccountHashWhereInput {
   NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
 }
 
-export interface FormSubscriptionWhereInput {
+export interface DeclarationSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<FormWhereInput>;
-  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-}
-
-export interface FormUpdateManyInput {
-  create?: Maybe<FormCreateInput[] | FormCreateInput>;
-  update?: Maybe<
-    | FormUpdateWithWhereUniqueNestedInput[]
-    | FormUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | FormUpsertWithWhereUniqueNestedInput[]
-    | FormUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  set?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  disconnect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  deleteMany?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-  updateMany?: Maybe<
-    FormUpdateManyWithWhereNestedInput[] | FormUpdateManyWithWhereNestedInput
-  >;
-}
-
-export interface CompanyAssociationSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyAssociationWhereInput>;
+  node?: Maybe<DeclarationWhereInput>;
   AND?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
+    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
   >;
   OR?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
+    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
+    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
   >;
 }
 
@@ -2045,6 +1954,8 @@ export interface FormUpdateInput {
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
@@ -2103,24 +2014,31 @@ export interface FormUpdateInput {
   appendix2Forms?: Maybe<FormUpdateManyInput>;
 }
 
-export interface CompanySubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyWhereInput>;
-  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-}
+export type FormWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  readableId?: Maybe<String>;
+}>;
 
 export interface FormCreateManyInput {
   create?: Maybe<FormCreateInput[] | FormCreateInput>;
   connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
 }
 
-export interface UserActivationHashUpdateManyMutationInput {
-  hash?: Maybe<String>;
+export interface AccessTokenSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<AccessTokenWhereInput>;
+  AND?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
 }
 
 export interface FormCreateInput {
@@ -2134,6 +2052,8 @@ export interface FormCreateInput {
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
@@ -2192,10 +2112,25 @@ export interface FormCreateInput {
   appendix2Forms?: Maybe<FormCreateManyInput>;
 }
 
-export interface UserActivationHashCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  hash: String;
+export interface UserActivationHashUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  hash?: Maybe<String>;
+}
+
+export interface DeclarationUpdateManyMutationInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  annee?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+}
+
+export interface UserAccountHashUpdateManyMutationInput {
+  email?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  hash?: Maybe<String>;
 }
 
 export type UserActivationHashWhereUniqueInput = AtLeastOne<{
@@ -2305,6 +2240,28 @@ export interface FormWhereInput {
   sentBy_not_ends_with?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
   isAccepted_not?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteAcceptationStatus_not?: Maybe<WasteAcceptationStatus>;
+  wasteAcceptationStatus_in?: Maybe<
+    WasteAcceptationStatus[] | WasteAcceptationStatus
+  >;
+  wasteAcceptationStatus_not_in?: Maybe<
+    WasteAcceptationStatus[] | WasteAcceptationStatus
+  >;
+  wasteRefusalReason?: Maybe<String>;
+  wasteRefusalReason_not?: Maybe<String>;
+  wasteRefusalReason_in?: Maybe<String[] | String>;
+  wasteRefusalReason_not_in?: Maybe<String[] | String>;
+  wasteRefusalReason_lt?: Maybe<String>;
+  wasteRefusalReason_lte?: Maybe<String>;
+  wasteRefusalReason_gt?: Maybe<String>;
+  wasteRefusalReason_gte?: Maybe<String>;
+  wasteRefusalReason_contains?: Maybe<String>;
+  wasteRefusalReason_not_contains?: Maybe<String>;
+  wasteRefusalReason_starts_with?: Maybe<String>;
+  wasteRefusalReason_not_starts_with?: Maybe<String>;
+  wasteRefusalReason_ends_with?: Maybe<String>;
+  wasteRefusalReason_not_ends_with?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedBy_not?: Maybe<String>;
   receivedBy_in?: Maybe<String[] | String>;
@@ -2979,7 +2936,7 @@ export interface FormWhereInput {
   NOT?: Maybe<FormWhereInput[] | FormWhereInput>;
 }
 
-export interface DeclarationUpdateManyMutationInput {
+export interface DeclarationUpdateInput {
   codeS3ic?: Maybe<String>;
   nomEts?: Maybe<String>;
   annee?: Maybe<String>;
@@ -2988,11 +2945,12 @@ export interface DeclarationUpdateManyMutationInput {
   gerepType?: Maybe<GerepType>;
 }
 
-export interface UserAccountHashUpdateInput {
-  email?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  hash?: Maybe<String>;
+export interface UserAccountHashCreateInput {
+  id?: Maybe<ID_Input>;
+  email: String;
+  companySiret: ID_Input;
+  role: UserRole;
+  hash: String;
 }
 
 export interface UserActivationHashWhereInput {
@@ -3046,23 +3004,6 @@ export interface UserActivationHashWhereInput {
   NOT?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
 }
 
-export interface UserUpdateManyMutationInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-}
-
-export interface DeclarationUpdateInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  annee?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-}
-
 export interface UserUpdateInput {
   isActive?: Maybe<Boolean>;
   email?: Maybe<String>;
@@ -3080,6 +3021,14 @@ export interface DeclarationCreateInput {
   codeDechet?: Maybe<String>;
   libDechet?: Maybe<String>;
   gerepType?: Maybe<GerepType>;
+}
+
+export interface StatusLogUpdateManyMutationInput {
+  status?: Maybe<Status>;
+}
+
+export interface CompanyAssociationUpdateManyMutationInput {
+  role?: Maybe<UserRole>;
 }
 
 export interface InstallationWhereInput {
@@ -3260,25 +3209,23 @@ export interface InstallationWhereInput {
   NOT?: Maybe<InstallationWhereInput[] | InstallationWhereInput>;
 }
 
-export interface CompanyAssociationUpdateManyMutationInput {
-  role?: Maybe<UserRole>;
-}
-
-export interface FormUpdateOneRequiredInput {
-  create?: Maybe<FormCreateInput>;
-  update?: Maybe<FormUpdateDataInput>;
-  upsert?: Maybe<FormUpsertNestedInput>;
-  connect?: Maybe<FormWhereUniqueInput>;
-}
-
 export interface UserUpsertWithoutCompanyAssociationsInput {
   update: UserUpdateWithoutCompanyAssociationsDataInput;
   create: UserCreateWithoutCompanyAssociationsInput;
 }
 
-export interface FormCreateOneInput {
-  create?: Maybe<FormCreateInput>;
-  connect?: Maybe<FormWhereUniqueInput>;
+export interface StatusLogUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  form?: Maybe<FormUpdateOneRequiredInput>;
+  status?: Maybe<Status>;
+}
+
+export interface UserUpdateWithoutCompanyAssociationsDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
 }
 
 export interface StatusLogCreateInput {
@@ -3286,6 +3233,20 @@ export interface StatusLogCreateInput {
   user: UserCreateOneInput;
   form: FormCreateOneInput;
   status: Status;
+}
+
+export interface RubriqueUpdateManyMutationInput {
+  codeS3ic?: Maybe<String>;
+  rubrique?: Maybe<String>;
+  alinea?: Maybe<String>;
+  dateAutorisation?: Maybe<String>;
+  etatActivite?: Maybe<String>;
+  regimeAutorise?: Maybe<String>;
+  activite?: Maybe<String>;
+  volume?: Maybe<String>;
+  unite?: Maybe<String>;
+  category?: Maybe<String>;
+  wasteType?: Maybe<WasteType>;
 }
 
 export interface RubriqueWhereInput {
@@ -3460,7 +3421,7 @@ export interface AccessTokenCreateInput {
   lastUsed?: Maybe<DateTimeInput>;
 }
 
-export interface RubriqueUpdateManyMutationInput {
+export interface RubriqueUpdateInput {
   codeS3ic?: Maybe<String>;
   rubrique?: Maybe<String>;
   alinea?: Maybe<String>;
@@ -3479,19 +3440,19 @@ export interface UserCreateOneInput {
   connect?: Maybe<UserWhereUniqueInput>;
 }
 
-export interface RubriqueCreateInput {
-  id?: Maybe<ID_Input>;
+export interface InstallationUpdateManyMutationInput {
   codeS3ic?: Maybe<String>;
-  rubrique?: Maybe<String>;
-  alinea?: Maybe<String>;
-  dateAutorisation?: Maybe<String>;
-  etatActivite?: Maybe<String>;
-  regimeAutorise?: Maybe<String>;
-  activite?: Maybe<String>;
-  volume?: Maybe<String>;
-  unite?: Maybe<String>;
-  category?: Maybe<String>;
-  wasteType?: Maybe<WasteType>;
+  nomEts?: Maybe<String>;
+  regime?: Maybe<String>;
+  libRegime?: Maybe<String>;
+  seveso?: Maybe<Seveso>;
+  libSeveso?: Maybe<String>;
+  familleIc?: Maybe<String>;
+  urlFiche?: Maybe<String>;
+  s3icNumeroSiret?: Maybe<String>;
+  irepNumeroSiret?: Maybe<String>;
+  gerepNumeroSiret?: Maybe<String>;
+  sireneNumeroSiret?: Maybe<String>;
 }
 
 export interface UserCreateInput {
@@ -3504,7 +3465,7 @@ export interface UserCreateInput {
   companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
 }
 
-export interface InstallationUpdateManyMutationInput {
+export interface InstallationUpdateInput {
   codeS3ic?: Maybe<String>;
   nomEts?: Maybe<String>;
   regime?: Maybe<String>;
@@ -3561,31 +3522,7 @@ export interface CompanyAssociationCreateWithoutUserInput {
   role: UserRole;
 }
 
-export interface InstallationCreateInput {
-  id?: Maybe<ID_Input>;
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  regime?: Maybe<String>;
-  libRegime?: Maybe<String>;
-  seveso?: Maybe<Seveso>;
-  libSeveso?: Maybe<String>;
-  familleIc?: Maybe<String>;
-  urlFiche?: Maybe<String>;
-  s3icNumeroSiret?: Maybe<String>;
-  irepNumeroSiret?: Maybe<String>;
-  gerepNumeroSiret?: Maybe<String>;
-  sireneNumeroSiret?: Maybe<String>;
-}
-
-export interface UserUpdateWithoutCompanyAssociationsDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-}
-
-export interface FormUpdateManyDataInput {
+export interface FormUpdateManyMutationInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
@@ -3594,6 +3531,8 @@ export interface FormUpdateManyDataInput {
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
@@ -3651,6 +3590,18 @@ export interface FormUpdateManyDataInput {
   traderValidityLimit?: Maybe<DateTimeInput>;
 }
 
+export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
+  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
+  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
+  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface FormUpdateManyWithWhereNestedInput {
+  where: FormScalarWhereInput;
+  data: FormUpdateManyDataInput;
+}
+
 export interface CompanyCreateInput {
   id?: Maybe<ID_Input>;
   siret: String;
@@ -3666,37 +3617,58 @@ export interface CompanyCreateInput {
   documentKeys?: Maybe<CompanyCreatedocumentKeysInput>;
 }
 
-export type CompanyAssociationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
+export interface UserAccountHashSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<UserAccountHashWhereInput>;
+  AND?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+}
 
 export interface CompanyCreatecompanyTypesInput {
   set?: Maybe<CompanyType[] | CompanyType>;
 }
 
-export type DeclarationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
+export interface RubriqueSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<RubriqueWhereInput>;
+  AND?: Maybe<
+    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
+  >;
+  OR?: Maybe<RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput>;
+  NOT?: Maybe<
+    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
+  >;
+}
 
 export interface CompanyCreatedocumentKeysInput {
   set?: Maybe<String[] | String>;
 }
 
-export interface InstallationSubscriptionWhereInput {
+export interface FormSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<InstallationWhereInput>;
-  AND?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
+  node?: Maybe<FormWhereInput>;
+  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
 }
 
 export interface AccessTokenUpdateInput {
@@ -3706,10 +3678,16 @@ export interface AccessTokenUpdateInput {
   lastUsed?: Maybe<DateTimeInput>;
 }
 
-export type FormWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
-}>;
+export interface CompanySubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CompanyWhereInput>;
+  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+}
 
 export interface UserUpdateOneRequiredInput {
   create?: Maybe<UserCreateInput>;
@@ -3718,9 +3696,10 @@ export interface UserUpdateOneRequiredInput {
   connect?: Maybe<UserWhereUniqueInput>;
 }
 
-export interface UserActivationHashUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  hash?: Maybe<String>;
+export interface UserActivationHashCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneInput;
+  hash: String;
 }
 
 export interface UserUpdateDataInput {
@@ -3732,7 +3711,7 @@ export interface UserUpdateDataInput {
   companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
 }
 
-export interface UserAccountHashUpdateManyMutationInput {
+export interface UserAccountHashUpdateInput {
   email?: Maybe<String>;
   companySiret?: Maybe<ID_Input>;
   role?: Maybe<UserRole>;
@@ -3782,9 +3761,11 @@ export interface CompanyAssociationUpdateWithWhereUniqueWithoutUserInput {
   data: CompanyAssociationUpdateWithoutUserDataInput;
 }
 
-export interface FormUpsertNestedInput {
-  update: FormUpdateDataInput;
-  create: FormCreateInput;
+export interface FormUpdateOneRequiredInput {
+  create?: Maybe<FormCreateInput>;
+  update?: Maybe<FormUpdateDataInput>;
+  upsert?: Maybe<FormUpsertNestedInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
 }
 
 export interface CompanyAssociationUpdateWithoutUserDataInput {
@@ -3918,14 +3899,14 @@ export type StatusLogWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
-export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
-  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
-  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
-  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
+export interface CompanyAssociationUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  role?: Maybe<UserRole>;
 }
 
-export interface InstallationUpdateInput {
+export interface InstallationCreateInput {
+  id?: Maybe<ID_Input>;
   codeS3ic?: Maybe<String>;
   nomEts?: Maybe<String>;
   regime?: Maybe<String>;
@@ -3940,35 +3921,127 @@ export interface InstallationUpdateInput {
   sireneNumeroSiret?: Maybe<String>;
 }
 
-export interface CompanyAssociationUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
-  company?: Maybe<CompanyUpdateOneRequiredInput>;
-  role?: Maybe<UserRole>;
+export interface CompanyUpdatedocumentKeysInput {
+  set?: Maybe<String[] | String>;
 }
 
-export type UserWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  email?: Maybe<String>;
-}>;
+export interface UserActivationHashSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<UserActivationHashWhereInput>;
+  AND?: Maybe<
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | UserActivationHashSubscriptionWhereInput[]
+    | UserActivationHashSubscriptionWhereInput
+  >;
+}
 
 export interface CompanyUpsertNestedInput {
   update: CompanyUpdateDataInput;
   create: CompanyCreateInput;
 }
 
-export interface RubriqueSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<RubriqueWhereInput>;
-  AND?: Maybe<
-    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
-  >;
-  OR?: Maybe<RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput>;
-  NOT?: Maybe<
-    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
-  >;
+export interface DeclarationWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  codeS3ic?: Maybe<String>;
+  codeS3ic_not?: Maybe<String>;
+  codeS3ic_in?: Maybe<String[] | String>;
+  codeS3ic_not_in?: Maybe<String[] | String>;
+  codeS3ic_lt?: Maybe<String>;
+  codeS3ic_lte?: Maybe<String>;
+  codeS3ic_gt?: Maybe<String>;
+  codeS3ic_gte?: Maybe<String>;
+  codeS3ic_contains?: Maybe<String>;
+  codeS3ic_not_contains?: Maybe<String>;
+  codeS3ic_starts_with?: Maybe<String>;
+  codeS3ic_not_starts_with?: Maybe<String>;
+  codeS3ic_ends_with?: Maybe<String>;
+  codeS3ic_not_ends_with?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  nomEts_not?: Maybe<String>;
+  nomEts_in?: Maybe<String[] | String>;
+  nomEts_not_in?: Maybe<String[] | String>;
+  nomEts_lt?: Maybe<String>;
+  nomEts_lte?: Maybe<String>;
+  nomEts_gt?: Maybe<String>;
+  nomEts_gte?: Maybe<String>;
+  nomEts_contains?: Maybe<String>;
+  nomEts_not_contains?: Maybe<String>;
+  nomEts_starts_with?: Maybe<String>;
+  nomEts_not_starts_with?: Maybe<String>;
+  nomEts_ends_with?: Maybe<String>;
+  nomEts_not_ends_with?: Maybe<String>;
+  annee?: Maybe<String>;
+  annee_not?: Maybe<String>;
+  annee_in?: Maybe<String[] | String>;
+  annee_not_in?: Maybe<String[] | String>;
+  annee_lt?: Maybe<String>;
+  annee_lte?: Maybe<String>;
+  annee_gt?: Maybe<String>;
+  annee_gte?: Maybe<String>;
+  annee_contains?: Maybe<String>;
+  annee_not_contains?: Maybe<String>;
+  annee_starts_with?: Maybe<String>;
+  annee_not_starts_with?: Maybe<String>;
+  annee_ends_with?: Maybe<String>;
+  annee_not_ends_with?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  codeDechet_not?: Maybe<String>;
+  codeDechet_in?: Maybe<String[] | String>;
+  codeDechet_not_in?: Maybe<String[] | String>;
+  codeDechet_lt?: Maybe<String>;
+  codeDechet_lte?: Maybe<String>;
+  codeDechet_gt?: Maybe<String>;
+  codeDechet_gte?: Maybe<String>;
+  codeDechet_contains?: Maybe<String>;
+  codeDechet_not_contains?: Maybe<String>;
+  codeDechet_starts_with?: Maybe<String>;
+  codeDechet_not_starts_with?: Maybe<String>;
+  codeDechet_ends_with?: Maybe<String>;
+  codeDechet_not_ends_with?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  libDechet_not?: Maybe<String>;
+  libDechet_in?: Maybe<String[] | String>;
+  libDechet_not_in?: Maybe<String[] | String>;
+  libDechet_lt?: Maybe<String>;
+  libDechet_lte?: Maybe<String>;
+  libDechet_gt?: Maybe<String>;
+  libDechet_gte?: Maybe<String>;
+  libDechet_contains?: Maybe<String>;
+  libDechet_not_contains?: Maybe<String>;
+  libDechet_starts_with?: Maybe<String>;
+  libDechet_not_starts_with?: Maybe<String>;
+  libDechet_ends_with?: Maybe<String>;
+  libDechet_not_ends_with?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+  gerepType_not?: Maybe<GerepType>;
+  gerepType_in?: Maybe<GerepType[] | GerepType>;
+  gerepType_not_in?: Maybe<GerepType[] | GerepType>;
+  AND?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
+  OR?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
+  NOT?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
 }
 
 export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
@@ -3977,21 +4050,8 @@ export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
   create: CompanyAssociationCreateWithoutUserInput;
 }
 
-export interface AccessTokenSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<AccessTokenWhereInput>;
-  AND?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
+export interface UserActivationHashUpdateManyMutationInput {
+  hash?: Maybe<String>;
 }
 
 export interface CompanyAssociationScalarWhereInput {
@@ -4024,12 +4084,12 @@ export interface CompanyAssociationScalarWhereInput {
   >;
 }
 
-export interface UserAccountHashCreateInput {
-  id?: Maybe<ID_Input>;
-  email: String;
-  companySiret: ID_Input;
-  role: UserRole;
-  hash: String;
+export interface UserUpdateManyMutationInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
 }
 
 export interface CompanyAssociationUpdateManyWithWhereNestedInput {
@@ -4037,17 +4097,17 @@ export interface CompanyAssociationUpdateManyWithWhereNestedInput {
   data: CompanyAssociationUpdateManyDataInput;
 }
 
-export interface StatusLogUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  form?: Maybe<FormUpdateOneRequiredInput>;
-  status?: Maybe<Status>;
+export interface FormCreateOneInput {
+  create?: Maybe<FormCreateInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
 }
 
 export interface CompanyAssociationUpdateManyDataInput {
   role?: Maybe<UserRole>;
 }
 
-export interface RubriqueUpdateInput {
+export interface RubriqueCreateInput {
+  id?: Maybe<ID_Input>;
   codeS3ic?: Maybe<String>;
   rubrique?: Maybe<String>;
   alinea?: Maybe<String>;
@@ -4066,7 +4126,7 @@ export interface UserUpsertNestedInput {
   create: UserCreateInput;
 }
 
-export interface FormUpdateManyMutationInput {
+export interface FormUpdateManyDataInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
@@ -4075,6 +4135,8 @@ export interface FormUpdateManyMutationInput {
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
@@ -4138,20 +4200,23 @@ export interface AccessTokenUpdateManyMutationInput {
   lastUsed?: Maybe<DateTimeInput>;
 }
 
-export interface DeclarationSubscriptionWhereInput {
+export interface CompanyAssociationSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<DeclarationWhereInput>;
+  node?: Maybe<CompanyAssociationWhereInput>;
   AND?: Maybe<
-    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
   >;
   OR?: Maybe<
-    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
   >;
 }
 
@@ -4258,23 +4323,20 @@ export interface AccessTokenWhereInput {
   NOT?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
 }
 
-export interface UserAccountHashSubscriptionWhereInput {
+export interface StatusLogSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<UserAccountHashWhereInput>;
+  node?: Maybe<StatusLogWhereInput>;
   AND?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
   >;
   OR?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
   >;
 }
 
@@ -4460,8 +4522,9 @@ export interface CompanyWhereInput {
   NOT?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
 }
 
-export interface StatusLogUpdateManyMutationInput {
-  status?: Maybe<Status>;
+export interface FormUpsertNestedInput {
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
 }
 
 export interface NodeNode {
@@ -4491,6 +4554,94 @@ export interface UserActivationHashPreviousValuesSubscription
   hash: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface AccessTokenConnection {
+  pageInfo: PageInfo;
+  edges: AccessTokenEdge[];
+}
+
+export interface AccessTokenConnectionPromise
+  extends Promise<AccessTokenConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<AccessTokenEdge>>() => T;
+  aggregate: <T = AggregateAccessTokenPromise>() => T;
+}
+
+export interface AccessTokenConnectionSubscription
+  extends Promise<AsyncIterator<AccessTokenConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<AccessTokenEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateAccessTokenSubscription>() => T;
+}
+
+export interface CompanyConnection {
+  pageInfo: PageInfo;
+  edges: CompanyEdge[];
+}
+
+export interface CompanyConnectionPromise
+  extends Promise<CompanyConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CompanyEdge>>() => T;
+  aggregate: <T = AggregateCompanyPromise>() => T;
+}
+
+export interface CompanyConnectionSubscription
+  extends Promise<AsyncIterator<CompanyConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<CompanyEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateCompanySubscription>() => T;
+}
+
+export interface FormConnection {
+  pageInfo: PageInfo;
+  edges: FormEdge[];
+}
+
+export interface FormConnectionPromise
+  extends Promise<FormConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<FormEdge>>() => T;
+  aggregate: <T = AggregateFormPromise>() => T;
+}
+
+export interface FormConnectionSubscription
+  extends Promise<AsyncIterator<FormConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateFormSubscription>() => T;
+}
+
+export interface UserSubscriptionPayload {
+  mutation: MutationType;
+  node: User;
+  updatedFields: String[];
+  previousValues: UserPreviousValues;
+}
+
+export interface UserSubscriptionPayloadPromise
+  extends Promise<UserSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = UserPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserPreviousValuesPromise>() => T;
+}
+
+export interface UserSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserPreviousValuesSubscription>() => T;
 }
 
 export interface Company {
@@ -4582,43 +4733,6 @@ export interface CompanyEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface AccessTokenConnection {
-  pageInfo: PageInfo;
-  edges: AccessTokenEdge[];
-}
-
-export interface AccessTokenConnectionPromise
-  extends Promise<AccessTokenConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<AccessTokenEdge>>() => T;
-  aggregate: <T = AggregateAccessTokenPromise>() => T;
-}
-
-export interface AccessTokenConnectionSubscription
-  extends Promise<AsyncIterator<AccessTokenConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<AccessTokenEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateAccessTokenSubscription>() => T;
-}
-
-export interface AggregateCompany {
-  count: Int;
-}
-
-export interface AggregateCompanyPromise
-  extends Promise<AggregateCompany>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateCompanySubscription
-  extends Promise<AsyncIterator<AggregateCompany>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
 export interface BatchPayload {
   count: Long;
 }
@@ -4633,6 +4747,241 @@ export interface BatchPayloadSubscription
   extends Promise<AsyncIterator<BatchPayload>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Long>>;
+}
+
+export interface UserActivationHashEdge {
+  node: UserActivationHash;
+  cursor: String;
+}
+
+export interface UserActivationHashEdgePromise
+  extends Promise<UserActivationHashEdge>,
+    Fragmentable {
+  node: <T = UserActivationHashPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface UserActivationHashEdgeSubscription
+  extends Promise<AsyncIterator<UserActivationHashEdge>>,
+    Fragmentable {
+  node: <T = UserActivationHashSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface UserAccountHashSubscriptionPayload {
+  mutation: MutationType;
+  node: UserAccountHash;
+  updatedFields: String[];
+  previousValues: UserAccountHashPreviousValues;
+}
+
+export interface UserAccountHashSubscriptionPayloadPromise
+  extends Promise<UserAccountHashSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = UserAccountHashPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserAccountHashPreviousValuesPromise>() => T;
+}
+
+export interface UserAccountHashSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserAccountHashSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserAccountHashSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserAccountHashPreviousValuesSubscription>() => T;
+}
+
+export interface AccessToken {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  token: String;
+  isRevoked: Boolean;
+  lastUsed?: DateTimeOutput;
+}
+
+export interface AccessTokenPromise extends Promise<AccessToken>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  user: <T = UserPromise>() => T;
+  token: () => Promise<String>;
+  isRevoked: () => Promise<Boolean>;
+  lastUsed: () => Promise<DateTimeOutput>;
+}
+
+export interface AccessTokenSubscription
+  extends Promise<AsyncIterator<AccessToken>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  user: <T = UserSubscription>() => T;
+  token: () => Promise<AsyncIterator<String>>;
+  isRevoked: () => Promise<AsyncIterator<Boolean>>;
+  lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface AccessTokenNullablePromise
+  extends Promise<AccessToken | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  user: <T = UserPromise>() => T;
+  token: () => Promise<String>;
+  isRevoked: () => Promise<Boolean>;
+  lastUsed: () => Promise<DateTimeOutput>;
+}
+
+export interface PageInfo {
+  hasNextPage: Boolean;
+  hasPreviousPage: Boolean;
+  startCursor?: String;
+  endCursor?: String;
+}
+
+export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
+  hasNextPage: () => Promise<Boolean>;
+  hasPreviousPage: () => Promise<Boolean>;
+  startCursor: () => Promise<String>;
+  endCursor: () => Promise<String>;
+}
+
+export interface PageInfoSubscription
+  extends Promise<AsyncIterator<PageInfo>>,
+    Fragmentable {
+  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
+  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
+  startCursor: () => Promise<AsyncIterator<String>>;
+  endCursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateUserAccountHash {
+  count: Int;
+}
+
+export interface AggregateUserAccountHashPromise
+  extends Promise<AggregateUserAccountHash>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateUserAccountHashSubscription
+  extends Promise<AsyncIterator<AggregateUserAccountHash>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface CompanyAssociationConnection {
+  pageInfo: PageInfo;
+  edges: CompanyAssociationEdge[];
+}
+
+export interface CompanyAssociationConnectionPromise
+  extends Promise<CompanyAssociationConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CompanyAssociationEdge>>() => T;
+  aggregate: <T = AggregateCompanyAssociationPromise>() => T;
+}
+
+export interface CompanyAssociationConnectionSubscription
+  extends Promise<AsyncIterator<CompanyAssociationConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <
+    T = Promise<AsyncIterator<CompanyAssociationEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateCompanyAssociationSubscription>() => T;
+}
+
+export interface UserAccountHashConnection {
+  pageInfo: PageInfo;
+  edges: UserAccountHashEdge[];
+}
+
+export interface UserAccountHashConnectionPromise
+  extends Promise<UserAccountHashConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<UserAccountHashEdge>>() => T;
+  aggregate: <T = AggregateUserAccountHashPromise>() => T;
+}
+
+export interface UserAccountHashConnectionSubscription
+  extends Promise<AsyncIterator<UserAccountHashConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<UserAccountHashEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateUserAccountHashSubscription>() => T;
+}
+
+export interface AccessTokenEdge {
+  node: AccessToken;
+  cursor: String;
+}
+
+export interface AccessTokenEdgePromise
+  extends Promise<AccessTokenEdge>,
+    Fragmentable {
+  node: <T = AccessTokenPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface AccessTokenEdgeSubscription
+  extends Promise<AsyncIterator<AccessTokenEdge>>,
+    Fragmentable {
+  node: <T = AccessTokenSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface UserAccountHash {
+  id: ID_Output;
+  email: String;
+  companySiret: ID_Output;
+  role: UserRole;
+  hash: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface UserAccountHashPromise
+  extends Promise<UserAccountHash>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserAccountHashSubscription
+  extends Promise<AsyncIterator<UserAccountHash>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  email: () => Promise<AsyncIterator<String>>;
+  companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
+  hash: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserAccountHashNullablePromise
+  extends Promise<UserAccountHash | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface UserPreviousValues {
@@ -4672,228 +5021,21 @@ export interface UserPreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface CompanyConnection {
-  pageInfo: PageInfo;
-  edges: CompanyEdge[];
-}
-
-export interface CompanyConnectionPromise
-  extends Promise<CompanyConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CompanyEdge>>() => T;
-  aggregate: <T = AggregateCompanyPromise>() => T;
-}
-
-export interface CompanyConnectionSubscription
-  extends Promise<AsyncIterator<CompanyConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<CompanyEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateCompanySubscription>() => T;
-}
-
-export interface UserActivationHashConnection {
-  pageInfo: PageInfo;
-  edges: UserActivationHashEdge[];
-}
-
-export interface UserActivationHashConnectionPromise
-  extends Promise<UserActivationHashConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserActivationHashEdge>>() => T;
-  aggregate: <T = AggregateUserActivationHashPromise>() => T;
-}
-
-export interface UserActivationHashConnectionSubscription
-  extends Promise<AsyncIterator<UserActivationHashConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <
-    T = Promise<AsyncIterator<UserActivationHashEdgeSubscription>>
-  >() => T;
-  aggregate: <T = AggregateUserActivationHashSubscription>() => T;
-}
-
-export interface AggregateUserActivationHash {
-  count: Int;
-}
-
-export interface AggregateUserActivationHashPromise
-  extends Promise<AggregateUserActivationHash>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserActivationHashSubscription
-  extends Promise<AsyncIterator<AggregateUserActivationHash>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface UserActivationHash {
-  id: ID_Output;
-  hash: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-}
-
-export interface UserActivationHashPromise
-  extends Promise<UserActivationHash>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface UserActivationHashSubscription
-  extends Promise<AsyncIterator<UserActivationHash>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  hash: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface UserActivationHashNullablePromise
-  extends Promise<UserActivationHash | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface PageInfo {
-  hasNextPage: Boolean;
-  hasPreviousPage: Boolean;
-  startCursor?: String;
-  endCursor?: String;
-}
-
-export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
-  hasNextPage: () => Promise<Boolean>;
-  hasPreviousPage: () => Promise<Boolean>;
-  startCursor: () => Promise<String>;
-  endCursor: () => Promise<String>;
-}
-
-export interface PageInfoSubscription
-  extends Promise<AsyncIterator<PageInfo>>,
-    Fragmentable {
-  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
-  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
-  startCursor: () => Promise<AsyncIterator<String>>;
-  endCursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface UserAccountHashEdge {
-  node: UserAccountHash;
+export interface UserEdge {
+  node: User;
   cursor: String;
 }
 
-export interface UserAccountHashEdgePromise
-  extends Promise<UserAccountHashEdge>,
-    Fragmentable {
-  node: <T = UserAccountHashPromise>() => T;
+export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
+  node: <T = UserPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface UserAccountHashEdgeSubscription
-  extends Promise<AsyncIterator<UserAccountHashEdge>>,
+export interface UserEdgeSubscription
+  extends Promise<AsyncIterator<UserEdge>>,
     Fragmentable {
-  node: <T = UserAccountHashSubscription>() => T;
+  node: <T = UserSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface UserAccountHashSubscriptionPayload {
-  mutation: MutationType;
-  node: UserAccountHash;
-  updatedFields: String[];
-  previousValues: UserAccountHashPreviousValues;
-}
-
-export interface UserAccountHashSubscriptionPayloadPromise
-  extends Promise<UserAccountHashSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserAccountHashPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserAccountHashPreviousValuesPromise>() => T;
-}
-
-export interface UserAccountHashSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserAccountHashSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserAccountHashSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserAccountHashPreviousValuesSubscription>() => T;
-}
-
-export interface UserActivationHashSubscriptionPayload {
-  mutation: MutationType;
-  node: UserActivationHash;
-  updatedFields: String[];
-  previousValues: UserActivationHashPreviousValues;
-}
-
-export interface UserActivationHashSubscriptionPayloadPromise
-  extends Promise<UserActivationHashSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserActivationHashPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
-}
-
-export interface UserActivationHashSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserActivationHashSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
-}
-
-export interface CompanyAssociationEdge {
-  node: CompanyAssociation;
-  cursor: String;
-}
-
-export interface CompanyAssociationEdgePromise
-  extends Promise<CompanyAssociationEdge>,
-    Fragmentable {
-  node: <T = CompanyAssociationPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface CompanyAssociationEdgeSubscription
-  extends Promise<AsyncIterator<CompanyAssociationEdge>>,
-    Fragmentable {
-  node: <T = CompanyAssociationSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface AggregateUser {
-  count: Int;
-}
-
-export interface AggregateUserPromise
-  extends Promise<AggregateUser>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserSubscription
-  extends Promise<AsyncIterator<AggregateUser>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface AccessTokenSubscriptionPayload {
@@ -4921,25 +5063,81 @@ export interface AccessTokenSubscriptionPayloadSubscription
   previousValues: <T = AccessTokenPreviousValuesSubscription>() => T;
 }
 
-export interface UserConnection {
-  pageInfo: PageInfo;
-  edges: UserEdge[];
+export interface User {
+  id: ID_Output;
+  isActive?: Boolean;
+  email: String;
+  password: String;
+  name?: String;
+  phone?: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
 }
 
-export interface UserConnectionPromise
-  extends Promise<UserConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserEdge>>() => T;
-  aggregate: <T = AggregateUserPromise>() => T;
+export interface UserPromise extends Promise<User>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
+  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface UserConnectionSubscription
-  extends Promise<AsyncIterator<UserConnection>>,
+export interface UserSubscription
+  extends Promise<AsyncIterator<User>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateUserSubscription>() => T;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  isActive: () => Promise<AsyncIterator<Boolean>>;
+  email: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  phone: () => Promise<AsyncIterator<String>>;
+  companyAssociations: <
+    T = Promise<AsyncIterator<CompanyAssociationSubscription>>
+  >(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserNullablePromise
+  extends Promise<User | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
+  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface AccessTokenPreviousValues {
@@ -4973,20 +5171,23 @@ export interface AccessTokenPreviousValuesSubscription
   lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface AggregateStatusLog {
-  count: Int;
+export interface StatusLogEdge {
+  node: StatusLog;
+  cursor: String;
 }
 
-export interface AggregateStatusLogPromise
-  extends Promise<AggregateStatusLog>,
+export interface StatusLogEdgePromise
+  extends Promise<StatusLogEdge>,
     Fragmentable {
-  count: () => Promise<Int>;
+  node: <T = StatusLogPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface AggregateStatusLogSubscription
-  extends Promise<AsyncIterator<AggregateStatusLog>>,
+export interface StatusLogEdgeSubscription
+  extends Promise<AsyncIterator<StatusLogEdge>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  node: <T = StatusLogSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface Form {
@@ -5001,6 +5202,8 @@ export interface Form {
   sentAt?: DateTimeOutput;
   sentBy?: String;
   isAccepted?: Boolean;
+  wasteAcceptationStatus?: WasteAcceptationStatus;
+  wasteRefusalReason?: String;
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
   quantityReceived?: Float;
@@ -5071,6 +5274,8 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
   isAccepted: () => Promise<Boolean>;
+  wasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
+  wasteRefusalReason: () => Promise<String>;
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
@@ -5152,6 +5357,8 @@ export interface FormSubscription
   sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   sentBy: () => Promise<AsyncIterator<String>>;
   isAccepted: () => Promise<AsyncIterator<Boolean>>;
+  wasteAcceptationStatus: () => Promise<AsyncIterator<WasteAcceptationStatus>>;
+  wasteRefusalReason: () => Promise<AsyncIterator<String>>;
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
@@ -5233,6 +5440,8 @@ export interface FormNullablePromise
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
   isAccepted: () => Promise<Boolean>;
+  wasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
+  wasteRefusalReason: () => Promise<String>;
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
@@ -5299,25 +5508,20 @@ export interface FormNullablePromise
   }) => T;
 }
 
-export interface StatusLogConnection {
-  pageInfo: PageInfo;
-  edges: StatusLogEdge[];
+export interface AggregateCompany {
+  count: Int;
 }
 
-export interface StatusLogConnectionPromise
-  extends Promise<StatusLogConnection>,
+export interface AggregateCompanyPromise
+  extends Promise<AggregateCompany>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<StatusLogEdge>>() => T;
-  aggregate: <T = AggregateStatusLogPromise>() => T;
+  count: () => Promise<Int>;
 }
 
-export interface StatusLogConnectionSubscription
-  extends Promise<AsyncIterator<StatusLogConnection>>,
+export interface AggregateCompanySubscription
+  extends Promise<AsyncIterator<AggregateCompany>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<StatusLogEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateStatusLogSubscription>() => T;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface CompanySubscriptionPayload {
@@ -5345,34 +5549,20 @@ export interface CompanySubscriptionPayloadSubscription
   previousValues: <T = CompanyPreviousValuesSubscription>() => T;
 }
 
-export interface StatusLog {
-  id: ID_Output;
-  status: Status;
+export interface AggregateRubrique {
+  count: Int;
 }
 
-export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  form: <T = FormPromise>() => T;
-  status: () => Promise<Status>;
-}
-
-export interface StatusLogSubscription
-  extends Promise<AsyncIterator<StatusLog>>,
+export interface AggregateRubriquePromise
+  extends Promise<AggregateRubrique>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  form: <T = FormSubscription>() => T;
-  status: () => Promise<AsyncIterator<Status>>;
+  count: () => Promise<Int>;
 }
 
-export interface StatusLogNullablePromise
-  extends Promise<StatusLog | null>,
+export interface AggregateRubriqueSubscription
+  extends Promise<AsyncIterator<AggregateRubrique>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  form: <T = FormPromise>() => T;
-  status: () => Promise<Status>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface CompanyPreviousValues {
@@ -5430,23 +5620,25 @@ export interface CompanyPreviousValuesSubscription
   documentKeys: () => Promise<AsyncIterator<String[]>>;
 }
 
-export interface RubriqueEdge {
-  node: Rubrique;
-  cursor: String;
+export interface RubriqueConnection {
+  pageInfo: PageInfo;
+  edges: RubriqueEdge[];
 }
 
-export interface RubriqueEdgePromise
-  extends Promise<RubriqueEdge>,
+export interface RubriqueConnectionPromise
+  extends Promise<RubriqueConnection>,
     Fragmentable {
-  node: <T = RubriquePromise>() => T;
-  cursor: () => Promise<String>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<RubriqueEdge>>() => T;
+  aggregate: <T = AggregateRubriquePromise>() => T;
 }
 
-export interface RubriqueEdgeSubscription
-  extends Promise<AsyncIterator<RubriqueEdge>>,
+export interface RubriqueConnectionSubscription
+  extends Promise<AsyncIterator<RubriqueConnection>>,
     Fragmentable {
-  node: <T = RubriqueSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<RubriqueEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateRubriqueSubscription>() => T;
 }
 
 export interface AggregateDeclaration {
@@ -5465,68 +5657,20 @@ export interface AggregateDeclarationSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface Rubrique {
-  id: ID_Output;
-  codeS3ic?: String;
-  rubrique?: String;
-  alinea?: String;
-  dateAutorisation?: String;
-  etatActivite?: String;
-  regimeAutorise?: String;
-  activite?: String;
-  volume?: String;
-  unite?: String;
-  category?: String;
-  wasteType?: WasteType;
+export interface AggregateInstallation {
+  count: Int;
 }
 
-export interface RubriquePromise extends Promise<Rubrique>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  rubrique: () => Promise<String>;
-  alinea: () => Promise<String>;
-  dateAutorisation: () => Promise<String>;
-  etatActivite: () => Promise<String>;
-  regimeAutorise: () => Promise<String>;
-  activite: () => Promise<String>;
-  volume: () => Promise<String>;
-  unite: () => Promise<String>;
-  category: () => Promise<String>;
-  wasteType: () => Promise<WasteType>;
-}
-
-export interface RubriqueSubscription
-  extends Promise<AsyncIterator<Rubrique>>,
+export interface AggregateInstallationPromise
+  extends Promise<AggregateInstallation>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  codeS3ic: () => Promise<AsyncIterator<String>>;
-  rubrique: () => Promise<AsyncIterator<String>>;
-  alinea: () => Promise<AsyncIterator<String>>;
-  dateAutorisation: () => Promise<AsyncIterator<String>>;
-  etatActivite: () => Promise<AsyncIterator<String>>;
-  regimeAutorise: () => Promise<AsyncIterator<String>>;
-  activite: () => Promise<AsyncIterator<String>>;
-  volume: () => Promise<AsyncIterator<String>>;
-  unite: () => Promise<AsyncIterator<String>>;
-  category: () => Promise<AsyncIterator<String>>;
-  wasteType: () => Promise<AsyncIterator<WasteType>>;
+  count: () => Promise<Int>;
 }
 
-export interface RubriqueNullablePromise
-  extends Promise<Rubrique | null>,
+export interface AggregateInstallationSubscription
+  extends Promise<AsyncIterator<AggregateInstallation>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  rubrique: () => Promise<String>;
-  alinea: () => Promise<String>;
-  dateAutorisation: () => Promise<String>;
-  etatActivite: () => Promise<String>;
-  regimeAutorise: () => Promise<String>;
-  activite: () => Promise<String>;
-  volume: () => Promise<String>;
-  unite: () => Promise<String>;
-  category: () => Promise<String>;
-  wasteType: () => Promise<WasteType>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface CompanyAssociationSubscriptionPayload {
@@ -5554,23 +5698,25 @@ export interface CompanyAssociationSubscriptionPayloadSubscription
   previousValues: <T = CompanyAssociationPreviousValuesSubscription>() => T;
 }
 
-export interface InstallationEdge {
-  node: Installation;
-  cursor: String;
+export interface InstallationConnection {
+  pageInfo: PageInfo;
+  edges: InstallationEdge[];
 }
 
-export interface InstallationEdgePromise
-  extends Promise<InstallationEdge>,
+export interface InstallationConnectionPromise
+  extends Promise<InstallationConnection>,
     Fragmentable {
-  node: <T = InstallationPromise>() => T;
-  cursor: () => Promise<String>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<InstallationEdge>>() => T;
+  aggregate: <T = AggregateInstallationPromise>() => T;
 }
 
-export interface InstallationEdgeSubscription
-  extends Promise<AsyncIterator<InstallationEdge>>,
+export interface InstallationConnectionSubscription
+  extends Promise<AsyncIterator<InstallationConnection>>,
     Fragmentable {
-  node: <T = InstallationSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<InstallationEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateInstallationSubscription>() => T;
 }
 
 export interface CompanyAssociationPreviousValues {
@@ -5592,38 +5738,36 @@ export interface CompanyAssociationPreviousValuesSubscription
   role: () => Promise<AsyncIterator<UserRole>>;
 }
 
-export interface UserAccountHashPreviousValues {
+export interface CompanyAssociation {
   id: ID_Output;
-  email: String;
-  companySiret: ID_Output;
   role: UserRole;
-  hash: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
 }
 
-export interface UserAccountHashPreviousValuesPromise
-  extends Promise<UserAccountHashPreviousValues>,
+export interface CompanyAssociationPromise
+  extends Promise<CompanyAssociation>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
   role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface UserAccountHashPreviousValuesSubscription
-  extends Promise<AsyncIterator<UserAccountHashPreviousValues>>,
+export interface CompanyAssociationSubscription
+  extends Promise<AsyncIterator<CompanyAssociation>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  email: () => Promise<AsyncIterator<String>>;
-  companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
+  company: <T = CompanySubscription>() => T;
   role: () => Promise<AsyncIterator<UserRole>>;
-  hash: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface CompanyAssociationNullablePromise
+  extends Promise<CompanyAssociation | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
+  role: () => Promise<UserRole>;
 }
 
 export interface DeclarationEdge {
@@ -5643,6 +5787,595 @@ export interface DeclarationEdgeSubscription
     Fragmentable {
   node: <T = DeclarationSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateForm {
+  count: Int;
+}
+
+export interface AggregateFormPromise
+  extends Promise<AggregateForm>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateFormSubscription
+  extends Promise<AsyncIterator<AggregateForm>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface DeclarationSubscriptionPayload {
+  mutation: MutationType;
+  node: Declaration;
+  updatedFields: String[];
+  previousValues: DeclarationPreviousValues;
+}
+
+export interface DeclarationSubscriptionPayloadPromise
+  extends Promise<DeclarationSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = DeclarationPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = DeclarationPreviousValuesPromise>() => T;
+}
+
+export interface DeclarationSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<DeclarationSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = DeclarationSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = DeclarationPreviousValuesSubscription>() => T;
+}
+
+export interface AggregateUserActivationHash {
+  count: Int;
+}
+
+export interface AggregateUserActivationHashPromise
+  extends Promise<AggregateUserActivationHash>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateUserActivationHashSubscription
+  extends Promise<AsyncIterator<AggregateUserActivationHash>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface DeclarationPreviousValues {
+  id: ID_Output;
+  codeS3ic?: String;
+  nomEts?: String;
+  annee?: String;
+  codeDechet?: String;
+  libDechet?: String;
+  gerepType?: GerepType;
+}
+
+export interface DeclarationPreviousValuesPromise
+  extends Promise<DeclarationPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  codeS3ic: () => Promise<String>;
+  nomEts: () => Promise<String>;
+  annee: () => Promise<String>;
+  codeDechet: () => Promise<String>;
+  libDechet: () => Promise<String>;
+  gerepType: () => Promise<GerepType>;
+}
+
+export interface DeclarationPreviousValuesSubscription
+  extends Promise<AsyncIterator<DeclarationPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  codeS3ic: () => Promise<AsyncIterator<String>>;
+  nomEts: () => Promise<AsyncIterator<String>>;
+  annee: () => Promise<AsyncIterator<String>>;
+  codeDechet: () => Promise<AsyncIterator<String>>;
+  libDechet: () => Promise<AsyncIterator<String>>;
+  gerepType: () => Promise<AsyncIterator<GerepType>>;
+}
+
+export interface UserActivationHash {
+  id: ID_Output;
+  hash: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface UserActivationHashPromise
+  extends Promise<UserActivationHash>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserActivationHashSubscription
+  extends Promise<AsyncIterator<UserActivationHash>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
+  hash: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserActivationHashNullablePromise
+  extends Promise<UserActivationHash | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface DeclarationConnection {
+  pageInfo: PageInfo;
+  edges: DeclarationEdge[];
+}
+
+export interface DeclarationConnectionPromise
+  extends Promise<DeclarationConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<DeclarationEdge>>() => T;
+  aggregate: <T = AggregateDeclarationPromise>() => T;
+}
+
+export interface DeclarationConnectionSubscription
+  extends Promise<AsyncIterator<DeclarationConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<DeclarationEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateDeclarationSubscription>() => T;
+}
+
+export interface UserActivationHashSubscriptionPayload {
+  mutation: MutationType;
+  node: UserActivationHash;
+  updatedFields: String[];
+  previousValues: UserActivationHashPreviousValues;
+}
+
+export interface UserActivationHashSubscriptionPayloadPromise
+  extends Promise<UserActivationHashSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = UserActivationHashPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
+}
+
+export interface UserActivationHashSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserActivationHashSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
+}
+
+export interface FormSubscriptionPayload {
+  mutation: MutationType;
+  node: Form;
+  updatedFields: String[];
+  previousValues: FormPreviousValues;
+}
+
+export interface FormSubscriptionPayloadPromise
+  extends Promise<FormSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = FormPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = FormPreviousValuesPromise>() => T;
+}
+
+export interface FormSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<FormSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = FormSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = FormPreviousValuesSubscription>() => T;
+}
+
+export interface UserConnection {
+  pageInfo: PageInfo;
+  edges: UserEdge[];
+}
+
+export interface UserConnectionPromise
+  extends Promise<UserConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<UserEdge>>() => T;
+  aggregate: <T = AggregateUserPromise>() => T;
+}
+
+export interface UserConnectionSubscription
+  extends Promise<AsyncIterator<UserConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateUserSubscription>() => T;
+}
+
+export interface FormPreviousValues {
+  id: ID_Output;
+  readableId?: String;
+  customId?: String;
+  isDeleted?: Boolean;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  signedByTransporter?: Boolean;
+  status?: String;
+  sentAt?: DateTimeOutput;
+  sentBy?: String;
+  isAccepted?: Boolean;
+  wasteAcceptationStatus?: WasteAcceptationStatus;
+  wasteRefusalReason?: String;
+  receivedBy?: String;
+  receivedAt?: DateTimeOutput;
+  quantityReceived?: Float;
+  processedBy?: String;
+  processedAt?: String;
+  processingOperationDone?: String;
+  processingOperationDescription?: String;
+  noTraceability?: Boolean;
+  nextDestinationProcessingOperation?: String;
+  nextDestinationDetails?: String;
+  emitterType?: EmitterType;
+  emitterPickupSite?: String;
+  emitterCompanyName?: String;
+  emitterCompanySiret?: String;
+  emitterCompanyAddress?: String;
+  emitterCompanyContact?: String;
+  emitterCompanyPhone?: String;
+  emitterCompanyMail?: String;
+  recipientCap?: String;
+  recipientProcessingOperation?: String;
+  recipientCompanyName?: String;
+  recipientCompanySiret?: String;
+  recipientCompanyAddress?: String;
+  recipientCompanyContact?: String;
+  recipientCompanyPhone?: String;
+  recipientCompanyMail?: String;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterIsExemptedOfReceipt?: Boolean;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeOutput;
+  transporterNumberPlate?: String;
+  wasteDetailsCode?: String;
+  wasteDetailsName?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+  wasteDetailsConsistence?: Consistence;
+  traderCompanyName?: String;
+  traderCompanySiret?: String;
+  traderCompanyAddress?: String;
+  traderCompanyContact?: String;
+  traderCompanyPhone?: String;
+  traderCompanyMail?: String;
+  traderReceipt?: String;
+  traderDepartment?: String;
+  traderValidityLimit?: DateTimeOutput;
+}
+
+export interface FormPreviousValuesPromise
+  extends Promise<FormPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  readableId: () => Promise<String>;
+  customId: () => Promise<String>;
+  isDeleted: () => Promise<Boolean>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  signedByTransporter: () => Promise<Boolean>;
+  status: () => Promise<String>;
+  sentAt: () => Promise<DateTimeOutput>;
+  sentBy: () => Promise<String>;
+  isAccepted: () => Promise<Boolean>;
+  wasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
+  wasteRefusalReason: () => Promise<String>;
+  receivedBy: () => Promise<String>;
+  receivedAt: () => Promise<DateTimeOutput>;
+  quantityReceived: () => Promise<Float>;
+  processedBy: () => Promise<String>;
+  processedAt: () => Promise<String>;
+  processingOperationDone: () => Promise<String>;
+  processingOperationDescription: () => Promise<String>;
+  noTraceability: () => Promise<Boolean>;
+  nextDestinationProcessingOperation: () => Promise<String>;
+  nextDestinationDetails: () => Promise<String>;
+  emitterType: () => Promise<EmitterType>;
+  emitterPickupSite: () => Promise<String>;
+  emitterCompanyName: () => Promise<String>;
+  emitterCompanySiret: () => Promise<String>;
+  emitterCompanyAddress: () => Promise<String>;
+  emitterCompanyContact: () => Promise<String>;
+  emitterCompanyPhone: () => Promise<String>;
+  emitterCompanyMail: () => Promise<String>;
+  recipientCap: () => Promise<String>;
+  recipientProcessingOperation: () => Promise<String>;
+  recipientCompanyName: () => Promise<String>;
+  recipientCompanySiret: () => Promise<String>;
+  recipientCompanyAddress: () => Promise<String>;
+  recipientCompanyContact: () => Promise<String>;
+  recipientCompanyPhone: () => Promise<String>;
+  recipientCompanyMail: () => Promise<String>;
+  transporterCompanyName: () => Promise<String>;
+  transporterCompanySiret: () => Promise<String>;
+  transporterCompanyAddress: () => Promise<String>;
+  transporterCompanyContact: () => Promise<String>;
+  transporterCompanyPhone: () => Promise<String>;
+  transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
+  transporterReceipt: () => Promise<String>;
+  transporterDepartment: () => Promise<String>;
+  transporterValidityLimit: () => Promise<DateTimeOutput>;
+  transporterNumberPlate: () => Promise<String>;
+  wasteDetailsCode: () => Promise<String>;
+  wasteDetailsName: () => Promise<String>;
+  wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagings: () => Promise<Json>;
+  wasteDetailsOtherPackaging: () => Promise<String>;
+  wasteDetailsNumberOfPackages: () => Promise<Int>;
+  wasteDetailsQuantity: () => Promise<Float>;
+  wasteDetailsQuantityType: () => Promise<QuantityType>;
+  wasteDetailsConsistence: () => Promise<Consistence>;
+  traderCompanyName: () => Promise<String>;
+  traderCompanySiret: () => Promise<String>;
+  traderCompanyAddress: () => Promise<String>;
+  traderCompanyContact: () => Promise<String>;
+  traderCompanyPhone: () => Promise<String>;
+  traderCompanyMail: () => Promise<String>;
+  traderReceipt: () => Promise<String>;
+  traderDepartment: () => Promise<String>;
+  traderValidityLimit: () => Promise<DateTimeOutput>;
+}
+
+export interface FormPreviousValuesSubscription
+  extends Promise<AsyncIterator<FormPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  readableId: () => Promise<AsyncIterator<String>>;
+  customId: () => Promise<AsyncIterator<String>>;
+  isDeleted: () => Promise<AsyncIterator<Boolean>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
+  status: () => Promise<AsyncIterator<String>>;
+  sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  sentBy: () => Promise<AsyncIterator<String>>;
+  isAccepted: () => Promise<AsyncIterator<Boolean>>;
+  wasteAcceptationStatus: () => Promise<AsyncIterator<WasteAcceptationStatus>>;
+  wasteRefusalReason: () => Promise<AsyncIterator<String>>;
+  receivedBy: () => Promise<AsyncIterator<String>>;
+  receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  quantityReceived: () => Promise<AsyncIterator<Float>>;
+  processedBy: () => Promise<AsyncIterator<String>>;
+  processedAt: () => Promise<AsyncIterator<String>>;
+  processingOperationDone: () => Promise<AsyncIterator<String>>;
+  processingOperationDescription: () => Promise<AsyncIterator<String>>;
+  noTraceability: () => Promise<AsyncIterator<Boolean>>;
+  nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
+  nextDestinationDetails: () => Promise<AsyncIterator<String>>;
+  emitterType: () => Promise<AsyncIterator<EmitterType>>;
+  emitterPickupSite: () => Promise<AsyncIterator<String>>;
+  emitterCompanyName: () => Promise<AsyncIterator<String>>;
+  emitterCompanySiret: () => Promise<AsyncIterator<String>>;
+  emitterCompanyAddress: () => Promise<AsyncIterator<String>>;
+  emitterCompanyContact: () => Promise<AsyncIterator<String>>;
+  emitterCompanyPhone: () => Promise<AsyncIterator<String>>;
+  emitterCompanyMail: () => Promise<AsyncIterator<String>>;
+  recipientCap: () => Promise<AsyncIterator<String>>;
+  recipientProcessingOperation: () => Promise<AsyncIterator<String>>;
+  recipientCompanyName: () => Promise<AsyncIterator<String>>;
+  recipientCompanySiret: () => Promise<AsyncIterator<String>>;
+  recipientCompanyAddress: () => Promise<AsyncIterator<String>>;
+  recipientCompanyContact: () => Promise<AsyncIterator<String>>;
+  recipientCompanyPhone: () => Promise<AsyncIterator<String>>;
+  recipientCompanyMail: () => Promise<AsyncIterator<String>>;
+  transporterCompanyName: () => Promise<AsyncIterator<String>>;
+  transporterCompanySiret: () => Promise<AsyncIterator<String>>;
+  transporterCompanyAddress: () => Promise<AsyncIterator<String>>;
+  transporterCompanyContact: () => Promise<AsyncIterator<String>>;
+  transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
+  transporterCompanyMail: () => Promise<AsyncIterator<String>>;
+  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
+  transporterReceipt: () => Promise<AsyncIterator<String>>;
+  transporterDepartment: () => Promise<AsyncIterator<String>>;
+  transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  wasteDetailsCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsName: () => Promise<AsyncIterator<String>>;
+  wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
+  wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
+  wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
+  wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
+  wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
+  wasteDetailsConsistence: () => Promise<AsyncIterator<Consistence>>;
+  traderCompanyName: () => Promise<AsyncIterator<String>>;
+  traderCompanySiret: () => Promise<AsyncIterator<String>>;
+  traderCompanyAddress: () => Promise<AsyncIterator<String>>;
+  traderCompanyContact: () => Promise<AsyncIterator<String>>;
+  traderCompanyPhone: () => Promise<AsyncIterator<String>>;
+  traderCompanyMail: () => Promise<AsyncIterator<String>>;
+  traderReceipt: () => Promise<AsyncIterator<String>>;
+  traderDepartment: () => Promise<AsyncIterator<String>>;
+  traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface StatusLogConnection {
+  pageInfo: PageInfo;
+  edges: StatusLogEdge[];
+}
+
+export interface StatusLogConnectionPromise
+  extends Promise<StatusLogConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<StatusLogEdge>>() => T;
+  aggregate: <T = AggregateStatusLogPromise>() => T;
+}
+
+export interface StatusLogConnectionSubscription
+  extends Promise<AsyncIterator<StatusLogConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<StatusLogEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateStatusLogSubscription>() => T;
+}
+
+export interface AggregateAccessToken {
+  count: Int;
+}
+
+export interface AggregateAccessTokenPromise
+  extends Promise<AggregateAccessToken>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateAccessTokenSubscription
+  extends Promise<AsyncIterator<AggregateAccessToken>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface RubriqueEdge {
+  node: Rubrique;
+  cursor: String;
+}
+
+export interface RubriqueEdgePromise
+  extends Promise<RubriqueEdge>,
+    Fragmentable {
+  node: <T = RubriquePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface RubriqueEdgeSubscription
+  extends Promise<AsyncIterator<RubriqueEdge>>,
+    Fragmentable {
+  node: <T = RubriqueSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface InstallationSubscriptionPayload {
+  mutation: MutationType;
+  node: Installation;
+  updatedFields: String[];
+  previousValues: InstallationPreviousValues;
+}
+
+export interface InstallationSubscriptionPayloadPromise
+  extends Promise<InstallationSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = InstallationPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = InstallationPreviousValuesPromise>() => T;
+}
+
+export interface InstallationSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<InstallationSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = InstallationSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = InstallationPreviousValuesSubscription>() => T;
+}
+
+export interface InstallationEdge {
+  node: Installation;
+  cursor: String;
+}
+
+export interface InstallationEdgePromise
+  extends Promise<InstallationEdge>,
+    Fragmentable {
+  node: <T = InstallationPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface InstallationEdgeSubscription
+  extends Promise<AsyncIterator<InstallationEdge>>,
+    Fragmentable {
+  node: <T = InstallationSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface InstallationPreviousValues {
+  id: ID_Output;
+  codeS3ic?: String;
+  nomEts?: String;
+  regime?: String;
+  libRegime?: String;
+  seveso?: Seveso;
+  libSeveso?: String;
+  familleIc?: String;
+  urlFiche?: String;
+  s3icNumeroSiret?: String;
+  irepNumeroSiret?: String;
+  gerepNumeroSiret?: String;
+  sireneNumeroSiret?: String;
+}
+
+export interface InstallationPreviousValuesPromise
+  extends Promise<InstallationPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  codeS3ic: () => Promise<String>;
+  nomEts: () => Promise<String>;
+  regime: () => Promise<String>;
+  libRegime: () => Promise<String>;
+  seveso: () => Promise<Seveso>;
+  libSeveso: () => Promise<String>;
+  familleIc: () => Promise<String>;
+  urlFiche: () => Promise<String>;
+  s3icNumeroSiret: () => Promise<String>;
+  irepNumeroSiret: () => Promise<String>;
+  gerepNumeroSiret: () => Promise<String>;
+  sireneNumeroSiret: () => Promise<String>;
+}
+
+export interface InstallationPreviousValuesSubscription
+  extends Promise<AsyncIterator<InstallationPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  codeS3ic: () => Promise<AsyncIterator<String>>;
+  nomEts: () => Promise<AsyncIterator<String>>;
+  regime: () => Promise<AsyncIterator<String>>;
+  libRegime: () => Promise<AsyncIterator<String>>;
+  seveso: () => Promise<AsyncIterator<Seveso>>;
+  libSeveso: () => Promise<AsyncIterator<String>>;
+  familleIc: () => Promise<AsyncIterator<String>>;
+  urlFiche: () => Promise<AsyncIterator<String>>;
+  s3icNumeroSiret: () => Promise<AsyncIterator<String>>;
+  irepNumeroSiret: () => Promise<AsyncIterator<String>>;
+  gerepNumeroSiret: () => Promise<AsyncIterator<String>>;
+  sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
 }
 
 export interface Installation {
@@ -5715,49 +6448,7 @@ export interface InstallationNullablePromise
   sireneNumeroSiret: () => Promise<String>;
 }
 
-export interface DeclarationSubscriptionPayload {
-  mutation: MutationType;
-  node: Declaration;
-  updatedFields: String[];
-  previousValues: DeclarationPreviousValues;
-}
-
-export interface DeclarationSubscriptionPayloadPromise
-  extends Promise<DeclarationSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = DeclarationPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = DeclarationPreviousValuesPromise>() => T;
-}
-
-export interface DeclarationSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<DeclarationSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = DeclarationSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = DeclarationPreviousValuesSubscription>() => T;
-}
-
-export interface FormEdge {
-  node: Form;
-  cursor: String;
-}
-
-export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
-  node: <T = FormPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface FormEdgeSubscription
-  extends Promise<AsyncIterator<FormEdge>>,
-    Fragmentable {
-  node: <T = FormSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface DeclarationPreviousValues {
+export interface Declaration {
   id: ID_Output;
   codeS3ic?: String;
   nomEts?: String;
@@ -5767,9 +6458,7 @@ export interface DeclarationPreviousValues {
   gerepType?: GerepType;
 }
 
-export interface DeclarationPreviousValuesPromise
-  extends Promise<DeclarationPreviousValues>,
-    Fragmentable {
+export interface DeclarationPromise extends Promise<Declaration>, Fragmentable {
   id: () => Promise<ID_Output>;
   codeS3ic: () => Promise<String>;
   nomEts: () => Promise<String>;
@@ -5779,8 +6468,8 @@ export interface DeclarationPreviousValuesPromise
   gerepType: () => Promise<GerepType>;
 }
 
-export interface DeclarationPreviousValuesSubscription
-  extends Promise<AsyncIterator<DeclarationPreviousValues>>,
+export interface DeclarationSubscription
+  extends Promise<AsyncIterator<Declaration>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   codeS3ic: () => Promise<AsyncIterator<String>>;
@@ -5791,612 +6480,39 @@ export interface DeclarationPreviousValuesSubscription
   gerepType: () => Promise<AsyncIterator<GerepType>>;
 }
 
-export interface UserActivationHashEdge {
-  node: UserActivationHash;
-  cursor: String;
-}
-
-export interface UserActivationHashEdgePromise
-  extends Promise<UserActivationHashEdge>,
-    Fragmentable {
-  node: <T = UserActivationHashPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface UserActivationHashEdgeSubscription
-  extends Promise<AsyncIterator<UserActivationHashEdge>>,
-    Fragmentable {
-  node: <T = UserActivationHashSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface DeclarationConnection {
-  pageInfo: PageInfo;
-  edges: DeclarationEdge[];
-}
-
-export interface DeclarationConnectionPromise
-  extends Promise<DeclarationConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<DeclarationEdge>>() => T;
-  aggregate: <T = AggregateDeclarationPromise>() => T;
-}
-
-export interface DeclarationConnectionSubscription
-  extends Promise<AsyncIterator<DeclarationConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<DeclarationEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateDeclarationSubscription>() => T;
-}
-
-export interface AggregateUserAccountHash {
-  count: Int;
-}
-
-export interface AggregateUserAccountHashPromise
-  extends Promise<AggregateUserAccountHash>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserAccountHashSubscription
-  extends Promise<AsyncIterator<AggregateUserAccountHash>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface FormSubscriptionPayload {
-  mutation: MutationType;
-  node: Form;
-  updatedFields: String[];
-  previousValues: FormPreviousValues;
-}
-
-export interface FormSubscriptionPayloadPromise
-  extends Promise<FormSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = FormPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = FormPreviousValuesPromise>() => T;
-}
-
-export interface FormSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<FormSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = FormSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = FormPreviousValuesSubscription>() => T;
-}
-
-export interface UserAccountHash {
-  id: ID_Output;
-  email: String;
-  companySiret: ID_Output;
-  role: UserRole;
-  hash: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-}
-
-export interface UserAccountHashPromise
-  extends Promise<UserAccountHash>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface UserAccountHashSubscription
-  extends Promise<AsyncIterator<UserAccountHash>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  email: () => Promise<AsyncIterator<String>>;
-  companySiret: () => Promise<AsyncIterator<ID_Output>>;
-  role: () => Promise<AsyncIterator<UserRole>>;
-  hash: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface UserAccountHashNullablePromise
-  extends Promise<UserAccountHash | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface FormPreviousValues {
-  id: ID_Output;
-  readableId?: String;
-  customId?: String;
-  isDeleted?: Boolean;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  signedByTransporter?: Boolean;
-  status?: String;
-  sentAt?: DateTimeOutput;
-  sentBy?: String;
-  isAccepted?: Boolean;
-  receivedBy?: String;
-  receivedAt?: DateTimeOutput;
-  quantityReceived?: Float;
-  processedBy?: String;
-  processedAt?: String;
-  processingOperationDone?: String;
-  processingOperationDescription?: String;
-  noTraceability?: Boolean;
-  nextDestinationProcessingOperation?: String;
-  nextDestinationDetails?: String;
-  emitterType?: EmitterType;
-  emitterPickupSite?: String;
-  emitterCompanyName?: String;
-  emitterCompanySiret?: String;
-  emitterCompanyAddress?: String;
-  emitterCompanyContact?: String;
-  emitterCompanyPhone?: String;
-  emitterCompanyMail?: String;
-  recipientCap?: String;
-  recipientProcessingOperation?: String;
-  recipientCompanyName?: String;
-  recipientCompanySiret?: String;
-  recipientCompanyAddress?: String;
-  recipientCompanyContact?: String;
-  recipientCompanyPhone?: String;
-  recipientCompanyMail?: String;
-  transporterCompanyName?: String;
-  transporterCompanySiret?: String;
-  transporterCompanyAddress?: String;
-  transporterCompanyContact?: String;
-  transporterCompanyPhone?: String;
-  transporterCompanyMail?: String;
-  transporterIsExemptedOfReceipt?: Boolean;
-  transporterReceipt?: String;
-  transporterDepartment?: String;
-  transporterValidityLimit?: DateTimeOutput;
-  transporterNumberPlate?: String;
-  wasteDetailsCode?: String;
-  wasteDetailsName?: String;
-  wasteDetailsOnuCode?: String;
-  wasteDetailsPackagings?: Json;
-  wasteDetailsOtherPackaging?: String;
-  wasteDetailsNumberOfPackages?: Int;
-  wasteDetailsQuantity?: Float;
-  wasteDetailsQuantityType?: QuantityType;
-  wasteDetailsConsistence?: Consistence;
-  traderCompanyName?: String;
-  traderCompanySiret?: String;
-  traderCompanyAddress?: String;
-  traderCompanyContact?: String;
-  traderCompanyPhone?: String;
-  traderCompanyMail?: String;
-  traderReceipt?: String;
-  traderDepartment?: String;
-  traderValidityLimit?: DateTimeOutput;
-}
-
-export interface FormPreviousValuesPromise
-  extends Promise<FormPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  readableId: () => Promise<String>;
-  customId: () => Promise<String>;
-  isDeleted: () => Promise<Boolean>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  signedByTransporter: () => Promise<Boolean>;
-  status: () => Promise<String>;
-  sentAt: () => Promise<DateTimeOutput>;
-  sentBy: () => Promise<String>;
-  isAccepted: () => Promise<Boolean>;
-  receivedBy: () => Promise<String>;
-  receivedAt: () => Promise<DateTimeOutput>;
-  quantityReceived: () => Promise<Float>;
-  processedBy: () => Promise<String>;
-  processedAt: () => Promise<String>;
-  processingOperationDone: () => Promise<String>;
-  processingOperationDescription: () => Promise<String>;
-  noTraceability: () => Promise<Boolean>;
-  nextDestinationProcessingOperation: () => Promise<String>;
-  nextDestinationDetails: () => Promise<String>;
-  emitterType: () => Promise<EmitterType>;
-  emitterPickupSite: () => Promise<String>;
-  emitterCompanyName: () => Promise<String>;
-  emitterCompanySiret: () => Promise<String>;
-  emitterCompanyAddress: () => Promise<String>;
-  emitterCompanyContact: () => Promise<String>;
-  emitterCompanyPhone: () => Promise<String>;
-  emitterCompanyMail: () => Promise<String>;
-  recipientCap: () => Promise<String>;
-  recipientProcessingOperation: () => Promise<String>;
-  recipientCompanyName: () => Promise<String>;
-  recipientCompanySiret: () => Promise<String>;
-  recipientCompanyAddress: () => Promise<String>;
-  recipientCompanyContact: () => Promise<String>;
-  recipientCompanyPhone: () => Promise<String>;
-  recipientCompanyMail: () => Promise<String>;
-  transporterCompanyName: () => Promise<String>;
-  transporterCompanySiret: () => Promise<String>;
-  transporterCompanyAddress: () => Promise<String>;
-  transporterCompanyContact: () => Promise<String>;
-  transporterCompanyPhone: () => Promise<String>;
-  transporterCompanyMail: () => Promise<String>;
-  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
-  transporterReceipt: () => Promise<String>;
-  transporterDepartment: () => Promise<String>;
-  transporterValidityLimit: () => Promise<DateTimeOutput>;
-  transporterNumberPlate: () => Promise<String>;
-  wasteDetailsCode: () => Promise<String>;
-  wasteDetailsName: () => Promise<String>;
-  wasteDetailsOnuCode: () => Promise<String>;
-  wasteDetailsPackagings: () => Promise<Json>;
-  wasteDetailsOtherPackaging: () => Promise<String>;
-  wasteDetailsNumberOfPackages: () => Promise<Int>;
-  wasteDetailsQuantity: () => Promise<Float>;
-  wasteDetailsQuantityType: () => Promise<QuantityType>;
-  wasteDetailsConsistence: () => Promise<Consistence>;
-  traderCompanyName: () => Promise<String>;
-  traderCompanySiret: () => Promise<String>;
-  traderCompanyAddress: () => Promise<String>;
-  traderCompanyContact: () => Promise<String>;
-  traderCompanyPhone: () => Promise<String>;
-  traderCompanyMail: () => Promise<String>;
-  traderReceipt: () => Promise<String>;
-  traderDepartment: () => Promise<String>;
-  traderValidityLimit: () => Promise<DateTimeOutput>;
-}
-
-export interface FormPreviousValuesSubscription
-  extends Promise<AsyncIterator<FormPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  readableId: () => Promise<AsyncIterator<String>>;
-  customId: () => Promise<AsyncIterator<String>>;
-  isDeleted: () => Promise<AsyncIterator<Boolean>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
-  status: () => Promise<AsyncIterator<String>>;
-  sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  sentBy: () => Promise<AsyncIterator<String>>;
-  isAccepted: () => Promise<AsyncIterator<Boolean>>;
-  receivedBy: () => Promise<AsyncIterator<String>>;
-  receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  quantityReceived: () => Promise<AsyncIterator<Float>>;
-  processedBy: () => Promise<AsyncIterator<String>>;
-  processedAt: () => Promise<AsyncIterator<String>>;
-  processingOperationDone: () => Promise<AsyncIterator<String>>;
-  processingOperationDescription: () => Promise<AsyncIterator<String>>;
-  noTraceability: () => Promise<AsyncIterator<Boolean>>;
-  nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
-  nextDestinationDetails: () => Promise<AsyncIterator<String>>;
-  emitterType: () => Promise<AsyncIterator<EmitterType>>;
-  emitterPickupSite: () => Promise<AsyncIterator<String>>;
-  emitterCompanyName: () => Promise<AsyncIterator<String>>;
-  emitterCompanySiret: () => Promise<AsyncIterator<String>>;
-  emitterCompanyAddress: () => Promise<AsyncIterator<String>>;
-  emitterCompanyContact: () => Promise<AsyncIterator<String>>;
-  emitterCompanyPhone: () => Promise<AsyncIterator<String>>;
-  emitterCompanyMail: () => Promise<AsyncIterator<String>>;
-  recipientCap: () => Promise<AsyncIterator<String>>;
-  recipientProcessingOperation: () => Promise<AsyncIterator<String>>;
-  recipientCompanyName: () => Promise<AsyncIterator<String>>;
-  recipientCompanySiret: () => Promise<AsyncIterator<String>>;
-  recipientCompanyAddress: () => Promise<AsyncIterator<String>>;
-  recipientCompanyContact: () => Promise<AsyncIterator<String>>;
-  recipientCompanyPhone: () => Promise<AsyncIterator<String>>;
-  recipientCompanyMail: () => Promise<AsyncIterator<String>>;
-  transporterCompanyName: () => Promise<AsyncIterator<String>>;
-  transporterCompanySiret: () => Promise<AsyncIterator<String>>;
-  transporterCompanyAddress: () => Promise<AsyncIterator<String>>;
-  transporterCompanyContact: () => Promise<AsyncIterator<String>>;
-  transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
-  transporterCompanyMail: () => Promise<AsyncIterator<String>>;
-  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
-  transporterReceipt: () => Promise<AsyncIterator<String>>;
-  transporterDepartment: () => Promise<AsyncIterator<String>>;
-  transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-  transporterNumberPlate: () => Promise<AsyncIterator<String>>;
-  wasteDetailsCode: () => Promise<AsyncIterator<String>>;
-  wasteDetailsName: () => Promise<AsyncIterator<String>>;
-  wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
-  wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
-  wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
-  wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
-  wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
-  wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
-  wasteDetailsConsistence: () => Promise<AsyncIterator<Consistence>>;
-  traderCompanyName: () => Promise<AsyncIterator<String>>;
-  traderCompanySiret: () => Promise<AsyncIterator<String>>;
-  traderCompanyAddress: () => Promise<AsyncIterator<String>>;
-  traderCompanyContact: () => Promise<AsyncIterator<String>>;
-  traderCompanyPhone: () => Promise<AsyncIterator<String>>;
-  traderCompanyMail: () => Promise<AsyncIterator<String>>;
-  traderReceipt: () => Promise<AsyncIterator<String>>;
-  traderDepartment: () => Promise<AsyncIterator<String>>;
-  traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface User {
-  id: ID_Output;
-  isActive?: Boolean;
-  email: String;
-  password: String;
-  name?: String;
-  phone?: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-}
-
-export interface UserPromise extends Promise<User>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface UserSubscription
-  extends Promise<AsyncIterator<User>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  isActive: () => Promise<AsyncIterator<Boolean>>;
-  email: () => Promise<AsyncIterator<String>>;
-  password: () => Promise<AsyncIterator<String>>;
-  name: () => Promise<AsyncIterator<String>>;
-  phone: () => Promise<AsyncIterator<String>>;
-  companyAssociations: <
-    T = Promise<AsyncIterator<CompanyAssociationSubscription>>
-  >(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface UserNullablePromise
-  extends Promise<User | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface AccessTokenEdge {
-  node: AccessToken;
-  cursor: String;
-}
-
-export interface AccessTokenEdgePromise
-  extends Promise<AccessTokenEdge>,
-    Fragmentable {
-  node: <T = AccessTokenPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface AccessTokenEdgeSubscription
-  extends Promise<AsyncIterator<AccessTokenEdge>>,
-    Fragmentable {
-  node: <T = AccessTokenSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface CompanyAssociationConnection {
-  pageInfo: PageInfo;
-  edges: CompanyAssociationEdge[];
-}
-
-export interface CompanyAssociationConnectionPromise
-  extends Promise<CompanyAssociationConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CompanyAssociationEdge>>() => T;
-  aggregate: <T = AggregateCompanyAssociationPromise>() => T;
-}
-
-export interface CompanyAssociationConnectionSubscription
-  extends Promise<AsyncIterator<CompanyAssociationConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <
-    T = Promise<AsyncIterator<CompanyAssociationEdgeSubscription>>
-  >() => T;
-  aggregate: <T = AggregateCompanyAssociationSubscription>() => T;
-}
-
-export interface InstallationSubscriptionPayload {
-  mutation: MutationType;
-  node: Installation;
-  updatedFields: String[];
-  previousValues: InstallationPreviousValues;
-}
-
-export interface InstallationSubscriptionPayloadPromise
-  extends Promise<InstallationSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = InstallationPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = InstallationPreviousValuesPromise>() => T;
-}
-
-export interface InstallationSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<InstallationSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = InstallationSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = InstallationPreviousValuesSubscription>() => T;
-}
-
-export interface RubriqueConnection {
-  pageInfo: PageInfo;
-  edges: RubriqueEdge[];
-}
-
-export interface RubriqueConnectionPromise
-  extends Promise<RubriqueConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<RubriqueEdge>>() => T;
-  aggregate: <T = AggregateRubriquePromise>() => T;
-}
-
-export interface RubriqueConnectionSubscription
-  extends Promise<AsyncIterator<RubriqueConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<RubriqueEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateRubriqueSubscription>() => T;
-}
-
-export interface InstallationPreviousValues {
-  id: ID_Output;
-  codeS3ic?: String;
-  nomEts?: String;
-  regime?: String;
-  libRegime?: String;
-  seveso?: Seveso;
-  libSeveso?: String;
-  familleIc?: String;
-  urlFiche?: String;
-  s3icNumeroSiret?: String;
-  irepNumeroSiret?: String;
-  gerepNumeroSiret?: String;
-  sireneNumeroSiret?: String;
-}
-
-export interface InstallationPreviousValuesPromise
-  extends Promise<InstallationPreviousValues>,
+export interface DeclarationNullablePromise
+  extends Promise<Declaration | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
   codeS3ic: () => Promise<String>;
   nomEts: () => Promise<String>;
-  regime: () => Promise<String>;
-  libRegime: () => Promise<String>;
-  seveso: () => Promise<Seveso>;
-  libSeveso: () => Promise<String>;
-  familleIc: () => Promise<String>;
-  urlFiche: () => Promise<String>;
-  s3icNumeroSiret: () => Promise<String>;
-  irepNumeroSiret: () => Promise<String>;
-  gerepNumeroSiret: () => Promise<String>;
-  sireneNumeroSiret: () => Promise<String>;
+  annee: () => Promise<String>;
+  codeDechet: () => Promise<String>;
+  libDechet: () => Promise<String>;
+  gerepType: () => Promise<GerepType>;
 }
 
-export interface InstallationPreviousValuesSubscription
-  extends Promise<AsyncIterator<InstallationPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  codeS3ic: () => Promise<AsyncIterator<String>>;
-  nomEts: () => Promise<AsyncIterator<String>>;
-  regime: () => Promise<AsyncIterator<String>>;
-  libRegime: () => Promise<AsyncIterator<String>>;
-  seveso: () => Promise<AsyncIterator<Seveso>>;
-  libSeveso: () => Promise<AsyncIterator<String>>;
-  familleIc: () => Promise<AsyncIterator<String>>;
-  urlFiche: () => Promise<AsyncIterator<String>>;
-  s3icNumeroSiret: () => Promise<AsyncIterator<String>>;
-  irepNumeroSiret: () => Promise<AsyncIterator<String>>;
-  gerepNumeroSiret: () => Promise<AsyncIterator<String>>;
-  sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
-}
-
-export interface InstallationConnection {
+export interface UserActivationHashConnection {
   pageInfo: PageInfo;
-  edges: InstallationEdge[];
+  edges: UserActivationHashEdge[];
 }
 
-export interface InstallationConnectionPromise
-  extends Promise<InstallationConnection>,
+export interface UserActivationHashConnectionPromise
+  extends Promise<UserActivationHashConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<InstallationEdge>>() => T;
-  aggregate: <T = AggregateInstallationPromise>() => T;
+  edges: <T = FragmentableArray<UserActivationHashEdge>>() => T;
+  aggregate: <T = AggregateUserActivationHashPromise>() => T;
 }
 
-export interface InstallationConnectionSubscription
-  extends Promise<AsyncIterator<InstallationConnection>>,
+export interface UserActivationHashConnectionSubscription
+  extends Promise<AsyncIterator<UserActivationHashConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<InstallationEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateInstallationSubscription>() => T;
-}
-
-export interface AggregateAccessToken {
-  count: Int;
-}
-
-export interface AggregateAccessTokenPromise
-  extends Promise<AggregateAccessToken>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateAccessTokenSubscription
-  extends Promise<AsyncIterator<AggregateAccessToken>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface AggregateForm {
-  count: Int;
-}
-
-export interface AggregateFormPromise
-  extends Promise<AggregateForm>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateFormSubscription
-  extends Promise<AsyncIterator<AggregateForm>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  edges: <
+    T = Promise<AsyncIterator<UserActivationHashEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateUserActivationHashSubscription>() => T;
 }
 
 export interface RubriqueSubscriptionPayload {
@@ -6424,47 +6540,20 @@ export interface RubriqueSubscriptionPayloadSubscription
   previousValues: <T = RubriquePreviousValuesSubscription>() => T;
 }
 
-export interface AccessToken {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  token: String;
-  isRevoked: Boolean;
-  lastUsed?: DateTimeOutput;
+export interface AggregateUser {
+  count: Int;
 }
 
-export interface AccessTokenPromise extends Promise<AccessToken>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  user: <T = UserPromise>() => T;
-  token: () => Promise<String>;
-  isRevoked: () => Promise<Boolean>;
-  lastUsed: () => Promise<DateTimeOutput>;
-}
-
-export interface AccessTokenSubscription
-  extends Promise<AsyncIterator<AccessToken>>,
+export interface AggregateUserPromise
+  extends Promise<AggregateUser>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  user: <T = UserSubscription>() => T;
-  token: () => Promise<AsyncIterator<String>>;
-  isRevoked: () => Promise<AsyncIterator<Boolean>>;
-  lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
+  count: () => Promise<Int>;
 }
 
-export interface AccessTokenNullablePromise
-  extends Promise<AccessToken | null>,
+export interface AggregateUserSubscription
+  extends Promise<AsyncIterator<AggregateUser>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  user: <T = UserPromise>() => T;
-  token: () => Promise<String>;
-  isRevoked: () => Promise<Boolean>;
-  lastUsed: () => Promise<DateTimeOutput>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface RubriquePreviousValues {
@@ -6516,122 +6605,87 @@ export interface RubriquePreviousValuesSubscription
   wasteType: () => Promise<AsyncIterator<WasteType>>;
 }
 
-export interface UserEdge {
-  node: User;
+export interface StatusLog {
+  id: ID_Output;
+  status: Status;
+}
+
+export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  form: <T = FormPromise>() => T;
+  status: () => Promise<Status>;
+}
+
+export interface StatusLogSubscription
+  extends Promise<AsyncIterator<StatusLog>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
+  form: <T = FormSubscription>() => T;
+  status: () => Promise<AsyncIterator<Status>>;
+}
+
+export interface StatusLogNullablePromise
+  extends Promise<StatusLog | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  form: <T = FormPromise>() => T;
+  status: () => Promise<Status>;
+}
+
+export interface UserAccountHashPreviousValues {
+  id: ID_Output;
+  email: String;
+  companySiret: ID_Output;
+  role: UserRole;
+  hash: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface UserAccountHashPreviousValuesPromise
+  extends Promise<UserAccountHashPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserAccountHashPreviousValuesSubscription
+  extends Promise<AsyncIterator<UserAccountHashPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  email: () => Promise<AsyncIterator<String>>;
+  companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
+  hash: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface CompanyAssociationEdge {
+  node: CompanyAssociation;
   cursor: String;
 }
 
-export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
-  node: <T = UserPromise>() => T;
+export interface CompanyAssociationEdgePromise
+  extends Promise<CompanyAssociationEdge>,
+    Fragmentable {
+  node: <T = CompanyAssociationPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface UserEdgeSubscription
-  extends Promise<AsyncIterator<UserEdge>>,
+export interface CompanyAssociationEdgeSubscription
+  extends Promise<AsyncIterator<CompanyAssociationEdge>>,
     Fragmentable {
-  node: <T = UserSubscription>() => T;
+  node: <T = CompanyAssociationSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface Declaration {
-  id: ID_Output;
-  codeS3ic?: String;
-  nomEts?: String;
-  annee?: String;
-  codeDechet?: String;
-  libDechet?: String;
-  gerepType?: GerepType;
-}
-
-export interface DeclarationPromise extends Promise<Declaration>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  nomEts: () => Promise<String>;
-  annee: () => Promise<String>;
-  codeDechet: () => Promise<String>;
-  libDechet: () => Promise<String>;
-  gerepType: () => Promise<GerepType>;
-}
-
-export interface DeclarationSubscription
-  extends Promise<AsyncIterator<Declaration>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  codeS3ic: () => Promise<AsyncIterator<String>>;
-  nomEts: () => Promise<AsyncIterator<String>>;
-  annee: () => Promise<AsyncIterator<String>>;
-  codeDechet: () => Promise<AsyncIterator<String>>;
-  libDechet: () => Promise<AsyncIterator<String>>;
-  gerepType: () => Promise<AsyncIterator<GerepType>>;
-}
-
-export interface DeclarationNullablePromise
-  extends Promise<Declaration | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  nomEts: () => Promise<String>;
-  annee: () => Promise<String>;
-  codeDechet: () => Promise<String>;
-  libDechet: () => Promise<String>;
-  gerepType: () => Promise<GerepType>;
-}
-
-export interface AggregateRubrique {
-  count: Int;
-}
-
-export interface AggregateRubriquePromise
-  extends Promise<AggregateRubrique>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateRubriqueSubscription
-  extends Promise<AsyncIterator<AggregateRubrique>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface UserSubscriptionPayload {
-  mutation: MutationType;
-  node: User;
-  updatedFields: String[];
-  previousValues: UserPreviousValues;
-}
-
-export interface UserSubscriptionPayloadPromise
-  extends Promise<UserSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserPreviousValuesPromise>() => T;
-}
-
-export interface UserSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserPreviousValuesSubscription>() => T;
-}
-
-export interface AggregateCompanyAssociation {
-  count: Int;
-}
-
-export interface AggregateCompanyAssociationPromise
-  extends Promise<AggregateCompanyAssociation>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateCompanyAssociationSubscription
-  extends Promise<AsyncIterator<AggregateCompanyAssociation>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface StatusLogPreviousValues {
@@ -6678,124 +6732,141 @@ export interface StatusLogSubscriptionPayloadSubscription
   previousValues: <T = StatusLogPreviousValuesSubscription>() => T;
 }
 
-export interface AggregateInstallation {
+export interface AggregateCompanyAssociation {
   count: Int;
 }
 
-export interface AggregateInstallationPromise
-  extends Promise<AggregateInstallation>,
+export interface AggregateCompanyAssociationPromise
+  extends Promise<AggregateCompanyAssociation>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateInstallationSubscription
-  extends Promise<AsyncIterator<AggregateInstallation>>,
+export interface AggregateCompanyAssociationSubscription
+  extends Promise<AsyncIterator<AggregateCompanyAssociation>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface StatusLogEdge {
-  node: StatusLog;
+export interface FormEdge {
+  node: Form;
   cursor: String;
 }
 
-export interface StatusLogEdgePromise
-  extends Promise<StatusLogEdge>,
-    Fragmentable {
-  node: <T = StatusLogPromise>() => T;
+export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
+  node: <T = FormPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface StatusLogEdgeSubscription
-  extends Promise<AsyncIterator<StatusLogEdge>>,
+export interface FormEdgeSubscription
+  extends Promise<AsyncIterator<FormEdge>>,
     Fragmentable {
-  node: <T = StatusLogSubscription>() => T;
+  node: <T = FormSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface UserAccountHashConnection {
-  pageInfo: PageInfo;
-  edges: UserAccountHashEdge[];
-}
-
-export interface UserAccountHashConnectionPromise
-  extends Promise<UserAccountHashConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserAccountHashEdge>>() => T;
-  aggregate: <T = AggregateUserAccountHashPromise>() => T;
-}
-
-export interface UserAccountHashConnectionSubscription
-  extends Promise<AsyncIterator<UserAccountHashConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<UserAccountHashEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateUserAccountHashSubscription>() => T;
-}
-
-export interface FormConnection {
-  pageInfo: PageInfo;
-  edges: FormEdge[];
-}
-
-export interface FormConnectionPromise
-  extends Promise<FormConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<FormEdge>>() => T;
-  aggregate: <T = AggregateFormPromise>() => T;
-}
-
-export interface FormConnectionSubscription
-  extends Promise<AsyncIterator<FormConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateFormSubscription>() => T;
-}
-
-export interface CompanyAssociation {
+export interface Rubrique {
   id: ID_Output;
-  role: UserRole;
+  codeS3ic?: String;
+  rubrique?: String;
+  alinea?: String;
+  dateAutorisation?: String;
+  etatActivite?: String;
+  regimeAutorise?: String;
+  activite?: String;
+  volume?: String;
+  unite?: String;
+  category?: String;
+  wasteType?: WasteType;
 }
 
-export interface CompanyAssociationPromise
-  extends Promise<CompanyAssociation>,
-    Fragmentable {
+export interface RubriquePromise extends Promise<Rubrique>, Fragmentable {
   id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  company: <T = CompanyPromise>() => T;
-  role: () => Promise<UserRole>;
+  codeS3ic: () => Promise<String>;
+  rubrique: () => Promise<String>;
+  alinea: () => Promise<String>;
+  dateAutorisation: () => Promise<String>;
+  etatActivite: () => Promise<String>;
+  regimeAutorise: () => Promise<String>;
+  activite: () => Promise<String>;
+  volume: () => Promise<String>;
+  unite: () => Promise<String>;
+  category: () => Promise<String>;
+  wasteType: () => Promise<WasteType>;
 }
 
-export interface CompanyAssociationSubscription
-  extends Promise<AsyncIterator<CompanyAssociation>>,
+export interface RubriqueSubscription
+  extends Promise<AsyncIterator<Rubrique>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  company: <T = CompanySubscription>() => T;
-  role: () => Promise<AsyncIterator<UserRole>>;
+  codeS3ic: () => Promise<AsyncIterator<String>>;
+  rubrique: () => Promise<AsyncIterator<String>>;
+  alinea: () => Promise<AsyncIterator<String>>;
+  dateAutorisation: () => Promise<AsyncIterator<String>>;
+  etatActivite: () => Promise<AsyncIterator<String>>;
+  regimeAutorise: () => Promise<AsyncIterator<String>>;
+  activite: () => Promise<AsyncIterator<String>>;
+  volume: () => Promise<AsyncIterator<String>>;
+  unite: () => Promise<AsyncIterator<String>>;
+  category: () => Promise<AsyncIterator<String>>;
+  wasteType: () => Promise<AsyncIterator<WasteType>>;
 }
 
-export interface CompanyAssociationNullablePromise
-  extends Promise<CompanyAssociation | null>,
+export interface RubriqueNullablePromise
+  extends Promise<Rubrique | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  company: <T = CompanyPromise>() => T;
-  role: () => Promise<UserRole>;
+  codeS3ic: () => Promise<String>;
+  rubrique: () => Promise<String>;
+  alinea: () => Promise<String>;
+  dateAutorisation: () => Promise<String>;
+  etatActivite: () => Promise<String>;
+  regimeAutorise: () => Promise<String>;
+  activite: () => Promise<String>;
+  volume: () => Promise<String>;
+  unite: () => Promise<String>;
+  category: () => Promise<String>;
+  wasteType: () => Promise<WasteType>;
+}
+
+export interface AggregateStatusLog {
+  count: Int;
+}
+
+export interface AggregateStatusLogPromise
+  extends Promise<AggregateStatusLog>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateStatusLogSubscription
+  extends Promise<AsyncIterator<AggregateStatusLog>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface UserAccountHashEdge {
+  node: UserAccountHash;
+  cursor: String;
+}
+
+export interface UserAccountHashEdgePromise
+  extends Promise<UserAccountHashEdge>,
+    Fragmentable {
+  node: <T = UserAccountHashPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface UserAccountHashEdgeSubscription
+  extends Promise<AsyncIterator<UserAccountHashEdge>>,
+    Fragmentable {
+  node: <T = UserAccountHashSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export type Json = any;
 
 export type Long = string;
-
-/*
-The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
-*/
-export type ID_Input = string | number;
-export type ID_Output = string;
 
 /*
 DateTime scalar input type, allowing Date
@@ -6816,6 +6887,12 @@ export type Boolean = boolean;
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
 */
 export type Int = number;
+
+/*
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+*/
+export type ID_Input = string | number;
+export type ID_Output = string;
 
 /*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).
@@ -6882,6 +6959,10 @@ export const models: Model[] = [
   },
   {
     name: "Declaration",
+    embedded: false
+  },
+  {
+    name: "WasteAcceptationStatus",
     embedded: false
   },
   {

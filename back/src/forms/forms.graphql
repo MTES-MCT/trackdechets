@@ -118,7 +118,8 @@ type Form {
   sentAt: DateTime
   sentBy: String
 
-  isAccepted: Boolean
+  wasteAcceptationStatus: String
+  wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
   quantityReceived: Float

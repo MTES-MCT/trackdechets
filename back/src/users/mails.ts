@@ -11,6 +11,9 @@ const {
 
 const baseUrl = `https://${UI_HOST}`;
 
+export const quantityPartiallyRefused = (quantitySent, quantityAccepted) =>
+  quantitySent - quantityAccepted;
+
 export const userMails = {
   onSignup: (user, activationHash) => ({
     to: [{ email: user.email, name: user.name }],
@@ -130,6 +133,9 @@ export const userMails = {
       <li>Appellation du déchet : ${form.wasteDetailsName}</li>
       <li>Code déchet : ${form.wasteDetailsCode}</li>
       <li>Quantité : ${form.wasteDetailsQuantity} Tonnes refusées</li>
+      <li>Motif de refus: ${
+        form.wasteRefusalReason ? form.wasteRefusalReason : "Non précisé"
+      }</li>
     </ul>
      <li>Transporteur : ${
        form.transporterIsExemptedOfReceipt
@@ -143,6 +149,49 @@ export const userMails = {
     Comme le prévoit l'article R541-45 du code de l'environnement, l'expéditeur initial du déchet et l'inspection des installations classées sont tenus informés de ce refus.
     <br><br>
     <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
+    attachment: attachment
+  }),
+  formPartiallyRefused: (toEmail, toName, form: Form, attachment) => ({
+    to: [{ email: toEmail, name: toName }],
+    subject: "Refus partiel de prise en charge de votre déchet",
+    title: "Refus partiel de prise en charge de votre déchet",
+    body: `Madame, Monsieur,
+    <br><br>
+    Nous vous informons que la société ${cleanupSpecialChars(
+      form.recipientCompanyName
+    )} a refusé partiellement le ${toFrFormat(
+      new Date(form.receivedAt)
+    )}, le déchet de la société suivante :
+    <br><br>
+   
+    <ul>
+    <li>${cleanupSpecialChars(form.emitterCompanyName)} - ${
+      form.emitterCompanyAddress
+    }
+    </li>
+    <li>Informations relatives aux déchets refusés :</li>
+    <ul>
+      <li>Numéro du BSD : ${form.readableId}</li>
+      <li>Appellation du déchet : ${form.wasteDetailsName}</li>
+      <li>Code déchet : ${form.wasteDetailsCode}</li>
+      <li>Quantité refusée (estimée): ${quantityPartiallyRefused(form.wasteDetailsQuantity, form.quantityReceived)} Tonnes</li>
+      <li>Quantité acceptée: ${form.quantityReceived} Tonnes</li>
+      <li>Motif de refus : ${
+        form.wasteRefusalReason ? form.wasteRefusalReason : "Non précisé"
+      }</li>
+    </ul>
+     <li>Transporteur : ${
+       form.transporterIsExemptedOfReceipt
+         ? "Exemption relevant de l'article R.541-50 du code de l'Environnement"
+         : cleanupSpecialChars(form.transporterCompanyName)
+     }</li>
+     <li>Responsable du site : ${form.sentBy || ""}</li>
+     </ul>
+     Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
+    <br><br>
+    Comme le prévoit l'article R541-45 du code de l'environnement, l'expéditeur initial du déchet et l'inspection des installations classées sont tenus informés de ce refus.
+    <br><br>
+    <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus partiel de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
     attachment: attachment
   }),
   onboardingFirstStep: (toEmail, toName) => ({

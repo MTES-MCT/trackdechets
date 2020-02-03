@@ -64,7 +64,7 @@ async function transitionForm(
 ) {
   const form = await context.prisma.form({ id: formId });
   const formPropsFromEvent = transformEventToFormProps(eventParams);
-
+ 
   const userCompanies = await getUserCompanies(context.user.id);
   const actorSirets = userCompanies.map(c => c.siret);
 

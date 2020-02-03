@@ -1,12 +1,14 @@
 import { prisma } from "../../generated/prisma-client";
 import { createUserAccountHash } from "../mutations/createUserAccountHash";
-import { resetDatabase } from "../../../integration-tests/helper";
 
 import { server } from "../../server";
 import { createTestClient } from "apollo-server-integration-testing";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { escape } from "querystring";
 import axios from "axios";
+
+import makeClient from "../../__tests__/testClient";
+import { resetDatabase } from "../../../integration-tests/helper";
 
 // Intercept mail calls
 const mockedAxiosPost = jest.spyOn(axios, "post");
@@ -31,17 +33,7 @@ describe("Invitation removal", () => {
       company.siret
     );
 
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-
-    // Set authenticated user
-    setOptions({
-      request: {
-        user: admin
-      }
-    });
+    const { mutate } = makeClient(admin);
 
     // Call the mutation to delete the invitation
     // We pass company siret to allow permission to check requiring user is one admin of this company
@@ -77,17 +69,7 @@ describe("Invitation resend", () => {
       company.siret
     );
 
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-
-    // Set authenticated user
-    setOptions({
-      request: {
-        user: admin
-      }
-    });
+    const { mutate } = makeClient(admin);
 
     // Call the mutation to resend the invitation
 
@@ -127,17 +109,7 @@ describe("Invitation sending", () => {
     // set up an user, a company, its admin and an invitation (UserAccountHash)
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");
 
-    // instantiate test client
-    const { mutate, setOptions } = createTestClient({
-      apolloServer: server
-    });
-
-    // Set authenticated user
-    setOptions({
-      request: {
-        user: admin
-      }
-    });
+    const { mutate } = makeClient(admin);
 
     // Call the mutation to send an invitation
     const invitedUserEmail = "newuser@example.test";
