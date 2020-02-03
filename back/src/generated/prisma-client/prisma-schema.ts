@@ -949,7 +949,6 @@ type Form {
   processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
   nextDestinationCompanyName: String
   nextDestinationCompanySiret: String
   nextDestinationCompanyAddress: String
@@ -1032,7 +1031,6 @@ input FormCreateInput {
   processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
   nextDestinationCompanyName: String
   nextDestinationCompanySiret: String
   nextDestinationCompanyAddress: String
@@ -1147,8 +1145,6 @@ enum FormOrderByInput {
   noTraceability_DESC
   nextDestinationProcessingOperation_ASC
   nextDestinationProcessingOperation_DESC
-  nextDestinationDetails_ASC
-  nextDestinationDetails_DESC
   nextDestinationCompanyName_ASC
   nextDestinationCompanyName_DESC
   nextDestinationCompanySiret_ASC
@@ -1276,7 +1272,6 @@ type FormPreviousValues {
   processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
   nextDestinationCompanyName: String
   nextDestinationCompanySiret: String
   nextDestinationCompanyAddress: String
@@ -1551,20 +1546,6 @@ input FormScalarWhereInput {
   nextDestinationProcessingOperation_not_starts_with: String
   nextDestinationProcessingOperation_ends_with: String
   nextDestinationProcessingOperation_not_ends_with: String
-  nextDestinationDetails: String
-  nextDestinationDetails_not: String
-  nextDestinationDetails_in: [String!]
-  nextDestinationDetails_not_in: [String!]
-  nextDestinationDetails_lt: String
-  nextDestinationDetails_lte: String
-  nextDestinationDetails_gt: String
-  nextDestinationDetails_gte: String
-  nextDestinationDetails_contains: String
-  nextDestinationDetails_not_contains: String
-  nextDestinationDetails_starts_with: String
-  nextDestinationDetails_not_starts_with: String
-  nextDestinationDetails_ends_with: String
-  nextDestinationDetails_not_ends_with: String
   nextDestinationCompanyName: String
   nextDestinationCompanyName_not: String
   nextDestinationCompanyName_in: [String!]
@@ -2243,7 +2224,6 @@ input FormUpdateDataInput {
   processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
   nextDestinationCompanyName: String
   nextDestinationCompanySiret: String
   nextDestinationCompanyAddress: String
@@ -2319,7 +2299,6 @@ input FormUpdateInput {
   processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
   nextDestinationCompanyName: String
   nextDestinationCompanySiret: String
   nextDestinationCompanyAddress: String
@@ -2394,7 +2373,6 @@ input FormUpdateManyDataInput {
   processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
   nextDestinationCompanyName: String
   nextDestinationCompanySiret: String
   nextDestinationCompanyAddress: String
@@ -2480,7 +2458,6 @@ input FormUpdateManyMutationInput {
   processingOperationDescription: String
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
   nextDestinationCompanyName: String
   nextDestinationCompanySiret: String
   nextDestinationCompanyAddress: String
@@ -2784,20 +2761,6 @@ input FormWhereInput {
   nextDestinationProcessingOperation_not_starts_with: String
   nextDestinationProcessingOperation_ends_with: String
   nextDestinationProcessingOperation_not_ends_with: String
-  nextDestinationDetails: String
-  nextDestinationDetails_not: String
-  nextDestinationDetails_in: [String!]
-  nextDestinationDetails_not_in: [String!]
-  nextDestinationDetails_lt: String
-  nextDestinationDetails_lte: String
-  nextDestinationDetails_gt: String
-  nextDestinationDetails_gte: String
-  nextDestinationDetails_contains: String
-  nextDestinationDetails_not_contains: String
-  nextDestinationDetails_starts_with: String
-  nextDestinationDetails_not_starts_with: String
-  nextDestinationDetails_ends_with: String
-  nextDestinationDetails_not_ends_with: String
   nextDestinationCompanyName: String
   nextDestinationCompanyName_not: String
   nextDestinationCompanyName_in: [String!]
