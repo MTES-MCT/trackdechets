@@ -100,7 +100,17 @@ const fieldSettings = {
   processedAt: { x: 318, y: 692 },
 
   nextDestinationProcessingOperation: { x: 154, y: 776.5 },
-  nextDestinationDetails: { x: 88, y: 788 }
+  nextDestinationCompanySiret: { x: 88, y: 788 },
+  nextDestinationCompanyName: { x: 69, y: 798, maxLength: 50 },
+  nextDestinationCompanyAddress: {
+    x: 79,
+    y: 808,
+    lineBreakAt: 55,
+    maxLength: 110
+  },
+  nextDestinationCompanyContact: { x: 380, y: 787 },
+  nextDestinationCompanyPhone: { x: 318, y: 798 },
+  nextDestinationCompanyMail: { x: 318, y: 808 }
 };
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
