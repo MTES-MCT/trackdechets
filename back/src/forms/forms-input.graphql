@@ -34,9 +34,13 @@ input ProcessedFormInput {
   processingOperationDescription: String
   processedBy: String!
   processedAt: DateTime!
-  nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
+  nextDestination: NextDestinationInput
   noTraceability: Boolean
+}
+
+input NextDestinationInput {
+  processingOperation: String
+  company: CompanyInput
 }
 
 input FormInput {

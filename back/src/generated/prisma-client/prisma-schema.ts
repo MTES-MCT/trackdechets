@@ -950,6 +950,12 @@ type Form {
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -1027,6 +1033,12 @@ input FormCreateInput {
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -1137,6 +1149,18 @@ enum FormOrderByInput {
   nextDestinationProcessingOperation_DESC
   nextDestinationDetails_ASC
   nextDestinationDetails_DESC
+  nextDestinationCompanyName_ASC
+  nextDestinationCompanyName_DESC
+  nextDestinationCompanySiret_ASC
+  nextDestinationCompanySiret_DESC
+  nextDestinationCompanyAddress_ASC
+  nextDestinationCompanyAddress_DESC
+  nextDestinationCompanyContact_ASC
+  nextDestinationCompanyContact_DESC
+  nextDestinationCompanyPhone_ASC
+  nextDestinationCompanyPhone_DESC
+  nextDestinationCompanyMail_ASC
+  nextDestinationCompanyMail_DESC
   emitterType_ASC
   emitterType_DESC
   emitterPickupSite_ASC
@@ -1253,6 +1277,12 @@ type FormPreviousValues {
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -1535,6 +1565,90 @@ input FormScalarWhereInput {
   nextDestinationDetails_not_starts_with: String
   nextDestinationDetails_ends_with: String
   nextDestinationDetails_not_ends_with: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanyName_not: String
+  nextDestinationCompanyName_in: [String!]
+  nextDestinationCompanyName_not_in: [String!]
+  nextDestinationCompanyName_lt: String
+  nextDestinationCompanyName_lte: String
+  nextDestinationCompanyName_gt: String
+  nextDestinationCompanyName_gte: String
+  nextDestinationCompanyName_contains: String
+  nextDestinationCompanyName_not_contains: String
+  nextDestinationCompanyName_starts_with: String
+  nextDestinationCompanyName_not_starts_with: String
+  nextDestinationCompanyName_ends_with: String
+  nextDestinationCompanyName_not_ends_with: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanySiret_not: String
+  nextDestinationCompanySiret_in: [String!]
+  nextDestinationCompanySiret_not_in: [String!]
+  nextDestinationCompanySiret_lt: String
+  nextDestinationCompanySiret_lte: String
+  nextDestinationCompanySiret_gt: String
+  nextDestinationCompanySiret_gte: String
+  nextDestinationCompanySiret_contains: String
+  nextDestinationCompanySiret_not_contains: String
+  nextDestinationCompanySiret_starts_with: String
+  nextDestinationCompanySiret_not_starts_with: String
+  nextDestinationCompanySiret_ends_with: String
+  nextDestinationCompanySiret_not_ends_with: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyAddress_not: String
+  nextDestinationCompanyAddress_in: [String!]
+  nextDestinationCompanyAddress_not_in: [String!]
+  nextDestinationCompanyAddress_lt: String
+  nextDestinationCompanyAddress_lte: String
+  nextDestinationCompanyAddress_gt: String
+  nextDestinationCompanyAddress_gte: String
+  nextDestinationCompanyAddress_contains: String
+  nextDestinationCompanyAddress_not_contains: String
+  nextDestinationCompanyAddress_starts_with: String
+  nextDestinationCompanyAddress_not_starts_with: String
+  nextDestinationCompanyAddress_ends_with: String
+  nextDestinationCompanyAddress_not_ends_with: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyContact_not: String
+  nextDestinationCompanyContact_in: [String!]
+  nextDestinationCompanyContact_not_in: [String!]
+  nextDestinationCompanyContact_lt: String
+  nextDestinationCompanyContact_lte: String
+  nextDestinationCompanyContact_gt: String
+  nextDestinationCompanyContact_gte: String
+  nextDestinationCompanyContact_contains: String
+  nextDestinationCompanyContact_not_contains: String
+  nextDestinationCompanyContact_starts_with: String
+  nextDestinationCompanyContact_not_starts_with: String
+  nextDestinationCompanyContact_ends_with: String
+  nextDestinationCompanyContact_not_ends_with: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyPhone_not: String
+  nextDestinationCompanyPhone_in: [String!]
+  nextDestinationCompanyPhone_not_in: [String!]
+  nextDestinationCompanyPhone_lt: String
+  nextDestinationCompanyPhone_lte: String
+  nextDestinationCompanyPhone_gt: String
+  nextDestinationCompanyPhone_gte: String
+  nextDestinationCompanyPhone_contains: String
+  nextDestinationCompanyPhone_not_contains: String
+  nextDestinationCompanyPhone_starts_with: String
+  nextDestinationCompanyPhone_not_starts_with: String
+  nextDestinationCompanyPhone_ends_with: String
+  nextDestinationCompanyPhone_not_ends_with: String
+  nextDestinationCompanyMail: String
+  nextDestinationCompanyMail_not: String
+  nextDestinationCompanyMail_in: [String!]
+  nextDestinationCompanyMail_not_in: [String!]
+  nextDestinationCompanyMail_lt: String
+  nextDestinationCompanyMail_lte: String
+  nextDestinationCompanyMail_gt: String
+  nextDestinationCompanyMail_gte: String
+  nextDestinationCompanyMail_contains: String
+  nextDestinationCompanyMail_not_contains: String
+  nextDestinationCompanyMail_starts_with: String
+  nextDestinationCompanyMail_not_starts_with: String
+  nextDestinationCompanyMail_ends_with: String
+  nextDestinationCompanyMail_not_ends_with: String
   emitterType: EmitterType
   emitterType_not: EmitterType
   emitterType_in: [EmitterType!]
@@ -2130,6 +2244,12 @@ input FormUpdateDataInput {
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -2200,6 +2320,12 @@ input FormUpdateInput {
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -2269,6 +2395,12 @@ input FormUpdateManyDataInput {
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -2349,6 +2481,12 @@ input FormUpdateManyMutationInput {
   noTraceability: Boolean
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
   emitterType: EmitterType
   emitterPickupSite: String
   emitterCompanyName: String
@@ -2660,6 +2798,90 @@ input FormWhereInput {
   nextDestinationDetails_not_starts_with: String
   nextDestinationDetails_ends_with: String
   nextDestinationDetails_not_ends_with: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanyName_not: String
+  nextDestinationCompanyName_in: [String!]
+  nextDestinationCompanyName_not_in: [String!]
+  nextDestinationCompanyName_lt: String
+  nextDestinationCompanyName_lte: String
+  nextDestinationCompanyName_gt: String
+  nextDestinationCompanyName_gte: String
+  nextDestinationCompanyName_contains: String
+  nextDestinationCompanyName_not_contains: String
+  nextDestinationCompanyName_starts_with: String
+  nextDestinationCompanyName_not_starts_with: String
+  nextDestinationCompanyName_ends_with: String
+  nextDestinationCompanyName_not_ends_with: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanySiret_not: String
+  nextDestinationCompanySiret_in: [String!]
+  nextDestinationCompanySiret_not_in: [String!]
+  nextDestinationCompanySiret_lt: String
+  nextDestinationCompanySiret_lte: String
+  nextDestinationCompanySiret_gt: String
+  nextDestinationCompanySiret_gte: String
+  nextDestinationCompanySiret_contains: String
+  nextDestinationCompanySiret_not_contains: String
+  nextDestinationCompanySiret_starts_with: String
+  nextDestinationCompanySiret_not_starts_with: String
+  nextDestinationCompanySiret_ends_with: String
+  nextDestinationCompanySiret_not_ends_with: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyAddress_not: String
+  nextDestinationCompanyAddress_in: [String!]
+  nextDestinationCompanyAddress_not_in: [String!]
+  nextDestinationCompanyAddress_lt: String
+  nextDestinationCompanyAddress_lte: String
+  nextDestinationCompanyAddress_gt: String
+  nextDestinationCompanyAddress_gte: String
+  nextDestinationCompanyAddress_contains: String
+  nextDestinationCompanyAddress_not_contains: String
+  nextDestinationCompanyAddress_starts_with: String
+  nextDestinationCompanyAddress_not_starts_with: String
+  nextDestinationCompanyAddress_ends_with: String
+  nextDestinationCompanyAddress_not_ends_with: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyContact_not: String
+  nextDestinationCompanyContact_in: [String!]
+  nextDestinationCompanyContact_not_in: [String!]
+  nextDestinationCompanyContact_lt: String
+  nextDestinationCompanyContact_lte: String
+  nextDestinationCompanyContact_gt: String
+  nextDestinationCompanyContact_gte: String
+  nextDestinationCompanyContact_contains: String
+  nextDestinationCompanyContact_not_contains: String
+  nextDestinationCompanyContact_starts_with: String
+  nextDestinationCompanyContact_not_starts_with: String
+  nextDestinationCompanyContact_ends_with: String
+  nextDestinationCompanyContact_not_ends_with: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyPhone_not: String
+  nextDestinationCompanyPhone_in: [String!]
+  nextDestinationCompanyPhone_not_in: [String!]
+  nextDestinationCompanyPhone_lt: String
+  nextDestinationCompanyPhone_lte: String
+  nextDestinationCompanyPhone_gt: String
+  nextDestinationCompanyPhone_gte: String
+  nextDestinationCompanyPhone_contains: String
+  nextDestinationCompanyPhone_not_contains: String
+  nextDestinationCompanyPhone_starts_with: String
+  nextDestinationCompanyPhone_not_starts_with: String
+  nextDestinationCompanyPhone_ends_with: String
+  nextDestinationCompanyPhone_not_ends_with: String
+  nextDestinationCompanyMail: String
+  nextDestinationCompanyMail_not: String
+  nextDestinationCompanyMail_in: [String!]
+  nextDestinationCompanyMail_not_in: [String!]
+  nextDestinationCompanyMail_lt: String
+  nextDestinationCompanyMail_lte: String
+  nextDestinationCompanyMail_gt: String
+  nextDestinationCompanyMail_gte: String
+  nextDestinationCompanyMail_contains: String
+  nextDestinationCompanyMail_not_contains: String
+  nextDestinationCompanyMail_starts_with: String
+  nextDestinationCompanyMail_not_starts_with: String
+  nextDestinationCompanyMail_ends_with: String
+  nextDestinationCompanyMail_not_ends_with: String
   emitterType: EmitterType
   emitterType_not: EmitterType
   emitterType_in: [EmitterType!]

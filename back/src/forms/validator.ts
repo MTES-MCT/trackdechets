@@ -17,7 +17,7 @@ setLocale({
   }
 } as LocaleObject);
 
-const companySchema = (type: string) =>
+export const companySchema = (type: string) =>
   object().shape({
     name: string().required(`${type}: Le nom de l'entreprise est obligatoire`),
     siret: string().required(

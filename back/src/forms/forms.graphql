@@ -139,8 +139,7 @@ type Form {
   processedBy: String
   processedAt: DateTime
   noTraceability: Boolean
-  nextDestinationProcessingOperation: String
-  nextDestinationDetails: String
+  nextDestination: NextDestination
 
   appendix2Forms: [Form]
 }
@@ -184,6 +183,11 @@ type Transporter {
   department: String
   validityLimit: DateTime
   numberPlate: String
+}
+
+type NextDestination {
+  processingOperation: String
+  company: FormCompany
 }
 
 enum QuantityType {
