@@ -195,6 +195,12 @@ type Form {
   # Next destination fields (frame 12)
   nextDestinationProcessingOperation: String
   nextDestinationDetails: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
 
   # Emitter fields
   emitterType: EmitterType
