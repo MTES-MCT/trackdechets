@@ -622,8 +622,6 @@ export type FormOrderByInput =
   | "noTraceability_DESC"
   | "nextDestinationProcessingOperation_ASC"
   | "nextDestinationProcessingOperation_DESC"
-  | "nextDestinationDetails_ASC"
-  | "nextDestinationDetails_DESC"
   | "nextDestinationCompanyName_ASC"
   | "nextDestinationCompanyName_DESC"
   | "nextDestinationCompanySiret_ASC"
@@ -1137,20 +1135,6 @@ export interface FormScalarWhereInput {
   nextDestinationProcessingOperation_not_starts_with?: Maybe<String>;
   nextDestinationProcessingOperation_ends_with?: Maybe<String>;
   nextDestinationProcessingOperation_not_ends_with?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
-  nextDestinationDetails_not?: Maybe<String>;
-  nextDestinationDetails_in?: Maybe<String[] | String>;
-  nextDestinationDetails_not_in?: Maybe<String[] | String>;
-  nextDestinationDetails_lt?: Maybe<String>;
-  nextDestinationDetails_lte?: Maybe<String>;
-  nextDestinationDetails_gt?: Maybe<String>;
-  nextDestinationDetails_gte?: Maybe<String>;
-  nextDestinationDetails_contains?: Maybe<String>;
-  nextDestinationDetails_not_contains?: Maybe<String>;
-  nextDestinationDetails_starts_with?: Maybe<String>;
-  nextDestinationDetails_not_starts_with?: Maybe<String>;
-  nextDestinationDetails_ends_with?: Maybe<String>;
-  nextDestinationDetails_not_ends_with?: Maybe<String>;
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanyName_not?: Maybe<String>;
   nextDestinationCompanyName_in?: Maybe<String[] | String>;
@@ -1825,7 +1809,6 @@ export interface FormUpdateDataInput {
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
   nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
@@ -2067,7 +2050,6 @@ export interface FormUpdateInput {
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
   nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
@@ -2171,7 +2153,6 @@ export interface FormCreateInput {
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
   nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
@@ -2478,20 +2459,6 @@ export interface FormWhereInput {
   nextDestinationProcessingOperation_not_starts_with?: Maybe<String>;
   nextDestinationProcessingOperation_ends_with?: Maybe<String>;
   nextDestinationProcessingOperation_not_ends_with?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
-  nextDestinationDetails_not?: Maybe<String>;
-  nextDestinationDetails_in?: Maybe<String[] | String>;
-  nextDestinationDetails_not_in?: Maybe<String[] | String>;
-  nextDestinationDetails_lt?: Maybe<String>;
-  nextDestinationDetails_lte?: Maybe<String>;
-  nextDestinationDetails_gt?: Maybe<String>;
-  nextDestinationDetails_gte?: Maybe<String>;
-  nextDestinationDetails_contains?: Maybe<String>;
-  nextDestinationDetails_not_contains?: Maybe<String>;
-  nextDestinationDetails_starts_with?: Maybe<String>;
-  nextDestinationDetails_not_starts_with?: Maybe<String>;
-  nextDestinationDetails_ends_with?: Maybe<String>;
-  nextDestinationDetails_not_ends_with?: Maybe<String>;
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanyName_not?: Maybe<String>;
   nextDestinationCompanyName_in?: Maybe<String[] | String>;
@@ -3740,7 +3707,6 @@ export interface FormUpdateManyMutationInput {
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
   nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
@@ -4350,7 +4316,6 @@ export interface FormUpdateManyDataInput {
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
   nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationDetails?: Maybe<String>;
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
@@ -5423,7 +5388,6 @@ export interface Form {
   processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
-  nextDestinationDetails?: String;
   nextDestinationCompanyName?: String;
   nextDestinationCompanySiret?: String;
   nextDestinationCompanyAddress?: String;
@@ -5501,7 +5465,6 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
   nextDestinationProcessingOperation: () => Promise<String>;
-  nextDestinationDetails: () => Promise<String>;
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
@@ -5590,7 +5553,6 @@ export interface FormSubscription
   processingOperationDescription: () => Promise<AsyncIterator<String>>;
   noTraceability: () => Promise<AsyncIterator<Boolean>>;
   nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
-  nextDestinationDetails: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyName: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanySiret: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyAddress: () => Promise<AsyncIterator<String>>;
@@ -5679,7 +5641,6 @@ export interface FormNullablePromise
   processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
   nextDestinationProcessingOperation: () => Promise<String>;
-  nextDestinationDetails: () => Promise<String>;
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
@@ -6266,7 +6227,6 @@ export interface FormPreviousValues {
   processingOperationDescription?: String;
   noTraceability?: Boolean;
   nextDestinationProcessingOperation?: String;
-  nextDestinationDetails?: String;
   nextDestinationCompanyName?: String;
   nextDestinationCompanySiret?: String;
   nextDestinationCompanyAddress?: String;
@@ -6345,7 +6305,6 @@ export interface FormPreviousValuesPromise
   processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
   nextDestinationProcessingOperation: () => Promise<String>;
-  nextDestinationDetails: () => Promise<String>;
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
@@ -6424,7 +6383,6 @@ export interface FormPreviousValuesSubscription
   processingOperationDescription: () => Promise<AsyncIterator<String>>;
   noTraceability: () => Promise<AsyncIterator<Boolean>>;
   nextDestinationProcessingOperation: () => Promise<AsyncIterator<String>>;
-  nextDestinationDetails: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyName: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanySiret: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyAddress: () => Promise<AsyncIterator<String>>;
