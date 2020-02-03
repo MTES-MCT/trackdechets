@@ -68,9 +68,17 @@ const sentryMiddleware = () =>
     },
     forwardErrors: true,
     withScope: (scope, error, context: ExpressContext) => {
+      const reqUser = !!context["user"]
+        ? context["user"]["email"]
+        : "anonymous";
+      scope.setUser({
+        email: reqUser
+      });
+
       scope.setExtra("body", context.req.body);
       scope.setExtra("origin", context.req.headers.origin);
       scope.setExtra("user-agent", context.req.headers["user-agent"]);
+      scope.setExtra("ip", context.req.headers["x-real-ip"]);
       scope.setTag("service", "api");
     }
   });
