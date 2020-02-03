@@ -4,6 +4,7 @@ import DateInput from "../../../form/custom-inputs/DateInput";
 import { SlipActionProps } from "../SlipActions";
 import { Operations } from "../../../form/processing-operation/ProcessingOperation";
 import { DateTime } from "luxon";
+import CompanySelector from "../../../form/company/CompanySelector";
 
 export default function Processed(props: SlipActionProps) {
   return (
@@ -14,8 +15,17 @@ export default function Processed(props: SlipActionProps) {
           processingOperationDescription: "",
           processedBy: "",
           processedAt: DateTime.local().toISODate(),
-          nextDestinationProcessingOperation: "",
-          nextDestinationDetails: "",
+          nextDestination: {
+            processingOperation: "",
+            company: {
+              siret: "",
+              name: "",
+              address: "",
+              contact: "",
+              mail: "",
+              phone: ""
+            }
+          },
           noTraceability: false
         }}
         onSubmit={values => props.onSubmit({ info: values })}
@@ -74,13 +84,15 @@ export default function Processed(props: SlipActionProps) {
             {["D 13", "D 14", "D 15", "R 13"].indexOf(
               values.processingOperationDone
             ) > -1 && (
-              <div>
+              <div className="form__group">
                 <h4>Destination ultérieure prévue</h4>
-                <label>
-                  Opération de traitement
+                <CompanySelector name="nextDestination.company" />
+
+                <div className="form__group">
+                  <label>Opération de traitement</label>
                   <Field
                     component="select"
-                    name="nextDestinationProcessingOperation"
+                    name="nextDestination.processingOperation"
                   >
                     <option value="">Choisissez...</option>
                     {Operations.map(o => (
@@ -90,16 +102,7 @@ export default function Processed(props: SlipActionProps) {
                       </option>
                     ))}
                   </Field>
-                </label>
-                <label>
-                  Entreprise
-                  <Field
-                    component="textarea"
-                    className="textarea-pickup-site"
-                    placeholder="Siret / Nom / Adresse..."
-                    name="nextDestinationDetails"
-                  />
-                </label>
+                </div>
               </div>
             )}
             <div className="form__group button__group">
