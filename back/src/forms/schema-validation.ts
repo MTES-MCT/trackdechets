@@ -1,5 +1,6 @@
 import { object, date, string, boolean, number, array } from "yup";
 import { companySchema } from "./validator";
+import { GROUP_CODES } from "./workflow/machine";
 
 export const receivedInfoSchema = object({
   wasteAcceptationStatus: string()
@@ -75,9 +76,12 @@ export default {
         processedAt: date().required(
           "Vous devez saisir la date de traitement."
         ),
-        nextDestination: object({
-          processingOperation: string().nullable(true),
-          company: companySchema("Destination ultérieure prévue")
+        nextDestination: object().when("processingOperationDone", {
+          is: val => GROUP_CODES.includes(val),
+          then: object({
+            processingOperation: string(),
+            company: companySchema("Destination ultérieure prévue")
+          })
         }),
         noTraceability: boolean().nullable(true)
       })

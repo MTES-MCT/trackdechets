@@ -1,3 +1,4 @@
+import { hash } from "bcrypt";
 import {
   CompanyCreatecompanyTypesInput,
   CompanyType,
@@ -7,7 +8,6 @@ import {
   prisma,
   UserRole
 } from "../generated/prisma-client";
-import { hash } from "bcrypt";
 
 /**
  * Create a user with name and email
@@ -90,7 +90,7 @@ export const userWithCompanyFactory = async role => {
 
 /**
  * Create a user and an accessToken
- * @param opt : extram parameters for user
+ * @param opt : extra parameters for user
  */
 export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
