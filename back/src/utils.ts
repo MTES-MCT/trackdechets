@@ -49,6 +49,12 @@ export function getUIBaseURL() {
   return `${UI_URL_SCHEME}://${UI_HOST}`;
 }
 
+export function getAPIBaseURL() {
+  let { API_URL_SCHEME, API_HOST } = process.env;
+  API_URL_SCHEME = API_URL_SCHEME || "http";
+  return `${API_URL_SCHEME}://${API_HOST}`;
+}
+
 /**
  * Convert a date to midnight the same day
  * @param date
