@@ -1,4 +1,5 @@
 import { prisma } from "../generated/prisma-client";
+import { getUIBaseURL } from "../utils";
 
 export const userActivationHandler = async (req, res) => {
   const { hash } = req.query;
@@ -18,5 +19,6 @@ export const userActivationHandler = async (req, res) => {
     data: { isActive: true }
   });
 
-  return res.redirect(`https://${process.env.UI_HOST}`);
+  const UI_BASE_URL = getUIBaseURL()
+  return res.redirect(UI_BASE_URL);
 };

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { redis, setInCache } from "./redis";
-import { randomNumber } from "../utils";
+import { randomNumber, getAPIBaseURL } from "../utils";
 
 type DownloadInfos = { type: string; params: any };
 type DownloadHandler = (res: Response, params: any) => void | Promise<void>;
@@ -34,11 +34,10 @@ export async function getFileDownloadToken(
   await setInCache(token, JSON.stringify({ type, params }), { EX: 10 });
   registerFileDownloader(type, downloadHandler);
 
+  const API_BASE_URL = getAPIBaseURL()
   return {
     token,
-    downloadLink: `${process.env.API_URL_SCHEME ?? "https"}://${
-      process.env.API_HOST
-    }/download?token=${token}`
+    downloadLink: `${API_BASE_URL}/download?token=${token}`
   };
 }
 
