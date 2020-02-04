@@ -21,11 +21,11 @@ export const isCompanyAdmin = and(
   isAuthenticated,
   rule()(async (_, { siret }, ctx) => {
     ensureRuleParametersArePresent(siret);
-    
-    const isCompanyAdmin = await isUserInCompanyWithRole(
+
+    const isCompanyAdmin = await isUserInCompaniesWithRoles(
       ctx.user.id,
-      siret,
-      "ADMIN",
+      [siret],
+      ["ADMIN"],
       ctx.prisma
     );
 
@@ -44,10 +44,10 @@ export const isCompanyMember = and(
   rule()(async (_, { siret }, ctx) => {
     ensureRuleParametersArePresent(siret);
 
-    const isCompanyMember = await isUserInCompanyWithRole(
+    const isCompanyMember = await isUserInCompaniesWithRoles(
       ctx.user.id,
-      siret,
-      "MEMBER",
+      [siret],
+      ["MEMBER"],
       ctx.prisma
     );
 
@@ -55,6 +55,30 @@ export const isCompanyMember = and(
       isCompanyMember ||
       new DomainError(
         `Vous ne faites pas partie de l'entreprise "${siret}".`,
+        ErrorCode.FORBIDDEN
+      )
+    );
+  })
+);
+
+export const isCompaniesUser = and(
+  isAuthenticated,
+  rule()(async (_, { sirets }, ctx) => {
+    ensureRuleParametersArePresent(sirets);
+
+    const isCompaniesUser = await isUserInCompaniesWithRoles(
+      ctx.user.id,
+      sirets,
+      ["MEMBER", "ADMIN"],
+      ctx.prisma
+    );
+
+    return (
+      isCompaniesUser ||
+      new DomainError(
+        `Vous ne faites pas partie d'au moins une des entreprises dont les SIRETS sont "${sirets.join(
+          ", "
+        )}".`,
         ErrorCode.FORBIDDEN
       )
     );
@@ -70,29 +94,35 @@ export function ensureRuleParametersArePresent(...params: any[]) {
 }
 
 /**
- * Checks if `userId` is in the company with `siret` as a `expectedRole`
+ * Checks if `userId` is in the companies with `siret` as a ons of the `expectedRoles`
  *
  * @param userId
- * @param siret
- * @param expectedRole
+ * @param sirets
+ * @param expectedRoles
  * @param prisma
  */
-async function isUserInCompanyWithRole(
+async function isUserInCompaniesWithRoles(
   userId: string,
-  siret: string,
-  expectedRole: "MEMBER" | "ADMIN",
+  sirets: string[],
+  expectedRoles: ["MEMBER" | "ADMIN"] | ["MEMBER", "ADMIN"],
   prisma: Prisma
 ) {
-  const associations = await prisma.companyAssociations({
-    where: {
-      user: {
-        id: userId
-      },
-      company: {
-        siret
-      }
-    }
-  });
+  const checks = await Promise.all(
+    sirets.map(async siret => {
+      const associations = await prisma.companyAssociations({
+        where: {
+          user: {
+            id: userId
+          },
+          company: {
+            siret
+          }
+        }
+      });
 
-  return associations.some(({ role }) => role === expectedRole);
+      return associations.some(({ role }) => expectedRoles.includes(role));
+    })
+  );
+
+  return checks.every(Boolean);
 }

@@ -9,13 +9,15 @@ import {
 import {
   isAuthenticated,
   isCompanyMember,
-  isCompanyAdmin
+  isCompanyAdmin,
+  isCompaniesUser
 } from "../common/rules";
 
 export default {
   Query: {
     form: canAccessForm,
     formPdf: canAccessForm,
+    formsRegister: isCompaniesUser,
     forms: isAuthenticated,
     stats: isAuthenticated,
     appendixForms: or(isCompanyMember, isCompanyAdmin)
