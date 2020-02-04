@@ -8,6 +8,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [Next release]
 
 * Amélioration du refus du déchet pour gérer le refus partiel et les motifs de refus éventuels
+* Modification du traitement du déchet
+  * Tous les champs du cadre 12 du BSD sont désormais renseignables
+  * Les champs `nextDestinationDetails` & `nextDestinationProcessingOperation` disparaissent
+  * Ils sont remplacés par `nextDestination`, constitué de `processingOperation` et `company`
  
 # [2020.01.4] 30/01/2020
 
