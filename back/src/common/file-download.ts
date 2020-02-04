@@ -36,7 +36,7 @@ export async function getFileDownloadToken(
 
   return {
     token,
-    downloadLink: `${process.env.URL_SCHEME ?? "https"}://${
+    downloadLink: `${process.env.API_URL_SCHEME ?? "https"}://${
       process.env.API_HOST
     }/download?token=${token}`
   };

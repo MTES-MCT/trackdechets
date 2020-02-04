@@ -174,10 +174,10 @@ app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
 
 // TODO Remove
 app.get("/pdf", (_, res) =>
-  res.send("Route dépréciée, utilisez la query GraphQL `formPdf`")
+  res.status(410).send("Route dépréciée, utilisez la query GraphQL `formPdf`")
 );
 app.get("/exports", (_, res) =>
-  res.send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
+  res.status(410).send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
 );
 
 server.applyMiddleware({
