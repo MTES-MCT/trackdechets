@@ -1,6 +1,6 @@
-import { Context } from "../types";
+import { GraphQLContext } from "../types";
 
-export async function getReadableId(context: Context) {
+export async function getReadableId(context: GraphQLContext) {
   const beginningOfYear = new Date(new Date().getFullYear(), 0, 1);
   const shortYear = beginningOfYear
     .getFullYear()

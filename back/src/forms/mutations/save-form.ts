@@ -1,4 +1,4 @@
-import { Context } from "../../types";
+import { GraphQLContext } from "../../types";
 import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getReadableId } from "../readable-id";
@@ -9,7 +9,7 @@ import {
 } from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/queries";
 
-export async function saveForm(_, { formInput }, context: Context) {
+export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const userId = context.user.id;
 
   const { id, ...formContent } = formInput;
@@ -49,7 +49,7 @@ const formSiretsGetter = (form: Partial<Form>) => [
 async function checkThatUserIsPartOftheForm(
   userId: string,
   form: Partial<Form>,
-  context: Context
+  context: GraphQLContext
 ) {
   const isEdition = form.id != null;
   const formSirets = formSiretsGetter(form);

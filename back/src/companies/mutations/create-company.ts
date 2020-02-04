@@ -1,11 +1,11 @@
 import { DomainError, ErrorCode } from "../../common/errors";
-import { Context } from "../../types";
+import { GraphQLContext } from "../../types";
 import { randomNumber } from "../../utils";
 
 export default async function createCompany(
   _,
   { companyInput },
-  context: Context
+  context: GraphQLContext
 ) {
   const trimedSiret = companyInput.siret.replace(/\s+/g, "");
 

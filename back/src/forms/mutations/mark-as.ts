@@ -1,16 +1,16 @@
 import { interpret, State } from "xstate";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
-import { Context } from "../../types";
 import { flattenObjectForDb } from "../form-converter";
+import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
 
-export async function markAsSealed(_, { id }, context: Context) {
+export async function markAsSealed(_, { id }, context: GraphQLContext) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
 }
 
-export function markAsSent(_, { id, sentInfo }, context: Context) {
+export function markAsSent(_, { id, sentInfo }, context: GraphQLContext) {
   return transitionForm(
     id,
     { eventType: "MARK_SENT", eventParams: sentInfo },
@@ -18,7 +18,11 @@ export function markAsSent(_, { id, sentInfo }, context: Context) {
   );
 }
 
-export function markAsReceived(_, { id, receivedInfo }, context: Context) {
+export function markAsReceived(
+  _,
+  { id, receivedInfo },
+  context: GraphQLContext
+) {
   return transitionForm(
     id,
     { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
@@ -26,7 +30,11 @@ export function markAsReceived(_, { id, receivedInfo }, context: Context) {
   );
 }
 
-export function markAsProcessed(_, { id, processedInfo }, context: Context) {
+export function markAsProcessed(
+  _,
+  { id, processedInfo },
+  context: GraphQLContext
+) {
   return transitionForm(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
@@ -38,7 +46,7 @@ export function markAsProcessed(_, { id, processedInfo }, context: Context) {
 export async function signedByTransporter(
   _,
   { id, signingInfo },
-  context: Context
+  context: GraphQLContext
 ) {
   const transformEventToFormParams = signingInfo => ({
     signedByTransporter: signingInfo.signedByTransporter,
@@ -61,12 +69,12 @@ export async function signedByTransporter(
 async function transitionForm(
   formId: string,
   { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
-  context: Context,
+  context: GraphQLContext,
   transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
   const formPropsFromEvent = transformEventToFormProps(eventParams);
- 
+
   const userCompanies = await getUserCompanies(context.user.id);
   const actorSirets = userCompanies.map(c => c.siret);
 
@@ -122,7 +130,7 @@ async function transitionForm(
   });
 }
 
-export function logStatusChange(formId, status, context: Context) {
+export function logStatusChange(formId, status, context: GraphQLContext) {
   return context.prisma
     .createStatusLog({
       form: { connect: { id: formId } },
