@@ -1,11 +1,10 @@
-import React, { useEffect } from "react";
-import { Formik, Field, Form, getIn } from "formik";
+import React from "react";
+import { Formik, Field, Form } from "formik";
 import { DateTime } from "luxon";
 import NumberInput from "../../../form/custom-inputs/NumberInput";
 import DateInput from "../../../form/custom-inputs/DateInput";
 import { SlipActionProps } from "../SlipActions";
 import { InlineRadioButton } from "../../../form/custom-inputs/RadioButton";
-import { receivedFormSchema } from "../../../form/schema";
 import { WasteAcceptationStatus } from "../../../Constants";
 
 const textConfig = {
