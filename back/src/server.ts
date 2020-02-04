@@ -1,6 +1,5 @@
 import { CaptureConsole } from "@sentry/integrations";
 import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
-import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import * as express from "express";
 import * as passport from "passport";
 import * as session from "express-session";
@@ -24,13 +23,15 @@ import {
 } from "./common/middlewares/schema-validation";
 import { mergePermissions, getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
+import { GraphQLContext } from "./types";
 
 const {
   SENTRY_DSN,
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
   SESSION_COOKIE_SECURE,
-  UI_HOST
+  UI_HOST,
+  NODE_ENV
 } = process.env;
 
 const UI_BASE_URL = getUIBaseURL();
@@ -63,14 +64,12 @@ const sentryMiddleware = () =>
   sentry({
     config: {
       dsn: SENTRY_DSN,
-      environment: process.env.NODE_ENV,
+      environment: NODE_ENV,
       integrations: [new CaptureConsole({ levels: ["error"] })]
     },
     forwardErrors: true,
-    withScope: (scope, error, context: ExpressContext) => {
-      const reqUser = !!context["user"]
-        ? context["user"]["email"]
-        : "anonymous";
+    withScope: (scope, error, context: GraphQLContext) => {
+      const reqUser = !!context.user ? context.user.email : "anonymous";
       scope.setUser({
         email: reqUser
       });

@@ -1,7 +1,7 @@
 import { sendMail } from "../common/mails.helper";
 import { getUserCompanies } from "../companies/queries";
 import { prisma } from "../generated/prisma-client";
-import { Context } from "../types";
+import { GraphQLContext } from "../types";
 import { userMails } from "./mails";
 import {
   changePassword,
@@ -23,7 +23,7 @@ export default {
       const userId = context.user.id;
       return changePassword(userId, oldPassword, newPassword);
     },
-    resetPassword: async (_, { email }, context: Context) => {
+    resetPassword: async (_, { email }, context: GraphQLContext) => {
       const user = await context.prisma.user({ email }).catch(_ => null);
 
       if (!user) {
@@ -47,9 +47,9 @@ export default {
       const userId = context.user.id;
       return editProfile(userId, payload);
     },
-    inviteUserToCompany: async (_, { email, siret, role }, context: Context) =>
+    inviteUserToCompany: async (_, { email, siret, role }, context: GraphQLContext) =>
       inviteUserToCompany(context.user, email, siret, role),
-    resendInvitation: async (_, { email, siret }, context: Context) =>
+    resendInvitation: async (_, { email, siret }, context: GraphQLContext) =>
       resendInvitation(context.user, email, siret),
     joinWithInvite: async (_, { inviteHash, name, password }) =>
       joinWithInvite(inviteHash, name, password),
@@ -84,7 +84,7 @@ export default {
       const userId = context.user.id;
       return context.prisma.user({ id: userId });
     },
-    apiKey: (_parent, _args, context: Context) => apiKey(context.user)
+    apiKey: (_parent, _args, context: GraphQLContext) => apiKey(context.user)
   },
   User: {
     companies: async parent => {

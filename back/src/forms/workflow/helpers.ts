@@ -1,5 +1,5 @@
 import { Form } from "../../generated/prisma-client";
-import { Context } from "../../types";
+import { GraphQLContext } from "../../types";
 import { unflattenObjectFromDb } from "../form-converter";
 import { logStatusChange } from "../mutations/mark-as";
 import { formSchema } from "../validator";
@@ -13,7 +13,7 @@ export async function validateForm(form: Form) {
 export async function validateSecurityCode(
   form: Form,
   securityCode: number,
-  requestContext: Context
+  requestContext: GraphQLContext
 ) {
   const exists = await requestContext.prisma.$exists.company({
     siret: form.emitterCompanySiret,
@@ -24,7 +24,7 @@ export async function validateSecurityCode(
 
 export async function markFormAppendixAwaitingFormsAsGrouped(
   formId: string,
-  requestContext: Context
+  requestContext: GraphQLContext
 ) {
   const appendix2Forms = await requestContext.prisma
     .form({ id: formId })
@@ -45,7 +45,7 @@ export async function markFormAppendixAwaitingFormsAsGrouped(
 
 export async function markFormAppendixGroupedsAsProcessed(
   formId: string,
-  requestContext: Context
+  requestContext: GraphQLContext
 ) {
   const appendix2Forms = await requestContext.prisma
     .form({ id: formId })

@@ -1,10 +1,10 @@
 import { getPutSignedUrl } from "../../common/s3";
-import { Context } from "../../types";
+import { GraphQLContext } from "../../types";
 
 export default async function createUploadLink(
   _,
   { fileName, fileType },
-  context: Context
+  context: GraphQLContext
 ) {
   const timestamp = new Date().getTime();
   const computedFileName = [context.user.id, timestamp, fileName].join("-");
