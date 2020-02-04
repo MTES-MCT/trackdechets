@@ -10,7 +10,7 @@ enum ExportType {
 
 export async function downloadCsvExport(res, { sirets, exportType }) {
   if (!sirets?.length || !exportType) {
-    return res.status(500).send("Paramètres invalides.");
+    return res.status(400).send("Paramètres invalides.");
   }
 
   try {
@@ -19,7 +19,7 @@ export async function downloadCsvExport(res, { sirets, exportType }) {
     res.set("Content-Type", "text/csv");
     res.status(200).send(csv);
   } catch (e) {
-    res.status(400).send(e.message);
+    res.status(500).send(e.message);
   }
 }
 
