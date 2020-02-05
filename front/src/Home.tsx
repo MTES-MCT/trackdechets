@@ -6,8 +6,11 @@ import "./Home.scss";
 import { trackEvent } from "./tracker";
 import LazyLoad from "react-lazyload";
 import Footer from "./Footer";
+import useCrisp from "./use-crisp";
 
 export default function Home({ isAuthenticated }) {
+  useCrisp();
+
   return (
     <React.Fragment>
       <div className="hero" role="banner">
@@ -92,7 +95,11 @@ export default function Home({ isAuthenticated }) {
             <h3>Editez et transmettez simplement vos bsd</h3>
             <p>
               Pour que la préparation des bordereaux ne soit plus d'une
-              complexité inutile <span role="img" aria-label="Fort">💪</span>.
+              complexité inutile{" "}
+              <span role="img" aria-label="Fort">
+                💪
+              </span>
+              .
             </p>
           </div>
           <div className="description-img">
