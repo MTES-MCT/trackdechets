@@ -52,7 +52,7 @@ export default function Dashboard() {
   const match = useRouteMatch();
   const history = useHistory();
 
-  if (loading) return <Loader />;
+  if (loading || !activeSiret) return <Loader />;
   if (error || !data) return <p>{`Erreur ! ${error?.message}`}</p>;
 
   // As long as you don't belong to a company, you can't access the dashnoard
