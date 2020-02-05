@@ -10,7 +10,7 @@ import Slips from "./Slips";
 import { getTabForms, SlipTabs } from "./slips-actions/next-step";
 import "./SlipsTabs.scss";
 
-type Props = { me: Me; siret?: string };
+type Props = { me: Me; siret: string };
 
 export default function SlipsTabs({ me, siret }: Props) {
   const { loading, error, data } = useQuery(GET_SLIPS, {
@@ -20,10 +20,10 @@ export default function SlipsTabs({ me, siret }: Props) {
   if (loading) return <Loader />;
   if (error || !data) return <p>Erreur...</p>;
 
-  const drafts = getTabForms(SlipTabs.DRAFTS, data.forms, me);
-  const toSign = getTabForms(SlipTabs.TO_SIGN, data.forms, me);
-  const status = getTabForms(SlipTabs.STATUS, data.forms, me);
-  const history = getTabForms(SlipTabs.HISTORY, data.forms, me);
+  const drafts = getTabForms(SlipTabs.DRAFTS, data.forms, siret);
+  const toSign = getTabForms(SlipTabs.TO_SIGN, data.forms, siret);
+  const status = getTabForms(SlipTabs.STATUS, data.forms, siret);
+  const history = getTabForms(SlipTabs.HISTORY, data.forms, siret);
 
   return (
     <Tabs>
@@ -37,7 +37,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       <TabPanel>
         {drafts.length ? (
           <Slips
-            me={me}
+            siret={siret}
             forms={drafts}
             hiddenFields={["status", "readableId"]}
           />
@@ -60,7 +60,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       </TabPanel>
       <TabPanel>
         {toSign.length ? (
-          <Slips me={me} forms={toSign} />
+          <Slips siret={siret} forms={toSign} />
         ) : (
           <div className="empty-tab">
             <img src="/illu/illu_sent.svg" alt="" />
@@ -76,7 +76,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       </TabPanel>
       <TabPanel>
         {status.length ? (
-          <Slips me={me} forms={status} />
+          <Slips siret={siret} forms={status} />
         ) : (
           <div className="empty-tab">
             <img src="/illu/illu_transfer.svg" alt="" />
@@ -93,7 +93,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       </TabPanel>
       <TabPanel>
         {history.length ? (
-          <Slips me={me} forms={history} />
+          <Slips siret={siret} forms={history} />
         ) : (
           <div className="empty-tab">
             <img src="/illu/illu_hello.svg" alt="" />

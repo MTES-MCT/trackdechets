@@ -1,5 +1,4 @@
 import { Form } from "../../../form/model";
-import { Me } from "../../../login/model";
 import { FormStatus } from "../../../Constants";
 
 export enum SlipTabs {
@@ -9,7 +8,11 @@ export enum SlipTabs {
   HISTORY
 }
 
-export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
+export function getTabForms(
+  tab: SlipTabs,
+  forms: Form[],
+  currentSiret: string
+) {
   switch (tab) {
     case SlipTabs.DRAFTS:
       return forms
@@ -19,7 +22,7 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
       return forms
         .filter(
           (f: Form) =>
-            !isDraftStatus(f.status) && getNextStep(f, currentUser) != null
+            !isDraftStatus(f.status) && getNextStep(f, currentSiret) != null
         )
         .sort((a: any, b: any) =>
           a.status > b.status
@@ -35,7 +38,7 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
           (f: Form) =>
             !isDraftStatus(f.status) &&
             !isHistoryStatus(f.status) &&
-            getNextStep(f, currentUser) == null
+            getNextStep(f, currentSiret) == null
         )
         .sort((a: any, b: any) =>
           a.status > b.status
@@ -54,25 +57,20 @@ export function getTabForms(tab: SlipTabs, forms: Form[], currentUser: Me) {
   }
 }
 
-export function getNextStep(form: Form, currentUser: Me) {
-  const currentUserIsEmitter =
-    currentUser.companies
-      .map(c => c.siret)
-      .indexOf(form.emitter.company.siret) > -1;
-  const currentUserIsRecipient =
-    currentUser.companies
-      .map(c => c.siret)
-      .indexOf(form.recipient.company.siret) > -1;
+export function getNextStep(form: Form, currentSiret: string) {
+  const currentUserIsEmitter = currentSiret === form.emitter.company.siret;
+  const currentUserIsRecipient = currentSiret === form.recipient.company.siret;
 
   if (form.status === FormStatus.DRAFT) return FormStatus.SEALED;
 
   if (currentUserIsEmitter) {
     if (form.status === FormStatus.SEALED) return FormStatus.SENT;
-    if (!currentUserIsRecipient) return null;
   }
 
-  if (form.status === FormStatus.SENT) return FormStatus.RECEIVED;
-  if (form.status === FormStatus.RECEIVED) return FormStatus.PROCESSED;
+  if (currentUserIsRecipient) {
+    if (form.status === FormStatus.SENT) return FormStatus.RECEIVED;
+    if (form.status === FormStatus.RECEIVED) return FormStatus.PROCESSED;
+  }
   return null;
 }
 
