@@ -210,7 +210,7 @@ export default function CompanySelector(props) {
         ))}
       </ul>
 
-      <RedErrorMessage name={field.name} />
+      <RedErrorMessage name={`${field.name}.siret`} />
 
       <div className="form__group">
         <label>
