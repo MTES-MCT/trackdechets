@@ -1,5 +1,5 @@
+import { useMutation } from "@apollo/react-hooks";
 import React, { useState } from "react";
-import { Mutation } from "@apollo/react-components";
 import {
   FaCheck,
   FaCog,
@@ -9,7 +9,6 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Form } from "../../form/model";
-import { Me } from "../../login/model";
 import "./SlipActions.scss";
 import Delete from "./slips-actions/Delete";
 import DownloadPdf from "./slips-actions/DownloadPdf";
@@ -29,75 +28,74 @@ export type SlipActionProps = {
 
 interface IProps {
   form: Form;
-  currentUser: Me;
+  siret: string;
 }
-export default function SlipActions({ form, currentUser }: IProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const nextStep = getNextStep(form, currentUser);
-
-  const ButtonComponent = nextStep ? buttons[nextStep].component : null;
+export default function SlipActions({ form, siret }: IProps) {
+  const nextStep = getNextStep(form, siret);
 
   return (
     <div className="SlipActions">
       {form.status === "DRAFT" ? (
-        <React.Fragment>
+        <>
           <Link to={`/form/${form.id}`} className="icon" title="Editer">
             <FaEdit />
           </Link>
           <Delete formId={form.id} />
-        </React.Fragment>
+        </>
       ) : (
         <DownloadPdf formId={form.id} />
       )}
       <Duplicate formId={form.id} />
-      {nextStep && (
-        <Mutation
-          mutation={mutations[nextStep]}
-          onCompleted={() => setIsOpen(false)}
-        >
-          {(mark, { error }) => {
-            return (
-              <React.Fragment>
-                <button
-                  className="icon"
-                  onClick={() => setIsOpen(true)}
-                  title={buttons[nextStep].title}
-                >
-                  {buttons[nextStep].icon({})}
-                </button>
-                <div
-                  className="modal__backdrop"
-                  id="modal"
-                  style={{ display: isOpen ? "flex" : "none" }}
-                >
-                  <div className="modal">
-                    <h2>{buttons[nextStep].title}</h2>
-                    {ButtonComponent && (
-                      <ButtonComponent
-                        onCancel={() => setIsOpen(false)}
-                        onSubmit={vars => {
-                          return mark({ variables: { id: form.id, ...vars } });
-                        }}
-                        form={form}
-                      />
-                    )}
-
-                    {error && (
-                      <div
-                        className="notification error action-error"
-                        dangerouslySetInnerHTML={{
-                          __html: error.graphQLErrors[0].message
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-              </React.Fragment>
-            );
-          }}
-        </Mutation>
-      )}
+      {nextStep && <DynamicActions form={form} nextStep={nextStep} />}
     </div>
+  );
+}
+
+function DynamicActions({ form, nextStep }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [mark, { error }] = useMutation(mutations[nextStep], {
+    onCompleted: () => setIsOpen(false)
+  });
+
+  const ButtonComponent = nextStep ? buttons[nextStep].component : null;
+
+  return (
+    <>
+      <button
+        className="icon"
+        onClick={() => setIsOpen(true)}
+        title={buttons[nextStep].title}
+      >
+        {buttons[nextStep].icon({})}
+      </button>
+      <div
+        className="modal__backdrop"
+        id="modal"
+        style={{ display: isOpen ? "flex" : "none" }}
+      >
+        <div className="modal">
+          <h2>{buttons[nextStep].title}</h2>
+          {ButtonComponent && (
+            <ButtonComponent
+              onCancel={() => setIsOpen(false)}
+              onSubmit={vars => {
+                return mark({ variables: { id: form.id, ...vars } });
+              }}
+              form={form}
+            />
+          )}
+
+          {error && (
+            <div
+              className="notification error action-error"
+              dangerouslySetInnerHTML={{
+                __html: error.graphQLErrors[0].message
+              }}
+            />
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
