@@ -76,6 +76,7 @@ services:
       VIRTUAL_HOST: $UI_HOST
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+      REACT_APP_SENTRY_DSN: $SENTRY_DSN
 
   td-insee:
     image: td-insee
