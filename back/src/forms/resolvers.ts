@@ -13,11 +13,53 @@ import {
   markAsSent,
   signedByTransporter
 } from "./mutations/mark-as";
+<<<<<<< HEAD
 import { saveForm } from "./mutations/save-form";
+=======
+import { prisma, StatusLogConnection } from "../generated/prisma-client";
+import { saveForm } from "./mutations/save-form";
+import { getReadableId } from "./readable-id";
+import { getUserCompanies } from "../companies/queries";
+
+import { DomainError, ErrorCode } from "../common/errors";
+>>>>>>> Add new query to retrieve form lifecycle data
 import { formPdf } from "./queries/form-pdf";
 import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
 import { getReadableId } from "./readable-id";
+
+// formLifeCycle fragment
+const statusLogFragment = `
+fragment StatusLogPaginated on StatusLogConnection {
+  aggregate {
+    count
+  }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        id
+        created
+        status
+        updatedFields
+        form {
+          id
+          readableId
+        }
+        user {
+          id
+          email
+        }
+      }
+    }
+  }
+`;
+
+const PAGINATE_BY = 100;
 
 export default {
   Form: {
@@ -35,7 +77,105 @@ export default {
       const dbForm = await context.prisma.form({ id });
       return unflattenObjectFromDb(dbForm);
     },
-    forms,
+ 
+
+    formLifeCycle: async (
+      _,
+      { siret, createdAfter, createdBefore, cursorAfter, cursorBefore, formId },
+      context: Context
+    ) => {
+      const userId = context.user.id;
+      const userCompanies = await getUserCompanies(userId);
+      // User must be associated with a company
+      if (!userCompanies.length) {
+        throw new Error(
+          "Vous n'êtes pas autorisé à consulter le cycle de vie des bordereau."
+        );
+      }
+      // If user is associated with several companies, siret is mandatory
+      if (userCompanies.length > 1 && !siret) {
+        throw new Error(
+          "Vous devez préciser pour quel siret vous souhaitez consulter"
+        );
+      }
+      // Select user company matching siret or get the first
+      const selectedCompany =
+        userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
+
+      const formsFilter = {
+        OR: [
+          { owner: { id: userId } },
+          { recipientCompanySiret: selectedCompany.siret },
+          { emitterCompanySiret: selectedCompany.siret },
+          {
+            transporterCompanySiret: selectedCompany.siret,
+            status: "SEALED"
+          }
+        ]
+      };
+
+      const statusLogsCx = await context.prisma
+        .statusLogsConnection({
+          orderBy: "created_DESC",
+          first: PAGINATE_BY,
+          after: cursorAfter,
+          before: cursorBefore,
+          where: {
+            created_not: null,
+            created_gte: createdAfter,
+            created_lte: createdBefore,
+            form: { ...formsFilter, isDeleted: false, id: formId }
+          }
+        })
+        .$fragment<
+          StatusLogConnection & {
+            aggregate: { count: number };
+          }
+        >(statusLogFragment);
+
+      return {
+        statusLogs: statusLogsCx.edges.map(el => el.node),
+        ...statusLogsCx.pageInfo,
+        count: statusLogsCx.aggregate.count
+      };
+    },
+
+    forms: async (_, { siret, type }, context: GraphQLContext) => {
+      const userId = context.user.id;
+      const userCompanies = await getUserCompanies(userId);
+
+      if (!userCompanies.length) {
+        throw new Error("Vous n'êtes pas autorisé à consulter les bordereaux.");
+      }
+
+      // Find on userCompanies to make sure that the siret belongs to the current user
+      const selectedCompany =
+        userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
+
+      const formsFilter = {
+        ACTOR: {
+          OR: [
+            { owner: { id: userId } },
+            { recipientCompanySiret: selectedCompany.siret },
+            { emitterCompanySiret: selectedCompany.siret }
+          ]
+        },
+        TRANSPORTER: {
+          transporterCompanySiret: selectedCompany.siret,
+          status: "SEALED"
+        }
+      };
+
+      const forms = await context.prisma.forms({
+        where: {
+          ...formsFilter[type],
+          isDeleted: false
+        }
+      });
+
+      return forms.map(f => unflattenObjectFromDb(f));
+    },
+ 
     stats: async (parent, args, context: GraphQLContext) => {
       const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
