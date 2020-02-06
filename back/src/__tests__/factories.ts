@@ -179,3 +179,20 @@ export const formFactory = async ({ ownerId, opt = {} }) => {
     owner: { connect: { id: ownerId } }
   });
 };
+
+export const statusLogFactory = async ({
+  status,
+  userId,
+  formId,
+  updatedFields = {},
+  opt = {}
+}) => {
+  return prisma.createStatusLog({
+    form: { connect: { id: formId } },
+    user: { connect: { id: userId } },
+    status,
+    created: new Date(),
+    updatedFields: updatedFields,
+    ...opt
+  });
+};
