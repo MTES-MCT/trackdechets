@@ -72,6 +72,7 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
+
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
   const userCompanies = await getUserCompanies(context.user.id);
@@ -114,7 +115,13 @@ async function transitionForm(
       // If we reached one of those, we konow the transition is over and we can safely update the form and return
       if (state.done || state.context.isStableState) {
         const newStatus = state.value;
-        await logStatusChange(formId, newStatus, context);
+        await logStatusChange(
+          formId,
+          newStatus,
+          context,
+          eventType,
+          eventParams
+        );
 
         const updatedForm = context.prisma.updateForm({
           where: { id: formId },
@@ -128,13 +135,44 @@ async function transitionForm(
     formService.send({ type: eventType, ...eventParams });
   });
 }
+const fieldsToLog = {
+  MARK_SEALED: [],
+  MARK_SENT: ["sentBy", "sentAt"],
+  MARK_RECEIVED: ["receivedBy", "receivedAt", "quantityReceived"],
+  MARK_PROCESSED: [
+    "processedBy",
+    "processedAt",
+    "processingOperationDone",
+    "processingOperationDescription",
+    "noTraceability",
+    "nextDestinationProcessingOperation",
+    "nextDestinationDetails"
+  ]
+};
 
-export function logStatusChange(formId, status, context: GraphQLContext) {
+const getSubset = fields => o =>
+  fields.reduce((acc, curr) => ({ ...acc, [curr]: o[curr] }), {});
+
+const getDiff = (eventType, params) => {
+  let fields = fieldsToLog[eventType];
+  return getSubset(fields)(params);
+};
+export function logStatusChange(
+  formId,
+  status,
+  context: GraphQLContext,
+  eventType: string,
+  eventParams: any
+) {
+  const diff = getDiff(eventType, eventParams);
+
   return context.prisma
     .createStatusLog({
       form: { connect: { id: formId } },
       user: { connect: { id: context.user.id } },
-      status
+      status,
+      created: new Date(),
+      updatedFields: diff
     })
     .catch(err => {
       console.error(
