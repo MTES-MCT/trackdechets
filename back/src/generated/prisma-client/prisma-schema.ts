@@ -4183,6 +4183,8 @@ type StatusLog {
   user: User!
   form: Form!
   status: Status!
+  created: DateTime
+  updatedFields: Json
 }
 
 type StatusLogConnection {
@@ -4196,6 +4198,8 @@ input StatusLogCreateInput {
   user: UserCreateOneInput!
   form: FormCreateOneInput!
   status: Status!
+  created: DateTime
+  updatedFields: Json
 }
 
 type StatusLogEdge {
@@ -4208,11 +4212,17 @@ enum StatusLogOrderByInput {
   id_DESC
   status_ASC
   status_DESC
+  created_ASC
+  created_DESC
+  updatedFields_ASC
+  updatedFields_DESC
 }
 
 type StatusLogPreviousValues {
   id: ID!
   status: Status!
+  created: DateTime
+  updatedFields: Json
 }
 
 type StatusLogSubscriptionPayload {
@@ -4237,10 +4247,14 @@ input StatusLogUpdateInput {
   user: UserUpdateOneRequiredInput
   form: FormUpdateOneRequiredInput
   status: Status
+  created: DateTime
+  updatedFields: Json
 }
 
 input StatusLogUpdateManyMutationInput {
   status: Status
+  created: DateTime
+  updatedFields: Json
 }
 
 input StatusLogWhereInput {
@@ -4264,6 +4278,14 @@ input StatusLogWhereInput {
   status_not: Status
   status_in: [Status!]
   status_not_in: [Status!]
+  created: DateTime
+  created_not: DateTime
+  created_in: [DateTime!]
+  created_not_in: [DateTime!]
+  created_lt: DateTime
+  created_lte: DateTime
+  created_gt: DateTime
+  created_gte: DateTime
   AND: [StatusLogWhereInput!]
   OR: [StatusLogWhereInput!]
   NOT: [StatusLogWhereInput!]
