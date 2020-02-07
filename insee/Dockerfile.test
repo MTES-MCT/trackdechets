@@ -1,0 +1,6 @@
+# build stage
+FROM golang:1.11 AS build-env
+WORKDIR /go/src/app
+ADD ./src .
+RUN go get
+CMD ["go", "test"]
