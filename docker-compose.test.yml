@@ -4,25 +4,20 @@ services:
     restart: "no"
     build:
       context: ./back
-      dockerfile: Dockerfile
-    command: npm t
-    env_file:
-      - .env
+      dockerfile: Dockerfile.test
+    environment:
+      JWT_SECRET: "xxx"
 
   td-ui:
     restart: "no"
-    image: node:10.14-alpine
-    working_dir: /usr/src/front
+    build:
+      context: ./front
+      dockerfile: Dockerfile.test
     environment:
       - CI=true
-    command: sh -c "npm i --silent && npm t"
-    volumes:
-      - ./front/:/usr/src/front
 
   td-insee:
     restart: "no"
-    image: golang:stretch
-    working_dir: /go/src/app/src
-    command: sh -c "go get && go test -failfast"
-    volumes:
-      - ./insee:/go/src/app
+    build:
+      context: ./insee
+      dockerfile: Dockerfile.test
