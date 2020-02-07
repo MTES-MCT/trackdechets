@@ -7,46 +7,35 @@ executors:
     working_directory: ~/project/trackdechets
 
 jobs:
-  check-docker:
-    executor: node
-    steps:
-      - run: |
-          if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
-            echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
-            exit 1
-          fi
-
-  build-service:
-    description: "Build and push <service-name> (located in <folder-name>) to the Docker repository"
+  build-and-push:
+    description: "Build all images, pushes them to the Docker repository if branch is master or dev"
     parameters:
-      service-name:
+      extra-cfg:
         type: string
-      folder-name:
-        type: string
-      run-tests:
-        type: boolean
-        default: false
-      run-cmd:
-        type: string
-        default: npm t
-    executor: node
+        default: ""
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Run tests
           command: |
-            cd ./<< parameters.folder-name >>
-            <<# parameters.run-tests >> << parameters.run-cmd >> <</ parameters.run-tests >>
-      - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 ./<< parameters.folder-name >>
-          docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-          docker push betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 betagouv/trackdechets-<< parameters.service-name >>:latest
-            docker push betagouv/trackdechets-<< parameters.service-name >>:latest
-          fi
+            for container in $(docker-compose -f docker-compose.test.yml ps --services | tr '\r\n' '\n');
+            do
+              docker-compose -f docker-compose.test.yml run --rm $container
+              code=$?
+              if [[ $code != "0" ]]; then
+                echo "Tests failed for ${container}, exit code ${code}"
+                exit 1
+              fi
+            done
+      - run:
+          name: "Build and push images"
+          command: |
+            docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> build
+            if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "dev" ]; then
+              docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+              docker-compose -f << parameters.compose-name >> -f docker-compose.build.yml push
+            fi
 
   deploy:
     machine:
@@ -68,19 +57,6 @@ jobs:
             ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
             docker-compose pull
             docker-compose up -d
-            docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
-
-  deploy-validation:
-    machine:
-      enabled: true
-    steps:
-      - run:
-          name: Deploy to validation over SSH
-          command: |
-            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/
-            git pull
-            docker-compose -f docker-compose.val.yml build
-            docker-compose -f docker-compose.val.yml up -d
             docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
 
   integration-tests:
@@ -109,93 +85,39 @@ jobs:
 workflows:
   build-and-deploy:
     jobs:
-      - check-docker:
+      - build-and-push:
+          name: build-and-push-prod
           filters:
             branches:
               only: master
-      - build-service:
-          name: build-postgres
-          service-name: postgres
-          folder-name: postgres
-          requires:
-            - check-docker
-      - build-service:
-          name: build-ui
-          service-name: ui
-          folder-name: front
-          requires:
-            - check-docker
-      - build-service:
-          name: build-api
-          service-name: api
-          folder-name: back
-          run-tests: true
-          requires:
-            - check-docker
-      - build-service:
-          name: build-insee
-          service-name: insee
-          folder-name: insee
-          run-tests: true
-          run-cmd: go test
-          requires:
-            - check-docker
-      - build-service:
-          name: build-pdf
-          service-name: pdf
-          folder-name: pdf
-          requires:
-            - check-docker
-      - build-service:
-          name: build-mail
-          service-name: mail
-          folder-name: mail
-          requires:
-            - check-docker
-      - build-service:
-          name: build-doc
-          service-name: doc
-          folder-name: documentation
-          requires:
-            - check-docker
-      - build-service:
-          name: build-etl
-          service-name: etl
-          folder-name: etl
-          requires:
-            - check-docker
+      - build-and-push:
+          name: build-and-push-staging
+          extra-cfg: "-f docker-compose.val.yml"
+          filters:
+            branches:
+              only:
+                - dev
+                - mod/ci-tests-and-staging-ref
       - deploy:
           name: deploy-prod
           requires:
-            - build-postgres
-            - build-api
-            - build-ui
-            - build-insee
-            - build-pdf
-            - build-mail
-            - build-doc
-            - build-etl
+            - build-and-push-prod
           filters:
             branches:
               only: master
       - deploy:
-          name: deploy-validation
+          name: deploy-sandbox
           host: SSH_HOST_ST
           requires:
-            - build-postgres
-            - build-api
-            - build-ui
-            - build-insee
-            - build-pdf
-            - build-mail
-            - build-etl
+            - build-and-push-prod
           filters:
             branches:
               only: master
-
-  deploy-validation:
-    jobs:
-      - deploy-validation:
+      - deploy:
+          name: deploy-staging
+          host: SSH_HOST_BU
+          requires:
+            - build-and-push-staging
           filters:
             branches:
               only: dev
