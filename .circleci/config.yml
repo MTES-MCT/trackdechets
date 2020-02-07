@@ -9,6 +9,7 @@ executors:
 jobs:
   build-and-push:
     description: "Build all images, pushes them to the Docker repository if branch is master or dev"
+    executor: node
     parameters:
       extra-cfg:
         type: string
@@ -16,6 +17,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - run: |
+          touch .env
       - run:
           name: Run tests
           command: |
@@ -34,7 +37,7 @@ jobs:
             docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> build
             if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "dev" ]; then
               docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-              docker-compose -f << parameters.compose-name >> -f docker-compose.build.yml push
+              docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> push
             fi
 
   deploy:
@@ -48,12 +51,18 @@ jobs:
       host:
         type: env_var_name
         default: SSH_HOST
+      isValidation:
+        type: boolean
+        default: false
     steps:
       - checkout
       - run:
           name: Deploy Over SSH
           command: |
             scp docker-compose.yml ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/
+            <<# parameters.isValidation >>
+            scp docker-compose.val.yml ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/docker-compose.override.yml
+            <</ parameters.isValidation >>
             ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
             docker-compose pull
             docker-compose up -d
@@ -95,9 +104,7 @@ workflows:
           extra-cfg: "-f docker-compose.val.yml"
           filters:
             branches:
-              only:
-                - dev
-                - mod/ci-tests-and-staging-ref
+              only: dev
       - deploy:
           name: deploy-prod
           requires:
@@ -116,6 +123,7 @@ workflows:
       - deploy:
           name: deploy-staging
           host: SSH_HOST_BU
+          isValidation: true
           requires:
             - build-and-push-staging
           filters:
