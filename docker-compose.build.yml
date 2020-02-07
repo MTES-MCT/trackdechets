@@ -1,0 +1,44 @@
+version: "3"
+services:
+
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+
+  td-api:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+
+  td-ui:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      args:
+        build_env: recette
+
+  td-insee:
+    build:
+      context: ./insee
+      dockerfile: Dockerfile
+
+  td-pdf:
+    build:
+      context: ./pdf
+      dockerfile: Dockerfile
+
+  td-mail:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+
+  td-doc:
+    build:
+      context: ./documentation
+      dockerfile: Dockerfile
+
+  td-etl:
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
