@@ -1,6 +1,5 @@
 import { CaptureConsole } from "@sentry/integrations";
 import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
-import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import * as express from "express";
 import * as passport from "passport";
 import * as session from "express-session";
@@ -24,13 +23,15 @@ import {
 } from "./common/middlewares/schema-validation";
 import { mergePermissions, getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
+import { GraphQLContext } from "./types";
 
 const {
   SENTRY_DSN,
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
   SESSION_COOKIE_SECURE,
-  UI_HOST
+  UI_HOST,
+  NODE_ENV
 } = process.env;
 
 const UI_BASE_URL = getUIBaseURL();
@@ -60,17 +61,23 @@ const schemaValidationMiddleware = schemaValidation(
  * Capture console.error statements
  */
 const sentryMiddleware = () =>
-  sentry({
+  sentry<GraphQLContext>({
     config: {
       dsn: SENTRY_DSN,
-      environment: process.env.NODE_ENV,
+      environment: NODE_ENV,
       integrations: [new CaptureConsole({ levels: ["error"] })]
     },
     forwardErrors: true,
-    withScope: (scope, error, context: ExpressContext) => {
+    withScope: (scope, error, context) => {
+      const reqUser = !!context.user ? context.user.email : "anonymous";
+      scope.setUser({
+        email: reqUser
+      });
+
       scope.setExtra("body", context.req.body);
       scope.setExtra("origin", context.req.headers.origin);
       scope.setExtra("user-agent", context.req.headers["user-agent"]);
+      scope.setExtra("ip", context.req.headers["x-real-ip"]);
       scope.setTag("service", "api");
     }
   });
@@ -177,7 +184,9 @@ app.get("/pdf", (_, res) =>
   res.status(410).send("Route dépréciée, utilisez la query GraphQL `formPdf`")
 );
 app.get("/exports", (_, res) =>
-  res.status(410).send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
+  res
+    .status(410)
+    .send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
 );
 
 server.applyMiddleware({

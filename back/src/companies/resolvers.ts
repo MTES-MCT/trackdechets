@@ -1,4 +1,4 @@
-import { Context } from "../types";
+import { GraphQLContext } from "../types";
 import { prisma } from "../generated/prisma-client";
 import { getCachedCompanySireneInfo, searchCompanies } from "./insee";
 import {
@@ -30,7 +30,7 @@ export default {
     users: parent => {
       return getCompanyUsers(parent.siret);
     },
-    userRole: (parent, _, context: Context) => {
+    userRole: (parent, _, context: GraphQLContext) => {
       const userId = context.user.id;
       return getUserRole(userId, parent.siret);
     }
@@ -39,7 +39,7 @@ export default {
     ...companySireneInfoResolvers
   },
   CompanyMember: {
-    isMe: (parent, _, context: Context) => {
+    isMe: (parent, _, context: GraphQLContext) => {
       return parent.id == context.user.id;
     }
   },
@@ -64,7 +64,7 @@ export default {
     favorites: async (
       parent,
       { type }: { type: FavoriteType },
-      context: Context
+      context: GraphQLContext
     ) => {
       const lowerType = type.toLowerCase();
       const userId = context.user.id;

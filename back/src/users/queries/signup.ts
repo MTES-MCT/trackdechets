@@ -2,11 +2,11 @@ import { hash } from "bcrypt";
 import { DomainError, ErrorCode } from "../../common/errors";
 import { sendMail } from "../../common/mails.helper";
 import { Prisma, User } from "../../generated/prisma-client";
-import { Context } from "../../types";
+import { GraphQLContext } from "../../types";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
 
-export default async function signup(_, { userInfos }, context: Context) {
+export default async function signup(_, { userInfos }, context: GraphQLContext) {
   const hashedPassword = await hashPassword(userInfos.password);
   const user = await context.prisma
     .createUser({

@@ -1,4 +1,4 @@
-import { Context } from "../types";
+import { GraphQLContext } from "../types";
 import {
   cleanUpNotDuplicatableFieldsInForm,
   unflattenObjectFromDb
@@ -20,12 +20,12 @@ import { formsRegister } from "./queries/forms-register";
 
 export default {
   Form: {
-    appendix2Forms: (parent, args, context: Context) => {
+    appendix2Forms: (parent, args, context: GraphQLContext) => {
       return context.prisma.form({ id: parent.id }).appendix2Forms();
     }
   },
   Query: {
-    form: async (_, { id }, context: Context) => {
+    form: async (_, { id }, context: GraphQLContext) => {
       if (!id) {
         // On form creation, there is no id
         return null;
@@ -34,7 +34,7 @@ export default {
       const dbForm = await context.prisma.form({ id });
       return unflattenObjectFromDb(dbForm);
     },
-    forms: async (_, { siret, type }, context: Context) => {
+    forms: async (_, { siret, type }, context: GraphQLContext) => {
       const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
@@ -69,7 +69,7 @@ export default {
 
       return forms.map(f => unflattenObjectFromDb(f));
     },
-    stats: async (parent, args, context: Context) => {
+    stats: async (parent, args, context: GraphQLContext) => {
       const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
@@ -110,7 +110,7 @@ export default {
         };
       });
     },
-    appendixForms: async (parent, { siret, wasteCode }, context: Context) => {
+    appendixForms: async (parent, { siret, wasteCode }, context: GraphQLContext) => {
       const forms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),
@@ -127,13 +127,13 @@ export default {
   },
   Mutation: {
     saveForm,
-    deleteForm: async (parent, { id }, context: Context) => {
+    deleteForm: async (parent, { id }, context: GraphQLContext) => {
       return context.prisma.updateForm({
         where: { id },
         data: { isDeleted: true }
       });
     },
-    duplicateForm: async (parent, { id }, context: Context) => {
+    duplicateForm: async (parent, { id }, context: GraphQLContext) => {
       const userId = context.user.id;
 
       const existingForm = await context.prisma.form({
@@ -157,7 +157,7 @@ export default {
   },
   Subscription: {
     forms: {
-      subscribe: async (parent, { token }, context: Context) => {
+      subscribe: async (parent, { token }, context: GraphQLContext) => {
         // Web socket has no headers so we pass the token as a param
 
         const user = await prisma.accessToken({ token }).user();
