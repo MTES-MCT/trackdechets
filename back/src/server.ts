@@ -61,14 +61,14 @@ const schemaValidationMiddleware = schemaValidation(
  * Capture console.error statements
  */
 const sentryMiddleware = () =>
-  sentry({
+  sentry<GraphQLContext>({
     config: {
       dsn: SENTRY_DSN,
       environment: NODE_ENV,
       integrations: [new CaptureConsole({ levels: ["error"] })]
     },
     forwardErrors: true,
-    withScope: (scope, error, context: GraphQLContext) => {
+    withScope: (scope, error, context) => {
       const reqUser = !!context.user ? context.user.email : "anonymous";
       scope.setUser({
         email: reqUser
@@ -184,7 +184,9 @@ app.get("/pdf", (_, res) =>
   res.status(410).send("Route dépréciée, utilisez la query GraphQL `formPdf`")
 );
 app.get("/exports", (_, res) =>
-  res.status(410).send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
+  res
+    .status(410)
+    .send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
 );
 
 server.applyMiddleware({
