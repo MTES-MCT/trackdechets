@@ -6,11 +6,8 @@ import "./Home.scss";
 import { trackEvent } from "./tracker";
 import LazyLoad from "react-lazyload";
 import Footer from "./Footer";
-import useCrisp from "./use-crisp";
 
 export default function Home({ isAuthenticated }) {
-  useCrisp();
-
   return (
     <React.Fragment>
       <div className="hero" role="banner">
