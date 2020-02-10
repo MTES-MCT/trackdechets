@@ -132,12 +132,8 @@ oauth2server.exchange(
  * @param grant
  */
 export function isExpired(grant: Grant): boolean {
-  // use new Date(Date.now()) instead of new Date() in order to mock function in test
-  const now = new Date(Date.now());
+  const now = Date.now();
   const createdAt = new Date(grant.createdAt);
-  const elasped = (now.getTime() - createdAt.getTime()) / 1000;
-  if (elasped > grant.expires) {
-    return true;
-  }
-  return false;
+  const elasped = (now - createdAt.getTime()) / 1000;
+  return elasped > grant.expires;
 }
