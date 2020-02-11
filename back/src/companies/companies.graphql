@@ -33,6 +33,12 @@ type Query {
     "type de favoris"
     type: FavoriteType!
     ): [CompanyFavorite]
+
+  """
+  USAGE INTERNE
+  Renvoie la liste des éco-organismes
+  """
+  ecoOrganismes: [EcoOrganisme]
 }
 
 type Mutation {
@@ -276,6 +282,14 @@ type CompanyFavorite {
 
   "Email de contact"
   mail: String
+}
+
+"Eco-organisme"
+type EcoOrganisme {
+  id: ID!
+  name: String!
+  siret: String!
+  address: String!
 }
 
 "Lien d'upload"

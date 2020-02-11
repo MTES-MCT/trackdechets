@@ -162,6 +162,16 @@ enum WasteAcceptationStatus {
   PARTIALLY_REFUSED
 }
 
+"""
+Eco-organismes
+"""
+type EcoOrganisme {
+  id: ID! @id
+  siret: String! @unique
+  name: String!
+  address: String!
+}
+
 type Form {
   id: ID! @id
   readableId: String @unique
@@ -265,6 +275,9 @@ type Form {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+
+  # Eco-organisme
+  ecoOrganisme: EcoOrganisme
 
   appendix2Forms: [Form]
 }

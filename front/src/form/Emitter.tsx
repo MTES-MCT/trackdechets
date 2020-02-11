@@ -1,17 +1,16 @@
+import { Field, useFormikContext } from "formik";
 import React, { useState } from "react";
 import CompanySelector from "./company/CompanySelector";
-import { Field, connect } from "formik";
 import { RadioButton } from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
+import { Form } from "./model";
+import EcoOrganismes from "./eco-organismes/EcoOrganismes";
 import WorkSite from "./work-site/WorkSite";
 
-type Values = {
-  customId: string;
-};
-export default connect<{}, Values>(function Emitter({ formik }) {
-  const [displayCustomId, setDisplayCustomId] = useState(
-    !!formik.values.customId
-  );
+export default function Emitter() {
+  const { values } = useFormikContext<Form>();
+
+  const [displayCustomId, setDisplayCustomId] = useState(!!values.customId);
 
   return (
     <>
@@ -68,10 +67,14 @@ export default connect<{}, Values>(function Emitter({ formik }) {
         </fieldset>
       </div>
 
+      {values.emitter.type === "OTHER" && (
+        <EcoOrganismes name="emitter.ecoOrganisme" />
+      )}
+
       <h4>Entreprise émettrice</h4>
       <CompanySelector name="emitter.company" />
 
       <WorkSite />
     </>
   );
-});
+}

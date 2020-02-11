@@ -15,7 +15,8 @@ export default {
       contact: "",
       mail: "",
       phone: ""
-    }
+    },
+    ecoOrganisme: ""
   },
   recipient: {
     cap: "",
