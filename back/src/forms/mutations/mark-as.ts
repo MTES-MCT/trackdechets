@@ -50,7 +50,6 @@ export async function signedByTransporter(
 ) {
   const transformEventToFormParams = signingInfo => ({
     signedByTransporter: signingInfo.signedByTransporter,
-    signedByProducer: signingInfo.signedByProducer,
     sentAt: signingInfo.sentAt,
     sentBy: signingInfo.sentBy,
     wasteDetailsPackagings: signingInfo.packagings,
