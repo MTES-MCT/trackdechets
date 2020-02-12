@@ -37,7 +37,7 @@ jobs:
             docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> build
             if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "dev" ]; then
               docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-              docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> push
+              docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> push --ignore-push-failures
             fi
 
   deploy:
