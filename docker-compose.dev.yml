@@ -141,7 +141,7 @@ services:
       - ./etl/code/tests:/usr/local/airflow/tests
 
   metabase:
-    image: metabase/metabase
+    image: metabase/metabase:v0.34.2
     volumes:
       - metabase:/metabase-data
     environment:
