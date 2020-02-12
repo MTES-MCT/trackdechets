@@ -103,16 +103,6 @@ services:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
 
-  td-doc:
-    image: td-doc
-    build:
-      context: ./documentation
-      dockerfile: Dockerfile
-    environment:
-      VIRTUAL_HOST: $DOC_HOST
-      LETSENCRYPT_HOST: $DOC_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-
   td-etl:
     image: td-etl
     build:
@@ -131,13 +121,34 @@ services:
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/airflow
       AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$ETL_DB
       AIRFLOW_CONN_POSTGRES_PRISMA: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/prisma
-
     volumes:
       - ./etl/code/dags:/usr/local/airflow/dags
       - ./etl/code/data:/usr/local/airflow/data
       - ./etl/code/embulk:/usr/local/airflow/embulk
       - ./etl/code/sql:/usr/local/airflow/sql
       - ./etl/code/tests:/usr/local/airflow/tests
+
+  td-doc:
+    image: td-doc
+    build:
+      context: ./doc
+    environment:
+      VIRTUAL_HOST: $DOC_HOST
+      VIRTUAL_PORT: 3000
+      API_HOST: $API_HOST
+      API_URL_SCHEME: $URL_SCHEME
+      UI_HOST: $UI_HOST
+      UI_URL_SCHEME: $UI_URL_SCHEME
+    volumes:
+      - ./doc/docs:/app/docs
+      - ./doc/website/blog:/app/website/blog
+      - ./doc/website/core:/app/website/core
+      - ./doc/website/i18n:/app/website/i18n
+      - ./doc/website/pages:/app/website/pages
+      - ./doc/website/static:/app/website/static
+      - ./doc/website/sidebars.json:/app/website/sidebars.json
+      - ./doc/website/siteConfig.js:/app/website/siteConfig.js
+    working_dir: /app/website
 
   metabase:
     image: metabase/metabase:v0.34.2
