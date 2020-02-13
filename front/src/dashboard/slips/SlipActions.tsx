@@ -51,7 +51,11 @@ export default function SlipActions({ form, siret }: IProps) {
 
 function DynamicActions({ form, siret }) {
   const nextStep = getNextStep(form, siret);
-  const dynamicMutation = mutations[nextStep ?? "NOOP"];
+  // This dynamic mutation must have a value, otherwise the `useMutation` hook throws.
+  // And hooks should not be conditionally called (cf rules of hooks)
+  // Therefore, when there is no `nextStep`, we assign it **any** mutation: it does not matter at it will never get called
+  // Indeed nothing is rendered when there is no `nextStep`
+  const dynamicMutation = mutations[nextStep ?? mutations.DELETE_FORM];
 
   const [isOpen, setIsOpen] = useState(false);
   const [mark, { error }] = useMutation(dynamicMutation);
