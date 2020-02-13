@@ -3,7 +3,7 @@ import cogoToast from "cogo-toast";
 import { Formik, setNestedObjectValues } from "formik";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { uploadApolloCache } from "../../common/helper";
+import { updateApolloCache } from "../../common/helper";
 import { currentSiretService } from "../../dashboard/CompanySelector";
 import { GET_SLIPS } from "../../dashboard/slips/query";
 import initialState from "../initial-state";
@@ -30,7 +30,7 @@ export default withRouter(function StepList(
 
   const [saveForm] = useMutation(SAVE_FORM, {
     update: (store, { data: { saveForm } }) => {
-      uploadApolloCache<{ forms: Form[] }>(store, {
+      updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret: currentSiretService.getSiret() },
         getNewData: data => ({
