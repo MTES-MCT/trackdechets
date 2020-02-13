@@ -77,5 +77,12 @@ export default {
   RECEIVED: MARK_RECEIVED,
   PROCESSED: MARK_PROCESSED,
   DUPLICATE_FORM,
-  DELETE_FORM
+  DELETE_FORM,
+  NOOP: gql`
+    mutation Noop {
+      noop {
+        nothing
+      }
+    }
+  `
 };

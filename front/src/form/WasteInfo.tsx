@@ -46,10 +46,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
       {values.emitter.type === "APPENDIX1" && <AppendixInfo />}
 
       {values.emitter.type === "APPENDIX2" && (
-        <FormsSelector
-          emitterSiret={values.emitter.company.siret}
-          name="appendix2Forms"
-        />
+        <FormsSelector name="appendix2Forms" />
       )}
 
       <h4>Conditionnement</h4>

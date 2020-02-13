@@ -76,7 +76,8 @@ export class Wizard extends React.Component<Props, State> {
             enableReinitialize={false}
             validate={this.validate}
             onSubmit={this.handleSubmit}
-            render={({ isSubmitting, handleSubmit }) => (
+          >
+            {({ isSubmitting }) => (
               <Form {...formProps}>
                 {activePage}
                 <div className="buttons">
@@ -107,7 +108,7 @@ export class Wizard extends React.Component<Props, State> {
                 </div>
               </Form>
             )}
-          />
+          </Formik>
         </div>
       </React.Fragment>
     );

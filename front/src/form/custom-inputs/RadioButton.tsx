@@ -34,8 +34,8 @@ export function RadioButton({
   ...props
 }: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <p>
+    <div>
       <InlineRadioButton field={field} id={id} label={label} {...props} />
-    </p>
+    </div>
   );
 }
