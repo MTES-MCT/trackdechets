@@ -14,17 +14,17 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-        name: Run tests
-        command: |
-          for container in $(docker-compose -f docker-compose.test.yml ps --services | tr '\r\n' '\n');
-          do
-            docker-compose -f docker-compose.test.yml run --rm $container
-            code=$?
-            if [[ $code != "0" ]]; then
-              echo "Tests failed for ${container}, exit code ${code}"
-              exit 1
-            fi
-          done
+          name: Run tests
+          command: |
+            for container in $(docker-compose -f docker-compose.test.yml ps --services | tr '\r\n' '\n');
+            do
+              docker-compose -f docker-compose.test.yml run --rm $container
+              code=$?
+              if [[ $code != "0" ]]; then
+                echo "Tests failed for ${container}, exit code ${code}"
+                exit 1
+              fi
+            done
 
   build-and-push:
     description: "Build all images, pushes them to the Docker repository if branch is master or dev"
