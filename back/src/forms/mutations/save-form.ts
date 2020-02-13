@@ -22,7 +22,7 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
       where: { id },
       data: {
         ...(form as FormUpdateInput),
-        appendix2Forms: { connect: formContent.appendix2Forms }
+        appendix2Forms: { set: formContent.appendix2Forms }
       }
     });
 

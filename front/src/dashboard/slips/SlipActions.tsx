@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/react-hooks";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaCheck,
   FaCog,
@@ -31,8 +31,6 @@ interface IProps {
   siret: string;
 }
 export default function SlipActions({ form, siret }: IProps) {
-  const nextStep = getNextStep(form, siret);
-
   return (
     <div className="SlipActions">
       {form.status === "DRAFT" ? (
@@ -46,18 +44,27 @@ export default function SlipActions({ form, siret }: IProps) {
         <DownloadPdf formId={form.id} />
       )}
       <Duplicate formId={form.id} />
-      {nextStep && <DynamicActions form={form} nextStep={nextStep} />}
+      <DynamicActions form={form} siret={siret} />
     </div>
   );
 }
 
-function DynamicActions({ form, nextStep }) {
+function DynamicActions({ form, siret }) {
+  const nextStep = getNextStep(form, siret);
+  const dynamicMutation = mutations[nextStep ?? "NOOP"];
+
   const [isOpen, setIsOpen] = useState(false);
-  const [mark, { error }] = useMutation(mutations[nextStep], {
-    onCompleted: () => setIsOpen(false)
-  });
+  const [mark, { error }] = useMutation(dynamicMutation);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [nextStep]);
 
   const ButtonComponent = nextStep ? buttons[nextStep].component : null;
+
+  if (!nextStep) {
+    return null;
+  }
 
   return (
     <>
@@ -79,7 +86,7 @@ function DynamicActions({ form, nextStep }) {
             <ButtonComponent
               onCancel={() => setIsOpen(false)}
               onSubmit={vars => {
-                return mark({ variables: { id: form.id, ...vars } });
+                mark({ variables: { id: form.id, ...vars } });
               }}
               form={form}
             />
