@@ -7,6 +7,7 @@ export PRISMA_SECRET=any_secret
 export COMPOSE_PROJECT_NAME=integration
 export MSYS_NO_PATHCONV=1 # needed for windows
 
+EXIT_CODE=0
 
 startcontainers(){
     echo ">> Starting containers..."
@@ -26,6 +27,7 @@ stopcontainers(){
 runtest(){
     api_container_id=$(docker ps -qf "name=integration_td-api")
     docker exec -t $api_container_id npx jest --config ./integration-tests/jest.config.js -i --forceExit $1
+    EXIT_CODE=$?
 }
 
 all(){
@@ -80,4 +82,4 @@ done
 # no args, run everything
 all
 
-exit 0;
+exit $EXIT_CODE;
