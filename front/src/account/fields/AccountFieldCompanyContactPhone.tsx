@@ -34,7 +34,7 @@ const UPDATE_CONTACT_PHONE = gql`
 const yupSchema = object().shape({
   contactPhone: string()
     .trim()
-    .matches(/^(0[1-7])(?:[ _.-]?(\d{2})){4}$/, {
+    .matches(/^(0[1-9])(?:[ _.-]?(\d{2})){4}$/, {
       message: "Le numéro de téléphone est invalide",
       excludeEmptyString: true
     })
