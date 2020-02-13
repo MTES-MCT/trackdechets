@@ -4,7 +4,7 @@ import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
 import { currentSiretService } from "../../CompanySelector";
 import { useMutation } from "@apollo/react-hooks";
-import { uploadApolloCache } from "../../../common/helper";
+import { updateApolloCache } from "../../../common/helper";
 import { Form } from "../../../form/model";
 
 type Props = { formId: string };
@@ -14,7 +14,7 @@ export default function Delete({ formId }: Props) {
   const [deleteForm] = useMutation(mutations.DELETE_FORM, {
     variables: { id: formId },
     update: (store, { data: { deleteForm } }) => {
-      uploadApolloCache<{ forms: Form[] }>(store, {
+      updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret: currentSiretService.getSiret() },
         getNewData: data => ({

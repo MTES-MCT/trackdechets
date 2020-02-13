@@ -14,7 +14,7 @@ export function toMacroCase(string: string) {
     .toUpperCase();
 }
 
-export function uploadApolloCache<T>(
+export function updateApolloCache<T>(
   store: DataProxy,
   {
     query,
