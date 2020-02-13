@@ -79,7 +79,6 @@ jobs:
     working_directory: ~/project/trackdechets
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: Run integration tests
           command: |
