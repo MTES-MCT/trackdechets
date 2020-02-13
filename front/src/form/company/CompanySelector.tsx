@@ -72,11 +72,11 @@ export default function CompanySelector(props) {
       type: "search_change",
       payload: {
         searchResults: searchData?.searchCompanies ?? [],
-        searchLoading: searchLoading
+        searchLoading
       }
     });
 
-    if (searchData?.searchCompanies.length === 1) {
+    if (searchData?.searchCompanies?.length === 1) {
       dispatch({
         type: "company_selected",
         payload: searchData.searchCompanies[0]
@@ -116,12 +116,19 @@ export default function CompanySelector(props) {
   // Load different favorites depending on the object we are filling
   const type = toMacroCase(field.name.split(".")[0]);
 
-  const { loading, error, data } = useQuery(FAVORITES, {
+  const { loading, error } = useQuery(FAVORITES, {
     variables: { type },
-    onCompleted: data =>
-      state.selectedCompany.siret === ""
-        ? dispatch({ type: "company_selected", payload: data.favorites[0] })
-        : null
+    onCompleted: data => {
+      if (state.selectedCompany.siret === "") {
+        dispatch({ type: "company_selected", payload: data.favorites[0] });
+      }
+      dispatch({
+        type: "search_change",
+        payload: {
+          searchResults: data.favorites
+        }
+      });
+    }
   });
 
   if (loading) return <p>Chargement...</p>;
@@ -148,7 +155,7 @@ export default function CompanySelector(props) {
       <button
         className="button-outline small primary"
         type="button"
-        onClick={e =>
+        onClick={_ =>
           dispatch({
             type: "department_filter",
             payload: !state.displayDepartment
@@ -177,7 +184,14 @@ export default function CompanySelector(props) {
 
       {state.searchLoading && <span>Chargement...</span>}
       <ul className="company-bookmarks">
-        {[...state.searchResults, ...data.favorites].map(c => (
+        {[
+          ...state.searchResults,
+          ...(!state.searchResults.some(
+            c => c.siret === state.selectedCompany.siret
+          )
+            ? [state.selectedCompany]
+            : [])
+        ].map(c => (
           <li
             className={`company-bookmarks__item  ${
               state.selectedCompany.siret === c.siret ? "is-selected" : ""

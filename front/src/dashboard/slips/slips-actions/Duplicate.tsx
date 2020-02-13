@@ -1,45 +1,40 @@
+import { useMutation } from "@apollo/react-hooks";
+import cogoToast from "cogo-toast";
 import React from "react";
 import { FaClone } from "react-icons/fa";
-import { Mutation } from "@apollo/react-components";
-import mutations from "./slip-actions.mutations";
-import { GET_SLIPS } from "../query";
+import { uploadApolloCache } from "../../../common/helper";
+import { Form } from "../../../form/model";
 import { currentSiretService } from "../../CompanySelector";
+import { GET_SLIPS } from "../query";
+import mutations from "./slip-actions.mutations";
 
 type Props = { formId: string };
 
 export default function Duplicate({ formId }: Props) {
-  return (
-    <Mutation mutation={mutations.DUPLICATE_FORM}>
-      {(duplicate, { error }) => (
-        <button
-          className="icon"
-          title="Dupliquer en brouillon"
-          onClick={() =>
-            duplicate({
-              variables: { id: formId },
-              update: (store, { data: { duplicateForm } }) => {
+  const [duplicate] = useMutation(mutations.DUPLICATE_FORM, {
+    variables: { id: formId },
+    update: (store, { data: { duplicateForm } }) => {
+      uploadApolloCache<{ forms: Form[] }>(store, {
+        query: GET_SLIPS,
+        variables: { siret: currentSiretService.getSiret() },
+        getNewData: data => ({
+          forms: [...data.forms, duplicateForm]
+        })
+      });
+    },
+    onCompleted: () =>
+      cogoToast.success(
+        `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`
+      )
+  });
 
-                const data = store.readQuery({
-                  query: GET_SLIPS,
-                  variables: { siret: currentSiretService.getSiret() }
-                });
-                if (!data || !data.forms) {
-                  return;
-                }
-                store.writeQuery({
-                  query: GET_SLIPS,
-                  variables: { siret: currentSiretService.getSiret()},
-                  data : {
-                    forms: [...data.forms, duplicateForm]
-                  }
-                });
-              }
-            })
-          }
-        >
-          <FaClone />
-        </button>
-      )}
-    </Mutation>
+  return (
+    <button
+      className="icon"
+      title="Dupliquer en brouillon"
+      onClick={() => duplicate()}
+    >
+      <FaClone />
+    </button>
   );
 }

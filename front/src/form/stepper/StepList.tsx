@@ -3,9 +3,11 @@ import cogoToast from "cogo-toast";
 import { Formik, setNestedObjectValues } from "formik";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { uploadApolloCache } from "../../common/helper";
 import { currentSiretService } from "../../dashboard/CompanySelector";
 import { GET_SLIPS } from "../../dashboard/slips/query";
 import initialState from "../initial-state";
+import { Form } from "../model";
 import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
@@ -28,19 +30,12 @@ export default withRouter(function StepList(
 
   const [saveForm] = useMutation(SAVE_FORM, {
     update: (store, { data: { saveForm } }) => {
-      const data = store.readQuery<any>({
-        query: GET_SLIPS,
-        variables: { siret: currentSiretService.getSiret() }
-      });
-      if (!data || !data.forms) {
-        return;
-      }
-      data.forms = data.forms.filter(f => f.id !== saveForm.id);
-      data.forms.push(saveForm);
-      store.writeQuery({
+      uploadApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret: currentSiretService.getSiret() },
-        data
+        getNewData: data => ({
+          forms: [...data.forms.filter(f => f.id !== saveForm.id), saveForm]
+        })
       });
     }
   });
@@ -107,7 +102,8 @@ export default withRouter(function StepList(
           initialValues={state}
           validationSchema={formSchema}
           onSubmit={() => Promise.resolve()}
-          render={({ values }) => {
+        >
+          {({ values }) => {
             return (
               <form
                 onSubmit={e => {
@@ -141,7 +137,7 @@ export default withRouter(function StepList(
               </form>
             );
           }}
-        />
+        </Formik>
       </div>
     </div>
   );

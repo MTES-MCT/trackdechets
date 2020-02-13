@@ -1,33 +1,9 @@
-import gql from "graphql-tag";
-import React, { useState, useEffect, useReducer } from "react";
-import { Query } from "@apollo/react-components";
-import { Form } from "../model";
-import { DateTime } from "luxon";
-import { connect, getIn, setIn } from "formik";
+import { getIn, useFormikContext } from "formik";
+import React, { useEffect, useReducer, useState } from "react";
 import useDebounce from "../../utils/use-debounce";
+import { Form } from "../model";
 import formatWasteCodeEffect from "../waste-code/format-waste-code.effect";
-import useDidUpdateEffect from "../../utils/use-did-update";
-
-const GET_APPENDIX_FORMS = gql`
-  query AppendixForms($emitterSiret: String!, $wasteCode: String) {
-    appendixForms(siret: $emitterSiret, wasteCode: $wasteCode) {
-      readableId
-      emitter {
-        company {
-          name
-        }
-      }
-      wasteDetails {
-        code
-        name
-      }
-      receivedAt
-      quantityReceived
-      processingOperationDone
-    }
-  }
-`;
-type Props = { emitterSiret: string; name: string };
+import FormsTable from "./FormsTable";
 
 function round(value: number) {
   return Math.round(value * 100) / 100;
@@ -66,35 +42,43 @@ function reducer(
   }
 }
 
-export default connect<Props>(function FormsSelector(props) {
-  const [wasteCodeFilter, setWasteCodeFilter] = useState("");
-  useEffect(() => formatWasteCodeEffect(wasteCodeFilter, setWasteCodeFilter), [
-    wasteCodeFilter
-  ]);
-  const debouncedWasteCodeFilter = useDebounce(wasteCodeFilter, 500);
+export default function FormsSelector({ name }) {
+  const { values, setFieldValue } = useFormikContext<Form>();
 
-  const fieldValue: Form[] = getIn(props.formik.values, props.name);
+  const [wasteCodeFilter, setWasteCodeFilter] = useState("");
+  const debouncedWasteCodeFilter = useDebounce(wasteCodeFilter, 500);
+  useEffect(() => {
+    formatWasteCodeEffect(wasteCodeFilter, setWasteCodeFilter);
+  }, [wasteCodeFilter]);
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: fieldValue.map(f => f.readableId),
-    quantity: getIn(props.formik.values, "wasteDetails.quantity")
+    selected: getIn(values, name).map(f => f.readableId),
+    quantity: getIn(values, "wasteDetails.quantity")
   });
 
-  useDidUpdateEffect(() => {
-    props.formik.setValues({
-      ...props.formik.values,
-      ...setIn(props.formik.values, "wasteDetails.quantity", state.quantity),
-      [props.name]: state.selected.map(s => ({ readableId: s }))
-    });
-  }, [state]);
+  useEffect(() => {
+    setFieldValue(
+      name,
+      state.selected.map(s => ({ readableId: s }))
+    );
+    setFieldValue("wasteDetails.quantity", state.quantity);
+  }, [state, name, setFieldValue]);
 
-  const toggleSelected = (form: Form) => {
-    state.selected.find(s => s === form.readableId)
-      ? dispatch({ type: "unselect", payload: form })
-      : dispatch({ type: "select", payload: form });
-  };
+  function onToggle(payload: Form | Form[]) {
+    if (Array.isArray(payload)) {
+      return dispatch({
+        type: "selectAll",
+        payload
+      });
+    }
+
+    state.selected.find(s => s === payload.readableId)
+      ? dispatch({ type: "unselect", payload })
+      : dispatch({ type: "select", payload });
+  }
+
   return (
-    <div>
+    <>
       <h4>Annexe 2</h4>
       <p>
         Vous êtes en train de créer un bordereau de regroupement. Veuillez
@@ -117,85 +101,11 @@ export default connect<Props>(function FormsSelector(props) {
         />
       </p>
 
-      <Query
-        query={GET_APPENDIX_FORMS}
-        variables={{
-          wasteCode: debouncedWasteCodeFilter,
-          emitterSiret: props.emitterSiret
-        }}
-      >
-        {({ loading, error, data }) => {
-          if (loading) return <p>Chargement...</p>;
-          if (error || !data)
-            return <p>{`Erreur! ${error && error.message}`}</p>;
-
-          const values = data.appendixForms;
-
-          if (!values.length) {
-            return (
-              <div className="notification error">
-                Vous n'avez actuellement aucun bordereau qui peut être inclus
-                dans ce regroupement.{" "}
-                {wasteCodeFilter && (
-                  <span>
-                    Essayez de vider le filtre sur le code déchet{" "}
-                    {wasteCodeFilter} pour identifier des bordereaux
-                    regroupables
-                  </span>
-                )}
-              </div>
-            );
-          }
-
-          return (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>
-                    <input
-                      type="checkbox"
-                      checked={state.selected.length === values.length}
-                      onChange={e =>
-                        dispatch({
-                          type: "selectAll",
-                          payload: e.target.checked ? values : []
-                        })
-                      }
-                    />
-                  </th>
-                  <th>Numéro</th>
-                  <th>Code déchet</th>
-                  <th>Expéditeur initial</th>
-                  <th>Date de réception</th>
-                  <th>Quantité</th>
-                  <th>Opération réalisée</th>
-                </tr>
-              </thead>
-              <tbody>
-                {values.map(v => (
-                  <tr key={v.readableId} onClick={() => toggleSelected(v)}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={state.selected.indexOf(v.readableId) > -1}
-                        onChange={() => true}
-                      />
-                    </td>
-                    <td>{v.readableId}</td>
-                    <td>
-                      {v.wasteDetails.code} - {v.wasteDetails.name}
-                    </td>
-                    <td>{v.emitter.company.name}</td>
-                    <td>{DateTime.fromISO(v.receivedAt).toLocaleString()}</td>
-                    <td>{v.quantityReceived} tonnes</td>
-                    <td>{v.processingOperationDone}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          );
-        }}
-      </Query>
-    </div>
+      <FormsTable
+        wasteCode={debouncedWasteCodeFilter}
+        selectedItems={state.selected}
+        onToggle={onToggle}
+      />
+    </>
   );
-});
+}

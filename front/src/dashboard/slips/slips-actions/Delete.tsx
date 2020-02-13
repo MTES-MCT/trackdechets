@@ -4,12 +4,25 @@ import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
 import { currentSiretService } from "../../CompanySelector";
 import { useMutation } from "@apollo/react-hooks";
+import { uploadApolloCache } from "../../../common/helper";
+import { Form } from "../../../form/model";
 
 type Props = { formId: string };
 
 export default function Delete({ formId }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [deleteForm] = useMutation(mutations.DELETE_FORM);
+  const [deleteForm] = useMutation(mutations.DELETE_FORM, {
+    variables: { id: formId },
+    update: (store, { data: { deleteForm } }) => {
+      uploadApolloCache<{ forms: Form[] }>(store, {
+        query: GET_SLIPS,
+        variables: { siret: currentSiretService.getSiret() },
+        getNewData: data => ({
+          forms: [...data.forms.filter(f => f.id !== deleteForm.id)]
+        })
+      });
+    }
+  });
 
   return (
     <>
@@ -31,31 +44,7 @@ export default function Delete({ formId }: Props) {
           <button className="button warning" onClick={() => setIsOpen(false)}>
             Annuler
           </button>
-          <button
-            className="button"
-            onClick={() =>
-              deleteForm({
-                variables: { id: formId },
-                update: (store, { data: { deleteForm } }) => {
-                  const data = store.readQuery<any>({
-                    query: GET_SLIPS,
-                    variables: { siret: currentSiretService.getSiret() }
-                  });
-                  if (!data || !data.forms) {
-                    return;
-                  }
-
-                  store.writeQuery({
-                    query: GET_SLIPS,
-                    variables: { siret: currentSiretService.getSiret() },
-                    data: {
-                      forms: [...data.forms.filter(f => f.id !== deleteForm.id)]
-                    }
-                  });
-                }
-              })
-            }
-          >
+          <button className="button" onClick={() => deleteForm()}>
             Supprimer
           </button>
         </div>
