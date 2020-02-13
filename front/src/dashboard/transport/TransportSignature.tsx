@@ -13,7 +13,7 @@ import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS } from "./Transport";
 import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
-import { uploadApolloCache } from "../../common/helper";
+import { updateApolloCache } from "../../common/helper";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -40,7 +40,7 @@ export default function TransportSignature({ form }: Props) {
     onCompleted: () => setIsOpen(false),
     refetchQueries: [],
     update: store => {
-      uploadApolloCache<{ forms: Form[] }>(store, {
+      updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
           siret: currentSiretService.getSiret(),
