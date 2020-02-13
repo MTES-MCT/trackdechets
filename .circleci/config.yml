@@ -7,6 +7,24 @@ executors:
     working_directory: ~/project/trackdechets
 
 jobs:
+  test:
+    description: "Run tests"
+    executor: node
+      - checkout
+      - setup_remote_docker
+      - run:
+        name: Run tests
+        command: |
+          for container in $(docker-compose -f docker-compose.test.yml ps --services | tr '\r\n' '\n');
+          do
+            docker-compose -f docker-compose.test.yml run --rm $container
+            code=$?
+            if [[ $code != "0" ]]; then
+              echo "Tests failed for ${container}, exit code ${code}"
+              exit 1
+            fi
+          done
+
   build-and-push:
     description: "Build all images, pushes them to the Docker repository if branch is master or dev"
     executor: node
@@ -17,20 +35,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: |
-          touch .env
-      - run:
-          name: Run tests
-          command: |
-            for container in $(docker-compose -f docker-compose.test.yml ps --services | tr '\r\n' '\n');
-            do
-              docker-compose -f docker-compose.test.yml run --rm $container
-              code=$?
-              if [[ $code != "0" ]]; then
-                echo "Tests failed for ${container}, exit code ${code}"
-                exit 1
-              fi
-            done
       - run:
           name: "Build and push images"
           command: |
@@ -74,34 +78,33 @@ jobs:
     working_directory: ~/project/trackdechets
     steps:
       - checkout
-      - run:
-          name: Install Node Version Manager
-          command: |
-            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-            export NVM_DIR="/opt/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            nvm install v8.12.0
-            nvm alias default v8.12.0
-            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
-            echo "[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"" >> $BASH_ENV
+      - setup_remote_docker
       - run:
           name: Run integration tests
           command: |
-            cd integration-tests
+            cd back/integration-tests
             sudo chmod +x ./run.sh
             ./run.sh
 
 workflows:
   build-and-deploy:
     jobs:
+      - test
+      - integration-tests
       - build-and-push:
           name: build-and-push-prod
+          requires:
+            - test
+            - integration-tests
           filters:
             branches:
               only: master
       - build-and-push:
-          name: build-and-push-staging
+          name: build-and-push-recette
           extra-cfg: "-f docker-compose.val.yml"
+          requires:
+            - test
+            - integration-tests
           filters:
             branches:
               only: dev
@@ -114,18 +117,18 @@ workflows:
               only: master
       - deploy:
           name: deploy-sandbox
-          host: SSH_HOST_ST
+          host: SSH_HOST_SANDBOX
           requires:
             - build-and-push-prod
           filters:
             branches:
               only: master
       - deploy:
-          name: deploy-staging
-          host: SSH_HOST_BU
+          name: deploy-recette
+          host: SSH_HOST_RECETTE
           isValidation: true
           requires:
-            - build-and-push-staging
+            - build-and-push-recette
           filters:
             branches:
               only: dev
