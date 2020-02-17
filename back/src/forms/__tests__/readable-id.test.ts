@@ -1,4 +1,5 @@
 import { getReadableId } from "../readable-id";
+import { GraphQLContext } from "../../types";
 
 describe("getReadableId", () => {
   const currentYearDigits = `${new Date().getFullYear()}`.slice(2, 4);
@@ -10,7 +11,7 @@ describe("getReadableId", () => {
       } as any,
       user: null,
       request: null
-    };
+    } as GraphQLContext;
 
     const result = await getReadableId(context);
 
@@ -24,7 +25,7 @@ describe("getReadableId", () => {
       } as any,
       user: null,
       request: null
-    };
+    } as GraphQLContext;
 
     const result = await getReadableId(context);
 
@@ -38,7 +39,7 @@ describe("getReadableId", () => {
       } as any,
       user: null,
       request: null
-    };
+    } as GraphQLContext;
 
     const result = await getReadableId(context);
 
