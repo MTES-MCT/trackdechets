@@ -9,7 +9,7 @@ export async function joinWithInvite(
   const existingHash = await prisma.userAccountHash({ hash: inviteHash });
 
   if (!existingHash) {
-    throw new Error(
+    return new Error(
       `Cette invitation n'est plus valable. Contactez le responsable de votre société.`
     );
   }
