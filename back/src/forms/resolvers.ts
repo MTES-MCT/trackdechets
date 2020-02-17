@@ -1,3 +1,6 @@
+import { DomainError, ErrorCode } from "../common/errors";
+import { getUserCompanies } from "../companies/queries";
+import { prisma } from "../generated/prisma-client";
 import { GraphQLContext } from "../types";
 import {
   cleanUpNotDuplicatableFieldsInForm,
@@ -10,13 +13,11 @@ import {
   markAsSent,
   signedByTransporter
 } from "./mutations/mark-as";
-import { prisma } from "../generated/prisma-client";
 import { saveForm } from "./mutations/save-form";
-import { getReadableId } from "./readable-id";
-import { getUserCompanies } from "../companies/queries";
-import { DomainError, ErrorCode } from "../common/errors";
 import { formPdf } from "./queries/form-pdf";
+import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
+import { getReadableId } from "./readable-id";
 
 export default {
   Form: {
@@ -34,41 +35,7 @@ export default {
       const dbForm = await context.prisma.form({ id });
       return unflattenObjectFromDb(dbForm);
     },
-    forms: async (_, { siret, type }, context: GraphQLContext) => {
-      const userId = context.user.id;
-      const userCompanies = await getUserCompanies(userId);
-
-      if (!userCompanies.length) {
-        throw new Error("Vous n'êtes pas autorisé à consulter les bordereaux.");
-      }
-
-      // Find on userCompanies to make sure that the siret belongs to the current user
-      const selectedCompany =
-        userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
-
-      const formsFilter = {
-        ACTOR: {
-          OR: [
-            { owner: { id: userId } },
-            { recipientCompanySiret: selectedCompany.siret },
-            { emitterCompanySiret: selectedCompany.siret }
-          ]
-        },
-        TRANSPORTER: {
-          transporterCompanySiret: selectedCompany.siret,
-          status: "SEALED"
-        }
-      };
-
-      const forms = await context.prisma.forms({
-        where: {
-          ...formsFilter[type],
-          isDeleted: false
-        }
-      });
-
-      return forms.map(f => unflattenObjectFromDb(f));
-    },
+    forms,
     stats: async (parent, args, context: GraphQLContext) => {
       const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
@@ -110,7 +77,11 @@ export default {
         };
       });
     },
-    appendixForms: async (parent, { siret, wasteCode }, context: GraphQLContext) => {
+    appendixForms: async (
+      parent,
+      { siret, wasteCode },
+      context: GraphQLContext
+    ) => {
       const forms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),
