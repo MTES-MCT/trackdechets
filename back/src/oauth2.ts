@@ -2,7 +2,6 @@ import * as oauth2orize from "oauth2orize";
 import { TokenError } from "oauth2orize";
 import { prisma, Grant, User, Application } from "./generated/prisma-client/";
 import { getUid } from "./utils";
-import { date } from "yup";
 
 // Create OAuth 2.0 server
 export const oauth2server = oauth2orize.createServer();
