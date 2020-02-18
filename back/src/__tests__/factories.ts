@@ -190,8 +190,8 @@ export const statusLogFactory = async ({
   return prisma.createStatusLog({
     form: { connect: { id: formId } },
     user: { connect: { id: userId } },
+    loggedAt: new Date(),
     status,
-    created: new Date(),
     updatedFields: updatedFields,
     ...opt
   });

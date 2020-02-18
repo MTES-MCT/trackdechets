@@ -78,4 +78,23 @@ describe("Test Factories", () => {
 
     expect(newStatusLog.id).toBeTruthy();
   });
+
+  test("should create a status log in the past", async () => {
+    const usr = await userFactory();
+
+    const frm = await formFactory({
+      ownerId: usr.id
+    });
+
+    const newStatusLog = await statusLogFactory({
+      userId: usr.id,
+      status: "SEALED",
+      formId: frm.id,
+      opt: { loggedAt: "2017-03-25" }
+    });
+
+    expect(newStatusLog.id).toBeTruthy();
+
+    expect(newStatusLog.loggedAt).toEqual("2017-03-25T00:00:00.000Z");
+  });
 });
