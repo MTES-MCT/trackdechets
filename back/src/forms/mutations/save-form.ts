@@ -40,7 +40,6 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     form: { connect: { id: newForm.id } },
     user: { connect: { id: context.user.id } },
     status: newForm.status as Status,
-    created: new Date(),
     updatedFields: {}
   });
   return unflattenObjectFromDb(newForm);

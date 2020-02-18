@@ -138,6 +138,16 @@ async function transitionForm(
 const fieldsToLog = {
   MARK_SEALED: [],
   MARK_SENT: ["sentBy", "sentAt"],
+  MARK_SIGNED_BY_TRANSPORTER: [
+    "sentAt",
+    "signedByTransporter",
+    "securityCode",
+    "sentBy",
+    "signedByProducer",
+    "packagings",
+    "quantity",
+    "onuCode"
+  ],
   MARK_RECEIVED: ["receivedBy", "receivedAt", "quantityReceived"],
   MARK_PROCESSED: [
     "processedBy",
@@ -146,7 +156,13 @@ const fieldsToLog = {
     "processingOperationDescription",
     "noTraceability",
     "nextDestinationProcessingOperation",
-    "nextDestinationDetails"
+    "nextDestinationDetails",
+    "nextDestinationCompanyName",
+    "nextDestinationCompanySiret",
+    "nextDestinationCompanyAddress",
+    "nextDestinationCompanyContact",
+    "nextDestinationCompanyPhone",
+    "nextDestinationCompanyMail"
   ]
 };
 
@@ -171,7 +187,7 @@ export function logStatusChange(
       form: { connect: { id: formId } },
       user: { connect: { id: context.user.id } },
       status,
-      created: new Date(),
+      loggedAt: new Date(),
       updatedFields: diff
     })
     .catch(err => {
