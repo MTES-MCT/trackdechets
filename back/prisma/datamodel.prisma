@@ -334,7 +334,7 @@ type Application {
   admins: [User!]!
   # The list of allowed redirect uris
   redirectUris: [String!]! @scalarList(strategy: RELATION)
-  logo: String
+  logoUrl: String
 }
 
 """
