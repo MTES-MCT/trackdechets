@@ -831,8 +831,8 @@ export type StatusLogOrderByInput =
   | "id_DESC"
   | "status_ASC"
   | "status_DESC"
-  | "created_ASC"
-  | "created_DESC"
+  | "loggedAt_ASC"
+  | "loggedAt_DESC"
   | "updatedFields_ASC"
   | "updatedFields_DESC";
 
@@ -3194,7 +3194,7 @@ export interface DeclarationCreateInput {
 
 export interface StatusLogUpdateManyMutationInput {
   status?: Maybe<Status>;
-  created?: Maybe<DateTimeInput>;
+  loggedAt?: Maybe<DateTimeInput>;
   updatedFields?: Maybe<Json>;
 }
 
@@ -3389,7 +3389,7 @@ export interface StatusLogUpdateInput {
   user?: Maybe<UserUpdateOneRequiredInput>;
   form?: Maybe<FormUpdateOneRequiredInput>;
   status?: Maybe<Status>;
-  created?: Maybe<DateTimeInput>;
+  loggedAt?: Maybe<DateTimeInput>;
   updatedFields?: Maybe<Json>;
 }
 
@@ -3406,7 +3406,7 @@ export interface StatusLogCreateInput {
   user: UserCreateOneInput;
   form: FormCreateOneInput;
   status: Status;
-  created?: Maybe<DateTimeInput>;
+  loggedAt?: Maybe<DateTimeInput>;
   updatedFields?: Maybe<Json>;
 }
 
@@ -3686,14 +3686,14 @@ export interface StatusLogWhereInput {
   status_not?: Maybe<Status>;
   status_in?: Maybe<Status[] | Status>;
   status_not_in?: Maybe<Status[] | Status>;
-  created?: Maybe<DateTimeInput>;
-  created_not?: Maybe<DateTimeInput>;
-  created_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  created_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  created_lt?: Maybe<DateTimeInput>;
-  created_lte?: Maybe<DateTimeInput>;
-  created_gt?: Maybe<DateTimeInput>;
-  created_gte?: Maybe<DateTimeInput>;
+  loggedAt?: Maybe<DateTimeInput>;
+  loggedAt_not?: Maybe<DateTimeInput>;
+  loggedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  loggedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  loggedAt_lt?: Maybe<DateTimeInput>;
+  loggedAt_lte?: Maybe<DateTimeInput>;
+  loggedAt_gt?: Maybe<DateTimeInput>;
+  loggedAt_gte?: Maybe<DateTimeInput>;
   AND?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
   OR?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
   NOT?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
@@ -6836,7 +6836,7 @@ export interface RubriquePreviousValuesSubscription
 export interface StatusLog {
   id: ID_Output;
   status: Status;
-  created?: DateTimeOutput;
+  loggedAt?: DateTimeOutput;
   updatedFields?: Json;
 }
 
@@ -6845,7 +6845,7 @@ export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
   user: <T = UserPromise>() => T;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
-  created: () => Promise<DateTimeOutput>;
+  loggedAt: () => Promise<DateTimeOutput>;
   updatedFields: () => Promise<Json>;
 }
 
@@ -6856,7 +6856,7 @@ export interface StatusLogSubscription
   user: <T = UserSubscription>() => T;
   form: <T = FormSubscription>() => T;
   status: () => Promise<AsyncIterator<Status>>;
-  created: () => Promise<AsyncIterator<DateTimeOutput>>;
+  loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedFields: () => Promise<AsyncIterator<Json>>;
 }
 
@@ -6867,7 +6867,7 @@ export interface StatusLogNullablePromise
   user: <T = UserPromise>() => T;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
-  created: () => Promise<DateTimeOutput>;
+  loggedAt: () => Promise<DateTimeOutput>;
   updatedFields: () => Promise<Json>;
 }
 
@@ -6927,7 +6927,7 @@ export interface CompanyAssociationEdgeSubscription
 export interface StatusLogPreviousValues {
   id: ID_Output;
   status: Status;
-  created?: DateTimeOutput;
+  loggedAt?: DateTimeOutput;
   updatedFields?: Json;
 }
 
@@ -6936,7 +6936,7 @@ export interface StatusLogPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   status: () => Promise<Status>;
-  created: () => Promise<DateTimeOutput>;
+  loggedAt: () => Promise<DateTimeOutput>;
   updatedFields: () => Promise<Json>;
 }
 
@@ -6945,7 +6945,7 @@ export interface StatusLogPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   status: () => Promise<AsyncIterator<Status>>;
-  created: () => Promise<AsyncIterator<DateTimeOutput>>;
+  loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedFields: () => Promise<AsyncIterator<Json>>;
 }
 

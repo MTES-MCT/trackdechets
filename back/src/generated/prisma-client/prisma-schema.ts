@@ -4183,7 +4183,7 @@ type StatusLog {
   user: User!
   form: Form!
   status: Status!
-  created: DateTime
+  loggedAt: DateTime
   updatedFields: Json
 }
 
@@ -4198,7 +4198,7 @@ input StatusLogCreateInput {
   user: UserCreateOneInput!
   form: FormCreateOneInput!
   status: Status!
-  created: DateTime
+  loggedAt: DateTime
   updatedFields: Json
 }
 
@@ -4212,8 +4212,8 @@ enum StatusLogOrderByInput {
   id_DESC
   status_ASC
   status_DESC
-  created_ASC
-  created_DESC
+  loggedAt_ASC
+  loggedAt_DESC
   updatedFields_ASC
   updatedFields_DESC
 }
@@ -4221,7 +4221,7 @@ enum StatusLogOrderByInput {
 type StatusLogPreviousValues {
   id: ID!
   status: Status!
-  created: DateTime
+  loggedAt: DateTime
   updatedFields: Json
 }
 
@@ -4247,13 +4247,13 @@ input StatusLogUpdateInput {
   user: UserUpdateOneRequiredInput
   form: FormUpdateOneRequiredInput
   status: Status
-  created: DateTime
+  loggedAt: DateTime
   updatedFields: Json
 }
 
 input StatusLogUpdateManyMutationInput {
   status: Status
-  created: DateTime
+  loggedAt: DateTime
   updatedFields: Json
 }
 
@@ -4278,14 +4278,14 @@ input StatusLogWhereInput {
   status_not: Status
   status_in: [Status!]
   status_not_in: [Status!]
-  created: DateTime
-  created_not: DateTime
-  created_in: [DateTime!]
-  created_not_in: [DateTime!]
-  created_lt: DateTime
-  created_lte: DateTime
-  created_gt: DateTime
-  created_gte: DateTime
+  loggedAt: DateTime
+  loggedAt_not: DateTime
+  loggedAt_in: [DateTime!]
+  loggedAt_not_in: [DateTime!]
+  loggedAt_lt: DateTime
+  loggedAt_lte: DateTime
+  loggedAt_gt: DateTime
+  loggedAt_gte: DateTime
   AND: [StatusLogWhereInput!]
   OR: [StatusLogWhereInput!]
   NOT: [StatusLogWhereInput!]
