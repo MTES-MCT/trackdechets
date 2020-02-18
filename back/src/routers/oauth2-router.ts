@@ -44,7 +44,7 @@ oauth2Router.get(
       },
       client: {
         name: req.oauth2.client.name,
-        logo: req.oauth2.client.logo
+        logoUrl: req.oauth2.client.logoUrl
       },
       redirectURI: req.oauth2.redirectURI
     };

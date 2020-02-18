@@ -216,7 +216,7 @@ type Application {
   name: String!
   admins(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   redirectUris: [String!]!
-  logo: String
+  logoUrl: String
 }
 
 type ApplicationConnection {
@@ -231,7 +231,7 @@ input ApplicationCreateInput {
   name: String!
   admins: UserCreateManyInput
   redirectUris: ApplicationCreateredirectUrisInput
-  logo: String
+  logoUrl: String
 }
 
 input ApplicationCreateOneInput {
@@ -259,8 +259,8 @@ enum ApplicationOrderByInput {
   clientSecret_DESC
   name_ASC
   name_DESC
-  logo_ASC
-  logo_DESC
+  logoUrl_ASC
+  logoUrl_DESC
 }
 
 type ApplicationPreviousValues {
@@ -270,7 +270,7 @@ type ApplicationPreviousValues {
   clientSecret: String!
   name: String!
   redirectUris: [String!]!
-  logo: String
+  logoUrl: String
 }
 
 type ApplicationSubscriptionPayload {
@@ -296,7 +296,7 @@ input ApplicationUpdateDataInput {
   name: String
   admins: UserUpdateManyInput
   redirectUris: ApplicationUpdateredirectUrisInput
-  logo: String
+  logoUrl: String
 }
 
 input ApplicationUpdateInput {
@@ -304,14 +304,14 @@ input ApplicationUpdateInput {
   name: String
   admins: UserUpdateManyInput
   redirectUris: ApplicationUpdateredirectUrisInput
-  logo: String
+  logoUrl: String
 }
 
 input ApplicationUpdateManyMutationInput {
   clientSecret: String
   name: String
   redirectUris: ApplicationUpdateredirectUrisInput
-  logo: String
+  logoUrl: String
 }
 
 input ApplicationUpdateOneInput {
@@ -401,20 +401,20 @@ input ApplicationWhereInput {
   admins_every: UserWhereInput
   admins_some: UserWhereInput
   admins_none: UserWhereInput
-  logo: String
-  logo_not: String
-  logo_in: [String!]
-  logo_not_in: [String!]
-  logo_lt: String
-  logo_lte: String
-  logo_gt: String
-  logo_gte: String
-  logo_contains: String
-  logo_not_contains: String
-  logo_starts_with: String
-  logo_not_starts_with: String
-  logo_ends_with: String
-  logo_not_ends_with: String
+  logoUrl: String
+  logoUrl_not: String
+  logoUrl_in: [String!]
+  logoUrl_not_in: [String!]
+  logoUrl_lt: String
+  logoUrl_lte: String
+  logoUrl_gt: String
+  logoUrl_gte: String
+  logoUrl_contains: String
+  logoUrl_not_contains: String
+  logoUrl_starts_with: String
+  logoUrl_not_starts_with: String
+  logoUrl_ends_with: String
+  logoUrl_not_ends_with: String
   AND: [ApplicationWhereInput!]
   OR: [ApplicationWhereInput!]
   NOT: [ApplicationWhereInput!]

@@ -31,8 +31,8 @@ export default function Dialog() {
     <div className={styles["dialog-container"]}>
       <div className={styles.flex}>
         <img
-          src={client.logo || "/logo-placeholder.png"}
-          alt="trackdechets"
+          src={client.logoUrl || "/logo-placeholder.png"}
+          alt="application logo"
           width="100px"
         />
         <FaCheckCircle color="var(--green)" size="40px" />

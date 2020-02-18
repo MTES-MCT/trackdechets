@@ -640,8 +640,8 @@ export type ApplicationOrderByInput =
   | "clientSecret_DESC"
   | "name_ASC"
   | "name_DESC"
-  | "logo_ASC"
-  | "logo_DESC";
+  | "logoUrl_ASC"
+  | "logoUrl_DESC";
 
 export type FormOrderByInput =
   | "id_ASC"
@@ -1675,20 +1675,20 @@ export interface ApplicationWhereInput {
   admins_every?: Maybe<UserWhereInput>;
   admins_some?: Maybe<UserWhereInput>;
   admins_none?: Maybe<UserWhereInput>;
-  logo?: Maybe<String>;
-  logo_not?: Maybe<String>;
-  logo_in?: Maybe<String[] | String>;
-  logo_not_in?: Maybe<String[] | String>;
-  logo_lt?: Maybe<String>;
-  logo_lte?: Maybe<String>;
-  logo_gt?: Maybe<String>;
-  logo_gte?: Maybe<String>;
-  logo_contains?: Maybe<String>;
-  logo_not_contains?: Maybe<String>;
-  logo_starts_with?: Maybe<String>;
-  logo_not_starts_with?: Maybe<String>;
-  logo_ends_with?: Maybe<String>;
-  logo_not_ends_with?: Maybe<String>;
+  logoUrl?: Maybe<String>;
+  logoUrl_not?: Maybe<String>;
+  logoUrl_in?: Maybe<String[] | String>;
+  logoUrl_not_in?: Maybe<String[] | String>;
+  logoUrl_lt?: Maybe<String>;
+  logoUrl_lte?: Maybe<String>;
+  logoUrl_gt?: Maybe<String>;
+  logoUrl_gte?: Maybe<String>;
+  logoUrl_contains?: Maybe<String>;
+  logoUrl_not_contains?: Maybe<String>;
+  logoUrl_starts_with?: Maybe<String>;
+  logoUrl_not_starts_with?: Maybe<String>;
+  logoUrl_ends_with?: Maybe<String>;
+  logoUrl_not_ends_with?: Maybe<String>;
   AND?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
   OR?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
   NOT?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
@@ -3085,7 +3085,7 @@ export interface ApplicationCreateInput {
   name: String;
   admins?: Maybe<UserCreateManyInput>;
   redirectUris?: Maybe<ApplicationCreateredirectUrisInput>;
-  logo?: Maybe<String>;
+  logoUrl?: Maybe<String>;
 }
 
 export interface FormUpdateManyMutationInput {
@@ -4416,7 +4416,7 @@ export interface ApplicationUpdateDataInput {
   name?: Maybe<String>;
   admins?: Maybe<UserUpdateManyInput>;
   redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logo?: Maybe<String>;
+  logoUrl?: Maybe<String>;
 }
 
 export interface GrantSubscriptionWhereInput {
@@ -5093,7 +5093,7 @@ export interface ApplicationUpdateManyMutationInput {
   clientSecret?: Maybe<String>;
   name?: Maybe<String>;
   redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logo?: Maybe<String>;
+  logoUrl?: Maybe<String>;
 }
 
 export interface ApplicationUpdateInput {
@@ -5101,7 +5101,7 @@ export interface ApplicationUpdateInput {
   name?: Maybe<String>;
   admins?: Maybe<UserUpdateManyInput>;
   redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logo?: Maybe<String>;
+  logoUrl?: Maybe<String>;
 }
 
 export interface CompanyUpdateManyMutationInput {
@@ -5430,7 +5430,7 @@ export interface Application {
   clientSecret: String;
   name: String;
   redirectUris: String[];
-  logo?: String;
+  logoUrl?: String;
 }
 
 export interface ApplicationPromise extends Promise<Application>, Fragmentable {
@@ -5449,7 +5449,7 @@ export interface ApplicationPromise extends Promise<Application>, Fragmentable {
     last?: Int;
   }) => T;
   redirectUris: () => Promise<String[]>;
-  logo: () => Promise<String>;
+  logoUrl: () => Promise<String>;
 }
 
 export interface ApplicationSubscription
@@ -5470,7 +5470,7 @@ export interface ApplicationSubscription
     last?: Int;
   }) => T;
   redirectUris: () => Promise<AsyncIterator<String[]>>;
-  logo: () => Promise<AsyncIterator<String>>;
+  logoUrl: () => Promise<AsyncIterator<String>>;
 }
 
 export interface ApplicationNullablePromise
@@ -5491,7 +5491,7 @@ export interface ApplicationNullablePromise
     last?: Int;
   }) => T;
   redirectUris: () => Promise<String[]>;
-  logo: () => Promise<String>;
+  logoUrl: () => Promise<String>;
 }
 
 export interface ApplicationConnection {
@@ -6353,7 +6353,7 @@ export interface ApplicationPreviousValues {
   clientSecret: String;
   name: String;
   redirectUris: String[];
-  logo?: String;
+  logoUrl?: String;
 }
 
 export interface ApplicationPreviousValuesPromise
@@ -6365,7 +6365,7 @@ export interface ApplicationPreviousValuesPromise
   clientSecret: () => Promise<String>;
   name: () => Promise<String>;
   redirectUris: () => Promise<String[]>;
-  logo: () => Promise<String>;
+  logoUrl: () => Promise<String>;
 }
 
 export interface ApplicationPreviousValuesSubscription
@@ -6377,7 +6377,7 @@ export interface ApplicationPreviousValuesSubscription
   clientSecret: () => Promise<AsyncIterator<String>>;
   name: () => Promise<AsyncIterator<String>>;
   redirectUris: () => Promise<AsyncIterator<String[]>>;
-  logo: () => Promise<AsyncIterator<String>>;
+  logoUrl: () => Promise<AsyncIterator<String>>;
 }
 
 export interface RubriqueEdge {

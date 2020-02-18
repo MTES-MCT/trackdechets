@@ -10,7 +10,7 @@ export interface AuthorizePayload {
   };
   client: {
     name: string;
-    logo: string;
+    logoUrl: string;
   };
 }
 

@@ -33,7 +33,7 @@ describe("GET /oauth2/autorize", () => {
     expect(res.body.redirectURI).toEqual(application.redirectUris[0]);
     expect(res.body.client).toEqual({
       name: application.name,
-      logo: application.logo
+      logoUrl: application.logoUrl
     });
     expect(res.body.user).toEqual({ name: user.name });
   });
