@@ -134,6 +134,6 @@ oauth2server.exchange(
 export function isExpired(grant: Grant): boolean {
   const now = Date.now();
   const createdAt = new Date(grant.createdAt);
-  const elasped = (now - createdAt.getTime()) / 1000;
-  return elasped > grant.expires;
+  const elapsed = (now - createdAt.getTime()) / 1000;
+  return elapsed > grant.expires;
 }
