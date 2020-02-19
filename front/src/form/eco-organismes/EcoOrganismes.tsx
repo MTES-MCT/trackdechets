@@ -118,9 +118,17 @@ export default function EcoOrganismes(props) {
           )}
 
           <div className="notification warning">
-            Blabla explcatif ici Remplissez dans la partie{" "}
-            <strong>"Entreprise émettrice"</strong> ci-dessous les informations
-            sur l'entreprise de collecte.
+            Indiquez dans la partie <strong>"Entreprise émettrice"</strong>{" "}
+            ci-dessous l'entreprise du lieu de collecte et son SIRET.
+            L'Eco-organisme est bien identifié comme responsable du déchet.
+            <br />
+            Vous pouvez utiliser la case <strong>
+              adresse de chantier
+            </strong>{" "}
+            tout en bas si le lieu réel de collecte est différent de l'adresse
+            de l'entreprise (exemple SIRET / adresse communauté de commune pour
+            l'entreprise émettrice, et adresse dechetterie pour lieu de
+            collecte.)
           </div>
         </>
       )}
