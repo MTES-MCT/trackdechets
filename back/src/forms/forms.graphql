@@ -1,4 +1,5 @@
 scalar DateTime
+scalar JSON
 
 type Query {
   """
@@ -18,6 +19,7 @@ type Query {
   `wasteCode`: Code déchet pour affiner la recherche, optionnel
   """
   appendixForms(siret: String!, wasteCode: String): [Form]
+
   """
   Renvoie un token pour télécharger un pdf de bordereau
   Ce token doit être transmis à la route /download pour obtenir le fichier.
@@ -28,7 +30,34 @@ type Query {
     sirets: [String]
     exportType: FormsRegisterExportType
   ): FileDownload
+
+  
+"""
+Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée. 
+La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `created`)
+Seuls les changements de statuts disposant d'un champ `created` non nul sont retournés
+  
+Filtres:
+
+  `siret`: Siret d'une des entreprises que j'administre, optionnel
+
+  `createdAfter`: date formatée après laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
+
+  `createdBefore`: date formatée avant laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
+  
+  `formId`: id d'un bordereau, optionnel
+  
+Pagination:
+
+  `cursorAfter`: cursor après lequel les changements de statut doivent être retournés, optionnel
+
+  `cursorBefore`: cursor avant lequel les changements de statut doivent être retournés, optionnel
+ 
+  """
+  formsLifeCycle(siret: String, loggedBefore: String, loggedAfter: String, cursorAfter:String, cursorBefore:String, formId: ID):formsLifeCycleData
+
 }
+
 
 type Mutation {
   """
@@ -249,3 +278,49 @@ enum FormsRegisterExportType {
   INCOMING
   OUTGOING
 }
+ 
+type StatusLogForm {
+  id: ID
+  readableId: String
+}
+
+type StatusLogUser {
+  id: ID
+  email: String
+}
+
+"""
+Changement de statut d'un bordereau
+
+  `status`: statut du bordereau après le changement de statut
+
+  `updatedFields`: valeur des champs transmis lors du changement de statut (eg. receivedBY, processingOperationDescription)
+"""
+type StatusLog{
+  id: ID
+  status: FormStatus
+  loggedAt: DateTime
+  updatedFields: JSON
+  form: StatusLogForm
+  user: StatusLogUser
+}
+
+"""
+Informations du cycle de vie des bordereaux
+
+Pagination
+
+  `hasNextPage` et `hasPreviousPage`: pagination, indique si d'autres pages existent avant ou après
+
+  `startCursor`et `endCursor`: premier et dernier ID de la page, à passer dans cursorAfter ou cursorBefore de la query formsLifeCycle
+
+"""
+type formsLifeCycleData{
+  statusLogs: [StatusLog]
+  hasNextPage: Boolean
+  hasPreviousPage: Boolean
+  startCursor: ID
+  endCursor: ID
+  count: Int
+}
+

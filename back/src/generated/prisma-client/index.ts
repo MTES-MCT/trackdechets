@@ -830,7 +830,11 @@ export type StatusLogOrderByInput =
   | "id_ASC"
   | "id_DESC"
   | "status_ASC"
-  | "status_DESC";
+  | "status_DESC"
+  | "loggedAt_ASC"
+  | "loggedAt_DESC"
+  | "updatedFields_ASC"
+  | "updatedFields_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -3190,6 +3194,8 @@ export interface DeclarationCreateInput {
 
 export interface StatusLogUpdateManyMutationInput {
   status?: Maybe<Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
 }
 
 export interface CompanyAssociationUpdateManyMutationInput {
@@ -3383,6 +3389,8 @@ export interface StatusLogUpdateInput {
   user?: Maybe<UserUpdateOneRequiredInput>;
   form?: Maybe<FormUpdateOneRequiredInput>;
   status?: Maybe<Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
 }
 
 export interface UserUpdateWithoutCompanyAssociationsDataInput {
@@ -3398,6 +3406,8 @@ export interface StatusLogCreateInput {
   user: UserCreateOneInput;
   form: FormCreateOneInput;
   status: Status;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
 }
 
 export interface RubriqueUpdateManyMutationInput {
@@ -3676,6 +3686,14 @@ export interface StatusLogWhereInput {
   status_not?: Maybe<Status>;
   status_in?: Maybe<Status[] | Status>;
   status_not_in?: Maybe<Status[] | Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  loggedAt_not?: Maybe<DateTimeInput>;
+  loggedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  loggedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  loggedAt_lt?: Maybe<DateTimeInput>;
+  loggedAt_lte?: Maybe<DateTimeInput>;
+  loggedAt_gt?: Maybe<DateTimeInput>;
+  loggedAt_gte?: Maybe<DateTimeInput>;
   AND?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
   OR?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
   NOT?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
@@ -6818,6 +6836,8 @@ export interface RubriquePreviousValuesSubscription
 export interface StatusLog {
   id: ID_Output;
   status: Status;
+  loggedAt?: DateTimeOutput;
+  updatedFields?: Json;
 }
 
 export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
@@ -6825,6 +6845,8 @@ export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
   user: <T = UserPromise>() => T;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
+  loggedAt: () => Promise<DateTimeOutput>;
+  updatedFields: () => Promise<Json>;
 }
 
 export interface StatusLogSubscription
@@ -6834,6 +6856,8 @@ export interface StatusLogSubscription
   user: <T = UserSubscription>() => T;
   form: <T = FormSubscription>() => T;
   status: () => Promise<AsyncIterator<Status>>;
+  loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedFields: () => Promise<AsyncIterator<Json>>;
 }
 
 export interface StatusLogNullablePromise
@@ -6843,6 +6867,8 @@ export interface StatusLogNullablePromise
   user: <T = UserPromise>() => T;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
+  loggedAt: () => Promise<DateTimeOutput>;
+  updatedFields: () => Promise<Json>;
 }
 
 export interface UserAccountHashPreviousValues {
@@ -6901,6 +6927,8 @@ export interface CompanyAssociationEdgeSubscription
 export interface StatusLogPreviousValues {
   id: ID_Output;
   status: Status;
+  loggedAt?: DateTimeOutput;
+  updatedFields?: Json;
 }
 
 export interface StatusLogPreviousValuesPromise
@@ -6908,6 +6936,8 @@ export interface StatusLogPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   status: () => Promise<Status>;
+  loggedAt: () => Promise<DateTimeOutput>;
+  updatedFields: () => Promise<Json>;
 }
 
 export interface StatusLogPreviousValuesSubscription
@@ -6915,6 +6945,8 @@ export interface StatusLogPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   status: () => Promise<AsyncIterator<Status>>;
+  loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedFields: () => Promise<AsyncIterator<Json>>;
 }
 
 export interface StatusLogSubscriptionPayload {

@@ -295,10 +295,11 @@ enum Status {
 
 type StatusLog {
   id: ID! @id
-
   user: User!
   form: Form!
   status: Status!
+  loggedAt: DateTime
+  updatedFields: Json
 }
 
 

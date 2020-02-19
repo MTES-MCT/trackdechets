@@ -5,7 +5,8 @@ import { getReadableId } from "../readable-id";
 import {
   Form,
   FormUpdateInput,
-  FormCreateInput
+  FormCreateInput,
+  Status
 } from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/queries";
 
@@ -35,7 +36,12 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     readableId: await getReadableId(context),
     owner: { connect: { id: userId } }
   });
-
+  await context.prisma.createStatusLog({
+    form: { connect: { id: newForm.id } },
+    user: { connect: { id: context.user.id } },
+    status: newForm.status as Status,
+    updatedFields: {}
+  });
   return unflattenObjectFromDb(newForm);
 }
 

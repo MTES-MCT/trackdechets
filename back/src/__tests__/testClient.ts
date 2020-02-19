@@ -8,16 +8,16 @@ const { JWT_SECRET } = process.env;
  */
 const makeClient = user => {
   // instantiate test client
-  const { mutate, setOptions } = createTestClient({
+  const { mutate, query, setOptions } = createTestClient({
     apolloServer: server
   });
- 
+
   setOptions({
     request: {
       user: user
     }
   });
-  return { mutate };
+  return { mutate, query };
 };
 
 export default makeClient;
