@@ -87,7 +87,6 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      INSEE_SECRET: $INSEE_SECRET
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
