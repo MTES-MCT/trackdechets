@@ -38,6 +38,8 @@ services:
     environment:
       NODE_ENV: production
       JWT_SECRET: $JWT_SECRET
+      API_HOST: $API_HOST
+      API_URL_SCHEME: $API_URL_SCHEME
       UI_HOST: $UI_HOST
       UI_URL_SCHEME: $UI_URL_SCHEME
       VIRTUAL_HOST: $API_HOST
