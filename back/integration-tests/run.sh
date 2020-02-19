@@ -19,8 +19,8 @@ startcontainers(){
 }
 
 stopcontainers(){
-    echo ">> Stopping containers 🛏️ ..."
-    docker-compose stop
+    echo ">> Removing containers 🛏️ ..."
+    docker-compose rm --stop -v --force
 }
 
 runtest(){
