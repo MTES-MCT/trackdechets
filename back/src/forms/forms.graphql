@@ -34,16 +34,16 @@ type Query {
   
 """
 Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée. 
-La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `created`)
+La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
 Seuls les changements de statuts disposant d'un champ `created` non nul sont retournés
   
 Filtres:
 
   `siret`: Siret d'une des entreprises que j'administre, optionnel
 
-  `createdAfter`: date formatée après laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
+  `loggedAfter`: date formatée après laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
 
-  `createdBefore`: date formatée avant laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
+  `loggedBefore`: date formatée avant laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
   
   `formId`: id d'un bordereau, optionnel
   
