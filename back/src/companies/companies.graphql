@@ -35,153 +35,318 @@ type Installation {
   declarations: [Declaration]
 }
 
+"Liste des profils entreprise"
 enum CompanyType {
+  "Producteur de déchet"
   PRODUCER
+
+  "Installation de Transit, regroupement ou tri de déchets"
   COLLECTOR
+
+  "Installation de traitement"
   WASTEPROCESSOR
+
+  "Transporteur"
   TRANSPORTER
+
+  "Installation d'entreposage, dépollution, démontage, découpage de VHU"
   WASTE_VEHICLES
+
+  "Installation de collecte de déchets apportés par le producteur initial"
   WASTE_CENTER
+
+  "Négociant"
   TRADER
 }
 
 # Private company type accessed by a user
 # who is member of the company. Is is typically
 # accessed through `query { user { companies } }`
+
+"""
+Information sur un établissement accessible par un utilisateur membre
+"""
 type CompanyPrivate {
-  # Company info in Prisma
-  ########################
+
+  "Identifiant unique"
   id: ID!
+
+  "Profil de l'établissement"
   companyTypes: [CompanyType]
+
+  "Identifiant GEREP"
   gerepId: String
+
+  "Code de sécurité"
   securityCode: Int!
 
-  # Contact info (from prisma)
-  ###########################
+  "Email de contact (visible sur la fiche entreprise)"
   contactEmail: String
+
+  "Numéro de téléphone de contact (visible sur la fiche entreprise)"
   contactPhone: String
+
+  "Site web (visible sur la fiche entreprise)"
   website: String
 
-  # List of company members
+  "Liste des utilisateurs appartenant à cet établissement"
   users: [CompanyMember]
 
-  # Role of the logged in user in the company
+  "Rôle de l'utilisateur authentifié cau sein de cet établissement"
   userRole: UserRole
 
-  # Given name used in company selector
+  """
+  Nom d'usage de l'entreprise qui permet de différencier
+  différents établissements ayant le même nom"""
   givenName: String
 
-  # Company info from SIRENE
-  ##########################
+  "SIRET de l'établissement"
   siret: String
+
+  "Adresse de l'établissement"
   address: String
+
+  "Nom de l'établissement"
   name: String
+
+  "Code NAF de l'établissement"
   naf: String
+
+  "Libellé NAF de l'établissement"
   libelleNaf: String
+
+  "Longitude de l'établissement (info géographique)"
   longitude: Float
+
+  "Latitude de l'établissement (info géographique)"
   latitude: Float
 
-  # Company info from ICPE database
-  #################################
+  """
+  Installation classée pour la protection de l'environnement (ICPE)
+  associé à cet établissement
+  """
   installation: Installation
 }
 
-# Public company type that can be accessed
-# by a user who is not member of the company
-# (for example in the fiche entreprise)
+
+"Information sur un établissement accessible publiquement"
 type CompanyPublic {
-  # Contact info (from prisma)
-  ###########################
+
+  "Email de contact"
   contactEmail: String
+
+  "Numéro de téléphone de contact"
   contactPhone: String
+
+  "Site web"
   website: String
 
-  # Company info from SIRENE
-  ##########################
+  "SIRET de l'établissement"
   siret: String
+
+  "Adresse de l'établissement"
   address: String
+
+  "Nom de l'établissement"
   name: String
+
+  "Code NAF"
   naf: String
+
+  "Libellé NAF"
   libelleNaf: String
+
+  "Longitude de l'établissement (info géographique)"
   longitude: Float
+
+  "Latitude de l'établissement (info géographique)"
   latitude: Float
 
-  # Company info from ICPE database
+  """
+  Installation classée pour la protection de l'environnement (ICPE)
+  associé à cet établissement
+  """
   installation: Installation
 
-  # Whether or not this company is registered in TD
+  """
+  Si oui on non cet établissement est rattaché à un
+  utilisateur sur la plateforme Trackdéchets"""
   isRegistered: Boolean
 }
 
+"Information sur un établissement accessible en recherche"
 type CompanySearchResult {
-  # company info from SIRENE
+
+  "SIRET de l'établissement"
   siret: String
+
+  "Adresse de l'établissement"
   address: String
+
+  "Nom de l'établissement"
   name: String
+
+  "Profil de l'établissement"
   companyTypes: [CompanyType]
+
+  "Code NAF"
   naf: String
+
+  "Libellé NAF"
   libelleNaf: String
+
+  "Longitude de l'établissement (info géographique)"
   longitude: Float
+
+  "Latitude de l'établissement (info géographique)"
   latitude: Float
 
-  # company info from ICPE database
+  """
+  Installation classée pour la protection de l'environnement (ICPE)
+  associé à cet établissement
+  """
   installation: Installation
 }
 
+"""
+Information sur établissement accessible dans la liste des favoris
+La liste des favoris est constituée à partir de l'historique des
+BSD édités
+"""
 type CompanyFavorite {
+  "Nom de l'établissement"
   name: String
+
+  "SIRET de l'établissement"
   siret: String
+
+  "Adresse de l'établissement"
   address: String
+
+  "Nom du contact"
   contact: String
+
+  "Numéro de téléphone"
   phone: String
+
+  "Email de contact"
   mail: String
 }
 
 type Query {
+  """
+  Renvoie des informations publiques sur un établissement
+  extrait de la base SIRENE et de la base des installations
+  classées pour la protection de l'environnement (ICPE)
+  """
   companyInfos(siret: String!): CompanyPublic
+
+  """
+  Effectue une recherche floue sur la base SIRENE et enrichit
+  les résultats avec des informations provenant de Trackdéchets
+  """
   searchCompanies(clue: String!, department: Int): [CompanySearchResult]
+
+  """
+  Liste les établissements favoris de l'utilisateur. C'est à dire les
+  établissements qui font souvent partis des BSD édités
+  """
   favorites(type: FavoriteType!): [CompanyFavorite]
 }
 
 type Mutation {
+
+  "Renouvelle le code de sécurité de l'établissement"
   renewSecurityCode(siret: String!): CompanyPrivate
+
+  "Édite les informations d'un établissement"
   updateCompany(
+    "SIRET de l'établissement"
     siret: String!
+    "Identifiant GEREP"
     gerepId: String
+    "Email de contact"
     contactEmail: String
+    "Numéro de téléphone de contact"
     contactPhone: String
+    "Site web"
     website: String
+    "Profil de l'établissement"
     companyTypes: [CompanyType]
+    "Nom d'usage de l'établissement"
     givenName: String
   ): CompanyPrivate
+
+  "Rattache un établissement à l'utilisateur authentifié"
   createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate
+
+  """
+  Renvoie une URL permettant de télécharger un fichier
+  Le fichier peut être par exemple un BSD au format .pdf
+  ou un registre au format .csv
+  """
   createUploadLink(fileName: String!, fileType: String!): UploadLink
 }
 
 type UploadLink {
+
+  "URL permettant de télécharger un fichier, protégée par une clé"
   signedUrl: String
+
+  "Clé unique permettant le téléchargement de fichier. La clé expire au bout de 10 secondes"
   key: String
 }
 
+"Payload permettant le rattachement d'un établissement à un utilisateur"
 input PrivateCompanyInput {
+
+  "SIRET de l'établissement"
   siret: String!
+
+  "Identifiant GEREP de l'établissement"
   gerepId: String
+
+  "Profil de l'établissement"
   companyTypes: [CompanyType]
+
+  "Code NAF"
   codeNaf: String
+
+  "Nom de l'établissement"
   companyName: String
+
+  """
+  Liste de documents permettant de démontrer l'appartenance
+  de l'utilisateur à l'établissement"""
   documentKeys: [String]
 }
 
+"Information sur utilisateur au sein d'un établissement"
 type CompanyMember {
+
+  "Identifiant unique"
   id: ID!
+
+  "Email"
   email: String!
+
+  "Nom de l'utilisateur"
   name: String
+
+  "Rôle de l'utilisateur dans l'établissement (ADMIN or MEMBER)"
   role: UserRole
+
+  "Si oui ou non l'email de l'utilisateur a été confirmé"
   isActive: Boolean
+
+  "Si oui ou non une une invitation à joindre l'établissement est en attente"
   isPendingInvitation: Boolean
+
+  "Si oui ou non cet utilisateur correspond à l'utilisateur authentifié"
   isMe: Boolean
 }
 
+"Type d'établissement favoris"
 enum FavoriteType {
   EMITTER
   TRANSPORTER

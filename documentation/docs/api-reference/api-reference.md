@@ -1,81 +1,5 @@
-# Schema Types
+# Référence de l'API GraphQL
 
-<details>
-  <summary><strong>Table of Contents</strong></summary>
-
-  * [Query](#query)
-  * [Mutation](#mutation)
-  * [Objects](#objects)
-    * [AccessToken](#accesstoken)
-    * [AuthPayload](#authpayload)
-    * [CompanyFavorite](#companyfavorite)
-    * [CompanyMember](#companymember)
-    * [CompanyPrivate](#companyprivate)
-    * [CompanyPublic](#companypublic)
-    * [CompanySearchResult](#companysearchresult)
-    * [CompanyStat](#companystat)
-    * [Declaration](#declaration)
-    * [Emitter](#emitter)
-    * [FileDownload](#filedownload)
-    * [Form](#form)
-    * [FormCompany](#formcompany)
-    * [FormSubscription](#formsubscription)
-    * [Installation](#installation)
-    * [NextDestination](#nextdestination)
-    * [Recipient](#recipient)
-    * [Rubrique](#rubrique)
-    * [Stat](#stat)
-    * [StatusLog](#statuslog)
-    * [StatusLogForm](#statuslogform)
-    * [StatusLogUser](#statusloguser)
-    * [Subscription](#subscription)
-    * [Trader](#trader)
-    * [Transporter](#transporter)
-    * [UploadLink](#uploadlink)
-    * [User](#user)
-    * [WasteDetails](#wastedetails)
-    * [formsLifeCycleData](#formslifecycledata)
-  * [Inputs](#inputs)
-    * [AppendixFormInput](#appendixforminput)
-    * [CompanyInput](#companyinput)
-    * [EmitterInput](#emitterinput)
-    * [FormInput](#forminput)
-    * [NextDestinationInput](#nextdestinationinput)
-    * [PrivateCompanyInput](#privatecompanyinput)
-    * [ProcessedFormInput](#processedforminput)
-    * [ReceivedFormInput](#receivedforminput)
-    * [RecipientInput](#recipientinput)
-    * [SentFormInput](#sentforminput)
-    * [SignupInput](#signupinput)
-    * [TraderInput](#traderinput)
-    * [TransporterInput](#transporterinput)
-    * [TransporterSignatureFormInput](#transportersignatureforminput)
-    * [WasteDetailsInput](#wastedetailsinput)
-  * [Enums](#enums)
-    * [CompanyType](#companytype)
-    * [Consistence](#consistence)
-    * [EmitterType](#emittertype)
-    * [FavoriteType](#favoritetype)
-    * [FormStatus](#formstatus)
-    * [FormType](#formtype)
-    * [FormsRegisterExportType](#formsregisterexporttype)
-    * [GerepType](#gereptype)
-    * [Packagings](#packagings)
-    * [QuantityType](#quantitytype)
-    * [UserRole](#userrole)
-    * [UserType](#usertype)
-    * [WasteAcceptationStatusInput](#wasteacceptationstatusinput)
-    * [WasteType](#wastetype)
-  * [Scalars](#scalars)
-    * [Boolean](#boolean)
-    * [DateTime](#datetime)
-    * [Float](#float)
-    * [ID](#id)
-    * [Int](#int)
-    * [JSON](#json)
-    * [String](#string)
-
-</details>
 
 ## Query
 <table>
@@ -91,7 +15,13 @@
 <tr>
 <td colspan="2" valign="top"><strong>companyInfos</strong></td>
 <td valign="top"><a href="#companypublic">CompanyPublic</a></td>
-<td></td>
+<td>
+
+Renvoie des informations publiques sur un établissement
+extrait de la base SIRENE et de la base des installations
+classées pour la protection de l'environnement (ICPE)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">siret</td>
@@ -101,7 +31,12 @@
 <tr>
 <td colspan="2" valign="top"><strong>searchCompanies</strong></td>
 <td valign="top">[<a href="#companysearchresult">CompanySearchResult</a>]</td>
-<td></td>
+<td>
+
+Effectue une recherche floue sur la base SIRENE et enrichit
+les résultats avec des informations provenant de Trackdéchets
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">clue</td>
@@ -116,7 +51,12 @@
 <tr>
 <td colspan="2" valign="top"><strong>favorites</strong></td>
 <td valign="top">[<a href="#companyfavorite">CompanyFavorite</a>]</td>
-<td></td>
+<td>
+
+Liste les établissements favoris de l'utilisateur. C'est à dire les
+établissements qui font souvent partis des BSD édités
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">type</td>
@@ -275,12 +215,20 @@ Pagination:
 <tr>
 <td colspan="2" valign="top"><strong>me</strong></td>
 <td valign="top"><a href="#user">User</a></td>
-<td></td>
+<td>
+
+Renvoie les informations sur l'utilisateur authentifié
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>apiKey</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Renvoie un token permettant de faire des requêtes sur l'API Trackdéchets
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -299,7 +247,11 @@ Pagination:
 <tr>
 <td colspan="2" valign="top"><strong>renewSecurityCode</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td></td>
+<td>
+
+Renouvelle le code de sécurité de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">siret</td>
@@ -309,47 +261,83 @@ Pagination:
 <tr>
 <td colspan="2" valign="top"><strong>updateCompany</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td></td>
+<td>
+
+Édite les informations d'un établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">siret</td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+SIRET de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">gerepId</td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Identifiant GEREP
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">contactEmail</td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Email de contact
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">contactPhone</td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de téléphone de contact
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">website</td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Site web
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">companyTypes</td>
 <td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td></td>
+<td>
+
+Profil de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">givenName</td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom d'usage de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>createCompany</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td></td>
+<td>
+
+Rattache un établissement à l'utilisateur authentifié
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">companyInput</td>
@@ -359,7 +347,13 @@ Pagination:
 <tr>
 <td colspan="2" valign="top"><strong>createUploadLink</strong></td>
 <td valign="top"><a href="#uploadlink">UploadLink</a></td>
-<td></td>
+<td>
+
+Renvoie une URL permettant de télécharger un fichier
+Le fichier peut être par exemple un BSD au format .pdf
+ou un registre au format .csv
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">fileName</td>
@@ -506,7 +500,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>signup</strong></td>
 <td valign="top"><a href="#user">User</a></td>
-<td></td>
+<td>
+
+Permet de créer un nouvel utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">userInfos</td>
@@ -516,7 +514,15 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>login</strong></td>
 <td valign="top"><a href="#authpayload">AuthPayload</a>!</td>
-<td></td>
+<td>
+
+DEPRECATED - La récupération de token doit s'effectuer avec
+le protocole OAuth2
+
+Récupére un token à partir de l'email et du mot de passe
+d'un utilisateur.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">email</td>
@@ -531,7 +537,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>changePassword</strong></td>
 <td valign="top"><a href="#user">User</a>!</td>
-<td></td>
+<td>
+
+Modifie le mot de passe d'un utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">oldPassword</td>
@@ -546,7 +556,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>resetPassword</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Envoie un email pour la réinitialisation du mot de passe
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">email</td>
@@ -556,7 +570,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>editProfile</strong></td>
 <td valign="top"><a href="#user">User</a></td>
-<td></td>
+<td>
+
+Met à jour les informations de l'utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">name</td>
@@ -576,7 +594,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>inviteUserToCompany</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td></td>
+<td>
+
+Invite un nouvel utilisateur à un établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">email</td>
@@ -596,7 +618,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>resendInvitation</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Renvoie l'email d'invitation à un établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">email</td>
@@ -611,7 +637,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>joinWithInvite</strong></td>
 <td valign="top"><a href="#user">User</a>!</td>
-<td></td>
+<td>
+
+Active le compte d'un utilisateur invité
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">inviteHash</td>
@@ -631,7 +661,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>removeUserFromCompany</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td></td>
+<td>
+
+Supprime les droits d'un utilisateurs sur un établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">userId</td>
@@ -646,7 +680,11 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>deleteInvitation</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td></td>
+<td>
+
+Supprime une invitation à un établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">email</td>
@@ -663,28 +701,10 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 
 ## Objects
 
-### AccessToken
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>token</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
 ### AuthPayload
 
+Cet objet est renvoyé par la mutation login qui est dépréciée
+
 <table>
 <thead>
 <tr>
@@ -698,18 +718,32 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>token</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Bearer token à durée illimité permettant de s'authentifier
+à l'API Trackdéchets. Pour ce faire, il doit être passé dans le
+header d'autorisation `Authorization: Bearer ******`
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>user</strong></td>
 <td valign="top"><a href="#user">User</a>!</td>
-<td></td>
+<td>
+
+Utilisateur lié au token
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### CompanyFavorite
 
+Information sur établissement accessible dans la liste des favoris
+La liste des favoris est constituée à partir de l'historique des
+BSD édités
+
 <table>
 <thead>
 <tr>
@@ -723,38 +757,64 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+SIRET de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>contact</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom du contact
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>phone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de téléphone
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>mail</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Email de contact
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### CompanyMember
 
+Information sur utilisateur au sein d'un établissement
+
 <table>
 <thead>
 <tr>
@@ -768,46 +828,72 @@ Valide la prise en charge par le transporteur, et peut valider l'envoi
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
 <td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
+<td>
+
+Identifiant unique
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>email</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Email
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>role</strong></td>
 <td valign="top"><a href="#userrole">UserRole</a></td>
-<td></td>
+<td>
+
+Rôle de l'utilisateur dans l'établissement (ADMIN or MEMBER)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>isActive</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Si oui ou non l'email de l'utilisateur a été confirmé
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>isPendingInvitation</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Si oui ou non une une invitation à joindre l'établissement est en attente
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>isMe</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Si oui ou non cet utilisateur correspond à l'utilisateur authentifié
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### CompanyPrivate
 
-Private company type accessed by a user
-who is member of the company. Is is typically
-accessed through `query { user { companies } }`
+Information sur un établissement accessible par un utilisateur membre
 
 <table>
 <thead>
@@ -824,52 +910,70 @@ accessed through `query { user { companies } }`
 <td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
- Company info in Prisma
-#######################
+Identifiant unique
 
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyTypes</strong></td>
 <td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td></td>
+<td>
+
+Profil de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>gerepId</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Identifiant GEREP
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>securityCode</strong></td>
 <td valign="top"><a href="#int">Int</a>!</td>
-<td></td>
+<td>
+
+Code de sécurité
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>contactEmail</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
- Contact info (from prisma)
-##########################
+Email de contact (visible sur la fiche entreprise)
 
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>contactPhone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de téléphone de contact (visible sur la fiche entreprise)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>website</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Site web (visible sur la fiche entreprise)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>users</strong></td>
 <td valign="top">[<a href="#companymember">CompanyMember</a>]</td>
 <td>
 
-List of company members
+Liste des utilisateurs appartenant à cet établissement
 
 </td>
 </tr>
@@ -878,7 +982,7 @@ List of company members
 <td valign="top"><a href="#userrole">UserRole</a></td>
 <td>
 
-Role of the logged in user in the company
+Rôle de l'utilisateur authentifié cau sein de cet établissement
 
 </td>
 </tr>
@@ -887,7 +991,8 @@ Role of the logged in user in the company
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Given name used in company selector
+Nom d'usage de l'entreprise qui permet de différencier
+différents établissements ayant le même nom
 
 </td>
 </tr>
@@ -896,48 +1001,71 @@ Given name used in company selector
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
- Company info from SIRENE
-#########################
+SIRET de l'établissement
 
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>naf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Code NAF de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>libelleNaf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Libellé NAF de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>longitude</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Longitude de l'établissement (info géographique)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>latitude</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Latitude de l'établissement (info géographique)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>installation</strong></td>
 <td valign="top"><a href="#installation">Installation</a></td>
 <td>
 
- Company info from ICPE database
-################################
+Installation classée pour la protection de l'environnement (ICPE)
+associé à cet établissement
 
 </td>
 </tr>
@@ -946,9 +1074,7 @@ Given name used in company selector
 
 ### CompanyPublic
 
-Public company type that can be accessed
-by a user who is not member of the company
-(for example in the fiche entreprise)
+Information sur un établissement accessible publiquement
 
 <table>
 <thead>
@@ -965,67 +1091,98 @@ by a user who is not member of the company
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
- Contact info (from prisma)
-##########################
+Email de contact
 
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>contactPhone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de téléphone de contact
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>website</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Site web
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
- Company info from SIRENE
-#########################
+SIRET de l'établissement
 
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>naf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Code NAF
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>libelleNaf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Libellé NAF
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>longitude</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Longitude de l'établissement (info géographique)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>latitude</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Latitude de l'établissement (info géographique)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>installation</strong></td>
 <td valign="top"><a href="#installation">Installation</a></td>
 <td>
 
-Company info from ICPE database
+Installation classée pour la protection de l'environnement (ICPE)
+associé à cet établissement
 
 </td>
 </tr>
@@ -1034,7 +1191,8 @@ Company info from ICPE database
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 
-Whether or not this company is registered in TD
+Si oui on non cet établissement est rattaché à un
+utilisateur sur la plateforme Trackdéchets
 
 </td>
 </tr>
@@ -1042,6 +1200,8 @@ Whether or not this company is registered in TD
 </table>
 
 ### CompanySearchResult
+
+Information sur un établissement accessible en recherche
 
 <table>
 <thead>
@@ -1058,51 +1218,80 @@ Whether or not this company is registered in TD
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-company info from SIRENE
+SIRET de l'établissement
 
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyTypes</strong></td>
 <td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td></td>
+<td>
+
+Profil de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>naf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Code NAF
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>libelleNaf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Libellé NAF
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>longitude</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Longitude de l'établissement (info géographique)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>latitude</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Latitude de l'établissement (info géographique)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>installation</strong></td>
 <td valign="top"><a href="#installation">Installation</a></td>
 <td>
 
-company info from ICPE database
+Installation classée pour la protection de l'environnement (ICPE)
+associé à cet établissement
 
 </td>
 </tr>
@@ -1857,17 +2046,27 @@ Changement de statut d'un bordereau
 <tr>
 <td colspan="2" valign="top"><strong>signedUrl</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+URL permettant de télécharger un fichier, protégée par une clé
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>key</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Clé unique permettant le téléchargement de fichier. La clé expire au bout de 10 secondes
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### User
+
+Représente un utilisateur sur la plateforme Trackdéchets
 
 <table>
 <thead>
@@ -1882,27 +2081,47 @@ Changement de statut d'un bordereau
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
 <td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
+<td>
+
+Identifiant unique
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>email</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Email de l'utiliateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>phone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de téléphone de l'utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companies</strong></td>
 <td valign="top">[<a href="#companyprivate">CompanyPrivate</a>]</td>
-<td></td>
+<td>
+
+Liste des établissements dont fait partie l'utilisateur
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -2199,6 +2418,8 @@ Pagination
 
 ### PrivateCompanyInput
 
+Payload permettant le rattachement d'un établissement à un utilisateur
+
 <table>
 <thead>
 <tr>
@@ -2211,32 +2432,57 @@ Pagination
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+SIRET de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>gerepId</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Identifiant GEREP de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyTypes</strong></td>
 <td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td></td>
+<td>
+
+Profil de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>codeNaf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Code NAF
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyName</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>documentKeys</strong></td>
 <td valign="top">[<a href="#string">String</a>]</td>
-<td></td>
+<td>
+
+Liste de documents permettant de démontrer l'appartenance
+de l'utilisateur à l'établissement
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -2391,22 +2637,38 @@ Pagination
 <tr>
 <td colspan="2" valign="top"><strong>email</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Email de l'utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>password</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+mot de passe de l'utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Nom de l'utilisateur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>phone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de téléphone de l'utilisateur
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -2606,6 +2868,8 @@ Pagination
 
 ### CompanyType
 
+Liste des profils entreprise
+
 <table>
 <thead>
 <th align="left">Value</th>
@@ -2614,31 +2878,59 @@ Pagination
 <tbody>
 <tr>
 <td valign="top"><strong>PRODUCER</strong></td>
-<td></td>
+<td>
+
+Producteur de déchet
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>COLLECTOR</strong></td>
-<td></td>
+<td>
+
+Installation de Transit, regroupement ou tri de déchets
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>WASTEPROCESSOR</strong></td>
-<td></td>
+<td>
+
+Installation de traitement
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>TRANSPORTER</strong></td>
-<td></td>
+<td>
+
+Transporteur
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>WASTE_VEHICLES</strong></td>
-<td></td>
+<td>
+
+Installation d'entreposage, dépollution, démontage, découpage de VHU
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>WASTE_CENTER</strong></td>
-<td></td>
+<td>
+
+Installation de collecte de déchets apportés par le producteur initial
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>TRADER</strong></td>
-<td></td>
+<td>
+
+Négociant
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -2694,6 +2986,8 @@ Pagination
 </table>
 
 ### FavoriteType
+
+Type d'établissement favoris
 
 <table>
 <thead>
@@ -2884,6 +3178,20 @@ On peut récupérer les BSD par type:
 
 ### UserRole
 
+Liste les différents rôles d'un utilisateur au sein
+d'un établissement.
+
+Les admins peuvent:
+* consulter/éditer les bordereaux
+* gérer les utilisateurs de l'établissement
+* éditer les informations de la fiche entreprise
+* demander le renouvellement du code de sécurité
+* Éditer les informations de la fiche entreprise
+
+Les membres peuvent:
+* consulter/éditer les bordereaux
+* consulter le reste des informations
+
 <table>
 <thead>
 <th align="left">Value</th>
@@ -2896,45 +3204,6 @@ On peut récupérer les BSD par type:
 </tr>
 <tr>
 <td valign="top"><strong>ADMIN</strong></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### UserType
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>PRODUCER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>COLLECTOR</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>WASTEPROCESSOR</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>WASTE_VEHICLES</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>WASTE_CENTER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TRADER</strong></td>
 <td></td>
 </tr>
 </tbody>

@@ -9,6 +9,8 @@ import * as fs from "fs";
 const content = [];
 
 const options = {
+  title: "Référence de l'API GraphQL",
+  skipTableOfContents: true,
   printer: (txt: string) => content.push(txt)
 };
 
