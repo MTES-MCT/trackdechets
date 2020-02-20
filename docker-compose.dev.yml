@@ -47,6 +47,7 @@ services:
     command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
     volumes:
       - ./back/src:/usr/src/app/src
+      - ./documentation/docs/api-reference:/usr/src/app/documentation
     env_file:
       - .env
     environment:
