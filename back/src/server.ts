@@ -14,6 +14,7 @@ import { shield } from "graphql-shield";
 import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
+import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
@@ -160,6 +161,7 @@ require("./auth");
 
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
+app.use(oauth2Router);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);

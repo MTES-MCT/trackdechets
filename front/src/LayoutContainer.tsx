@@ -1,11 +1,11 @@
 import React, { lazy, Suspense, useEffect } from "react";
-import { Route, withRouter } from "react-router";
+import { Route, withRouter, Switch } from "react-router";
 import { useAuth } from "./use-auth";
-import Header from "./Header";
 import Home from "./Home";
 import PrivateRoute from "./login/PrivateRoute";
 import { trackPageView } from "./tracker";
 import Loader from "./common/Loader";
+import Layout from "./Layout";
 
 const dashBoardPreload = import("./dashboard/Dashboard");
 const Dashboard = lazy(() => dashBoardPreload);
@@ -19,6 +19,7 @@ const ResetPassword = lazy(() => import("./login/ResetPassword"));
 const Cgu = lazy(() => import("./Cgu"));
 const Login = lazy(() => import("./login/Login"));
 const Signup = lazy(() => import("./login/Signup"));
+const Dialog = lazy(() => import("./oauth2/Dialog"));
 const Company = lazy(() => import("./company/Company"));
 const WasteTree = lazy(() => import("./search/WasteTree"));
 const Stats = lazy(() => import("./Stats"));
@@ -42,58 +43,70 @@ export default withRouter(function LayoutContainer({ history }) {
   }
 
   return (
-    <React.Fragment>
-      <Header isAuthenticated={isAuthenticated} />
-      <Route
+    <Switch>
+      <PrivateRoute
         exact
-        path="/"
-        render={() => <Home isAuthenticated={isAuthenticated} />}
+        path="/oauth2/authorize/dialog"
+        isAuthenticated={isAuthenticated}
+        component={WaitingComponent(Dialog)}
       />
-      <Route exact path="/cgu" component={WaitingComponent(Cgu)} />
-      <Route exact path="/partners" component={WaitingComponent(Partners)} />
-      <Route exact path="/login" component={WaitingComponent(Login)} />
-      <Route exact path="/invite" component={WaitingComponent(Invite)} />
-      <Route exact path="/signup" component={WaitingComponent(Signup)} />
-      <Route
-        exact
-        path="/signup/details"
-        component={WaitingComponent(WasteSelector)}
-      />
-      <Route
-        exact
-        path="/signup/activation"
-        component={WaitingComponent(SignupInfo)}
-      />
-      <Route
-        exact
-        path="/reset-password"
-        component={WaitingComponent(ResetPassword)}
-      />
+      <Layout isAuthenticated={isAuthenticated}>
+        <Route
+          exact
+          path="/"
+          render={() => <Home isAuthenticated={isAuthenticated} />}
+        />
+        <Route exact path="/cgu" component={WaitingComponent(Cgu)} />
+        <Route exact path="/partners" component={WaitingComponent(Partners)} />
+        <Route exact path="/login" component={WaitingComponent(Login)} />
+        <Route exact path="/invite" component={WaitingComponent(Invite)} />
+        <Route exact path="/signup" component={WaitingComponent(Signup)} />
 
-      <Route
-        exact
-        path="/company/:siret"
-        component={WaitingComponent(Company)}
-      />
+        <Route
+          exact
+          path="/signup/details"
+          component={WaitingComponent(WasteSelector)}
+        />
+        <Route
+          exact
+          path="/signup/activation"
+          component={WaitingComponent(SignupInfo)}
+        />
+        <Route
+          exact
+          path="/reset-password"
+          component={WaitingComponent(ResetPassword)}
+        />
 
-      <Route exact path="/wasteTree" component={WaitingComponent(WasteTree)} />
-      <Route exact path="/stats" component={WaitingComponent(Stats)} />
-      <PrivateRoute
-        path="/form/:id?"
-        isAuthenticated={isAuthenticated}
-        component={WaitingComponent(FormContainer)}
-      />
-      <PrivateRoute
-        path="/dashboard"
-        isAuthenticated={isAuthenticated}
-        component={WaitingComponent(Dashboard)}
-      />
-      <PrivateRoute
-        path="/account"
-        isAuthenticated={isAuthenticated}
-        component={WaitingComponent(Account)}
-      />
-    </React.Fragment>
+        <Route
+          exact
+          path="/company/:siret"
+          component={WaitingComponent(Company)}
+        />
+
+        <Route
+          exact
+          path="/wasteTree"
+          component={WaitingComponent(WasteTree)}
+        />
+        <Route exact path="/stats" component={WaitingComponent(Stats)} />
+        <PrivateRoute
+          path="/form/:id?"
+          isAuthenticated={isAuthenticated}
+          component={WaitingComponent(FormContainer)}
+        />
+        <PrivateRoute
+          path="/dashboard"
+          isAuthenticated={isAuthenticated}
+          component={WaitingComponent(Dashboard)}
+        />
+        <PrivateRoute
+          path="/account"
+          isAuthenticated={isAuthenticated}
+          component={WaitingComponent(Account)}
+        />
+      </Layout>
+    </Switch>
   );
 });
 

@@ -9,17 +9,21 @@ import {
 import styles from "./Login.module.scss";
 
 export default withRouter(function Login(
-  routeProps: RouteComponentProps<{}, {}, { error: string }>
+  routeProps: RouteComponentProps<{}, {}, { error?: string; returnTo?: string }>
 ) {
   const { REACT_APP_API_ENDPOINT } = process.env;
 
   const queries = queryString.parse(routeProps.location.search);
 
-  if (queries.error) {
-    return (
-      <Redirect to={{ pathname: "/login", state: { error: queries.error } }} />
-    );
+  if (queries.error || queries.returnTo) {
+    const state = {
+      ...(queries.error ? { error: queries.error } : {}),
+      ...(queries.returnTo ? { returnTo: queries.returnTo } : {})
+    };
+    return <Redirect to={{ pathname: "/login", state }} />;
   }
+
+  const { returnTo, error } = routeProps.location.state || {};
 
   return (
     <section className="section section-white">
@@ -40,11 +44,9 @@ export default withRouter(function Login(
             </label>
           </div>
 
-          {routeProps.location.state && (
-            <div className={styles["form-error-message"]}>
-              {routeProps.location.state.error}
-            </div>
-          )}
+          {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
+
+          {error && <div className={styles["form-error-message"]}>{error}</div>}
 
           <button className="button" type="submit">
             Se connecter
