@@ -2,325 +2,604 @@ scalar DateTime
 scalar JSON
 
 type Query {
+
+  "Renvoie un BSD, sélectionné par ID"
+  form(
+    "Identifiant opaque du BSD"
+    id: ID
+    ): Form
+
   """
-  Renvoie un BSD, sélectionné par ID
-  """
-  form(id: ID): Form
-  """
-  Renvoie les BSDs de la compagnie sélectionnée (la première par défaut)
+  Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
   Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
   On peut également demander les bordereaux pour lesquels on est transporteur
   """
-  forms(siret: String, type: FormType = ACTOR): [Form]
+  forms(
+    "SIRET d'un établissement dont je suis membre"
+    siret: String,
+    """
+    (Optionnel) Type de BSD renvoyés
+    ACTOR = BSD's dont on est producteur ou destinataire
+    TRANSPORTER = BSD's dont on est transporteur
+    """
+    type: FormType = ACTOR
+    ): [Form]
+
+  "Renvoie des statistiques sur le volume de déchets entrant et sortant"
   stats: [CompanyStat]
-  """
-  Renvoie des BSD candidats à un regroupement dans une annexe 2
-  `siret`: Siret d'une des entreprises que j'administre
-  `wasteCode`: Code déchet pour affiner la recherche, optionnel
-  """
-  appendixForms(siret: String!, wasteCode: String): [Form]
+
+  "Renvoie des BSD candidats à un regroupement dans une annexe 2"
+  appendixForms(
+    "Siret d'un des établissements dont je suis membre"
+    siret: String!,
+    "(Optionnel) Code déchet pour affiner la recherche"
+    wasteCode: String
+    ): [Form]
 
   """
-  Renvoie un token pour télécharger un pdf de bordereau
+  Renvoie un token pour télécharger un pdf de BSD
   Ce token doit être transmis à la route /download pour obtenir le fichier.
   Il est valable 10 secondes
   """
-  formPdf(id: ID): FileDownload
+  formPdf(
+    "ID d'un BSD"
+    id: ID):
+  FileDownload
+
+  """
+  Renvoie un token pour télécharger un csv du regsitre
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
   formsRegister(
+    "Liste de SIRET d'établissements dont je suis membre"
     sirets: [String]
+    "Type d'export"
     exportType: FormsRegisterExportType
   ): FileDownload
 
-  
-"""
-Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée. 
-La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
-Seuls les changements de statuts disposant d'un champ `created` non nul sont retournés
-  
-Filtres:
 
-  `siret`: Siret d'une des entreprises que j'administre, optionnel
-
-  `loggedAfter`: date formatée après laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
-
-  `loggedBefore`: date formatée avant laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel
-  
-  `formId`: id d'un bordereau, optionnel
-  
-Pagination:
-
-  `cursorAfter`: cursor après lequel les changements de statut doivent être retournés, optionnel
-
-  `cursorBefore`: cursor avant lequel les changements de statut doivent être retournés, optionnel
- 
   """
-  formsLifeCycle(siret: String, loggedBefore: String, loggedAfter: String, cursorAfter:String, cursorBefore:String, formId: ID):formsLifeCycleData
+  Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
+  La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
+  Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont retournés
+  """
+  formsLifeCycle(
+    "(Optionnel) SIRET d'un établissement dont je suis membre"
+    siret: String,
+    "(Optionnel) Date formatée après laquelle les changements de statut doivent être retournés (YYYY-MM-DD)"
+    loggedBefore: String,
+    "(Optionnel) Date formatée avant laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel"
+    loggedAfter: String,
+    "(Optionnel) PAGINATION - Curseur après lequel les changements de statut doivent être retournés"
+    cursorAfter: String,
+    "(Optionnel) PAGINATION - Curseur avant lequel les changements de statut doivent être retournés"
+    cursorBefore: String,
+    "(Optionnel) ID d'un BSD en particulier"
+    formId: ID
+    ):formsLifeCycleData
 
 }
 
 
 type Mutation {
-  """
-  Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
-  """
-  saveForm(formInput: FormInput!): Form
-  """
-  Supprime un BSD
-  """
-  deleteForm(id: ID!): Form
-  """
-  Duplique un BSD
-  """
-  duplicateForm(id: ID!): Form
 
-  """
-  Scelle un BSD
-  """
-  markAsSealed(id: ID): Form
-  """
-  Valide l'envoi d'un BSD
-  """
-  markAsSent(id: ID, sentInfo: SentFormInput!): Form
-  """
-  Valide la réception d'un BSD
-  """
-  markAsReceived(id: ID, receivedInfo: ReceivedFormInput!): Form
-  """
-  Valide le traitement d'un BSD
-  """
-  markAsProcessed(id: ID, processedInfo: ProcessedFormInput!): Form
+  "Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
+  saveForm(
+    "Payload du BSD"
+    formInput: FormInput!
+    ): Form
 
-  """
-  Valide la prise en charge par le transporteur, et peut valider l'envoi
-  """
-  signedByTransporter(
+  "Supprime un BSD"
+  deleteForm(
+    "ID d'un BSD"
     id: ID!
+    ): Form
+
+  "Duplique un BSD"
+  duplicateForm(
+    "ID d'un BSD"
+    id: ID!
+    ): Form
+
+  "Scelle un BSD"
+  markAsSealed(
+    "ID d'un BSD"
+    id: ID
+    ): Form
+
+  "Valide l'envoi d'un BSD"
+  markAsSent(
+    "ID d'un BSD"
+    id: ID,
+    "Informations liées à l'envoi"
+    sentInfo: SentFormInput!
+    ): Form
+
+  "Valide la réception d'un BSD"
+  markAsReceived(
+    "ID d'un BSD"
+    id: ID,
+    "Informations liées à la réception"
+    receivedInfo: ReceivedFormInput!): Form
+
+  "Valide le traitement d'un BSD"
+  markAsProcessed(
+    "ID d'un BSD"
+    id: ID,
+    "Informations liées au traitement"
+    processedInfo: ProcessedFormInput!
+    ): Form
+
+  "Valide la prise en charge par le transporteur, et peut valider l'envoi"
+  signedByTransporter(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées à la signature transporteur"
     signingInfo: TransporterSignatureFormInput!
   ): Form
 }
 
 type Subscription {
-  forms(token: String!): FormSubscription
+  """
+  DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
+
+  Permet de s'abonner aux changements de statuts d'un BSD
+  """
+  forms(
+    "Token permettant de s'authentifier à l'API"
+    token: String!
+    ): FormSubscription
 }
 
+"""
+DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
+
+Mise à jour d'un BSD
+"""
 type FormSubscription {
+
+  "Type de mutation"
   mutation: String
+
+  "BSD concerné"
   node: Form
+
+  "Liste des champs mis à jour"
   updatedFields: [String]
+
+  "Ancienne valeurs"
   previousValues: Form
 }
 
+"Différents statuts d'un BSD au cours de son cycle de vie"
 enum FormStatus {
+
+  """
+  BSD à l'état de brouillon
+  Des champs obligatoires peuvent manquer
+  """
   DRAFT
+
+  """
+  BSD finalisé
+  Les champs sont validés pour détecter des valeurs manquantes ou erronnées
+  """
   SEALED
+
+  "BSD envoyé vers l'établissement de destination"
   SENT
+
+  "BSD reçu par l'établissement de destination"
   RECEIVED
+
+  "BSD dont les déchets ont été traités"
   PROCESSED
+
+  "BSD en attente de regroupement"
   AWAITING_GROUP
+
+  "Regroupement effectué"
   GROUPED
+
+  "Perte de traçabalité"
   NO_TRACEABILITY
+
+  "Déchet refusé"
   REFUSED
 }
 
-"""
-On peut récupérer les BSD par type:
-- ACTOR: on est acteur du BSD, c'est à dire émetteur ou destinataire (cas par défaut)
-- TRANSPORTER: on est uniquement transporteur du déchet
-"""
+"Valeur possibles pour le filtre de la query `forms`"
 enum FormType {
+
+  "Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)"
   ACTOR
+
+  "Uniquement les BSD's dont je suis transporteur"
   TRANSPORTER
 }
 
 """
-Représente un BSD
+Bordereau de suivi de déchets (BSD)
+Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/professionnels-entreprises/vosdroits/R14334)
 """
 type Form {
+
+  "Identifiant interne du BSD"
   id: ID
+
+  "Identifiant utilisé dans la case 'Bordereau n° ****'"
   readableId: String
+
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
   customId: String
 
+  "Établissement émetteur/producteur du déchet (case 1)"
   emitter: Emitter
+
+  "Établissement qui reçoit le déchet (case 2)"
   recipient: Recipient
+
+  "Transporteur du déchet (case 8)"
   transporter: Transporter
+
+  "Détails du déchet (case 3)"
   wasteDetails: WasteDetails
+
+  "Négociant (case 7)"
   trader: Trader
 
+  "Date de création du BSD"
   createdAt: DateTime
+
+  "Date de la dernière modification du BSD"
   updatedAt: DateTime
 
+  "ID de l'utilisateur ayant crée le BSD"
   ownerId: Int
+
+  "Statut du BSD (brouillon, envoyé, reçu, traité, etc)"
   status: FormStatus
 
+  "Si oui ou non le BSD a été signé par un transporteur"
   signedByTransporter: Boolean
 
+  "Date de l'envoi du déchet par l'émetteur (case 9)"
   sentAt: DateTime
+
+  "Nom de la personne responsable de l'envoi du déchet (case 9)"
   sentBy: String
 
+  "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: String
+
+  "Raison du refus (case 10)"
   wasteRefusalReason: String
+
+  "Nom de la personne en charge de la réception du déchet (case 10)"
   receivedBy: String
+
+  "Date à laquelle le déchet a été reçu (case 10)"
   receivedAt: DateTime
+
+  "Quantité réelle présentée (case 10)"
   quantityReceived: Float
 
+  "Si oui ou non le traitement a été effectué"
   processingOperationDone: String
+
+  "Description de l'opération de traitement (case 11)"
   processingOperationDescription: String
+
+  "Personne en charge du traitement"
   processedBy: String
+
+  "Date à laquelle le déchet a été traité"
   processedAt: DateTime
+
+  "Si oui ou non il y a eu perte de traçabalité"
   noTraceability: Boolean
+
+  "Destination ultérieure prévue (case 12)"
   nextDestination: NextDestination
 
+  "Annexe 2"
   appendix2Forms: [Form]
 }
 
+"Information sur un établissement dans un BSD"
 type FormCompany {
+
+  "Nom de l'établissement"
   name: String
+
+  "SIRET de l'établissement"
   siret: String
+
+  "Adresse de l'établissement"
   address: String
+
+  "Nom du contact dans l'établissement"
   contact: String
+
+  "Numéro de téléphone de contact dans l'établissement"
   phone: String
+
+  "Email du contact dans l'établissement"
   mail: String
 }
 
+"Types d'émetteur de déchet (choix multiple de la case 1)"
 enum EmitterType {
+
+  "Producetur de déchet"
   PRODUCER
+
+  "Autre détenteur"
   OTHER
+
+  "Collecteur de petites quantités de déchets relevant de la même rubrique"
   APPENDIX1
+
+  "Personne ayant transformé ou réalisé un traitement dont la provenance des déchets reste identifiable"
   APPENDIX2
 }
 
+"Émetteur du BSD (case 1)"
 type Emitter {
+
+  "Type d'émetteur"
   type: EmitterType
+
+  "Adresse du chantier"
   pickupSite: String
 
+  "Établissement émetteur"
   company: FormCompany
 }
 
+"""
+Installation de destination ou d'entreprosage
+ou de reconditionnement prévue (case 2)
+"""
 type Recipient {
+
+  "N° de CAP (le cas échéant)"
   cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
 
+  "Établissement de destination"
   company: FormCompany
 }
 
+"Collecteur - transporteur (case 8)"
 type Transporter {
+
+  "Établissement collecteur - transporteur"
   company: FormCompany
 
+  "Exemption de récipissé"
   isExemptedOfReceipt: Boolean
 
+  "N° de récipissé"
   receipt: String
+
+  "Département"
   department: String
+
+  "Limite de validité du récipissé"
   validityLimit: DateTime
+
+  "Numéro de plaque d'immatriculation"
   numberPlate: String
 }
 
+"Destination ultérieure prévue (case 12)"
 type NextDestination {
+
+  "Traitement prévue (code D/R)"
   processingOperation: String
+
+  "Établissement ultérieure"
   company: FormCompany
 }
 
+"Type de quantité lors de l'émission"
 enum QuantityType {
+
+  "Quntité réelle"
   REAL
+
+  "Quantité estimée"
   ESTIMATED
 }
 
+"Type de packaging du déchet"
 enum Packagings {
+
+  "Fut"
   FUT
+
+  "GRV"
   GRV
+
+  "Citerne"
   CITERNE
+
+  "Benne"
   BENNE
+
+  "Autre"
   AUTRE
 }
 
+"Consistance du déchet"
 enum Consistence {
+
+  "Solide"
   SOLID
+
+  "Liquide"
   LIQUID
+
+  "Gazeux"
   GASEOUS
 }
 
+"Détails du déchet (case 3, 4, 5, 6)"
 type WasteDetails {
+
+  "rubrique déchet au format |_|_| |_|_| |_|_| (*)"
   code: String
+
+  "Dénomination usuelle"
   name: String
+
+  "Code ONU"
   onuCode: String
+
+  "Conditionnement"
   packagings: [Packagings]
   otherPackaging: String
+
+  "Nombre de colis"
   numberOfPackages: Int
+
+  "Quantité en tonnes"
   quantity: Float
+
+  "Réelle ou estimée"
   quantityType: QuantityType
+
+  "Consistance"
   consistence: Consistence
 }
 
+"Négociant (case 7)"
 type Trader {
+
+  "Établissement négociant"
   company: FormCompany
 
+  "N° de récipissé"
   receipt: String
+
+  "Département"
   department: String
+
+  "Limite de validité"
   validityLimit: DateTime
 }
 
+"Statistiques d'un établissement"
 type CompanyStat {
+
+  "Établissement"
   company: FormCompany
+
+  "Liste des statistiques"
   stats: [Stat]
 }
 
+"Statistiques"
 type Stat {
+
+  "Code déchet"
   wasteCode: String
+
+  "Quantité entrante"
   incoming: Float
+
+  "Qantité sortante"
   outgoing: Float
 }
 
+"""
+URL de téléchargement accompagné d'un token
+permettant de valider le téléchargement.
+"""
 type FileDownload {
+
+  "Token ayant une durée de validité de 10s"
   token: String
+
+  "Lien de téléchargement"
   downloadLink: String
 }
 
+"Type pour l'export du registre"
 enum FormsRegisterExportType {
+
+  "Déchets entrants"
   INCOMING
+
+  "Déchets sortants"
   OUTGOING
 }
- 
+
+"Information sur un BSD dans les logs de modifications de statuts"
 type StatusLogForm {
+
+  "Identifiant du BSD"
   id: ID
+
+  "N° du bordereau"
   readableId: String
 }
 
+"Utilisateur ayant modifié le BSD"
 type StatusLogUser {
   id: ID
   email: String
 }
 
-"""
-Changement de statut d'un bordereau
-
-  `status`: statut du bordereau après le changement de statut
-
-  `updatedFields`: valeur des champs transmis lors du changement de statut (eg. receivedBY, processingOperationDescription)
-"""
+"Changement de statut d'un bordereau"
 type StatusLog{
+
+  "Identifiant du log"
   id: ID
+
+  "Statut du bordereau après le changement de statut"
   status: FormStatus
+
+  "Date à laquelle le changement de statut a été effectué"
   loggedAt: DateTime
+
+  "Valeur des champs transmis lors du changement de statut (eg. receivedBY, processingOperationDescription)"
   updatedFields: JSON
+
+  "BSD concerné"
   form: StatusLogForm
+
+  "Utilisateur à l'origine de la modification"
   user: StatusLogUser
 }
 
-"""
-Informations du cycle de vie des bordereaux
 
-Pagination
-
-  `hasNextPage` et `hasPreviousPage`: pagination, indique si d'autres pages existent avant ou après
-
-  `startCursor`et `endCursor`: premier et dernier ID de la page, à passer dans cursorAfter ou cursorBefore de la query formsLifeCycle
-
-"""
+"Informations du cycle de vie des bordereaux"
 type formsLifeCycleData{
+
+  "Liste des changements de statuts"
   statusLogs: [StatusLog]
+
+  "pagination, indique si d'autres pages existent après"
   hasNextPage: Boolean
+
+  "pagination, indique si d'autres pages existent avant"
   hasPreviousPage: Boolean
+
+  "Premier id de la page, à passer dans cursorAfter ou cursorBefore de la query formsLifeCycle"
   startCursor: ID
+
+  "Dernier ID de la page, à passer dans cursorAfter ou cursorBefore de la query formsLifeCycle"
   endCursor: ID
+
+  "Nombre de changements de statuts renvoyés"
   count: Int
 }
 

@@ -1,42 +1,90 @@
-type Rubrique {
-  rubrique: String
-  alinea: String
-  etatActivite: String
-  regimeAutorise: String
-  activite: String
-  category: String
-  volume: String
-  unite: String
-  wasteType: WasteType
+
+type Query {
+
+  """
+  Renvoie des informations publiques sur un établissement
+  extrait de la base SIRENE et de la base des installations
+  classées pour la protection de l'environnement (ICPE)
+  """
+  companyInfos(
+    "SIRET de l'établissement"
+    siret: String!
+    ): CompanyPublic
+
+  """
+  Effectue une recherche floue sur la base SIRENE et enrichit
+  les résultats avec des informations provenant de Trackdéchets
+  """
+  searchCompanies(
+    """
+    Champ utilisé pour faire une recherche floue
+    sur la nom de l'établissement, ex: 'Boulangerie Dupont'
+    """
+    clue: String!,
+    "(Optionnel) Filtre les résultats par numéro de département"
+    department: Int
+    ): [CompanySearchResult]
+
+  """
+  Renvoie les établissements favoris de l'utilisateur. C'est à dire les
+  établissements qui font souvent partis des BSD édités
+  """
+  favorites(
+    "type de favoris"
+    type: FavoriteType!
+    ): [CompanyFavorite]
 }
 
-enum GerepType {
-  Producteur
-  Traiteur
+type Mutation {
+
+  """
+  USAGE INTERNE
+  Renouvelle le code de sécurité de l'établissement
+  """
+  renewSecurityCode(siret: String!): CompanyPrivate
+
+  """
+  USAGE INTERNE
+  Édite les informations d'un établissement
+  """
+  updateCompany(
+    "SIRET de l'établissement"
+    siret: String!
+    "(Optionnel) Identifiant GEREP"
+    gerepId: String
+    "(Optionnel) Email de contact"
+    contactEmail: String
+    "(Optionnel) Numéro de téléphone de contact"
+    contactPhone: String
+    "(Optionnel) Site web"
+    website: String
+    "(Optionnel) Profil de l'établissement"
+    companyTypes: [CompanyType]
+    "(Optionnel) Nom d'usage de l'établissement"
+    givenName: String
+  ): CompanyPrivate
+
+  """
+  USAGE INTERNE
+  Rattache un établissement à l'utilisateur authentifié
+  """
+  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate
+
+  """
+  USAGE INTERNE
+  Récupère une URL signé pour l'upload d'un fichier
+  """
+  createUploadLink(
+    "nom du fichier"
+    fileName: String!,
+    "type de fichier"
+    fileType: String!
+    ): UploadLink
 }
 
-enum WasteType {
-  INERTE
-  NOT_DANGEROUS
-  DANGEROUS
-}
-
-type Declaration {
-  annee: String
-  codeDechet: String
-  libDechet: String
-  gerepType: GerepType
-}
-
-type Installation {
-  codeS3ic: String
-  urlFiche: String
-  rubriques: [Rubrique]
-  declarations: [Declaration]
-}
-
-"Liste des profils entreprise"
+"Profil entreprise"
 enum CompanyType {
+
   "Producteur de déchet"
   PRODUCER
 
@@ -59,16 +107,11 @@ enum CompanyType {
   TRADER
 }
 
-# Private company type accessed by a user
-# who is member of the company. Is is typically
-# accessed through `query { user { companies } }`
 
-"""
-Information sur un établissement accessible par un utilisateur membre
-"""
+"Information sur un établissement accessible par un utilisateur membre"
 type CompanyPrivate {
 
-  "Identifiant unique"
+  "Identifiant opaque"
   id: ID!
 
   "Profil de l'établissement"
@@ -77,7 +120,7 @@ type CompanyPrivate {
   "Identifiant GEREP"
   gerepId: String
 
-  "Code de sécurité"
+  "Code de sécurité permettant de signer les BSD"
   securityCode: Int!
 
   "Email de contact (visible sur la fiche entreprise)"
@@ -97,7 +140,8 @@ type CompanyPrivate {
 
   """
   Nom d'usage de l'entreprise qui permet de différencier
-  différents établissements ayant le même nom"""
+  différents établissements ayant le même nom
+  """
   givenName: String
 
   "SIRET de l'établissement"
@@ -123,7 +167,7 @@ type CompanyPrivate {
 
   """
   Installation classée pour la protection de l'environnement (ICPE)
-  associé à cet établissement
+  associé à cet établissement (le cas échéant)
   """
   installation: Installation
 }
@@ -169,12 +213,12 @@ type CompanyPublic {
   installation: Installation
 
   """
-  Si oui on non cet établissement est rattaché à un
-  utilisateur sur la plateforme Trackdéchets"""
+  Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
+  """
   isRegistered: Boolean
 }
 
-"Information sur un établissement accessible en recherche"
+"Information sur un établissement accessible publiquement en recherche"
 type CompanySearchResult {
 
   "SIRET de l'établissement"
@@ -214,6 +258,7 @@ La liste des favoris est constituée à partir de l'historique des
 BSD édités
 """
 type CompanyFavorite {
+
   "Nom de l'établissement"
   name: String
 
@@ -233,67 +278,13 @@ type CompanyFavorite {
   mail: String
 }
 
-type Query {
-  """
-  Renvoie des informations publiques sur un établissement
-  extrait de la base SIRENE et de la base des installations
-  classées pour la protection de l'environnement (ICPE)
-  """
-  companyInfos(siret: String!): CompanyPublic
-
-  """
-  Effectue une recherche floue sur la base SIRENE et enrichit
-  les résultats avec des informations provenant de Trackdéchets
-  """
-  searchCompanies(clue: String!, department: Int): [CompanySearchResult]
-
-  """
-  Liste les établissements favoris de l'utilisateur. C'est à dire les
-  établissements qui font souvent partis des BSD édités
-  """
-  favorites(type: FavoriteType!): [CompanyFavorite]
-}
-
-type Mutation {
-
-  "Renouvelle le code de sécurité de l'établissement"
-  renewSecurityCode(siret: String!): CompanyPrivate
-
-  "Édite les informations d'un établissement"
-  updateCompany(
-    "SIRET de l'établissement"
-    siret: String!
-    "Identifiant GEREP"
-    gerepId: String
-    "Email de contact"
-    contactEmail: String
-    "Numéro de téléphone de contact"
-    contactPhone: String
-    "Site web"
-    website: String
-    "Profil de l'établissement"
-    companyTypes: [CompanyType]
-    "Nom d'usage de l'établissement"
-    givenName: String
-  ): CompanyPrivate
-
-  "Rattache un établissement à l'utilisateur authentifié"
-  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate
-
-  """
-  Renvoie une URL permettant de télécharger un fichier
-  Le fichier peut être par exemple un BSD au format .pdf
-  ou un registre au format .csv
-  """
-  createUploadLink(fileName: String!, fileType: String!): UploadLink
-}
-
+"Lien d'upload"
 type UploadLink {
 
-  "URL permettant de télécharger un fichier, protégée par une clé"
+  "URL signé permettant d'uploader un fichier"
   signedUrl: String
 
-  "Clé unique permettant le téléchargement de fichier. La clé expire au bout de 10 secondes"
+  "Clé permettant l'upload du fichier"
   key: String
 }
 
@@ -317,14 +308,15 @@ input PrivateCompanyInput {
 
   """
   Liste de documents permettant de démontrer l'appartenance
-  de l'utilisateur à l'établissement"""
+  de l'utilisateur à l'établissement
+  """
   documentKeys: [String]
 }
 
 "Information sur utilisateur au sein d'un établissement"
 type CompanyMember {
 
-  "Identifiant unique"
+  "Identifiant opaque"
   id: ID!
 
   "Email"
@@ -333,7 +325,7 @@ type CompanyMember {
   "Nom de l'utilisateur"
   name: String
 
-  "Rôle de l'utilisateur dans l'établissement (ADMIN or MEMBER)"
+  "Rôle de l'utilisateur dans l'établissement (admin ou membre)"
   role: UserRole
 
   "Si oui ou non l'email de l'utilisateur a été confirmé"
@@ -353,4 +345,96 @@ enum FavoriteType {
   RECIPIENT
   TRADER
   NEXT_DESTINATION
+}
+
+"""
+Rubrique ICPE d'un établissement avec les autorisations associées
+Pour plus de détails, se référer à la
+[nomenclature des ICPE](https://www.georisques.gouv.fr/dossiers/installations/nomenclature-ic)
+"""
+type Rubrique {
+
+  """
+  Numéro de rubrique tel que défini dans la nomenclature des ICPE
+  Ex: 2710
+  """
+  rubrique: String
+
+  "Alinéa pour la rubrique concerné"
+  alinea: String
+
+  "État de l'activité, ex: 'En fonct', 'À l'arrêt'"
+  etatActivite: String
+
+  "Régime autorisé pour la rubrique: déclaratif, autorisation, seveso, etc"
+  regimeAutorise: String
+
+  """
+  Description de l'activité:
+  Ex: traitement thermique de déchets dangereux
+  """
+  activite: String
+
+  "Catégorie d'établissement associé: TTR, VHU, Traitement"
+  category: String
+
+  "Volume autorisé"
+  volume: String
+
+  "Unité utilisé pour le volume autorisé"
+  unite: String
+
+  "Type de déchets autorisé"
+  wasteType: WasteType
+}
+
+"Type d'une déclaration GEREP"
+enum GerepType {
+  Producteur
+  Traiteur
+}
+
+"Type de déchets autorisé pour une rubrique"
+enum WasteType {
+
+  "Déchet inerte"
+  INERTE
+
+  "Déchet non dangereux"
+  NOT_DANGEROUS
+
+  "Déchet dangereux"
+  DANGEROUS
+}
+
+"Représente une ligne dans une déclaration GEREP"
+type Declaration {
+
+  "Année de la déclaration"
+  annee: String
+
+  "Code du déchet"
+  codeDechet: String
+
+  "Description du déchet"
+  libDechet: String
+
+  "Type de déclaration GEREP: producteur ou traiteur"
+  gerepType: GerepType
+}
+
+"Installation pour la protection de l'environnement (ICPE)"
+type Installation {
+
+  "Identifiant S3IC"
+  codeS3ic: String
+
+  "URL de la fiche ICPE sur Géorisques"
+  urlFiche: String
+
+  "Liste des rubriques associées"
+  rubriques: [Rubrique]
+
+  "Liste des déclarations GEREP"
+  declarations: [Declaration]
 }
