@@ -3653,7 +3653,7 @@ Payload lié au détails du déchet (case 3, 4, 5, 6)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-rubrique déchet au format |_|_| |_|_| |_|_| (*)
+Rubrique déchet au format |_|_| |_|_| |_|_| (*)
 
 </td>
 </tr>
