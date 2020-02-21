@@ -1,6 +1,6 @@
 import axios from "axios";
 import { cachedGet } from "../common/redis";
-import { DomainError, ErrorCode } from "../common/errors";
+import { UserInputError } from "apollo-server-express";
 
 export const COMPANY_INFOS_CACHE_KEY = "CompanyInfos";
 const INSEE_URI = "http://td-insee:81";
@@ -12,10 +12,7 @@ function getCompanySireneInfo(siret: string) {
 
 export function getCachedCompanySireneInfo(siret) {
   if (siret.length !== 14) {
-    throw new DomainError(
-      "Le siret doit faire 14 caractères",
-      ErrorCode.BAD_USER_INPUT
-    );
+    throw new UserInputError("Le siret doit faire 14 caractères");
   }
 
   return cachedGet(getCompanySireneInfo, COMPANY_INFOS_CACHE_KEY, siret, {

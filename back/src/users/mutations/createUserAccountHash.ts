@@ -1,6 +1,6 @@
 import { hash } from "bcrypt";
 import { prisma, UserRole } from "../../generated/prisma-client";
-import { ErrorCode, DomainError } from "../../common/errors";
+import { UserInputError } from "apollo-server-express";
 
 /**
  * Create a temporary association between an email and
@@ -20,10 +20,7 @@ export async function createUserAccountHash(
   });
 
   if (existingHashes && existingHashes.length > 0) {
-    throw new DomainError(
-      "Cet utilisateur a déjà été invité",
-      ErrorCode.BAD_USER_INPUT
-    );
+    throw new UserInputError("Cet utilisateur a déjà été invité");
   }
 
   const userAccoutHash = await hash(

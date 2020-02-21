@@ -1,6 +1,6 @@
 import { prisma } from "../../generated/prisma-client";
 import { hash, compare } from "bcrypt";
-import { DomainError, ErrorCode } from "../../common/errors";
+import { UserInputError } from "apollo-server-express";
 
 /**
  * Change user password
@@ -12,10 +12,7 @@ export async function changePassword(userId, oldPassword, newPassword) {
   const user = await prisma.user({ id: userId });
   const passwordValid = await compare(oldPassword, user.password);
   if (!passwordValid) {
-    throw new DomainError(
-      "L'ancien mot de passe est incorrect.",
-      ErrorCode.BAD_USER_INPUT
-    );
+    throw new UserInputError("L'ancien mot de passe est incorrect.");
   }
 
   const hashedPassword = await hash(newPassword, 10);

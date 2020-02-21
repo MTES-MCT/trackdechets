@@ -1,10 +1,10 @@
 import { hash } from "bcrypt";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { sendMail } from "../../common/mails.helper";
 import { Prisma, User } from "../../generated/prisma-client";
 import { GraphQLContext } from "../../types";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
+import { UserInputError } from "apollo-server-express";
 
 export default async function signup(
   _,
@@ -22,9 +22,8 @@ export default async function signup(
     .catch(__ => null);
 
   if (!user) {
-    return new DomainError(
-      "Impossible de créer cet utilisateur. Cet email a déjà un compte associé.",
-      ErrorCode.BAD_USER_INPUT
+    return new UserInputError(
+      "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
     );
   }
 

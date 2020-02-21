@@ -1,7 +1,7 @@
 import { prisma, Company } from "../../generated/prisma-client";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { getInstallation } from "./installation";
 import { getCachedCompanySireneInfo } from "../insee";
+import { UserInputError } from "apollo-server-express";
 /**
  * This function is used to return public company
  * information for a specific siret. It merge info
@@ -18,7 +18,7 @@ export async function getCompanyInfos(siret: string) {
   // not recognized. Handle this edge case by throwing a NOT_FOUND
   // exception
   if (!sireneCompanyInfo || !sireneCompanyInfo.siret) {
-    throw new DomainError("Ce siret n'existe pas", ErrorCode.NOT_FOUND);
+    throw new UserInputError("Ce siret n'existe pas");
   }
 
   const companyFragment = `

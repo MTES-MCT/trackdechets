@@ -1,14 +1,9 @@
-import {
-  prisma,
-  User,
-  UserRole,
-  UserAccountHash
-} from "../../generated/prisma-client";
+import { prisma, User, UserRole } from "../../generated/prisma-client";
 import { sendMail } from "../../common/mails.helper";
 import { userMails } from "../mails";
 import { associateUserToCompany } from "./associateUserToCompany";
 import { createUserAccountHash } from "./createUserAccountHash";
-import { DomainError, ErrorCode } from "../../common/errors";
+import { UserInputError } from "apollo-server-express";
 
 export async function inviteUserToCompany(
   adminUser: User,
@@ -63,7 +58,7 @@ export async function resendInvitation(
 
   const company = await prisma.company({ siret });
   if (!company || !hashes.length) {
-    throw new DomainError("Invitation non trouvée", ErrorCode.NOT_FOUND);
+    throw new UserInputError("Invitation non trouvée");
   }
   await sendMail(
     userMails.inviteUserToJoin(email, adminUser.name, company.name, hashes[0])

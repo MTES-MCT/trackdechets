@@ -10,8 +10,8 @@ import {
   IMiddlewareGeneratorConstructor
 } from "graphql-middleware";
 import { ValidationError } from "yup";
-import { DomainError, ErrorCode } from "../../errors";
 import { RuleFieldMap, RuleTypeMap, ValidationRule } from "./types";
+import { UserInputError } from "apollo-server-express";
 
 function generateFieldMiddlewareFromRule(rule: ValidationRule) {
   return async (
@@ -27,10 +27,7 @@ function generateFieldMiddlewareFromRule(rule: ValidationRule) {
       });
     } catch (error) {
       if (error instanceof ValidationError) {
-        return new DomainError(
-          error.errors.join("\n"),
-          ErrorCode.BAD_USER_INPUT
-        );
+        return new UserInputError(error.errors.join("\n"));
       } else {
         throw error;
       }
