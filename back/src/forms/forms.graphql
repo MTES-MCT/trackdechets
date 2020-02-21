@@ -288,7 +288,7 @@ type Form {
   "Quantité réelle présentée (case 10)"
   quantityReceived: Float
 
-  "Si oui ou non le traitement a été effectué"
+  "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
   "Description de l'opération de traitement (case 11)"
@@ -454,7 +454,7 @@ enum Consistence {
 "Détails du déchet (case 3, 4, 5, 6)"
 type WasteDetails {
 
-  "rubrique déchet au format |_|_| |_|_| |_|_| (*)"
+  "Rubrique déchet au format |_|_| |_|_| |_|_| (*)"
   code: String
 
   "Dénomination usuelle"
@@ -465,6 +465,8 @@ type WasteDetails {
 
   "Conditionnement"
   packagings: [Packagings]
+
+  "Autre packaging (préciser)"
   otherPackaging: String
 
   "Nombre de colis"

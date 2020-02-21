@@ -1,110 +1,262 @@
+"Payload de signature d'un BSD"
 input SentFormInput {
+
+  "Date de l'envoi du déchet par l'émetteur (case 9)"
   sentAt: DateTime
+
+  "Nom de la personne responsable de l'envoi du déchet (case 9)"
   sentBy: String
 }
 
+"Payload de signature d'un BSD par un transporteur"
 input TransporterSignatureFormInput {
+
+  "Date de l'envoi du déchet par l'émetteur (case 9)"
   sentAt: DateTime!
+
+  "Si oui ou non le BSD a été signé par un transporteur"
   signedByTransporter: Boolean!
+
+  "Code de sécurité permettant d'authentifier l'émetteur"
   securityCode: Int
+
+  "Nom de la personne responsable de l'envoi du déchet (case 9)"
   sentBy: String
+
+  "Si oui on non le BSD a été signé par l'émetteur"
   signedByProducer: Boolean!
 
+  "Conditionnement"
   packagings: [Packagings]!
+
+  "Quantité en tonnes"
   quantity: Float!
+
+  "Code ONU"
   onuCode: String!
 }
 
+"Statut d'acceptation d'un déchet"
 enum WasteAcceptationStatusInput {
+
+  "Accepté en totalité"
   ACCEPTED
+
+  "Refusé"
   REFUSED
+
+  "Refus partiel"
   PARTIALLY_REFUSED
 }
 
+"Payload de réception d'un BSD"
 input ReceivedFormInput {
+
+  "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
+
+  "Raison du refus (case 10)"
   wasteRefusalReason: String
+
+  "Nom de la personne en charge de la réception du déchet (case 10)"
   receivedBy: String!
+
+  "Date à laquelle le déchet a été reçu (case 10)"
   receivedAt: DateTime!
+
+  "Quantité réelle présentée (case 10)"
   quantityReceived: Float!
 }
 
+"Payload de traitement d'un BSD"
 input ProcessedFormInput {
+
+  "Traitement réalisé (code D/R)"
   processingOperationDone: String!
+
+  "Description de l'opération de traitement (case 11)"
   processingOperationDescription: String
+
+  "Personne en charge du traitement"
   processedBy: String!
+
+  "Date à laquelle le déchet a été traité"
   processedAt: DateTime!
+
+  "Destination ultérieure prévue (case 12)"
   nextDestination: NextDestinationInput
+
+  "Si oui ou non il y a eu perte de traçabalité"
   noTraceability: Boolean
 }
 
 input NextDestinationInput {
+
+  "Traitement prévue (code D/R)"
   processingOperation: String
+
+  "Établissement de destination ultérieur"
   company: CompanyInput
 }
 
+
+"Payload de création d'un BSD"
 input FormInput {
+
+  "Identifiant opaque"
   id: ID
+
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
   customId: String
+
+  "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
+
+  "Établissement qui reçoit le déchet (case 2)"
   recipient: RecipientInput
+
+  "Transporteur du déchet (case 8)"
   transporter: TransporterInput
+
+  "Détails du déchet (case 3)"
   wasteDetails: WasteDetailsInput
+
+  "Négociant (case 7)"
   trader: TraderInput
 
+  "Annexe 2"
   appendix2Forms: [AppendixFormInput]
 }
 
+"Payload de création d'une annexe 2"
 input AppendixFormInput {
+
+  "SIRET de l'établissement émetteur"
   emitterSiret: String
+
+  "N° de bordereau"
   readableId: ID
 }
 
+"Payload d'un établissement"
 input CompanyInput {
+
+  "SIRET de l'établissement"
   siret: String
+
+  "Nom de l'établissement"
   name: String
+
+  "Adresse de l'établissement"
   address: String
+
+  "Nom du contact dans l'établissement"
   contact: String
+
+  "Email du contact dans l'établissement"
   mail: String
+
+  "Numéro de téléphone de contact dans l'établissement"
   phone: String
 }
 
+"Payload lié à un l'émetteur du BSD (case 1)"
 input EmitterInput {
+
+  "Type d'émetteur"
   type: EmitterType
+
+  "Adresse du chantier"
   pickupSite: String
+
+  "Établissement émetteur"
   company: CompanyInput
 }
 
+"""
+Payload lié à l'installation de destination ou d'entreprosage
+ou de reconditionnement prévue (case 2)
+"""
 input RecipientInput {
+
+  "N° de CAP (le cas échéant)"
   cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
+
+  "Établissement de destination"
   company: CompanyInput
 }
 
+"Collecteur - transporteur (case 8)"
 input TransporterInput {
+
+  "Exemption de récipissé"
   isExemptedOfReceipt: Boolean
+
+  "N° de récipissé"
   receipt: String
+
+  "Département"
   department: String
+
+  "Limite de validité du récipissé"
   validityLimit: DateTime
+
+  "Numéro de plaque d'immatriculation"
   numberPlate: String
+
+  "Établissement collecteur - transporteur"
   company: CompanyInput
 }
 
+"Payload lié au négociant"
 input TraderInput {
+
+  "N° de récipissé"
   receipt: String
+
+  "Département"
   department: String
+
+  "Limite de validité"
   validityLimit: DateTime
+
+  "Établissement négociant"
   company: CompanyInput
 }
 
+"Payload lié au détails du déchet (case 3, 4, 5, 6)"
 input WasteDetailsInput {
+
+  "rubrique déchet au format |_|_| |_|_| |_|_| (*)"
   code: String
+
+  "Dénomination usuelle"
   name: String
+
+  "Code ONU"
   onuCode: String
+
+  "Conditionnement"
   packagings: [Packagings]
+
+  "Autre packaging (préciser)"
   otherPackaging: String
+
+  "Nombre de colis"
   numberOfPackages: Int
+
+  "Quantité en tonnes"
   quantity: Float
+
+  "Réelle ou estimée"
   quantityType: QuantityType
+
+  "Consistance"
   consistence: Consistence
 }

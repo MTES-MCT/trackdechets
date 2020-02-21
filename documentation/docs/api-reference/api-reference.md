@@ -1801,7 +1801,7 @@ Quantité réelle présentée (case 10)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Si oui ou non le traitement a été effectué
+Traitement réalisé (code D/R)
 
 </td>
 </tr>
@@ -2675,7 +2675,7 @@ Détails du déchet (case 3, 4, 5, 6)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-rubrique déchet au format |_|_| |_|_| |_|_| (*)
+Rubrique déchet au format |_|_| |_|_| |_|_| (*)
 
 </td>
 </tr>
@@ -2709,7 +2709,11 @@ Conditionnement
 <tr>
 <td colspan="2" valign="top"><strong>otherPackaging</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Autre packaging (préciser)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>numberOfPackages</strong></td>
@@ -2825,6 +2829,8 @@ Nombre de changements de statuts renvoyés
 
 ### AppendixFormInput
 
+Payload de création d'une annexe 2
+
 <table>
 <thead>
 <tr>
@@ -2837,17 +2843,27 @@ Nombre de changements de statuts renvoyés
 <tr>
 <td colspan="2" valign="top"><strong>emitterSiret</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+SIRET de l'établissement émetteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>readableId</strong></td>
 <td valign="top"><a href="#id">ID</a></td>
-<td></td>
+<td>
+
+N° de bordereau
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### CompanyInput
+
+Payload d'un établissement
 
 <table>
 <thead>
@@ -2861,37 +2877,63 @@ Nombre de changements de statuts renvoyés
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+SIRET de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>contact</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom du contact dans l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>mail</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Email du contact dans l'établissement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>phone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de téléphone de contact dans l'établissement
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### EmitterInput
+
+Payload lié à un l'émetteur du BSD (case 1)
 
 <table>
 <thead>
@@ -2905,22 +2947,36 @@ Nombre de changements de statuts renvoyés
 <tr>
 <td colspan="2" valign="top"><strong>type</strong></td>
 <td valign="top"><a href="#emittertype">EmitterType</a></td>
-<td></td>
+<td>
+
+Type d'émetteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>pickupSite</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Adresse du chantier
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
+<td>
+
+Établissement émetteur
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### FormInput
+
+Payload de création d'un BSD
 
 <table>
 <thead>
@@ -2934,42 +2990,75 @@ Nombre de changements de statuts renvoyés
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
 <td valign="top"><a href="#id">ID</a></td>
-<td></td>
+<td>
+
+Identifiant opaque
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>customId</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Identifiant personnalisé permettant de faire le lien avec un
+objet un système d'information tierce
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
 <td valign="top"><a href="#emitterinput">EmitterInput</a></td>
-<td></td>
+<td>
+
+Établissement émetteur/producteur du déchet (case 1)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>recipient</strong></td>
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
-<td></td>
+<td>
+
+Établissement qui reçoit le déchet (case 2)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#transporterinput">TransporterInput</a></td>
-<td></td>
+<td>
+
+Transporteur du déchet (case 8)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>wasteDetails</strong></td>
 <td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
-<td></td>
+<td>
+
+Détails du déchet (case 3)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>trader</strong></td>
 <td valign="top"><a href="#traderinput">TraderInput</a></td>
-<td></td>
+<td>
+
+Négociant (case 7)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
 <td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
-<td></td>
+<td>
+
+Annexe 2
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -2988,12 +3077,20 @@ Nombre de changements de statuts renvoyés
 <tr>
 <td colspan="2" valign="top"><strong>processingOperation</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Traitement prévue (code D/R)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
+<td>
+
+Établissement de destination ultérieur
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -3071,6 +3168,8 @@ de l'utilisateur à l'établissement
 
 ### ProcessedFormInput
 
+Payload de traitement d'un BSD
+
 <table>
 <thead>
 <tr>
@@ -3083,37 +3182,63 @@ de l'utilisateur à l'établissement
 <tr>
 <td colspan="2" valign="top"><strong>processingOperationDone</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Traitement réalisé (code D/R)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>processingOperationDescription</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Description de l'opération de traitement (case 11)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>processedBy</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Personne en charge du traitement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>processedAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
+<td>
+
+Date à laquelle le déchet a été traité
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>nextDestination</strong></td>
 <td valign="top"><a href="#nextdestinationinput">NextDestinationInput</a></td>
-<td></td>
+<td>
+
+Destination ultérieure prévue (case 12)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>noTraceability</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Si oui ou non il y a eu perte de traçabalité
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### ReceivedFormInput
+
+Payload de réception d'un BSD
 
 <table>
 <thead>
@@ -3127,32 +3252,55 @@ de l'utilisateur à l'établissement
 <tr>
 <td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
 <td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
-<td></td>
+<td>
+
+Statut d'acceptation du déchet (case 10)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Raison du refus (case 10)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>receivedBy</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Nom de la personne en charge de la réception du déchet (case 10)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>receivedAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
+<td>
+
+Date à laquelle le déchet a été reçu (case 10)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>quantityReceived</strong></td>
 <td valign="top"><a href="#float">Float</a>!</td>
-<td></td>
+<td>
+
+Quantité réelle présentée (case 10)
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### RecipientInput
+
+Payload lié à l'installation de destination ou d'entreprosage
+ou de reconditionnement prévue (case 2)
 
 <table>
 <thead>
@@ -3166,22 +3314,36 @@ de l'utilisateur à l'établissement
 <tr>
 <td colspan="2" valign="top"><strong>cap</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+N° de CAP (le cas échéant)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>processingOperation</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Opération d'élimination / valorisation prévue (code D/R)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
+<td>
+
+Établissement de destination
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### SentFormInput
+
+Payload de signature d'un BSD
 
 <table>
 <thead>
@@ -3195,12 +3357,20 @@ de l'utilisateur à l'établissement
 <tr>
 <td colspan="2" valign="top"><strong>sentAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Date de l'envoi du déchet par l'émetteur (case 9)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de la personne responsable de l'envoi du déchet (case 9)
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -3257,6 +3427,8 @@ Numéro de téléphone de l'utilisateur
 
 ### TraderInput
 
+Payload lié au négociant
+
 <table>
 <thead>
 <tr>
@@ -3269,27 +3441,45 @@ Numéro de téléphone de l'utilisateur
 <tr>
 <td colspan="2" valign="top"><strong>receipt</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+N° de récipissé
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>department</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Département
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>validityLimit</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Limite de validité
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
+<td>
+
+Établissement négociant
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### TransporterInput
+
+Collecteur - transporteur (case 8)
 
 <table>
 <thead>
@@ -3303,37 +3493,63 @@ Numéro de téléphone de l'utilisateur
 <tr>
 <td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Exemption de récipissé
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>receipt</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+N° de récipissé
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>department</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Département
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>validityLimit</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Limite de validité du récipissé
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>numberPlate</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Numéro de plaque d'immatriculation
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
+<td>
+
+Établissement collecteur - transporteur
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### TransporterSignatureFormInput
+
+Payload de signature d'un BSD par un transporteur
 
 <table>
 <thead>
@@ -3347,47 +3563,81 @@ Numéro de téléphone de l'utilisateur
 <tr>
 <td colspan="2" valign="top"><strong>sentAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
+<td>
+
+Date de l'envoi du déchet par l'émetteur (case 9)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedByTransporter</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
-<td></td>
+<td>
+
+Si oui ou non le BSD a été signé par un transporteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>securityCode</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
-<td></td>
+<td>
+
+Code de sécurité permettant d'authentifier l'émetteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Nom de la personne responsable de l'envoi du déchet (case 9)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedByProducer</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
-<td></td>
+<td>
+
+Si oui on non le BSD a été signé par l'émetteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>packagings</strong></td>
 <td valign="top">[<a href="#packagings">Packagings</a>]!</td>
-<td></td>
+<td>
+
+Conditionnement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
 <td valign="top"><a href="#float">Float</a>!</td>
-<td></td>
+<td>
+
+Quantité en tonnes
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>onuCode</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Code ONU
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### WasteDetailsInput
+
+Payload lié au détails du déchet (case 3, 4, 5, 6)
 
 <table>
 <thead>
@@ -3401,47 +3651,83 @@ Numéro de téléphone de l'utilisateur
 <tr>
 <td colspan="2" valign="top"><strong>code</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+rubrique déchet au format |_|_| |_|_| |_|_| (*)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Dénomination usuelle
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>onuCode</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Code ONU
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>packagings</strong></td>
 <td valign="top">[<a href="#packagings">Packagings</a>]</td>
-<td></td>
+<td>
+
+Conditionnement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>otherPackaging</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Autre packaging (préciser)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>numberOfPackages</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
-<td></td>
+<td>
+
+Nombre de colis
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Quantité en tonnes
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>quantityType</strong></td>
 <td valign="top"><a href="#quantitytype">QuantityType</a></td>
-<td></td>
+<td>
+
+Réelle ou estimée
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>consistence</strong></td>
 <td valign="top"><a href="#consistence">Consistence</a></td>
-<td></td>
+<td>
+
+Consistance
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -3915,6 +4201,8 @@ Les membres peuvent:
 
 ### WasteAcceptationStatusInput
 
+Statut d'acceptation d'un déchet
+
 <table>
 <thead>
 <th align="left">Value</th>
@@ -3923,15 +4211,27 @@ Les membres peuvent:
 <tbody>
 <tr>
 <td valign="top"><strong>ACCEPTED</strong></td>
-<td></td>
+<td>
+
+Accepté en totalité
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>REFUSED</strong></td>
-<td></td>
+<td>
+
+Refusé
+
+</td>
 </tr>
 <tr>
 <td valign="top"><strong>PARTIALLY_REFUSED</strong></td>
-<td></td>
+<td>
+
+Refus partiel
+
+</td>
 </tr>
 </tbody>
 </table>
