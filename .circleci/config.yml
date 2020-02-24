@@ -72,9 +72,9 @@ jobs:
           condition: << parameters.extra-cfg >>
           steps:
             - run:
-              name: Copy extra compose config file
-              command: |
-                scp << parameters.extra-cfg >> ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/docker-compose.override.yml
+                name: Copy extra compose config file
+                command: |
+                  scp << parameters.extra-cfg >> ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/docker-compose.override.yml
       - run:
           name: Deploy Over SSH
           command: |
@@ -110,15 +110,15 @@ workflows:
             branches:
               only: master
       - build-and-push:
-        name: build-and-push-sandbox
-        extra-cfg: "-f docker-compose.sandbox.yml"
-          build-args: "--build-arg build_env=sandbox"
-        requires:
-          - test
-          - integration-tests
-        filters:
-          branches:
-            only: master
+          name: build-and-push-sandbox
+          extra-cfg: "-f docker-compose.sandbox.yml"
+            build-args: "--build-arg build_env=sandbox"
+          requires:
+            - test
+            - integration-tests
+          filters:
+            branches:
+              only: master
       - build-and-push:
           name: build-and-push-recette
           extra-cfg: "-f docker-compose.val.yml"
