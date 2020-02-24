@@ -112,7 +112,7 @@ workflows:
       - build-and-push:
           name: build-and-push-sandbox
           extra-cfg: "-f docker-compose.sandbox.yml"
-            build-args: "--build-arg build_env=sandbox"
+          build-args: "--build-arg build_env=sandbox"
           requires:
             - test
             - integration-tests
