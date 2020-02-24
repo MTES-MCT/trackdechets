@@ -10,9 +10,6 @@ services:
 
   td-ui:
     image: betagouv/trackdechets-ui:dev
-    build:
-      args:
-        build_env: recette
 
   td-insee:
     image: betagouv/trackdechets-insee:dev
