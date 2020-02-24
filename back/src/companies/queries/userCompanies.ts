@@ -36,7 +36,9 @@ export async function getUserCompanies(userId: string) {
 
   return Promise.all(
     companies.map(async company => {
-      const companySireneInfo = await getCachedCompanySireneInfo(company.siret);
+      const companySireneInfo = await getCachedCompanySireneInfo(
+        company.siret
+      ).catch(_ => ({}));
       const companyIcpeInfo = {
         installation: await getInstallation(company.siret)
       };

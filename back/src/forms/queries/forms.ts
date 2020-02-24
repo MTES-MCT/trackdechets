@@ -18,7 +18,7 @@ export default async function forms(
       : userCompanies.shift();
 
   if (!selectedCompany) {
-    throw new DomainError(
+    return new DomainError(
       "Vous ne pouvez pas consulter les bordereaux.",
       ErrorCode.FORBIDDEN
     );
