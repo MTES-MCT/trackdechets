@@ -42,7 +42,7 @@ jobs:
       - run:
           name: "Build and push images"
           command: |
-            docker-compose -f docker-compose.yml -f docker-compose.build.yml build << parameters.build-args >>
+            docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> build << parameters.build-args >>
             if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "dev" ]; then
               docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
               docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> push --ignore-push-failures
