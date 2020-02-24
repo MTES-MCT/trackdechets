@@ -28,7 +28,7 @@ export const formWorkflowMachine = Machine(
           MARK_SEALED: [
             {
               target: "error.invalidTransition",
-              cond: "isNotEmitter"
+              cond: "isNeitherEmitterOrRecipient"
             },
             { target: "pendingSealedValidation" }
           ],
@@ -197,6 +197,9 @@ export const formWorkflowMachine = Machine(
       isNeitherEmitterOrTransporter: ctx =>
         !ctx.actorSirets.includes(ctx.form.emitterCompanySiret) &&
         !ctx.actorSirets.includes(ctx.form.transporterCompanySiret),
+      isNeitherEmitterOrRecipient: ctx =>
+        !ctx.actorSirets.includes(ctx.form.emitterCompanySiret) &&
+        !ctx.actorSirets.includes(ctx.form.recipientCompanySiret),
       isMissingSignature: (_, event: any) =>
         !event.signedByTransporter || !event.signedByProducer,
       isNotRecipient: ctx =>
