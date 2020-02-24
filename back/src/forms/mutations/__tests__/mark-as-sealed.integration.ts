@@ -3,9 +3,8 @@ import {
   formFactory,
   companyFactory
 } from "../../../__tests__/factories";
-import { createTestClient } from "apollo-server-integration-testing";
+import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { server } from "../../../server";
 import { prisma } from "../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
@@ -35,13 +34,7 @@ describe("{ mutation { markAsSealed } }", () => {
       }
     });
 
-    const { mutate, setOptions } = createTestClient({ apolloServer: server });
-
-    setOptions({
-      request: {
-        user
-      }
-    });
+    const { mutate } = makeClient(user);
 
     const mutation = `
       mutation   {
@@ -56,6 +49,13 @@ describe("{ mutation { markAsSealed } }", () => {
     form = await prisma.form({ id: form.id });
 
     expect(form.status).toEqual("SEALED");
+
+    // check relevant statusLog is created
+    const statusLogs = await prisma.statusLogs({
+      where: { form: { id: form.id }, user: {id: user.id}, status:"SEALED"  }
+    });
+    expect(statusLogs.length).toEqual(1);
+ 
   });
 
   test("the recipient of the BSD can seal it", async () => {
@@ -74,13 +74,7 @@ describe("{ mutation { markAsSealed } }", () => {
       }
     });
 
-    const { mutate, setOptions } = createTestClient({ apolloServer: server });
-
-    setOptions({
-      request: {
-        user
-      }
-    });
+    const { mutate } = makeClient(user);
 
     const mutation = `
       mutation   {
@@ -95,5 +89,12 @@ describe("{ mutation { markAsSealed } }", () => {
     form = await prisma.form({ id: form.id });
 
     expect(form.status).toEqual("SEALED");
+
+    // check relevant statusLog is created
+    const statusLogs = await prisma.statusLogs({
+      where: { form: { id: form.id }, user: {id: user.id}, status:"SEALED"  }
+    });
+    expect(statusLogs.length).toEqual(1);
+ 
   });
 });
