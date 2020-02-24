@@ -141,7 +141,7 @@ workflows:
           host: SSH_HOST_SANDBOX
           extra-cfg: "docker-compose.sandbox.yml"
           requires:
-            - build-and-push-prod
+            - build-and-push-sandbox
           filters:
             branches:
               only: dev
