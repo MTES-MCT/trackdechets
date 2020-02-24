@@ -42,6 +42,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "build:recette": "env-cmd -f .env.recette npm run build",
+    "build:sandbox": "env-cmd -f .env.sandbox npm run build",
     "build:production": "npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
