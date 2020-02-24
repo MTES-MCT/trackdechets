@@ -118,7 +118,7 @@ workflows:
             - integration-tests
           filters:
             branches:
-              only: master
+              only: dev
       - build-and-push:
           name: build-and-push-recette
           extra-cfg: "-f docker-compose.val.yml"
@@ -144,7 +144,7 @@ workflows:
             - build-and-push-prod
           filters:
             branches:
-              only: master
+              only: dev
       - deploy:
           name: deploy-recette
           host: SSH_HOST_RECETTE
