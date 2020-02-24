@@ -12,3 +12,4 @@ nav:
   - "Cycle de vie d'un BSD": "workflow.md"
   - "Cas d'usages": "use-cases.md"
   - "Lexique": "glossary.md"
+  - "Référence de l'API": "api-reference/api-reference.md"

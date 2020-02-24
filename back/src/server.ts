@@ -83,7 +83,7 @@ const sentryMiddleware = () =>
     }
   });
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+export const schema = makeExecutableSchema({ typeDefs, resolvers });
 export const schemaWithMiddleware = applyMiddleware(
   schema,
   ...[
