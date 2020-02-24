@@ -23,6 +23,8 @@ services:
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      AIRFLOW_POSTGRES_USER: $AIRFLOW_POSTGRES_USER
+      AIRFLOW_POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
     volumes:
       - postgres:/var/lib/postgresql/data
 
