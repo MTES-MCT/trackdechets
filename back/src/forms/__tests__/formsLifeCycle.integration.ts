@@ -84,6 +84,37 @@ describe("Test formsLifeCycle query", () => {
     expect(statusLogs[0].user.id).toBe(emitter.id);
   });
 
+  it("should return not statusLog objects without null loggedAt", async () => {
+    const {
+      emitter,
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form
+    } = await prepareDB();
+
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    // create a statusLog without loggedAt field (as it was before formsLifeCycle feature)
+    await statusLogFactory({
+      status: "SENT",
+      formId: form.id,
+      userId: emitter.id,
+      updatedFields: { lorem: "ipsum" },
+      opt: { loggedAt: null }
+    });
+    const glQuery = buildFormsLifecycleQuery();
+
+    const { query } = makeClient(recipient);
+
+    const { data } = (await query(glQuery)) as any;
+    const { statusLogs } = data.formsLifeCycle;
+    expect(statusLogs.length).toBe(0);
+  });
+
   it("should return statusLog data after a given date", async () => {
     const {
       emitter,
@@ -118,7 +149,7 @@ describe("Test formsLifeCycle query", () => {
       updatedFields: { consectetur: "adipiscing" }
     });
 
-    // query forms created after today
+    // query forms statuses created after today
     const glQuery = buildFormsLifecycleQuery("loggedAfter", todayStr);
 
     const { query } = makeClient(recipient);
@@ -163,7 +194,7 @@ describe("Test formsLifeCycle query", () => {
       updatedFields: { consectetur: "adipiscing" }
     });
 
-    // query forms created after today
+    // query forms statuses created after today
     const glQuery = buildFormsLifecycleQuery("loggedBefore", todayStr);
 
     const { query } = makeClient(recipient);
@@ -210,7 +241,7 @@ describe("Test formsLifeCycle query", () => {
       userId: emitter.id,
       updatedFields: { foo: "bar" }
     });
-    // query forms created for a given form
+    // query forms statuses created for a given form
     const glQuery = buildFormsLifecycleQuery("formId", form.id);
 
     const { query } = makeClient(recipient);

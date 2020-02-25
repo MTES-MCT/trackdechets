@@ -114,6 +114,7 @@ export default {
           after: cursorAfter,
           before: cursorBefore,
           where: {
+            loggedAt_not: null,
             loggedAt_gte: loggedAfter,
             loggedAt_lte: loggedBefore,
             form: { ...formsFilter, isDeleted: false, id: formId }
