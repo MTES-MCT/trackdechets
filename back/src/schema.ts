@@ -1,5 +1,4 @@
 import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
-import { DocumentNode } from "graphql";
 import { mergePermissions } from "./utils";
 import { mergeValidationRules } from "./common/middlewares/schema-validation";
 

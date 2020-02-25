@@ -1,10 +1,11 @@
 import { renderSchema, schemaToJSON } from "graphql-markdown";
-import { schema } from "../server";
+import { typeDefs } from "../schema";
 import * as graphql from "graphql";
 import * as fs from "fs";
+import { buildSchemaFromTypeDefinitions } from "apollo-server-express";
 
 // Render GraphQL schema to markdown
-// and save as a page in the documentation folder
+// and save it as a page in the documentation folder
 
 const content = [];
 
@@ -15,6 +16,8 @@ const options = {
 };
 
 const filePath = "documentation/api-reference.md";
+
+const schema = buildSchemaFromTypeDefinitions(typeDefs);
 
 schemaToJSON(schema, { graphql }).then(s => {
   renderSchema(s, options);
