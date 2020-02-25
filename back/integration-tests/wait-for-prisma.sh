@@ -1,5 +1,5 @@
 attempt_counter=0
-max_attempts=10
+max_attempts=30
 
 until [ $(curl -s -o /dev/null -w '%{http_code}' http://prisma:4467) -eq 200 ]; do
     if [ ${attempt_counter} -eq ${max_attempts} ];then
