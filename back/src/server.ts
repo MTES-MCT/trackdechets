@@ -11,18 +11,15 @@ import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
 import { shield } from "graphql-shield";
-import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
 import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
-import {
-  schemaValidation,
-  mergeValidationRules
-} from "./common/middlewares/schema-validation";
-import { mergePermissions, getUIBaseURL } from "./utils";
+import { typeDefs, resolvers, permissions, validations } from "./schema";
+import { schemaValidation } from "./common/middlewares/schema-validation";
+import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
 
@@ -37,25 +34,9 @@ const {
 
 const UI_BASE_URL = getUIBaseURL();
 
-const typesArray = fileLoader(`${__dirname}/**/*.graphql`, { recursive: true });
-const typeDefs = mergeTypes(typesArray, { all: true });
+const shieldMiddleware = shield(permissions, { allowExternalErrors: true });
 
-const resolversArray = fileLoader(`${__dirname}/**/resolvers.ts`, {
-  recursive: true
-});
-const resolvers = mergeResolvers(resolversArray);
-
-const permissions = fileLoader(`${__dirname}/**/permissions.ts`, {
-  recursive: true
-});
-const shieldMiddleware = shield(mergePermissions(permissions));
-
-const schemas = fileLoader(`${__dirname}/**/schema-validation.ts`, {
-  recursive: true
-});
-const schemaValidationMiddleware = schemaValidation(
-  mergeValidationRules(schemas)
-);
+const schemaValidationMiddleware = schemaValidation(validations);
 
 /**
  * Sentry configuration
@@ -83,7 +64,11 @@ const sentryMiddleware = () =>
     }
   });
 
-export const schema = makeExecutableSchema({ typeDefs, resolvers });
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers
+});
+
 export const schemaWithMiddleware = applyMiddleware(
   schema,
   ...[
@@ -104,6 +89,16 @@ export const server = new ApolloServer({
       ...{ user: !!ctx.req ? ctx.req.user : null },
       prisma
     };
+  },
+  formatError: err => {
+    if (
+      err.extensions.code == "INTERNAL_SERVER_ERROR" &&
+      NODE_ENV != "development"
+    ) {
+      err.message = "Erreur serveur";
+      return err;
+    }
+    return err;
   }
 });
 
