@@ -29,7 +29,7 @@ function generateFieldMiddlewareFromRule(rule: ValidationRule) {
 
     } catch (error) {
       if (error instanceof ValidationError) {
-        throw new DomainError(
+        return new DomainError(
           error.errors.join("\n"),
           ErrorCode.BAD_USER_INPUT
         );
