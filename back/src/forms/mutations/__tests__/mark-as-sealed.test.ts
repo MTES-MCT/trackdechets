@@ -87,18 +87,6 @@ describe("Forms -> markAsSealed mutation", () => {
     }
   });
 
-  it("should fail when current user cannot do the transition", async () => {
-    expect.assertions(1);
-    try {
-      getUserCompaniesMock.mockResolvedValue([{ siret: "any siret" } as any]);
-      prisma.form.mockResolvedValue({ id: 1, status: "DRAFT" });
-
-      await markAsSealed(null, { id: 1 }, defaultContext);
-    } catch (err) {
-      expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
-    }
-  });
-
   it("should fail when SEALED is not a possible next step", async () => {
     expect.assertions(1);
     try {

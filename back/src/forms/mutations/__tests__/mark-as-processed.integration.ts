@@ -4,7 +4,8 @@ import { prisma } from "../../../generated/prisma-client";
 import { server } from "../../../server";
 import {
   formFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  companyFactory
 } from "../../../__tests__/factories";
 
 jest.mock("axios", () => ({
@@ -41,6 +42,35 @@ describe("Integration / Mark as processed mutation", () => {
 
   afterAll(async () => {
     await resetDatabase();
+  });
+
+  it("should fail if current user is not recipient", async () => {
+    const recipientCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: recipientCompany.name,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const mutation = `
+      mutation   {
+        markAsProcessed(id: "${form.id}", processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 1",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }) {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation);
+    expect(errors[0].extensions.code).toBe("FORBIDDEN");
   });
 
   it("should mark a form as processed", async () => {

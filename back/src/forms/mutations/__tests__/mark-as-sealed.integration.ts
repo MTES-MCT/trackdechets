@@ -52,10 +52,9 @@ describe("{ mutation { markAsSealed } }", () => {
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: {id: user.id}, status:"SEALED"  }
+      where: { form: { id: form.id }, user: { id: user.id }, status: "SEALED" }
     });
     expect(statusLogs.length).toEqual(1);
- 
   });
 
   test("the recipient of the BSD can seal it", async () => {
@@ -92,9 +91,39 @@ describe("{ mutation { markAsSealed } }", () => {
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: {id: user.id}, status:"SEALED"  }
+      where: { form: { id: form.id }, user: { id: user.id }, status: "SEALED" }
     });
     expect(statusLogs.length).toEqual(1);
- 
+  });
+
+  test("should fail if user is neither emitter or recipient", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER");
+
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: emitterCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutation = `
+      mutation   {
+        markAsSealed(id: "${form.id}") {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation);
+    expect(errors[0].extensions.code).toBe("FORBIDDEN");
+
+    const resultingForm = await prisma.form({ id: form.id });
+    expect(resultingForm.status).toEqual("DRAFT");
   });
 });
