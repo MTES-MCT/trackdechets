@@ -16,7 +16,6 @@ export const formWorkflowMachine = Machine(
     initial: FormState.Draft,
     context: {
       form: null,
-      actorSirets: [],
       requestContext: null,
       isStableState: true
     },
@@ -25,33 +24,15 @@ export const formWorkflowMachine = Machine(
         entry: "setStable",
         exit: "setUnStable",
         on: {
-          MARK_SEALED: [
-            {
-              target: "error.invalidTransition",
-              cond: "isNotEmitter"
-            },
-            { target: "pendingSealedValidation" }
-          ],
-          MARK_SENT: [
-            {
-              target: "error.invalidTransition",
-              cond: "isNotEmitter"
-            },
-            { target: "pendingSentValidation" }
-          ]
+          MARK_SEALED: [{ target: "pendingSealedValidation" }],
+          MARK_SENT: [{ target: "pendingSentValidation" }]
         }
       },
       [FormState.Sealed]: {
         entry: "setStable",
         exit: "setUnStable",
         on: {
-          MARK_SENT: [
-            {
-              target: "error.invalidTransition",
-              cond: "isNeitherEmitterOrTransporter"
-            },
-            { target: "pendingSentValidation" }
-          ],
+          MARK_SENT: [{ target: "pendingSentValidation" }],
           MARK_SIGNED_BY_TRANSPORTER: [
             {
               target: "error.missingSignature",
@@ -69,10 +50,6 @@ export const formWorkflowMachine = Machine(
         on: {
           MARK_RECEIVED: [
             {
-              target: "error.invalidTransition",
-              cond: "isNotRecipient"
-            },
-            {
               target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
               cond: "isFormAccepted"
             },
@@ -88,10 +65,6 @@ export const formWorkflowMachine = Machine(
         exit: "setUnStable",
         on: {
           MARK_PROCESSED: [
-            {
-              target: "error.invalidTransition",
-              cond: "isNotRecipient"
-            },
             {
               target: FormState.NoTraceability,
               cond: "isExemptOfTraceability"
@@ -192,15 +165,8 @@ export const formWorkflowMachine = Machine(
       setUnStable: assign({ isStableState: false }) as any
     },
     guards: {
-      isNotEmitter: ctx =>
-        !ctx.actorSirets.includes(ctx.form.emitterCompanySiret),
-      isNeitherEmitterOrTransporter: ctx =>
-        !ctx.actorSirets.includes(ctx.form.emitterCompanySiret) &&
-        !ctx.actorSirets.includes(ctx.form.transporterCompanySiret),
       isMissingSignature: (_, event: any) =>
         !event.signedByTransporter || !event.signedByProducer,
-      isNotRecipient: ctx =>
-        !ctx.actorSirets.includes(ctx.form.recipientCompanySiret),
       isExemptOfTraceability: ctx => ctx.form.noTraceability,
       awaitsGroup: ctx =>
         GROUP_CODES.includes(ctx.form.processingOperationDone),

@@ -75,12 +75,8 @@ async function transitionForm(
 
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
-  const userCompanies = await getUserCompanies(context.user.id);
-  const actorSirets = userCompanies.map(c => c.siret);
-
   const startingState = State.from(form.status, {
     form: { ...form, ...formPropsFromEvent },
-    actorSirets,
     requestContext: context,
     isStableState: true
   });
@@ -112,7 +108,7 @@ async function transitionForm(
 
       // `done` means we reached a final state (xstate concept)
       // `context.isStableState` is a concept introduced to differentiate form state with transient states (validation or side effects)
-      // If we reached one of those, we konow the transition is over and we can safely update the form and return
+      // If we reached one of those, we know the transition is over and we can safely update the form and return
       if (state.done || state.context.isStableState) {
         const newStatus = state.value;
         await logStatusChange(

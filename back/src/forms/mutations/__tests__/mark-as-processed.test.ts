@@ -28,21 +28,6 @@ describe("Forms -> markAsProcessed mutation", () => {
     jest.clearAllMocks();
   });
 
-  it("fail if current user is not recipient", async () => {
-    expect.assertions(1);
-    try {
-      const form = getNewValidForm();
-      form.status = "RECEIVED";
-
-      prisma.form.mockResolvedValue({ id: 1, status: FormState.Received });
-      getUserCompaniesMock.mockResolvedValue([{ siret: "any siret" } as any]);
-
-      await markAsProcessed(null, { id: 1, processedInfo: {} }, defaultContext);
-    } catch (err) {
-      expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
-    }
-  });
-
   it("set status to NoTraceability if actor is exempt of traceability", async () => {
     const form = getNewValidForm();
     form.status = "RECEIVED";
