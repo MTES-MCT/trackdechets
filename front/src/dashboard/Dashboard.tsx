@@ -51,13 +51,15 @@ export default function Dashboard() {
   });
   const match = useRouteMatch();
 
-  if (loading || !activeSiret) return <Loader />;
+  if (loading) return <Loader />;
   if (error || !data) return <p>{`Erreur ! ${error?.message}`}</p>;
 
   // As long as you don't belong to a company, you can't access the dashnoard
   if (data.me.companies.length === 0) {
-    return <Redirect to="/account/companies" />
+    return <Redirect to="/account/companies" />;
   }
+
+  if (!activeSiret) return null;
 
   return (
     <div id="dashboard" className="dashboard">
