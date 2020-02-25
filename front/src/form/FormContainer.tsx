@@ -14,10 +14,10 @@ export default function FormContainer({
     <main className="main">
       <div className="container">
         <StepList formId={match.params.id}>
-          <StepContainer component={Emitter} title="Emetteur" />
+          <StepContainer component={Emitter} title="Émetteur du déchet" />
           <StepContainer component={WasteInfo} title="Détail du déchet" />
-          <StepContainer component={Recipient} title="Destination" />
-          <StepContainer component={Transporter} title="Transporteur" />
+          <StepContainer component={Recipient} title="Destination du déchet" />
+          <StepContainer component={Transporter} title="Transporteur du déchet" />
         </StepList>
       </div>
     </main>
