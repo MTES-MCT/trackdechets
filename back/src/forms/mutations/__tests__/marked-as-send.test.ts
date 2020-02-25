@@ -32,7 +32,7 @@ describe("Forms -> markAsSealed mutation", () => {
     expect.assertions(1);
     try {
       getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
-      prisma.form.mockResolvedValue({ id: 1, status: FormState.Sealed });
+      prisma.form.mockResolvedValue({ id: 1, status: FormState.Sent });
 
       await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
     } catch (err) {
