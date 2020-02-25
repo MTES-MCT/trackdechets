@@ -26,10 +26,10 @@ export default {
     saveForm: isAuthenticated,
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
-    markAsSealed: canAccessForm,
+    markAsSealed: or(isFormRecipient, isFormEmitter),
     markAsSent: or(isFormRecipient, isFormEmitter),
-    markAsReceived: canAccessForm,
-    markAsProcessed: canAccessForm,
+    markAsReceived: isFormRecipient,
+    markAsProcessed: isFormRecipient,
     signedByTransporter: isFormTransporter
   }
 };

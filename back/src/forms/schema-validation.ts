@@ -89,16 +89,22 @@ export default {
     signedByTransporter: object().shape({
       signingInfo: object({
         sentAt: date().required("Vous devez saisir une date d'envoi."),
-        signedByTransporter: boolean().required(
-          "Voud devez indiquer si le transporteur a signé."
-        ),
+        signedByTransporter: boolean()
+          .required("Vous devez indiquer si le transporteur a signé.")
+          .oneOf(
+            [true],
+            "Le transporteur doit signer pour valider l'enlèvement."
+          ),
         securityCode: number().nullable(true),
         sentBy: string().required(
           "Vous devez saisir un responsable de l'envoi."
         ),
-        signedByProducer: boolean().required(
-          "Voud devez indiquer si le producteur a signé."
-        ),
+        signedByProducer: boolean()
+          .required("Vous devez indiquer si le producteur a signé.")
+          .oneOf(
+            [true],
+            "Le producteur doit signer pour valider l'enlèvement."
+          ),
 
         packagings: array().of(
           string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/)
