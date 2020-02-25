@@ -13,11 +13,11 @@ import { getReadableId } from "../readable-id";
  * @param userId
  */
 export async function duplicateForm(formId: string, userId: string) {
-  const existingForm = prisma.form({
+  const existingForm = await prisma.form({
     id: formId
   });
 
-  const newForm = prisma.createForm({
+  const newForm = await prisma.createForm({
     ...cleanUpNotDuplicatableFieldsInForm(existingForm),
     readableId: await getReadableId(),
     status: "DRAFT",
