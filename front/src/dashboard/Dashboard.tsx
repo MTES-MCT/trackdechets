@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import React, { useState } from "react";
-import { Route, useHistory } from "react-router";
+import { Route, Redirect } from "react-router";
 import Loader from "../common/Loader";
 import { Me } from "../login/model";
 import { currentSiretService } from "./CompanySelector";
@@ -50,14 +50,13 @@ export default function Dashboard() {
     }
   });
   const match = useRouteMatch();
-  const history = useHistory();
 
   if (loading || !activeSiret) return <Loader />;
   if (error || !data) return <p>{`Erreur ! ${error?.message}`}</p>;
 
   // As long as you don't belong to a company, you can't access the dashnoard
   if (data.me.companies.length === 0) {
-    history.push("/account/companies");
+    return <Redirect to="/account/companies" />
   }
 
   return (
