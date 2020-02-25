@@ -210,7 +210,7 @@ export default {
 
       const newForm = await context.prisma.createForm({
         ...cleanUpNotDuplicatableFieldsInForm(existingForm),
-        readableId: await getReadableId(context),
+        readableId: await getReadableId(),
         status: "DRAFT",
         owner: { connect: { id: userId } }
       });
