@@ -203,7 +203,12 @@ type Form {
 
   # Emitter fields
   emitterType: EmitterType
-  emitterPickupSite: String
+
+  emitterPickupSiteCompanyName: String;
+  emitterPickupSiteAddress: String;
+  emitterPickupSiteCity: String;
+  emitterPickupSitePostalCode: Int;
+  emitterPickupSiteInfos: String;
 
   emitterCompanyName: String
   emitterCompanySiret: String
