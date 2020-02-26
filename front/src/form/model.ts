@@ -4,6 +4,13 @@ export type Form = {
   status: string;
   emitter: {
     company: FormCompany;
+    pickupSite: {
+      companyName: string;
+      address: string;
+      city: string;
+      postalCode: number;
+      infos: string;
+    };
   };
   recipient: {
     company: FormCompany;
