@@ -11,5 +11,6 @@ nav:
   - "Mise en route": "getting-started.md"
   - "Cycle de vie d'un BSD": "workflow.md"
   - "Cas d'usages": "use-cases.md"
+  - "Gestion des erreurs": "errors.md"
   - "Lexique": "glossary.md"
   - "Référence de l'API": "api-reference/api-reference.md"
