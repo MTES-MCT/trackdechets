@@ -1,5 +1,5 @@
 import forms from "../forms";
-import { ErrorCode, DomainError } from "../../../common/errors";
+import { ErrorCode } from "../../../common/errors";
 
 const prisma = {
   forms: jest.fn(() => Promise.resolve([]))
@@ -25,9 +25,9 @@ describe("Forms query", () => {
     expect.assertions(1);
     getUserCompaniesMock.mockResolvedValue([]);
 
-    const err = await forms(null, { type: "", siret: null }, defaultContext);
-
-    if (err instanceof DomainError) {
+    try {
+      await forms(null, { type: "", siret: null }, defaultContext);
+    } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
@@ -36,13 +36,9 @@ describe("Forms query", () => {
     expect.assertions(1);
     getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" }]);
 
-    const err = await forms(
-      null,
-      { type: "", siret: "another siret" },
-      defaultContext
-    );
-
-    if (err instanceof DomainError) {
+    try {
+      await forms(null, { type: "", siret: "another siret" }, defaultContext);
+    } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });

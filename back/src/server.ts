@@ -30,6 +30,7 @@ import { schemaValidation } from "./common/middlewares/schema-validation";
 import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
+import { ErrorCode } from "./common/errors";
 
 const {
   SENTRY_DSN,
@@ -118,8 +119,7 @@ export const server = new ApolloServer({
   },
   formatError: err => {
     if (
-      err.extensions &&
-      err.extensions.code == "INTERNAL_SERVER_ERROR" &&
+      err.extensions.code == ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV !== "dev"
     ) {
       // Do not leak error message for internal server error in production

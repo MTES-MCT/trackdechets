@@ -45,13 +45,13 @@ describe("renewSecurityCode", () => {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
   });
-  it("should throw NOT_FOUND exception if the company is not found", async () => {
+  it("should throw BAD_USER_INPUT exception if the company is not found", async () => {
     expect.assertions(1);
     companyMock.mockResolvedValueOnce(null);
     try {
       await renewSecurityCode("85001946400013");
     } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.NOT_FOUND);
+      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
   });
   it("should retry getting a new security code if \

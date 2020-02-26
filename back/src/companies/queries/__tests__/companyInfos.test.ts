@@ -34,7 +34,7 @@ describe("companyInfos", () => {
     try {
       await getCompanyInfos("85001946400014");
     } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.NOT_FOUND);
+      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
   });
   it("should merge info from sirene, TD and s3ic", async () => {
