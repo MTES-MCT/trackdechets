@@ -91,9 +91,13 @@ export const server = new ApolloServer({
     };
   },
   formatError: err => {
-    if (err.extensions.code == "INTERNAL_SERVER_ERROR" && NODE_ENV != "dev") {
+    if (
+      err.extensions &&
+      err.extensions.code == "INTERNAL_SERVER_ERROR" &&
+      NODE_ENV !== "dev"
+    ) {
+      // Do not leak error message for internal server error in production
       err.message = "Erreur serveur";
-      return err;
     }
     return err;
   }
