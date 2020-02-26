@@ -11,7 +11,7 @@ import {
   login,
   joinWithInvite
 } from "./mutations";
-import signup from "./queries/signup";
+import signup from "./mutations/signup";
 import { hashPassword } from "./utils";
 import { apiKey } from "./queries";
 

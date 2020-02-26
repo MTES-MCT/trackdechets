@@ -11,7 +11,7 @@ import { Wizard } from "./Wizard";
 
 export default function Signup() {
   const [passwordType, setPasswordType] = useState("password");
-  const [signup] = useMutation(SIGNUP);
+  const [signup, { error: signupError }] = useMutation(SIGNUP);
 
   const history = useHistory();
 
@@ -223,6 +223,10 @@ export default function Signup() {
             </div>
 
             <RedErrorMessage name="cgu" />
+
+            {signupError && (
+              <div className="notification error">{signupError.message}</div>
+            )}
           </Wizard.Page>
         </Wizard>
       </div>

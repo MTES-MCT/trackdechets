@@ -6,7 +6,11 @@ import { GraphQLContext } from "../../types";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
 
-export default async function signup(_, { userInfos }, context: GraphQLContext) {
+export default async function signup(
+  _,
+  { userInfos },
+  context: GraphQLContext
+) {
   const hashedPassword = await hashPassword(userInfos.password);
   const user = await context.prisma
     .createUser({
@@ -15,12 +19,14 @@ export default async function signup(_, { userInfos }, context: GraphQLContext) 
       password: hashedPassword,
       phone: userInfos.phone
     })
-    .catch(async _ => {
-      throw new DomainError(
-        "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide.",
-        ErrorCode.BAD_USER_INPUT
-      );
-    });
+    .catch(_ => null);
+
+  if (!user) {
+    return new DomainError(
+      "Impossible de créer cet utilisateur. Cet email a déjà un compte associé.",
+      ErrorCode.BAD_USER_INPUT
+    );
+  }
 
   const userActivationHash = await createActivationHash(user, context.prisma);
   await acceptNewUserComapnyInvitations(user, context.prisma);
