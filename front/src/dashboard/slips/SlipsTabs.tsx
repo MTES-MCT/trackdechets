@@ -28,10 +28,10 @@ export default function SlipsTabs({ me, siret }: Props) {
   return (
     <Tabs>
       <TabList>
-        <Tab>Brouillons ({drafts.length})</Tab>
-        <Tab>En attente de signature ({toSign.length})</Tab>
-        <Tab>Statut du déchet ({status.length})</Tab>
-        <Tab>Archives ({history.length})</Tab>
+        <Tab>Mes brouillons ({drafts.length})</Tab>
+        <Tab>Agir sur mes bordereaux ({toSign.length})</Tab>
+        <Tab>Suivre mes bordereaux ({status.length})</Tab>
+        <Tab>Mes bordereaux archivés ({history.length})</Tab>
       </TabList>
 
       <TabPanel>
