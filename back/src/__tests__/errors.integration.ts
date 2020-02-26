@@ -43,7 +43,7 @@ describe("Error handling", () => {
     expect(data).toEqual({ hello: "world" });
   });
 
-  test("handled errors should be formatted correctly when thrown", async () => {
+  test("subclasses of Apollo errors should be formatted correctly when thrown", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
@@ -57,7 +57,7 @@ describe("Error handling", () => {
     expect(error.extensions.code).toEqual("BAD_USER_INPUT");
   });
 
-  test("handled errors should be formatted correctly when returned", async () => {
+  test("subclasses of Apollo errors should be formatted correctly when returned", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
@@ -71,12 +71,27 @@ describe("Error handling", () => {
     expect(error.extensions.code).toEqual("BAD_USER_INPUT");
   });
 
-  test("unhandled errors message should not be displayed in production", async () => {
+  test("the message of unhandled errors thrown should be masked", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
     mockHello.mockImplementationOnce(() => {
       throw new Error("Bang");
+    });
+    const { errors } = await query({ query: HELLO });
+    expect(errors).toHaveLength(1);
+
+    const error = errors[0];
+    expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
+    expect(error.message).toEqual("Erreur serveur");
+  });
+
+  test("the message of unhandled error returned should be masked", async () => {
+    process.env.NODE_ENV = "production";
+    const server = require("../server").server;
+    const { query } = createTestClient(server);
+    mockHello.mockImplementationOnce(() => {
+      return new Error("Bang");
     });
     const { errors } = await query({ query: HELLO });
     expect(errors).toHaveLength(1);

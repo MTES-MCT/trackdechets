@@ -2,7 +2,8 @@ import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
 import { mergePermissions } from "./utils";
 import { mergeValidationRules } from "./common/middlewares/schema-validation";
 
-// TODO add documentation
+// Merge GraphQL schema by merging types, resolvers, permissions and validations
+// definitions from differents modules
 
 const typesArray = fileLoader(`${__dirname}/**/*.graphql`, {
   recursive: true
