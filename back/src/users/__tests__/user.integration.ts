@@ -87,7 +87,7 @@ describe("User endpoint", () => {
         signup(
           userInfos: {
             email: "${email}"
-            password: "newUser"
+            password: "newUserPassword"
             name: "New User"
             phone: ""
           }
