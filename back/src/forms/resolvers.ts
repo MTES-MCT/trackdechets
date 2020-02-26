@@ -2,10 +2,7 @@ import { DomainError, ErrorCode } from "../common/errors";
 import { getUserCompanies } from "../companies/queries";
 import { prisma, StatusLogConnection } from "../generated/prisma-client";
 import { GraphQLContext } from "../types";
-import {
-  cleanUpNotDuplicatableFieldsInForm,
-  unflattenObjectFromDb
-} from "./form-converter";
+import { unflattenObjectFromDb } from "./form-converter";
 import {
   markAsProcessed,
   markAsReceived,
@@ -13,11 +10,11 @@ import {
   markAsSent,
   signedByTransporter
 } from "./mutations/mark-as";
+import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
 import { formPdf } from "./queries/form-pdf";
 import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
-import { getReadableId } from "./readable-id";
 
 // formsLifeCycle fragment
 const statusLogFragment = `
@@ -201,22 +198,8 @@ export default {
         data: { isDeleted: true }
       });
     },
-    duplicateForm: async (parent, { id }, context: GraphQLContext) => {
-      const userId = context.user.id;
-
-      const existingForm = await context.prisma.form({
-        id
-      });
-
-      const newForm = await context.prisma.createForm({
-        ...cleanUpNotDuplicatableFieldsInForm(existingForm),
-        readableId: await getReadableId(context),
-        status: "DRAFT",
-        owner: { connect: { id: userId } }
-      });
-
-      return unflattenObjectFromDb(newForm);
-    },
+    duplicateForm: (_parent, { id }, { user }: GraphQLContext) =>
+      duplicateForm(id, user.id),
     markAsSealed,
     markAsSent,
     markAsReceived,
