@@ -1,5 +1,13 @@
 import { CaptureConsole } from "@sentry/integrations";
-import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
+import {
+  ApolloServer,
+  makeExecutableSchema,
+  UserInputError,
+  ForbiddenError,
+  AuthenticationError,
+  SyntaxError,
+  ValidationError
+} from "apollo-server-express";
 import * as express from "express";
 import * as passport from "passport";
 import * as session from "express-session";
@@ -39,6 +47,23 @@ const shieldMiddleware = shield(permissions, { allowExternalErrors: true });
 const schemaValidationMiddleware = schemaValidation(validations);
 
 /**
+ * Custom report error for sentry middleware
+ * It decides whether or not the error should be captured
+ */
+export function reportError(res: Error | any) {
+  if (
+    res instanceof UserInputError ||
+    res instanceof AuthenticationError ||
+    res instanceof ForbiddenError ||
+    res instanceof SyntaxError ||
+    res instanceof ValidationError
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Sentry configuration
  * Capture console.error statements
  */
@@ -61,7 +86,8 @@ const sentryMiddleware = () =>
       scope.setExtra("user-agent", context.req.headers["user-agent"]);
       scope.setExtra("ip", context.req.headers["x-real-ip"]);
       scope.setTag("service", "api");
-    }
+    },
+    reportError
   });
 
 const schema = makeExecutableSchema({
