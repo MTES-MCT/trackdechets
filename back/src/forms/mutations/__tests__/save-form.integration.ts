@@ -15,7 +15,7 @@ describe("{ mutation { saveForm } }", () => {
     const payload = {
       emitter: {
         type: "PRODUCER",
-        pickupSite: {
+        workSite: {
           name: "The name",
           address: "The address",
           city: "The city",
@@ -90,7 +90,7 @@ describe("{ mutation { saveForm } }", () => {
         saveForm(formInput: $formInput) {
           id
           emitter {
-            pickupSite {
+            workSite {
               name
               address
               city
@@ -106,20 +106,20 @@ describe("{ mutation { saveForm } }", () => {
       variables: { formInput: payload }
     });
 
-    expect(data.saveForm.emitter.pickupSite.name).toBe(
-      payload.emitter.pickupSite.name
+    expect(data.saveForm.emitter.workSite.name).toBe(
+      payload.emitter.workSite.name
     );
-    expect(data.saveForm.emitter.pickupSite.address).toBe(
-      payload.emitter.pickupSite.address
+    expect(data.saveForm.emitter.workSite.address).toBe(
+      payload.emitter.workSite.address
     );
-    expect(data.saveForm.emitter.pickupSite.city).toBe(
-      payload.emitter.pickupSite.city
+    expect(data.saveForm.emitter.workSite.city).toBe(
+      payload.emitter.workSite.city
     );
-    expect(data.saveForm.emitter.pickupSite.postalCode).toBe(
-      payload.emitter.pickupSite.postalCode
+    expect(data.saveForm.emitter.workSite.postalCode).toBe(
+      payload.emitter.workSite.postalCode
     );
-    expect(data.saveForm.emitter.pickupSite.infos).toBe(
-      payload.emitter.pickupSite.infos
+    expect(data.saveForm.emitter.workSite.infos).toBe(
+      payload.emitter.workSite.infos
     );
   });
 });

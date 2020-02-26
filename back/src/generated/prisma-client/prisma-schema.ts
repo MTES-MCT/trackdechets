@@ -1184,11 +1184,12 @@ type Form {
   nextDestinationCompanyPhone: String
   nextDestinationCompanyMail: String
   emitterType: EmitterType
-  emitterPickupSiteName: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteCity: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSiteInfos: String
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
   emitterCompanyName: String
   emitterCompanySiret: String
   emitterCompanyAddress: String
@@ -1270,11 +1271,12 @@ input FormCreateInput {
   nextDestinationCompanyPhone: String
   nextDestinationCompanyMail: String
   emitterType: EmitterType
-  emitterPickupSiteName: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteCity: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSiteInfos: String
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
   emitterCompanyName: String
   emitterCompanySiret: String
   emitterCompanyAddress: String
@@ -1395,16 +1397,18 @@ enum FormOrderByInput {
   nextDestinationCompanyMail_DESC
   emitterType_ASC
   emitterType_DESC
-  emitterPickupSiteName_ASC
-  emitterPickupSiteName_DESC
-  emitterPickupSiteAddress_ASC
-  emitterPickupSiteAddress_DESC
-  emitterPickupSiteCity_ASC
-  emitterPickupSiteCity_DESC
-  emitterPickupSitePostalCode_ASC
-  emitterPickupSitePostalCode_DESC
-  emitterPickupSiteInfos_ASC
-  emitterPickupSiteInfos_DESC
+  emitterPickupSite_ASC
+  emitterPickupSite_DESC
+  emitterWorkSiteName_ASC
+  emitterWorkSiteName_DESC
+  emitterWorkSiteAddress_ASC
+  emitterWorkSiteAddress_DESC
+  emitterWorkSiteCity_ASC
+  emitterWorkSiteCity_DESC
+  emitterWorkSitePostalCode_ASC
+  emitterWorkSitePostalCode_DESC
+  emitterWorkSiteInfos_ASC
+  emitterWorkSiteInfos_DESC
   emitterCompanyName_ASC
   emitterCompanyName_DESC
   emitterCompanySiret_ASC
@@ -1523,11 +1527,12 @@ type FormPreviousValues {
   nextDestinationCompanyPhone: String
   nextDestinationCompanyMail: String
   emitterType: EmitterType
-  emitterPickupSiteName: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteCity: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSiteInfos: String
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
   emitterCompanyName: String
   emitterCompanySiret: String
   emitterCompanyAddress: String
@@ -1882,76 +1887,90 @@ input FormScalarWhereInput {
   emitterType_not: EmitterType
   emitterType_in: [EmitterType!]
   emitterType_not_in: [EmitterType!]
-  emitterPickupSiteName: String
-  emitterPickupSiteName_not: String
-  emitterPickupSiteName_in: [String!]
-  emitterPickupSiteName_not_in: [String!]
-  emitterPickupSiteName_lt: String
-  emitterPickupSiteName_lte: String
-  emitterPickupSiteName_gt: String
-  emitterPickupSiteName_gte: String
-  emitterPickupSiteName_contains: String
-  emitterPickupSiteName_not_contains: String
-  emitterPickupSiteName_starts_with: String
-  emitterPickupSiteName_not_starts_with: String
-  emitterPickupSiteName_ends_with: String
-  emitterPickupSiteName_not_ends_with: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteAddress_not: String
-  emitterPickupSiteAddress_in: [String!]
-  emitterPickupSiteAddress_not_in: [String!]
-  emitterPickupSiteAddress_lt: String
-  emitterPickupSiteAddress_lte: String
-  emitterPickupSiteAddress_gt: String
-  emitterPickupSiteAddress_gte: String
-  emitterPickupSiteAddress_contains: String
-  emitterPickupSiteAddress_not_contains: String
-  emitterPickupSiteAddress_starts_with: String
-  emitterPickupSiteAddress_not_starts_with: String
-  emitterPickupSiteAddress_ends_with: String
-  emitterPickupSiteAddress_not_ends_with: String
-  emitterPickupSiteCity: String
-  emitterPickupSiteCity_not: String
-  emitterPickupSiteCity_in: [String!]
-  emitterPickupSiteCity_not_in: [String!]
-  emitterPickupSiteCity_lt: String
-  emitterPickupSiteCity_lte: String
-  emitterPickupSiteCity_gt: String
-  emitterPickupSiteCity_gte: String
-  emitterPickupSiteCity_contains: String
-  emitterPickupSiteCity_not_contains: String
-  emitterPickupSiteCity_starts_with: String
-  emitterPickupSiteCity_not_starts_with: String
-  emitterPickupSiteCity_ends_with: String
-  emitterPickupSiteCity_not_ends_with: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSitePostalCode_not: String
-  emitterPickupSitePostalCode_in: [String!]
-  emitterPickupSitePostalCode_not_in: [String!]
-  emitterPickupSitePostalCode_lt: String
-  emitterPickupSitePostalCode_lte: String
-  emitterPickupSitePostalCode_gt: String
-  emitterPickupSitePostalCode_gte: String
-  emitterPickupSitePostalCode_contains: String
-  emitterPickupSitePostalCode_not_contains: String
-  emitterPickupSitePostalCode_starts_with: String
-  emitterPickupSitePostalCode_not_starts_with: String
-  emitterPickupSitePostalCode_ends_with: String
-  emitterPickupSitePostalCode_not_ends_with: String
-  emitterPickupSiteInfos: String
-  emitterPickupSiteInfos_not: String
-  emitterPickupSiteInfos_in: [String!]
-  emitterPickupSiteInfos_not_in: [String!]
-  emitterPickupSiteInfos_lt: String
-  emitterPickupSiteInfos_lte: String
-  emitterPickupSiteInfos_gt: String
-  emitterPickupSiteInfos_gte: String
-  emitterPickupSiteInfos_contains: String
-  emitterPickupSiteInfos_not_contains: String
-  emitterPickupSiteInfos_starts_with: String
-  emitterPickupSiteInfos_not_starts_with: String
-  emitterPickupSiteInfos_ends_with: String
-  emitterPickupSiteInfos_not_ends_with: String
+  emitterPickupSite: String
+  emitterPickupSite_not: String
+  emitterPickupSite_in: [String!]
+  emitterPickupSite_not_in: [String!]
+  emitterPickupSite_lt: String
+  emitterPickupSite_lte: String
+  emitterPickupSite_gt: String
+  emitterPickupSite_gte: String
+  emitterPickupSite_contains: String
+  emitterPickupSite_not_contains: String
+  emitterPickupSite_starts_with: String
+  emitterPickupSite_not_starts_with: String
+  emitterPickupSite_ends_with: String
+  emitterPickupSite_not_ends_with: String
+  emitterWorkSiteName: String
+  emitterWorkSiteName_not: String
+  emitterWorkSiteName_in: [String!]
+  emitterWorkSiteName_not_in: [String!]
+  emitterWorkSiteName_lt: String
+  emitterWorkSiteName_lte: String
+  emitterWorkSiteName_gt: String
+  emitterWorkSiteName_gte: String
+  emitterWorkSiteName_contains: String
+  emitterWorkSiteName_not_contains: String
+  emitterWorkSiteName_starts_with: String
+  emitterWorkSiteName_not_starts_with: String
+  emitterWorkSiteName_ends_with: String
+  emitterWorkSiteName_not_ends_with: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteAddress_not: String
+  emitterWorkSiteAddress_in: [String!]
+  emitterWorkSiteAddress_not_in: [String!]
+  emitterWorkSiteAddress_lt: String
+  emitterWorkSiteAddress_lte: String
+  emitterWorkSiteAddress_gt: String
+  emitterWorkSiteAddress_gte: String
+  emitterWorkSiteAddress_contains: String
+  emitterWorkSiteAddress_not_contains: String
+  emitterWorkSiteAddress_starts_with: String
+  emitterWorkSiteAddress_not_starts_with: String
+  emitterWorkSiteAddress_ends_with: String
+  emitterWorkSiteAddress_not_ends_with: String
+  emitterWorkSiteCity: String
+  emitterWorkSiteCity_not: String
+  emitterWorkSiteCity_in: [String!]
+  emitterWorkSiteCity_not_in: [String!]
+  emitterWorkSiteCity_lt: String
+  emitterWorkSiteCity_lte: String
+  emitterWorkSiteCity_gt: String
+  emitterWorkSiteCity_gte: String
+  emitterWorkSiteCity_contains: String
+  emitterWorkSiteCity_not_contains: String
+  emitterWorkSiteCity_starts_with: String
+  emitterWorkSiteCity_not_starts_with: String
+  emitterWorkSiteCity_ends_with: String
+  emitterWorkSiteCity_not_ends_with: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSitePostalCode_not: String
+  emitterWorkSitePostalCode_in: [String!]
+  emitterWorkSitePostalCode_not_in: [String!]
+  emitterWorkSitePostalCode_lt: String
+  emitterWorkSitePostalCode_lte: String
+  emitterWorkSitePostalCode_gt: String
+  emitterWorkSitePostalCode_gte: String
+  emitterWorkSitePostalCode_contains: String
+  emitterWorkSitePostalCode_not_contains: String
+  emitterWorkSitePostalCode_starts_with: String
+  emitterWorkSitePostalCode_not_starts_with: String
+  emitterWorkSitePostalCode_ends_with: String
+  emitterWorkSitePostalCode_not_ends_with: String
+  emitterWorkSiteInfos: String
+  emitterWorkSiteInfos_not: String
+  emitterWorkSiteInfos_in: [String!]
+  emitterWorkSiteInfos_not_in: [String!]
+  emitterWorkSiteInfos_lt: String
+  emitterWorkSiteInfos_lte: String
+  emitterWorkSiteInfos_gt: String
+  emitterWorkSiteInfos_gte: String
+  emitterWorkSiteInfos_contains: String
+  emitterWorkSiteInfos_not_contains: String
+  emitterWorkSiteInfos_starts_with: String
+  emitterWorkSiteInfos_not_starts_with: String
+  emitterWorkSiteInfos_ends_with: String
+  emitterWorkSiteInfos_not_ends_with: String
   emitterCompanyName: String
   emitterCompanyName_not: String
   emitterCompanyName_in: [String!]
@@ -2535,11 +2554,12 @@ input FormUpdateDataInput {
   nextDestinationCompanyPhone: String
   nextDestinationCompanyMail: String
   emitterType: EmitterType
-  emitterPickupSiteName: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteCity: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSiteInfos: String
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
   emitterCompanyName: String
   emitterCompanySiret: String
   emitterCompanyAddress: String
@@ -2614,11 +2634,12 @@ input FormUpdateInput {
   nextDestinationCompanyPhone: String
   nextDestinationCompanyMail: String
   emitterType: EmitterType
-  emitterPickupSiteName: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteCity: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSiteInfos: String
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
   emitterCompanyName: String
   emitterCompanySiret: String
   emitterCompanyAddress: String
@@ -2692,11 +2713,12 @@ input FormUpdateManyDataInput {
   nextDestinationCompanyPhone: String
   nextDestinationCompanyMail: String
   emitterType: EmitterType
-  emitterPickupSiteName: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteCity: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSiteInfos: String
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
   emitterCompanyName: String
   emitterCompanySiret: String
   emitterCompanyAddress: String
@@ -2781,11 +2803,12 @@ input FormUpdateManyMutationInput {
   nextDestinationCompanyPhone: String
   nextDestinationCompanyMail: String
   emitterType: EmitterType
-  emitterPickupSiteName: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteCity: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSiteInfos: String
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
   emitterCompanyName: String
   emitterCompanySiret: String
   emitterCompanyAddress: String
@@ -3169,76 +3192,90 @@ input FormWhereInput {
   emitterType_not: EmitterType
   emitterType_in: [EmitterType!]
   emitterType_not_in: [EmitterType!]
-  emitterPickupSiteName: String
-  emitterPickupSiteName_not: String
-  emitterPickupSiteName_in: [String!]
-  emitterPickupSiteName_not_in: [String!]
-  emitterPickupSiteName_lt: String
-  emitterPickupSiteName_lte: String
-  emitterPickupSiteName_gt: String
-  emitterPickupSiteName_gte: String
-  emitterPickupSiteName_contains: String
-  emitterPickupSiteName_not_contains: String
-  emitterPickupSiteName_starts_with: String
-  emitterPickupSiteName_not_starts_with: String
-  emitterPickupSiteName_ends_with: String
-  emitterPickupSiteName_not_ends_with: String
-  emitterPickupSiteAddress: String
-  emitterPickupSiteAddress_not: String
-  emitterPickupSiteAddress_in: [String!]
-  emitterPickupSiteAddress_not_in: [String!]
-  emitterPickupSiteAddress_lt: String
-  emitterPickupSiteAddress_lte: String
-  emitterPickupSiteAddress_gt: String
-  emitterPickupSiteAddress_gte: String
-  emitterPickupSiteAddress_contains: String
-  emitterPickupSiteAddress_not_contains: String
-  emitterPickupSiteAddress_starts_with: String
-  emitterPickupSiteAddress_not_starts_with: String
-  emitterPickupSiteAddress_ends_with: String
-  emitterPickupSiteAddress_not_ends_with: String
-  emitterPickupSiteCity: String
-  emitterPickupSiteCity_not: String
-  emitterPickupSiteCity_in: [String!]
-  emitterPickupSiteCity_not_in: [String!]
-  emitterPickupSiteCity_lt: String
-  emitterPickupSiteCity_lte: String
-  emitterPickupSiteCity_gt: String
-  emitterPickupSiteCity_gte: String
-  emitterPickupSiteCity_contains: String
-  emitterPickupSiteCity_not_contains: String
-  emitterPickupSiteCity_starts_with: String
-  emitterPickupSiteCity_not_starts_with: String
-  emitterPickupSiteCity_ends_with: String
-  emitterPickupSiteCity_not_ends_with: String
-  emitterPickupSitePostalCode: String
-  emitterPickupSitePostalCode_not: String
-  emitterPickupSitePostalCode_in: [String!]
-  emitterPickupSitePostalCode_not_in: [String!]
-  emitterPickupSitePostalCode_lt: String
-  emitterPickupSitePostalCode_lte: String
-  emitterPickupSitePostalCode_gt: String
-  emitterPickupSitePostalCode_gte: String
-  emitterPickupSitePostalCode_contains: String
-  emitterPickupSitePostalCode_not_contains: String
-  emitterPickupSitePostalCode_starts_with: String
-  emitterPickupSitePostalCode_not_starts_with: String
-  emitterPickupSitePostalCode_ends_with: String
-  emitterPickupSitePostalCode_not_ends_with: String
-  emitterPickupSiteInfos: String
-  emitterPickupSiteInfos_not: String
-  emitterPickupSiteInfos_in: [String!]
-  emitterPickupSiteInfos_not_in: [String!]
-  emitterPickupSiteInfos_lt: String
-  emitterPickupSiteInfos_lte: String
-  emitterPickupSiteInfos_gt: String
-  emitterPickupSiteInfos_gte: String
-  emitterPickupSiteInfos_contains: String
-  emitterPickupSiteInfos_not_contains: String
-  emitterPickupSiteInfos_starts_with: String
-  emitterPickupSiteInfos_not_starts_with: String
-  emitterPickupSiteInfos_ends_with: String
-  emitterPickupSiteInfos_not_ends_with: String
+  emitterPickupSite: String
+  emitterPickupSite_not: String
+  emitterPickupSite_in: [String!]
+  emitterPickupSite_not_in: [String!]
+  emitterPickupSite_lt: String
+  emitterPickupSite_lte: String
+  emitterPickupSite_gt: String
+  emitterPickupSite_gte: String
+  emitterPickupSite_contains: String
+  emitterPickupSite_not_contains: String
+  emitterPickupSite_starts_with: String
+  emitterPickupSite_not_starts_with: String
+  emitterPickupSite_ends_with: String
+  emitterPickupSite_not_ends_with: String
+  emitterWorkSiteName: String
+  emitterWorkSiteName_not: String
+  emitterWorkSiteName_in: [String!]
+  emitterWorkSiteName_not_in: [String!]
+  emitterWorkSiteName_lt: String
+  emitterWorkSiteName_lte: String
+  emitterWorkSiteName_gt: String
+  emitterWorkSiteName_gte: String
+  emitterWorkSiteName_contains: String
+  emitterWorkSiteName_not_contains: String
+  emitterWorkSiteName_starts_with: String
+  emitterWorkSiteName_not_starts_with: String
+  emitterWorkSiteName_ends_with: String
+  emitterWorkSiteName_not_ends_with: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteAddress_not: String
+  emitterWorkSiteAddress_in: [String!]
+  emitterWorkSiteAddress_not_in: [String!]
+  emitterWorkSiteAddress_lt: String
+  emitterWorkSiteAddress_lte: String
+  emitterWorkSiteAddress_gt: String
+  emitterWorkSiteAddress_gte: String
+  emitterWorkSiteAddress_contains: String
+  emitterWorkSiteAddress_not_contains: String
+  emitterWorkSiteAddress_starts_with: String
+  emitterWorkSiteAddress_not_starts_with: String
+  emitterWorkSiteAddress_ends_with: String
+  emitterWorkSiteAddress_not_ends_with: String
+  emitterWorkSiteCity: String
+  emitterWorkSiteCity_not: String
+  emitterWorkSiteCity_in: [String!]
+  emitterWorkSiteCity_not_in: [String!]
+  emitterWorkSiteCity_lt: String
+  emitterWorkSiteCity_lte: String
+  emitterWorkSiteCity_gt: String
+  emitterWorkSiteCity_gte: String
+  emitterWorkSiteCity_contains: String
+  emitterWorkSiteCity_not_contains: String
+  emitterWorkSiteCity_starts_with: String
+  emitterWorkSiteCity_not_starts_with: String
+  emitterWorkSiteCity_ends_with: String
+  emitterWorkSiteCity_not_ends_with: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSitePostalCode_not: String
+  emitterWorkSitePostalCode_in: [String!]
+  emitterWorkSitePostalCode_not_in: [String!]
+  emitterWorkSitePostalCode_lt: String
+  emitterWorkSitePostalCode_lte: String
+  emitterWorkSitePostalCode_gt: String
+  emitterWorkSitePostalCode_gte: String
+  emitterWorkSitePostalCode_contains: String
+  emitterWorkSitePostalCode_not_contains: String
+  emitterWorkSitePostalCode_starts_with: String
+  emitterWorkSitePostalCode_not_starts_with: String
+  emitterWorkSitePostalCode_ends_with: String
+  emitterWorkSitePostalCode_not_ends_with: String
+  emitterWorkSiteInfos: String
+  emitterWorkSiteInfos_not: String
+  emitterWorkSiteInfos_in: [String!]
+  emitterWorkSiteInfos_not_in: [String!]
+  emitterWorkSiteInfos_lt: String
+  emitterWorkSiteInfos_lte: String
+  emitterWorkSiteInfos_gt: String
+  emitterWorkSiteInfos_gte: String
+  emitterWorkSiteInfos_contains: String
+  emitterWorkSiteInfos_not_contains: String
+  emitterWorkSiteInfos_starts_with: String
+  emitterWorkSiteInfos_not_starts_with: String
+  emitterWorkSiteInfos_ends_with: String
+  emitterWorkSiteInfos_not_ends_with: String
   emitterCompanyName: String
   emitterCompanyName_not: String
   emitterCompanyName_in: [String!]

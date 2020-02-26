@@ -5,6 +5,7 @@ const apiShape = {
     company: {
       name: "test"
     },
+    workSite: "A site",
     otherField: "other"
   },
   boolean: true,

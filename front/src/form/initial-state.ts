@@ -1,7 +1,7 @@
 export default {
   emitter: {
     type: "PRODUCER",
-    pickupSite: {
+    workSite: {
       name: "",
       address: "",
       city: "",

@@ -42,7 +42,7 @@ export function unflattenObjectFromDb(input, apiObject = {}) {
     "wasteDetails",
     "company",
     "nextDestination",
-    "pickupSite"
+    "workSite"
   ];
 
   Object.keys(input).forEach(key => {

@@ -3,10 +3,9 @@ import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import { RadioButton } from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
-import PickupSite from "./pickup-site/PickupSite";
+import WorkSite from "./work-site/WorkSite";
 
 type Values = {
-  emitter: { pickupSite: string };
   customId: string;
 };
 export default connect<{}, Values>(function Emitter({ formik }) {
@@ -72,7 +71,7 @@ export default connect<{}, Values>(function Emitter({ formik }) {
       <h4>Entreprise émettrice</h4>
       <CompanySelector name="emitter.company" />
 
-      <PickupSite />
+      <WorkSite />
     </>
   );
 });

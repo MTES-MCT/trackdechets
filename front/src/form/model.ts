@@ -4,7 +4,7 @@ export type Form = {
   status: string;
   emitter: {
     company: FormCompany;
-    pickupSite: {
+    workSite: {
       name: string;
       address: string;
       city: string;

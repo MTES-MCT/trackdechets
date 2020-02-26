@@ -2,10 +2,10 @@ import { Field, useFormikContext } from "formik";
 import React, { useState } from "react";
 import { Form } from "../model";
 
-export default function PickupSite() {
+export default function WorkSite() {
   const { values } = useFormikContext<Form>();
-  const [pickupSite, setPickupSite] = useState(
-    Object.values(values.emitter.pickupSite).some(v => v != "")
+  const [workSite, setWorkSite] = useState(
+    Object.values(values.emitter.workSite).some(v => v != "")
   );
 
   return (
@@ -13,12 +13,12 @@ export default function PickupSite() {
       <label>
         <input
           type="checkbox"
-          defaultChecked={pickupSite}
-          onChange={() => setPickupSite(!pickupSite)}
+          defaultChecked={workSite}
+          onChange={() => setWorkSite(!workSite)}
         />
         Je souhaite ajouter une adresse de chantier ou de collecte
       </label>
-      {pickupSite && (
+      {workSite && (
         <>
           <h4>Adresse chantier</h4>
 
@@ -27,7 +27,7 @@ export default function PickupSite() {
               Nom de l'entreprise
               <Field
                 type="text"
-                name="emitter.pickupSite.name"
+                name="emitter.workSite.name"
                 placeholder="Intitulé"
               />
             </label>
@@ -38,7 +38,7 @@ export default function PickupSite() {
               Adresse chantier
               <Field
                 type="text"
-                name="emitter.pickupSite.address"
+                name="emitter.workSite.address"
                 placeholder="Rue / numéro"
               />
             </label>
@@ -49,7 +49,7 @@ export default function PickupSite() {
               Commune
               <Field
                 type="text"
-                name="emitter.pickupSite.city"
+                name="emitter.workSite.city"
                 placeholder="Intitulé"
               />
             </label>
@@ -60,7 +60,7 @@ export default function PickupSite() {
               Code postal
               <Field
                 type="input"
-                name="emitter.pickupSite.postalCode"
+                name="emitter.workSite.postalCode"
                 placeholder="Code"
               />
             </label>
@@ -73,7 +73,7 @@ export default function PickupSite() {
                 component="textarea"
                 className="textarea-pickup-site"
                 placeholder="Champ libre pour préciser..."
-                name="emitter.pickupSite.infos"
+                name="emitter.workSite.infos"
               />
             </label>
           </div>

@@ -349,7 +349,7 @@ enum EmitterType {
 }
 
 "Informations sur une adresse chantier"
-type PickupSite {
+type WorkSite {
   name: String
   address: String
   city: String
@@ -364,7 +364,7 @@ type Emitter {
   type: EmitterType
 
   "Adresse du chantier"
-  pickupSite: PickupSite
+  workSite: WorkSite
 
   "Établissement émetteur"
   company: FormCompany

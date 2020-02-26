@@ -164,7 +164,7 @@ input CompanyInput {
 }
 
 "Payload d'une adresse chantier"
-input PickupSiteInput {
+input WorkSiteInput {
   name: String
   address: String
   city: String
@@ -179,7 +179,7 @@ input EmitterInput {
   type: EmitterType
 
   "Adresse du chantier"
-  pickupSite: PickupSiteInput
+  workSite: WorkSiteInput
 
   "Établissement émetteur"
   company: CompanyInput

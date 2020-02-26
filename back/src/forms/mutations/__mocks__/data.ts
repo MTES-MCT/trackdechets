@@ -6,7 +6,7 @@ export const getNewValidForm = () =>
       status: "DRAFT",
       emitter: {
         type: "PRODUCER",
-        pickupSite: {
+        workSite: {
           name: "",
           address: "",
           city: "",
