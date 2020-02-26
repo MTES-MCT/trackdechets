@@ -348,6 +348,15 @@ enum EmitterType {
   APPENDIX2
 }
 
+"Informations sur une adresse chantier"
+type PickupSite {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
 "Émetteur du BSD (case 1)"
 type Emitter {
 
@@ -355,7 +364,7 @@ type Emitter {
   type: EmitterType
 
   "Adresse du chantier"
-  pickupSite: String
+  pickupSite: PickupSite
 
   "Établissement émetteur"
   company: FormCompany

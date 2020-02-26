@@ -2,7 +2,7 @@ export default {
   emitter: {
     type: "PRODUCER",
     pickupSite: {
-      companyName: "",
+      name: "",
       address: "",
       city: "",
       postalCode: "",

@@ -27,7 +27,7 @@ export default function PickupSite() {
               Nom de l'entreprise
               <Field
                 type="text"
-                name="emitter.pickupSite.companyName"
+                name="emitter.pickupSite.name"
                 placeholder="Intitulé"
               />
             </label>
@@ -59,7 +59,7 @@ export default function PickupSite() {
             <label>
               Code postal
               <Field
-                type="number"
+                type="input"
                 name="emitter.pickupSite.postalCode"
                 placeholder="Code"
               />

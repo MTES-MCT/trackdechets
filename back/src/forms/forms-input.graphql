@@ -163,6 +163,15 @@ input CompanyInput {
   phone: String
 }
 
+"Payload d'une adresse chantier"
+input PickupSiteInput {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
 "Payload lié à un l'émetteur du BSD (case 1)"
 input EmitterInput {
 
@@ -170,7 +179,7 @@ input EmitterInput {
   type: EmitterType
 
   "Adresse du chantier"
-  pickupSite: String
+  pickupSite: PickupSiteInput
 
   "Établissement émetteur"
   company: CompanyInput

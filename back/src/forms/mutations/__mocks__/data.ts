@@ -6,7 +6,13 @@ export const getNewValidForm = () =>
       status: "DRAFT",
       emitter: {
         type: "PRODUCER",
-        pickupSite: "Nom:\nAdresse:\nMail:",
+        pickupSite: {
+          name: "",
+          address: "",
+          city: "",
+          postalCode: "",
+          infos: ""
+        },
         company: {
           name: "A company 2",
           siret: "XXX XXX XXX 0002",

@@ -5,10 +5,10 @@ export type Form = {
   emitter: {
     company: FormCompany;
     pickupSite: {
-      companyName: string;
+      name: string;
       address: string;
       city: string;
-      postalCode: number;
+      postalCode: string;
       infos: string;
     };
   };

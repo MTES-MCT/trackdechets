@@ -20,7 +20,13 @@ export const GET_FORM = gql`
       customId
       emitter {
         type
-        pickupSite
+        pickupSite {
+          name
+          address
+          city
+          postalCode
+          infos
+        }
         company {
           ...CompanyFragment
         }
