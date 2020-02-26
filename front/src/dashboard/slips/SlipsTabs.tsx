@@ -40,6 +40,7 @@ export default function SlipsTabs({ me, siret }: Props) {
             siret={siret}
             forms={drafts}
             hiddenFields={["status", "readableId"]}
+            dynamicActions={true}
           />
         ) : (
           <div className="empty-tab">
@@ -60,7 +61,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       </TabPanel>
       <TabPanel>
         {toSign.length ? (
-          <Slips siret={siret} forms={toSign} />
+          <Slips siret={siret} forms={toSign} dynamicActions={true}/>
         ) : (
           <div className="empty-tab">
             <img src="/illu/illu_sent.svg" alt="" />
@@ -76,7 +77,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       </TabPanel>
       <TabPanel>
         {status.length ? (
-          <Slips siret={siret} forms={status} />
+          <Slips siret={siret} forms={status}  />
         ) : (
           <div className="empty-tab">
             <img src="/illu/illu_transfer.svg" alt="" />
