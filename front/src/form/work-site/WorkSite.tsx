@@ -1,24 +1,32 @@
 import { Field, useFormikContext } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form } from "../model";
 
+const FIELDS = ["name", "address", "city", "postalCode", "infos"];
+
 export default function WorkSite() {
-  const { values } = useFormikContext<Form>();
-  const [workSite, setWorkSite] = useState(
-    Object.values(values.emitter.workSite).some(v => v != "")
+  const { values, setFieldValue } = useFormikContext<Form>();
+  const [showWorkSite, setShowWorkSite] = useState(
+    FIELDS.some(field => values.emitter.workSite[field])
   );
+
+  useEffect(() => {
+    for (const field of FIELDS) {
+      setFieldValue(`emitter.workSite.${field}`, "");
+    }
+  }, [showWorkSite]);
 
   return (
     <div className="form__group">
       <label>
         <input
           type="checkbox"
-          defaultChecked={workSite}
-          onChange={() => setWorkSite(!workSite)}
+          defaultChecked={showWorkSite}
+          onChange={() => setShowWorkSite(!showWorkSite)}
         />
         Je souhaite ajouter une adresse de chantier ou de collecte
       </label>
-      {workSite && (
+      {showWorkSite && (
         <>
           <h4>Adresse chantier</h4>
 
