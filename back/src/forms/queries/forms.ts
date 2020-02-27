@@ -37,12 +37,12 @@ export default async function forms(
     }
   };
 
-  const forms = await context.prisma.forms({
+  const queriedForms = await context.prisma.forms({
     where: {
       ...formsFilter[type],
       isDeleted: false
     }
   });
 
-  return forms.map(f => unflattenObjectFromDb(f));
+  return queriedForms.map(f => unflattenObjectFromDb(f));
 }

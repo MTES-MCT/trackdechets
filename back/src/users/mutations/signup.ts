@@ -19,7 +19,7 @@ export default async function signup(
       password: hashedPassword,
       phone: userInfos.phone
     })
-    .catch(_ => null);
+    .catch(__ => null);
 
   if (!user) {
     return new DomainError(

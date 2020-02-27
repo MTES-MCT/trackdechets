@@ -11,7 +11,7 @@ function getCompanySireneInfo(siret: string) {
 }
 
 export function getCachedCompanySireneInfo(siret) {
-  if (siret.length != 14) {
+  if (siret.length !== 14) {
     throw new DomainError(
       "Le siret doit faire 14 caractères",
       ErrorCode.BAD_USER_INPUT

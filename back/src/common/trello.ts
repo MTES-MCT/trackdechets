@@ -92,7 +92,7 @@ export async function createSiretUnknownAlertCard(
   const cards = await getCards(idAlertsList);
 
   const foundCard = cards.find(c => {
-    return c.name == cardName && c.labels[0].id == siretUnknownLabelId;
+    return c.name === cardName && c.labels[0].id === siretUnknownLabelId;
   });
 
   if (foundCard) {
@@ -160,7 +160,7 @@ export async function createNotICPEAlertCard(
   const cards = await getCards(idAlertsList);
 
   const foundCard = cards.find(c => {
-    return c.name == cardName && c.labels[0].id == notIcpeLabelId;
+    return c.name === cardName && c.labels[0].id === notIcpeLabelId;
   });
 
   if (foundCard) {
@@ -224,7 +224,7 @@ export async function createNotCompatibleRubriqueAlertCard(
   const cards = await getCards(idAlertsList);
 
   const foundCard = cards.find(c => {
-    return c.name == cardName && c.labels[0].id == notCompatibleLabelId;
+    return c.name === cardName && c.labels[0].id === notCompatibleLabelId;
   });
 
   if (foundCard) {

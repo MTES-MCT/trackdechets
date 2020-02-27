@@ -174,13 +174,8 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
 
   return Promise.all(
     recipients.map(admin => {
-      const payload = mailFunction(
-        admin.email,
-        admin.name,
-        form,
-        attachmentData
-      );
-      return sendMail(payload);
+      const mail = mailFunction(admin.email, admin.name, form, attachmentData);
+      return sendMail(mail);
     })
   );
 }
@@ -196,11 +191,13 @@ async function verifiyPresta(payload: FormSubscriptionPayload) {
     switch (anomaly) {
       case anomalies.SIRET_UNKNOWN:
         // Raise an internal alert => the siret was not recognized
-        const company_ = {
+        const companyWithName = {
           ...company,
           name: bsd.recipientCompanyName
         };
-        createSiretUnknownAlertCard(company_, alertTypes.BSD_CREATION, { bsd });
+        createSiretUnknownAlertCard(companyWithName, alertTypes.BSD_CREATION, {
+          bsd
+        });
         break;
       case anomalies.NOT_ICPE_27XX_35XX:
         // Raise an internal alert => a producer is sending a waste

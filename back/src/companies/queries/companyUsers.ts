@@ -69,5 +69,5 @@ export async function getCompanyInvitedUsers(siret: string) {
  */
 export async function getCompanyAdminUsers(siret: string) {
   const users = await getCompanyActiveUsers(siret);
-  return users.filter(c => c.role == "ADMIN");
+  return users.filter(c => c.role === "ADMIN");
 }

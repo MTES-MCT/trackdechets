@@ -22,13 +22,13 @@ describe("File download token", () => {
   });
 
   it("should return token and link", async () => {
-    const res = await getFileDownloadToken(
+    const response = await getFileDownloadToken(
       { type: "A_TYPE", params: null },
       handler
     );
 
-    expect(res.token).not.toBeNull();
-    expect(res.downloadLink).not.toBeNull();
+    expect(response.token).not.toBeNull();
+    expect(response.downloadLink).not.toBeNull();
   });
 
   it("should return different tokens every time", async () => {

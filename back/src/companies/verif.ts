@@ -71,7 +71,7 @@ export async function checkIsCompatible(installation, wasteCode) {
     const rubriques = await getRubriques(installation.codeS3ic);
 
     for (const rubrique of rubriques) {
-      if (rubrique.wasteType == "DANGEROUS") {
+      if (rubrique.wasteType === "DANGEROUS") {
         canTakeDangerousWaste = true;
         break;
       }

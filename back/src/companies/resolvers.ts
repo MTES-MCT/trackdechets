@@ -40,7 +40,7 @@ export default {
   },
   CompanyMember: {
     isMe: (parent, _, context: GraphQLContext) => {
-      return parent.id == context.user.id;
+      return parent.id === context.user.id;
     }
   },
   Installation: {

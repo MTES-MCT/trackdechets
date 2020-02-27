@@ -24,7 +24,7 @@ export default {
       return changePassword(userId, oldPassword, newPassword);
     },
     resetPassword: async (_, { email }, context: GraphQLContext) => {
-      const user = await context.prisma.user({ email }).catch(_ => null);
+      const user = await context.prisma.user({ email }).catch(__ => null);
 
       if (!user) {
         throw new Error(`Cet email n'existe pas sur notre plateforme.`);
@@ -62,7 +62,7 @@ export default {
           user: { id: userId },
           company: { siret }
         })
-        .catch(_ => {
+        .catch(__ => {
           throw new Error(
             `Erreur, l'utilisateur n'a pas pu être retiré de l'entreprise`
           );

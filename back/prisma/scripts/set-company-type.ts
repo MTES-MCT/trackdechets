@@ -27,7 +27,7 @@ export async function setCompanyType() {
     const updates = [];
 
     type User = {
-      userType: [String];
+      userType: [string];
     };
 
     const fragment = `

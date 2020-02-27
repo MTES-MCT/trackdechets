@@ -85,14 +85,14 @@ oauth2server.exchange(
       );
       return done(err);
     }
-    if (redirectUri != grant.redirectUri) {
+    if (redirectUri !== grant.redirectUri) {
       const err = new TokenError(
         tokenErrorMessages.invalid_redirect_uri,
         "invalid_grant"
       );
       return done(err);
     }
-    if (client.id != grant.application.id) {
+    if (client.id !== grant.application.id) {
       const err = new TokenError(
         tokenErrorMessages.invalid_client_id,
         "invalid_grant"

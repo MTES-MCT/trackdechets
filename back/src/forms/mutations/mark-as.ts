@@ -39,7 +39,7 @@ export function markAsProcessed(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
-    processedInfo => flattenObjectForDb(processedInfo)
+    infos => flattenObjectForDb(infos)
   );
 }
 
@@ -48,13 +48,13 @@ export async function signedByTransporter(
   { id, signingInfo },
   context: GraphQLContext
 ) {
-  const transformEventToFormParams = signingInfo => ({
-    signedByTransporter: signingInfo.signedByTransporter,
-    sentAt: signingInfo.sentAt,
-    sentBy: signingInfo.sentBy,
-    wasteDetailsPackagings: signingInfo.packagings,
-    wasteDetailsQuantity: signingInfo.quantity,
-    wasteDetailsOnuCode: signingInfo.onuCode
+  const transformEventToFormParams = infos => ({
+    signedByTransporter: infos.signedByTransporter,
+    sentAt: infos.sentAt,
+    sentBy: infos.sentBy,
+    wasteDetailsPackagings: infos.packagings,
+    wasteDetailsQuantity: infos.quantity,
+    wasteDetailsOnuCode: infos.onuCode
   });
 
   return transitionForm(

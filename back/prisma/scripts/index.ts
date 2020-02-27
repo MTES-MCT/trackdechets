@@ -15,7 +15,7 @@ export function registerUpdater(
   description: string = "",
   active: boolean = true
 ) {
-  return function(constructor: Function) {
+  return (constructor: new () => object) => {
     if (!active) return;
     updaters.push({ constructor, name, description });
   };

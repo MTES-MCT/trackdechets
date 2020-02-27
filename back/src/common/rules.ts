@@ -22,7 +22,7 @@ export const isCompanyAdmin = and(
   rule()(async (_, { siret }, ctx) => {
     ensureRuleParametersArePresent(siret);
 
-    const isCompanyAdmin = await isUserInCompaniesWithRoles(
+    const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
       [siret],
       ["ADMIN"],
@@ -30,7 +30,7 @@ export const isCompanyAdmin = and(
     );
 
     return (
-      isCompanyAdmin ||
+      isAuthorized ||
       new DomainError(
         `Vous n'êtes pas administrateur de l'entreprise "${siret}".`,
         ErrorCode.FORBIDDEN
@@ -44,7 +44,7 @@ export const isCompanyMember = and(
   rule()(async (_, { siret }, ctx) => {
     ensureRuleParametersArePresent(siret);
 
-    const isCompanyMember = await isUserInCompaniesWithRoles(
+    const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
       [siret],
       ["MEMBER"],
@@ -52,7 +52,7 @@ export const isCompanyMember = and(
     );
 
     return (
-      isCompanyMember ||
+      isAuthorized ||
       new DomainError(
         `Vous ne faites pas partie de l'entreprise "${siret}".`,
         ErrorCode.FORBIDDEN
@@ -66,7 +66,7 @@ export const isCompaniesUser = and(
   rule()(async (_, { sirets }, ctx) => {
     ensureRuleParametersArePresent(sirets);
 
-    const isCompaniesUser = await isUserInCompaniesWithRoles(
+    const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
       sirets,
       ["MEMBER", "ADMIN"],
@@ -74,7 +74,7 @@ export const isCompaniesUser = and(
     );
 
     return (
-      isCompaniesUser ||
+      isAuthorized ||
       new DomainError(
         `Vous ne faites pas partie d'au moins une des entreprises dont les SIRETS sont "${sirets.join(
           ", "

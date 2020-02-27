@@ -12,7 +12,7 @@ export async function revokeToken(token: string, user: User) {
     })
     .count();
 
-  if (parseInt(revokedTokenCount) === 0) {
+  if (parseInt(revokedTokenCount, 10) === 0) {
     throw new DomainError("Ce token n'existe pas", ErrorCode.NOT_FOUND);
   }
 
