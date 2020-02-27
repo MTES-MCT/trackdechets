@@ -120,7 +120,7 @@ oauth2server.exchange(
     });
 
     // Add custom params
-    let params = { user: { name: grant.user.name, email: grant.user.email } };
+    const params = { user: { name: grant.user.name, email: grant.user.email } };
 
     return done(null, accessToken.token, null, params);
   })

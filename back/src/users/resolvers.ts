@@ -47,8 +47,11 @@ export default {
       const userId = context.user.id;
       return editProfile(userId, payload);
     },
-    inviteUserToCompany: async (_, { email, siret, role }, context: GraphQLContext) =>
-      inviteUserToCompany(context.user, email, siret, role),
+    inviteUserToCompany: async (
+      _,
+      { email, siret, role },
+      context: GraphQLContext
+    ) => inviteUserToCompany(context.user, email, siret, role),
     resendInvitation: async (_, { email, siret }, context: GraphQLContext) =>
       resendInvitation(context.user, email, siret),
     joinWithInvite: async (_, { inviteHash, name, password }) =>
@@ -57,7 +60,7 @@ export default {
       await prisma
         .deleteManyCompanyAssociations({
           user: { id: userId },
-          company: { siret: siret }
+          company: { siret }
         })
         .catch(_ => {
           throw new Error(

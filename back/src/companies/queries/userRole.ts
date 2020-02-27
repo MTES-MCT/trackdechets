@@ -11,7 +11,7 @@ import { prisma } from "../../generated/prisma-client";
  */
 export async function getUserRole(userId: string, siret: string) {
   const associations = await prisma.companyAssociations({
-    where: { user: { id: userId }, company: { siret: siret } }
+    where: { user: { id: userId }, company: { siret } }
   });
   if (associations.length > 0) {
     return associations[0].role;

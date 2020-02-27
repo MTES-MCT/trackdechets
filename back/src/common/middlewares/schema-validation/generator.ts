@@ -21,12 +21,10 @@ function generateFieldMiddlewareFromRule(rule: ValidationRule) {
     context,
     info: GraphQLResolveInfo
   ) {
-
     try {
-        await rule.validate(args, {
+      await rule.validate(args, {
         abortEarly: false
       });
-
     } catch (error) {
       if (error instanceof ValidationError) {
         return new DomainError(

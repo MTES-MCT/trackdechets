@@ -60,7 +60,7 @@ describe("renewSecurityCode", () => {
       securityCode: "1234"
     });
 
-    updateCompanyMock.mockReturnValueOnce({})
+    updateCompanyMock.mockReturnValueOnce({});
     randomNumberMock.mockReturnValueOnce("1234").mockReturnValueOnce("2345");
 
     getCompanyActiveUsersMock.mockReturnValueOnce([]);

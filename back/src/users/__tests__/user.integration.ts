@@ -99,7 +99,7 @@ describe("User endpoint", () => {
     const { data } = await mutate({ mutation });
     expect(data.id).not.toBeNull();
 
-    const newUserExists = await prisma.$exists.user({ email: email });
+    const newUserExists = await prisma.$exists.user({ email });
     expect(newUserExists).toBe(true);
   });
 });

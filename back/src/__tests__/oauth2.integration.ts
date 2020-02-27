@@ -125,7 +125,7 @@ describe("/oauth2/authorize/decision", () => {
     ).toEqual(1);
 
     // should pass the grant code as query in the redirect uri
-    const redirect = decision.header["location"];
+    const redirect = decision.header.location;
     const grants = await prisma.grants({
       where: { user: { id: user.id }, application: { id: application.id } }
     });
@@ -156,7 +156,7 @@ describe("/oauth2/authorize/decision", () => {
       .send(`transaction_id=${transactionID}`)
       .send("cancel=Cancel");
 
-    const redirect = decision.header["location"];
+    const redirect = decision.header.location;
     expect(redirect).toEqual(
       `${application.redirectUris[0]}?error=access_denied`
     );

@@ -14,7 +14,7 @@ const makeClient = user => {
 
   setOptions({
     request: {
-      user: user
+      user
     }
   });
   return { mutate, query };

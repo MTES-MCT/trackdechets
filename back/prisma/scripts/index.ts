@@ -26,7 +26,7 @@ fileLoader(`${__dirname}/*.ts`);
 
 (async () => {
   // Run them one by one
-  for (let updater of updaters) {
+  for (const updater of updaters) {
     console.info(`=== About to start "${updater.name}" script ===`);
     console.info(`Description: ${updater.description}`);
 

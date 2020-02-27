@@ -12,7 +12,7 @@ const apiShape = {
   flat: "flat",
   null: null,
   array: [1],
-  arrayOfObject: [{foo: "bar"}]
+  arrayOfObject: [{ foo: "bar" }]
 };
 
 const dbShape = {
@@ -23,19 +23,17 @@ const dbShape = {
   flat: "flat",
   null: null,
   array: [1],
-  arrayOfObject: [{foo: "bar"}]
+  arrayOfObject: [{ foo: "bar" }]
 };
 
-describe('flattenInoutObjectForDb', () => {
+describe("flattenInoutObjectForDb", () => {
   test("flattenObject deeply flatten objects", () => {
     expect(flattenObjectForDb(apiShape)).toEqual(dbShape);
   });
-})
+});
 
-describe('unflattenObjectFromDb', () => {
+describe("unflattenObjectFromDb", () => {
   test("unflatten deeply flatten objects", () => {
     expect(unflattenObjectFromDb(dbShape)).toEqual(apiShape);
   });
-})
-
-
+});

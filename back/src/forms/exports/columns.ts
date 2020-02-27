@@ -16,12 +16,12 @@ const dateFmt = datestr => {
     return "";
   }
   const date = new Date(datestr);
-  let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
 
-  let fmtDay = day < 10 ? `0${day}` : `${day}`;
-  let fmtMonth = month < 10 ? `0${month}` : `${month}`;
+  const fmtDay = day < 10 ? `0${day}` : `${day}`;
+  const fmtMonth = month < 10 ? `0${month}` : `${month}`;
 
   return `${fmtDay}/${fmtMonth}/${year}`;
 };

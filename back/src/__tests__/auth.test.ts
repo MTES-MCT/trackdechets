@@ -23,7 +23,7 @@ describe("updateAccessTokenLastUsed", () => {
 
   it("should set lastUsed if it was never set", () => {
     mockDate();
-    let accessToken: AccessToken = {
+    const accessToken: AccessToken = {
       id: "",
       createdAt: "",
       updatedAt: "",
@@ -41,7 +41,7 @@ describe("updateAccessTokenLastUsed", () => {
   });
 
   it("should not set lastUsed if it was already set the same day", () => {
-    let accessToken: AccessToken = {
+    const accessToken: AccessToken = {
       id: "",
       createdAt: "",
       updatedAt: "",
@@ -54,7 +54,7 @@ describe("updateAccessTokenLastUsed", () => {
   });
 
   it("should set lastUsed if it was set more than one day ago", () => {
-    let accessToken: AccessToken = {
+    const accessToken: AccessToken = {
       id: "",
       createdAt: "",
       updatedAt: "",

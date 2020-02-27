@@ -19,6 +19,6 @@ export const userActivationHandler = async (req, res) => {
     data: { isActive: true }
   });
 
-  const UI_BASE_URL = getUIBaseURL()
+  const UI_BASE_URL = getUIBaseURL();
   return res.redirect(UI_BASE_URL);
 };

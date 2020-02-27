@@ -133,17 +133,17 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   // build pdf as a base64 string
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
-  let attachmentData = await pdfEmailAttachment(payload.node.id);
+  const attachmentData = await pdfEmailAttachment(payload.node.id);
   const companyAdmins = await getCompanyAdminUsers(form.emitterCompanySiret);
 
   // retrieve departments by querying distant api entreprise.data.gouv through td-insee
   // we can not rely on parsing already stored address zip codes because some french cities
   // have a zip code not matching their real department
   const formDepartments = [];
-  for (let field of ["emitterCompanySiret", "recipientCompanySiret"]) {
+  for (const field of ["emitterCompanySiret", "recipientCompanySiret"]) {
     if (!!form[field]) {
       try {
-        let res = await axios.get(
+        const res = await axios.get(
           `http://td-insee:81/siret/${trim(form[field])}`
         );
         if (!!res.data.departement) {
@@ -166,15 +166,15 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
       ? [...companyAdmins, ...drealsRecipients]
       : [...companyAdmins];
 
-  // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value 
+  // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
   const mailFunction = {
     REFUSED: userMails.formNotAccepted,
     PARTIALLY_REFUSED: userMails.formPartiallyRefused
   }[payload.node.wasteAcceptationStatus];
-  
+
   return Promise.all(
     recipients.map(admin => {
-      let payload = mailFunction(
+      const payload = mailFunction(
         admin.email,
         admin.name,
         form,

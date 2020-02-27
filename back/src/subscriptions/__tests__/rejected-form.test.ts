@@ -91,7 +91,7 @@ const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
     id: "xyz12345",
     createdAt: "2019-10-16T07:45:13.959Z",
     updatedAt: "2019-10-16T07:45:13.959Z",
-    wasteAcceptationStatus: wasteAcceptationStatus,
+    wasteAcceptationStatus,
     wasteRefusalReason: "Non conforme",
     quantityReceived: 21.3
   },
@@ -207,9 +207,9 @@ describe("mailWhenFormIsDeclined", () => {
     expect(args[1][0]).toEqual("http://td-mail/send");
     expect(args[2][0]).toEqual("http://td-mail/send");
 
-    let payload1 = args[0][1];
-    let payload2 = args[1][1];
-    let payload3 = args[2][1];
+    const payload1 = args[0][1];
+    const payload2 = args[1][1];
+    const payload3 = args[2][1];
 
     // pdf from was attached
     expect(payload1.attachment).toEqual("base64xyz");
@@ -276,9 +276,9 @@ describe("mailWhenFormIsDeclined", () => {
     expect(args[1][0]).toEqual("http://td-mail/send");
     expect(args[2][0]).toEqual("http://td-mail/send");
 
-    let payload1 = args[0][1];
-    let payload2 = args[1][1];
-    let payload3 = args[2][1];
+    const payload1 = args[0][1];
+    const payload2 = args[1][1];
+    const payload3 = args[2][1];
 
     // pdf from was attached
     expect(payload1.attachment).toEqual("base64xyz");

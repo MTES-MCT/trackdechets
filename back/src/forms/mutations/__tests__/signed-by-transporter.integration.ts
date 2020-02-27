@@ -45,7 +45,7 @@ describe("Integration / Mark as processed mutation", () => {
   });
 
   it("should mark a form as signed", async () => {
-    const emittingCompany = await companyFactory()
+    const emittingCompany = await companyFactory();
 
     const form = await formFactory({
       ownerId: user.id,
