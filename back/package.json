@@ -7,7 +7,9 @@
     "start": "ts-node src/index.ts",
     "update": "ts-node prisma/scripts/index.ts",
     "graphql-markdown": "ts-node src/scripts/graphql-markdown.ts",
-    "test": "jest"
+    "test": "jest",
+    "lint": "tslint --project ./tsconfig.json",
+    "lint:fix": "tslint --project ./tsconfig.json --fix"
   },
   "keywords": [],
   "author": "",
@@ -67,10 +69,14 @@
     "jest": "^24.9.0",
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.2",
+    "prettier": "^1.19.1",
     "prisma": "1.34.10",
     "supertest": "^4.0.2",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.5.4",
+    "tslint": "^6.0.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.1.0",
     "typescript": "3.7.3"
   }
 }

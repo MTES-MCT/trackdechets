@@ -69,13 +69,13 @@ export async function setInCache(
   options: SetOptions = {}
 ) {
   const setOptions = Object.keys(options)
-    .map(key => {
-      const val = options[key];
+    .map(optionKey => {
+      const val = options[optionKey];
       // Some options don't have an associated value
       if (isNaN(val)) {
-        return [key];
+        return [optionKey];
       }
-      return [key, val];
+      return [optionKey, val];
     })
     .reduce((acc, val) => acc.concat(val), []);
 

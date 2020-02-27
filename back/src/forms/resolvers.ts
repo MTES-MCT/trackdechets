@@ -135,7 +135,7 @@ export default {
       const userCompanies = await getUserCompanies(userId);
 
       return userCompanies.map(async userCompany => {
-        const forms = await context.prisma.forms({
+        const queriedForms = await context.prisma.forms({
           where: {
             OR: [
               { owner: { id: userId } },
@@ -147,7 +147,7 @@ export default {
           }
         });
 
-        const stats = forms.reduce((prev, cur) => {
+        const stats = queriedForms.reduce((prev, cur) => {
           prev[cur.wasteDetailsCode] = prev[cur.wasteDetailsCode] || {
             wasteCode: cur.wasteDetailsCode,
             incoming: 0,
@@ -176,7 +176,7 @@ export default {
       { siret, wasteCode },
       context: GraphQLContext
     ) => {
-      const forms = await context.prisma.forms({
+      const queriedForms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),
           status: "AWAITING_GROUP",
@@ -185,7 +185,7 @@ export default {
         }
       });
 
-      return forms.map(f => unflattenObjectFromDb(f));
+      return queriedForms.map(f => unflattenObjectFromDb(f));
     },
     formPdf,
     formsRegister

@@ -35,7 +35,7 @@ export async function getFileDownloadToken(
   await setInCache(token, JSON.stringify({ type, params }), { EX: 10 });
   registerFileDownloader(type, downloadHandler);
 
-  const API_BASE_URL = getAPIBaseURL()
+  const API_BASE_URL = getAPIBaseURL();
   return {
     token,
     downloadLink: `${API_BASE_URL}/download?token=${token}`

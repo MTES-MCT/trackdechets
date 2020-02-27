@@ -28,7 +28,7 @@ export const sendOnboardingEmails = async (daysAgo: number, emailFunction) => {
   const inscriptionDateGt = xDaysAgo(now, daysAgo);
   const inscriptionDateLt = xDaysAgo(now, daysAgo - 1);
   // retrieve users whose account was created yesterday
-  let recipients = await prisma.users({
+  const recipients = await prisma.users({
     where: {
       AND: [
         { createdAt_gt: inscriptionDateGt },
@@ -40,7 +40,7 @@ export const sendOnboardingEmails = async (daysAgo: number, emailFunction) => {
 
   await Promise.all(
     recipients.map(recipient => {
-      let payload = emailFunction(recipient.email, recipient.name);
+      const payload = emailFunction(recipient.email, recipient.name);
 
       return sendMail(payload);
     })

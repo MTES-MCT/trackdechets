@@ -50,7 +50,7 @@ describe("sendOnboardingFirstStepMails", () => {
     expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
       body: "_",
       subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
-      templateId: parseInt(process.env.MJ_FIRST_ONBOARDING_TEMPLATE_ID), // hardcoded mailjet template ID, should match .env MJ_FIRST_ONBOARDING_TEMPLATE_ID
+      templateId: parseInt(process.env.MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10), // hardcoded mailjet template ID, should match .env MJ_FIRST_ONBOARDING_TEMPLATE_ID
       title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
       toEmail: "user@example.com",
       toName: "Rick Hunter",
@@ -73,7 +73,7 @@ describe("sendOnboardingSecondStepMails", () => {
     expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
       body: "_",
       subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
-      templateId: parseInt(process.env.MJ_SECOND_ONBOARDING_TEMPLATE_ID), // hardcoded mailjet template ID, should match .env MJ_SECOND_ONBOARDING_TEMPLATE_ID
+      templateId: parseInt(process.env.MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10), // hardcoded mailjet template ID, should match .env MJ_SECOND_ONBOARDING_TEMPLATE_ID
       title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
       toEmail: "user@example.com",
       toName: "Rick Hunter",

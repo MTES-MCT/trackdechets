@@ -1,22 +1,18 @@
-
 import axios from "axios";
 import * as request from "request";
 import * as util from "util";
-
 
 export const alertTypes = {
   BSD_CREATION: "CREATION BSD",
   INSCRIPTION: "INSCRIPTION"
 };
 
-
 /*
-* Create a Trello card in a specific list using Trello API
-* See https://developers.trello.com/reference/#introduction
-* and https://developers.trello.com/reference/#cards-2
-*/
+ * Create a Trello card in a specific list using Trello API
+ * See https://developers.trello.com/reference/#introduction
+ * and https://developers.trello.com/reference/#cards-2
+ */
 async function createCard(data) {
-
   // TODO this is using Benoit Guigal's API key
   // It would be better to get the API key from a
   // Trackdéchet Trello account
@@ -27,17 +23,17 @@ async function createCard(data) {
     }
   };
 
-  return axios.post("https://api.trello.com/1/cards", data, config)
+  return axios
+    .post("https://api.trello.com/1/cards", data, config)
     .then(response => {
       return response.data;
     });
 }
 
 /*
-* Returns all the cards in a specific list
-*/
+ * Returns all the cards in a specific list
+ */
 export function getCards(idList) {
-
   const config = {
     params: {
       key: process.env.TRELLO_API_KEY,
@@ -47,17 +43,15 @@ export function getCards(idList) {
 
   const url = `https://api.trello.com/1/lists/${idList}/cards?fields=id,name,labels`;
 
-  return axios.get(url, config)
-    .then(response => {
-      return response.data;
-    });
+  return axios.get(url, config).then(response => {
+    return response.data;
+  });
 }
 
 /*
-* Attach some files to a specific card
-*/
-function attachToCard(idCard, file, filename){
-
+ * Attach some files to a specific card
+ */
+function attachToCard(idCard, file, filename) {
   const url = `https://api.trello.com/1/cards/${idCard}/attachments`;
 
   const formData = {
@@ -66,7 +60,7 @@ function attachToCard(idCard, file, filename){
     file: {
       value: file,
       options: {
-        filename: filename,
+        filename
       }
     },
     name: filename
@@ -76,7 +70,7 @@ function attachToCard(idCard, file, filename){
   // form-data
   const requestPost = util.promisify(request.post);
 
-  return requestPost({url, formData}).then(r => {
+  return requestPost({ url, formData }).then(r => {
     return r.body;
   });
 }
@@ -86,9 +80,11 @@ const notIcpeLabelId = "5d4131f3159c5f75617c81fc";
 const notCompatibleLabelId = "5c3c3b13a3a82f48728d9343";
 const siretUnknownLabelId = "5d68e9630969b733ef3dc1eb";
 
-
-export async function createSiretUnknownAlertCard(company, alertType, options=null) {
-
+export async function createSiretUnknownAlertCard(
+  company,
+  alertType,
+  options = null
+) {
   options = options || {};
 
   const cardName = `[${alertType}] ${company.siret}`;
@@ -96,7 +92,7 @@ export async function createSiretUnknownAlertCard(company, alertType, options=nu
   const cards = await getCards(idAlertsList);
 
   const foundCard = cards.find(c => {
-    return (c.name == cardName) && (c.labels[0].id == siretUnknownLabelId);
+    return c.name === cardName && c.labels[0].id === siretUnknownLabelId;
   });
 
   if (foundCard) {
@@ -104,20 +100,21 @@ export async function createSiretUnknownAlertCard(company, alertType, options=nu
       await attachToCard(
         foundCard.id,
         JSON.stringify(options.bsd, null, 2),
-        "bsd.json");
+        "bsd.json"
+      );
     }
     return;
   }
 
   let description = "";
 
-  if (alertType == alertTypes.BSD_CREATION) {
+  if (alertType === alertTypes.BSD_CREATION) {
     description = `Le siret ${company.siret} du destinataire n'a pas été reconnu`;
   }
 
-  if (alertType == alertTypes.INSCRIPTION) {
+  if (alertType === alertTypes.INSCRIPTION) {
     description = `Un utilisateur a crée un compte pour l'entreprise ${company.siret}
-mais ce siret n'a pas été reconnu`
+mais ce siret n'a pas été reconnu`;
   }
 
   const data = {
@@ -130,26 +127,31 @@ mais ce siret n'a pas été reconnu`
   const created = await createCard(data);
 
   if (options.bsd) {
-   await attachToCard(
-     created.id,
-     JSON.stringify(options.bsd, null, 2),
-     "bsd.json");
+    await attachToCard(
+      created.id,
+      JSON.stringify(options.bsd, null, 2),
+      "bsd.json"
+    );
   }
 
   if (options.user) {
     await attachToCard(
       created.id,
       JSON.stringify(options.user, null, 2),
-      "user.json");
+      "user.json"
+    );
   }
 }
 
 /*
-* Create a card labelled "Non ICPE" in list "Alertes"
-* of the "Verif prestataire" board
-*/
-export async function createNotICPEAlertCard(company, alertType, options=null){
-
+ * Create a card labelled "Non ICPE" in list "Alertes"
+ * of the "Verif prestataire" board
+ */
+export async function createNotICPEAlertCard(
+  company,
+  alertType,
+  options = null
+) {
   options = options || {};
 
   const cardName = `[${alertType}] ${company.name} (${company.siret})`;
@@ -157,8 +159,8 @@ export async function createNotICPEAlertCard(company, alertType, options=null){
   // check if an alert already exist for this company
   const cards = await getCards(idAlertsList);
 
-  const foundCard = cards.find(c =>{
-    return (c.name == cardName) && (c.labels[0].id == notIcpeLabelId);
+  const foundCard = cards.find(c => {
+    return c.name === cardName && c.labels[0].id === notIcpeLabelId;
   });
 
   if (foundCard) {
@@ -166,7 +168,8 @@ export async function createNotICPEAlertCard(company, alertType, options=null){
       await attachToCard(
         foundCard.id,
         JSON.stringify(options.bsd, null, 2),
-        "bsd.json");
+        "bsd.json"
+      );
     }
     return;
   }
@@ -191,38 +194,41 @@ de l'environnement
 
   if (options.bsd) {
     await attachToCard(
-      created.id, JSON.stringify(created, null, 2), "bsd.json");
+      created.id,
+      JSON.stringify(created, null, 2),
+      "bsd.json"
+    );
   }
 
   if (options.user) {
     await attachToCard(
       created.id,
       JSON.stringify(options.user, null, 2),
-      "user.json");
+      "user.json"
+    );
   }
-
 }
 
 /*
  * Create a card labelled "Incompatible" in list "Alertes"
  * of the "Verif prestataire board"
  */
-export async function createNotCompatibleRubriqueAlertCard(company, alertType, bsd){
-
+export async function createNotCompatibleRubriqueAlertCard(
+  company,
+  alertType,
+  bsd
+) {
   const cardName = `[${alertType}] ${company.name} (${company.siret})`;
 
   // check if an alert already exist for this company
   const cards = await getCards(idAlertsList);
 
-  const foundCard = cards.find(c =>{
-    return (c.name == cardName) && (c.labels[0].id == notCompatibleLabelId);
+  const foundCard = cards.find(c => {
+    return c.name === cardName && c.labels[0].id === notCompatibleLabelId;
   });
 
   if (foundCard) {
-    await attachToCard(
-      foundCard.id,
-      JSON.stringify(bsd, null, 2),
-      "bsd.json");
+    await attachToCard(foundCard.id, JSON.stringify(bsd, null, 2), "bsd.json");
     return;
   }
 

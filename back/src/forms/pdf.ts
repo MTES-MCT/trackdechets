@@ -30,7 +30,7 @@ const buildPdf = async (form, responseType: ResponseType) => {
   return axios.post(
     "http://td-pdf:3201/pdf",
     { ...form, appendix2Forms },
-    { responseType: responseType }
+    { responseType }
   );
 };
 

@@ -12,7 +12,7 @@ import { sendMail } from "../../common/mails.helper";
  * @param siret
  */
 export default async function renewSecurityCode(siret: string) {
-  if (siret.length != 14) {
+  if (siret.length !== 14) {
     throw new DomainError(
       "Le siret doit faire 14 caractères",
       ErrorCode.BAD_USER_INPUT
@@ -32,7 +32,7 @@ export default async function renewSecurityCode(siret: string) {
 
   let newSecurityCode = null;
 
-  while (!newSecurityCode || newSecurityCode == currentSecurityCode) {
+  while (!newSecurityCode || newSecurityCode === currentSecurityCode) {
     newSecurityCode = randomNumber(4);
   }
 
@@ -46,11 +46,11 @@ export default async function renewSecurityCode(siret: string) {
   const users = await getCompanyActiveUsers(siret);
   const recipients = users.map(({ email, name }) => ({ email, name }));
 
-  const email = companyMails.securityCodeRenewal(recipients, {
+  const mail = companyMails.securityCodeRenewal(recipients, {
     siret: updatedCompany.siret,
     name: updatedCompany.name
   });
-  sendMail(email);
+  sendMail(mail);
 
   return updatedCompany;
 }

@@ -37,7 +37,7 @@ export const userFactory = async (opt = {}) => {
  */
 function siretify(index) {
   const siretLength = 14;
-  let siret = `${index}`;
+  const siret = `${index}`;
   if (siret.length === siretLength) {
     return siret;
   }
@@ -45,7 +45,7 @@ function siretify(index) {
     throw Error("Generated siret is too long");
   }
   // polyfill for str.padStart
-  let padding = "0".repeat(siretLength - siret.length);
+  const padding = "0".repeat(siretLength - siret.length);
   return padding + siret;
 }
 
@@ -199,7 +199,7 @@ export const statusLogFactory = async ({
     user: { connect: { id: userId } },
     loggedAt: new Date(),
     status,
-    updatedFields: updatedFields,
+    updatedFields,
     ...opt
   });
 };

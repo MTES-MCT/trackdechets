@@ -8,7 +8,7 @@ export async function logIn(
 ): Promise<{ sessionCookie: string }> {
   const request = supertest(app);
 
-  let login = await request
+  const login = await request
     .post("/login")
     .send(`email=${email}`)
     .send(`password=${password}`);

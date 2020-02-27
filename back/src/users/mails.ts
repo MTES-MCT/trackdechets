@@ -149,7 +149,7 @@ export const userMails = {
     Comme le prévoit l'article R541-45 du code de l'environnement, l'expéditeur initial du déchet et l'inspection des installations classées sont tenus informés de ce refus.
     <br><br>
     <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
-    attachment: attachment
+    attachment
   }),
   formPartiallyRefused: (toEmail, toName, form: Form, attachment) => ({
     to: [{ email: toEmail, name: toName }],
@@ -174,7 +174,10 @@ export const userMails = {
       <li>Numéro du BSD : ${form.readableId}</li>
       <li>Appellation du déchet : ${form.wasteDetailsName}</li>
       <li>Code déchet : ${form.wasteDetailsCode}</li>
-      <li>Quantité refusée (estimée): ${quantityPartiallyRefused(form.wasteDetailsQuantity, form.quantityReceived)} Tonnes</li>
+      <li>Quantité refusée (estimée): ${quantityPartiallyRefused(
+        form.wasteDetailsQuantity,
+        form.quantityReceived
+      )} Tonnes</li>
       <li>Quantité acceptée: ${form.quantityReceived} Tonnes</li>
       <li>Motif de refus : ${
         form.wasteRefusalReason ? form.wasteRefusalReason : "Non précisé"
@@ -192,7 +195,7 @@ export const userMails = {
     Comme le prévoit l'article R541-45 du code de l'environnement, l'expéditeur initial du déchet et l'inspection des installations classées sont tenus informés de ce refus.
     <br><br>
     <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus partiel de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
-    attachment: attachment
+    attachment
   }),
   onboardingFirstStep: (toEmail, toName) => ({
     to: [{ email: toEmail, name: toName }],
@@ -200,7 +203,7 @@ export const userMails = {
     title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     body: "_",
     templateId: parseInt(MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10),
-    baseUrl: baseUrl
+    baseUrl
   }),
   onboardingSecondStep: (toEmail, toName) => ({
     to: [{ email: toEmail, name: toName }],
@@ -208,7 +211,7 @@ export const userMails = {
     title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     body: "_",
     templateId: parseInt(MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10),
-    baseUrl: baseUrl
+    baseUrl
   }),
   formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({
     to: [{ email: toEmail, name: toName }],
