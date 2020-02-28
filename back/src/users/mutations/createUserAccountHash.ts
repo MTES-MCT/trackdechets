@@ -20,7 +20,9 @@ export async function createUserAccountHash(
   });
 
   if (existingHashes && existingHashes.length > 0) {
-    throw new UserInputError("Cet utilisateur a déjà été invité");
+    throw new UserInputError("Cet utilisateur a déjà été invité", {
+      invalidArgs: ["email"]
+    });
   }
 
   const userAccoutHash = await hash(

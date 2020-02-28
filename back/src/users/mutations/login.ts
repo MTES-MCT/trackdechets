@@ -13,7 +13,9 @@ import { UserInputError, ForbiddenError } from "apollo-server-express";
 export async function login(email: string, password: string) {
   const user = await prisma.user({ email: email.trim() });
   if (!user) {
-    throw new UserInputError(`Aucun utilisateur trouvé avec l'email ${email}`);
+    throw new UserInputError(`Aucun utilisateur trouvé avec l'email ${email}`, {
+      invalidArgs: ["email"]
+    });
   }
   if (!user.isActive) {
     throw new ForbiddenError(
@@ -22,7 +24,9 @@ export async function login(email: string, password: string) {
   }
   const passwordValid = await compare(password, user.password);
   if (!passwordValid) {
-    throw new UserInputError("Mot de passe incorrect");
+    throw new UserInputError("Mot de passe incorrect", {
+      invalidArgs: ["password"]
+    });
   }
 
   const token = await apiKey(user);

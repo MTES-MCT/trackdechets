@@ -12,7 +12,9 @@ function getCompanySireneInfo(siret: string) {
 
 export function getCachedCompanySireneInfo(siret) {
   if (siret.length !== 14) {
-    throw new UserInputError("Le siret doit faire 14 caractères");
+    throw new UserInputError("Le siret doit faire 14 caractères", {
+      invalidArgs: ["siret"]
+    });
   }
 
   return cachedGet(getCompanySireneInfo, COMPANY_INFOS_CACHE_KEY, siret, {

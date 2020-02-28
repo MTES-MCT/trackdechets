@@ -18,7 +18,9 @@ export async function getCompanyInfos(siret: string) {
   // not recognized. Handle this edge case by throwing a NOT_FOUND
   // exception
   if (!sireneCompanyInfo || !sireneCompanyInfo.siret) {
-    throw new UserInputError("Ce siret n'existe pas");
+    throw new UserInputError("Ce siret n'existe pas", {
+      invalidArgs: ["siret"]
+    });
   }
 
   const companyFragment = `

@@ -86,7 +86,10 @@ export default {
       // If user is associated with several companies, siret is mandatory
       if (userCompanies.length > 1 && !siret) {
         throw new UserInputError(
-          "Vous devez préciser pour quel siret vous souhaitez consulter"
+          "Vous devez préciser pour quel siret vous souhaitez consulter",
+          {
+            invalidArgs: ["siret"]
+          }
         );
       }
       // If requested siret does not belong to user, raise an error

@@ -13,7 +13,9 @@ export async function revokeToken(token: string, user: User) {
     .count();
 
   if (parseInt(revokedTokenCount, 10) === 0) {
-    throw new UserInputError("Ce token n'existe pas");
+    throw new UserInputError("Ce token n'existe pas", {
+      invalidArgs: ["token"]
+    });
   }
 
   return true;

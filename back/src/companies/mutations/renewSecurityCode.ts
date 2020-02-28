@@ -12,23 +12,20 @@ import { UserInputError } from "apollo-server-express";
  * @param siret
  */
 export default async function renewSecurityCode(siret: string) {
-<<<<<<< HEAD
   if (siret.length !== 14) {
-    throw new DomainError(
-      "Le siret doit faire 14 caractères",
-      ErrorCode.BAD_USER_INPUT
-    );
-=======
-  if (siret.length != 14) {
-    throw new UserInputError("Le siret doit faire 14 caractères");
->>>>>>> back - replace DomainError with built-in ApolloError
+    throw new UserInputError("Le siret doit faire 14 caractères", {
+      invalidArgs: ["siret"]
+    });
   }
 
   const company = await prisma.company({ siret });
 
   if (!company) {
     throw new UserInputError(
-      "Aucune entreprise enregistré sur Trackdéchets avec ce siret"
+      "Aucune entreprise enregistré sur Trackdéchets avec ce siret",
+      {
+        invalidArgs: ["siret"]
+      }
     );
   }
 
