@@ -181,6 +181,9 @@ input EmitterInput {
   "Adresse du chantier"
   workSite: WorkSiteInput
 
+  "DEPRECATED - Ancienne adresse chantier"
+  pickupSite: String
+
   "Établissement émetteur"
   company: CompanyInput
 }

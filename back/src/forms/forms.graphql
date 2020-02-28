@@ -366,6 +366,9 @@ type Emitter {
   "Adresse du chantier"
   workSite: WorkSite
 
+  "DEPRECATED - Ancienne adresse chantier"
+  pickupSite: String
+
   "Établissement émetteur"
   company: FormCompany
 }
