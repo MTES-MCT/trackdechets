@@ -13,4 +13,7 @@ nav:
   - "Cas d'usages": "use-cases.md"
   - "Gestion des erreurs": "errors.md"
   - "Lexique": "glossary.md"
+  - "OAuth2": "oauth2.md"
+  - "Playground": "playground.md"
   - "Référence de l'API": "api-reference/api-reference.md"
+  - "Changelog": "changelog.md"
