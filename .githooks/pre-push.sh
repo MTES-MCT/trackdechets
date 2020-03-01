@@ -3,13 +3,9 @@
 # Exit and return error if any command fails
 set -e
 
-# Run backend tests
-echo "Running td-api tests"
-docker exec $(docker ps -aqf "name=td-api") npm test
-echo "......................"
+# Root of the project
+GIT_DIR=$(git rev-parse --git-dir)
 
-
-# Run frontend tests
-echo "Running td-front tests"
-docker exec -e CI=true $(docker ps -aqf "name=td-ui") npm test
-echo "......................."
+# Run linter
+echo "Running linter for ./back"
+cd $GIT_DIR/../back && npm run lint
