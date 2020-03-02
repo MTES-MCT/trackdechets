@@ -1,5 +1,6 @@
 import { createTestClient } from "apollo-server-testing";
-import { UserInputError } from "apollo-server-express";
+import { UserInputError, ApolloError } from "apollo-server-express";
+import { readFileSync } from "fs";
 
 const mockHello = jest.fn();
 
@@ -71,12 +72,27 @@ describe("Error handling", () => {
     expect(error.extensions.code).toEqual("BAD_USER_INPUT");
   });
 
+  test("the message of generic Apollo errors without code should be masked", async () => {
+    process.env.NODE_ENV = "production";
+    const server = require("../server").server;
+    const { query } = createTestClient(server);
+    mockHello.mockImplementationOnce(() => {
+      throw new ApolloError("Bang");
+    });
+    const { errors } = await query({ query: HELLO });
+    expect(errors).toHaveLength(1);
+
+    const error = errors[0];
+    expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
+    expect(error.message).toEqual("Erreur serveur");
+  });
+
   test("the message of unhandled errors thrown should be masked", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
     mockHello.mockImplementationOnce(() => {
-      throw new Error("Bang");
+      readFileSync("path/does/not/exist");
     });
     const { errors } = await query({ query: HELLO });
     expect(errors).toHaveLength(1);
@@ -91,7 +107,7 @@ describe("Error handling", () => {
     const server = require("../server").server;
     const { query } = createTestClient(server);
     mockHello.mockImplementationOnce(() => {
-      return new Error("Bang");
+      return readFileSync("path/does/not/exist");
     });
     const { errors } = await query({ query: HELLO });
     expect(errors).toHaveLength(1);
