@@ -11,20 +11,18 @@ import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
 import { shield } from "graphql-shield";
-import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
 import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
-import {
-  schemaValidation,
-  mergeValidationRules
-} from "./common/middlewares/schema-validation";
-import { mergePermissions, getUIBaseURL } from "./utils";
+import { typeDefs, resolvers, permissions, validations } from "./schema";
+import { schemaValidation } from "./common/middlewares/schema-validation";
+import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
+import { ErrorCode } from "./common/errors";
 
 const {
   SENTRY_DSN,
@@ -37,25 +35,28 @@ const {
 
 const UI_BASE_URL = getUIBaseURL();
 
-const typesArray = fileLoader(`${__dirname}/**/*.graphql`, { recursive: true });
-const typeDefs = mergeTypes(typesArray, { all: true });
+const shieldMiddleware = shield(permissions, { allowExternalErrors: true });
 
-const resolversArray = fileLoader(`${__dirname}/**/resolvers.ts`, {
-  recursive: true
-});
-const resolvers = mergeResolvers(resolversArray);
+const schemaValidationMiddleware = schemaValidation(validations);
 
-const permissions = fileLoader(`${__dirname}/**/permissions.ts`, {
-  recursive: true
-});
-const shieldMiddleware = shield(mergePermissions(permissions));
+/**
+ * Custom report error for sentry middleware
+ * It decides whether or not the error should be captured
+ */
+export function reportError(res: Error | any) {
+  const whiteList = [
+    ErrorCode.GRAPHQL_PARSE_FAILED,
+    ErrorCode.GRAPHQL_VALIDATION_FAILED,
+    ErrorCode.BAD_USER_INPUT,
+    ErrorCode.UNAUTHENTICATED,
+    ErrorCode.FORBIDDEN
+  ];
 
-const schemas = fileLoader(`${__dirname}/**/schema-validation.ts`, {
-  recursive: true
-});
-const schemaValidationMiddleware = schemaValidation(
-  mergeValidationRules(schemas)
-);
+  if (res.extensions && whiteList.includes(res.extensions.code)) {
+    return false;
+  }
+  return true;
+}
 
 /**
  * Sentry configuration
@@ -80,10 +81,15 @@ const sentryMiddleware = () =>
       scope.setExtra("user-agent", context.req.headers["user-agent"]);
       scope.setExtra("ip", context.req.headers["x-real-ip"]);
       scope.setTag("service", "api");
-    }
+    },
+    reportError
   });
 
-export const schema = makeExecutableSchema({ typeDefs, resolvers });
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers
+});
+
 export const schemaWithMiddleware = applyMiddleware(
   schema,
   ...[
@@ -104,6 +110,16 @@ export const server = new ApolloServer({
       ...{ user: !!ctx.req ? ctx.req.user : null },
       prisma
     };
+  },
+  formatError: err => {
+    if (
+      err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
+      NODE_ENV !== "dev"
+    ) {
+      // Do not leak error message for internal server error in production
+      err.message = "Erreur serveur";
+    }
+    return err;
   }
 });
 

@@ -1,4 +1,3 @@
-import { DomainError, ErrorCode } from "../common/errors";
 import { getUserCompanies } from "../companies/queries";
 import { prisma, StatusLogConnection } from "../generated/prisma-client";
 import { GraphQLContext } from "../types";
@@ -15,6 +14,11 @@ import { saveForm } from "./mutations/save-form";
 import { formPdf } from "./queries/form-pdf";
 import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
+import {
+  ForbiddenError,
+  UserInputError,
+  AuthenticationError
+} from "apollo-server-express";
 
 // formsLifeCycle fragment
 const statusLogFragment = `
@@ -75,19 +79,24 @@ export default {
       const userCompanies = await getUserCompanies(userId);
       // User must be associated with a company
       if (!userCompanies.length) {
-        throw new Error(
+        throw new ForbiddenError(
           "Vous n'êtes pas autorisé à consulter le cycle de vie des bordereaux."
         );
       }
       // If user is associated with several companies, siret is mandatory
       if (userCompanies.length > 1 && !siret) {
-        throw new Error(
-          "Vous devez préciser pour quel siret vous souhaitez consulter"
+        throw new UserInputError(
+          "Vous devez préciser pour quel siret vous souhaitez consulter",
+          {
+            invalidArgs: ["siret"]
+          }
         );
       }
       // If requested siret does not belong to user, raise an error
       if (!!siret && !userCompanies.map(c => c.siret).includes(siret)) {
-        throw new Error("Vous n'avez pas le droit d'accéder au siret précisé");
+        throw new ForbiddenError(
+          "Vous n'avez pas le droit d'accéder au siret précisé"
+        );
       }
       // Select user company matching siret or get the first
       const selectedCompany =
@@ -214,7 +223,7 @@ export default {
         const user = await prisma.accessToken({ token }).user();
 
         if (!user) {
-          throw new DomainError(ErrorCode.UNAUTHENTICATED);
+          throw new AuthenticationError("Vous n'êtes pas connecté");
         }
 
         const userCompanies = await getUserCompanies(user.id);

@@ -1,6 +1,5 @@
 import { GraphQLContext } from "../../types";
 import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { getReadableId } from "../readable-id";
 import {
   Form,
@@ -9,6 +8,7 @@ import {
   Status
 } from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/queries";
+import { ForbiddenError } from "apollo-server-express";
 
 export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const userId = context.user.id;
@@ -71,9 +71,8 @@ async function checkThatUserIsPartOftheForm(
   const userSirets = userCompanies.map(c => c.siret);
 
   if (!formSirets.some(siret => userSirets.includes(siret))) {
-    throw new DomainError(
-      "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas.",
-      ErrorCode.BAD_USER_INPUT
+    throw new ForbiddenError(
+      "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas."
     );
   }
 }

@@ -1,6 +1,6 @@
-import { DomainError, ErrorCode } from "../../common/errors";
 import { GraphQLContext } from "../../types";
 import { randomNumber } from "../../utils";
+import { UserInputError } from "apollo-server-express";
 
 export default async function createCompany(
   _,
@@ -20,9 +20,8 @@ export default async function createCompany(
     });
 
   if (existingCompany) {
-    throw new DomainError(
-      `Cette entreprise existe déjà dans Trackdéchets. Contactez l'administrateur de votre entreprise afin qu'il puisse vous inviter à rejoindre l'organisation`,
-      ErrorCode.BAD_USER_INPUT
+    throw new UserInputError(
+      `Cette entreprise existe déjà dans Trackdéchets. Contactez l'administrateur de votre entreprise afin qu'il puisse vous inviter à rejoindre l'organisation`
     );
   }
 

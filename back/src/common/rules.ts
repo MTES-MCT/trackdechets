@@ -1,7 +1,7 @@
 import { rule, and } from "graphql-shield";
 
 import { Prisma } from "../generated/prisma-client";
-import { DomainError, ErrorCode } from "./errors";
+import { AuthenticationError, ForbiddenError } from "apollo-server-express";
 
 /**************************
  * Common permissions rules
@@ -10,10 +10,7 @@ import { DomainError, ErrorCode } from "./errors";
 export const isAuthenticated = rule({ cache: "contextual" })(
   async (_1, _2, ctx) => {
     const user = ctx.user;
-    return (
-      !!user ||
-      new DomainError(`Vous n'êtes pas connecté.`, ErrorCode.FORBIDDEN)
-    );
+    return !!user || new AuthenticationError(`Vous n'êtes pas connecté.`);
   }
 );
 
@@ -31,9 +28,8 @@ export const isCompanyAdmin = and(
 
     return (
       isAuthorized ||
-      new DomainError(
-        `Vous n'êtes pas administrateur de l'entreprise "${siret}".`,
-        ErrorCode.FORBIDDEN
+      new ForbiddenError(
+        `Vous n'êtes pas administrateur de l'entreprise "${siret}".`
       )
     );
   })
@@ -53,9 +49,8 @@ export const isCompanyMember = and(
 
     return (
       isAuthorized ||
-      new DomainError(
-        `Vous ne faites pas partie de l'entreprise "${siret}".`,
-        ErrorCode.FORBIDDEN
+      new ForbiddenError(
+        `Vous ne faites pas partie de l'entreprise "${siret}".`
       )
     );
   })
@@ -75,11 +70,10 @@ export const isCompaniesUser = and(
 
     return (
       isAuthorized ||
-      new DomainError(
+      new ForbiddenError(
         `Vous ne faites pas partie d'au moins une des entreprises dont les SIRETS sont "${sirets.join(
           ", "
-        )}".`,
-        ErrorCode.FORBIDDEN
+        )}".`
       )
     );
   })

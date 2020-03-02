@@ -1,10 +1,10 @@
 import { rule, and } from "graphql-shield";
 import { Prisma } from "../generated/prisma-client";
-import { DomainError, ErrorCode } from "../common/errors";
 import {
   isAuthenticated,
   ensureRuleParametersArePresent
 } from "../common/rules";
+import { ForbiddenError } from "apollo-server-express";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -30,10 +30,7 @@ export const canAccessForm = and(
       formInfos.owner.id === ctx.user.id ||
       currentUserSirets.includes(formInfos.emitterCompanySiret) ||
       currentUserSirets.includes(formInfos.recipientCompanySiret) ||
-      new DomainError(
-        `Vous n'êtes pas autorisé à accéder à ce bordereau.`,
-        ErrorCode.FORBIDDEN
-      )
+      new ForbiddenError(`Vous n'êtes pas autorisé à accéder à ce bordereau.`)
     );
   })
 );
@@ -51,10 +48,7 @@ export const isFormRecipient = and(
 
     return (
       currentUserSirets.includes(formInfos.recipientCompanySiret) ||
-      new DomainError(
-        `Vous n'êtes pas destinataire de ce bordereau.`,
-        ErrorCode.FORBIDDEN
-      )
+      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
     );
   })
 );
@@ -72,10 +66,7 @@ export const isFormEmitter = and(
 
     return (
       currentUserSirets.includes(formInfos.emitterCompanySiret) ||
-      new DomainError(
-        `Vous n'êtes pas émetteur de ce bordereau.`,
-        ErrorCode.FORBIDDEN
-      )
+      new ForbiddenError(`Vous n'êtes pas émetteur de ce bordereau.`)
     );
   })
 );
@@ -93,10 +84,7 @@ export const isFormTransporter = and(
 
     return (
       currentUserSirets.includes(formInfos.transporterCompanySiret) ||
-      new DomainError(
-        `Vous n'êtes pas transporteur de ce bordereau.`,
-        ErrorCode.FORBIDDEN
-      )
+      new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`)
     );
   })
 );

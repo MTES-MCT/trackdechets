@@ -37,7 +37,7 @@ describe("Forms -> saveForm mutation", () => {
 
       expect("Should throw").toBe("Error");
     } catch (err) {
-      expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
+      expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
 
@@ -59,7 +59,7 @@ describe("Forms -> saveForm mutation", () => {
 
       expect("Should throw").toBe("Error");
     } catch (err) {
-      expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
+      expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
 
@@ -99,7 +99,7 @@ describe("Forms -> saveForm mutation", () => {
 
       expect("Should throw").toBe("Error");
     } catch (err) {
-      expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
+      expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
 
@@ -118,7 +118,7 @@ describe("Forms -> saveForm mutation", () => {
 
       expect("Should throw").toBe("Error");
     } catch (err) {
-      expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
+      expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
 });

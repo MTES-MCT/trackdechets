@@ -1,10 +1,10 @@
 import { interpret, State } from "xstate";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { flattenObjectForDb } from "../form-converter";
 import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
+import { ForbiddenError } from "apollo-server-express";
 
 export async function markAsSealed(_, { id }, context: GraphQLContext) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
@@ -86,7 +86,7 @@ async function transitionForm(
       .resolveState(startingState)
       .nextEvents.includes(eventType)
   ) {
-    throw new DomainError("Transition impossible", ErrorCode.FORBIDDEN);
+    throw new ForbiddenError("Transition impossible");
   }
 
   const formService = interpret(formWorkflowMachine);
