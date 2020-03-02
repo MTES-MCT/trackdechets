@@ -44,7 +44,7 @@ Il faut alors se connecter à l'image postgre et y restaurer ce dump. Par exempl
 
 6. C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` pour commencer à utiliser l'application.
 
-7. [Linux/MacOS uniquement] Avant de pousser votre premier commit, il est recommandé d'installer un hook Github permettant de faire tourner les tests avant chaque push. Le script `~/.githooks/install-hooks.sh` se chargera de l'installation. Si vous avez besoin de forcer un push sans faire passer les tests, il est toujours possible de faire `git push --no-verify`.
+7. [Linux/MacOS uniquement] Avant de pousser votre premier commit, il est recommandé d'installer un hook Github permettant de faire tourner TSLint sur le projet back. `~/.githooks/install-hooks.sh` se chargera de l'installation. Si vous avez besoin de forcer un push sans linter, il est toujours possible de faire `git push --no-verify`.
 
 ## Technologies
 
