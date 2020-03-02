@@ -30,7 +30,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
 
   if (loading) return <Loader />;
 
-  if (error) return <Error message={error.message} />;
+  if (error) return <Error apolloError={error} />;
 
   return (
     <div id="account" className="account dashboard">

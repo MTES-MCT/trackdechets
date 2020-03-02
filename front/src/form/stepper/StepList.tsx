@@ -115,9 +115,8 @@ export default withRouter(function StepList(
                   })
                     .then(_ => props.history.push("/dashboard/slips"))
                     .catch(err => {
-                      cogoToast.error(
-                        err.message.replace("GraphQL error:", ""),
-                        { hideAfter: 7 }
+                      err.graphQLErrors.map(err =>
+                        cogoToast.error(err.message, { hideAfter: 7 })
                       );
                     });
                   return false;

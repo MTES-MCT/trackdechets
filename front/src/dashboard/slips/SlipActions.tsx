@@ -19,6 +19,7 @@ import Received from "./slips-actions/Received";
 import Sealed from "./slips-actions/Sealed";
 import Sent from "./slips-actions/Sent";
 import mutations from "./slips-actions/slip-actions.mutations";
+import { NotificationError } from "../../common/Error";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -99,12 +100,7 @@ function DynamicActions({ form, siret }) {
           )}
 
           {error && (
-            <div
-              className="notification error action-error"
-              dangerouslySetInnerHTML={{
-                __html: error.graphQLErrors[0].message
-              }}
-            />
+            <NotificationError className="action-error" apolloError={error} />
           )}
         </div>
       </div>
