@@ -1,12 +1,14 @@
 import { useMutation } from "@apollo/react-hooks";
 import React, { useState, useEffect } from "react";
 import {
-  FaCheck,
-  FaCog,
+  FaTruckMoving,
+  FaCogs,
   FaEdit,
-  FaEnvelope,
-  FaEnvelopeOpen
+  FaIndustry,
+  FaFileSignature
 } from "react-icons/fa";
+import { IconContext } from "react-icons";
+
 import { Link } from "react-router-dom";
 import { Form } from "../../form/model";
 import "./SlipActions.scss";
@@ -26,11 +28,10 @@ export type SlipActionProps = {
   form: Form;
 };
 
-interface IProps {
+interface SlipActionsProps {
   form: Form;
-  siret: string;
 }
-export default function SlipActions({ form, siret }: IProps) {
+export function SlipActions({ form }: SlipActionsProps) {
   return (
     <div className="SlipActions">
       {form.status === "DRAFT" ? (
@@ -44,12 +45,14 @@ export default function SlipActions({ form, siret }: IProps) {
         <DownloadPdf formId={form.id} />
       )}
       <Duplicate formId={form.id} />
-      <DynamicActions form={form} siret={siret} />
     </div>
   );
 }
 
-function DynamicActions({ form, siret }) {
+interface DynamicActionsProps extends SlipActionsProps {
+  siret: string;
+}
+export function DynamicActions({ form, siret }: DynamicActionsProps) {
   const nextStep = getNextStep(form, siret);
   // This dynamic mutation must have a value, otherwise the `useMutation` hook throws.
   // And hooks should not be conditionally called (cf rules of hooks)
@@ -73,14 +76,22 @@ function DynamicActions({ form, siret }) {
   }
 
   return (
-    <>
+    <div className="SlipActions">
       <button
-        className="icon"
+        className="button small"
         onClick={() => setIsOpen(true)}
         title={buttons[nextStep].title}
       >
-        {buttons[nextStep].icon({})}
+        <span className="dynamic-action">
+          <IconContext.Provider value={{ size: "2em" }}>
+            {buttons[nextStep].icon({})}
+          </IconContext.Provider>
+          <span className="dynamic-action__text">
+            {buttons[nextStep].title}
+          </span>
+        </span>
       </button>
+
       <div
         className="modal__backdrop"
         id="modal"
@@ -97,7 +108,6 @@ function DynamicActions({ form, siret }) {
               form={form}
             />
           )}
-
           {error && (
             <div
               className="notification error action-error"
@@ -108,21 +118,25 @@ function DynamicActions({ form, siret }) {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
 const buttons = {
-  SEALED: { title: "Finaliser", icon: FaCheck, component: Sealed },
-  SENT: { title: "Marquer comme envoyé", icon: FaEnvelope, component: Sent },
+  SEALED: {
+    title: "Finaliser le bordereau",
+    icon: FaFileSignature,
+    component: Sealed
+  },
+  SENT: { title: "Valider l'enlèvement", icon: FaTruckMoving, component: Sent },
   RECEIVED: {
-    title: "Réception du déchet",
-    icon: FaEnvelopeOpen,
+    title: "Valider la réception",
+    icon: FaIndustry,
     component: Received
   },
   PROCESSED: {
-    title: "Marquer comme traité",
-    icon: FaCog,
+    title: "Valider le traitement",
+    icon: FaCogs,
     component: Processed
   }
 };
