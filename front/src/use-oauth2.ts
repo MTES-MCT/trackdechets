@@ -55,7 +55,7 @@ export function useOAuth2() {
         setError(fallbackError);
         setLoading(false);
       });
-  }, []);
+  }, [authorizeUrl]);
 
   return { loading, error, authorizePayload };
 }
