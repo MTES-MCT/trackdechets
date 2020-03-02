@@ -1,13 +1,5 @@
 import { CaptureConsole } from "@sentry/integrations";
-import {
-  ApolloServer,
-  makeExecutableSchema,
-  UserInputError,
-  ForbiddenError,
-  AuthenticationError,
-  SyntaxError,
-  ValidationError
-} from "apollo-server-express";
+import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
 import * as express from "express";
 import * as passport from "passport";
 import * as session from "express-session";
@@ -52,13 +44,15 @@ const schemaValidationMiddleware = schemaValidation(validations);
  * It decides whether or not the error should be captured
  */
 export function reportError(res: Error | any) {
-  if (
-    res instanceof UserInputError ||
-    res instanceof AuthenticationError ||
-    res instanceof ForbiddenError ||
-    res instanceof SyntaxError ||
-    res instanceof ValidationError
-  ) {
+  const whiteList = [
+    ErrorCode.GRAPHQL_PARSE_FAILED,
+    ErrorCode.GRAPHQL_VALIDATION_FAILED,
+    ErrorCode.BAD_USER_INPUT,
+    ErrorCode.UNAUTHENTICATED,
+    ErrorCode.FORBIDDEN
+  ];
+
+  if (res.extensions && whiteList.includes(res.extensions.code)) {
     return false;
   }
   return true;
