@@ -1,15 +1,16 @@
-import React from "react";
+import { useQuery } from "@apollo/react-hooks/lib/useQuery";
 import gql from "graphql-tag";
-import { Query } from "@apollo/react-components";
+import React from "react";
 import { RouteComponentProps } from "react-router";
+import { InlineError } from "../common/Error";
+import "./Company.scss";
+import CompanyActivity from "./CompanyActivity";
+import CompanyContact from "./CompanyContact";
+import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyHeader from "./CompanyHeader";
 import CompanyMap from "./CompanyMap";
-import "./Company.scss";
 import CompanyRegistration from "./CompanyRegistration";
-import CompanyDisclaimer from "./CompanyDisclaimer";
-import CompanyContact from "./CompanyContact";
 import { Company } from "./companyTypes";
-import CompanyActivity from "./CompanyActivity";
 
 const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
@@ -46,50 +47,45 @@ const COMPANY_INFOS = gql`
 export default function CompanyInfo({
   match
 }: RouteComponentProps<{ siret: string }>) {
+  const { data, loading, error } = useQuery(COMPANY_INFOS, {
+    variables: { siret: match.params.siret },
+    fetchPolicy: "no-cache"
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <InlineError apolloError={error} />;
+
+  const company: Company = data.companyInfos;
+
+  if (!company.siret) {
+    return <p>Entreprise inconnue</p>;
+  }
+
   return (
-    <Query
-      query={COMPANY_INFOS}
-      variables={{ siret: match.params.siret }}
-      fetchPolicy="no-cache"
-    >
-      {({ loading, error, data }) => {
-        if (loading) return <p>Loading...</p>;
-        if (error) return <p>{`Error!: ${error}`}</p>;
+    <div className="section">
+      <div className="container">
+        <CompanyHeader
+          name={company.name}
+          siret={company.siret}
+          naf={company.naf}
+          libelleNaf={company.libelleNaf}
+        />
 
-        const company: Company = data.companyInfos;
+        <CompanyRegistration isRegistered={company.isRegistered} />
 
-        if (!company.siret) {
-          return <p>Entreprise inconnue</p>;
-        }
+        <CompanyDisclaimer />
 
-        return (
-          <div className="section">
-            <div className="container">
-              <CompanyHeader
-                name={company.name}
-                siret={company.siret}
-                naf={company.naf}
-                libelleNaf={company.libelleNaf}
-              />
+        <div className="columns">
+          <CompanyContact company={company} />
+          {company.longitude && company.latitude && (
+            <CompanyMap lng={company.longitude} lat={company.latitude} />
+          )}
+        </div>
 
-              <CompanyRegistration isRegistered={company.isRegistered} />
-
-              <CompanyDisclaimer />
-
-              <div className="columns">
-                <CompanyContact company={company} />
-                {company.longitude && company.latitude && (
-                  <CompanyMap lng={company.longitude} lat={company.latitude} />
-                )}
-              </div>
-
-              {company.installation && (
-                <CompanyActivity installation={company.installation} />
-              )}
-            </div>
-          </div>
-        );
-      }}
-    </Query>
+        {company.installation && (
+          <CompanyActivity installation={company.installation} />
+        )}
+      </div>
+    </div>
   );
 }

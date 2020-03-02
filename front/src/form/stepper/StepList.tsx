@@ -3,6 +3,7 @@ import cogoToast from "cogo-toast";
 import { Formik, setNestedObjectValues } from "formik";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { InlineError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
 import { currentSiretService } from "../../dashboard/CompanySelector";
 import { GET_SLIPS } from "../../dashboard/slips/query";
@@ -75,7 +76,7 @@ export default withRouter(function StepList(
   });
 
   if (loading) return <p>Chargement...</p>;
-  if (error) return <p>Erreur :(</p>;
+  if (error) return <InlineError apolloError={error} />;
 
   const state = { ...initialState, ...data.form };
   return (

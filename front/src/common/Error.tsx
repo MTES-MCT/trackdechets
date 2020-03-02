@@ -25,7 +25,7 @@ export const ErrorProvider: FunctionComponent<Props> = ({
   return <>{errors.map((error, idx) => children({ error, idx }))}</>;
 };
 
-export default function Error({ apolloError }: Props) {
+export function InlineError({ apolloError }: Props) {
   return (
     <ErrorProvider apolloError={apolloError}>
       {({ error, idx }) => (

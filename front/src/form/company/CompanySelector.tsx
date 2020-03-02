@@ -1,11 +1,12 @@
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 import { FaCheck, FaRegCircle, FaSearch } from "react-icons/fa";
+import { InlineError } from "../../common/Error";
+import { toMacroCase } from "../../common/helper";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
-import { toMacroCase } from "../../common/helper";
 
 export type Rubrique = {
   rubrique: string;
@@ -132,7 +133,7 @@ export default function CompanySelector(props) {
   });
 
   if (loading) return <p>Chargement...</p>;
-  if (error) return <p>Erreur :(</p>;
+  if (error) return <InlineError apolloError={error} />;
 
   return (
     <div className="CompanySelector">

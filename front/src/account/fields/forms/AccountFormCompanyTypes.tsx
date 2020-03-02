@@ -5,6 +5,7 @@ import { Formik, Field, Form, FormikProps } from "formik";
 import CompanyTypes from "../../../login/CompanyType";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
+import { InlineError } from "../../../common/Error";
 
 type Props = {
   name: string;
@@ -67,7 +68,7 @@ export default function AccountFormCompanyTypes({
           {props.errors[name] && (
             <RedErrorMessage name="phone">{props.errors[name]}</RedErrorMessage>
           )}
-          {error && <div>{error.message}</div>}
+          {error && <InlineError apolloError={error} />}
 
           <button
             className="button"
