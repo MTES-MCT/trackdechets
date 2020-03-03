@@ -68,7 +68,7 @@ export default function Emitter() {
       </div>
 
       {values.emitter.type === "OTHER" && (
-        <EcoOrganismes name="emitter.ecoOrganisme" />
+        <EcoOrganismes name="ecoOrganisme.id" />
       )}
 
       <h4>Entreprise émettrice</h4>

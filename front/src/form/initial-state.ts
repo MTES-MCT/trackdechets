@@ -15,8 +15,7 @@ export default {
       contact: "",
       mail: "",
       phone: ""
-    },
-    ecoOrganisme: ""
+    }
   },
   recipient: {
     cap: "",
@@ -69,5 +68,6 @@ export default {
     quantityType: "ESTIMATED",
     consistence: "SOLID"
   },
-  appendix2Forms: []
+  appendix2Forms: [],
+  ecoOrganisme: {}
 };

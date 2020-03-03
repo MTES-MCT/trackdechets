@@ -17,26 +17,34 @@ const GET_ECO_ORGANISMES = gql`
   }
 `;
 
+function init(
+  selectedOrganismeId: string | null,
+  isActive = !!selectedOrganismeId,
+  ecoOrganismes = []
+) {
+  return {
+    isActive,
+    ecoOrganismes,
+    searchClue: "",
+    selectedOrganismeId
+  };
+}
+
 function reducer(state, action) {
   switch (action.type) {
     case "toggle_activation":
-      return { ...state, active: !state.active };
+      return init("", !state.isActive, state.ecoOrganismes);
     case "select":
       return {
         ...state,
-        selectedOrganisme: state.ecoOrganismes.find(
-          eo => eo.id === action.payload
-        )
+        selectedOrganismeId: action.payload
       };
     case "fetch":
       return { ...state, ecoOrganismes: action.payload };
     case "search":
       return {
         ...state,
-        searchClue: action.payload,
-        filteredEcoOrganismes: state.ecoOrganismes.filter(
-          eo => eo.name.toLowerCase().indexOf(action.payload) > -1
-        )
+        searchClue: action.payload.toLowerCase()
       };
   }
 }
@@ -44,28 +52,19 @@ function reducer(state, action) {
 export default function EcoOrganismes(props) {
   const [field] = useField(props);
   const { setFieldValue } = useFormikContext();
-  const [state, dispatch] = useReducer(reducer, {
-    active: !!field.value,
-    ecoOrganismes: [],
-    filteredEcoOrganismes: [],
-    searchClue: "",
-    selectedOrganisme: null
-  });
+  const [state, dispatch] = useReducer(reducer, field.value, init);
 
   const { loading, error, data } = useQuery(GET_ECO_ORGANISMES);
 
   useEffect(() => {
     if (data?.ecoOrganismes) {
       dispatch({ type: "fetch", payload: data.ecoOrganismes });
-      dispatch({ type: "search", payload: "" });
     }
   }, [data]);
 
   useEffect(() => {
-    if (field.value) {
-      dispatch({ type: "select", payload: field.value });
-    }
-  }, [data, field.value]);
+    setFieldValue(field.name, state.selectedOrganismeId);
+  }, [state.selectedOrganismeId, field.name, setFieldValue]);
 
   return (
     <>
@@ -74,7 +73,7 @@ export default function EcoOrganismes(props) {
         <label>
           <input
             type="checkbox"
-            checked={state.active}
+            checked={state.isActive}
             onChange={() => dispatch({ type: "toggle_activation" })}
           />
           Un éco-organisme est le responsable / producteur des déchets de ce
@@ -82,7 +81,7 @@ export default function EcoOrganismes(props) {
         </label>
       </div>
 
-      {state.active && (
+      {state.isActive && (
         <>
           {loading && <p>Chargement...</p>}
           {error && <p>Erreur lors du chargement des éco-organismes...</p>}
@@ -109,9 +108,13 @@ export default function EcoOrganismes(props) {
               </div>
               <div className={styles.list}>
                 <CompanyResults
-                  onSelect={eo => setFieldValue(field.name, eo.id)}
-                  results={state.filteredEcoOrganismes}
-                  selectedItem={state.selectedOrganisme}
+                  onSelect={eo => dispatch({ type: "select", payload: eo.id })}
+                  results={state.ecoOrganismes.filter(eo =>
+                    eo.name.toLowerCase().includes(state.searchClue)
+                  )}
+                  selectedItem={state.ecoOrganismes.find(
+                    eo => eo.id === state.selectedOrganismeId
+                  )}
                 />
               </div>
             </>
@@ -123,7 +126,7 @@ export default function EcoOrganismes(props) {
             L'Eco-organisme est bien identifié comme responsable du déchet.
             <br />
             Vous pouvez utiliser la case <strong>
-              adresse de chantier
+              Adresse de chantier
             </strong>{" "}
             tout en bas si le lieu réel de collecte est différent de l'adresse
             de l'entreprise (exemple SIRET / adresse communauté de commune pour

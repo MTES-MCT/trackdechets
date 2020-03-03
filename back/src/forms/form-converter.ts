@@ -5,11 +5,14 @@ export function flattenObjectForDb(
   previousKeys = [],
   dbObject = {}
 ): Partial<Form> {
+  const relations = ["ecoOrganisme"];
+
   Object.keys(input).forEach(key => {
     if (
       input[key] &&
       !Array.isArray(input[key]) &&
-      typeof input[key] === "object"
+      typeof input[key] === "object" &&
+      !relations.includes(key)
     ) {
       return flattenObjectForDb(input[key], [...previousKeys, key], dbObject);
     }
