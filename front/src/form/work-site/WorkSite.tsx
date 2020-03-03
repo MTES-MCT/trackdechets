@@ -1,6 +1,7 @@
 import { Field, useFormikContext } from "formik";
 import React, { useState, useEffect } from "react";
 import { Form } from "../model";
+import WorkSiteAddress from "./WorkSiteAddress";
 
 const FIELDS = ["name", "address", "city", "postalCode", "infos"];
 
@@ -11,10 +12,18 @@ export default function WorkSite() {
   );
 
   useEffect(() => {
-    for (const field of FIELDS) {
-      setFieldValue(`emitter.workSite.${field}`, "");
+    if (!showWorkSite) {
+      for (const field of FIELDS) {
+        setFieldValue(`emitter.workSite.${field}`, "");
+      }
     }
   }, [showWorkSite]);
+
+  function setAddress(details) {
+    setFieldValue(`emitter.workSite.address`, details.name);
+    setFieldValue(`emitter.workSite.city`, details.city);
+    setFieldValue(`emitter.workSite.postalCode`, details.postcode);
+  }
 
   return (
     <div className="form__group">
@@ -42,36 +51,12 @@ export default function WorkSite() {
           </div>
 
           <div className="form__group">
-            <label>
-              Adresse chantier
-              <Field
-                type="text"
-                name="emitter.workSite.address"
-                placeholder="Rue / numéro"
-              />
-            </label>
-          </div>
-
-          <div className="form__group">
-            <label>
-              Commune
-              <Field
-                type="text"
-                name="emitter.workSite.city"
-                placeholder="Intitulé"
-              />
-            </label>
-          </div>
-
-          <div className="form__group">
-            <label>
-              Code postal
-              <Field
-                type="input"
-                name="emitter.workSite.postalCode"
-                placeholder="Code"
-              />
-            </label>
+            <WorkSiteAddress
+              adress={values.emitter.workSite.address}
+              city={values.emitter.workSite.city}
+              postalCode={values.emitter.workSite.postalCode}
+              onAddressSelection={details => setAddress(details)}
+            />
           </div>
 
           <div className="form__group">
