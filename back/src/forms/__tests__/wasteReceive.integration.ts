@@ -9,7 +9,6 @@ import makeClient from "../../__tests__/testClient";
 import {
   formFactory,
   userFactory,
-  userWithCompanyFactory,
   companyFactory
 } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";

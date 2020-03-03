@@ -36,11 +36,13 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }
   });
+  // create statuslog when and only when form is created
   await context.prisma.createStatusLog({
     form: { connect: { id: newForm.id } },
     user: { connect: { id: context.user.id } },
     status: newForm.status as Status,
-    updatedFields: {}
+    updatedFields: {},
+    loggedAt: new Date()
   });
   return unflattenObjectFromDb(newForm);
 }

@@ -1,5 +1,9 @@
 import { getUserCompanies } from "../companies/queries";
-import { prisma, StatusLogConnection } from "../generated/prisma-client";
+import {
+  prisma,
+  StatusLogConnection,
+  Company
+} from "../generated/prisma-client";
 import { GraphQLContext } from "../types";
 import { unflattenObjectFromDb } from "./form-converter";
 import {
@@ -51,6 +55,15 @@ const statusLogFragment = `
   }
 `;
 
+const companyFragment = `
+fragment Company on CompanyAssociation {
+  company {
+    id
+    siret
+  }
+}
+`;
+
 const PAGINATE_BY = 100;
 
 export default {
@@ -76,7 +89,12 @@ export default {
       context: GraphQLContext
     ) => {
       const userId = context.user.id;
-      const userCompanies = await getUserCompanies(userId);
+
+      const userCompanies = await prisma
+        .companyAssociations({ where: { user: { id: userId } } })
+        .$fragment<{ company: Company }[]>(companyFragment)
+        .then(associations => associations.map(a => a.company));
+
       // User must be associated with a company
       if (!userCompanies.length) {
         throw new ForbiddenError(

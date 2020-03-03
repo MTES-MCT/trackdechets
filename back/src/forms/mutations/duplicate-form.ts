@@ -1,4 +1,4 @@
-import { prisma } from "../../generated/prisma-client";
+import { prisma, Status } from "../../generated/prisma-client";
 import {
   cleanUpNotDuplicatableFieldsInForm,
   unflattenObjectFromDb
@@ -23,6 +23,13 @@ export async function duplicateForm(formId: string, userId: string) {
     status: "DRAFT",
     owner: { connect: { id: userId } }
   });
-
+  // create statuslog when form is created
+  await prisma.createStatusLog({
+    form: { connect: { id: newForm.id } },
+    user: { connect: { id: userId } },
+    status: newForm.status as Status,
+    updatedFields: {},
+    loggedAt: new Date()
+  });
   return unflattenObjectFromDb(newForm);
 }

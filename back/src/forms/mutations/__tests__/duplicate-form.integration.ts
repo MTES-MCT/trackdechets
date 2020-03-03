@@ -34,5 +34,16 @@ describe("{ mutation { duplicateForm } }", () => {
     expect(cleanUpNotDuplicatableFieldsInForm(form)).toEqual(
       cleanUpNotDuplicatableFieldsInForm(duplicateForm)
     );
+
+    // check relevant statusLog is created
+    const statusLogs = await prisma.statusLogs({
+      where: {
+        form: { id: duplicateForm.id },
+        user: { id: user.id },
+        status: "DRAFT"
+      }
+    });
+    expect(statusLogs.length).toEqual(1);
+    expect(statusLogs[0].loggedAt).toBeTruthy();
   });
 });

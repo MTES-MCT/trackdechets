@@ -311,4 +311,41 @@ describe("Test formsLifeCycle query", () => {
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("RECEIVED");
   });
+
+  it("should not return statusLog data for deleted forms", async () => {
+    const {
+      emitter,
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form
+    } = await prepareDB();
+
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    await statusLogFactory({
+      status: "SENT",
+      formId: form.id,
+      userId: emitter.id,
+      updatedFields: { lorem: "ipsum" }
+    });
+
+    // mark the form as deleted, related statuslogs should be hidden
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: {
+        isDeleted: true
+      }
+    });
+    const glQuery = buildFormsLifecycleQuery();
+
+    const { query } = makeClient(recipient);
+
+    const { data } = (await query(glQuery)) as any;
+    const { statusLogs } = data.formsLifeCycle;
+    expect(statusLogs.length).toBe(0);
+  });
 });
