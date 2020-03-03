@@ -16,6 +16,8 @@ services:
 
   td-pdf:
     image: betagouv/trackdechets-pdf:dev
+    environment:
+      PDF_WATERMARK: display
 
   td-mail:
     image: betagouv/trackdechets-mail:dev

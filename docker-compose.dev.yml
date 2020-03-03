@@ -89,6 +89,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3201:3201
+    environment:
+      PDF_WATERMARK: display
 
   td-mail:
     image: td-mail
