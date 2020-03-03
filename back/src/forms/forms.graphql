@@ -367,7 +367,7 @@ type Emitter {
   workSite: WorkSite
 
   "DEPRECATED - Ancienne adresse chantier"
-  pickupSite: String
+  pickupSite: String @deprecated(reason: "Migration vers `workSite` obligatoire")
 
   "Établissement émetteur"
   company: FormCompany
