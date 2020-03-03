@@ -1,10 +1,10 @@
 import { interpret, State } from "xstate";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { flattenObjectForDb } from "../form-converter";
 import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
+import { ForbiddenError } from "apollo-server-express";
 
 export async function markAsSealed(_, { id }, context: GraphQLContext) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
@@ -39,7 +39,7 @@ export function markAsProcessed(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
-    processedInfo => flattenObjectForDb(processedInfo)
+    infos => flattenObjectForDb(infos)
   );
 }
 
@@ -48,13 +48,13 @@ export async function signedByTransporter(
   { id, signingInfo },
   context: GraphQLContext
 ) {
-  const transformEventToFormParams = signingInfo => ({
-    signedByTransporter: signingInfo.signedByTransporter,
-    sentAt: signingInfo.sentAt,
-    sentBy: signingInfo.sentBy,
-    wasteDetailsPackagings: signingInfo.packagings,
-    wasteDetailsQuantity: signingInfo.quantity,
-    wasteDetailsOnuCode: signingInfo.onuCode
+  const transformEventToFormParams = infos => ({
+    signedByTransporter: infos.signedByTransporter,
+    sentAt: infos.sentAt,
+    sentBy: infos.sentBy,
+    wasteDetailsPackagings: infos.packagings,
+    wasteDetailsQuantity: infos.quantity,
+    wasteDetailsOnuCode: infos.onuCode
   });
 
   return transitionForm(
@@ -72,6 +72,7 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
+
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
   const startingState = State.from(form.status, {
@@ -85,7 +86,7 @@ async function transitionForm(
       .resolveState(startingState)
       .nextEvents.includes(eventType)
   ) {
-    throw new DomainError("Transition impossible", ErrorCode.FORBIDDEN);
+    throw new ForbiddenError("Transition impossible");
   }
 
   const formService = interpret(formWorkflowMachine);
@@ -110,7 +111,13 @@ async function transitionForm(
       // If we reached one of those, we know the transition is over and we can safely update the form and return
       if (state.done || state.context.isStableState) {
         const newStatus = state.value;
-        await logStatusChange(formId, newStatus, context);
+        await logStatusChange(
+          formId,
+          newStatus,
+          context,
+          eventType,
+          eventParams
+        );
 
         const updatedForm = context.prisma.updateForm({
           where: { id: formId },
@@ -124,13 +131,60 @@ async function transitionForm(
     formService.send({ type: eventType, ...eventParams });
   });
 }
+const fieldsToLog = {
+  MARK_SEALED: [],
+  MARK_SENT: ["sentBy", "sentAt"],
+  MARK_SIGNED_BY_TRANSPORTER: [
+    "sentAt",
+    "signedByTransporter",
+    "securityCode",
+    "sentBy",
+    "signedByProducer",
+    "packagings",
+    "quantity",
+    "onuCode"
+  ],
+  MARK_RECEIVED: ["receivedBy", "receivedAt", "quantityReceived"],
+  MARK_PROCESSED: [
+    "processedBy",
+    "processedAt",
+    "processingOperationDone",
+    "processingOperationDescription",
+    "noTraceability",
+    "nextDestinationProcessingOperation",
+    "nextDestinationDetails",
+    "nextDestinationCompanyName",
+    "nextDestinationCompanySiret",
+    "nextDestinationCompanyAddress",
+    "nextDestinationCompanyContact",
+    "nextDestinationCompanyPhone",
+    "nextDestinationCompanyMail"
+  ]
+};
 
-export function logStatusChange(formId, status, context: GraphQLContext) {
+const getSubset = fields => o =>
+  fields.reduce((acc, curr) => ({ ...acc, [curr]: o[curr] }), {});
+
+const getDiff = (eventType, params) => {
+  const fields = fieldsToLog[eventType];
+  return getSubset(fields)(params);
+};
+export function logStatusChange(
+  formId,
+  status,
+  context: GraphQLContext,
+  eventType: string,
+  eventParams: any
+) {
+  const diff = getDiff(eventType, eventParams);
+
   return context.prisma
     .createStatusLog({
       form: { connect: { id: formId } },
       user: { connect: { id: context.user.id } },
-      status
+      status,
+      loggedAt: new Date(),
+      updatedFields: diff
     })
     .catch(err => {
       console.error(

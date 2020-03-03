@@ -1,9 +1,9 @@
 import { prisma } from "../../generated/prisma-client";
 import { randomNumber } from "../../utils";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { companyMails } from "../mails";
 import { getCompanyActiveUsers } from "../queries/companyUsers";
 import { sendMail } from "../../common/mails.helper";
+import { UserInputError } from "apollo-server-express";
 
 /**
  * This function is used to renew the security code
@@ -12,19 +12,20 @@ import { sendMail } from "../../common/mails.helper";
  * @param siret
  */
 export default async function renewSecurityCode(siret: string) {
-  if (siret.length != 14) {
-    throw new DomainError(
-      "Le siret doit faire 14 caractères",
-      ErrorCode.BAD_USER_INPUT
-    );
+  if (siret.length !== 14) {
+    throw new UserInputError("Le siret doit faire 14 caractères", {
+      invalidArgs: ["siret"]
+    });
   }
 
   const company = await prisma.company({ siret });
 
   if (!company) {
-    throw new DomainError(
+    throw new UserInputError(
       "Aucune entreprise enregistré sur Trackdéchets avec ce siret",
-      ErrorCode.NOT_FOUND
+      {
+        invalidArgs: ["siret"]
+      }
     );
   }
 
@@ -32,7 +33,7 @@ export default async function renewSecurityCode(siret: string) {
 
   let newSecurityCode = null;
 
-  while (!newSecurityCode || newSecurityCode == currentSecurityCode) {
+  while (!newSecurityCode || newSecurityCode === currentSecurityCode) {
     newSecurityCode = randomNumber(4);
   }
 
@@ -46,11 +47,11 @@ export default async function renewSecurityCode(siret: string) {
   const users = await getCompanyActiveUsers(siret);
   const recipients = users.map(({ email, name }) => ({ email, name }));
 
-  const email = companyMails.securityCodeRenewal(recipients, {
+  const mail = companyMails.securityCodeRenewal(recipients, {
     siret: updatedCompany.siret,
     name: updatedCompany.name
   });
-  sendMail(email);
+  sendMail(mail);
 
   return updatedCompany;
 }

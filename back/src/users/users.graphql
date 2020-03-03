@@ -1,61 +1,151 @@
 type Query {
+
+  "Renvoie les informations sur l'utilisateur authentifié"
   me: User
+
+  """
+  USAGE INTERNE > Mon Compte > Générer un token
+  Renvoie un token permettant de s'authentifier à l'API Trackdéchets
+  """
   apiKey: String
 }
 
-input SignupInput {
-  email: String!
-  password: String!
-  name: String!
-  phone: String
-}
+
 
 type Mutation {
+
+  """
+  USAGE INTERNE
+  Permet de créer un nouvel utilisateur
+  """
   signup(userInfos: SignupInput!): User
+
+  """
+  DEPRECATED - La récupération de token pour le compte de tiers
+  doit s'effectuer avec le protocole OAuth2
+
+  Récupére un token à partir de l'email et du mot de passe
+  d'un utilisateur.
+  """
   login(email: String!, password: String!): AuthPayload!
+
+  """
+  USAGE INTERNE
+  Modifie le mot de passe d'un utilisateur
+  """
   changePassword(oldPassword: String!, newPassword: String!): User!
+
+  """
+  USAGE INTERNE
+  Envoie un email pour la réinitialisation du mot de passe
+  """
   resetPassword(email: String!): Boolean
+
+  """
+  USAGE INTERNE
+  Met à jour les informations de l'utilisateur
+  """
   editProfile(name: String, phone: String, email: String): User
+
+  """
+  USAGE INTERNE
+  Invite un nouvel utilisateur à un établissement
+  """
   inviteUserToCompany(email: String!, siret: String!, role: UserRole!): CompanyPrivate
+
+  """
+  USAGE INTERNE
+  Renvoie l'email d'invitation à un établissement
+  """
   resendInvitation(email: String!, siret: String!): Boolean
+
+  """
+  USAGE INTERNE
+  Active le compte d'un utilisateur invité
+  """
   joinWithInvite(
     inviteHash: String!
     name: String!
     password: String!
   ): User!
+
+  """
+  USAGE INTERNE
+  Supprime les droits d'un utilisateurs sur un établissement
+  """
   removeUserFromCompany(userId: ID!, siret: String!):  CompanyPrivate
+
+  """
+  USAGE INTERNE
+  Supprime une invitation à un établissement
+  """
   deleteInvitation(email: String!, siret: String!):  CompanyPrivate
 }
 
+input SignupInput {
+
+  "Email de l'utilisateur"
+  email: String!
+
+  "Mot de passe de l'utilisateur"
+  password: String!
+
+  "Nom de l'utilisateur"
+  name: String!
+
+  "Numéro de téléphone de l'utilisateur"
+  phone: String
+}
+
+
+"Cet objet est renvoyé par la mutation login qui est dépréciée"
 type AuthPayload {
+  """
+  Bearer token à durée illimité permettant de s'authentifier
+  à l'API Trackdéchets. Pour ce faire, il doit être passé dans le
+  header d'autorisation `Authorization: Bearer ******`
+  """
   token: String!
+
+  "Utilisateur lié au token"
   user: User!
 }
 
-enum UserType {
-  PRODUCER
-  COLLECTOR
-  WASTEPROCESSOR
-  TRANSPORTER
-  WASTE_VEHICLES
-  WASTE_CENTER
-  TRADER
-}
+"""
+Liste les différents rôles d'un utilisateur au sein
+d'un établissement.
 
+Les admins peuvent:
+* consulter/éditer les bordereaux
+* gérer les utilisateurs de l'établissement
+* éditer les informations de la fiche entreprise
+* demander le renouvellement du code de sécurité
+* Éditer les informations de la fiche entreprise
+
+Les membres peuvent:
+* consulter/éditer les bordereaux
+* consulter le reste des informations
+"""
 enum UserRole {
   MEMBER
   ADMIN
 }
 
+"Représente un utilisateur sur la plateforme Trackdéchets"
 type User {
+
+  "Identifiant opaque"
   id: ID!
+
+  "Email de l'utiliateur"
   email: String!
+
+  "Nom de l'utilisateur"
   name: String
+
+  "Numéro de téléphone de l'utilisateur"
   phone: String
 
+  "Liste des établissements dont l'utilisateur est membre"
   companies: [CompanyPrivate]
-}
-
-type AccessToken {
-  token: String!
 }

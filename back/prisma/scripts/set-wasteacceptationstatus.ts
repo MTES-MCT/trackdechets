@@ -18,8 +18,8 @@ export class SetFormUpdater implements Updater {
         where: { isAccepted_not: null, wasteAcceptationStatus: null }
       });
 
-      for (let frm of forms) {
-        let wasteAcceptationStatus =
+      for (const frm of forms) {
+        const wasteAcceptationStatus =
           frm.isAccepted === true ? "ACCEPTED" : "REFUSED";
         await prisma.updateForm({
           where: { id: frm.id },

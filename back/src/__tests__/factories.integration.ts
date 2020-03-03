@@ -3,7 +3,8 @@ import {
   userFactory,
   companyFactory,
   userWithCompanyFactory,
-  formFactory
+  formFactory,
+  statusLogFactory
 } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
 
@@ -60,5 +61,40 @@ describe("Test Factories", () => {
 
     expect(newfrm.id).toBeTruthy();
     expect(newfrm.emitterCompanyName).toBe("somecompany");
+  });
+
+  test("should create a status log", async () => {
+    const usr = await userFactory();
+
+    const frm = await formFactory({
+      ownerId: usr.id
+    });
+
+    const newStatusLog = await statusLogFactory({
+      userId: usr.id,
+      status: "SEALED",
+      formId: frm.id
+    });
+
+    expect(newStatusLog.id).toBeTruthy();
+  });
+
+  test("should create a status log in the past", async () => {
+    const usr = await userFactory();
+
+    const frm = await formFactory({
+      ownerId: usr.id
+    });
+
+    const newStatusLog = await statusLogFactory({
+      userId: usr.id,
+      status: "SEALED",
+      formId: frm.id,
+      opt: { loggedAt: "2017-03-25" }
+    });
+
+    expect(newStatusLog.id).toBeTruthy();
+
+    expect(newStatusLog.loggedAt).toEqual("2017-03-25T00:00:00.000Z");
   });
 });

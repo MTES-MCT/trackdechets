@@ -7,35 +7,46 @@ executors:
     working_directory: ~/project/trackdechets
 
 jobs:
-  check-docker:
-    executor: node
-    steps:
-      - run: |
-          if [[ -z "$DOCKERHUB_USER" || -z "$DOCKERHUB_PASSWORD" ]]; then
-            echo "Missing DOCKERHUB_USER or DOCKERHUB_PASSWORD environment variables!"
-            exit 1
-          fi
-
-  build-service:
-    description: "Build and push <service-name> (located in <folder-name>) to the Docker repository"
-    parameters:
-      service-name:
-        type: string
-      folder-name:
-        type: string
+  test:
+    description: "Run tests"
     executor: node
     steps:
       - checkout
       - setup_remote_docker
-      - run: |
-          docker build -t betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 ./<< parameters.folder-name >>
-          docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-          docker push betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1
-      - run: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag betagouv/trackdechets-<< parameters.service-name >>:$CIRCLE_SHA1 betagouv/trackdechets-<< parameters.service-name >>:latest
-            docker push betagouv/trackdechets-<< parameters.service-name >>:latest
-          fi
+      - run:
+          name: Run tests
+          command: |
+            for container in $(docker-compose -f docker-compose.test.yml ps --services | tr '\r\n' '\n');
+            do
+              docker-compose -f docker-compose.test.yml run --rm $container
+              code=$?
+              if [[ $code != "0" ]]; then
+                echo "Tests failed for ${container}, exit code ${code}"
+                exit 1
+              fi
+            done
+
+  build-and-push:
+    description: "Build all images, pushes them to the Docker repository if branch is master or dev"
+    executor: node
+    parameters:
+      extra-cfg:
+        type: string
+        default: ""
+      build-args:
+        type: string
+        default: ""
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build and push images"
+          command: |
+            docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> build << parameters.build-args >>
+            if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "dev" ]; then
+              docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+              docker-compose -f docker-compose.yml -f docker-compose.build.yml << parameters.extra-cfg >> push --ignore-push-failures
+            fi
 
   deploy:
     machine:
@@ -48,29 +59,29 @@ jobs:
       host:
         type: env_var_name
         default: SSH_HOST
+      extra-cfg:
+        type: string
+        default: ""
     steps:
       - checkout
       - run:
-          name: Deploy Over SSH
+          name: Copy compose file
           command: |
             scp docker-compose.yml ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/
-            ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
-            docker-compose pull
-            docker-compose up -d
-            docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
-
-  deploy-validation:
-    machine:
-      enabled: true
-    steps:
+      - when:
+          condition: << parameters.extra-cfg >>
+          steps:
+            - run:
+                name: Copy extra compose config file
+                command: |
+                  scp << parameters.extra-cfg >> ${<< parameters.user >>}@${<< parameters.host >>}:/srv/trackdechets/docker-compose.override.yml
       - run:
-          name: Deploy to validation over SSH
+          name: Deploy Over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST_BU "cd /srv/trackdechets/
-            git pull
-            docker-compose -f docker-compose.val.yml build
-            docker-compose -f docker-compose.val.yml up -d
-            docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
+            ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
+                docker-compose pull
+                docker-compose up -d
+                docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
 
   integration-tests:
     machine:
@@ -79,94 +90,67 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Node Version Manager
-          command: |
-            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-            export NVM_DIR="/opt/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            nvm install v8.12.0
-            nvm alias default v8.12.0
-            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
-            echo "[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"" >> $BASH_ENV
-      - run:
           name: Run integration tests
           command: |
-            cd integration-tests
+            cd back/integration-tests
             sudo chmod +x ./run.sh
             ./run.sh
 
 workflows:
   build-and-deploy:
     jobs:
-      - check-docker:
+      - test
+      - integration-tests
+      - build-and-push:
+          name: build-and-push-prod
+          requires:
+            - test
+            - integration-tests
           filters:
             branches:
               only: master
-      - build-service:
-          name: build-postgres
-          service-name: postgres
-          folder-name: postgres
+      - build-and-push:
+          name: build-and-push-sandbox
+          extra-cfg: "-f docker-compose.sandbox.yml"
+          build-args: "--build-arg build_env=sandbox"
           requires:
-            - check-docker
-      - build-service:
-          name: build-ui
-          service-name: ui
-          folder-name: front
+            - test
+            - integration-tests
+          filters:
+            branches:
+              only: master
+      - build-and-push:
+          name: build-and-push-recette
+          extra-cfg: "-f docker-compose.val.yml"
+          build-args: "--build-arg build_env=recette"
           requires:
-            - check-docker
-      - build-service:
-          name: build-api
-          service-name: api
-          folder-name: back
-          requires:
-            - check-docker
-      - build-service:
-          name: build-insee
-          service-name: insee
-          folder-name: insee
-          requires:
-            - check-docker
-      - build-service:
-          name: build-pdf
-          service-name: pdf
-          folder-name: pdf
-          requires:
-            - check-docker
-      - build-service:
-          name: build-mail
-          service-name: mail
-          folder-name: mail
-          requires:
-            - check-docker
-      - build-service:
-          name: build-doc
-          service-name: doc
-          folder-name: documentation
-          requires:
-            - check-docker
-      - build-service:
-          name: build-etl
-          service-name: etl
-          folder-name: etl
-          requires:
-            - check-docker
+            - test
+            - integration-tests
+          filters:
+            branches:
+              only: dev
       - deploy:
+          name: deploy-prod
           requires:
-            - build-postgres
-            - build-api
-            - build-ui
-            - build-insee
-            - build-pdf
-            - build-mail
-            - build-doc
-            - build-etl
+            - build-and-push-prod
           filters:
             branches:
               only: master
-
-  deploy-validation:
-    jobs:
-      - deploy-validation:
+      - deploy:
+          name: deploy-sandbox
+          host: SSH_HOST_SANDBOX
+          extra-cfg: "docker-compose.sandbox.yml"
+          requires:
+            - build-and-push-sandbox
+          filters:
+            branches:
+              only: master
+      - deploy:
+          name: deploy-recette
+          host: SSH_HOST_RECETTE
+          extra-cfg: "docker-compose.val.yml"
+          requires:
+            - build-and-push-recette
           filters:
             branches:
               only: dev

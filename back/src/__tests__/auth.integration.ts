@@ -25,7 +25,7 @@ describe("POST /login", () => {
       isActive: true
     });
 
-    let login = await request
+    const login = await request
       .post("/login")
       .send(`email=${user.email}`)
       .send(`password=winter-is-coming`);
@@ -40,7 +40,7 @@ describe("POST /login", () => {
 
     // should redirect to /dashboard/slips
     expect(login.status).toBe(302);
-    expect(login.header["location"]).toBe(`http://${UI_HOST}/dashboard/slips`);
+    expect(login.header.location).toBe(`http://${UI_HOST}/dashboard/slips`);
 
     // should persist user across requests
     const res = await request
@@ -54,7 +54,7 @@ describe("POST /login", () => {
   });
 
   it("should not authenticate an unknown user", async () => {
-    let login = await request
+    const login = await request
       .post("/login")
       .send("email=unknown-user")
       .send("password=password");
@@ -64,7 +64,7 @@ describe("POST /login", () => {
 
     // should redirect to /login with error message
     expect(login.status).toBe(302);
-    const redirect = login.header["location"];
+    const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(queryString.escape(loginError.UNKNOWN_USER));
   });
@@ -77,7 +77,7 @@ describe("POST /login", () => {
       isActive: false
     });
 
-    let login = await request
+    const login = await request
       .post("/login")
       .send(`email=${user.email}`)
       .send(`password=winter-is-coming`);
@@ -87,7 +87,7 @@ describe("POST /login", () => {
 
     // should redirect to /login with error message
     expect(login.status).toBe(302);
-    const redirect = login.header["location"];
+    const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(queryString.escape(loginError.NOT_ACTIVATED));
   });
@@ -100,7 +100,7 @@ describe("POST /login", () => {
       isActive: true
     });
 
-    let login = await request
+    const login = await request
       .post("/login")
       .send(`email=${user.email}`)
       .send(`password=invalid`);
@@ -110,7 +110,7 @@ describe("POST /login", () => {
 
     // should redirect to /login with error message
     expect(login.status).toBe(302);
-    const redirect = login.header["location"];
+    const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(queryString.escape(loginError.INVALID_PASSWORD));
   });

@@ -3,12 +3,26 @@ import * as express from "express";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as LocalStrategy } from "passport-local";
+import { BasicStrategy } from "passport-http";
+import {
+  Strategy as ClientPasswordStrategy,
+  VerifyFunction
+} from "passport-oauth2-client-password";
 import { prisma, User } from "./generated/prisma-client";
 import { compare } from "bcrypt";
 import { AccessToken } from "./generated/prisma-client";
 import { sameDayMidnight, daysBetween } from "./utils";
+import { User as PrismaUser } from "./generated/prisma-client";
 
 const { JWT_SECRET } = process.env;
+
+// Set specific type for req.user
+declare global {
+  namespace Express {
+    // tslint:disable-next-line:no-empty-interface
+    interface User extends PrismaUser {}
+  }
+}
 
 export const loginError = {
   UNKNOWN_USER: "Aucun utilisateur trouvé avec cet email",
@@ -139,6 +153,33 @@ passport.use(
     }
   })
 );
+
+/**
+ * BasicStrategy & ClientPasswordStrategy
+ *
+ * These strategies are used to authenticate registered OAuth clients. They are
+ * employed to protect the `token` endpoint, which consumers use to obtain
+ * access tokens. The OAuth 2.0 specification suggests that clients use the
+ * HTTP Basic scheme to authenticate. Use of the client password strategy
+ * allows clients to send the same credentials in the request body (as opposed
+ * to the `Authorization` header). While this approach is not recommended by
+ * the specification, in practice it is quite common.
+ */
+
+const verifyClient: VerifyFunction = async (clientId, clientSecret, done) => {
+  const application = await prisma.application({ id: clientId });
+  if (!application) {
+    return done(null, false);
+  }
+  if (application.clientSecret !== clientSecret) {
+    return done(null, false);
+  }
+  return done(null, application);
+};
+
+passport.use(new BasicStrategy(verifyClient));
+
+passport.use(new ClientPasswordStrategy(verifyClient));
 
 /**
  * Custom passport callback that pass to next middleware

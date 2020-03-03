@@ -2,14 +2,13 @@ import { prisma, UserRole } from "../../generated/prisma-client";
 
 import * as mailsHelper from "../../common/mails.helper";
 
-import { cachedGet } from "../../common/redis";
+import { prepareRedis, prepareDB } from "./helpers";
+
 import makeClient from "../../__tests__/testClient";
 
-import { COMPANY_INFOS_CACHE_KEY } from "../../companies/insee";
 import {
   formFactory,
   userFactory,
-  userWithCompanyFactory,
   companyFactory
 } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
@@ -18,66 +17,6 @@ import { resetDatabase } from "../../../integration-tests/helper";
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
-const prepareDB = async () => {
-  const {
-    user: emitter,
-    company: emitterCompany
-  } = await userWithCompanyFactory("ADMIN");
-  const {
-    user: recipient,
-    company: recipientCompany
-  } = await userWithCompanyFactory("ADMIN");
-
-  const form = await formFactory({
-    ownerId: emitter.id,
-    opt: {
-      emitterCompanyName: emitterCompany.name,
-      emitterCompanySiret: emitterCompany.siret,
-      recipientCompanySiret: recipientCompany.siret
-    }
-  });
-
-  return { emitter, emitterCompany, recipient, recipientCompany, form };
-};
-
-const prepareRedis = async ({ emitterCompany, recipientCompany }) => {
-  const emitterCompanyInfos = async () => [
-    {
-      id: emitterCompany.id,
-      siret: emitterCompany.siret,
-      securityCode: "1234",
-      companyTypes: ["PRODUCER"]
-    }
-  ];
-
-  await cachedGet(
-    emitterCompanyInfos,
-    COMPANY_INFOS_CACHE_KEY,
-    emitterCompany.siret,
-    {
-      parser: JSON,
-      options: { EX: 60 }
-    }
-  );
-  const recipientCompanyInfos = async () => [
-    {
-      id: recipientCompany.id,
-      siret: recipientCompany.siret,
-      securityCode: "1234",
-      companyTypes: ["WASTE_PROCESSOR"]
-    }
-  ];
-
-  await cachedGet(
-    recipientCompanyInfos,
-    COMPANY_INFOS_CACHE_KEY,
-    recipientCompany.siret,
-    {
-      parser: JSON,
-      options: { EX: 60 }
-    }
-  );
-};
 describe("Test Form reception", () => {
   afterEach(async () => {
     await resetDatabase();
@@ -119,6 +58,13 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(frm.receivedBy).toBe("Bill");
     expect(frm.quantityReceived).toBe(11);
+
+    // A StatusLog object is created
+    const logs = await prisma.statusLogs({
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(1);
+    expect(logs[0].status).toBe("RECEIVED");
   });
 
   it("should not accept negative values", async () => {
@@ -237,6 +183,13 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Holden");
     expect(frm.wasteRefusalReason).toBe("Lorem ipsum");
     expect(frm.quantityReceived).toBe(0); // quantityReceived is set to 0
+
+    // A StatusLog object is created
+    const logs = await prisma.statusLogs({
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(1);
+    expect(logs[0].status).toBe("REFUSED");
   });
 
   it("should not accept a non-zero quantity when waste is refused", async () => {
@@ -277,6 +230,12 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe(null);
     expect(frm.receivedBy).toBe(null);
     expect(frm.quantityReceived).toBe(null);
+
+    // No StatusLog object was created
+    const logs = await prisma.statusLogs({
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(0);
   });
   it("should mark a sent form as partially refused", async () => {
     const {
@@ -315,6 +274,13 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Carol");
     expect(frm.wasteRefusalReason).toBe("Dolor sit amet");
     expect(frm.quantityReceived).toBe(12.5);
+
+    // A StatusLog object is created
+    const logs = await prisma.statusLogs({
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(1);
+    expect(logs[0].status).toBe("RECEIVED");
   });
 
   it("should not accept to edit a received form", async () => {

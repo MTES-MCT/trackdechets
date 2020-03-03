@@ -6,8 +6,8 @@ import { getCompanyUsers } from "../../../companies/queries";
 import * as mailsHelper from "../../../common/mails.helper";
 
 describe("joinWithInvite mutation", () => {
-  afterEach(() => {
-    resetDatabase();
+  afterAll(() => {
+    return resetDatabase();
   });
 
   it("should raise exception if hash does not exist", async () => {

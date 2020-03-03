@@ -17,7 +17,7 @@ describe("mergeUserTypes", () => {
 
   it("should return [] if userTypes are null or empty array", () => {
     const userTypes = [null, null, []];
-    let merged = mergeUserTypes(userTypes);
+    const merged = mergeUserTypes(userTypes);
     expect(merged).toEqual([]);
   });
 });

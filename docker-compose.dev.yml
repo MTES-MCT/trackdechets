@@ -47,6 +47,7 @@ services:
     command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
     volumes:
       - ./back/src:/usr/src/app/src
+      - ./documentation/docs/api-reference:/usr/src/app/documentation
     env_file:
       - .env
     environment:
@@ -54,9 +55,6 @@ services:
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      PRISMA_ENDPOINT: $PRISMA_ENDPOINT
-      PRISMA_SECRET: $PRISMA_SECRET
-      SESSION_SECRET: $SESSION_SECRET
 
   td-ui:
     image: node:10.14-alpine
@@ -81,7 +79,6 @@ services:
     ports:
       - 81:81
     environment:
-      INSEE_SECRET: $INSEE_SECRET
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 

@@ -1,11 +1,10 @@
 .SlipActions {
   display: flex;
-  margin-top: 5px;
 
+  align-items: center;
   .icon {
     font-size: larger;
     margin: 0 5px;
-    text-decoration: underline;
     cursor: pointer;
     background: none;
     border: none;
@@ -15,5 +14,16 @@
 
   .action-error {
     white-space: pre-line;
+  }
+}
+
+.dynamic-action {
+  display: flex;
+  align-items: center;
+
+  &__text {
+    margin-left: 6px;
+    font-size: 12px;
+    font-weight: bold;
   }
 }

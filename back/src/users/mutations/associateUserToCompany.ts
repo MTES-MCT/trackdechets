@@ -1,5 +1,5 @@
-import { prisma, User, UserRole } from "../../generated/prisma-client";
-import { DomainError, ErrorCode } from "../../common/errors";
+import { prisma } from "../../generated/prisma-client";
+import { UserInputError } from "apollo-server-express";
 
 /**
  * Associate an existing user with company
@@ -22,9 +22,8 @@ export async function associateUserToCompany(userId, siret, role) {
   });
 
   if (associations && associations.length > 0) {
-    throw new DomainError(
-      "L'utilisateur est déjà membre de l'établissement",
-      ErrorCode.BAD_USER_INPUT
+    throw new UserInputError(
+      "L'utilisateur est déjà membre de l'établissement"
     );
   }
 

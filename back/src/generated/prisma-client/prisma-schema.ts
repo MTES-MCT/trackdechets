@@ -7,6 +7,7 @@ export const typeDefs = /* GraphQL */ `type AccessToken {
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
+  application: Application
   token: String!
   isRevoked: Boolean!
   lastUsed: DateTime
@@ -21,6 +22,7 @@ type AccessTokenConnection {
 input AccessTokenCreateInput {
   id: ID
   user: UserCreateOneInput!
+  application: ApplicationCreateOneInput
   token: String!
   isRevoked: Boolean
   lastUsed: DateTime
@@ -75,6 +77,7 @@ input AccessTokenSubscriptionWhereInput {
 
 input AccessTokenUpdateInput {
   user: UserUpdateOneRequiredInput
+  application: ApplicationUpdateOneInput
   token: String
   isRevoked: Boolean
   lastUsed: DateTime
@@ -118,6 +121,7 @@ input AccessTokenWhereInput {
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
   user: UserWhereInput
+  application: ApplicationWhereInput
   token: String
   token_not: String
   token_in: [String!]
@@ -156,6 +160,10 @@ type AggregateAccessToken {
   count: Int!
 }
 
+type AggregateApplication {
+  count: Int!
+}
+
 type AggregateCompany {
   count: Int!
 }
@@ -169,6 +177,10 @@ type AggregateDeclaration {
 }
 
 type AggregateForm {
+  count: Int!
+}
+
+type AggregateGrant {
   count: Int!
 }
 
@@ -194,6 +206,222 @@ type AggregateUserAccountHash {
 
 type AggregateUserActivationHash {
   count: Int!
+}
+
+type Application {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  clientSecret: String!
+  name: String!
+  admins(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  redirectUris: [String!]!
+  logoUrl: String
+}
+
+type ApplicationConnection {
+  pageInfo: PageInfo!
+  edges: [ApplicationEdge]!
+  aggregate: AggregateApplication!
+}
+
+input ApplicationCreateInput {
+  id: ID
+  clientSecret: String!
+  name: String!
+  admins: UserCreateManyInput
+  redirectUris: ApplicationCreateredirectUrisInput
+  logoUrl: String
+}
+
+input ApplicationCreateOneInput {
+  create: ApplicationCreateInput
+  connect: ApplicationWhereUniqueInput
+}
+
+input ApplicationCreateredirectUrisInput {
+  set: [String!]
+}
+
+type ApplicationEdge {
+  node: Application!
+  cursor: String!
+}
+
+enum ApplicationOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  clientSecret_ASC
+  clientSecret_DESC
+  name_ASC
+  name_DESC
+  logoUrl_ASC
+  logoUrl_DESC
+}
+
+type ApplicationPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  clientSecret: String!
+  name: String!
+  redirectUris: [String!]!
+  logoUrl: String
+}
+
+type ApplicationSubscriptionPayload {
+  mutation: MutationType!
+  node: Application
+  updatedFields: [String!]
+  previousValues: ApplicationPreviousValues
+}
+
+input ApplicationSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: ApplicationWhereInput
+  AND: [ApplicationSubscriptionWhereInput!]
+  OR: [ApplicationSubscriptionWhereInput!]
+  NOT: [ApplicationSubscriptionWhereInput!]
+}
+
+input ApplicationUpdateDataInput {
+  clientSecret: String
+  name: String
+  admins: UserUpdateManyInput
+  redirectUris: ApplicationUpdateredirectUrisInput
+  logoUrl: String
+}
+
+input ApplicationUpdateInput {
+  clientSecret: String
+  name: String
+  admins: UserUpdateManyInput
+  redirectUris: ApplicationUpdateredirectUrisInput
+  logoUrl: String
+}
+
+input ApplicationUpdateManyMutationInput {
+  clientSecret: String
+  name: String
+  redirectUris: ApplicationUpdateredirectUrisInput
+  logoUrl: String
+}
+
+input ApplicationUpdateOneInput {
+  create: ApplicationCreateInput
+  update: ApplicationUpdateDataInput
+  upsert: ApplicationUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: ApplicationWhereUniqueInput
+}
+
+input ApplicationUpdateOneRequiredInput {
+  create: ApplicationCreateInput
+  update: ApplicationUpdateDataInput
+  upsert: ApplicationUpsertNestedInput
+  connect: ApplicationWhereUniqueInput
+}
+
+input ApplicationUpdateredirectUrisInput {
+  set: [String!]
+}
+
+input ApplicationUpsertNestedInput {
+  update: ApplicationUpdateDataInput!
+  create: ApplicationCreateInput!
+}
+
+input ApplicationWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  clientSecret: String
+  clientSecret_not: String
+  clientSecret_in: [String!]
+  clientSecret_not_in: [String!]
+  clientSecret_lt: String
+  clientSecret_lte: String
+  clientSecret_gt: String
+  clientSecret_gte: String
+  clientSecret_contains: String
+  clientSecret_not_contains: String
+  clientSecret_starts_with: String
+  clientSecret_not_starts_with: String
+  clientSecret_ends_with: String
+  clientSecret_not_ends_with: String
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  admins_every: UserWhereInput
+  admins_some: UserWhereInput
+  admins_none: UserWhereInput
+  logoUrl: String
+  logoUrl_not: String
+  logoUrl_in: [String!]
+  logoUrl_not_in: [String!]
+  logoUrl_lt: String
+  logoUrl_lte: String
+  logoUrl_gt: String
+  logoUrl_gte: String
+  logoUrl_contains: String
+  logoUrl_not_contains: String
+  logoUrl_starts_with: String
+  logoUrl_not_starts_with: String
+  logoUrl_ends_with: String
+  logoUrl_not_ends_with: String
+  AND: [ApplicationWhereInput!]
+  OR: [ApplicationWhereInput!]
+  NOT: [ApplicationWhereInput!]
+}
+
+input ApplicationWhereUniqueInput {
+  id: ID
 }
 
 type BatchPayload {
@@ -3413,6 +3641,172 @@ enum GerepType {
   Traiteur
 }
 
+type Grant {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  code: String!
+  application: Application!
+  expires: Int!
+  redirectUri: String!
+}
+
+type GrantConnection {
+  pageInfo: PageInfo!
+  edges: [GrantEdge]!
+  aggregate: AggregateGrant!
+}
+
+input GrantCreateInput {
+  id: ID
+  user: UserCreateOneInput!
+  code: String!
+  application: ApplicationCreateOneInput!
+  expires: Int!
+  redirectUri: String!
+}
+
+type GrantEdge {
+  node: Grant!
+  cursor: String!
+}
+
+enum GrantOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  code_ASC
+  code_DESC
+  expires_ASC
+  expires_DESC
+  redirectUri_ASC
+  redirectUri_DESC
+}
+
+type GrantPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  code: String!
+  expires: Int!
+  redirectUri: String!
+}
+
+type GrantSubscriptionPayload {
+  mutation: MutationType!
+  node: Grant
+  updatedFields: [String!]
+  previousValues: GrantPreviousValues
+}
+
+input GrantSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: GrantWhereInput
+  AND: [GrantSubscriptionWhereInput!]
+  OR: [GrantSubscriptionWhereInput!]
+  NOT: [GrantSubscriptionWhereInput!]
+}
+
+input GrantUpdateInput {
+  user: UserUpdateOneRequiredInput
+  code: String
+  application: ApplicationUpdateOneRequiredInput
+  expires: Int
+  redirectUri: String
+}
+
+input GrantUpdateManyMutationInput {
+  code: String
+  expires: Int
+  redirectUri: String
+}
+
+input GrantWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  user: UserWhereInput
+  code: String
+  code_not: String
+  code_in: [String!]
+  code_not_in: [String!]
+  code_lt: String
+  code_lte: String
+  code_gt: String
+  code_gte: String
+  code_contains: String
+  code_not_contains: String
+  code_starts_with: String
+  code_not_starts_with: String
+  code_ends_with: String
+  code_not_ends_with: String
+  application: ApplicationWhereInput
+  expires: Int
+  expires_not: Int
+  expires_in: [Int!]
+  expires_not_in: [Int!]
+  expires_lt: Int
+  expires_lte: Int
+  expires_gt: Int
+  expires_gte: Int
+  redirectUri: String
+  redirectUri_not: String
+  redirectUri_in: [String!]
+  redirectUri_not_in: [String!]
+  redirectUri_lt: String
+  redirectUri_lte: String
+  redirectUri_gt: String
+  redirectUri_gte: String
+  redirectUri_contains: String
+  redirectUri_not_contains: String
+  redirectUri_starts_with: String
+  redirectUri_not_starts_with: String
+  redirectUri_ends_with: String
+  redirectUri_not_ends_with: String
+  AND: [GrantWhereInput!]
+  OR: [GrantWhereInput!]
+  NOT: [GrantWhereInput!]
+}
+
+input GrantWhereUniqueInput {
+  id: ID
+  code: String
+}
+
 type Installation {
   id: ID!
   codeS3ic: String
@@ -3742,6 +4136,12 @@ type Mutation {
   upsertAccessToken(where: AccessTokenWhereUniqueInput!, create: AccessTokenCreateInput!, update: AccessTokenUpdateInput!): AccessToken!
   deleteAccessToken(where: AccessTokenWhereUniqueInput!): AccessToken
   deleteManyAccessTokens(where: AccessTokenWhereInput): BatchPayload!
+  createApplication(data: ApplicationCreateInput!): Application!
+  updateApplication(data: ApplicationUpdateInput!, where: ApplicationWhereUniqueInput!): Application
+  updateManyApplications(data: ApplicationUpdateManyMutationInput!, where: ApplicationWhereInput): BatchPayload!
+  upsertApplication(where: ApplicationWhereUniqueInput!, create: ApplicationCreateInput!, update: ApplicationUpdateInput!): Application!
+  deleteApplication(where: ApplicationWhereUniqueInput!): Application
+  deleteManyApplications(where: ApplicationWhereInput): BatchPayload!
   createCompany(data: CompanyCreateInput!): Company!
   updateCompany(data: CompanyUpdateInput!, where: CompanyWhereUniqueInput!): Company
   updateManyCompanies(data: CompanyUpdateManyMutationInput!, where: CompanyWhereInput): BatchPayload!
@@ -3766,6 +4166,12 @@ type Mutation {
   upsertForm(where: FormWhereUniqueInput!, create: FormCreateInput!, update: FormUpdateInput!): Form!
   deleteForm(where: FormWhereUniqueInput!): Form
   deleteManyForms(where: FormWhereInput): BatchPayload!
+  createGrant(data: GrantCreateInput!): Grant!
+  updateGrant(data: GrantUpdateInput!, where: GrantWhereUniqueInput!): Grant
+  updateManyGrants(data: GrantUpdateManyMutationInput!, where: GrantWhereInput): BatchPayload!
+  upsertGrant(where: GrantWhereUniqueInput!, create: GrantCreateInput!, update: GrantUpdateInput!): Grant!
+  deleteGrant(where: GrantWhereUniqueInput!): Grant
+  deleteManyGrants(where: GrantWhereInput): BatchPayload!
   createInstallation(data: InstallationCreateInput!): Installation!
   updateInstallation(data: InstallationUpdateInput!, where: InstallationWhereUniqueInput!): Installation
   updateManyInstallations(data: InstallationUpdateManyMutationInput!, where: InstallationWhereInput): BatchPayload!
@@ -3830,6 +4236,9 @@ type Query {
   accessToken(where: AccessTokenWhereUniqueInput!): AccessToken
   accessTokens(where: AccessTokenWhereInput, orderBy: AccessTokenOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [AccessToken]!
   accessTokensConnection(where: AccessTokenWhereInput, orderBy: AccessTokenOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+  application(where: ApplicationWhereUniqueInput!): Application
+  applications(where: ApplicationWhereInput, orderBy: ApplicationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Application]!
+  applicationsConnection(where: ApplicationWhereInput, orderBy: ApplicationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ApplicationConnection!
   company(where: CompanyWhereUniqueInput!): Company
   companies(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Company]!
   companiesConnection(where: CompanyWhereInput, orderBy: CompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CompanyConnection!
@@ -3842,6 +4251,9 @@ type Query {
   form(where: FormWhereUniqueInput!): Form
   forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form]!
   formsConnection(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FormConnection!
+  grant(where: GrantWhereUniqueInput!): Grant
+  grants(where: GrantWhereInput, orderBy: GrantOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Grant]!
+  grantsConnection(where: GrantWhereInput, orderBy: GrantOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): GrantConnection!
   installation(where: InstallationWhereUniqueInput!): Installation
   installations(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Installation]!
   installationsConnection(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InstallationConnection!
@@ -4183,6 +4595,8 @@ type StatusLog {
   user: User!
   form: Form!
   status: Status!
+  loggedAt: DateTime
+  updatedFields: Json
 }
 
 type StatusLogConnection {
@@ -4196,6 +4610,8 @@ input StatusLogCreateInput {
   user: UserCreateOneInput!
   form: FormCreateOneInput!
   status: Status!
+  loggedAt: DateTime
+  updatedFields: Json
 }
 
 type StatusLogEdge {
@@ -4208,11 +4624,17 @@ enum StatusLogOrderByInput {
   id_DESC
   status_ASC
   status_DESC
+  loggedAt_ASC
+  loggedAt_DESC
+  updatedFields_ASC
+  updatedFields_DESC
 }
 
 type StatusLogPreviousValues {
   id: ID!
   status: Status!
+  loggedAt: DateTime
+  updatedFields: Json
 }
 
 type StatusLogSubscriptionPayload {
@@ -4237,10 +4659,14 @@ input StatusLogUpdateInput {
   user: UserUpdateOneRequiredInput
   form: FormUpdateOneRequiredInput
   status: Status
+  loggedAt: DateTime
+  updatedFields: Json
 }
 
 input StatusLogUpdateManyMutationInput {
   status: Status
+  loggedAt: DateTime
+  updatedFields: Json
 }
 
 input StatusLogWhereInput {
@@ -4264,6 +4690,14 @@ input StatusLogWhereInput {
   status_not: Status
   status_in: [Status!]
   status_not_in: [Status!]
+  loggedAt: DateTime
+  loggedAt_not: DateTime
+  loggedAt_in: [DateTime!]
+  loggedAt_not_in: [DateTime!]
+  loggedAt_lt: DateTime
+  loggedAt_lte: DateTime
+  loggedAt_gt: DateTime
+  loggedAt_gte: DateTime
   AND: [StatusLogWhereInput!]
   OR: [StatusLogWhereInput!]
   NOT: [StatusLogWhereInput!]
@@ -4275,10 +4709,12 @@ input StatusLogWhereUniqueInput {
 
 type Subscription {
   accessToken(where: AccessTokenSubscriptionWhereInput): AccessTokenSubscriptionPayload
+  application(where: ApplicationSubscriptionWhereInput): ApplicationSubscriptionPayload
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   companyAssociation(where: CompanyAssociationSubscriptionWhereInput): CompanyAssociationSubscriptionPayload
   declaration(where: DeclarationSubscriptionWhereInput): DeclarationSubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
+  grant(where: GrantSubscriptionWhereInput): GrantSubscriptionPayload
   installation(where: InstallationSubscriptionWhereInput): InstallationSubscriptionPayload
   rubrique(where: RubriqueSubscriptionWhereInput): RubriqueSubscriptionPayload
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
@@ -4616,6 +5052,11 @@ input UserCreateInput {
   companyAssociations: CompanyAssociationCreateManyWithoutUserInput
 }
 
+input UserCreateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+}
+
 input UserCreateOneInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
@@ -4675,6 +5116,100 @@ enum UserRole {
   ADMIN
 }
 
+input UserScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  isActive: Boolean
+  isActive_not: Boolean
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  email_lt: String
+  email_lte: String
+  email_gt: String
+  email_gte: String
+  email_contains: String
+  email_not_contains: String
+  email_starts_with: String
+  email_not_starts_with: String
+  email_ends_with: String
+  email_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  phone: String
+  phone_not: String
+  phone_in: [String!]
+  phone_not_in: [String!]
+  phone_lt: String
+  phone_lte: String
+  phone_gt: String
+  phone_gte: String
+  phone_contains: String
+  phone_not_contains: String
+  phone_starts_with: String
+  phone_not_starts_with: String
+  phone_ends_with: String
+  phone_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [UserScalarWhereInput!]
+  OR: [UserScalarWhereInput!]
+  NOT: [UserScalarWhereInput!]
+}
+
 type UserSubscriptionPayload {
   mutation: MutationType!
   node: User
@@ -4711,12 +5246,37 @@ input UserUpdateInput {
   companyAssociations: CompanyAssociationUpdateManyWithoutUserInput
 }
 
+input UserUpdateManyDataInput {
+  isActive: Boolean
+  email: String
+  password: String
+  name: String
+  phone: String
+}
+
+input UserUpdateManyInput {
+  create: [UserCreateInput!]
+  update: [UserUpdateWithWhereUniqueNestedInput!]
+  upsert: [UserUpsertWithWhereUniqueNestedInput!]
+  delete: [UserWhereUniqueInput!]
+  connect: [UserWhereUniqueInput!]
+  set: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  deleteMany: [UserScalarWhereInput!]
+  updateMany: [UserUpdateManyWithWhereNestedInput!]
+}
+
 input UserUpdateManyMutationInput {
   isActive: Boolean
   email: String
   password: String
   name: String
   phone: String
+}
+
+input UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput!
+  data: UserUpdateManyDataInput!
 }
 
 input UserUpdateOneRequiredInput {
@@ -4741,6 +5301,11 @@ input UserUpdateWithoutCompanyAssociationsDataInput {
   phone: String
 }
 
+input UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateDataInput!
+}
+
 input UserUpsertNestedInput {
   update: UserUpdateDataInput!
   create: UserCreateInput!
@@ -4749,6 +5314,12 @@ input UserUpsertNestedInput {
 input UserUpsertWithoutCompanyAssociationsInput {
   update: UserUpdateWithoutCompanyAssociationsDataInput!
   create: UserCreateWithoutCompanyAssociationsInput!
+}
+
+input UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
 }
 
 input UserWhereInput {

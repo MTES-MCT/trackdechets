@@ -1,0 +1,34 @@
+version: "3"
+services:
+
+  postgres:
+    build:
+      context: ./postgres
+
+  td-api:
+    build:
+      context: ./back
+
+  td-ui:
+    build:
+      context: ./front
+
+  td-insee:
+    build:
+      context: ./insee
+
+  td-pdf:
+    build:
+      context: ./pdf
+
+  td-mail:
+    build:
+      context: ./mail
+
+  td-doc:
+    build:
+      context: ./documentation
+
+  td-etl:
+    build:
+      context: ./etl

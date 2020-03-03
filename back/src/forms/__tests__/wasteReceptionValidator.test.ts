@@ -5,7 +5,7 @@ const acceptedInfo = {
   quantityReceived: 12.5,
   wasteRefusalReason: "",
   receivedBy: "Jim",
-  receivedAt :"2020-01-17T10:12:00+0100"
+  receivedAt: "2020-01-17T10:12:00+0100"
 };
 
 describe("waste is accepted", () => {
@@ -17,23 +17,25 @@ describe("waste is accepted", () => {
   });
 
   it("should be invalid when quantityReceived is missing", async () => {
-    let isValid = await receivedInfoSchema.isValid({ wasteAcceptationStatus });
+    const isValid = await receivedInfoSchema.isValid({
+      wasteAcceptationStatus
+    });
     expect(isValid).toEqual(false);
   });
   it("should be invalid when wasteAcceptationStatus is missing", async () => {
-    let isValid = await receivedInfoSchema.isValid({ quantityReceived });
+    const isValid = await receivedInfoSchema.isValid({ quantityReceived });
     expect(isValid).toEqual(false);
   });
 
   it("should be invalid when quantityReceived is 0", async () => {
     // quantityReceived should be > 0
-    let isValid = await receivedInfoSchema.isValid({
+    const isValid = await receivedInfoSchema.isValid({
       wasteAcceptationStatus,
       quantityReceived: 0
     });
   });
   it("should be invalid when wasteRefusalReason is here", async () => {
-    let isValid = await receivedInfoSchema.isValid({
+    const isValid = await receivedInfoSchema.isValid({
       wasteAcceptationStatus,
       quantityReceived,
       wasteRefusalReason: "lorem"
@@ -47,7 +49,7 @@ const refusedInfo = {
   quantityReceived: 0,
   wasteRefusalReason: "non conformity",
   receivedBy: "Joe",
-  receivedAt :"2020-01-17T10:12:00+0100"
+  receivedAt: "2020-01-17T10:12:00+0100"
 };
 
 describe("waste is refused", () => {
@@ -59,12 +61,14 @@ describe("waste is refused", () => {
   });
 
   it("should be invalid when quantityReceived and wasteRefusalReason are missing ", async () => {
-    let isValid = await receivedInfoSchema.isValid({ wasteAcceptationStatus });
+    const isValid = await receivedInfoSchema.isValid({
+      wasteAcceptationStatus
+    });
     expect(isValid).toEqual(false);
   });
 
   it("should be invalid when quantityReceived is not 0", async () => {
-    let isValid = await receivedInfoSchema.isValid({
+    const isValid = await receivedInfoSchema.isValid({
       wasteAcceptationStatus,
       quantityReceived: 22
     });
@@ -72,7 +76,7 @@ describe("waste is refused", () => {
   });
 
   it("should be invalid when wasteRefusalReason is missing ", async () => {
-    let isValid = await receivedInfoSchema.isValid({
+    const isValid = await receivedInfoSchema.isValid({
       wasteAcceptationStatus,
       quantityReceived
     });
@@ -85,7 +89,7 @@ const partiallyRefusedInfo = {
   quantityReceived: 11,
   wasteRefusalReason: "mixed waste",
   receivedBy: "Bill",
-  receivedAt :"2020-01-17T10:12:00+0100"
+  receivedAt: "2020-01-17T10:12:00+0100"
 };
 describe("waste is partially accepted", () => {
   const { wasteAcceptationStatus, quantityReceived } = partiallyRefusedInfo;
@@ -96,12 +100,14 @@ describe("waste is partially accepted", () => {
   });
 
   it("should be invalid when quantityReceived and wasteRefusalReason are missing ", async () => {
-    let isValid = await receivedInfoSchema.isValid({ wasteAcceptationStatus });
+    const isValid = await receivedInfoSchema.isValid({
+      wasteAcceptationStatus
+    });
     expect(isValid).toEqual(false);
   });
 
   it("should be invalid when quantityReceived is 0", async () => {
-    let isValid = await receivedInfoSchema.isValid({
+    const isValid = await receivedInfoSchema.isValid({
       wasteAcceptationStatus,
       quantityReceived: 0
     });
@@ -109,7 +115,7 @@ describe("waste is partially accepted", () => {
   });
 
   it("should be invalid when wasteRefusalReason is missing", async () => {
-    let isValid = await receivedInfoSchema.isValid({
+    const isValid = await receivedInfoSchema.isValid({
       wasteAcceptationStatus,
       quantityReceived
     });

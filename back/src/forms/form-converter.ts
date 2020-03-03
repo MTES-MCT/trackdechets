@@ -11,11 +11,7 @@ export function flattenObjectForDb(
       !Array.isArray(input[key]) &&
       typeof input[key] === "object"
     ) {
-      return flattenObjectForDb(
-        input[key],
-        [...previousKeys, key],
-        dbObject
-      );
+      return flattenObjectForDb(input[key], [...previousKeys, key], dbObject);
     }
 
     const objectKey = [...previousKeys, key]

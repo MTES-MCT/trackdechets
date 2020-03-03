@@ -23,8 +23,9 @@ describe("Forms query", () => {
 
   it("should fail if user doesnt belong to a company", async () => {
     expect.assertions(1);
+    getUserCompaniesMock.mockResolvedValue([]);
+
     try {
-      getUserCompaniesMock.mockResolvedValue([]);
       await forms(null, { type: "", siret: null }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
@@ -33,8 +34,9 @@ describe("Forms query", () => {
 
   it("should fail if user ask for a siret he doesnt belong to", async () => {
     expect.assertions(1);
+    getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" }]);
+
     try {
-      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" }]);
       await forms(null, { type: "", siret: "another siret" }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);

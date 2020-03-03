@@ -1,12 +1,16 @@
 import { hash } from "bcrypt";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { sendMail } from "../../common/mails.helper";
 import { Prisma, User } from "../../generated/prisma-client";
 import { GraphQLContext } from "../../types";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
+import { UserInputError } from "apollo-server-express";
 
-export default async function signup(_, { userInfos }, context: GraphQLContext) {
+export default async function signup(
+  _,
+  { userInfos },
+  context: GraphQLContext
+) {
   const hashedPassword = await hashPassword(userInfos.password);
   const user = await context.prisma
     .createUser({
@@ -15,12 +19,13 @@ export default async function signup(_, { userInfos }, context: GraphQLContext) 
       password: hashedPassword,
       phone: userInfos.phone
     })
-    .catch(async _ => {
-      throw new DomainError(
-        "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide.",
-        ErrorCode.BAD_USER_INPUT
-      );
-    });
+    .catch(__ => null);
+
+  if (!user) {
+    return new UserInputError(
+      "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
+    );
+  }
 
   const userActivationHash = await createActivationHash(user, context.prisma);
   await acceptNewUserComapnyInvitations(user, context.prisma);

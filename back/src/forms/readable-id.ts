@@ -1,13 +1,13 @@
-import { GraphQLContext } from "../types";
+import { prisma } from "../generated/prisma-client";
 
-export async function getReadableId(context: GraphQLContext) {
+export async function getReadableId() {
   const beginningOfYear = new Date(new Date().getFullYear(), 0, 1);
   const shortYear = beginningOfYear
     .getFullYear()
     .toString()
     .slice(-2);
 
-  const mostRecentForms = await context.prisma.forms({
+  const mostRecentForms = await prisma.forms({
     orderBy: "readableId_DESC",
     first: 10
   });

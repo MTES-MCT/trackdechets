@@ -44,15 +44,13 @@ export function mergePermissions(permissions) {
 }
 
 export function getUIBaseURL() {
-  let { UI_URL_SCHEME, UI_HOST } = process.env;
-  UI_URL_SCHEME = UI_URL_SCHEME || "http";
-  return `${UI_URL_SCHEME}://${UI_HOST}`;
+  const { UI_URL_SCHEME, UI_HOST } = process.env;
+  return `${UI_URL_SCHEME || "http"}://${UI_HOST}`;
 }
 
 export function getAPIBaseURL() {
-  let { API_URL_SCHEME, API_HOST } = process.env;
-  API_URL_SCHEME = API_URL_SCHEME || "http";
-  return `${API_URL_SCHEME}://${API_HOST}`;
+  const { API_URL_SCHEME, API_HOST } = process.env;
+  return `${API_URL_SCHEME || "http"}://${API_HOST}`;
 }
 
 /**

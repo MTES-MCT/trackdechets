@@ -28,7 +28,7 @@ export class SetCampanyNameGerepNafUpdater implements Updater {
             `http://td-insee:81/siret/${company.siret}`
           );
 
-          if (response.status == 200) {
+          if (response.status === 200) {
             const companyInfo = response.data;
 
             console.log(companyInfo);

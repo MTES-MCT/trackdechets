@@ -1,11 +1,11 @@
-import { DomainError, ErrorCode } from "../common/errors";
 import { getUserCompanies } from "../companies/queries";
-import { prisma } from "../generated/prisma-client";
-import { GraphQLContext } from "../types";
 import {
-  cleanUpNotDuplicatableFieldsInForm,
-  unflattenObjectFromDb
-} from "./form-converter";
+  prisma,
+  StatusLogConnection,
+  Company
+} from "../generated/prisma-client";
+import { GraphQLContext } from "../types";
+import { unflattenObjectFromDb } from "./form-converter";
 import {
   markAsProcessed,
   markAsReceived,
@@ -13,11 +13,58 @@ import {
   markAsSent,
   signedByTransporter
 } from "./mutations/mark-as";
+import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
 import { formPdf } from "./queries/form-pdf";
 import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
-import { getReadableId } from "./readable-id";
+import {
+  ForbiddenError,
+  UserInputError,
+  AuthenticationError
+} from "apollo-server-express";
+
+// formsLifeCycle fragment
+const statusLogFragment = `
+  fragment StatusLogPaginated on StatusLogConnection {
+    aggregate {
+      count
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        id
+        loggedAt
+        status
+        updatedFields
+        form {
+          id
+          readableId
+        }
+        user {
+          id
+          email
+        }
+      }
+    }
+  }
+`;
+
+const companyFragment = `
+fragment Company on CompanyAssociation {
+  company {
+    id
+    siret
+  }
+}
+`;
+
+const PAGINATE_BY = 100;
 
 export default {
   Form: {
@@ -36,12 +83,86 @@ export default {
       return unflattenObjectFromDb(dbForm);
     },
     forms,
+    formsLifeCycle: async (
+      _,
+      { siret, loggedAfter, loggedBefore, cursorAfter, cursorBefore, formId },
+      context: GraphQLContext
+    ) => {
+      const userId = context.user.id;
+
+      const userCompanies = await prisma
+        .companyAssociations({ where: { user: { id: userId } } })
+        .$fragment<{ company: Company }[]>(companyFragment)
+        .then(associations => associations.map(a => a.company));
+
+      // User must be associated with a company
+      if (!userCompanies.length) {
+        throw new ForbiddenError(
+          "Vous n'êtes pas autorisé à consulter le cycle de vie des bordereaux."
+        );
+      }
+      // If user is associated with several companies, siret is mandatory
+      if (userCompanies.length > 1 && !siret) {
+        throw new UserInputError(
+          "Vous devez préciser pour quel siret vous souhaitez consulter",
+          {
+            invalidArgs: ["siret"]
+          }
+        );
+      }
+      // If requested siret does not belong to user, raise an error
+      if (!!siret && !userCompanies.map(c => c.siret).includes(siret)) {
+        throw new ForbiddenError(
+          "Vous n'avez pas le droit d'accéder au siret précisé"
+        );
+      }
+      // Select user company matching siret or get the first
+      const selectedCompany =
+        userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
+
+      const formsFilter = {
+        OR: [
+          { owner: { id: userId } },
+          { recipientCompanySiret: selectedCompany.siret },
+          { emitterCompanySiret: selectedCompany.siret },
+          {
+            transporterCompanySiret: selectedCompany.siret,
+            status: "SEALED"
+          }
+        ]
+      };
+      const statusLogsCx = await context.prisma
+        .statusLogsConnection({
+          orderBy: "loggedAt_DESC",
+          first: PAGINATE_BY,
+          after: cursorAfter,
+          before: cursorBefore,
+          where: {
+            loggedAt_not: null,
+            loggedAt_gte: loggedAfter,
+            loggedAt_lte: loggedBefore,
+            form: { ...formsFilter, isDeleted: false, id: formId }
+          }
+        })
+        .$fragment<
+          StatusLogConnection & {
+            aggregate: { count: number };
+          }
+        >(statusLogFragment);
+
+      return {
+        statusLogs: statusLogsCx.edges.map(el => el.node),
+        ...statusLogsCx.pageInfo,
+        count: statusLogsCx.aggregate.count
+      };
+    },
+
     stats: async (parent, args, context: GraphQLContext) => {
       const userId = context.user.id;
       const userCompanies = await getUserCompanies(userId);
 
       return userCompanies.map(async userCompany => {
-        const forms = await context.prisma.forms({
+        const queriedForms = await context.prisma.forms({
           where: {
             OR: [
               { owner: { id: userId } },
@@ -53,7 +174,7 @@ export default {
           }
         });
 
-        const stats = forms.reduce((prev, cur) => {
+        const stats = queriedForms.reduce((prev, cur) => {
           prev[cur.wasteDetailsCode] = prev[cur.wasteDetailsCode] || {
             wasteCode: cur.wasteDetailsCode,
             incoming: 0,
@@ -82,7 +203,7 @@ export default {
       { siret, wasteCode },
       context: GraphQLContext
     ) => {
-      const forms = await context.prisma.forms({
+      const queriedForms = await context.prisma.forms({
         where: {
           ...(wasteCode && { wasteDetailsCode: wasteCode }),
           status: "AWAITING_GROUP",
@@ -91,7 +212,7 @@ export default {
         }
       });
 
-      return forms.map(f => unflattenObjectFromDb(f));
+      return queriedForms.map(f => unflattenObjectFromDb(f));
     },
     formPdf,
     formsRegister
@@ -104,22 +225,8 @@ export default {
         data: { isDeleted: true }
       });
     },
-    duplicateForm: async (parent, { id }, context: GraphQLContext) => {
-      const userId = context.user.id;
-
-      const existingForm = await context.prisma.form({
-        id
-      });
-
-      const newForm = await context.prisma.createForm({
-        ...cleanUpNotDuplicatableFieldsInForm(existingForm),
-        readableId: await getReadableId(context),
-        status: "DRAFT",
-        owner: { connect: { id: userId } }
-      });
-
-      return unflattenObjectFromDb(newForm);
-    },
+    duplicateForm: (_parent, { id }, { user }: GraphQLContext) =>
+      duplicateForm(id, user.id),
     markAsSealed,
     markAsSent,
     markAsReceived,
@@ -134,7 +241,7 @@ export default {
         const user = await prisma.accessToken({ token }).user();
 
         if (!user) {
-          throw new DomainError(ErrorCode.UNAUTHENTICATED);
+          throw new AuthenticationError("Vous n'êtes pas connecté");
         }
 
         const userCompanies = await getUserCompanies(user.id);

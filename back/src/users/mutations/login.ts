@@ -1,7 +1,7 @@
 import { prisma } from "../../generated/prisma-client";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { compare } from "bcrypt";
 import { apiKey } from "../queries";
+import { UserInputError, ForbiddenError } from "apollo-server-express";
 
 /**
  * DEPRECATED
@@ -13,20 +13,20 @@ import { apiKey } from "../queries";
 export async function login(email: string, password: string) {
   const user = await prisma.user({ email: email.trim() });
   if (!user) {
-    throw new DomainError(
-      `Aucun utilisateur trouvé avec l'email ${email}`,
-      ErrorCode.BAD_USER_INPUT
-    );
+    throw new UserInputError(`Aucun utilisateur trouvé avec l'email ${email}`, {
+      invalidArgs: ["email"]
+    });
   }
   if (!user.isActive) {
-    throw new DomainError(
-      `Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support.`,
-      ErrorCode.FORBIDDEN
+    throw new ForbiddenError(
+      `Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support.`
     );
   }
   const passwordValid = await compare(password, user.password);
   if (!passwordValid) {
-    throw new Error("Mot de passe incorrect");
+    throw new UserInputError("Mot de passe incorrect", {
+      invalidArgs: ["password"]
+    });
   }
 
   const token = await apiKey(user);

@@ -20,6 +20,7 @@ export default {
     formsRegister: isCompaniesUser,
     forms: isAuthenticated,
     stats: isAuthenticated,
+    formsLifeCycle: isAuthenticated,
     appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {

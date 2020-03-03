@@ -1,6 +1,10 @@
-import { DomainError, ErrorCode } from "../../common/errors";
 import { Form } from "../../generated/prisma-client";
 import { formSchema } from "../validator";
+import {
+  UserInputError,
+  ForbiddenError,
+  ApolloError
+} from "apollo-server-express";
 
 export enum WorkflowError {
   InvalidForm,
@@ -16,32 +20,28 @@ export async function getError(error: WorkflowError, form: Form) {
       const errors: string[] = await formSchema
         .validate(form, { abortEarly: false })
         .catch(err => err.errors);
-      return new DomainError(
+      return new UserInputError(
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${errors.join(
           "\n"
-        )}`,
-        ErrorCode.BAD_USER_INPUT
+        )}`
       );
 
     case WorkflowError.InvalidSecurityCode:
-      return new DomainError(
-        "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'.",
-        ErrorCode.FORBIDDEN
+      return new ForbiddenError(
+        "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'."
       );
 
     case WorkflowError.InvalidTransition:
-      return new DomainError(
-        "Vous ne pouvez pas passer ce bordereau à l'état souhaité.",
-        ErrorCode.FORBIDDEN
+      return new ForbiddenError(
+        "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
       );
 
     case WorkflowError.MissingSignature:
-      return new DomainError(
-        "Le transporteur et le producteur du déchet doivent tous deux valider l'enlèvement",
-        ErrorCode.BAD_USER_INPUT
+      return new UserInputError(
+        "Le transporteur et le producteur du déchet doivent tous deux valider l'enlèvement"
       );
 
     default:
-      return new DomainError("Une erreur est survenue.", ErrorCode.FORBIDDEN);
+      return new ApolloError("Une erreur est survenue.");
   }
 }

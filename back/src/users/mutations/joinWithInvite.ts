@@ -16,7 +16,7 @@ export async function joinWithInvite(
 
   const hashedPassword = await hashPassword(password);
   const user = await prisma.createUser({
-    name: name,
+    name,
     email: existingHash.email,
     password: hashedPassword,
     phone: "",

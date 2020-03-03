@@ -1,0 +1,23 @@
+version: "3"
+services:
+  td-api:
+    restart: "no"
+    build:
+      context: ./back
+      dockerfile: Dockerfile.test
+    environment:
+      JWT_SECRET: "xxx"
+
+  td-ui:
+    restart: "no"
+    build:
+      context: ./front
+      dockerfile: Dockerfile.test
+    environment:
+      - CI=true
+
+  td-insee:
+    restart: "no"
+    build:
+      context: ./insee
+      dockerfile: Dockerfile.test

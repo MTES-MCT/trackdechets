@@ -11,7 +11,7 @@ import {
   login,
   joinWithInvite
 } from "./mutations";
-import signup from "./queries/signup";
+import signup from "./mutations/signup";
 import { hashPassword } from "./utils";
 import { apiKey } from "./queries";
 
@@ -24,7 +24,7 @@ export default {
       return changePassword(userId, oldPassword, newPassword);
     },
     resetPassword: async (_, { email }, context: GraphQLContext) => {
-      const user = await context.prisma.user({ email }).catch(_ => null);
+      const user = await context.prisma.user({ email }).catch(__ => null);
 
       if (!user) {
         throw new Error(`Cet email n'existe pas sur notre plateforme.`);
@@ -47,8 +47,11 @@ export default {
       const userId = context.user.id;
       return editProfile(userId, payload);
     },
-    inviteUserToCompany: async (_, { email, siret, role }, context: GraphQLContext) =>
-      inviteUserToCompany(context.user, email, siret, role),
+    inviteUserToCompany: async (
+      _,
+      { email, siret, role },
+      context: GraphQLContext
+    ) => inviteUserToCompany(context.user, email, siret, role),
     resendInvitation: async (_, { email, siret }, context: GraphQLContext) =>
       resendInvitation(context.user, email, siret),
     joinWithInvite: async (_, { inviteHash, name, password }) =>
@@ -57,9 +60,9 @@ export default {
       await prisma
         .deleteManyCompanyAssociations({
           user: { id: userId },
-          company: { siret: siret }
+          company: { siret }
         })
-        .catch(_ => {
+        .catch(__ => {
           throw new Error(
             `Erreur, l'utilisateur n'a pas pu être retiré de l'entreprise`
           );

@@ -1,6 +1,6 @@
 import React from "react";
 import { DateTime } from "luxon";
-import SlipActions from "./SlipActions";
+import { SlipActions, DynamicActions } from "./SlipActions";
 import { Form } from "../../form/model";
 import { useFormsTable } from "./use-forms-table";
 import { FaSort } from "react-icons/fa";
@@ -18,8 +18,18 @@ const statusLabels: { [key: string]: string } = {
   REFUSED: "Refusé"
 };
 
-type Props = { forms: Form[]; siret: string; hiddenFields?: string[] };
-export default function Slips({ forms, siret, hiddenFields = [] }: Props) {
+type Props = {
+  forms: Form[];
+  siret: string;
+  hiddenFields?: string[];
+  dynamicActions?: boolean;
+};
+export default function Slips({
+  forms,
+  siret,
+  hiddenFields = [],
+  dynamicActions = false
+}: Props) {
   const [sortedForms, sortBy, filter] = useFormsTable(forms);
 
   return (
@@ -66,7 +76,8 @@ export default function Slips({ forms, siret, hiddenFields = [] }: Props) {
               </small>
             </th>
           )}
-          <th>Actions</th>
+          {dynamicActions && <th>Mes actions</th>}
+          <th></th>
         </tr>
         <tr>
           {hiddenFields.indexOf("readableId") === -1 && (
@@ -103,6 +114,7 @@ export default function Slips({ forms, siret, hiddenFields = [] }: Props) {
           <th />
           {hiddenFields.indexOf("status") === -1 && <th />}
           <th />
+          {dynamicActions && <th></th>}
         </tr>
       </thead>
       <tbody>
@@ -128,8 +140,13 @@ export default function Slips({ forms, siret, hiddenFields = [] }: Props) {
             {hiddenFields.indexOf("status") === -1 && (
               <td>{statusLabels[s.status]}</td>
             )}
+            {dynamicActions && (
+              <td>
+                <DynamicActions siret={siret} form={s} />
+              </td>
+            )}
             <td>
-              <SlipActions siret={siret} form={s} />
+              <SlipActions form={s} />
             </td>
           </tr>
         ))}

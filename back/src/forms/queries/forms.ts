@@ -1,7 +1,7 @@
-import { DomainError, ErrorCode } from "../../common/errors";
 import { getUserCompanies } from "../../companies/queries";
 import { GraphQLContext } from "../../types";
 import { unflattenObjectFromDb } from "../form-converter";
+import { ForbiddenError } from "apollo-server-express";
 
 export default async function forms(
   _,
@@ -18,10 +18,7 @@ export default async function forms(
       : userCompanies.shift();
 
   if (!selectedCompany) {
-    throw new DomainError(
-      "Vous ne pouvez pas consulter les bordereaux.",
-      ErrorCode.FORBIDDEN
-    );
+    throw new ForbiddenError("Vous ne pouvez pas consulter les bordereaux.");
   }
 
   const formsFilter = {
@@ -37,12 +34,12 @@ export default async function forms(
     }
   };
 
-  const forms = await context.prisma.forms({
+  const queriedForms = await context.prisma.forms({
     where: {
       ...formsFilter[type],
       isDeleted: false
     }
   });
 
-  return forms.map(f => unflattenObjectFromDb(f));
+  return queriedForms.map(f => unflattenObjectFromDb(f));
 }

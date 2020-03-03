@@ -301,10 +301,12 @@ const renameAndFormatFields = params => ({
   recipientCompanyAddress10: params.recipientCompanyAddress,
   recipientCompanyContact10: params.recipientCompanyContact,
   transporterSentAt: dateFmt(params.sentAt),
+  senderSentBy: params.sentBy,
   senderSentAt: dateFmt(params.sentAt),
   receivedAt1: dateFmt(params.receivedAt),
   receivedAt2: dateFmt(params.receivedAt),
-  receivedBy10: params.receivedBy
+  receivedBy10: params.receivedBy,
+  processedAt: dateFmt(params.processedAt)
 });
 
 /**
@@ -318,7 +320,7 @@ const getWasteDetailsPackagings = params => {
   if (!params.wasteDetailsPackagings) {
     return {};
   }
-  return params.wasteDetailsPackagings.reduce(function (acc, elem) {
+  return params.wasteDetailsPackagings.reduce(function(acc, elem) {
     let key = `wasteDetailsPackagings${capitalize(elem)}`;
     return {
       ...acc,
@@ -373,13 +375,13 @@ const getWasteQuantityRefused = (wasteDetailsQuantity, quantityReceived) =>
 const getWasteRefusalreason = params =>
   params.wasteAcceptationStatus === "PARTIALLY_REFUSED"
     ? {
-      wasteRefusalReason: `Refus partiel: ${
-        params.wasteRefusalReason
+        wasteRefusalReason: `Refus partiel: ${
+          params.wasteRefusalReason
         } - Tonnage estimé de refus : ${getWasteQuantityRefused(
           params.wasteDetailsQuantity,
           params.quantityReceived
         )} tonnes`
-    }
+      }
     : {};
 
 /**

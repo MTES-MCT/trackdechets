@@ -18,11 +18,13 @@ services:
             migrations: true
 
   postgres:
-    image: betagouv/trackdechets-postgres:latest
+    image: betagouv/trackdechets-postgres:master
     restart: always
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      AIRFLOW_POSTGRES_USER: $AIRFLOW_POSTGRES_USER
+      AIRFLOW_POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
     volumes:
       - postgres:/var/lib/postgresql/data
 
@@ -33,13 +35,10 @@ services:
       - net.core.somaxconn=511
 
   td-api:
-    image: betagouv/trackdechets-api:latest
+    image: betagouv/trackdechets-api:master
     restart: always
     environment:
       NODE_ENV: production
-      JWT_SECRET: $JWT_SECRET
-      UI_HOST: $UI_HOST
-      UI_URL_SCHEME: $UI_URL_SCHEME
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
@@ -57,39 +56,42 @@ services:
       SESSION_SECRET: $SESSION_SECRET
       SESSION_COOKIE_HOST: $SESSION_COOKIE_HOST
       SESSION_COOKIE_SECURE: $SESSION_COOKIE_SECURE
+      JWT_SECRET: $JWT_SECRET
+      UI_HOST: $UI_HOST
+      UI_URL_SCHEME: $UI_URL_SCHEME
+      API_HOST: $API_HOST
+      API_URL_SCHEME: $API_URL_SCHEME
 
   td-ui:
-    image: betagouv/trackdechets-ui:latest
+    image: betagouv/trackdechets-ui:master
     restart: always
     environment:
       VIRTUAL_HOST: $UI_HOST
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      REACT_APP_SENTRY_DSN: $SENTRY_DSN
 
   td-insee:
-    image: betagouv/trackdechets-insee:latest
+    image: betagouv/trackdechets-insee:master
     restart: always
     environment:
-      INSEE_SECRET: $INSEE_SECRET
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
   td-pdf:
-    image: betagouv/trackdechets-pdf:latest
+    image: betagouv/trackdechets-pdf:master
     restart: always
     environment:
       SENTRY_DSN: $SENTRY_DSN
 
   td-mail:
-    image: betagouv/trackdechets-mail:latest
+    image: betagouv/trackdechets-mail:master
     restart: always
     environment:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
 
   td-doc:
-    image: betagouv/trackdechets-doc:latest
+    image: betagouv/trackdechets-doc:master
     restart: always
     environment:
       VIRTUAL_HOST: $DOC_HOST
@@ -97,7 +99,7 @@ services:
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
   td-etl:
-    image: betagouv/trackdechets-etl:latest
+    image: betagouv/trackdechets-etl:master
     restart: always
     ports:
       - 127.0.0.1:8080:8080

@@ -1,160 +1,28 @@
 version: "3"
 services:
-  prisma:
-    image: prismagraphql/prisma:1.34.10
-    restart: always
-    ports:
-      - "4466:4466"
-    environment:
-      PRISMA_CONFIG: |
-        port: 4466
-        databases:
-          default:
-            connector: postgres
-            host: $POSTGRES_HOST
-            port: $POSTGRES_PORT
-            user: $POSTGRES_USER
-            password: $POSTGRES_PASSWORD
-            migrations: true
-
   postgres:
-    image: td-postgres
-    build:
-      context: ./postgres
-      dockerfile: Dockerfile
-    restart: always
-    environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-    volumes:
-      - postgres:/var/lib/postgresql/data
-
-  redis:
-    image: redis:5.0-alpine
-    restart: always
-    sysctls:
-      - net.core.somaxconn=511
+    image: betagouv/trackdechets-postgres:dev
 
   td-api:
-    image: td-api
-    build:
-      context: ./back
-      dockerfile: Dockerfile
-    restart: always
+    image: betagouv/trackdechets-api:dev
     environment:
       NODE_ENV: dev
-      JWT_SECRET: $JWT_SECRET
-      API_URL_SCHEME: $API_URL_SCHEME
-      API_HOST: $API_HOST
-      UI_HOST: $UI_HOST
-      UI_URL_SCHEME: $UI_URL_SCHEME
-      VIRTUAL_HOST: $API_HOST
-      LETSENCRYPT_HOST: $API_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      TRELLO_API_KEY: $TRELLO_API_KEY
-      TRELLO_TOKEN: $TRELLO_TOKEN
-      TRELLO_ALERTS_LIST_ID: $TRELLO_ALERTS_LIST_ID
-      SENTRY_DSN: $SENTRY_DSN
-      MJ_MAIN_TEMPLATE_ID: $MJ_MAIN_TEMPLATE_ID
-      MJ_FIRST_ONBOARDING_TEMPLATE_ID: $MJ_FIRST_ONBOARDING_TEMPLATE_ID
-      MJ_SECOND_ONBOARDING_TEMPLATE_ID: $MJ_SECOND_ONBOARDING_TEMPLATE_ID
-      MJ_SECURITY_CODE_RENEWAL_TEMPLATE_ID: $MJ_SECURITY_CODE_RENEWAL_TEMPLATE_ID
-      NOTIFY_DREAL_WHEN_FORM_DECLINED: $NOTIFY_DREAL_WHEN_FORM_DECLINED
-      PRISMA_ENDPOINT: $PRISMA_ENDPOINT
-      PRISMA_SECRET: $PRISMA_SECRET
-      SESSION_SECRET: $SESSION_SECRET
-      SESSION_COOKIE_HOST: $SESSION_COOKIE_HOST
-      SESSION_COOKIE_SECURE: $SESSION_COOKIE_SECURE
 
   td-ui:
-    image: td-ui
-    build:
-      context: ./front
-      dockerfile: Dockerfile
-      args:
-        build_env: recette
-    restart: always
-    environment:
-      VIRTUAL_HOST: $UI_HOST
-      LETSENCRYPT_HOST: $UI_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      REACT_APP_SENTRY_DSN: $SENTRY_DSN
+    image: betagouv/trackdechets-ui:dev
 
   td-insee:
-    image: td-insee
-    build:
-      context: ./insee
-      dockerfile: Dockerfile
-    restart: always
-    environment:
-      INSEE_SECRET: $INSEE_SECRET
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    image: betagouv/trackdechets-insee:dev
 
   td-pdf:
-    image: td-pdf
-    build:
-      context: ./pdf
-      dockerfile: Dockerfile
-    restart: always
-    environment:
-      SENTRY_DSN: $SENTRY_DSN
+    image: betagouv/trackdechets-pdf:dev
 
   td-mail:
-    image: td-mail
-    build:
-      context: ./mail
-      dockerfile: Dockerfile
-    restart: always
-    environment:
-      MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
-      MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
+    image: betagouv/trackdechets-mail:dev
 
   td-doc:
-    image: td-doc
-    build:
-      context: ./documentation
-      dockerfile: Dockerfile
-    environment:
-      VIRTUAL_HOST: $DOC_HOST
-      LETSENCRYPT_HOST: $DOC_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+    image: betagouv/trackdechets-doc:dev
 
   td-etl:
-    image: td-etl
-    build:
-      context: ./etl
-      dockerfile: Dockerfile
-    ports:
-      - 127.0.0.1:8080:8080
-    environment:
-      POSTGRES_USER: $AIRFLOW_POSTGRES_USER
-      POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
-      POSTGRES_HOST: $POSTGRES_HOST
-      POSTGRES_PORT: $POSTGRES_PORT
-      AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY
-      AIRFLOW__CORE__LOGGING_LEVEL: ERROR
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/airflow
-      AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$ETL_DB
-      AIRFLOW_CONN_POSTGRES_PRISMA: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/prisma
+    image: betagouv/trackdechets-etl:dev
 
-  metabase:
-    image: metabase/metabase:v0.34.2
-    volumes:
-      - metabase:/metabase-data
-    environment:
-      - MB_DB_FILE=/metabase-data/metabase.db
-      - VIRTUAL_HOST=$METABASE_HOST
-      - VIRTUAL_PORT=3000
-      - LETSENCRYPT_HOST=$METABASE_HOST
-      - LETSENCRYPT_EMAIL=$EMAIL_LETS_ENCRYPT
-
-volumes:
-  postgres:
-  metabase:
-
-networks:
-  default:
-    external:
-      name: nginx-proxy

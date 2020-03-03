@@ -37,7 +37,7 @@ export const userFactory = async (opt = {}) => {
  */
 function siretify(index) {
   const siretLength = 14;
-  let siret = `${index}`;
+  const siret = `${index}`;
   if (siret.length === siretLength) {
     return siret;
   }
@@ -45,7 +45,7 @@ function siretify(index) {
     throw Error("Generated siret is too long");
   }
   // polyfill for str.padStart
-  let padding = "0".repeat(siretLength - siret.length);
+  const padding = "0".repeat(siretLength - siret.length);
   return padding + siret;
 }
 
@@ -94,8 +94,15 @@ export const userWithCompanyFactory = async role => {
  */
 export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
+
+  const accessTokenIndex =
+    (await prisma
+      .accessTokensConnection()
+      .aggregate()
+      .count()) + 1;
+
   const accessToken = await prisma.createAccessToken({
-    token: "token",
+    token: `token_${accessTokenIndex}`,
     user: { connect: { id: user.id } }
   });
   return { user, accessToken };
@@ -178,4 +185,40 @@ export const formFactory = async ({ ownerId, opt = {} }) => {
     ...formParams,
     owner: { connect: { id: ownerId } }
   });
+};
+
+export const statusLogFactory = async ({
+  status,
+  userId,
+  formId,
+  updatedFields = {},
+  opt = {}
+}) => {
+  return prisma.createStatusLog({
+    form: { connect: { id: formId } },
+    user: { connect: { id: userId } },
+    loggedAt: new Date(),
+    status,
+    updatedFields,
+    ...opt
+  });
+};
+
+export const applicationFactory = async () => {
+  const admin = await userFactory();
+
+  const applicationIndex =
+    (await prisma
+      .applicationsConnection()
+      .aggregate()
+      .count()) + 1;
+
+  const application = await prisma.createApplication({
+    admins: { connect: { id: admin.id } },
+    clientSecret: `Secret_${applicationIndex}`,
+    name: `Application_${applicationIndex}`,
+    redirectUris: { set: ["https://acme.inc/authorize"] }
+  });
+
+  return application;
 };

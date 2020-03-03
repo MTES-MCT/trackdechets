@@ -100,6 +100,17 @@ describe("Integration / Mark as processed mutation", () => {
 
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toBe("PROCESSED");
+
+    // check relevant statusLog is created
+    const statusLogs = await prisma.statusLogs({
+      where: {
+        form: { id: resultingForm.id },
+        user: { id: user.id },
+        status: "PROCESSED"
+      }
+    });
+    expect(statusLogs.length).toEqual(1);
+    expect(statusLogs[0].loggedAt).toBeTruthy();
   });
 
   it("should mark a form as AWAITING_GROUP when operation implies so", async () => {

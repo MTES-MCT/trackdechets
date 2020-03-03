@@ -1,13 +1,14 @@
 import { GraphQLContext } from "../../types";
 import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
-import { DomainError, ErrorCode } from "../../common/errors";
 import { getReadableId } from "../readable-id";
 import {
   Form,
   FormUpdateInput,
-  FormCreateInput
+  FormCreateInput,
+  Status
 } from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/queries";
+import { ForbiddenError } from "apollo-server-express";
 
 export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const userId = context.user.id;
@@ -32,10 +33,17 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const newForm = await context.prisma.createForm({
     ...(form as FormCreateInput),
     appendix2Forms: { connect: formContent.appendix2Forms },
-    readableId: await getReadableId(context),
+    readableId: await getReadableId(),
     owner: { connect: { id: userId } }
   });
-
+  // create statuslog when and only when form is created
+  await context.prisma.createStatusLog({
+    form: { connect: { id: newForm.id } },
+    user: { connect: { id: context.user.id } },
+    status: newForm.status as Status,
+    updatedFields: {},
+    loggedAt: new Date()
+  });
   return unflattenObjectFromDb(newForm);
 }
 
@@ -65,9 +73,8 @@ async function checkThatUserIsPartOftheForm(
   const userSirets = userCompanies.map(c => c.siret);
 
   if (!formSirets.some(siret => userSirets.includes(siret))) {
-    throw new DomainError(
-      "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas.",
-      ErrorCode.BAD_USER_INPUT
+    throw new ForbiddenError(
+      "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas."
     );
   }
 }
