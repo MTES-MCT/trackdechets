@@ -5,9 +5,15 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [Next] 
+# [2020.03.1] 03/03/2020
 
+* Corrections du moteur pdf [PR # 194](https://github.com/MTES-MCT/trackdechets/pull/194)
+  * affichage et formatage des champs `sentBy` et `processedAt`
+* Améliorations de la documentaion de l'api dans le playground [PR 187](https://github.com/MTES-MCT/trackdechets/pull/187)
 * Renommage des colonnes du tableau de bord et des onglets du formulaire de création de bordereau pour d'avantage de clarté [PR #195] (https://github.com/MTES-MCT/trackdechets/pull/195)
+* Refonte des colonnes d'actions du dashboard et de leurs icones [PR 198](https://github.com/MTES-MCT/trackdechets/pull/198)
+* Corrections des permissions de la mutation markAsSealed [PR 192](https://github.com/MTES-MCT/trackdechets/pull/192)
+* Corrections et amélioration de la gestion des erreurs et de leur affichage [PR 197](https://github.com/MTES-MCT/trackdechets/pull/197)
  
 # [2020.02.1] 18/02/2020
 
