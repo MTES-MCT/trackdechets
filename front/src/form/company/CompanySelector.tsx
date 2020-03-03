@@ -135,7 +135,7 @@ export default function CompanySelector(props) {
   if (error) return <p>Erreur :(</p>;
 
   return (
-    <div className="CompanySelector">
+    <div className="CompanySelector form__group">
       <div className="search__group">
         <input
           type="text"

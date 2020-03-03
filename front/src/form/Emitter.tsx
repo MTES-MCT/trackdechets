@@ -3,15 +3,12 @@ import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import { RadioButton } from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
+import WorkSite from "./work-site/WorkSite";
 
 type Values = {
-  emitter: { pickupSite: string };
   customId: string;
 };
 export default connect<{}, Values>(function Emitter({ formik }) {
-  const [pickupSite, setPickupSite] = useState(
-    !!formik.values.emitter.pickupSite
-  );
   const [displayCustomId, setDisplayCustomId] = useState(
     !!formik.values.customId
   );
@@ -74,25 +71,7 @@ export default connect<{}, Values>(function Emitter({ formik }) {
       <h4>Entreprise émettrice</h4>
       <CompanySelector name="emitter.company" />
 
-      <label>
-        <input
-          type="checkbox"
-          defaultChecked={pickupSite}
-          onChange={() => setPickupSite(!pickupSite)}
-        />
-        Je souhaite ajouter une adresse de chantier ou de collecte
-      </label>
-      {pickupSite && (
-        <>
-          <h4>Adresse chantier</h4>
-          <Field
-            component="textarea"
-            className="textarea-pickup-site"
-            placeholder="Nom / Adresse / Précisions..."
-            name="emitter.pickupSite"
-          />
-        </>
-      )}
+      <WorkSite />
     </>
   );
 });

@@ -4,6 +4,13 @@ export type Form = {
   status: string;
   emitter: {
     company: FormCompany;
+    workSite: {
+      name: string;
+      address: string;
+      city: string;
+      postalCode: string;
+      infos: string;
+    };
   };
   recipient: {
     company: FormCompany;

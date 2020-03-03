@@ -5,6 +5,10 @@ const apiShape = {
     company: {
       name: "test"
     },
+    pickupSite: "A site",
+    workSite: {
+      name: "A name"
+    },
     otherField: "other"
   },
   boolean: true,
@@ -17,6 +21,8 @@ const apiShape = {
 
 const dbShape = {
   emitterCompanyName: "test",
+  emitterPickupSite: "A site",
+  emitterWorkSiteName: "A name",
   emitterOtherField: "other",
   boolean: true,
   number: 2,

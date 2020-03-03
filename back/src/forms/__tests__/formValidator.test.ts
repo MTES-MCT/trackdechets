@@ -4,7 +4,13 @@ const form = {
   id: "cjplbvecc000d0766j32r19am",
   emitter: {
     type: "PRODUCER",
-    pickupSite: "Nom:\nAdresse:\nMail:",
+    workSite: {
+      name: "",
+      address: "",
+      city: "",
+      postalCode: "",
+      infos: ""
+    },
     company: {
       name: "A company 2",
       siret: "XXX XXX XXX 0002",
@@ -60,7 +66,7 @@ describe("Form is valid", () => {
   test("with empty strings for optional fields", async () => {
     const testForm = {
       ...form,
-      emitter: { ...form.emitter, pickupSite: "" },
+      emitter: { ...form.emitter, workSite: {} },
       recipient: { ...form.recipient, cap: "" },
       transporter: { ...form.transporter, numberPlate: "" }
     };
@@ -71,7 +77,7 @@ describe("Form is valid", () => {
   test("with null values for optional fields", async () => {
     const testForm = {
       ...form,
-      emitter: { ...form.emitter, pickupSite: null },
+      emitter: { ...form.emitter, workSite: null },
       recipient: { ...form.recipient, cap: null },
       transporter: {
         ...form.transporter,
