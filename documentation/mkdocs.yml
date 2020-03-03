@@ -5,6 +5,8 @@ site_url: https://trackdechets.beta.gouv.fr/
 
 repo_url: https://github.com/MTES-MCT/trackdechets
 theme: readthedocs
+markdown_extensions:
+  - admonition
 nav:
   - "Introduction": "index.md"
   - "Informations sur l'interopérabilité": "infos.md"
@@ -17,3 +19,4 @@ nav:
   - "Playground": "playground.md"
   - "Référence de l'API": "api-reference/api-reference.md"
   - "Changelog": "changelog.md"
+
