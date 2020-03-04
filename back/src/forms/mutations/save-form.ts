@@ -38,7 +38,9 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const newForm = await context.prisma.createForm({
     ...(form as FormCreateInput),
     appendix2Forms: { connect: formContent.appendix2Forms },
-    ecoOrganisme: { connect: formContent.ecoOrganisme },
+    ...(formContent.ecoOrganisme?.id && {
+      ecoOrganisme: { connect: formContent.ecoOrganisme }
+    }),
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }
   });
