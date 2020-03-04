@@ -54,7 +54,7 @@ export default function WorkSiteAddress({
     return () => {
       clearTimeout(handler);
     };
-  }, [state.searchInput]);
+  }, [state.searchInput, state.selectedAdress]);
 
   function selectAddress(feature) {
     onAddressSelection(feature.properties);
