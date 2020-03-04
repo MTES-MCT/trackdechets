@@ -1,8 +1,5 @@
 version: "3"
 services:
-  postgres:
-    image: betagouv/trackdechets-postgres:sandbox
-
   td-api:
     image: betagouv/trackdechets-api:sandbox
 
