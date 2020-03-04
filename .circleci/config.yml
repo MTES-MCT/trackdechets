@@ -80,7 +80,7 @@ jobs:
           command: |
             ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
                 docker-compose pull
-                docker-compose up -d
+                docker-compose up -d && docker-compose stop td-etl
                 docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
 
   integration-tests:
