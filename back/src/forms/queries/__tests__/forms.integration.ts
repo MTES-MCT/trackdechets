@@ -96,6 +96,37 @@ describe("Integration / Forms query", () => {
     ).toBe(1);
   });
 
+  it("should return forms for which user is eco organisme", async () => {
+    const eo = await prisma.createEcoOrganisme({
+      address: "address",
+      name: "an EO",
+      siret: "eo siret"
+    });
+
+    // Create form associated to the EO
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        ecoOrganisme: { id: eo.id }
+      }
+    });
+
+    const { data } = await query(
+      `
+        query {
+          forms {
+            id
+          }
+        }
+      `
+    );
+
+    const eoForms = data.forms.filter(
+      f => f.ecoOrganisme.siret === company.siret
+    );
+    expect(eoForms.length).toBe(1);
+  });
+
   it("should filter by siret", async () => {
     const otherCompany = await companyFactory();
     await prisma.createCompanyAssociation({

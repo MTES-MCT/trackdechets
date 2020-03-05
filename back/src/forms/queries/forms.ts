@@ -25,7 +25,8 @@ export default async function forms(
     ACTOR: {
       OR: [
         { recipientCompanySiret: selectedCompany.siret },
-        { emitterCompanySiret: selectedCompany.siret }
+        { emitterCompanySiret: selectedCompany.siret },
+        { ecoOrganisme: { siret: selectedCompany.siret } }
       ]
     },
     TRANSPORTER: {
