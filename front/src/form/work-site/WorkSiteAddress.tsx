@@ -70,7 +70,7 @@ export default function WorkSiteAddress({
       <div className="search__group">
         <input
           type="text"
-          placeholder="Rechercher une adresse"
+          placeholder="Recherchez une adresse puis sélectionnez un des choix qui apparait..."
           value={state.searchInput}
           onChange={e =>
             dispatch({ type: "search_input", payload: e.target.value })
