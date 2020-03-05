@@ -14,6 +14,8 @@ services:
 
   td-pdf:
     image: betagouv/trackdechets-pdf:sandbox
+    environment:
+      PDF_WATERMARK: display
 
   td-mail:
     image: betagouv/trackdechets-mail:sandbox
