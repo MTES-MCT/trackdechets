@@ -103,6 +103,34 @@ describe("Form is valid", () => {
     const isValid = await formSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
+
+  test("when there is an eco-organisme and emitter type is OTHER", async () => {
+    const testForm = {
+      ...form,
+      emitter: {
+        ...form.emitter,
+        type: "OTHER"
+      },
+      ecoOrganisme: { id: "an_id" }
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test("when there is no eco-organisme and emitter type is OTHER", async () => {
+    const testForm = {
+      ...form,
+      emitter: {
+        ...form.emitter,
+        type: "OTHER"
+      },
+      ecoOrganisme: {}
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
 });
 
 describe("Form is not valid", () => {
@@ -114,6 +142,20 @@ describe("Form is not valid", () => {
         isExemptedOfReceipt: false,
         receipt: null
       }
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(false);
+  });
+
+  test("when there is an eco-organisme but emitter type is not OTHER", async () => {
+    const testForm = {
+      ...form,
+      emitter: {
+        ...form.emitter,
+        type: "PRODUCER"
+      },
+      ecoOrganisme: { id: "an_id" }
     };
 
     const isValid = await formSchema.isValid(testForm);

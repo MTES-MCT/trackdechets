@@ -99,5 +99,16 @@ export const formSchema = object<any>().shape({
       /(SOLID|LIQUID|GASEOUS)/,
       "La consistance du déchet doit être précisée"
     )
+  }),
+  ecoOrganisme: object().when("emitter", {
+    is: e => e.type === "OTHER",
+    then: object({ id: string().nullable() }).nullable(),
+    otherwise: object()
+      .test(
+        "is-not-set",
+        "${path} ne peut avoir une valeur que si l'émetteur est de type `Autre détenteur`",
+        value => value?.id == null
+      )
+      .nullable()
   })
 });
