@@ -2,6 +2,7 @@ import * as express from "express";
 import * as passport from "passport";
 import * as querystring from "querystring";
 import { getUIBaseURL } from "../utils";
+import { sess } from "../server";
 
 const { UI_HOST } = process.env;
 
@@ -37,7 +38,7 @@ authRouter.get("/isAuthenticated", (req, res) => {
 authRouter.post("/logout", (req, res) => {
   req.logout();
   res
-    .clearCookie("connect.sid", { domain: UI_HOST, path: "/" })
+    .clearCookie(sess.name, { domain: UI_HOST, path: "/" })
     .redirect(`${UI_BASE_URL}`);
 });
 
