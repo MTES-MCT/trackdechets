@@ -9,13 +9,12 @@ markdown_extensions:
   - admonition
 nav:
   - "Introduction": "index.md"
-  - "Informations sur l'interopérabilité": "infos.md"
-  - "Mise en route": "getting-started.md"
-  - "Cycle de vie d'un BSD": "workflow.md"
-  - "Cas d'usages": "use-cases.md"
+  - "Faire des appels à l'API GraphQL": "graphql.md"
+  - "Cycle de vie des BSD's": "workflow.md"
   - "Gestion des erreurs": "errors.md"
-  - "Lexique": "glossary.md"
   - "OAuth2": "oauth2.md"
+  - "Les environnements de tests": "environments.md"
+  - "Obtenir un jeton d'accès personnel": "access-token.md"
   - "Playground": "playground.md"
   - "Référence de l'API": "api-reference/api-reference.md"
   - "Changelog": "changelog.md"
