@@ -1,7 +1,16 @@
 version: "3"
 services:
+
   postgres:
     image: betagouv/trackdechets-postgres:dev
+    restart: always
+    environment:
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      AIRFLOW_POSTGRES_USER: $AIRFLOW_POSTGRES_USER
+      AIRFLOW_POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
+    volumes:
+      - postgres:/var/lib/postgresql/data
 
   td-api:
     image: betagouv/trackdechets-api:dev
