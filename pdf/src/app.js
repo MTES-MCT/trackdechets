@@ -2,7 +2,7 @@ const express = require("express");
 const { json } = require("body-parser");
 const Sentry = require("@sentry/node");
 
-const write = require("./generator");
+const buildPdf = require("./generator");
 
 const sentryDsn = process.env.SENTRY_DSN;
 
@@ -27,14 +27,11 @@ app.post("/pdf", async (req, res) => {
     1}-${date.getFullYear()}`;
 
   try {
-    const buffer = await write(req.body);
+    const buffer = await buildPdf(req.body);
     res.status(200);
     res.type("pdf");
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment;filename=${fileName}.pdf`
-    );
+    res.setHeader("Content-Disposition", `attachment;filename=${fileName}.pdf`);
 
     res.send(buffer);
   } catch (err) {
