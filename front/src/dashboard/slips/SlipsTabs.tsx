@@ -3,6 +3,7 @@ import React from "react";
 import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { InlineError } from "../../common/Error";
 import Loader from "../../common/Loader";
 import { Me } from "../../login/model";
 import { GET_SLIPS } from "./query";
@@ -18,7 +19,8 @@ export default function SlipsTabs({ me, siret }: Props) {
   });
 
   if (loading) return <Loader />;
-  if (error || !data) return <p>Erreur...</p>;
+  if (error) return <InlineError apolloError={error} />;
+  if (!data) return <p>Aucune donnée à afficher</p>;
 
   const drafts = getTabForms(SlipTabs.DRAFTS, data.forms, siret);
   const toSign = getTabForms(SlipTabs.TO_SIGN, data.forms, siret);

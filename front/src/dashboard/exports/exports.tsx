@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Me } from "../../login/model";
-import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
-import Loader from "../../common/Loader";
+import gql from "graphql-tag";
+import React, { useState } from "react";
 import DownloadFileLink from "../../common/DownloadFileLink";
+import { InlineError } from "../../common/Error";
+import Loader from "../../common/Loader";
+import { Me } from "../../login/model";
 
 interface IProps {
   me: Me;
@@ -40,7 +41,8 @@ export default function Exports({ me }: IProps) {
     <div className="main">
       <h2>Statistiques</h2>
       {loading && <Loader />}
-      {(error || !data) && <p>"Erreur..."</p>}
+      {error && <InlineError apolloError={error} />}
+      {!data && <p>Aucune donnée à afficher.</p>}
       {data && (
         <table className="table">
           <thead>

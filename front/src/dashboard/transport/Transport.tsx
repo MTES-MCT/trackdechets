@@ -1,8 +1,9 @@
-import React from "react";
-import { Me } from "../../login/model";
-import "./Transport.scss";
 import { Query } from "@apollo/react-components";
 import gql from "graphql-tag";
+import React from "react";
+import { InlineError } from "../../common/Error";
+import { Me } from "../../login/model";
+import "./Transport.scss";
 import TransportSignature from "./TransportSignature";
 
 type Props = {
@@ -62,7 +63,8 @@ export default function Transport({ me, siret }: Props) {
         >
           {({ loading, error, data }) => {
             if (loading) return <p>Chargement...</p>;
-            if (error || !data) return <p>"Erreur..."</p>;
+            if (error) return <InlineError apolloError={error} />;
+            if (!data) return <p>Aucune donnée à afficher</p>;
 
             return (
               <table className="table">

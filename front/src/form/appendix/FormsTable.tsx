@@ -1,9 +1,10 @@
-import React from "react";
 import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import { useFormikContext } from "formik";
-import { Form } from "../model";
+import gql from "graphql-tag";
 import { DateTime } from "luxon";
+import React from "react";
+import { InlineError } from "../../common/Error";
+import { Form } from "../model";
 
 const GET_APPENDIX_FORMS = gql`
   query AppendixForms($emitterSiret: String!, $wasteCode: String) {
@@ -36,7 +37,8 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
   });
 
   if (loading) return <p>Chargement...</p>;
-  if (error || !data) return <p>{`Erreur! ${error && error.message}`}</p>;
+  if (error) return <InlineError apolloError={error} />;
+  if (!data) return <p>Aucune donnée à afficher</p>;
 
   const forms = data.appendixForms;
 

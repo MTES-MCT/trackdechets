@@ -5,6 +5,8 @@ import { DateTime } from "luxon";
 import React, { useState } from "react";
 import { FaFileSignature } from "react-icons/fa";
 import DownloadFileLink from "../../common/DownloadFileLink";
+import { NotificationError } from "../../common/Error";
+import { updateApolloCache } from "../../common/helper";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import { Form, Form as FormModel } from "../../form/model";
 import Packagings from "../../form/packagings/Packagings";
@@ -13,7 +15,6 @@ import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS } from "./Transport";
 import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
-import { updateApolloCache } from "../../common/helper";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -241,9 +242,7 @@ export default function TransportSignature({ form }: Props) {
                         <Field type="text" name="sentBy" />
                       </label>
                     </p>
-                    {error && (
-                      <div className="notification error">{error.message}</div>
-                    )}
+                    {error && <NotificationError apolloError={error} />}
                   </div>
                 </>
               )}

@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import React, { useEffect, useRef, useState } from "react";
 import { FaHourglassHalf } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
+import { NotificationError } from "../common/Error";
 import Loader from "../common/Loader";
 import RedErrorMessage from "../common/RedErrorMessage";
 import { GET_ME } from "../dashboard/Dashboard";
@@ -110,9 +111,7 @@ export default function AccountCompanyAdd() {
 
   return (
     <div className="panel">
-      {savingError && (
-        <div className="notification error">{savingError.message}</div>
-      )}
+      {savingError && <NotificationError apolloError={savingError} />}
 
       <Formik
         initialValues={{
@@ -174,7 +173,7 @@ export default function AccountCompanyAdd() {
               </div>
             </div>
 
-            {error && <div className="notification error">{error.message}</div>}
+            {error && <NotificationError apolloError={error} />}
             {data && (
               <>
                 <AccountFieldNotEditable
