@@ -1,7 +1,9 @@
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import React, { useState } from "react";
-import { Route, Redirect } from "react-router";
+import { Redirect, Route } from "react-router";
+import { useRouteMatch } from "react-router-dom";
+import { InlineError } from "../common/Error";
 import Loader from "../common/Loader";
 import { Me } from "../login/model";
 import { currentSiretService } from "./CompanySelector";
@@ -10,7 +12,6 @@ import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/exports";
 import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
-import { useRouteMatch } from "react-router-dom";
 
 export const GET_ME = gql`
   {
@@ -52,7 +53,8 @@ export default function Dashboard() {
   const match = useRouteMatch();
 
   if (loading) return <Loader />;
-  if (error || !data) return <p>{`Erreur ! ${error?.message}`}</p>;
+  if (error) return <InlineError apolloError={error} />;
+  if (!data) return <p>Aucune donnée à afficher</p>;
 
   // As long as you don't belong to a company, you can't access the dashnoard
   if (data.me.companies.length === 0) {

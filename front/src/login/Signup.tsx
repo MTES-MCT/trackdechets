@@ -3,6 +3,7 @@ import { Field } from "formik";
 import React, { useState } from "react";
 import { FaEnvelope, FaEye, FaIdCard, FaLock, FaPhone } from "react-icons/fa";
 import { Link, useHistory } from "react-router-dom";
+import { NotificationError } from "../common/Error";
 import PasswordMeter from "../common/PasswordMeter";
 import RedErrorMessage from "../common/RedErrorMessage";
 import { SIGNUP } from "./mutations";
@@ -28,7 +29,7 @@ export default function Signup() {
             passwordConfirmation: "",
             cgu: false
           }}
-          onSubmit={(values: any, { setStatus, setSubmitting }) => {
+          onSubmit={(values: any, { setSubmitting }) => {
             const {
               passwordConfirmation,
               emailConfirmation,
@@ -38,13 +39,7 @@ export default function Signup() {
 
             signup({ variables: { userInfos } })
               .then(_ => history.push("/signup/activation"))
-              .catch(errors => {
-                // graphQLErrors are returned as an array of objects, we map and join  them to a string
-
-                let errorMessages = (errors.graphQLErrors || [])
-                  .map(({ message }: { message: string }) => message)
-                  .join("\n");
-                setStatus(errorMessages);
+              .catch(_ => {
                 setSubmitting(false);
               });
           }}
@@ -224,9 +219,7 @@ export default function Signup() {
 
             <RedErrorMessage name="cgu" />
 
-            {signupError && (
-              <div className="notification error">{signupError.message}</div>
-            )}
+            {signupError && <NotificationError apolloError={signupError} />}
           </Wizard.Page>
         </Wizard>
       </div>

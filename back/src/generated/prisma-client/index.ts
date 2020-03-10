@@ -704,6 +704,16 @@ export type FormOrderByInput =
   | "emitterType_DESC"
   | "emitterPickupSite_ASC"
   | "emitterPickupSite_DESC"
+  | "emitterWorkSiteName_ASC"
+  | "emitterWorkSiteName_DESC"
+  | "emitterWorkSiteAddress_ASC"
+  | "emitterWorkSiteAddress_DESC"
+  | "emitterWorkSiteCity_ASC"
+  | "emitterWorkSiteCity_DESC"
+  | "emitterWorkSitePostalCode_ASC"
+  | "emitterWorkSitePostalCode_DESC"
+  | "emitterWorkSiteInfos_ASC"
+  | "emitterWorkSiteInfos_DESC"
   | "emitterCompanyName_ASC"
   | "emitterCompanyName_DESC"
   | "emitterCompanySiret_ASC"
@@ -1051,6 +1061,11 @@ export interface FormUpdateDataInput {
   nextDestinationCompanyMail?: Maybe<String>;
   emitterType?: Maybe<EmitterType>;
   emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
   emitterCompanyName?: Maybe<String>;
   emitterCompanySiret?: Maybe<String>;
   emitterCompanyAddress?: Maybe<String>;
@@ -1231,6 +1246,11 @@ export interface FormUpdateInput {
   nextDestinationCompanyMail?: Maybe<String>;
   emitterType?: Maybe<EmitterType>;
   emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
   emitterCompanyName?: Maybe<String>;
   emitterCompanySiret?: Maybe<String>;
   emitterCompanyAddress?: Maybe<String>;
@@ -1419,6 +1439,11 @@ export interface FormCreateInput {
   nextDestinationCompanyMail?: Maybe<String>;
   emitterType?: Maybe<EmitterType>;
   emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
   emitterCompanyName?: Maybe<String>;
   emitterCompanySiret?: Maybe<String>;
   emitterCompanyAddress?: Maybe<String>;
@@ -2093,6 +2118,76 @@ export interface FormWhereInput {
   emitterPickupSite_not_starts_with?: Maybe<String>;
   emitterPickupSite_ends_with?: Maybe<String>;
   emitterPickupSite_not_ends_with?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteName_not?: Maybe<String>;
+  emitterWorkSiteName_in?: Maybe<String[] | String>;
+  emitterWorkSiteName_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteName_lt?: Maybe<String>;
+  emitterWorkSiteName_lte?: Maybe<String>;
+  emitterWorkSiteName_gt?: Maybe<String>;
+  emitterWorkSiteName_gte?: Maybe<String>;
+  emitterWorkSiteName_contains?: Maybe<String>;
+  emitterWorkSiteName_not_contains?: Maybe<String>;
+  emitterWorkSiteName_starts_with?: Maybe<String>;
+  emitterWorkSiteName_not_starts_with?: Maybe<String>;
+  emitterWorkSiteName_ends_with?: Maybe<String>;
+  emitterWorkSiteName_not_ends_with?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteAddress_not?: Maybe<String>;
+  emitterWorkSiteAddress_in?: Maybe<String[] | String>;
+  emitterWorkSiteAddress_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteAddress_lt?: Maybe<String>;
+  emitterWorkSiteAddress_lte?: Maybe<String>;
+  emitterWorkSiteAddress_gt?: Maybe<String>;
+  emitterWorkSiteAddress_gte?: Maybe<String>;
+  emitterWorkSiteAddress_contains?: Maybe<String>;
+  emitterWorkSiteAddress_not_contains?: Maybe<String>;
+  emitterWorkSiteAddress_starts_with?: Maybe<String>;
+  emitterWorkSiteAddress_not_starts_with?: Maybe<String>;
+  emitterWorkSiteAddress_ends_with?: Maybe<String>;
+  emitterWorkSiteAddress_not_ends_with?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSiteCity_not?: Maybe<String>;
+  emitterWorkSiteCity_in?: Maybe<String[] | String>;
+  emitterWorkSiteCity_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteCity_lt?: Maybe<String>;
+  emitterWorkSiteCity_lte?: Maybe<String>;
+  emitterWorkSiteCity_gt?: Maybe<String>;
+  emitterWorkSiteCity_gte?: Maybe<String>;
+  emitterWorkSiteCity_contains?: Maybe<String>;
+  emitterWorkSiteCity_not_contains?: Maybe<String>;
+  emitterWorkSiteCity_starts_with?: Maybe<String>;
+  emitterWorkSiteCity_not_starts_with?: Maybe<String>;
+  emitterWorkSiteCity_ends_with?: Maybe<String>;
+  emitterWorkSiteCity_not_ends_with?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSitePostalCode_not?: Maybe<String>;
+  emitterWorkSitePostalCode_in?: Maybe<String[] | String>;
+  emitterWorkSitePostalCode_not_in?: Maybe<String[] | String>;
+  emitterWorkSitePostalCode_lt?: Maybe<String>;
+  emitterWorkSitePostalCode_lte?: Maybe<String>;
+  emitterWorkSitePostalCode_gt?: Maybe<String>;
+  emitterWorkSitePostalCode_gte?: Maybe<String>;
+  emitterWorkSitePostalCode_contains?: Maybe<String>;
+  emitterWorkSitePostalCode_not_contains?: Maybe<String>;
+  emitterWorkSitePostalCode_starts_with?: Maybe<String>;
+  emitterWorkSitePostalCode_not_starts_with?: Maybe<String>;
+  emitterWorkSitePostalCode_ends_with?: Maybe<String>;
+  emitterWorkSitePostalCode_not_ends_with?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterWorkSiteInfos_not?: Maybe<String>;
+  emitterWorkSiteInfos_in?: Maybe<String[] | String>;
+  emitterWorkSiteInfos_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteInfos_lt?: Maybe<String>;
+  emitterWorkSiteInfos_lte?: Maybe<String>;
+  emitterWorkSiteInfos_gt?: Maybe<String>;
+  emitterWorkSiteInfos_gte?: Maybe<String>;
+  emitterWorkSiteInfos_contains?: Maybe<String>;
+  emitterWorkSiteInfos_not_contains?: Maybe<String>;
+  emitterWorkSiteInfos_starts_with?: Maybe<String>;
+  emitterWorkSiteInfos_not_starts_with?: Maybe<String>;
+  emitterWorkSiteInfos_ends_with?: Maybe<String>;
+  emitterWorkSiteInfos_not_ends_with?: Maybe<String>;
   emitterCompanyName?: Maybe<String>;
   emitterCompanyName_not?: Maybe<String>;
   emitterCompanyName_in?: Maybe<String[] | String>;
@@ -3116,6 +3211,11 @@ export interface FormUpdateManyMutationInput {
   nextDestinationCompanyMail?: Maybe<String>;
   emitterType?: Maybe<EmitterType>;
   emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
   emitterCompanyName?: Maybe<String>;
   emitterCompanySiret?: Maybe<String>;
   emitterCompanyAddress?: Maybe<String>;
@@ -3195,6 +3295,11 @@ export interface FormUpdateManyDataInput {
   nextDestinationCompanyMail?: Maybe<String>;
   emitterType?: Maybe<EmitterType>;
   emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
   emitterCompanyName?: Maybe<String>;
   emitterCompanySiret?: Maybe<String>;
   emitterCompanyAddress?: Maybe<String>;
@@ -3571,6 +3676,76 @@ export interface FormScalarWhereInput {
   emitterPickupSite_not_starts_with?: Maybe<String>;
   emitterPickupSite_ends_with?: Maybe<String>;
   emitterPickupSite_not_ends_with?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteName_not?: Maybe<String>;
+  emitterWorkSiteName_in?: Maybe<String[] | String>;
+  emitterWorkSiteName_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteName_lt?: Maybe<String>;
+  emitterWorkSiteName_lte?: Maybe<String>;
+  emitterWorkSiteName_gt?: Maybe<String>;
+  emitterWorkSiteName_gte?: Maybe<String>;
+  emitterWorkSiteName_contains?: Maybe<String>;
+  emitterWorkSiteName_not_contains?: Maybe<String>;
+  emitterWorkSiteName_starts_with?: Maybe<String>;
+  emitterWorkSiteName_not_starts_with?: Maybe<String>;
+  emitterWorkSiteName_ends_with?: Maybe<String>;
+  emitterWorkSiteName_not_ends_with?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteAddress_not?: Maybe<String>;
+  emitterWorkSiteAddress_in?: Maybe<String[] | String>;
+  emitterWorkSiteAddress_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteAddress_lt?: Maybe<String>;
+  emitterWorkSiteAddress_lte?: Maybe<String>;
+  emitterWorkSiteAddress_gt?: Maybe<String>;
+  emitterWorkSiteAddress_gte?: Maybe<String>;
+  emitterWorkSiteAddress_contains?: Maybe<String>;
+  emitterWorkSiteAddress_not_contains?: Maybe<String>;
+  emitterWorkSiteAddress_starts_with?: Maybe<String>;
+  emitterWorkSiteAddress_not_starts_with?: Maybe<String>;
+  emitterWorkSiteAddress_ends_with?: Maybe<String>;
+  emitterWorkSiteAddress_not_ends_with?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSiteCity_not?: Maybe<String>;
+  emitterWorkSiteCity_in?: Maybe<String[] | String>;
+  emitterWorkSiteCity_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteCity_lt?: Maybe<String>;
+  emitterWorkSiteCity_lte?: Maybe<String>;
+  emitterWorkSiteCity_gt?: Maybe<String>;
+  emitterWorkSiteCity_gte?: Maybe<String>;
+  emitterWorkSiteCity_contains?: Maybe<String>;
+  emitterWorkSiteCity_not_contains?: Maybe<String>;
+  emitterWorkSiteCity_starts_with?: Maybe<String>;
+  emitterWorkSiteCity_not_starts_with?: Maybe<String>;
+  emitterWorkSiteCity_ends_with?: Maybe<String>;
+  emitterWorkSiteCity_not_ends_with?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSitePostalCode_not?: Maybe<String>;
+  emitterWorkSitePostalCode_in?: Maybe<String[] | String>;
+  emitterWorkSitePostalCode_not_in?: Maybe<String[] | String>;
+  emitterWorkSitePostalCode_lt?: Maybe<String>;
+  emitterWorkSitePostalCode_lte?: Maybe<String>;
+  emitterWorkSitePostalCode_gt?: Maybe<String>;
+  emitterWorkSitePostalCode_gte?: Maybe<String>;
+  emitterWorkSitePostalCode_contains?: Maybe<String>;
+  emitterWorkSitePostalCode_not_contains?: Maybe<String>;
+  emitterWorkSitePostalCode_starts_with?: Maybe<String>;
+  emitterWorkSitePostalCode_not_starts_with?: Maybe<String>;
+  emitterWorkSitePostalCode_ends_with?: Maybe<String>;
+  emitterWorkSitePostalCode_not_ends_with?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterWorkSiteInfos_not?: Maybe<String>;
+  emitterWorkSiteInfos_in?: Maybe<String[] | String>;
+  emitterWorkSiteInfos_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteInfos_lt?: Maybe<String>;
+  emitterWorkSiteInfos_lte?: Maybe<String>;
+  emitterWorkSiteInfos_gt?: Maybe<String>;
+  emitterWorkSiteInfos_gte?: Maybe<String>;
+  emitterWorkSiteInfos_contains?: Maybe<String>;
+  emitterWorkSiteInfos_not_contains?: Maybe<String>;
+  emitterWorkSiteInfos_starts_with?: Maybe<String>;
+  emitterWorkSiteInfos_not_starts_with?: Maybe<String>;
+  emitterWorkSiteInfos_ends_with?: Maybe<String>;
+  emitterWorkSiteInfos_not_ends_with?: Maybe<String>;
   emitterCompanyName?: Maybe<String>;
   emitterCompanyName_not?: Maybe<String>;
   emitterCompanyName_in?: Maybe<String[] | String>;
@@ -5680,6 +5855,11 @@ export interface Form {
   nextDestinationCompanyMail?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
+  emitterWorkSiteName?: String;
+  emitterWorkSiteAddress?: String;
+  emitterWorkSiteCity?: String;
+  emitterWorkSitePostalCode?: String;
+  emitterWorkSiteInfos?: String;
   emitterCompanyName?: String;
   emitterCompanySiret?: String;
   emitterCompanyAddress?: String;
@@ -5757,6 +5937,11 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   nextDestinationCompanyMail: () => Promise<String>;
   emitterType: () => Promise<EmitterType>;
   emitterPickupSite: () => Promise<String>;
+  emitterWorkSiteName: () => Promise<String>;
+  emitterWorkSiteAddress: () => Promise<String>;
+  emitterWorkSiteCity: () => Promise<String>;
+  emitterWorkSitePostalCode: () => Promise<String>;
+  emitterWorkSiteInfos: () => Promise<String>;
   emitterCompanyName: () => Promise<String>;
   emitterCompanySiret: () => Promise<String>;
   emitterCompanyAddress: () => Promise<String>;
@@ -5845,6 +6030,11 @@ export interface FormSubscription
   nextDestinationCompanyMail: () => Promise<AsyncIterator<String>>;
   emitterType: () => Promise<AsyncIterator<EmitterType>>;
   emitterPickupSite: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteName: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteAddress: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteCity: () => Promise<AsyncIterator<String>>;
+  emitterWorkSitePostalCode: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteInfos: () => Promise<AsyncIterator<String>>;
   emitterCompanyName: () => Promise<AsyncIterator<String>>;
   emitterCompanySiret: () => Promise<AsyncIterator<String>>;
   emitterCompanyAddress: () => Promise<AsyncIterator<String>>;
@@ -5933,6 +6123,11 @@ export interface FormNullablePromise
   nextDestinationCompanyMail: () => Promise<String>;
   emitterType: () => Promise<EmitterType>;
   emitterPickupSite: () => Promise<String>;
+  emitterWorkSiteName: () => Promise<String>;
+  emitterWorkSiteAddress: () => Promise<String>;
+  emitterWorkSiteCity: () => Promise<String>;
+  emitterWorkSitePostalCode: () => Promise<String>;
+  emitterWorkSiteInfos: () => Promise<String>;
   emitterCompanyName: () => Promise<String>;
   emitterCompanySiret: () => Promise<String>;
   emitterCompanyAddress: () => Promise<String>;
@@ -7062,6 +7257,11 @@ export interface FormPreviousValues {
   nextDestinationCompanyMail?: String;
   emitterType?: EmitterType;
   emitterPickupSite?: String;
+  emitterWorkSiteName?: String;
+  emitterWorkSiteAddress?: String;
+  emitterWorkSiteCity?: String;
+  emitterWorkSitePostalCode?: String;
+  emitterWorkSiteInfos?: String;
   emitterCompanyName?: String;
   emitterCompanySiret?: String;
   emitterCompanyAddress?: String;
@@ -7140,6 +7340,11 @@ export interface FormPreviousValuesPromise
   nextDestinationCompanyMail: () => Promise<String>;
   emitterType: () => Promise<EmitterType>;
   emitterPickupSite: () => Promise<String>;
+  emitterWorkSiteName: () => Promise<String>;
+  emitterWorkSiteAddress: () => Promise<String>;
+  emitterWorkSiteCity: () => Promise<String>;
+  emitterWorkSitePostalCode: () => Promise<String>;
+  emitterWorkSiteInfos: () => Promise<String>;
   emitterCompanyName: () => Promise<String>;
   emitterCompanySiret: () => Promise<String>;
   emitterCompanyAddress: () => Promise<String>;
@@ -7218,6 +7423,11 @@ export interface FormPreviousValuesSubscription
   nextDestinationCompanyMail: () => Promise<AsyncIterator<String>>;
   emitterType: () => Promise<AsyncIterator<EmitterType>>;
   emitterPickupSite: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteName: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteAddress: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteCity: () => Promise<AsyncIterator<String>>;
+  emitterWorkSitePostalCode: () => Promise<AsyncIterator<String>>;
+  emitterWorkSiteInfos: () => Promise<AsyncIterator<String>>;
   emitterCompanyName: () => Promise<AsyncIterator<String>>;
   emitterCompanySiret: () => Promise<AsyncIterator<String>>;
   emitterCompanyAddress: () => Promise<AsyncIterator<String>>;

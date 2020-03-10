@@ -3,8 +3,7 @@ const pdflib = require("pdf-lib");
 const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 
-const { PDFDocument, rgb } = pdflib;
-
+const { PDFDocument } = pdflib;
 // Object to configure field settings
 // coordinates: top/left, mandatory
 // fontsize: optional
@@ -174,7 +173,8 @@ const imageLocations = {
   processingSignature: { x: 450, y: 732 },
   receivedSignature: { x: 210, y: 742 },
   exemptionStamp: { x: 400, y: 520 },
-  noTraceabilityStamp: { x: 300, y: 740 }
+  noTraceabilityStamp: { x: 300, y: 740 },
+  watermark: { x: 0, y: 800 },
 };
 
 /**
@@ -191,7 +191,6 @@ const drawImage = (
   dimensions = { width: 75, height: 37 }
 ) => {
   location = imageLocations[locationName];
-
   page.drawImage(image, {
     x: location.x,
     y: pageHeight - location.y,
@@ -389,7 +388,7 @@ const getWasteRefusalreason = params =>
  * @param params -  the full request payload
  * @returns {object}
  */
-function process(params) {
+function processParams(params) {
   params = { ...params, ...getWasteRefusalreason(params) }; // compute refused quantity before converting number to strings
   const data = stringifyNumberFields(params);
   return {
@@ -410,7 +409,7 @@ function process(params) {
  * @return Buffer
  */
 const write = async params => {
-  const formData = process(params);
+  const formData = processParams(params);
   const arialBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
   const timesBoldBytes = fs.readFileSync(
     path.join(__dirname, "./fonts/times-bold.ttf")
@@ -444,6 +443,12 @@ const write = async params => {
   );
   const noTraceabilityImage = await pdfDoc.embedPng(noTraceabilityBytes);
 
+
+  const watermarkBytes = fs.readFileSync(
+    path.join(__dirname, "./medias/watermark.png")
+  );
+  const watermarkImage = await pdfDoc.embedPng(watermarkBytes);
+
   // customId does not belong to original cerfa, so we had to add our own field title and mimic font look and feel
   if (!!formData.customId) {
     firstPage.drawText("Autre n° libre :", {
@@ -463,6 +468,14 @@ const write = async params => {
       drawText(k, v, arialFont, firstPage);
     }
   }
+ 
+  if (!!process.env.PDF_WATERMARK){
+    drawImage("watermark", watermarkImage, firstPage, {
+      width: 600,
+      height: 800
+    });
+  }
+ 
 
   if (!!formData.noTraceability) {
     drawImage("noTraceabilityStamp", noTraceabilityImage, firstPage, {

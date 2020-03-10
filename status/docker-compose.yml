@@ -4,14 +4,14 @@ services:
   postgres:
     image: postgres:10.5
     volumes:
-      - /var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=$DB_USERNAME
       - POSTGRES_PASSWORD=$DB_PASSWORD
     restart: always
 
   cachet:
-    image: cachethq/docker:2.3.12
+    image: cachethq/docker:2.3.15
     ports:
       - 81:8000
     env_file:
@@ -28,3 +28,8 @@ services:
     depends_on:
       - cachet
     restart: on-failure
+
+
+volumes:
+  postgres:
+

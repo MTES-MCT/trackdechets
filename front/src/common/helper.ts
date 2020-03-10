@@ -1,5 +1,6 @@
 import { DocumentNode } from "graphql";
 import { DataProxy } from "apollo-cache";
+import { ApolloError } from "apollo-client";
 
 /**
  * converts `aString` to `A_STRING`
@@ -42,4 +43,8 @@ export function updateApolloCache<T>(
   } catch (_) {
     console.info(`Cache miss, skipping update.`);
   }
+}
+
+export function getErrorMessages(err: ApolloError) {
+  return err.graphQLErrors.map(error => error.message);
 }

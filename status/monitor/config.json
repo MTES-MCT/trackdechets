@@ -1,14 +1,14 @@
 {
   "api": {
     "url": "http://cachet:8000/api/v1",
-    "token": "5LWYCXWaUbLcgefjoNXh",
+    "token": "{YOUR_TOKEN}", // token obtenu lors de la première configuration de Cachet
     "insecure": true
   },
   "date_format": "02/01/2006 15:04:05 MST",
   "monitors": [
     {
       "name": "td-api",
-      "target": "https://api.trackdechets.beta.gouv.fr/health",
+      "target": "https://api.trackdechets.beta.gouv.fr/.well-known/apollo/server-health",
       "strict": true,
       "method": "GET",
       "component_id": 1,

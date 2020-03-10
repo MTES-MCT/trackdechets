@@ -1544,12 +1544,27 @@ Type d'émetteur
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>pickupSite</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>workSite</strong></td>
+<td valign="top"><a href="#worksite">WorkSite</a></td>
 <td>
 
 Adresse du chantier
 
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>pickupSite</strong> ⚠️</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+DEPRECATED - Ancienne adresse chantier
+
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Migration vers `workSite` obligatoire
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -2754,6 +2769,48 @@ Consistance
 </tbody>
 </table>
 
+### WorkSite
+
+Informations sur une adresse chantier
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>city</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>infos</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### formsLifeCycleData
 
 Informations du cycle de vie des bordereaux
@@ -2954,11 +3011,20 @@ Type d'émetteur
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>workSite</strong></td>
+<td valign="top"><a href="#worksiteinput">WorkSiteInput</a></td>
+<td>
+
+Adresse du chantier
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>pickupSite</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Adresse du chantier
+DEPRECATED - Ancienne adresse chantier
 
 </td>
 </tr>
@@ -3728,6 +3794,47 @@ Réelle ou estimée
 Consistance
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### WorkSiteInput
+
+Payload d'une adresse chantier
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>city</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>infos</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>

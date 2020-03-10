@@ -1,8 +1,5 @@
 version: "3"
 services:
-  postgres:
-    image: betagouv/trackdechets-postgres:sandbox
-
   td-api:
     image: betagouv/trackdechets-api:sandbox
 
@@ -14,6 +11,8 @@ services:
 
   td-pdf:
     image: betagouv/trackdechets-pdf:sandbox
+    environment:
+      PDF_WATERMARK: display
 
   td-mail:
     image: betagouv/trackdechets-mail:sandbox

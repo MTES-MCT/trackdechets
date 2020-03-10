@@ -29,6 +29,7 @@ const {
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
   SESSION_COOKIE_SECURE,
+  SESSION_NAME,
   UI_HOST,
   NODE_ENV
 } = process.env;
@@ -150,8 +151,9 @@ app.use(
 const RedisStore = redisStore(session);
 const redisClient = new Redis({ host: "redis" });
 
-const sess = {
+export const sess = {
   store: new RedisStore({ client: redisClient }),
+  name: SESSION_NAME || "trackdechets.connect.sid",
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,

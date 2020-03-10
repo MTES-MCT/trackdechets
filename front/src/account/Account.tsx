@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/react-hooks";
 import AccountMenu from "./AccountMenu";
 import { Route, withRouter, RouteComponentProps } from "react-router";
 import Loader from "../common/Loader";
-import Error from "../common/Error";
+import { InlineError } from "../common/Error";
 import AccountInfo from "./AccountInfo";
 import AccountIntegrationApi from "./AccountIntegrationApi";
 import AccountCompanyList from "./AccountCompanyList";
@@ -30,7 +30,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
 
   if (loading) return <Loader />;
 
-  if (error) return <Error message={error.message} />;
+  if (error) return <InlineError apolloError={error} />;
 
   return (
     <div id="account" className="account dashboard">
