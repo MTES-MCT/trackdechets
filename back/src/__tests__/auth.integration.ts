@@ -1,39 +1,32 @@
 import { resetDatabase } from "../../integration-tests/helper";
 import * as supertest from "supertest";
-import { app } from "../server";
+import { app, sess } from "../server";
 import { prisma } from "../generated/prisma-client";
-import { hashPassword } from "../users/utils";
 import { loginError } from "../auth";
 import * as queryString from "querystring";
 import { sign } from "jsonwebtoken";
 import { getUid } from "../utils";
+import { userFactory } from "./factories";
 
 const { UI_HOST, JWT_SECRET } = process.env;
 
 const request = supertest(app);
 
 describe("POST /login", () => {
-  afterEach(async () => {
-    await resetDatabase();
-  });
+  afterEach(() => resetDatabase());
 
   it("create a persistent session if login form is valid", async () => {
-    const user = await prisma.createUser({
-      name: "John Snow",
-      email: "john.snow@trackdechets.fr",
-      password: await hashPassword("winter-is-coming"),
-      isActive: true
-    });
+    const user = await userFactory();
 
     const login = await request
       .post("/login")
       .send(`email=${user.email}`)
-      .send(`password=winter-is-coming`);
+      .send(`password=pass`);
 
-    // should send connect.sid cookie
+    // should send trackdechets.connect.sid cookie
     expect(login.header["set-cookie"]).toHaveLength(1);
     const cookieRegExp = new RegExp(
-      `connect.sid=.+; Domain=${UI_HOST}; Path=/; Expires=.+; HttpOnly`
+      `${sess.name}=(.+); Domain=${sess.cookie.domain}; Path=/; Expires=.+; HttpOnly`
     );
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
@@ -42,14 +35,16 @@ describe("POST /login", () => {
     expect(login.status).toBe(302);
     expect(login.header.location).toBe(`http://${UI_HOST}/dashboard/slips`);
 
+    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+
     // should persist user across requests
     const res = await request
       .post("/")
       .send({ query: "{ me { email } }" })
-      .set("Cookie", sessionCookie);
+      .set("Cookie", `${sess.name}=${cookieValue}`);
 
     expect(res.body.data).toEqual({
-      me: { email: "john.snow@trackdechets.fr" }
+      me: { email: user.email }
     });
   });
 
@@ -70,17 +65,12 @@ describe("POST /login", () => {
   });
 
   it("should not authenticate a user whose email has not been validated", async () => {
-    const user = await prisma.createUser({
-      name: "John Snow",
-      email: "john.snow@trackdechets.fr",
-      password: await hashPassword("winter-is-coming"),
-      isActive: false
-    });
+    const user = await userFactory({ isActive: false });
 
     const login = await request
       .post("/login")
       .send(`email=${user.email}`)
-      .send(`password=winter-is-coming`);
+      .send(`password=pass`);
 
     // should not set a session cookie
     expect(login.header["set-cookie"]).toBeUndefined();
@@ -93,12 +83,7 @@ describe("POST /login", () => {
   });
 
   it("should not authenticate a user if password is invalid", async () => {
-    const user = await prisma.createUser({
-      name: "John Snow",
-      email: "john.snow@trackdechets.fr",
-      password: await hashPassword("winter-is-coming"),
-      isActive: true
-    });
+    const user = await userFactory();
 
     const login = await request
       .post("/login")
@@ -114,6 +99,60 @@ describe("POST /login", () => {
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(queryString.escape(loginError.INVALID_PASSWORD));
   });
+
+  it(`should not take into account a session cookie
+      from a different environment on the same subdomain`, async () => {
+    // We had a bug in the sandbox environment where the cookie from production
+    // was taken into account causing authentication to fail. The fix was to set
+    // an explicit cookie name
+    // Cf https://github.com/expressjs/session#name
+    // Using default cookie name will cause this test to fail
+
+    const OLD_ENV = process.env;
+    process.env.SESSION_NAME = "sandbox.trackdechets.connect.sid";
+    process.env.SESSION_COOKIE_HOST = "sandbox.trackdechets.beta.gouv.fr";
+
+    // re-load variables with custom env
+    jest.resetModules();
+    const a = require("../server").app;
+    const s = require("../server").sess;
+    const r = supertest(a);
+
+    const user = await userFactory();
+
+    const login = await r
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    // should send sandbox.trackdechets.connect.sid cookie
+    expect(login.header["set-cookie"]).toHaveLength(1);
+    const cookieRegExp = new RegExp(
+      `${s.name}=(.+); Domain=${s.cookie.domain}; Path=/; Expires=.+; HttpOnly`
+    );
+    const sessionCookie = login.header["set-cookie"][0];
+    expect(sessionCookie).toMatch(cookieRegExp);
+
+    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+
+    // send both cookies
+    const res = await r
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set(
+        "Cookie",
+        [
+          "trackdechets.connect.sid=s%3Ax88pByFASxf",
+          `${s.name}=${cookieValue}`
+        ].join(";")
+      );
+
+    expect(res.body.data).toEqual({
+      me: { email: user.email }
+    });
+
+    process.env = OLD_ENV;
+  });
 });
 
 describe("POST /logout", () => {
@@ -122,15 +161,13 @@ describe("POST /logout", () => {
     expect(logout.header["set-cookie"]).toHaveLength(1);
     const cookieHeader = logout.header["set-cookie"][0];
     expect(cookieHeader).toEqual(
-      `connect.sid=; Domain=${UI_HOST}; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+      `${sess.name}=; Domain=${UI_HOST}; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
     );
   });
 });
 
 describe("Authentification with token", () => {
-  afterEach(async () => {
-    await resetDatabase();
-  });
+  afterEach(() => resetDatabase());
 
   it("should deny access to unauthenticated requests", async () => {
     const res = await request.post("/").send({ query: "{ me { email } }" });
@@ -140,12 +177,7 @@ describe("Authentification with token", () => {
   });
 
   it("should authenticate using JWT token", async () => {
-    const user = await prisma.createUser({
-      name: "John Snow",
-      email: "john.snow@trackdechets.fr",
-      password: await hashPassword("winter-is-coming"),
-      isActive: true
-    });
+    const user = await userFactory();
 
     const token = sign({ userId: user.id }, JWT_SECRET);
 
@@ -155,7 +187,7 @@ describe("Authentification with token", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.body.data).toEqual({
-      me: { email: "john.snow@trackdechets.fr" }
+      me: { email: user.email }
     });
 
     // should create a new access token to make it revokable
@@ -169,12 +201,7 @@ describe("Authentification with token", () => {
   });
 
   it("should authenticate using OAuth2 bearer token", async () => {
-    const user = await prisma.createUser({
-      name: "John Snow",
-      email: "john.snow@trackdechets.fr",
-      password: await hashPassword("winter-is-coming"),
-      isActive: true
-    });
+    const user = await userFactory();
 
     const token = getUid(10);
     await prisma.createAccessToken({
@@ -188,7 +215,7 @@ describe("Authentification with token", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.body.data).toEqual({
-      me: { email: "john.snow@trackdechets.fr" }
+      me: { email: user.email }
     });
 
     // should update lastUsed field
