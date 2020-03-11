@@ -7,6 +7,8 @@ repo_url: https://github.com/MTES-MCT/trackdechets
 theme: readthedocs
 markdown_extensions:
   - admonition
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
 nav:
   - "Introduction": "index.md"
   - "Faire des appels à l'API GraphQL": "graphql.md"
@@ -18,4 +20,6 @@ nav:
   - "Playground": "playground.md"
   - "Référence de l'API": "api-reference/api-reference.md"
   - "Changelog": "changelog.md"
+extra_css:
+  - css/style.css
 
