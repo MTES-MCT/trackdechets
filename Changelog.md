@@ -5,6 +5,10 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2020.03.3] 11/03/2020
+
+* Correction - Ajout de la variable SESSION_NAME permettant de définir le nom du cookie de session
+
 # [2020.03.2] 10/03/2020
 
 * Affichage d'un filigrane sur les pdf de test [PR 211](https://github.com/MTES-MCT/trackdechets/pull/211)
@@ -14,6 +18,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2020.03.1] 03/03/2020
 
+* Implémentation du protocole OAuth2 permettant la récupération de jeton d'accès par des applications tierces sans exposer le mot de passe de l'utilisateur [PR #169](https://github.com/MTES-MCT/trackdechets/pull/169)
+* Ajout d'une requête GraphQL `formsLifeCycle` permettant d'accéder au flux de modifications de BSD's [PR #170](https://github.com/MTES-MCT/trackdechets/pull/170)
 * Corrections du moteur pdf [PR # 194](https://github.com/MTES-MCT/trackdechets/pull/194)
   * affichage et formatage des champs `sentBy` et `processedAt`
 * Améliorations de la documentaion de l'api dans le playground [PR 187](https://github.com/MTES-MCT/trackdechets/pull/187)
@@ -21,7 +27,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 * Refonte des colonnes d'actions du dashboard et de leurs icones [PR 198](https://github.com/MTES-MCT/trackdechets/pull/198)
 * Corrections des permissions de la mutation markAsSealed [PR 192](https://github.com/MTES-MCT/trackdechets/pull/192)
 * Corrections et amélioration de la gestion des erreurs et de leur affichage [PR 197](https://github.com/MTES-MCT/trackdechets/pull/197)
- 
+
 # [2020.02.1] 18/02/2020
 
 * Amélioration du refus du déchet pour gérer le refus partiel et les motifs de refus éventuels [PR #155](https://github.com/MTES-MCT/trackdechets/pull/155)
