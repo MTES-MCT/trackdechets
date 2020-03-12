@@ -3,7 +3,8 @@ import { markAsSealed } from "../mark-as";
 import { getNewValidForm } from "../__mocks__/data";
 import { flattenObjectForDb } from "../../form-converter";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
-
+import { formSchema } from "../../validator";
+import { unflattenObjectFromDb } from "../../form-converter";
 describe("Forms -> markAsSealed mutation", () => {
   const prisma = {
     form: jest.fn(() => Promise.resolve({})),
@@ -49,7 +50,7 @@ describe("Forms -> markAsSealed mutation", () => {
     try {
       const form = getNewValidForm();
       // unvalidate form
-      form.emitter.company.siret = null;
+      form.emitter.company.siret = "";
 
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
@@ -58,9 +59,11 @@ describe("Forms -> markAsSealed mutation", () => {
 
       await markAsSealed(null, { id: 1 }, defaultContext);
     } catch (err) {
-      expect(err.message).toMatch(
-        /Émetteur: La sélection d'une entreprise par SIRET est obligatoire/
-      );
+      const errMess =
+        `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
+        `Erreur(s): Émetteur: La sélection d'une entreprise par SIRET est obligatoire`;
+
+      expect(err.message).toBe(errMess);
     }
   });
 
@@ -68,22 +71,22 @@ describe("Forms -> markAsSealed mutation", () => {
     try {
       const form = getNewValidForm();
       // unvalidate form
-      form.emitter.company.siret = null;
-      form.emitter.company.address = null;
+      form.emitter.company.siret = "";
+      form.emitter.company.address = "";
 
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
       prisma.form.mockResolvedValue(flattenObjectForDb(form));
 
-      await markAsSealed(null, { id: 1 }, defaultContext);
+      await markAsSealed(null, { id: form.id }, defaultContext);
     } catch (err) {
-      expect(err.message).toMatch(
-        /Émetteur: La sélection d'une entreprise par SIRET est obligatoire/
-      );
-      expect(err.message).toMatch(
-        /Émetteur: L'adresse d'une entreprise est obligatoire/
-      );
+      const errMess =
+        `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
+        `Erreur(s): Émetteur: La sélection d'une entreprise par SIRET est obligatoire\n` +
+        `Émetteur: L'adresse d'une entreprise est obligatoire`;
+
+      expect(err.message).toBe(errMess);
     }
   });
 
