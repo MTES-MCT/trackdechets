@@ -5,6 +5,11 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+
+# [2020.03.4] 12/03/2020
+
+* Correction - Génération des messages d'erreurs sur la mutation markAsSealed
+
 # [2020.03.3] 11/03/2020
 
 * Correction - Ajout de la variable SESSION_NAME permettant de définir le nom du cookie de session

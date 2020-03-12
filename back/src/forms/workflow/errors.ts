@@ -5,7 +5,7 @@ import {
   ForbiddenError,
   ApolloError
 } from "apollo-server-express";
-
+import { unflattenObjectFromDb } from "../form-converter";
 export enum WorkflowError {
   InvalidForm,
   InvalidTransition,
@@ -18,7 +18,7 @@ export async function getError(error: WorkflowError, form: Form) {
   switch (error) {
     case WorkflowError.InvalidForm:
       const errors: string[] = await formSchema
-        .validate(form, { abortEarly: false })
+        .validate(unflattenObjectFromDb(form), { abortEarly: false })
         .catch(err => err.errors);
       return new UserInputError(
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${errors.join(
