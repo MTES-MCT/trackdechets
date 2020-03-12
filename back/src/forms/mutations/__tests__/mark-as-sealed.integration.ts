@@ -126,4 +126,48 @@ describe("{ mutation { markAsSealed } }", () => {
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toEqual("DRAFT");
   });
+
+  test("the BSD can not be sealed if data do not validate", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const recipientCompany = await companyFactory();
+
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        emitterCompanyContact: "", // this field is required and will make the mutation fail
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutation = `
+      mutation   {
+        markAsSealed(id: "${form.id}") {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation);
+
+    // check error message is relevant and only failing fields are reported
+    const errMessage =
+      "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): Émetteur: Le contact dans l'entreprise est obligatoire";
+    expect(errors[0].message).toBe(errMessage);
+
+    form = await prisma.form({ id: form.id });
+    expect(form.status).toEqual("DRAFT");
+
+    // no statusLog is created
+    const statusLogs = await prisma.statusLogs({
+      where: { form: { id: form.id }, user: { id: user.id } }
+    });
+    expect(statusLogs.length).toEqual(0);
+  });
 });
