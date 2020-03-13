@@ -11,7 +11,7 @@ Nous avons également mis en place des [environnements de test](environments.md)
 
 ## Authentification
 
-L'authentifcation à l'API se fait à l'aide d'un token (ou jeton d'accès) de type "Bearer". Suivez les instructions dans [Obtenir un jeton d'accès personnel](access_token.md) pour en obtenir un.
+L'authentifcation à l'API se fait à l'aide d'un token (ou jeton d'accès) de type "Bearer". Suivez les instructions dans [Obtenir un jeton d'accès personnel](access-token.md) pour en obtenir un.
 
 
 !!! info
@@ -20,7 +20,7 @@ L'authentifcation à l'API se fait à l'aide d'un token (ou jeton d'accès) de t
 !!! warning
     La mutation `login(email, password)` qui permet d'obtenir un token via l'API GraphQL à partir de l'email et mot de passe est désormais dépréciée.
 
- Un token est lié à un utilisateur. Les droits d'accès du token découle donc directement des droits de l'utilisateur qui a généré le token. Le token doit être être ajouté à l'en-tête `Authorization` de chaque requête faite à l'API Trackdéchets.
+ Un token est lié à un utilisateur. Les droits d'accès du token découle donc directement des droits de l'utilisateur qui a généré le token. Le token doit être ajouté à l'en-tête `Authorization` de chaque requête faite à l'API Trackdéchets.
 
 !!! hint
     Les tokens personnels générés depuis votre compte Trackdéchets ont une durée de validité infinie. Il sera bientôt possible de les révoquer depuis le même espace
@@ -32,28 +32,26 @@ Nous recommandons d'utiliser le playground GraphQL pour une première prise en m
 
 Dans le standard REST, la méthode de requête HTTP (`GET`, `POST`, `PUT`, `DELETE`) détermine le type d'opération. Dans le standard GraphQL, un contenu de requête JSON est passé que ce soit pour une `query` ou une `mutation`, la méthode de requête est donc toujours `POST`. La seule exception est la requête d'introspection qui est un simple `GET` sur le point de terminaison GraphQL.
 
-Pour faire une requête GraphQL en utilisant cURL, vous devez faire un `POST` avec un corps JSON. Le corps de la requête doit contenir un chaine de caractères appelée `query`.
+Pour faire une requête GraphQL en utilisant cURL, vous devez faire un `POST` avec un corps JSON. Le corps de la requête doit contenir une chaine de caractères appelée `query`.
 
 
 ```
 curl \
   -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <ACCESS_TOKEN>" \ # <= Header Authorization
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
   --data " \
-  { \
-    \"query\": \"query \
-      { me \
-        { \
-          name \
-        } \
+ { \
+   \"query\": \" \
+    query { \
+      me { name } \
       }\" \
-  } \
-  " https://api.trackdechets.beta.gouv.fr/
+ } \
+" https://api.trackdechets.beta.gouv.fr/
 ```
 
 !!! note
-    La chaîne de caractères de `"query"` doit échapper les sauts de lignes pour être correctement lu par le serveur. Pour le corps du message `POST`, il faut utiliser des guillemets double à l'extérieur et échapper tous les guillements double à l'intérieur du message.
+    La chaîne de caractères de `"query"` doit échapper les sauts de lignes pour être correctement lu par le serveur. Pour le corps du message `POST`, il faut utiliser des guillemets doubles à l'extérieur et échapper tous les guillements doubles à l'intérieur du message.
 
 
 ## À propos des opérations de type `query` et `mutation`
@@ -97,7 +95,7 @@ query {
 Pour construire une mutation, il faut spécifier trois choses:
 
 1. Le nom de la mutation qui correspond à l'opération à exécuter
-2. Les données d'input passés en argument
+2. Les données d'input passées en argument
 3. Les données retournées
 
 Exemple avec une requête permettant d'éditer son profil utilisateur Trackdéchets en ajoutant un numéro de téléphone
@@ -110,12 +108,3 @@ mutation {
   }
 }
 ```
-
-
-
-
-
-
-
-
-
