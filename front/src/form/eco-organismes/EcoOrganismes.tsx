@@ -87,10 +87,19 @@ export default function EcoOrganismes(props) {
           {error && <p>Erreur lors du chargement des éco-organismes...</p>}
           {data && (
             <>
+              <div className="form__group notification info">
+                Veuillez sélectionner ci-dessous un des éco-organismes
+                enregistrés dans Trackdéchets. Si votre éco-organisme n'apparait
+                pas et que vous pensez que c'est une erreur,{" "}
+                <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
+                  contactez le support.
+                </a>
+              </div>
+
               <div className="form__group search__group">
                 <input
                   type="text"
-                  placeholder="Recherche d'un éco-organisme par nom..."
+                  placeholder="Filtrer les éco-organismes par nom..."
                   onChange={e =>
                     dispatch({
                       type: "search",
@@ -129,7 +138,7 @@ export default function EcoOrganismes(props) {
               Adresse de chantier
             </strong>{" "}
             tout en bas si le lieu réel de collecte est différent de l'adresse
-            de l'entreprise (exemple SIRET / adresse communauté de commune pour
+            de l'entreprise (exemple SIRET / adresse communauté de communes pour
             l'entreprise émettrice, et adresse dechetterie pour lieu de
             collecte.)
           </div>

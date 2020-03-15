@@ -366,7 +366,7 @@ const getAcceptationStatus = params => {
  * @returns object
  */
 const getFlatEcoOrganisme = params => {
-  return params.ecoOrganisme.name
+  return params.ecoOrganisme && params.ecoOrganisme.name
     ? {
         ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`
       }

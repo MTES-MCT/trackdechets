@@ -284,11 +284,23 @@ type CompanyFavorite {
   mail: String
 }
 
-"Eco-organisme"
+"""
+Eco-organisme
+Les éco-organismes n'apparaissent pas en case 1 du bordereau mais sont quand même responsables du déchet.
+C'est l'entreprise de collecte de déchet qui apparait en case 1.
+Pour pouvoir saisir un éco-organisme, le détenteur du déchet doit être défini comme 'Autre détenteur'.
+Seul un éco-organisme enregistré dans Trackdéchet peut être associé.
+"""
 type EcoOrganisme {
   id: ID!
+
+  "Nom de l'éco-organisme"
   name: String!
+
+  "Siret de l'éco-organisme"
   siret: String!
+
+  "Adresse de l'éco-organisme"
   address: String!
 }
 

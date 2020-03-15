@@ -8,6 +8,7 @@ import {
   setLocale,
   LocaleObject
 } from "yup";
+import { prisma } from "../generated/prisma-client";
 
 setLocale({
   mixed: {
@@ -102,7 +103,18 @@ export const formSchema = object<any>().shape({
   }),
   ecoOrganisme: object().when("emitter", {
     is: e => e.type === "OTHER",
-    then: object({ id: string().nullable() }).nullable(),
+    then: object({ id: string().nullable() })
+      .test(
+        "is-unknown",
+        "${path} n'est pas un éco-organisme connu par Trackdéchet. (Si vous pensez que c'est une erreur, contactez le support)",
+        value => {
+          if (!value.id) {
+            return true;
+          }
+          return prisma.$exists.ecoOrganisme(value.id);
+        }
+      )
+      .nullable(),
     otherwise: object()
       .test(
         "is-not-set",
