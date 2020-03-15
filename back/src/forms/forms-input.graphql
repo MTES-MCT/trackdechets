@@ -144,7 +144,7 @@ input AppendixFormInput {
 
 "Payload de liason d'un BSD à un eco-organisme"
 input EcoOrganismeInput {
-  id: ID!
+  id: ID
 }
 
 "Payload d'un établissement"

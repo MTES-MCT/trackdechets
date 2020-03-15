@@ -1,5 +1,9 @@
 import { formSchema } from "../validator";
 
+jest.mock("../../generated/prisma-client", () => ({
+  prisma: { $exists: { ecoOrganisme: () => Promise.resolve(true) } }
+}));
+
 const form = {
   id: "cjplbvecc000d0766j32r19am",
   emitter: {
