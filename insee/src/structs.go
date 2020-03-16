@@ -23,6 +23,8 @@ type Etablissement struct {
 	ActivitePrincipale        string `json:"activite_principale"`
 	LibelleActivitePrincipale string `json:"libelle_activite_principale"`
 	GeoAdresse                string `json:"geo_adresse"`
+	LibelleCommune            string `json:"libelle_commune"`
+	LibelleVoie               string `json:"libelle_voie"`
 	Longitude                 string `json:"longitude"`
 	Latitude                  string `json:"latitude"`
 	Departement               string `json:"departement"`
