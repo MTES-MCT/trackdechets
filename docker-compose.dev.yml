@@ -135,9 +135,7 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./doc/docs:/app/docs
-      - ./doc/website/blog:/app/website/blog
       - ./doc/website/core:/app/website/core
-      - ./doc/website/i18n:/app/website/i18n
       - ./doc/website/pages:/app/website/pages
       - ./doc/website/static:/app/website/static
       - ./doc/website/sidebars.json:/app/website/sidebars.json
