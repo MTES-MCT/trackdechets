@@ -80,7 +80,7 @@ const siteConfig = {
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
-    { doc: "mise-en-route", label: "Documentation" },
+    { doc: "introduction", label: "Documentation" },
     { doc: "api-reference", label: "Référence de l'API" },
     {
       href: API_URL,
@@ -104,23 +104,9 @@ const siteConfig = {
 
   /* Colors for website */
   colors: {
-    primaryColor: "#00234d",
-    secondaryColor: "#ff9947"
+    primaryColor: "#16a085",
+    secondaryColor: "#1abc9c"
   },
-
-  /* Custom fonts for website */
-  /*
-  fonts: {
-    myFont: [
-      "Times New Roman",
-      "Serif"
-    ],
-    myOtherFont: [
-      "-apple-system",
-      "system-ui"
-    ]
-  },
-  */
 
   // This copyright info is used in /core/Footer.js and blog RSS/Atom feeds.
   copyright: `Copyright ${new Date().getFullYear()} Ministère de la Transition Écologique et Solidaire`,
@@ -139,8 +125,8 @@ const siteConfig = {
   cleanUrl: true,
 
   // Open Graph and Twitter card images.
-  ogImage: "img/undraw_online.svg",
-  twitterImage: "img/undraw_tweetstorm.svg",
+  // ogImage: "img/undraw_online.svg",
+  // twitterImage: "img/undraw_tweetstorm.svg",
 
   // For sites with a sizable amount of content, set collapsible to true.
   // Expand/collapse the links and subcategories under categories.

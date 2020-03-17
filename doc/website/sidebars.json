@@ -1,7 +1,7 @@
 {
   "docs": {
-    "Mise en route": ["mise-en-route","mise-en-route-saas"],
-    "Référence de l'API": ["api-reference", "api-changelog"],
-    "Guides": ["api-graphql"]
+    "Introduction": ["introduction"],
+    "Guides": ["graphql"],
+    "Référence de l'API": ["api-reference", "changelog"]
   }
 }

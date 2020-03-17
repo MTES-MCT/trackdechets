@@ -55,7 +55,7 @@ class HomeSplash extends React.Component {
         <Logo img_src={`${baseUrl}img/undraw_monitor.svg`} />
         <div className="inner align-left">
           <ProjectTitle tagline={siteConfig.tagline} />
-          <Button href={docUrl("mise-en-route")}>Démarrer avec l'API</Button>
+          <Button href={docUrl("introduction")}>Démarrer avec l'API</Button>
         </div>
       </SplashContainer>
     );
