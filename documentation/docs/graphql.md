@@ -51,7 +51,7 @@ curl \
 ```
 
 !!! note
-    La chaîne de caractères de `"query"` doit échapper les sauts de lignes pour être correctement lu par le serveur. Pour le corps du message `POST`, il faut utiliser des guillemets doubles à l'extérieur et échapper tous les guillements doubles à l'intérieur du message.
+    La chaîne de caractères de `"query"` doit échapper les sauts de lignes pour être correctement lue par le serveur. Pour le corps du message `POST`, il faut utiliser des guillemets doubles à l'extérieur et échapper tous les guillements doubles à l'intérieur du message.
 
 
 ## À propos des opérations de type `query` et `mutation`
@@ -61,7 +61,7 @@ Les deux types d'opération autorisées sur l'API GraphQL Trackdéchets sont les
 
 ### Queries
 
-Les `queries` GraphQL retourne uniquement les données spécifiées. Pour construire une `query` il faut spécifier les champs imbriqués jusqu'à un champs de type scalaire (string, int, etc).
+Les `queries` GraphQL retournent uniquement les données spécifiées. Pour construire une `query` il faut spécifier les champs imbriqués jusqu'à un champs de type scalaire (string, int, etc).
 
 Exemple avec une requête de profil utilisateur
 ```

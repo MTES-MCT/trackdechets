@@ -100,6 +100,6 @@ query {
 ### Flux de modifications de BSD
 
 
-Il est possible d'accéder à un flux des modifications d'états qui ont eu lieu sur un BSD en particulier ou sur l'ensemble des BSD's liés à un établissement. En faisant des appels régulier sur ce flux, il est possible d'implémenter des systèmes de notifications en quasi temps réel pour vos utilisateurs (par exemple lors du traitement d'un déchets).
+Il est possible d'accéder à un flux des modifications d'états qui ont eu lieu sur un BSD en particulier ou sur l'ensemble des BSD's liés à un établissement. En faisant des appels réguliers sur ce flux, il est possible d'implémenter des systèmes de notifications en quasi temps réel pour vos utilisateurs (par exemple lors du traitement d'un déchets).
 
 Ce flux est accessible via la query `formsLifeCycle`. Pour plus d'informations se référer à la [référence de l'API](https://doc.trackdechets.fr/api-reference/api-reference/#query)
