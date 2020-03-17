@@ -12,24 +12,54 @@
 const users = [
   {
     caption: "Trinov",
-    // You will need to prepend the image path with your baseUrl
-    // if it is not '/', like: '/test-site/img/image.jpg'.
-    image: "/img/trinov.png",
-    infoLink: "http://www.trinov.com/",
+    image: "/img/partners-logos/trinov.png",
+    pinned: true
+  },
+  {
+    caption: "Kerlog",
+    image: "/img/partners-logos/kerlog.png",
+    pinned: true
+  },
+  {
+    caption: "Chimirec",
+    image: "/img/partners-logos/chimirec.png",
+    pinned: true
+  },
+  {
+    caption: "Hensel Recycling",
+    image: "/img/partners-logos/hensel.png",
+    pinned: true
+  },
+  {
+    caption: "Sarpi Veolia",
+    image: "/img/partners-logos/sarpi-veolia.png",
+    pinned: true
+  },
+  {
+    caption: "Séché Environnement",
+    image: "/img/partners-logos/seche.png",
     pinned: true
   }
 ];
 
-const { API_HOST, API_URL_SCHEME, UI_HOST, UI_URL_SCHEME } = process.env;
+const {
+  API_HOST,
+  API_URL_SCHEME,
+  UI_HOST,
+  UI_URL_SCHEME,
+  DOC_HOST,
+  DOC_URL_SCHEME
+} = process.env;
 
 const API_URL = `${API_URL_SCHEME}://${API_HOST}`;
 const UI_URL = `${UI_URL_SCHEME}://${UI_HOST}`;
+const DOC_URL = `${DOC_URL_SCHEME}://${DOC_HOST}`;
 
 const siteConfig = {
   title: "Trackdéchets Développeurs", // Title for your website.
   tagline:
     "Connectez-vous à l'API Trackdéchets pour une traçabilité 100% dématérialisée",
-  url: "https://your-docusaurus-test-site.com", // Your website URL
+  url: DOC_URL, // Your website URL
   baseUrl: "/", // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',

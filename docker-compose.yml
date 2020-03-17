@@ -86,6 +86,13 @@ services:
       VIRTUAL_HOST: $DOC_HOST
       LETSENCRYPT_HOST: $DOC_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+      VIRTUAL_PORT: 3000
+      API_HOST: $API_HOST
+      API_URL_SCHEME: $URL_SCHEME
+      UI_HOST: $UI_HOST
+      UI_URL_SCHEME: $UI_URL_SCHEME
+      DOC_HOST: $DOC_HOST
+      DOC_URL_SCHEME: $DOC_URL_SCHEME
 
   td-etl:
     image: betagouv/trackdechets-etl:master

@@ -9,7 +9,6 @@ const React = require("react");
 
 const CompLibrary = require("../../core/CompLibrary.js");
 
-const MarkdownBlock = CompLibrary.MarkdownBlock; /* Used to read markdown */
 const Container = CompLibrary.Container;
 const GridBlock = CompLibrary.GridBlock;
 
@@ -39,14 +38,6 @@ class HomeSplash extends React.Component {
       <h2 className="projectTitle">{props.tagline}</h2>
     );
 
-    const PromoSection = props => (
-      <div className="section promoSection">
-        <div className="promoRow">
-          <div className="pluginRowBlock">{props.children}</div>
-        </div>
-      </div>
-    );
-
     const Button = props => (
       <div className="pluginWrapper buttonWrapper">
         <a
@@ -65,11 +56,6 @@ class HomeSplash extends React.Component {
         <div className="inner align-left">
           <ProjectTitle tagline={siteConfig.tagline} />
           <Button href={docUrl("mise-en-route")}>Démarrer avec l'API</Button>
-          {/* <PromoSection>
-            <Button href="#try">Try It Out</Button>
-            <Button href={docUrl("doc1.html")}>Example Link</Button>
-            <Button href={docUrl("doc2.html")}>Example Link 2</Button>
-          </PromoSection> */}
         </div>
       </SplashContainer>
     );
@@ -88,81 +74,77 @@ class Index extends React.Component {
         background={props.background}
       >
         <GridBlock
-          align="center"
+          align="left"
           contents={props.children}
           layout={props.layout}
         />
       </Container>
     );
 
-    const FeatureCallout = () => (
-      <div
-        className="productShowcaseSection paddingBottom"
-        style={{ textAlign: "center" }}
-      >
-        <h2>Feature Callout</h2>
-        <MarkdownBlock>These are features of this project</MarkdownBlock>
-      </div>
-    );
-
-    const TryOut = () => (
-      <Block id="try">
+    const WhatIsTrackdechets = () => (
+      <Block id="whatistd">
         {[
           {
             content:
-              "To make your landing page more attractive, use illustrations! Check out " +
-              "[**unDraw**](https://undraw.co/) which provides you with customizable illustrations which are free to use. " +
-              "The illustrations you see on this page are from unDraw.",
-            image: `${baseUrl}img/undraw_code_review.svg`,
+              "Trackdéchets est un service gratuit développé " +
+              "par le Ministère de la Transition Écologique et Solidaire afin de:" +
+              "<br/> " +
+              "<ul>" +
+              "<li>simplifier la traçabilité des déchets dangereux </li>" +
+              "<li>" +
+              "assurer aux acteurs de la filière que leurs entreprises " +
+              "partenaires disposent bien des autorisations nécessaires " +
+              "pour collecter, regrouper et/ou traiter leurs déchets dangereux" +
+              "</li>" +
+              "</ul>",
+            image: `${baseUrl}img/undraw_factory.svg`,
+            imageAlign: "right",
+            title: "La mission de Trackdéchets ?"
+          }
+        ]}
+      </Block>
+    );
+
+    const WhyTrackdechets = () => (
+      <Block id="whytd" background="light">
+        {[
+          {
+            content:
+              "Trackdéchets assure un rôle d’interface qui permet le partage " +
+              "d’informations entre les différents acteurs de la chaîne de traçabilité." +
+              "<ul>" +
+              "<li>" +
+              "Gagnez du temps et de l’argent : une fois connecté, fini le papier et plus " +
+              "besoin de se connecter à de très nombreux acteurs aux processus métiers et " +
+              "SI divers pour assurer le suivi." +
+              "</li>" +
+              "<li>" +
+              "Anticipez les évolutions réglementaires en matière de responsabilité de la filière : " +
+              "Trackdéchets s’insère directement dans le cadre réglementaire et facilite la prise " +
+              "en compte des évolutions" +
+              "</ul>",
+            image: `${baseUrl}img/undraw_instant_information.svg`,
             imageAlign: "left",
-            title: "Wonderful SVG Illustrations"
+            title: "Pourquoi se connecter à Trackdéchets ?"
           }
         ]}
       </Block>
     );
 
-    const Description = () => (
-      <Block background="dark">
+    const HowDoesItWork = () => (
+      <Block id="howdoesitwork">
         {[
           {
             content:
-              "This is another description of how this project is useful",
-            image: `${baseUrl}img/undraw_note_list.svg`,
+              "Trackdéchets a 2 composantes distinctes : un moteur de gestion des BSD " +
+              "(constitutif de l’API GraphQL Trackdéchets) et une interface graphique. " +
+              "Que vous soyez professionnel du déchet (SI métier) ou un SaaS de gestion des déchets, " +
+              "en vous connectant à l’API Trackdéchets, vous pourrez échanger des données avec tous " +
+              "les acteurs connectés à Trackdéchets et rendre possible la dématérialisation totale " +
+              "de la chaîne de traçabilité du BSD.",
+            image: `${baseUrl}img/undraw_online_transactions.svg`,
             imageAlign: "right",
-            title: "Description"
-          }
-        ]}
-      </Block>
-    );
-
-    const LearnHow = () => (
-      <Block background="light">
-        {[
-          {
-            content:
-              "Each new Docusaurus project has **randomly-generated** theme colors.",
-            image: `${baseUrl}img/undraw_youtube_tutorial.svg`,
-            imageAlign: "right",
-            title: "Randomly Generated Theme Colors"
-          }
-        ]}
-      </Block>
-    );
-
-    const Features = () => (
-      <Block layout="fourColumn">
-        {[
-          {
-            content: "This is the content of my feature",
-            image: `${baseUrl}img/undraw_react.svg`,
-            imageAlign: "top",
-            title: "Feature One"
-          },
-          {
-            content: "The content of my second feature",
-            image: `${baseUrl}img/undraw_operating_system.svg`,
-            imageAlign: "top",
-            title: "Feature Two"
+            title: "Comment ça marche ?"
           }
         ]}
       </Block>
@@ -176,12 +158,8 @@ class Index extends React.Component {
       const showcase = siteConfig.users
         .filter(user => user.pinned)
         .map(user => (
-          <a href={user.infoLink} key={user.infoLink}>
-            <img src={user.image} alt={user.caption} title={user.caption} />
-          </a>
+          <img src={user.image} alt={user.caption} title={user.caption} />
         ));
-
-      const pageUrl = page => baseUrl + (language ? `${language}/` : "") + page;
 
       return (
         <div className="productShowcaseSection paddingBottom">
@@ -196,11 +174,9 @@ class Index extends React.Component {
       <div>
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
-          {/* <Features />
-          <FeatureCallout />
-          <LearnHow />
-          <TryOut />
-          <Description /> */}
+          <WhatIsTrackdechets />
+          <WhyTrackdechets />
+          <HowDoesItWork />
           <Showcase />
         </div>
       </div>

@@ -132,13 +132,6 @@ services:
     image: td-doc
     build:
       context: ./doc
-    environment:
-      VIRTUAL_HOST: $DOC_HOST
-      VIRTUAL_PORT: 3000
-      API_HOST: $API_HOST
-      API_URL_SCHEME: $URL_SCHEME
-      UI_HOST: $UI_HOST
-      UI_URL_SCHEME: $UI_URL_SCHEME
     volumes:
       - ./doc/docs:/app/docs
       - ./doc/website/blog:/app/website/blog
