@@ -1,8 +1,7 @@
 import { object, date, string, boolean, number, array, mixed } from "yup";
 import { companySchema } from "./validator";
 import { GROUP_CODES } from "./workflow/machine";
-export const GROUP_COsDES = ["D 13", "D 14", "D 15", "R 13"];
-["D 13", "D 14", "D 15", "R 12", "R 13"]
+
 const PROCESSING_OPERATION_CODES = [
   "D 1",
   "D 2",
@@ -94,7 +93,7 @@ export default {
     }),
     markAsProcessed: object().shape({
       processedInfo: object({
-         processingOperationDone: mixed().oneOf(
+        processingOperationDone: mixed().oneOf(
           PROCESSING_OPERATION_CODES,
           "Cette opération de traitement n'existe pas."
         ),
