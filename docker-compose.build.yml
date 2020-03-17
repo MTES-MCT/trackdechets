@@ -27,7 +27,7 @@ services:
 
   td-doc:
     build:
-      context: ./documentation
+      context: ./doc
 
   td-etl:
     build:

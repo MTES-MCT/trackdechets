@@ -1,10 +1,11 @@
-FROM node:lts
+FROM node:lts as build-deps
 
 WORKDIR /app/website
 
-EXPOSE 3000 35729
 COPY ./docs /app/docs
 COPY ./website /app/website
 RUN yarn install
+RUN yarn run build
 
-CMD ["yarn", "start"]
+FROM nginx:1.15-alpine
+COPY --from=build-deps /app/website/build /usr/share/nginx/html
