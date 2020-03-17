@@ -72,6 +72,12 @@ const siteConfig = {
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
 
+  // Add custom markdown plugins
+  markdownPlugins: [
+    // Highlight admonitions (callouts such as tips, warnings, note, important, etc)
+    require("remarkable-admonitions")({ icon: "svg-inline" })
+  ],
+
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     { doc: "mise-en-route", label: "Documentation" },
