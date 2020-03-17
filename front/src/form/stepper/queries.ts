@@ -70,6 +70,9 @@ export const GET_FORM = gql`
       appendix2Forms {
         readableId
       }
+      ecoOrganisme {
+        id
+      }
     }
   }
   ${fragments.company}

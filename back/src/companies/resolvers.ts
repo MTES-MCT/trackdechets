@@ -1,17 +1,17 @@
-import { GraphQLContext } from "../types";
 import { prisma } from "../generated/prisma-client";
+import { GraphQLContext } from "../types";
 import { getCachedCompanySireneInfo, searchCompanies } from "./insee";
+import { renewSecurityCode, updateCompany } from "./mutations";
+import createCompany from "./mutations/create-company";
+import createUploadLink from "./mutations/create-upload-link";
 import {
   getCompanyInfos,
   getCompanyUsers,
-  getUserRole,
-  getUserCompanies,
   getDeclarations,
-  getRubriques
+  getRubriques,
+  getUserCompanies,
+  getUserRole
 } from "./queries";
-import { updateCompany, renewSecurityCode } from "./mutations";
-import createCompany from "./mutations/create-company";
-import createUploadLink from "./mutations/create-upload-link";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
@@ -118,7 +118,9 @@ export default {
       }
 
       return favorites;
-    }
+    },
+    ecoOrganismes: (_, {}, context: GraphQLContext) =>
+      context.prisma.ecoOrganismes()
   },
   Mutation: {
     renewSecurityCode: (_, { siret }) => renewSecurityCode(siret),

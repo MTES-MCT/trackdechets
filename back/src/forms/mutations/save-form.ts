@@ -23,7 +23,12 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
       where: { id },
       data: {
         ...(form as FormUpdateInput),
-        appendix2Forms: { set: formContent.appendix2Forms }
+        appendix2Forms: { set: formContent.appendix2Forms },
+        ecoOrganisme: {
+          ...(formContent.ecoOrganisme?.id
+            ? { connect: formContent.ecoOrganisme }
+            : { disconnect: true })
+        }
       }
     });
 
@@ -33,6 +38,9 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const newForm = await context.prisma.createForm({
     ...(form as FormCreateInput),
     appendix2Forms: { connect: formContent.appendix2Forms },
+    ...(formContent.ecoOrganisme?.id && {
+      ecoOrganisme: { connect: formContent.ecoOrganisme }
+    }),
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }
   });

@@ -1,5 +1,6 @@
 export type Form = {
   id: string;
+  customId: string;
   readableId: string;
   status: string;
   emitter: {
@@ -11,6 +12,7 @@ export type Form = {
       postalCode: string;
       infos: string;
     };
+    type: string;
   };
   recipient: {
     company: FormCompany;

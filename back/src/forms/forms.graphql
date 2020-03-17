@@ -308,6 +308,7 @@ type Form {
 
   "Annexe 2"
   appendix2Forms: [Form]
+  ecoOrganisme: EcoOrganisme
 }
 
 "Information sur un établissement dans un BSD"

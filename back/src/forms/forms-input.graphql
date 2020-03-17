@@ -129,6 +129,7 @@ input FormInput {
 
   "Annexe 2"
   appendix2Forms: [AppendixFormInput]
+  ecoOrganisme: EcoOrganismeInput
 }
 
 "Payload de création d'une annexe 2"
@@ -139,6 +140,11 @@ input AppendixFormInput {
 
   "N° de bordereau"
   readableId: ID
+}
+
+"Payload de liason d'un BSD à un eco-organisme"
+input EcoOrganismeInput {
+  id: ID
 }
 
 "Payload d'un établissement"

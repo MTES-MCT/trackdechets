@@ -18,6 +18,8 @@ const fieldSettings = {
   readableId: { x: 115, y: 104, fontSize: 10 },
   customId: { x: 300, y: 104, fontSize: 10 },
 
+  ecoOrganismeName: { x: 180, y: 180 },
+
   emitterCompanySiret: { x: 88, y: 210 },
   emitterCompanyName: { x: 70, y: 219, maxLength: 50 },
   emitterCompanyAddress: { x: 78, y: 230, lineBreakAt: 55, maxLength: 110 },
@@ -358,6 +360,20 @@ const getAcceptationStatus = params => {
 };
 
 /**
+ * Flatten ecoOrganisme object and keep only relevant properties for the PDF
+ *
+ * @param params
+ * @returns object
+ */
+const getFlatEcoOrganisme = params => {
+  return params.ecoOrganisme && params.ecoOrganisme.name
+    ? {
+        ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`
+      }
+    : {};
+};
+
+/**
  * Compute estimated refused quantity
  * @param wasteDetailsQuantity
  * @param quantityReceived
@@ -398,7 +414,8 @@ function processParams(params) {
     ...getWasteDetailsPackagings(data),
     ...getWasteDetailsType(data),
     ...renameAndFormatFields(data),
-    ...getAcceptationStatus(data)
+    ...getAcceptationStatus(data),
+    ...getFlatEcoOrganisme(data)
   };
 }
 

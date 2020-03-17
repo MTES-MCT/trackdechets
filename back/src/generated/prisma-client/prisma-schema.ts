@@ -176,6 +176,10 @@ type AggregateDeclaration {
   count: Int!
 }
 
+type AggregateEcoOrganisme {
+  count: Int!
+}
+
 type AggregateForm {
   count: Int!
 }
@@ -1146,6 +1150,171 @@ input DeclarationWhereUniqueInput {
   id: ID
 }
 
+type EcoOrganisme {
+  id: ID!
+  siret: String!
+  name: String!
+  address: String!
+}
+
+type EcoOrganismeConnection {
+  pageInfo: PageInfo!
+  edges: [EcoOrganismeEdge]!
+  aggregate: AggregateEcoOrganisme!
+}
+
+input EcoOrganismeCreateInput {
+  id: ID
+  siret: String!
+  name: String!
+  address: String!
+}
+
+input EcoOrganismeCreateOneInput {
+  create: EcoOrganismeCreateInput
+  connect: EcoOrganismeWhereUniqueInput
+}
+
+type EcoOrganismeEdge {
+  node: EcoOrganisme!
+  cursor: String!
+}
+
+enum EcoOrganismeOrderByInput {
+  id_ASC
+  id_DESC
+  siret_ASC
+  siret_DESC
+  name_ASC
+  name_DESC
+  address_ASC
+  address_DESC
+}
+
+type EcoOrganismePreviousValues {
+  id: ID!
+  siret: String!
+  name: String!
+  address: String!
+}
+
+type EcoOrganismeSubscriptionPayload {
+  mutation: MutationType!
+  node: EcoOrganisme
+  updatedFields: [String!]
+  previousValues: EcoOrganismePreviousValues
+}
+
+input EcoOrganismeSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: EcoOrganismeWhereInput
+  AND: [EcoOrganismeSubscriptionWhereInput!]
+  OR: [EcoOrganismeSubscriptionWhereInput!]
+  NOT: [EcoOrganismeSubscriptionWhereInput!]
+}
+
+input EcoOrganismeUpdateDataInput {
+  siret: String
+  name: String
+  address: String
+}
+
+input EcoOrganismeUpdateInput {
+  siret: String
+  name: String
+  address: String
+}
+
+input EcoOrganismeUpdateManyMutationInput {
+  siret: String
+  name: String
+  address: String
+}
+
+input EcoOrganismeUpdateOneInput {
+  create: EcoOrganismeCreateInput
+  update: EcoOrganismeUpdateDataInput
+  upsert: EcoOrganismeUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: EcoOrganismeWhereUniqueInput
+}
+
+input EcoOrganismeUpsertNestedInput {
+  update: EcoOrganismeUpdateDataInput!
+  create: EcoOrganismeCreateInput!
+}
+
+input EcoOrganismeWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  siret: String
+  siret_not: String
+  siret_in: [String!]
+  siret_not_in: [String!]
+  siret_lt: String
+  siret_lte: String
+  siret_gt: String
+  siret_gte: String
+  siret_contains: String
+  siret_not_contains: String
+  siret_starts_with: String
+  siret_not_starts_with: String
+  siret_ends_with: String
+  siret_not_ends_with: String
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  address: String
+  address_not: String
+  address_in: [String!]
+  address_not_in: [String!]
+  address_lt: String
+  address_lte: String
+  address_gt: String
+  address_gte: String
+  address_contains: String
+  address_not_contains: String
+  address_starts_with: String
+  address_not_starts_with: String
+  address_ends_with: String
+  address_not_ends_with: String
+  AND: [EcoOrganismeWhereInput!]
+  OR: [EcoOrganismeWhereInput!]
+  NOT: [EcoOrganismeWhereInput!]
+}
+
+input EcoOrganismeWhereUniqueInput {
+  id: ID
+  siret: String
+}
+
 enum EmitterType {
   PRODUCER
   OTHER
@@ -1233,6 +1402,7 @@ type Form {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganisme
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
 }
 
@@ -1320,6 +1490,7 @@ input FormCreateInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeCreateOneInput
   appendix2Forms: FormCreateManyInput
 }
 
@@ -2603,6 +2774,7 @@ input FormUpdateDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
 }
 
@@ -2683,6 +2855,7 @@ input FormUpdateInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
 }
 
@@ -3808,6 +3981,7 @@ input FormWhereInput {
   traderValidityLimit_lte: DateTime
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
+  ecoOrganisme: EcoOrganismeWhereInput
   appendix2Forms_every: FormWhereInput
   appendix2Forms_some: FormWhereInput
   appendix2Forms_none: FormWhereInput
@@ -4345,6 +4519,12 @@ type Mutation {
   upsertDeclaration(where: DeclarationWhereUniqueInput!, create: DeclarationCreateInput!, update: DeclarationUpdateInput!): Declaration!
   deleteDeclaration(where: DeclarationWhereUniqueInput!): Declaration
   deleteManyDeclarations(where: DeclarationWhereInput): BatchPayload!
+  createEcoOrganisme(data: EcoOrganismeCreateInput!): EcoOrganisme!
+  updateEcoOrganisme(data: EcoOrganismeUpdateInput!, where: EcoOrganismeWhereUniqueInput!): EcoOrganisme
+  updateManyEcoOrganismes(data: EcoOrganismeUpdateManyMutationInput!, where: EcoOrganismeWhereInput): BatchPayload!
+  upsertEcoOrganisme(where: EcoOrganismeWhereUniqueInput!, create: EcoOrganismeCreateInput!, update: EcoOrganismeUpdateInput!): EcoOrganisme!
+  deleteEcoOrganisme(where: EcoOrganismeWhereUniqueInput!): EcoOrganisme
+  deleteManyEcoOrganismes(where: EcoOrganismeWhereInput): BatchPayload!
   createForm(data: FormCreateInput!): Form!
   updateForm(data: FormUpdateInput!, where: FormWhereUniqueInput!): Form
   updateManyForms(data: FormUpdateManyMutationInput!, where: FormWhereInput): BatchPayload!
@@ -4433,6 +4613,9 @@ type Query {
   declaration(where: DeclarationWhereUniqueInput!): Declaration
   declarations(where: DeclarationWhereInput, orderBy: DeclarationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Declaration]!
   declarationsConnection(where: DeclarationWhereInput, orderBy: DeclarationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DeclarationConnection!
+  ecoOrganisme(where: EcoOrganismeWhereUniqueInput!): EcoOrganisme
+  ecoOrganismes(where: EcoOrganismeWhereInput, orderBy: EcoOrganismeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [EcoOrganisme]!
+  ecoOrganismesConnection(where: EcoOrganismeWhereInput, orderBy: EcoOrganismeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): EcoOrganismeConnection!
   form(where: FormWhereUniqueInput!): Form
   forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form]!
   formsConnection(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FormConnection!
@@ -4898,6 +5081,7 @@ type Subscription {
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   companyAssociation(where: CompanyAssociationSubscriptionWhereInput): CompanyAssociationSubscriptionPayload
   declaration(where: DeclarationSubscriptionWhereInput): DeclarationSubscriptionPayload
+  ecoOrganisme(where: EcoOrganismeSubscriptionWhereInput): EcoOrganismeSubscriptionPayload
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
   grant(where: GrantSubscriptionWhereInput): GrantSubscriptionPayload
   installation(where: InstallationSubscriptionWhereInput): InstallationSubscriptionPayload

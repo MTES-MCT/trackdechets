@@ -70,6 +70,9 @@ export default {
   Form: {
     appendix2Forms: (parent, args, context: GraphQLContext) => {
       return context.prisma.form({ id: parent.id }).appendix2Forms();
+    },
+    ecoOrganisme: (parent, _, context: GraphQLContext) => {
+      return context.prisma.form({ id: parent.id }).ecoOrganisme();
     }
   },
   Query: {

@@ -10,6 +10,7 @@ type FormSiretsAndOwner = {
   recipientCompanySiret: string;
   emitterCompanySiret: string;
   transporterCompanySiret: string;
+  ecoOrganisme: { siret: string };
   owner: { id: string };
 };
 
@@ -28,8 +29,11 @@ export const canAccessForm = and(
     );
     return (
       formInfos.owner.id === ctx.user.id ||
-      currentUserSirets.includes(formInfos.emitterCompanySiret) ||
-      currentUserSirets.includes(formInfos.recipientCompanySiret) ||
+      [
+        formInfos.emitterCompanySiret,
+        formInfos.recipientCompanySiret,
+        formInfos.ecoOrganisme?.siret
+      ].some(siret => currentUserSirets.includes(siret)) ||
       new ForbiddenError(`Vous n'êtes pas autorisé à accéder à ce bordereau.`)
     );
   })
@@ -101,6 +105,7 @@ async function getFormAccessInfos(
     recipientCompanySiret
     emitterCompanySiret
     transporterCompanySiret
+    ecoOrganisme { siret }
     owner { id }
   }
 `);
