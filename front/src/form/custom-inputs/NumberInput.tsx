@@ -15,6 +15,7 @@ export default function NumberInput({
         value={!value && value !== 0 ? "" : value}
         onChange={onChange}
         onBlur={onBlur}
+        min="0"
         {...props}
       />
     </label>
