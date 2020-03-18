@@ -8,4 +8,5 @@ RUN yarn install
 RUN yarn run build
 
 FROM nginx:1.15-alpine
-COPY --from=build-deps /app/website/build /usr/share/nginx/html
+ENV PROJECT_NAME="td-doc"
+COPY --from=build-deps /app/website/build/${PROJECT_NAME} /usr/share/nginx/html

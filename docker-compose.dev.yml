@@ -146,12 +146,6 @@ services:
       VIRTUAL_PORT: 3000
       LETSENCRYPT_HOST: $DOC_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      API_HOST: $API_HOST
-      API_URL_SCHEME: $API_URL_SCHEME
-      UI_HOST: $UI_HOST
-      UI_URL_SCHEME: $UI_URL_SCHEME
-      DOC_HOST: $DOC_HOST
-      DOC_URL_SCHEME: $DOC_URL_SCHEME
 
   metabase:
     image: metabase/metabase:v0.34.2

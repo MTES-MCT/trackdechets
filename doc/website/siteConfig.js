@@ -42,31 +42,17 @@ const users = [
   }
 ];
 
-const {
-  API_HOST,
-  API_URL_SCHEME,
-  UI_HOST,
-  UI_URL_SCHEME,
-  DOC_HOST,
-  DOC_URL_SCHEME
-} = process.env;
-
-const API_URL = `${API_URL_SCHEME}://${API_HOST}`;
-const UI_URL = `${UI_URL_SCHEME}://${UI_HOST}`;
-const DOC_URL = `${DOC_URL_SCHEME}://${DOC_HOST}`;
-
 const siteConfig = {
   title: "Trackdéchets Développeurs", // Title for your website.
   tagline:
     "Connectez-vous à l'API Trackdéchets pour une traçabilité 100% dématérialisée",
-  url: DOC_URL, // Your website URL
   baseUrl: "/", // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
-  projectName: "trackdechets-developers",
+  projectName: "td-doc",
   organizationName: "Trackdéchets",
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
@@ -85,7 +71,7 @@ const siteConfig = {
     { doc: "introduction", label: "Documentation" },
     { doc: "api-reference", label: "Référence de l'API" },
     {
-      href: API_URL,
+      href: "https://api.trackdechets.beta.gouv.fr",
       label: "Playground",
       external: true
     },
@@ -144,7 +130,7 @@ const siteConfig = {
   // template. For example, if you need your repo's URL...
   repoUrl: "https://github.com/MTES-MCT/trackdechets",
 
-  trackdechetsUrl: UI_URL,
+  trackdechetsUrl: "https://trackdechets.beta.gouv.fr",
 
   roadmapUrl: "https://trello.com/b/2pkc7bFg/trackd%C3%A9chets-roadmap-produit",
 
@@ -152,7 +138,7 @@ const siteConfig = {
 
   statusUrl: "https://status.trackdechets.beta.gouv.fr",
 
-  plagroundUrl: API_URL
+  playgroundUrl: "https://api.trackdechets.beta.gouv.fr"
 };
 
 module.exports = siteConfig;
