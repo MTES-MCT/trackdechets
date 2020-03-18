@@ -10,6 +10,7 @@ type FormSiretsAndOwner = {
   recipientCompanySiret: string;
   emitterCompanySiret: string;
   transporterCompanySiret: string;
+  traderCompanySiret: string;
   ecoOrganisme: { siret: string };
   owner: { id: string };
 };
@@ -93,6 +94,24 @@ export const isFormTransporter = and(
   })
 );
 
+export const isFormTrader = and(
+  isAuthenticated,
+  rule()(async (_, { id }, ctx) => {
+    ensureRuleParametersArePresent(id);
+
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    return (
+      currentUserSirets.includes(formInfos.traderCompanySiret) ||
+      new ForbiddenError(`Vous n'êtes pas négociant de ce bordereau.`)
+    );
+  })
+);
+
 async function getFormAccessInfos(
   formId: string,
   userId: string,
@@ -105,6 +124,7 @@ async function getFormAccessInfos(
     recipientCompanySiret
     emitterCompanySiret
     transporterCompanySiret
+    traderCompanySiret
     ecoOrganisme { siret }
     owner { id }
   }
