@@ -42,7 +42,7 @@ Dans le standard REST, la méthode de requête HTTP (`GET`, `POST`, `PUT`, `DELE
 Pour faire une requête GraphQL en utilisant cURL, vous devez faire un `POST` avec un corps JSON. Le corps de la requête doit contenir une chaine de caractères appelée `query`.
 
 
-```
+```bash
 curl \
   -X POST \
   -H "Content-Type: application/json" \
@@ -72,7 +72,8 @@ Les `queries` GraphQL retournent uniquement les données spécifiées. Pour cons
 
 Exemple avec une requête de profil utilisateur
 
-```
+
+```graphql
 query {
   me {
     name
@@ -89,7 +90,7 @@ Des variables peuvent également être ajoutées sur certaines `queries`.
 
 Exemple avec une requête d'information entreprise en passant un numéro siret en variable
 
-```
+```graphql
 query {
   companyInfos(siret: "13001045700013") {
     name,
@@ -108,7 +109,7 @@ Pour construire une mutation, il faut spécifier trois choses:
 
 Exemple avec une requête permettant d'éditer son profil utilisateur Trackdéchets en ajoutant un numéro de téléphone
 
-```
+```graphql
 mutation {
   editProfile(phone: "06xxxxxxxx"){
     id

@@ -9,7 +9,7 @@ sidebar_label: Gestion des erreurs
 
 Dans le cas où une erreur a lieu avant ou pendant l'exécution d'une requête GraphQL, un champ `errors` sera présent dans le corps de la réponse. Ce champ correspond à une liste non vide d'erreurs formatées de la façon suivante:
 
-```
+```json
 {
   "errors": [
     {
@@ -32,7 +32,7 @@ La liste des codes erreur utilisés est la suivante:
 
 * `GRAPHQL_PARSE_FAILED`: Erreur de syntaxe dans la requête GraphQL. Exemple
 
-```
+```graphql
 query {
   me  // accolade manquante
     email
@@ -42,7 +42,7 @@ query {
 
 * `GRAPHQL_VALIDATION_FAILED`: La syntaxe de la requête GraphQL est correcte mais elle ne correspond pas au schéma. Exemple:
 
-```
+```graphql
 {
   query {
     me {
@@ -57,7 +57,7 @@ query {
 
 * `BAD_USER_INPUT`: La requête GraphQL est valide mais la valeur des arguments fourni ne l'est pas. Exemple: vous essayez de passer un SIRET qui ne fait pas 14 caractères.
 
-```
+```graphql
 query {
   companyInfos(siret: "123"){
     siret
@@ -67,7 +67,7 @@ query {
 
 Dans le cas des erreurs `BAD_USER_INPUT` un champ additionnel `invalidArgs` pourra être présent dans la réponse
 
-```
+```json
 {
   "errors": [
     {
@@ -85,7 +85,7 @@ Dans le cas des erreurs `BAD_USER_INPUT` un champ additionnel `invalidArgs` pour
 
 * `INTERNAL_SERVER_ERROR`: Une erreur inconnue s'est produite. Ce code s'accompagne du message d'erreur "Erreur serveur"
 
-```
+```json
 {
   "errors": [
     {

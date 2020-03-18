@@ -25,7 +25,7 @@ La plupart des requêtes nécessitant d'être authentifié, vous devrez donc [r�
 
 Le token doit être inséré dans le cadre inférieur gauche de l'écran sous la forme d'un header d'autorisation de type "Bearer"
 
-```
+```json
 {
   "Authorization": "Bearer ACCESS_TOKEN"
 }
@@ -43,13 +43,13 @@ Une fois le token renseigné, vous pourrez écrire `queries` et `mutations` dans
 
 Dans la zone de gauche, copiez cette requête.
 
-```
-    query {
-      me {
-        id
-        email
-      }
-    }
+```graphql
+query {
+  me {
+    id
+    email
+  }
+}
 ```
 
 En cliquant sur le bouton central, vous verrez la réponse dans la zone de droite.

@@ -78,6 +78,8 @@ const siteConfig = {
     require("remarkable-admonitions")({ icon: "svg-inline" })
   ],
 
+  usePrism: ["graphql"],
+
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     { doc: "introduction", label: "Documentation" },
