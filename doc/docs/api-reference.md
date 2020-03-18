@@ -86,6 +86,16 @@ type de favoris
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>ecoOrganismes</strong></td>
+<td valign="top">[<a href="#ecoorganisme">EcoOrganisme</a>]</td>
+<td>
+
+USAGE INTERNE
+Renvoie la liste des éco-organismes
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>form</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -1525,6 +1535,59 @@ Type de déclaration GEREP: producteur ou traiteur
 </tbody>
 </table>
 
+### EcoOrganisme
+
+Eco-organisme
+Les éco-organismes n'apparaissent pas en case 1 du bordereau mais sont quand même responsables du déchet.
+C'est l'entreprise de collecte de déchet qui apparait en case 1.
+Pour pouvoir saisir un éco-organisme, le détenteur du déchet doit être défini comme 'Autre détenteur'.
+Seul un éco-organisme enregistré dans Trackdéchet peut être associé.
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom de l'éco-organisme
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Siret de l'éco-organisme
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Adresse de l'éco-organisme
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### Emitter
 
 Émetteur du BSD (case 1)
@@ -1878,6 +1941,11 @@ Destination ultérieure prévue (case 12)
 Annexe 2
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
+<td valign="top"><a href="#ecoorganisme">EcoOrganisme</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -2993,6 +3061,27 @@ Numéro de téléphone de contact dans l'établissement
 </tbody>
 </table>
 
+### EcoOrganismeInput
+
+Payload de liason d'un BSD à un eco-organisme
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### EmitterInput
 
 Payload lié à un l'émetteur du BSD (case 1)
@@ -3130,6 +3219,11 @@ Négociant (case 7)
 Annexe 2
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
+<td valign="top"><a href="#ecoorganismeinput">EcoOrganismeInput</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
