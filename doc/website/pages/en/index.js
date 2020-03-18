@@ -136,7 +136,7 @@ class Index extends React.Component {
         {[
           {
             content:
-              "Trackdéchets a 2 composantes distinctes : un moteur de gestion des BSD " +
+              "Trackdéchets a deux composantes distinctes : un moteur de gestion des BSD " +
               "(constitutif de l’API GraphQL Trackdéchets) et une interface graphique. " +
               "Que vous soyez professionnel du déchet (SI métier) ou un SaaS de gestion des déchets, " +
               "en vous connectant à l’API Trackdéchets, vous pourrez échanger des données avec tous " +
