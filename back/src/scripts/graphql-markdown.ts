@@ -9,9 +9,18 @@ import { buildSchemaFromTypeDefinitions } from "apollo-server-express";
 
 const content = [];
 
+// Docusaurus use this annotation to generate markdown pages
+const prologue = `---
+id: api-reference
+title: Référence de l'API
+sidebar_label: Référence de l'API
+---
+`;
+
 const options = {
-  title: "Référence de l'API GraphQL",
+  skipTitle: true,
   skipTableOfContents: true,
+  prologue,
   printer: (txt: string) => content.push(txt)
 };
 
