@@ -19,6 +19,11 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
   await checkThatUserIsPartOftheForm(userId, { ...form, id }, context);
 
   if (id) {
+    // {disconnect: true} fails if there is no relation, so we have to check ecoOrganisme before
+    const existingEcoOrganisme = await context.prisma
+      .form({ id })
+      .ecoOrganisme();
+
     const updatedForm = await context.prisma.updateForm({
       where: { id },
       data: {
@@ -27,11 +32,12 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
         ecoOrganisme: {
           ...(formContent.ecoOrganisme?.id
             ? { connect: formContent.ecoOrganisme }
-            : { disconnect: true })
+            : existingEcoOrganisme
+            ? { disconnect: true }
+            : null)
         }
       }
     });
-
     return unflattenObjectFromDb(updatedForm);
   }
 
