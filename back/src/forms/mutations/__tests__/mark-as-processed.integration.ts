@@ -113,6 +113,47 @@ describe("Integration / Mark as processed mutation", () => {
     expect(statusLogs[0].loggedAt).toBeTruthy();
   });
 
+  it("should not mark a form as processed when operation code is not valid", async () => {
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const mutation = `
+      mutation   {
+        markAsProcessed(id: "${form.id}", processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 18",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }) {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation);
+
+    expect(errors[0].message).toBe(
+      "Cette opération de traitement n'existe pas."
+    );
+    const resultingForm = await prisma.form({ id: form.id });
+    expect(resultingForm.status).toBe("RECEIVED");
+
+    // no statusLog is created
+    const statusLogs = await prisma.statusLogs({
+      where: {
+        form: { id: resultingForm.id },
+        user: { id: user.id }
+      }
+    });
+    expect(statusLogs.length).toEqual(0);
+  });
+
   it("should mark a form as AWAITING_GROUP when operation implies so", async () => {
     const form = await formFactory({
       ownerId: user.id,

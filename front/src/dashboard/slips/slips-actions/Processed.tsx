@@ -81,7 +81,7 @@ export default function Processed(props: SlipActionProps) {
                 transférée
               </label>
             </div>
-            {["D 13", "D 14", "D 15", "R 13"].indexOf(
+            {["D 13", "D 14", "D 15", "R 12", "R 13"].indexOf(
               values.processingOperationDone
             ) > -1 && (
               <div className="form__group">

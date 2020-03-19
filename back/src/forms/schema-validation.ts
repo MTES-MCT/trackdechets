@@ -1,7 +1,37 @@
-import { object, date, string, boolean, number, array } from "yup";
+import { object, date, string, boolean, number, array, mixed } from "yup";
 import { companySchema } from "./validator";
 import { GROUP_CODES } from "./workflow/machine";
 
+const PROCESSING_OPERATION_CODES = [
+  "D 1",
+  "D 2",
+  "D 3",
+  "D 4",
+  "D 5",
+  "D 6",
+  "D 7",
+  "D 8",
+  "D 9",
+  "D 10",
+  "D 11",
+  "D 12",
+  "D 13",
+  "D 14",
+  "D 15",
+  "R 1",
+  "R 2",
+  "R 3",
+  "R 4",
+  "R 5",
+  "R 6",
+  "R 7",
+  "R 8",
+  "R 9",
+  "R 10",
+  "R 11",
+  "R 12",
+  "R 13"
+];
 export const receivedInfoSchema = object({
   wasteAcceptationStatus: string()
     .required()
@@ -63,8 +93,8 @@ export default {
     }),
     markAsProcessed: object().shape({
       processedInfo: object({
-        processingOperationDone: string().matches(
-          /(R|D)\s\d{1,2}/,
+        processingOperationDone: mixed().oneOf(
+          PROCESSING_OPERATION_CODES,
           "Cette opération de traitement n'existe pas."
         ),
         processingOperationDescription: string().required(
