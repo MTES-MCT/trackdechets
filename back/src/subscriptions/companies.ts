@@ -96,7 +96,7 @@ export async function warnIfUserCreatesTooManyCompanies(
     .aggregate()
     .count();
 
-  if (userCompaniesNumber >= NB_OF_COMPANIES_BEFORE_ALERT) {
+  if (userCompaniesNumber > NB_OF_COMPANIES_BEFORE_ALERT) {
     return sendMail({
       body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
       subject:
