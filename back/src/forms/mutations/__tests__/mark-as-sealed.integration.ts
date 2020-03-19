@@ -14,9 +14,7 @@ jest.mock("axios", () => ({
 }));
 
 describe("{ mutation { markAsSealed } }", () => {
-  afterAll(() => {
-    resetDatabase();
-  });
+  afterAll(() => resetDatabase());
 
   test("the emitter of the BSD can seal it", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
@@ -96,7 +94,43 @@ describe("{ mutation { markAsSealed } }", () => {
     expect(statusLogs.length).toEqual(1);
   });
 
-  test("should fail if user is neither emitter or recipient", async () => {
+  test("the trader of the BSD can seal it", async () => {
+    const emitterCompany = await companyFactory();
+
+    const recipientCompany = await companyFactory();
+
+    const { user, company: traderCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        traderCompanySiret: traderCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutation = `
+      mutation   {
+        markAsSealed(id: "${form.id}") {
+          id
+        }
+      }
+    `;
+
+    await mutate(mutation);
+
+    form = await prisma.form({ id: form.id });
+
+    expect(form.status).toEqual("SEALED");
+  });
+
+  test("should fail if user is neither emitter or recipient or trader", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
 
     const emitterCompany = await companyFactory();

@@ -14,9 +14,7 @@ jest.mock("axios", () => ({
 }));
 
 describe("{ mutation { markAsSent } }", () => {
-  afterAll(() => {
-    resetDatabase();
-  });
+  afterAll(() => resetDatabase());
 
   test("the emitter of the BSD can send it when it's sealed", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
