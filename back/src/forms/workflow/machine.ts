@@ -48,6 +48,11 @@ export const formWorkflowMachine = Machine(
         entry: "setStable",
         exit: "setUnStable",
         on: {
+          MARK_TEMP_STORED: [
+            {
+              target: FormState.TempStored
+            }
+          ],
           MARK_RECEIVED: [
             {
               target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
@@ -140,6 +145,43 @@ export const formWorkflowMachine = Machine(
       [FormState.Processed]: { type: "final" },
       [FormState.NoTraceability]: { type: "final" },
       [FormState.AwaitingGroup]: { type: "final" },
+      [FormState.TempStored]: {
+        entry: "setStable",
+        exit: "setUnStable",
+        on: {
+          MARK_RESEALED: [
+            {
+              target: FormState.Resealed
+            }
+          ]
+        }
+      },
+      [FormState.Resealed]: {
+        entry: "setStable",
+        exit: "setUnStable",
+        on: {
+          MARK_RESENT: [
+            {
+              target: FormState.Resent
+            }
+          ]
+        }
+      },
+      [FormState.Resent]: {
+        entry: "setStable",
+        exit: "setUnStable",
+        on: {
+          MARK_RECEIVED: [
+            {
+              target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
+              cond: "isFormAccepted"
+            },
+            {
+              target: FormState.Refused
+            }
+          ]
+        }
+      },
       error: {
         states: {
           invalidForm: { meta: WorkflowError.InvalidForm },

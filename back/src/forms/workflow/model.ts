@@ -6,5 +6,8 @@ export enum FormState {
   Refused = "REFUSED",
   Processed = "PROCESSED",
   NoTraceability = "NO_TRACEABILITY",
-  AwaitingGroup = "AWAITING_GROUP"
+  AwaitingGroup = "AWAITING_GROUP",
+  TempStored = "TEMP_STORED",
+  Resealed = "RESEALED",
+  Resent = "RESENT"
 }
