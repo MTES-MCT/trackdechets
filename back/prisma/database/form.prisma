@@ -111,30 +111,22 @@ type Form {
   ecoOrganisme: EcoOrganisme
 
   appendix2Forms: [Form]
-  tempStorage: TempStorageFormInfos @relation(link: INLINE)
+  tempStorageFormInfos: TempStorageFormInfos @relation(link: INLINE)
 }
 
 type TempStorageFormInfos {
   id: ID! @id
 
   # Frame 13
-  tempStorageQuantityType: QuantityType
-  tempStorageQuantityReceived: Float
-  tempStorageWasteAcceptationStatus: WasteAcceptationStatus
-  tempStorageWasteRefusalReason: String
-  tempStorageReceivedAt: DateTime
-  tempStorageSignedAt: DateTime
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerSignedAt: DateTime
 
-  # Frame 14
-  destinationCompanyName: String
-  destinationCompanySiret: String
-  destinationCompanyAddress: String
-  destinationCompanyContact: String
-  destinationCompanyPhone: String
-  destinationCompanyMail: String
-  destinationCap: String
-  destinationProcessingOperation: String
-  destinationIsFilledByEmitter: Boolean
+  # Frame 14 - the rest of the infos are in frame 2
+  destinationIsFilledByEmitter: Boolean @default(value: true)
 
   # Frame 15, 16, 17
   wasteDetailsOnuCode: String
