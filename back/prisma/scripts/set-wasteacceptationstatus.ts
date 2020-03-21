@@ -7,7 +7,7 @@ import {
 @registerUpdater(
   "Set wasteAcceptationStatus",
   `The wasteAcceptationStatus properties was added to replace isAccepted`,
-  true
+  false
 )
 export class SetFormUpdater implements Updater {
   async run() {
