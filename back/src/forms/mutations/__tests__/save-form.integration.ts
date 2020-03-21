@@ -5,13 +5,17 @@ import { prisma } from "../../../generated/prisma-client";
 import { EMPTY_FORM } from "../__mocks__/data";
 
 describe("{ mutation { saveForm } }", () => {
-  afterAll(() => resetDatabase());
-
+  beforeEach(async () => {
+    await resetDatabase();
+  });
+  afterAll(async () => {
+    await resetDatabase();
+  });
   test("should create a form with a pickup site", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload = EMPTY_FORM;
+    const payload = { ...EMPTY_FORM };
 
     payload.emitter.workSite = {
       name: "The name",
@@ -77,7 +81,7 @@ describe("{ mutation { saveForm } }", () => {
     });
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = EMPTY_FORM;
+    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
 
     payload.ecoOrganisme = { id: eo.id };
     payload.emitter.company.siret = company.siret;
@@ -124,5 +128,64 @@ describe("{ mutation { saveForm } }", () => {
       .ecoOrganisme();
 
     expect(formEcoOrganisme3).toBe(null);
+  });
+
+  test("should update a form", async () => {
+    // prevent ecoOrganisme regression
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const createPayload = { ...EMPTY_FORM };
+
+    createPayload.emitter.company.siret = company.siret;
+    createPayload.emitter.company.name = company.name;
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+          emitter {
+            workSite {
+              name
+              address
+              city
+              postalCode
+              infos
+            }
+          }
+          wasteDetails{
+            name
+          }
+        }
+      }
+    `;
+
+    // create a form
+    const {
+      data: {
+        saveForm: { id }
+      }
+    } = await mutate(mutation, {
+      variables: { formInput: createPayload }
+    });
+
+    // update its waste name
+    const updatePayload = {
+      ...createPayload,
+      id: id,
+      wasteDetails: { name: "things" }
+    };
+
+    const {
+      data: {
+        saveForm: {
+          wasteDetails: { name }
+        }
+      }
+    } = await mutate(mutation, {
+      variables: { formInput: updatePayload }
+    });
+
+    expect(name).toBe("things");
   });
 });
