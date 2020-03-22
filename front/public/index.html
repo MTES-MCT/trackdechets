@@ -50,43 +50,6 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
 
-    <!-- Outdated browsers -->
-    <div id="outdated"></div>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.css"
-    />
-    <script
-      defer
-      src="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.5/outdatedbrowser.min.js"
-    ></script>
-    <script>
-      function addLoadEvent(func) {
-        var oldonload = window.onload;
-        if (typeof window.onload != "function") {
-          window.onload = func;
-        } else {
-          window.onload = function() {
-            if (oldonload) {
-              oldonload();
-            }
-            func();
-          };
-        }
-      }
-      //call plugin function after DOM ready
-      addLoadEvent(function() {
-        // Outdated browsers
-        outdatedBrowser({
-          bgColor: "#f25648",
-          color: "#ffffff",
-          lowerThan: "transform",
-          languagePath: "https://browser-update.org/fr/update.html"
-        });
-      });
-    </script>
-    <!-- End Outdated browsers -->
-
     <!-- CRISP -->
     <script type="text/javascript">
         // CRISP
