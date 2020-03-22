@@ -6,6 +6,7 @@ import client from "./graphql-client";
 import LayoutContainer from "./LayoutContainer";
 import { Settings } from "luxon";
 import setYupLocale from "./common/setYupLocale";
+import BrowserDetect from "./BrowserDetect";
 
 Settings.defaultLocale = "fr";
 
@@ -15,12 +16,14 @@ setYupLocale();
 
 export default function App() {
   return (
-    <ApolloProvider client={client}>
-      <Router>
-        <div className="App">
-          <LayoutContainer />
-        </div>
-      </Router>
-    </ApolloProvider>
+    <BrowserDetect>
+      <ApolloProvider client={client}>
+        <Router>
+          <div className="App">
+            <LayoutContainer />
+          </div>
+        </Router>
+      </ApolloProvider>
+    </BrowserDetect>
   );
 }
