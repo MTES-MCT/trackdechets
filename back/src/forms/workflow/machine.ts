@@ -55,6 +55,10 @@ export const formWorkflowMachine = Machine(
           ],
           MARK_RECEIVED: [
             {
+              target: "error.invalidTransition",
+              cond: "hasTempStorageDestination"
+            },
+            {
               target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
               cond: "isFormAccepted"
             },
@@ -153,6 +157,11 @@ export const formWorkflowMachine = Machine(
             {
               target: FormState.Resealed
             }
+          ],
+          MARK_RESENT: [
+            {
+              target: FormState.Resent
+            }
           ]
         }
       },
@@ -216,7 +225,8 @@ export const formWorkflowMachine = Machine(
         return ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
           ctx.form.wasteAcceptationStatus
         );
-      }
+      },
+      hasTempStorageDestination: ctx => ctx.form.tempStorageFormInfos != null
     }
   }
 );

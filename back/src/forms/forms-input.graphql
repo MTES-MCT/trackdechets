@@ -1,6 +1,5 @@
 "Payload de signature d'un BSD"
 input SentFormInput {
-
   "Date de l'envoi du déchet par l'émetteur (case 9)"
   sentAt: DateTime
 
@@ -10,7 +9,6 @@ input SentFormInput {
 
 "Payload de signature d'un BSD par un transporteur"
 input TransporterSignatureFormInput {
-
   "Date de l'envoi du déchet par l'émetteur (case 9)"
   sentAt: DateTime!
 
@@ -38,7 +36,6 @@ input TransporterSignatureFormInput {
 
 "Statut d'acceptation d'un déchet"
 enum WasteAcceptationStatusInput {
-
   "Accepté en totalité"
   ACCEPTED
 
@@ -51,7 +48,6 @@ enum WasteAcceptationStatusInput {
 
 "Payload de réception d'un BSD"
 input ReceivedFormInput {
-
   "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
 
@@ -70,7 +66,6 @@ input ReceivedFormInput {
 
 "Payload de traitement d'un BSD"
 input ProcessedFormInput {
-
   "Traitement réalisé (code D/R)"
   processingOperationDone: String!
 
@@ -91,7 +86,6 @@ input ProcessedFormInput {
 }
 
 input NextDestinationInput {
-
   "Traitement prévue (code D/R)"
   processingOperation: String
 
@@ -99,10 +93,8 @@ input NextDestinationInput {
   company: CompanyInput
 }
 
-
 "Payload de création d'un BSD"
 input FormInput {
-
   "Identifiant opaque"
   id: ID
 
@@ -134,7 +126,6 @@ input FormInput {
 
 "Payload de création d'une annexe 2"
 input AppendixFormInput {
-
   "SIRET de l'établissement émetteur"
   emitterSiret: String
 
@@ -149,7 +140,6 @@ input EcoOrganismeInput {
 
 "Payload d'un établissement"
 input CompanyInput {
-
   "SIRET de l'établissement"
   siret: String
 
@@ -180,7 +170,6 @@ input WorkSiteInput {
 
 "Payload lié à un l'émetteur du BSD (case 1)"
 input EmitterInput {
-
   "Type d'émetteur"
   type: EmitterType
 
@@ -199,7 +188,6 @@ Payload lié à l'installation de destination ou d'entreprosage
 ou de reconditionnement prévue (case 2)
 """
 input RecipientInput {
-
   "N° de CAP (le cas échéant)"
   cap: String
 
@@ -212,7 +200,6 @@ input RecipientInput {
 
 "Collecteur - transporteur (case 8)"
 input TransporterInput {
-
   "Exemption de récipissé"
   isExemptedOfReceipt: Boolean
 
@@ -234,7 +221,6 @@ input TransporterInput {
 
 "Payload lié au négociant"
 input TraderInput {
-
   "N° de récipissé"
   receipt: String
 
@@ -250,7 +236,6 @@ input TraderInput {
 
 "Payload lié au détails du déchet (case 3, 4, 5, 6)"
 input WasteDetailsInput {
-
   "Rubrique déchet au format |_|_| |_|_| |_|_| (*)"
   code: String
 
@@ -277,4 +262,23 @@ input WasteDetailsInput {
 
   "Consistance"
   consistence: Consistence
+}
+
+input TempStoredFormIput {
+  quantityType: QuantityType!
+  quantityReceived: Float!
+  wasteAcceptationStatus: WasteAcceptationStatusInput!
+  wasteRefusalReason: String
+
+  receivedAt: DateTime!
+}
+
+input ResentFormInput {
+  wasteDetails: WasteDetailsInput
+  transporter: TransporterInput
+
+  "Nom du signataire du BSD suite  (case 19)"
+  signedBy: String
+  "Date de signature du BSD suite (case 19)"
+  signedAt: DateTime
 }

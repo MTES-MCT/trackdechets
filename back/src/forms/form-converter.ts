@@ -5,7 +5,7 @@ export function flattenObjectForDb(
   previousKeys = [],
   dbObject = {}
 ): Partial<Form> {
-  const relations = ["ecoOrganisme"];
+  const relations = ["ecoOrganisme", "tempStorageFormInfos"];
 
   Object.keys(input).forEach(key => {
     if (
@@ -41,7 +41,8 @@ export function unflattenObjectFromDb(input, apiObject = {}) {
     "wasteDetails",
     "company",
     "nextDestination",
-    "workSite"
+    "workSite",
+    "temporaryStorer"
   ];
 
   Object.keys(input).forEach(key => {

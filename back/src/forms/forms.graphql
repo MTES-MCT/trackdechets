@@ -127,6 +127,16 @@ type Mutation {
     "Informations liées à la signature transporteur"
     signingInfo: TransporterSignatureFormInput!
   ): Form
+
+  markAsTempStored(
+    id: ID!,
+    tempStoredInfos: TempStoredFormIput!
+  ): Form
+
+  markAsResent(
+    id: ID!,
+    resentInfos: ResentFormInput!
+  ): Form
 }
 
 type Subscription {
