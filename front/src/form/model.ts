@@ -3,6 +3,9 @@ export type Form = {
   customId: string;
   readableId: string;
   status: string;
+  ecoOrganisme: {
+    id: string;
+  };
   emitter: {
     company: FormCompany;
     workSite: {
