@@ -61,7 +61,8 @@ export function getNextStep(form: Form, currentSiret: string) {
   const currentUserIsEmitter = currentSiret === form.emitter.company.siret;
   const currentUserIsRecipient = currentSiret === form.recipient.company.siret;
   const currentUserIsTempStorer =
-    currentSiret === form.temporaryStorageDetail.temporaryStorer.company.siret;
+    currentSiret ===
+    form.temporaryStorageDetail?.temporaryStorer?.company?.siret;
 
   if (form.status === FormStatus.DRAFT) return FormStatus.SEALED;
 

@@ -7,6 +7,7 @@ import initialState from "./initial-state";
 import { Form } from "./model";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
+import TemporaryStorage from "./TemporaryStorage/TemporaryStorage";
 
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -68,7 +69,7 @@ export default function Recipient() {
         </label>
       </div>
       {hasTrader && (
-        <>
+        <div className="form__group">
           <h4>Négociant</h4>
           <CompanySelector name="trader.company" />
 
@@ -98,8 +99,10 @@ export default function Recipient() {
 
             <RedErrorMessage name="trader.validityLimit" />
           </div>
-        </>
+        </div>
       )}
+
+      <TemporaryStorage name="temporaryStorageDetail" />
     </>
   );
 }
