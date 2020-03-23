@@ -18,15 +18,21 @@ describe("Create company endpoint", () => {
     const user = await userFactory();
 
     const siret = "12345678912345";
+    const gerepId = "1234";
+    const name = "Acme";
+    const companyTypes = ["PRODUCER"];
+    const naf = "456";
 
     const mutation = `
     mutation {
       createCompany(
         companyInput: {
           siret: "${siret}"
-          gerepId: "1234"
+          gerepId: "${gerepId}"
+          companyName: "${name}"
+          companyTypes: [${companyTypes}]
         }
-      ) { id }
+      ) { siret, gerepId, name, companyTypes }
     }
   `;
 
@@ -34,8 +40,13 @@ describe("Create company endpoint", () => {
 
     const { data } = await mutate(mutation);
 
-    expect(data.createCompany.id).toBeDefined();
-    expect(data.createCompany.id).not.toBeNull();
+    const expected = {
+      siret,
+      gerepId,
+      name,
+      companyTypes
+    };
+    expect(data.createCompany).toEqual(expected);
 
     const newCompanyExists = await prisma.$exists.company({ siret });
     expect(newCompanyExists).toBe(true);
