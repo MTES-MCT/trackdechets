@@ -40,6 +40,11 @@ export type Form = {
   receivedAt: string;
   quantityReceived: number;
   processingOperationDone: string;
+  temporaryStorageDetail: {
+    temporaryStorer: {
+      company: FormCompany;
+    };
+  };
 };
 
 type FormCompany = {

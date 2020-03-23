@@ -226,7 +226,7 @@ export const formWorkflowMachine = Machine(
           ctx.form.wasteAcceptationStatus
         );
       },
-      hasTempStorageDestination: ctx => ctx.form.tempStorageFormInfos != null
+      hasTempStorageDestination: ctx => ctx.form.temporaryStorageDetail != null
     }
   }
 );

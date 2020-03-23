@@ -75,8 +75,13 @@ export default {
     ecoOrganisme: (parent, _, context: GraphQLContext) => {
       return context.prisma.form({ id: parent.id }).ecoOrganisme();
     },
-    tempStorageFormInfos: (parent, _, context: GraphQLContext) => {
-        return context.prisma.form({ id: parent.id }).tempStorageFormInfos();
+    hasTemporaryStorage: (parent, _, context: GraphQLContext) => {
+      return context.prisma.$exists.temporaryStorageDetail({
+        form: { id: parent.id }
+      });
+    },
+    temporaryStorageDetail: (parent, _, context: GraphQLContext) => {
+      return context.prisma.form({ id: parent.id }).temporaryStorageDetail();
     }
   },
   Query: {

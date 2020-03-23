@@ -117,13 +117,20 @@ type Form {
   ecoOrganisme: EcoOrganisme
 
   appendix2Forms: [Form]
-  tempStorageFormInfos: TempStorageFormInfos @relation(link: INLINE)
+  temporaryStorageDetail: TemporaryStorageDetail @relation(link: INLINE)
 }
 
-type TempStorageFormInfos {
+type TemporaryStorageDetail {
   id: ID! @id
+  form: Form
 
   # Frame 13
+  tempStorerCompanyName: String
+  tempStorerCompanySiret: String
+  tempStorerCompanyAddress: String
+  tempStorerCompanyContact: String
+  tempStorerCompanyPhone: String
+  tempStorerCompanyMail: String
   tempStorerQuantityType: QuantityType
   tempStorerQuantityReceived: Float
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus

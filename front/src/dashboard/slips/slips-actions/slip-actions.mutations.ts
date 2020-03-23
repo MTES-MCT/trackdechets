@@ -33,6 +33,24 @@ const MARK_PROCESSED = gql`
   }
 `;
 
+const MARK_TEMP_STORED = gql`
+  mutation MarkAsTempStored($id: ID, $info: TempStoredFormInput!) {
+    markAsTempStored(id: $id, tempStoredInfos: $info) {
+      id
+      status
+    }
+  }
+`;
+
+const MARK_RESENT = gql`
+  mutation MarkAsResent($id: ID, $info: ResentFormInput!) {
+    markAsResent(id: $id, resentInfos: $info) {
+      id
+      status
+    }
+  }
+`;
+
 const DUPLICATE_FORM = gql`
   mutation DuplicateForm($id: ID!) {
     duplicateForm(id: $id) {
@@ -76,6 +94,8 @@ export default {
   SENT: MARK_SENT,
   RECEIVED: MARK_RECEIVED,
   PROCESSED: MARK_PROCESSED,
+  TEMP_STORED: MARK_TEMP_STORED,
+  RESENT: MARK_RESENT,
   DUPLICATE_FORM,
   DELETE_FORM
 };

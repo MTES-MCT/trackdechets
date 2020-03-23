@@ -128,15 +128,9 @@ type Mutation {
     signingInfo: TransporterSignatureFormInput!
   ): Form
 
-  markAsTempStored(
-    id: ID!,
-    tempStoredInfos: TempStoredFormIput!
-  ): Form
+  markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormIput!): Form
 
-  markAsResent(
-    id: ID!,
-    resentInfos: ResentFormInput!
-  ): Form
+  markAsResent(id: ID!, resentInfos: ResentFormInput!): Form
 }
 
 type Subscription {
@@ -306,12 +300,15 @@ type Form {
 
   ecoOrganisme: EcoOrganisme
 
-  "BSD suite - partie entreposage provisoire ou reconditionnement"
-  tempStorageFormInfos: TempStorageFormInfos
+  "Indique si ce BSD passe par un entreposage provisoire"
+  hasTemporaryStorage: Boolean!
+
+  "BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement"
+  temporaryStorageDetail: TemporaryStorageDetail
 }
 
 "Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant"
-type TempStorageFormInfos {
+type TemporaryStorageDetail {
   "Établissement qui sotcke temporairement le déchet (case 13)"
   temporaryStorer: TemporaryStorer
 
@@ -331,6 +328,9 @@ type TempStorageFormInfos {
 }
 
 type TemporaryStorer {
+  "Établissement qui rélise l'entreposage temporaire"
+  company: FormCompany
+
   quantityType: QuantityType
   quantityReceived: Float
   wasteAcceptationStatus: WasteAcceptationStatus
@@ -394,7 +394,8 @@ type Emitter {
   workSite: WorkSite
 
   "DEPRECATED - Ancienne adresse chantier"
-  pickupSite: String @deprecated(reason: "Migration vers `workSite` obligatoire")
+  pickupSite: String
+    @deprecated(reason: "Migration vers `workSite` obligatoire")
 
   "Établissement émetteur"
   company: FormCompany

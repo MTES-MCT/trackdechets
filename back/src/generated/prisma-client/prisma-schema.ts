@@ -200,7 +200,7 @@ type AggregateStatusLog {
   count: Int!
 }
 
-type AggregateTempStorageFormInfos {
+type AggregateTemporaryStorageDetail {
   count: Int!
 }
 
@@ -1410,7 +1410,7 @@ type Form {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganisme
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
-  tempStorageFormInfos: TempStorageFormInfos
+  temporaryStorageDetail: TemporaryStorageDetail
 }
 
 type FormConnection {
@@ -1501,7 +1501,7 @@ input FormCreateInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
   appendix2Forms: FormCreateManyInput
-  tempStorageFormInfos: TempStorageFormInfosCreateOneInput
+  temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
 }
 
 input FormCreateManyInput {
@@ -1512,6 +1512,94 @@ input FormCreateManyInput {
 input FormCreateOneInput {
   create: FormCreateInput
   connect: FormWhereUniqueInput
+}
+
+input FormCreateOneWithoutTemporaryStorageDetailInput {
+  create: FormCreateWithoutTemporaryStorageDetailInput
+  connect: FormWhereUniqueInput
+}
+
+input FormCreateWithoutTemporaryStorageDetailInput {
+  id: ID
+  readableId: String
+  customId: String
+  isDeleted: Boolean
+  owner: UserCreateOneInput!
+  signedByTransporter: Boolean
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
+  receivedBy: String
+  receivedAt: DateTime
+  quantityReceived: Float
+  processedBy: String
+  processedAt: String
+  processingOperationDone: String
+  processingOperationDescription: String
+  noTraceability: Boolean
+  nextDestinationProcessingOperation: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: String
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: String
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  wasteDetailsCode: String
+  wasteDetailsName: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeCreateOneInput
+  appendix2Forms: FormCreateManyInput
 }
 
 type FormEdge {
@@ -2810,7 +2898,7 @@ input FormUpdateDataInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
-  tempStorageFormInfos: TempStorageFormInfosUpdateOneInput
+  temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
 }
 
 input FormUpdateInput {
@@ -2894,7 +2982,7 @@ input FormUpdateInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
-  tempStorageFormInfos: TempStorageFormInfosUpdateOneInput
+  temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
 }
 
 input FormUpdateManyDataInput {
@@ -3081,6 +3169,97 @@ input FormUpdateOneRequiredInput {
   connect: FormWhereUniqueInput
 }
 
+input FormUpdateOneWithoutTemporaryStorageDetailInput {
+  create: FormCreateWithoutTemporaryStorageDetailInput
+  update: FormUpdateWithoutTemporaryStorageDetailDataInput
+  upsert: FormUpsertWithoutTemporaryStorageDetailInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: FormWhereUniqueInput
+}
+
+input FormUpdateWithoutTemporaryStorageDetailDataInput {
+  readableId: String
+  customId: String
+  isDeleted: Boolean
+  owner: UserUpdateOneRequiredInput
+  signedByTransporter: Boolean
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
+  receivedBy: String
+  receivedAt: DateTime
+  quantityReceived: Float
+  processedBy: String
+  processedAt: String
+  processingOperationDone: String
+  processingOperationDescription: String
+  noTraceability: Boolean
+  nextDestinationProcessingOperation: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: String
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: String
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  wasteDetailsCode: String
+  wasteDetailsName: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeUpdateOneInput
+  appendix2Forms: FormUpdateManyInput
+}
+
 input FormUpdateWithWhereUniqueNestedInput {
   where: FormWhereUniqueInput!
   data: FormUpdateDataInput!
@@ -3089,6 +3268,11 @@ input FormUpdateWithWhereUniqueNestedInput {
 input FormUpsertNestedInput {
   update: FormUpdateDataInput!
   create: FormCreateInput!
+}
+
+input FormUpsertWithoutTemporaryStorageDetailInput {
+  update: FormUpdateWithoutTemporaryStorageDetailDataInput!
+  create: FormCreateWithoutTemporaryStorageDetailInput!
 }
 
 input FormUpsertWithWhereUniqueNestedInput {
@@ -4043,7 +4227,7 @@ input FormWhereInput {
   appendix2Forms_every: FormWhereInput
   appendix2Forms_some: FormWhereInput
   appendix2Forms_none: FormWhereInput
-  tempStorageFormInfos: TempStorageFormInfosWhereInput
+  temporaryStorageDetail: TemporaryStorageDetailWhereInput
   AND: [FormWhereInput!]
   OR: [FormWhereInput!]
   NOT: [FormWhereInput!]
@@ -4614,12 +4798,12 @@ type Mutation {
   upsertStatusLog(where: StatusLogWhereUniqueInput!, create: StatusLogCreateInput!, update: StatusLogUpdateInput!): StatusLog!
   deleteStatusLog(where: StatusLogWhereUniqueInput!): StatusLog
   deleteManyStatusLogs(where: StatusLogWhereInput): BatchPayload!
-  createTempStorageFormInfos(data: TempStorageFormInfosCreateInput!): TempStorageFormInfos!
-  updateTempStorageFormInfos(data: TempStorageFormInfosUpdateInput!, where: TempStorageFormInfosWhereUniqueInput!): TempStorageFormInfos
-  updateManyTempStorageFormInfoses(data: TempStorageFormInfosUpdateManyMutationInput!, where: TempStorageFormInfosWhereInput): BatchPayload!
-  upsertTempStorageFormInfos(where: TempStorageFormInfosWhereUniqueInput!, create: TempStorageFormInfosCreateInput!, update: TempStorageFormInfosUpdateInput!): TempStorageFormInfos!
-  deleteTempStorageFormInfos(where: TempStorageFormInfosWhereUniqueInput!): TempStorageFormInfos
-  deleteManyTempStorageFormInfoses(where: TempStorageFormInfosWhereInput): BatchPayload!
+  createTemporaryStorageDetail(data: TemporaryStorageDetailCreateInput!): TemporaryStorageDetail!
+  updateTemporaryStorageDetail(data: TemporaryStorageDetailUpdateInput!, where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
+  updateManyTemporaryStorageDetails(data: TemporaryStorageDetailUpdateManyMutationInput!, where: TemporaryStorageDetailWhereInput): BatchPayload!
+  upsertTemporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!, create: TemporaryStorageDetailCreateInput!, update: TemporaryStorageDetailUpdateInput!): TemporaryStorageDetail!
+  deleteTemporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
+  deleteManyTemporaryStorageDetails(where: TemporaryStorageDetailWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -4696,9 +4880,9 @@ type Query {
   statusLog(where: StatusLogWhereUniqueInput!): StatusLog
   statusLogs(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [StatusLog]!
   statusLogsConnection(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): StatusLogConnection!
-  tempStorageFormInfos(where: TempStorageFormInfosWhereUniqueInput!): TempStorageFormInfos
-  tempStorageFormInfoses(where: TempStorageFormInfosWhereInput, orderBy: TempStorageFormInfosOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TempStorageFormInfos]!
-  tempStorageFormInfosesConnection(where: TempStorageFormInfosWhereInput, orderBy: TempStorageFormInfosOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TempStorageFormInfosConnection!
+  temporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
+  temporaryStorageDetails(where: TemporaryStorageDetailWhereInput, orderBy: TemporaryStorageDetailOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TemporaryStorageDetail]!
+  temporaryStorageDetailsConnection(where: TemporaryStorageDetailWhereInput, orderBy: TemporaryStorageDetailOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TemporaryStorageDetailConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -5158,14 +5342,15 @@ type Subscription {
   installation(where: InstallationSubscriptionWhereInput): InstallationSubscriptionPayload
   rubrique(where: RubriqueSubscriptionWhereInput): RubriqueSubscriptionPayload
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
-  tempStorageFormInfos(where: TempStorageFormInfosSubscriptionWhereInput): TempStorageFormInfosSubscriptionPayload
+  temporaryStorageDetail(where: TemporaryStorageDetailSubscriptionWhereInput): TemporaryStorageDetailSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
   userActivationHash(where: UserActivationHashSubscriptionWhereInput): UserActivationHashSubscriptionPayload
 }
 
-type TempStorageFormInfos {
+type TemporaryStorageDetail {
   id: ID!
+  form: Form
   tempStorerQuantityType: QuantityType
   tempStorerQuantityReceived: Float
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
@@ -5194,13 +5379,49 @@ type TempStorageFormInfos {
   signedAt: DateTime
 }
 
-type TempStorageFormInfosConnection {
+type TemporaryStorageDetailConnection {
   pageInfo: PageInfo!
-  edges: [TempStorageFormInfosEdge]!
-  aggregate: AggregateTempStorageFormInfos!
+  edges: [TemporaryStorageDetailEdge]!
+  aggregate: AggregateTemporaryStorageDetail!
 }
 
-input TempStorageFormInfosCreateInput {
+input TemporaryStorageDetailCreateInput {
+  id: ID
+  form: FormCreateOneWithoutTemporaryStorageDetailInput
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedBy: String
+  signedAt: DateTime
+}
+
+input TemporaryStorageDetailCreateOneWithoutFormInput {
+  create: TemporaryStorageDetailCreateWithoutFormInput
+  connect: TemporaryStorageDetailWhereUniqueInput
+}
+
+input TemporaryStorageDetailCreateWithoutFormInput {
   id: ID
   tempStorerQuantityType: QuantityType
   tempStorerQuantityReceived: Float
@@ -5230,17 +5451,12 @@ input TempStorageFormInfosCreateInput {
   signedAt: DateTime
 }
 
-input TempStorageFormInfosCreateOneInput {
-  create: TempStorageFormInfosCreateInput
-  connect: TempStorageFormInfosWhereUniqueInput
-}
-
-type TempStorageFormInfosEdge {
-  node: TempStorageFormInfos!
+type TemporaryStorageDetailEdge {
+  node: TemporaryStorageDetail!
   cursor: String!
 }
 
-enum TempStorageFormInfosOrderByInput {
+enum TemporaryStorageDetailOrderByInput {
   id_ASC
   id_DESC
   tempStorerQuantityType_ASC
@@ -5297,7 +5513,7 @@ enum TempStorageFormInfosOrderByInput {
   signedAt_DESC
 }
 
-type TempStorageFormInfosPreviousValues {
+type TemporaryStorageDetailPreviousValues {
   id: ID!
   tempStorerQuantityType: QuantityType
   tempStorerQuantityReceived: Float
@@ -5327,25 +5543,26 @@ type TempStorageFormInfosPreviousValues {
   signedAt: DateTime
 }
 
-type TempStorageFormInfosSubscriptionPayload {
+type TemporaryStorageDetailSubscriptionPayload {
   mutation: MutationType!
-  node: TempStorageFormInfos
+  node: TemporaryStorageDetail
   updatedFields: [String!]
-  previousValues: TempStorageFormInfosPreviousValues
+  previousValues: TemporaryStorageDetailPreviousValues
 }
 
-input TempStorageFormInfosSubscriptionWhereInput {
+input TemporaryStorageDetailSubscriptionWhereInput {
   mutation_in: [MutationType!]
   updatedFields_contains: String
   updatedFields_contains_every: [String!]
   updatedFields_contains_some: [String!]
-  node: TempStorageFormInfosWhereInput
-  AND: [TempStorageFormInfosSubscriptionWhereInput!]
-  OR: [TempStorageFormInfosSubscriptionWhereInput!]
-  NOT: [TempStorageFormInfosSubscriptionWhereInput!]
+  node: TemporaryStorageDetailWhereInput
+  AND: [TemporaryStorageDetailSubscriptionWhereInput!]
+  OR: [TemporaryStorageDetailSubscriptionWhereInput!]
+  NOT: [TemporaryStorageDetailSubscriptionWhereInput!]
 }
 
-input TempStorageFormInfosUpdateDataInput {
+input TemporaryStorageDetailUpdateInput {
+  form: FormUpdateOneWithoutTemporaryStorageDetailInput
   tempStorerQuantityType: QuantityType
   tempStorerQuantityReceived: Float
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
@@ -5374,7 +5591,7 @@ input TempStorageFormInfosUpdateDataInput {
   signedAt: DateTime
 }
 
-input TempStorageFormInfosUpdateInput {
+input TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerQuantityType: QuantityType
   tempStorerQuantityReceived: Float
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
@@ -5403,50 +5620,50 @@ input TempStorageFormInfosUpdateInput {
   signedAt: DateTime
 }
 
-input TempStorageFormInfosUpdateManyMutationInput {
-  tempStorerQuantityType: QuantityType
-  tempStorerQuantityReceived: Float
-  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
-  tempStorerWasteRefusalReason: String
-  tempStorerReceivedAt: DateTime
-  tempStorerSignedAt: DateTime
-  destinationIsFilledByEmitter: Boolean
-  wasteDetailsOnuCode: String
-  wasteDetailsPackagings: Json
-  wasteDetailsOtherPackaging: String
-  wasteDetailsNumberOfPackages: Int
-  wasteDetailsQuantity: Float
-  wasteDetailsQuantityType: QuantityType
-  transporterCompanyName: String
-  transporterCompanySiret: String
-  transporterCompanyAddress: String
-  transporterCompanyContact: String
-  transporterCompanyPhone: String
-  transporterCompanyMail: String
-  transporterIsExemptedOfReceipt: Boolean
-  transporterReceipt: String
-  transporterDepartment: String
-  transporterValidityLimit: DateTime
-  transporterNumberPlate: String
-  signedBy: String
-  signedAt: DateTime
-}
-
-input TempStorageFormInfosUpdateOneInput {
-  create: TempStorageFormInfosCreateInput
-  update: TempStorageFormInfosUpdateDataInput
-  upsert: TempStorageFormInfosUpsertNestedInput
+input TemporaryStorageDetailUpdateOneWithoutFormInput {
+  create: TemporaryStorageDetailCreateWithoutFormInput
+  update: TemporaryStorageDetailUpdateWithoutFormDataInput
+  upsert: TemporaryStorageDetailUpsertWithoutFormInput
   delete: Boolean
   disconnect: Boolean
-  connect: TempStorageFormInfosWhereUniqueInput
+  connect: TemporaryStorageDetailWhereUniqueInput
 }
 
-input TempStorageFormInfosUpsertNestedInput {
-  update: TempStorageFormInfosUpdateDataInput!
-  create: TempStorageFormInfosCreateInput!
+input TemporaryStorageDetailUpdateWithoutFormDataInput {
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedBy: String
+  signedAt: DateTime
 }
 
-input TempStorageFormInfosWhereInput {
+input TemporaryStorageDetailUpsertWithoutFormInput {
+  update: TemporaryStorageDetailUpdateWithoutFormDataInput!
+  create: TemporaryStorageDetailCreateWithoutFormInput!
+}
+
+input TemporaryStorageDetailWhereInput {
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -5461,6 +5678,7 @@ input TempStorageFormInfosWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  form: FormWhereInput
   tempStorerQuantityType: QuantityType
   tempStorerQuantityType_not: QuantityType
   tempStorerQuantityType_in: [QuantityType!]
@@ -5715,12 +5933,12 @@ input TempStorageFormInfosWhereInput {
   signedAt_lte: DateTime
   signedAt_gt: DateTime
   signedAt_gte: DateTime
-  AND: [TempStorageFormInfosWhereInput!]
-  OR: [TempStorageFormInfosWhereInput!]
-  NOT: [TempStorageFormInfosWhereInput!]
+  AND: [TemporaryStorageDetailWhereInput!]
+  OR: [TemporaryStorageDetailWhereInput!]
+  NOT: [TemporaryStorageDetailWhereInput!]
 }
 
-input TempStorageFormInfosWhereUniqueInput {
+input TemporaryStorageDetailWhereUniqueInput {
   id: ID
 }
 

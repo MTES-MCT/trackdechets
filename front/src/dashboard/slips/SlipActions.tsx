@@ -20,6 +20,7 @@ import Processed from "./slips-actions/Processed";
 import Received from "./slips-actions/Received";
 import Sealed from "./slips-actions/Sealed";
 import Sent from "./slips-actions/Sent";
+import Resent from "./slips-actions/Resent";
 import mutations from "./slips-actions/slip-actions.mutations";
 import { NotificationError } from "../../common/Error";
 
@@ -57,7 +58,7 @@ export function DynamicActions({ form, siret }: DynamicActionsProps) {
   const nextStep = getNextStep(form, siret);
   // This dynamic mutation must have a value, otherwise the `useMutation` hook throws.
   // And hooks should not be conditionally called (cf rules of hooks)
-  // Therefore, when there is no `nextStep`, we assign it **any** mutation: it does not matter at it will never get called
+  // Therefore, when there is no `nextStep`, we assign it **any** mutation: it does not matter as it will never get called
   // Indeed nothing is rendered when there is no `nextStep`
   const dynamicMutation = nextStep
     ? mutations[nextStep]
@@ -134,5 +135,15 @@ const buttons = {
     title: "Valider le traitement",
     icon: FaCogs,
     component: Processed
+  },
+  TEMP_STORED: {
+    title: "Valider l'entreposage provisoire",
+    icon: FaIndustry,
+    component: Received
+  },
+  RESENT: {
+    title: "Valider l'envement",
+    icon: FaTruckMoving,
+    component: Resent
   }
 };

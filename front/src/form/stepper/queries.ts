@@ -73,6 +73,13 @@ export const GET_FORM = gql`
       ecoOrganisme {
         id
       }
+      temporaryStorageDetail {
+        temporaryStorer {
+          company {
+            ...CompanyFragment
+          }
+        }
+      }
     }
   }
   ${fragments.company}

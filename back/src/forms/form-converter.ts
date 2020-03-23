@@ -5,7 +5,7 @@ export function flattenObjectForDb(
   previousKeys = [],
   dbObject = {}
 ): Partial<Form> {
-  const relations = ["ecoOrganisme", "tempStorageFormInfos"];
+  const relations = ["ecoOrganisme", "temporaryStorageDetail"];
 
   Object.keys(input).forEach(key => {
     if (

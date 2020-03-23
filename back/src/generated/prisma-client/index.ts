@@ -29,8 +29,8 @@ export interface Exists {
   installation: (where?: InstallationWhereInput) => Promise<boolean>;
   rubrique: (where?: RubriqueWhereInput) => Promise<boolean>;
   statusLog: (where?: StatusLogWhereInput) => Promise<boolean>;
-  tempStorageFormInfos: (
-    where?: TempStorageFormInfosWhereInput
+  temporaryStorageDetail: (
+    where?: TemporaryStorageDetailWhereInput
   ) => Promise<boolean>;
   user: (where?: UserWhereInput) => Promise<boolean>;
   userAccountHash: (where?: UserAccountHashWhereInput) => Promise<boolean>;
@@ -279,27 +279,27 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => StatusLogConnectionPromise;
-  tempStorageFormInfos: (
-    where: TempStorageFormInfosWhereUniqueInput
-  ) => TempStorageFormInfosNullablePromise;
-  tempStorageFormInfoses: (args?: {
-    where?: TempStorageFormInfosWhereInput;
-    orderBy?: TempStorageFormInfosOrderByInput;
+  temporaryStorageDetail: (
+    where: TemporaryStorageDetailWhereUniqueInput
+  ) => TemporaryStorageDetailNullablePromise;
+  temporaryStorageDetails: (args?: {
+    where?: TemporaryStorageDetailWhereInput;
+    orderBy?: TemporaryStorageDetailOrderByInput;
     skip?: Int;
     after?: String;
     before?: String;
     first?: Int;
     last?: Int;
-  }) => FragmentableArray<TempStorageFormInfos>;
-  tempStorageFormInfosesConnection: (args?: {
-    where?: TempStorageFormInfosWhereInput;
-    orderBy?: TempStorageFormInfosOrderByInput;
+  }) => FragmentableArray<TemporaryStorageDetail>;
+  temporaryStorageDetailsConnection: (args?: {
+    where?: TemporaryStorageDetailWhereInput;
+    orderBy?: TemporaryStorageDetailOrderByInput;
     skip?: Int;
     after?: String;
     before?: String;
     first?: Int;
     last?: Int;
-  }) => TempStorageFormInfosConnectionPromise;
+  }) => TemporaryStorageDetailConnectionPromise;
   user: (where: UserWhereUniqueInput) => UserNullablePromise;
   users: (args?: {
     where?: UserWhereInput;
@@ -563,27 +563,27 @@ export interface Prisma {
   }) => StatusLogPromise;
   deleteStatusLog: (where: StatusLogWhereUniqueInput) => StatusLogPromise;
   deleteManyStatusLogs: (where?: StatusLogWhereInput) => BatchPayloadPromise;
-  createTempStorageFormInfos: (
-    data: TempStorageFormInfosCreateInput
-  ) => TempStorageFormInfosPromise;
-  updateTempStorageFormInfos: (args: {
-    data: TempStorageFormInfosUpdateInput;
-    where: TempStorageFormInfosWhereUniqueInput;
-  }) => TempStorageFormInfosPromise;
-  updateManyTempStorageFormInfoses: (args: {
-    data: TempStorageFormInfosUpdateManyMutationInput;
-    where?: TempStorageFormInfosWhereInput;
+  createTemporaryStorageDetail: (
+    data: TemporaryStorageDetailCreateInput
+  ) => TemporaryStorageDetailPromise;
+  updateTemporaryStorageDetail: (args: {
+    data: TemporaryStorageDetailUpdateInput;
+    where: TemporaryStorageDetailWhereUniqueInput;
+  }) => TemporaryStorageDetailPromise;
+  updateManyTemporaryStorageDetails: (args: {
+    data: TemporaryStorageDetailUpdateManyMutationInput;
+    where?: TemporaryStorageDetailWhereInput;
   }) => BatchPayloadPromise;
-  upsertTempStorageFormInfos: (args: {
-    where: TempStorageFormInfosWhereUniqueInput;
-    create: TempStorageFormInfosCreateInput;
-    update: TempStorageFormInfosUpdateInput;
-  }) => TempStorageFormInfosPromise;
-  deleteTempStorageFormInfos: (
-    where: TempStorageFormInfosWhereUniqueInput
-  ) => TempStorageFormInfosPromise;
-  deleteManyTempStorageFormInfoses: (
-    where?: TempStorageFormInfosWhereInput
+  upsertTemporaryStorageDetail: (args: {
+    where: TemporaryStorageDetailWhereUniqueInput;
+    create: TemporaryStorageDetailCreateInput;
+    update: TemporaryStorageDetailUpdateInput;
+  }) => TemporaryStorageDetailPromise;
+  deleteTemporaryStorageDetail: (
+    where: TemporaryStorageDetailWhereUniqueInput
+  ) => TemporaryStorageDetailPromise;
+  deleteManyTemporaryStorageDetails: (
+    where?: TemporaryStorageDetailWhereInput
   ) => BatchPayloadPromise;
   createUser: (data: UserCreateInput) => UserPromise;
   updateUser: (args: {
@@ -687,9 +687,9 @@ export interface Subscription {
   statusLog: (
     where?: StatusLogSubscriptionWhereInput
   ) => StatusLogSubscriptionPayloadSubscription;
-  tempStorageFormInfos: (
-    where?: TempStorageFormInfosSubscriptionWhereInput
-  ) => TempStorageFormInfosSubscriptionPayloadSubscription;
+  temporaryStorageDetail: (
+    where?: TemporaryStorageDetailSubscriptionWhereInput
+  ) => TemporaryStorageDetailSubscriptionPayloadSubscription;
   user: (
     where?: UserSubscriptionWhereInput
   ) => UserSubscriptionPayloadSubscription;
@@ -930,7 +930,7 @@ export type FormOrderByInput =
   | "traderValidityLimit_ASC"
   | "traderValidityLimit_DESC";
 
-export type TempStorageFormInfosOrderByInput =
+export type TemporaryStorageDetailOrderByInput =
   | "id_ASC"
   | "id_DESC"
   | "tempStorerQuantityType_ASC"
@@ -1179,11 +1179,9 @@ export type CompanyAssociationOrderByInput =
   | "role_ASC"
   | "role_DESC";
 
-export interface UserUpdateOneRequiredInput {
-  create?: Maybe<UserCreateInput>;
-  update?: Maybe<UserUpdateDataInput>;
-  upsert?: Maybe<UserUpsertNestedInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
+export interface CompanyAssociationUpdateWithWhereUniqueWithoutUserInput {
+  where: CompanyAssociationWhereUniqueInput;
+  data: CompanyAssociationUpdateWithoutUserDataInput;
 }
 
 export type AccessTokenWhereUniqueInput = AtLeastOne<{
@@ -1191,55 +1189,51 @@ export type AccessTokenWhereUniqueInput = AtLeastOne<{
   token?: Maybe<String>;
 }>;
 
-export interface FormUpdateDataInput {
-  readableId?: Maybe<String>;
-  customId?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  owner?: Maybe<UserUpdateOneRequiredInput>;
-  signedByTransporter?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  wasteRefusalReason?: Maybe<String>;
-  receivedBy?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationCompanyName?: Maybe<String>;
-  nextDestinationCompanySiret?: Maybe<String>;
-  nextDestinationCompanyAddress?: Maybe<String>;
-  nextDestinationCompanyContact?: Maybe<String>;
-  nextDestinationCompanyPhone?: Maybe<String>;
-  nextDestinationCompanyMail?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterWorkSiteName?: Maybe<String>;
-  emitterWorkSiteAddress?: Maybe<String>;
-  emitterWorkSiteCity?: Maybe<String>;
-  emitterWorkSitePostalCode?: Maybe<String>;
-  emitterWorkSiteInfos?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientIsTempStorage?: Maybe<Boolean>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
+export interface FormUpsertWithWhereUniqueNestedInput {
+  where: FormWhereUniqueInput;
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
+}
+
+export interface EcoOrganismeUpdateInput {
+  siret?: Maybe<String>;
+  name?: Maybe<String>;
+  address?: Maybe<String>;
+}
+
+export interface TemporaryStorageDetailUpsertWithoutFormInput {
+  update: TemporaryStorageDetailUpdateWithoutFormDataInput;
+  create: TemporaryStorageDetailCreateWithoutFormInput;
+}
+
+export interface UserUpdateManyInput {
+  create?: Maybe<UserCreateInput[] | UserCreateInput>;
+  update?: Maybe<
+    | UserUpdateWithWhereUniqueNestedInput[]
+    | UserUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | UserUpsertWithWhereUniqueNestedInput[]
+    | UserUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  set?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  disconnect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  deleteMany?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  updateMany?: Maybe<
+    UserUpdateManyWithWhereNestedInput[] | UserUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
+  tempStorerQuantityType?: Maybe<QuantityType>;
+  tempStorerQuantityReceived?: Maybe<Float>;
+  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  tempStorerWasteRefusalReason?: Maybe<String>;
+  tempStorerReceivedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedAt?: Maybe<DateTimeInput>;
+  destinationIsFilledByEmitter?: Maybe<Boolean>;
   transporterCompanyName?: Maybe<String>;
   transporterCompanySiret?: Maybe<String>;
   transporterCompanyAddress?: Maybe<String>;
@@ -1272,7 +1266,6 @@ export interface FormUpdateDataInput {
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
-  tempStorageFormInfos?: Maybe<TempStorageFormInfosUpdateOneInput>;
 }
 
 export interface UserUpsertWithoutCompanyAssociationsInput {
@@ -1289,11 +1282,6 @@ export interface UserUpsertNestedInput {
   update: UserUpdateDataInput;
   create: UserCreateInput;
 }
-
-export type UserWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  email?: Maybe<String>;
-}>;
 
 export interface UserActivationHashSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
@@ -1315,25 +1303,10 @@ export interface UserActivationHashSubscriptionWhereInput {
   >;
 }
 
-export interface FormUpdateManyInput {
-  create?: Maybe<FormCreateInput[] | FormCreateInput>;
-  update?: Maybe<
-    | FormUpdateWithWhereUniqueNestedInput[]
-    | FormUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | FormUpsertWithWhereUniqueNestedInput[]
-    | FormUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  set?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  disconnect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-  deleteMany?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-  updateMany?: Maybe<
-    FormUpdateManyWithWhereNestedInput[] | FormUpdateManyWithWhereNestedInput
-  >;
-}
+export type UserAccountHashWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  hash?: Maybe<String>;
+}>;
 
 export interface UserSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
@@ -1346,55 +1319,16 @@ export interface UserSubscriptionWhereInput {
   NOT?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
 }
 
-export interface EcoOrganismeUpsertNestedInput {
-  update: EcoOrganismeUpdateDataInput;
-  create: EcoOrganismeCreateInput;
+export interface TemporaryStorageDetailUpdateOneWithoutFormInput {
+  create?: Maybe<TemporaryStorageDetailCreateWithoutFormInput>;
+  update?: Maybe<TemporaryStorageDetailUpdateWithoutFormDataInput>;
+  upsert?: Maybe<TemporaryStorageDetailUpsertWithoutFormInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<TemporaryStorageDetailWhereUniqueInput>;
 }
 
 export type CompanyAssociationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface EcoOrganismeUpdateDataInput {
-  siret?: Maybe<String>;
-  name?: Maybe<String>;
-  address?: Maybe<String>;
-}
-
-export interface RubriqueSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<RubriqueWhereInput>;
-  AND?: Maybe<
-    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
-  >;
-  OR?: Maybe<RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput>;
-  NOT?: Maybe<
-    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
-  >;
-}
-
-export type UserAccountHashWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  hash?: Maybe<String>;
-}>;
-
-export type DeclarationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface EcoOrganismeUpdateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  update?: Maybe<EcoOrganismeUpdateDataInput>;
-  upsert?: Maybe<EcoOrganismeUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
-}
-
-export type ApplicationWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
@@ -1480,18 +1414,22 @@ export interface UserAccountHashWhereInput {
   NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
 }
 
-export interface FormSubscriptionWhereInput {
+export interface RubriqueSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<FormWhereInput>;
-  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  node?: Maybe<RubriqueWhereInput>;
+  AND?: Maybe<
+    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
+  >;
+  OR?: Maybe<RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput>;
+  NOT?: Maybe<
+    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
+  >;
 }
 
-export interface FormUpdateInput {
+export interface FormUpdateDataInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
@@ -1572,7 +1510,58 @@ export interface FormUpdateInput {
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
-  tempStorageFormInfos?: Maybe<TempStorageFormInfosUpdateOneInput>;
+  temporaryStorageDetail?: Maybe<
+    TemporaryStorageDetailUpdateOneWithoutFormInput
+  >;
+}
+
+export type DeclarationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface FormUpdateWithWhereUniqueNestedInput {
+  where: FormWhereUniqueInput;
+  data: FormUpdateDataInput;
+}
+
+export type ApplicationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface FormUpdateManyInput {
+  create?: Maybe<FormCreateInput[] | FormCreateInput>;
+  update?: Maybe<
+    | FormUpdateWithWhereUniqueNestedInput[]
+    | FormUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | FormUpsertWithWhereUniqueNestedInput[]
+    | FormUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  set?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  disconnect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+  deleteMany?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+  updateMany?: Maybe<
+    FormUpdateManyWithWhereNestedInput[] | FormUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface FormSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<FormWhereInput>;
+  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+}
+
+export interface EcoOrganismeUpsertNestedInput {
+  update: EcoOrganismeUpdateDataInput;
+  create: EcoOrganismeCreateInput;
 }
 
 export interface DeclarationSubscriptionWhereInput {
@@ -1592,44 +1581,20 @@ export interface DeclarationSubscriptionWhereInput {
   >;
 }
 
-export interface TempStorageFormInfosCreateInput {
-  id?: Maybe<ID_Input>;
-  tempStorerQuantityType?: Maybe<QuantityType>;
-  tempStorerQuantityReceived?: Maybe<Float>;
-  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  tempStorerWasteRefusalReason?: Maybe<String>;
-  tempStorerReceivedAt?: Maybe<DateTimeInput>;
-  tempStorerSignedAt?: Maybe<DateTimeInput>;
-  destinationIsFilledByEmitter?: Maybe<Boolean>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  signedBy?: Maybe<String>;
-  signedAt?: Maybe<DateTimeInput>;
-}
+export type UserActivationHashWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  hash?: Maybe<String>;
+}>;
 
 export type EcoOrganismeWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
   siret?: Maybe<String>;
 }>;
 
-export interface TempStorageFormInfosCreateOneInput {
-  create?: Maybe<TempStorageFormInfosCreateInput>;
-  connect?: Maybe<TempStorageFormInfosWhereUniqueInput>;
+export interface EcoOrganismeUpdateDataInput {
+  siret?: Maybe<String>;
+  name?: Maybe<String>;
+  address?: Maybe<String>;
 }
 
 export interface EcoOrganismeWhereInput {
@@ -1694,49 +1659,6 @@ export interface EcoOrganismeWhereInput {
   NOT?: Maybe<EcoOrganismeWhereInput[] | EcoOrganismeWhereInput>;
 }
 
-export interface FormCreateManyInput {
-  create?: Maybe<FormCreateInput[] | FormCreateInput>;
-  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
-}
-
-export interface AccessTokenSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<AccessTokenWhereInput>;
-  AND?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-}
-
-export type UserActivationHashWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  hash?: Maybe<String>;
-}>;
-
-export interface UserActivationHashUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  hash?: Maybe<String>;
-}
-
-export interface EcoOrganismeCreateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
-}
-
-export interface UserActivationHashCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  hash: String;
-}
-
 export interface UserActivationHashWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
@@ -1788,19 +1710,42 @@ export interface UserActivationHashWhereInput {
   NOT?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
 }
 
-export interface UserAccountHashUpdateInput {
-  email?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
+export interface AccessTokenSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<AccessTokenWhereInput>;
+  AND?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+}
+
+export interface EcoOrganismeUpdateOneInput {
+  create?: Maybe<EcoOrganismeCreateInput>;
+  update?: Maybe<EcoOrganismeUpdateDataInput>;
+  upsert?: Maybe<EcoOrganismeUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
+}
+
+export interface UserActivationHashUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
   hash?: Maybe<String>;
 }
 
-export interface FormCreateInput {
-  id?: Maybe<ID_Input>;
+export interface FormUpdateInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
-  owner: UserCreateOneInput;
+  owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
@@ -1874,9 +1819,59 @@ export interface FormCreateInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
-  appendix2Forms?: Maybe<FormCreateManyInput>;
-  tempStorageFormInfos?: Maybe<TempStorageFormInfosCreateOneInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  appendix2Forms?: Maybe<FormUpdateManyInput>;
+  temporaryStorageDetail?: Maybe<
+    TemporaryStorageDetailUpdateOneWithoutFormInput
+  >;
+}
+
+export interface UserActivationHashCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneInput;
+  hash: String;
+}
+
+export interface TemporaryStorageDetailCreateWithoutFormInput {
+  id?: Maybe<ID_Input>;
+  tempStorerQuantityType?: Maybe<QuantityType>;
+  tempStorerQuantityReceived?: Maybe<Float>;
+  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  tempStorerWasteRefusalReason?: Maybe<String>;
+  tempStorerReceivedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedAt?: Maybe<DateTimeInput>;
+  destinationIsFilledByEmitter?: Maybe<Boolean>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  signedBy?: Maybe<String>;
+  signedAt?: Maybe<DateTimeInput>;
+}
+
+export interface UserAccountHashUpdateInput {
+  email?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  hash?: Maybe<String>;
+}
+
+export interface TemporaryStorageDetailCreateOneWithoutFormInput {
+  create?: Maybe<TemporaryStorageDetailCreateWithoutFormInput>;
+  connect?: Maybe<TemporaryStorageDetailWhereUniqueInput>;
 }
 
 export interface UserUpdateManyMutationInput {
@@ -1885,12 +1880,6 @@ export interface UserUpdateManyMutationInput {
   password?: Maybe<String>;
   name?: Maybe<String>;
   phone?: Maybe<String>;
-}
-
-export interface EcoOrganismeUpdateManyMutationInput {
-  siret?: Maybe<String>;
-  name?: Maybe<String>;
-  address?: Maybe<String>;
 }
 
 export interface AccessTokenWhereInput {
@@ -1955,13 +1944,7 @@ export interface AccessTokenWhereInput {
   NOT?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
 }
 
-export interface EcoOrganismeUpdateInput {
-  siret?: Maybe<String>;
-  name?: Maybe<String>;
-  address?: Maybe<String>;
-}
-
-export interface TempStorageFormInfosWhereInput {
+export interface TemporaryStorageDetailWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -1976,6 +1959,7 @@ export interface TempStorageFormInfosWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
+  form?: Maybe<FormWhereInput>;
   tempStorerQuantityType?: Maybe<QuantityType>;
   tempStorerQuantityType_not?: Maybe<QuantityType>;
   tempStorerQuantityType_in?: Maybe<QuantityType[] | QuantityType>;
@@ -2235,22 +2219,26 @@ export interface TempStorageFormInfosWhereInput {
   signedAt_gt?: Maybe<DateTimeInput>;
   signedAt_gte?: Maybe<DateTimeInput>;
   AND?: Maybe<
-    TempStorageFormInfosWhereInput[] | TempStorageFormInfosWhereInput
+    TemporaryStorageDetailWhereInput[] | TemporaryStorageDetailWhereInput
   >;
-  OR?: Maybe<TempStorageFormInfosWhereInput[] | TempStorageFormInfosWhereInput>;
+  OR?: Maybe<
+    TemporaryStorageDetailWhereInput[] | TemporaryStorageDetailWhereInput
+  >;
   NOT?: Maybe<
-    TempStorageFormInfosWhereInput[] | TempStorageFormInfosWhereInput
+    TemporaryStorageDetailWhereInput[] | TemporaryStorageDetailWhereInput
   >;
 }
 
-export interface EcoOrganismeCreateInput {
+export interface AccessTokenCreateInput {
   id?: Maybe<ID_Input>;
-  siret: String;
-  name: String;
-  address: String;
+  user: UserCreateOneInput;
+  application?: Maybe<ApplicationCreateOneInput>;
+  token: String;
+  isRevoked?: Maybe<Boolean>;
+  lastUsed?: Maybe<DateTimeInput>;
 }
 
-export interface TempStorageFormInfosUpdateManyMutationInput {
+export interface TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerQuantityType?: Maybe<QuantityType>;
   tempStorerQuantityReceived?: Maybe<Float>;
   tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
@@ -2279,10 +2267,101 @@ export interface TempStorageFormInfosUpdateManyMutationInput {
   signedAt?: Maybe<DateTimeInput>;
 }
 
-export interface StatusLogUpdateManyMutationInput {
-  status?: Maybe<Status>;
-  loggedAt?: Maybe<DateTimeInput>;
-  updatedFields?: Maybe<Json>;
+export interface UserCreateOneInput {
+  create?: Maybe<UserCreateInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
+  readableId?: Maybe<String>;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner?: Maybe<UserUpdateOneRequiredInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  appendix2Forms?: Maybe<FormUpdateManyInput>;
+}
+
+export interface UserCreateInput {
+  id?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  email: String;
+  password: String;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
 }
 
 export type GrantWhereUniqueInput = AtLeastOne<{
@@ -2290,13 +2369,14 @@ export type GrantWhereUniqueInput = AtLeastOne<{
   code?: Maybe<String>;
 }>;
 
-export interface AccessTokenCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  application?: Maybe<ApplicationCreateOneInput>;
-  token: String;
-  isRevoked?: Maybe<Boolean>;
-  lastUsed?: Maybe<DateTimeInput>;
+export interface CompanyAssociationCreateManyWithoutUserInput {
+  create?: Maybe<
+    | CompanyAssociationCreateWithoutUserInput[]
+    | CompanyAssociationCreateWithoutUserInput
+  >;
+  connect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
 }
 
 export interface GrantWhereInput {
@@ -2373,68 +2453,50 @@ export interface GrantWhereInput {
   NOT?: Maybe<GrantWhereInput[] | GrantWhereInput>;
 }
 
-export interface UserCreateOneInput {
-  create?: Maybe<UserCreateInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface FormCreateOneInput {
-  create?: Maybe<FormCreateInput>;
-  connect?: Maybe<FormWhereUniqueInput>;
-}
-
-export interface UserCreateInput {
-  id?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  email: String;
-  password: String;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
-}
-
-export interface RubriqueUpdateManyMutationInput {
-  codeS3ic?: Maybe<String>;
-  rubrique?: Maybe<String>;
-  alinea?: Maybe<String>;
-  dateAutorisation?: Maybe<String>;
-  etatActivite?: Maybe<String>;
-  regimeAutorise?: Maybe<String>;
-  activite?: Maybe<String>;
-  volume?: Maybe<String>;
-  unite?: Maybe<String>;
-  category?: Maybe<String>;
-  wasteType?: Maybe<WasteType>;
-}
-
-export interface CompanyAssociationCreateManyWithoutUserInput {
-  create?: Maybe<
-    | CompanyAssociationCreateWithoutUserInput[]
-    | CompanyAssociationCreateWithoutUserInput
-  >;
-  connect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-}
-
-export interface RubriqueUpdateInput {
-  codeS3ic?: Maybe<String>;
-  rubrique?: Maybe<String>;
-  alinea?: Maybe<String>;
-  dateAutorisation?: Maybe<String>;
-  etatActivite?: Maybe<String>;
-  regimeAutorise?: Maybe<String>;
-  activite?: Maybe<String>;
-  volume?: Maybe<String>;
-  unite?: Maybe<String>;
-  category?: Maybe<String>;
-  wasteType?: Maybe<WasteType>;
-}
-
 export interface CompanyAssociationCreateWithoutUserInput {
   id?: Maybe<ID_Input>;
   company: CompanyCreateOneInput;
   role: UserRole;
+}
+
+export interface FormCreateOneWithoutTemporaryStorageDetailInput {
+  create?: Maybe<FormCreateWithoutTemporaryStorageDetailInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface CompanyCreateOneInput {
+  create?: Maybe<CompanyCreateInput>;
+  connect?: Maybe<CompanyWhereUniqueInput>;
+}
+
+export interface StatusLogUpdateManyMutationInput {
+  status?: Maybe<Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
+}
+
+export interface CompanyCreateInput {
+  id?: Maybe<ID_Input>;
+  siret: String;
+  companyTypes?: Maybe<CompanyCreatecompanyTypesInput>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  securityCode: Int;
+  givenName?: Maybe<String>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
+  documentKeys?: Maybe<CompanyCreatedocumentKeysInput>;
+}
+
+export interface FormUpsertNestedInput {
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
+}
+
+export interface CompanyCreatecompanyTypesInput {
+  set?: Maybe<CompanyType[] | CompanyType>;
 }
 
 export interface InstallationWhereInput {
@@ -2615,60 +2677,60 @@ export interface InstallationWhereInput {
   NOT?: Maybe<InstallationWhereInput[] | InstallationWhereInput>;
 }
 
-export interface CompanyCreateOneInput {
-  create?: Maybe<CompanyCreateInput>;
-  connect?: Maybe<CompanyWhereUniqueInput>;
+export interface CompanyCreatedocumentKeysInput {
+  set?: Maybe<String[] | String>;
 }
 
-export interface InstallationUpdateInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  regime?: Maybe<String>;
-  libRegime?: Maybe<String>;
-  seveso?: Maybe<Seveso>;
-  libSeveso?: Maybe<String>;
-  familleIc?: Maybe<String>;
-  urlFiche?: Maybe<String>;
-  s3icNumeroSiret?: Maybe<String>;
-  irepNumeroSiret?: Maybe<String>;
-  gerepNumeroSiret?: Maybe<String>;
-  sireneNumeroSiret?: Maybe<String>;
+export interface FormCreateOneInput {
+  create?: Maybe<FormCreateInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
 }
 
-export interface CompanyCreateInput {
-  id?: Maybe<ID_Input>;
-  siret: String;
-  companyTypes?: Maybe<CompanyCreatecompanyTypesInput>;
-  name?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  codeNaf?: Maybe<String>;
-  securityCode: Int;
-  givenName?: Maybe<String>;
-  contactEmail?: Maybe<String>;
-  contactPhone?: Maybe<String>;
-  website?: Maybe<String>;
-  documentKeys?: Maybe<CompanyCreatedocumentKeysInput>;
-}
-
-export interface GrantUpdateManyMutationInput {
-  code?: Maybe<String>;
-  expires?: Maybe<Int>;
-  redirectUri?: Maybe<String>;
-}
-
-export interface CompanyCreatecompanyTypesInput {
-  set?: Maybe<CompanyType[] | CompanyType>;
-}
-
-export interface ApplicationUpdateOneRequiredInput {
+export interface ApplicationCreateOneInput {
   create?: Maybe<ApplicationCreateInput>;
-  update?: Maybe<ApplicationUpdateDataInput>;
-  upsert?: Maybe<ApplicationUpsertNestedInput>;
   connect?: Maybe<ApplicationWhereUniqueInput>;
 }
 
-export interface CompanyCreatedocumentKeysInput {
-  set?: Maybe<String[] | String>;
+export interface RubriqueUpdateManyMutationInput {
+  codeS3ic?: Maybe<String>;
+  rubrique?: Maybe<String>;
+  alinea?: Maybe<String>;
+  dateAutorisation?: Maybe<String>;
+  etatActivite?: Maybe<String>;
+  regimeAutorise?: Maybe<String>;
+  activite?: Maybe<String>;
+  volume?: Maybe<String>;
+  unite?: Maybe<String>;
+  category?: Maybe<String>;
+  wasteType?: Maybe<WasteType>;
+}
+
+export interface ApplicationCreateInput {
+  id?: Maybe<ID_Input>;
+  clientSecret: String;
+  name: String;
+  admins?: Maybe<UserCreateManyInput>;
+  redirectUris?: Maybe<ApplicationCreateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
+}
+
+export interface RubriqueUpdateInput {
+  codeS3ic?: Maybe<String>;
+  rubrique?: Maybe<String>;
+  alinea?: Maybe<String>;
+  dateAutorisation?: Maybe<String>;
+  etatActivite?: Maybe<String>;
+  regimeAutorise?: Maybe<String>;
+  activite?: Maybe<String>;
+  volume?: Maybe<String>;
+  unite?: Maybe<String>;
+  category?: Maybe<String>;
+  wasteType?: Maybe<WasteType>;
+}
+
+export interface UserCreateManyInput {
+  create?: Maybe<UserCreateInput[] | UserCreateInput>;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
 }
 
 export interface RubriqueWhereInput {
@@ -2835,26 +2897,172 @@ export interface RubriqueWhereInput {
   NOT?: Maybe<RubriqueWhereInput[] | RubriqueWhereInput>;
 }
 
-export interface ApplicationCreateOneInput {
+export interface ApplicationCreateredirectUrisInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface RubriqueCreateInput {
+  id?: Maybe<ID_Input>;
+  codeS3ic?: Maybe<String>;
+  rubrique?: Maybe<String>;
+  alinea?: Maybe<String>;
+  dateAutorisation?: Maybe<String>;
+  etatActivite?: Maybe<String>;
+  regimeAutorise?: Maybe<String>;
+  activite?: Maybe<String>;
+  volume?: Maybe<String>;
+  unite?: Maybe<String>;
+  category?: Maybe<String>;
+  wasteType?: Maybe<WasteType>;
+}
+
+export interface AccessTokenUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  application?: Maybe<ApplicationUpdateOneInput>;
+  token?: Maybe<String>;
+  isRevoked?: Maybe<Boolean>;
+  lastUsed?: Maybe<DateTimeInput>;
+}
+
+export interface InstallationUpdateInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  regime?: Maybe<String>;
+  libRegime?: Maybe<String>;
+  seveso?: Maybe<Seveso>;
+  libSeveso?: Maybe<String>;
+  familleIc?: Maybe<String>;
+  urlFiche?: Maybe<String>;
+  s3icNumeroSiret?: Maybe<String>;
+  irepNumeroSiret?: Maybe<String>;
+  gerepNumeroSiret?: Maybe<String>;
+  sireneNumeroSiret?: Maybe<String>;
+}
+
+export interface UserUpdateOneRequiredInput {
+  create?: Maybe<UserCreateInput>;
+  update?: Maybe<UserUpdateDataInput>;
+  upsert?: Maybe<UserUpsertNestedInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface InstallationCreateInput {
+  id?: Maybe<ID_Input>;
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  regime?: Maybe<String>;
+  libRegime?: Maybe<String>;
+  seveso?: Maybe<Seveso>;
+  libSeveso?: Maybe<String>;
+  familleIc?: Maybe<String>;
+  urlFiche?: Maybe<String>;
+  s3icNumeroSiret?: Maybe<String>;
+  irepNumeroSiret?: Maybe<String>;
+  gerepNumeroSiret?: Maybe<String>;
+  sireneNumeroSiret?: Maybe<String>;
+}
+
+export interface UserUpdateDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+}
+
+export interface StatusLogWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  user?: Maybe<UserWhereInput>;
+  form?: Maybe<FormWhereInput>;
+  status?: Maybe<Status>;
+  status_not?: Maybe<Status>;
+  status_in?: Maybe<Status[] | Status>;
+  status_not_in?: Maybe<Status[] | Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  loggedAt_not?: Maybe<DateTimeInput>;
+  loggedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  loggedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  loggedAt_lt?: Maybe<DateTimeInput>;
+  loggedAt_lte?: Maybe<DateTimeInput>;
+  loggedAt_gt?: Maybe<DateTimeInput>;
+  loggedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
+  OR?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
+  NOT?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
+}
+
+export interface CompanyAssociationUpdateManyWithoutUserInput {
+  create?: Maybe<
+    | CompanyAssociationCreateWithoutUserInput[]
+    | CompanyAssociationCreateWithoutUserInput
+  >;
+  delete?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  connect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  set?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  disconnect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  update?: Maybe<
+    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput[]
+    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput
+  >;
+  upsert?: Maybe<
+    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput[]
+    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput
+  >;
+  deleteMany?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | CompanyAssociationUpdateManyWithWhereNestedInput[]
+    | CompanyAssociationUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface ApplicationUpdateOneRequiredInput {
   create?: Maybe<ApplicationCreateInput>;
+  update?: Maybe<ApplicationUpdateDataInput>;
+  upsert?: Maybe<ApplicationUpsertNestedInput>;
   connect?: Maybe<ApplicationWhereUniqueInput>;
 }
 
-export interface GrantUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  code?: Maybe<String>;
-  application?: Maybe<ApplicationUpdateOneRequiredInput>;
-  expires?: Maybe<Int>;
-  redirectUri?: Maybe<String>;
+export interface FormCreateManyInput {
+  create?: Maybe<FormCreateInput[] | FormCreateInput>;
+  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
 }
 
-export interface ApplicationCreateInput {
+export interface GrantCreateInput {
   id?: Maybe<ID_Input>;
-  clientSecret: String;
-  name: String;
-  admins?: Maybe<UserCreateManyInput>;
-  redirectUris?: Maybe<ApplicationCreateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
+  user: UserCreateOneInput;
+  code: String;
+  application: ApplicationCreateOneInput;
+  expires: Int;
+  redirectUri: String;
+}
+
+export interface CompanyAssociationUpdateWithoutUserDataInput {
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  role?: Maybe<UserRole>;
 }
 
 export interface FormUpdateManyMutationInput {
@@ -2937,15 +3145,314 @@ export interface FormUpdateManyMutationInput {
   traderValidityLimit?: Maybe<DateTimeInput>;
 }
 
-export interface UserCreateManyInput {
-  create?: Maybe<UserCreateInput[] | UserCreateInput>;
-  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+export interface CompanyUpdateOneRequiredInput {
+  create?: Maybe<CompanyCreateInput>;
+  update?: Maybe<CompanyUpdateDataInput>;
+  upsert?: Maybe<CompanyUpsertNestedInput>;
+  connect?: Maybe<CompanyWhereUniqueInput>;
 }
 
-export interface FormUpdateManyDataInput {
+export interface FormUpdateManyWithWhereNestedInput {
+  where: FormScalarWhereInput;
+  data: FormUpdateManyDataInput;
+}
+
+export interface CompanyUpdateDataInput {
+  siret?: Maybe<String>;
+  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  givenName?: Maybe<String>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
+  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+}
+
+export type UserWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  email?: Maybe<String>;
+}>;
+
+export interface CompanyUpdatecompanyTypesInput {
+  set?: Maybe<CompanyType[] | CompanyType>;
+}
+
+export interface UserAccountHashSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<UserAccountHashWhereInput>;
+  AND?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+}
+
+export interface CompanyUpdatedocumentKeysInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface StatusLogSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<StatusLogWhereInput>;
+  AND?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+}
+
+export interface CompanyUpsertNestedInput {
+  update: CompanyUpdateDataInput;
+  create: CompanyCreateInput;
+}
+
+export interface GrantSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<GrantWhereInput>;
+  AND?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
+  OR?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
+  NOT?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
+}
+
+export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
+  where: CompanyAssociationWhereUniqueInput;
+  update: CompanyAssociationUpdateWithoutUserDataInput;
+  create: CompanyAssociationCreateWithoutUserInput;
+}
+
+export interface EcoOrganismeSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<EcoOrganismeWhereInput>;
+  AND?: Maybe<
+    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
+  >;
+}
+
+export interface CompanyAssociationScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  AND?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  OR?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  NOT?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+}
+
+export interface CompanySubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CompanyWhereInput>;
+  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+}
+
+export interface CompanyAssociationUpdateManyWithWhereNestedInput {
+  where: CompanyAssociationScalarWhereInput;
+  data: CompanyAssociationUpdateManyDataInput;
+}
+
+export interface UserActivationHashUpdateManyMutationInput {
+  hash?: Maybe<String>;
+}
+
+export interface CompanyAssociationUpdateManyDataInput {
+  role?: Maybe<UserRole>;
+}
+
+export interface UserAccountHashUpdateManyMutationInput {
+  email?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  hash?: Maybe<String>;
+}
+
+export interface UserUpsertNestedInput {
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
+}
+
+export interface ApplicationWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  clientSecret?: Maybe<String>;
+  clientSecret_not?: Maybe<String>;
+  clientSecret_in?: Maybe<String[] | String>;
+  clientSecret_not_in?: Maybe<String[] | String>;
+  clientSecret_lt?: Maybe<String>;
+  clientSecret_lte?: Maybe<String>;
+  clientSecret_gt?: Maybe<String>;
+  clientSecret_gte?: Maybe<String>;
+  clientSecret_contains?: Maybe<String>;
+  clientSecret_not_contains?: Maybe<String>;
+  clientSecret_starts_with?: Maybe<String>;
+  clientSecret_not_starts_with?: Maybe<String>;
+  clientSecret_ends_with?: Maybe<String>;
+  clientSecret_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  admins_every?: Maybe<UserWhereInput>;
+  admins_some?: Maybe<UserWhereInput>;
+  admins_none?: Maybe<UserWhereInput>;
+  logoUrl?: Maybe<String>;
+  logoUrl_not?: Maybe<String>;
+  logoUrl_in?: Maybe<String[] | String>;
+  logoUrl_not_in?: Maybe<String[] | String>;
+  logoUrl_lt?: Maybe<String>;
+  logoUrl_lte?: Maybe<String>;
+  logoUrl_gt?: Maybe<String>;
+  logoUrl_gte?: Maybe<String>;
+  logoUrl_contains?: Maybe<String>;
+  logoUrl_not_contains?: Maybe<String>;
+  logoUrl_starts_with?: Maybe<String>;
+  logoUrl_not_starts_with?: Maybe<String>;
+  logoUrl_ends_with?: Maybe<String>;
+  logoUrl_not_ends_with?: Maybe<String>;
+  AND?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
+  OR?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
+  NOT?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
+}
+
+export interface ApplicationUpdateOneInput {
+  create?: Maybe<ApplicationCreateInput>;
+  update?: Maybe<ApplicationUpdateDataInput>;
+  upsert?: Maybe<ApplicationUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<ApplicationWhereUniqueInput>;
+}
+
+export interface UserUpdateInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+}
+
+export interface ApplicationUpdateDataInput {
+  clientSecret?: Maybe<String>;
+  name?: Maybe<String>;
+  admins?: Maybe<UserUpdateManyInput>;
+  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
+}
+
+export interface FormUpdateOneWithoutTemporaryStorageDetailInput {
+  create?: Maybe<FormCreateWithoutTemporaryStorageDetailInput>;
+  update?: Maybe<FormUpdateWithoutTemporaryStorageDetailDataInput>;
+  upsert?: Maybe<FormUpsertWithoutTemporaryStorageDetailInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface EcoOrganismeCreateOneInput {
+  create?: Maybe<EcoOrganismeCreateInput>;
+  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
+}
+
+export interface FormCreateWithoutTemporaryStorageDetailInput {
+  id?: Maybe<ID_Input>;
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
@@ -3019,13 +3526,34 @@ export interface FormUpdateManyDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  appendix2Forms?: Maybe<FormCreateManyInput>;
 }
 
-export interface ApplicationCreateredirectUrisInput {
-  set?: Maybe<String[] | String>;
+export interface UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
+  data: UserUpdateDataInput;
 }
 
-export interface StatusLogWhereInput {
+export type InstallationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
+}
+
+export interface StatusLogUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  form?: Maybe<FormUpdateOneRequiredInput>;
+  status?: Maybe<Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
+}
+
+export interface UserScalarWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -3040,28 +3568,223 @@ export interface StatusLogWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  user?: Maybe<UserWhereInput>;
-  form?: Maybe<FormWhereInput>;
-  status?: Maybe<Status>;
-  status_not?: Maybe<Status>;
-  status_in?: Maybe<Status[] | Status>;
-  status_not_in?: Maybe<Status[] | Status>;
-  loggedAt?: Maybe<DateTimeInput>;
-  loggedAt_not?: Maybe<DateTimeInput>;
-  loggedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  loggedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  loggedAt_lt?: Maybe<DateTimeInput>;
-  loggedAt_lte?: Maybe<DateTimeInput>;
-  loggedAt_gt?: Maybe<DateTimeInput>;
-  loggedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
-  OR?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
-  NOT?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
+  isActive?: Maybe<Boolean>;
+  isActive_not?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  password?: Maybe<String>;
+  password_not?: Maybe<String>;
+  password_in?: Maybe<String[] | String>;
+  password_not_in?: Maybe<String[] | String>;
+  password_lt?: Maybe<String>;
+  password_lte?: Maybe<String>;
+  password_gt?: Maybe<String>;
+  password_gte?: Maybe<String>;
+  password_contains?: Maybe<String>;
+  password_not_contains?: Maybe<String>;
+  password_starts_with?: Maybe<String>;
+  password_not_starts_with?: Maybe<String>;
+  password_ends_with?: Maybe<String>;
+  password_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  phone?: Maybe<String>;
+  phone_not?: Maybe<String>;
+  phone_in?: Maybe<String[] | String>;
+  phone_not_in?: Maybe<String[] | String>;
+  phone_lt?: Maybe<String>;
+  phone_lte?: Maybe<String>;
+  phone_gt?: Maybe<String>;
+  phone_gte?: Maybe<String>;
+  phone_contains?: Maybe<String>;
+  phone_not_contains?: Maybe<String>;
+  phone_starts_with?: Maybe<String>;
+  phone_not_starts_with?: Maybe<String>;
+  phone_ends_with?: Maybe<String>;
+  phone_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  OR?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  NOT?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
 }
 
-export interface AccessTokenUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  application?: Maybe<ApplicationUpdateOneInput>;
+export type RubriqueWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput;
+  data: UserUpdateManyDataInput;
+}
+
+export interface UserWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  isActive_not?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  password?: Maybe<String>;
+  password_not?: Maybe<String>;
+  password_in?: Maybe<String[] | String>;
+  password_not_in?: Maybe<String[] | String>;
+  password_lt?: Maybe<String>;
+  password_lte?: Maybe<String>;
+  password_gt?: Maybe<String>;
+  password_gte?: Maybe<String>;
+  password_contains?: Maybe<String>;
+  password_not_contains?: Maybe<String>;
+  password_starts_with?: Maybe<String>;
+  password_not_starts_with?: Maybe<String>;
+  password_ends_with?: Maybe<String>;
+  password_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  phone?: Maybe<String>;
+  phone_not?: Maybe<String>;
+  phone_in?: Maybe<String[] | String>;
+  phone_not_in?: Maybe<String[] | String>;
+  phone_lt?: Maybe<String>;
+  phone_lte?: Maybe<String>;
+  phone_gt?: Maybe<String>;
+  phone_gte?: Maybe<String>;
+  phone_contains?: Maybe<String>;
+  phone_not_contains?: Maybe<String>;
+  phone_starts_with?: Maybe<String>;
+  phone_not_starts_with?: Maybe<String>;
+  phone_ends_with?: Maybe<String>;
+  phone_not_ends_with?: Maybe<String>;
+  companyAssociations_every?: Maybe<CompanyAssociationWhereInput>;
+  companyAssociations_some?: Maybe<CompanyAssociationWhereInput>;
+  companyAssociations_none?: Maybe<CompanyAssociationWhereInput>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserWhereInput[] | UserWhereInput>;
+  OR?: Maybe<UserWhereInput[] | UserWhereInput>;
+  NOT?: Maybe<UserWhereInput[] | UserWhereInput>;
+}
+
+export interface UserUpdateManyDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+}
+
+export type StatusLogWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface ApplicationUpdateredirectUrisInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface GrantUpdateManyMutationInput {
+  code?: Maybe<String>;
+  expires?: Maybe<Int>;
+  redirectUri?: Maybe<String>;
+}
+
+export interface ApplicationUpsertNestedInput {
+  update: ApplicationUpdateDataInput;
+  create: ApplicationCreateInput;
+}
+
+export type TemporaryStorageDetailWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface AccessTokenUpdateManyMutationInput {
   token?: Maybe<String>;
   isRevoked?: Maybe<Boolean>;
   lastUsed?: Maybe<DateTimeInput>;
@@ -3112,1265 +3835,6 @@ export interface FormScalarWhereInput {
   customId_not_ends_with?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   isDeleted_not?: Maybe<Boolean>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  signedByTransporter?: Maybe<Boolean>;
-  signedByTransporter_not?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  status_not?: Maybe<String>;
-  status_in?: Maybe<String[] | String>;
-  status_not_in?: Maybe<String[] | String>;
-  status_lt?: Maybe<String>;
-  status_lte?: Maybe<String>;
-  status_gt?: Maybe<String>;
-  status_gte?: Maybe<String>;
-  status_contains?: Maybe<String>;
-  status_not_contains?: Maybe<String>;
-  status_starts_with?: Maybe<String>;
-  status_not_starts_with?: Maybe<String>;
-  status_ends_with?: Maybe<String>;
-  status_not_ends_with?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentAt_not?: Maybe<DateTimeInput>;
-  sentAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  sentAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  sentAt_lt?: Maybe<DateTimeInput>;
-  sentAt_lte?: Maybe<DateTimeInput>;
-  sentAt_gt?: Maybe<DateTimeInput>;
-  sentAt_gte?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  sentBy_not?: Maybe<String>;
-  sentBy_in?: Maybe<String[] | String>;
-  sentBy_not_in?: Maybe<String[] | String>;
-  sentBy_lt?: Maybe<String>;
-  sentBy_lte?: Maybe<String>;
-  sentBy_gt?: Maybe<String>;
-  sentBy_gte?: Maybe<String>;
-  sentBy_contains?: Maybe<String>;
-  sentBy_not_contains?: Maybe<String>;
-  sentBy_starts_with?: Maybe<String>;
-  sentBy_not_starts_with?: Maybe<String>;
-  sentBy_ends_with?: Maybe<String>;
-  sentBy_not_ends_with?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  isAccepted_not?: Maybe<Boolean>;
-  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  wasteAcceptationStatus_not?: Maybe<WasteAcceptationStatus>;
-  wasteAcceptationStatus_in?: Maybe<
-    WasteAcceptationStatus[] | WasteAcceptationStatus
-  >;
-  wasteAcceptationStatus_not_in?: Maybe<
-    WasteAcceptationStatus[] | WasteAcceptationStatus
-  >;
-  wasteRefusalReason?: Maybe<String>;
-  wasteRefusalReason_not?: Maybe<String>;
-  wasteRefusalReason_in?: Maybe<String[] | String>;
-  wasteRefusalReason_not_in?: Maybe<String[] | String>;
-  wasteRefusalReason_lt?: Maybe<String>;
-  wasteRefusalReason_lte?: Maybe<String>;
-  wasteRefusalReason_gt?: Maybe<String>;
-  wasteRefusalReason_gte?: Maybe<String>;
-  wasteRefusalReason_contains?: Maybe<String>;
-  wasteRefusalReason_not_contains?: Maybe<String>;
-  wasteRefusalReason_starts_with?: Maybe<String>;
-  wasteRefusalReason_not_starts_with?: Maybe<String>;
-  wasteRefusalReason_ends_with?: Maybe<String>;
-  wasteRefusalReason_not_ends_with?: Maybe<String>;
-  receivedBy?: Maybe<String>;
-  receivedBy_not?: Maybe<String>;
-  receivedBy_in?: Maybe<String[] | String>;
-  receivedBy_not_in?: Maybe<String[] | String>;
-  receivedBy_lt?: Maybe<String>;
-  receivedBy_lte?: Maybe<String>;
-  receivedBy_gt?: Maybe<String>;
-  receivedBy_gte?: Maybe<String>;
-  receivedBy_contains?: Maybe<String>;
-  receivedBy_not_contains?: Maybe<String>;
-  receivedBy_starts_with?: Maybe<String>;
-  receivedBy_not_starts_with?: Maybe<String>;
-  receivedBy_ends_with?: Maybe<String>;
-  receivedBy_not_ends_with?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  receivedAt_not?: Maybe<DateTimeInput>;
-  receivedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  receivedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  receivedAt_lt?: Maybe<DateTimeInput>;
-  receivedAt_lte?: Maybe<DateTimeInput>;
-  receivedAt_gt?: Maybe<DateTimeInput>;
-  receivedAt_gte?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  quantityReceived_not?: Maybe<Float>;
-  quantityReceived_in?: Maybe<Float[] | Float>;
-  quantityReceived_not_in?: Maybe<Float[] | Float>;
-  quantityReceived_lt?: Maybe<Float>;
-  quantityReceived_lte?: Maybe<Float>;
-  quantityReceived_gt?: Maybe<Float>;
-  quantityReceived_gte?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedBy_not?: Maybe<String>;
-  processedBy_in?: Maybe<String[] | String>;
-  processedBy_not_in?: Maybe<String[] | String>;
-  processedBy_lt?: Maybe<String>;
-  processedBy_lte?: Maybe<String>;
-  processedBy_gt?: Maybe<String>;
-  processedBy_gte?: Maybe<String>;
-  processedBy_contains?: Maybe<String>;
-  processedBy_not_contains?: Maybe<String>;
-  processedBy_starts_with?: Maybe<String>;
-  processedBy_not_starts_with?: Maybe<String>;
-  processedBy_ends_with?: Maybe<String>;
-  processedBy_not_ends_with?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processedAt_not?: Maybe<String>;
-  processedAt_in?: Maybe<String[] | String>;
-  processedAt_not_in?: Maybe<String[] | String>;
-  processedAt_lt?: Maybe<String>;
-  processedAt_lte?: Maybe<String>;
-  processedAt_gt?: Maybe<String>;
-  processedAt_gte?: Maybe<String>;
-  processedAt_contains?: Maybe<String>;
-  processedAt_not_contains?: Maybe<String>;
-  processedAt_starts_with?: Maybe<String>;
-  processedAt_not_starts_with?: Maybe<String>;
-  processedAt_ends_with?: Maybe<String>;
-  processedAt_not_ends_with?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDone_not?: Maybe<String>;
-  processingOperationDone_in?: Maybe<String[] | String>;
-  processingOperationDone_not_in?: Maybe<String[] | String>;
-  processingOperationDone_lt?: Maybe<String>;
-  processingOperationDone_lte?: Maybe<String>;
-  processingOperationDone_gt?: Maybe<String>;
-  processingOperationDone_gte?: Maybe<String>;
-  processingOperationDone_contains?: Maybe<String>;
-  processingOperationDone_not_contains?: Maybe<String>;
-  processingOperationDone_starts_with?: Maybe<String>;
-  processingOperationDone_not_starts_with?: Maybe<String>;
-  processingOperationDone_ends_with?: Maybe<String>;
-  processingOperationDone_not_ends_with?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  processingOperationDescription_not?: Maybe<String>;
-  processingOperationDescription_in?: Maybe<String[] | String>;
-  processingOperationDescription_not_in?: Maybe<String[] | String>;
-  processingOperationDescription_lt?: Maybe<String>;
-  processingOperationDescription_lte?: Maybe<String>;
-  processingOperationDescription_gt?: Maybe<String>;
-  processingOperationDescription_gte?: Maybe<String>;
-  processingOperationDescription_contains?: Maybe<String>;
-  processingOperationDescription_not_contains?: Maybe<String>;
-  processingOperationDescription_starts_with?: Maybe<String>;
-  processingOperationDescription_not_starts_with?: Maybe<String>;
-  processingOperationDescription_ends_with?: Maybe<String>;
-  processingOperationDescription_not_ends_with?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  noTraceability_not?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationProcessingOperation_not?: Maybe<String>;
-  nextDestinationProcessingOperation_in?: Maybe<String[] | String>;
-  nextDestinationProcessingOperation_not_in?: Maybe<String[] | String>;
-  nextDestinationProcessingOperation_lt?: Maybe<String>;
-  nextDestinationProcessingOperation_lte?: Maybe<String>;
-  nextDestinationProcessingOperation_gt?: Maybe<String>;
-  nextDestinationProcessingOperation_gte?: Maybe<String>;
-  nextDestinationProcessingOperation_contains?: Maybe<String>;
-  nextDestinationProcessingOperation_not_contains?: Maybe<String>;
-  nextDestinationProcessingOperation_starts_with?: Maybe<String>;
-  nextDestinationProcessingOperation_not_starts_with?: Maybe<String>;
-  nextDestinationProcessingOperation_ends_with?: Maybe<String>;
-  nextDestinationProcessingOperation_not_ends_with?: Maybe<String>;
-  nextDestinationCompanyName?: Maybe<String>;
-  nextDestinationCompanyName_not?: Maybe<String>;
-  nextDestinationCompanyName_in?: Maybe<String[] | String>;
-  nextDestinationCompanyName_not_in?: Maybe<String[] | String>;
-  nextDestinationCompanyName_lt?: Maybe<String>;
-  nextDestinationCompanyName_lte?: Maybe<String>;
-  nextDestinationCompanyName_gt?: Maybe<String>;
-  nextDestinationCompanyName_gte?: Maybe<String>;
-  nextDestinationCompanyName_contains?: Maybe<String>;
-  nextDestinationCompanyName_not_contains?: Maybe<String>;
-  nextDestinationCompanyName_starts_with?: Maybe<String>;
-  nextDestinationCompanyName_not_starts_with?: Maybe<String>;
-  nextDestinationCompanyName_ends_with?: Maybe<String>;
-  nextDestinationCompanyName_not_ends_with?: Maybe<String>;
-  nextDestinationCompanySiret?: Maybe<String>;
-  nextDestinationCompanySiret_not?: Maybe<String>;
-  nextDestinationCompanySiret_in?: Maybe<String[] | String>;
-  nextDestinationCompanySiret_not_in?: Maybe<String[] | String>;
-  nextDestinationCompanySiret_lt?: Maybe<String>;
-  nextDestinationCompanySiret_lte?: Maybe<String>;
-  nextDestinationCompanySiret_gt?: Maybe<String>;
-  nextDestinationCompanySiret_gte?: Maybe<String>;
-  nextDestinationCompanySiret_contains?: Maybe<String>;
-  nextDestinationCompanySiret_not_contains?: Maybe<String>;
-  nextDestinationCompanySiret_starts_with?: Maybe<String>;
-  nextDestinationCompanySiret_not_starts_with?: Maybe<String>;
-  nextDestinationCompanySiret_ends_with?: Maybe<String>;
-  nextDestinationCompanySiret_not_ends_with?: Maybe<String>;
-  nextDestinationCompanyAddress?: Maybe<String>;
-  nextDestinationCompanyAddress_not?: Maybe<String>;
-  nextDestinationCompanyAddress_in?: Maybe<String[] | String>;
-  nextDestinationCompanyAddress_not_in?: Maybe<String[] | String>;
-  nextDestinationCompanyAddress_lt?: Maybe<String>;
-  nextDestinationCompanyAddress_lte?: Maybe<String>;
-  nextDestinationCompanyAddress_gt?: Maybe<String>;
-  nextDestinationCompanyAddress_gte?: Maybe<String>;
-  nextDestinationCompanyAddress_contains?: Maybe<String>;
-  nextDestinationCompanyAddress_not_contains?: Maybe<String>;
-  nextDestinationCompanyAddress_starts_with?: Maybe<String>;
-  nextDestinationCompanyAddress_not_starts_with?: Maybe<String>;
-  nextDestinationCompanyAddress_ends_with?: Maybe<String>;
-  nextDestinationCompanyAddress_not_ends_with?: Maybe<String>;
-  nextDestinationCompanyContact?: Maybe<String>;
-  nextDestinationCompanyContact_not?: Maybe<String>;
-  nextDestinationCompanyContact_in?: Maybe<String[] | String>;
-  nextDestinationCompanyContact_not_in?: Maybe<String[] | String>;
-  nextDestinationCompanyContact_lt?: Maybe<String>;
-  nextDestinationCompanyContact_lte?: Maybe<String>;
-  nextDestinationCompanyContact_gt?: Maybe<String>;
-  nextDestinationCompanyContact_gte?: Maybe<String>;
-  nextDestinationCompanyContact_contains?: Maybe<String>;
-  nextDestinationCompanyContact_not_contains?: Maybe<String>;
-  nextDestinationCompanyContact_starts_with?: Maybe<String>;
-  nextDestinationCompanyContact_not_starts_with?: Maybe<String>;
-  nextDestinationCompanyContact_ends_with?: Maybe<String>;
-  nextDestinationCompanyContact_not_ends_with?: Maybe<String>;
-  nextDestinationCompanyPhone?: Maybe<String>;
-  nextDestinationCompanyPhone_not?: Maybe<String>;
-  nextDestinationCompanyPhone_in?: Maybe<String[] | String>;
-  nextDestinationCompanyPhone_not_in?: Maybe<String[] | String>;
-  nextDestinationCompanyPhone_lt?: Maybe<String>;
-  nextDestinationCompanyPhone_lte?: Maybe<String>;
-  nextDestinationCompanyPhone_gt?: Maybe<String>;
-  nextDestinationCompanyPhone_gte?: Maybe<String>;
-  nextDestinationCompanyPhone_contains?: Maybe<String>;
-  nextDestinationCompanyPhone_not_contains?: Maybe<String>;
-  nextDestinationCompanyPhone_starts_with?: Maybe<String>;
-  nextDestinationCompanyPhone_not_starts_with?: Maybe<String>;
-  nextDestinationCompanyPhone_ends_with?: Maybe<String>;
-  nextDestinationCompanyPhone_not_ends_with?: Maybe<String>;
-  nextDestinationCompanyMail?: Maybe<String>;
-  nextDestinationCompanyMail_not?: Maybe<String>;
-  nextDestinationCompanyMail_in?: Maybe<String[] | String>;
-  nextDestinationCompanyMail_not_in?: Maybe<String[] | String>;
-  nextDestinationCompanyMail_lt?: Maybe<String>;
-  nextDestinationCompanyMail_lte?: Maybe<String>;
-  nextDestinationCompanyMail_gt?: Maybe<String>;
-  nextDestinationCompanyMail_gte?: Maybe<String>;
-  nextDestinationCompanyMail_contains?: Maybe<String>;
-  nextDestinationCompanyMail_not_contains?: Maybe<String>;
-  nextDestinationCompanyMail_starts_with?: Maybe<String>;
-  nextDestinationCompanyMail_not_starts_with?: Maybe<String>;
-  nextDestinationCompanyMail_ends_with?: Maybe<String>;
-  nextDestinationCompanyMail_not_ends_with?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterType_not?: Maybe<EmitterType>;
-  emitterType_in?: Maybe<EmitterType[] | EmitterType>;
-  emitterType_not_in?: Maybe<EmitterType[] | EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterPickupSite_not?: Maybe<String>;
-  emitterPickupSite_in?: Maybe<String[] | String>;
-  emitterPickupSite_not_in?: Maybe<String[] | String>;
-  emitterPickupSite_lt?: Maybe<String>;
-  emitterPickupSite_lte?: Maybe<String>;
-  emitterPickupSite_gt?: Maybe<String>;
-  emitterPickupSite_gte?: Maybe<String>;
-  emitterPickupSite_contains?: Maybe<String>;
-  emitterPickupSite_not_contains?: Maybe<String>;
-  emitterPickupSite_starts_with?: Maybe<String>;
-  emitterPickupSite_not_starts_with?: Maybe<String>;
-  emitterPickupSite_ends_with?: Maybe<String>;
-  emitterPickupSite_not_ends_with?: Maybe<String>;
-  emitterWorkSiteName?: Maybe<String>;
-  emitterWorkSiteName_not?: Maybe<String>;
-  emitterWorkSiteName_in?: Maybe<String[] | String>;
-  emitterWorkSiteName_not_in?: Maybe<String[] | String>;
-  emitterWorkSiteName_lt?: Maybe<String>;
-  emitterWorkSiteName_lte?: Maybe<String>;
-  emitterWorkSiteName_gt?: Maybe<String>;
-  emitterWorkSiteName_gte?: Maybe<String>;
-  emitterWorkSiteName_contains?: Maybe<String>;
-  emitterWorkSiteName_not_contains?: Maybe<String>;
-  emitterWorkSiteName_starts_with?: Maybe<String>;
-  emitterWorkSiteName_not_starts_with?: Maybe<String>;
-  emitterWorkSiteName_ends_with?: Maybe<String>;
-  emitterWorkSiteName_not_ends_with?: Maybe<String>;
-  emitterWorkSiteAddress?: Maybe<String>;
-  emitterWorkSiteAddress_not?: Maybe<String>;
-  emitterWorkSiteAddress_in?: Maybe<String[] | String>;
-  emitterWorkSiteAddress_not_in?: Maybe<String[] | String>;
-  emitterWorkSiteAddress_lt?: Maybe<String>;
-  emitterWorkSiteAddress_lte?: Maybe<String>;
-  emitterWorkSiteAddress_gt?: Maybe<String>;
-  emitterWorkSiteAddress_gte?: Maybe<String>;
-  emitterWorkSiteAddress_contains?: Maybe<String>;
-  emitterWorkSiteAddress_not_contains?: Maybe<String>;
-  emitterWorkSiteAddress_starts_with?: Maybe<String>;
-  emitterWorkSiteAddress_not_starts_with?: Maybe<String>;
-  emitterWorkSiteAddress_ends_with?: Maybe<String>;
-  emitterWorkSiteAddress_not_ends_with?: Maybe<String>;
-  emitterWorkSiteCity?: Maybe<String>;
-  emitterWorkSiteCity_not?: Maybe<String>;
-  emitterWorkSiteCity_in?: Maybe<String[] | String>;
-  emitterWorkSiteCity_not_in?: Maybe<String[] | String>;
-  emitterWorkSiteCity_lt?: Maybe<String>;
-  emitterWorkSiteCity_lte?: Maybe<String>;
-  emitterWorkSiteCity_gt?: Maybe<String>;
-  emitterWorkSiteCity_gte?: Maybe<String>;
-  emitterWorkSiteCity_contains?: Maybe<String>;
-  emitterWorkSiteCity_not_contains?: Maybe<String>;
-  emitterWorkSiteCity_starts_with?: Maybe<String>;
-  emitterWorkSiteCity_not_starts_with?: Maybe<String>;
-  emitterWorkSiteCity_ends_with?: Maybe<String>;
-  emitterWorkSiteCity_not_ends_with?: Maybe<String>;
-  emitterWorkSitePostalCode?: Maybe<String>;
-  emitterWorkSitePostalCode_not?: Maybe<String>;
-  emitterWorkSitePostalCode_in?: Maybe<String[] | String>;
-  emitterWorkSitePostalCode_not_in?: Maybe<String[] | String>;
-  emitterWorkSitePostalCode_lt?: Maybe<String>;
-  emitterWorkSitePostalCode_lte?: Maybe<String>;
-  emitterWorkSitePostalCode_gt?: Maybe<String>;
-  emitterWorkSitePostalCode_gte?: Maybe<String>;
-  emitterWorkSitePostalCode_contains?: Maybe<String>;
-  emitterWorkSitePostalCode_not_contains?: Maybe<String>;
-  emitterWorkSitePostalCode_starts_with?: Maybe<String>;
-  emitterWorkSitePostalCode_not_starts_with?: Maybe<String>;
-  emitterWorkSitePostalCode_ends_with?: Maybe<String>;
-  emitterWorkSitePostalCode_not_ends_with?: Maybe<String>;
-  emitterWorkSiteInfos?: Maybe<String>;
-  emitterWorkSiteInfos_not?: Maybe<String>;
-  emitterWorkSiteInfos_in?: Maybe<String[] | String>;
-  emitterWorkSiteInfos_not_in?: Maybe<String[] | String>;
-  emitterWorkSiteInfos_lt?: Maybe<String>;
-  emitterWorkSiteInfos_lte?: Maybe<String>;
-  emitterWorkSiteInfos_gt?: Maybe<String>;
-  emitterWorkSiteInfos_gte?: Maybe<String>;
-  emitterWorkSiteInfos_contains?: Maybe<String>;
-  emitterWorkSiteInfos_not_contains?: Maybe<String>;
-  emitterWorkSiteInfos_starts_with?: Maybe<String>;
-  emitterWorkSiteInfos_not_starts_with?: Maybe<String>;
-  emitterWorkSiteInfos_ends_with?: Maybe<String>;
-  emitterWorkSiteInfos_not_ends_with?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanyName_not?: Maybe<String>;
-  emitterCompanyName_in?: Maybe<String[] | String>;
-  emitterCompanyName_not_in?: Maybe<String[] | String>;
-  emitterCompanyName_lt?: Maybe<String>;
-  emitterCompanyName_lte?: Maybe<String>;
-  emitterCompanyName_gt?: Maybe<String>;
-  emitterCompanyName_gte?: Maybe<String>;
-  emitterCompanyName_contains?: Maybe<String>;
-  emitterCompanyName_not_contains?: Maybe<String>;
-  emitterCompanyName_starts_with?: Maybe<String>;
-  emitterCompanyName_not_starts_with?: Maybe<String>;
-  emitterCompanyName_ends_with?: Maybe<String>;
-  emitterCompanyName_not_ends_with?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanySiret_not?: Maybe<String>;
-  emitterCompanySiret_in?: Maybe<String[] | String>;
-  emitterCompanySiret_not_in?: Maybe<String[] | String>;
-  emitterCompanySiret_lt?: Maybe<String>;
-  emitterCompanySiret_lte?: Maybe<String>;
-  emitterCompanySiret_gt?: Maybe<String>;
-  emitterCompanySiret_gte?: Maybe<String>;
-  emitterCompanySiret_contains?: Maybe<String>;
-  emitterCompanySiret_not_contains?: Maybe<String>;
-  emitterCompanySiret_starts_with?: Maybe<String>;
-  emitterCompanySiret_not_starts_with?: Maybe<String>;
-  emitterCompanySiret_ends_with?: Maybe<String>;
-  emitterCompanySiret_not_ends_with?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyAddress_not?: Maybe<String>;
-  emitterCompanyAddress_in?: Maybe<String[] | String>;
-  emitterCompanyAddress_not_in?: Maybe<String[] | String>;
-  emitterCompanyAddress_lt?: Maybe<String>;
-  emitterCompanyAddress_lte?: Maybe<String>;
-  emitterCompanyAddress_gt?: Maybe<String>;
-  emitterCompanyAddress_gte?: Maybe<String>;
-  emitterCompanyAddress_contains?: Maybe<String>;
-  emitterCompanyAddress_not_contains?: Maybe<String>;
-  emitterCompanyAddress_starts_with?: Maybe<String>;
-  emitterCompanyAddress_not_starts_with?: Maybe<String>;
-  emitterCompanyAddress_ends_with?: Maybe<String>;
-  emitterCompanyAddress_not_ends_with?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyContact_not?: Maybe<String>;
-  emitterCompanyContact_in?: Maybe<String[] | String>;
-  emitterCompanyContact_not_in?: Maybe<String[] | String>;
-  emitterCompanyContact_lt?: Maybe<String>;
-  emitterCompanyContact_lte?: Maybe<String>;
-  emitterCompanyContact_gt?: Maybe<String>;
-  emitterCompanyContact_gte?: Maybe<String>;
-  emitterCompanyContact_contains?: Maybe<String>;
-  emitterCompanyContact_not_contains?: Maybe<String>;
-  emitterCompanyContact_starts_with?: Maybe<String>;
-  emitterCompanyContact_not_starts_with?: Maybe<String>;
-  emitterCompanyContact_ends_with?: Maybe<String>;
-  emitterCompanyContact_not_ends_with?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyPhone_not?: Maybe<String>;
-  emitterCompanyPhone_in?: Maybe<String[] | String>;
-  emitterCompanyPhone_not_in?: Maybe<String[] | String>;
-  emitterCompanyPhone_lt?: Maybe<String>;
-  emitterCompanyPhone_lte?: Maybe<String>;
-  emitterCompanyPhone_gt?: Maybe<String>;
-  emitterCompanyPhone_gte?: Maybe<String>;
-  emitterCompanyPhone_contains?: Maybe<String>;
-  emitterCompanyPhone_not_contains?: Maybe<String>;
-  emitterCompanyPhone_starts_with?: Maybe<String>;
-  emitterCompanyPhone_not_starts_with?: Maybe<String>;
-  emitterCompanyPhone_ends_with?: Maybe<String>;
-  emitterCompanyPhone_not_ends_with?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  emitterCompanyMail_not?: Maybe<String>;
-  emitterCompanyMail_in?: Maybe<String[] | String>;
-  emitterCompanyMail_not_in?: Maybe<String[] | String>;
-  emitterCompanyMail_lt?: Maybe<String>;
-  emitterCompanyMail_lte?: Maybe<String>;
-  emitterCompanyMail_gt?: Maybe<String>;
-  emitterCompanyMail_gte?: Maybe<String>;
-  emitterCompanyMail_contains?: Maybe<String>;
-  emitterCompanyMail_not_contains?: Maybe<String>;
-  emitterCompanyMail_starts_with?: Maybe<String>;
-  emitterCompanyMail_not_starts_with?: Maybe<String>;
-  emitterCompanyMail_ends_with?: Maybe<String>;
-  emitterCompanyMail_not_ends_with?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientCap_not?: Maybe<String>;
-  recipientCap_in?: Maybe<String[] | String>;
-  recipientCap_not_in?: Maybe<String[] | String>;
-  recipientCap_lt?: Maybe<String>;
-  recipientCap_lte?: Maybe<String>;
-  recipientCap_gt?: Maybe<String>;
-  recipientCap_gte?: Maybe<String>;
-  recipientCap_contains?: Maybe<String>;
-  recipientCap_not_contains?: Maybe<String>;
-  recipientCap_starts_with?: Maybe<String>;
-  recipientCap_not_starts_with?: Maybe<String>;
-  recipientCap_ends_with?: Maybe<String>;
-  recipientCap_not_ends_with?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientProcessingOperation_not?: Maybe<String>;
-  recipientProcessingOperation_in?: Maybe<String[] | String>;
-  recipientProcessingOperation_not_in?: Maybe<String[] | String>;
-  recipientProcessingOperation_lt?: Maybe<String>;
-  recipientProcessingOperation_lte?: Maybe<String>;
-  recipientProcessingOperation_gt?: Maybe<String>;
-  recipientProcessingOperation_gte?: Maybe<String>;
-  recipientProcessingOperation_contains?: Maybe<String>;
-  recipientProcessingOperation_not_contains?: Maybe<String>;
-  recipientProcessingOperation_starts_with?: Maybe<String>;
-  recipientProcessingOperation_not_starts_with?: Maybe<String>;
-  recipientProcessingOperation_ends_with?: Maybe<String>;
-  recipientProcessingOperation_not_ends_with?: Maybe<String>;
-  recipientIsTempStorage?: Maybe<Boolean>;
-  recipientIsTempStorage_not?: Maybe<Boolean>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanyName_not?: Maybe<String>;
-  recipientCompanyName_in?: Maybe<String[] | String>;
-  recipientCompanyName_not_in?: Maybe<String[] | String>;
-  recipientCompanyName_lt?: Maybe<String>;
-  recipientCompanyName_lte?: Maybe<String>;
-  recipientCompanyName_gt?: Maybe<String>;
-  recipientCompanyName_gte?: Maybe<String>;
-  recipientCompanyName_contains?: Maybe<String>;
-  recipientCompanyName_not_contains?: Maybe<String>;
-  recipientCompanyName_starts_with?: Maybe<String>;
-  recipientCompanyName_not_starts_with?: Maybe<String>;
-  recipientCompanyName_ends_with?: Maybe<String>;
-  recipientCompanyName_not_ends_with?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanySiret_not?: Maybe<String>;
-  recipientCompanySiret_in?: Maybe<String[] | String>;
-  recipientCompanySiret_not_in?: Maybe<String[] | String>;
-  recipientCompanySiret_lt?: Maybe<String>;
-  recipientCompanySiret_lte?: Maybe<String>;
-  recipientCompanySiret_gt?: Maybe<String>;
-  recipientCompanySiret_gte?: Maybe<String>;
-  recipientCompanySiret_contains?: Maybe<String>;
-  recipientCompanySiret_not_contains?: Maybe<String>;
-  recipientCompanySiret_starts_with?: Maybe<String>;
-  recipientCompanySiret_not_starts_with?: Maybe<String>;
-  recipientCompanySiret_ends_with?: Maybe<String>;
-  recipientCompanySiret_not_ends_with?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyAddress_not?: Maybe<String>;
-  recipientCompanyAddress_in?: Maybe<String[] | String>;
-  recipientCompanyAddress_not_in?: Maybe<String[] | String>;
-  recipientCompanyAddress_lt?: Maybe<String>;
-  recipientCompanyAddress_lte?: Maybe<String>;
-  recipientCompanyAddress_gt?: Maybe<String>;
-  recipientCompanyAddress_gte?: Maybe<String>;
-  recipientCompanyAddress_contains?: Maybe<String>;
-  recipientCompanyAddress_not_contains?: Maybe<String>;
-  recipientCompanyAddress_starts_with?: Maybe<String>;
-  recipientCompanyAddress_not_starts_with?: Maybe<String>;
-  recipientCompanyAddress_ends_with?: Maybe<String>;
-  recipientCompanyAddress_not_ends_with?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyContact_not?: Maybe<String>;
-  recipientCompanyContact_in?: Maybe<String[] | String>;
-  recipientCompanyContact_not_in?: Maybe<String[] | String>;
-  recipientCompanyContact_lt?: Maybe<String>;
-  recipientCompanyContact_lte?: Maybe<String>;
-  recipientCompanyContact_gt?: Maybe<String>;
-  recipientCompanyContact_gte?: Maybe<String>;
-  recipientCompanyContact_contains?: Maybe<String>;
-  recipientCompanyContact_not_contains?: Maybe<String>;
-  recipientCompanyContact_starts_with?: Maybe<String>;
-  recipientCompanyContact_not_starts_with?: Maybe<String>;
-  recipientCompanyContact_ends_with?: Maybe<String>;
-  recipientCompanyContact_not_ends_with?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyPhone_not?: Maybe<String>;
-  recipientCompanyPhone_in?: Maybe<String[] | String>;
-  recipientCompanyPhone_not_in?: Maybe<String[] | String>;
-  recipientCompanyPhone_lt?: Maybe<String>;
-  recipientCompanyPhone_lte?: Maybe<String>;
-  recipientCompanyPhone_gt?: Maybe<String>;
-  recipientCompanyPhone_gte?: Maybe<String>;
-  recipientCompanyPhone_contains?: Maybe<String>;
-  recipientCompanyPhone_not_contains?: Maybe<String>;
-  recipientCompanyPhone_starts_with?: Maybe<String>;
-  recipientCompanyPhone_not_starts_with?: Maybe<String>;
-  recipientCompanyPhone_ends_with?: Maybe<String>;
-  recipientCompanyPhone_not_ends_with?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  recipientCompanyMail_not?: Maybe<String>;
-  recipientCompanyMail_in?: Maybe<String[] | String>;
-  recipientCompanyMail_not_in?: Maybe<String[] | String>;
-  recipientCompanyMail_lt?: Maybe<String>;
-  recipientCompanyMail_lte?: Maybe<String>;
-  recipientCompanyMail_gt?: Maybe<String>;
-  recipientCompanyMail_gte?: Maybe<String>;
-  recipientCompanyMail_contains?: Maybe<String>;
-  recipientCompanyMail_not_contains?: Maybe<String>;
-  recipientCompanyMail_starts_with?: Maybe<String>;
-  recipientCompanyMail_not_starts_with?: Maybe<String>;
-  recipientCompanyMail_ends_with?: Maybe<String>;
-  recipientCompanyMail_not_ends_with?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanyName_not?: Maybe<String>;
-  transporterCompanyName_in?: Maybe<String[] | String>;
-  transporterCompanyName_not_in?: Maybe<String[] | String>;
-  transporterCompanyName_lt?: Maybe<String>;
-  transporterCompanyName_lte?: Maybe<String>;
-  transporterCompanyName_gt?: Maybe<String>;
-  transporterCompanyName_gte?: Maybe<String>;
-  transporterCompanyName_contains?: Maybe<String>;
-  transporterCompanyName_not_contains?: Maybe<String>;
-  transporterCompanyName_starts_with?: Maybe<String>;
-  transporterCompanyName_not_starts_with?: Maybe<String>;
-  transporterCompanyName_ends_with?: Maybe<String>;
-  transporterCompanyName_not_ends_with?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanySiret_not?: Maybe<String>;
-  transporterCompanySiret_in?: Maybe<String[] | String>;
-  transporterCompanySiret_not_in?: Maybe<String[] | String>;
-  transporterCompanySiret_lt?: Maybe<String>;
-  transporterCompanySiret_lte?: Maybe<String>;
-  transporterCompanySiret_gt?: Maybe<String>;
-  transporterCompanySiret_gte?: Maybe<String>;
-  transporterCompanySiret_contains?: Maybe<String>;
-  transporterCompanySiret_not_contains?: Maybe<String>;
-  transporterCompanySiret_starts_with?: Maybe<String>;
-  transporterCompanySiret_not_starts_with?: Maybe<String>;
-  transporterCompanySiret_ends_with?: Maybe<String>;
-  transporterCompanySiret_not_ends_with?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyAddress_not?: Maybe<String>;
-  transporterCompanyAddress_in?: Maybe<String[] | String>;
-  transporterCompanyAddress_not_in?: Maybe<String[] | String>;
-  transporterCompanyAddress_lt?: Maybe<String>;
-  transporterCompanyAddress_lte?: Maybe<String>;
-  transporterCompanyAddress_gt?: Maybe<String>;
-  transporterCompanyAddress_gte?: Maybe<String>;
-  transporterCompanyAddress_contains?: Maybe<String>;
-  transporterCompanyAddress_not_contains?: Maybe<String>;
-  transporterCompanyAddress_starts_with?: Maybe<String>;
-  transporterCompanyAddress_not_starts_with?: Maybe<String>;
-  transporterCompanyAddress_ends_with?: Maybe<String>;
-  transporterCompanyAddress_not_ends_with?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyContact_not?: Maybe<String>;
-  transporterCompanyContact_in?: Maybe<String[] | String>;
-  transporterCompanyContact_not_in?: Maybe<String[] | String>;
-  transporterCompanyContact_lt?: Maybe<String>;
-  transporterCompanyContact_lte?: Maybe<String>;
-  transporterCompanyContact_gt?: Maybe<String>;
-  transporterCompanyContact_gte?: Maybe<String>;
-  transporterCompanyContact_contains?: Maybe<String>;
-  transporterCompanyContact_not_contains?: Maybe<String>;
-  transporterCompanyContact_starts_with?: Maybe<String>;
-  transporterCompanyContact_not_starts_with?: Maybe<String>;
-  transporterCompanyContact_ends_with?: Maybe<String>;
-  transporterCompanyContact_not_ends_with?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyPhone_not?: Maybe<String>;
-  transporterCompanyPhone_in?: Maybe<String[] | String>;
-  transporterCompanyPhone_not_in?: Maybe<String[] | String>;
-  transporterCompanyPhone_lt?: Maybe<String>;
-  transporterCompanyPhone_lte?: Maybe<String>;
-  transporterCompanyPhone_gt?: Maybe<String>;
-  transporterCompanyPhone_gte?: Maybe<String>;
-  transporterCompanyPhone_contains?: Maybe<String>;
-  transporterCompanyPhone_not_contains?: Maybe<String>;
-  transporterCompanyPhone_starts_with?: Maybe<String>;
-  transporterCompanyPhone_not_starts_with?: Maybe<String>;
-  transporterCompanyPhone_ends_with?: Maybe<String>;
-  transporterCompanyPhone_not_ends_with?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterCompanyMail_not?: Maybe<String>;
-  transporterCompanyMail_in?: Maybe<String[] | String>;
-  transporterCompanyMail_not_in?: Maybe<String[] | String>;
-  transporterCompanyMail_lt?: Maybe<String>;
-  transporterCompanyMail_lte?: Maybe<String>;
-  transporterCompanyMail_gt?: Maybe<String>;
-  transporterCompanyMail_gte?: Maybe<String>;
-  transporterCompanyMail_contains?: Maybe<String>;
-  transporterCompanyMail_not_contains?: Maybe<String>;
-  transporterCompanyMail_starts_with?: Maybe<String>;
-  transporterCompanyMail_not_starts_with?: Maybe<String>;
-  transporterCompanyMail_ends_with?: Maybe<String>;
-  transporterCompanyMail_not_ends_with?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterIsExemptedOfReceipt_not?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterReceipt_not?: Maybe<String>;
-  transporterReceipt_in?: Maybe<String[] | String>;
-  transporterReceipt_not_in?: Maybe<String[] | String>;
-  transporterReceipt_lt?: Maybe<String>;
-  transporterReceipt_lte?: Maybe<String>;
-  transporterReceipt_gt?: Maybe<String>;
-  transporterReceipt_gte?: Maybe<String>;
-  transporterReceipt_contains?: Maybe<String>;
-  transporterReceipt_not_contains?: Maybe<String>;
-  transporterReceipt_starts_with?: Maybe<String>;
-  transporterReceipt_not_starts_with?: Maybe<String>;
-  transporterReceipt_ends_with?: Maybe<String>;
-  transporterReceipt_not_ends_with?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterDepartment_not?: Maybe<String>;
-  transporterDepartment_in?: Maybe<String[] | String>;
-  transporterDepartment_not_in?: Maybe<String[] | String>;
-  transporterDepartment_lt?: Maybe<String>;
-  transporterDepartment_lte?: Maybe<String>;
-  transporterDepartment_gt?: Maybe<String>;
-  transporterDepartment_gte?: Maybe<String>;
-  transporterDepartment_contains?: Maybe<String>;
-  transporterDepartment_not_contains?: Maybe<String>;
-  transporterDepartment_starts_with?: Maybe<String>;
-  transporterDepartment_not_starts_with?: Maybe<String>;
-  transporterDepartment_ends_with?: Maybe<String>;
-  transporterDepartment_not_ends_with?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterValidityLimit_not?: Maybe<DateTimeInput>;
-  transporterValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  transporterValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  transporterValidityLimit_lt?: Maybe<DateTimeInput>;
-  transporterValidityLimit_lte?: Maybe<DateTimeInput>;
-  transporterValidityLimit_gt?: Maybe<DateTimeInput>;
-  transporterValidityLimit_gte?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  transporterNumberPlate_not?: Maybe<String>;
-  transporterNumberPlate_in?: Maybe<String[] | String>;
-  transporterNumberPlate_not_in?: Maybe<String[] | String>;
-  transporterNumberPlate_lt?: Maybe<String>;
-  transporterNumberPlate_lte?: Maybe<String>;
-  transporterNumberPlate_gt?: Maybe<String>;
-  transporterNumberPlate_gte?: Maybe<String>;
-  transporterNumberPlate_contains?: Maybe<String>;
-  transporterNumberPlate_not_contains?: Maybe<String>;
-  transporterNumberPlate_starts_with?: Maybe<String>;
-  transporterNumberPlate_not_starts_with?: Maybe<String>;
-  transporterNumberPlate_ends_with?: Maybe<String>;
-  transporterNumberPlate_not_ends_with?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsCode_not?: Maybe<String>;
-  wasteDetailsCode_in?: Maybe<String[] | String>;
-  wasteDetailsCode_not_in?: Maybe<String[] | String>;
-  wasteDetailsCode_lt?: Maybe<String>;
-  wasteDetailsCode_lte?: Maybe<String>;
-  wasteDetailsCode_gt?: Maybe<String>;
-  wasteDetailsCode_gte?: Maybe<String>;
-  wasteDetailsCode_contains?: Maybe<String>;
-  wasteDetailsCode_not_contains?: Maybe<String>;
-  wasteDetailsCode_starts_with?: Maybe<String>;
-  wasteDetailsCode_not_starts_with?: Maybe<String>;
-  wasteDetailsCode_ends_with?: Maybe<String>;
-  wasteDetailsCode_not_ends_with?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsName_not?: Maybe<String>;
-  wasteDetailsName_in?: Maybe<String[] | String>;
-  wasteDetailsName_not_in?: Maybe<String[] | String>;
-  wasteDetailsName_lt?: Maybe<String>;
-  wasteDetailsName_lte?: Maybe<String>;
-  wasteDetailsName_gt?: Maybe<String>;
-  wasteDetailsName_gte?: Maybe<String>;
-  wasteDetailsName_contains?: Maybe<String>;
-  wasteDetailsName_not_contains?: Maybe<String>;
-  wasteDetailsName_starts_with?: Maybe<String>;
-  wasteDetailsName_not_starts_with?: Maybe<String>;
-  wasteDetailsName_ends_with?: Maybe<String>;
-  wasteDetailsName_not_ends_with?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsOnuCode_not?: Maybe<String>;
-  wasteDetailsOnuCode_in?: Maybe<String[] | String>;
-  wasteDetailsOnuCode_not_in?: Maybe<String[] | String>;
-  wasteDetailsOnuCode_lt?: Maybe<String>;
-  wasteDetailsOnuCode_lte?: Maybe<String>;
-  wasteDetailsOnuCode_gt?: Maybe<String>;
-  wasteDetailsOnuCode_gte?: Maybe<String>;
-  wasteDetailsOnuCode_contains?: Maybe<String>;
-  wasteDetailsOnuCode_not_contains?: Maybe<String>;
-  wasteDetailsOnuCode_starts_with?: Maybe<String>;
-  wasteDetailsOnuCode_not_starts_with?: Maybe<String>;
-  wasteDetailsOnuCode_ends_with?: Maybe<String>;
-  wasteDetailsOnuCode_not_ends_with?: Maybe<String>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsOtherPackaging_not?: Maybe<String>;
-  wasteDetailsOtherPackaging_in?: Maybe<String[] | String>;
-  wasteDetailsOtherPackaging_not_in?: Maybe<String[] | String>;
-  wasteDetailsOtherPackaging_lt?: Maybe<String>;
-  wasteDetailsOtherPackaging_lte?: Maybe<String>;
-  wasteDetailsOtherPackaging_gt?: Maybe<String>;
-  wasteDetailsOtherPackaging_gte?: Maybe<String>;
-  wasteDetailsOtherPackaging_contains?: Maybe<String>;
-  wasteDetailsOtherPackaging_not_contains?: Maybe<String>;
-  wasteDetailsOtherPackaging_starts_with?: Maybe<String>;
-  wasteDetailsOtherPackaging_not_starts_with?: Maybe<String>;
-  wasteDetailsOtherPackaging_ends_with?: Maybe<String>;
-  wasteDetailsOtherPackaging_not_ends_with?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_not?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_in?: Maybe<Int[] | Int>;
-  wasteDetailsNumberOfPackages_not_in?: Maybe<Int[] | Int>;
-  wasteDetailsNumberOfPackages_lt?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_lte?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_gt?: Maybe<Int>;
-  wasteDetailsNumberOfPackages_gte?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantity_not?: Maybe<Float>;
-  wasteDetailsQuantity_in?: Maybe<Float[] | Float>;
-  wasteDetailsQuantity_not_in?: Maybe<Float[] | Float>;
-  wasteDetailsQuantity_lt?: Maybe<Float>;
-  wasteDetailsQuantity_lte?: Maybe<Float>;
-  wasteDetailsQuantity_gt?: Maybe<Float>;
-  wasteDetailsQuantity_gte?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsQuantityType_not?: Maybe<QuantityType>;
-  wasteDetailsQuantityType_in?: Maybe<QuantityType[] | QuantityType>;
-  wasteDetailsQuantityType_not_in?: Maybe<QuantityType[] | QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  wasteDetailsConsistence_not?: Maybe<Consistence>;
-  wasteDetailsConsistence_in?: Maybe<Consistence[] | Consistence>;
-  wasteDetailsConsistence_not_in?: Maybe<Consistence[] | Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanyName_not?: Maybe<String>;
-  traderCompanyName_in?: Maybe<String[] | String>;
-  traderCompanyName_not_in?: Maybe<String[] | String>;
-  traderCompanyName_lt?: Maybe<String>;
-  traderCompanyName_lte?: Maybe<String>;
-  traderCompanyName_gt?: Maybe<String>;
-  traderCompanyName_gte?: Maybe<String>;
-  traderCompanyName_contains?: Maybe<String>;
-  traderCompanyName_not_contains?: Maybe<String>;
-  traderCompanyName_starts_with?: Maybe<String>;
-  traderCompanyName_not_starts_with?: Maybe<String>;
-  traderCompanyName_ends_with?: Maybe<String>;
-  traderCompanyName_not_ends_with?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanySiret_not?: Maybe<String>;
-  traderCompanySiret_in?: Maybe<String[] | String>;
-  traderCompanySiret_not_in?: Maybe<String[] | String>;
-  traderCompanySiret_lt?: Maybe<String>;
-  traderCompanySiret_lte?: Maybe<String>;
-  traderCompanySiret_gt?: Maybe<String>;
-  traderCompanySiret_gte?: Maybe<String>;
-  traderCompanySiret_contains?: Maybe<String>;
-  traderCompanySiret_not_contains?: Maybe<String>;
-  traderCompanySiret_starts_with?: Maybe<String>;
-  traderCompanySiret_not_starts_with?: Maybe<String>;
-  traderCompanySiret_ends_with?: Maybe<String>;
-  traderCompanySiret_not_ends_with?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyAddress_not?: Maybe<String>;
-  traderCompanyAddress_in?: Maybe<String[] | String>;
-  traderCompanyAddress_not_in?: Maybe<String[] | String>;
-  traderCompanyAddress_lt?: Maybe<String>;
-  traderCompanyAddress_lte?: Maybe<String>;
-  traderCompanyAddress_gt?: Maybe<String>;
-  traderCompanyAddress_gte?: Maybe<String>;
-  traderCompanyAddress_contains?: Maybe<String>;
-  traderCompanyAddress_not_contains?: Maybe<String>;
-  traderCompanyAddress_starts_with?: Maybe<String>;
-  traderCompanyAddress_not_starts_with?: Maybe<String>;
-  traderCompanyAddress_ends_with?: Maybe<String>;
-  traderCompanyAddress_not_ends_with?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyContact_not?: Maybe<String>;
-  traderCompanyContact_in?: Maybe<String[] | String>;
-  traderCompanyContact_not_in?: Maybe<String[] | String>;
-  traderCompanyContact_lt?: Maybe<String>;
-  traderCompanyContact_lte?: Maybe<String>;
-  traderCompanyContact_gt?: Maybe<String>;
-  traderCompanyContact_gte?: Maybe<String>;
-  traderCompanyContact_contains?: Maybe<String>;
-  traderCompanyContact_not_contains?: Maybe<String>;
-  traderCompanyContact_starts_with?: Maybe<String>;
-  traderCompanyContact_not_starts_with?: Maybe<String>;
-  traderCompanyContact_ends_with?: Maybe<String>;
-  traderCompanyContact_not_ends_with?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyPhone_not?: Maybe<String>;
-  traderCompanyPhone_in?: Maybe<String[] | String>;
-  traderCompanyPhone_not_in?: Maybe<String[] | String>;
-  traderCompanyPhone_lt?: Maybe<String>;
-  traderCompanyPhone_lte?: Maybe<String>;
-  traderCompanyPhone_gt?: Maybe<String>;
-  traderCompanyPhone_gte?: Maybe<String>;
-  traderCompanyPhone_contains?: Maybe<String>;
-  traderCompanyPhone_not_contains?: Maybe<String>;
-  traderCompanyPhone_starts_with?: Maybe<String>;
-  traderCompanyPhone_not_starts_with?: Maybe<String>;
-  traderCompanyPhone_ends_with?: Maybe<String>;
-  traderCompanyPhone_not_ends_with?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderCompanyMail_not?: Maybe<String>;
-  traderCompanyMail_in?: Maybe<String[] | String>;
-  traderCompanyMail_not_in?: Maybe<String[] | String>;
-  traderCompanyMail_lt?: Maybe<String>;
-  traderCompanyMail_lte?: Maybe<String>;
-  traderCompanyMail_gt?: Maybe<String>;
-  traderCompanyMail_gte?: Maybe<String>;
-  traderCompanyMail_contains?: Maybe<String>;
-  traderCompanyMail_not_contains?: Maybe<String>;
-  traderCompanyMail_starts_with?: Maybe<String>;
-  traderCompanyMail_not_starts_with?: Maybe<String>;
-  traderCompanyMail_ends_with?: Maybe<String>;
-  traderCompanyMail_not_ends_with?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderReceipt_not?: Maybe<String>;
-  traderReceipt_in?: Maybe<String[] | String>;
-  traderReceipt_not_in?: Maybe<String[] | String>;
-  traderReceipt_lt?: Maybe<String>;
-  traderReceipt_lte?: Maybe<String>;
-  traderReceipt_gt?: Maybe<String>;
-  traderReceipt_gte?: Maybe<String>;
-  traderReceipt_contains?: Maybe<String>;
-  traderReceipt_not_contains?: Maybe<String>;
-  traderReceipt_starts_with?: Maybe<String>;
-  traderReceipt_not_starts_with?: Maybe<String>;
-  traderReceipt_ends_with?: Maybe<String>;
-  traderReceipt_not_ends_with?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderDepartment_not?: Maybe<String>;
-  traderDepartment_in?: Maybe<String[] | String>;
-  traderDepartment_not_in?: Maybe<String[] | String>;
-  traderDepartment_lt?: Maybe<String>;
-  traderDepartment_lte?: Maybe<String>;
-  traderDepartment_gt?: Maybe<String>;
-  traderDepartment_gte?: Maybe<String>;
-  traderDepartment_contains?: Maybe<String>;
-  traderDepartment_not_contains?: Maybe<String>;
-  traderDepartment_starts_with?: Maybe<String>;
-  traderDepartment_not_starts_with?: Maybe<String>;
-  traderDepartment_ends_with?: Maybe<String>;
-  traderDepartment_not_ends_with?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  traderValidityLimit_not?: Maybe<DateTimeInput>;
-  traderValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  traderValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  traderValidityLimit_lt?: Maybe<DateTimeInput>;
-  traderValidityLimit_lte?: Maybe<DateTimeInput>;
-  traderValidityLimit_gt?: Maybe<DateTimeInput>;
-  traderValidityLimit_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-  OR?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-  NOT?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
-}
-
-export interface DeclarationUpdateManyMutationInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  annee?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-}
-
-export interface TempStorageFormInfosUpsertNestedInput {
-  update: TempStorageFormInfosUpdateDataInput;
-  create: TempStorageFormInfosCreateInput;
-}
-
-export interface UserUpdateDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-}
-
-export interface TempStorageFormInfosUpdateDataInput {
-  tempStorerQuantityType?: Maybe<QuantityType>;
-  tempStorerQuantityReceived?: Maybe<Float>;
-  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  tempStorerWasteRefusalReason?: Maybe<String>;
-  tempStorerReceivedAt?: Maybe<DateTimeInput>;
-  tempStorerSignedAt?: Maybe<DateTimeInput>;
-  destinationIsFilledByEmitter?: Maybe<Boolean>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  signedBy?: Maybe<String>;
-  signedAt?: Maybe<DateTimeInput>;
-}
-
-export interface CompanyAssociationUpdateManyWithoutUserInput {
-  create?: Maybe<
-    | CompanyAssociationCreateWithoutUserInput[]
-    | CompanyAssociationCreateWithoutUserInput
-  >;
-  delete?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  connect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  set?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  disconnect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  update?: Maybe<
-    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput[]
-    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput
-  >;
-  upsert?: Maybe<
-    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput[]
-    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput
-  >;
-  deleteMany?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-  updateMany?: Maybe<
-    | CompanyAssociationUpdateManyWithWhereNestedInput[]
-    | CompanyAssociationUpdateManyWithWhereNestedInput
-  >;
-}
-
-export type CompanyWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  siret?: Maybe<String>;
-}>;
-
-export interface CompanyAssociationUpdateWithWhereUniqueWithoutUserInput {
-  where: CompanyAssociationWhereUniqueInput;
-  data: CompanyAssociationUpdateWithoutUserDataInput;
-}
-
-export interface TempStorageFormInfosSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<TempStorageFormInfosWhereInput>;
-  AND?: Maybe<
-    | TempStorageFormInfosSubscriptionWhereInput[]
-    | TempStorageFormInfosSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | TempStorageFormInfosSubscriptionWhereInput[]
-    | TempStorageFormInfosSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | TempStorageFormInfosSubscriptionWhereInput[]
-    | TempStorageFormInfosSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyAssociationUpdateWithoutUserDataInput {
-  company?: Maybe<CompanyUpdateOneRequiredInput>;
-  role?: Maybe<UserRole>;
-}
-
-export interface InstallationSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<InstallationWhereInput>;
-  AND?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyUpdateOneRequiredInput {
-  create?: Maybe<CompanyCreateInput>;
-  update?: Maybe<CompanyUpdateDataInput>;
-  upsert?: Maybe<CompanyUpsertNestedInput>;
-  connect?: Maybe<CompanyWhereUniqueInput>;
-}
-
-export interface DeclarationWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  codeS3ic?: Maybe<String>;
-  codeS3ic_not?: Maybe<String>;
-  codeS3ic_in?: Maybe<String[] | String>;
-  codeS3ic_not_in?: Maybe<String[] | String>;
-  codeS3ic_lt?: Maybe<String>;
-  codeS3ic_lte?: Maybe<String>;
-  codeS3ic_gt?: Maybe<String>;
-  codeS3ic_gte?: Maybe<String>;
-  codeS3ic_contains?: Maybe<String>;
-  codeS3ic_not_contains?: Maybe<String>;
-  codeS3ic_starts_with?: Maybe<String>;
-  codeS3ic_not_starts_with?: Maybe<String>;
-  codeS3ic_ends_with?: Maybe<String>;
-  codeS3ic_not_ends_with?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  nomEts_not?: Maybe<String>;
-  nomEts_in?: Maybe<String[] | String>;
-  nomEts_not_in?: Maybe<String[] | String>;
-  nomEts_lt?: Maybe<String>;
-  nomEts_lte?: Maybe<String>;
-  nomEts_gt?: Maybe<String>;
-  nomEts_gte?: Maybe<String>;
-  nomEts_contains?: Maybe<String>;
-  nomEts_not_contains?: Maybe<String>;
-  nomEts_starts_with?: Maybe<String>;
-  nomEts_not_starts_with?: Maybe<String>;
-  nomEts_ends_with?: Maybe<String>;
-  nomEts_not_ends_with?: Maybe<String>;
-  annee?: Maybe<String>;
-  annee_not?: Maybe<String>;
-  annee_in?: Maybe<String[] | String>;
-  annee_not_in?: Maybe<String[] | String>;
-  annee_lt?: Maybe<String>;
-  annee_lte?: Maybe<String>;
-  annee_gt?: Maybe<String>;
-  annee_gte?: Maybe<String>;
-  annee_contains?: Maybe<String>;
-  annee_not_contains?: Maybe<String>;
-  annee_starts_with?: Maybe<String>;
-  annee_not_starts_with?: Maybe<String>;
-  annee_ends_with?: Maybe<String>;
-  annee_not_ends_with?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  codeDechet_not?: Maybe<String>;
-  codeDechet_in?: Maybe<String[] | String>;
-  codeDechet_not_in?: Maybe<String[] | String>;
-  codeDechet_lt?: Maybe<String>;
-  codeDechet_lte?: Maybe<String>;
-  codeDechet_gt?: Maybe<String>;
-  codeDechet_gte?: Maybe<String>;
-  codeDechet_contains?: Maybe<String>;
-  codeDechet_not_contains?: Maybe<String>;
-  codeDechet_starts_with?: Maybe<String>;
-  codeDechet_not_starts_with?: Maybe<String>;
-  codeDechet_ends_with?: Maybe<String>;
-  codeDechet_not_ends_with?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  libDechet_not?: Maybe<String>;
-  libDechet_in?: Maybe<String[] | String>;
-  libDechet_not_in?: Maybe<String[] | String>;
-  libDechet_lt?: Maybe<String>;
-  libDechet_lte?: Maybe<String>;
-  libDechet_gt?: Maybe<String>;
-  libDechet_gte?: Maybe<String>;
-  libDechet_contains?: Maybe<String>;
-  libDechet_not_contains?: Maybe<String>;
-  libDechet_starts_with?: Maybe<String>;
-  libDechet_not_starts_with?: Maybe<String>;
-  libDechet_ends_with?: Maybe<String>;
-  libDechet_not_ends_with?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-  gerepType_not?: Maybe<GerepType>;
-  gerepType_in?: Maybe<GerepType[] | GerepType>;
-  gerepType_not_in?: Maybe<GerepType[] | GerepType>;
-  AND?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
-  OR?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
-  NOT?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
-}
-
-export interface CompanyUpdateDataInput {
-  siret?: Maybe<String>;
-  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
-  name?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  codeNaf?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  givenName?: Maybe<String>;
-  contactEmail?: Maybe<String>;
-  contactPhone?: Maybe<String>;
-  website?: Maybe<String>;
-  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
-}
-
-export interface CompanyAssociationSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyAssociationWhereInput>;
-  AND?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyUpdatecompanyTypesInput {
-  set?: Maybe<CompanyType[] | CompanyType>;
-}
-
-export interface ApplicationSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<ApplicationWhereInput>;
-  AND?: Maybe<
-    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyUpdatedocumentKeysInput {
-  set?: Maybe<String[] | String>;
-}
-
-export type FormWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
-}>;
-
-export interface CompanyUpsertNestedInput {
-  update: CompanyUpdateDataInput;
-  create: CompanyCreateInput;
-}
-
-export interface UserAccountHashCreateInput {
-  id?: Maybe<ID_Input>;
-  email: String;
-  companySiret: ID_Input;
-  role: UserRole;
-  hash: String;
-}
-
-export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
-  where: CompanyAssociationWhereUniqueInput;
-  update: CompanyAssociationUpdateWithoutUserDataInput;
-  create: CompanyAssociationCreateWithoutUserInput;
-}
-
-export interface FormWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
-  readableId_not?: Maybe<String>;
-  readableId_in?: Maybe<String[] | String>;
-  readableId_not_in?: Maybe<String[] | String>;
-  readableId_lt?: Maybe<String>;
-  readableId_lte?: Maybe<String>;
-  readableId_gt?: Maybe<String>;
-  readableId_gte?: Maybe<String>;
-  readableId_contains?: Maybe<String>;
-  readableId_not_contains?: Maybe<String>;
-  readableId_starts_with?: Maybe<String>;
-  readableId_not_starts_with?: Maybe<String>;
-  readableId_ends_with?: Maybe<String>;
-  readableId_not_ends_with?: Maybe<String>;
-  customId?: Maybe<String>;
-  customId_not?: Maybe<String>;
-  customId_in?: Maybe<String[] | String>;
-  customId_not_in?: Maybe<String[] | String>;
-  customId_lt?: Maybe<String>;
-  customId_lte?: Maybe<String>;
-  customId_gt?: Maybe<String>;
-  customId_gte?: Maybe<String>;
-  customId_contains?: Maybe<String>;
-  customId_not_contains?: Maybe<String>;
-  customId_starts_with?: Maybe<String>;
-  customId_not_starts_with?: Maybe<String>;
-  customId_ends_with?: Maybe<String>;
-  customId_not_ends_with?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  isDeleted_not?: Maybe<Boolean>;
-  owner?: Maybe<UserWhereInput>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -5271,17 +4735,124 @@ export interface FormWhereInput {
   traderValidityLimit_lte?: Maybe<DateTimeInput>;
   traderValidityLimit_gt?: Maybe<DateTimeInput>;
   traderValidityLimit_gte?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeWhereInput>;
-  appendix2Forms_every?: Maybe<FormWhereInput>;
-  appendix2Forms_some?: Maybe<FormWhereInput>;
-  appendix2Forms_none?: Maybe<FormWhereInput>;
-  tempStorageFormInfos?: Maybe<TempStorageFormInfosWhereInput>;
-  AND?: Maybe<FormWhereInput[] | FormWhereInput>;
-  OR?: Maybe<FormWhereInput[] | FormWhereInput>;
-  NOT?: Maybe<FormWhereInput[] | FormWhereInput>;
+  AND?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+  OR?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
+  NOT?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
 }
 
-export interface CompanyAssociationScalarWhereInput {
+export interface FormCreateInput {
+  id?: Maybe<ID_Input>;
+  readableId?: Maybe<String>;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner: UserCreateOneInput;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  appendix2Forms?: Maybe<FormCreateManyInput>;
+  temporaryStorageDetail?: Maybe<
+    TemporaryStorageDetailCreateOneWithoutFormInput
+  >;
+}
+
+export interface TemporaryStorageDetailSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<TemporaryStorageDetailWhereInput>;
+  AND?: Maybe<
+    | TemporaryStorageDetailSubscriptionWhereInput[]
+    | TemporaryStorageDetailSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | TemporaryStorageDetailSubscriptionWhereInput[]
+    | TemporaryStorageDetailSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | TemporaryStorageDetailSubscriptionWhereInput[]
+    | TemporaryStorageDetailSubscriptionWhereInput
+  >;
+}
+
+export interface EcoOrganismeUpdateManyMutationInput {
+  siret?: Maybe<String>;
+  name?: Maybe<String>;
+  address?: Maybe<String>;
+}
+
+export interface DeclarationWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -5296,22 +4867,161 @@ export interface CompanyAssociationScalarWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
+  codeS3ic?: Maybe<String>;
+  codeS3ic_not?: Maybe<String>;
+  codeS3ic_in?: Maybe<String[] | String>;
+  codeS3ic_not_in?: Maybe<String[] | String>;
+  codeS3ic_lt?: Maybe<String>;
+  codeS3ic_lte?: Maybe<String>;
+  codeS3ic_gt?: Maybe<String>;
+  codeS3ic_gte?: Maybe<String>;
+  codeS3ic_contains?: Maybe<String>;
+  codeS3ic_not_contains?: Maybe<String>;
+  codeS3ic_starts_with?: Maybe<String>;
+  codeS3ic_not_starts_with?: Maybe<String>;
+  codeS3ic_ends_with?: Maybe<String>;
+  codeS3ic_not_ends_with?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  nomEts_not?: Maybe<String>;
+  nomEts_in?: Maybe<String[] | String>;
+  nomEts_not_in?: Maybe<String[] | String>;
+  nomEts_lt?: Maybe<String>;
+  nomEts_lte?: Maybe<String>;
+  nomEts_gt?: Maybe<String>;
+  nomEts_gte?: Maybe<String>;
+  nomEts_contains?: Maybe<String>;
+  nomEts_not_contains?: Maybe<String>;
+  nomEts_starts_with?: Maybe<String>;
+  nomEts_not_starts_with?: Maybe<String>;
+  nomEts_ends_with?: Maybe<String>;
+  nomEts_not_ends_with?: Maybe<String>;
+  annee?: Maybe<String>;
+  annee_not?: Maybe<String>;
+  annee_in?: Maybe<String[] | String>;
+  annee_not_in?: Maybe<String[] | String>;
+  annee_lt?: Maybe<String>;
+  annee_lte?: Maybe<String>;
+  annee_gt?: Maybe<String>;
+  annee_gte?: Maybe<String>;
+  annee_contains?: Maybe<String>;
+  annee_not_contains?: Maybe<String>;
+  annee_starts_with?: Maybe<String>;
+  annee_not_starts_with?: Maybe<String>;
+  annee_ends_with?: Maybe<String>;
+  annee_not_ends_with?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  codeDechet_not?: Maybe<String>;
+  codeDechet_in?: Maybe<String[] | String>;
+  codeDechet_not_in?: Maybe<String[] | String>;
+  codeDechet_lt?: Maybe<String>;
+  codeDechet_lte?: Maybe<String>;
+  codeDechet_gt?: Maybe<String>;
+  codeDechet_gte?: Maybe<String>;
+  codeDechet_contains?: Maybe<String>;
+  codeDechet_not_contains?: Maybe<String>;
+  codeDechet_starts_with?: Maybe<String>;
+  codeDechet_not_starts_with?: Maybe<String>;
+  codeDechet_ends_with?: Maybe<String>;
+  codeDechet_not_ends_with?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  libDechet_not?: Maybe<String>;
+  libDechet_in?: Maybe<String[] | String>;
+  libDechet_not_in?: Maybe<String[] | String>;
+  libDechet_lt?: Maybe<String>;
+  libDechet_lte?: Maybe<String>;
+  libDechet_gt?: Maybe<String>;
+  libDechet_gte?: Maybe<String>;
+  libDechet_contains?: Maybe<String>;
+  libDechet_not_contains?: Maybe<String>;
+  libDechet_starts_with?: Maybe<String>;
+  libDechet_not_starts_with?: Maybe<String>;
+  libDechet_ends_with?: Maybe<String>;
+  libDechet_not_ends_with?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+  gerepType_not?: Maybe<GerepType>;
+  gerepType_in?: Maybe<GerepType[] | GerepType>;
+  gerepType_not_in?: Maybe<GerepType[] | GerepType>;
+  AND?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
+  OR?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
+  NOT?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
+}
+
+export interface ApplicationUpdateInput {
+  clientSecret?: Maybe<String>;
+  name?: Maybe<String>;
+  admins?: Maybe<UserUpdateManyInput>;
+  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
+}
+
+export interface ApplicationSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<ApplicationWhereInput>;
   AND?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
   >;
   OR?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
   >;
 }
 
-export interface TempStorageFormInfosUpdateInput {
+export interface ApplicationUpdateManyMutationInput {
+  clientSecret?: Maybe<String>;
+  name?: Maybe<String>;
+  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
+}
+
+export interface UserAccountHashCreateInput {
+  id?: Maybe<ID_Input>;
+  email: String;
+  companySiret: ID_Input;
+  role: UserRole;
+  hash: String;
+}
+
+export interface CompanyUpdateInput {
+  siret?: Maybe<String>;
+  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  givenName?: Maybe<String>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
+  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+}
+
+export interface FormUpsertWithoutTemporaryStorageDetailInput {
+  update: FormUpdateWithoutTemporaryStorageDetailDataInput;
+  create: FormCreateWithoutTemporaryStorageDetailInput;
+}
+
+export interface CompanyUpdateManyMutationInput {
+  siret?: Maybe<String>;
+  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  givenName?: Maybe<String>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
+  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+}
+
+export interface TemporaryStorageDetailCreateInput {
+  id?: Maybe<ID_Input>;
+  form?: Maybe<FormCreateOneWithoutTemporaryStorageDetailInput>;
   tempStorerQuantityType?: Maybe<QuantityType>;
   tempStorerQuantityReceived?: Maybe<Float>;
   tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
@@ -5340,20 +5050,11 @@ export interface TempStorageFormInfosUpdateInput {
   signedAt?: Maybe<DateTimeInput>;
 }
 
-export interface CompanyAssociationUpdateManyWithWhereNestedInput {
-  where: CompanyAssociationScalarWhereInput;
-  data: CompanyAssociationUpdateManyDataInput;
-}
-
-export interface FormUpdateOneRequiredInput {
-  create?: Maybe<FormCreateInput>;
-  update?: Maybe<FormUpdateDataInput>;
-  upsert?: Maybe<FormUpsertNestedInput>;
-  connect?: Maybe<FormWhereUniqueInput>;
-}
-
-export interface CompanyAssociationUpdateManyDataInput {
-  role?: Maybe<UserRole>;
+export interface CompanyAssociationCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneWithoutCompanyAssociationsInput;
+  company: CompanyCreateOneInput;
+  role: UserRole;
 }
 
 export interface StatusLogCreateInput {
@@ -5365,41 +5066,12 @@ export interface StatusLogCreateInput {
   updatedFields?: Maybe<Json>;
 }
 
-export interface DeclarationUpdateInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  annee?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
+export interface UserCreateOneWithoutCompanyAssociationsInput {
+  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
 }
 
-export interface RubriqueCreateInput {
-  id?: Maybe<ID_Input>;
-  codeS3ic?: Maybe<String>;
-  rubrique?: Maybe<String>;
-  alinea?: Maybe<String>;
-  dateAutorisation?: Maybe<String>;
-  etatActivite?: Maybe<String>;
-  regimeAutorise?: Maybe<String>;
-  activite?: Maybe<String>;
-  volume?: Maybe<String>;
-  unite?: Maybe<String>;
-  category?: Maybe<String>;
-  wasteType?: Maybe<WasteType>;
-}
-
-export interface ApplicationUpdateOneInput {
-  create?: Maybe<ApplicationCreateInput>;
-  update?: Maybe<ApplicationUpdateDataInput>;
-  upsert?: Maybe<ApplicationUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<ApplicationWhereUniqueInput>;
-}
-
-export interface InstallationCreateInput {
-  id?: Maybe<ID_Input>;
+export interface InstallationUpdateManyMutationInput {
   codeS3ic?: Maybe<String>;
   nomEts?: Maybe<String>;
   regime?: Maybe<String>;
@@ -5414,12 +5086,1165 @@ export interface InstallationCreateInput {
   sireneNumeroSiret?: Maybe<String>;
 }
 
-export interface ApplicationUpdateDataInput {
-  clientSecret?: Maybe<String>;
+export interface UserCreateWithoutCompanyAssociationsInput {
+  id?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  email: String;
+  password: String;
   name?: Maybe<String>;
-  admins?: Maybe<UserUpdateManyInput>;
-  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
+  phone?: Maybe<String>;
+}
+
+export interface GrantUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  code?: Maybe<String>;
+  application?: Maybe<ApplicationUpdateOneRequiredInput>;
+  expires?: Maybe<Int>;
+  redirectUri?: Maybe<String>;
+}
+
+export interface CompanyAssociationUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  role?: Maybe<UserRole>;
+}
+
+export type CompanyWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  siret?: Maybe<String>;
+}>;
+
+export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
+  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
+  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
+  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface CompanyAssociationSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CompanyAssociationWhereInput>;
+  AND?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
+  >;
+}
+
+export interface UserUpdateWithoutCompanyAssociationsDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+}
+
+export interface FormWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  readableId?: Maybe<String>;
+  readableId_not?: Maybe<String>;
+  readableId_in?: Maybe<String[] | String>;
+  readableId_not_in?: Maybe<String[] | String>;
+  readableId_lt?: Maybe<String>;
+  readableId_lte?: Maybe<String>;
+  readableId_gt?: Maybe<String>;
+  readableId_gte?: Maybe<String>;
+  readableId_contains?: Maybe<String>;
+  readableId_not_contains?: Maybe<String>;
+  readableId_starts_with?: Maybe<String>;
+  readableId_not_starts_with?: Maybe<String>;
+  readableId_ends_with?: Maybe<String>;
+  readableId_not_ends_with?: Maybe<String>;
+  customId?: Maybe<String>;
+  customId_not?: Maybe<String>;
+  customId_in?: Maybe<String[] | String>;
+  customId_not_in?: Maybe<String[] | String>;
+  customId_lt?: Maybe<String>;
+  customId_lte?: Maybe<String>;
+  customId_gt?: Maybe<String>;
+  customId_gte?: Maybe<String>;
+  customId_contains?: Maybe<String>;
+  customId_not_contains?: Maybe<String>;
+  customId_starts_with?: Maybe<String>;
+  customId_not_starts_with?: Maybe<String>;
+  customId_ends_with?: Maybe<String>;
+  customId_not_ends_with?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  isDeleted_not?: Maybe<Boolean>;
+  owner?: Maybe<UserWhereInput>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  signedByTransporter_not?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  status_not?: Maybe<String>;
+  status_in?: Maybe<String[] | String>;
+  status_not_in?: Maybe<String[] | String>;
+  status_lt?: Maybe<String>;
+  status_lte?: Maybe<String>;
+  status_gt?: Maybe<String>;
+  status_gte?: Maybe<String>;
+  status_contains?: Maybe<String>;
+  status_not_contains?: Maybe<String>;
+  status_starts_with?: Maybe<String>;
+  status_not_starts_with?: Maybe<String>;
+  status_ends_with?: Maybe<String>;
+  status_not_ends_with?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentAt_not?: Maybe<DateTimeInput>;
+  sentAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  sentAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  sentAt_lt?: Maybe<DateTimeInput>;
+  sentAt_lte?: Maybe<DateTimeInput>;
+  sentAt_gt?: Maybe<DateTimeInput>;
+  sentAt_gte?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  sentBy_not?: Maybe<String>;
+  sentBy_in?: Maybe<String[] | String>;
+  sentBy_not_in?: Maybe<String[] | String>;
+  sentBy_lt?: Maybe<String>;
+  sentBy_lte?: Maybe<String>;
+  sentBy_gt?: Maybe<String>;
+  sentBy_gte?: Maybe<String>;
+  sentBy_contains?: Maybe<String>;
+  sentBy_not_contains?: Maybe<String>;
+  sentBy_starts_with?: Maybe<String>;
+  sentBy_not_starts_with?: Maybe<String>;
+  sentBy_ends_with?: Maybe<String>;
+  sentBy_not_ends_with?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  isAccepted_not?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteAcceptationStatus_not?: Maybe<WasteAcceptationStatus>;
+  wasteAcceptationStatus_in?: Maybe<
+    WasteAcceptationStatus[] | WasteAcceptationStatus
+  >;
+  wasteAcceptationStatus_not_in?: Maybe<
+    WasteAcceptationStatus[] | WasteAcceptationStatus
+  >;
+  wasteRefusalReason?: Maybe<String>;
+  wasteRefusalReason_not?: Maybe<String>;
+  wasteRefusalReason_in?: Maybe<String[] | String>;
+  wasteRefusalReason_not_in?: Maybe<String[] | String>;
+  wasteRefusalReason_lt?: Maybe<String>;
+  wasteRefusalReason_lte?: Maybe<String>;
+  wasteRefusalReason_gt?: Maybe<String>;
+  wasteRefusalReason_gte?: Maybe<String>;
+  wasteRefusalReason_contains?: Maybe<String>;
+  wasteRefusalReason_not_contains?: Maybe<String>;
+  wasteRefusalReason_starts_with?: Maybe<String>;
+  wasteRefusalReason_not_starts_with?: Maybe<String>;
+  wasteRefusalReason_ends_with?: Maybe<String>;
+  wasteRefusalReason_not_ends_with?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedBy_not?: Maybe<String>;
+  receivedBy_in?: Maybe<String[] | String>;
+  receivedBy_not_in?: Maybe<String[] | String>;
+  receivedBy_lt?: Maybe<String>;
+  receivedBy_lte?: Maybe<String>;
+  receivedBy_gt?: Maybe<String>;
+  receivedBy_gte?: Maybe<String>;
+  receivedBy_contains?: Maybe<String>;
+  receivedBy_not_contains?: Maybe<String>;
+  receivedBy_starts_with?: Maybe<String>;
+  receivedBy_not_starts_with?: Maybe<String>;
+  receivedBy_ends_with?: Maybe<String>;
+  receivedBy_not_ends_with?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  receivedAt_not?: Maybe<DateTimeInput>;
+  receivedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  receivedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  receivedAt_lt?: Maybe<DateTimeInput>;
+  receivedAt_lte?: Maybe<DateTimeInput>;
+  receivedAt_gt?: Maybe<DateTimeInput>;
+  receivedAt_gte?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  quantityReceived_not?: Maybe<Float>;
+  quantityReceived_in?: Maybe<Float[] | Float>;
+  quantityReceived_not_in?: Maybe<Float[] | Float>;
+  quantityReceived_lt?: Maybe<Float>;
+  quantityReceived_lte?: Maybe<Float>;
+  quantityReceived_gt?: Maybe<Float>;
+  quantityReceived_gte?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedBy_not?: Maybe<String>;
+  processedBy_in?: Maybe<String[] | String>;
+  processedBy_not_in?: Maybe<String[] | String>;
+  processedBy_lt?: Maybe<String>;
+  processedBy_lte?: Maybe<String>;
+  processedBy_gt?: Maybe<String>;
+  processedBy_gte?: Maybe<String>;
+  processedBy_contains?: Maybe<String>;
+  processedBy_not_contains?: Maybe<String>;
+  processedBy_starts_with?: Maybe<String>;
+  processedBy_not_starts_with?: Maybe<String>;
+  processedBy_ends_with?: Maybe<String>;
+  processedBy_not_ends_with?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processedAt_not?: Maybe<String>;
+  processedAt_in?: Maybe<String[] | String>;
+  processedAt_not_in?: Maybe<String[] | String>;
+  processedAt_lt?: Maybe<String>;
+  processedAt_lte?: Maybe<String>;
+  processedAt_gt?: Maybe<String>;
+  processedAt_gte?: Maybe<String>;
+  processedAt_contains?: Maybe<String>;
+  processedAt_not_contains?: Maybe<String>;
+  processedAt_starts_with?: Maybe<String>;
+  processedAt_not_starts_with?: Maybe<String>;
+  processedAt_ends_with?: Maybe<String>;
+  processedAt_not_ends_with?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDone_not?: Maybe<String>;
+  processingOperationDone_in?: Maybe<String[] | String>;
+  processingOperationDone_not_in?: Maybe<String[] | String>;
+  processingOperationDone_lt?: Maybe<String>;
+  processingOperationDone_lte?: Maybe<String>;
+  processingOperationDone_gt?: Maybe<String>;
+  processingOperationDone_gte?: Maybe<String>;
+  processingOperationDone_contains?: Maybe<String>;
+  processingOperationDone_not_contains?: Maybe<String>;
+  processingOperationDone_starts_with?: Maybe<String>;
+  processingOperationDone_not_starts_with?: Maybe<String>;
+  processingOperationDone_ends_with?: Maybe<String>;
+  processingOperationDone_not_ends_with?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  processingOperationDescription_not?: Maybe<String>;
+  processingOperationDescription_in?: Maybe<String[] | String>;
+  processingOperationDescription_not_in?: Maybe<String[] | String>;
+  processingOperationDescription_lt?: Maybe<String>;
+  processingOperationDescription_lte?: Maybe<String>;
+  processingOperationDescription_gt?: Maybe<String>;
+  processingOperationDescription_gte?: Maybe<String>;
+  processingOperationDescription_contains?: Maybe<String>;
+  processingOperationDescription_not_contains?: Maybe<String>;
+  processingOperationDescription_starts_with?: Maybe<String>;
+  processingOperationDescription_not_starts_with?: Maybe<String>;
+  processingOperationDescription_ends_with?: Maybe<String>;
+  processingOperationDescription_not_ends_with?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  noTraceability_not?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationProcessingOperation_not?: Maybe<String>;
+  nextDestinationProcessingOperation_in?: Maybe<String[] | String>;
+  nextDestinationProcessingOperation_not_in?: Maybe<String[] | String>;
+  nextDestinationProcessingOperation_lt?: Maybe<String>;
+  nextDestinationProcessingOperation_lte?: Maybe<String>;
+  nextDestinationProcessingOperation_gt?: Maybe<String>;
+  nextDestinationProcessingOperation_gte?: Maybe<String>;
+  nextDestinationProcessingOperation_contains?: Maybe<String>;
+  nextDestinationProcessingOperation_not_contains?: Maybe<String>;
+  nextDestinationProcessingOperation_starts_with?: Maybe<String>;
+  nextDestinationProcessingOperation_not_starts_with?: Maybe<String>;
+  nextDestinationProcessingOperation_ends_with?: Maybe<String>;
+  nextDestinationProcessingOperation_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanyName_not?: Maybe<String>;
+  nextDestinationCompanyName_in?: Maybe<String[] | String>;
+  nextDestinationCompanyName_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyName_lt?: Maybe<String>;
+  nextDestinationCompanyName_lte?: Maybe<String>;
+  nextDestinationCompanyName_gt?: Maybe<String>;
+  nextDestinationCompanyName_gte?: Maybe<String>;
+  nextDestinationCompanyName_contains?: Maybe<String>;
+  nextDestinationCompanyName_not_contains?: Maybe<String>;
+  nextDestinationCompanyName_starts_with?: Maybe<String>;
+  nextDestinationCompanyName_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyName_ends_with?: Maybe<String>;
+  nextDestinationCompanyName_not_ends_with?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanySiret_not?: Maybe<String>;
+  nextDestinationCompanySiret_in?: Maybe<String[] | String>;
+  nextDestinationCompanySiret_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanySiret_lt?: Maybe<String>;
+  nextDestinationCompanySiret_lte?: Maybe<String>;
+  nextDestinationCompanySiret_gt?: Maybe<String>;
+  nextDestinationCompanySiret_gte?: Maybe<String>;
+  nextDestinationCompanySiret_contains?: Maybe<String>;
+  nextDestinationCompanySiret_not_contains?: Maybe<String>;
+  nextDestinationCompanySiret_starts_with?: Maybe<String>;
+  nextDestinationCompanySiret_not_starts_with?: Maybe<String>;
+  nextDestinationCompanySiret_ends_with?: Maybe<String>;
+  nextDestinationCompanySiret_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyAddress_not?: Maybe<String>;
+  nextDestinationCompanyAddress_in?: Maybe<String[] | String>;
+  nextDestinationCompanyAddress_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyAddress_lt?: Maybe<String>;
+  nextDestinationCompanyAddress_lte?: Maybe<String>;
+  nextDestinationCompanyAddress_gt?: Maybe<String>;
+  nextDestinationCompanyAddress_gte?: Maybe<String>;
+  nextDestinationCompanyAddress_contains?: Maybe<String>;
+  nextDestinationCompanyAddress_not_contains?: Maybe<String>;
+  nextDestinationCompanyAddress_starts_with?: Maybe<String>;
+  nextDestinationCompanyAddress_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyAddress_ends_with?: Maybe<String>;
+  nextDestinationCompanyAddress_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyContact_not?: Maybe<String>;
+  nextDestinationCompanyContact_in?: Maybe<String[] | String>;
+  nextDestinationCompanyContact_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyContact_lt?: Maybe<String>;
+  nextDestinationCompanyContact_lte?: Maybe<String>;
+  nextDestinationCompanyContact_gt?: Maybe<String>;
+  nextDestinationCompanyContact_gte?: Maybe<String>;
+  nextDestinationCompanyContact_contains?: Maybe<String>;
+  nextDestinationCompanyContact_not_contains?: Maybe<String>;
+  nextDestinationCompanyContact_starts_with?: Maybe<String>;
+  nextDestinationCompanyContact_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyContact_ends_with?: Maybe<String>;
+  nextDestinationCompanyContact_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyPhone_not?: Maybe<String>;
+  nextDestinationCompanyPhone_in?: Maybe<String[] | String>;
+  nextDestinationCompanyPhone_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyPhone_lt?: Maybe<String>;
+  nextDestinationCompanyPhone_lte?: Maybe<String>;
+  nextDestinationCompanyPhone_gt?: Maybe<String>;
+  nextDestinationCompanyPhone_gte?: Maybe<String>;
+  nextDestinationCompanyPhone_contains?: Maybe<String>;
+  nextDestinationCompanyPhone_not_contains?: Maybe<String>;
+  nextDestinationCompanyPhone_starts_with?: Maybe<String>;
+  nextDestinationCompanyPhone_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyPhone_ends_with?: Maybe<String>;
+  nextDestinationCompanyPhone_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  nextDestinationCompanyMail_not?: Maybe<String>;
+  nextDestinationCompanyMail_in?: Maybe<String[] | String>;
+  nextDestinationCompanyMail_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyMail_lt?: Maybe<String>;
+  nextDestinationCompanyMail_lte?: Maybe<String>;
+  nextDestinationCompanyMail_gt?: Maybe<String>;
+  nextDestinationCompanyMail_gte?: Maybe<String>;
+  nextDestinationCompanyMail_contains?: Maybe<String>;
+  nextDestinationCompanyMail_not_contains?: Maybe<String>;
+  nextDestinationCompanyMail_starts_with?: Maybe<String>;
+  nextDestinationCompanyMail_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyMail_ends_with?: Maybe<String>;
+  nextDestinationCompanyMail_not_ends_with?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterType_not?: Maybe<EmitterType>;
+  emitterType_in?: Maybe<EmitterType[] | EmitterType>;
+  emitterType_not_in?: Maybe<EmitterType[] | EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterPickupSite_not?: Maybe<String>;
+  emitterPickupSite_in?: Maybe<String[] | String>;
+  emitterPickupSite_not_in?: Maybe<String[] | String>;
+  emitterPickupSite_lt?: Maybe<String>;
+  emitterPickupSite_lte?: Maybe<String>;
+  emitterPickupSite_gt?: Maybe<String>;
+  emitterPickupSite_gte?: Maybe<String>;
+  emitterPickupSite_contains?: Maybe<String>;
+  emitterPickupSite_not_contains?: Maybe<String>;
+  emitterPickupSite_starts_with?: Maybe<String>;
+  emitterPickupSite_not_starts_with?: Maybe<String>;
+  emitterPickupSite_ends_with?: Maybe<String>;
+  emitterPickupSite_not_ends_with?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteName_not?: Maybe<String>;
+  emitterWorkSiteName_in?: Maybe<String[] | String>;
+  emitterWorkSiteName_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteName_lt?: Maybe<String>;
+  emitterWorkSiteName_lte?: Maybe<String>;
+  emitterWorkSiteName_gt?: Maybe<String>;
+  emitterWorkSiteName_gte?: Maybe<String>;
+  emitterWorkSiteName_contains?: Maybe<String>;
+  emitterWorkSiteName_not_contains?: Maybe<String>;
+  emitterWorkSiteName_starts_with?: Maybe<String>;
+  emitterWorkSiteName_not_starts_with?: Maybe<String>;
+  emitterWorkSiteName_ends_with?: Maybe<String>;
+  emitterWorkSiteName_not_ends_with?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteAddress_not?: Maybe<String>;
+  emitterWorkSiteAddress_in?: Maybe<String[] | String>;
+  emitterWorkSiteAddress_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteAddress_lt?: Maybe<String>;
+  emitterWorkSiteAddress_lte?: Maybe<String>;
+  emitterWorkSiteAddress_gt?: Maybe<String>;
+  emitterWorkSiteAddress_gte?: Maybe<String>;
+  emitterWorkSiteAddress_contains?: Maybe<String>;
+  emitterWorkSiteAddress_not_contains?: Maybe<String>;
+  emitterWorkSiteAddress_starts_with?: Maybe<String>;
+  emitterWorkSiteAddress_not_starts_with?: Maybe<String>;
+  emitterWorkSiteAddress_ends_with?: Maybe<String>;
+  emitterWorkSiteAddress_not_ends_with?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSiteCity_not?: Maybe<String>;
+  emitterWorkSiteCity_in?: Maybe<String[] | String>;
+  emitterWorkSiteCity_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteCity_lt?: Maybe<String>;
+  emitterWorkSiteCity_lte?: Maybe<String>;
+  emitterWorkSiteCity_gt?: Maybe<String>;
+  emitterWorkSiteCity_gte?: Maybe<String>;
+  emitterWorkSiteCity_contains?: Maybe<String>;
+  emitterWorkSiteCity_not_contains?: Maybe<String>;
+  emitterWorkSiteCity_starts_with?: Maybe<String>;
+  emitterWorkSiteCity_not_starts_with?: Maybe<String>;
+  emitterWorkSiteCity_ends_with?: Maybe<String>;
+  emitterWorkSiteCity_not_ends_with?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSitePostalCode_not?: Maybe<String>;
+  emitterWorkSitePostalCode_in?: Maybe<String[] | String>;
+  emitterWorkSitePostalCode_not_in?: Maybe<String[] | String>;
+  emitterWorkSitePostalCode_lt?: Maybe<String>;
+  emitterWorkSitePostalCode_lte?: Maybe<String>;
+  emitterWorkSitePostalCode_gt?: Maybe<String>;
+  emitterWorkSitePostalCode_gte?: Maybe<String>;
+  emitterWorkSitePostalCode_contains?: Maybe<String>;
+  emitterWorkSitePostalCode_not_contains?: Maybe<String>;
+  emitterWorkSitePostalCode_starts_with?: Maybe<String>;
+  emitterWorkSitePostalCode_not_starts_with?: Maybe<String>;
+  emitterWorkSitePostalCode_ends_with?: Maybe<String>;
+  emitterWorkSitePostalCode_not_ends_with?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterWorkSiteInfos_not?: Maybe<String>;
+  emitterWorkSiteInfos_in?: Maybe<String[] | String>;
+  emitterWorkSiteInfos_not_in?: Maybe<String[] | String>;
+  emitterWorkSiteInfos_lt?: Maybe<String>;
+  emitterWorkSiteInfos_lte?: Maybe<String>;
+  emitterWorkSiteInfos_gt?: Maybe<String>;
+  emitterWorkSiteInfos_gte?: Maybe<String>;
+  emitterWorkSiteInfos_contains?: Maybe<String>;
+  emitterWorkSiteInfos_not_contains?: Maybe<String>;
+  emitterWorkSiteInfos_starts_with?: Maybe<String>;
+  emitterWorkSiteInfos_not_starts_with?: Maybe<String>;
+  emitterWorkSiteInfos_ends_with?: Maybe<String>;
+  emitterWorkSiteInfos_not_ends_with?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanyName_not?: Maybe<String>;
+  emitterCompanyName_in?: Maybe<String[] | String>;
+  emitterCompanyName_not_in?: Maybe<String[] | String>;
+  emitterCompanyName_lt?: Maybe<String>;
+  emitterCompanyName_lte?: Maybe<String>;
+  emitterCompanyName_gt?: Maybe<String>;
+  emitterCompanyName_gte?: Maybe<String>;
+  emitterCompanyName_contains?: Maybe<String>;
+  emitterCompanyName_not_contains?: Maybe<String>;
+  emitterCompanyName_starts_with?: Maybe<String>;
+  emitterCompanyName_not_starts_with?: Maybe<String>;
+  emitterCompanyName_ends_with?: Maybe<String>;
+  emitterCompanyName_not_ends_with?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanySiret_not?: Maybe<String>;
+  emitterCompanySiret_in?: Maybe<String[] | String>;
+  emitterCompanySiret_not_in?: Maybe<String[] | String>;
+  emitterCompanySiret_lt?: Maybe<String>;
+  emitterCompanySiret_lte?: Maybe<String>;
+  emitterCompanySiret_gt?: Maybe<String>;
+  emitterCompanySiret_gte?: Maybe<String>;
+  emitterCompanySiret_contains?: Maybe<String>;
+  emitterCompanySiret_not_contains?: Maybe<String>;
+  emitterCompanySiret_starts_with?: Maybe<String>;
+  emitterCompanySiret_not_starts_with?: Maybe<String>;
+  emitterCompanySiret_ends_with?: Maybe<String>;
+  emitterCompanySiret_not_ends_with?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyAddress_not?: Maybe<String>;
+  emitterCompanyAddress_in?: Maybe<String[] | String>;
+  emitterCompanyAddress_not_in?: Maybe<String[] | String>;
+  emitterCompanyAddress_lt?: Maybe<String>;
+  emitterCompanyAddress_lte?: Maybe<String>;
+  emitterCompanyAddress_gt?: Maybe<String>;
+  emitterCompanyAddress_gte?: Maybe<String>;
+  emitterCompanyAddress_contains?: Maybe<String>;
+  emitterCompanyAddress_not_contains?: Maybe<String>;
+  emitterCompanyAddress_starts_with?: Maybe<String>;
+  emitterCompanyAddress_not_starts_with?: Maybe<String>;
+  emitterCompanyAddress_ends_with?: Maybe<String>;
+  emitterCompanyAddress_not_ends_with?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyContact_not?: Maybe<String>;
+  emitterCompanyContact_in?: Maybe<String[] | String>;
+  emitterCompanyContact_not_in?: Maybe<String[] | String>;
+  emitterCompanyContact_lt?: Maybe<String>;
+  emitterCompanyContact_lte?: Maybe<String>;
+  emitterCompanyContact_gt?: Maybe<String>;
+  emitterCompanyContact_gte?: Maybe<String>;
+  emitterCompanyContact_contains?: Maybe<String>;
+  emitterCompanyContact_not_contains?: Maybe<String>;
+  emitterCompanyContact_starts_with?: Maybe<String>;
+  emitterCompanyContact_not_starts_with?: Maybe<String>;
+  emitterCompanyContact_ends_with?: Maybe<String>;
+  emitterCompanyContact_not_ends_with?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyPhone_not?: Maybe<String>;
+  emitterCompanyPhone_in?: Maybe<String[] | String>;
+  emitterCompanyPhone_not_in?: Maybe<String[] | String>;
+  emitterCompanyPhone_lt?: Maybe<String>;
+  emitterCompanyPhone_lte?: Maybe<String>;
+  emitterCompanyPhone_gt?: Maybe<String>;
+  emitterCompanyPhone_gte?: Maybe<String>;
+  emitterCompanyPhone_contains?: Maybe<String>;
+  emitterCompanyPhone_not_contains?: Maybe<String>;
+  emitterCompanyPhone_starts_with?: Maybe<String>;
+  emitterCompanyPhone_not_starts_with?: Maybe<String>;
+  emitterCompanyPhone_ends_with?: Maybe<String>;
+  emitterCompanyPhone_not_ends_with?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  emitterCompanyMail_not?: Maybe<String>;
+  emitterCompanyMail_in?: Maybe<String[] | String>;
+  emitterCompanyMail_not_in?: Maybe<String[] | String>;
+  emitterCompanyMail_lt?: Maybe<String>;
+  emitterCompanyMail_lte?: Maybe<String>;
+  emitterCompanyMail_gt?: Maybe<String>;
+  emitterCompanyMail_gte?: Maybe<String>;
+  emitterCompanyMail_contains?: Maybe<String>;
+  emitterCompanyMail_not_contains?: Maybe<String>;
+  emitterCompanyMail_starts_with?: Maybe<String>;
+  emitterCompanyMail_not_starts_with?: Maybe<String>;
+  emitterCompanyMail_ends_with?: Maybe<String>;
+  emitterCompanyMail_not_ends_with?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientCap_not?: Maybe<String>;
+  recipientCap_in?: Maybe<String[] | String>;
+  recipientCap_not_in?: Maybe<String[] | String>;
+  recipientCap_lt?: Maybe<String>;
+  recipientCap_lte?: Maybe<String>;
+  recipientCap_gt?: Maybe<String>;
+  recipientCap_gte?: Maybe<String>;
+  recipientCap_contains?: Maybe<String>;
+  recipientCap_not_contains?: Maybe<String>;
+  recipientCap_starts_with?: Maybe<String>;
+  recipientCap_not_starts_with?: Maybe<String>;
+  recipientCap_ends_with?: Maybe<String>;
+  recipientCap_not_ends_with?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientProcessingOperation_not?: Maybe<String>;
+  recipientProcessingOperation_in?: Maybe<String[] | String>;
+  recipientProcessingOperation_not_in?: Maybe<String[] | String>;
+  recipientProcessingOperation_lt?: Maybe<String>;
+  recipientProcessingOperation_lte?: Maybe<String>;
+  recipientProcessingOperation_gt?: Maybe<String>;
+  recipientProcessingOperation_gte?: Maybe<String>;
+  recipientProcessingOperation_contains?: Maybe<String>;
+  recipientProcessingOperation_not_contains?: Maybe<String>;
+  recipientProcessingOperation_starts_with?: Maybe<String>;
+  recipientProcessingOperation_not_starts_with?: Maybe<String>;
+  recipientProcessingOperation_ends_with?: Maybe<String>;
+  recipientProcessingOperation_not_ends_with?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientIsTempStorage_not?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanyName_not?: Maybe<String>;
+  recipientCompanyName_in?: Maybe<String[] | String>;
+  recipientCompanyName_not_in?: Maybe<String[] | String>;
+  recipientCompanyName_lt?: Maybe<String>;
+  recipientCompanyName_lte?: Maybe<String>;
+  recipientCompanyName_gt?: Maybe<String>;
+  recipientCompanyName_gte?: Maybe<String>;
+  recipientCompanyName_contains?: Maybe<String>;
+  recipientCompanyName_not_contains?: Maybe<String>;
+  recipientCompanyName_starts_with?: Maybe<String>;
+  recipientCompanyName_not_starts_with?: Maybe<String>;
+  recipientCompanyName_ends_with?: Maybe<String>;
+  recipientCompanyName_not_ends_with?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanySiret_not?: Maybe<String>;
+  recipientCompanySiret_in?: Maybe<String[] | String>;
+  recipientCompanySiret_not_in?: Maybe<String[] | String>;
+  recipientCompanySiret_lt?: Maybe<String>;
+  recipientCompanySiret_lte?: Maybe<String>;
+  recipientCompanySiret_gt?: Maybe<String>;
+  recipientCompanySiret_gte?: Maybe<String>;
+  recipientCompanySiret_contains?: Maybe<String>;
+  recipientCompanySiret_not_contains?: Maybe<String>;
+  recipientCompanySiret_starts_with?: Maybe<String>;
+  recipientCompanySiret_not_starts_with?: Maybe<String>;
+  recipientCompanySiret_ends_with?: Maybe<String>;
+  recipientCompanySiret_not_ends_with?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyAddress_not?: Maybe<String>;
+  recipientCompanyAddress_in?: Maybe<String[] | String>;
+  recipientCompanyAddress_not_in?: Maybe<String[] | String>;
+  recipientCompanyAddress_lt?: Maybe<String>;
+  recipientCompanyAddress_lte?: Maybe<String>;
+  recipientCompanyAddress_gt?: Maybe<String>;
+  recipientCompanyAddress_gte?: Maybe<String>;
+  recipientCompanyAddress_contains?: Maybe<String>;
+  recipientCompanyAddress_not_contains?: Maybe<String>;
+  recipientCompanyAddress_starts_with?: Maybe<String>;
+  recipientCompanyAddress_not_starts_with?: Maybe<String>;
+  recipientCompanyAddress_ends_with?: Maybe<String>;
+  recipientCompanyAddress_not_ends_with?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyContact_not?: Maybe<String>;
+  recipientCompanyContact_in?: Maybe<String[] | String>;
+  recipientCompanyContact_not_in?: Maybe<String[] | String>;
+  recipientCompanyContact_lt?: Maybe<String>;
+  recipientCompanyContact_lte?: Maybe<String>;
+  recipientCompanyContact_gt?: Maybe<String>;
+  recipientCompanyContact_gte?: Maybe<String>;
+  recipientCompanyContact_contains?: Maybe<String>;
+  recipientCompanyContact_not_contains?: Maybe<String>;
+  recipientCompanyContact_starts_with?: Maybe<String>;
+  recipientCompanyContact_not_starts_with?: Maybe<String>;
+  recipientCompanyContact_ends_with?: Maybe<String>;
+  recipientCompanyContact_not_ends_with?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyPhone_not?: Maybe<String>;
+  recipientCompanyPhone_in?: Maybe<String[] | String>;
+  recipientCompanyPhone_not_in?: Maybe<String[] | String>;
+  recipientCompanyPhone_lt?: Maybe<String>;
+  recipientCompanyPhone_lte?: Maybe<String>;
+  recipientCompanyPhone_gt?: Maybe<String>;
+  recipientCompanyPhone_gte?: Maybe<String>;
+  recipientCompanyPhone_contains?: Maybe<String>;
+  recipientCompanyPhone_not_contains?: Maybe<String>;
+  recipientCompanyPhone_starts_with?: Maybe<String>;
+  recipientCompanyPhone_not_starts_with?: Maybe<String>;
+  recipientCompanyPhone_ends_with?: Maybe<String>;
+  recipientCompanyPhone_not_ends_with?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  recipientCompanyMail_not?: Maybe<String>;
+  recipientCompanyMail_in?: Maybe<String[] | String>;
+  recipientCompanyMail_not_in?: Maybe<String[] | String>;
+  recipientCompanyMail_lt?: Maybe<String>;
+  recipientCompanyMail_lte?: Maybe<String>;
+  recipientCompanyMail_gt?: Maybe<String>;
+  recipientCompanyMail_gte?: Maybe<String>;
+  recipientCompanyMail_contains?: Maybe<String>;
+  recipientCompanyMail_not_contains?: Maybe<String>;
+  recipientCompanyMail_starts_with?: Maybe<String>;
+  recipientCompanyMail_not_starts_with?: Maybe<String>;
+  recipientCompanyMail_ends_with?: Maybe<String>;
+  recipientCompanyMail_not_ends_with?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyName_not?: Maybe<String>;
+  transporterCompanyName_in?: Maybe<String[] | String>;
+  transporterCompanyName_not_in?: Maybe<String[] | String>;
+  transporterCompanyName_lt?: Maybe<String>;
+  transporterCompanyName_lte?: Maybe<String>;
+  transporterCompanyName_gt?: Maybe<String>;
+  transporterCompanyName_gte?: Maybe<String>;
+  transporterCompanyName_contains?: Maybe<String>;
+  transporterCompanyName_not_contains?: Maybe<String>;
+  transporterCompanyName_starts_with?: Maybe<String>;
+  transporterCompanyName_not_starts_with?: Maybe<String>;
+  transporterCompanyName_ends_with?: Maybe<String>;
+  transporterCompanyName_not_ends_with?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanySiret_not?: Maybe<String>;
+  transporterCompanySiret_in?: Maybe<String[] | String>;
+  transporterCompanySiret_not_in?: Maybe<String[] | String>;
+  transporterCompanySiret_lt?: Maybe<String>;
+  transporterCompanySiret_lte?: Maybe<String>;
+  transporterCompanySiret_gt?: Maybe<String>;
+  transporterCompanySiret_gte?: Maybe<String>;
+  transporterCompanySiret_contains?: Maybe<String>;
+  transporterCompanySiret_not_contains?: Maybe<String>;
+  transporterCompanySiret_starts_with?: Maybe<String>;
+  transporterCompanySiret_not_starts_with?: Maybe<String>;
+  transporterCompanySiret_ends_with?: Maybe<String>;
+  transporterCompanySiret_not_ends_with?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyAddress_not?: Maybe<String>;
+  transporterCompanyAddress_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_not_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_lt?: Maybe<String>;
+  transporterCompanyAddress_lte?: Maybe<String>;
+  transporterCompanyAddress_gt?: Maybe<String>;
+  transporterCompanyAddress_gte?: Maybe<String>;
+  transporterCompanyAddress_contains?: Maybe<String>;
+  transporterCompanyAddress_not_contains?: Maybe<String>;
+  transporterCompanyAddress_starts_with?: Maybe<String>;
+  transporterCompanyAddress_not_starts_with?: Maybe<String>;
+  transporterCompanyAddress_ends_with?: Maybe<String>;
+  transporterCompanyAddress_not_ends_with?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyContact_not?: Maybe<String>;
+  transporterCompanyContact_in?: Maybe<String[] | String>;
+  transporterCompanyContact_not_in?: Maybe<String[] | String>;
+  transporterCompanyContact_lt?: Maybe<String>;
+  transporterCompanyContact_lte?: Maybe<String>;
+  transporterCompanyContact_gt?: Maybe<String>;
+  transporterCompanyContact_gte?: Maybe<String>;
+  transporterCompanyContact_contains?: Maybe<String>;
+  transporterCompanyContact_not_contains?: Maybe<String>;
+  transporterCompanyContact_starts_with?: Maybe<String>;
+  transporterCompanyContact_not_starts_with?: Maybe<String>;
+  transporterCompanyContact_ends_with?: Maybe<String>;
+  transporterCompanyContact_not_ends_with?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyPhone_not?: Maybe<String>;
+  transporterCompanyPhone_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_not_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_lt?: Maybe<String>;
+  transporterCompanyPhone_lte?: Maybe<String>;
+  transporterCompanyPhone_gt?: Maybe<String>;
+  transporterCompanyPhone_gte?: Maybe<String>;
+  transporterCompanyPhone_contains?: Maybe<String>;
+  transporterCompanyPhone_not_contains?: Maybe<String>;
+  transporterCompanyPhone_starts_with?: Maybe<String>;
+  transporterCompanyPhone_not_starts_with?: Maybe<String>;
+  transporterCompanyPhone_ends_with?: Maybe<String>;
+  transporterCompanyPhone_not_ends_with?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterCompanyMail_not?: Maybe<String>;
+  transporterCompanyMail_in?: Maybe<String[] | String>;
+  transporterCompanyMail_not_in?: Maybe<String[] | String>;
+  transporterCompanyMail_lt?: Maybe<String>;
+  transporterCompanyMail_lte?: Maybe<String>;
+  transporterCompanyMail_gt?: Maybe<String>;
+  transporterCompanyMail_gte?: Maybe<String>;
+  transporterCompanyMail_contains?: Maybe<String>;
+  transporterCompanyMail_not_contains?: Maybe<String>;
+  transporterCompanyMail_starts_with?: Maybe<String>;
+  transporterCompanyMail_not_starts_with?: Maybe<String>;
+  transporterCompanyMail_ends_with?: Maybe<String>;
+  transporterCompanyMail_not_ends_with?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterIsExemptedOfReceipt_not?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterReceipt_not?: Maybe<String>;
+  transporterReceipt_in?: Maybe<String[] | String>;
+  transporterReceipt_not_in?: Maybe<String[] | String>;
+  transporterReceipt_lt?: Maybe<String>;
+  transporterReceipt_lte?: Maybe<String>;
+  transporterReceipt_gt?: Maybe<String>;
+  transporterReceipt_gte?: Maybe<String>;
+  transporterReceipt_contains?: Maybe<String>;
+  transporterReceipt_not_contains?: Maybe<String>;
+  transporterReceipt_starts_with?: Maybe<String>;
+  transporterReceipt_not_starts_with?: Maybe<String>;
+  transporterReceipt_ends_with?: Maybe<String>;
+  transporterReceipt_not_ends_with?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterDepartment_not?: Maybe<String>;
+  transporterDepartment_in?: Maybe<String[] | String>;
+  transporterDepartment_not_in?: Maybe<String[] | String>;
+  transporterDepartment_lt?: Maybe<String>;
+  transporterDepartment_lte?: Maybe<String>;
+  transporterDepartment_gt?: Maybe<String>;
+  transporterDepartment_gte?: Maybe<String>;
+  transporterDepartment_contains?: Maybe<String>;
+  transporterDepartment_not_contains?: Maybe<String>;
+  transporterDepartment_starts_with?: Maybe<String>;
+  transporterDepartment_not_starts_with?: Maybe<String>;
+  transporterDepartment_ends_with?: Maybe<String>;
+  transporterDepartment_not_ends_with?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterValidityLimit_not?: Maybe<DateTimeInput>;
+  transporterValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_lt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_lte?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gte?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterNumberPlate_not?: Maybe<String>;
+  transporterNumberPlate_in?: Maybe<String[] | String>;
+  transporterNumberPlate_not_in?: Maybe<String[] | String>;
+  transporterNumberPlate_lt?: Maybe<String>;
+  transporterNumberPlate_lte?: Maybe<String>;
+  transporterNumberPlate_gt?: Maybe<String>;
+  transporterNumberPlate_gte?: Maybe<String>;
+  transporterNumberPlate_contains?: Maybe<String>;
+  transporterNumberPlate_not_contains?: Maybe<String>;
+  transporterNumberPlate_starts_with?: Maybe<String>;
+  transporterNumberPlate_not_starts_with?: Maybe<String>;
+  transporterNumberPlate_ends_with?: Maybe<String>;
+  transporterNumberPlate_not_ends_with?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsCode_not?: Maybe<String>;
+  wasteDetailsCode_in?: Maybe<String[] | String>;
+  wasteDetailsCode_not_in?: Maybe<String[] | String>;
+  wasteDetailsCode_lt?: Maybe<String>;
+  wasteDetailsCode_lte?: Maybe<String>;
+  wasteDetailsCode_gt?: Maybe<String>;
+  wasteDetailsCode_gte?: Maybe<String>;
+  wasteDetailsCode_contains?: Maybe<String>;
+  wasteDetailsCode_not_contains?: Maybe<String>;
+  wasteDetailsCode_starts_with?: Maybe<String>;
+  wasteDetailsCode_not_starts_with?: Maybe<String>;
+  wasteDetailsCode_ends_with?: Maybe<String>;
+  wasteDetailsCode_not_ends_with?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsName_not?: Maybe<String>;
+  wasteDetailsName_in?: Maybe<String[] | String>;
+  wasteDetailsName_not_in?: Maybe<String[] | String>;
+  wasteDetailsName_lt?: Maybe<String>;
+  wasteDetailsName_lte?: Maybe<String>;
+  wasteDetailsName_gt?: Maybe<String>;
+  wasteDetailsName_gte?: Maybe<String>;
+  wasteDetailsName_contains?: Maybe<String>;
+  wasteDetailsName_not_contains?: Maybe<String>;
+  wasteDetailsName_starts_with?: Maybe<String>;
+  wasteDetailsName_not_starts_with?: Maybe<String>;
+  wasteDetailsName_ends_with?: Maybe<String>;
+  wasteDetailsName_not_ends_with?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsOnuCode_not?: Maybe<String>;
+  wasteDetailsOnuCode_in?: Maybe<String[] | String>;
+  wasteDetailsOnuCode_not_in?: Maybe<String[] | String>;
+  wasteDetailsOnuCode_lt?: Maybe<String>;
+  wasteDetailsOnuCode_lte?: Maybe<String>;
+  wasteDetailsOnuCode_gt?: Maybe<String>;
+  wasteDetailsOnuCode_gte?: Maybe<String>;
+  wasteDetailsOnuCode_contains?: Maybe<String>;
+  wasteDetailsOnuCode_not_contains?: Maybe<String>;
+  wasteDetailsOnuCode_starts_with?: Maybe<String>;
+  wasteDetailsOnuCode_not_starts_with?: Maybe<String>;
+  wasteDetailsOnuCode_ends_with?: Maybe<String>;
+  wasteDetailsOnuCode_not_ends_with?: Maybe<String>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsOtherPackaging_not?: Maybe<String>;
+  wasteDetailsOtherPackaging_in?: Maybe<String[] | String>;
+  wasteDetailsOtherPackaging_not_in?: Maybe<String[] | String>;
+  wasteDetailsOtherPackaging_lt?: Maybe<String>;
+  wasteDetailsOtherPackaging_lte?: Maybe<String>;
+  wasteDetailsOtherPackaging_gt?: Maybe<String>;
+  wasteDetailsOtherPackaging_gte?: Maybe<String>;
+  wasteDetailsOtherPackaging_contains?: Maybe<String>;
+  wasteDetailsOtherPackaging_not_contains?: Maybe<String>;
+  wasteDetailsOtherPackaging_starts_with?: Maybe<String>;
+  wasteDetailsOtherPackaging_not_starts_with?: Maybe<String>;
+  wasteDetailsOtherPackaging_ends_with?: Maybe<String>;
+  wasteDetailsOtherPackaging_not_ends_with?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_not?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_in?: Maybe<Int[] | Int>;
+  wasteDetailsNumberOfPackages_not_in?: Maybe<Int[] | Int>;
+  wasteDetailsNumberOfPackages_lt?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_lte?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_gt?: Maybe<Int>;
+  wasteDetailsNumberOfPackages_gte?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantity_not?: Maybe<Float>;
+  wasteDetailsQuantity_in?: Maybe<Float[] | Float>;
+  wasteDetailsQuantity_not_in?: Maybe<Float[] | Float>;
+  wasteDetailsQuantity_lt?: Maybe<Float>;
+  wasteDetailsQuantity_lte?: Maybe<Float>;
+  wasteDetailsQuantity_gt?: Maybe<Float>;
+  wasteDetailsQuantity_gte?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsQuantityType_not?: Maybe<QuantityType>;
+  wasteDetailsQuantityType_in?: Maybe<QuantityType[] | QuantityType>;
+  wasteDetailsQuantityType_not_in?: Maybe<QuantityType[] | QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsConsistence_not?: Maybe<Consistence>;
+  wasteDetailsConsistence_in?: Maybe<Consistence[] | Consistence>;
+  wasteDetailsConsistence_not_in?: Maybe<Consistence[] | Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanyName_not?: Maybe<String>;
+  traderCompanyName_in?: Maybe<String[] | String>;
+  traderCompanyName_not_in?: Maybe<String[] | String>;
+  traderCompanyName_lt?: Maybe<String>;
+  traderCompanyName_lte?: Maybe<String>;
+  traderCompanyName_gt?: Maybe<String>;
+  traderCompanyName_gte?: Maybe<String>;
+  traderCompanyName_contains?: Maybe<String>;
+  traderCompanyName_not_contains?: Maybe<String>;
+  traderCompanyName_starts_with?: Maybe<String>;
+  traderCompanyName_not_starts_with?: Maybe<String>;
+  traderCompanyName_ends_with?: Maybe<String>;
+  traderCompanyName_not_ends_with?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanySiret_not?: Maybe<String>;
+  traderCompanySiret_in?: Maybe<String[] | String>;
+  traderCompanySiret_not_in?: Maybe<String[] | String>;
+  traderCompanySiret_lt?: Maybe<String>;
+  traderCompanySiret_lte?: Maybe<String>;
+  traderCompanySiret_gt?: Maybe<String>;
+  traderCompanySiret_gte?: Maybe<String>;
+  traderCompanySiret_contains?: Maybe<String>;
+  traderCompanySiret_not_contains?: Maybe<String>;
+  traderCompanySiret_starts_with?: Maybe<String>;
+  traderCompanySiret_not_starts_with?: Maybe<String>;
+  traderCompanySiret_ends_with?: Maybe<String>;
+  traderCompanySiret_not_ends_with?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyAddress_not?: Maybe<String>;
+  traderCompanyAddress_in?: Maybe<String[] | String>;
+  traderCompanyAddress_not_in?: Maybe<String[] | String>;
+  traderCompanyAddress_lt?: Maybe<String>;
+  traderCompanyAddress_lte?: Maybe<String>;
+  traderCompanyAddress_gt?: Maybe<String>;
+  traderCompanyAddress_gte?: Maybe<String>;
+  traderCompanyAddress_contains?: Maybe<String>;
+  traderCompanyAddress_not_contains?: Maybe<String>;
+  traderCompanyAddress_starts_with?: Maybe<String>;
+  traderCompanyAddress_not_starts_with?: Maybe<String>;
+  traderCompanyAddress_ends_with?: Maybe<String>;
+  traderCompanyAddress_not_ends_with?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyContact_not?: Maybe<String>;
+  traderCompanyContact_in?: Maybe<String[] | String>;
+  traderCompanyContact_not_in?: Maybe<String[] | String>;
+  traderCompanyContact_lt?: Maybe<String>;
+  traderCompanyContact_lte?: Maybe<String>;
+  traderCompanyContact_gt?: Maybe<String>;
+  traderCompanyContact_gte?: Maybe<String>;
+  traderCompanyContact_contains?: Maybe<String>;
+  traderCompanyContact_not_contains?: Maybe<String>;
+  traderCompanyContact_starts_with?: Maybe<String>;
+  traderCompanyContact_not_starts_with?: Maybe<String>;
+  traderCompanyContact_ends_with?: Maybe<String>;
+  traderCompanyContact_not_ends_with?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyPhone_not?: Maybe<String>;
+  traderCompanyPhone_in?: Maybe<String[] | String>;
+  traderCompanyPhone_not_in?: Maybe<String[] | String>;
+  traderCompanyPhone_lt?: Maybe<String>;
+  traderCompanyPhone_lte?: Maybe<String>;
+  traderCompanyPhone_gt?: Maybe<String>;
+  traderCompanyPhone_gte?: Maybe<String>;
+  traderCompanyPhone_contains?: Maybe<String>;
+  traderCompanyPhone_not_contains?: Maybe<String>;
+  traderCompanyPhone_starts_with?: Maybe<String>;
+  traderCompanyPhone_not_starts_with?: Maybe<String>;
+  traderCompanyPhone_ends_with?: Maybe<String>;
+  traderCompanyPhone_not_ends_with?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderCompanyMail_not?: Maybe<String>;
+  traderCompanyMail_in?: Maybe<String[] | String>;
+  traderCompanyMail_not_in?: Maybe<String[] | String>;
+  traderCompanyMail_lt?: Maybe<String>;
+  traderCompanyMail_lte?: Maybe<String>;
+  traderCompanyMail_gt?: Maybe<String>;
+  traderCompanyMail_gte?: Maybe<String>;
+  traderCompanyMail_contains?: Maybe<String>;
+  traderCompanyMail_not_contains?: Maybe<String>;
+  traderCompanyMail_starts_with?: Maybe<String>;
+  traderCompanyMail_not_starts_with?: Maybe<String>;
+  traderCompanyMail_ends_with?: Maybe<String>;
+  traderCompanyMail_not_ends_with?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderReceipt_not?: Maybe<String>;
+  traderReceipt_in?: Maybe<String[] | String>;
+  traderReceipt_not_in?: Maybe<String[] | String>;
+  traderReceipt_lt?: Maybe<String>;
+  traderReceipt_lte?: Maybe<String>;
+  traderReceipt_gt?: Maybe<String>;
+  traderReceipt_gte?: Maybe<String>;
+  traderReceipt_contains?: Maybe<String>;
+  traderReceipt_not_contains?: Maybe<String>;
+  traderReceipt_starts_with?: Maybe<String>;
+  traderReceipt_not_starts_with?: Maybe<String>;
+  traderReceipt_ends_with?: Maybe<String>;
+  traderReceipt_not_ends_with?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderDepartment_not?: Maybe<String>;
+  traderDepartment_in?: Maybe<String[] | String>;
+  traderDepartment_not_in?: Maybe<String[] | String>;
+  traderDepartment_lt?: Maybe<String>;
+  traderDepartment_lte?: Maybe<String>;
+  traderDepartment_gt?: Maybe<String>;
+  traderDepartment_gte?: Maybe<String>;
+  traderDepartment_contains?: Maybe<String>;
+  traderDepartment_not_contains?: Maybe<String>;
+  traderDepartment_starts_with?: Maybe<String>;
+  traderDepartment_not_starts_with?: Maybe<String>;
+  traderDepartment_ends_with?: Maybe<String>;
+  traderDepartment_not_ends_with?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  traderValidityLimit_not?: Maybe<DateTimeInput>;
+  traderValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  traderValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  traderValidityLimit_lt?: Maybe<DateTimeInput>;
+  traderValidityLimit_lte?: Maybe<DateTimeInput>;
+  traderValidityLimit_gt?: Maybe<DateTimeInput>;
+  traderValidityLimit_gte?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeWhereInput>;
+  appendix2Forms_every?: Maybe<FormWhereInput>;
+  appendix2Forms_some?: Maybe<FormWhereInput>;
+  appendix2Forms_none?: Maybe<FormWhereInput>;
+  temporaryStorageDetail?: Maybe<TemporaryStorageDetailWhereInput>;
+  AND?: Maybe<FormWhereInput[] | FormWhereInput>;
+  OR?: Maybe<FormWhereInput[] | FormWhereInput>;
+  NOT?: Maybe<FormWhereInput[] | FormWhereInput>;
+}
+
+export interface UserUpsertWithoutCompanyAssociationsInput {
+  update: UserUpdateWithoutCompanyAssociationsDataInput;
+  create: UserCreateWithoutCompanyAssociationsInput;
+}
+
+export interface FormUpdateOneRequiredInput {
+  create?: Maybe<FormCreateInput>;
+  update?: Maybe<FormUpdateDataInput>;
+  upsert?: Maybe<FormUpsertNestedInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface CompanyAssociationUpdateManyMutationInput {
+  role?: Maybe<UserRole>;
+}
+
+export interface CompanyAssociationWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  user?: Maybe<UserWhereInput>;
+  company?: Maybe<CompanyWhereInput>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  AND?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+  OR?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+  NOT?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+}
+
+export interface EcoOrganismeCreateInput {
+  id?: Maybe<ID_Input>;
+  siret: String;
+  name: String;
+  address: String;
+}
+
+export interface DeclarationUpdateManyMutationInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  annee?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+}
+
+export interface DeclarationUpdateInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  annee?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+}
+
+export interface DeclarationCreateInput {
+  id?: Maybe<ID_Input>;
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  annee?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+}
+
+export interface FormUpdateManyDataInput {
+  readableId?: Maybe<String>;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
 }
 
 export interface CompanyWhereInput {
@@ -5578,628 +6403,55 @@ export interface CompanyWhereInput {
   NOT?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
 }
 
-export interface UserUpdateManyInput {
-  create?: Maybe<UserCreateInput[] | UserCreateInput>;
-  update?: Maybe<
-    | UserUpdateWithWhereUniqueNestedInput[]
-    | UserUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | UserUpsertWithWhereUniqueNestedInput[]
-    | UserUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  set?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  disconnect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  deleteMany?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  updateMany?: Maybe<
-    UserUpdateManyWithWhereNestedInput[] | UserUpdateManyWithWhereNestedInput
-  >;
+export interface TemporaryStorageDetailUpdateInput {
+  form?: Maybe<FormUpdateOneWithoutTemporaryStorageDetailInput>;
+  tempStorerQuantityType?: Maybe<QuantityType>;
+  tempStorerQuantityReceived?: Maybe<Float>;
+  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  tempStorerWasteRefusalReason?: Maybe<String>;
+  tempStorerReceivedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedAt?: Maybe<DateTimeInput>;
+  destinationIsFilledByEmitter?: Maybe<Boolean>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  signedBy?: Maybe<String>;
+  signedAt?: Maybe<DateTimeInput>;
 }
 
-export interface GrantCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  code: String;
-  application: ApplicationCreateOneInput;
-  expires: Int;
-  redirectUri: String;
-}
+export type FormWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  readableId?: Maybe<String>;
+}>;
 
-export interface UserUpdateWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput;
-  data: UserUpdateDataInput;
-}
-
-export interface CompanyAssociationWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  user?: Maybe<UserWhereInput>;
-  company?: Maybe<CompanyWhereInput>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
-  AND?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-  OR?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-  NOT?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-}
-
-export interface UserUpsertWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput;
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
-}
-
-export interface FormUpsertWithWhereUniqueNestedInput {
-  where: FormWhereUniqueInput;
-  update: FormUpdateDataInput;
-  create: FormCreateInput;
-}
-
-export interface UserScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  isActive_not?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  email_not?: Maybe<String>;
-  email_in?: Maybe<String[] | String>;
-  email_not_in?: Maybe<String[] | String>;
-  email_lt?: Maybe<String>;
-  email_lte?: Maybe<String>;
-  email_gt?: Maybe<String>;
-  email_gte?: Maybe<String>;
-  email_contains?: Maybe<String>;
-  email_not_contains?: Maybe<String>;
-  email_starts_with?: Maybe<String>;
-  email_not_starts_with?: Maybe<String>;
-  email_ends_with?: Maybe<String>;
-  email_not_ends_with?: Maybe<String>;
-  password?: Maybe<String>;
-  password_not?: Maybe<String>;
-  password_in?: Maybe<String[] | String>;
-  password_not_in?: Maybe<String[] | String>;
-  password_lt?: Maybe<String>;
-  password_lte?: Maybe<String>;
-  password_gt?: Maybe<String>;
-  password_gte?: Maybe<String>;
-  password_contains?: Maybe<String>;
-  password_not_contains?: Maybe<String>;
-  password_starts_with?: Maybe<String>;
-  password_not_starts_with?: Maybe<String>;
-  password_ends_with?: Maybe<String>;
-  password_not_ends_with?: Maybe<String>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  phone?: Maybe<String>;
-  phone_not?: Maybe<String>;
-  phone_in?: Maybe<String[] | String>;
-  phone_not_in?: Maybe<String[] | String>;
-  phone_lt?: Maybe<String>;
-  phone_lte?: Maybe<String>;
-  phone_gt?: Maybe<String>;
-  phone_gte?: Maybe<String>;
-  phone_contains?: Maybe<String>;
-  phone_not_contains?: Maybe<String>;
-  phone_starts_with?: Maybe<String>;
-  phone_not_starts_with?: Maybe<String>;
-  phone_ends_with?: Maybe<String>;
-  phone_not_ends_with?: Maybe<String>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  OR?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  NOT?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-}
-
-export interface TempStorageFormInfosUpdateOneInput {
-  create?: Maybe<TempStorageFormInfosCreateInput>;
-  update?: Maybe<TempStorageFormInfosUpdateDataInput>;
-  upsert?: Maybe<TempStorageFormInfosUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<TempStorageFormInfosWhereUniqueInput>;
-}
-
-export interface UserUpdateManyWithWhereNestedInput {
-  where: UserScalarWhereInput;
-  data: UserUpdateManyDataInput;
-}
-
-export interface StatusLogSubscriptionWhereInput {
+export interface InstallationSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<StatusLogWhereInput>;
+  node?: Maybe<InstallationWhereInput>;
   AND?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
   >;
   OR?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
-  >;
-}
-
-export interface UserUpdateManyDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-}
-
-export interface EcoOrganismeSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<EcoOrganismeWhereInput>;
-  AND?: Maybe<
-    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
-  >;
-}
-
-export interface ApplicationUpdateredirectUrisInput {
-  set?: Maybe<String[] | String>;
-}
-
-export interface UserActivationHashUpdateManyMutationInput {
-  hash?: Maybe<String>;
-}
-
-export interface ApplicationUpsertNestedInput {
-  update: ApplicationUpdateDataInput;
-  create: ApplicationCreateInput;
-}
-
-export interface ApplicationWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  clientSecret?: Maybe<String>;
-  clientSecret_not?: Maybe<String>;
-  clientSecret_in?: Maybe<String[] | String>;
-  clientSecret_not_in?: Maybe<String[] | String>;
-  clientSecret_lt?: Maybe<String>;
-  clientSecret_lte?: Maybe<String>;
-  clientSecret_gt?: Maybe<String>;
-  clientSecret_gte?: Maybe<String>;
-  clientSecret_contains?: Maybe<String>;
-  clientSecret_not_contains?: Maybe<String>;
-  clientSecret_starts_with?: Maybe<String>;
-  clientSecret_not_starts_with?: Maybe<String>;
-  clientSecret_ends_with?: Maybe<String>;
-  clientSecret_not_ends_with?: Maybe<String>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  admins_every?: Maybe<UserWhereInput>;
-  admins_some?: Maybe<UserWhereInput>;
-  admins_none?: Maybe<UserWhereInput>;
-  logoUrl?: Maybe<String>;
-  logoUrl_not?: Maybe<String>;
-  logoUrl_in?: Maybe<String[] | String>;
-  logoUrl_not_in?: Maybe<String[] | String>;
-  logoUrl_lt?: Maybe<String>;
-  logoUrl_lte?: Maybe<String>;
-  logoUrl_gt?: Maybe<String>;
-  logoUrl_gte?: Maybe<String>;
-  logoUrl_contains?: Maybe<String>;
-  logoUrl_not_contains?: Maybe<String>;
-  logoUrl_starts_with?: Maybe<String>;
-  logoUrl_not_starts_with?: Maybe<String>;
-  logoUrl_ends_with?: Maybe<String>;
-  logoUrl_not_ends_with?: Maybe<String>;
-  AND?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
-  OR?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
-  NOT?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
-}
-
-export interface AccessTokenUpdateManyMutationInput {
-  token?: Maybe<String>;
-  isRevoked?: Maybe<Boolean>;
-  lastUsed?: Maybe<DateTimeInput>;
-}
-
-export interface FormUpsertNestedInput {
-  update: FormUpdateDataInput;
-  create: FormCreateInput;
-}
-
-export interface DeclarationCreateInput {
-  id?: Maybe<ID_Input>;
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  annee?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-}
-
-export type InstallationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface CompanyAssociationUpdateManyMutationInput {
-  role?: Maybe<UserRole>;
-}
-
-export type RubriqueWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface ApplicationUpdateInput {
-  clientSecret?: Maybe<String>;
-  name?: Maybe<String>;
-  admins?: Maybe<UserUpdateManyInput>;
-  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
-}
-
-export type StatusLogWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface ApplicationUpdateManyMutationInput {
-  clientSecret?: Maybe<String>;
-  name?: Maybe<String>;
-  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
-}
-
-export type TempStorageFormInfosWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface CompanyUpdateInput {
-  siret?: Maybe<String>;
-  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
-  name?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  codeNaf?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  givenName?: Maybe<String>;
-  contactEmail?: Maybe<String>;
-  contactPhone?: Maybe<String>;
-  website?: Maybe<String>;
-  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
-}
-
-export interface GrantSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<GrantWhereInput>;
-  AND?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
-  OR?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
-  NOT?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
-}
-
-export interface CompanyUpdateManyMutationInput {
-  siret?: Maybe<String>;
-  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
-  name?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  codeNaf?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  givenName?: Maybe<String>;
-  contactEmail?: Maybe<String>;
-  contactPhone?: Maybe<String>;
-  website?: Maybe<String>;
-  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
-}
-
-export interface UserAccountHashUpdateManyMutationInput {
-  email?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  hash?: Maybe<String>;
-}
-
-export interface CompanyAssociationCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneWithoutCompanyAssociationsInput;
-  company: CompanyCreateOneInput;
-  role: UserRole;
-}
-
-export interface StatusLogUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  form?: Maybe<FormUpdateOneRequiredInput>;
-  status?: Maybe<Status>;
-  loggedAt?: Maybe<DateTimeInput>;
-  updatedFields?: Maybe<Json>;
-}
-
-export interface UserCreateOneWithoutCompanyAssociationsInput {
-  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface UserWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  isActive_not?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  email_not?: Maybe<String>;
-  email_in?: Maybe<String[] | String>;
-  email_not_in?: Maybe<String[] | String>;
-  email_lt?: Maybe<String>;
-  email_lte?: Maybe<String>;
-  email_gt?: Maybe<String>;
-  email_gte?: Maybe<String>;
-  email_contains?: Maybe<String>;
-  email_not_contains?: Maybe<String>;
-  email_starts_with?: Maybe<String>;
-  email_not_starts_with?: Maybe<String>;
-  email_ends_with?: Maybe<String>;
-  email_not_ends_with?: Maybe<String>;
-  password?: Maybe<String>;
-  password_not?: Maybe<String>;
-  password_in?: Maybe<String[] | String>;
-  password_not_in?: Maybe<String[] | String>;
-  password_lt?: Maybe<String>;
-  password_lte?: Maybe<String>;
-  password_gt?: Maybe<String>;
-  password_gte?: Maybe<String>;
-  password_contains?: Maybe<String>;
-  password_not_contains?: Maybe<String>;
-  password_starts_with?: Maybe<String>;
-  password_not_starts_with?: Maybe<String>;
-  password_ends_with?: Maybe<String>;
-  password_not_ends_with?: Maybe<String>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  phone?: Maybe<String>;
-  phone_not?: Maybe<String>;
-  phone_in?: Maybe<String[] | String>;
-  phone_not_in?: Maybe<String[] | String>;
-  phone_lt?: Maybe<String>;
-  phone_lte?: Maybe<String>;
-  phone_gt?: Maybe<String>;
-  phone_gte?: Maybe<String>;
-  phone_contains?: Maybe<String>;
-  phone_not_contains?: Maybe<String>;
-  phone_starts_with?: Maybe<String>;
-  phone_not_starts_with?: Maybe<String>;
-  phone_ends_with?: Maybe<String>;
-  phone_not_ends_with?: Maybe<String>;
-  companyAssociations_every?: Maybe<CompanyAssociationWhereInput>;
-  companyAssociations_some?: Maybe<CompanyAssociationWhereInput>;
-  companyAssociations_none?: Maybe<CompanyAssociationWhereInput>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserWhereInput[] | UserWhereInput>;
-  OR?: Maybe<UserWhereInput[] | UserWhereInput>;
-  NOT?: Maybe<UserWhereInput[] | UserWhereInput>;
-}
-
-export interface UserUpdateWithoutCompanyAssociationsDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-}
-
-export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
-  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
-  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
-  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface CompanyAssociationUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
-  company?: Maybe<CompanyUpdateOneRequiredInput>;
-  role?: Maybe<UserRole>;
-}
-
-export interface UserCreateWithoutCompanyAssociationsInput {
-  id?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  email: String;
-  password: String;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-}
-
-export interface FormUpdateManyWithWhereNestedInput {
-  where: FormScalarWhereInput;
-  data: FormUpdateManyDataInput;
-}
-
-export interface InstallationUpdateManyMutationInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  regime?: Maybe<String>;
-  libRegime?: Maybe<String>;
-  seveso?: Maybe<Seveso>;
-  libSeveso?: Maybe<String>;
-  familleIc?: Maybe<String>;
-  urlFiche?: Maybe<String>;
-  s3icNumeroSiret?: Maybe<String>;
-  irepNumeroSiret?: Maybe<String>;
-  gerepNumeroSiret?: Maybe<String>;
-  sireneNumeroSiret?: Maybe<String>;
-}
-
-export interface UserUpdateInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-}
-
-export interface CompanySubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyWhereInput>;
-  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-}
-
-export interface UserAccountHashSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<UserAccountHashWhereInput>;
-  AND?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
   >;
 }
 
@@ -6447,7 +6699,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
     first?: Int;
     last?: Int;
   }) => T;
-  tempStorageFormInfos: <T = TempStorageFormInfosPromise>() => T;
+  temporaryStorageDetail: <T = TemporaryStorageDetailPromise>() => T;
 }
 
 export interface FormSubscription
@@ -6543,7 +6795,7 @@ export interface FormSubscription
     first?: Int;
     last?: Int;
   }) => T;
-  tempStorageFormInfos: <T = TempStorageFormInfosSubscription>() => T;
+  temporaryStorageDetail: <T = TemporaryStorageDetailSubscription>() => T;
 }
 
 export interface FormNullablePromise
@@ -6639,7 +6891,7 @@ export interface FormNullablePromise
     first?: Int;
     last?: Int;
   }) => T;
-  tempStorageFormInfos: <T = TempStorageFormInfosPromise>() => T;
+  temporaryStorageDetail: <T = TemporaryStorageDetailPromise>() => T;
 }
 
 export interface AggregateApplication {
@@ -7024,18 +7276,18 @@ export interface AccessTokenSubscriptionPayloadSubscription
   previousValues: <T = AccessTokenPreviousValuesSubscription>() => T;
 }
 
-export interface AggregateTempStorageFormInfos {
+export interface AggregateTemporaryStorageDetail {
   count: Int;
 }
 
-export interface AggregateTempStorageFormInfosPromise
-  extends Promise<AggregateTempStorageFormInfos>,
+export interface AggregateTemporaryStorageDetailPromise
+  extends Promise<AggregateTemporaryStorageDetail>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateTempStorageFormInfosSubscription
-  extends Promise<AsyncIterator<AggregateTempStorageFormInfos>>,
+export interface AggregateTemporaryStorageDetailSubscription
+  extends Promise<AsyncIterator<AggregateTemporaryStorageDetail>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -7071,27 +7323,27 @@ export interface AccessTokenPreviousValuesSubscription
   lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface TempStorageFormInfosConnection {
+export interface TemporaryStorageDetailConnection {
   pageInfo: PageInfo;
-  edges: TempStorageFormInfosEdge[];
+  edges: TemporaryStorageDetailEdge[];
 }
 
-export interface TempStorageFormInfosConnectionPromise
-  extends Promise<TempStorageFormInfosConnection>,
+export interface TemporaryStorageDetailConnectionPromise
+  extends Promise<TemporaryStorageDetailConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<TempStorageFormInfosEdge>>() => T;
-  aggregate: <T = AggregateTempStorageFormInfosPromise>() => T;
+  edges: <T = FragmentableArray<TemporaryStorageDetailEdge>>() => T;
+  aggregate: <T = AggregateTemporaryStorageDetailPromise>() => T;
 }
 
-export interface TempStorageFormInfosConnectionSubscription
-  extends Promise<AsyncIterator<TempStorageFormInfosConnection>>,
+export interface TemporaryStorageDetailConnectionSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetailConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
   edges: <
-    T = Promise<AsyncIterator<TempStorageFormInfosEdgeSubscription>>
+    T = Promise<AsyncIterator<TemporaryStorageDetailEdgeSubscription>>
   >() => T;
-  aggregate: <T = AggregateTempStorageFormInfosSubscription>() => T;
+  aggregate: <T = AggregateTemporaryStorageDetailSubscription>() => T;
 }
 
 export interface AccessTokenEdge {
@@ -8745,7 +8997,7 @@ export interface InstallationPreviousValuesSubscription
   sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
 }
 
-export interface TempStorageFormInfos {
+export interface TemporaryStorageDetail {
   id: ID_Output;
   tempStorerQuantityType?: QuantityType;
   tempStorerQuantityReceived?: Float;
@@ -8775,10 +9027,11 @@ export interface TempStorageFormInfos {
   signedAt?: DateTimeOutput;
 }
 
-export interface TempStorageFormInfosPromise
-  extends Promise<TempStorageFormInfos>,
+export interface TemporaryStorageDetailPromise
+  extends Promise<TemporaryStorageDetail>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  form: <T = FormPromise>() => T;
   tempStorerQuantityType: () => Promise<QuantityType>;
   tempStorerQuantityReceived: () => Promise<Float>;
   tempStorerWasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
@@ -8807,10 +9060,11 @@ export interface TempStorageFormInfosPromise
   signedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface TempStorageFormInfosSubscription
-  extends Promise<AsyncIterator<TempStorageFormInfos>>,
+export interface TemporaryStorageDetailSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetail>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  form: <T = FormSubscription>() => T;
   tempStorerQuantityType: () => Promise<AsyncIterator<QuantityType>>;
   tempStorerQuantityReceived: () => Promise<AsyncIterator<Float>>;
   tempStorerWasteAcceptationStatus: () => Promise<
@@ -8841,10 +9095,11 @@ export interface TempStorageFormInfosSubscription
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface TempStorageFormInfosNullablePromise
-  extends Promise<TempStorageFormInfos | null>,
+export interface TemporaryStorageDetailNullablePromise
+  extends Promise<TemporaryStorageDetail | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  form: <T = FormPromise>() => T;
   tempStorerQuantityType: () => Promise<QuantityType>;
   tempStorerQuantityReceived: () => Promise<Float>;
   tempStorerWasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
@@ -9157,22 +9412,22 @@ export interface UserAccountHashSubscriptionPayloadSubscription
   previousValues: <T = UserAccountHashPreviousValuesSubscription>() => T;
 }
 
-export interface TempStorageFormInfosEdge {
-  node: TempStorageFormInfos;
+export interface TemporaryStorageDetailEdge {
+  node: TemporaryStorageDetail;
   cursor: String;
 }
 
-export interface TempStorageFormInfosEdgePromise
-  extends Promise<TempStorageFormInfosEdge>,
+export interface TemporaryStorageDetailEdgePromise
+  extends Promise<TemporaryStorageDetailEdge>,
     Fragmentable {
-  node: <T = TempStorageFormInfosPromise>() => T;
+  node: <T = TemporaryStorageDetailPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface TempStorageFormInfosEdgeSubscription
-  extends Promise<AsyncIterator<TempStorageFormInfosEdge>>,
+export interface TemporaryStorageDetailEdgeSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetailEdge>>,
     Fragmentable {
-  node: <T = TempStorageFormInfosSubscription>() => T;
+  node: <T = TemporaryStorageDetailSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
@@ -9193,7 +9448,7 @@ export interface CompanyEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface TempStorageFormInfosPreviousValues {
+export interface TemporaryStorageDetailPreviousValues {
   id: ID_Output;
   tempStorerQuantityType?: QuantityType;
   tempStorerQuantityReceived?: Float;
@@ -9223,8 +9478,8 @@ export interface TempStorageFormInfosPreviousValues {
   signedAt?: DateTimeOutput;
 }
 
-export interface TempStorageFormInfosPreviousValuesPromise
-  extends Promise<TempStorageFormInfosPreviousValues>,
+export interface TemporaryStorageDetailPreviousValuesPromise
+  extends Promise<TemporaryStorageDetailPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
   tempStorerQuantityType: () => Promise<QuantityType>;
@@ -9255,8 +9510,8 @@ export interface TempStorageFormInfosPreviousValuesPromise
   signedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface TempStorageFormInfosPreviousValuesSubscription
-  extends Promise<AsyncIterator<TempStorageFormInfosPreviousValues>>,
+export interface TemporaryStorageDetailPreviousValuesSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetailPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   tempStorerQuantityType: () => Promise<AsyncIterator<QuantityType>>;
@@ -9289,29 +9544,29 @@ export interface TempStorageFormInfosPreviousValuesSubscription
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface TempStorageFormInfosSubscriptionPayload {
+export interface TemporaryStorageDetailSubscriptionPayload {
   mutation: MutationType;
-  node: TempStorageFormInfos;
+  node: TemporaryStorageDetail;
   updatedFields: String[];
-  previousValues: TempStorageFormInfosPreviousValues;
+  previousValues: TemporaryStorageDetailPreviousValues;
 }
 
-export interface TempStorageFormInfosSubscriptionPayloadPromise
-  extends Promise<TempStorageFormInfosSubscriptionPayload>,
+export interface TemporaryStorageDetailSubscriptionPayloadPromise
+  extends Promise<TemporaryStorageDetailSubscriptionPayload>,
     Fragmentable {
   mutation: () => Promise<MutationType>;
-  node: <T = TempStorageFormInfosPromise>() => T;
+  node: <T = TemporaryStorageDetailPromise>() => T;
   updatedFields: () => Promise<String[]>;
-  previousValues: <T = TempStorageFormInfosPreviousValuesPromise>() => T;
+  previousValues: <T = TemporaryStorageDetailPreviousValuesPromise>() => T;
 }
 
-export interface TempStorageFormInfosSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<TempStorageFormInfosSubscriptionPayload>>,
+export interface TemporaryStorageDetailSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetailSubscriptionPayload>>,
     Fragmentable {
   mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = TempStorageFormInfosSubscription>() => T;
+  node: <T = TemporaryStorageDetailSubscription>() => T;
   updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = TempStorageFormInfosPreviousValuesSubscription>() => T;
+  previousValues: <T = TemporaryStorageDetailPreviousValuesSubscription>() => T;
 }
 
 export interface AggregateCompany {
@@ -9486,7 +9741,7 @@ export const models: Model[] = [
     embedded: false
   },
   {
-    name: "TempStorageFormInfos",
+    name: "TemporaryStorageDetail",
     embedded: false
   },
   {

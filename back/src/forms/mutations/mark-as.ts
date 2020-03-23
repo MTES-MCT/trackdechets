@@ -71,7 +71,7 @@ export function markAsTempStored(
   context: GraphQLContext
 ) {
   const transformEventToFormParams = infos => ({
-    tempStorageFormInfos: {
+    temporaryStorageDetail: {
       tempStorerReceivedAt: infos.receivedAt,
       tempStorerSignedAt: infos.signedAt
     }
@@ -87,7 +87,7 @@ export function markAsTempStored(
 
 export function markAsResent(_, { id, resentInfos }, context: GraphQLContext) {
   const transformEventToFormParams = infos => ({
-    tempStorageFormInfos: {
+    temporaryStorageDetail: {
       ...flattenObjectForDb(infos)
     }
   });
@@ -107,14 +107,14 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
-  const tempStorageFormInfos = await context.prisma
+  const temporaryStorageDetail = await context.prisma
     .form({ id: formId })
-    .tempStorageFormInfos();
+    .temporaryStorageDetail();
 
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
   const startingState = State.from(form.status, {
-    form: { ...form, ...formPropsFromEvent, tempStorageFormInfos },
+    form: { ...form, ...formPropsFromEvent, temporaryStorageDetail },
     requestContext: context,
     isStableState: true
   });
