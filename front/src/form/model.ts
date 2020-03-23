@@ -18,6 +18,9 @@ export type Form = {
     company: FormCompany;
     processingOperation: String;
   };
+  trader: {
+    company: FormCompany;
+  };
   transporter: {
     company: FormCompany;
   };
