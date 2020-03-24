@@ -39,7 +39,7 @@ authRouter.post("/logout", (req, res) => {
   req.logout();
   res
     .clearCookie(sess.name, {
-      domain: SESSION_COOKIE_HOST || UI_HOST,
+      domain: sess.cookie.domain,
       path: "/"
     })
     .redirect(`${UI_BASE_URL}`);
