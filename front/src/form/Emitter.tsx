@@ -12,7 +12,7 @@ export default function Emitter() {
 
   const [displayCustomId, setDisplayCustomId] = useState(!!values.customId);
   const [lockEmitterType, setLockEmitterType] = useState(
-    values.ecoOrganisme.id != null
+    values.ecoOrganisme?.id != null
   );
 
   useEffect(() => {
