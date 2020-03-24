@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "whatwg-fetch";
 
 export function useAuth() {
   const [loading, setIsLoading] = useState(true);

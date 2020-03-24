@@ -172,7 +172,7 @@ describe("{ mutation { saveForm } }", () => {
     // update its waste name
     const updatePayload = {
       ...createPayload,
-      id: id,
+      id,
       wasteDetails: { name: "things" }
     };
 

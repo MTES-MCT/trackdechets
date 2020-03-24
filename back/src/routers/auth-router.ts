@@ -3,13 +3,13 @@ import * as passport from "passport";
 import * as querystring from "querystring";
 import { getUIBaseURL } from "../utils";
 import { sess } from "../server";
+import nocache from "../common/middlewares/nocache";
 
-const { UI_HOST } = process.env;
+const { UI_HOST, SESSION_COOKIE_HOST } = process.env;
 
 const UI_BASE_URL = getUIBaseURL();
 
 const authRouter = express.Router();
-
 authRouter.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -31,14 +31,17 @@ authRouter.post("/login", (req, res, next) => {
   })(req, res, next);
 });
 
-authRouter.get("/isAuthenticated", (req, res) => {
+authRouter.get("/isAuthenticated", nocache, (req, res) => {
   return res.json({ isAuthenticated: req.isAuthenticated() });
 });
 
 authRouter.post("/logout", (req, res) => {
   req.logout();
   res
-    .clearCookie(sess.name, { domain: UI_HOST, path: "/" })
+    .clearCookie(sess.name, {
+      domain: sess.cookie.domain,
+      path: "/"
+    })
     .redirect(`${UI_BASE_URL}`);
 });
 
