@@ -80,15 +80,26 @@ const mockedForm = {
   wasteAcceptationStatus: "REFUSED"
 };
 
-const mockedCompanyAdmins = [
-  {
-    name: "Eric",
-    email: "producer@example.com",
-    id: "qsd678",
-    isActive: true,
-    phone: "06 18 33 22 33"
-  }
-];
+const mockedCompanyAdmins = {
+  "12343606600011": [
+    {
+      name: "Eric",
+      email: "producer@example.com",
+      id: "qsd678",
+      isActive: true,
+      phone: "06 18 33 22 33"
+    }
+  ],
+  "12346084400013": [
+    {
+      name: "Henry",
+      email: "recipient@example.com",
+      id: "qsd678",
+      isActive: true,
+      phone: "06 18 33 22 33"
+    }
+  ]
+};
 
 const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
   node: {
@@ -142,7 +153,7 @@ jest.mock("../../forms/pdf", () => ({
 }));
 // Mock a utils function that hits th db
 jest.mock("../../companies/queries", () => ({
-  getCompanyAdminUsers: jest.fn(() => mockedCompanyAdmins)
+  getCompanyAdminUsers: jest.fn(siret => mockedCompanyAdmins[siret])
 }));
 
 // Mock prima DB
@@ -201,43 +212,34 @@ describe("mailWhenFormIsDeclined", () => {
     // get called twice for td-insee
     expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
 
-    // post called 3 times for mail sending
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(3);
+    // post called 1 time for mail sending
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
     const args = mockedAxiosPost.mock.calls;
     // right service was called
 
     expect(args[0][0]).toEqual("http://td-mail/send");
-    expect(args[1][0]).toEqual("http://td-mail/send");
-    expect(args[2][0]).toEqual("http://td-mail/send");
 
     const payload1 = args[0][1];
-    const payload2 = args[1][1];
-    const payload3 = args[2][1];
 
     // pdf from was attached
     expect(payload1.attachment).toEqual("base64xyz");
-    expect(payload2.attachment).toEqual("base64xyz");
-    expect(payload3.attachment).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
-    expect(payload2.to[0].email).toEqual(
+    expect(payload1.cc[0].email).toEqual("recipient@example.com");
+    expect(payload1.cc[1].email).toEqual(
       "uid-11-66.dreal-occitanie@developpement-durable.gouv.fr"
     );
-    expect(payload3.to[0].email).toEqual(
+    expect(payload1.cc[2].email).toEqual(
       "ud77.driee-if@developpement-durable.gouv.fr"
     );
 
     // check form readable id is in mail body
     expect(payload1.body).toContain("TD-19-AAA03488");
-    expect(payload2.body).toContain("TD-19-AAA03488");
-    expect(payload3.body).toContain("TD-19-AAA03488");
 
     const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
     expect(payload1.templateId).toEqual(templateId);
-    expect(payload2.templateId).toEqual(templateId);
-    expect(payload3.templateId).toEqual(templateId);
 
     mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
     mockedAxiosGet.mockReset(); // removes calls, instances, returned values and implementations
@@ -267,46 +269,37 @@ describe("mailWhenFormIsDeclined", () => {
 
     await mailWhenFormIsDeclined(formPayload("PARTIALLY_REFUSED"));
 
-    // get called twice for td-insee
+    // get called 2 times for td-insee
     expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
 
-    // post called 3 times for mail sending
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(3);
+    // post called 1 time for mail sending
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
     const args = mockedAxiosPost.mock.calls;
-    // right service was called
 
+    // right service was called
     expect(args[0][0]).toEqual("http://td-mail/send");
-    expect(args[1][0]).toEqual("http://td-mail/send");
-    expect(args[2][0]).toEqual("http://td-mail/send");
 
     const payload1 = args[0][1];
-    const payload2 = args[1][1];
-    const payload3 = args[2][1];
 
     // pdf from was attached
     expect(payload1.attachment).toEqual("base64xyz");
-    expect(payload2.attachment).toEqual("base64xyz");
-    expect(payload3.attachment).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
-    expect(payload2.to[0].email).toEqual(
+    expect(payload1.cc[0].email).toEqual("recipient@example.com");
+    expect(payload1.cc[1].email).toEqual(
       "uid-11-66.dreal-occitanie@developpement-durable.gouv.fr"
     );
-    expect(payload3.to[0].email).toEqual(
+    expect(payload1.cc[2].email).toEqual(
       "ud77.driee-if@developpement-durable.gouv.fr"
     );
 
     // check form readable id is in mail body
     expect(payload1.body).toContain("TD-19-AAA03488");
-    expect(payload2.body).toContain("TD-19-AAA03488");
-    expect(payload3.body).toContain("TD-19-AAA03488");
 
     const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
     expect(payload1.templateId).toEqual(templateId);
-    expect(payload2.templateId).toEqual(templateId);
-    expect(payload3.templateId).toEqual(templateId);
 
     mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
     mockedAxiosGet.mockReset(); // removes calls, instances, returned values and implementations

@@ -20,8 +20,8 @@ const formWithTransporter: Form = {
 describe("userMails.formNotAccepted", () => {
   it("should return an email payload", () => {
     const { subject, title, to, body, attachment } = userMails.formNotAccepted(
-      "marcel@recyclator.fr",
-      "Marcel Dubois",
+      [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
+      [],
       formWithTransporter,
       "xyz"
     );
@@ -52,8 +52,8 @@ describe("userMails.formNotAccepted", () => {
       transporterIsExemptedOfReceipt: true
     };
     const { body } = userMails.formNotAccepted(
-      "marcel@recyclator.fr",
-      "Marcel Dubois",
+      [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
+      [],
       formExemptedOfReceipt,
       "xyz"
     );
@@ -75,8 +75,8 @@ describe("userMails.formPartiallyRefused", () => {
       body,
       attachment
     } = userMails.formPartiallyRefused(
-      "marcel@recyclator.fr",
-      "Marcel Dubois",
+      [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
+      [],
       payload,
       "xyz"
     );
@@ -110,8 +110,8 @@ describe("userMails.formPartiallyRefused", () => {
       transporterIsExemptedOfReceipt: true
     };
     const { body } = userMails.formPartiallyRefused(
-      "marcel@recyclator.fr",
-      "Marcel Dubois",
+      [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
+      [],
       formExemptedOfReceipt,
       "xyz"
     );

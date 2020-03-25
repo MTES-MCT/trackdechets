@@ -109,8 +109,9 @@ export const userMails = {
     Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">par mail.</a>
     `
   }),
-  formNotAccepted: (toEmail, toName, form: Form, attachment) => ({
-    to: [{ email: toEmail, name: toName }],
+  formNotAccepted: (recipients, ccs, form: Form, attachment) => ({
+    to: recipients,
+    cc: ccs,
     subject: "Refus de prise en charge de votre déchet",
     title: "Refus de prise en charge de votre déchet",
     body: `Madame, Monsieur,
@@ -151,8 +152,9 @@ export const userMails = {
     <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>`,
     attachment
   }),
-  formPartiallyRefused: (toEmail, toName, form: Form, attachment) => ({
-    to: [{ email: toEmail, name: toName }],
+  formPartiallyRefused: (recipients, ccs, form: Form, attachment) => ({
+    to: recipients,
+    cc: ccs,
     subject: "Refus partiel de prise en charge de votre déchet",
     title: "Refus partiel de prise en charge de votre déchet",
     body: `Madame, Monsieur,
@@ -163,7 +165,7 @@ export const userMails = {
       new Date(form.receivedAt)
     )}, le déchet de la société suivante :
     <br><br>
-   
+
     <ul>
     <li>${cleanupSpecialChars(form.emitterCompanyName)} - ${
       form.emitterCompanyAddress
