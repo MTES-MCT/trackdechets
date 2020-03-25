@@ -140,7 +140,7 @@ const appendixFieldSettings = {
   initialEmitter: { x: 142, y: 243, fontSize: 10 },
   readableId: { x: 392, y: 244, fontSize: 10 },
   emitterCompanySiret: { x: 104, y: 256, fontSize: 10 },
-  emitterCompanyName: { x: 84, y: 267, fontSize: 10 },
+  emitterCompanyName: { x: 84, y: 267, fontSize: 10, maxLength: 29 },
   emitterCompanyAddress: { x: 94, y: 278, fontSize: 10, lineBreakAt: 38 },
   emitterCompanyPhone: { x: 76, y: 302, fontSize: 10 },
 
@@ -149,8 +149,7 @@ const appendixFieldSettings = {
   wasteDetailsCode: { x: 360, y: 267, fontSize: 10 },
   wasteDetailsName: { x: 430, y: 279, fontSize: 10 },
   wasteDetailsQuantityReal: { x: 327, y: 302, fontSize: 10 },
-  wasteDetailsQuantityEstimated: { x: 380, y: 302, fontSize: 10 },
-  wasteDetailsQuantity: { x: 468, y: 302, fontSize: 10, rightAlign: true },
+  quantityReceived: { x: 468, y: 302, fontSize: 10, rightAlign: true },
   receivedAt: { x: 350, y: 326, fontSize: 10 }
 };
 
