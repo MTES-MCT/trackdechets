@@ -1,5 +1,5 @@
 import { Field, useFormikContext } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { RadioButton } from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
@@ -8,9 +8,21 @@ import EcoOrganismes from "./eco-organismes/EcoOrganismes";
 import WorkSite from "./work-site/WorkSite";
 
 export default function Emitter() {
-  const { values } = useFormikContext<Form>();
+  const { values, setFieldValue } = useFormikContext<Form>();
 
   const [displayCustomId, setDisplayCustomId] = useState(!!values.customId);
+  const [lockEmitterType, setLockEmitterType] = useState(
+    values.ecoOrganisme?.id != null
+  );
+
+  useEffect(() => {
+    if (values.ecoOrganisme?.id) {
+      setLockEmitterType(true);
+      setFieldValue("emitter.type", "OTHER");
+      return;
+    }
+    setLockEmitterType(false);
+  }, [values.ecoOrganisme, setFieldValue]);
 
   return (
     <>
@@ -34,7 +46,17 @@ export default function Emitter() {
           </>
         )}
       </div>
+
+      <EcoOrganismes name="ecoOrganisme.id" />
+
       <h4>Type d'émetteur</h4>
+
+      {lockEmitterType && (
+        <div className="form__group notification info">
+          Lorsqu'un éco-organisme est indiqué comme responsable du déchet, le
+          type d'émetteur est vérouillé à <strong>Autre détenteur</strong>.
+        </div>
+      )}
 
       <div className="form__group">
         <fieldset>
@@ -44,18 +66,21 @@ export default function Emitter() {
             id="PRODUCER"
             label="Producteur du déchet"
             component={RadioButton}
+            disabled={lockEmitterType}
           />
           <Field
             name="emitter.type"
             id="OTHER"
             label="Autre détenteur"
             component={RadioButton}
+            disabled={lockEmitterType}
           />
           <Field
             name="emitter.type"
             id="APPENDIX2"
             label="Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable"
             component={RadioButton}
+            disabled={lockEmitterType}
           />
 
           <Field
@@ -63,13 +88,10 @@ export default function Emitter() {
             id="APPENDIX1"
             label="Collecteur de petites quantités de déchets relevant d’une même rubrique"
             component={RadioButton}
+            disabled={lockEmitterType}
           />
         </fieldset>
       </div>
-
-      {values.emitter.type === "OTHER" && (
-        <EcoOrganismes name="ecoOrganisme.id" />
-      )}
 
       <h4>Entreprise émettrice</h4>
       <CompanySelector name="emitter.company" />
