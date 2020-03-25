@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import styles from "./Footer.module.scss";
 
 export default function Footer() {
-  const { REACT_APP_DOC_ENDPOINT } = process.env;
+  const { REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
   return (
     <footer className="footer" role="contentinfo">
       <div className="container">
@@ -41,7 +41,7 @@ export default function Footer() {
             <a href="https://faq.trackdechets.fr/">Foire aux questions</a>
           </li>
           <li>
-            <a href={REACT_APP_DOC_ENDPOINT}>Espace développeurs</a>
+            <a href={REACT_APP_DEVELOPERS_ENDPOINT}>Espace développeurs</a>
           </li>
           <li>
             <Link to="/cgu">Conditions générales d'utilisation</Link>

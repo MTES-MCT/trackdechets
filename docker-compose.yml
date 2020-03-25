@@ -83,8 +83,8 @@ services:
     image: betagouv/trackdechets-doc:master
     restart: always
     environment:
-      VIRTUAL_HOST: $DOC_HOST
-      LETSENCRYPT_HOST: $DOC_HOST
+      VIRTUAL_HOST: $DEVELOPERS_HOST
+      LETSENCRYPT_HOST: $DEVELOPERS_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
   td-etl:

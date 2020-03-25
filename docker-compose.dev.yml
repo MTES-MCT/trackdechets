@@ -142,9 +142,9 @@ services:
       - ./doc/website/siteConfig.js:/app/website/siteConfig.js
     working_dir: /app/website
     environment:
-      VIRTUAL_HOST: $DOC_HOST
+      VIRTUAL_HOST: $DEVELOPERS_HOST
       VIRTUAL_PORT: 3000
-      LETSENCRYPT_HOST: $DOC_HOST
+      LETSENCRYPT_HOST: $DEVELOPERS_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
   metabase:
