@@ -26,8 +26,8 @@ const drawText = ({
       const contentWidth = font.widthOfTextAtSize(content, fontSize);
       x = x - contentWidth;
     }
-    if (!!params.maxLength) {
-      content = content.substring(0, params.maxLength);
+    if (!!params.maxLength && content.length > params.maxLength) {
+      content = `${content.substring(0, params.maxLength - 1)}…`;
     }
     if (!!params.lineBreakAt) {
       content = `${content.substring(
@@ -264,7 +264,6 @@ const getWasteRefusalreason = params =>
       }
     : {};
 
-
 /**
  * Flatten ecoOrganisme object and keep only relevant properties for the PDF
  *
@@ -299,12 +298,17 @@ function processMainFormParams(params) {
   };
 }
 
+// on appendix subforms, wasteDetailsQuantityReal checkbox is checked is quantityReceived is filled 
+const checkWasteDetailsQuantityReal = data =>
+  !!data.quantityReceived ? { wasteDetailsQuantityReal: true } : {};
+
 function processAnnexParams(params) {
   const data = stringifyNumberFields(params);
   return {
     ...data,
 
     ...getWasteDetailsType(data),
+    ...checkWasteDetailsQuantityReal(data),
     receivedAt: dateFmt(params.receivedAt)
   };
 }
