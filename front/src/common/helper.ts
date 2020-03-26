@@ -2,6 +2,9 @@ import { DocumentNode } from "graphql";
 import { DataProxy } from "apollo-cache";
 import { ApolloError } from "apollo-client";
 
+export const capitalize = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
+
 /**
  * converts `aString` to `A_STRING`
  * @param string

@@ -9,3 +9,40 @@ table .icon {
 .transport-table {
   overflow-y: auto;
 }
+
+.transport-menu {
+  display: flex;
+  margin: 1em;
+
+  .link {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--theme-dark-text);
+    margin-right: 1.5em;
+  }
+
+  .link:hover {
+    background: none;
+    color: var(--blue);
+  }
+
+  .link.active {
+    color: var(--blue);
+    border-bottom: var(--blue) solid 2px;
+    cursor: default;
+  }
+  .transport-refresh {
+    margin-left: auto;
+    &:hover {
+      margin-left: auto; //prevent button default rules to be applied on click
+    }
+  }
+}
+.transporter-permanent-filter{
+  display: flex;
+  margin: 1em;
+  input{
+    max-width: 300px;
+    margin-right: 1em;
+  }
+}

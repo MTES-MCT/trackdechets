@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 function getKey(object: any, key: string) {
   const splittedKey = key.split(".");
-  return splittedKey.reduce((prev, curr) => prev && prev[curr], object);
+  return splittedKey.reduce((prev, curr) => prev && prev[curr], object) || "";
 }
 
 function compareBy(key: string) {
@@ -18,7 +18,6 @@ export function useFormsTable(
   inputForms: Form[]
 ): [Form[], (k: string) => void, (k: string, v: string) => void] {
   const [forms, setForms] = useState(inputForms);
-
   const [sortKey, setSortKey] = useState("");
   const [filters, setFilters] = useState<{ key: string; value: string }[]>([]);
 

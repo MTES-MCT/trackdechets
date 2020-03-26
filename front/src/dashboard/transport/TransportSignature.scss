@@ -19,3 +19,15 @@
     }
   }
 }
+
+// hide number input spinner
+input.no-spinner::-webkit-outer-spin-button,
+input.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.no-spinner[type=number] {
+  -moz-appearance: textfield;
+}
