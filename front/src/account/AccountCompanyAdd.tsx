@@ -138,7 +138,10 @@ export default function AccountCompanyAdd() {
         }}
         onSubmit={values => {
           const { isAllowed, ...companyInput } = values;
-          createCompany({ variables: { companyInput } }).then(_ => {
+          const companyName = companyInfos ? companyInfos.name || "" : "";
+          createCompany({
+            variables: { companyInput: { ...companyInput, companyName } }
+          }).then(_ => {
             history.push("/dashboard/slips");
           });
         }}

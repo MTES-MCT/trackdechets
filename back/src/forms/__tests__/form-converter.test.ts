@@ -16,7 +16,11 @@ const apiShape = {
   flat: "flat",
   null: null,
   array: [1],
-  arrayOfObject: [{ foo: "bar" }]
+  arrayOfObject: [{ foo: "bar" }],
+  // relation, no flattening
+  ecoOrganisme: {
+    id: "an id"
+  }
 };
 
 const dbShape = {
@@ -29,7 +33,10 @@ const dbShape = {
   flat: "flat",
   null: null,
   array: [1],
-  arrayOfObject: [{ foo: "bar" }]
+  arrayOfObject: [{ foo: "bar" }],
+  ecoOrganisme: {
+    id: "an id"
+  }
 };
 
 describe("flattenInoutObjectForDb", () => {

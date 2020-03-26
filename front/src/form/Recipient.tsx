@@ -1,19 +1,24 @@
-import React, { useState } from "react";
+import { Field, useFormikContext } from "formik";
+import React, { useEffect, useState } from "react";
+import RedErrorMessage from "../common/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
+import DateInput from "./custom-inputs/DateInput";
+import initialState from "./initial-state";
+import { Form } from "./model";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
-import { Field, connect } from "formik";
-import RedErrorMessage from "../common/RedErrorMessage";
-import DateInput from "./custom-inputs/DateInput";
 
-type Values = {
-  trader: { company: { siret: string } };
-};
+export default function Recipient() {
+  const { values, setFieldValue } = useFormikContext<Form>();
 
-export default connect<{}, Values>(function Recipient({ formik }) {
-  const [hasTrader, setHasTrader] = useState(
-    !!formik.values.trader.company.siret
-  );
+  const [hasTrader, setHasTrader] = useState(!!values.trader.company.siret);
+
+  useEffect(() => {
+    if (!hasTrader) {
+      setFieldValue("trader.company", initialState.trader.company);
+    }
+  }, [hasTrader, setFieldValue]);
+
   return (
     <>
       <h4>Entreprise de destination</h4>
@@ -97,4 +102,4 @@ export default connect<{}, Values>(function Recipient({ formik }) {
       )}
     </>
   );
-});
+}

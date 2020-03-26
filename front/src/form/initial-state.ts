@@ -68,5 +68,6 @@ export default {
     quantityType: "ESTIMATED",
     consistence: "SOLID"
   },
-  appendix2Forms: []
+  appendix2Forms: [],
+  ecoOrganisme: {}
 };

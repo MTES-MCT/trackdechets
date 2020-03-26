@@ -1,10 +1,11 @@
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
-import { FaCheck, FaRegCircle, FaSearch } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { InlineError } from "../../common/Error";
 import { toMacroCase } from "../../common/helper";
 import RedErrorMessage from "../../common/RedErrorMessage";
+import CompanyResults from "./CompanyResults";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
 
@@ -184,47 +185,20 @@ export default function CompanySelector(props) {
       )}
 
       {state.searchLoading && <span>Chargement...</span>}
-      <ul className="company-bookmarks">
-        {[
+      <CompanyResults
+        onSelect={company =>
+          dispatch({ type: "company_selected", payload: company })
+        }
+        results={[
           ...state.searchResults,
           ...(!state.searchResults.some(
             c => c.siret === state.selectedCompany.siret
           )
             ? [state.selectedCompany]
             : [])
-        ].map(c => (
-          <li
-            className={`company-bookmarks__item  ${
-              state.selectedCompany.siret === c.siret ? "is-selected" : ""
-            }`}
-            key={c.siret}
-            onClick={() => dispatch({ type: "company_selected", payload: c })}
-          >
-            <div className="content">
-              <h6>{c.name}</h6>
-              <p>
-                {c.siret} - {c.address}
-              </p>
-              <p>
-                <a
-                  href={`/company/${c.siret}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Information sur l'entreprise
-                </a>
-              </p>
-            </div>
-            <div className="icon">
-              {state.selectedCompany.siret === c.siret ? (
-                <FaCheck />
-              ) : (
-                <FaRegCircle />
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
+        ]}
+        selectedItem={state.selectedCompany}
+      />
 
       <RedErrorMessage name={`${field.name}.siret`} />
 

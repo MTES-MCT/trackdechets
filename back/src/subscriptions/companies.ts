@@ -65,9 +65,9 @@ async function verifyPresta(payload: CompanySubscriptionPayload) {
   }
 }
 
-const NB_OF_COMAPNIES_BEFORE_ALERT = 5;
+const NB_OF_COMPANIES_BEFORE_ALERT = 5;
 
-async function warnIfUserCreatesTooManyCompanies(
+export async function warnIfUserCreatesTooManyCompanies(
   payload: CompanySubscriptionPayload
 ) {
   if (payload.mutation !== "CREATED") {
@@ -76,7 +76,7 @@ async function warnIfUserCreatesTooManyCompanies(
 
   const company = payload.node;
   const associationsUsers = await prisma.companyAssociations({
-    where: { company: { id: company.siret } }
+    where: { company: { id: company.id } }
   }).$fragment<{ user: { id: string; name: string } }[]>(`
     fragment Users on companyAssociations {
       user { id name }
@@ -96,20 +96,21 @@ async function warnIfUserCreatesTooManyCompanies(
     .aggregate()
     .count();
 
-  if (userCompaniesNumber <= NB_OF_COMAPNIES_BEFORE_ALERT) {
-    return Promise.resolve();
+  if (userCompaniesNumber > NB_OF_COMPANIES_BEFORE_ALERT) {
+    return sendMail({
+      body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
+      subject:
+        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
+      title:
+        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
+      to: [
+        {
+          email: "tech@trackdechets.beta.gouv.fr ",
+          name: "Equipe Trackdéchets"
+        }
+      ]
+    });
   }
 
-  return sendMail({
-    body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
-    subject:
-      "Alerte: Grand mombre de compagnies créées par un même utilisateur",
-    title: "Alerte: Grand mombre de compagnies créées par un même utilisateur",
-    to: [
-      {
-        email: "tech@trackdechets.beta.gouv.fr ",
-        name: "Equipe Trackdéchets"
-      }
-    ]
-  });
+  return Promise.resolve();
 }

@@ -1,4 +1,4 @@
-const app = require('./app')
+const app = require("./app");
 
 const PORT = 3201;
 

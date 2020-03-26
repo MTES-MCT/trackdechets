@@ -4,7 +4,8 @@ import {
   canAccessForm,
   isFormRecipient,
   isFormEmitter,
-  isFormTransporter
+  isFormTransporter,
+  isFormTrader
 } from "./rules";
 import {
   isAuthenticated,
@@ -27,7 +28,7 @@ export default {
     saveForm: isAuthenticated,
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
-    markAsSealed: or(isFormRecipient, isFormEmitter),
+    markAsSealed: or(isFormRecipient, isFormEmitter, isFormTrader),
     markAsSent: or(isFormRecipient, isFormEmitter),
     markAsReceived: isFormRecipient,
     markAsProcessed: isFormRecipient,

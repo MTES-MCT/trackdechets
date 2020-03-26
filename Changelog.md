@@ -6,6 +6,12 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 
+# [2020.03.5] 26/03/2020
+* Mise à jour de la documentation [PR 224](https://github.com/MTES-MCT/trackdechets/pull/224)
+* Intégration des éco-organismes [PR 212](https://github.com/MTES-MCT/trackdechets/pull/212)
+* Génération pdf annexe 2 [PR 220](https://github.com/MTES-MCT/trackdechets/pull/220)
+* Bugfixes et correctifs
+
 # [2020.03.4] 12/03/2020
 
 * Correction - Génération des messages d'erreurs sur la mutation markAsSealed

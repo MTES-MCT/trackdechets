@@ -5,8 +5,10 @@ import * as queries from "../../../companies/queries";
 
 describe("Forms -> saveForm mutation", () => {
   const formMock = jest.fn();
+
   const prisma = {
     form: formMock,
+    forms: jest.fn(() => []),
     updateForm: jest.fn(() => ({})),
     createForm: jest.fn(() => ({}))
   };

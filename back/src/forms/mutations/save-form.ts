@@ -19,20 +19,35 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
   await checkThatUserIsPartOftheForm(userId, { ...form, id }, context);
 
   if (id) {
+    // {disconnect: true} fails if there is no relation, so we have to check ecoOrganisme before
+    // calling prims.form().ecoOrganisme() was hard to mock, we use another query for the same puppose
+    const existingEcoOrganisme = await context.prisma.forms({
+      where: { id, ecoOrganisme: { id_not: null } }
+    });
+
     const updatedForm = await context.prisma.updateForm({
       where: { id },
       data: {
         ...(form as FormUpdateInput),
-        appendix2Forms: { set: formContent.appendix2Forms }
+        appendix2Forms: { set: formContent.appendix2Forms },
+        ecoOrganisme: {
+          ...(formContent.ecoOrganisme?.id
+            ? { connect: formContent.ecoOrganisme }
+            : !!existingEcoOrganisme.length
+            ? { disconnect: true }
+            : null)
+        }
       }
     });
-
     return unflattenObjectFromDb(updatedForm);
   }
 
   const newForm = await context.prisma.createForm({
     ...(form as FormCreateInput),
     appendix2Forms: { connect: formContent.appendix2Forms },
+    ...(formContent.ecoOrganisme?.id && {
+      ecoOrganisme: { connect: formContent.ecoOrganisme }
+    }),
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }
   });

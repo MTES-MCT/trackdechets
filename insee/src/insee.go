@@ -131,12 +131,18 @@ func buildSearchURI(query url.Values) string {
 }
 
 func etablissementToResponse(item Etablissement) Response {
+	address := item.GeoAdresse
+
+	if address == "" {
+		address = item.LibelleVoie + " " + item.LibelleCommune
+	}
+
 	return Response{item.Siret,
 		item.Siren,
 		item.NomRaisonSociale,
 		item.ActivitePrincipale,
 		item.LibelleActivitePrincipale,
-		item.GeoAdresse,
+		address,
 		item.Longitude,
 		item.Latitude,
 		item.Departement}

@@ -1,7 +1,11 @@
 export type Form = {
   id: string;
+  customId: string;
   readableId: string;
   status: string;
+  ecoOrganisme: {
+    id: string;
+  };
   emitter: {
     company: FormCompany;
     workSite: {
@@ -11,10 +15,14 @@ export type Form = {
       postalCode: string;
       infos: string;
     };
+    type: string;
   };
   recipient: {
     company: FormCompany;
     processingOperation: String;
+  };
+  trader: {
+    company: FormCompany;
   };
   transporter: {
     company: FormCompany;

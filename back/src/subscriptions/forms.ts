@@ -134,7 +134,12 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
   const attachmentData = await pdfEmailAttachment(payload.node.id);
-  const companyAdmins = await getCompanyAdminUsers(form.emitterCompanySiret);
+  const emitterCompanyAdmins = await getCompanyAdminUsers(
+    form.emitterCompanySiret
+  );
+  const recipientCompanyAdmins = await getCompanyAdminUsers(
+    form.recipientCompanySiret
+  );
 
   // retrieve departments by querying distant api entreprise.data.gouv through td-insee
   // we can not rely on parsing already stored address zip codes because some french cities
@@ -161,10 +166,15 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   const drealsRecipients = Dreals.filter(d => formDepartments.includes(d.Dept));
 
   // include drealsRecipients if settings says so
-  const recipients =
-    NOTIFY_DREAL_WHEN_FORM_DECLINED === "true"
-      ? [...companyAdmins, ...drealsRecipients]
-      : [...companyAdmins];
+  const recipients = emitterCompanyAdmins.map(admin => ({
+    email: admin.email,
+    name: admin.name
+  }));
+
+  const ccs = [
+    ...recipientCompanyAdmins,
+    ...(NOTIFY_DREAL_WHEN_FORM_DECLINED === "true" ? drealsRecipients : [])
+  ].map(admin => ({ email: admin.email, name: admin.name }));
 
   // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
   const mailFunction = {
@@ -172,12 +182,8 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
     PARTIALLY_REFUSED: userMails.formPartiallyRefused
   }[payload.node.wasteAcceptationStatus];
 
-  return Promise.all(
-    recipients.map(admin => {
-      const mail = mailFunction(admin.email, admin.name, form, attachmentData);
-      return sendMail(mail);
-    })
-  );
+  const mail = mailFunction(recipients, ccs, form, attachmentData);
+  return sendMail(mail);
 }
 
 async function verifiyPresta(payload: FormSubscriptionPayload) {
