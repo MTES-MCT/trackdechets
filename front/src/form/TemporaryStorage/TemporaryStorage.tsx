@@ -1,32 +1,44 @@
-import React, { useState } from "react";
-import { useField, useFormikContext } from "formik";
+import { useFormikContext, Field } from "formik";
+import React from "react";
 import CompanySelector from "../company/CompanySelector";
+import { Form } from "../model";
+import { Operations } from "../processing-operation/ProcessingOperation";
 
 export default function TemporaryStorage(props) {
-  const [field] = useField(props);
-  const [isActive, setIsActive] = useState(field.value != null);
+  const { values } = useFormikContext<Form>();
+
+  if (!values.recipient?.isTempStorage) {
+    return null;
+  }
 
   return (
     <>
-      <h4>Entreposage provisoire ou reconditionnement ?</h4>
+      <h4>Installation de destination prévue</h4>
+      <CompanySelector name={`${props.name}.destination.company`} />
+
       <div className="form__group">
         <label>
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={() => setIsActive(!isActive)}
-          />
-          Le BSD va passer par une étape d'entreposage provisoire ou
-          reconditionnement
+          Numéro de CAP (le cas échéant)
+          <Field type="text" name={`${props.name}.destination.cap`} />
         </label>
       </div>
 
-      {isActive && (
-        <>
-          <h5>Installation d'entreposage ou de reconditionnement</h5>
-          <CompanySelector name={`${props.name}.temporaryStorer.company`} />
-        </>
-      )}
+      <div className="form__group">
+        <label>Opération d'élimination / valoristation prévue (code D/R)</label>
+
+        <Field
+          component="select"
+          name={`${props.name}.destination.processingOperation`}
+        >
+          <option value="">Choisissez...</option>
+          {Operations.map(o => (
+            <option key={o.code} value={o.code}>
+              {o.code} - {o.description.substr(0, 50)}
+              {o.description.length > 50 ? "..." : ""}
+            </option>
+          ))}
+        </Field>
+      </div>
     </>
   );
 }

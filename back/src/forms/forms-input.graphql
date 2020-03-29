@@ -122,6 +122,8 @@ input FormInput {
   "Annexe 2"
   appendix2Forms: [AppendixFormInput]
   ecoOrganisme: EcoOrganismeInput
+
+  temporaryStorageDetail: TemporaryStorageDetailInput
 }
 
 "Payload de création d'une annexe 2"
@@ -136,6 +138,17 @@ input AppendixFormInput {
 "Payload de liason d'un BSD à un eco-organisme"
 input EcoOrganismeInput {
   id: ID
+}
+
+type TemporaryStorageDetailInput {
+  "Installation de destination prévue"
+  destination: CompanyInput
+
+  "N° de CAP prévu (le cas échéant)"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
 }
 
 "Payload d'un établissement"
@@ -196,6 +209,9 @@ input RecipientInput {
 
   "Établissement de destination"
   company: CompanyInput
+
+  "Si c'est un entreprosage provisoire ou reconditionnement"
+  isTempStorage: boolean
 }
 
 "Collecteur - transporteur (case 8)"

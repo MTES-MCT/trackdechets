@@ -124,13 +124,7 @@ type TemporaryStorageDetail {
   id: ID! @id
   form: Form
 
-  # Frame 13
-  tempStorerCompanyName: String
-  tempStorerCompanySiret: String
-  tempStorerCompanyAddress: String
-  tempStorerCompanyContact: String
-  tempStorerCompanyPhone: String
-  tempStorerCompanyMail: String
+  # Frame 13 - the rest of the infos are in frame 2
   tempStorerQuantityType: QuantityType
   tempStorerQuantityReceived: Float
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
@@ -138,8 +132,16 @@ type TemporaryStorageDetail {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
 
-  # Frame 14 - the rest of the infos are in frame 2
+  # Frame 14
   destinationIsFilledByEmitter: Boolean @default(value: true)
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
 
   # Frame 15, 16, 17
   wasteDetailsOnuCode: String

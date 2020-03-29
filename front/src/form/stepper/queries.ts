@@ -34,6 +34,7 @@ export const GET_FORM = gql`
       recipient {
         cap
         processingOperation
+        isTempStorage
         company {
           ...CompanyFragment
         }
@@ -74,7 +75,7 @@ export const GET_FORM = gql`
         id
       }
       temporaryStorageDetail {
-        temporaryStorer {
+        destination {
           company {
             ...CompanyFragment
           }

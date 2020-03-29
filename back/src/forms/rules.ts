@@ -8,6 +8,7 @@ import { ForbiddenError } from "apollo-server-express";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
+  recipientIsTempStorage: boolean;
   emitterCompanySiret: string;
   transporterCompanySiret: string;
   traderCompanySiret: string;
@@ -112,6 +113,19 @@ export const isFormTrader = and(
   })
 );
 
+export const isFormTempStorer = and(
+  isAuthenticated,
+  isFormRecipient,
+  rule()(async (_, { id }, ctx) => {
+    const form = await ctx.prisma.form({ id });
+
+    return (
+      form.recipientIsTempStorage ||
+      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+    );
+  })
+);
+
 async function getFormAccessInfos(
   formId: string,
   userId: string,
@@ -122,6 +136,7 @@ async function getFormAccessInfos(
   >(`
   fragment FormWithOwner on Form {
     recipientCompanySiret
+    recipientIsTempStorage
     emitterCompanySiret
     transporterCompanySiret
     traderCompanySiret

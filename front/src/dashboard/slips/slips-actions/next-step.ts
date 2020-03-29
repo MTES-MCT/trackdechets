@@ -61,8 +61,7 @@ export function getNextStep(form: Form, currentSiret: string) {
   const currentUserIsEmitter = currentSiret === form.emitter.company.siret;
   const currentUserIsRecipient = currentSiret === form.recipient.company.siret;
   const currentUserIsTempStorer =
-    currentSiret ===
-    form.temporaryStorageDetail?.temporaryStorer?.company?.siret;
+    currentUserIsRecipient && form.recipient.isTempStorage;
 
   if (form.status === FormStatus.DRAFT) return FormStatus.SEALED;
 
@@ -73,6 +72,7 @@ export function getNextStep(form: Form, currentSiret: string) {
   if (currentUserIsTempStorer) {
     if (form.status === FormStatus.SENT) return FormStatus.TEMP_STORED;
     if (form.status === FormStatus.TEMP_STORED) return FormStatus.RESENT;
+    return null;
   }
 
   if (currentUserIsRecipient) {

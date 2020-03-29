@@ -5,6 +5,7 @@ import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
 import { ForbiddenError } from "apollo-server-express";
+import { capitalize } from "../../common/strings";
 
 export async function markAsSealed(_, { id }, context: GraphQLContext) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
@@ -72,8 +73,10 @@ export function markAsTempStored(
 ) {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
-      tempStorerReceivedAt: infos.receivedAt,
-      tempStorerSignedAt: infos.signedAt
+      ...Object.keys(infos).reduce((prev, cur) => {
+        prev[`tempStorer${capitalize(cur)}`] = infos[cur];
+        return prev;
+      }, {})
     }
   });
 

@@ -313,7 +313,7 @@ type TemporaryStorageDetail {
   temporaryStorer: TemporaryStorer
 
   "Indique si le cadre 14 est rempli par l'émetteur du bordereau ou l'installation d'entreprosage"
-  destinationIsFilledByEmitter: Boolean
+  destination: Destination
 
   "Détails du déchet (cases 15, 16 et 17)"
   wasteDetails: WasteDetails
@@ -328,9 +328,6 @@ type TemporaryStorageDetail {
 }
 
 type TemporaryStorer {
-  "Établissement qui rélise l'entreposage temporaire"
-  company: FormCompany
-
   quantityType: QuantityType
   quantityReceived: Float
   wasteAcceptationStatus: String
@@ -338,6 +335,20 @@ type TemporaryStorer {
 
   receivedAt: DateTime
   signedAt: DateTime
+}
+
+type Destination{
+  "N° de CAP (le cas échéant)"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
+
+  "Établissement de destination"
+  company: FormCompany
+
+  "Indique si l'information a été saisie par l'émetteur du bordereau ou l'installation d'entreposage"
+  isFilledByEmitter: Boolean
 }
 
 "Information sur un établissement dans un BSD"
@@ -414,6 +425,9 @@ type Recipient {
 
   "Établissement de destination"
   company: FormCompany
+
+  "Indique si c'est un établissement d'entreposage temporaire ou de reocnditionnement"
+  isTempStorage: Boolean
 }
 
 "Collecteur - transporteur (case 8)"

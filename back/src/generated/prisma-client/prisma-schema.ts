@@ -5358,6 +5358,14 @@ type TemporaryStorageDetail {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -5395,6 +5403,14 @@ input TemporaryStorageDetailCreateInput {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -5430,6 +5446,14 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -5473,6 +5497,22 @@ enum TemporaryStorageDetailOrderByInput {
   tempStorerSignedAt_DESC
   destinationIsFilledByEmitter_ASC
   destinationIsFilledByEmitter_DESC
+  destinationCompanyName_ASC
+  destinationCompanyName_DESC
+  destinationCompanySiret_ASC
+  destinationCompanySiret_DESC
+  destinationCompanyAddress_ASC
+  destinationCompanyAddress_DESC
+  destinationCompanyContact_ASC
+  destinationCompanyContact_DESC
+  destinationCompanyPhone_ASC
+  destinationCompanyPhone_DESC
+  destinationCompanyMail_ASC
+  destinationCompanyMail_DESC
+  destinationCap_ASC
+  destinationCap_DESC
+  destinationProcessingOperation_ASC
+  destinationProcessingOperation_DESC
   wasteDetailsOnuCode_ASC
   wasteDetailsOnuCode_DESC
   wasteDetailsPackagings_ASC
@@ -5522,6 +5562,14 @@ type TemporaryStorageDetailPreviousValues {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -5570,6 +5618,14 @@ input TemporaryStorageDetailUpdateInput {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -5599,6 +5655,14 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -5637,6 +5701,14 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerReceivedAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
   wasteDetailsOnuCode: String
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
@@ -5727,6 +5799,118 @@ input TemporaryStorageDetailWhereInput {
   tempStorerSignedAt_gte: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationIsFilledByEmitter_not: Boolean
+  destinationCompanyName: String
+  destinationCompanyName_not: String
+  destinationCompanyName_in: [String!]
+  destinationCompanyName_not_in: [String!]
+  destinationCompanyName_lt: String
+  destinationCompanyName_lte: String
+  destinationCompanyName_gt: String
+  destinationCompanyName_gte: String
+  destinationCompanyName_contains: String
+  destinationCompanyName_not_contains: String
+  destinationCompanyName_starts_with: String
+  destinationCompanyName_not_starts_with: String
+  destinationCompanyName_ends_with: String
+  destinationCompanyName_not_ends_with: String
+  destinationCompanySiret: String
+  destinationCompanySiret_not: String
+  destinationCompanySiret_in: [String!]
+  destinationCompanySiret_not_in: [String!]
+  destinationCompanySiret_lt: String
+  destinationCompanySiret_lte: String
+  destinationCompanySiret_gt: String
+  destinationCompanySiret_gte: String
+  destinationCompanySiret_contains: String
+  destinationCompanySiret_not_contains: String
+  destinationCompanySiret_starts_with: String
+  destinationCompanySiret_not_starts_with: String
+  destinationCompanySiret_ends_with: String
+  destinationCompanySiret_not_ends_with: String
+  destinationCompanyAddress: String
+  destinationCompanyAddress_not: String
+  destinationCompanyAddress_in: [String!]
+  destinationCompanyAddress_not_in: [String!]
+  destinationCompanyAddress_lt: String
+  destinationCompanyAddress_lte: String
+  destinationCompanyAddress_gt: String
+  destinationCompanyAddress_gte: String
+  destinationCompanyAddress_contains: String
+  destinationCompanyAddress_not_contains: String
+  destinationCompanyAddress_starts_with: String
+  destinationCompanyAddress_not_starts_with: String
+  destinationCompanyAddress_ends_with: String
+  destinationCompanyAddress_not_ends_with: String
+  destinationCompanyContact: String
+  destinationCompanyContact_not: String
+  destinationCompanyContact_in: [String!]
+  destinationCompanyContact_not_in: [String!]
+  destinationCompanyContact_lt: String
+  destinationCompanyContact_lte: String
+  destinationCompanyContact_gt: String
+  destinationCompanyContact_gte: String
+  destinationCompanyContact_contains: String
+  destinationCompanyContact_not_contains: String
+  destinationCompanyContact_starts_with: String
+  destinationCompanyContact_not_starts_with: String
+  destinationCompanyContact_ends_with: String
+  destinationCompanyContact_not_ends_with: String
+  destinationCompanyPhone: String
+  destinationCompanyPhone_not: String
+  destinationCompanyPhone_in: [String!]
+  destinationCompanyPhone_not_in: [String!]
+  destinationCompanyPhone_lt: String
+  destinationCompanyPhone_lte: String
+  destinationCompanyPhone_gt: String
+  destinationCompanyPhone_gte: String
+  destinationCompanyPhone_contains: String
+  destinationCompanyPhone_not_contains: String
+  destinationCompanyPhone_starts_with: String
+  destinationCompanyPhone_not_starts_with: String
+  destinationCompanyPhone_ends_with: String
+  destinationCompanyPhone_not_ends_with: String
+  destinationCompanyMail: String
+  destinationCompanyMail_not: String
+  destinationCompanyMail_in: [String!]
+  destinationCompanyMail_not_in: [String!]
+  destinationCompanyMail_lt: String
+  destinationCompanyMail_lte: String
+  destinationCompanyMail_gt: String
+  destinationCompanyMail_gte: String
+  destinationCompanyMail_contains: String
+  destinationCompanyMail_not_contains: String
+  destinationCompanyMail_starts_with: String
+  destinationCompanyMail_not_starts_with: String
+  destinationCompanyMail_ends_with: String
+  destinationCompanyMail_not_ends_with: String
+  destinationCap: String
+  destinationCap_not: String
+  destinationCap_in: [String!]
+  destinationCap_not_in: [String!]
+  destinationCap_lt: String
+  destinationCap_lte: String
+  destinationCap_gt: String
+  destinationCap_gte: String
+  destinationCap_contains: String
+  destinationCap_not_contains: String
+  destinationCap_starts_with: String
+  destinationCap_not_starts_with: String
+  destinationCap_ends_with: String
+  destinationCap_not_ends_with: String
+  destinationProcessingOperation: String
+  destinationProcessingOperation_not: String
+  destinationProcessingOperation_in: [String!]
+  destinationProcessingOperation_not_in: [String!]
+  destinationProcessingOperation_lt: String
+  destinationProcessingOperation_lte: String
+  destinationProcessingOperation_gt: String
+  destinationProcessingOperation_gte: String
+  destinationProcessingOperation_contains: String
+  destinationProcessingOperation_not_contains: String
+  destinationProcessingOperation_starts_with: String
+  destinationProcessingOperation_not_starts_with: String
+  destinationProcessingOperation_ends_with: String
+  destinationProcessingOperation_not_ends_with: String
   wasteDetailsOnuCode: String
   wasteDetailsOnuCode_not: String
   wasteDetailsOnuCode_in: [String!]

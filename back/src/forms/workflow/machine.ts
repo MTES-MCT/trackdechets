@@ -50,7 +50,15 @@ export const formWorkflowMachine = Machine(
         on: {
           MARK_TEMP_STORED: [
             {
-              target: FormState.TempStored
+              target: FormState.Refused,
+              cond: "isFormRefusedByTempStorage"
+            },
+            {
+              target: FormState.TempStored,
+              cond: "hasTempStorageDestination"
+            },
+            {
+              target: "error.invalidTransition"
             }
           ],
           MARK_RECEIVED: [
@@ -226,7 +234,12 @@ export const formWorkflowMachine = Machine(
           ctx.form.wasteAcceptationStatus
         );
       },
-      hasTempStorageDestination: ctx => ctx.form.temporaryStorageDetail != null
+      isFormRefusedByTempStorage: ctx => {
+        return !["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+          ctx.form.temporaryStorageDetail.tempStorerWasteAcceptationStatus
+        );
+      },
+      hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage
     }
   }
 );

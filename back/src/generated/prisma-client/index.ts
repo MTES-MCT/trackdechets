@@ -947,6 +947,22 @@ export type TemporaryStorageDetailOrderByInput =
   | "tempStorerSignedAt_DESC"
   | "destinationIsFilledByEmitter_ASC"
   | "destinationIsFilledByEmitter_DESC"
+  | "destinationCompanyName_ASC"
+  | "destinationCompanyName_DESC"
+  | "destinationCompanySiret_ASC"
+  | "destinationCompanySiret_DESC"
+  | "destinationCompanyAddress_ASC"
+  | "destinationCompanyAddress_DESC"
+  | "destinationCompanyContact_ASC"
+  | "destinationCompanyContact_DESC"
+  | "destinationCompanyPhone_ASC"
+  | "destinationCompanyPhone_DESC"
+  | "destinationCompanyMail_ASC"
+  | "destinationCompanyMail_DESC"
+  | "destinationCap_ASC"
+  | "destinationCap_DESC"
+  | "destinationProcessingOperation_ASC"
+  | "destinationProcessingOperation_DESC"
   | "wasteDetailsOnuCode_ASC"
   | "wasteDetailsOnuCode_DESC"
   | "wasteDetailsPackagings_ASC"
@@ -1841,6 +1857,14 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
@@ -2012,6 +2036,118 @@ export interface TemporaryStorageDetailWhereInput {
   tempStorerSignedAt_gte?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationIsFilledByEmitter_not?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanyName_not?: Maybe<String>;
+  destinationCompanyName_in?: Maybe<String[] | String>;
+  destinationCompanyName_not_in?: Maybe<String[] | String>;
+  destinationCompanyName_lt?: Maybe<String>;
+  destinationCompanyName_lte?: Maybe<String>;
+  destinationCompanyName_gt?: Maybe<String>;
+  destinationCompanyName_gte?: Maybe<String>;
+  destinationCompanyName_contains?: Maybe<String>;
+  destinationCompanyName_not_contains?: Maybe<String>;
+  destinationCompanyName_starts_with?: Maybe<String>;
+  destinationCompanyName_not_starts_with?: Maybe<String>;
+  destinationCompanyName_ends_with?: Maybe<String>;
+  destinationCompanyName_not_ends_with?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanySiret_not?: Maybe<String>;
+  destinationCompanySiret_in?: Maybe<String[] | String>;
+  destinationCompanySiret_not_in?: Maybe<String[] | String>;
+  destinationCompanySiret_lt?: Maybe<String>;
+  destinationCompanySiret_lte?: Maybe<String>;
+  destinationCompanySiret_gt?: Maybe<String>;
+  destinationCompanySiret_gte?: Maybe<String>;
+  destinationCompanySiret_contains?: Maybe<String>;
+  destinationCompanySiret_not_contains?: Maybe<String>;
+  destinationCompanySiret_starts_with?: Maybe<String>;
+  destinationCompanySiret_not_starts_with?: Maybe<String>;
+  destinationCompanySiret_ends_with?: Maybe<String>;
+  destinationCompanySiret_not_ends_with?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyAddress_not?: Maybe<String>;
+  destinationCompanyAddress_in?: Maybe<String[] | String>;
+  destinationCompanyAddress_not_in?: Maybe<String[] | String>;
+  destinationCompanyAddress_lt?: Maybe<String>;
+  destinationCompanyAddress_lte?: Maybe<String>;
+  destinationCompanyAddress_gt?: Maybe<String>;
+  destinationCompanyAddress_gte?: Maybe<String>;
+  destinationCompanyAddress_contains?: Maybe<String>;
+  destinationCompanyAddress_not_contains?: Maybe<String>;
+  destinationCompanyAddress_starts_with?: Maybe<String>;
+  destinationCompanyAddress_not_starts_with?: Maybe<String>;
+  destinationCompanyAddress_ends_with?: Maybe<String>;
+  destinationCompanyAddress_not_ends_with?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyContact_not?: Maybe<String>;
+  destinationCompanyContact_in?: Maybe<String[] | String>;
+  destinationCompanyContact_not_in?: Maybe<String[] | String>;
+  destinationCompanyContact_lt?: Maybe<String>;
+  destinationCompanyContact_lte?: Maybe<String>;
+  destinationCompanyContact_gt?: Maybe<String>;
+  destinationCompanyContact_gte?: Maybe<String>;
+  destinationCompanyContact_contains?: Maybe<String>;
+  destinationCompanyContact_not_contains?: Maybe<String>;
+  destinationCompanyContact_starts_with?: Maybe<String>;
+  destinationCompanyContact_not_starts_with?: Maybe<String>;
+  destinationCompanyContact_ends_with?: Maybe<String>;
+  destinationCompanyContact_not_ends_with?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyPhone_not?: Maybe<String>;
+  destinationCompanyPhone_in?: Maybe<String[] | String>;
+  destinationCompanyPhone_not_in?: Maybe<String[] | String>;
+  destinationCompanyPhone_lt?: Maybe<String>;
+  destinationCompanyPhone_lte?: Maybe<String>;
+  destinationCompanyPhone_gt?: Maybe<String>;
+  destinationCompanyPhone_gte?: Maybe<String>;
+  destinationCompanyPhone_contains?: Maybe<String>;
+  destinationCompanyPhone_not_contains?: Maybe<String>;
+  destinationCompanyPhone_starts_with?: Maybe<String>;
+  destinationCompanyPhone_not_starts_with?: Maybe<String>;
+  destinationCompanyPhone_ends_with?: Maybe<String>;
+  destinationCompanyPhone_not_ends_with?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCompanyMail_not?: Maybe<String>;
+  destinationCompanyMail_in?: Maybe<String[] | String>;
+  destinationCompanyMail_not_in?: Maybe<String[] | String>;
+  destinationCompanyMail_lt?: Maybe<String>;
+  destinationCompanyMail_lte?: Maybe<String>;
+  destinationCompanyMail_gt?: Maybe<String>;
+  destinationCompanyMail_gte?: Maybe<String>;
+  destinationCompanyMail_contains?: Maybe<String>;
+  destinationCompanyMail_not_contains?: Maybe<String>;
+  destinationCompanyMail_starts_with?: Maybe<String>;
+  destinationCompanyMail_not_starts_with?: Maybe<String>;
+  destinationCompanyMail_ends_with?: Maybe<String>;
+  destinationCompanyMail_not_ends_with?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationCap_not?: Maybe<String>;
+  destinationCap_in?: Maybe<String[] | String>;
+  destinationCap_not_in?: Maybe<String[] | String>;
+  destinationCap_lt?: Maybe<String>;
+  destinationCap_lte?: Maybe<String>;
+  destinationCap_gt?: Maybe<String>;
+  destinationCap_gte?: Maybe<String>;
+  destinationCap_contains?: Maybe<String>;
+  destinationCap_not_contains?: Maybe<String>;
+  destinationCap_starts_with?: Maybe<String>;
+  destinationCap_not_starts_with?: Maybe<String>;
+  destinationCap_ends_with?: Maybe<String>;
+  destinationCap_not_ends_with?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
+  destinationProcessingOperation_not?: Maybe<String>;
+  destinationProcessingOperation_in?: Maybe<String[] | String>;
+  destinationProcessingOperation_not_in?: Maybe<String[] | String>;
+  destinationProcessingOperation_lt?: Maybe<String>;
+  destinationProcessingOperation_lte?: Maybe<String>;
+  destinationProcessingOperation_gt?: Maybe<String>;
+  destinationProcessingOperation_gte?: Maybe<String>;
+  destinationProcessingOperation_contains?: Maybe<String>;
+  destinationProcessingOperation_not_contains?: Maybe<String>;
+  destinationProcessingOperation_starts_with?: Maybe<String>;
+  destinationProcessingOperation_not_starts_with?: Maybe<String>;
+  destinationProcessingOperation_ends_with?: Maybe<String>;
+  destinationProcessingOperation_not_ends_with?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
   wasteDetailsOnuCode_not?: Maybe<String>;
   wasteDetailsOnuCode_in?: Maybe<String[] | String>;
@@ -2246,6 +2382,14 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
@@ -5029,6 +5173,14 @@ export interface TemporaryStorageDetailCreateInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
@@ -6412,6 +6564,14 @@ export interface TemporaryStorageDetailUpdateInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
@@ -9006,6 +9166,14 @@ export interface TemporaryStorageDetail {
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerSignedAt?: DateTimeOutput;
   destinationIsFilledByEmitter?: Boolean;
+  destinationCompanyName?: String;
+  destinationCompanySiret?: String;
+  destinationCompanyAddress?: String;
+  destinationCompanyContact?: String;
+  destinationCompanyPhone?: String;
+  destinationCompanyMail?: String;
+  destinationCap?: String;
+  destinationProcessingOperation?: String;
   wasteDetailsOnuCode?: String;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
@@ -9039,6 +9207,14 @@ export interface TemporaryStorageDetailPromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
+  destinationCompanyName: () => Promise<String>;
+  destinationCompanySiret: () => Promise<String>;
+  destinationCompanyAddress: () => Promise<String>;
+  destinationCompanyContact: () => Promise<String>;
+  destinationCompanyPhone: () => Promise<String>;
+  destinationCompanyMail: () => Promise<String>;
+  destinationCap: () => Promise<String>;
+  destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
@@ -9074,6 +9250,14 @@ export interface TemporaryStorageDetailSubscription
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
+  destinationCompanyName: () => Promise<AsyncIterator<String>>;
+  destinationCompanySiret: () => Promise<AsyncIterator<String>>;
+  destinationCompanyAddress: () => Promise<AsyncIterator<String>>;
+  destinationCompanyContact: () => Promise<AsyncIterator<String>>;
+  destinationCompanyPhone: () => Promise<AsyncIterator<String>>;
+  destinationCompanyMail: () => Promise<AsyncIterator<String>>;
+  destinationCap: () => Promise<AsyncIterator<String>>;
+  destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
@@ -9107,6 +9291,14 @@ export interface TemporaryStorageDetailNullablePromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
+  destinationCompanyName: () => Promise<String>;
+  destinationCompanySiret: () => Promise<String>;
+  destinationCompanyAddress: () => Promise<String>;
+  destinationCompanyContact: () => Promise<String>;
+  destinationCompanyPhone: () => Promise<String>;
+  destinationCompanyMail: () => Promise<String>;
+  destinationCap: () => Promise<String>;
+  destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
@@ -9457,6 +9649,14 @@ export interface TemporaryStorageDetailPreviousValues {
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerSignedAt?: DateTimeOutput;
   destinationIsFilledByEmitter?: Boolean;
+  destinationCompanyName?: String;
+  destinationCompanySiret?: String;
+  destinationCompanyAddress?: String;
+  destinationCompanyContact?: String;
+  destinationCompanyPhone?: String;
+  destinationCompanyMail?: String;
+  destinationCap?: String;
+  destinationProcessingOperation?: String;
   wasteDetailsOnuCode?: String;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
@@ -9489,6 +9689,14 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
+  destinationCompanyName: () => Promise<String>;
+  destinationCompanySiret: () => Promise<String>;
+  destinationCompanyAddress: () => Promise<String>;
+  destinationCompanyContact: () => Promise<String>;
+  destinationCompanyPhone: () => Promise<String>;
+  destinationCompanyMail: () => Promise<String>;
+  destinationCap: () => Promise<String>;
+  destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
@@ -9523,6 +9731,14 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
+  destinationCompanyName: () => Promise<AsyncIterator<String>>;
+  destinationCompanySiret: () => Promise<AsyncIterator<String>>;
+  destinationCompanyAddress: () => Promise<AsyncIterator<String>>;
+  destinationCompanyContact: () => Promise<AsyncIterator<String>>;
+  destinationCompanyPhone: () => Promise<AsyncIterator<String>>;
+  destinationCompanyMail: () => Promise<AsyncIterator<String>>;
+  destinationCap: () => Promise<AsyncIterator<String>>;
+  destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;

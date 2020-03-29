@@ -7,7 +7,7 @@ import initialState from "./initial-state";
 import { Form } from "./model";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import "./Recipient.scss";
-import TemporaryStorage from "./TemporaryStorage/TemporaryStorage";
+import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
 
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -22,7 +22,17 @@ export default function Recipient() {
 
   return (
     <>
-      <h4 className="required">Entreprise de destination</h4>
+      <h4 className="required">
+        Installation de destination ou d’entreposage ou de reconditionnement
+      </h4>
+
+      <div className="form__group">
+        <label>
+          <Field type="checkbox" name="recipient.isTempStorage" />
+          Le BSD va passer par une étape d'entreposage provisoire ou
+          reconditionnement
+        </label>
+      </div>
 
       <div className="text-quote recipient">
         <p>
