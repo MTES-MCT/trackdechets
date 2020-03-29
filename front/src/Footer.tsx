@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import styles from "./Footer.module.scss";
 
 export default function Footer() {
+  const { REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
   return (
     <footer className="footer" role="contentinfo">
       <div className="container">
@@ -40,6 +41,9 @@ export default function Footer() {
             <a href="https://faq.trackdechets.fr/">Foire aux questions</a>
           </li>
           <li>
+            <a href={REACT_APP_DEVELOPERS_ENDPOINT}>Espace développeurs</a>
+          </li>
+          <li>
             <Link to="/cgu">Conditions générales d'utilisation</Link>
           </li>
           <li>
@@ -57,27 +61,6 @@ export default function Footer() {
           <li>
             <a href="https://drive.google.com/open?id=1To5yrG6jO3-bh9jRqyi334mXT1LqGCjE">
               Boite à outils communication
-            </a>
-          </li>
-        </ul>
-        <ul className="footer__links">
-          <li>
-            <h4>Développeurs</h4>
-          </li>
-          <li>
-            <a href={process.env.REACT_APP_DOC_ENDPOINT}>Documentation API</a>
-          </li>
-          <li>
-            <a href={process.env.REACT_APP_API_ENDPOINT}>API Playground</a>
-          </li>
-          <li>
-            <a href="https://forum.trackdechets.beta.gouv.fr/">
-              Forum technique
-            </a>
-          </li>
-          <li>
-            <a href="http://status.trackdechets.beta.gouv.fr/">
-              Statut des applications
             </a>
           </li>
         </ul>
