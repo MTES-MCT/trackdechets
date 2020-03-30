@@ -1,3 +1,4 @@
+import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import RedErrorMessage from "../../../common/RedErrorMessage";
@@ -9,10 +10,13 @@ import Packagings from "../../../form/packagings/Packagings";
 import { SlipActionProps } from "../SlipActions";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
+  // We need a deep merge as sub-objects may be partially filled
+  const initialValues = merge(emptyState, form.temporaryStorageDetail);
+
   return (
     <div>
       <Formik
-        initialValues={form.temporaryStorageDetail}
+        initialValues={initialValues}
         onSubmit={values => onSubmit({ info: values })}
       >
         {({ values }) => (
@@ -105,15 +109,13 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
 
               <RedErrorMessage name="wasteDetails.quantityType" />
             </div>
-            {values.wasteDetails.code.includes("*") && (
-              <div className="form__group">
-                <label>
-                  Mentions au titre des règlements ADR, RID, ADNR, IMDG (le cas
-                  échéant)
-                  <Field type="text" name="wasteDetails.onuCode" />
-                </label>
-              </div>
-            )}
+            <div className="form__group">
+              <label>
+                Mentions au titre des règlements ADR, RID, ADNR, IMDG (le cas
+                échéant)
+                <Field type="text" name="wasteDetails.onuCode" />
+              </label>
+            </div>
 
             <h5>
               Collecteur-transporteur après entreposage ou reconditionnement
@@ -210,3 +212,57 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
     </div>
   );
 }
+
+const emptyState = {
+  destination: {
+    company: {
+      siret: "",
+      name: "",
+      address: "",
+      contact: "",
+      mail: "",
+      phone: ""
+    }
+  },
+  transporter: {
+    isExemptedOfReceipt: false,
+    receipt: "",
+    department: "",
+    validityLimit: null,
+    numberPlate: "",
+    company: {
+      siret: "",
+      name: "",
+      address: "",
+      contact: "",
+      mail: "",
+      phone: ""
+    }
+  },
+  trader: {
+    receipt: "",
+    department: "",
+    validityLimit: null,
+    company: {
+      siret: "",
+      name: "",
+      address: "",
+      contact: "",
+      mail: "",
+      phone: ""
+    }
+  },
+  wasteDetails: {
+    code: "",
+    name: "",
+    onuCode: "",
+    packagings: [],
+    otherPackaging: "",
+    numberOfPackages: null,
+    quantity: null,
+    quantityType: "ESTIMATED",
+    consistence: "SOLID"
+  },
+  signedBy: "",
+  signedAt: ""
+};

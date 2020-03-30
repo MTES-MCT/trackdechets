@@ -34,7 +34,7 @@ const MARK_PROCESSED = gql`
 `;
 
 const MARK_TEMP_STORED = gql`
-  mutation MarkAsTempStored($id: ID, $info: TempStoredFormInput!) {
+  mutation MarkAsTempStored($id: ID!, $info: TempStoredFormInput!) {
     markAsTempStored(id: $id, tempStoredInfos: $info) {
       id
       status
@@ -43,7 +43,7 @@ const MARK_TEMP_STORED = gql`
 `;
 
 const MARK_RESENT = gql`
-  mutation MarkAsResent($id: ID, $info: ResentFormInput!) {
+  mutation MarkAsResent($id: ID!, $info: ResentFormInput!) {
     markAsResent(id: $id, resentInfos: $info) {
       id
       status

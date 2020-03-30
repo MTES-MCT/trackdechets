@@ -5356,6 +5356,7 @@ type TemporaryStorageDetail {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5401,6 +5402,7 @@ input TemporaryStorageDetailCreateInput {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5444,6 +5446,7 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5493,6 +5496,8 @@ enum TemporaryStorageDetailOrderByInput {
   tempStorerWasteRefusalReason_DESC
   tempStorerReceivedAt_ASC
   tempStorerReceivedAt_DESC
+  tempStorerReceivedBy_ASC
+  tempStorerReceivedBy_DESC
   tempStorerSignedAt_ASC
   tempStorerSignedAt_DESC
   destinationIsFilledByEmitter_ASC
@@ -5560,6 +5565,7 @@ type TemporaryStorageDetailPreviousValues {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5616,6 +5622,7 @@ input TemporaryStorageDetailUpdateInput {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5653,6 +5660,7 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5699,6 +5707,7 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5789,6 +5798,20 @@ input TemporaryStorageDetailWhereInput {
   tempStorerReceivedAt_lte: DateTime
   tempStorerReceivedAt_gt: DateTime
   tempStorerReceivedAt_gte: DateTime
+  tempStorerReceivedBy: String
+  tempStorerReceivedBy_not: String
+  tempStorerReceivedBy_in: [String!]
+  tempStorerReceivedBy_not_in: [String!]
+  tempStorerReceivedBy_lt: String
+  tempStorerReceivedBy_lte: String
+  tempStorerReceivedBy_gt: String
+  tempStorerReceivedBy_gte: String
+  tempStorerReceivedBy_contains: String
+  tempStorerReceivedBy_not_contains: String
+  tempStorerReceivedBy_starts_with: String
+  tempStorerReceivedBy_not_starts_with: String
+  tempStorerReceivedBy_ends_with: String
+  tempStorerReceivedBy_not_ends_with: String
   tempStorerSignedAt: DateTime
   tempStorerSignedAt_not: DateTime
   tempStorerSignedAt_in: [DateTime!]

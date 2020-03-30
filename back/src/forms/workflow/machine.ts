@@ -234,9 +234,9 @@ export const formWorkflowMachine = Machine(
           ctx.form.wasteAcceptationStatus
         );
       },
-      isFormRefusedByTempStorage: ctx => {
+      isFormRefusedByTempStorage: (_, event: any) => {
         return !["ACCEPTED", "PARTIALLY_REFUSED"].includes(
-          ctx.form.temporaryStorageDetail.tempStorerWasteAcceptationStatus
+          event.wasteAcceptationStatus
         );
       },
       hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage

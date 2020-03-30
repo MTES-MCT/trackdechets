@@ -79,6 +79,8 @@ export const GET_FORM = gql`
           company {
             ...CompanyFragment
           }
+          cap
+          processingOperation
         }
       }
     }

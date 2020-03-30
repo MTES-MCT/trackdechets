@@ -8,11 +8,17 @@ export function flattenObjectForDb(
   const relations = ["ecoOrganisme", "temporaryStorageDetail"];
 
   Object.keys(input).forEach(key => {
+    if (relations.includes(key)) {
+      dbObject[key] = {};
+      return input[key]
+        ? flattenObjectForDb(input[key], [], dbObject[key])
+        : {};
+    }
+
     if (
       input[key] &&
       !Array.isArray(input[key]) &&
-      typeof input[key] === "object" &&
-      !relations.includes(key)
+      typeof input[key] === "object"
     ) {
       return flattenObjectForDb(input[key], [...previousKeys, key], dbObject);
     }
@@ -42,10 +48,20 @@ export function unflattenObjectFromDb(input, apiObject = {}) {
     "company",
     "nextDestination",
     "workSite",
-    "temporaryStorer"
+    "temporaryStorer",
+    "destination"
   ];
 
   Object.keys(input).forEach(key => {
+    if (
+      !Array.isArray(input[key]) &&
+      typeof input[key] === "object" &&
+      input[key] !== null
+    ) {
+      apiObject[key] = unflattenObjectFromDb(input[key], {});
+      return;
+    }
+
     const index = separator.findIndex(s => key.startsWith(s));
     if (index === -1) {
       apiObject[key] = input[key];

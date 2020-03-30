@@ -20,6 +20,12 @@ const apiShape = {
   // relation, no flattening
   ecoOrganisme: {
     id: "an id"
+  },
+  temporaryStorageDetail: {
+    destination: {
+      company: { siret: "a siret" },
+      cap: "cap"
+    }
   }
 };
 
@@ -36,6 +42,10 @@ const dbShape = {
   arrayOfObject: [{ foo: "bar" }],
   ecoOrganisme: {
     id: "an id"
+  },
+  temporaryStorageDetail: {
+    destinationCompanySiret: "a siret",
+    destinationCap: "cap"
   }
 };
 

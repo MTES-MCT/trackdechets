@@ -140,9 +140,13 @@ input EcoOrganismeInput {
   id: ID
 }
 
-type TemporaryStorageDetailInput {
+input TemporaryStorageDetailInput {
+  destination: DestinationInput
+}
+
+input DestinationInput {
   "Installation de destination prévue"
-  destination: CompanyInput
+  company: CompanyInput
 
   "N° de CAP prévu (le cas échéant)"
   cap: String
@@ -211,7 +215,7 @@ input RecipientInput {
   company: CompanyInput
 
   "Si c'est un entreprosage provisoire ou reconditionnement"
-  isTempStorage: boolean
+  isTempStorage: Boolean
 }
 
 "Collecteur - transporteur (case 8)"
@@ -280,13 +284,23 @@ input WasteDetailsInput {
   consistence: Consistence
 }
 
-input TempStoredFormIput {
-  quantityType: QuantityType!
-  quantityReceived: Float!
+input TempStoredFormInput {
+  "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
+
+  "Raison du refus (case 10)"
   wasteRefusalReason: String
 
+  "Nom de la personne en charge de la réception du déchet (case 10)"
+  receivedBy: String!
+
+  "Date à laquelle le déchet a été reçu (case 10)"
   receivedAt: DateTime!
+
+  "Quantité réelle présentée (case 10)"
+  quantityReceived: Float!
+
+  quantityType: QuantityType!
 }
 
 input ResentFormInput {

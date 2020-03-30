@@ -11,7 +11,9 @@ import {
   markAsReceived,
   markAsSealed,
   markAsSent,
-  signedByTransporter
+  signedByTransporter,
+  markAsTempStored,
+  markAsResent
 } from "./mutations/mark-as";
 import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
@@ -75,13 +77,14 @@ export default {
     ecoOrganisme: (parent, _, context: GraphQLContext) => {
       return context.prisma.form({ id: parent.id }).ecoOrganisme();
     },
-    hasTemporaryStorage: (parent, _, context: GraphQLContext) => {
-      return context.prisma.$exists.temporaryStorageDetail({
-        form: { id: parent.id }
-      });
-    },
-    temporaryStorageDetail: (parent, _, context: GraphQLContext) => {
-      return context.prisma.form({ id: parent.id }).temporaryStorageDetail();
+    temporaryStorageDetail: async (parent, _, context: GraphQLContext) => {
+      const temporaryStorageDetail = await context.prisma
+        .form({ id: parent.id })
+        .temporaryStorageDetail();
+
+      return temporaryStorageDetail
+        ? unflattenObjectFromDb(temporaryStorageDetail)
+        : null;
     }
   },
   Query: {
@@ -244,7 +247,9 @@ export default {
     markAsReceived,
     markAsProcessed,
     signedByTransporter,
-    updateTransporterFields
+    updateTransporterFields,
+    markAsTempStored,
+    markAsResent
   },
   Subscription: {
     forms: {

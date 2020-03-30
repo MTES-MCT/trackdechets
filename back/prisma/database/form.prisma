@@ -130,6 +130,7 @@ type TemporaryStorageDetail {
   tempStorerWasteAcceptationStatus: WasteAcceptationStatus
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
 
   # Frame 14

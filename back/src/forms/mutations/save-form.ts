@@ -36,6 +36,9 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
             : !!existingEcoOrganisme.length
             ? { disconnect: true }
             : null)
+        },
+        temporaryStorageDetail: {
+          update: (form as any).temporaryStorageDetail // TODO typings form converter
         }
       }
     });
@@ -47,6 +50,9 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     appendix2Forms: { connect: formContent.appendix2Forms },
     ...(formContent.ecoOrganisme?.id && {
       ecoOrganisme: { connect: formContent.ecoOrganisme }
+    }),
+    ...(formContent.temporaryStorageDetail && {
+      temporaryStorageDetail: { create: (form as any).temporaryStorageDetail }
     }),
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }

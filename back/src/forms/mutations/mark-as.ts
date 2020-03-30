@@ -73,10 +73,12 @@ export function markAsTempStored(
 ) {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
-      ...Object.keys(infos).reduce((prev, cur) => {
-        prev[`tempStorer${capitalize(cur)}`] = infos[cur];
-        return prev;
-      }, {})
+      update: {
+        ...Object.keys(infos).reduce((prev, cur) => {
+          prev[`tempStorer${capitalize(cur)}`] = infos[cur];
+          return prev;
+        }, {})
+      }
     }
   });
 
@@ -200,6 +202,12 @@ const fieldsToLog = {
     "nextDestinationCompanyContact",
     "nextDestinationCompanyPhone",
     "nextDestinationCompanyMail"
+  ],
+  MARK_TEMP_STORED: [
+    "receivedBy",
+    "receivedAt",
+    "quantityReceived",
+    "quantityType"
   ]
 };
 

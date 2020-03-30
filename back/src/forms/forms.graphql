@@ -128,7 +128,7 @@ type Mutation {
     signingInfo: TransporterSignatureFormInput!
   ): Form
 
-  markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormIput!): Form
+  markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form
 
   markAsResent(id: ID!, resentInfos: ResentFormInput!): Form
 }
@@ -198,6 +198,12 @@ enum FormStatus {
 
   "Déchet refusé"
   REFUSED
+
+  "Déchet arrivé sur le site d'entreposage ou reconditionnement"
+  TEMP_STORED
+
+  "Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement"
+  RESENT
 }
 
 "Valeur possibles pour le filtre de la query `forms`"
@@ -300,9 +306,6 @@ type Form {
 
   ecoOrganisme: EcoOrganisme
 
-  "Indique si ce BSD passe par un entreposage provisoire"
-  hasTemporaryStorage: Boolean!
-
   "BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement"
   temporaryStorageDetail: TemporaryStorageDetail
 }
@@ -334,10 +337,10 @@ type TemporaryStorer {
   wasteRefusalReason: String
 
   receivedAt: DateTime
-  signedAt: DateTime
+  receivedBy: String
 }
 
-type Destination{
+type Destination {
   "N° de CAP (le cas échéant)"
   cap: String
 
