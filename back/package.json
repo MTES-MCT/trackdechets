@@ -9,7 +9,8 @@
     "graphql-markdown": "ts-node src/scripts/graphql-markdown.ts",
     "test": "jest",
     "lint": "tslint --project ./tsconfig.json",
-    "lint:fix": "tslint --project ./tsconfig.json --fix"
+    "lint:fix": "tslint --project ./tsconfig.json --fix",
+    "bulk-create-account": "ts-node src/users/bulk-creation/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
     "body-parser": "^1.19.0",
     "connect-redis": "^4.0.3",
     "cors": "^2.8.5",
+    "csv-parser": "^2.3.2",
     "dataloader": "^1.4.0",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
