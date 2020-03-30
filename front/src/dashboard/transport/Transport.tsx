@@ -78,7 +78,7 @@ const Table = ({ forms, displayActions }) => {
             </small>
           </th>
           <th
-            className="sortable"
+            className="sortable hide-on-mobile"
             onClick={() => sortBy("recipient.company.name")}
           >
             Destinataire{" "}
@@ -88,7 +88,7 @@ const Table = ({ forms, displayActions }) => {
           </th>
 
           <th>Déchet</th>
-          <th>Quantité estimée</th>
+          <th className="hide-on-mobile">Quantité estimée</th>
           <th colSpan={2}>Champ libre</th>
           <th colSpan={2}>Plaque d'immatriculation</th>
 
@@ -109,7 +109,7 @@ const Table = ({ forms, displayActions }) => {
               placeholder="Filtrer..."
             />
           </th>
-          <th>
+          <th className="hide-on-mobile">
             <input
               type="text"
               onChange={e => filter("recipient.company.name", e.target.value)}
@@ -123,7 +123,7 @@ const Table = ({ forms, displayActions }) => {
               placeholder="Filtrer..."
             />
           </th>
-          <th></th>
+          <th className="hide-on-mobile"></th>
           <th colSpan={2}></th>
           <th colSpan={2}></th>
           {displayActions ? <th></th> : null}
@@ -134,11 +134,15 @@ const Table = ({ forms, displayActions }) => {
           <tr key={form.id}>
             <td>{form.readableId}</td>
             <td>{form.emitter.company && form.emitter.company.name}</td>
-            <td>{form.recipient.company && form.recipient.company.name}</td>
+            <td className="hide-on-mobile">
+              {form.recipient.company && form.recipient.company.name}
+            </td>
             <td>
               <div>{form.wasteDetails.name}</div>
             </td>
-            <td>{form.wasteDetails.quantity} tonnes</td>
+            <td className="hide-on-mobile">
+              {form.wasteDetails.quantity} tonnes
+            </td>
 
             <td>{form.transporter.customInfo}</td>
             <td style={{ paddingLeft: 0, paddingRight: 0 }}>

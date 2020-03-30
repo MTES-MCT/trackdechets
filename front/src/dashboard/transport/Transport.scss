@@ -9,7 +9,16 @@ table .icon {
 .transport-table {
   overflow-y: auto;
 }
-
+@media all and (max-width: 768px) {
+  td.hide-on-mobile,
+  th.hide-on-mobile {
+    display: none;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    visibility: collapse;
+  }
+}
 .transport-menu {
   display: flex;
   margin: 1em;
@@ -38,10 +47,10 @@ table .icon {
     }
   }
 }
-.transporter-permanent-filter{
+.transporter-permanent-filter {
   display: flex;
   margin: 1em;
-  input{
+  input {
     max-width: 300px;
     margin-right: 1em;
   }
