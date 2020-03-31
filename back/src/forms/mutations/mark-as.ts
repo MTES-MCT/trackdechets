@@ -93,7 +93,9 @@ export function markAsTempStored(
 export function markAsResent(_, { id, resentInfos }, context: GraphQLContext) {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
-      ...flattenObjectForDb(infos)
+      update: {
+        ...flattenObjectForDb(infos)
+      }
     }
   });
 
@@ -208,6 +210,25 @@ const fieldsToLog = {
     "receivedAt",
     "quantityReceived",
     "quantityType"
+  ],
+  MARK_RESENT: [
+    "destinationIsFilledByEmitter",
+    "destinationCompanyName",
+    "destinationCompanySiret",
+    "destinationCompanyAddress",
+    "destinationCompanyContact",
+    "destinationCompanyPhone",
+    "destinationCompanyMail",
+    "destinationCap",
+    "destinationProcessingOperation",
+    "signedBy",
+    "signedAt",
+    "wasteDetailsOnuCode",
+    "wasteDetailsPackagings",
+    "wasteDetailsOtherPackaging",
+    "wasteDetailsNumberOfPackages",
+    "wasteDetailsQuantity",
+    "wasteDetailsQuantityType"
   ]
 };
 

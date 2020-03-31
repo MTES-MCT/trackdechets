@@ -1,6 +1,7 @@
 import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
 import React from "react";
+import { removeNulls } from "../../../common/helper";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import CompanySelector from "../../../form/company/CompanySelector";
 import DateInput from "../../../form/custom-inputs/DateInput";
@@ -11,7 +12,11 @@ import { SlipActionProps } from "../SlipActions";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   // We need a deep merge as sub-objects may be partially filled
-  const initialValues = merge(emptyState, form.temporaryStorageDetail);
+  // But without the null values as they break form elements (uncontrolled)
+  const initialValues = merge(
+    emptyState,
+    removeNulls(form.temporaryStorageDetail)
+  );
 
   return (
     <div>
@@ -51,32 +56,6 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                 label="Nombre de colis"
               />
               <RedErrorMessage name="wasteDetails.numberOfPackages" />
-            </div>
-
-            <div className="form__group">
-              <fieldset>
-                <legend>Consistance</legend>
-                <Field
-                  name="wasteDetails.consistence"
-                  id="SOLID"
-                  label="Solide"
-                  component={RadioButton}
-                />
-                <Field
-                  name="wasteDetails.consistence"
-                  id="LIQUID"
-                  label="Liquide"
-                  component={RadioButton}
-                />
-                <Field
-                  name="wasteDetails.consistence"
-                  id="GASEOUS"
-                  label="Gazeux"
-                  component={RadioButton}
-                />
-              </fieldset>
-
-              <RedErrorMessage name="wasteDetails.consistence" />
             </div>
 
             <h4>Quantité en tonnes</h4>
@@ -239,29 +218,13 @@ const emptyState = {
       phone: ""
     }
   },
-  trader: {
-    receipt: "",
-    department: "",
-    validityLimit: null,
-    company: {
-      siret: "",
-      name: "",
-      address: "",
-      contact: "",
-      mail: "",
-      phone: ""
-    }
-  },
   wasteDetails: {
-    code: "",
-    name: "",
     onuCode: "",
-    packagings: [],
+    packagings: [] as string[],
     otherPackaging: "",
     numberOfPackages: null,
     quantity: null,
-    quantityType: "ESTIMATED",
-    consistence: "SOLID"
+    quantityType: "ESTIMATED"
   },
   signedBy: "",
   signedAt: ""

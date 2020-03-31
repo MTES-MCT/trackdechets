@@ -304,6 +304,7 @@ input TempStoredFormInput {
 }
 
 input ResentFormInput {
+  destination: DestinationInput
   wasteDetails: WasteDetailsInput
   transporter: TransporterInput
 
