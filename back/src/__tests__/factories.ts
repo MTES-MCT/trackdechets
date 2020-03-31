@@ -133,7 +133,7 @@ const formdata = {
   recipientCap: "",
   emitterCompanyPhone: "06 18 76 02 96",
   isAccepted: null,
-  emitterCompanyMail: "lp@providenz.fr",
+  emitterCompanyMail: "emitter@compnay.fr",
   wasteDetailsOtherPackaging: "",
   receivedBy: null,
   transporterCompanySiret: "9876",
