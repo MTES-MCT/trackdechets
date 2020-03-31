@@ -67,7 +67,7 @@ type Form {
   # Recipient fields
   recipientCap: String
   recipientProcessingOperation: String
-  recipientIsTempStorage: Boolean! @default(value: false)
+  recipientIsTempStorage: Boolean @default(value: false)
 
   recipientCompanyName: String
   recipientCompanySiret: String

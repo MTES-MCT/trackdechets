@@ -1371,7 +1371,7 @@ type Form {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
-  recipientIsTempStorage: Boolean!
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -1814,7 +1814,7 @@ type FormPreviousValues {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
-  recipientIsTempStorage: Boolean!
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String

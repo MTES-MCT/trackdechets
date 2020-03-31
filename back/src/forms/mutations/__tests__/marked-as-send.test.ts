@@ -7,6 +7,15 @@ import { getNewValidForm } from "../__mocks__/data";
 
 describe("Forms -> markAsSealed mutation", () => {
   const formMock = jest.fn();
+  const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+  const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
+  function mockFormWith(value) {
+    const result: any = Promise.resolve(value);
+    result.temporaryStorageDetail = temporaryStorageDetailMock;
+    result.appendix2Forms = appendix2FormsMock;
+    formMock.mockReturnValue(result);
+  }
+
   const prisma = {
     form: formMock,
     updateForm: jest.fn(() => Promise.resolve({})),
@@ -32,7 +41,7 @@ describe("Forms -> markAsSealed mutation", () => {
     expect.assertions(1);
     try {
       getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
-      prisma.form.mockResolvedValue({ id: 1, status: FormState.Sent });
+      mockFormWith({ id: 1, status: FormState.Sent });
 
       await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
     } catch (err) {
@@ -48,11 +57,9 @@ describe("Forms -> markAsSealed mutation", () => {
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.emitter.company.siret } as any
     ]);
-    prisma.form
-      .mockReturnValue({
-        appendix2Forms: () => Promise.resolve([])
-      } as any)
-      .mockReturnValueOnce(Promise.resolve(flattenObjectForDb(form)));
+
+    appendix2FormsMock.mockResolvedValue([]);
+    mockFormWith(flattenObjectForDb(form));
 
     await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
@@ -65,11 +72,9 @@ describe("Forms -> markAsSealed mutation", () => {
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.emitter.company.siret } as any
     ]);
-    prisma.form
-      .mockReturnValue({
-        appendix2Forms: () => Promise.resolve([{ id: "appendix id" }])
-      } as any)
-      .mockReturnValueOnce(Promise.resolve(flattenObjectForDb(form)));
+
+    appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
+    mockFormWith(flattenObjectForDb(form));
 
     await markAsSent(null, { id: 1, sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);

@@ -6751,7 +6751,7 @@ export interface Form {
   emitterCompanyMail?: String;
   recipientCap?: String;
   recipientProcessingOperation?: String;
-  recipientIsTempStorage: Boolean;
+  recipientIsTempStorage?: Boolean;
   recipientCompanyName?: String;
   recipientCompanySiret?: String;
   recipientCompanyAddress?: String;
@@ -8574,7 +8574,7 @@ export interface FormPreviousValues {
   emitterCompanyMail?: String;
   recipientCap?: String;
   recipientProcessingOperation?: String;
-  recipientIsTempStorage: Boolean;
+  recipientIsTempStorage?: Boolean;
   recipientCompanyName?: String;
   recipientCompanySiret?: String;
   recipientCompanyAddress?: String;
