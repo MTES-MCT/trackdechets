@@ -95,7 +95,7 @@ describe("{ mutation { markAsTempStored } }", () => {
           wasteRefusalReason: "Thats isn't what I was expecting man !"
           receivedBy: "John Doe",
           receivedAt: "2018-12-11T00:00:00.000Z",
-          quantityReceived: 2.4
+          quantityReceived: 0
           quantityType: REAL
         }) {
           id

@@ -43,10 +43,10 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
         },
         temporaryStorageDetail: {
           // TODO look for a more elagant way to handle that
-          ...(formContent.recipient.isTempStorage &&
+          ...(formContent.recipient?.isTempStorage &&
           temporaryStorageDetail != null
             ? { update: flattenObjectForDb(formContent.temporaryStorageDetail) }
-            : formContent.recipient.isTempStorage
+            : formContent.recipient?.isTempStorage
             ? { create: flattenObjectForDb(formContent.temporaryStorageDetail) }
             : temporaryStorageDetail != null
             ? { disconnect: true }
