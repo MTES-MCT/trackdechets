@@ -58,7 +58,8 @@ export const formSchema = object<any>().shape({
       .label("Opération de traitement")
       .required(),
     cap: string().nullable(true),
-    company: companySchema("Destinataire")
+    company: companySchema("Destinataire"),
+    isTempStorage: boolean()
   }),
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(true),
@@ -122,5 +123,18 @@ export const formSchema = object<any>().shape({
         value => value?.id == null
       )
       .nullable()
+  }),
+  temporartStorageDetail: object().when("recipient", {
+    is: e => e.isTempStorage,
+    then: object({
+      destination: object({
+        company: companySchema("Destinataire final du BSD"),
+        processingOperation: string()
+          .label("Opération de traitement")
+          .required(),
+        cap: string().nullable(true)
+      })
+    }),
+    otherwise: object().nullable()
   })
 });

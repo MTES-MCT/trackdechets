@@ -5,7 +5,8 @@ import {
   isFormRecipient,
   isFormEmitter,
   isFormTransporter,
-  isFormTrader
+  isFormTrader,
+  isFormTempStorer
 } from "./rules";
 import {
   isAuthenticated,
@@ -33,6 +34,8 @@ export default {
     markAsReceived: isFormRecipient,
     markAsProcessed: isFormRecipient,
     signedByTransporter: isFormTransporter,
-    updateTransporterFields: isFormTransporter
+    updateTransporterFields: isFormTransporter,
+    markAsTempStored: isFormTempStorer,
+    markAsResent: isFormTempStorer
   }
 };
