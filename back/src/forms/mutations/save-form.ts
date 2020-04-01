@@ -25,6 +25,10 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
       where: { id, ecoOrganisme: { id_not: null } }
     });
 
+    const temporaryStorageDetail = await context.prisma
+      .form({ id })
+      .temporaryStorageDetail();
+
     const updatedForm = await context.prisma.updateForm({
       where: { id },
       data: {
@@ -38,7 +42,15 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
             : null)
         },
         temporaryStorageDetail: {
-          update: (form as any).temporaryStorageDetail // TODO typings form converter
+          // TODO look for a more elagant way to handle that
+          ...(formContent.recipient.isTempStorage &&
+          temporaryStorageDetail != null
+            ? { update: flattenObjectForDb(formContent.temporaryStorageDetail) }
+            : formContent.recipient.isTempStorage
+            ? { create: flattenObjectForDb(formContent.temporaryStorageDetail) }
+            : temporaryStorageDetail != null
+            ? { disconnect: true }
+            : null)
         }
       }
     });
@@ -51,9 +63,12 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     ...(formContent.ecoOrganisme?.id && {
       ecoOrganisme: { connect: formContent.ecoOrganisme }
     }),
-    ...(formContent.temporaryStorageDetail && {
-      temporaryStorageDetail: { create: (form as any).temporaryStorageDetail }
-    }),
+    temporaryStorageDetail: {
+      ...(formContent.recipient.isTempStorage &&
+        formContent.temporaryStorageDetail && {
+          create: flattenObjectForDb(formContent.temporaryStorageDetail)
+        })
+    },
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }
   });

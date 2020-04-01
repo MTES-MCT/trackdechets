@@ -114,14 +114,11 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
-  const temporaryStorageDetail = await context.prisma
-    .form({ id: formId })
-    .temporaryStorageDetail();
 
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
   const startingState = State.from(form.status, {
-    form: { ...form, ...formPropsFromEvent, temporaryStorageDetail },
+    form: { ...form, ...formPropsFromEvent },
     requestContext: context,
     isStableState: true
   });
