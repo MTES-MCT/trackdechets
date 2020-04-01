@@ -477,6 +477,42 @@ Payload du BSD
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>updateTransporterFields</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Met à jour la plaque d'immatriculation ou le champ libre du transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">transporterNumberPlate</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Plaque d'immatriculation du transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">transporterCustomInfo</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Champ libre, utilisable par exemple pour noter les tournées des transporteurs
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>deleteForm</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -2641,6 +2677,15 @@ Limite de validité du récipissé
 <td>
 
 Numéro de plaque d'immatriculation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Information libre, destinée aux transporteurs
 
 </td>
 </tr>

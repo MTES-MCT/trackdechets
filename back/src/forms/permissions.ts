@@ -32,6 +32,7 @@ export default {
     markAsSent: or(isFormRecipient, isFormEmitter),
     markAsReceived: isFormRecipient,
     markAsProcessed: isFormRecipient,
-    signedByTransporter: isFormTransporter
+    signedByTransporter: isFormTransporter,
+    updateTransporterFields: isFormTransporter
   }
 };

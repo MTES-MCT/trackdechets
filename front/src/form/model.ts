@@ -26,6 +26,8 @@ export type Form = {
   };
   transporter: {
     company: FormCompany;
+    numberPlate: string;
+    customInfo: string;
   };
   wasteDetails: {
     quantity: number;
