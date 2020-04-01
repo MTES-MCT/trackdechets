@@ -4,7 +4,13 @@ import { ErrorCode } from "../../../common/errors";
 import * as queries from "../../../companies/queries";
 
 describe("Forms -> saveForm mutation", () => {
-  const formMock = jest.fn();
+  const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+  const formMock = jest.fn(() => Promise.resolve({}));
+  function mockFormWith(value) {
+    const result: any = Promise.resolve(value);
+    result.temporaryStorageDetail = temporaryStorageDetailMock;
+    formMock.mockReturnValue(result);
+  }
 
   const prisma = {
     form: formMock,
@@ -71,7 +77,7 @@ describe("Forms -> saveForm mutation", () => {
       // No siret infos
     };
 
-    formMock.mockResolvedValue({ emitterCompanySiret: "user siret" });
+    mockFormWith({ emitterCompanySiret: "user siret" });
 
     const result = await saveForm(null, { formInput }, {
       prisma,
@@ -88,7 +94,7 @@ describe("Forms -> saveForm mutation", () => {
       // No siret infos
     };
 
-    formMock.mockResolvedValue({
+    mockFormWith({
       emitterCompanySiret: "unknown resolved siret"
     });
 
