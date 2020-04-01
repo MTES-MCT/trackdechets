@@ -34,9 +34,10 @@ export default function Partners() {
 
       <section className="section section-white">
         <div className="container Partners__engagements_benefices">
+          <h2 className="section__title">Devenir partenaire</h2>
           <div className="row">
             <div>
-              <h3>Devenir partenaires : quels engagements ?</h3>
+              <h3>Quels engagements ?</h3>
               <ul>
                 <li>
                   La chaine des BSD que vous gérez est 100% dématérialisée
@@ -55,8 +56,10 @@ export default function Partners() {
                   qui sera proposée sur le produit (fin 2019)
                 </li>
               </ul>
+            </div>
 
-              <h3>Devenir partenaires : quels bénéfices ?</h3>
+            <div>
+              <h3>Quels bénéfices ?</h3>
               <ul>
                 <li>
                   Mise en visibilité lors des diverses communication
@@ -78,46 +81,49 @@ export default function Partners() {
                 </li>
               </ul>
             </div>
+          </div>
 
-            <div>
-              <h3>Nos partenaires actuels</h3>
-              <div className="Partners__logos">
-                <figure>
-                  <img src="/partners-logos/kerlog.png" alt="Kerlog" />
-                </figure>
-                <figure>
-                  <img src="/partners-logos/chimirec.png" alt="Chimirec" />
-                </figure>
-                <figure>
-                  <img
-                    className="sarpi-veolia"
-                    src="/partners-logos/sarpi.png"
-                    alt="Sarpi-Veolia"
-                  />
-                </figure>
-                <figure>
-                  <img
-                    className="seche"
-                    src="/partners-logos/seche.png"
-                    alt="Séché Environnement"
-                  />
-                </figure>
-                <figure>
-                  <img
-                    className="trinov"
-                    src="/partners-logos/trinov.png"
-                    alt="Trinov"
-                  />
-                </figure>
-                <figure>
-                  <img
-                    className="hensel"
-                    src="/partners-logos/hensel.png"
-                    alt="Hensel"
-                  />
-                </figure>
-              </div>
-            </div>
+          <h2 className="current-partners">Nos partenaires actuels</h2>
+
+          <div className="Partners__logos">
+            <figure>
+              <img src="/partners-logos/kerlog.png" alt="Kerlog" />
+            </figure>
+            <figure>
+              <img src="/partners-logos/chimirec.png" alt="Chimirec" />
+            </figure>
+            <figure>
+              <img
+                className="sarpi-veolia"
+                src="/partners-logos/sarpi.png"
+                alt="Sarpi-Veolia"
+              />
+            </figure>
+            <figure>
+              <img
+                className="seche"
+                src="/partners-logos/seche.png"
+                alt="Séché Environnement"
+              />
+            </figure>
+            <figure>
+              <img src="/partners-logos/trinov.png" alt="Trinov" />
+            </figure>
+            <figure>
+              <img src="/partners-logos/hensel.png" alt="Hensel" />
+            </figure>
+            <figure>
+              <img src="/partners-logos/alme.jpg" alt="Alme" />
+            </figure>
+            <figure>
+              <img src="/partners-logos/caktus.png" alt="Caktus" />
+            </figure>
+            <figure>
+              <img src="/partners-logos/aecr.png" alt="Arc en ciel recyclage" />
+            </figure>
+            <figure>
+              <img src="/partners-logos/sarp.png" alt="Sarp Veolia" />
+            </figure>
           </div>
         </div>
       </section>
