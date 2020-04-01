@@ -2,13 +2,7 @@ import * as csv from "csv-parser";
 import * as fs from "fs";
 import { CompanyRow, RoleRow } from "./types";
 
-const { CSV_DIR } = process.env;
-
-const csvDir = CSV_DIR || `${__dirname}/../../../csv`;
-
 const separator = ";";
-const companiesPath = `${csvDir}/etablissements.csv`;
-const rolesPath = `${csvDir}/roles.csv`;
 
 /**
  *
@@ -37,8 +31,11 @@ function readCsv<Row>(
  * companyTypes entry like "PRODUCER,WASTE_PROCESSOR" is transformed
  * into an array like ["PRODUCER", "WASTE_PROCESSOR"]
  */
-export function loadCompanies(): Promise<CompanyRow[]> {
-  return readCsv<CompanyRow>(companiesPath, row => {
+export function loadCompanies(
+  csvDir = `${__dirname}/csv`
+): Promise<CompanyRow[]> {
+  const csvPath = `${csvDir}/etablissements.csv`;
+  return readCsv<CompanyRow>(csvPath, row => {
     return { ...row, companyTypes: row.companyTypes.split(",") };
   });
 }
@@ -46,6 +43,7 @@ export function loadCompanies(): Promise<CompanyRow[]> {
 /**
  * load roles from csv
  */
-export function loadRoles(): Promise<RoleRow[]> {
-  return readCsv<RoleRow>(rolesPath);
+export function loadRoles(csvDir = `${__dirname}/csv`): Promise<RoleRow[]> {
+  const csvPath = `${csvDir}/roles.csv`;
+  return readCsv<RoleRow>(csvPath);
 }

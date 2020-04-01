@@ -1,4 +1,4 @@
-import * as mailsHelper from "../.../../../../common/mails.helper";
+import * as mailsHelper from "../../../common/mails.helper";
 import { bulkCreate } from "../index";
 import { prisma } from "../../../generated/prisma-client";
 import { resetDatabase } from "../../../../integration-tests/helper";
@@ -22,9 +22,36 @@ describe("bulk create users and companies from csv files", () => {
   // - tyrion.lannister@trackdechets.fr who is MEMBER of both
 
   afterEach(() => resetDatabase());
+
+  const opts = {
+    validateOnly: false,
+    csvDir: `${__dirname}/csv`
+  };
+
   it("should create companies, users and company associations", async () => {
-    await bulkCreate();
+    await bulkCreate(opts);
     const users = await prisma.users();
-    expect(users).toHaveLength(1);
+    expect(users).toHaveLength(3);
+
+    // check fields are OK for first user
+    const john = await prisma.user({ email: "john.snow@trackdechets.fr" });
+    expect(john.name).toEqual("john.snow@trackdechets.fr");
+    expect(john.isActive).toEqual(true);
+
+    const companies = await prisma.companies();
+    expect(companies).toHaveLength(2);
+
+    // check fields are OK for first company
+    const codeEnStock = await prisma.company({ siret: "85001946400013" });
+    expect(codeEnStock.name).toEqual("CODE EN STOCK");
+    expect(codeEnStock.givenName).toEqual("Code en Stock");
+    expect(codeEnStock.companyTypes).toEqual(["PRODUCER"]);
+    expect(codeEnStock.codeNaf).toEqual("62.01Z");
+    expect(codeEnStock.website).toEqual("https://codeenstock.trackdechets.fr");
+    expect(codeEnStock.gerepId).toEqual("1234");
+    expect(codeEnStock.contactPhone).toEqual("0600000000");
+
+    const associations = await prisma.companyAssociations();
+    expect(associations).toHaveLength(4);
   });
 });

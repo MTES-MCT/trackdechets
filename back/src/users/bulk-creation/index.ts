@@ -18,27 +18,47 @@ function printHelp() {
 
   Options:
 
-  -- --help            Print help
-  -- --validateOnly    Only perform validation csv files
+  -- --help                       Print help
+  -- --validateOnly               Only perform validation csv files
+  -- --csvDir=/path/to/csv/dir    Specify custom csv directory
   `);
 }
 
-export async function bulkCreate(argv = process.argv.slice(2)): Promise<void> {
+async function run(argv = process.argv.slice(2)): Promise<void> {
   const args = parseArgs(argv);
 
   if (args.help) {
     printHelp();
   }
 
-  let validateOnly = false;
+  const opts = {
+    validateOnly: false,
+    csvDir: `${__dirname}/csv`
+  };
+
   if (args.validateOnly) {
-    validateOnly = true;
+    opts.validateOnly = args.validateOnly;
+    console.log(args.validateOnly);
     console.log("Running csv validations only...");
   }
 
+  if (args.csvDir) {
+    console.log(args.csvDir);
+    opts.csvDir = args.csvDir;
+  }
+
+  await bulkCreate(opts);
+}
+
+interface Opts {
+  validateOnly: boolean;
+  csvDir: string;
+}
+
+export async function bulkCreate(opts?: Opts): Promise<void> {
   // load data from csv files
-  const companiesRows = await loadCompanies();
-  const rolesRows = await loadRoles();
+  const companiesRows = await loadCompanies(opts.csvDir);
+  const rolesRows = await loadRoles(opts.csvDir);
 
   let isValid = true;
 
@@ -65,7 +85,7 @@ export async function bulkCreate(argv = process.argv.slice(2)): Promise<void> {
     console.info("Validation successful");
   }
 
-  if (validateOnly) {
+  if (opts.validateOnly) {
     process.exit(0);
   }
 
@@ -86,6 +106,7 @@ export async function bulkCreate(argv = process.argv.slice(2)): Promise<void> {
   });
 
   // create companies in Trackdéchets
+
   await Promise.all(
     companies.map(async company => {
       const existingCompany = await prisma.company({ siret: company.siret });
@@ -96,7 +117,11 @@ export async function bulkCreate(argv = process.argv.slice(2)): Promise<void> {
           gerepId: company.gerepId,
           name: company.name,
           companyTypes: { set: company.companyTypes },
-          securityCode: randomNumber(4)
+          securityCode: randomNumber(4),
+          givenName: company.givenName,
+          contactEmail: company.contactEmail,
+          contactPhone: company.contactPhone,
+          website: company.website
         });
       }
     })
@@ -167,5 +192,5 @@ export async function bulkCreate(argv = process.argv.slice(2)): Promise<void> {
 }
 
 if (require.main === module) {
-  bulkCreate();
+  run();
 }

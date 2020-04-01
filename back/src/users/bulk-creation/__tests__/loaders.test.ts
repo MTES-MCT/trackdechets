@@ -1,19 +1,8 @@
+import { loadCompanies, loadRoles } from "../loaders";
+
 describe("loaders", () => {
-  const OLD_ENV = process.env;
-  process.env.CSV_DIR = `${__dirname}/csv`;
-
-  beforeAll(() => {
-    jest.resetModules();
-  });
-
-  afterAll(() => {
-    process.env = OLD_ENV;
-  });
-
   it("should load companies from csv", async () => {
-    const { loadCompanies } = require("../loaders");
-
-    const companies = await loadCompanies();
+    const companies = await loadCompanies(`${__dirname}/csv`);
     expect(companies).toHaveLength(2);
     expect(companies).toEqual([
       {
@@ -28,7 +17,7 @@ describe("loaders", () => {
       {
         siret: "81343950200028",
         gerepId: "2345",
-        companyTypes: ["PRODUCER", "WASTE_PROCESSOR"],
+        companyTypes: ["PRODUCER", "WASTEPROCESSOR"],
         givenName: "Frontier SAS",
         contactEmail: "frontier@trackdechets.fr",
         contactPhone: "0700000000",
@@ -38,8 +27,7 @@ describe("loaders", () => {
   });
 
   it("should load roles from csv", async () => {
-    const { loadRoles } = require("../loaders");
-    const roles = await loadRoles();
+    const roles = await loadRoles(`${__dirname}/csv`);
     expect(roles).toHaveLength(4);
     expect(roles).toEqual([
       {

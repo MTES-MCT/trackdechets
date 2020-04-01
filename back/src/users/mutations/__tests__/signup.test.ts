@@ -1,4 +1,5 @@
 import signup from "../signup";
+import { prisma } from "../../../generated/prisma-client";
 
 const userInfos = {
   id: "new_user",
@@ -8,7 +9,7 @@ const userInfos = {
   phone: "0000"
 };
 
-const context = {
+jest.mock("../../../generated/prisma-client", () => ({
   prisma: {
     createUser: jest.fn(() => Promise.resolve(userInfos)),
     createUserActivationHash: jest.fn(() =>
@@ -18,7 +19,7 @@ const context = {
     createCompanyAssociation: jest.fn(() => Promise.resolve()),
     deleteManyUserAccountHashes: jest.fn(() => Promise.resolve())
   }
-};
+}));
 
 jest.mock("../../../common/mails.helper", () => ({
   sendMail: () => null
@@ -30,15 +31,15 @@ describe("signup", () => {
   });
 
   test("should create user", async () => {
-    const user = await signup(null, { userInfos }, context as any);
+    const user = await signup(null, { userInfos });
 
     expect(user.id).toBe("new_user");
   });
 
   test("should create activation hash", async () => {
-    await signup(null, { userInfos }, context as any);
+    await signup(null, { userInfos });
 
-    expect(context.prisma.createUserActivationHash).toHaveBeenCalledTimes(1);
+    expect(prisma.createUserActivationHash).toHaveBeenCalledTimes(1);
   });
 
   test("should accept all pending invitations", async () => {
@@ -47,13 +48,13 @@ describe("signup", () => {
       { companySiret: "", role: "ADMIN" },
       { companySiret: "", role: "ADMIN" }
     ];
-    context.prisma.userAccountHashes.mockResolvedValue(hashes);
+    (prisma.userAccountHashes as jest.Mock).mockResolvedValue(hashes);
 
-    await signup(null, { userInfos }, context as any);
+    await signup(null, { userInfos });
 
-    expect(context.prisma.createCompanyAssociation).toHaveBeenCalledTimes(
+    expect(prisma.createCompanyAssociation).toHaveBeenCalledTimes(
       hashes.length
     );
-    expect(context.prisma.deleteManyUserAccountHashes).toHaveBeenCalledTimes(1);
+    expect(prisma.deleteManyUserAccountHashes).toHaveBeenCalledTimes(1);
   });
 });
