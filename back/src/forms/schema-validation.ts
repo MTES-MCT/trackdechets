@@ -145,7 +145,7 @@ export default {
         onuCode: string().required("Vous devez saisir un code ONU.")
       })
     }),
-    markedAsTempStored: object().shape({
+    markAsTempStored: object().shape({
       tempStoredInfos: object({
         wasteAcceptationStatus: string()
           .required()
