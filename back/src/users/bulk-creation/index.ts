@@ -13,7 +13,7 @@ import { UserInputError } from "apollo-server-express";
 
 function printHelp() {
   console.log(`
-  Usage npm start [options]
+  Usage npm run bulk-create-account [options]
 
   Bulk load a list of companies and users to Trackdéchets
   Two csv files are required
@@ -39,7 +39,7 @@ async function run(argv = process.argv.slice(2)): Promise<void> {
 
   const opts = {
     validateOnly: false,
-    csvDir: `${__dirname}/csv`
+    csvDir: `${__dirname}/../../../csv`
   };
 
   if (args.validateOnly) {
@@ -202,7 +202,11 @@ export async function bulkCreate(opts: Opts): Promise<void> {
         `
         };
 
-        await sendMail(mail);
+        try {
+          await sendMail(mail);
+        } catch (err) {
+          console.error("Error while sending invitation email");
+        }
       }
 
       return associations;
