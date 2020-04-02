@@ -5,6 +5,7 @@ import { Me } from "../../login/model";
 import "./Transport.scss";
 import TransportSignature from "./TransportSignature";
 import TransporterInfoEdit from "./TransporterInfoEdit";
+import DownloadPdf from "../slips/slips-actions/DownloadPdf";
 import { useQuery } from "@apollo/react-hooks";
 import { useFormsTable } from "../slips/use-forms-table";
 import { FaSync, FaSort } from "react-icons/fa";
@@ -132,7 +133,10 @@ const Table = ({ forms, displayActions }) => {
       <tbody>
         {sortedForms.map(form => (
           <tr key={form.id}>
-            <td>{form.readableId}</td>
+            <td className="readable-id">
+              {form.readableId}
+              <DownloadPdf formId={form.id} />
+            </td>
             <td>{form.emitter.company && form.emitter.company.name}</td>
             <td className="hide-on-mobile">
               {form.recipient.company && form.recipient.company.name}
@@ -227,7 +231,7 @@ export default function Transport({ siret }: Props & any) {
           onClick={() => setFilterStatus("SENT")}
           className={`link ${filterStatus === "SENT" ? "active" : ""}`}
         >
-          Déchets en attente de traitement
+          Déchets chargés, en attente de réception
         </button>
         <button
           className="button button-primary transport-refresh"

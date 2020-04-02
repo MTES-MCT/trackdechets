@@ -17,7 +17,7 @@ import {
 export default {
   Query: {
     form: canAccessForm,
-    formPdf: canAccessForm,
+    formPdf: or(canAccessForm, isFormTransporter),
     formsRegister: isCompaniesUser,
     forms: isAuthenticated,
     stats: isAuthenticated,
