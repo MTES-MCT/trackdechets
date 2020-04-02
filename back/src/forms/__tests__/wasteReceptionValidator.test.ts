@@ -55,7 +55,7 @@ const refusedInfo = {
 describe("waste is refused", () => {
   const { wasteAcceptationStatus, quantityReceived } = refusedInfo;
 
-  it.only("should be valid when waste is refused", async () => {
+  it("should be valid when waste is refused", async () => {
     const isValid = await receivedInfoSchema.isValid(refusedInfo);
     expect(isValid).toEqual(true);
   });
