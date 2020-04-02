@@ -6,6 +6,13 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 
+# [2020.04.1] 2/04/2020
+* Mise en place espace développeurs [PR 225](https://github.com/MTES-MCT/trackdechets/pull/225)
+* Amélioration page transporteur [PR 242](https://github.com/MTES-MCT/trackdechets/pull/242)
+* Mise à jour page partenaires [PR 249](https://github.com/MTES-MCT/trackdechets/pull/249)
+* Correction réception des bordereaux avec annexes 2 [PR 248](https://github.com/MTES-MCT/trackdechets/pull/248)
+* Corrections pdf [PR 241](https://github.com/MTES-MCT/trackdechets/pull/241)
+
 # [2020.03.5] 26/03/2020
 * Mise à jour de la documentation [PR 224](https://github.com/MTES-MCT/trackdechets/pull/224)
 * Intégration des éco-organismes [PR 212](https://github.com/MTES-MCT/trackdechets/pull/212)
