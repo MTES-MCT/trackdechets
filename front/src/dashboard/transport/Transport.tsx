@@ -231,7 +231,7 @@ export default function Transport({ siret }: Props & any) {
           onClick={() => setFilterStatus("SENT")}
           className={`link ${filterStatus === "SENT" ? "active" : ""}`}
         >
-          Déchets en attente de traitement
+          Déchets chargés, en attente de réception
         </button>
         <button
           className="button button-primary transport-refresh"
