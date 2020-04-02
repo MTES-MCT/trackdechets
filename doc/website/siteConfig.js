@@ -40,6 +40,17 @@ const users = [
     image: "/img/partners-logos/seche.png",
     pinned: true
   }
+  ,
+  {
+    caption: "Caktus",
+    image: "/img/partners-logos/caktus.png",
+    pinned: true
+  },
+  {
+    caption: "Sarp Veolia",
+    image: "/img/partners-logos/sarp.png",
+    pinned: true
+  }
 ];
 
 const siteConfig = {
