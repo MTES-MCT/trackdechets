@@ -27,14 +27,14 @@ export default connect<{}, Values>(function Transporter(props) {
       </div>
       {!props.formik.values.transporter.isExemptedOfReceipt && (
         <div className="form__group">
-          <label>
+          <label className="required">
             Numéro de récépissé
             <Field type="text" name="transporter.receipt" />
           </label>
 
           <RedErrorMessage name="transporter.receipt" />
 
-          <label>
+          <label className="required">
             Département
             <Field
               type="text"
