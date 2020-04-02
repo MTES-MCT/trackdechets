@@ -9,12 +9,18 @@ import { acceptNewUserCompanyInvitations } from "../mutations/signup";
 import { associateUserToCompany } from "../mutations/associateUserToCompany";
 import { groupBy } from "./utils";
 import { sendMail } from "../../common/mails.helper";
+import { UserInputError } from "apollo-server-express";
 
 function printHelp() {
   console.log(`
   Usage npm start [options]
 
   Bulk load a list of companies and users to Trackdéchets
+  Two csv files are required
+  * etablissements.csv
+  * roles.csv
+
+  See validations.ts for the format of each file
 
   Options:
 
@@ -38,12 +44,10 @@ async function run(argv = process.argv.slice(2)): Promise<void> {
 
   if (args.validateOnly) {
     opts.validateOnly = args.validateOnly;
-    console.log(args.validateOnly);
-    console.log("Running csv validations only...");
+    console.info("Running csv validations only...");
   }
 
   if (args.csvDir) {
-    console.log(args.csvDir);
     opts.csvDir = args.csvDir;
   }
 
@@ -53,9 +57,12 @@ async function run(argv = process.argv.slice(2)): Promise<void> {
 interface Opts {
   validateOnly: boolean;
   csvDir: string;
+  console?: any;
 }
 
-export async function bulkCreate(opts?: Opts): Promise<void> {
+export async function bulkCreate(opts: Opts): Promise<void> {
+  console = opts.console || global.console;
+
   // load data from csv files
   const companiesRows = await loadCompanies(opts.csvDir);
   const rolesRows = await loadRoles(opts.csvDir);
@@ -158,8 +165,20 @@ export async function bulkCreate(opts?: Opts): Promise<void> {
       }
 
       const associations = await Promise.all(
-        usersWithRoles[email].map(({ role, siret }) => {
-          return associateUserToCompany(user.id, siret, role);
+        usersWithRoles[email].map(async ({ role, siret }) => {
+          try {
+            return await associateUserToCompany(user.id, siret, role);
+          } catch (err) {
+            if (err instanceof UserInputError) {
+              // association already exist, return it
+              const existingAssociations = await prisma.companyAssociations({
+                where: { company: { siret }, user: { id: user.id } }
+              });
+              return existingAssociations[0];
+            }
+
+            console.error(err);
+          }
         })
       );
 
@@ -183,7 +202,7 @@ export async function bulkCreate(opts?: Opts): Promise<void> {
         `
         };
 
-        sendMail(mail);
+        await sendMail(mail);
       }
 
       return associations;
@@ -192,5 +211,8 @@ export async function bulkCreate(opts?: Opts): Promise<void> {
 }
 
 if (require.main === module) {
-  run();
+  run().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
 }
