@@ -107,6 +107,7 @@ export const SAVE_FORM = gql`
           name
           siret
         }
+        isTempStorage
         processingOperation
       }
       wasteDetails {

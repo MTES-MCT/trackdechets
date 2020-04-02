@@ -1,13 +1,23 @@
 import { useFormikContext, Field } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import CompanySelector from "../company/CompanySelector";
 import { Form } from "../model";
 import { Operations } from "../processing-operation/ProcessingOperation";
+import initialState from "../initial-state";
 
 export default function TemporaryStorage(props) {
-  const { values } = useFormikContext<Form>();
+  const { values, setFieldValue } = useFormikContext<Form>();
 
-  if (!values.recipient?.isTempStorage) {
+  useEffect(() => {
+    if (values.recipient?.isTempStorage && !values.temporaryStorageDetail) {
+      setFieldValue(
+        "temporaryStorageDetail",
+        initialState.temporaryStorageDetail
+      );
+    }
+  }, [values, setFieldValue]);
+
+  if (!values.recipient?.isTempStorage || !values.temporaryStorageDetail) {
     return null;
   }
 

@@ -8,7 +8,7 @@ import {
   InlineRadioButton,
   RadioButton
 } from "../../../form/custom-inputs/RadioButton";
-import { WasteAcceptationStatus } from "../../../Constants";
+import { WasteAcceptationStatus, FormStatus } from "../../../Constants";
 
 const textConfig = {
   [WasteAcceptationStatus.ACCEPTED]: {
@@ -39,7 +39,8 @@ export default function Received(props: SlipActionProps) {
           quantityReceived: "",
           wasteAcceptationStatus: "",
           wasteRefusalReason: "",
-          ...(props.form.recipient.isTempStorage && { quantityType: "REAL" })
+          ...(props.form.recipient.isTempStorage &&
+            props.form.status === FormStatus.SENT && { quantityType: "REAL" })
         }}
         onSubmit={values => props.onSubmit({ info: values })}
       >
@@ -117,23 +118,24 @@ export default function Received(props: SlipActionProps) {
                   tonnes
                 </span>
               </label>
-              {props.form.recipient.isTempStorage && (
-                <fieldset>
-                  <legend>Cette quantité est</legend>
-                  <Field
-                    name="quantityType"
-                    id="REAL"
-                    label="Réelle"
-                    component={RadioButton}
-                  />
-                  <Field
-                    name="quantityType"
-                    id="ESTIMATED"
-                    label="Estimée"
-                    component={RadioButton}
-                  />
-                </fieldset>
-              )}
+              {props.form.recipient.isTempStorage &&
+                props.form.status === FormStatus.SENT && (
+                  <fieldset>
+                    <legend>Cette quantité est</legend>
+                    <Field
+                      name="quantityType"
+                      id="REAL"
+                      label="Réelle"
+                      component={RadioButton}
+                    />
+                    <Field
+                      name="quantityType"
+                      id="ESTIMATED"
+                      label="Estimée"
+                      component={RadioButton}
+                    />
+                  </fieldset>
+                )}
               {/* Display wasteRefusalReason field if waste is refused or partially refused*/}
               {[
                 WasteAcceptationStatus.REFUSED.toString(),

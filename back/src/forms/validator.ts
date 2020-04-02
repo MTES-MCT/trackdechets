@@ -124,7 +124,7 @@ export const formSchema = object<any>().shape({
       )
       .nullable()
   }),
-  temporartStorageDetail: object().when("recipient", {
+  temporaryStorageDetail: object().when("recipient", {
     is: e => e.isTempStorage,
     then: object({
       destination: object({
@@ -133,7 +133,7 @@ export const formSchema = object<any>().shape({
           .label("Opération de traitement")
           .required(),
         cap: string().nullable(true)
-      })
+      }).nullable()
     }),
     otherwise: object().nullable()
   })
