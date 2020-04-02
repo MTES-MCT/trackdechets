@@ -252,6 +252,8 @@ type Form {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  # Free field, used to easily retrieve transporter tours
+  transporterCustomInfo: String
 
   # Waste details fields
   wasteDetailsCode: String
@@ -280,6 +282,8 @@ type Form {
   ecoOrganisme: EcoOrganisme
 
   appendix2Forms: [Form]
+
+
 }
 
 enum EmitterType {

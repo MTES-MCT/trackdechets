@@ -166,6 +166,9 @@ const getSubset = fields => o =>
   fields.reduce((acc, curr) => ({ ...acc, [curr]: o[curr] }), {});
 
 const getDiff = (eventType, params) => {
+  if (!eventType) {
+    return {};
+  }
   const fields = fieldsToLog[eventType];
   return getSubset(fields)(params);
 };

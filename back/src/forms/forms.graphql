@@ -25,6 +25,7 @@ type Query {
     type: FormType = ACTOR
     ): [Form]
 
+
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"
   stats: [CompanyStat]
 
@@ -88,6 +89,16 @@ type Mutation {
   saveForm(
     "Payload du BSD"
     formInput: FormInput!
+    ): Form
+
+ "Met à jour la plaque d'immatriculation ou le champ libre du transporteur"
+  updateTransporterFields(
+    "ID d'un BSD"
+    id: ID!
+    "Plaque d'immatriculation du transporteur"
+    transporterNumberPlate: String
+    "Champ libre, utilisable par exemple pour noter les tournées des transporteurs"
+     transporterCustomInfo: String
     ): Form
 
   "Supprime un BSD"
@@ -308,7 +319,9 @@ type Form {
 
   "Annexe 2"
   appendix2Forms: [Form]
+
   ecoOrganisme: EcoOrganisme
+
 }
 
 "Information sur un établissement dans un BSD"
@@ -410,6 +423,9 @@ type Transporter {
 
   "Numéro de plaque d'immatriculation"
   numberPlate: String
+
+  "Information libre, destinée aux transporteurs"
+  customInfo: String
 }
 
 "Destination ultérieure prévue (case 12)"

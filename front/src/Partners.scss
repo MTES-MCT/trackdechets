@@ -1,15 +1,15 @@
 .Partners__logos {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 
   img {
     width: 130px;
-    display: block;
   }
 
   figure {
-    margin: 15px;
+    margin: 30px;
   }
 
   figcaption {
@@ -17,10 +17,10 @@
     text-align: center;
   }
 
-  .sarpi-veolia, .seche {
+  .sarpi-veolia,
+  .seche {
     width: 150px;
   }
-
 }
 
 .Partners__engagements_benefices {
@@ -36,4 +36,9 @@
 
 .section:nth-of-type(3) {
   padding-top: 2em;
+}
+.current-partners {
+  display: block;
+  text-align: center;
+  margin-top: 32px;
 }

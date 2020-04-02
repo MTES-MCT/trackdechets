@@ -47,7 +47,7 @@ services:
     command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
     volumes:
       - ./back/src:/usr/src/app/src
-      - ./documentation/docs/api-reference:/usr/src/app/documentation
+      - ./doc/docs:/usr/src/app/documentation
     env_file:
       - .env
     environment:
@@ -103,16 +103,6 @@ services:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
 
-  td-doc:
-    image: td-doc
-    build:
-      context: ./documentation
-      dockerfile: Dockerfile
-    environment:
-      VIRTUAL_HOST: $DOC_HOST
-      LETSENCRYPT_HOST: $DOC_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-
   td-etl:
     image: td-etl
     build:
@@ -131,13 +121,31 @@ services:
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/airflow
       AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$ETL_DB
       AIRFLOW_CONN_POSTGRES_PRISMA: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/prisma
-
     volumes:
       - ./etl/code/dags:/usr/local/airflow/dags
       - ./etl/code/data:/usr/local/airflow/data
       - ./etl/code/embulk:/usr/local/airflow/embulk
       - ./etl/code/sql:/usr/local/airflow/sql
       - ./etl/code/tests:/usr/local/airflow/tests
+
+  td-doc:
+    image: td-doc
+    build:
+      context: ./doc
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./doc/docs:/app/docs
+      - ./doc/website/core:/app/website/core
+      - ./doc/website/pages:/app/website/pages
+      - ./doc/website/static:/app/website/static
+      - ./doc/website/sidebars.json:/app/website/sidebars.json
+      - ./doc/website/siteConfig.js:/app/website/siteConfig.js
+    working_dir: /app/website
+    environment:
+      VIRTUAL_HOST: $DEVELOPERS_HOST
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: $DEVELOPERS_HOST
+      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
   metabase:
     image: metabase/metabase:v0.34.2

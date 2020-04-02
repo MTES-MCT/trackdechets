@@ -27,7 +27,11 @@ services:
 
   td-doc:
     build:
-      context: ./documentation
+      context: ./doc
+
+  td-doc-redirect:
+    build:
+      context: ./doc-redirect
 
   td-etl:
     build:

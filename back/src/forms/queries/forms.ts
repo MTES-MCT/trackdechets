@@ -31,7 +31,7 @@ export default async function forms(
     },
     TRANSPORTER: {
       transporterCompanySiret: selectedCompany.siret,
-      status: "SEALED"
+      status_in: ["SEALED", "SENT"]
     }
   };
 

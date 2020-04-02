@@ -17,7 +17,7 @@ import {
 export default {
   Query: {
     form: canAccessForm,
-    formPdf: canAccessForm,
+    formPdf: or(canAccessForm, isFormTransporter),
     formsRegister: isCompaniesUser,
     forms: isAuthenticated,
     stats: isAuthenticated,
@@ -32,6 +32,7 @@ export default {
     markAsSent: or(isFormRecipient, isFormEmitter),
     markAsReceived: isFormRecipient,
     markAsProcessed: isFormRecipient,
-    signedByTransporter: isFormTransporter
+    signedByTransporter: isFormTransporter,
+    updateTransporterFields: isFormTransporter
   }
 };

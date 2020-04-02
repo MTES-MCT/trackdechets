@@ -233,7 +233,11 @@ export default function TransportSignature({ form }: Props) {
                     <p>
                       <label>
                         Code de sécurité entreprise
-                        <Field type="number" name="securityCode" />
+                        <Field
+                          name="securityCode"
+                          type="number"
+                          className="no-spinner"
+                        />
                       </label>
                     </p>
                     <p>

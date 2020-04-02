@@ -17,7 +17,7 @@ export default withRouter(function Header({
   history,
   isAuthenticated
 }: RouteComponentProps & Props) {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  const { REACT_APP_API_ENDPOINT, REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
 
   return (
     <header className="navbar" role="navigation">
@@ -40,6 +40,7 @@ export default withRouter(function Header({
               >
                 FAQ
               </NavLink> */}
+              <a href={REACT_APP_DEVELOPERS_ENDPOINT}>Développeurs</a>
               <a href="https://faq.trackdechets.fr/"> FAQ</a>
             </li>
             <li className="nav__item">

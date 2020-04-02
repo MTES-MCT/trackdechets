@@ -1,0 +1,15 @@
+{
+  "docs": {
+    "Introduction": ["introduction"],
+    "Guides": [
+      "graphql",
+      "workflow",
+      "errors",
+      "oauth2",
+      "environments",
+      "access-token",
+      "playground"
+    ],
+    "Référence de l'API": ["api-reference", "changelog"]
+  }
+}

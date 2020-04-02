@@ -15,6 +15,7 @@ import {
 } from "./mutations/mark-as";
 import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
+import { updateTransporterFields } from "./mutations/updateTransporterFields";
 import { formPdf } from "./queries/form-pdf";
 import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
@@ -234,7 +235,8 @@ export default {
     markAsSent,
     markAsReceived,
     markAsProcessed,
-    signedByTransporter
+    signedByTransporter,
+    updateTransporterFields
   },
   Subscription: {
     forms: {

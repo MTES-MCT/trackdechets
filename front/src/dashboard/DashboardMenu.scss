@@ -3,6 +3,7 @@
   .company-title {
     margin: 30px 30px;
     font-weight: bold;
+    overflow-wrap: break-word;
     @media (min-width: 749px) {
       max-width: 200px;
     }

@@ -52,10 +52,11 @@ export async function markFormAppendixGroupedsAsProcessed(
     .appendix2Forms();
 
   if (appendix2Forms.length) {
-    appendix2Forms.map(f =>
-      logStatusChange(f.id, "PROCESSED", requestContext, "", {})
+    await Promise.all(
+      appendix2Forms.map(f =>
+        logStatusChange(f.id, "PROCESSED", requestContext, "", {})
+      )
     );
-
     await requestContext.prisma.updateManyForms({
       where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
       data: { status: "PROCESSED" }
