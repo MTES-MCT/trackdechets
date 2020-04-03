@@ -89,6 +89,8 @@ type Form {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  # Free field, used to easily retrieve transporter tours
+  transporterCustomInfo: String
 
   # Waste details fields
   wasteDetailsCode: String
@@ -164,8 +166,6 @@ type TemporaryStorageDetail {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  # Free field, used to easily retrieve transporter tours
-  transporterCustomInfo: String
 
   # Frame 19
   signedBy: String

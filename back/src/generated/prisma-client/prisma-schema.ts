@@ -1389,6 +1389,7 @@ type Form {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -1479,6 +1480,7 @@ input FormCreateInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -1578,6 +1580,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -1728,6 +1731,8 @@ enum FormOrderByInput {
   transporterValidityLimit_DESC
   transporterNumberPlate_ASC
   transporterNumberPlate_DESC
+  transporterCustomInfo_ASC
+  transporterCustomInfo_DESC
   wasteDetailsCode_ASC
   wasteDetailsCode_DESC
   wasteDetailsName_ASC
@@ -1828,6 +1833,7 @@ type FormPreviousValues {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -2575,6 +2581,20 @@ input FormScalarWhereInput {
   transporterNumberPlate_not_starts_with: String
   transporterNumberPlate_ends_with: String
   transporterNumberPlate_not_ends_with: String
+  transporterCustomInfo: String
+  transporterCustomInfo_not: String
+  transporterCustomInfo_in: [String!]
+  transporterCustomInfo_not_in: [String!]
+  transporterCustomInfo_lt: String
+  transporterCustomInfo_lte: String
+  transporterCustomInfo_gt: String
+  transporterCustomInfo_gte: String
+  transporterCustomInfo_contains: String
+  transporterCustomInfo_not_contains: String
+  transporterCustomInfo_starts_with: String
+  transporterCustomInfo_not_starts_with: String
+  transporterCustomInfo_ends_with: String
+  transporterCustomInfo_not_ends_with: String
   wasteDetailsCode: String
   wasteDetailsCode_not: String
   wasteDetailsCode_in: [String!]
@@ -2858,6 +2878,7 @@ input FormUpdateDataInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -2941,6 +2962,7 @@ input FormUpdateInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -3023,6 +3045,7 @@ input FormUpdateManyDataInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -3114,6 +3137,7 @@ input FormUpdateManyMutationInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -3215,6 +3239,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  transporterCustomInfo: String
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
@@ -3986,6 +4011,20 @@ input FormWhereInput {
   transporterNumberPlate_not_starts_with: String
   transporterNumberPlate_ends_with: String
   transporterNumberPlate_not_ends_with: String
+  transporterCustomInfo: String
+  transporterCustomInfo_not: String
+  transporterCustomInfo_in: [String!]
+  transporterCustomInfo_not_in: [String!]
+  transporterCustomInfo_lt: String
+  transporterCustomInfo_lte: String
+  transporterCustomInfo_gt: String
+  transporterCustomInfo_gte: String
+  transporterCustomInfo_contains: String
+  transporterCustomInfo_not_contains: String
+  transporterCustomInfo_starts_with: String
+  transporterCustomInfo_not_starts_with: String
+  transporterCustomInfo_ends_with: String
+  transporterCustomInfo_not_ends_with: String
   wasteDetailsCode: String
   wasteDetailsCode_not: String
   wasteDetailsCode_in: [String!]
@@ -5347,7 +5386,6 @@ type TemporaryStorageDetail {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  transporterCustomInfo: String
   signedBy: String
   signedAt: DateTime
 }
@@ -5394,7 +5432,6 @@ input TemporaryStorageDetailCreateInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  transporterCustomInfo: String
   signedBy: String
   signedAt: DateTime
 }
@@ -5439,7 +5476,6 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  transporterCustomInfo: String
   signedBy: String
   signedAt: DateTime
 }
@@ -5518,8 +5554,6 @@ enum TemporaryStorageDetailOrderByInput {
   transporterValidityLimit_DESC
   transporterNumberPlate_ASC
   transporterNumberPlate_DESC
-  transporterCustomInfo_ASC
-  transporterCustomInfo_DESC
   signedBy_ASC
   signedBy_DESC
   signedAt_ASC
@@ -5561,7 +5595,6 @@ type TemporaryStorageDetailPreviousValues {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  transporterCustomInfo: String
   signedBy: String
   signedAt: DateTime
 }
@@ -5619,7 +5652,6 @@ input TemporaryStorageDetailUpdateInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  transporterCustomInfo: String
   signedBy: String
   signedAt: DateTime
 }
@@ -5658,7 +5690,6 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  transporterCustomInfo: String
   signedBy: String
   signedAt: DateTime
 }
@@ -5706,7 +5737,6 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
-  transporterCustomInfo: String
   signedBy: String
   signedAt: DateTime
 }
@@ -6090,20 +6120,6 @@ input TemporaryStorageDetailWhereInput {
   transporterNumberPlate_not_starts_with: String
   transporterNumberPlate_ends_with: String
   transporterNumberPlate_not_ends_with: String
-  transporterCustomInfo: String
-  transporterCustomInfo_not: String
-  transporterCustomInfo_in: [String!]
-  transporterCustomInfo_not_in: [String!]
-  transporterCustomInfo_lt: String
-  transporterCustomInfo_lte: String
-  transporterCustomInfo_gt: String
-  transporterCustomInfo_gte: String
-  transporterCustomInfo_contains: String
-  transporterCustomInfo_not_contains: String
-  transporterCustomInfo_starts_with: String
-  transporterCustomInfo_not_starts_with: String
-  transporterCustomInfo_ends_with: String
-  transporterCustomInfo_not_ends_with: String
   signedBy: String
   signedBy_not: String
   signedBy_in: [String!]
