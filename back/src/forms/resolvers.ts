@@ -92,14 +92,20 @@ export default {
       if (parent.quantityReceived !== null) {
         return parent.quantityReceived;
       }
-      // When form is temp stored the quantity is reported on arrival
+      // When form is temp stored the quantity is reported on arrival and might be changed
       if (parent.recipient?.isTempStorage) {
         const temporaryStorageDetail = await context.prisma
           .form({ id: parent.id })
           .temporaryStorageDetail();
 
+        // Repackaging
         if (temporaryStorageDetail?.wasteDetailsQuantity) {
           return temporaryStorageDetail.wasteDetailsQuantity;
+        }
+
+        // Arrival
+        if (temporaryStorageDetail?.tempStorerQuantityReceived) {
+          return temporaryStorageDetail.tempStorerQuantityReceived;
         }
       }
       // Not a lot happened yet, use the quantity input
