@@ -285,6 +285,8 @@ describe("{ mutation { saveForm } }", () => {
     // Now edit the form and add a temporary storage
     const temporaryStorerCompany = await companyFactory();
 
+    payload.id = data.saveForm.id;
+
     payload.recipient.isTempStorage = true;
     payload.temporaryStorageDetail.destination.company.siret =
       temporaryStorerCompany.siret;
@@ -294,6 +296,7 @@ describe("{ mutation { saveForm } }", () => {
     await mutate(mutation, {
       variables: { formInput: payload }
     });
+
     const temporaryStorageDetail2 = await prisma
       .form({ id: data.saveForm.id })
       .temporaryStorageDetail();
