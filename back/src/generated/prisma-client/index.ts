@@ -891,8 +891,6 @@ export type FormOrderByInput =
   | "transporterValidityLimit_DESC"
   | "transporterNumberPlate_ASC"
   | "transporterNumberPlate_DESC"
-  | "transporterCustomInfo_ASC"
-  | "transporterCustomInfo_DESC"
   | "wasteDetailsCode_ASC"
   | "wasteDetailsCode_DESC"
   | "wasteDetailsName_ASC"
@@ -999,6 +997,8 @@ export type TemporaryStorageDetailOrderByInput =
   | "transporterValidityLimit_DESC"
   | "transporterNumberPlate_ASC"
   | "transporterNumberPlate_DESC"
+  | "transporterCustomInfo_ASC"
+  | "transporterCustomInfo_DESC"
   | "signedBy_ASC"
   | "signedBy_DESC"
   | "signedAt_ASC"
@@ -1253,6 +1253,20 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
   transporterCompanyName?: Maybe<String>;
   transporterCompanySiret?: Maybe<String>;
   transporterCompanyAddress?: Maybe<String>;
@@ -1265,41 +1279,8 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
   transporterCustomInfo?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
-  appendix2Forms?: Maybe<FormUpdateManyInput>;
-}
-
-export interface UserUpsertWithoutCompanyAssociationsInput {
-  update: UserUpdateWithoutCompanyAssociationsDataInput;
-  create: UserCreateWithoutCompanyAssociationsInput;
-}
-
-export interface FormUpdateWithWhereUniqueNestedInput {
-  where: FormWhereUniqueInput;
-  data: FormUpdateDataInput;
-}
-
-export interface UserUpsertNestedInput {
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
+  signedBy?: Maybe<String>;
+  signedAt?: Maybe<DateTimeInput>;
 }
 
 export interface UserActivationHashSubscriptionWhereInput {
@@ -1508,7 +1489,6 @@ export interface FormUpdateDataInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
-  transporterCustomInfo?: Maybe<String>;
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
@@ -1886,6 +1866,7 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -2350,6 +2331,20 @@ export interface TemporaryStorageDetailWhereInput {
   transporterNumberPlate_not_starts_with?: Maybe<String>;
   transporterNumberPlate_ends_with?: Maybe<String>;
   transporterNumberPlate_not_ends_with?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
+  transporterCustomInfo_not?: Maybe<String>;
+  transporterCustomInfo_in?: Maybe<String[] | String>;
+  transporterCustomInfo_not_in?: Maybe<String[] | String>;
+  transporterCustomInfo_lt?: Maybe<String>;
+  transporterCustomInfo_lte?: Maybe<String>;
+  transporterCustomInfo_gt?: Maybe<String>;
+  transporterCustomInfo_gte?: Maybe<String>;
+  transporterCustomInfo_contains?: Maybe<String>;
+  transporterCustomInfo_not_contains?: Maybe<String>;
+  transporterCustomInfo_starts_with?: Maybe<String>;
+  transporterCustomInfo_not_starts_with?: Maybe<String>;
+  transporterCustomInfo_ends_with?: Maybe<String>;
+  transporterCustomInfo_not_ends_with?: Maybe<String>;
   signedBy?: Maybe<String>;
   signedBy_not?: Maybe<String>;
   signedBy_in?: Maybe<String[] | String>;
@@ -2426,6 +2421,7 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -3287,7 +3283,6 @@ export interface FormUpdateManyMutationInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
-  transporterCustomInfo?: Maybe<String>;
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
@@ -4684,20 +4679,6 @@ export interface FormScalarWhereInput {
   transporterNumberPlate_not_starts_with?: Maybe<String>;
   transporterNumberPlate_ends_with?: Maybe<String>;
   transporterNumberPlate_not_ends_with?: Maybe<String>;
-  transporterCustomInfo?: Maybe<String>;
-  transporterCustomInfo_not?: Maybe<String>;
-  transporterCustomInfo_in?: Maybe<String[] | String>;
-  transporterCustomInfo_not_in?: Maybe<String[] | String>;
-  transporterCustomInfo_lt?: Maybe<String>;
-  transporterCustomInfo_lte?: Maybe<String>;
-  transporterCustomInfo_gt?: Maybe<String>;
-  transporterCustomInfo_gte?: Maybe<String>;
-  transporterCustomInfo_contains?: Maybe<String>;
-  transporterCustomInfo_not_contains?: Maybe<String>;
-  transporterCustomInfo_starts_with?: Maybe<String>;
-  transporterCustomInfo_not_starts_with?: Maybe<String>;
-  transporterCustomInfo_ends_with?: Maybe<String>;
-  transporterCustomInfo_not_ends_with?: Maybe<String>;
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsCode_not?: Maybe<String>;
   wasteDetailsCode_in?: Maybe<String[] | String>;
@@ -5218,6 +5199,7 @@ export interface TemporaryStorageDetailCreateInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -6610,6 +6592,7 @@ export interface TemporaryStorageDetailUpdateInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -8592,7 +8575,6 @@ export interface FormPreviousValues {
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
   transporterNumberPlate?: String;
-  transporterCustomInfo?: String;
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
   wasteDetailsOnuCode?: String;
@@ -8677,7 +8659,6 @@ export interface FormPreviousValuesPromise
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
-  transporterCustomInfo: () => Promise<String>;
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
@@ -8762,7 +8743,6 @@ export interface FormPreviousValuesSubscription
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
-  transporterCustomInfo: () => Promise<AsyncIterator<String>>;
   wasteDetailsCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsName: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
@@ -9213,6 +9193,7 @@ export interface TemporaryStorageDetail {
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
   transporterNumberPlate?: String;
+  transporterCustomInfo?: String;
   signedBy?: String;
   signedAt?: DateTimeOutput;
 }
@@ -9255,6 +9236,7 @@ export interface TemporaryStorageDetailPromise
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
+  transporterCustomInfo: () => Promise<String>;
   signedBy: () => Promise<String>;
   signedAt: () => Promise<DateTimeOutput>;
 }
@@ -9299,6 +9281,7 @@ export interface TemporaryStorageDetailSubscription
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  transporterCustomInfo: () => Promise<AsyncIterator<String>>;
   signedBy: () => Promise<AsyncIterator<String>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -9341,6 +9324,7 @@ export interface TemporaryStorageDetailNullablePromise
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
+  transporterCustomInfo: () => Promise<String>;
   signedBy: () => Promise<String>;
   signedAt: () => Promise<DateTimeOutput>;
 }
@@ -9700,6 +9684,7 @@ export interface TemporaryStorageDetailPreviousValues {
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
   transporterNumberPlate?: String;
+  transporterCustomInfo?: String;
   signedBy?: String;
   signedAt?: DateTimeOutput;
 }
@@ -9741,6 +9726,7 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
+  transporterCustomInfo: () => Promise<String>;
   signedBy: () => Promise<String>;
   signedAt: () => Promise<DateTimeOutput>;
 }
@@ -9784,6 +9770,7 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  transporterCustomInfo: () => Promise<AsyncIterator<String>>;
   signedBy: () => Promise<AsyncIterator<String>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
