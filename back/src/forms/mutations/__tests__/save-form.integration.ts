@@ -198,7 +198,7 @@ describe("{ mutation { saveForm } }", () => {
     const temporaryStorerCompany = await companyFactory();
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = EMPTY_FORM;
+    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
 
     payload.emitter.company.siret = company.siret;
     payload.emitter.company.name = company.name;
@@ -257,7 +257,7 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = EMPTY_FORM;
+    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
 
     payload.emitter.company.siret = company.siret;
     payload.emitter.company.name = company.name;
