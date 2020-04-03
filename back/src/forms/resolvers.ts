@@ -89,7 +89,7 @@ export default {
     // Depending on the form state, the "actuel" form quantity must be read in different fields
     actualQuantity: async (parent, _, context: GraphQLContext) => {
       // When the form is received we have the definitive quantity
-      if (parent.quantityReceived !== null) {
+      if (parent.quantityReceived != null) {
         return parent.quantityReceived;
       }
       // When form is temp stored the quantity is reported on arrival and might be changed
@@ -104,7 +104,7 @@ export default {
         }
 
         // Arrival
-        if (temporaryStorageDetail?.tempStorerQuantityReceived) {
+        if (temporaryStorageDetail?.tempStorerQuantityReceived != null) {
           return temporaryStorageDetail.tempStorerQuantityReceived;
         }
       }
