@@ -52,6 +52,8 @@ export type Form = {
 type Transporter = {
   company: FormCompany;
   isExemptedOfReceipt: boolean;
+  numberPlate: string;
+  customInfo: string;
 };
 
 type WasteDetails = {

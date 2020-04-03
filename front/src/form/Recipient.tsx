@@ -6,8 +6,8 @@ import DateInput from "./custom-inputs/DateInput";
 import initialState from "./initial-state";
 import { Form } from "./model";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
-import "./Recipient.scss";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
+import "./Recipient.scss";
 
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
