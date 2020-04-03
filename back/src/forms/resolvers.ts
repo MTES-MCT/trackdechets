@@ -85,6 +85,29 @@ export default {
       return temporaryStorageDetail
         ? unflattenObjectFromDb(temporaryStorageDetail)
         : null;
+    },
+    // Depending on the form state, the "actuel" form quantity must be read in different fields
+    actualQuantity: async (parent, _, context: GraphQLContext) => {
+      // When the form is received we have the definitive quantity
+      if (parent.quantityReceived !== null) {
+        return parent.quantityReceived;
+      }
+      // When form is temp stored the quantity is reported on arrival
+      if (parent.recipient?.isTempStorage) {
+        const temporaryStorageDetail = await context.prisma
+          .form({ id: parent.id })
+          .temporaryStorageDetail();
+
+        if (temporaryStorageDetail?.wasteDetailsQuantity) {
+          return temporaryStorageDetail.wasteDetailsQuantity;
+        }
+      }
+      // Not a lot happened yet, use the quantity input
+      if (parent.wasteDetails?.quantity) {
+        return parent.wasteDetails.quantity;
+      }
+      // For drafts, we might not have a quantity yet
+      return null;
     }
   },
   Query: {

@@ -29,6 +29,7 @@ export type Form = {
   wasteDetails: WasteDetails;
 
   receivedAt: string;
+  actualQuantity: number;
   quantityReceived: number;
   processingOperationDone: string;
   temporaryStorageDetail: {

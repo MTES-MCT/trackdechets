@@ -39,6 +39,7 @@ export const GET_SLIPS = gql`
         name
         quantity
       }
+      actualQuantity
       quantityReceived
       temporaryStorageDetail {
         destination {

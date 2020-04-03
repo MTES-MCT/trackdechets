@@ -21,7 +21,6 @@ type Query {
     type: FormType = ACTOR
   ): [Form]
 
-
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"
   stats: [CompanyStat]
 
@@ -77,15 +76,15 @@ type Mutation {
   "Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
   saveForm("Payload du BSD" formInput: FormInput!): Form
 
- "Met à jour la plaque d'immatriculation ou le champ libre du transporteur"
+  "Met à jour la plaque d'immatriculation ou le champ libre du transporteur"
   updateTransporterFields(
     "ID d'un BSD"
     id: ID!
     "Plaque d'immatriculation du transporteur"
     transporterNumberPlate: String
     "Champ libre, utilisable par exemple pour noter les tournées des transporteurs"
-     transporterCustomInfo: String
-    ): Form
+    transporterCustomInfo: String
+  ): Form
 
   "Supprime un BSD"
   deleteForm("ID d'un BSD" id: ID!): Form
@@ -282,6 +281,13 @@ type Form {
 
   "Quantité réelle présentée (case 10)"
   quantityReceived: Float
+
+  """
+  Quantité actuellement connue en tonnes.
+  Elle est calculée en fonction des autres champs pour renvoyer la dernière quantité connue.
+  Elle renvoi ainsi soit la quantité envoyée estimée, soit la quantitée recue sur le site d'entreposage, soit la quantitée réelle recue.
+  """
+  actualQuantity: Float
 
   "Traitement réalisé (code D/R)"
   processingOperationDone: String

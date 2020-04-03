@@ -76,6 +76,7 @@ const DUPLICATE_FORM = gql`
         name
         quantity
       }
+      actualQuantity
       quantityReceived
     }
   }

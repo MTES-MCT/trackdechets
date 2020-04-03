@@ -115,6 +115,7 @@ export const SAVE_FORM = gql`
         name
         quantity
       }
+      actualQuantity
       quantityReceived
     }
   }
