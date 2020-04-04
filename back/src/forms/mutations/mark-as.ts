@@ -237,7 +237,6 @@ const fieldsToLog = {
   MARK_SIGNED_BY_TRANSPORTER: [
     "sentAt",
     "signedByTransporter",
-    "securityCode",
     "sentBy",
     "signedByProducer",
     "packagings",
