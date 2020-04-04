@@ -1,6 +1,5 @@
 import * as supertest from "supertest";
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import { app } from "../../../server";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
@@ -34,7 +33,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
 
   /**
    * Fonction utilitaire permettant de télécharger un BSD au format pdf
-   * et de le stocker dans le dossier temporaire /tmp
+   * et de le stocker dans le dossier PDF_DIR
    * @param formId identifiant opaque du BSD
    * @param token token d'authentification à l'API Trackdéchets
    * @param filename nom du fichier à sauvegarder
@@ -118,6 +117,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     // Le BSD est rempli du cadre 1 à 8 par l’émetteur du bordereau
 
     // La requête suivante est une chaîne de caractères
+    // Dans la plupart des langages ne supportant pas les littéraux de gabarits
+    // comme Node.js, vous devrez échapper les sauts de lignes et les guillements
     const saveFormQuery = `
       mutation {
         saveForm(formInput: {
@@ -182,9 +183,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         }
       }
     `;
-
-    // Dans la plupart des langages vous devrez échapper les sauts de lignes
-    // et les guillements, typiquement
 
     const saveFormResponse = await request
       .post("/")
