@@ -104,11 +104,11 @@ const mainFormFieldSettings = {
     x: 79,
     y: 808,
     lineBreakAt: 55,
-    maxLength: 110
+    maxLength: 110,
   },
   nextDestinationCompanyContact: { x: 380, y: 787 },
   nextDestinationCompanyPhone: { x: 318, y: 798 },
-  nextDestinationCompanyMail: { x: 318, y: 808 }
+  nextDestinationCompanyMail: { x: 318, y: 808 },
 };
 
 // coordinates of each stamp image
@@ -119,7 +119,63 @@ const imageLocations = {
   receivedSignature: { x: 210, y: 742 },
   exemptionStamp: { x: 400, y: 520 },
   noTraceabilityStamp: { x: 300, y: 740 },
-  watermark: { x: 0, y: 800 }
+  watermark: { x: 0, y: 800 },
+};
+
+// Continued main form field settings
+const continuedMainFormFieldSettings = {
+  tempStorerQuantityReal: { x: 53, y: 0 },
+  tempStorerQuantityEstimated: { x: 53, y: 0 },
+  tempStorerQuantity: { x: 53, y: 0 },
+  tempStorerQuantityReceived: { x: 0, y: 0 },
+  tempStorerWasteAcceptationStatus: { x: 0, y: 0 },
+  tempStorerWasteRefusalReason: { x: 0, y: 0 },
+  tempStorerReceivedAt: { x: 0, y: 0 },
+  tempStorerReceivedBy: { x: 0, y: 0 },
+  tempStorerSignedAt: { x: 0, y: 0 },
+  tempStorerCompanySiret: { x: 0, y: 0 },
+  tempStorerCompanyName: { x: 0, y: 0 },
+  tempStorerCompanyAddress: { x: 0, y: 0 },
+  tempStorerCompanyContact: { x: 0, y: 0 },
+  tempStorerCompanyPhone: { x: 0, y: 0 },
+  tempStorerCompanyMail: { x: 0, y: 0 },
+
+  destinationIsFilledByEmitter: { x: 0, y: 0 },
+  destinationCompanyName: { x: 0, y: 0 },
+  destinationCompanySiret: { x: 0, y: 0 },
+  destinationCompanyAddress: { x: 0, y: 0 },
+  destinationCompanyContact: { x: 0, y: 0 },
+  destinationCompanyPhone: { x: 0, y: 0 },
+  destinationCompanyMail: { x: 0, y: 0 },
+  destinationCap: { x: 0, y: 0 },
+  destinationProcessingOperation: { x: 0, y: 0 },
+
+  wasteDetailsOnuCode: { x: 0, y: 0 },
+  wasteDetailsPackagingsBenne: { x: 132, y: 358, fontSize: 12 },
+  wasteDetailsPackagingsCiterne: { x: 179, y: 358, fontSize: 12 },
+  wasteDetailsPackagingsGrv: { x: 230, y: 358, fontSize: 12 },
+  wasteDetailsPackagingsFut: { x: 272, y: 358, fontSize: 12 },
+  wasteDetailsPackagingsOther: { x: 324, y: 358, fontSize: 12 },
+  wasteDetailsNumberOfPackages: { x: 505, y: 355 },
+
+  wasteDetailsQuantityReal: { x: 112, y: 380, fontSize: 12 },
+  wasteDetailsQuantityEstimated: { x: 170, y: 380, fontSize: 12 },
+  wasteDetailsQuantity: { x: 248, y: 377, rightAlign: true },
+
+  transporterCompanyName: { x: 0, y: 0 },
+  transporterCompanySiret: { x: 0, y: 0 },
+  transporterCompanyAddress: { x: 0, y: 0 },
+  transporterCompanyContact: { x: 0, y: 0 },
+  transporterCompanyPhone: { x: 0, y: 0 },
+  transporterCompanyMail: { x: 0, y: 0 },
+  transporterIsExemptedOfReceipt: { x: 0, y: 0 },
+  transporterReceipt: { x: 0, y: 0 },
+  transporterDepartment: { x: 0, y: 0 },
+  transporterValidityLimit: { x: 0, y: 0 },
+  transporterNumberPlate: { x: 0, y: 0 },
+
+  signedBy: { x: 0, y: 0 },
+  signedAt: { x: 0, y: 0 },
 };
 
 // appendix2 header field settings
@@ -131,7 +187,7 @@ const appendixHeaderFieldSettings = {
   emitterCompanyMailName: { x: 372, y: 186, fontSize: 10 },
   emitterCompanyPhone: { x: 306, y: 197, fontSize: 10 },
   emitterCompanyMail: { x: 305, y: 208, fontSize: 10 },
-  emitterCompanyContact: { x: 375, y: 186, fontSize: 10 }
+  emitterCompanyContact: { x: 375, y: 186, fontSize: 10 },
 };
 
 // appendix2 attached form field settings
@@ -150,7 +206,7 @@ const appendixFieldSettings = {
   wasteDetailsName: { x: 430, y: 279, fontSize: 10 },
   wasteDetailsQuantityReal: { x: 327, y: 302, fontSize: 10 },
   quantityReceived: { x: 468, y: 302, fontSize: 10, rightAlign: true },
-  receivedAt: { x: 350, y: 326, fontSize: 10 }
+  receivedAt: { x: 350, y: 326, fontSize: 10 },
 };
 
 // vertical offset to be applied to each appending sub form coordinates
@@ -158,6 +214,7 @@ const appendixYOffsets = [0, 104, 208, 313, 418];
 
 exports.pageHeight = pageHeight;
 exports.mainFormFieldSettings = mainFormFieldSettings;
+exports.continuedMainFormFieldSettings = continuedMainFormFieldSettings;
 exports.imageLocations = imageLocations;
 exports.appendixHeaderFieldSettings = appendixHeaderFieldSettings;
 exports.appendixFieldSettings = appendixFieldSettings;
