@@ -4,9 +4,10 @@ import Elimination from "./operations-elimination.json";
 import Valorisation from "./operations-valorisation.json";
 import "./ProcessingOperation.scss";
 
-export const Operations: { code: string; description: string }[] = Elimination.concat(
-  Valorisation
-);
+export const Operations: {
+  code: string;
+  description: string;
+}[] = Elimination.concat(Valorisation);
 
 export default function ProcessingOperation({
   field: { value, name, onChange }
@@ -29,7 +30,7 @@ export default function ProcessingOperation({
         </p>
       </div>
 
-      <label>Opération de traitement prévue</label>
+      <label className="required">Opération de traitement prévue</label>
       <select id="select" name={name} value={value} onChange={onChange}>
         <option value="">Choisissez...</option>
         {Operations.map(o => (

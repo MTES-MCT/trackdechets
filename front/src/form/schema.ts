@@ -78,7 +78,7 @@ export const formSchema = object().shape({
   }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
-    name: string().required("Appelation du déchet manquante"),
+    name: string().nullable(true),
     onuCode: string(),
     packagings: array().of(packagingSchema),
     otherPackaging: string().nullable(true),
