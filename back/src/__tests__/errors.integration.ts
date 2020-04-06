@@ -83,7 +83,7 @@ describe("Error handling", () => {
     expect(errors).toHaveLength(1);
 
     const error = errors[0];
-    expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
+    expect(error.extensions).not.toBeDefined();
     expect(error.message).toEqual("Erreur serveur");
   });
 
@@ -98,7 +98,7 @@ describe("Error handling", () => {
     expect(errors).toHaveLength(1);
 
     const error = errors[0];
-    expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
+    expect(error.extensions).not.toBeDefined();
     expect(error.message).toEqual("Erreur serveur");
   });
 
@@ -113,7 +113,7 @@ describe("Error handling", () => {
     expect(errors).toHaveLength(1);
 
     const error = errors[0];
-    expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
+    expect(error.extensions).not.toBeDefined();
     expect(error.message).toEqual("Erreur serveur");
   });
 
