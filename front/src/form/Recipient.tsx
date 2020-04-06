@@ -21,7 +21,7 @@ export default function Recipient() {
 
   return (
     <>
-      <h4>Entreprise de destination</h4>
+      <h4 className="required">Entreprise de destination</h4>
 
       <div className="text-quote recipient">
         <p>

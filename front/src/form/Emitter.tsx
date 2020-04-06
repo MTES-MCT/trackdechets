@@ -60,7 +60,7 @@ export default function Emitter() {
 
       <div className="form__group">
         <fieldset>
-          <legend>L'émetteur est</legend>
+          <legend className="required"> L'émetteur est</legend>
           <Field
             name="emitter.type"
             id="PRODUCER"
@@ -93,7 +93,7 @@ export default function Emitter() {
         </fieldset>
       </div>
 
-      <h4>Entreprise émettrice</h4>
+      <h4 className="required">Entreprise émettrice</h4>
       <CompanySelector name="emitter.company" />
 
       <WorkSite />

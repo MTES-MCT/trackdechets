@@ -49,7 +49,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <FormsSelector name="appendix2Forms" />
       )}
 
-      <h4>Conditionnement</h4>
+      <h4 className="required">Conditionnement</h4>
       <div className="form__group">
         <Field name="wasteDetails.packagings" component={Packagings} />
 
@@ -63,17 +63,20 @@ export default connect<{}, Values>(function WasteInfo(props) {
           </label>
         )}
 
-        <Field
-          component={NumberInput}
-          name="wasteDetails.numberOfPackages"
-          label="Nombre de colis"
-        />
+        <label className="required mt-2">
+          Nombre de colis
+          <Field
+            component={NumberInput}
+            name="wasteDetails.numberOfPackages"
+            min="0"
+          />
+        </label>
         <RedErrorMessage name="wasteDetails.numberOfPackages" />
       </div>
 
       <div className="form__group">
         <fieldset>
-          <legend>Consistance</legend>
+          <legend className="required">Consistance</legend>
           <Field
             name="wasteDetails.consistence"
             id="SOLID"
@@ -112,7 +115,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <RedErrorMessage name="wasteDetails.quantity" />
 
         <fieldset className="mt-3">
-          <legend>Cette quantité est</legend>
+          <legend className="required">Cette quantité est</legend>
           <Field
             name="wasteDetails.quantityType"
             id="REAL"

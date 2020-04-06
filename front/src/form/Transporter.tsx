@@ -10,7 +10,7 @@ type Values = {
 export default connect<{}, Values>(function Transporter(props) {
   return (
     <>
-      <h4>Transporteur</h4>
+      <h4 className="required">Transporteur</h4>
       <CompanySelector name="transporter.company" />
 
       <h4>Autorisations</h4>
