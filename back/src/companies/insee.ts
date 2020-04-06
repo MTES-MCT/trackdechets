@@ -25,9 +25,26 @@ export function getCachedCompanySireneInfo(siret) {
   });
 }
 
-export function searchCompanies(clue: string, department: string = "") {
-  return axios
-    .get(`${INSEE_URI}/search?clue=${clue}&department=${department}`)
-    .then(r => r.data)
-    .catch(_ => []); // Silently fail
+const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
+
+export function searchCompanies(clue: string, department?: string) {
+  // API v1 is still used here because v3 does not support
+  // full text. It is marked as DEPRECATED but the team in
+  // #entreprise-data-gouv will still support it until
+  // v3 includes full text. The Solr index of the v1 is still
+  // updated with new data
+  let searchUrl = `${SIRENE_API_BASE_URL}/v1/full_text/${clue}`;
+
+  if (department && department.length === 2) {
+    searchUrl = `${searchUrl}?departement=${department}`;
+  }
+
+  if (department && department.length === 2) {
+    // this migth actually be a postal code
+    searchUrl = `${searchUrl}?code_postal=${department}`;
+  }
+
+  return axios.get(searchUrl).then(r => {
+    return r.data.etablissement;
+  });
 }
