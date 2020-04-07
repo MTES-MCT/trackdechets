@@ -1,7 +1,7 @@
 // margin & padding utils ispired from bootstrap
 //mt-1 ... mt-4, ml-1...ml-4, pb-1...pb-4 etc.
 $spaceamounts: (
-  0:0, 
+  0: 0,
   1: 0.5,
   2: 1,
   3: 2,
@@ -27,4 +27,14 @@ $breakpoint-tablet: 769px;
 .button.button--disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.required::before {
+  content: "✱";
+  color: var(--red);
+  font-weight: 700;
+  padding-right: var(--space-xs);
+  position: absolute;
+  left: 0;
+  transform: translateX(-100%);
 }
