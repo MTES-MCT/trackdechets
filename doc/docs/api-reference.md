@@ -1826,15 +1826,6 @@ Date de la dernière modification du BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>ownerId</strong></td>
-<td valign="top"><a href="#int">Int</a></td>
-<td>
-
-ID de l'utilisateur ayant crée le BSD
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>status</strong></td>
 <td valign="top"><a href="#formstatus">FormStatus</a></td>
 <td>
