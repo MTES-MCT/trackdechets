@@ -4,13 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently npm:watch-node npm:watch-graphql",
+    "watch-node": "npx nodemon -L --watch src --exec \"ts-node\" src/index.ts",
+    "watch-graphql": "npm run graphql-codegen -- --watch",
     "start": "ts-node src/index.ts",
     "update": "ts-node prisma/scripts/index.ts",
-    "graphql-markdown": "ts-node src/scripts/graphql-markdown.ts",
     "test": "jest",
     "lint": "tslint --project ./tsconfig.json",
     "lint:fix": "tslint --project ./tsconfig.json --fix",
-    "bulk-create-account": "ts-node src/users/bulk-creation/index.ts"
+    "bulk-create-account": "ts-node src/users/bulk-creation/index.ts",
+    "graphql-codegen": "graphql-codegen --config codegen.yml"
   },
   "keywords": [],
   "author": "",
@@ -49,6 +52,9 @@
     "yup": "^0.27.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.13.1",
+    "@graphql-codegen/introspection": "1.13.1",
+    "@graphql-codegen/typescript": "1.13.1",
     "@types/bcrypt": "^3.0.0",
     "@types/body-parser": "^1.17.1",
     "@types/connect-redis": "0.0.13",
@@ -68,6 +74,7 @@
     "@types/yup": "^0.26.27",
     "apollo-server-integration-testing": "^2.3.0",
     "apollo-server-testing": "^2.9.13",
+    "concurrently": "^5.1.0",
     "graphql-markdown": "^5.2.0",
     "jest": "^24.9.0",
     "jsonwebtoken": "^8.5.1",

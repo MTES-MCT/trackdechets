@@ -1,0 +1,13 @@
+overwrite: true
+schema: "./src/**/*.graphql"
+documents: null
+generates:
+  src/generated/types.ts:
+    plugins:
+      - "typescript"
+  src/graphql.schema.json:
+    plugins:
+      - "introspection"
+    hooks:
+      afterOneFileWrite:
+        - ./graphql-markdown.sh
