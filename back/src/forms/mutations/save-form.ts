@@ -64,10 +64,11 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
       ecoOrganisme: { connect: formContent.ecoOrganisme }
     }),
     temporaryStorageDetail: {
-      ...(formContent.recipient.isTempStorage &&
-        formContent.temporaryStorageDetail && {
-          create: flattenObjectForDb(formContent.temporaryStorageDetail)
-        })
+      ...(formContent.recipient.isTempStorage && {
+        create: formContent.temporaryStorageDetail
+          ? flattenObjectForDb(formContent.temporaryStorageDetail)
+          : {}
+      })
     },
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }

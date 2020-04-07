@@ -308,4 +308,34 @@ describe("{ mutation { saveForm } }", () => {
       temporaryStorerCompany.name
     );
   });
+
+  test("should create a form `isTempStorage=true` but no temp storage details and still create the temporaryStorageDetail object", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
+
+    payload.emitter.company.siret = company.siret;
+    payload.emitter.company.name = company.name;
+
+    payload.recipient.isTempStorage = true;
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    const temporaryStorageDetail = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail).not.toBeNull();
+  });
 });
