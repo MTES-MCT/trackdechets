@@ -675,6 +675,36 @@ Informations liées à la signature transporteur
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>markAsTempStored</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">tempStoredInfos</td>
+<td valign="top"><a href="#tempstoredforminput">TempStoredFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsResent</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">resentInfos</td>
+<td valign="top"><a href="#resentforminput">ResentFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>signup</strong></td>
 <td valign="top"><a href="#user">User</a></td>
 <td>
@@ -1571,6 +1601,57 @@ Type de déclaration GEREP: producteur ou traiteur
 </tbody>
 </table>
 
+### Destination
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de CAP (le cas échéant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>processingOperation</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération d'élimination / valorisation prévue (code D/R)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Établissement de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isFilledByEmitter</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Indique si l'information a été saisie par l'émetteur du bordereau ou l'installation d'entreposage
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### EcoOrganisme
 
 Eco-organisme
@@ -1916,6 +1997,17 @@ Quantité réelle présentée (case 10)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>actualQuantity</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td>
+
+Quantité actuellement connue en tonnes.
+Elle est calculée en fonction des autres champs pour renvoyer la dernière quantité connue.
+Elle renvoi ainsi soit la quantité envoyée estimée, soit la quantitée recue sur le site d'entreposage, soit la quantitée réelle recue.
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>processingOperationDone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
@@ -1982,6 +2074,15 @@ Annexe 2
 <td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
 <td valign="top"><a href="#ecoorganisme">EcoOrganisme</a></td>
 <td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>temporaryStorageDetail</strong></td>
+<td valign="top"><a href="#temporarystoragedetail">TemporaryStorageDetail</a></td>
+<td>
+
+BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -2239,6 +2340,15 @@ Opération d'élimination / valorisation prévue (code D/R)
 <td>
 
 Établissement de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isTempStorage</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Indique si c'est un établissement d'entreposage temporaire ou de reocnditionnement
 
 </td>
 </tr>
@@ -2555,6 +2665,122 @@ Permet de s'abonner aux changements de statuts d'un BSD
 Token permettant de s'authentifier à l'API
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### TemporaryStorageDetail
+
+Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>temporaryStorer</strong></td>
+<td valign="top"><a href="#temporarystorer">TemporaryStorer</a></td>
+<td>
+
+Établissement qui sotcke temporairement le déchet (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#destination">Destination</a></td>
+<td>
+
+Indique si le cadre 14 est rempli par l'émetteur du bordereau ou l'installation d'entreprosage
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetails">WasteDetails</a></td>
+<td>
+
+Détails du déchet (cases 15, 16 et 17)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporter">Transporter</a></td>
+<td>
+
+Transporteur du déchet (case 18)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedBy</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom du signataire du BSD suite  (case 19)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de signature du BSD suite (case 19)
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### TemporaryStorer
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityReceived</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receivedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receivedBy</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -3106,6 +3332,47 @@ Numéro de téléphone de contact dans l'établissement
 </tbody>
 </table>
 
+### DestinationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Installation de destination prévue
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de CAP prévu (le cas échéant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>processingOperation</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération d'élimination / valorisation prévue (code D/R)
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### EcoOrganismeInput
 
 Payload de liason d'un BSD à un eco-organisme
@@ -3268,6 +3535,11 @@ Annexe 2
 <tr>
 <td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
 <td valign="top"><a href="#ecoorganismeinput">EcoOrganismeInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>temporaryStorageDetail</strong></td>
+<td valign="top"><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -3548,6 +3820,74 @@ Opération d'élimination / valorisation prévue (code D/R)
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>isTempStorage</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Si c'est un entreprosage provisoire ou reconditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### ResentFormInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#destinationinput">DestinationInput</a></td>
+<td>
+
+Destination finale du déchet (case 14)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
+<td>
+
+Détail du déchet en cas de reconditionnement (case 15 à 19)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
+<td>
+
+Transporteur du déchet reconditionné
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedBy</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom du signataire du BSD suite  (case 19)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de signature du BSD suite (case 19)
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -3631,6 +3971,93 @@ Nom de l'utilisateur
 Numéro de téléphone de l'utilisateur
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### TempStoredFormInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
+<td>
+
+Statut d'acceptation du déchet (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Raison du refus (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receivedBy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom de la personne en charge de la réception du déchet (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receivedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date à laquelle le déchet a été reçu (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityReceived</strong></td>
+<td valign="top"><a href="#float">Float</a>!</td>
+<td>
+
+Quantité réelle présentée (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a>!</td>
+<td>
+
+Réelle ou estimée
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### TemporaryStorageDetailInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#destinationinput">DestinationInput</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -4166,6 +4593,14 @@ Type d'établissement favoris
 <td valign="top"><strong>NEXT_DESTINATION</strong></td>
 <td></td>
 </tr>
+<tr>
+<td valign="top"><strong>TEMPORARY_STORAGE_DETAIL</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>DESTINATION</strong></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -4250,6 +4685,22 @@ Perte de traçabalité
 <td>
 
 Déchet refusé
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TEMP_STORED</strong></td>
+<td>
+
+Déchet arrivé sur le site d'entreposage ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>RESENT</strong></td>
+<td>
+
+Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement
 
 </td>
 </tr>

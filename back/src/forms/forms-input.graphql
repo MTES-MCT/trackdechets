@@ -300,16 +300,23 @@ input TempStoredFormInput {
   "Quantité réelle présentée (case 10)"
   quantityReceived: Float!
 
+  "Réelle ou estimée"
   quantityType: QuantityType!
 }
 
 input ResentFormInput {
+  "Destination finale du déchet (case 14)"
   destination: DestinationInput
+
+  "Détail du déchet en cas de reconditionnement (case 15 à 19)"
   wasteDetails: WasteDetailsInput
+
+  "Transporteur du déchet reconditionné"
   transporter: TransporterInput
 
   "Nom du signataire du BSD suite  (case 19)"
   signedBy: String
+
   "Date de signature du BSD suite (case 19)"
   signedAt: DateTime
 }
