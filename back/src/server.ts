@@ -1,5 +1,5 @@
 import { CaptureConsole } from "@sentry/integrations";
-import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
+import { ApolloServer, makeExecutableSchema, ApolloError } from "apollo-server-express";
 import * as express from "express";
 import * as passport from "passport";
 import * as session from "express-session";
@@ -118,7 +118,7 @@ export const server = new ApolloServer({
       NODE_ENV !== "dev"
     ) {
       // Do not leak error for internal server error in production
-      return new Error("Erreur serveur");
+      return new ApolloError("Erreur serveur", ErrorCode.INTERNAL_SERVER_ERROR);
     }
     return err;
   }
