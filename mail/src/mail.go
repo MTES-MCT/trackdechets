@@ -37,6 +37,9 @@ var mailjetClient = mailjet.NewMailjetClient(
 	mustGetenv("MJ_APIKEY_PRIVATE"),
 )
 
+var senderAddress = mustGetenv("MJ_SENDER_EMAIL_ADDRESS")
+var senderName = mustGetenv("MJ_SENDER_NAME")
+
 func mustGetenv(k string) string {
 	v := os.Getenv(k)
 	if v == "" {
@@ -92,8 +95,8 @@ func sendEmail(w http.ResponseWriter, r *http.Request) {
 
 	messagesInfoParams := mailjet.InfoMessagesV31{
 		From: &mailjet.RecipientV31{
-			Email: "noreply@trackdechets.fr",
-			Name:  "Noreply Trackdéchets",
+			Email: senderAddress,
+			Name:  senderName,
 		},
 		To:               getAsMailjetRecipients(data.To),
 		Cc:               getAsMailjetRecipients(data.Cc),
