@@ -204,4 +204,56 @@ describe("{ mutation { markAsSealed } }", () => {
     });
     expect(statusLogs.length).toEqual(0);
   });
+
+  test.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(
+    "wrong waste code (%p) must invalidate mutation",
+    async wrongWasteCode => {
+      const { user, company: recipientCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      const emitterCompany = await companyFactory();
+
+      let form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: wrongWasteCode
+        }
+      });
+
+      const { mutate } = makeClient(user);
+
+      const mutation = `
+      mutation   {
+        markAsSealed(id: "${form.id}") {
+          id
+        }
+      }
+    `;
+
+      const { errors } = await mutate(mutation);
+
+      expect(errors[0].message).toEqual(
+        expect.stringContaining(
+          "Le code déchet est obligatoire et doit appartenir à la liste  du code"
+        )
+      );
+      form = await prisma.form({ id: form.id });
+
+      expect(form.status).toEqual("DRAFT");
+
+      // check no SEALED statusLog is created
+      const statusLogs = await prisma.statusLogs({
+        where: {
+          form: { id: form.id },
+          user: { id: user.id },
+          status: "SEALED"
+        }
+      });
+      expect(statusLogs.length).toEqual(0);
+    }
+  );
 });

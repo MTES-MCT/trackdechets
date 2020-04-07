@@ -9,7 +9,7 @@ import {
   LocaleObject
 } from "yup";
 import { prisma } from "../generated/prisma-client";
-
+import wasteCodes from "./wasteCodes";
 setLocale({
   mixed: {
     default: "${path} est invalide",
@@ -84,7 +84,10 @@ export const formSchema = object<any>().shape({
     company: companySchema("Transporteur")
   }),
   wasteDetails: object().shape({
-    code: string().required("Code déchet manquant"),
+    code: string().oneOf(
+      wasteCodes,
+      "Le code déchet est obligatoire et doit appartenir à la liste  du code de l'environnement (par exemple 16 11 05*)"
+    ),
     onuCode: string(),
     packagings: array().of(packagingSchema),
     otherPackaging: string().nullable(true),
