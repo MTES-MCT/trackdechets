@@ -1,4 +1,5 @@
 import * as supertest from "supertest";
+import * as os from "os";
 import * as fs from "fs";
 import * as path from "path";
 import { app } from "../../../server";
