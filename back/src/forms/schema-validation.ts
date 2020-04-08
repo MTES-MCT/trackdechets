@@ -195,6 +195,43 @@ export default {
         )
       })
     }),
+    markAsResealed: object().shape({
+      resealedInfos: object({
+        destination: object({
+          company: companySchema("Destinataire du BSD"),
+          processingOperation: mixed().oneOf(
+            PROCESSING_OPERATION_CODES,
+            "Cette opération de traitement n'existe pas."
+          ),
+          cap: string().nullable(true)
+        }),
+        wasteDetails: object({}),
+        transporter: object({
+          isExemptedOfReceipt: boolean().nullable(true),
+          receipt: string().when(
+            "isExemptedOfReceipt",
+            (isExemptedOfReceipt, schema) =>
+              isExemptedOfReceipt
+                ? schema.nullable(true)
+                : schema.required(
+                    "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+                  )
+          ),
+          department: string().when(
+            "isExemptedOfReceipt",
+            (isExemptedOfReceipt, schema) =>
+              isExemptedOfReceipt
+                ? schema.nullable(true)
+                : schema.required(
+                    "Le département du transporteur est obligatoire"
+                  )
+          ),
+          validityLimit: date().nullable(true),
+          numberPlate: string().nullable(true),
+          company: companySchema("Transporteur")
+        })
+      })
+    }),
     markAsResent: object().shape({
       resentInfos: object({
         destination: object({

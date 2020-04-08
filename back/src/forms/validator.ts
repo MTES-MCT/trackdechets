@@ -128,12 +128,19 @@ export const formSchema = object<any>().shape({
     is: e => e.isTempStorage,
     then: object({
       destination: object({
-        company: companySchema("Destinataire final du BSD"),
+        company: object({
+          name: string().nullable(),
+          siret: string().nullable(),
+          address: string().nullable(),
+          contact: string().nullable(),
+          phone: string().nullable(),
+          mail: string().nullable()
+        }).nullable(),
         processingOperation: string()
           .label("Opération de traitement")
-          .required(),
+          .nullable(),
         cap: string().nullable(true)
-      }).nullable()
+      })
     }),
     otherwise: object().nullable()
   })

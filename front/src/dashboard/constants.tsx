@@ -9,6 +9,6 @@ export const statusLabels: { [key: string]: string } = {
   NO_TRACEABILITY: "Regroupé, avec autorisation de perte de traçabilité",
   REFUSED: "Refusé",
   TEMP_STORED: "Entreposé temporairement ou en reconditionnement",
-  RESENT: "En attente de réception pour traitement"
+  RESENT: "En attente de réception pour traitement",
+  RESEALED: "En attente de départ de l'isntallation provisoire",
 };
-

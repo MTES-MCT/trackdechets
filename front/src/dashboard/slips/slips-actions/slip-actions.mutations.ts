@@ -42,6 +42,15 @@ const MARK_TEMP_STORED = gql`
   }
 `;
 
+const MARK_RESEALED = gql`
+  mutation MarkAsResealed($id: ID!, $info: ResealedFormInput!) {
+    markAsResealed(id: $id, resealedInfos: $info) {
+      id
+      status
+    }
+  }
+`;
+
 const MARK_RESENT = gql`
   mutation MarkAsResent($id: ID!, $info: ResentFormInput!) {
     markAsResent(id: $id, resentInfos: $info) {
@@ -96,7 +105,8 @@ export default {
   RECEIVED: MARK_RECEIVED,
   PROCESSED: MARK_PROCESSED,
   TEMP_STORED: MARK_TEMP_STORED,
+  RESEALED: MARK_RESEALED,
   RESENT: MARK_RESENT,
   DUPLICATE_FORM,
-  DELETE_FORM
+  DELETE_FORM,
 };

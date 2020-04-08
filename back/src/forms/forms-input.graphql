@@ -304,6 +304,7 @@ input TempStoredFormInput {
   quantityType: QuantityType!
 }
 
+"Payload lié au détails du déchet du BSD suite et à la signature de l'envoi (case 14 à 20)"
 input ResentFormInput {
   "Destination finale du déchet (case 14)"
   destination: DestinationInput
@@ -319,4 +320,16 @@ input ResentFormInput {
 
   "Date de signature du BSD suite (case 19)"
   signedAt: DateTime
+}
+
+"Payload lié au détails du déchet du BSD suite (case 14 à 19)"
+input ResealedFormInput {
+  "Destination finale du déchet (case 14)"
+  destination: DestinationInput
+
+  "Détail du déchet en cas de reconditionnement (case 15 à 19)"
+  wasteDetails: WasteDetailsInput
+
+  "Transporteur du déchet reconditionné"
+  transporter: TransporterInput
 }

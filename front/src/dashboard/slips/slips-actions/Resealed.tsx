@@ -11,7 +11,11 @@ import Packagings from "../../../form/packagings/Packagings";
 import { SlipActionProps } from "../SlipActions";
 import { Operations } from "../../../form/processing-operation/ProcessingOperation";
 
-export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
+export default function Resealed({
+  form,
+  onSubmit,
+  onCancel,
+}: SlipActionProps) {
   // We need a deep merge as sub-objects may be partially filled
   // But without the null values as they break form elements (uncontrolled)
   const initialValues = merge(
@@ -181,22 +185,6 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
               </div>
             )}
 
-            <h5>
-              Déclaration de l’exploitant du site d’entreposage ou de
-              reconditionnement
-            </h5>
-            <label>
-              Nom du responsable
-              <Field type="text" name="signedBy" placeholder="NOM Prénom" />
-            </label>
-            <label>
-              Date d'envoi
-              <Field component={DateInput} name="signedAt" />
-            </label>
-            <p>
-              En validant, je certifie que les renseignements portés ci-dessus
-              sont exacts et établis de bonne foi
-            </p>
             <div className="form__group button__group">
               <button
                 type="button"
@@ -252,6 +240,4 @@ const emptyState = {
     quantity: null,
     quantityType: "ESTIMATED",
   },
-  signedBy: "",
-  signedAt: "",
 };

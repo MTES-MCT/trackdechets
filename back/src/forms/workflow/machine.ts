@@ -140,9 +140,15 @@ export const formWorkflowMachine = Machine(
               event.securityCode,
               ctx.requestContext
             ),
-          onDone: {
-            target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
-          },
+          onDone: [
+            {
+              target: FormState.Resent,
+              cond: "isTemporaryStorageSignature"
+            },
+            {
+              target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
+            }
+          ],
           onError: { target: "error.invalidSecurityCode" }
         }
       },
@@ -180,6 +186,15 @@ export const formWorkflowMachine = Machine(
           MARK_RESENT: [
             {
               target: FormState.Resent
+            }
+          ],
+          MARK_SIGNED_BY_TRANSPORTER: [
+            {
+              target: "error.missingSignature",
+              cond: "isMissingSignature"
+            },
+            {
+              target: `pendingSecurityCodeValidation`
             }
           ]
         }
@@ -239,7 +254,9 @@ export const formWorkflowMachine = Machine(
           event.wasteAcceptationStatus
         );
       },
-      hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage
+      hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage,
+      isTemporaryStorageSignature: ctx =>
+        ctx.form.recipientIsTempStorage && ctx.form.sentAt != null
     }
   }
 );

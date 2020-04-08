@@ -36,6 +36,7 @@ export default {
     signedByTransporter: isFormTransporter,
     updateTransporterFields: isFormTransporter,
     markAsTempStored: isFormTempStorer,
+    markAsResealed: isFormTempStorer,
     markAsResent: isFormTempStorer
   }
 };

@@ -5,7 +5,8 @@ import {
   FaCogs,
   FaEdit,
   FaIndustry,
-  FaFileSignature
+  FaFileSignature,
+  FaPencilAlt,
 } from "react-icons/fa";
 import { IconContext } from "react-icons";
 
@@ -20,6 +21,7 @@ import Processed from "./slips-actions/Processed";
 import Received from "./slips-actions/Received";
 import Sealed from "./slips-actions/Sealed";
 import Sent from "./slips-actions/Sent";
+import Resealed from "./slips-actions/Resealed";
 import Resent from "./slips-actions/Resent";
 import mutations from "./slips-actions/slip-actions.mutations";
 import { NotificationError } from "../../common/Error";
@@ -104,7 +106,7 @@ export function DynamicActions({ form, siret }: DynamicActionsProps) {
           {ButtonComponent && (
             <ButtonComponent
               onCancel={() => setIsOpen(false)}
-              onSubmit={vars => {
+              onSubmit={(vars) => {
                 mark({ variables: { id: form.id, ...vars } });
               }}
               form={form}
@@ -123,27 +125,32 @@ const buttons = {
   SEALED: {
     title: "Finaliser le bordereau",
     icon: FaFileSignature,
-    component: Sealed
+    component: Sealed,
   },
   SENT: { title: "Valider l'enlèvement", icon: FaTruckMoving, component: Sent },
   RECEIVED: {
     title: "Valider la réception",
     icon: FaIndustry,
-    component: Received
+    component: Received,
   },
   PROCESSED: {
     title: "Valider le traitement",
     icon: FaCogs,
-    component: Processed
+    component: Processed,
   },
   TEMP_STORED: {
     title: "Valider l'entreposage provisoire",
     icon: FaIndustry,
-    component: Received
+    component: Received,
+  },
+  RESEALED: {
+    title: "Compléter le BSD suite",
+    icon: FaPencilAlt,
+    component: Resealed,
   },
   RESENT: {
     title: "Valider l'envement",
     icon: FaTruckMoving,
-    component: Resent
-  }
+    component: Resent,
+  },
 };

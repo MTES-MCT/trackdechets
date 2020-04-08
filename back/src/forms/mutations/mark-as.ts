@@ -49,6 +49,22 @@ export async function signedByTransporter(
   { id, signingInfo },
   context: GraphQLContext
 ) {
+  const form = context.prisma.form({ id });
+
+  // BSD has already been sent, it must be a signature for frame 18
+  if (form.sentAt) {
+    return transitionForm(
+      id,
+      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
+      context,
+      infos => ({
+        temporaryStorageDetail: {
+          update: flattenObjectForDb(infos)
+        }
+      })
+    );
+  }
+
   const transformEventToFormParams = infos => ({
     signedByTransporter: infos.signedByTransporter,
     sentAt: infos.sentAt,
@@ -85,6 +101,25 @@ export function markAsTempStored(
   return transitionForm(
     id,
     { eventType: "MARK_TEMP_STORED", eventParams: tempStoredInfos },
+    context,
+    transformEventToFormParams
+  );
+}
+
+export function markAsResealed(
+  _,
+  { id, resealedInfos },
+  context: GraphQLContext
+) {
+  const transformEventToFormParams = infos => ({
+    temporaryStorageDetail: {
+      update: flattenObjectForDb(infos)
+    }
+  });
+
+  return transitionForm(
+    id,
+    { eventType: "MARK_RESEALED", eventParams: resealedInfos },
     context,
     transformEventToFormParams
   );
@@ -210,6 +245,23 @@ const fieldsToLog = {
     "receivedAt",
     "quantityReceived",
     "quantityType"
+  ],
+  MARK_RESEALED: [
+    "destinationIsFilledByEmitter",
+    "destinationCompanyName",
+    "destinationCompanySiret",
+    "destinationCompanyAddress",
+    "destinationCompanyContact",
+    "destinationCompanyPhone",
+    "destinationCompanyMail",
+    "destinationCap",
+    "destinationProcessingOperation",
+    "wasteDetailsOnuCode",
+    "wasteDetailsPackagings",
+    "wasteDetailsOtherPackaging",
+    "wasteDetailsNumberOfPackages",
+    "wasteDetailsQuantity",
+    "wasteDetailsQuantityType"
   ],
   MARK_RESENT: [
     "destinationIsFilledByEmitter",

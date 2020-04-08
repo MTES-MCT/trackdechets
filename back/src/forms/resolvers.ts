@@ -13,7 +13,8 @@ import {
   markAsSent,
   signedByTransporter,
   markAsTempStored,
-  markAsResent
+  markAsResent,
+  markAsResealed
 } from "./mutations/mark-as";
 import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
@@ -278,6 +279,7 @@ export default {
     signedByTransporter,
     updateTransporterFields,
     markAsTempStored,
+    markAsResealed,
     markAsResent
   },
   Subscription: {
