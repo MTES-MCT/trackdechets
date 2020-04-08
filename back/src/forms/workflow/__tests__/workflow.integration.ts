@@ -33,15 +33,16 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
 
   /**
    * Fonction utilitaire permettant de télécharger un BSD au format pdf
-   * et de le stocker dans le dossier PDF_DIR
    * @param formId identifiant opaque du BSD
    * @param token token d'authentification à l'API Trackdéchets
    * @param filename nom du fichier à sauvegarder
+   * @param save if true save it to PDF_DIR, otherwise save it to tmp dir
    */
   async function downloadPdf(
     formId: string,
     token: string,
-    filename: string
+    filename: string,
+    save: boolean = false
   ): Promise<string> {
     const formPdfQuery = `
       query {
@@ -59,14 +60,16 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .send({ query: formPdfQuery });
 
     const downloadToken = formPdfResponse.body.data.formPdf.token;
-    const filepath = path.join(PDF_DIR, filename);
+
+    const dir = save ? PDF_DIR : fs.mkdtempSync(path.join(os.tmpdir(), "/"));
+    console.log(dir);
+    const filepath = path.join(dir, filename);
 
     const writeStream = fs.createWriteStream(filepath);
 
     // On fait ensuite une requête GET sur le endpoint /download
     // en passant le token en paramètre. Il est également possible
     // d'utiliser directement la variable de retour `downloadLink`
-    // Le fichier est stocké dans le dossier temporaire /tmp
     request.get(`/download?token=${downloadToken}`).pipe(writeStream);
 
     return new Promise((resolve, reject) => {
@@ -214,12 +217,12 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         }
       }`;
 
-    const markAsSealeddResponse = await request
+    const markAsSealedResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${producteurToken}`)
       .send({ query: markAsSealedQuery });
 
-    form = markAsSealeddResponse.body.data.markAsSealed;
+    form = markAsSealedResponse.body.data.markAsSealed;
 
     // Le BSD passe à l'état "Finalisé"
     expect(form.status).toEqual("SEALED");
