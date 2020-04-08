@@ -8,6 +8,6 @@ generates:
   src/graphql.schema.json:
     plugins:
       - "introspection"
-    hooks:
-      afterOneFileWrite:
-        - ./graphql-markdown.sh
+  documentation/api-reference.md:
+    plugins:
+      - graphql-markdown-plugin.js

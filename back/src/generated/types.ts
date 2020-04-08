@@ -10,6 +10,7 @@ export type Scalars = {
   JSON: any;
 };
 
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** SIRET de l'établissement émetteur */
