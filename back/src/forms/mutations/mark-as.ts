@@ -53,15 +53,35 @@ export async function signedByTransporter(
 
   // BSD has already been sent, it must be a signature for frame 18
   if (form.sentAt) {
+    const temporaryStorageDetail = await context.prisma
+      .form({ id })
+      .temporaryStorageDetail();
+
+    const hasWasteDetailsOverride = !!temporaryStorageDetail.wasteDetailsQuantity;
+
     return transitionForm(
       id,
       { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
       context,
-      infos => ({
-        temporaryStorageDetail: {
-          update: flattenObjectForDb(infos)
-        }
-      })
+      infos => {
+        const wasteDetails = {
+          wasteDetailsPackagings: infos.packagings,
+          wasteDetailsQuantity: infos.quantity,
+          wasteDetailsOnuCode: infos.onuCode
+        };
+
+        return {
+          ...(!hasWasteDetailsOverride && wasteDetails),
+          temporaryStorageDetail: {
+            update: {
+              signedBy: infos.sentBy,
+              signedAt: infos.sentAt,
+              signedByTransporter: infos.signedByTransporter,
+              ...(hasWasteDetailsOverride && wasteDetails)
+            }
+          }
+        };
+      }
     );
   }
 

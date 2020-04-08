@@ -96,6 +96,10 @@ export const isFormTransporter = and(
 
     return (
       currentUserSirets.includes(formInfos.transporterCompanySiret) ||
+      (formInfos.temporaryStorageDetail?.transporterCompanySiret &&
+        currentUserSirets.includes(
+          formInfos.temporaryStorageDetail.transporterCompanySiret
+        )) ||
       new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`)
     );
   })

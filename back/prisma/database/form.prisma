@@ -166,6 +166,7 @@ type TemporaryStorageDetail {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
 
   # Frame 19
   signedBy: String

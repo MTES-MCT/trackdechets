@@ -11,6 +11,7 @@ import { useFormsTable } from "../slips/use-forms-table";
 import { FaSync, FaSort } from "react-icons/fa";
 import { useState } from "react";
 import useLocalStorage from "./hooks";
+import { Form } from "../../form/model";
 
 type Props = {
   me: Me;
@@ -52,6 +53,23 @@ export const GET_TRANSPORT_SLIPS = gql`
         quantity
         packagings
         onuCode
+      }
+      temporaryStorageDetail {
+        destination {
+          company {
+            name
+            siret
+            address
+          }
+          cap
+          processingOperation
+        }
+        wasteDetails {
+          code
+          quantity
+          packagings
+          onuCode
+        }
       }
     }
   }
@@ -99,28 +117,28 @@ const Table = ({ forms, displayActions }) => {
           <th>
             <input
               type="text"
-              onChange={e => filter("readableId", e.target.value)}
+              onChange={(e) => filter("readableId", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th>
             <input
               type="text"
-              onChange={e => filter("emitter.company.name", e.target.value)}
+              onChange={(e) => filter("emitter.company.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th className="hide-on-mobile">
             <input
               type="text"
-              onChange={e => filter("recipient.company.name", e.target.value)}
+              onChange={(e) => filter("recipient.company.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th>
             <input
               type="text"
-              onChange={e => filter("wasteDetails.name", e.target.value)}
+              onChange={(e) => filter("wasteDetails.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
@@ -131,7 +149,7 @@ const Table = ({ forms, displayActions }) => {
         </tr>
       </thead>
       <tbody>
-        {sortedForms.map(form => (
+        {sortedForms.map((form) => (
           <tr key={form.id}>
             <td className="readable-id">
               {form.readableId}
@@ -169,7 +187,7 @@ const Table = ({ forms, displayActions }) => {
               }
             </td>
             {displayActions ? (
-              <td>{<TransportSignature form={form} />}</td>
+              <td>{<TransportSignature form={getTransportInfos(form)} />}</td>
             ) : null}
           </tr>
         ))}
@@ -179,17 +197,17 @@ const Table = ({ forms, displayActions }) => {
 };
 const TRANSPORTER_FILTER_STORAGE_KEY = "TRANSPORTER_FILTER_STORAGE_KEY";
 export default function Transport({ siret }: Props & any) {
-  const [filterStatus, setFilterStatus] = useState("SEALED");
+  const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
   );
   const { loading, error, data, refetch } = useQuery(GET_TRANSPORT_SLIPS, {
-    variables: { siret, type: "TRANSPORTER" }
+    variables: { siret, type: "TRANSPORTER" },
   });
   if (loading) return <div>loading</div>;
   if (error) return <div>error</div>;
 
-  const filterAgainstPersistenFilter = (field, filterParam, filterStatus) => {
+  const filterAgainstPersistenFilter = (field, filterParam) => {
     field = !field ? "" : field;
     return field.toLowerCase().indexOf(filterParam.toLowerCase()) > -1;
   };
@@ -198,20 +216,19 @@ export default function Transport({ siret }: Props & any) {
   const filteredForms = data
     ? data.forms
         .filter(
-          f =>
-            f.status === filterStatus &&
+          (f) =>
+            filterStatus.includes(f.status) &&
             filterAgainstPersistenFilter(
               f.transporter.customInfo,
-              persistentFilter,
-              filterStatus
+              persistentFilter
             )
         )
-        .map(f => ({
+        .map((f) => ({
           ...f,
           wasteDetails: {
             ...f.wasteDetails,
-            name: `${f.wasteDetails.code} ${f.wasteDetails.name} `
-          }
+            name: `${f.wasteDetails.code} ${f.wasteDetails.name} `,
+          },
         }))
     : [];
   return (
@@ -222,14 +239,14 @@ export default function Transport({ siret }: Props & any) {
 
       <div className="transport-menu">
         <button
-          onClick={() => setFilterStatus("SEALED")}
-          className={`link ${filterStatus === "SEALED" ? "active" : ""}`}
+          onClick={() => setFilterStatus(["SEALED", "RESEALED"])}
+          className={`link ${filterStatus.includes("SEALED") ? "active" : ""}`}
         >
           Déchets à collecter
         </button>
         <button
-          onClick={() => setFilterStatus("SENT")}
-          className={`link ${filterStatus === "SENT" ? "active" : ""}`}
+          onClick={() => setFilterStatus(["SENT", "RESENT"])}
+          className={`link ${filterStatus.includes("SENT") ? "active" : ""}`}
         >
           Déchets chargés, en attente de réception
         </button>
@@ -246,20 +263,46 @@ export default function Transport({ siret }: Props & any) {
           type="text"
           placeholder="Filtre champ libre…"
           value={persistentFilter}
-          onChange={e => setPersistentFilter(e.target.value)}
+          onChange={(e) => setPersistentFilter(e.target.value)}
         />
 
         {persistentFilter && (
           <button
             className="button-outline warning"
-            onClick={e => setPersistentFilter("")}
+            onClick={(e) => setPersistentFilter("")}
           >
             Afficher tous les bordereaux
           </button>
         )}
       </div>
 
-      <Table forms={filteredForms} displayActions={filterStatus === "SEALED"} />
+      <Table
+        forms={filteredForms}
+        displayActions={filterStatus.includes("SEALED")}
+      />
     </div>
   );
+}
+
+function getTransportInfos(form: Form) {
+  if (!form.temporaryStorageDetail) {
+    return form;
+  }
+
+  return {
+    ...form,
+    emitter: {
+      ...form.emitter,
+      ...form.recipient,
+    },
+    recipient: {
+      ...form.recipient,
+      ...form.temporaryStorageDetail.destination,
+    },
+    wasteDetails: {
+      ...form.wasteDetails,
+      ...(form.temporaryStorageDetail.wasteDetails.quantity &&
+        form.temporaryStorageDetail.wasteDetails),
+    },
+  };
 }

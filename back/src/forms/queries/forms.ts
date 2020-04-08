@@ -35,7 +35,7 @@ export default async function forms(
       ]
     },
     TRANSPORTER: {
-      status_in: ["SEALED", "SENT"],
+      status_in: ["SEALED", "SENT", "RESEALED", "RESENT"],
       OR: [
         { transporterCompanySiret: selectedCompany.siret },
         {

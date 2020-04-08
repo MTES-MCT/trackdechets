@@ -39,7 +39,7 @@ export const formWorkflowMachine = Machine(
               cond: "isMissingSignature"
             },
             {
-              target: `pendingSecurityCodeValidation`
+              target: `pendingEmitterSecurityCodeValidation`
             }
           ]
         }
@@ -132,23 +132,31 @@ export const formWorkflowMachine = Machine(
           onError: { target: "error.invalidForm" }
         }
       },
-      pendingSecurityCodeValidation: {
+      pendingEmitterSecurityCodeValidation: {
         invoke: {
           src: (ctx, event) =>
             validateSecurityCode(
-              ctx.form,
+              ctx.form.emitterCompanySiret,
               event.securityCode,
               ctx.requestContext
             ),
-          onDone: [
-            {
-              target: FormState.Resent,
-              cond: "isTemporaryStorageSignature"
-            },
-            {
-              target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
-            }
-          ],
+          onDone: {
+            target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
+          },
+          onError: { target: "error.invalidSecurityCode" }
+        }
+      },
+      pendingTempStorerSecurityCodeValidation: {
+        invoke: {
+          src: (ctx, event) =>
+            validateSecurityCode(
+              ctx.form.recipientCompanySiret,
+              event.securityCode,
+              ctx.requestContext
+            ),
+          onDone: {
+            target: FormState.Resent
+          },
           onError: { target: "error.invalidSecurityCode" }
         }
       },
@@ -194,7 +202,7 @@ export const formWorkflowMachine = Machine(
               cond: "isMissingSignature"
             },
             {
-              target: `pendingSecurityCodeValidation`
+              target: `pendingTempStorerSecurityCodeValidation`
             }
           ]
         }
@@ -254,9 +262,7 @@ export const formWorkflowMachine = Machine(
           event.wasteAcceptationStatus
         );
       },
-      hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage,
-      isTemporaryStorageSignature: ctx =>
-        ctx.form.recipientIsTempStorage && ctx.form.sentAt != null
+      hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage
     }
   }
 );

@@ -5386,6 +5386,7 @@ type TemporaryStorageDetail {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
   signedBy: String
   signedAt: DateTime
 }
@@ -5432,6 +5433,7 @@ input TemporaryStorageDetailCreateInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
   signedBy: String
   signedAt: DateTime
 }
@@ -5476,6 +5478,7 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
   signedBy: String
   signedAt: DateTime
 }
@@ -5554,6 +5557,8 @@ enum TemporaryStorageDetailOrderByInput {
   transporterValidityLimit_DESC
   transporterNumberPlate_ASC
   transporterNumberPlate_DESC
+  signedByTransporter_ASC
+  signedByTransporter_DESC
   signedBy_ASC
   signedBy_DESC
   signedAt_ASC
@@ -5595,6 +5600,7 @@ type TemporaryStorageDetailPreviousValues {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
   signedBy: String
   signedAt: DateTime
 }
@@ -5652,6 +5658,7 @@ input TemporaryStorageDetailUpdateInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
   signedBy: String
   signedAt: DateTime
 }
@@ -5690,6 +5697,7 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
   signedBy: String
   signedAt: DateTime
 }
@@ -5737,6 +5745,7 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   transporterDepartment: String
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
+  signedByTransporter: Boolean
   signedBy: String
   signedAt: DateTime
 }
@@ -6120,6 +6129,8 @@ input TemporaryStorageDetailWhereInput {
   transporterNumberPlate_not_starts_with: String
   transporterNumberPlate_ends_with: String
   transporterNumberPlate_not_ends_with: String
+  signedByTransporter: Boolean
+  signedByTransporter_not: Boolean
   signedBy: String
   signedBy_not: String
   signedBy_in: [String!]

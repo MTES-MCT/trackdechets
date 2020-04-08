@@ -999,6 +999,8 @@ export type TemporaryStorageDetailOrderByInput =
   | "transporterValidityLimit_DESC"
   | "transporterNumberPlate_ASC"
   | "transporterNumberPlate_DESC"
+  | "signedByTransporter_ASC"
+  | "signedByTransporter_DESC"
   | "signedBy_ASC"
   | "signedBy_DESC"
   | "signedAt_ASC"
@@ -1278,6 +1280,7 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -1867,6 +1870,7 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -2331,6 +2335,8 @@ export interface TemporaryStorageDetailWhereInput {
   transporterNumberPlate_not_starts_with?: Maybe<String>;
   transporterNumberPlate_ends_with?: Maybe<String>;
   transporterNumberPlate_not_ends_with?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
+  signedByTransporter_not?: Maybe<Boolean>;
   signedBy?: Maybe<String>;
   signedBy_not?: Maybe<String>;
   signedBy_in?: Maybe<String[] | String>;
@@ -2407,6 +2413,7 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -5202,6 +5209,7 @@ export interface TemporaryStorageDetailCreateInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -6609,6 +6617,7 @@ export interface TemporaryStorageDetailUpdateInput {
   transporterDepartment?: Maybe<String>;
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
 }
@@ -9216,6 +9225,7 @@ export interface TemporaryStorageDetail {
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
   transporterNumberPlate?: String;
+  signedByTransporter?: Boolean;
   signedBy?: String;
   signedAt?: DateTimeOutput;
 }
@@ -9258,6 +9268,7 @@ export interface TemporaryStorageDetailPromise
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
+  signedByTransporter: () => Promise<Boolean>;
   signedBy: () => Promise<String>;
   signedAt: () => Promise<DateTimeOutput>;
 }
@@ -9302,6 +9313,7 @@ export interface TemporaryStorageDetailSubscription
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
   signedBy: () => Promise<AsyncIterator<String>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -9344,6 +9356,7 @@ export interface TemporaryStorageDetailNullablePromise
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
+  signedByTransporter: () => Promise<Boolean>;
   signedBy: () => Promise<String>;
   signedAt: () => Promise<DateTimeOutput>;
 }
@@ -9703,6 +9716,7 @@ export interface TemporaryStorageDetailPreviousValues {
   transporterDepartment?: String;
   transporterValidityLimit?: DateTimeOutput;
   transporterNumberPlate?: String;
+  signedByTransporter?: Boolean;
   signedBy?: String;
   signedAt?: DateTimeOutput;
 }
@@ -9744,6 +9758,7 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   transporterDepartment: () => Promise<String>;
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
+  signedByTransporter: () => Promise<Boolean>;
   signedBy: () => Promise<String>;
   signedAt: () => Promise<DateTimeOutput>;
 }
@@ -9787,6 +9802,7 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   transporterDepartment: () => Promise<AsyncIterator<String>>;
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
   signedBy: () => Promise<AsyncIterator<String>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }

@@ -11,12 +11,12 @@ export async function validateForm(form: Form) {
 }
 
 export async function validateSecurityCode(
-  form: Form,
+  siret: string,
   securityCode: number,
   requestContext: GraphQLContext
 ) {
   const exists = await requestContext.prisma.$exists.company({
-    siret: form.emitterCompanySiret,
+    siret,
     securityCode
   });
   return exists ? Promise.resolve() : Promise.reject();
