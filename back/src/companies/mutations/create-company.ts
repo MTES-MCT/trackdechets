@@ -1,6 +1,8 @@
+import { sendMail } from "../../common/mails.helper";
 import { GraphQLContext } from "../../types";
 import { randomNumber } from "../../utils";
 import { UserInputError } from "apollo-server-express";
+import { User, Company, prisma } from "../../generated/prisma-client";
 
 export default async function createCompany(
   _,
@@ -40,5 +42,39 @@ export default async function createCompany(
     role: "ADMIN"
   });
 
-  return companyAssociationPromise.company();
+  const company = await companyAssociationPromise.company();
+
+  await warnIfUserCreatesTooManyCompanies(context.user, company);
+
+  return company;
+}
+
+const NB_OF_COMPANIES_BEFORE_ALERT = 5;
+
+export async function warnIfUserCreatesTooManyCompanies(
+  user: User,
+  company: Company
+) {
+  const userCompaniesNumber = await prisma
+    .companyAssociationsConnection({ where: { user: { id: user.id } } })
+    .aggregate()
+    .count();
+
+  if (userCompaniesNumber > NB_OF_COMPANIES_BEFORE_ALERT) {
+    return sendMail({
+      body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
+      subject:
+        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
+      title:
+        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
+      to: [
+        {
+          email: "tech@trackdechets.beta.gouv.fr ",
+          name: "Equipe Trackdéchets"
+        }
+      ]
+    });
+  }
+
+  return Promise.resolve();
 }
