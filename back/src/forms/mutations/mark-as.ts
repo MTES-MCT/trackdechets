@@ -49,7 +49,7 @@ export async function signedByTransporter(
   { id, signingInfo },
   context: GraphQLContext
 ) {
-  const form = context.prisma.form({ id });
+  const form = await context.prisma.form({ id });
 
   // BSD has already been sent, it must be a signature for frame 18
   if (form.sentAt) {

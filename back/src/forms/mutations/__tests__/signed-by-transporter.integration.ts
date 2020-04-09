@@ -97,12 +97,12 @@ describe("Integration / Mark as processed mutation", () => {
         temporaryStorageDetail: {
           create: {
             tempStorerQuantityType: "REAL",
-            tempStorerQuantityReceived: "2.4",
-            tempStorerWasteAcceptationStatus: "",
+            tempStorerQuantityReceived: 2.4,
+            tempStorerWasteAcceptationStatus: "ACCEPTED",
             tempStorerReceivedAt: "2019-11-20T00:00:00.000Z",
             tempStorerReceivedBy: "John Doe",
             tempStorerSignedAt: "2019-11-20T00:00:00.000Z",
-            destinationIsFilledByEmitter: "",
+            destinationIsFilledByEmitter: false,
             destinationCompanyName: destinationCompany.name,
             destinationCompanySiret: destinationCompany.siret,
             destinationCap: "",
@@ -112,7 +112,7 @@ describe("Integration / Mark as processed mutation", () => {
             transporterIsExemptedOfReceipt: false,
             transporterReceipt: "Damned! That receipt looks good",
             transporterDepartment: "10",
-            transporterValidityLimit: "",
+            transporterValidityLimit: "2019-11-20T00:00:00.000Z",
             transporterNumberPlate: ""
           }
         }
