@@ -65,20 +65,21 @@ graph TD
 A[DRAFT] -->|Optionnel| B(SEALED)
 B --> |Par l'émetteur| C(SENT)
 A --> |Par l'émetteur| C
-C -- Par le site provisoire (BSD suite) -->I{TEMP_STORED}
-I -- Optionnel via API --> J{RESEALED}
-I -- Entreposage terminé --> K{RESENT}
-K --> D
-C -->|Par le receveur| D{RECEIVED}
+C -->|Par le receveur| D(RECEIVED)
 D -- Cas classique -->E(PROCESSED)
 D -- Regroupement et perte de traçabilite -->G(NO_TRACEABILITY)
 D -- Regroupement -->F(AWAITING_GROUP)
-D -- Refus de déchets --> I(REFUSED)
+C -- Refus de déchets --> I(REFUSED)
 F-. Rempli une annexe2 .->A
 F-. Rempli une annexe2 .->A
 F-. Rempli une annexe2 .->A
 F--Fait partie d'une annexe2 -->H[GROUPED]
 H--BSD avec annexe devient Processed -->E
+C -- Par le site provisoire / BSD suite -->J(TEMP_STORED)
+J -- Optionnel via API --> K(RESEALED)
+J --> L
+K -- Entreposage terminé --> L(RESENT)
+L --> D
 </div>
 
 ## BSD au format pdf
