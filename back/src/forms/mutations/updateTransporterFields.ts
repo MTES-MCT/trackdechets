@@ -10,7 +10,9 @@ export async function updateTransporterFields(
 ) {
   const form = await context.prisma.form({ id });
   if (form.status !== "SEALED") {
-    throw new ForbiddenError("Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé");
+    throw new ForbiddenError(
+      "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé"
+    );
   }
   const updatedForm = await context.prisma.updateForm({
     where: { id },
