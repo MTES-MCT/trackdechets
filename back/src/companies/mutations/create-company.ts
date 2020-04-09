@@ -11,7 +11,7 @@ export default async function createCompany(
 ) {
   const trimedSiret = companyInput.siret.replace(/\s+/g, "");
 
-  const existingCompany = await context.prisma.$exists
+  const existingCompany = await prisma.$exists
     .company({
       siret: trimedSiret
     })
@@ -27,7 +27,7 @@ export default async function createCompany(
     );
   }
 
-  const companyAssociationPromise = context.prisma.createCompanyAssociation({
+  const companyAssociationPromise = prisma.createCompanyAssociation({
     user: { connect: { id: context.user.id } },
     company: {
       create: {

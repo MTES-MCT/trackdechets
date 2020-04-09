@@ -3,20 +3,26 @@ import { ErrorCode } from "../../../common/errors";
 import { User, Company } from "../../../generated/prisma-client";
 
 const context = {
-  prisma: {
-    $exists: {
-      company: jest.fn(() => Promise.resolve(false))
-    },
-    createCompany: jest.fn(() => Promise.resolve({ id: "companyId" })),
-    createCompanyAssociation: jest.fn(() => ({
-      company: jest.fn(() => Promise.resolve())
-    })),
-    companyAssociationsConnection: () => ({
-      aggregate: () => ({ count: 1 })
-    })
-  },
   user: { id: "USER_ID" } as User
 };
+
+const mockExists = jest.fn();
+const mockCreateCompanyAssociation = jest.fn(() => ({
+  company: jest.fn(() => Promise.resolve())
+}));
+
+jest.mock("../../../generated/prisma-client", () => ({
+  prisma: {
+    $exists: {
+      company: jest.fn(() => mockExists())
+    },
+    createCompany: jest.fn(() => Promise.resolve({ id: "companyId" })),
+    createCompanyAssociation: jest.fn(() => mockCreateCompanyAssociation()),
+    companyAssociationsConnection: jest.fn(() => ({
+      aggregate: () => ({ count: () => 1 })
+    }))
+  }
+}));
 
 describe("Create company resolver", () => {
   beforeEach(() => {
@@ -27,7 +33,7 @@ describe("Create company resolver", () => {
     expect.assertions(1);
 
     const companyInput = { siret: "a siret" } as Company;
-    context.prisma.$exists.company.mockResolvedValue(true);
+    mockExists.mockResolvedValueOnce(true);
 
     try {
       await createCompany(null, { companyInput }, context as any);
@@ -38,10 +44,10 @@ describe("Create company resolver", () => {
 
   it("should create company and related association", async () => {
     const companyInput = { siret: "a siret" };
-    context.prisma.$exists.company.mockResolvedValue(false);
+    mockExists.mockResolvedValueOnce(false);
 
     await createCompany(null, { companyInput }, context as any);
 
-    expect(context.prisma.createCompanyAssociation).toHaveBeenCalledTimes(1);
+    expect(mockCreateCompanyAssociation).toHaveBeenCalledTimes(1);
   });
 });
