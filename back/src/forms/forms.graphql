@@ -73,6 +73,43 @@ type Query {
 }
 
 type Mutation {
+
+  "Permet de modifier la case 1 d'un BSD"
+  updateFormEmitter(
+    formEmitterInput: FormEmitterInput!
+  ): Form
+
+  "Permet de modifier les informations de destination ou d'entreposage"
+  updateFormDestination(
+    formDestinationInput: FormDestinationInput!
+  ): Form
+
+  """
+  Modifie les informations de la case 8 - Collecteur Transporteur
+  Si la signature producteur a déjà été appliqué, le code de vérification
+  doit être fourni
+  """
+  updateFormTransporter(
+    formTransporterInput: FormTransporterInput!
+  ): Form
+
+  """
+  Signature producteur (case 9 ). Fige les informations des cases 1, 2 3, 4, 5, 6, 7, 8.
+  Si la signature transporteur est déjà présente, passage au statut SENT
+  """
+  signedByProducer(
+    producerSignatureInput: ProducerSignatureInput!
+  )
+
+  """
+  Signature transporteur (case 8)
+  Si la signature producteur a déjà été appliqué, passage au statut SENT
+  """
+  signedByTransporter2(
+    transporterSignatureInput: TransporterSignatureInput!
+  ): Form
+
+
   "Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
   saveForm("Payload du BSD" formInput: FormInput!): Form
 
