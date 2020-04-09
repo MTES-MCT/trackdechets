@@ -8,10 +8,15 @@ import { ForbiddenError } from "apollo-server-express";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
+  recipientIsTempStorage: boolean;
   emitterCompanySiret: string;
   transporterCompanySiret: string;
   traderCompanySiret: string;
   ecoOrganisme: { siret: string };
+  temporaryStorageDetail: {
+    destinationCompanySiret: string;
+    transporterCompanySiret: string;
+  };
   owner: { id: string };
 };
 
@@ -33,7 +38,9 @@ export const canAccessForm = and(
       [
         formInfos.emitterCompanySiret,
         formInfos.recipientCompanySiret,
-        formInfos.ecoOrganisme?.siret
+        formInfos.ecoOrganisme?.siret,
+        formInfos.temporaryStorageDetail?.destinationCompanySiret,
+        formInfos.temporaryStorageDetail?.transporterCompanySiret
       ].some(siret => currentUserSirets.includes(siret)) ||
       new ForbiddenError(`Vous n'êtes pas autorisé à accéder à ce bordereau.`)
     );
@@ -89,6 +96,10 @@ export const isFormTransporter = and(
 
     return (
       currentUserSirets.includes(formInfos.transporterCompanySiret) ||
+      (formInfos.temporaryStorageDetail?.transporterCompanySiret &&
+        currentUserSirets.includes(
+          formInfos.temporaryStorageDetail.transporterCompanySiret
+        )) ||
       new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`)
     );
   })
@@ -112,6 +123,19 @@ export const isFormTrader = and(
   })
 );
 
+export const isFormTempStorer = and(
+  isAuthenticated,
+  isFormRecipient,
+  rule()(async (_, { id }, ctx) => {
+    const form = await ctx.prisma.form({ id });
+
+    return (
+      form.recipientIsTempStorage ||
+      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+    );
+  })
+);
+
 async function getFormAccessInfos(
   formId: string,
   userId: string,
@@ -122,10 +146,15 @@ async function getFormAccessInfos(
   >(`
   fragment FormWithOwner on Form {
     recipientCompanySiret
+    recipientIsTempStorage
     emitterCompanySiret
     transporterCompanySiret
     traderCompanySiret
     ecoOrganisme { siret }
+    temporaryStorageDetail {
+      destinationCompanySiret
+      transporterCompanySiret
+    }
     owner { id }
   }
 `);

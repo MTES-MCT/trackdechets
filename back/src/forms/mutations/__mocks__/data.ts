@@ -32,7 +32,8 @@ export const getNewValidForm = () =>
           contact: "Destination",
           phone: "02",
           mail: "d@d.fr"
-        }
+        },
+        isTempStorage: false
       },
       transporter: {
         receipt: "sdfg",
@@ -82,6 +83,7 @@ export const EMPTY_FORM = {
   recipient: {
     cap: "",
     processingOperation: "",
+    isTempStorage: false,
     company: {
       siret: "",
       name: "",
@@ -131,5 +133,19 @@ export const EMPTY_FORM = {
     consistence: "SOLID"
   },
   appendix2Forms: [],
-  ecoOrganisme: {}
+  ecoOrganisme: {},
+  temporaryStorageDetail: {
+    destination: {
+      company: {
+        siret: "",
+        name: "",
+        address: "",
+        contact: "",
+        mail: "",
+        phone: ""
+      },
+      cap: "",
+      processingOperation: ""
+    }
+  }
 };

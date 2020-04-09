@@ -26,12 +26,24 @@ export default async function forms(
       OR: [
         { recipientCompanySiret: selectedCompany.siret },
         { emitterCompanySiret: selectedCompany.siret },
-        { ecoOrganisme: { siret: selectedCompany.siret } }
+        { ecoOrganisme: { siret: selectedCompany.siret } },
+        {
+          temporaryStorageDetail: {
+            destinationCompanySiret: selectedCompany.siret
+          }
+        }
       ]
     },
     TRANSPORTER: {
-      transporterCompanySiret: selectedCompany.siret,
-      status_in: ["SEALED", "SENT"]
+      status_in: ["SEALED", "SENT", "RESEALED", "RESENT"],
+      OR: [
+        { transporterCompanySiret: selectedCompany.siret },
+        {
+          temporaryStorageDetail: {
+            transporterCompanySiret: selectedCompany.siret
+          }
+        }
+      ]
     }
   };
 

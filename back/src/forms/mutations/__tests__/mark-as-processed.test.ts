@@ -1,11 +1,17 @@
 import { getNewValidForm } from "../__mocks__/data";
 import { markAsProcessed } from "../mark-as";
-import { ErrorCode } from "../../../common/errors";
-import { FormState } from "../../workflow/model";
 import { flattenObjectForDb } from "../../form-converter";
 
+const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+const formMock = jest.fn(() => Promise.resolve({}));
+function mockFormWith(value) {
+  const result: any = Promise.resolve(value);
+  result.temporaryStorageDetail = temporaryStorageDetailMock;
+  formMock.mockReturnValue(result);
+}
+
 const prisma = {
-  form: jest.fn(() => Promise.resolve({})),
+  form: formMock,
   updateForm: jest.fn(() => Promise.resolve({})),
   createForm: jest.fn(() => Promise.resolve({})),
   createStatusLog: jest.fn(() => Promise.resolve({})),
@@ -32,7 +38,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     const form = getNewValidForm();
     form.status = "RECEIVED";
 
-    prisma.form.mockResolvedValue(flattenObjectForDb(form));
+    mockFormWith(flattenObjectForDb(form));
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.recipient.company.siret }
     ]);
@@ -54,7 +60,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     const form = getNewValidForm();
     form.status = "RECEIVED";
 
-    prisma.form.mockResolvedValue(flattenObjectForDb(form));
+    mockFormWith(flattenObjectForDb(form));
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.recipient.company.siret }
     ]);
@@ -76,7 +82,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     const form = getNewValidForm();
     form.status = "RECEIVED";
 
-    prisma.form.mockResolvedValue(flattenObjectForDb(form));
+    mockFormWith(flattenObjectForDb(form));
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.recipient.company.siret }
     ]);

@@ -3,7 +3,16 @@ import { signedByTransporter } from "../mark-as";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 
 describe("Forms -> signedByTransporter mutation", () => {
-  const formMock = jest.fn();
+  const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+  const formMock = jest.fn(() => Promise.resolve({}));
+  const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
+  function mockFormWith(value) {
+    const result: any = Promise.resolve(value);
+    result.temporaryStorageDetail = temporaryStorageDetailMock;
+    result.appendix2Forms = appendix2FormsMock;
+    formMock.mockReturnValue(result);
+  }
+
   const prisma = {
     form: formMock,
     updateForm: jest.fn(() => Promise.resolve({})),
@@ -34,7 +43,7 @@ describe("Forms -> signedByTransporter mutation", () => {
     expect.assertions(1);
     try {
       getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
-      prisma.form.mockResolvedValue({
+      mockFormWith({
         id: 1,
         status: "SEALED",
         emitterCompanySiret: "a siret"
@@ -54,7 +63,7 @@ describe("Forms -> signedByTransporter mutation", () => {
     expect.assertions(1);
     try {
       getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
-      prisma.form.mockResolvedValue({
+      mockFormWith({
         id: 1,
         status: "SEALED",
         emitterCompanySiret: "a siret"
@@ -74,7 +83,7 @@ describe("Forms -> signedByTransporter mutation", () => {
     expect.assertions(1);
     try {
       getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
-      prisma.form.mockResolvedValue({
+      mockFormWith({
         id: 1,
         status: "SEALED",
         emitterCompanySiret: "a siret"
@@ -99,17 +108,12 @@ describe("Forms -> signedByTransporter mutation", () => {
 
   it("should work when signingInfo are complete and correct", async () => {
     getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
-    prisma.form
-      .mockReturnValue({
-        appendix2Forms: () => Promise.resolve([{ id: "appendix id" }])
-      } as any)
-      .mockReturnValueOnce(
-        Promise.resolve({
-          id: 1,
-          status: "SEALED",
-          emitterCompanySiret: "a siret"
-        })
-      );
+    appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
+    mockFormWith({
+      id: 1,
+      status: "SEALED",
+      emitterCompanySiret: "a siret"
+    });
     prisma.$exists.company.mockResolvedValue(true);
 
     await signedByTransporter(

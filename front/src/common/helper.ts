@@ -51,3 +51,13 @@ export function updateApolloCache<T>(
 export function getErrorMessages(err: ApolloError) {
   return err.graphQLErrors.map(error => error.message);
 }
+
+export function removeNulls(obj) {
+  const isArray = obj instanceof Array;
+  for (const k in obj) {
+    if (obj[k] === null) isArray ? obj.splice(k, 1) : delete obj[k];
+    else if (typeof obj[k] == "object") removeNulls(obj[k]);
+  }
+
+  return obj;
+}

@@ -11,7 +11,10 @@ import {
   markAsReceived,
   markAsSealed,
   markAsSent,
-  signedByTransporter
+  signedByTransporter,
+  markAsTempStored,
+  markAsResent,
+  markAsResealed
 } from "./mutations/mark-as";
 import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
@@ -74,6 +77,44 @@ export default {
     },
     ecoOrganisme: (parent, _, context: GraphQLContext) => {
       return context.prisma.form({ id: parent.id }).ecoOrganisme();
+    },
+    temporaryStorageDetail: async (parent, _, context: GraphQLContext) => {
+      const temporaryStorageDetail = await context.prisma
+        .form({ id: parent.id })
+        .temporaryStorageDetail();
+
+      return temporaryStorageDetail
+        ? unflattenObjectFromDb(temporaryStorageDetail)
+        : null;
+    },
+    // Depending on the form state, the "actuel" form quantity must be read in different fields
+    actualQuantity: async (parent, _, context: GraphQLContext) => {
+      // When the form is received we have the definitive quantity
+      if (parent.quantityReceived != null) {
+        return parent.quantityReceived;
+      }
+      // When form is temp stored the quantity is reported on arrival and might be changed
+      if (parent.recipient?.isTempStorage) {
+        const temporaryStorageDetail = await context.prisma
+          .form({ id: parent.id })
+          .temporaryStorageDetail();
+
+        // Repackaging
+        if (temporaryStorageDetail?.wasteDetailsQuantity) {
+          return temporaryStorageDetail.wasteDetailsQuantity;
+        }
+
+        // Arrival
+        if (temporaryStorageDetail?.tempStorerQuantityReceived != null) {
+          return temporaryStorageDetail.tempStorerQuantityReceived;
+        }
+      }
+      // Not a lot happened yet, use the quantity input
+      if (parent.wasteDetails?.quantity) {
+        return parent.wasteDetails.quantity;
+      }
+      // For drafts, we might not have a quantity yet
+      return null;
     }
   },
   Query: {
@@ -236,7 +277,10 @@ export default {
     markAsReceived,
     markAsProcessed,
     signedByTransporter,
-    updateTransporterFields
+    updateTransporterFields,
+    markAsTempStored,
+    markAsResealed,
+    markAsResent
   },
   Subscription: {
     forms: {

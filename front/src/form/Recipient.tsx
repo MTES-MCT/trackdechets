@@ -6,6 +6,7 @@ import DateInput from "./custom-inputs/DateInput";
 import initialState from "./initial-state";
 import { Form } from "./model";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
+import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
 import "./Recipient.scss";
 
 export default function Recipient() {
@@ -21,7 +22,17 @@ export default function Recipient() {
 
   return (
     <>
-      <h4 className="required">Entreprise de destination</h4>
+      <h4 className="required">
+        Installation de destination ou d’entreposage ou de reconditionnement
+      </h4>
+
+      <div className="form__group">
+        <label>
+          <Field type="checkbox" name="recipient.isTempStorage" />
+          Le BSD va passer par une étape d'entreposage provisoire ou
+          reconditionnement
+        </label>
+      </div>
 
       <div className="text-quote recipient">
         <p>
@@ -68,7 +79,7 @@ export default function Recipient() {
         </label>
       </div>
       {hasTrader && (
-        <>
+        <div className="form__group">
           <h4>Négociant</h4>
           <CompanySelector name="trader.company" />
 
@@ -98,8 +109,10 @@ export default function Recipient() {
 
             <RedErrorMessage name="trader.validityLimit" />
           </div>
-        </>
+        </div>
       )}
+
+      <TemporaryStorage name="temporaryStorageDetail" />
     </>
   );
 }

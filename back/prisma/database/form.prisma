@@ -1,0 +1,224 @@
+"""
+Eco-organismes
+"""
+type EcoOrganisme {
+  id: ID! @id
+  siret: String! @unique
+  name: String!
+  address: String!
+}
+
+type Form {
+  id: ID! @id
+  readableId: String @unique
+  customId: String
+  isDeleted: Boolean @default(value: false)
+
+  owner: User! @relation(link: TABLE)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+
+  # Workflow fields
+  signedByTransporter: Boolean
+
+  status: String @default(value: "DRAFT")
+  sentAt: DateTime
+  sentBy: String
+
+  isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
+  receivedBy: String
+  receivedAt: DateTime
+  quantityReceived: Float
+
+  processedBy: String
+  processedAt: String
+  processingOperationDone: String
+  processingOperationDescription: String
+  noTraceability: Boolean
+
+  # Next destination fields (frame 12)
+  nextDestinationProcessingOperation: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
+
+  # Emitter fields
+  emitterType: EmitterType
+
+  emitterPickupSite: String # DEPRECATED - To remove
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
+
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: String
+  emitterCompanyMail: String
+
+  # Recipient fields
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean @default(value: false)
+
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: String
+  recipientCompanyMail: String
+
+  # Transporter fields
+  transporterCompanyName: String
+  transporterCompanySiret: String
+
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  # Free field, used to easily retrieve transporter tours
+  transporterCustomInfo: String
+
+  # Waste details fields
+  wasteDetailsCode: String
+  wasteDetailsName: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
+
+  # Trader fields
+  traderCompanyName: String
+  traderCompanySiret: String
+
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
+
+  # Eco-organisme
+  ecoOrganisme: EcoOrganisme
+
+  appendix2Forms: [Form]
+  temporaryStorageDetail: TemporaryStorageDetail @relation(link: INLINE)
+}
+
+type TemporaryStorageDetail {
+  id: ID! @id
+  form: Form
+
+  # Frame 13 - the rest of the infos are in frame 2
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+
+  # Frame 14
+  destinationIsFilledByEmitter: Boolean @default(value: true)
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+
+  # Frame 15, 16, 17
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+
+  # Frame 18
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+
+  # Frame 19
+  signedBy: String
+  signedAt: DateTime
+}
+
+enum WasteAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}
+
+enum EmitterType {
+  PRODUCER
+  OTHER
+  APPENDIX1
+  APPENDIX2
+}
+
+enum QuantityType {
+  REAL
+  ESTIMATED
+}
+
+enum Consistence {
+  SOLID
+  LIQUID
+  GASEOUS
+}
+
+enum Status {
+  DRAFT
+  SEALED
+  SENT
+  RECEIVED
+  PROCESSED
+  AWAITING_GROUP
+  GROUPED
+  NO_TRACEABILITY
+  REFUSED
+
+  # Temporary storage status
+  TEMP_STORED
+  RESEALED
+  RESENT
+}
+
+type StatusLog {
+  id: ID! @id
+  user: User!
+  form: Form!
+  status: Status!
+  loggedAt: DateTime
+  updatedFields: Json
+}

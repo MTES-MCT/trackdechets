@@ -5,7 +5,7 @@ export enum SlipTabs {
   DRAFTS,
   TO_SIGN,
   STATUS,
-  HISTORY
+  HISTORY,
 }
 
 export function getTabForms(
@@ -50,7 +50,7 @@ export function getTabForms(
     case SlipTabs.HISTORY:
       return (
         forms
-          // filter from whose status is   PROCESSED|NO_TRACEABILITY|REFUSED
+          // filter from whose status is PROCESSED|NO_TRACEABILITY|REFUSED
           .filter((f: Form) => isHistoryStatus(f.status))
           .sort((a: any, b: any) => a.createdAt - b.createdAt)
       );
@@ -60,6 +60,10 @@ export function getTabForms(
 export function getNextStep(form: Form, currentSiret: string) {
   const currentUserIsEmitter = currentSiret === form.emitter.company.siret;
   const currentUserIsRecipient = currentSiret === form.recipient.company.siret;
+  const currentUserIsTempStorer =
+    currentUserIsRecipient && form.recipient.isTempStorage;
+  const currentUserIsDestination =
+    currentSiret === form.temporaryStorageDetail?.destination?.company.siret;
 
   if (form.status === FormStatus.DRAFT) return FormStatus.SEALED;
 
@@ -67,10 +71,26 @@ export function getNextStep(form: Form, currentSiret: string) {
     if (form.status === FormStatus.SEALED) return FormStatus.SENT;
   }
 
+  if (currentUserIsDestination) {
+    if (form.status === FormStatus.RESENT) return FormStatus.RECEIVED;
+  }
+
+  if (currentUserIsTempStorer) {
+    if (form.status === FormStatus.SENT) return FormStatus.TEMP_STORED;
+    if (form.status === FormStatus.TEMP_STORED) return FormStatus.RESEALED;
+    if (form.status === FormStatus.RESEALED) return FormStatus.RESENT;
+    return null;
+  }
+
   if (currentUserIsRecipient) {
-    if (form.status === FormStatus.SENT) return FormStatus.RECEIVED;
+    if (
+      form.status === FormStatus.SENT &&
+      form.temporaryStorageDetail?.temporaryStorer == null
+    )
+      return FormStatus.RECEIVED;
     if (form.status === FormStatus.RECEIVED) return FormStatus.PROCESSED;
   }
+
   return null;
 }
 
@@ -82,6 +102,6 @@ function isHistoryStatus(status: string) {
   return [
     FormStatus.PROCESSED,
     FormStatus.NO_TRACEABILITY,
-    FormStatus.REFUSED
+    FormStatus.REFUSED,
   ].includes(status as FormStatus);
 }

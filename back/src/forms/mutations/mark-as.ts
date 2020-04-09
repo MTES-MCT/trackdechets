@@ -5,6 +5,7 @@ import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
 import { ForbiddenError } from "apollo-server-express";
+import { capitalize } from "../../common/strings";
 
 export async function markAsSealed(_, { id }, context: GraphQLContext) {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
@@ -48,6 +49,42 @@ export async function signedByTransporter(
   { id, signingInfo },
   context: GraphQLContext
 ) {
+  const form = await context.prisma.form({ id });
+
+  // BSD has already been sent, it must be a signature for frame 18
+  if (form.sentAt) {
+    const temporaryStorageDetail = await context.prisma
+      .form({ id })
+      .temporaryStorageDetail();
+
+    const hasWasteDetailsOverride = !!temporaryStorageDetail.wasteDetailsQuantity;
+
+    return transitionForm(
+      id,
+      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
+      context,
+      infos => {
+        const wasteDetails = {
+          wasteDetailsPackagings: infos.packagings,
+          wasteDetailsQuantity: infos.quantity,
+          wasteDetailsOnuCode: infos.onuCode
+        };
+
+        return {
+          ...(!hasWasteDetailsOverride && wasteDetails),
+          temporaryStorageDetail: {
+            update: {
+              signedBy: infos.sentBy,
+              signedAt: infos.sentAt,
+              signedByTransporter: infos.signedByTransporter,
+              ...(hasWasteDetailsOverride && wasteDetails)
+            }
+          }
+        };
+      }
+    );
+  }
+
   const transformEventToFormParams = infos => ({
     signedByTransporter: infos.signedByTransporter,
     sentAt: infos.sentAt,
@@ -65,6 +102,66 @@ export async function signedByTransporter(
   );
 }
 
+export function markAsTempStored(
+  _,
+  { id, tempStoredInfos },
+  context: GraphQLContext
+) {
+  const transformEventToFormParams = infos => ({
+    temporaryStorageDetail: {
+      update: {
+        ...Object.keys(infos).reduce((prev, cur) => {
+          prev[`tempStorer${capitalize(cur)}`] = infos[cur];
+          return prev;
+        }, {})
+      }
+    }
+  });
+
+  return transitionForm(
+    id,
+    { eventType: "MARK_TEMP_STORED", eventParams: tempStoredInfos },
+    context,
+    transformEventToFormParams
+  );
+}
+
+export function markAsResealed(
+  _,
+  { id, resealedInfos },
+  context: GraphQLContext
+) {
+  const transformEventToFormParams = infos => ({
+    temporaryStorageDetail: {
+      update: flattenObjectForDb(infos)
+    }
+  });
+
+  return transitionForm(
+    id,
+    { eventType: "MARK_RESEALED", eventParams: resealedInfos },
+    context,
+    transformEventToFormParams
+  );
+}
+
+export function markAsResent(_, { id, resentInfos }, context: GraphQLContext) {
+  const transformEventToFormParams = infos => ({
+    temporaryStorageDetail: {
+      update: {
+        ...flattenObjectForDb(infos)
+      }
+    }
+  });
+
+  return transitionForm(
+    id,
+    { eventType: "MARK_RESENT", eventParams: resentInfos },
+    context,
+    transformEventToFormParams
+  );
+}
+
 async function transitionForm(
   formId: string,
   { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
@@ -72,11 +169,14 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await context.prisma.form({ id: formId });
+  const temporaryStorageDetail = await context.prisma
+    .form({ id: formId })
+    .temporaryStorageDetail();
 
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
   const startingState = State.from(form.status, {
-    form: { ...form, ...formPropsFromEvent },
+    form: { ...form, ...formPropsFromEvent, temporaryStorageDetail },
     requestContext: context,
     isStableState: true
   });
@@ -159,6 +259,48 @@ const fieldsToLog = {
     "nextDestinationCompanyContact",
     "nextDestinationCompanyPhone",
     "nextDestinationCompanyMail"
+  ],
+  MARK_TEMP_STORED: [
+    "receivedBy",
+    "receivedAt",
+    "quantityReceived",
+    "quantityType"
+  ],
+  MARK_RESEALED: [
+    "destinationIsFilledByEmitter",
+    "destinationCompanyName",
+    "destinationCompanySiret",
+    "destinationCompanyAddress",
+    "destinationCompanyContact",
+    "destinationCompanyPhone",
+    "destinationCompanyMail",
+    "destinationCap",
+    "destinationProcessingOperation",
+    "wasteDetailsOnuCode",
+    "wasteDetailsPackagings",
+    "wasteDetailsOtherPackaging",
+    "wasteDetailsNumberOfPackages",
+    "wasteDetailsQuantity",
+    "wasteDetailsQuantityType"
+  ],
+  MARK_RESENT: [
+    "destinationIsFilledByEmitter",
+    "destinationCompanyName",
+    "destinationCompanySiret",
+    "destinationCompanyAddress",
+    "destinationCompanyContact",
+    "destinationCompanyPhone",
+    "destinationCompanyMail",
+    "destinationCap",
+    "destinationProcessingOperation",
+    "signedBy",
+    "signedAt",
+    "wasteDetailsOnuCode",
+    "wasteDetailsPackagings",
+    "wasteDetailsOtherPackaging",
+    "wasteDetailsNumberOfPackages",
+    "wasteDetailsQuantity",
+    "wasteDetailsQuantityType"
   ]
 };
 

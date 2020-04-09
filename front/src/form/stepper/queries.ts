@@ -34,6 +34,7 @@ export const GET_FORM = gql`
       recipient {
         cap
         processingOperation
+        isTempStorage
         company {
           ...CompanyFragment
         }
@@ -73,6 +74,15 @@ export const GET_FORM = gql`
       ecoOrganisme {
         id
       }
+      temporaryStorageDetail {
+        destination {
+          company {
+            ...CompanyFragment
+          }
+          cap
+          processingOperation
+        }
+      }
     }
   }
   ${fragments.company}
@@ -97,6 +107,7 @@ export const SAVE_FORM = gql`
           name
           siret
         }
+        isTempStorage
         processingOperation
       }
       wasteDetails {
@@ -104,6 +115,7 @@ export const SAVE_FORM = gql`
         name
         quantity
       }
+      actualQuantity
       quantityReceived
     }
   }
