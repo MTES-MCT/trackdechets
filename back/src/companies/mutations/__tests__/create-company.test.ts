@@ -9,7 +9,10 @@ const context = {
     createCompany: jest.fn(() => Promise.resolve({ id: "companyId" })),
     createCompanyAssociation: jest.fn(() => ({
       company: jest.fn(() => Promise.resolve())
-    }))
+    })),
+    companyAssociationsConnection: () => ({
+      aggregate: () => ({ count: 1 })
+    })
   },
   user: { id: "USER_ID" }
 };
