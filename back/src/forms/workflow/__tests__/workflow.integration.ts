@@ -63,7 +63,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     const downloadToken = formPdfResponse.body.data.formPdf.token;
 
     const dir = save ? PDF_DIR : fs.mkdtempSync(path.join(os.tmpdir(), "/"));
-    console.log(dir);
     const filepath = path.join(dir, filename);
 
     const writeStream = fs.createWriteStream(filepath);
