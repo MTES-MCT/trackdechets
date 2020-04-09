@@ -677,7 +677,11 @@ Informations liées à la signature transporteur
 <tr>
 <td colspan="2" valign="top"><strong>markAsTempStored</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
-<td></td>
+<td>
+
+Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
@@ -690,9 +694,32 @@ Informations liées à la signature transporteur
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>markAsResealed</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">resealedInfos</td>
+<td valign="top"><a href="#resealedforminput">ResealedFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>markAsResent</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
-<td></td>
+<td>
+
+Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
@@ -3832,7 +3859,52 @@ Si c'est un entreprosage provisoire ou reconditionnement
 </tbody>
 </table>
 
+### ResealedFormInput
+
+Payload lié au détails du déchet du BSD suite (case 14 à 19)
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#destinationinput">DestinationInput</a></td>
+<td>
+
+Destination finale du déchet (case 14)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
+<td>
+
+Détail du déchet en cas de reconditionnement (case 15 à 19)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
+<td>
+
+Transporteur du déchet reconditionné
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### ResentFormInput
+
+Payload lié au détails du déchet du BSD suite et à la signature de l'envoi (case 14 à 20)
 
 <table>
 <thead>
@@ -4693,6 +4765,14 @@ Déchet refusé
 <td>
 
 Déchet arrivé sur le site d'entreposage ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>RESEALED</strong></td>
+<td>
+
+Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site d'entreposage ou reconditionnement
 
 </td>
 </tr>
