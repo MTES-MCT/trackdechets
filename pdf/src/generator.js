@@ -7,14 +7,15 @@ const {
   fillFields,
   drawImage,
   checkBox,
-  processAnnexParams
+  processAnnexParams,
 } = require("./helpers");
 const {
   pageHeight,
   mainFormFieldSettings,
+  temporaryStorageDetailsFieldSettings,
   appendixFieldSettings,
   appendixHeaderFieldSettings,
-  appendixYOffsets
+  appendixYOffsets,
 } = require("./settings");
 
 const { PDFDocument } = pdflib;
@@ -27,8 +28,8 @@ const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
  * @param params - payload
  * @return Buffer
  */
-const buildPdf = async params => {
-  const { appendix2Forms } = params;
+const buildPdf = async (params) => {
+  const { appendix2Forms, temporaryStorageDetail } = params;
 
   const formData = processMainFormParams(params);
   const arialBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
@@ -38,6 +39,10 @@ const buildPdf = async params => {
 
   const existingPdfBytes = fs.readFileSync(
     path.join(__dirname, "./templates/bsd.pdf")
+  );
+
+  const existingTemporaryStorageBytes = fs.readFileSync(
+    path.join(__dirname, "./templates/appendix2.pdf")
   );
 
   const existingAnnexBytes = fs.readFileSync(
@@ -79,14 +84,14 @@ const buildPdf = async params => {
       x: customIdTitleParams.x,
       y: pageHeight - customIdTitleParams.y,
       size: customIdTitleParams.fontSize,
-      font: timesBoldFont
+      font: timesBoldFont,
     });
   }
   checkBox({
     fieldName: "temporaryStorageNo",
     settings: mainFormFieldSettings,
     font: arialFont,
-    page: firstPage
+    page: firstPage,
   });
 
   // fill main form fields
@@ -94,20 +99,20 @@ const buildPdf = async params => {
     data: formData,
     page: firstPage,
     settings: mainFormFieldSettings,
-    font: arialFont
+    font: arialFont,
   });
 
   // draw watermark if needed
   if (!!process.env.PDF_WATERMARK) {
     drawImage("watermark", watermarkImage, firstPage, {
       width: 600,
-      height: 800
+      height: 800,
     });
   }
   if (!!formData.noTraceability) {
     drawImage("noTraceabilityStamp", noTraceabilityImage, firstPage, {
       width: 100,
-      height: 50
+      height: 50,
     });
   }
 
@@ -127,8 +132,45 @@ const buildPdf = async params => {
   if (!!formData.transporterIsExemptedOfReceipt) {
     drawImage("exemptionStamp", exemptionStampImage, firstPage, {
       width: 150,
-      height: 65
+      height: 65,
     });
+  }
+
+  if (temporaryStorageDetail) {
+    const temporaryStorageDetailsPage = await PDFDocument.load(
+      existingTemporaryStorageBytes
+    );
+    temporaryStorageDetailsPage.registerFontkit(fontkit);
+    const temporaryStorageArialFont = await temporaryStorageDetailsPage.embedFont(
+      arialBytes
+    );
+    const temporaryStorageWatermarkImage = await temporaryStorageDetailsPage.embedPng(
+      watermarkBytes
+    );
+    const currentTemporaryStoragePage = temporaryStorageDetailsPage.getPages()[0];
+
+    // fill form data
+    fillFields({
+      data: formData,
+      page: currentTemporaryStoragePage,
+      settings: temporaryStorageDetailsFieldSettings,
+      font: temporaryStorageArialFont,
+    });
+
+    // draw watermark if needed
+    if (!!process.env.PDF_WATERMARK) {
+      drawImage(
+        "watermark",
+        temporaryStorageWatermarkImage,
+        currentTemporaryStoragePage,
+        {
+          width: 600,
+          height: 800,
+        }
+      );
+    }
+
+    mainForm.addPage(currentTemporaryStoragePage);
   }
 
   // early return pdf if there is no appendix
@@ -165,7 +207,7 @@ const buildPdf = async params => {
       data: formData,
       page: currentAppendixPage,
       settings: appendixHeaderFieldSettings,
-      font: appendixArialFont
+      font: appendixArialFont,
     });
 
     let remaining = appendix2FormsCount - sheetCounter * formsByAppendix; // how many sub forms left
@@ -182,7 +224,7 @@ const buildPdf = async params => {
       // process each annex and add numbering
       appendix = {
         ...processAnnexParams(appendix),
-        numbering: `${subFormCounter + 1}`
+        numbering: `${subFormCounter + 1}`,
       };
       // to avoid using coordinates for each one of the 5 subForms, we add a vertical offset
       let yOffset = appendixYOffsets[pageSubFormCounter];
@@ -193,7 +235,7 @@ const buildPdf = async params => {
         page: currentAppendixPage,
         settings: appendixFieldSettings,
         font: appendixArialFont,
-        yOffset: yOffset
+        yOffset: yOffset,
       });
     }
 
@@ -201,7 +243,7 @@ const buildPdf = async params => {
     if (!!process.env.PDF_WATERMARK) {
       drawImage("watermark", appendixWatermarkImage, currentAppendixPage, {
         width: 600,
-        height: 800
+        height: 800,
       });
     }
 

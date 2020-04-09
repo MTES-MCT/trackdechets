@@ -28,9 +28,10 @@ const buildPdf = async (form, responseType: ResponseType) => {
 
   const appendix2Forms = await prisma.form({ id: form.id }).appendix2Forms();
   const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
+  const temporaryStorageDetail = await prisma.form({ id: form.id }).temporaryStorageDetail();
   return axios.post(
     "http://td-pdf:3201/pdf",
-    { ...form, appendix2Forms, ecoOrganisme },
+    { ...form, appendix2Forms, ecoOrganisme, temporaryStorageDetail },
     { responseType }
   );
 };

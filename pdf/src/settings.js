@@ -122,8 +122,8 @@ const imageLocations = {
   watermark: { x: 0, y: 800 },
 };
 
-// Continued main form field settings
-const continuedMainFormFieldSettings = {
+// Temporary Storage detail form field settings
+const temporaryStorageDetailsFieldSettings = {
   tempStorerQuantityReal: { x: 53, y: 0 },
   tempStorerQuantityEstimated: { x: 53, y: 0 },
   tempStorerQuantity: { x: 53, y: 0 },
@@ -214,7 +214,7 @@ const appendixYOffsets = [0, 104, 208, 313, 418];
 
 exports.pageHeight = pageHeight;
 exports.mainFormFieldSettings = mainFormFieldSettings;
-exports.continuedMainFormFieldSettings = continuedMainFormFieldSettings;
+exports.temporaryStorageDetailsFieldSettings = temporaryStorageDetailsFieldSettings;
 exports.imageLocations = imageLocations;
 exports.appendixHeaderFieldSettings = appendixHeaderFieldSettings;
 exports.appendixFieldSettings = appendixFieldSettings;
