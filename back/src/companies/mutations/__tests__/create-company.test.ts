@@ -1,5 +1,6 @@
 import createCompany from "../create-company";
 import { ErrorCode } from "../../../common/errors";
+import { User, Company } from "../../../generated/prisma-client";
 
 const context = {
   prisma: {
@@ -14,7 +15,7 @@ const context = {
       aggregate: () => ({ count: 1 })
     })
   },
-  user: { id: "USER_ID" }
+  user: { id: "USER_ID" } as User
 };
 
 describe("Create company resolver", () => {
@@ -25,7 +26,7 @@ describe("Create company resolver", () => {
   it("should throw when company already exists", async () => {
     expect.assertions(1);
 
-    const companyInput = { siret: "a siret" };
+    const companyInput = { siret: "a siret" } as Company;
     context.prisma.$exists.company.mockResolvedValue(true);
 
     try {
