@@ -49,6 +49,11 @@ export async function getFileDownloadToken(
  */
 export async function downloadFileHandler(req: Request, res: Response) {
   const { token } = req.query;
+
+  if (typeof token !== "string") {
+    return res.status(400).send("Le token doit être une chaine de caractères.");
+  }
+
   const redisValue = await redis.get(token).catch(_ => null);
 
   if (redisValue == null) {
