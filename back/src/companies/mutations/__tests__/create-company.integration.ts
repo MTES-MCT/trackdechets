@@ -2,7 +2,6 @@ import { userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import * as mailsHelper from "../../../common/mails.helper";
 import { prisma, MutationType } from "../../../generated/prisma-client";
-import { warnIfUserCreatesTooManyCompanies } from "../../../subscriptions/companies";
 import makeClient from "../../../__tests__/testClient";
 
 // No mails
@@ -73,13 +72,6 @@ describe("Create company endpoint", () => {
         }
       `;
       await mutate(mutation);
-      const companySubscriptionPayload = {
-        mutation: "CREATED" as MutationType,
-        node: await prisma.company({ siret }),
-        updatedFields: null,
-        previousValues: null
-      };
-      await warnIfUserCreatesTooManyCompanies(companySubscriptionPayload);
     }
 
     // 1 company

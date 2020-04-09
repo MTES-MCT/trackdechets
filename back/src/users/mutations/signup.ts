@@ -1,18 +1,13 @@
 import { hash } from "bcrypt";
 import { sendMail } from "../../common/mails.helper";
-import { Prisma, User } from "../../generated/prisma-client";
-import { GraphQLContext } from "../../types";
+import { User, prisma } from "../../generated/prisma-client";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
 import { UserInputError } from "apollo-server-express";
 
-export default async function signup(
-  _,
-  { userInfos },
-  context: GraphQLContext
-) {
+export default async function signup(_, { userInfos }) {
   const hashedPassword = await hashPassword(userInfos.password);
-  const user = await context.prisma
+  const user = await prisma
     .createUser({
       name: userInfos.name,
       email: userInfos.email,
@@ -27,8 +22,8 @@ export default async function signup(
     );
   }
 
-  const userActivationHash = await createActivationHash(user, context.prisma);
-  await acceptNewUserComapnyInvitations(user, context.prisma);
+  const userActivationHash = await createActivationHash(user);
+  await acceptNewUserCompanyInvitations(user);
   await sendMail(userMails.onSignup(user, userActivationHash.hash));
 
   return user;
@@ -40,9 +35,8 @@ export default async function signup(
  * This is to make sure we have a valid email.
  *
  * @param user
- * @param prisma
  */
-async function createActivationHash(user: User, prisma: Prisma) {
+async function createActivationHash(user: User) {
   const activationHash = await hash(
     new Date().valueOf().toString() + Math.random().toString(),
     10
@@ -63,9 +57,8 @@ async function createActivationHash(user: User, prisma: Prisma) {
  * If the user has pending invitations, validate them all at once on signup
  *
  * @param user
- * @param prisma
  */
-async function acceptNewUserComapnyInvitations(user: User, prisma: Prisma) {
+export async function acceptNewUserCompanyInvitations(user: User) {
   const existingHashes = await prisma
     .userAccountHashes({ where: { email: user.email } })
     .catch(_ => {

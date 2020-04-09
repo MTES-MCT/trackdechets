@@ -12,7 +12,7 @@ import {
   joinWithInvite
 } from "./mutations";
 import signup from "./mutations/signup";
-import { hashPassword } from "./utils";
+import { hashPassword, generatePassword } from "./utils";
 import { apiKey } from "./queries";
 
 export default {
@@ -30,9 +30,7 @@ export default {
         throw new Error(`Cet email n'existe pas sur notre plateforme.`);
       }
 
-      const newPassword = Math.random()
-        .toString(36)
-        .slice(-10);
+      const newPassword = generatePassword();
       const hashedPassword = await hashPassword(newPassword);
       await prisma.updateUser({
         where: { id: user.id },
