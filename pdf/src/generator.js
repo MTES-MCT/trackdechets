@@ -42,7 +42,7 @@ const buildPdf = async (params) => {
   );
 
   const existingTemporaryStorageBytes = fs.readFileSync(
-    path.join(__dirname, "./templates/appendix2.pdf")
+    path.join(__dirname, "./templates/bsd_suite.pdf")
   );
 
   const existingAnnexBytes = fs.readFileSync(
@@ -137,21 +137,30 @@ const buildPdf = async (params) => {
   }
 
   if (temporaryStorageDetail) {
-    const temporaryStorageDetailsPage = await PDFDocument.load(
+    const temporaryStorageDetailsPdf = await PDFDocument.load(
       existingTemporaryStorageBytes
     );
-    temporaryStorageDetailsPage.registerFontkit(fontkit);
-    const temporaryStorageArialFont = await temporaryStorageDetailsPage.embedFont(
+    temporaryStorageDetailsPdf.registerFontkit(fontkit);
+    const temporaryStorageArialFont = await temporaryStorageDetailsPdf.embedFont(
       arialBytes
     );
-    const temporaryStorageWatermarkImage = await temporaryStorageDetailsPage.embedPng(
+    const temporaryStorageWatermarkImage = await temporaryStorageDetailsPdf.embedPng(
       watermarkBytes
     );
-    const currentTemporaryStoragePage = temporaryStorageDetailsPage.getPages()[0];
+    const currentTemporaryStoragePage = temporaryStorageDetailsPdf.getPages()[0];
 
+    const tempraryStorageData = processMainFormParams({
+      ...temporaryStorageDetail,
+      tempStorerCompanySiret: params.recipientCompanySiret,
+      tempStorerCompanyAddress: params.recipientCompanyAddress,
+      tempStorerCompanyName: params.recipientCompanyName,
+      wasteAcceptationStatus: params.tempStorerWasteAcceptationStatus,
+    });
+
+    console.log(tempraryStorageData);
     // fill form data
     fillFields({
-      data: formData,
+      data: tempraryStorageData,
       page: currentTemporaryStoragePage,
       settings: temporaryStorageDetailsFieldSettings,
       font: temporaryStorageArialFont,
@@ -169,8 +178,26 @@ const buildPdf = async (params) => {
         }
       );
     }
+    if (!!tempraryStorageData.tempStorerSignedAt) {
+      drawImage(
+        "tempStorerReceptionSignature",
+        stampImage,
+        currentTemporaryStoragePage
+      );
+    }
 
-    mainForm.addPage(currentTemporaryStoragePage);
+    if (!!tempraryStorageData.signedAt) {
+      drawImage(
+        "tempStorerSentSignature",
+        stampImage,
+        currentTemporaryStoragePage
+      );
+    }
+
+    const copiedPage = await mainForm.copyPages(temporaryStorageDetailsPdf, [
+      0,
+    ]);
+    mainForm.addPage(copiedPage[0]);
   }
 
   // early return pdf if there is no appendix

@@ -113,7 +113,8 @@ export function markAsTempStored(
         ...Object.keys(infos).reduce((prev, cur) => {
           prev[`tempStorer${capitalize(cur)}`] = infos[cur];
           return prev;
-        }, {})
+        }, {}),
+        tempStorerSignedAt: new Date()
       }
     }
   });
