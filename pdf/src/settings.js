@@ -120,8 +120,8 @@ const imageLocations = {
   exemptionStamp: { x: 400, y: 520 },
   noTraceabilityStamp: { x: 300, y: 740 },
   watermark: { x: 0, y: 800 },
-  tempStorerReceptionSignature: { x: 400, y: 520 },
-  tempStorerSentSignature: { x: 600, y: 570 },
+  tempStorerReceptionSignature: { x: 195, y: 310 },
+  tempStorerSentSignature: { x: 420, y: 590 },
 };
 
 // Temporary Storage detail form field settings
@@ -130,8 +130,8 @@ const temporaryStorageDetailsFieldSettings = {
   tempStorerQuantityEstimated: { x: 200, y: 190, fontSize: 12 }, // TODO
   tempStorerQuantityReceived: { x: 222, y: 193 },
 
-  wasteAccepted: { x: 116, y: 225, fontSize: 12 },
-  wasteNotAccepted: { x: 161, y: 225, fontSize: 12 },
+  wasteAccepted: { x: 116, y: 223, fontSize: 12 },
+  wasteNotAccepted: { x: 161, y: 223, fontSize: 12 },
 
   tempStorerWasteRefusalReason: { x: 100, y: 240, lineBreakAt: 50 },
   tempStorerReceivedAt: { x: 125, y: 213 },

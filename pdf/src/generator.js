@@ -137,67 +137,68 @@ const buildPdf = async (params) => {
   }
 
   if (temporaryStorageDetail) {
-    const temporaryStorageDetailsPdf = await PDFDocument.load(
+    const tempStorageDetailsPdf = await PDFDocument.load(
       existingTemporaryStorageBytes
     );
-    temporaryStorageDetailsPdf.registerFontkit(fontkit);
-    const temporaryStorageArialFont = await temporaryStorageDetailsPdf.embedFont(
+    tempStorageDetailsPdf.registerFontkit(fontkit);
+    const temporaryStorageArialFont = await tempStorageDetailsPdf.embedFont(
       arialBytes
     );
-    const temporaryStorageWatermarkImage = await temporaryStorageDetailsPdf.embedPng(
+    const temporaryStorageWatermarkImage = await tempStorageDetailsPdf.embedPng(
       watermarkBytes
     );
-    const currentTemporaryStoragePage = temporaryStorageDetailsPdf.getPages()[0];
+    const tempStorageStampImage = await tempStorageDetailsPdf.embedPng(
+      stampBytes
+    );
+
+    const [tempStoragePage] = tempStorageDetailsPdf.getPages();
 
     const tempraryStorageData = processMainFormParams({
       ...temporaryStorageDetail,
       tempStorerCompanySiret: params.recipientCompanySiret,
       tempStorerCompanyAddress: params.recipientCompanyAddress,
       tempStorerCompanyName: params.recipientCompanyName,
-      wasteAcceptationStatus: params.tempStorerWasteAcceptationStatus,
+      wasteAcceptationStatus:
+        params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
     });
 
     console.log(tempraryStorageData);
     // fill form data
     fillFields({
       data: tempraryStorageData,
-      page: currentTemporaryStoragePage,
+      page: tempStoragePage,
       settings: temporaryStorageDetailsFieldSettings,
       font: temporaryStorageArialFont,
     });
 
     // draw watermark if needed
     if (!!process.env.PDF_WATERMARK) {
-      drawImage(
-        "watermark",
-        temporaryStorageWatermarkImage,
-        currentTemporaryStoragePage,
-        {
-          width: 600,
-          height: 800,
-        }
-      );
+      drawImage("watermark", temporaryStorageWatermarkImage, tempStoragePage, {
+        width: 600,
+        height: 800,
+      });
     }
+
     if (!!tempraryStorageData.tempStorerSignedAt) {
       drawImage(
         "tempStorerReceptionSignature",
-        stampImage,
-        currentTemporaryStoragePage
+        tempStorageStampImage,
+        tempStoragePage
       );
     }
 
     if (!!tempraryStorageData.signedAt) {
       drawImage(
         "tempStorerSentSignature",
-        stampImage,
-        currentTemporaryStoragePage
+        tempStorageStampImage,
+        tempStoragePage
       );
     }
 
-    const copiedPage = await mainForm.copyPages(temporaryStorageDetailsPdf, [
-      0,
-    ]);
-    mainForm.addPage(copiedPage[0]);
+    const [
+      copiedTempStoragePage,
+    ] = await mainForm.copyPages(tempStorageDetailsPdf, [0]);
+    mainForm.addPage(copiedTempStoragePage);
   }
 
   // early return pdf if there is no appendix
