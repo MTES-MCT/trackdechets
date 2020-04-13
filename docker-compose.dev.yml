@@ -71,17 +71,6 @@ services:
     volumes:
       - ./front/:/usr/src/front
 
-  td-insee:
-    image: td-insee
-    build:
-      context: ./insee
-      dockerfile: Dockerfile
-    ports:
-      - 81:81
-    environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-
   td-pdf:
     image: td-pdf
     build:

@@ -6,9 +6,6 @@ services:
   td-ui:
     image: betagouv/trackdechets-ui:sandbox
 
-  td-insee:
-    image: betagouv/trackdechets-insee:sandbox
-
   td-pdf:
     image: betagouv/trackdechets-pdf:sandbox
     environment:
