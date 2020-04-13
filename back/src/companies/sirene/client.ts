@@ -1,92 +1,14 @@
 import axios from "axios";
-import { cachedGet } from "../common/redis";
+import { URL } from "url";
 import { UserInputError } from "apollo-server-express";
-
-// Response from /api/sirene/v3/etablissements/<VOTRE_SIRET>
-interface SearchResponse {
-  etablissement: {
-    siret: string;
-    numero_voie: string;
-    type_voie: string;
-    libelle_voie: string;
-    code_postal: string;
-    libelle_commune: string;
-    longitude: string;
-    latitude: string;
-    geo_adresse: string;
-    unite_legale: {
-      denomination: string;
-      activite_principale: string;
-    };
-  };
-}
-
-// Response from /api/sirene/v1/full_text/<CLUE>
-interface FullTextSearchResponse {
-  etablissement: {
-    siret: string;
-    nom_raison_sociale: string;
-    numero_voie: string;
-    type_voie: string;
-    libelle_voie: string;
-    code_postal: string;
-    libelle_commune: string;
-    activite_principale: string;
-    libelle_activite_principale: string;
-    longitude: string;
-    latitude: string;
-    geo_adresse: string;
-  }[];
-}
-
-interface CompanySearchResult {
-  siret: string;
-  address: string;
-  name: string;
-  naf: string;
-  libelleNaf: string;
-  longitude: number;
-  latitude: number;
-}
-
-export const COMPANY_INFOS_CACHE_KEY = "CompanyInfos";
-const EXPIRY_TIME = 60 * 60 * 24;
-
-export function getCachedCompanySireneInfo(
-  siret: string
-): Promise<CompanySearchResult> {
-  if (siret.length !== 14) {
-    throw new UserInputError("Le siret doit faire 14 caractères", {
-      invalidArgs: ["siret"]
-    });
-  }
-
-  return cachedGet(searchCompany, COMPANY_INFOS_CACHE_KEY, siret, {
-    parser: JSON,
-    options: { EX: EXPIRY_TIME }
-  });
-}
+import {
+  libelleFromCodeNaf,
+  buildAddress,
+  safeParseFloat,
+  removeDiacritics
+} from "./utils";
 
 const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
-
-/**
- * Build a full address string from its base components
- */
-export function buildAddress(
-  streetNumber: string,
-  streetType: string,
-  streetLabel: string,
-  postalCode: string,
-  city: string
-) {
-  return [streetNumber, streetType, streetLabel, postalCode, city]
-    .filter(x => !!x)
-    .join(" ");
-}
-
-function safeParseFloat(f: string) {
-  return f ? parseFloat(f) : null;
-}
 
 /**
  * Build a company object from a search response
@@ -105,8 +27,9 @@ function searchResponseToCompany({
         etablissement.libelle_commune
       );
 
-  return {
+  const company = {
     siret: etablissement.siret,
+    etatAdministratif: etablissement.etat_administratif,
     address,
     name: etablissement.unite_legale.denomination,
     naf: etablissement.unite_legale.activite_principale,
@@ -114,6 +37,12 @@ function searchResponseToCompany({
     longitude: safeParseFloat(etablissement.longitude),
     latitude: safeParseFloat(etablissement.latitude)
   };
+
+  if (company.naf) {
+    company.libelleNaf = libelleFromCodeNaf(company.naf);
+  }
+
+  return company;
 }
 
 /**
@@ -124,9 +53,7 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/v3/etablissements/${siret}`;
   return axios
     .get<SearchResponse>(searchUrl)
-    .then(r => {
-      return searchResponseToCompany(r.data);
-    })
+    .then(r => searchResponseToCompany(r.data))
     .catch(error => {
       if (error.response) {
         // The request was made and the server responded with a status code
@@ -188,19 +115,34 @@ export function searchCompanies(
   clue: string,
   department?: string
 ): Promise<CompanySearchResult[]> {
-  let searchUrl = `${SIRENE_API_BASE_URL}/v1/full_text/${clue}`;
+  if (/[0-9]{14}/.test(clue)) {
+    // clue is formatted like a SIRET
+    // use search by siret instead of full text
+    return searchCompany(clue)
+      .then(c => [c])
+      .catch(_ => []);
+  }
+
+  let params = {};
 
   if (department && department.length === 2) {
-    searchUrl = `${searchUrl}?departement=${department}`;
+    params = { departement: department };
   }
 
   if (department && department.length === 5) {
     // this migth actually be a postal code
-    searchUrl = `${searchUrl}?code_postal=${department}`;
+    params = { code_postal: department };
   }
 
+  const formattedClue = removeDiacritics(clue);
+  const searchUrl = new URL(
+    formattedClue,
+    `${SIRENE_API_BASE_URL}/v1/full_text/`
+  );
+
+  const opts = { ...(params ? { params } : {}) };
   return axios
-    .get<FullTextSearchResponse>(searchUrl)
+    .get<FullTextSearchResponse>(searchUrl.toString(), opts)
     .then(r => {
       return fullTextSearchResponseToCompanies(r.data);
     })

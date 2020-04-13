@@ -1,6 +1,6 @@
 import { prisma, Company } from "../../generated/prisma-client";
 import { getInstallation } from "./installation";
-import { getCachedCompanySireneInfo } from "../insee";
+import { searchCompany } from "../sirene";
 import { UserInputError } from "apollo-server-express";
 /**
  * This function is used to return public company
@@ -12,7 +12,7 @@ import { UserInputError } from "apollo-server-express";
  */
 export async function getCompanyInfos(siret: string) {
   // retrieve cached info from SIRENE database
-  const sireneCompanyInfo = await getCachedCompanySireneInfo(siret);
+  const sireneCompanyInfo = await searchCompany(siret);
 
   // sireneCompanyInfo default to { siret: '', ...} if the siret is
   // not recognized. Handle this edge case by throwing a NOT_FOUND

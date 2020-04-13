@@ -1,5 +1,9 @@
 import { CaptureConsole } from "@sentry/integrations";
-import { ApolloServer, makeExecutableSchema, ApolloError } from "apollo-server-express";
+import {
+  ApolloServer,
+  makeExecutableSchema,
+  ApolloError
+} from "apollo-server-express";
 import * as express from "express";
 import * as passport from "passport";
 import * as session from "express-session";

@@ -1,51 +1,14 @@
-import {
-  getCachedCompanySireneInfo,
-  searchCompany,
-  searchCompanies,
-  buildAddress
-} from "../insee.new";
-import { ErrorCode } from "../../common/errors";
+import { searchCompany, searchCompanies } from "../client";
+import * as client from "../client";
+import { ErrorCode } from "../../../common/errors";
 import axios from "axios";
 
 jest.mock("axios");
 
-describe("getCachedCompanySireneInfo", () => {
-  it(`should throw BAD_USER_INPUT error if
-    the siret is not 14 character length`, async () => {
-    expect.assertions(1);
-    try {
-      await getCachedCompanySireneInfo("invalide");
-    } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-    }
-  });
-});
-
-describe("buildAdress", () => {
-  test("all address components are defined", () => {
-    const address = buildAddress(
-      "4",
-      "boulevard",
-      "Longchamp",
-      "13001",
-      "Marseille"
-    );
-    expect(address).toEqual("4 boulevard Longchamp 13001 Marseille");
-  });
-  test("some address components are null or empty", () => {
-    const address = buildAddress(
-      "",
-      "boulevard",
-      "Longchamp",
-      null,
-      "Marseille"
-    );
-    expect(address).toEqual("boulevard Longchamp Marseille");
-  });
-});
-
 describe("searchCompany", () => {
-  afterEach(() => (axios.get as jest.Mock).mockReset());
+  afterEach(() => {
+    (axios.get as jest.Mock).mockReset();
+  });
 
   it("should retrieve a company by siret", async () => {
     (axios.get as jest.Mock).mockResolvedValueOnce({
@@ -53,6 +16,7 @@ describe("searchCompany", () => {
       data: {
         etablissement: {
           siret: "85001946400013",
+          etat_administratif: "A",
           numero_voie: "4",
           type_voie: "BD",
           libelle_voie: "LONGCHAMP",
@@ -71,10 +35,11 @@ describe("searchCompany", () => {
     const company = await searchCompany("85001946400013");
     const expected = {
       siret: "85001946400013",
+      etatAdministratif: "A",
       address: "4 Boulevard Longchamp 13001 Marseille",
       name: "CODE EN STOCK",
       naf: "62.01Z",
-      libelleNaf: "",
+      libelleNaf: "Programmation informatique",
       longitude: 5.387141,
       latitude: 43.300746
     };
@@ -110,7 +75,9 @@ describe("searchCompany", () => {
 });
 
 describe("searchCompanies", () => {
-  afterEach(() => (axios.get as jest.Mock).mockReset());
+  afterEach(() => {
+    (axios.get as jest.Mock).mockReset();
+  });
 
   it("perform a full text search based on a clue", async () => {
     (axios.get as jest.Mock).mockResolvedValueOnce({
@@ -146,6 +113,38 @@ describe("searchCompanies", () => {
       latitude: 43.300746
     };
     expect(companies[0]).toEqual(expected);
+  });
+
+  it("should remove diacritics (accents) from clue", async () => {
+    (axios.get as jest.Mock).mockResolvedValueOnce({
+      status: 200,
+      data: {
+        etablissement: [
+          {
+            siret: "79824982700014",
+            nom_raison_sociale: "LE BAR A PAIN",
+            numero_voie: "18",
+            type_voie: "COURS",
+            libelle_voie: "JOSEPH THIERRY",
+            code_postal: "13001",
+            libelle_commune: "MARSEILLE",
+            activite_principale: "1071C",
+            libelle_activite_principale:
+              "Boulangerie et boulangerie-pâtisserie",
+            longitude: "5.38641",
+            latitude: "43.300208",
+            geo_adresse: "18 Cours Joseph Thierry 13001 Marseille"
+          }
+        ]
+      }
+    });
+    await searchCompanies("le bar à pain");
+    expect(
+      axios.get as jest.Mock
+    ).toHaveBeenCalledWith(
+      "https://entreprise.data.gouv.fr/api/sirene/v1/full_text/le%20bar%20a%20pain",
+      { params: {} }
+    );
   });
 
   it("should return empty array if no results", async () => {
@@ -208,8 +207,36 @@ describe("searchCompanies", () => {
       latitude: 45.258127
     };
     expect(companies[0]).toEqual(expected);
-    expect(axios.get).toHaveBeenCalledWith(
-      "https://entreprise.data.gouv.fr/api/sirene/v1/full_text/boulangerie?departement=07"
+    expect(
+      axios.get
+    ).toHaveBeenCalledWith(
+      "https://entreprise.data.gouv.fr/api/sirene/v1/full_text/boulangerie",
+      { params: { departement: "07" } }
     );
+  });
+
+  it("should search by siret if clue is formatted like a siret", async () => {
+    (axios.get as jest.Mock).mockResolvedValueOnce({
+      status: 200,
+      data: {
+        etablissement: {
+          siret: "85001946400013",
+          numero_voie: "4",
+          type_voie: "BD",
+          libelle_voie: "LONGCHAMP",
+          code_postal: "13001",
+          libelle_commune: "MARSEILLE",
+          longitude: "5.387141",
+          latitude: "43.300746",
+          geo_adresse: "4 Boulevard Longchamp 13001 Marseille",
+          unite_legale: {
+            denomination: "CODE EN STOCK",
+            activite_principale: "62.01Z"
+          }
+        }
+      }
+    });
+    const companies = await searchCompanies("85001946400013");
+    expect(companies).toHaveLength(1);
   });
 });

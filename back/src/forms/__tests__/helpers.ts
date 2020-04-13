@@ -1,4 +1,4 @@
-import { COMPANY_INFOS_CACHE_KEY } from "../../companies/insee";
+import { COMPANY_INFOS_CACHE_KEY } from "../../companies/sirene/cache";
 import { cachedGet } from "../../common/redis";
 
 import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
