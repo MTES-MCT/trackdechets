@@ -5,7 +5,6 @@ sidebar_label: Référence de l'API
 ---
 
 
-
 ## Query
 <table>
 <thead>
@@ -18,138 +17,12 @@ sidebar_label: Référence de l'API
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>companyInfos</strong></td>
-<td valign="top"><a href="#companypublic">CompanyPublic</a></td>
-<td>
-
-Renvoie des informations publiques sur un établissement
-extrait de la base SIRENE et de la base des installations
-classées pour la protection de l'environnement (ICPE)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-SIRET de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>searchCompanies</strong></td>
-<td valign="top">[<a href="#companysearchresult">CompanySearchResult</a>]</td>
-<td>
-
-Effectue une recherche floue sur la base SIRENE et enrichit
-les résultats avec des informations provenant de Trackdéchets
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">clue</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Champ utilisé pour faire une recherche floue
-sur la nom de l'établissement, ex: 'Boulangerie Dupont'
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">department</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td>
-
-(Optionnel) Filtre les résultats par numéro de département
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>favorites</strong></td>
-<td valign="top">[<a href="#companyfavorite">CompanyFavorite</a>]</td>
-<td>
-
-Renvoie les établissements favoris de l'utilisateur. C'est à dire les
-établissements qui font souvent partis des BSD édités
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">type</td>
-<td valign="top"><a href="#favoritetype">FavoriteType</a>!</td>
-<td>
-
-type de favoris
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>ecoOrganismes</strong></td>
-<td valign="top">[<a href="#ecoorganisme">EcoOrganisme</a>]</td>
-<td>
-
-USAGE INTERNE
-Renvoie la liste des éco-organismes
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>form</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Renvoie un BSD, sélectionné par ID
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
-<td>
-
-Identifiant opaque du BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>forms</strong></td>
-<td valign="top">[<a href="#form">Form</a>]</td>
-<td>
-
-Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
-Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
-On peut également demander les bordereaux pour lesquels on est transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
+<td colspan="2" valign="top"><strong>apiKey</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-SIRET d'un établissement dont je suis membre
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">type</td>
-<td valign="top"><a href="#formtype">FormType</a></td>
-<td>
-
-(Optionnel) Type de BSD renvoyés
-ACTOR = BSD's dont on est producteur ou destinataire
-TRANSPORTER = BSD's dont on est transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>stats</strong></td>
-<td valign="top">[<a href="#companystat">CompanyStat</a>]</td>
-<td>
-
-Renvoie des statistiques sur le volume de déchets entrant et sortant
+USAGE INTERNE > Mon Compte > Générer un token
+Renvoie un token permettant de s'authentifier à l'API Trackdéchets
 
 </td>
 </tr>
@@ -181,6 +54,73 @@ Siret d'un des établissements dont je suis membre
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>companyInfos</strong></td>
+<td valign="top"><a href="#companypublic">CompanyPublic</a></td>
+<td>
+
+Renvoie des informations publiques sur un établissement
+extrait de la base SIRENE et de la base des installations
+classées pour la protection de l'environnement (ICPE)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+SIRET de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganismes</strong></td>
+<td valign="top">[<a href="#ecoorganisme">EcoOrganisme</a>]</td>
+<td>
+
+USAGE INTERNE
+Renvoie la liste des éco-organismes
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>favorites</strong></td>
+<td valign="top">[<a href="#companyfavorite">CompanyFavorite</a>]</td>
+<td>
+
+Renvoie les établissements favoris de l'utilisateur. C'est à dire les
+établissements qui font souvent partis des BSD édités
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">type</td>
+<td valign="top"><a href="#favoritetype">FavoriteType</a>!</td>
+<td>
+
+type de favoris
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>form</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Renvoie un BSD, sélectionné par ID
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+Identifiant opaque du BSD
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>formPdf</strong></td>
 <td valign="top"><a href="#filedownload">FileDownload</a></td>
 <td>
@@ -201,31 +141,33 @@ ID d'un BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>formsRegister</strong></td>
-<td valign="top"><a href="#filedownload">FileDownload</a></td>
+<td colspan="2" valign="top"><strong>forms</strong></td>
+<td valign="top">[<a href="#form">Form</a>]</td>
 <td>
 
-Renvoie un token pour télécharger un csv du regsitre
-Ce token doit être transmis à la route /download pour obtenir le fichier.
-Il est valable 10 secondes
+Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
+Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
+On peut également demander les bordereaux pour lesquels on est transporteur
 
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">sirets</td>
-<td valign="top">[<a href="#string">String</a>]</td>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
-Liste de SIRET d'établissements dont je suis membre
+SIRET d'un établissement dont je suis membre
 
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">exportType</td>
-<td valign="top"><a href="#formsregisterexporttype">FormsRegisterExportType</a></td>
+<td colspan="2" align="right" valign="top">type</td>
+<td valign="top"><a href="#formtype">FormType</a></td>
 <td>
 
-Type d'export
+(Optionnel) Type de BSD renvoyés
+ACTOR = BSD's dont on est producteur ou destinataire
+TRANSPORTER = BSD's dont on est transporteur
 
 </td>
 </tr>
@@ -295,6 +237,35 @@ Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont re
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>formsRegister</strong></td>
+<td valign="top"><a href="#filedownload">FileDownload</a></td>
+<td>
+
+Renvoie un token pour télécharger un csv du regsitre
+Ce token doit être transmis à la route /download pour obtenir le fichier.
+Il est valable 10 secondes
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">sirets</td>
+<td valign="top">[<a href="#string">String</a>]</td>
+<td>
+
+Liste de SIRET d'établissements dont je suis membre
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">exportType</td>
+<td valign="top"><a href="#formsregisterexporttype">FormsRegisterExportType</a></td>
+<td>
+
+Type d'export
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>me</strong></td>
 <td valign="top"><a href="#user">User</a></td>
 <td>
@@ -304,12 +275,40 @@ Renvoie les informations sur l'utilisateur authentifié
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>apiKey</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>searchCompanies</strong></td>
+<td valign="top">[<a href="#companysearchresult">CompanySearchResult</a>]</td>
 <td>
 
-USAGE INTERNE > Mon Compte > Générer un token
-Renvoie un token permettant de s'authentifier à l'API Trackdéchets
+Effectue une recherche floue sur la base SIRENE et enrichit
+les résultats avec des informations provenant de Trackdéchets
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">clue</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Champ utilisé pour faire une recherche floue
+sur la nom de l'établissement, ex: 'Boulangerie Dupont'
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">department</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) Filtre les résultats par numéro de département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>stats</strong></td>
+<td valign="top">[<a href="#companystat">CompanyStat</a>]</td>
+<td>
+
+Renvoie des statistiques sur le volume de déchets entrant et sortant
 
 </td>
 </tr>
@@ -328,6 +327,399 @@ Renvoie un token permettant de s'authentifier à l'API Trackdéchets
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>changePassword</strong></td>
+<td valign="top"><a href="#user">User</a>!</td>
+<td>
+
+USAGE INTERNE
+Modifie le mot de passe d'un utilisateur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">oldPassword</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">newPassword</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createCompany</strong></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td>
+
+USAGE INTERNE
+Rattache un établissement à l'utilisateur authentifié
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">companyInput</td>
+<td valign="top"><a href="#privatecompanyinput">PrivateCompanyInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createUploadLink</strong></td>
+<td valign="top"><a href="#uploadlink">UploadLink</a></td>
+<td>
+
+USAGE INTERNE
+Récupère une URL signé pour l'upload d'un fichier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">fileName</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+nom du fichier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">fileType</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+type de fichier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>deleteForm</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Supprime un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>deleteInvitation</strong></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td>
+
+USAGE INTERNE
+Supprime une invitation à un établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">email</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>duplicateForm</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Duplique un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>editProfile</strong></td>
+<td valign="top"><a href="#user">User</a></td>
+<td>
+
+USAGE INTERNE
+Met à jour les informations de l'utilisateur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">name</td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">phone</td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">email</td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>inviteUserToCompany</strong></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td>
+
+USAGE INTERNE
+Invite un nouvel utilisateur à un établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">email</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">role</td>
+<td valign="top"><a href="#userrole">UserRole</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>joinWithInvite</strong></td>
+<td valign="top"><a href="#user">User</a>!</td>
+<td>
+
+USAGE INTERNE
+Active le compte d'un utilisateur invité
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">inviteHash</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">name</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">password</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>login</strong></td>
+<td valign="top"><a href="#authpayload">AuthPayload</a>!</td>
+<td>
+
+DEPRECATED - La récupération de token pour le compte de tiers
+doit s'effectuer avec le protocole OAuth2
+
+Récupére un token à partir de l'email et du mot de passe
+d'un utilisateur.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">email</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">password</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsProcessed</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide le traitement d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">processedInfo</td>
+<td valign="top"><a href="#processedforminput">ProcessedFormInput</a>!</td>
+<td>
+
+Informations liées au traitement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsReceived</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide la réception d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">receivedInfo</td>
+<td valign="top"><a href="#receivedforminput">ReceivedFormInput</a>!</td>
+<td>
+
+Informations liées à la réception
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsResealed</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">resealedInfos</td>
+<td valign="top"><a href="#resealedforminput">ResealedFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsResent</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">resentInfos</td>
+<td valign="top"><a href="#resentforminput">ResentFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsSealed</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Scelle un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsSent</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide l'envoi d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">sentInfo</td>
+<td valign="top"><a href="#sentforminput">SentFormInput</a>!</td>
+<td>
+
+Informations liées à l'envoi
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsTempStored</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">tempStoredInfos</td>
+<td valign="top"><a href="#tempstoredforminput">TempStoredFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>removeUserFromCompany</strong></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td>
+
+USAGE INTERNE
+Supprime les droits d'un utilisateurs sur un établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userId</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>renewSecurityCode</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
 <td>
@@ -340,6 +732,101 @@ Renouvelle le code de sécurité de l'établissement
 <tr>
 <td colspan="2" align="right" valign="top">siret</td>
 <td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>resendInvitation</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+USAGE INTERNE
+Renvoie l'email d'invitation à un établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">email</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>resetPassword</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+USAGE INTERNE
+Envoie un email pour la réinitialisation du mot de passe
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">email</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>saveForm</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">formInput</td>
+<td valign="top"><a href="#forminput">FormInput</a>!</td>
+<td>
+
+Payload du BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedByTransporter</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide la prise en charge par le transporteur, et peut valider l'envoi
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">signingInfo</td>
+<td valign="top"><a href="#transportersignatureforminput">TransporterSignatureFormInput</a>!</td>
+<td>
+
+Informations liées à la signature transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signup</strong></td>
+<td valign="top"><a href="#user">User</a></td>
+<td>
+
+USAGE INTERNE
+Permet de créer un nouvel utilisateur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">userInfos</td>
+<td valign="top"><a href="#signupinput">SignupInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -416,67 +903,6 @@ SIRET de l'établissement
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>createCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td>
-
-USAGE INTERNE
-Rattache un établissement à l'utilisateur authentifié
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">companyInput</td>
-<td valign="top"><a href="#privatecompanyinput">PrivateCompanyInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>createUploadLink</strong></td>
-<td valign="top"><a href="#uploadlink">UploadLink</a></td>
-<td>
-
-USAGE INTERNE
-Récupère une URL signé pour l'upload d'un fichier
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">fileName</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-nom du fichier
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">fileType</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-type de fichier
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>saveForm</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">formInput</td>
-<td valign="top"><a href="#forminput">FormInput</a>!</td>
-<td>
-
-Payload du BSD
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>updateTransporterFields</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -511,433 +937,6 @@ Plaque d'immatriculation du transporteur
 Champ libre, utilisable par exemple pour noter les tournées des transporteurs
 
 </td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>deleteForm</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Supprime un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td>
-
-ID d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>duplicateForm</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Duplique un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td>
-
-ID d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>markAsSealed</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Scelle un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
-<td>
-
-ID d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>markAsSent</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Valide l'envoi d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
-<td>
-
-ID d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">sentInfo</td>
-<td valign="top"><a href="#sentforminput">SentFormInput</a>!</td>
-<td>
-
-Informations liées à l'envoi
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>markAsReceived</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Valide la réception d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
-<td>
-
-ID d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">receivedInfo</td>
-<td valign="top"><a href="#receivedforminput">ReceivedFormInput</a>!</td>
-<td>
-
-Informations liées à la réception
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>markAsProcessed</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Valide le traitement d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
-<td>
-
-ID d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">processedInfo</td>
-<td valign="top"><a href="#processedforminput">ProcessedFormInput</a>!</td>
-<td>
-
-Informations liées au traitement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signedByTransporter</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Valide la prise en charge par le transporteur, et peut valider l'envoi
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td>
-
-ID d'un BSD
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">signingInfo</td>
-<td valign="top"><a href="#transportersignatureforminput">TransporterSignatureFormInput</a>!</td>
-<td>
-
-Informations liées à la signature transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>markAsTempStored</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">tempStoredInfos</td>
-<td valign="top"><a href="#tempstoredforminput">TempStoredFormInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>markAsResealed</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">resealedInfos</td>
-<td valign="top"><a href="#resealedforminput">ResealedFormInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>markAsResent</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
-<td>
-
-Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">resentInfos</td>
-<td valign="top"><a href="#resentforminput">ResentFormInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signup</strong></td>
-<td valign="top"><a href="#user">User</a></td>
-<td>
-
-USAGE INTERNE
-Permet de créer un nouvel utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">userInfos</td>
-<td valign="top"><a href="#signupinput">SignupInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>login</strong></td>
-<td valign="top"><a href="#authpayload">AuthPayload</a>!</td>
-<td>
-
-DEPRECATED - La récupération de token pour le compte de tiers
-doit s'effectuer avec le protocole OAuth2
-
-Récupére un token à partir de l'email et du mot de passe
-d'un utilisateur.
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">password</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>changePassword</strong></td>
-<td valign="top"><a href="#user">User</a>!</td>
-<td>
-
-USAGE INTERNE
-Modifie le mot de passe d'un utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">oldPassword</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">newPassword</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>resetPassword</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
-<td>
-
-USAGE INTERNE
-Envoie un email pour la réinitialisation du mot de passe
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>editProfile</strong></td>
-<td valign="top"><a href="#user">User</a></td>
-<td>
-
-USAGE INTERNE
-Met à jour les informations de l'utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">name</td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">phone</td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>inviteUserToCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td>
-
-USAGE INTERNE
-Invite un nouvel utilisateur à un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">role</td>
-<td valign="top"><a href="#userrole">UserRole</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>resendInvitation</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
-<td>
-
-USAGE INTERNE
-Renvoie l'email d'invitation à un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>joinWithInvite</strong></td>
-<td valign="top"><a href="#user">User</a>!</td>
-<td>
-
-USAGE INTERNE
-Active le compte d'un utilisateur invité
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">inviteHash</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">name</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">password</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>removeUserFromCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td>
-
-USAGE INTERNE
-Supprime les droits d'un utilisateurs sur un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">userId</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>deleteInvitation</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
-<td>
-
-USAGE INTERNE
-Supprime une invitation à un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
 </tr>
 </tbody>
 </table>

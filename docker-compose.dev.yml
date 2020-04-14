@@ -44,7 +44,7 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
-    command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
+    command: npm run dev
     volumes:
       - ./back/src:/usr/src/app/src
       - ./doc/docs:/usr/src/app/documentation
