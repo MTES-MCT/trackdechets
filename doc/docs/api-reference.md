@@ -1365,6 +1365,15 @@ SIRET de l'établissement
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>etatAdministratif</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+État administratif de l'établissement. A = Actif, F = Fermé
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
