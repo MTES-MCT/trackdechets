@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import * as sirene from "../../companies/sirene";
 import { mailWhenFormIsDeclined } from "../forms";
 import { FormSubscriptionPayload } from "../../generated/prisma-client";
 
@@ -124,27 +124,25 @@ const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
 });
 
 // entreprise.data.gouv responses, giving 66 and 77 departements for companies involved in the form
-const insee1 = {
+const insee1: CompanySearchResult = {
   siret: "12346084400013",
-  siren: "123460844",
   name: "Dechet Factory SA",
   naf: "123",
   libelleNaf: "Fabricant de déchets",
-  address: "01 Rue Marie Curie 66000 Laville",
-  longitude: "1",
-  latitude: "1",
-  departement: "66"
+  address: "01 Rue Marie Curie 66480 Laville",
+  longitude: 1.0,
+  latitude: 1.0,
+  codeCommune: "66001"
 };
-const insee2 = {
+const insee2: CompanySearchResult = {
   siret: "12346085500055",
-  siren: "484960855",
   name: "Dechet processor SA",
   naf: "345",
   libelleNaf: "Traitement de déchets",
-  address: "rue de la Paix, 77000 Une ville",
-  longitude: "2",
-  latitude: "2",
-  departement: "77"
+  address: "rue de la Paix, 77760 Une ville",
+  longitude: 2.0,
+  latitude: 2.0,
+  codeCommune: "77001"
 };
 
 // Mock pdf service
@@ -163,14 +161,21 @@ jest.mock("../../generated/prisma-client", () => ({
   }
 }));
 
+// spies on searchCompany to capture calls to entreprise.data.gouv.fr
+const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
+// spies on axios get to capture calls to geo.api.gouv.fr
+const mockedAxiosGet = jest.spyOn(axios, "get");
+// spies on axios post to capture calls to td-mail
+const mockedAxiosPost = jest.spyOn(axios, "post");
+
 const { MJ_MAIN_TEMPLATE_ID } = process.env;
 /**
  * Test mailWhenFormIsDeclined function
  * We check:
- *    td-insee is called twice
+ *    searchCompany is called twice
+ *    geo.api.gouv.fr is called twice
  *    td-mail is called 3 times with right params
  *    dreals from relevant departments are emailed
- *
  */
 describe("mailWhenFormIsDeclined", () => {
   // tweak and restore process.env after each test
@@ -183,24 +188,21 @@ describe("mailWhenFormIsDeclined", () => {
 
   afterEach(() => {
     process.env = OLD_ENV;
+    searchCompanySpy.mockReset(); // removes calls, instances, returned values and implementations
+    mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
+    mockedAxiosGet.mockReset(); // removes calls, instances, returned values and implementations
   });
 
   it("should send mails if waste is refused", async () => {
     process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
-    // spies on axios get and post methods
-    const mockedAxiosGet = jest.spyOn(axios, "get");
-    const mockedAxiosPost = jest.spyOn(axios, "post");
+
+    searchCompanySpy
+      .mockResolvedValueOnce(insee1)
+      .mockResolvedValueOnce(insee2);
+
     (mockedAxiosGet as jest.Mock<any>)
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          data: insee1
-        })
-      )
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          data: insee2
-        })
-      );
+      .mockResolvedValueOnce({ data: { codeDepartement: "66" } })
+      .mockResolvedValueOnce({ data: { codeDepartement: "77" } });
     (mockedAxiosPost as jest.Mock<any>).mockImplementation(() =>
       Promise.resolve({
         data: { result: "ok" }
@@ -209,7 +211,10 @@ describe("mailWhenFormIsDeclined", () => {
 
     await mailWhenFormIsDeclined(formPayload("REFUSED"));
 
-    // get called twice for td-insee
+    // get called twice for entreprise.data.gouv.fr
+    expect(searchCompanySpy).toHaveBeenCalledTimes(2);
+
+    // get called twice for geo.api.gouv.fr
     expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
 
     // post called 1 time for mail sending
@@ -240,27 +245,19 @@ describe("mailWhenFormIsDeclined", () => {
 
     const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
     expect(payload1.templateId).toEqual(templateId);
-
-    mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
-    mockedAxiosGet.mockReset(); // removes calls, instances, returned values and implementations
   });
 
   it("should send mails if waste is partially refused", async () => {
     process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
+
+    searchCompanySpy
+      .mockResolvedValueOnce(insee1)
+      .mockResolvedValueOnce(insee2);
+
     // spies on axios get and post methods
-    const mockedAxiosGet = jest.spyOn(axios, "get");
-    const mockedAxiosPost = jest.spyOn(axios, "post");
     (mockedAxiosGet as jest.Mock<any>)
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          data: insee1
-        })
-      )
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          data: insee2
-        })
-      );
+      .mockResolvedValueOnce({ data: { codeDepartement: "66" } })
+      .mockResolvedValueOnce({ data: { codeDepartement: "77" } });
     (mockedAxiosPost as jest.Mock<any>).mockImplementation(() =>
       Promise.resolve({
         data: { result: "ok" }
@@ -269,8 +266,11 @@ describe("mailWhenFormIsDeclined", () => {
 
     await mailWhenFormIsDeclined(formPayload("PARTIALLY_REFUSED"));
 
-    // get called 2 times for td-insee
-    expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
+    // get called 2 times for entreprise.data.gouv.fr
+    expect(searchCompanySpy).toHaveBeenCalledTimes(2);
+
+    // get called 2 times for geo.api.gouv.fr
+    // expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
 
     // post called 1 time for mail sending
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
@@ -300,8 +300,5 @@ describe("mailWhenFormIsDeclined", () => {
 
     const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
     expect(payload1.templateId).toEqual(templateId);
-
-    mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
-    mockedAxiosGet.mockReset(); // removes calls, instances, returned values and implementations
   });
 });

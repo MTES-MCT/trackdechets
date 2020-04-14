@@ -7,6 +7,7 @@ interface SearchResponse {
     type_voie: string;
     libelle_voie: string;
     code_postal: string;
+    code_commune: string;
     libelle_commune: string;
     longitude: string;
     latitude: string;
@@ -27,6 +28,7 @@ interface FullTextSearchResponse {
     type_voie: string;
     libelle_voie: string;
     code_postal: string;
+    departement_commune_siege: string;
     libelle_commune: string;
     activite_principale: string;
     libelle_activite_principale: string;
@@ -41,6 +43,7 @@ interface CompanySearchResult {
   siret: string;
   etatAdministratif?: string;
   address: string;
+  codeCommune?: string;
   name: string;
   naf: string;
   libelleNaf: string;

@@ -1,5 +1,4 @@
 import { searchCompany, searchCompanies } from "../client";
-import * as client from "../client";
 import { ErrorCode } from "../../../common/errors";
 import axios from "axios";
 
@@ -21,6 +20,7 @@ describe("searchCompany", () => {
           type_voie: "BD",
           libelle_voie: "LONGCHAMP",
           code_postal: "13001",
+          code_commune: "13201",
           libelle_commune: "MARSEILLE",
           longitude: "5.387141",
           latitude: "43.300746",
@@ -37,6 +37,7 @@ describe("searchCompany", () => {
       siret: "85001946400013",
       etatAdministratif: "A",
       address: "4 Boulevard Longchamp 13001 Marseille",
+      codeCommune: "13201",
       name: "CODE EN STOCK",
       naf: "62.01Z",
       libelleNaf: "Programmation informatique",

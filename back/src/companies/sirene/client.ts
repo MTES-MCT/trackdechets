@@ -31,6 +31,7 @@ function searchResponseToCompany({
     siret: etablissement.siret,
     etatAdministratif: etablissement.etat_administratif,
     address,
+    codeCommune: etablissement.code_commune,
     name: etablissement.unite_legale.denomination,
     naf: etablissement.unite_legale.activite_principale,
     libelleNaf: "",
