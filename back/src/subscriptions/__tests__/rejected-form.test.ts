@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as sirene from "../../companies/sirene";
+import { CompanySearchResult } from "../../companies/sirene/types";
 import { mailWhenFormIsDeclined } from "../forms";
 import { FormSubscriptionPayload } from "../../generated/prisma-client";
 
