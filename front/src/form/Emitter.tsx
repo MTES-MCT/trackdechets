@@ -47,7 +47,7 @@ export default function Emitter() {
         )}
       </div>
 
-      <EcoOrganismes name="ecoOrganisme.id" />
+      <EcoOrganismes name="ecoOrganisme" />
 
       <h4>Type d'émetteur</h4>
 

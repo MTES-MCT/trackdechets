@@ -10,7 +10,7 @@ const fragments = {
       phone
       mail
     }
-  `
+  `,
 };
 
 export const GET_FORM = gql`
@@ -117,6 +117,11 @@ export const SAVE_FORM = gql`
       }
       actualQuantity
       quantityReceived
+      temporaryStorageDetail {
+        destination {
+          processingOperation
+        }
+      }
     }
   }
 `;
