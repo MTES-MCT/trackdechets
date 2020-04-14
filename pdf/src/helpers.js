@@ -168,6 +168,19 @@ const getWasteDetailsType = (params) => {
   };
 };
 
+const getTempStorerWasteDetailsType = (params) => {
+  if (!params.tempStorerQuantityType) {
+    return {};
+  }
+  let field = {
+    ESTIMATED: "tempStorerQuantityEstimated",
+    REAL: "tempStorerQuantityReal",
+  }[params.tempStorerQuantityType];
+  return {
+    [field]: true,
+  };
+};
+
 /**
  * Format date fields to french fmt and copy some fields values to other fields
  * @param params
@@ -298,6 +311,7 @@ function processMainFormParams(params) {
     ...renameAndFormatMainFormFields(data),
     ...getAcceptationStatus(data),
     ...getFlatEcoOrganisme(data),
+    ...getTempStorerWasteDetailsType(data),
   };
 }
 

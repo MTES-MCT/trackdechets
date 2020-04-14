@@ -162,7 +162,6 @@ const buildPdf = async (params) => {
         params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
     });
 
-    console.log(tempraryStorageData);
     // fill form data
     fillFields({
       data: tempraryStorageData,

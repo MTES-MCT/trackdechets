@@ -126,8 +126,8 @@ const imageLocations = {
 
 // Temporary Storage detail form field settings
 const temporaryStorageDetailsFieldSettings = {
-  tempStorerQuantityReal: { x: 160, y: 190, fontSize: 12 },
-  tempStorerQuantityEstimated: { x: 200, y: 190, fontSize: 12 }, // TODO
+  tempStorerQuantityReal: { x: 125, y: 190, fontSize: 12 },
+  tempStorerQuantityEstimated: { x: 190, y: 190, fontSize: 12 }, // TODO
   tempStorerQuantityReceived: { x: 222, y: 193 },
 
   wasteAccepted: { x: 116, y: 223, fontSize: 12 },
