@@ -70,7 +70,7 @@
     "@types/passport-local": "^1.0.33",
     "@types/passport-oauth2-client-password": "^0.1.2",
     "@types/supertest": "^2.0.8",
-    "@types/yup": "^0.26.27",
+    "@types/yup": "0.26.35",
     "apollo-server-integration-testing": "^2.3.0",
     "apollo-server-testing": "^2.9.13",
     "concurrently": "^5.1.0",
