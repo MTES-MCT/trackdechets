@@ -31,7 +31,6 @@ const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
 const buildPdf = async (params) => {
   const { appendix2Forms, temporaryStorageDetail } = params;
 
-  const formData = processMainFormParams(params);
   const arialBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
   const timesBoldBytes = fs.readFileSync(
     path.join(__dirname, "./fonts/times-bold.ttf")
@@ -77,6 +76,14 @@ const buildPdf = async (params) => {
     path.join(__dirname, "./medias/watermark.png")
   );
   const watermarkImage = await mainForm.embedPng(watermarkBytes);
+
+  // Start by generating the main page of the PDF
+  // ----------------------------
+  const formData = processMainFormParams({
+    ...params,
+    currentPageNumber: 1,
+    totalPagesNumber: 1 + (params.temporaryStorageDetail ? 1 : 0),
+  });
 
   // customId does not belong to original cerfa, so we had to add our own field title and mimic font look and feel
   if (!!formData.customId) {
@@ -136,6 +143,8 @@ const buildPdf = async (params) => {
     });
   }
 
+  // Temporary storage page
+  // ----------------------
   if (temporaryStorageDetail) {
     const tempStorageDetailsPdf = await PDFDocument.load(
       existingTemporaryStorageBytes
@@ -153,18 +162,21 @@ const buildPdf = async (params) => {
 
     const [tempStoragePage] = tempStorageDetailsPdf.getPages();
 
-    const tempraryStorageData = processMainFormParams({
+    const temporaryStorageData = processMainFormParams({
       ...temporaryStorageDetail,
       tempStorerCompanySiret: params.recipientCompanySiret,
       tempStorerCompanyAddress: params.recipientCompanyAddress,
       tempStorerCompanyName: params.recipientCompanyName,
       wasteAcceptationStatus:
         params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
+      currentPageNumber: 2,
+      totalPagesNumber: 2,
+      formReadableId: params.readableId,
     });
 
     // fill form data
     fillFields({
-      data: tempraryStorageData,
+      data: temporaryStorageData,
       page: tempStoragePage,
       settings: temporaryStorageDetailsFieldSettings,
       font: temporaryStorageArialFont,
@@ -178,7 +190,7 @@ const buildPdf = async (params) => {
       });
     }
 
-    if (!!tempraryStorageData.tempStorerSignedAt) {
+    if (!!temporaryStorageData.tempStorerSignedAt) {
       drawImage(
         "tempStorerReceptionSignature",
         tempStorageStampImage,
@@ -186,9 +198,17 @@ const buildPdf = async (params) => {
       );
     }
 
-    if (!!tempraryStorageData.signedAt) {
+    if (!!temporaryStorageData.signedAt) {
       drawImage(
         "tempStorerSentSignature",
+        tempStorageStampImage,
+        tempStoragePage
+      );
+    }
+
+    if (!!temporaryStorageData.signedByTransporter) {
+      drawImage(
+        "tempStorageTransporterSignature",
         tempStorageStampImage,
         tempStoragePage
       );
@@ -206,15 +226,11 @@ const buildPdf = async (params) => {
     return Buffer.from(mainFormBytes.buffer);
   }
 
-  // if we have appendix, we have to merge mainform and appendix in another pdf
-  const mergedPdf = await PDFDocument.create();
-  const copiedPages = await mergedPdf.copyPages(mainForm, [0]);
-  mergedPdf.addPage(copiedPages[0]);
-
+  // Time to append the appendix 2 pages
+  // ----------------------------
   const formsByAppendix = 5;
   const appendix2FormsCount = appendix2Forms.length;
   const appendixPagesCount = Math.trunc(appendix2FormsCount / formsByAppendix); // how many appendix pages do we need
-
   let subFormCounter = 0; // each appendix page can hold up to 5 sub-forms, let's use a counter
 
   for (
@@ -275,12 +291,12 @@ const buildPdf = async (params) => {
     }
 
     // copy each page and merge in global pdf
-    let copiedAppendixPages = await mergedPdf.copyPages(appendixPages, [0]);
-    mergedPdf.addPage(copiedAppendixPages[0]);
+    let copiedAppendixPages = await mainForm.copyPages(appendixPages, [0]);
+    mainForm.addPage(copiedAppendixPages[0]);
   }
 
-  // finally save merged document and return it
-  const pdfBytes = await mergedPdf.save();
+  // finally save document and return it
+  const pdfBytes = await mainForm.save();
   return Buffer.from(pdfBytes.buffer);
 };
 

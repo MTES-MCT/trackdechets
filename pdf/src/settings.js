@@ -8,6 +8,9 @@ const pageHeight = 842;
 // lineBreakAt: at which position do we insert a linebreak (optional)
 // rightAlign: right align the content
 const mainFormFieldSettings = {
+  currentPageNumber: { x: 530, y: 70, fontSize: 10 },
+  totalPagesNumber: { x: 550, y: 70, fontSize: 10 },
+
   emitterTypeProducer: { x: 53, y: 126, fontSize: 12 },
   emitterTypeAppendix1: { x: 157.5, y: 125.5, fontSize: 12 },
   emitterTypeAppendix2: { x: 51, y: 167, fontSize: 12 },
@@ -122,12 +125,17 @@ const imageLocations = {
   watermark: { x: 0, y: 800 },
   tempStorerReceptionSignature: { x: 195, y: 310 },
   tempStorerSentSignature: { x: 420, y: 590 },
+  tempStorageTransporterSignature: { x: 420, y: 480 },
 };
 
 // Temporary Storage detail form field settings
 const temporaryStorageDetailsFieldSettings = {
+  currentPageNumber: { x: 530, y: 70, fontSize: 10 },
+  totalPagesNumber: { x: 550, y: 70, fontSize: 10 },
+  formReadableId: { x: 220, y: 95, fontSize: 10 },
+
   tempStorerQuantityReal: { x: 125, y: 190, fontSize: 12 },
-  tempStorerQuantityEstimated: { x: 190, y: 190, fontSize: 12 }, // TODO
+  tempStorerQuantityEstimated: { x: 190, y: 190, fontSize: 12 },
   tempStorerQuantityReceived: { x: 222, y: 193 },
 
   wasteAccepted: { x: 116, y: 223, fontSize: 12 },
@@ -137,13 +145,18 @@ const temporaryStorageDetailsFieldSettings = {
   tempStorerReceivedAt: { x: 125, y: 213 },
   tempStorerSignedAt: { x: 75, y: 273 },
   tempStorerCompanySiret: { x: 90, y: 151 },
-  tempStorerCompanyName: { x: 75, y: 161 },
+  tempStorerCompanyName: { x: 75, y: 161, maxLength: 50 },
   tempStorerCompanyAddress: { x: 80, y: 170, lineBreakAt: 55, maxLength: 110 },
 
   destinationIsFilledByEmitter: { x: 293, y: 284, fontSize: 12 },
   destinationCompanySiret: { x: 335, y: 140 },
-  destinationCompanyName: { x: 320, y: 150 },
-  destinationCompanyAddress: { x: 325, y: 161 },
+  destinationCompanyName: { x: 320, y: 150, maxLength: 50 },
+  destinationCompanyAddress: {
+    x: 325,
+    y: 161,
+    lineBreakAt: 55,
+    maxLength: 110,
+  },
   destinationCompanyPhone: { x: 313, y: 180 },
   destinationCompanyMail: { x: 313, y: 190 },
   destinationCompanyContact: { x: 372, y: 202 },
@@ -163,14 +176,14 @@ const temporaryStorageDetailsFieldSettings = {
   wasteDetailsQuantity: { x: 248, y: 387, rightAlign: true },
 
   transporterCompanySiret: { x: 90, y: 430 },
-  transporterCompanyName: { x: 75, y: 440 },
-  transporterCompanyAddress: { x: 80, y: 450 },
-  transporterCompanyPhone: { x: 70, y: 470 },
-  transporterCompanyMail: { x: 70, y: 490 },
+  transporterCompanyName: { x: 75, y: 440, maxLength: 50 },
+  transporterCompanyAddress: { x: 80, y: 450, lineBreakAt: 55, maxLength: 110 },
+  transporterCompanyPhone: { x: 65, y: 470 },
+  transporterCompanyMail: { x: 65, y: 490 },
   transporterCompanyContact: { x: 125, y: 501 },
   transporterReceipt: { x: 350, y: 410 },
-  transporterDepartment: { x: 450, y: 410 },
-  transporterValidityLimit: { x: 390, y: 420 },
+  transporterDepartment: { x: 472, y: 410 },
+  transporterValidityLimit: { x: 366, y: 420 },
 
   signedBy: { x: 75, y: 562 },
   signedAt: { x: 215, y: 562 },
