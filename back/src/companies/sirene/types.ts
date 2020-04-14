@@ -1,5 +1,5 @@
 // Response from /api/sirene/v3/etablissements/<VOTRE_SIRET>
-interface SearchResponse {
+export interface SearchResponse {
   etablissement: {
     siret: string;
     etat_administratif: string;
@@ -20,7 +20,7 @@ interface SearchResponse {
 }
 
 // Response from /api/sirene/v1/full_text/<CLUE>
-interface FullTextSearchResponse {
+export interface FullTextSearchResponse {
   etablissement: {
     siret: string;
     nom_raison_sociale: string;
@@ -39,7 +39,7 @@ interface FullTextSearchResponse {
 }
 
 // return type for mutation { searchCompanies }
-interface CompanySearchResult {
+export interface CompanySearchResult {
   siret: string;
   etatAdministratif?: string;
   address: string;

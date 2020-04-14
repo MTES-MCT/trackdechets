@@ -145,6 +145,8 @@ export type CompanyPublic = {
   website?: Maybe<Scalars['String']>;
   /** SIRET de l'établissement */
   siret?: Maybe<Scalars['String']>;
+  /** État administratif de l'établissement. A = Actif, F = Fermé */
+  etatAdministratif?: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address?: Maybe<Scalars['String']>;
   /** Nom de l'établissement */

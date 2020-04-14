@@ -7,6 +7,11 @@ import {
   safeParseFloat,
   removeDiacritics
 } from "./utils";
+import {
+  SearchResponse,
+  FullTextSearchResponse,
+  CompanySearchResult
+} from "./types";
 
 const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
 
