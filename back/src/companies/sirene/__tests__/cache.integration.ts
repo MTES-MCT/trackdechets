@@ -1,4 +1,4 @@
-import { cached } from "../cache";
+import { searchCompanyCached } from "../cache";
 import * as client from "../client";
 import { resetCache } from "../../../../integration-tests/helper";
 
@@ -21,8 +21,8 @@ describe("searchCompany cached", () => {
 
   it("should cache company information", async () => {
     // call the function twice on the same siret
-    const company1 = await cached("85001946400013");
-    const company2 = await cached("85001946400013");
+    const company1 = await searchCompanyCached("85001946400013");
+    const company2 = await searchCompanyCached("85001946400013");
     expect(company1).toEqual(company);
     expect(company2).toEqual(company);
 

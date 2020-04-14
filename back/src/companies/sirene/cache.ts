@@ -10,7 +10,9 @@ const EXPIRY_TIME = 60 * 60 * 24;
  * It performs validation and return from cache if key is present
  * @param siret
  */
-export function cached(siret: string): Promise<CompanySearchResult> {
+export function searchCompanyCached(
+  siret: string
+): Promise<CompanySearchResult> {
   if (siret.length !== 14) {
     throw new UserInputError("Le siret doit faire 14 caractères", {
       invalidArgs: ["siret"]
