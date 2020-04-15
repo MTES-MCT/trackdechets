@@ -127,7 +127,8 @@ export default function TransportSignature({ form }: Props) {
 
                   <p>
                     <label>
-                      Code ADR
+                      Code ADR (ONU) - Champ à renseigner selon le déchet
+                      transporté, sous votre responsabilité
                       <Field type="text" name="onuCode" />
                     </label>
                   </p>
