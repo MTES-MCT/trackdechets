@@ -22,7 +22,7 @@ export default function Recipient() {
 
   return (
     <>
-      <h4 className="required">
+      <h4>
         Installation de destination ou d’entreposage ou de reconditionnement
       </h4>
 

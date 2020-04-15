@@ -28,13 +28,3 @@ $breakpoint-tablet: 769px;
   opacity: 0.6;
   cursor: not-allowed;
 }
-
-.required::before {
-  content: "✱";
-  color: var(--red);
-  font-weight: 700;
-  padding-right: var(--space-xs);
-  position: absolute;
-  left: 0;
-  transform: translateX(-100%);
-}

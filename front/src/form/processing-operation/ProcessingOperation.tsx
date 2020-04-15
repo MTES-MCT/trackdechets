@@ -30,7 +30,7 @@ export default function ProcessingOperation({
         </p>
       </div>
 
-      <label className="required">Opération de traitement prévue</label>
+      <label>Opération de traitement prévue</label>
       <select id="select" name={name} value={value} onChange={onChange}>
         <option value="">Choisissez...</option>
         {Operations.map(o => (
