@@ -38,7 +38,7 @@ export interface FullTextSearchResponse {
   }[];
 }
 
-// return type for mutation { searchCompanies }
+// return type for functions searchCompany and searchCompanies
 export interface CompanySearchResult {
   siret: string;
   etatAdministratif?: string;
