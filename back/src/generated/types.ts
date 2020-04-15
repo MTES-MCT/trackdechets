@@ -1017,7 +1017,7 @@ export type QueryFormsRegisterArgs = {
 
 export type QuerySearchCompaniesArgs = {
   clue: Scalars['String'];
-  department?: Maybe<Scalars['Int']>;
+  department?: Maybe<Scalars['String']>;
 };
 
 /** Payload de réception d'un BSD */

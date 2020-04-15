@@ -17,7 +17,7 @@ type Query {
     """
     clue: String!
     "(Optionnel) Filtre les résultats par numéro de département"
-    department: Int
+    department: String
   ): [CompanySearchResult]
 
   """

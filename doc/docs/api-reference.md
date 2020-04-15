@@ -296,7 +296,7 @@ sur la nom de l'établissement, ex: 'Boulangerie Dupont'
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">department</td>
-<td valign="top"><a href="#int">Int</a></td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 (Optionnel) Filtre les résultats par numéro de département

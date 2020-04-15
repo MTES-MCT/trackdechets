@@ -37,7 +37,7 @@ function init(selectedCompany) {
     displayDepartment: false,
     searchLoading: false,
     searchResults: [],
-    selectedCompany
+    selectedCompany,
   };
 }
 
@@ -66,7 +66,7 @@ export default function CompanySelector(props) {
   const [state, dispatch] = useReducer(reducer, field.value, init);
   const [
     searchCompaniesQuery,
-    { loading: searchLoading, data: searchData }
+    { loading: searchLoading, data: searchData },
   ] = useLazyQuery(SEARCH_COMPANIES);
 
   useEffect(() => {
@@ -74,14 +74,14 @@ export default function CompanySelector(props) {
       type: "search_change",
       payload: {
         searchResults: searchData?.searchCompanies ?? [],
-        searchLoading
-      }
+        searchLoading,
+      },
     });
 
     if (searchData?.searchCompanies?.length === 1) {
       dispatch({
         type: "company_selected",
-        payload: searchData.searchCompanies[0]
+        payload: searchData.searchCompanies[0],
       });
     }
   }, [searchData, searchLoading]);
@@ -97,7 +97,7 @@ export default function CompanySelector(props) {
       }
 
       searchCompaniesQuery({
-        variables: { clue: state.clue, department: state.department }
+        variables: { clue: state.clue, department: state.department },
       });
     }, 300);
 
@@ -107,7 +107,7 @@ export default function CompanySelector(props) {
   }, [state.clue, state.department, searchCompaniesQuery]);
 
   useEffect(() => {
-    ["siret", "name", "address", "contact", "phone", "mail"].forEach(key => {
+    ["siret", "name", "address", "contact", "phone", "mail"].forEach((key) => {
       if (!state.selectedCompany?.[key]) {
         return;
       }
@@ -120,17 +120,17 @@ export default function CompanySelector(props) {
 
   const { loading, error } = useQuery(FAVORITES, {
     variables: { type },
-    onCompleted: data => {
+    onCompleted: (data) => {
       if (state.selectedCompany.siret === "") {
         dispatch({ type: "company_selected", payload: data.favorites[0] });
       }
       dispatch({
         type: "search_change",
         payload: {
-          searchResults: data.favorites
-        }
+          searchResults: data.favorites,
+        },
       });
-    }
+    },
   });
 
   if (loading) return <p>Chargement...</p>;
@@ -142,7 +142,7 @@ export default function CompanySelector(props) {
         <input
           type="text"
           placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-          onChange={e =>
+          onChange={(e) =>
             dispatch({ type: "search_input", payload: e.target.value })
           }
         />
@@ -157,10 +157,10 @@ export default function CompanySelector(props) {
       <button
         className="button-outline small primary"
         type="button"
-        onClick={_ =>
+        onClick={(_) =>
           dispatch({
             type: "department_filter",
-            payload: !state.displayDepartment
+            payload: !state.displayDepartment,
           })
         }
       >
@@ -173,10 +173,10 @@ export default function CompanySelector(props) {
             <input
               type="text"
               placeholder="Département ou code postal"
-              onChange={e =>
+              onChange={(e) =>
                 dispatch({
                   type: "department_input",
-                  payload: parseInt(e.target.value, 10)
+                  payload: e.target.value,
                 })
               }
             />
@@ -186,16 +186,16 @@ export default function CompanySelector(props) {
 
       {state.searchLoading && <span>Chargement...</span>}
       <CompanyResults
-        onSelect={company =>
+        onSelect={(company) =>
           dispatch({ type: "company_selected", payload: company })
         }
         results={[
           ...state.searchResults,
           ...(!state.searchResults.some(
-            c => c.siret === state.selectedCompany.siret
+            (c) => c.siret === state.selectedCompany.siret
           )
             ? [state.selectedCompany]
-            : [])
+            : []),
         ]}
         selectedItem={state.selectedCompany}
       />
