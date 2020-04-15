@@ -1,7 +1,7 @@
 import { parse } from "date-fns";
 import { string } from "yup";
 
-const allowed_formats = [
+const allowedFormats = [
   "yyyy-MM-dd",
   "yyyy-MM-dd'T'HH:mm:ss",
   "yyyy-MM-dd'T'HH:mm:ssX",
@@ -17,9 +17,9 @@ const isValidDatetime = str => {
   if (!str) {
     return true;
   }
-  for (let fmt of allowed_formats) {
+  for (const fmt of allowedFormats) {
     // to know if a given string is correctly formatted date, we use date-fns parse
-    // if format is correct, getDate() will return a nice Date object, 
+    // if format is correct, getDate() will return a nice Date object,
     // else parse will return an Invalid Date, i.e Date, whose time value is NaN
     if (!!parse(str, fmt, new Date()).getDate()) {
       return true;
@@ -34,7 +34,7 @@ const isValidDatetime = str => {
  *
  * The validation is built upon string(), because date() passes an already processed value to chained method, thus allowing
  * some formatted dates we don't want to accept.
- * 
+ *
  * @param verboseFieldName - human readable field name, for error messages
  * @param required - is this field required ?
  */

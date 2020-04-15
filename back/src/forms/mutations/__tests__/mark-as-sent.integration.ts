@@ -6,7 +6,6 @@ import {
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { prisma } from "../../../generated/prisma-client";
-import { isExpired } from "../../../oauth2";
 
 jest.mock("axios", () => ({
   default: {
