@@ -6,6 +6,7 @@ import {
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { prisma } from "../../../generated/prisma-client";
+import { isExpired } from "../../../oauth2";
 
 jest.mock("axios", () => ({
   default: {
@@ -211,37 +212,47 @@ describe("{ mutation { markAsSent } }", () => {
       );
 
       const emitterCompany = await companyFactory();
+  test.each(["20201211", "junk", "2020 12 11", "2020-12-33"])(
+    "sentAt must be a valid date, %p is not valid",
+    async dateStr => {
+      const { user, company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      const recipientCompany = await companyFactory();
 
       let form = await formFactory({
         ownerId: user.id,
         opt: {
           status: "SEALED",
           emitterCompanySiret: emitterCompany.siret,
+ 
           recipientCompanySiret: recipientCompany.siret,
           wasteDetailsCode: wrongWasteCode
+ 
         }
       });
 
       const { mutate } = makeClient(user);
 
       const mutation = `
-    mutation   {
-      markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
-        id
+ 
+      mutation   {
+        markAsSent(id: "${form.id}", sentInfo: { sentAt: "${dateStr}", sentBy: "John Doe"}) {
+          id
+        }
       }
-    }
-  `;
+    `;
 
       const { errors } = await mutate(mutation);
-
       expect(errors[0].message).toEqual(
-        expect.stringContaining(
-          "Le code déchet est obligatoire et doit appartenir à la liste  du code"
-        )
+        "La date d'envoi n'est pas formatée correctement"
+ 
       );
       form = await prisma.form({ id: form.id });
 
       expect(form.status).toEqual("SEALED");
+ 
 
       // check no SEALED statusLog is created
       const statusLogs = await prisma.statusLogs({
@@ -252,6 +263,7 @@ describe("{ mutation { markAsSent } }", () => {
         }
       });
       expect(statusLogs.length).toEqual(0);
+ Use date validation helper on existing schemas
     }
   );
 });
