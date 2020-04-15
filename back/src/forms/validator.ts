@@ -11,7 +11,6 @@ import { prisma } from "../generated/prisma-client";
 
 import wasteCodes from "./wasteCodes";
 
-import { validDate } from "./validation-helpers";
 import { validDatetime } from "./validation-helpers";
 
 setLocale({
