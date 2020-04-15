@@ -1,19 +1,19 @@
 import { object } from "yup";
 
-import { validDate } from "../validation-helpers";
+import { validDatetime } from "../validation-helpers";
 
 const dummySchema = object({
-  someDate: validDate({ verboseFieldName: "date de test", required: true })
+  someDate: validDatetime({ verboseFieldName: "date de test", required: true })
 });
 
-describe("Test validDate helper", () => {
+describe("Test validDatetime helper", () => {
   test.each([
     "2020-12-30",
     "2020-12-30T23:45:55",
     "2020-12-30T23:45:55Z",
     "2020-12-30T23:45:55+08",
     "2020-12-30T23:45:55.987"
-  ])("validDate is valid with date formatted as %p", async dateStr => {
+  ])("validDatetime is valid with date formatted as %p", async dateStr => {
     const isValid = await dummySchema.isValid({ someDate: dateStr });
     expect(isValid).toEqual(true);
   });
@@ -24,13 +24,13 @@ describe("Test validDate helper", () => {
     "2020-12-30T23 45 55",
     33,
     "junk"
-  ])("validDate is invalid with date formatted as %p", async dateStr => {
+  ])("validDatetime is invalid with date formatted as %p", async dateStr => {
     const isValid = await dummySchema.isValid({ someDate: dateStr });
     expect(isValid).toEqual(false);
   });
 
   test.each([{ someDate: null }, {}])(
-    "validDate is invalid with empty or null value",
+    "validDatetime is invalid with empty or null value",
     async params => {
       const isValid = await dummySchema.isValid(params);
       expect(isValid).toEqual(false);

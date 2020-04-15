@@ -12,6 +12,7 @@ import { prisma } from "../generated/prisma-client";
 import wasteCodes from "./wasteCodes";
 
 import { validDate } from "./validation-helpers";
+import { validDatetime } from "./validation-helpers";
 
 setLocale({
   mixed: {
@@ -82,7 +83,7 @@ export const formSchema = object<any>().shape({
           ? schema.nullable(true)
           : schema.required("Le département du transporteur est obligatoire")
     ),
-    validityLimit: validDate({ verboseFieldName: "date de validité" }),
+    validityLimit: validDatetime({ verboseFieldName: "date de validité" }),
     numberPlate: string().nullable(true),
     company: companySchema("Transporteur")
   }),

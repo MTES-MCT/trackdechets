@@ -13,7 +13,7 @@ const allowed_formats = [
  * Check an incoming string is a date formatted according to allowed_formats
  * "2020-11-23", "2020-11-23T13:34:55","2020-11-23T13:34:55Z", "2020-11-23T13:34:55.987", "2020-11-23T13:34:55.987Z"
  */
-const isValidDate = str => {
+const isValidDatetime = str => {
   if (!str) {
     return true;
   }
@@ -31,8 +31,11 @@ const isValidDate = str => {
  *
  * The validation is built upon string(), because date() passes an already processed value to chained method, thus allowing
  * some formatted dates we don't want to accept.
+ * 
+ * @param verboseFieldName - human readable field name, for error messages
+ * @param required - is this field required ?
  */
-export function validDate({ verboseFieldName, required = false }) {
+export function validDatetime({ verboseFieldName, required = false }) {
   let validator = string();
   if (!!required) {
     validator = validator.required(`Vous devez saisir une ${verboseFieldName}`);
@@ -44,7 +47,7 @@ export function validDate({ verboseFieldName, required = false }) {
     "valid-required-date",
     `La ${verboseFieldName} n'est pas formatée correctement`,
     v => {
-      return isValidDate(v);
+      return isValidDatetime(v);
     }
   );
 }
