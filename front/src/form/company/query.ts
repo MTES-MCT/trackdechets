@@ -20,6 +20,8 @@ export const COMPANY_INFOS = gql`
       name
       naf
       address
+      etatAdministratif
+      isRegistered
       installation {
         codeS3ic
         urlFiche

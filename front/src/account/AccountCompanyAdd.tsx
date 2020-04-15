@@ -43,7 +43,7 @@ export default function AccountCompanyAdd() {
 
   const [
     createCompany,
-    { loading: savingCompany, error: savingError }
+    { loading: savingCompany, error: savingError },
   ] = useMutation(CREATE_COMPANY, {
     update(cache, { data: { createCompany } }) {
       const getMeQuery = cache.readQuery<{ me: any }>({ query: GET_ME });
@@ -55,9 +55,9 @@ export default function AccountCompanyAdd() {
 
       cache.writeQuery({
         query: GET_ME,
-        data: { me }
+        data: { me },
       });
-    }
+    },
   });
   const [getCompanyInfos, { loading, data, error }] = useLazyQuery(
     COMPANY_INFOS
@@ -75,6 +75,14 @@ export default function AccountCompanyAdd() {
       cogoToast.error(
         "Ce SIRET existe déjà dans Trackdéchets, impossible de le re-créer."
       );
+      setCompanyInfos(null);
+
+      return;
+    }
+
+    if (data.companyInfos.etatAdministratif === "F") {
+      cogoToast.error("Cet établissement est fermé, impossible de le créer");
+      setCompanyInfos(null);
       return;
     }
 
@@ -95,12 +103,12 @@ export default function AccountCompanyAdd() {
       body: uploadedFile.file,
       headers: {
         "Content-Type": uploadedFile.fileType,
-        "x-amz-acl": "private"
-      }
-    }).then(_ =>
+        "x-amz-acl": "private",
+      },
+    }).then((_) =>
       setUploadedFile({
         ...uploadedFile,
-        key: uploadLinkData.createUploadLink.key
+        key: uploadLinkData.createUploadLink.key,
       })
     );
   }, [uploadLinkData, uploadedFile]);
@@ -120,28 +128,28 @@ export default function AccountCompanyAdd() {
           gerepId: "",
           codeNaf: "",
           documentKeys: [],
-          isAllowed: false
+          isAllowed: false,
         }}
-        validate={values => {
+        validate={(values) => {
           return {
             ...(values.companyTypes.length === 0 && {
-              companyTypes: "Vous devez préciser le type de compagnie"
+              companyTypes: "Vous devez préciser le type de compagnie",
             }),
             ...(!values.isAllowed && {
               isAllowed:
-                "Vous devez certifier être autorisé à créer ce compte pour votre entreprise"
+                "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
             }),
             ...(values.siret.replace(/\s/g, "").length !== 14 && {
-              siret: "Le SIRET doit faire 14 caractères"
-            })
+              siret: "Le SIRET doit faire 14 caractères",
+            }),
           };
         }}
-        onSubmit={values => {
+        onSubmit={(values) => {
           const { isAllowed, ...companyInput } = values;
           const companyName = companyInfos ? companyInfos.name || "" : "";
           createCompany({
-            variables: { companyInput: { ...companyInput, companyName } }
-          }).then(_ => {
+            variables: { companyInput: { ...companyInput, companyName } },
+          }).then((_) => {
             history.push("/dashboard/slips");
           });
         }}
@@ -177,7 +185,7 @@ export default function AccountCompanyAdd() {
             </div>
 
             {error && <NotificationError apolloError={error} />}
-            {data && (
+            {companyInfos && (
               <>
                 <AccountFieldNotEditable
                   label="Nom de l'entreprise"
@@ -238,7 +246,7 @@ export default function AccountCompanyAdd() {
                     <input
                       type="file"
                       accept="image/png, image/jpeg, .pdf"
-                      onChange={async event => {
+                      onChange={async (event) => {
                         const file = event.currentTarget.files?.item(0);
                         if (!file) {
                           return;
@@ -313,8 +321,8 @@ const UpdateSiretRelatedFields = ({ companyInfos }) => {
     // auto-complete companyTypes
     if (companyInfos.installation) {
       let categories = companyInfos.installation.rubriques
-        .filter(r => !!r.category) // null blocks form submitting
-        .map(r => r.category);
+        .filter((r) => !!r.category) // null blocks form submitting
+        .map((r) => r.category);
       const companyTypes = categories.filter((value, index, self) => {
         return self.indexOf(value) === index;
       });
