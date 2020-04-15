@@ -78,6 +78,7 @@ const DUPLICATE_FORM = gql`
           name
           siret
         }
+        isTempStorage
         processingOperation
       }
       wasteDetails {
@@ -87,6 +88,12 @@ const DUPLICATE_FORM = gql`
       }
       actualQuantity
       quantityReceived
+      temporaryStorageDetail {
+        destination {
+          cap
+          processingOperation
+        }
+      }
     }
   }
 `;
