@@ -142,7 +142,7 @@ export default {
         quantity: number().positive(
           "Vous devez saisir une quantité envoyée supérieure à 0."
         ),
-        onuCode: string().required("Vous devez saisir un code ONU.")
+        onuCode: string().nullable(true)
       })
     }),
     markAsTempStored: object().shape({

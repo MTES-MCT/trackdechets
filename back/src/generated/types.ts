@@ -1321,7 +1321,7 @@ export type TransporterSignatureFormInput = {
   /** Quantité en tonnes */
   quantity: Scalars['Float'];
   /** Code ONU */
-  onuCode: Scalars['String'];
+  onuCode?: Maybe<Scalars['String']>;
 };
 
 /** Lien d'upload */
