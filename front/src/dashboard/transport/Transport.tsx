@@ -12,6 +12,7 @@ import { FaSync, FaSort } from "react-icons/fa";
 import { useState } from "react";
 import useLocalStorage from "./hooks";
 import { Form } from "../../form/model";
+import { fullFormFragment } from "../../common/fragments";
 
 type Props = {
   me: Me;
@@ -20,58 +21,9 @@ type Props = {
 export const GET_TRANSPORT_SLIPS = gql`
   query GetSlips($siret: String, $type: FormType) {
     forms(siret: $siret, type: $type) {
-      id
-      status
-      readableId
-      createdAt
-      emitter {
-        company {
-          name
-          siret
-          address
-        }
-      }
-      recipient {
-        company {
-          name
-          siret
-          address
-        }
-      }
-      transporter {
-        company {
-          name
-          siret
-          address
-        }
-        numberPlate
-        customInfo
-      }
-      wasteDetails {
-        code
-        name
-        quantity
-        packagings
-        onuCode
-      }
-      temporaryStorageDetail {
-        destination {
-          company {
-            name
-            siret
-            address
-          }
-          cap
-          processingOperation
-        }
-        wasteDetails {
-          code
-          quantity
-          packagings
-          onuCode
-        }
-      }
+      ...FullForm
     }
+    ${fullFormFragment}
   }
 `;
 const Table = ({ forms, displayActions }) => {
