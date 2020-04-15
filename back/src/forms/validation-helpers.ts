@@ -18,6 +18,9 @@ const isValidDatetime = str => {
     return true;
   }
   for (let fmt of allowed_formats) {
+    // to know if a given string is correctly formatted date, we use date-fns parse
+    // if format is correct, getDate() will return a nice Date object, 
+    // else parse will return an Invalid Date, i.e Date, whose time value is NaN
     if (!!parse(str, fmt, new Date()).getDate()) {
       return true;
     }
