@@ -203,7 +203,7 @@ export default function CompanySelector(props) {
       <RedErrorMessage name={`${field.name}.siret`} />
 
       <div className="form__group">
-        <label className="required">
+        <label>
           Personne à contacter
           <Field
             type="text"
@@ -214,7 +214,7 @@ export default function CompanySelector(props) {
 
         <RedErrorMessage name={`${field.name}.contact`} />
 
-        <label className="required">
+        <label>
           Téléphone ou Fax
           <Field
             type="text"
@@ -225,7 +225,7 @@ export default function CompanySelector(props) {
 
         <RedErrorMessage name={`${field.name}.phone`} />
 
-        <label className="required">
+        <label>
           Mail
           <Field type="email" name={`${field.name}.mail`} />
         </label>

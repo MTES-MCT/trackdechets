@@ -51,7 +51,7 @@ export default function WasteCode(props) {
         </ul>
       </div>
 
-      <label className="required">
+      <label>
         Code déchet
         <input
           type="text"

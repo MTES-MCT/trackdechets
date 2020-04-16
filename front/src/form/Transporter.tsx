@@ -10,7 +10,7 @@ type Values = {
 export default connect<{}, Values>(function Transporter(props) {
   return (
     <>
-      <h4 className="required">Transporteur</h4>
+      <h4>Transporteur</h4>
       <CompanySelector name="transporter.company" />
 
       <h4>Autorisations</h4>
@@ -27,14 +27,14 @@ export default connect<{}, Values>(function Transporter(props) {
       </div>
       {!props.formik.values.transporter.isExemptedOfReceipt && (
         <div className="form__group">
-          <label className="required">
+          <label>
             Numéro de récépissé
             <Field type="text" name="transporter.receipt" />
           </label>
 
           <RedErrorMessage name="transporter.receipt" />
 
-          <label className="required">
+          <label>
             Département
             <Field
               type="text"
