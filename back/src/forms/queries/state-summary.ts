@@ -12,7 +12,7 @@ export const stateSummary = async (
     .temporaryStorageDetail();
 
   return {
-    actualQuantity: getActualQuantity(parent, temporaryStorageDetail),
+    quantity: getQuantity(parent, temporaryStorageDetail),
     transporter: getTransporter(parent, temporaryStorageDetail),
     recipient: getRecipient(parent, temporaryStorageDetail),
     lastActionOn: getLastActionOn(parent, temporaryStorageDetail)
@@ -86,7 +86,7 @@ function getLastActionOn(
   }
 }
 
-function getActualQuantity(
+function getQuantity(
   form: Form,
   temporaryStorageDetail: TemporaryStorageDetail
 ): number | null {

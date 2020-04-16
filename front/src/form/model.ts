@@ -3,6 +3,12 @@ export type Form = {
   customId: string;
   readableId: string;
   status: string;
+  stateSummary: {
+    quantity: number;
+    transporter: FormCompany;
+    recipient: FormCompany;
+    lastActionOn: string;
+  };
   ecoOrganisme: {
     id: string;
   };
@@ -29,7 +35,6 @@ export type Form = {
   wasteDetails: WasteDetails;
 
   receivedAt: string;
-  actualQuantity: number;
   quantityReceived: number;
   processingOperationDone: string;
   temporaryStorageDetail: {

@@ -40,18 +40,18 @@ export default function TransportSignature({ form }: Props) {
   const [signedByTransporter, { error }] = useMutation(SIGNED_BY_TRANSPORTER, {
     onCompleted: () => setIsOpen(false),
     refetchQueries: [],
-    update: store => {
+    update: (store) => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
           siret: currentSiretService.getSiret(),
-          type: "TRANSPORTER"
+          type: "TRANSPORTER",
         },
-        getNewData: data => ({
-          forms: data.forms.filter(f => f.id !== form.id)
-        })
+        getNewData: (data) => ({
+          forms: data.forms.filter((f) => f.id !== form.id),
+        }),
       });
-    }
+    },
   });
 
   return (
@@ -67,7 +67,7 @@ export default function TransportSignature({ form }: Props) {
         className="modal__backdrop"
         id="modal"
         style={{
-          display: isOpen ? "flex" : "none"
+          display: isOpen ? "flex" : "none",
         }}
       >
         <div className="modal">
@@ -82,11 +82,11 @@ export default function TransportSignature({ form }: Props) {
               signedByProducer: false,
               packagings: form.wasteDetails.packagings,
               quantity: form.wasteDetails.quantity,
-              onuCode: form.wasteDetails.onuCode
+              onuCode: form.wasteDetails.onuCode,
             }}
             onSubmit={(values: any) =>
               signedByTransporter({
-                variables: { id: form.id, signingInfo: values }
+                variables: { id: form.id, signingInfo: values },
               })
             }
             onCancel={() => setIsOpen(false)}
@@ -135,9 +135,9 @@ export default function TransportSignature({ form }: Props) {
 
                   <h3>Destination du déchet</h3>
                   <address>
-                    {form.recipient.company.name} (
-                    {form.recipient.company.siret})
-                    <br /> {form.recipient.company.address}
+                    {form.stateSummary.recipient?.name} (
+                    {form.stateSummary.recipient?.siret})
+                    <br /> {form.stateSummary.recipient?.address}
                   </address>
 
                   <h3>Validation</h3>
@@ -205,16 +205,16 @@ export default function TransportSignature({ form }: Props) {
 
                     <h3>Transporteur</h3>
                     <address>
-                      {form.transporter.company.name} (
-                      {form.transporter.company.siret})
-                      <br /> {form.transporter.company.address}
+                      {form.stateSummary.transporter.name} (
+                      {form.stateSummary.transporter.siret})
+                      <br /> {form.stateSummary.transporter.address}
                     </address>
 
                     <h3>Destination du déchet</h3>
                     <address>
-                      {form.recipient.company.name} (
-                      {form.recipient.company.siret})
-                      <br /> {form.recipient.company.address}
+                      {form.stateSummary.recipient?.name} (
+                      {form.stateSummary.recipient?.siret})
+                      <br /> {form.stateSummary.recipient?.address}
                     </address>
 
                     <p>

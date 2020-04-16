@@ -6,25 +6,25 @@ import DateInput from "../../../form/custom-inputs/DateInput";
 import { SlipActionProps } from "../SlipActions";
 import {
   InlineRadioButton,
-  RadioButton
+  RadioButton,
 } from "../../../form/custom-inputs/RadioButton";
 import { WasteAcceptationStatus, FormStatus } from "../../../Constants";
 
 const textConfig = {
   [WasteAcceptationStatus.ACCEPTED]: {
     validationText:
-      "En validant, je confirme la réception des déchets indiqués dans ce bordereau."
+      "En validant, je confirme la réception des déchets indiqués dans ce bordereau.",
   },
   [WasteAcceptationStatus.REFUSED]: {
     validationText:
       "En refusant ce déchet, je le retourne à son producteur. Un mail automatique Trackdéchets, informera le producteur de ce refus, accompagné du BSD en pdf. L'inspection des ICPE et ma société en recevront une copie",
-    refusalReasonText: "Motif du refus"
+    refusalReasonText: "Motif du refus",
   },
   [WasteAcceptationStatus.PARTIALLY_REFUSED]: {
     validationText:
       "En validant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. Un mail automatique Trackdéchets, informera le producteur de ce refus partiel, accompagné du BSD en pdf. L'inspection des ICPE et ma société en recevront une copie",
-    refusalReasonText: "Motif du refus partiel"
-  }
+    refusalReasonText: "Motif du refus partiel",
+  },
 };
 const FieldError = ({ fieldError }) =>
   !!fieldError ? <p className="text-red mt-0 mb-0">{fieldError}</p> : null;
@@ -40,9 +40,9 @@ export default function Received(props: SlipActionProps) {
           wasteAcceptationStatus: "",
           wasteRefusalReason: "",
           ...(props.form.recipient.isTempStorage &&
-            props.form.status === FormStatus.SENT && { quantityType: "REAL" })
+            props.form.status === FormStatus.SENT && { quantityType: "REAL" }),
         }}
-        onSubmit={values => props.onSubmit({ info: values })}
+        onSubmit={(values) => props.onSubmit({ info: values })}
       >
         {({ values, errors, touched, handleReset, setFieldValue }) => {
           const hasErrors = !!Object.keys(errors).length;
@@ -114,7 +114,8 @@ export default function Received(props: SlipActionProps) {
                 />
                 <FieldError fieldError={errors.quantityReceived} />
                 <span>
-                  Poids indicatif émis: {props.form.actualQuantity} tonnes
+                  Poids indicatif émis: {props.form.stateSummary.quantity}{" "}
+                  tonnes
                 </span>
               </label>
               {props.form.recipient.isTempStorage &&
@@ -138,7 +139,7 @@ export default function Received(props: SlipActionProps) {
               {/* Display wasteRefusalReason field if waste is refused or partially refused*/}
               {[
                 WasteAcceptationStatus.REFUSED.toString(),
-                WasteAcceptationStatus.PARTIALLY_REFUSED.toString()
+                WasteAcceptationStatus.PARTIALLY_REFUSED.toString(),
               ].includes(values.wasteAcceptationStatus) && (
                 <label>
                   {textConfig[values.wasteAcceptationStatus].refusalReasonText}
