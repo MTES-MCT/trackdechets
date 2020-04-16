@@ -23,8 +23,8 @@ export const GET_TRANSPORT_SLIPS = gql`
     forms(siret: $siret, type: $type) {
       ...FullForm
     }
-    ${fullFormFragment}
   }
+  ${fullFormFragment}
 `;
 const Table = ({ forms, displayActions }) => {
   const [sortedForms, sortBy, filter] = useFormsTable(forms);
