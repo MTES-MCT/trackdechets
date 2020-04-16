@@ -1,6 +1,6 @@
 import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { removeNulls } from "../../../common/helper";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import CompanySelector from "../../../form/company/CompanySelector";
@@ -17,6 +17,10 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   const initialValues = merge(
     emptyState,
     removeNulls(form.temporaryStorageDetail)
+  );
+
+  const [isRefurbished, setIsRefurbished] = useState(
+    !!form.temporaryStorageDetail.wasteDetails.quantity
   );
 
   return (
@@ -53,72 +57,86 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                 ))}
               </Field>
             </div>
-
-            <h5>Détails du déchet</h5>
-            <div className="notification info">
-              Les champs concernant le détail du déchet sont à remplir en cas de
-              reconditionnement uniquement.
-            </div>
-
-            <h4>Conditionnement</h4>
-            <div className="form__group">
-              <Field name="wasteDetails.packagings" component={Packagings} />
-
-              {values.wasteDetails.packagings.indexOf("AUTRE") > -1 && (
-                <label>
-                  <Field
-                    name="wasteDetails.otherPackaging"
-                    type="text"
-                    placeholder="Détail de l'autre conditionnement"
-                  />
-                </label>
-              )}
-
-              <Field
-                component={NumberInput}
-                name="wasteDetails.numberOfPackages"
-                label="Nombre de colis"
-              />
-              <RedErrorMessage name="wasteDetails.numberOfPackages" />
-            </div>
-
-            <h4>Quantité en tonnes</h4>
-            <div className="form__group">
-              <Field
-                component={NumberInput}
-                name="wasteDetails.quantity"
-                placeholder="En tonnes"
-                min="0"
-                step="0.001"
-              />
-
-              <RedErrorMessage name="wasteDetails.quantity" />
-
-              <fieldset>
-                <legend>Cette quantité est</legend>
-                <Field
-                  name="wasteDetails.quantityType"
-                  id="REAL"
-                  label="Réelle"
-                  component={RadioButton}
-                />
-                <Field
-                  name="wasteDetails.quantityType"
-                  id="ESTIMATED"
-                  label="Estimée"
-                  component={RadioButton}
-                />
-              </fieldset>
-
-              <RedErrorMessage name="wasteDetails.quantityType" />
-            </div>
             <div className="form__group">
               <label>
-                Mentions au titre des règlements ADR, RID, ADNR, IMDG (le cas
-                échéant)
-                <Field type="text" name="wasteDetails.onuCode" />
+                <input
+                  type="checkbox"
+                  checked={isRefurbished}
+                  onChange={() => setIsRefurbished(!isRefurbished)}
+                />
+                Les déchets ont subi un reconditionnement, je dois saisir les
+                détails
               </label>
             </div>
+
+            {isRefurbished && (
+              <>
+                <h5>Détails du déchet</h5>
+
+                <h4>Conditionnement</h4>
+                <div className="form__group">
+                  <Field
+                    name="wasteDetails.packagings"
+                    component={Packagings}
+                  />
+
+                  {values.wasteDetails.packagings.indexOf("AUTRE") > -1 && (
+                    <label>
+                      <Field
+                        name="wasteDetails.otherPackaging"
+                        type="text"
+                        placeholder="Détail de l'autre conditionnement"
+                      />
+                    </label>
+                  )}
+
+                  <Field
+                    component={NumberInput}
+                    name="wasteDetails.numberOfPackages"
+                    label="Nombre de colis"
+                  />
+                  <RedErrorMessage name="wasteDetails.numberOfPackages" />
+                </div>
+
+                <h4>Quantité en tonnes</h4>
+                <div className="form__group">
+                  <Field
+                    component={NumberInput}
+                    name="wasteDetails.quantity"
+                    placeholder="En tonnes"
+                    min="0"
+                    step="0.001"
+                  />
+
+                  <RedErrorMessage name="wasteDetails.quantity" />
+
+                  <fieldset>
+                    <legend>Cette quantité est</legend>
+                    <Field
+                      name="wasteDetails.quantityType"
+                      id="REAL"
+                      label="Réelle"
+                      component={RadioButton}
+                    />
+                    <Field
+                      name="wasteDetails.quantityType"
+                      id="ESTIMATED"
+                      label="Estimée"
+                      component={RadioButton}
+                    />
+                  </fieldset>
+
+                  <RedErrorMessage name="wasteDetails.quantityType" />
+                </div>
+                <div className="form__group">
+                  <label>
+                    Mentions au titre des règlements ADR, RID, ADNR, IMDG (le
+                    cas échéant)
+                    <Field type="text" name="wasteDetails.onuCode" />
+                  </label>
+                </div>
+              </>
+            )}
 
             <h5>
               Collecteur-transporteur après entreposage ou reconditionnement
