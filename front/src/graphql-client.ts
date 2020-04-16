@@ -23,5 +23,5 @@ const cleanTypenameLink = new ApolloLink((operation, forward) => {
 
 export default new ApolloClient({
   link: ApolloLink.from([cleanTypenameLink, httpLink]),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({ dataIdFromObject: (obj) => obj.id }),
 });

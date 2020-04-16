@@ -1,3 +1,14 @@
 .content {
   padding: var(--space-s) var(--space-l);
 }
+
+.panelTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  button,
+  button:active {
+    margin: 0;
+  }
+}

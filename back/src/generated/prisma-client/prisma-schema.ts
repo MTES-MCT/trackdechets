@@ -204,6 +204,14 @@ type AggregateTemporaryStorageDetail {
   count: Int!
 }
 
+type AggregateTraderReceipt {
+  count: Int!
+}
+
+type AggregateTransporterReceipt {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -451,6 +459,8 @@ type Company {
   contactPhone: String
   website: String
   documentKeys: [String!]!
+  transporterReceipt: TransporterReceipt
+  traderReceipt: TraderReceipt
 }
 
 type CompanyAssociation {
@@ -647,6 +657,8 @@ input CompanyCreateInput {
   contactPhone: String
   website: String
   documentKeys: CompanyCreatedocumentKeysInput
+  transporterReceipt: TransporterReceiptCreateOneInput
+  traderReceipt: TraderReceiptCreateOneInput
 }
 
 input CompanyCreateOneInput {
@@ -747,6 +759,8 @@ input CompanyUpdateDataInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  transporterReceipt: TransporterReceiptUpdateOneInput
+  traderReceipt: TraderReceiptUpdateOneInput
 }
 
 input CompanyUpdatedocumentKeysInput {
@@ -765,6 +779,8 @@ input CompanyUpdateInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  transporterReceipt: TransporterReceiptUpdateOneInput
+  traderReceipt: TraderReceiptUpdateOneInput
 }
 
 input CompanyUpdateManyMutationInput {
@@ -944,6 +960,8 @@ input CompanyWhereInput {
   website_not_starts_with: String
   website_ends_with: String
   website_not_ends_with: String
+  transporterReceipt: TransporterReceiptWhereInput
+  traderReceipt: TraderReceiptWhereInput
   AND: [CompanyWhereInput!]
   OR: [CompanyWhereInput!]
   NOT: [CompanyWhereInput!]
@@ -4806,6 +4824,18 @@ type Mutation {
   upsertTemporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!, create: TemporaryStorageDetailCreateInput!, update: TemporaryStorageDetailUpdateInput!): TemporaryStorageDetail!
   deleteTemporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
   deleteManyTemporaryStorageDetails(where: TemporaryStorageDetailWhereInput): BatchPayload!
+  createTraderReceipt(data: TraderReceiptCreateInput!): TraderReceipt!
+  updateTraderReceipt(data: TraderReceiptUpdateInput!, where: TraderReceiptWhereUniqueInput!): TraderReceipt
+  updateManyTraderReceipts(data: TraderReceiptUpdateManyMutationInput!, where: TraderReceiptWhereInput): BatchPayload!
+  upsertTraderReceipt(where: TraderReceiptWhereUniqueInput!, create: TraderReceiptCreateInput!, update: TraderReceiptUpdateInput!): TraderReceipt!
+  deleteTraderReceipt(where: TraderReceiptWhereUniqueInput!): TraderReceipt
+  deleteManyTraderReceipts(where: TraderReceiptWhereInput): BatchPayload!
+  createTransporterReceipt(data: TransporterReceiptCreateInput!): TransporterReceipt!
+  updateTransporterReceipt(data: TransporterReceiptUpdateInput!, where: TransporterReceiptWhereUniqueInput!): TransporterReceipt
+  updateManyTransporterReceipts(data: TransporterReceiptUpdateManyMutationInput!, where: TransporterReceiptWhereInput): BatchPayload!
+  upsertTransporterReceipt(where: TransporterReceiptWhereUniqueInput!, create: TransporterReceiptCreateInput!, update: TransporterReceiptUpdateInput!): TransporterReceipt!
+  deleteTransporterReceipt(where: TransporterReceiptWhereUniqueInput!): TransporterReceipt
+  deleteManyTransporterReceipts(where: TransporterReceiptWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -4885,6 +4915,12 @@ type Query {
   temporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
   temporaryStorageDetails(where: TemporaryStorageDetailWhereInput, orderBy: TemporaryStorageDetailOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TemporaryStorageDetail]!
   temporaryStorageDetailsConnection(where: TemporaryStorageDetailWhereInput, orderBy: TemporaryStorageDetailOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TemporaryStorageDetailConnection!
+  traderReceipt(where: TraderReceiptWhereUniqueInput!): TraderReceipt
+  traderReceipts(where: TraderReceiptWhereInput, orderBy: TraderReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TraderReceipt]!
+  traderReceiptsConnection(where: TraderReceiptWhereInput, orderBy: TraderReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TraderReceiptConnection!
+  transporterReceipt(where: TransporterReceiptWhereUniqueInput!): TransporterReceipt
+  transporterReceipts(where: TransporterReceiptWhereInput, orderBy: TransporterReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TransporterReceipt]!
+  transporterReceiptsConnection(where: TransporterReceiptWhereInput, orderBy: TransporterReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TransporterReceiptConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -5345,6 +5381,8 @@ type Subscription {
   rubrique(where: RubriqueSubscriptionWhereInput): RubriqueSubscriptionPayload
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
   temporaryStorageDetail(where: TemporaryStorageDetailSubscriptionWhereInput): TemporaryStorageDetailSubscriptionPayload
+  traderReceipt(where: TraderReceiptSubscriptionWhereInput): TraderReceiptSubscriptionPayload
+  transporterReceipt(where: TransporterReceiptSubscriptionWhereInput): TransporterReceiptSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
   userActivationHash(where: UserActivationHashSubscriptionWhereInput): UserActivationHashSubscriptionPayload
@@ -6159,6 +6197,322 @@ input TemporaryStorageDetailWhereInput {
 }
 
 input TemporaryStorageDetailWhereUniqueInput {
+  id: ID
+}
+
+type TraderReceipt {
+  id: ID!
+  receiptNumber: String!
+  validityLimit: DateTime!
+  department: String!
+}
+
+type TraderReceiptConnection {
+  pageInfo: PageInfo!
+  edges: [TraderReceiptEdge]!
+  aggregate: AggregateTraderReceipt!
+}
+
+input TraderReceiptCreateInput {
+  id: ID
+  receiptNumber: String!
+  validityLimit: DateTime!
+  department: String!
+}
+
+input TraderReceiptCreateOneInput {
+  create: TraderReceiptCreateInput
+  connect: TraderReceiptWhereUniqueInput
+}
+
+type TraderReceiptEdge {
+  node: TraderReceipt!
+  cursor: String!
+}
+
+enum TraderReceiptOrderByInput {
+  id_ASC
+  id_DESC
+  receiptNumber_ASC
+  receiptNumber_DESC
+  validityLimit_ASC
+  validityLimit_DESC
+  department_ASC
+  department_DESC
+}
+
+type TraderReceiptPreviousValues {
+  id: ID!
+  receiptNumber: String!
+  validityLimit: DateTime!
+  department: String!
+}
+
+type TraderReceiptSubscriptionPayload {
+  mutation: MutationType!
+  node: TraderReceipt
+  updatedFields: [String!]
+  previousValues: TraderReceiptPreviousValues
+}
+
+input TraderReceiptSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TraderReceiptWhereInput
+  AND: [TraderReceiptSubscriptionWhereInput!]
+  OR: [TraderReceiptSubscriptionWhereInput!]
+  NOT: [TraderReceiptSubscriptionWhereInput!]
+}
+
+input TraderReceiptUpdateDataInput {
+  receiptNumber: String
+  validityLimit: DateTime
+  department: String
+}
+
+input TraderReceiptUpdateInput {
+  receiptNumber: String
+  validityLimit: DateTime
+  department: String
+}
+
+input TraderReceiptUpdateManyMutationInput {
+  receiptNumber: String
+  validityLimit: DateTime
+  department: String
+}
+
+input TraderReceiptUpdateOneInput {
+  create: TraderReceiptCreateInput
+  update: TraderReceiptUpdateDataInput
+  upsert: TraderReceiptUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: TraderReceiptWhereUniqueInput
+}
+
+input TraderReceiptUpsertNestedInput {
+  update: TraderReceiptUpdateDataInput!
+  create: TraderReceiptCreateInput!
+}
+
+input TraderReceiptWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  receiptNumber: String
+  receiptNumber_not: String
+  receiptNumber_in: [String!]
+  receiptNumber_not_in: [String!]
+  receiptNumber_lt: String
+  receiptNumber_lte: String
+  receiptNumber_gt: String
+  receiptNumber_gte: String
+  receiptNumber_contains: String
+  receiptNumber_not_contains: String
+  receiptNumber_starts_with: String
+  receiptNumber_not_starts_with: String
+  receiptNumber_ends_with: String
+  receiptNumber_not_ends_with: String
+  validityLimit: DateTime
+  validityLimit_not: DateTime
+  validityLimit_in: [DateTime!]
+  validityLimit_not_in: [DateTime!]
+  validityLimit_lt: DateTime
+  validityLimit_lte: DateTime
+  validityLimit_gt: DateTime
+  validityLimit_gte: DateTime
+  department: String
+  department_not: String
+  department_in: [String!]
+  department_not_in: [String!]
+  department_lt: String
+  department_lte: String
+  department_gt: String
+  department_gte: String
+  department_contains: String
+  department_not_contains: String
+  department_starts_with: String
+  department_not_starts_with: String
+  department_ends_with: String
+  department_not_ends_with: String
+  AND: [TraderReceiptWhereInput!]
+  OR: [TraderReceiptWhereInput!]
+  NOT: [TraderReceiptWhereInput!]
+}
+
+input TraderReceiptWhereUniqueInput {
+  id: ID
+}
+
+type TransporterReceipt {
+  id: ID!
+  receiptNumber: String!
+  validityLimit: DateTime!
+  department: String!
+}
+
+type TransporterReceiptConnection {
+  pageInfo: PageInfo!
+  edges: [TransporterReceiptEdge]!
+  aggregate: AggregateTransporterReceipt!
+}
+
+input TransporterReceiptCreateInput {
+  id: ID
+  receiptNumber: String!
+  validityLimit: DateTime!
+  department: String!
+}
+
+input TransporterReceiptCreateOneInput {
+  create: TransporterReceiptCreateInput
+  connect: TransporterReceiptWhereUniqueInput
+}
+
+type TransporterReceiptEdge {
+  node: TransporterReceipt!
+  cursor: String!
+}
+
+enum TransporterReceiptOrderByInput {
+  id_ASC
+  id_DESC
+  receiptNumber_ASC
+  receiptNumber_DESC
+  validityLimit_ASC
+  validityLimit_DESC
+  department_ASC
+  department_DESC
+}
+
+type TransporterReceiptPreviousValues {
+  id: ID!
+  receiptNumber: String!
+  validityLimit: DateTime!
+  department: String!
+}
+
+type TransporterReceiptSubscriptionPayload {
+  mutation: MutationType!
+  node: TransporterReceipt
+  updatedFields: [String!]
+  previousValues: TransporterReceiptPreviousValues
+}
+
+input TransporterReceiptSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TransporterReceiptWhereInput
+  AND: [TransporterReceiptSubscriptionWhereInput!]
+  OR: [TransporterReceiptSubscriptionWhereInput!]
+  NOT: [TransporterReceiptSubscriptionWhereInput!]
+}
+
+input TransporterReceiptUpdateDataInput {
+  receiptNumber: String
+  validityLimit: DateTime
+  department: String
+}
+
+input TransporterReceiptUpdateInput {
+  receiptNumber: String
+  validityLimit: DateTime
+  department: String
+}
+
+input TransporterReceiptUpdateManyMutationInput {
+  receiptNumber: String
+  validityLimit: DateTime
+  department: String
+}
+
+input TransporterReceiptUpdateOneInput {
+  create: TransporterReceiptCreateInput
+  update: TransporterReceiptUpdateDataInput
+  upsert: TransporterReceiptUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: TransporterReceiptWhereUniqueInput
+}
+
+input TransporterReceiptUpsertNestedInput {
+  update: TransporterReceiptUpdateDataInput!
+  create: TransporterReceiptCreateInput!
+}
+
+input TransporterReceiptWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  receiptNumber: String
+  receiptNumber_not: String
+  receiptNumber_in: [String!]
+  receiptNumber_not_in: [String!]
+  receiptNumber_lt: String
+  receiptNumber_lte: String
+  receiptNumber_gt: String
+  receiptNumber_gte: String
+  receiptNumber_contains: String
+  receiptNumber_not_contains: String
+  receiptNumber_starts_with: String
+  receiptNumber_not_starts_with: String
+  receiptNumber_ends_with: String
+  receiptNumber_not_ends_with: String
+  validityLimit: DateTime
+  validityLimit_not: DateTime
+  validityLimit_in: [DateTime!]
+  validityLimit_not_in: [DateTime!]
+  validityLimit_lt: DateTime
+  validityLimit_lte: DateTime
+  validityLimit_gt: DateTime
+  validityLimit_gte: DateTime
+  department: String
+  department_not: String
+  department_in: [String!]
+  department_not_in: [String!]
+  department_lt: String
+  department_lte: String
+  department_gt: String
+  department_gte: String
+  department_contains: String
+  department_not_contains: String
+  department_starts_with: String
+  department_not_starts_with: String
+  department_ends_with: String
+  department_not_ends_with: String
+  AND: [TransporterReceiptWhereInput!]
+  OR: [TransporterReceiptWhereInput!]
+  NOT: [TransporterReceiptWhereInput!]
+}
+
+input TransporterReceiptWhereUniqueInput {
   id: ID
 }
 

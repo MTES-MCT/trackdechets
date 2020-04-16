@@ -1,39 +1,66 @@
-.companyForm {
+.companyAddForm {
   max-width: initial;
-}
 
-.field {
-  width: 100%;
-  display: flex;
-  margin: auto;
-  padding: 1em;
-  justify-content: flex-start;
-  border-top: 1px solid var(--lighter-grey);
+  .subtitle {
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid var(--lighter-grey);
+  }
+
+  .field {
+    width: 100%;
+    display: flex;
+    margin: 1.5em auto;
+    justify-content: flex-start;
+  }
+
+  .field > label {
+    flex-shrink: 0;
+    width: 180px;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
 
   .field__value {
+    width: 100%;
+    display: block;
     margin-left: 3em;
     margin-right: 3em;
-
-    ul {
-      margin: 0;
-      padding: 0;
-    }
   }
 
-  .formDescription {
-    margin-top: 0;
+  .submit-form {
+    display: flex;
+    justify-content: flex-end;
   }
 
-  .acceptedFormats {
-    font-size: small;
+  .submit-form > button {
+    margin: 0.5em;
   }
-}
 
-.field:last-of-type {
-  border-bottom: 1px solid var(--lighter-grey);
-}
+  input:not([type="checkbox"]) {
+    width: 300px;
+  }
 
-.field > label {
-  font-weight: bold;
-  min-width: 180px;
+  .smaller {
+    font-size: 90%;
+  }
+  table {
+    border-collapse: collapse;
+  }
+
+  td {
+    padding-right: 1em;
+    padding-bottom: 1em;
+    vertical-align: top;
+  }
+
+  tr td:last-of-type {
+    padding-right: 0;
+  }
+
+  tr:last-of-type td {
+    padding-bottom: 0;
+  }
 }

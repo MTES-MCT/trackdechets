@@ -19,7 +19,7 @@ export default function AccountFieldNotEditable({
 
   return (
     <div className={classes.join(" ")}>
-      <label htmlFor={name}>
+      <label htmlFor={name} className="text-right">
         {label}
         {tooltip && <ToolTip msg={tooltip} />}
       </label>

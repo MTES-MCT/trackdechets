@@ -56,6 +56,10 @@ export type CompanyFavorite = {
   phone: Maybe<Scalars['String']>;
   /** Email de contact */
   mail: Maybe<Scalars['String']>;
+  /** Récépissé transporteur associé à cet établissement (le cas échéant) */
+  transporterReceipt: Maybe<TransporterReceipt>;
+  /** Récépissé négociant associé à cet établissement (le cas échant) */
+  traderReceipt: Maybe<TraderReceipt>;
 };
 
 /** Payload d'un établissement */
@@ -138,6 +142,10 @@ export type CompanyPrivate = {
    * associé à cet établissement (le cas échéant)
    */
   installation: Maybe<Installation>;
+  /** Récépissé transporteur (le cas échéant, pour les profils transporteur) */
+  transporterReceipt: Maybe<TransporterReceipt>;
+  /** Récépissé négociant (le cas échéant, pour les profils transporteur) */
+  traderReceipt: Maybe<TraderReceipt>;
 };
 
 /** Information sur un établissement accessible publiquement */
@@ -172,6 +180,10 @@ export type CompanyPublic = {
   installation: Maybe<Installation>;
   /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
   isRegistered: Maybe<Scalars['Boolean']>;
+  /** Récépissé transporteur associé à cet établissement (le cas échéant) */
+  transporterReceipt: Maybe<TransporterReceipt>;
+  /** Récépissé négociant associé à cet établissement (le cas échant) */
+  traderReceipt: Maybe<TraderReceipt>;
 };
 
 /** Information sur un établissement accessible publiquement en recherche */
@@ -198,6 +210,10 @@ export type CompanySearchResult = {
    * associé à cet établissement
    */
   installation: Maybe<Installation>;
+  /** Récépissé transporteur associé à cet établissement (le cas échéant) */
+  transporterReceipt: Maybe<TransporterReceipt>;
+  /** Récépissé négociant associé à cet établissement (le cas échant) */
+  traderReceipt: Maybe<TraderReceipt>;
 };
 
 /** Statistiques d'un établissement */
@@ -237,6 +253,26 @@ export enum Consistence {
   Gaseous = 'GASEOUS'
 }
 
+/** Payload de création d'un récépissé négociant */
+export type CreateTraderReceiptInput = {
+  /** Numéro de récépissé négociant */
+  receiptNumber: Scalars['String'];
+  /** Limite de validatié du récépissé */
+  validityLimit: Scalars['DateTime'];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars['String'];
+};
+
+/** Payload de création d'un récépissé transporteur */
+export type CreateTransporterReceiptInput = {
+  /** Numéro de récépissé transporteur */
+  receiptNumber: Scalars['String'];
+  /** Limite de validatié du récépissé */
+  validityLimit: Scalars['DateTime'];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars['String'];
+};
+
 
 /** Représente une ligne dans une déclaration GEREP */
 export type Declaration = {
@@ -249,6 +285,18 @@ export type Declaration = {
   libDechet: Maybe<Scalars['String']>;
   /** Type de déclaration GEREP: producteur ou traiteur */
   gerepType: Maybe<GerepType>;
+};
+
+/** Payload de suppression d'un récépissé négociant */
+export type DeleteTraderReceiptInput = {
+  /** The id of the trader receipt to delete */
+  id: Scalars['ID'];
+};
+
+/** Payload de suppression d'un récépissé transporteur */
+export type DeleteTransporterReceiptInput = {
+  /** The id of the transporter receipt to delete */
+  id: Scalars['ID'];
 };
 
 export type Destination = {
@@ -595,6 +643,16 @@ export type Mutation = {
   createCompany: CompanyPrivate;
   /**
    * USAGE INTERNE
+   * Crée un récépissé transporteur
+   */
+  createTraderReceipt: Maybe<TraderReceipt>;
+  /**
+   * USAGE INTERNE
+   * Crée un récépissé transporteur
+   */
+  createTransporterReceipt: Maybe<TransporterReceipt>;
+  /**
+   * USAGE INTERNE
    * Récupère une URL signé pour l'upload d'un fichier
    */
   createUploadLink: UploadLink;
@@ -605,6 +663,16 @@ export type Mutation = {
    * Supprime une invitation à un établissement
    */
   deleteInvitation: CompanyPrivate;
+  /**
+   * USAGE INTERNE
+   * Supprime un récépissé négociant
+   */
+  deleteTraderReceipt: Maybe<TransporterReceipt>;
+  /**
+   * USAGE INTERNE
+   * Supprime un récépissé transporteur
+   */
+  deleteTransporterReceipt: Maybe<TransporterReceipt>;
   /** Duplique un BSD */
   duplicateForm: Maybe<Form>;
   /**
@@ -678,8 +746,18 @@ export type Mutation = {
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
+  /**
+   * USAGE INTERNE
+   * Édite les informations d'un récépissé négociant
+   */
+  updateTraderReceipt: Maybe<TraderReceipt>;
   /** Met à jour la plaque d'immatriculation ou le champ libre du transporteur */
   updateTransporterFields: Maybe<Form>;
+  /**
+   * USAGE INTERNE
+   * Édite les informations d'un récépissé transporteur
+   */
+  updateTransporterReceipt: Maybe<TransporterReceipt>;
 };
 
 
@@ -691,6 +769,16 @@ export type MutationChangePasswordArgs = {
 
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+
+export type MutationCreateTraderReceiptArgs = {
+  input: Maybe<CreateTraderReceiptInput>;
+};
+
+
+export type MutationCreateTransporterReceiptArgs = {
+  input: Maybe<CreateTransporterReceiptInput>;
 };
 
 
@@ -708,6 +796,16 @@ export type MutationDeleteFormArgs = {
 export type MutationDeleteInvitationArgs = {
   email: Scalars['String'];
   siret: Scalars['String'];
+};
+
+
+export type MutationDeleteTraderReceiptArgs = {
+  input: Maybe<DeleteTraderReceiptInput>;
+};
+
+
+export type MutationDeleteTransporterReceiptArgs = {
+  input: Maybe<DeleteTransporterReceiptInput>;
 };
 
 
@@ -830,6 +928,13 @@ export type MutationUpdateCompanyArgs = {
   website: Maybe<Scalars['String']>;
   companyTypes: Maybe<Array<Maybe<CompanyType>>>;
   givenName: Maybe<Scalars['String']>;
+  transporterReceiptId: Maybe<Scalars['String']>;
+  traderReceiptId: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTraderReceiptArgs = {
+  input: Maybe<UpdateTraderReceiptInput>;
 };
 
 
@@ -837,6 +942,11 @@ export type MutationUpdateTransporterFieldsArgs = {
   id: Scalars['ID'];
   transporterNumberPlate: Maybe<Scalars['String']>;
   transporterCustomInfo: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTransporterReceiptArgs = {
+  input: Maybe<UpdateTransporterReceiptInput>;
 };
 
 /** Destination ultérieure prévue (case 12) */
@@ -886,6 +996,10 @@ export type PrivateCompanyInput = {
    * de l'utilisateur à l'établissement
    */
   documentKeys: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Récipissé transporteur (le cas échéant, pour les profils transporteur) */
+  transporterReceiptId: Maybe<Scalars['String']>;
+  /** Récipissé négociant (le cas échéant, pour les profils négociant) */
+  traderReceiptId: Maybe<Scalars['String']>;
 };
 
 /** Payload de traitement d'un BSD */
@@ -1310,6 +1424,18 @@ export type TraderInput = {
   company: Maybe<CompanyInput>;
 };
 
+/** Récépissé négociant */
+export type TraderReceipt = {
+   __typename?: 'TraderReceipt';
+  id: Scalars['ID'];
+  /** Numéro de récépissé négociant */
+  receiptNumber: Scalars['String'];
+  /** Limite de validatié du récépissé */
+  validityLimit: Scalars['DateTime'];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars['String'];
+};
+
 /** Collecteur - transporteur (case 8) */
 export type Transporter = {
    __typename?: 'Transporter';
@@ -1345,6 +1471,18 @@ export type TransporterInput = {
   company: Maybe<CompanyInput>;
 };
 
+/** Récépissé transporteur */
+export type TransporterReceipt = {
+   __typename?: 'TransporterReceipt';
+  id: Scalars['ID'];
+  /** Numéro de récépissé transporteur */
+  receiptNumber: Scalars['String'];
+  /** Limite de validatié du récépissé */
+  validityLimit: Scalars['DateTime'];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars['String'];
+};
+
 /** Payload de signature d'un BSD par un transporteur */
 export type TransporterSignatureFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
@@ -1363,6 +1501,30 @@ export type TransporterSignatureFormInput = {
   quantity: Scalars['Float'];
   /** Code ONU */
   onuCode: Maybe<Scalars['String']>;
+};
+
+/** Payload d'édition d'un récépissé transporteur */
+export type UpdateTraderReceiptInput = {
+  /** The id of the trader receipt to modify */
+  id: Scalars['ID'];
+  /** Numéro de récépissé transporteur */
+  receiptNumber: Maybe<Scalars['String']>;
+  /** Limite de validatié du récépissé */
+  validityLimit: Maybe<Scalars['DateTime']>;
+  /** Département ayant enregistré la déclaration */
+  department: Maybe<Scalars['String']>;
+};
+
+/** Payload d'édition d'un récépissé transporteur */
+export type UpdateTransporterReceiptInput = {
+  /** The id of the transporter receipt to modify */
+  id: Scalars['ID'];
+  /** Numéro de récépissé transporteur */
+  receiptNumber: Maybe<Scalars['String']>;
+  /** Limite de validatié du récépissé */
+  validityLimit: Maybe<Scalars['DateTime']>;
+  /** Département ayant enregistré la déclaration */
+  department: Maybe<Scalars['String']>;
 };
 
 /** Lien d'upload */
