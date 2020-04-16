@@ -116,13 +116,19 @@ export const temporaryStorageDetailFragment = gql`
   ${transporterFragment}
 `;
 
-export const fullFormFragment = gql`
-  fragment FullForm on Form {
-    id
+const staticFieldsFragment = gql`
+  fragment StaticFieldsFragment on Form {
     readableId
-    customId
     createdAt
     status
+    actualQuantity
+  }
+`;
+
+const mutableFieldsFragment = gql`
+  fragment MutableFieldsFragment on Form {
+    id
+    customId
     emitter {
       ...EmitterFragment
     }
@@ -147,7 +153,6 @@ export const fullFormFragment = gql`
     temporaryStorageDetail {
       ...TemporaryStorageDetailFragment
     }
-    actualQuantity
   }
 
   ${traderFragment}
@@ -156,4 +161,20 @@ export const fullFormFragment = gql`
   ${wasteDetailsFragment}
   ${emitterFragment}
   ${recipientFragment}
+`;
+
+export const editableFormFragment = gql`
+  fragment EditableForm on Form {
+    ...MutableFieldsFragment
+  }
+  ${mutableFieldsFragment}
+`;
+
+export const fullFormFragment = gql`
+  fragment FullForm on Form {
+    ...MutableFieldsFragment
+    ...StaticFieldsFragment
+  }
+  ${mutableFieldsFragment}
+  ${staticFieldsFragment}
 `;
