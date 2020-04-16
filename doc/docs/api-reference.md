@@ -4333,7 +4333,7 @@ Quantité en tonnes
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>onuCode</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 Code ONU

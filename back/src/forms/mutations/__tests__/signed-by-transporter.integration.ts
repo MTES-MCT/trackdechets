@@ -14,7 +14,7 @@ jest.mock("axios", () => ({
   }
 }));
 
-describe("Integration / Mark as processed mutation", () => {
+describe("Integration / Mark as signed mutation", () => {
   let user;
   let company;
   let mutate;
@@ -44,22 +44,24 @@ describe("Integration / Mark as processed mutation", () => {
     await resetDatabase();
   });
 
-  it("should mark a form as signed", async () => {
-    const emittingCompany = await companyFactory();
+  it.each([`onuCode: "Code ONU"`, ""])(
+    "should mark a form as signed",
+    async onuCodeParam => {
+      const emittingCompany = await companyFactory();
 
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        sentAt: null,
-        status: "SEALED",
-        emitterCompanyName: emittingCompany.name,
-        emitterCompanySiret: emittingCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret
-      }
-    });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          sentAt: null,
+          status: "SEALED",
+          emitterCompanyName: emittingCompany.name,
+          emitterCompanySiret: emittingCompany.siret,
+          transporterCompanyName: company.name,
+          transporterCompanySiret: company.siret
+        }
+      });
 
-    const mutation = `
+      const mutation = `
       mutation   {
         signedByTransporter(id: "${form.id}", signingInfo: {
           sentAt: "2018-12-11T00:00:00.000Z"
@@ -70,18 +72,20 @@ describe("Integration / Mark as processed mutation", () => {
 
           packagings: ${form.wasteDetailsPackagings}
           quantity: ${form.wasteDetailsQuantity}
-          onuCode: "Code ONU"
+          ${onuCodeParam}
+          
         }) {
           id
         }
       }
     `;
 
-    await mutate(mutation);
+      await mutate(mutation);
 
-    const resultingForm = await prisma.form({ id: form.id });
-    expect(resultingForm.status).toBe("SENT");
-  });
+      const resultingForm = await prisma.form({ id: form.id });
+      expect(resultingForm.status).toBe("SENT");
+    }
+  );
 
   it("should mark a form with temporary storage as signed (frame 18)", async () => {
     const receivingCompany = await companyFactory();
