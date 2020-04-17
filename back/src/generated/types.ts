@@ -1163,9 +1163,15 @@ export type Stat = {
  */
 export type StateSummary = {
    __typename?: 'StateSummary';
+  /** Quantité la plus à jour */
   quantity?: Maybe<Scalars['Float']>;
+  /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
   transporter?: Maybe<FormCompany>;
+  /** Prochaine entreprise à recevoir le déchet (entreprise en case 2 ou 14) */
   recipient?: Maybe<FormCompany>;
+  /** Prochaine entreprise à émettre le déchet (entreprise en case 1 ou 13) */
+  emitter?: Maybe<FormCompany>;
+  /** Date de la dernière action sur le bordereau */
   lastActionOn?: Maybe<Scalars['DateTime']>;
 };
 

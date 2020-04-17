@@ -109,7 +109,7 @@ const Table = ({ forms, displayActions }) => {
               {form.readableId}
               <DownloadPdf formId={form.id} />
             </td>
-            <td>{form.emitter.company && form.emitter.company.name}</td>
+            <td>{form.stateSummary.emitter?.name}</td>
             <td className="hide-on-mobile">
               {form.stateSummary.recipient?.name}
             </td>

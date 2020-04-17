@@ -133,6 +133,11 @@ const staticFieldsFragment = gql`
         siret
         address
       }
+      emitter {
+        name
+        siret
+        address
+      }
       lastActionOn
     }
   }

@@ -187,8 +187,9 @@ export default function TransportSignature({ form }: Props) {
 
                     <h3>Lieu de collecte</h3>
                     <address>
-                      {form.emitter.company.name} ({form.emitter.company.siret})
-                      <br /> {form.emitter.company.address}
+                      {form.stateSummary.emitter?.name} (
+                      {form.stateSummary.emitter?.siret})
+                      <br /> {form.stateSummary.emitter?.address}
                     </address>
 
                     <h3>Mes déchets</h3>

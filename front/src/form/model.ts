@@ -7,6 +7,7 @@ export type Form = {
     quantity: number;
     transporter: FormCompany;
     recipient: FormCompany;
+    emitter: FormCompany;
     lastActionOn: string;
   };
   ecoOrganisme: {

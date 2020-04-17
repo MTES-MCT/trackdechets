@@ -2559,22 +2559,47 @@ Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours 
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Quantité la plus à jour
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td></td>
+<td>
+
+Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>recipient</strong></td>
 <td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td></td>
+<td>
+
+Prochaine entreprise à recevoir le déchet (entreprise en case 2 ou 14)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Prochaine entreprise à émettre le déchet (entreprise en case 1 ou 13)
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>lastActionOn</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Date de la dernière action sur le bordereau
+
+</td>
 </tr>
 </tbody>
 </table>

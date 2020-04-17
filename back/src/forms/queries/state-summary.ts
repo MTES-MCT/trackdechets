@@ -15,6 +15,7 @@ export const stateSummary = async (
     quantity: getQuantity(parent, temporaryStorageDetail),
     transporter: getTransporter(parent, temporaryStorageDetail),
     recipient: getRecipient(parent, temporaryStorageDetail),
+    emitter: getEmitter(parent, temporaryStorageDetail),
     lastActionOn: getLastActionOn(parent, temporaryStorageDetail)
   };
 };
@@ -63,6 +64,20 @@ function getRecipient(
   }
 
   return form.recipient?.company;
+}
+
+function getEmitter(
+  form: Form,
+  temporaryStorageDetail: TemporaryStorageDetail
+) {
+  if (
+    temporaryStorageDetail &&
+    [FormStatus.TempStored, FormStatus.Resealed].includes(form.status)
+  ) {
+    return form.recipient?.company;
+  }
+
+  return form.emitter?.company;
 }
 
 function getLastActionOn(
