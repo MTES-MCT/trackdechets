@@ -48,6 +48,19 @@ function searchResponseToCompany({
     company.libelleNaf = libelleFromCodeNaf(company.naf);
   }
 
+  const isEntrepreneurIndividuel =
+    etablissement.unite_legale.categorie_juridique === "1000";
+
+  if (isEntrepreneurIndividuel) {
+    // concatenate prénom et nom
+    company.name = [
+      etablissement.unite_legale.prenom_1,
+      etablissement.unite_legale.nom
+    ]
+      .join(" ")
+      .trim();
+  }
+
   return company;
 }
 

@@ -47,6 +47,37 @@ describe("searchCompany", () => {
     expect(company).toEqual(expected);
   });
 
+  it(`should set name for an individual enterprise
+      by concatenating first and last name`, async () => {
+    (axios.get as jest.Mock).mockResolvedValueOnce({
+      status: 200,
+      data: {
+        etablissement: {
+          siret: "34393738900041",
+          etat_administratif: "A",
+          numero_voie: "4",
+          type_voie: "RUE",
+          libelle_voie: "DES ROSIERS",
+          code_postal: "13001",
+          code_commune: "13201",
+          libelle_commune: "MARSEILLE",
+          longitude: "5.387141",
+          latitude: "43.300746",
+          geo_adresse: "4 RUE DES ROSIERS 13001 Marseille",
+          unite_legale: {
+            denomination: null,
+            prenom_1: "JOHN",
+            nom: "SNOW",
+            categorie_juridique: "1000",
+            activite_principale: "86.21Z"
+          }
+        }
+      }
+    });
+    const company = await searchCompany("34393738900041");
+    expect(company.name).toEqual("JOHN SNOW");
+  });
+
   it("should raise BAD_USER_INPUT if error 404 (siret not found)", async () => {
     (axios.get as jest.Mock).mockRejectedValueOnce({
       response: {

@@ -14,7 +14,10 @@ export interface SearchResponse {
     geo_adresse: string;
     unite_legale: {
       denomination: string;
+      prenom_1: string;
+      nom: string;
       activite_principale: string;
+      categorie_juridique: string;
     };
   };
 }
