@@ -50,6 +50,7 @@ export type Form = {
     };
     destination: {
       company: FormCompany;
+      processingOperation: string;
     };
     transporter: Transporter;
     wasteDetails: WasteDetails;
