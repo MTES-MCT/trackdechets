@@ -3,8 +3,8 @@ import { ErrorCode } from "../../../common/errors";
 
 const sireneMock = jest.fn();
 
-jest.mock("../../insee", () => ({
-  getCachedCompanySireneInfo: jest.fn((...args) => sireneMock(...args))
+jest.mock("../../sirene", () => ({
+  searchCompany: jest.fn((...args) => sireneMock(...args))
 }));
 
 const companyMock = jest.fn();

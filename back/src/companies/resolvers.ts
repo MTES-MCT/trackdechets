@@ -1,6 +1,6 @@
 import { prisma } from "../generated/prisma-client";
 import { GraphQLContext } from "../types";
-import { getCachedCompanySireneInfo, searchCompanies } from "./insee";
+import { searchCompany, searchCompanies } from "./sirene";
 import { renewSecurityCode, updateCompany } from "./mutations";
 import createCompany from "./mutations/create-company";
 import createUploadLink from "./mutations/create-upload-link";
@@ -10,23 +10,14 @@ import {
   getDeclarations,
   getRubriques,
   getUserCompanies,
-  getUserRole
+  getUserRole,
+  getInstallation
 } from "./queries";
 
 type FavoriteType = "EMITTER" | "TRANSPORTER" | "RECIPIENT" | "TRADER";
 
-const companySireneInfoResolvers = {
-  latitude: parent => {
-    return parent.latitude ? parseFloat(parent.latitude) : null;
-  },
-  longitude: parent => {
-    return parent.latitude ? parseFloat(parent.longitude) : null;
-  }
-};
-
 export default {
   CompanyPrivate: {
-    ...companySireneInfoResolvers,
     users: parent => {
       return getCompanyUsers(parent.siret);
     },
@@ -34,9 +25,6 @@ export default {
       const userId = context.user.id;
       return getUserRole(userId, parent.siret);
     }
-  },
-  CompanyPublic: {
-    ...companySireneInfoResolvers
   },
   CompanyMember: {
     isMe: (parent, _, context: GraphQLContext) => {
@@ -51,15 +39,14 @@ export default {
   },
   Query: {
     companyInfos: async (_, { siret }) => getCompanyInfos(siret),
-    searchCompanies: async (_, { clue, department = "" }) => {
-      const isNumber = /^[0-9\s]+$/.test(clue);
-      if (!isNumber) {
-        return searchCompanies(clue, department);
-      }
-      if (clue.length < 14) {
-        return [];
-      }
-      return [await getCachedCompanySireneInfo(clue)];
+    searchCompanies: async (_, { clue, department }) => {
+      const companies = await searchCompanies(clue, department);
+      return companies.map(async company => {
+        return {
+          ...company,
+          installation: await getInstallation(company.siret)
+        };
+      });
     },
     favorites: async (
       parent,
@@ -112,9 +99,7 @@ export default {
       // If there is no data yet, propose his own companies as favorites
       // We won't have every props populated, but it's a start
       if (!favorites.length) {
-        return Promise.all(
-          companies.map(c => getCachedCompanySireneInfo(c.siret))
-        );
+        return Promise.all(companies.map(c => searchCompany(c.siret)));
       }
 
       return favorites;

@@ -11,9 +11,9 @@ import {
 } from "../common/trello";
 import { pdfEmailAttachment } from "../forms/pdf";
 import Dreals from "./dreals";
-
 import axios from "axios";
 import { trim } from "../common/strings";
+import { searchCompany } from "../companies/sirene";
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
@@ -141,18 +141,19 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
     form.recipientCompanySiret
   );
 
-  // retrieve departments by querying distant api entreprise.data.gouv through td-insee
-  // we can not rely on parsing already stored address zip codes because some french cities
-  // have a zip code not matching their real department
+  // Retrieve city code by querying distant api entreprise.data.gouv.fr
+  // Make a subsequent call to geo.api.gouv.fr to retrive department number
+  // from city code
   const formDepartments = [];
   for (const field of ["emitterCompanySiret", "recipientCompanySiret"]) {
     if (!!form[field]) {
       try {
+        const company = await searchCompany(trim(form[field]));
         const res = await axios.get(
-          `http://td-insee:81/siret/${trim(form[field])}`
+          `https://geo.api.gouv.fr/communes/${company.codeCommune}`
         );
-        if (!!res.data.departement) {
-          formDepartments.push(res.data.departement);
+        if (!!res.data.codeDepartement) {
+          formDepartments.push(res.data.codeDepartement);
         }
       } catch (e) {
         console.error(

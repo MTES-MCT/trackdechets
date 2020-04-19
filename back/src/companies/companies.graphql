@@ -17,7 +17,7 @@ type Query {
     """
     clue: String!
     "(Optionnel) Filtre les résultats par numéro de département"
-    department: Int
+    department: String
   ): [CompanySearchResult]
 
   """
@@ -180,6 +180,9 @@ type CompanyPublic {
   "SIRET de l'établissement"
   siret: String
 
+  "État administratif de l'établissement. A = Actif, F = Fermé"
+  etatAdministratif: String
+
   "Adresse de l'établissement"
   address: String
 
@@ -208,6 +211,7 @@ type CompanyPublic {
   Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
   """
   isRegistered: Boolean
+
 }
 
 "Information sur un établissement accessible publiquement en recherche"

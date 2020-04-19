@@ -22,9 +22,6 @@ services:
   td-ui:
     image: betagouv/trackdechets-ui:dev
 
-  td-insee:
-    image: betagouv/trackdechets-insee:dev
-
   td-pdf:
     image: betagouv/trackdechets-pdf:dev
     environment:
