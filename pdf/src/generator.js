@@ -7,14 +7,15 @@ const {
   fillFields,
   drawImage,
   checkBox,
-  processAnnexParams
+  processAnnexParams,
 } = require("./helpers");
 const {
   pageHeight,
   mainFormFieldSettings,
+  temporaryStorageDetailsFieldSettings,
   appendixFieldSettings,
   appendixHeaderFieldSettings,
-  appendixYOffsets
+  appendixYOffsets,
 } = require("./settings");
 
 const { PDFDocument } = pdflib;
@@ -27,10 +28,9 @@ const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
  * @param params - payload
  * @return Buffer
  */
-const buildPdf = async params => {
-  const { appendix2Forms } = params;
+const buildPdf = async (params) => {
+  const { appendix2Forms, temporaryStorageDetail } = params;
 
-  const formData = processMainFormParams(params);
   const arialBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
   const timesBoldBytes = fs.readFileSync(
     path.join(__dirname, "./fonts/times-bold.ttf")
@@ -38,6 +38,10 @@ const buildPdf = async params => {
 
   const existingPdfBytes = fs.readFileSync(
     path.join(__dirname, "./templates/bsd.pdf")
+  );
+
+  const existingTemporaryStorageBytes = fs.readFileSync(
+    path.join(__dirname, "./templates/bsd_suite.pdf")
   );
 
   const existingAnnexBytes = fs.readFileSync(
@@ -73,41 +77,43 @@ const buildPdf = async params => {
   );
   const watermarkImage = await mainForm.embedPng(watermarkBytes);
 
+  // Start by generating the main page of the PDF
+  // ----------------------------
+  const formData = processMainFormParams({
+    ...params,
+    currentPageNumber: 1,
+    totalPagesNumber: 1 + (params.temporaryStorageDetail ? 1 : 0),
+  });
+
   // customId does not belong to original cerfa, so we had to add our own field title and mimic font look and feel
   if (!!formData.customId) {
     firstPage.drawText("Autre n° libre :", {
       x: customIdTitleParams.x,
       y: pageHeight - customIdTitleParams.y,
       size: customIdTitleParams.fontSize,
-      font: timesBoldFont
+      font: timesBoldFont,
     });
   }
-  checkBox({
-    fieldName: "temporaryStorageNo",
-    settings: mainFormFieldSettings,
-    font: arialFont,
-    page: firstPage
-  });
 
   // fill main form fields
   fillFields({
     data: formData,
     page: firstPage,
     settings: mainFormFieldSettings,
-    font: arialFont
+    font: arialFont,
   });
 
   // draw watermark if needed
   if (!!process.env.PDF_WATERMARK) {
     drawImage("watermark", watermarkImage, firstPage, {
       width: 600,
-      height: 800
+      height: 800,
     });
   }
   if (!!formData.noTraceability) {
     drawImage("noTraceabilityStamp", noTraceabilityImage, firstPage, {
       width: 100,
-      height: 50
+      height: 50,
     });
   }
 
@@ -127,8 +133,85 @@ const buildPdf = async params => {
   if (!!formData.transporterIsExemptedOfReceipt) {
     drawImage("exemptionStamp", exemptionStampImage, firstPage, {
       width: 150,
-      height: 65
+      height: 65,
     });
+  }
+
+  // Temporary storage page
+  // ----------------------
+  if (temporaryStorageDetail) {
+    const tempStorageDetailsPdf = await PDFDocument.load(
+      existingTemporaryStorageBytes
+    );
+    tempStorageDetailsPdf.registerFontkit(fontkit);
+    const temporaryStorageArialFont = await tempStorageDetailsPdf.embedFont(
+      arialBytes
+    );
+    const temporaryStorageWatermarkImage = await tempStorageDetailsPdf.embedPng(
+      watermarkBytes
+    );
+    const tempStorageStampImage = await tempStorageDetailsPdf.embedPng(
+      stampBytes
+    );
+
+    const [tempStoragePage] = tempStorageDetailsPdf.getPages();
+
+    const temporaryStorageData = processMainFormParams({
+      ...temporaryStorageDetail,
+      tempStorerCompanySiret: params.recipientCompanySiret,
+      tempStorerCompanyAddress: params.recipientCompanyAddress,
+      tempStorerCompanyName: params.recipientCompanyName,
+      wasteAcceptationStatus:
+        params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
+      currentPageNumber: 2,
+      totalPagesNumber: 2,
+      formReadableId: params.readableId,
+    });
+
+    // fill form data
+    fillFields({
+      data: temporaryStorageData,
+      page: tempStoragePage,
+      settings: temporaryStorageDetailsFieldSettings,
+      font: temporaryStorageArialFont,
+    });
+
+    // draw watermark if needed
+    if (!!process.env.PDF_WATERMARK) {
+      drawImage("watermark", temporaryStorageWatermarkImage, tempStoragePage, {
+        width: 600,
+        height: 800,
+      });
+    }
+
+    if (!!temporaryStorageData.tempStorerSignedAt) {
+      drawImage(
+        "tempStorerReceptionSignature",
+        tempStorageStampImage,
+        tempStoragePage
+      );
+    }
+
+    if (!!temporaryStorageData.signedAt) {
+      drawImage(
+        "tempStorerSentSignature",
+        tempStorageStampImage,
+        tempStoragePage
+      );
+    }
+
+    if (!!temporaryStorageData.signedByTransporter) {
+      drawImage(
+        "tempStorageTransporterSignature",
+        tempStorageStampImage,
+        tempStoragePage
+      );
+    }
+
+    const [
+      copiedTempStoragePage,
+    ] = await mainForm.copyPages(tempStorageDetailsPdf, [0]);
+    mainForm.addPage(copiedTempStoragePage);
   }
 
   // early return pdf if there is no appendix
@@ -137,15 +220,11 @@ const buildPdf = async params => {
     return Buffer.from(mainFormBytes.buffer);
   }
 
-  // if we have appendix, we have to merge mainform and appendix in another pdf
-  const mergedPdf = await PDFDocument.create();
-  const copiedPages = await mergedPdf.copyPages(mainForm, [0]);
-  mergedPdf.addPage(copiedPages[0]);
-
+  // Time to append the appendix 2 pages
+  // ----------------------------
   const formsByAppendix = 5;
   const appendix2FormsCount = appendix2Forms.length;
   const appendixPagesCount = Math.trunc(appendix2FormsCount / formsByAppendix); // how many appendix pages do we need
-
   let subFormCounter = 0; // each appendix page can hold up to 5 sub-forms, let's use a counter
 
   for (
@@ -165,7 +244,7 @@ const buildPdf = async params => {
       data: formData,
       page: currentAppendixPage,
       settings: appendixHeaderFieldSettings,
-      font: appendixArialFont
+      font: appendixArialFont,
     });
 
     let remaining = appendix2FormsCount - sheetCounter * formsByAppendix; // how many sub forms left
@@ -182,7 +261,7 @@ const buildPdf = async params => {
       // process each annex and add numbering
       appendix = {
         ...processAnnexParams(appendix),
-        numbering: `${subFormCounter + 1}`
+        numbering: `${subFormCounter + 1}`,
       };
       // to avoid using coordinates for each one of the 5 subForms, we add a vertical offset
       let yOffset = appendixYOffsets[pageSubFormCounter];
@@ -193,7 +272,7 @@ const buildPdf = async params => {
         page: currentAppendixPage,
         settings: appendixFieldSettings,
         font: appendixArialFont,
-        yOffset: yOffset
+        yOffset: yOffset,
       });
     }
 
@@ -201,17 +280,17 @@ const buildPdf = async params => {
     if (!!process.env.PDF_WATERMARK) {
       drawImage("watermark", appendixWatermarkImage, currentAppendixPage, {
         width: 600,
-        height: 800
+        height: 800,
       });
     }
 
     // copy each page and merge in global pdf
-    let copiedAppendixPages = await mergedPdf.copyPages(appendixPages, [0]);
-    mergedPdf.addPage(copiedAppendixPages[0]);
+    let copiedAppendixPages = await mainForm.copyPages(appendixPages, [0]);
+    mainForm.addPage(copiedAppendixPages[0]);
   }
 
-  // finally save merged document and return it
-  const pdfBytes = await mergedPdf.save();
+  // finally save document and return it
+  const pdfBytes = await mainForm.save();
   return Buffer.from(pdfBytes.buffer);
 };
 
