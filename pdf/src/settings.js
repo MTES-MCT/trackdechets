@@ -35,6 +35,7 @@ const mainFormFieldSettings = {
   recipientCompanyContact: { x: 378, y: 240.5 },
   recipientCap: { x: 402, y: 261 },
   recipientProcessingOperation: { x: 507, y: 271 },
+  temporaryStorageYes: { x: 305, y: 147, fontSize: 12 },
   temporaryStorageNo: { x: 305, y: 159, fontSize: 12 },
 
   wasteDetailsCode: { x: 155, y: 292, fontSize: 10 },

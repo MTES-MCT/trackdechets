@@ -131,6 +131,20 @@ const dateFmt = (datestr) => {
 };
 
 /**
+ * Return either temporaryStorageYes: true | temporaryStorageNo: true etc according to
+ * recipientIsTempStorage parameter
+ *
+ * @param {object} params -  the full request payload
+ * @returns {object}
+ */
+const getTemporaryStorageExistance = (params) => {
+  if (params.recipientIsTempStorage) {
+    return { temporaryStorageYes: true };
+  }
+  return { temporaryStorageNo: true };
+};
+
+/**
  * Return either wasteDetailsConsistenceLiquid: true | wasteDetailsConsistenceSolid: true etc according to
  * wasteDetailsConsistence parameter
  *
@@ -311,6 +325,7 @@ function processMainFormParams(params) {
     ...renameAndFormatMainFormFields(data),
     ...getAcceptationStatus(data),
     ...getFlatEcoOrganisme(data),
+    ...getTemporaryStorageExistance(data),
     ...getTempStorerWasteDetailsType(data),
   };
 }

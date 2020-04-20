@@ -94,12 +94,6 @@ const buildPdf = async (params) => {
       font: timesBoldFont,
     });
   }
-  checkBox({
-    fieldName: "temporaryStorageNo",
-    settings: mainFormFieldSettings,
-    font: arialFont,
-    page: firstPage,
-  });
 
   // fill main form fields
   fillFields({
