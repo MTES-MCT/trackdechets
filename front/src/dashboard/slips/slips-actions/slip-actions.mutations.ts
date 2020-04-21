@@ -9,32 +9,32 @@ const MARK_SEALED = gql`
     markAsSealed(id: $id) {
       ...StatusChange
     }
-    ${statusChangeFragment}
   }
+  ${statusChangeFragment}
 `;
 const MARK_SENT = gql`
   mutation MarkAsSent($id: ID, $info: SentFormInput!) {
     markAsSent(id: $id, sentInfo: $info) {
       ...StatusChange
     }
-    ${statusChangeFragment}
   }
+  ${statusChangeFragment}
 `;
 const MARK_RECEIVED = gql`
   mutation MarkAsReceived($id: ID, $info: ReceivedFormInput!) {
     markAsReceived(id: $id, receivedInfo: $info) {
       ...StatusChange
     }
-    ${statusChangeFragment}
   }
+  ${statusChangeFragment}
 `;
 const MARK_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID, $info: ProcessedFormInput!) {
     markAsProcessed(id: $id, processedInfo: $info) {
       ...StatusChange
     }
-    ${statusChangeFragment}
   }
+  ${statusChangeFragment}
 `;
 
 const MARK_TEMP_STORED = gql`
@@ -42,8 +42,8 @@ const MARK_TEMP_STORED = gql`
     markAsTempStored(id: $id, tempStoredInfos: $info) {
       ...StatusChange
     }
-    ${statusChangeFragment}
   }
+  ${statusChangeFragment}
 `;
 
 const MARK_RESEALED = gql`
@@ -51,8 +51,8 @@ const MARK_RESEALED = gql`
     markAsResealed(id: $id, resealedInfos: $info) {
       ...StatusChange
     }
-    ${statusChangeFragment}
   }
+  ${statusChangeFragment}
 `;
 
 const MARK_RESENT = gql`
@@ -60,8 +60,8 @@ const MARK_RESENT = gql`
     markAsResent(id: $id, resentInfos: $info) {
       ...StatusChange
     }
-    ${statusChangeFragment}
   }
+  ${statusChangeFragment}
 `;
 
 const DUPLICATE_FORM = gql`
@@ -69,8 +69,8 @@ const DUPLICATE_FORM = gql`
     duplicateForm(id: $id) {
       ...FullForm
     }
-    ${fullFormFragment}
   }
+  ${fullFormFragment}
 `;
 
 const DELETE_FORM = gql`
