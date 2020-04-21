@@ -1,6 +1,7 @@
-import { object, date, string, boolean, number, array, mixed } from "yup";
+import { object, string, boolean, number, array, mixed } from "yup";
 import { companySchema } from "./validator";
 import { GROUP_CODES } from "./workflow/machine";
+import { validDatetime } from "./validation-helpers";
 
 const PROCESSING_OPERATION_CODES = [
   "D 1",
@@ -41,7 +42,10 @@ export const receivedInfoSchema = object({
   receivedBy: string().required(
     "Vous devez saisir un responsable de la réception."
   ),
-  receivedAt: date().required("Vous devez saisir une date de réception."),
+  receivedAt: validDatetime({
+    verboseFieldName: "date de réception",
+    required: true
+  }),
 
   quantityReceived: number()
     .required()
@@ -82,7 +86,7 @@ export default {
   Mutation: {
     markAsSent: object().shape({
       sentInfo: object({
-        sentAt: date().required("Vous devez saisir une date d'envoi."),
+        sentAt: validDatetime({ verboseFieldName: "date d'envoi", required: true }),
         sentBy: string().required(
           "Vous devez saisir un responsable de l'envoi."
         )
@@ -103,9 +107,10 @@ export default {
         processedBy: string().required(
           "Vous devez saisir un responsable de traitement."
         ),
-        processedAt: date().required(
-          "Vous devez saisir la date de traitement."
-        ),
+        processedAt: validDatetime({
+          verboseFieldName: "date de traitement",
+          required: true
+        }),
         nextDestination: object().when("processingOperationDone", {
           is: val => GROUP_CODES.includes(val),
           then: object({
@@ -118,7 +123,7 @@ export default {
     }),
     signedByTransporter: object().shape({
       signingInfo: object({
-        sentAt: date().required("Vous devez saisir une date d'envoi."),
+        sentAt: validDatetime({ verboseFieldName: "date d'envoi", required: true }),
         signedByTransporter: boolean()
           .required("Vous devez indiquer si le transporteur a signé.")
           .oneOf(
@@ -166,7 +171,10 @@ export default {
         receivedBy: string().required(
           "Vous devez saisir un responsable de la réception."
         ),
-        receivedAt: date().required("Vous devez saisir une date de réception."),
+        receivedAt: validDatetime({
+          verboseFieldName: "date de réception",
+          required: true
+        }),
         quantityReceived: number()
           .required()
           // if waste is refused, quantityReceived must be 0
@@ -226,7 +234,7 @@ export default {
                     "Le département du transporteur est obligatoire"
                   )
           ),
-          validityLimit: date().nullable(true),
+          validityLimit: validDatetime({ verboseFieldName: "date de validité" }),
           numberPlate: string().nullable(true),
           company: companySchema("Transporteur")
         })
@@ -263,14 +271,17 @@ export default {
                     "Le département du transporteur est obligatoire"
                   )
           ),
-          validityLimit: date().nullable(true),
+          validityLimit: validDatetime({ verboseFieldName: "date de validité" }),
           numberPlate: string().nullable(true),
           company: companySchema("Transporteur")
         }),
         signedBy: string().required(
           "Vous devez saisir un responsable de l'envoi."
         ),
-        signedAt: date().required("Vous devez saisir une date de l'envoi.")
+        signedAt: validDatetime({
+          verboseFieldName: "une date d'envoi",
+          required: true
+        })
       })
     })
   }

@@ -5071,6 +5071,13 @@ The `Boolean` scalar type represents `true` or `false`.
 
 ### DateTime
 
+The `DateTime` scalar expects a date-formatted string matching one of the following formats:
+- "yyyy-MM-dd" (eg. 2020-11-23)
+- "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
+- "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
+- "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
+- "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
+
 ### Float
 
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).
