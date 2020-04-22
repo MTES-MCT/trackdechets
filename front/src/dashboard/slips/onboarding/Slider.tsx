@@ -3,7 +3,7 @@ import {
   FaArrowAltCircleRight,
   FaArrowAltCircleLeft,
   FaAngleRight,
-  FaAngleLeft
+  FaAngleLeft,
 } from "react-icons/fa";
 import "./Slider.scss";
 

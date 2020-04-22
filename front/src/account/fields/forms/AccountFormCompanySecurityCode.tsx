@@ -18,12 +18,12 @@ const RENEW_SECURITY_CODE = gql`
 
 export default function AccountFormCompanySecurityCode({
   toggleEdition,
-  mutationArgs
+  mutationArgs,
 }: Props) {
   const [renewSecurityCode, { loading }] = useMutation(RENEW_SECURITY_CODE, {
     onCompleted: () => {
       toggleEdition();
-    }
+    },
   });
 
   const cautionMessage =

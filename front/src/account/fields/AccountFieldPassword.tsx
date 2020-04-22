@@ -8,7 +8,7 @@ export default function AccountFieldPassword() {
       name="password"
       label="Mot de passe"
       value="**********"
-      renderForm={toggleEdition => (
+      renderForm={(toggleEdition) => (
         <AccountFormChangePassword toggleEdition={toggleEdition} />
       )}
     />

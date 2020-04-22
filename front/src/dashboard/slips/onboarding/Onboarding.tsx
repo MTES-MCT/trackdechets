@@ -22,7 +22,7 @@ export default function OnBoarding() {
       style={{ display: isOpen ? "flex" : "none" }}
       onClick={() => setIsOpen(false)}
     >
-      <div className="modal onboarding" onClick={e => e.stopPropagation()}>
+      <div className="modal onboarding" onClick={(e) => e.stopPropagation()}>
         <Slider onClose={() => setIsOpen(false)}>
           <Slide
             image="/onboarding/slide1.png"
@@ -35,7 +35,13 @@ export default function OnBoarding() {
               votre prestataire (ou il peut le préparer à votre place via son
               compte Trackdéchets).
             </p>
-            <p>On vous facilite la vie avec <span role="img" aria-label="Fort">💪</span> :</p>
+            <p>
+              On vous facilite la vie avec{" "}
+              <span role="img" aria-label="Fort">
+                💪
+              </span>{" "}
+              :
+            </p>
             <ul>
               <li>
                 un système de favoris (codes déchets, coordonnées prestataires,

@@ -34,7 +34,7 @@ const FORMS_REGISTER = gql`
 `;
 
 export default function Exports({ me }: IProps) {
-  const [sirets, setSirets] = useState(me.companies.map(c => c.siret));
+  const [sirets, setSirets] = useState(me.companies.map((c) => c.siret));
   const { loading, error, data } = useQuery(GET_STATS);
 
   return (
@@ -54,7 +54,7 @@ export default function Exports({ me }: IProps) {
             </tr>
           </thead>
           <tbody>
-            {data.stats[0].stats.map(s => (
+            {data.stats[0].stats.map((s) => (
               <tr key={s.wasteCode}>
                 <td>{s.wasteCode}</td>
                 <td>{s.incoming}</td>
@@ -80,9 +80,9 @@ export default function Exports({ me }: IProps) {
       {me.companies.length > 1 && (
         <p>
           Pour quelle entreprise(s) souhaitez vous télécharger le registre ?{" "}
-          <select onChange={evt => setSirets([evt.target.value])}>
-            <option value={me.companies.map(c => c.siret)}>Toutes</option>
-            {me.companies.map(c => (
+          <select onChange={(evt) => setSirets([evt.target.value])}>
+            <option value={me.companies.map((c) => c.siret)}>Toutes</option>
+            {me.companies.map((c) => (
               <option value={c.siret} key={c.siret}>
                 {c.name}
               </option>

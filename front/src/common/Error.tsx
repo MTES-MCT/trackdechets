@@ -12,7 +12,7 @@ export const isFunction = (obj: any): obj is Function =>
 
 export const ErrorProvider: FunctionComponent<Props> = ({
   apolloError,
-  children
+  children,
 }) => {
   if (!children || !isFunction(children)) {
     console.info("ErrorProvider only accepts a function as a child.");
@@ -41,8 +41,9 @@ export function NotificationError({ apolloError, className }: Props) {
       {({ error, idx }) => (
         <div
           key={`${idx}-${error.message}`}
-          className={`notification error ${styles.lineBreak} ${className ??
-            ""}`}
+          className={`notification error ${styles.lineBreak} ${
+            className ?? ""
+          }`}
         >
           {error.message}
         </div>

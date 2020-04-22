@@ -14,7 +14,7 @@ AccountFielCompanyGerepId.fragments = {
       siret
       gerepId
     }
-  `
+  `,
 };
 
 const UPDATE_GEREP_ID = gql`
@@ -33,7 +33,7 @@ export default function AccountFielCompanyGerepId({ company }: Props) {
       name="gerepId"
       label="Identifiant GEREP"
       value={company.gerepId}
-      renderForm={toggleEdition => (
+      renderForm={(toggleEdition) => (
         <AccountFormSimpleInput<{ gerepId: string }>
           name="gerepId"
           type="text"

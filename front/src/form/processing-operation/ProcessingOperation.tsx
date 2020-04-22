@@ -10,9 +10,9 @@ export const Operations: {
 }[] = Elimination.concat(Valorisation);
 
 export default function ProcessingOperation({
-  field: { value, name, onChange }
+  field: { value, name, onChange },
 }: FieldProps) {
-  const operationDetail = Operations.find(o => o.code === value);
+  const operationDetail = Operations.find((o) => o.code === value);
 
   return (
     <div className="ProcessingOperation">
@@ -33,7 +33,7 @@ export default function ProcessingOperation({
       <label>Opération de traitement prévue</label>
       <select id="select" name={name} value={value} onChange={onChange}>
         <option value="">Choisissez...</option>
-        {Operations.map(o => (
+        {Operations.map((o) => (
           <option key={o.code} value={o.code}>
             {o.code} - {o.description.substr(0, 120)}
             {o.description.length > 120 ? "..." : ""}

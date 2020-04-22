@@ -19,7 +19,7 @@ AccountCompanyMemberList.fragments = {
     ${AccountFormCompanyInviteNewUser.fragments.company}
     ${AccountCompanyMember.fragments.company}
     ${AccountCompanyMember.fragments.user}
-  `
+  `,
 };
 
 export default function AccountCompanyMemberList({ company }: Props) {

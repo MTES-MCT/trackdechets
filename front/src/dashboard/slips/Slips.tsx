@@ -89,7 +89,9 @@ export default function Slips({
           <th>
             <input
               type="text"
-              onChange={(e) => filter("stateSummary.recipient.name", e.target.value)}
+              onChange={(e) =>
+                filter("stateSummary.recipient.name", e.target.value)
+              }
               placeholder="Filtrer..."
             />
           </th>

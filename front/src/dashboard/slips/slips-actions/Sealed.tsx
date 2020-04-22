@@ -18,7 +18,11 @@ export default function Sealed(props: SlipActionProps) {
         >
           Annuler
         </button>
-        <button type="submit" className="button" onClick={() => props.onSubmit({})}>
+        <button
+          type="submit"
+          className="button"
+          onClick={() => props.onSubmit({})}
+        >
           Je valide
         </button>
       </div>

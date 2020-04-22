@@ -15,7 +15,7 @@ type Props = { me: Me; siret: string };
 
 export default function SlipsTabs({ me, siret }: Props) {
   const { loading, error, data } = useQuery(GET_SLIPS, {
-    variables: { siret }
+    variables: { siret },
   });
 
   if (loading) return <Loader />;
@@ -63,7 +63,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       </TabPanel>
       <TabPanel>
         {toSign.length ? (
-          <Slips siret={siret} forms={toSign} dynamicActions={true}/>
+          <Slips siret={siret} forms={toSign} dynamicActions={true} />
         ) : (
           <div className="empty-tab">
             <img src="/illu/illu_sent.svg" alt="" />
@@ -79,7 +79,7 @@ export default function SlipsTabs({ me, siret }: Props) {
       </TabPanel>
       <TabPanel>
         {status.length ? (
-          <Slips siret={siret} forms={status}  />
+          <Slips siret={siret} forms={status} />
         ) : (
           <div className="empty-tab">
             <img src="/illu/illu_transfer.svg" alt="" />

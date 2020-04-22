@@ -22,7 +22,7 @@ export function useOAuth2() {
   const [error, setError] = useState<string | null>(null);
   const [
     authorizePayload,
-    setAuthorizePayload
+    setAuthorizePayload,
   ] = useState<AuthorizePayload | null>(null);
 
   const { REACT_APP_API_ENDPOINT } = process.env;
@@ -35,8 +35,8 @@ export function useOAuth2() {
 
   useEffect(() => {
     fetch(authorizeUrl, { credentials: "include" })
-      .then(res => {
-        res.json().then(data => {
+      .then((res) => {
+        res.json().then((data) => {
           if (res.status === 200) {
             setAuthorizePayload(data);
             setLoading(false);
@@ -51,7 +51,7 @@ export function useOAuth2() {
           }
         });
       })
-      .catch(_err => {
+      .catch((_err) => {
         setError(fallbackError);
         setLoading(false);
       });

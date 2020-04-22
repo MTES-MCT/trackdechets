@@ -32,12 +32,12 @@ export default function AccountFormCompanyTypes({
   name,
   siret,
   companyTypes,
-  toggleEdition
+  toggleEdition,
 }: Props) {
   const [update, { loading, error }] = useMutation(UPDATE_COMPANY_TYPES, {
     onCompleted: () => {
       toggleEdition();
-    }
+    },
   });
 
   const initialValues = {} as V;

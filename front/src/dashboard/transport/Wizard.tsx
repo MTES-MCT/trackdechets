@@ -20,7 +20,7 @@ export class Wizard extends React.Component<Props, State> {
     this.contentRef = React.createRef();
     this.state = {
       page: 0,
-      values: props.initialValues
+      values: props.initialValues,
     };
   }
 
@@ -32,16 +32,16 @@ export class Wizard extends React.Component<Props, State> {
 
   next = (values: Object) => {
     this.scrollTop();
-    this.setState(state => ({
+    this.setState((state) => ({
       page: Math.min(state.page + 1, this.props.children.length - 1),
-      values
+      values,
     }));
   };
 
   previous = () => {
     this.scrollTop();
-    this.setState(state => ({
-      page: Math.max(state.page - 1, 0)
+    this.setState((state) => ({
+      page: Math.max(state.page - 1, 0),
     }));
   };
   validate = (values: Object) => {

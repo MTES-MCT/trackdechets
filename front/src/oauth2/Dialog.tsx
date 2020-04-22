@@ -24,7 +24,7 @@ export default function Dialog() {
     transactionID,
     redirectURI,
     client,
-    user
+    user,
   } = authorizePayload as AuthorizePayload;
 
   return (

@@ -19,14 +19,14 @@ export default function PrivateRoute({
   return (
     <Route
       {...routerProps}
-      render={props =>
+      render={(props) =>
         isAuthenticated ? (
           <Component {...props} />
         ) : (
           <Redirect
             to={{
               pathname: "/login",
-              state: { returnTo: location.pathname + location.search }
+              state: { returnTo: location.pathname + location.search },
             }}
           />
         )

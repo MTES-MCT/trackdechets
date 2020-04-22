@@ -23,12 +23,12 @@ export default function Processed(props: SlipActionProps) {
               address: "",
               contact: "",
               mail: "",
-              phone: ""
-            }
+              phone: "",
+            },
           },
-          noTraceability: false
+          noTraceability: false,
         }}
-        onSubmit={values => props.onSubmit({ info: values })}
+        onSubmit={(values) => props.onSubmit({ info: values })}
       >
         {({ values }) => (
           <Form>
@@ -52,7 +52,7 @@ export default function Processed(props: SlipActionProps) {
               <label>Opération de traitement effectuée</label>
               <Field component="select" name="processingOperationDone">
                 <option value="">Choisissez...</option>
-                {Operations.map(o => (
+                {Operations.map((o) => (
                   <option key={o.code} value={o.code}>
                     {o.code} - {o.description.substr(0, 50)}
                     {o.description.length > 50 ? "..." : ""}
@@ -95,7 +95,7 @@ export default function Processed(props: SlipActionProps) {
                     name="nextDestination.processingOperation"
                   >
                     <option value="">Choisissez...</option>
-                    {Operations.map(o => (
+                    {Operations.map((o) => (
                       <option key={o.code} value={o.code}>
                         {o.code} - {o.description.substr(0, 50)}
                         {o.description.length > 50 ? "..." : ""}

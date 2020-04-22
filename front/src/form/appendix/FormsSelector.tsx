@@ -18,13 +18,13 @@ function reducer(
       const sp = action.payload as Form;
       return {
         selected: [sp.readableId, ...state.selected],
-        quantity: round(state.quantity + sp.quantityReceived)
+        quantity: round(state.quantity + sp.quantityReceived),
       };
     case "unselect":
       const usp = action.payload as Form;
       return {
-        selected: state.selected.filter(v => v !== usp.readableId),
-        quantity: round(state.quantity - usp.quantityReceived)
+        selected: state.selected.filter((v) => v !== usp.readableId),
+        quantity: round(state.quantity - usp.quantityReceived),
       };
     case "selectAll":
       const sap = action.payload as Form[];
@@ -35,7 +35,7 @@ function reducer(
             (prev: number, cur: Form) => (prev += cur.quantityReceived),
             0
           )
-        )
+        ),
       };
     default:
       throw new Error();
@@ -52,14 +52,14 @@ export default function FormsSelector({ name }) {
   }, [wasteCodeFilter]);
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, name).map(f => f.readableId),
-    quantity: getIn(values, "wasteDetails.quantity")
+    selected: getIn(values, name).map((f) => f.readableId),
+    quantity: getIn(values, "wasteDetails.quantity"),
   });
 
   useEffect(() => {
     setFieldValue(
       name,
-      state.selected.map(s => ({ readableId: s }))
+      state.selected.map((s) => ({ readableId: s }))
     );
     setFieldValue("wasteDetails.quantity", state.quantity);
   }, [state, name, setFieldValue]);
@@ -68,11 +68,11 @@ export default function FormsSelector({ name }) {
     if (Array.isArray(payload)) {
       return dispatch({
         type: "selectAll",
-        payload
+        payload,
       });
     }
 
-    state.selected.find(s => s === payload.readableId)
+    state.selected.find((s) => s === payload.readableId)
       ? dispatch({ type: "unselect", payload })
       : dispatch({ type: "select", payload });
   }
@@ -97,7 +97,7 @@ export default function FormsSelector({ name }) {
           type="text"
           placeholder="Filtre optionnel..."
           value={wasteCodeFilter}
-          onChange={e => setWasteCodeFilter(e.target.value)}
+          onChange={(e) => setWasteCodeFilter(e.target.value)}
         />
       </p>
 
