@@ -1,5 +1,5 @@
-import { testRule } from "../../common/__tests__/rules.test";
-import { canAccessForm } from "../rules";
+import { testRule } from "../../../common/__tests__/rules.test";
+import { canAccessForm } from "../permissions";
 
 describe("canAccessForm", () => {
   it("should be true if the user created the form", async () => {

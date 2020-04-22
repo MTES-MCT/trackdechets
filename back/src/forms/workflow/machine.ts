@@ -1,14 +1,13 @@
-import { Machine, assign } from "xstate";
-import { FormState } from "./model";
+import { assign, Machine } from "xstate";
+import { GROUP_CODES } from "../../common/constants";
 import { WorkflowError } from "./errors";
 import {
   markFormAppendixAwaitingFormsAsGrouped,
+  markFormAppendixGroupedsAsProcessed,
   validateForm,
-  validateSecurityCode,
-  markFormAppendixGroupedsAsProcessed
+  validateSecurityCode
 } from "./helpers";
-
-export const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
+import { FormState } from "./model";
 
 export const formWorkflowMachine = Machine(
   {

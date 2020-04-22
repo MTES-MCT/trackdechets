@@ -21,8 +21,7 @@ import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
-import { typeDefs, resolvers, permissions, validations } from "./schema";
-import { schemaValidation } from "./common/middlewares/schema-validation";
+import { typeDefs, resolvers, shieldRulesTree } from "./schema";
 import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
@@ -40,9 +39,7 @@ const {
 
 const UI_BASE_URL = getUIBaseURL();
 
-const shieldMiddleware = shield(permissions, { allowExternalErrors: true });
-
-const schemaValidationMiddleware = schemaValidation(validations);
+const shieldMiddleware = shield(shieldRulesTree, { allowExternalErrors: true });
 
 /**
  * Custom report error for sentry middleware
@@ -97,11 +94,7 @@ const schema = makeExecutableSchema({
 
 export const schemaWithMiddleware = applyMiddleware(
   schema,
-  ...[
-    shieldMiddleware,
-    ...(SENTRY_DSN ? [sentryMiddleware()] : []),
-    schemaValidationMiddleware
-  ]
+  ...[shieldMiddleware, ...(SENTRY_DSN ? [sentryMiddleware()] : [])]
 );
 
 export const server = new ApolloServer({

@@ -29,10 +29,10 @@ function getRandomInt(min: number, max: number): number {
 }
 
 /**
- * Merge a list of graphql-shield permissions
- * @param permissions
+ * Merge a list of graphql-shield rules tree
+ * @param rulesTree
  */
-export function mergePermissions(permissions) {
+export function mergeRulesTrees(rulesTree) {
   const merge = (r1, r2) => {
     return {
       Query: { ...r1.Query, ...r2.Query },
@@ -40,7 +40,7 @@ export function mergePermissions(permissions) {
     };
   };
 
-  return permissions.reduce((prev, cur) => merge(prev, cur));
+  return rulesTree.reduce((prev, cur) => merge(prev, cur));
 }
 
 export function getUIBaseURL() {
