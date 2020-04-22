@@ -38,7 +38,7 @@ const {
 } = process.env;
 
 const UI_BASE_URL = getUIBaseURL();
-
+console.log(shieldRulesTree)
 const shieldMiddleware = shield(shieldRulesTree, { allowExternalErrors: true });
 
 /**
