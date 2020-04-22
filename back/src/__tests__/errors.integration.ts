@@ -15,8 +15,7 @@ jest.mock("../schema.ts", () => ({
       hello: () => mockHello()
     }
   },
-  permissions: {},
-  validations: {}
+  shieldRulesTree: {}
 }));
 
 const HELLO = `query { hello }`;
