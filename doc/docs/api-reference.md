@@ -3277,15 +3277,6 @@ Payload de création d'une annexe 2
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>emitterSiret</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-SIRET de l'établissement émetteur
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>readableId</strong></td>
 <td valign="top"><a href="#id">ID</a></td>
 <td>
