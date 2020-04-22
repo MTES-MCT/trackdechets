@@ -163,13 +163,6 @@ const mutableFieldsFragment = gql`
   ${recipientFragment}
 `;
 
-export const editableFormFragment = gql`
-  fragment EditableForm on Form {
-    ...MutableFieldsFragment
-  }
-  ${mutableFieldsFragment}
-`;
-
 export const fullFormFragment = gql`
   fragment FullForm on Form {
     ...MutableFieldsFragment

@@ -1,13 +1,13 @@
 import gql from "graphql-tag";
-import { fullFormFragment, editableFormFragment } from "../../common/fragments";
+import { fullFormFragment } from "../../common/fragments";
 
 export const GET_FORM = gql`
   query Form($formId: ID) {
     form(id: $formId) {
-      ...EditableForm
+      ...FullForm
     }
   }
-  ${editableFormFragment}
+  ${fullFormFragment}
 `;
 
 export const SAVE_FORM = gql`
