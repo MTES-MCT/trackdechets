@@ -1,4 +1,4 @@
-import { or } from "graphql-shield";
+import { or, and } from "graphql-shield";
 
 import {
   canAccessForm,
@@ -6,7 +6,8 @@ import {
   isFormEmitter,
   isFormTransporter,
   isFormTrader,
-  isFormTempStorer
+  isFormTempStorer,
+  isAllowedToUseAppendix2Forms
 } from "./rules";
 import {
   isAuthenticated,
@@ -26,7 +27,7 @@ export default {
     appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
-    saveForm: isAuthenticated,
+    saveForm: and(isAuthenticated, isAllowedToUseAppendix2Forms),
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
     markAsSealed: or(isFormRecipient, isFormEmitter, isFormTrader),

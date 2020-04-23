@@ -1,10 +1,10 @@
+import { ForbiddenError } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
 import { Prisma } from "../generated/prisma-client";
 import {
   isAuthenticated,
   ensureRuleParametersArePresent
 } from "../common/rules";
-import { ForbiddenError } from "apollo-server-express";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -45,6 +45,38 @@ export const canAccessForm = and(
       new ForbiddenError(`Vous n'êtes pas autorisé à accéder à ce bordereau.`)
     );
   })
+);
+
+export const isAllowedToUseAppendix2Forms = rule()(
+  async (_, { appendix2Forms }, ctx) => {
+    if (!appendix2Forms) {
+      return true;
+    }
+    const currentUserSirets = await getCurrentUserSirets(
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    const forms = await ctx.prisma.forms({
+      where: {
+        OR: appendix2Forms.map(f => ({ readableId: f.readableId }))
+      }
+    });
+
+    for (const form of forms) {
+      if (
+        form.isDeleted ||
+        form.status !== "AWAITING_GROUP" ||
+        !currentUserSirets.includes(form.recipientCompanySiret)
+      ) {
+        return new ForbiddenError(
+          `Vous ne pouvez pas ajouter le bordereau ${form.readableId} en annexe 2.`
+        );
+      }
+    }
+
+    return true;
+  }
 );
 
 export const isFormRecipient = and(
@@ -159,6 +191,12 @@ async function getFormAccessInfos(
   }
 `);
 
+  const currentUserSirets = await getCurrentUserSirets(userId, prisma);
+
+  return { formInfos, currentUserSirets };
+}
+
+async function getCurrentUserSirets(userId: string, prisma: Prisma) {
   const user = await prisma.user({ id: userId }).$fragment<{
     companyAssociations: { company: { siret: string } }[];
   }>(`
@@ -170,7 +208,5 @@ async function getFormAccessInfos(
     }
   }
 `);
-  const currentUserSirets = user.companyAssociations.map(a => a.company.siret);
-
-  return { formInfos, currentUserSirets };
+  return user.companyAssociations.map(a => a.company.siret);
 }
