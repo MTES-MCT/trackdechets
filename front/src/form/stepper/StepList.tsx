@@ -1,7 +1,13 @@
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import cogoToast from "cogo-toast";
 import { Formik, setNestedObjectValues } from "formik";
-import React, { ReactElement, useEffect, useRef, useState } from "react";
+import React, {
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { InlineError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
@@ -26,19 +32,23 @@ export default withRouter(function StepList(
 
   const { loading, error, data } = useQuery(GET_FORM, {
     variables: { formId: props.formId },
-    fetchPolicy: "network-only"
+    fetchPolicy: "network-only",
   });
+
+  const formState = useMemo(() => getComputedState(initialState, data?.form), [
+    data,
+  ]);
 
   const [saveForm] = useMutation(SAVE_FORM, {
     update: (store, { data: { saveForm } }) => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret: currentSiretService.getSiret() },
-        getNewData: data => ({
-          forms: [...data.forms.filter(f => f.id !== saveForm.id), saveForm]
-        })
+        getNewData: (data) => ({
+          forms: [...data.forms.filter((f) => f.id !== saveForm.id), saveForm],
+        }),
       });
-    }
+    },
   });
 
   useEffect(() => window.scrollTo(0, 0), [currentStep]);
@@ -69,7 +79,7 @@ export default withRouter(function StepList(
         displayNext: currentStep < totalSteps,
         displaySubmit: currentStep === totalSteps,
         goToPreviousStep: () => setCurrentStep(currentStep - 1),
-        goToNextStep: () => setCurrentStep(currentStep + 1)
+        goToNextStep: () => setCurrentStep(currentStep + 1),
       },
       child
     );
@@ -78,7 +88,6 @@ export default withRouter(function StepList(
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;
 
-  const state = { ...initialState, ...data.form };
   return (
     <div>
       <ul className="step-header">
@@ -100,23 +109,23 @@ export default withRouter(function StepList(
       <div className="step-content">
         <Formik
           innerRef={formikForm}
-          initialValues={state}
+          initialValues={formState}
           validationSchema={formSchema}
           onSubmit={() => Promise.resolve()}
         >
           {({ values }) => {
             return (
               <form
-                onSubmit={e => {
+                onSubmit={(e) => {
                   e.preventDefault();
                   // As we want to be able to save draft, we skip validation on submit
                   // and don't use the classic Formik mechanism
                   saveForm({
-                    variables: { formInput: values }
+                    variables: { formInput: values },
                   })
-                    .then(_ => props.history.push("/dashboard/slips"))
-                    .catch(err => {
-                      err.graphQLErrors.map(err =>
+                    .then((_) => props.history.push("/dashboard/slips"))
+                    .catch((err) => {
+                      err.graphQLErrors.map((err) =>
                         cogoToast.error(err.message, { hideAfter: 7 })
                       );
                     });
@@ -124,7 +133,7 @@ export default withRouter(function StepList(
                 }}
               >
                 <div
-                  onKeyPress={e => {
+                  onKeyPress={(e) => {
                     // Disable submit on Enter key press
                     // We prevent it from bubbling further
                     if (e.key === "Enter") {
@@ -142,3 +151,33 @@ export default withRouter(function StepList(
     </div>
   );
 });
+
+/**
+ * Construct the form state by merging initialState and the actual form.
+ * The actual form may include properties that do not belong to the form.
+ * If we keep them in the form state they will break the mutation validation.
+ * To avoid that, we make sure that every properties we keep is a property contained in initial state.
+ *
+ * @param initialState what an empty Form is
+ * @param actualForm the actual form
+ */
+export function getComputedState(initialState, actualForm) {
+  if (!actualForm) {
+    return initialState;
+  }
+
+  return Object.keys(initialState).reduce((prev, curKey) => {
+    const initialValue = initialState[curKey];
+    if (
+      typeof initialValue === "object" &&
+      initialValue !== null &&
+      !(initialValue instanceof Array)
+    ) {
+      prev[curKey] = getComputedState(initialValue, actualForm[curKey]);
+    } else {
+      prev[curKey] = actualForm[curKey] ?? initialValue;
+    }
+
+    return prev;
+  }, {});
+}

@@ -128,9 +128,6 @@ input FormInput {
 
 "Payload de création d'une annexe 2"
 input AppendixFormInput {
-  "SIRET de l'établissement émetteur"
-  emitterSiret: String
-
   "N° de bordereau"
   readableId: ID
 }

@@ -20,8 +20,6 @@ export type Scalars = {
 
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
-  /** SIRET de l'établissement émetteur */
-  emitterSiret?: Maybe<Scalars['String']>;
   /** N° de bordereau */
   readableId?: Maybe<Scalars['ID']>;
 };
