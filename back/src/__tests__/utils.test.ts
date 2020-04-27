@@ -1,12 +1,12 @@
 import { rule } from "graphql-shield";
 import {
-  mergePermissions,
+  mergeRulesTrees,
   getUid,
   sameDayMidnight,
   daysBetween
 } from "../utils";
 
-test("mergePermissions merge a list of graphql-shield permissions", () => {
+test("mergeRulesTrees merge a list of graphql-shield rules tree", () => {
   const isAuthenticated = rule()(() => true);
   const isAdmin = rule()(() => false);
 
@@ -30,7 +30,7 @@ test("mergePermissions merge a list of graphql-shield permissions", () => {
 
   // empty rule
   const rule3 = {};
-  const merged = mergePermissions([rule1, rule2, rule3]);
+  const merged = mergeRulesTrees([rule1, rule2, rule3]);
   const expected = {
     Query: {
       frontPage: isAuthenticated,

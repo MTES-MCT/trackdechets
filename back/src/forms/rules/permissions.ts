@@ -1,10 +1,10 @@
 import { ForbiddenError } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
-import { Prisma } from "../generated/prisma-client";
+import { Prisma } from "../../generated/prisma-client";
 import {
   isAuthenticated,
   ensureRuleParametersArePresent
-} from "../common/rules";
+} from "../../common/rules";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;

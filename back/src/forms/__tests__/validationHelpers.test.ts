@@ -1,9 +1,13 @@
+import * as Yup from "yup";
 import { object } from "yup";
 
-import { validDatetime } from "../validation-helpers";
+import { validDatetime } from "../rules/validation-helpers";
 
 const dummySchema = object({
-  someDate: validDatetime({ verboseFieldName: "date de test", required: true })
+  someDate: validDatetime(
+    { verboseFieldName: "date de test", required: true },
+    Yup
+  )
 });
 
 describe("Test validDatetime helper", () => {

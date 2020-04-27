@@ -1,17 +1,16 @@
+import * as Yup from "yup";
 import {
-  string,
-  object,
-  number,
   array,
   boolean,
+  LocaleObject,
+  number,
+  object,
   setLocale,
-  LocaleObject
+  string
 } from "yup";
+import { wasteCodes } from "../common/constants";
 import { prisma } from "../generated/prisma-client";
-
-import wasteCodes from "./wasteCodes";
-
-import { validDatetime } from "./validation-helpers";
+import { validCompany, validDatetime } from "./rules/validation-helpers";
 
 setLocale({
   mixed: {
@@ -20,24 +19,6 @@ setLocale({
     notType: "${path} ne peut pas être null"
   }
 } as LocaleObject);
-
-export const companySchema = (type: string) =>
-  object().shape({
-    name: string().required(`${type}: Le nom de l'entreprise est obligatoire`),
-    siret: string().required(
-      `${type}: La sélection d'une entreprise par SIRET est obligatoire`
-    ),
-    address: string().required(
-      `${type}: L'adresse d'une entreprise est obligatoire`
-    ),
-    contact: string().required(
-      `${type}: Le contact dans l'entreprise est obligatoire`
-    ),
-    phone: string().required(
-      `${type}: Le téléphone de l'entreprise est obligatoire`
-    ),
-    mail: string().required(`${type}: L'email de l'entreprise est obligatoire`)
-  });
 
 const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
 
@@ -54,14 +35,14 @@ export const formSchema = object<any>().shape({
       postalCode: string().nullable(),
       infos: string().nullable()
     }).nullable(),
-    company: companySchema("Émetteur")
+    company: validCompany({ verboseFieldName: "Émetteur" }, Yup)
   }),
   recipient: object().shape({
     processingOperation: string()
       .label("Opération de traitement")
       .required(),
     cap: string().nullable(true),
-    company: companySchema("Destinataire"),
+    company: validCompany({ verboseFieldName: "Destinataire" }, Yup),
     isTempStorage: boolean()
   }),
   transporter: object().shape({
@@ -82,9 +63,9 @@ export const formSchema = object<any>().shape({
           ? schema.nullable(true)
           : schema.required("Le département du transporteur est obligatoire")
     ),
-    validityLimit: validDatetime({ verboseFieldName: "date de validité" }),
+    validityLimit: validDatetime({ verboseFieldName: "date de validité" }, Yup),
     numberPlate: string().nullable(true),
-    company: companySchema("Transporteur")
+    company: validCompany({ verboseFieldName: "Transporteur" }, Yup)
   }),
   wasteDetails: object().shape({
     code: string().oneOf(

@@ -1,4 +1,5 @@
 import { isAuthenticated, isCompanyAdmin } from "../common/rules";
+import { signupSchema } from "./rules/schema";
 
 export default {
   Query: {
@@ -11,6 +12,7 @@ export default {
     inviteUserToCompany: isCompanyAdmin,
     resendInvitation: isCompanyAdmin,
     removeUserFromCompany: isCompanyAdmin,
-    deleteInvitation: isCompanyAdmin
+    deleteInvitation: isCompanyAdmin,
+    signup: signupSchema
   }
 };

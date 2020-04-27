@@ -2,7 +2,8 @@ import { CaptureConsole } from "@sentry/integrations";
 import {
   ApolloServer,
   makeExecutableSchema,
-  ApolloError
+  ApolloError,
+  UserInputError
 } from "apollo-server-express";
 import * as express from "express";
 import * as passport from "passport";
@@ -21,8 +22,7 @@ import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
-import { typeDefs, resolvers, permissions, validations } from "./schema";
-import { schemaValidation } from "./common/middlewares/schema-validation";
+import { typeDefs, resolvers, shieldRulesTree } from "./schema";
 import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
@@ -40,9 +40,7 @@ const {
 
 const UI_BASE_URL = getUIBaseURL();
 
-const shieldMiddleware = shield(permissions, { allowExternalErrors: true });
-
-const schemaValidationMiddleware = schemaValidation(validations);
+const shieldMiddleware = shield(shieldRulesTree, { allowExternalErrors: true });
 
 /**
  * Custom report error for sentry middleware
@@ -97,11 +95,7 @@ const schema = makeExecutableSchema({
 
 export const schemaWithMiddleware = applyMiddleware(
   schema,
-  ...[
-    shieldMiddleware,
-    ...(SENTRY_DSN ? [sentryMiddleware()] : []),
-    schemaValidationMiddleware
-  ]
+  ...[shieldMiddleware, ...(SENTRY_DSN ? [sentryMiddleware()] : [])]
 );
 
 export const server = new ApolloServer({
@@ -117,6 +111,10 @@ export const server = new ApolloServer({
     };
   },
   formatError: err => {
+    // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
+    if (err.extensions.exception?.name === "ValidationError") {
+      return new UserInputError(err.extensions.exception.errors.join("\n"));
+    }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV !== "dev"

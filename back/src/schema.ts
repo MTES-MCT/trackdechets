@@ -1,6 +1,5 @@
 import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
-import { mergePermissions } from "./utils";
-import { mergeValidationRules } from "./common/middlewares/schema-validation";
+import { mergeRulesTrees } from "./utils";
 
 // Merge GraphQL schema by merging types, resolvers, permissions and validations
 // definitions from differents modules
@@ -15,16 +14,10 @@ const resolversArray = fileLoader(`${__dirname}/**/resolvers.ts`, {
 });
 const resolvers = mergeResolvers(resolversArray);
 
-const permissionsArray = fileLoader(`${__dirname}/**/permissions.ts`, {
+const shieldRulesTreeArray = fileLoader(`${__dirname}/**/shield-tree.ts`, {
   recursive: true
 });
 
-const permissions = mergePermissions(permissionsArray);
+const shieldRulesTree = mergeRulesTrees(shieldRulesTreeArray);
 
-const validationArray = fileLoader(`${__dirname}/**/schema-validation.ts`, {
-  recursive: true
-});
-
-const validations = mergeValidationRules(validationArray);
-
-export { typeDefs, resolvers, permissions, validations };
+export { typeDefs, resolvers, shieldRulesTree };

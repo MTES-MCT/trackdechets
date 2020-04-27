@@ -1,4 +1,5 @@
-import { receivedInfoSchema } from "../schema-validation";
+import * as Yup from "yup";
+import { getReceivedInfoSchema } from "../schema";
 
 const acceptedInfo = {
   wasteAcceptationStatus: "ACCEPTED",
@@ -7,6 +8,8 @@ const acceptedInfo = {
   receivedBy: "Jim",
   receivedAt: "2020-01-17T10:12:00+0100"
 };
+
+const receivedInfoSchema = getReceivedInfoSchema(Yup);
 
 describe("waste is accepted", () => {
   const { wasteAcceptationStatus, quantityReceived } = acceptedInfo;

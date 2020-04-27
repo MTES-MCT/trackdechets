@@ -1,6 +1,7 @@
 import { createTestClient } from "apollo-server-testing";
 import { UserInputError, ApolloError } from "apollo-server-express";
 import { readFileSync } from "fs";
+import { ValidationError } from "yup";
 
 const mockHello = jest.fn();
 
@@ -15,8 +16,7 @@ jest.mock("../schema.ts", () => ({
       hello: () => mockHello()
     }
   },
-  permissions: {},
-  validations: {}
+  shieldRulesTree: {}
 }));
 
 const HELLO = `query { hello }`;
@@ -129,5 +129,17 @@ describe("Error handling", () => {
     expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
     expect(error.message).toEqual("Bang");
     process.env = OLD_ENV;
+  });
+
+  test("Yup validation errors should be displayed as an input error", async () => {
+    const server = require("../server").server;
+    const { query } = createTestClient(server);
+    mockHello.mockImplementationOnce(() => {
+      throw new ValidationError("Bang", "Wrong value", "path");
+    });
+    const { errors } = await query({ query: HELLO });
+    const error = errors[0];
+    expect(error.extensions.code).toEqual("BAD_USER_INPUT");
+    expect(error.message).toContain("Bang");
   });
 });

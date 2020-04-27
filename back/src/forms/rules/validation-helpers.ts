@@ -1,5 +1,4 @@
 import { parse } from "date-fns";
-import { string } from "yup";
 
 const allowedFormats = [
   "yyyy-MM-dd",
@@ -38,8 +37,8 @@ const isValidDatetime = str => {
  * @param verboseFieldName - human readable field name, for error messages
  * @param required - is this field required ?
  */
-export function validDatetime({ verboseFieldName, required = false }) {
-  let validator = string();
+export function validDatetime({ verboseFieldName, required = false }, yup) {
+  let validator = yup.string();
   if (!!required) {
     validator = validator.required(`Vous devez saisir une ${verboseFieldName}`);
   } else {
@@ -53,4 +52,35 @@ export function validDatetime({ verboseFieldName, required = false }) {
       return isValidDatetime(v);
     }
   );
+}
+
+export function validCompany({ verboseFieldName }, yup) {
+  return yup.object().shape({
+    name: yup
+      .string()
+      .required(`${verboseFieldName}: Le nom de l'entreprise est obligatoire`),
+    siret: yup
+      .string()
+      .required(
+        `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
+      ),
+    address: yup
+      .string()
+      .required(
+        `${verboseFieldName}: L'adresse d'une entreprise est obligatoire`
+      ),
+    contact: yup
+      .string()
+      .required(
+        `${verboseFieldName}: Le contact dans l'entreprise est obligatoire`
+      ),
+    phone: yup
+      .string()
+      .required(
+        `${verboseFieldName}: Le téléphone de l'entreprise est obligatoire`
+      ),
+    mail: yup
+      .string()
+      .required(`${verboseFieldName}: L'email de l'entreprise est obligatoire`)
+  });
 }
