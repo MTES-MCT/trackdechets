@@ -2,7 +2,8 @@ import { CaptureConsole } from "@sentry/integrations";
 import {
   ApolloServer,
   makeExecutableSchema,
-  ApolloError
+  ApolloError,
+  UserInputError
 } from "apollo-server-express";
 import * as express from "express";
 import * as passport from "passport";
@@ -110,6 +111,10 @@ export const server = new ApolloServer({
     };
   },
   formatError: err => {
+    // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
+    if (err.extensions.exception?.name === "ValidationError") {
+      return new UserInputError(err.extensions.exception.errors.join("\n"));
+    }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV !== "dev"
