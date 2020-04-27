@@ -12,6 +12,9 @@ const userInfos = {
 jest.mock("../../../generated/prisma-client", () => ({
   prisma: {
     createUser: jest.fn(() => Promise.resolve(userInfos)),
+    $exists: {
+      user: jest.fn(() => Promise.resolve(false))
+    },
     createUserActivationHash: jest.fn(() =>
       Promise.resolve({ hash: "an hash" })
     ),
@@ -31,13 +34,13 @@ describe("signup", () => {
   });
 
   test("should create user", async () => {
-    const user = await signup(null, { userInfos });
+    const user = await signup(userInfos);
 
     expect(user.id).toBe("new_user");
   });
 
   test("should create activation hash", async () => {
-    await signup(null, { userInfos });
+    await signup(userInfos);
 
     expect(prisma.createUserActivationHash).toHaveBeenCalledTimes(1);
   });
@@ -50,7 +53,7 @@ describe("signup", () => {
     ];
     (prisma.userAccountHashes as jest.Mock).mockResolvedValue(hashes);
 
-    await signup(null, { userInfos });
+    await signup(userInfos);
 
     expect(prisma.createCompanyAssociation).toHaveBeenCalledTimes(
       hashes.length
