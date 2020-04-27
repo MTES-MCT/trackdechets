@@ -22,10 +22,6 @@ export default function Recipient() {
 
   return (
     <>
-      <h4>
-        Installation de destination ou d’entreposage ou de reconditionnement
-      </h4>
-
       <div className="form__group">
         <label>
           <Field type="checkbox" name="recipient.isTempStorage" />
@@ -33,6 +29,13 @@ export default function Recipient() {
           reconditionnement
         </label>
       </div>
+
+      <h4 className="required">
+        Installation{" "}
+        {values.recipient.isTempStorage
+          ? "d'entreposage ou de reconditionnement"
+          : "de destination"}
+      </h4>
 
       <div className="text-quote recipient">
         <p>

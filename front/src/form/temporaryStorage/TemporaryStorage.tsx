@@ -15,6 +15,17 @@ export default function TemporaryStorage(props) {
         initialState.temporaryStorageDetail
       );
     }
+
+    if (
+      values.recipient.processingOperation &&
+      values.temporaryStorageDetail &&
+      !values.temporaryStorageDetail.destination.processingOperation
+    ) {
+      setFieldValue(
+        "temporaryStorageDetail.destination.processingOperation",
+        values.recipient.processingOperation
+      );
+    }
   }, [values, setFieldValue]);
 
   if (!values.recipient?.isTempStorage || !values.temporaryStorageDetail) {
@@ -41,7 +52,7 @@ export default function TemporaryStorage(props) {
           name={`${props.name}.destination.processingOperation`}
         >
           <option value="">Choisissez...</option>
-          {Operations.map(o => (
+          {Operations.map((o) => (
             <option key={o.code} value={o.code}>
               {o.code} - {o.description.substr(0, 50)}
               {o.description.length > 50 ? "..." : ""}

@@ -17,7 +17,7 @@ export default function Slips({
   forms,
   siret,
   hiddenFields = [],
-  dynamicActions = false
+  dynamicActions = false,
 }: Props) {
   const [sortedForms, sortBy, filter] = useFormsTable(forms);
 
@@ -43,7 +43,7 @@ export default function Slips({
           </th>
           <th
             className="sortable"
-            onClick={() => sortBy("recipient.company.name")}
+            onClick={() => sortBy("stateSummary.recipient.name")}
           >
             Destinataire{" "}
             <small>
@@ -73,7 +73,7 @@ export default function Slips({
             <th>
               <input
                 type="text"
-                onChange={e => filter("readableId", e.target.value)}
+                onChange={(e) => filter("readableId", e.target.value)}
                 placeholder="Filtrer..."
               />
             </th>
@@ -82,21 +82,21 @@ export default function Slips({
           <th>
             <input
               type="text"
-              onChange={e => filter("emitter.company.name", e.target.value)}
+              onChange={(e) => filter("emitter.company.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th>
             <input
               type="text"
-              onChange={e => filter("recipient.company.name", e.target.value)}
+              onChange={(e) => filter("stateSummary.recipient.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th>
             <input
               type="text"
-              onChange={e => filter("wasteDetails.code", e.target.value)}
+              onChange={(e) => filter("wasteDetails.code", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
@@ -115,8 +115,8 @@ export default function Slips({
               </td>
             )}
             <td>{DateTime.fromISO(s.createdAt).toLocaleString()}</td>
-            <td>{s.emitter.company && s.emitter.company.name}</td>
-            <td>{s.recipient.company && s.recipient.company.name}</td>
+            <td>{s.emitter.company?.name}</td>
+            <td>{s.stateSummary.recipient?.name}</td>
             <td>
               {s.wasteDetails && (
                 <React.Fragment>
@@ -125,7 +125,7 @@ export default function Slips({
                 </React.Fragment>
               )}
             </td>
-            <td>{s.actualQuantity ?? "?"} t</td>
+            <td>{s.stateSummary.quantity ?? "?"} t</td>
             {hiddenFields.indexOf("status") === -1 && (
               <td>{statusLabels[s.status]}</td>
             )}

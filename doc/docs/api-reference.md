@@ -2119,6 +2119,15 @@ BSD suite - détail des champs de la partie entreposage provisoire ou reconditio
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>stateSummary</strong></td>
+<td valign="top"><a href="#statesummary">StateSummary</a></td>
+<td>
+
+Résumé des valeurs clés du bordereau à l'instant T
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -2530,6 +2539,74 @@ Quantité entrante
 <td>
 
 Qantité sortante
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### StateSummary
+
+En fonction du statut du bordereau, différentes informations sont à lire pour connaitre vraiment l'étast du bordereau:
+- la quantité peut changer entre émission, réception, entreposage provisoire...
+- le bordereau peut naviguer entre plusieurs entreprises.
+- quand le bordereau a-t-il été modifié pour la dernière fois ? (création, signature, traitement... ?)
+- si c'est un bordereau avec conditionnement et qu'on attend un transporteur, quel est-il ?
+
+Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td>
+
+Quantité la plus à jour
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Prochaine entreprise à recevoir le déchet (entreprise en case 2 ou 14)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Prochaine entreprise à émettre le déchet (entreprise en case 1 ou 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>lastActionOn</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de la dernière action sur le bordereau
 
 </td>
 </tr>

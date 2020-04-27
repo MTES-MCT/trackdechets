@@ -73,6 +73,7 @@ export function getNextStep(form: Form, currentSiret: string) {
 
   if (currentUserIsDestination) {
     if (form.status === FormStatus.RESENT) return FormStatus.RECEIVED;
+    if (form.status === FormStatus.RECEIVED) return FormStatus.PROCESSED;
   }
 
   if (currentUserIsTempStorer) {

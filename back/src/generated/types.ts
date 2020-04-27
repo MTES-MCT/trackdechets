@@ -433,6 +433,8 @@ export type Form = {
   ecoOrganisme?: Maybe<EcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
+  /** Résumé des valeurs clés du bordereau à l'instant T */
+  stateSummary?: Maybe<StateSummary>;
 };
 
 /** Information sur un établissement dans un BSD */
@@ -1158,6 +1160,29 @@ export type Stat = {
   incoming?: Maybe<Scalars['Float']>;
   /** Qantité sortante */
   outgoing?: Maybe<Scalars['Float']>;
+};
+
+/**
+ * En fonction du statut du bordereau, différentes informations sont à lire pour connaitre vraiment l'étast du bordereau:
+ * - la quantité peut changer entre émission, réception, entreposage provisoire...
+ * - le bordereau peut naviguer entre plusieurs entreprises.
+ * - quand le bordereau a-t-il été modifié pour la dernière fois ? (création, signature, traitement... ?)
+ * - si c'est un bordereau avec conditionnement et qu'on attend un transporteur, quel est-il ?
+ * 
+ * Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
+ */
+export type StateSummary = {
+   __typename?: 'StateSummary';
+  /** Quantité la plus à jour */
+  quantity?: Maybe<Scalars['Float']>;
+  /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
+  transporter?: Maybe<FormCompany>;
+  /** Prochaine entreprise à recevoir le déchet (entreprise en case 2 ou 14) */
+  recipient?: Maybe<FormCompany>;
+  /** Prochaine entreprise à émettre le déchet (entreprise en case 1 ou 13) */
+  emitter?: Maybe<FormCompany>;
+  /** Date de la dernière action sur le bordereau */
+  lastActionOn?: Maybe<Scalars['DateTime']>;
 };
 
 /** Changement de statut d'un bordereau */

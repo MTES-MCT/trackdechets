@@ -50,7 +50,7 @@ const Table = ({ forms, displayActions }) => {
           </th>
           <th
             className="sortable hide-on-mobile"
-            onClick={() => sortBy("recipient.company.name")}
+            onClick={() => sortBy("stateSummary.recipient.name")}
           >
             Destinataire{" "}
             <small>
@@ -83,7 +83,9 @@ const Table = ({ forms, displayActions }) => {
           <th className="hide-on-mobile">
             <input
               type="text"
-              onChange={(e) => filter("recipient.company.name", e.target.value)}
+              onChange={(e) =>
+                filter("stateSummary.recipient.name", e.target.value)
+              }
               placeholder="Filtrer..."
             />
           </th>
@@ -107,9 +109,9 @@ const Table = ({ forms, displayActions }) => {
               {form.readableId}
               <DownloadPdf formId={form.id} />
             </td>
-            <td>{form.emitter.company && form.emitter.company.name}</td>
+            <td>{form.stateSummary.emitter?.name}</td>
             <td className="hide-on-mobile">
-              {form.recipient.company && form.recipient.company.name}
+              {form.stateSummary.recipient?.name}
             </td>
             <td>
               <div>{form.wasteDetails.name}</div>

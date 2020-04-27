@@ -27,6 +27,7 @@ import {
   UserInputError,
   AuthenticationError
 } from "apollo-server-express";
+import { stateSummary } from "./queries/state-summary";
 
 // formsLifeCycle fragment
 const statusLogFragment = `
@@ -87,35 +88,8 @@ export default {
         ? unflattenObjectFromDb(temporaryStorageDetail)
         : null;
     },
-    // Depending on the form state, the "actuel" form quantity must be read in different fields
-    actualQuantity: async (parent, _, context: GraphQLContext) => {
-      // When the form is received we have the definitive quantity
-      if (parent.quantityReceived != null) {
-        return parent.quantityReceived;
-      }
-      // When form is temp stored the quantity is reported on arrival and might be changed
-      if (parent.recipient?.isTempStorage) {
-        const temporaryStorageDetail = await context.prisma
-          .form({ id: parent.id })
-          .temporaryStorageDetail();
-
-        // Repackaging
-        if (temporaryStorageDetail?.wasteDetailsQuantity) {
-          return temporaryStorageDetail.wasteDetailsQuantity;
-        }
-
-        // Arrival
-        if (temporaryStorageDetail?.tempStorerQuantityReceived != null) {
-          return temporaryStorageDetail.tempStorerQuantityReceived;
-        }
-      }
-      // Not a lot happened yet, use the quantity input
-      if (parent.wasteDetails?.quantity) {
-        return parent.wasteDetails.quantity;
-      }
-      // For drafts, we might not have a quantity yet
-      return null;
-    }
+    // Somme contextual values, depending on the form status / type, mostly to ease the display
+    stateSummary
   },
   Query: {
     form: async (_, { id }, context: GraphQLContext) => {

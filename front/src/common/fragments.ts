@@ -121,7 +121,25 @@ const staticFieldsFragment = gql`
     readableId
     createdAt
     status
-    actualQuantity
+    stateSummary {
+      quantity
+      transporter {
+        name
+        siret
+        address
+      }
+      recipient {
+        name
+        siret
+        address
+      }
+      emitter {
+        name
+        siret
+        address
+      }
+      lastActionOn
+    }
   }
 `;
 
