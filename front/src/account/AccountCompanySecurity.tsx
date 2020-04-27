@@ -11,7 +11,7 @@ AccountCompanySecurity.fragments = {
       ...AccountFielCompanySecurityCodeFragment
     }
     ${AccountCompanySecurityCodeField.fragments.company}
-  `
+  `,
 };
 
 export default function AccountCompanySecurity({ company }: Props) {

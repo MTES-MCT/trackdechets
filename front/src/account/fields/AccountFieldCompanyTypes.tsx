@@ -15,12 +15,12 @@ AccountFieldCompanyTypes.fragments = {
       siret
       companyTypes
     }
-  `
+  `,
 };
 
 export default function AccountFieldCompanyTypes({ company }: Props) {
-  const companyTypesLabel = company.companyTypes.map(ut => {
-    const obj = COMPANY_TYPES.find(t => t.value === ut);
+  const companyTypesLabel = company.companyTypes.map((ut) => {
+    const obj = COMPANY_TYPES.find((t) => t.value === ut);
     return obj ? obj.label : "";
   });
 
@@ -37,7 +37,7 @@ export default function AccountFieldCompanyTypes({ company }: Props) {
       name="companyTypes"
       label="Profil de l'entreprise"
       value={v}
-      renderForm={toggleEdition => (
+      renderForm={(toggleEdition) => (
         <AccountFormCompanyTypes
           name="companyTypes"
           siret={company.siret}

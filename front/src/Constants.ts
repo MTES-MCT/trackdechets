@@ -9,11 +9,11 @@ export enum FormStatus {
   REFUSED = "REFUSED",
   TEMP_STORED = "TEMP_STORED",
   RESEALED = "RESEALED",
-  RESENT = "RESENT"
+  RESENT = "RESENT",
 }
 // form acceptation statuses, provide required granularity to tell apart refused and partially refused wastes
 export enum WasteAcceptationStatus {
   ACCEPTED = "ACCEPTED",
   REFUSED = "REFUSED",
-  PARTIALLY_REFUSED = "PARTIALLY_REFUSED"
+  PARTIALLY_REFUSED = "PARTIALLY_REFUSED",
 }

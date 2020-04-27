@@ -6,7 +6,7 @@ export default function useWindowSize() {
   const getSize = useCallback(() => {
     return {
       width: isClient ? window.innerWidth : -1,
-      height: isClient ? window.innerHeight : -1
+      height: isClient ? window.innerHeight : -1,
     };
   }, [isClient]);
 

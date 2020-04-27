@@ -8,7 +8,7 @@ import WasteInfo from "./WasteInfo";
 import { RouteComponentProps } from "react-router";
 
 export default function FormContainer({
-  match
+  match,
 }: RouteComponentProps<{ id: string }>) {
   return (
     <main className="main">
@@ -17,7 +17,10 @@ export default function FormContainer({
           <StepContainer component={Emitter} title="Émetteur du déchet" />
           <StepContainer component={WasteInfo} title="Détail du déchet" />
           <StepContainer component={Recipient} title="Destination du déchet" />
-          <StepContainer component={Transporter} title="Transporteur du déchet" />
+          <StepContainer
+            component={Transporter}
+            title="Transporteur du déchet"
+          />
         </StepList>
       </div>
     </main>

@@ -30,7 +30,7 @@ export default function AccountField({
   value,
   renderForm,
   tooltip,
-  modifier = "Modifier"
+  modifier = "Modifier",
 }: Props) {
   const [editing, setEditing] = useState(false);
 

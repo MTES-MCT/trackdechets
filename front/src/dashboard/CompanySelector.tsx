@@ -4,7 +4,7 @@ import { Company } from "../login/model";
 export const currentSiretService = {
   getSiret: () => window.localStorage.getItem(SIRET_STORAGE_KEY) || "",
   setSiret: (value: string) =>
-    window.localStorage.setItem(SIRET_STORAGE_KEY, value)
+    window.localStorage.setItem(SIRET_STORAGE_KEY, value),
 };
 
 interface IProps {
@@ -17,7 +17,7 @@ export const SIRET_STORAGE_KEY = "td-selectedSiret";
 export default function CompanySelector({
   siret,
   companies,
-  handleCompanyChange
+  handleCompanyChange,
 }: IProps) {
   const handleChange = (siret: string) => {
     currentSiretService.setSiret(siret);
@@ -25,8 +25,8 @@ export default function CompanySelector({
   };
 
   return (
-    <select value={siret} onChange={e => handleChange(e.target.value)}>
-      {companies.map(c => (
+    <select value={siret} onChange={(e) => handleChange(e.target.value)}>
+      {companies.map((c) => (
         <option key={c.siret} value={c.siret}>
           {c.givenName || c.name} ({c.siret})
         </option>

@@ -13,7 +13,7 @@ export default function AccountFieldNotEditable({
   name,
   label,
   value,
-  tooltip
+  tooltip,
 }: Props) {
   const classes = [styles.field];
 

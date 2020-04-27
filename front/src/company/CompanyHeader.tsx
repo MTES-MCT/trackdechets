@@ -13,7 +13,7 @@ export default function CompanyHeader(props: Props) {
       className="columns"
       style={{
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
       }}
     >
       <div className="company__info">

@@ -4,7 +4,7 @@ import {
   Link,
   RouteComponentProps,
   withRouter,
-  Redirect
+  Redirect,
 } from "react-router-dom";
 import styles from "./Login.module.scss";
 
@@ -18,7 +18,7 @@ export default withRouter(function Login(
   if (queries.error || queries.returnTo) {
     const state = {
       ...(queries.error ? { error: queries.error } : {}),
-      ...(queries.returnTo ? { returnTo: queries.returnTo } : {})
+      ...(queries.returnTo ? { returnTo: queries.returnTo } : {}),
     };
     return <Redirect to={{ pathname: "/login", state }} />;
   }

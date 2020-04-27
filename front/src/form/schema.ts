@@ -7,14 +7,14 @@ import {
   boolean,
   setLocale,
   LocaleObject,
-  StringSchema
+  StringSchema,
 } from "yup";
 import { WasteAcceptationStatus } from "../Constants";
 
 setLocale({
   mixed: {
-    notType: "Ce champ ne peut pas être nul"
-  }
+    notType: "Ce champ ne peut pas être nul",
+  },
 } as LocaleObject);
 
 const companySchema = object().shape({
@@ -25,7 +25,7 @@ const companySchema = object().shape({
   phone: string().required("Le téléphone de l'entreprise est obligatoire"),
   mail: string()
     .email("Le format d'adresse email est incorrect")
-    .required("L'email est obligatoire")
+    .required("L'email est obligatoire"),
 });
 
 const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
@@ -39,9 +39,9 @@ export const formSchema = object().shape({
       address: string().nullable(),
       city: string().nullable(),
       postalCode: string().nullable(),
-      infos: string().nullable()
+      infos: string().nullable(),
     }).nullable(),
-    company: companySchema
+    company: companySchema,
   }),
   recipient: object().shape({
     processingOperation: string()
@@ -52,7 +52,7 @@ export const formSchema = object().shape({
         (v: string) => v !== ""
       ),
     cap: string().nullable(true),
-    company: companySchema
+    company: companySchema,
   }),
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(true),
@@ -74,7 +74,7 @@ export const formSchema = object().shape({
     ),
     validityLimit: date().nullable(true),
     numberPlate: string().nullable(true),
-    company: companySchema
+    company: companySchema,
   }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
@@ -94,8 +94,8 @@ export const formSchema = object().shape({
     consistence: string().matches(
       /(SOLID|LIQUID|GASEOUS)/,
       "La consistance du déchet doit être précisée"
-    )
-  })
+    ),
+  }),
 });
 
 export const receivedFormSchema = object().shape({
@@ -104,7 +104,7 @@ export const receivedFormSchema = object().shape({
   wasteAcceptationStatus: string().oneOf([
     WasteAcceptationStatus.ACCEPTED,
     WasteAcceptationStatus.REFUSED,
-    WasteAcceptationStatus.PARTIALLY_REFUSED
+    WasteAcceptationStatus.PARTIALLY_REFUSED,
   ]),
   quantityReceived: number()
     .required("Le champ est requis et doit être un nombre")
@@ -113,7 +113,7 @@ export const receivedFormSchema = object().shape({
         ? schema.test(
             "is-zero",
             "Le champ doit être à 0 si le déchet est refusé",
-            v => v === 0
+            (v) => v === 0
           )
         : schema.moreThan(0, "Le champ doit être un nombre supérieur à 0")
     ),
@@ -126,7 +126,7 @@ export const receivedFormSchema = object().shape({
         : schema.test(
             "is-empty",
             "Le champ ne doit pas être renseigné si le déchet est accepté",
-            v => !v
+            (v) => !v
           )
-  )
+  ),
 });

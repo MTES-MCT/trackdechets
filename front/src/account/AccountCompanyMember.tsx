@@ -27,7 +27,7 @@ AccountCompanyMember.fragments = {
       isActive
       isPendingInvitation
     }
-  `
+  `,
 };
 
 const REMOVE_USER_FROM_COMPANY = gql`
@@ -61,18 +61,16 @@ const RESEND_INVITATION = gql`
 `;
 
 export default function AccountCompanyMember({ company, user }: Props) {
-  const [removeUserFromCompany] = useMutation(
-    REMOVE_USER_FROM_COMPANY
-  );
+  const [removeUserFromCompany] = useMutation(REMOVE_USER_FROM_COMPANY);
   const [deleteInvitation] = useMutation(DELETE_INVITATION, {
     onCompleted: () => {
       cogoToast.success("Invitation supprimée", { hideAfter: 5 });
     },
     onError: () => {
       cogoToast.error("L'invitation n'a pas pu être supprimée", {
-        hideAfter: 5
+        hideAfter: 5,
       });
-    }
+    },
   });
   const [resendInvitation] = useMutation(RESEND_INVITATION, {
     onCompleted: () => {
@@ -80,9 +78,9 @@ export default function AccountCompanyMember({ company, user }: Props) {
     },
     onError: () => {
       cogoToast.error("L'invitation n'a pas pu être renvoyée", {
-        hideAfter: 5
+        hideAfter: 5,
       });
-    }
+    },
   });
   return (
     <>
@@ -107,7 +105,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
               className="button"
               onClick={() => {
                 removeUserFromCompany({
-                  variables: { siret: company.siret, userId: user.id }
+                  variables: { siret: company.siret, userId: user.id },
                 });
               }}
             >
@@ -122,7 +120,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 className="button small"
                 onClick={() => {
                   deleteInvitation({
-                    variables: { email: user.email, siret: company.siret }
+                    variables: { email: user.email, siret: company.siret },
                   });
                 }}
               >
@@ -134,7 +132,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 className="button small"
                 onClick={() => {
                   resendInvitation({
-                    variables: { email: user.email, siret: company.siret }
+                    variables: { email: user.email, siret: company.siret },
                   });
                 }}
               >

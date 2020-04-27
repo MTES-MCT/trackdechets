@@ -15,7 +15,7 @@ type Installation = {
 
 export enum UserRole {
   ADMIN = "ADMIN",
-  MEMBER = "MEMBER"
+  MEMBER = "MEMBER",
 }
 
 export type CompanyMember = {
@@ -54,7 +54,7 @@ export enum Link {
   Info = "Information",
   Security = "Sécurité",
   Members = "Membres",
-  CompanyPage = "Fiche Entreprise"
+  CompanyPage = "Fiche Entreprise",
 }
 
 AccountCompany.fragments = {
@@ -73,7 +73,7 @@ AccountCompany.fragments = {
     ${AccountCompanySecurity.fragments.company}
     ${AccountCompanyMemberList.fragments.company}
     ${AccountCompanyPage.fragments.company}
-  `
+  `,
 };
 
 export default function AccountCompany({ company }: Props) {

@@ -24,12 +24,12 @@ export default function AccountFormSimpleInput<T>({
   mutation,
   mutationArgs = {},
   yupSchema = Yup.object(),
-  toggleEdition
+  toggleEdition,
 }: Props) {
   const [update, { loading }] = useMutation(mutation, {
     onCompleted: () => {
       toggleEdition();
-    }
+    },
   });
 
   const initialValues = {} as T;

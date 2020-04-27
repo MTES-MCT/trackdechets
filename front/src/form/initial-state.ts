@@ -4,7 +4,7 @@ const initialCompany = {
   address: "",
   contact: "",
   mail: "",
-  phone: ""
+  phone: "",
 };
 
 const initialTransporter = {
@@ -13,7 +13,7 @@ const initialTransporter = {
   department: "",
   validityLimit: null,
   numberPlate: "",
-  company: initialCompany
+  company: initialCompany,
 };
 
 export default {
@@ -24,22 +24,22 @@ export default {
       address: "",
       city: "",
       postalCode: "",
-      infos: ""
+      infos: "",
     },
-    company: initialCompany
+    company: initialCompany,
   },
   recipient: {
     cap: "",
     processingOperation: "",
     isTempStorage: false,
-    company: initialCompany
+    company: initialCompany,
   },
   transporter: initialTransporter,
   trader: {
     receipt: "",
     department: "",
     validityLimit: null,
-    company: initialCompany
+    company: initialCompany,
   },
   wasteDetails: {
     code: "",
@@ -50,7 +50,7 @@ export default {
     numberOfPackages: null,
     quantity: null,
     quantityType: "ESTIMATED",
-    consistence: "SOLID"
+    consistence: "SOLID",
   },
   appendix2Forms: [],
   ecoOrganisme: {},
@@ -58,7 +58,7 @@ export default {
     destination: {
       company: initialCompany,
       cap: "",
-      processingOperation: ""
-    }
-  }
+      processingOperation: "",
+    },
+  },
 };

@@ -29,14 +29,14 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
   const [changePassword, { loading }] = useMutation(CHANGE_PASSWORD, {
     onCompleted: () => {
       toggleEdition();
-    }
+    },
   });
 
   const validate = (values: V) => {
     if (values.newPassword !== values.newPasswordConfirmation) {
       return {
         newPasswordConfirmation:
-          "Les deux mots de passe ne sont pas identiques."
+          "Les deux mots de passe ne sont pas identiques.",
       };
     }
   };
@@ -44,13 +44,13 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
   const yupSchema = object().shape({
     oldPassword: string().required(),
     newPassword: string().required(),
-    newPasswordConfirmation: string().required()
+    newPasswordConfirmation: string().required(),
   });
 
   const initialValues: V = {
     oldPassword: "",
     newPassword: "",
-    newPasswordConfirmation: ""
+    newPasswordConfirmation: "",
   };
 
   return (

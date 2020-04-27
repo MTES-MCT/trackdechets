@@ -14,7 +14,7 @@ import * as Sentry from "@sentry/browser";
 const { REACT_APP_SENTRY_DSN } = process.env;
 if (!!REACT_APP_SENTRY_DSN) {
   Sentry.init({ dsn: REACT_APP_SENTRY_DSN });
-  Sentry.configureScope(scope => scope.setTag("service", "frontend")); // tell apart logs from our different services
+  Sentry.configureScope((scope) => scope.setTag("service", "frontend")); // tell apart logs from our different services
 }
 
 const rootElement = document.getElementById("root");

@@ -18,7 +18,7 @@ AccountFielCompanyContactEmail.fragments = {
       contactEmail
       userRole
     }
-  `
+  `,
 };
 
 const UPDATE_CONTACT_EMAIL = gql`
@@ -32,7 +32,7 @@ const UPDATE_CONTACT_EMAIL = gql`
 `;
 
 const yupSchema = object().shape({
-  contactEmail: string().email()
+  contactEmail: string().email(),
 });
 
 export default function AccountFielCompanyContactEmail({ company }: Props) {
@@ -46,7 +46,7 @@ export default function AccountFielCompanyContactEmail({ company }: Props) {
           name={fieldName}
           label={fieldLabel}
           value={company.contactEmail}
-          renderForm={toggleEdition => (
+          renderForm={(toggleEdition) => (
             <AccountFormSimpleInput<{ contactEmail: string }>
               name="contactEmail"
               type="email"

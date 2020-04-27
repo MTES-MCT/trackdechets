@@ -5,7 +5,7 @@ import AccountFieldCompanyTypes from "./fields/AccountFieldCompanyTypes";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
 import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
-  tooltip as givenNameTooltip
+  tooltip as givenNameTooltip,
 } from "./fields/AccountFieldCompanyGivenName";
 import { Company, UserRole } from "./AccountCompany";
 
@@ -30,7 +30,7 @@ AccountCompanyInfo.fragments = {
     ${AccountFieldCompanyTypes.fragments.company}
     ${AccountFieldCompanyGerepId.fragments.company}
     ${AccountFieldCompanyGivenName.fragments.company}
-  `
+  `,
 };
 
 export default function AccountCompanyInfo({ company }: Props) {

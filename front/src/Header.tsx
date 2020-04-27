@@ -3,7 +3,7 @@ import {
   NavLink,
   Link,
   withRouter,
-  RouteComponentProps
+  RouteComponentProps,
 } from "react-router-dom";
 import { trackEvent } from "./tracker";
 import "./Header.scss";
@@ -15,7 +15,7 @@ type Props = {
 
 export default withRouter(function Header({
   history,
-  isAuthenticated
+  isAuthenticated,
 }: RouteComponentProps & Props) {
   const { REACT_APP_API_ENDPOINT, REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
 

@@ -45,11 +45,11 @@ const COMPANY_INFOS = gql`
 `;
 
 export default function CompanyInfo({
-  match
+  match,
 }: RouteComponentProps<{ siret: string }>) {
   const { data, loading, error } = useQuery(COMPANY_INFOS, {
     variables: { siret: match.params.siret },
-    fetchPolicy: "no-cache"
+    fetchPolicy: "no-cache",
   });
 
   if (loading) return <p>Loading...</p>;

@@ -7,13 +7,13 @@ export function useAuth() {
   useEffect(() => {
     const GETisAuthenticated = `${process.env.REACT_APP_API_ENDPOINT}/isAuthenticated`;
     fetch(GETisAuthenticated, { credentials: "include" })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         const { isAuthenticated } = data;
         setIsAuthenticated(isAuthenticated);
         setIsLoading(false);
       })
-      .catch(_err => {
+      .catch((_err) => {
         setIsAuthenticated(false);
         setIsLoading(false);
       });

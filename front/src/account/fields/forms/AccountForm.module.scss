@@ -1,4 +1,3 @@
-
 .input__group {
   display: flex;
   flex-direction: row;
@@ -12,14 +11,13 @@
 .icon {
   width: 1.3em;
   height: auto;
-  color: var(--blue)
+  color: var(--blue);
 }
 
 .icon:hover {
-  cursor: pointer
+  cursor: pointer;
 }
 
 .input {
   min-width: 400px;
 }
-

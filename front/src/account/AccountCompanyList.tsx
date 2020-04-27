@@ -16,7 +16,7 @@ AccountCompanyList.fragments = {
       ...AccountCompanyFragment
     }
     ${AccountCompany.fragments.company}
-  `
+  `,
 };
 
 export default function AccountCompanyList({ companies }: Props) {
@@ -26,7 +26,7 @@ export default function AccountCompanyList({ companies }: Props) {
   return (
     <>
       {companies.length ? (
-        companies.map(company => (
+        companies.map((company) => (
           <AccountCompany
             key={company.siret}
             company={filter(AccountCompany.fragments.company, company)}

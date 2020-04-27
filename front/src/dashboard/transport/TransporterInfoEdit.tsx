@@ -40,17 +40,17 @@ export default function TransporterInfoEdit({ form, fieldName, title }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const [updateTransporterPlate, { error }] = useMutation(UPDATE_PLATE, {
-    onCompleted: () => setIsOpen(false)
+    onCompleted: () => setIsOpen(false),
   });
   const formik = useFormik({
     initialValues: {
-      [fieldName]: form.transporter[fieldName]
+      [fieldName]: form.transporter[fieldName],
     },
-    onSubmit: values => {
+    onSubmit: (values) => {
       updateTransporterPlate({
-        variables: { id: form.id, [mutationFieldName]: values[fieldName] }
+        variables: { id: form.id, [mutationFieldName]: values[fieldName] },
       });
-    }
+    },
   });
 
   if (form.status !== "SEALED") {
@@ -69,7 +69,7 @@ export default function TransporterInfoEdit({ form, fieldName, title }: Props) {
         className="modal__backdrop"
         id="modal"
         style={{
-          display: isOpen ? "flex" : "none"
+          display: isOpen ? "flex" : "none",
         }}
       >
         <div className="modal">
