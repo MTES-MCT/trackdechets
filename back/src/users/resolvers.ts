@@ -17,7 +17,7 @@ import { apiKey } from "./queries";
 
 export default {
   Mutation: {
-    signup,
+    signup: (_parent, { userInfos }) => signup(userInfos),
     login: async (_parent, { email, password }) => login(email, password),
     changePassword: async (_, { oldPassword, newPassword }, context) => {
       const userId = context.user.id;
