@@ -86,14 +86,13 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
 
 const formSiretsGetter = (
   form: Partial<Form> & { ecoOrganisme?: { siret: string } }
-) =>
-  [
-    form.emitterCompanySiret,
-    form.traderCompanySiret,
-    form.recipientCompanySiret,
-    form.transporterCompanySiret,
-    form.ecoOrganisme?.siret
-  ].filter(Boolean);
+) => [
+  form.emitterCompanySiret,
+  form.traderCompanySiret,
+  form.recipientCompanySiret,
+  form.transporterCompanySiret,
+  form.ecoOrganisme?.siret
+];
 
 async function checkThatUserIsPartOftheForm(
   userId: string,
