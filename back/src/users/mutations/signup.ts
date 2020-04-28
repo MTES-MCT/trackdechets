@@ -4,23 +4,31 @@ import { User, prisma } from "../../generated/prisma-client";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
 import { UserInputError } from "apollo-server-express";
+import { SignupInput } from "../../generated/types";
 
-export default async function signup(_, { userInfos }) {
-  const hashedPassword = await hashPassword(userInfos.password);
-  const user = await prisma
-    .createUser({
-      name: userInfos.name,
-      email: userInfos.email,
-      password: hashedPassword,
-      phone: userInfos.phone
-    })
-    .catch(__ => null);
+export default async function signup({
+  name,
+  email,
+  password,
+  phone
+}: SignupInput) {
+  // check user does not exist
+  const userExists = await prisma.$exists.user({ email });
 
-  if (!user) {
-    return new UserInputError(
-      "Impossible de créer cet utilisateur. Cet email a déjà un compte associé ou le mot de passe est vide."
+  if (userExists) {
+    throw new UserInputError(
+      "Impossible de créer cet utilisateur. Cet email a déjà un compte"
     );
   }
+
+  const hashedPassword = await hashPassword(password);
+
+  const user = await prisma.createUser({
+    name,
+    email,
+    password: hashedPassword,
+    phone
+  });
 
   const userActivationHash = await createActivationHash(user);
   await acceptNewUserCompanyInvitations(user);
@@ -41,16 +49,12 @@ async function createActivationHash(user: User) {
     new Date().valueOf().toString() + Math.random().toString(),
     10
   );
-  return prisma
-    .createUserActivationHash({
-      hash: activationHash,
-      user: {
-        connect: { id: user.id }
-      }
-    })
-    .catch(_ => {
-      throw new Error("Erreur technique. Le support a été informé.");
-    });
+  return prisma.createUserActivationHash({
+    hash: activationHash,
+    user: {
+      connect: { id: user.id }
+    }
+  });
 }
 
 /**
