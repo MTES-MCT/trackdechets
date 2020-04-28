@@ -19,6 +19,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@graphql-toolkit/file-loading": "^0.10.5",
+    "@graphql-toolkit/schema-merging": "^0.10.5",
     "@sentry/integrations": "^5.8.0",
     "@sentry/node": "^5.8.0",
     "apollo-server-express": "^2.9.13",
@@ -38,7 +40,6 @@
     "graphql-middleware-sentry": "^3.2.1",
     "graphql-shield": "^7.0.12",
     "ioredis": "^4.15.0",
-    "merge-graphql-schemas": "1.7.3",
     "minimist": "^1.2.5",
     "oauth2orize": "^1.11.0",
     "passport": "^0.4.1",
