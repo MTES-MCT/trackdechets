@@ -39,8 +39,7 @@ const users = [
     caption: "Séché Environnement",
     image: "/img/partners-logos/seche.png",
     pinned: true
-  }
-  ,
+  },
   {
     caption: "Caktus",
     image: "/img/partners-logos/caktus.png",
@@ -49,6 +48,11 @@ const users = [
   {
     caption: "Sarp Veolia",
     image: "/img/partners-logos/sarp.png",
+    pinned: true
+  },
+  {
+    caption: "Colleco",
+    image: "/img/partners-logos/colleco.png",
     pinned: true
   }
 ];
