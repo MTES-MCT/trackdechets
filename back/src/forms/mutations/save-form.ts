@@ -106,6 +106,13 @@ async function checkThatUserIsPartOftheForm(
     formSirets.push(...savedFormSirets);
   }
 
+  const ecoOrganisme = await context.prisma
+    .form({ id: form.id })
+    .ecoOrganisme();
+  if (ecoOrganisme) {
+    formSirets.push(ecoOrganisme.siret);
+  }
+
   const userCompanies = await getUserCompanies(userId);
   const userSirets = userCompanies.map(c => c.siret);
 
