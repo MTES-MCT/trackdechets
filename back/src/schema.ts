@@ -11,8 +11,6 @@ import formsShields from "./forms/shield-tree";
 // Merge GraphQL schema by merging types, resolvers and shields
 // definitions from differents modules
 
-console.time("merging");
-
 const repositories = ["users", "companies", "forms"];
 
 const typeDefsPath = repositories.map(
@@ -30,7 +28,5 @@ const shieldRulesTree = mergeRulesTrees([
   companiesShields,
   formsShields
 ]);
-
-console.timeEnd("merging");
 
 export { typeDefs, resolvers, shieldRulesTree };
