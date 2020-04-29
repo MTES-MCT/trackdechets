@@ -1,4 +1,4 @@
-import { fileLoader } from "merge-graphql-schemas";
+import { loadFiles } from "@graphql-toolkit/file-loading";
 
 export interface Updater {
   run(): Promise<any>;
@@ -22,7 +22,7 @@ export function registerUpdater(
 }
 
 // Load every uploaders
-fileLoader(`${__dirname}/*.ts`);
+loadFiles(`${__dirname}/*.ts`);
 
 (async () => {
   // Run them one by one
