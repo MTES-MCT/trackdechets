@@ -2575,11 +2575,47 @@ Quantité la plus à jour
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#packagings">Packagings</a>]</td>
+<td>
+
+Packaging le plus à jour
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onuCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ONU le plus à jour
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#formcompany">FormCompany</a></td>
 <td>
 
 Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporterNumberPlate</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de plaque d'immatriculation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporterCustomInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Information libre, destinée aux transporteurs
 
 </td>
 </tr>

@@ -117,10 +117,10 @@ const Table = ({ forms, displayActions }) => {
               <div>{form.wasteDetails.name}</div>
             </td>
             <td className="hide-on-mobile">
-              {form.wasteDetails.quantity} tonnes
+              {form.stateSummary.quantity} tonnes
             </td>
 
-            <td>{form.transporter.customInfo}</td>
+            <td>{form.stateSummary.transporterCustomInfo}</td>
             <td style={{ paddingLeft: 0, paddingRight: 0 }}>
               {
                 <TransporterInfoEdit
@@ -130,7 +130,7 @@ const Table = ({ forms, displayActions }) => {
                 />
               }
             </td>
-            <td>{form.transporter.numberPlate}</td>
+            <td>{form.stateSummary.transporterNumberPlate}</td>
             <td style={{ paddingLeft: 0 }}>
               {
                 <TransporterInfoEdit
@@ -173,7 +173,7 @@ export default function Transport({ siret }: Props & any) {
           (f) =>
             filterStatus.includes(f.status) &&
             filterAgainstPersistenFilter(
-              f.transporter.customInfo,
+              f.stateSummary.transporterCustomInfo,
               persistentFilter
             )
         )

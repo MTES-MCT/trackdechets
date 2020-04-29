@@ -1173,8 +1173,16 @@ export type StateSummary = {
    __typename?: 'StateSummary';
   /** Quantité la plus à jour */
   quantity?: Maybe<Scalars['Float']>;
+  /** Packaging le plus à jour */
+  packagings?: Maybe<Array<Maybe<Packagings>>>;
+  /** Code ONU le plus à jour */
+  onuCode?: Maybe<Scalars['String']>;
   /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
   transporter?: Maybe<FormCompany>;
+  /** Numéro de plaque d'immatriculation */
+  transporterNumberPlate?: Maybe<Scalars['String']>;
+  /** Information libre, destinée aux transporteurs */
+  transporterCustomInfo?: Maybe<Scalars['String']>;
   /** Prochaine entreprise à recevoir le déchet (entreprise en case 2 ou 14) */
   recipient?: Maybe<FormCompany>;
   /** Prochaine entreprise à émettre le déchet (entreprise en case 1 ou 13) */

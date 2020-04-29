@@ -5,6 +5,10 @@ export type Form = {
   status: string;
   stateSummary: {
     quantity: number;
+    packagings: string[];
+    onuCode: string;
+    transporterNumberPlate: string;
+    transporterCustomInfo: string;
     transporter: FormCompany;
     recipient: FormCompany;
     emitter: FormCompany;

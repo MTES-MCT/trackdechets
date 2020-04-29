@@ -122,7 +122,11 @@ const staticFieldsFragment = gql`
     createdAt
     status
     stateSummary {
+      packagings
+      onuCode
       quantity
+      transporterNumberPlate
+      transporterCustomInfo
       transporter {
         name
         siret
