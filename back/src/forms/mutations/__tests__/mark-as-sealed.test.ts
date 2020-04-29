@@ -1,6 +1,6 @@
 import { ErrorCode } from "../../../common/errors";
 import { markAsSealed } from "../mark-as";
-import { getNewValidForm } from "../__mocks__/data";
+import { getNewValidForm, getContext } from "../__mocks__/data";
 import { flattenObjectForDb } from "../../form-converter";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 
@@ -14,22 +14,28 @@ function mockFormWith(value) {
   formMock.mockReturnValue(result);
 }
 
-describe("Forms -> markAsSealed mutation", () => {
-  const prisma = {
-    form: formMock,
-    updateForm: jest.fn(() => Promise.resolve({})),
-    createForm: jest.fn(() => Promise.resolve({})),
-    createStatusLog: jest.fn(() => Promise.resolve({})),
-    updateManyForms: jest.fn(() => Promise.resolve({}))
-  };
+const prisma = {
+  form: formMock,
+  updateForm: jest.fn((...args) => Promise.resolve({})),
+  createForm: jest.fn((...args) => Promise.resolve({})),
+  createStatusLog: jest.fn((...args) => Promise.resolve({})),
+  updateManyForms: jest.fn((...args) => Promise.resolve({}))
+};
 
+jest.mock("../../../generated/prisma-client", () => ({
+  prisma: {
+    form: () => prisma.form(),
+    updateForm: (...args) => prisma.updateForm(...args),
+    createForm: (...args) => prisma.createForm(...args),
+    createStatusLog: (...args) => prisma.createStatusLog(...args),
+    updateManyForms: (...args) => prisma.updateManyForms(...args)
+  }
+}));
+
+describe("Forms -> markAsSealed mutation", () => {
   const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
-  const defaultContext = {
-    prisma,
-    user: { id: "userId" },
-    request: null
-  } as any;
+  const defaultContext = getContext();
 
   beforeEach(() => {
     Object.keys(prisma).forEach(key => prisma[key].mockClear());
@@ -48,7 +54,7 @@ describe("Forms -> markAsSealed mutation", () => {
       ]);
       mockFormWith(flattenObjectForDb(form));
 
-      await markAsSealed(null, { id: 1 }, defaultContext);
+      await markAsSealed({ id: "1" }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
     }
@@ -66,7 +72,7 @@ describe("Forms -> markAsSealed mutation", () => {
       ]);
       mockFormWith(flattenObjectForDb(form));
 
-      await markAsSealed(null, { id: 1 }, defaultContext);
+      await markAsSealed({ id: "1" }, defaultContext);
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
@@ -88,7 +94,7 @@ describe("Forms -> markAsSealed mutation", () => {
       ]);
       mockFormWith(flattenObjectForDb(form));
 
-      await markAsSealed(null, { id: form.id }, defaultContext);
+      await markAsSealed({ id: form.id }, defaultContext);
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
@@ -105,7 +111,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([{ siret: "any siret" } as any]);
       mockFormWith({ id: 1, status: "SENT" });
 
-      await markAsSealed(null, { id: 1 }, defaultContext);
+      await markAsSealed({ id: "1" }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -119,9 +125,9 @@ describe("Forms -> markAsSealed mutation", () => {
       { siret: form.emitter.company.siret } as any
     ]);
     appendix2FormsMock.mockResolvedValue([]);
-    mockFormWith(Promise.resolve(flattenObjectForDb(form)));
+    mockFormWith(flattenObjectForDb(form));
 
-    await markAsSealed(null, { id: 1 }, defaultContext);
+    await markAsSealed({ id: "1" }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
@@ -133,9 +139,9 @@ describe("Forms -> markAsSealed mutation", () => {
     ]);
 
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
-    mockFormWith(Promise.resolve(flattenObjectForDb(form)));
+    mockFormWith(flattenObjectForDb(form));
 
-    await markAsSealed(null, { id: 1 }, defaultContext);
+    await markAsSealed({ id: "1" }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateManyForms).toHaveBeenCalledWith({
       where: {

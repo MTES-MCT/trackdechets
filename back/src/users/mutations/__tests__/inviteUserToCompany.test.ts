@@ -50,12 +50,11 @@ describe("inviteUserToCompany", () => {
 
     const adminUser = { name: "John Snow" } as User;
 
-    await inviteUserToCompany(
-      adminUser,
-      "arya.stark@trackdechets.fr",
-      "85001946400013",
-      "MEMBER"
-    );
+    await inviteUserToCompany(adminUser, {
+      email: "arya.stark@trackdechets.fr",
+      siret: "85001946400013",
+      role: "MEMBER"
+    });
 
     expect(associateUserToCompanyMock).toBeCalledWith(
       "id",
@@ -87,12 +86,11 @@ describe("inviteUserToCompany", () => {
 
     const adminUser = { name: "John Snow" } as User;
 
-    await inviteUserToCompany(
-      adminUser,
-      "arya.stark@trackdechets.fr",
-      "85001946400013",
-      "MEMBER"
-    );
+    await inviteUserToCompany(adminUser, {
+      email: "arya.stark@trackdechets.fr",
+      siret: "85001946400013",
+      role: "MEMBER"
+    });
 
     expect(createUserAccountHashMock).toHaveBeenCalledWith(
       "arya.stark@trackdechets.fr",

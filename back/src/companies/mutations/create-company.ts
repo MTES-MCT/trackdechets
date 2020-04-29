@@ -1,14 +1,16 @@
 import { sendMail } from "../../common/mails.helper";
-import { GraphQLContext } from "../../types";
 import { randomNumber } from "../../utils";
 import { UserInputError } from "apollo-server-express";
 import { User, Company, prisma } from "../../generated/prisma-client";
+import {
+  MutationCreateCompanyArgs,
+  CompanyPrivate
+} from "../../generated/graphql/types";
 
 export default async function createCompany(
-  _,
-  { companyInput },
-  context: GraphQLContext
-) {
+  user: User,
+  { companyInput }: MutationCreateCompanyArgs
+): Promise<CompanyPrivate> {
   const trimedSiret = companyInput.siret.replace(/\s+/g, "");
 
   const existingCompany = await prisma.$exists
@@ -28,7 +30,7 @@ export default async function createCompany(
   }
 
   const companyAssociationPromise = prisma.createCompanyAssociation({
-    user: { connect: { id: context.user.id } },
+    user: { connect: { id: user.id } },
     company: {
       create: {
         siret: trimedSiret,
@@ -44,7 +46,7 @@ export default async function createCompany(
 
   const company = await companyAssociationPromise.company();
 
-  await warnIfUserCreatesTooManyCompanies(context.user, company);
+  await warnIfUserCreatesTooManyCompanies(user, company);
 
   return company;
 }

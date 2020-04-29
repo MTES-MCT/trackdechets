@@ -1,36 +1,47 @@
 import { ErrorCode } from "../../../common/errors";
 import { signedByTransporter } from "../mark-as";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
+import { getContext } from "../__mocks__/data";
+import { TransporterSignatureFormInput } from "../../../generated/graphql/types";
+
+const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+const formMock = jest.fn(() => Promise.resolve({}));
+const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
+function mockFormWith(value) {
+  const result: any = Promise.resolve(value);
+  result.temporaryStorageDetail = temporaryStorageDetailMock;
+  result.appendix2Forms = appendix2FormsMock;
+  formMock.mockReturnValue(result);
+}
+
+const prisma = {
+  form: formMock,
+  updateForm: jest.fn((...args) => Promise.resolve({})),
+  createForm: jest.fn((...args) => Promise.resolve({})),
+  createStatusLog: jest.fn((...args) => Promise.resolve({})),
+  updateManyForms: jest.fn((...args) => Promise.resolve({})),
+  $exists: {
+    company: jest.fn((...args) => Promise.resolve(false))
+  }
+};
+
+jest.mock("../../../generated/prisma-client", () => ({
+  prisma: {
+    form: () => prisma.form(),
+    updateForm: (...args) => prisma.updateForm(...args),
+    createForm: (...args) => prisma.createForm(...args),
+    createStatusLog: (...args) => prisma.createStatusLog(...args),
+    updateManyForms: (...args) => prisma.updateManyForms(...args),
+    $exists: {
+      company: (...args) => prisma.$exists.company(...args)
+    }
+  }
+}));
 
 describe("Forms -> signedByTransporter mutation", () => {
-  const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
-  const formMock = jest.fn(() => Promise.resolve({}));
-  const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
-  function mockFormWith(value) {
-    const result: any = Promise.resolve(value);
-    result.temporaryStorageDetail = temporaryStorageDetailMock;
-    result.appendix2Forms = appendix2FormsMock;
-    formMock.mockReturnValue(result);
-  }
-
-  const prisma = {
-    form: formMock,
-    updateForm: jest.fn(() => Promise.resolve({})),
-    createForm: jest.fn(() => Promise.resolve({})),
-    createStatusLog: jest.fn(() => Promise.resolve({})),
-    updateManyForms: jest.fn(() => Promise.resolve({})),
-    $exists: {
-      company: jest.fn(() => Promise.resolve(false))
-    }
-  };
-
   const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
-  const defaultContext = {
-    prisma,
-    user: { id: "userId" },
-    request: null
-  } as any;
+  const defaultContext = getContext();
 
   beforeEach(() => {
     Object.keys(prisma).forEach(
@@ -50,8 +61,12 @@ describe("Forms -> signedByTransporter mutation", () => {
       });
 
       await signedByTransporter(
-        null,
-        { id: 1, signingInfo: { signedByTransporter: true } },
+        {
+          id: "1",
+          signingInfo: {
+            signedByTransporter: true
+          } as TransporterSignatureFormInput
+        },
         defaultContext
       );
     } catch (err) {
@@ -70,8 +85,12 @@ describe("Forms -> signedByTransporter mutation", () => {
       });
 
       await signedByTransporter(
-        null,
-        { id: 1, signingInfo: { signedByProducer: true } },
+        {
+          id: "1",
+          signingInfo: {
+            signedByProducer: true
+          } as TransporterSignatureFormInput
+        },
         defaultContext
       );
     } catch (err) {
@@ -90,14 +109,13 @@ describe("Forms -> signedByTransporter mutation", () => {
       });
 
       await signedByTransporter(
-        null,
         {
-          id: 1,
+          id: "1",
           signingInfo: {
             signedByProducer: true,
             signedByTransporter: true,
-            securityCode: ""
-          }
+            securityCode: 1234
+          } as TransporterSignatureFormInput
         },
         defaultContext
       );
@@ -117,10 +135,12 @@ describe("Forms -> signedByTransporter mutation", () => {
     prisma.$exists.company.mockResolvedValue(true);
 
     await signedByTransporter(
-      null,
       {
-        id: 1,
-        signingInfo: { signedByProducer: true, signedByTransporter: true }
+        id: "1",
+        signingInfo: {
+          signedByProducer: true,
+          signedByTransporter: true
+        } as TransporterSignatureFormInput
       },
       defaultContext
     );

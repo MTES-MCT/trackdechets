@@ -1,4 +1,5 @@
-import updateCompany, { Payload } from "../updateCompany";
+import updateCompany from "../updateCompany";
+import { MutationUpdateCompanyArgs } from "../../../generated/graphql/types";
 
 const updateCompanyMock = jest.fn();
 jest.mock("../../../generated/prisma-client", () => ({
@@ -12,7 +13,7 @@ describe("updateCompany", () => {
     updateCompanyMock.mockReset();
   });
   it("should call prisma.updateCompany with proper data", async () => {
-    let payload: Payload = {
+    let payload: MutationUpdateCompanyArgs = {
       siret: "85001946400013",
       gerepId: "gerepId"
     };

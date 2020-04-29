@@ -1,14 +1,13 @@
 import { getUserCompanies } from "../../companies/queries";
-import { GraphQLContext } from "../../types";
 import { unflattenObjectFromDb } from "../form-converter";
 import { ForbiddenError } from "apollo-server-express";
+import { prisma, Status } from "../../generated/prisma-client";
+import { QueryFormsArgs, Form } from "../../generated/graphql/types";
 
 export default async function forms(
-  _,
-  { siret, type },
-  context: GraphQLContext
-) {
-  const userId = context.user.id;
+  userId: string,
+  { siret, type }: QueryFormsArgs
+): Promise<Form[]> {
   const userCompanies = await getUserCompanies(userId);
 
   // TODO: require a SIRET if user has several companies ?
@@ -20,6 +19,8 @@ export default async function forms(
   if (!selectedCompany) {
     throw new ForbiddenError("Vous ne pouvez pas consulter les bordereaux.");
   }
+
+  const statusIn: Status[] = ["SEALED", "SENT", "RESEALED", "RESENT"];
 
   const formsFilter = {
     ACTOR: {
@@ -35,7 +36,7 @@ export default async function forms(
       ]
     },
     TRANSPORTER: {
-      status_in: ["SEALED", "SENT", "RESEALED", "RESENT"],
+      status_in: statusIn,
       OR: [
         { transporterCompanySiret: selectedCompany.siret },
         {
@@ -47,7 +48,7 @@ export default async function forms(
     }
   };
 
-  const queriedForms = await context.prisma.forms({
+  const queriedForms = await prisma.forms({
     where: {
       ...formsFilter[type],
       isDeleted: false

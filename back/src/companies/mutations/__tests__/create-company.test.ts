@@ -1,10 +1,9 @@
 import createCompany from "../create-company";
 import { ErrorCode } from "../../../common/errors";
 import { User, Company } from "../../../generated/prisma-client";
+import { GraphQLContext } from "../../../types";
 
-const context = {
-  user: { id: "USER_ID" } as User
-};
+const user = { id: "USER_ID" } as User;
 
 const mockExists = jest.fn();
 const mockCreateCompanyAssociation = jest.fn(() => ({
@@ -32,11 +31,11 @@ describe("Create company resolver", () => {
   it("should throw when company already exists", async () => {
     expect.assertions(1);
 
-    const companyInput = { siret: "a siret" } as Company;
+    const companyInput = { siret: "a siret" };
     mockExists.mockResolvedValueOnce(true);
 
     try {
-      await createCompany(null, { companyInput }, context as any);
+      await createCompany(user, { companyInput });
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
     }
@@ -46,7 +45,7 @@ describe("Create company resolver", () => {
     const companyInput = { siret: "a siret" };
     mockExists.mockResolvedValueOnce(false);
 
-    await createCompany(null, { companyInput }, context as any);
+    await createCompany(user, { companyInput });
 
     expect(mockCreateCompanyAssociation).toHaveBeenCalledTimes(1);
   });

@@ -4,6 +4,7 @@ import {
   unflattenObjectFromDb
 } from "../form-converter";
 import { getReadableId } from "../readable-id";
+import { MutationDuplicateFormArgs, Form } from "../../generated/graphql/types";
 
 /**
  * Duplicate the content of a form into a new DRAFT form
@@ -12,7 +13,10 @@ import { getReadableId } from "../readable-id";
  * @param formId
  * @param userId
  */
-export async function duplicateForm(formId: string, userId: string) {
+export async function duplicateForm(
+  userId: string,
+  { id: formId }: MutationDuplicateFormArgs
+): Promise<Form> {
   const existingForm = await prisma.form({
     id: formId
   });

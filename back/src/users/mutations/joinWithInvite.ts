@@ -1,15 +1,19 @@
 import { prisma } from "../../generated/prisma-client";
+import {
+  MutationJoinWithInviteArgs,
+  User
+} from "../../generated/graphql/types";
 import { hashPassword } from "../utils";
 
-export async function joinWithInvite(
-  inviteHash: string,
-  name: string,
-  password: string
-) {
+export async function joinWithInvite({
+  inviteHash,
+  name,
+  password
+}: MutationJoinWithInviteArgs): Promise<User> {
   const existingHash = await prisma.userAccountHash({ hash: inviteHash });
 
   if (!existingHash) {
-    return new Error(
+    throw new Error(
       `Cette invitation n'est plus valable. Contactez le responsable de votre société.`
     );
   }

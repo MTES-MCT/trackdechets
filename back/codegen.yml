@@ -1,9 +1,14 @@
 overwrite: true
-schema: "./src/**/*.graphql"
+schema: ./src/**/*.graphql
 generates:
-  src/generated/types.ts:
+  src/generated/graphql/types.ts:
     plugins:
-      - "typescript"
+      - typescript
+      - typescript-resolvers
+    config:
+      contextType: ../../types#GraphQLContext
+      enumsAsTypes: true
   documentation/api-reference.md:
     plugins:
       - graphql-markdown-plugin.js
+

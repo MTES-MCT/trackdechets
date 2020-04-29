@@ -9,6 +9,7 @@ import {
   Consistence,
   EmitterType,
   QuantityType,
+  Status,
   prisma
 } from "../../../generated/prisma-client";
 
@@ -64,7 +65,7 @@ const appendixFormData = {
   traderCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "signe",
-  status: "GROUPED",
+  status: "GROUPED" as Status,
   wasteRefusalReason: "",
   recipientCompanySiret: "5678",
   transporterCompanyMail: "transporter@td.io",
@@ -139,7 +140,7 @@ const groupingFormData = {
   traderCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "sender",
-  status: "SENT",
+  status: "SENT" as Status,
   wasteRefusalReason: "",
   recipientCompanySiret: "9999",
   transporterCompanyMail: "transporter@td.io",

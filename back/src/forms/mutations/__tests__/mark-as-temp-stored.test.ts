@@ -1,36 +1,46 @@
-import { getNewValidForm } from "../__mocks__/data";
+import { getNewValidForm, getContext } from "../__mocks__/data";
 import { markAsTempStored } from "../mark-as";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";
 import { flattenObjectForDb } from "../../form-converter";
+import {
+  TempStoredFormInput,
+  WasteAcceptationStatusInput
+} from "../../../generated/graphql/types";
+
+const formMock = jest.fn();
+const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
+function mockFormWith(value) {
+  const result: any = Promise.resolve(value);
+  result.temporaryStorageDetail = temporaryStorageDetailMock;
+  result.appendix2Forms = appendix2FormsMock;
+  formMock.mockReturnValue(result);
+}
+
+const prisma = {
+  form: formMock,
+  updateForm: jest.fn((...args) => Promise.resolve({})),
+  createForm: jest.fn((...args) => Promise.resolve({})),
+  createStatusLog: jest.fn((...args) => Promise.resolve({})),
+  updateManyForms: jest.fn((...args) => Promise.resolve({}))
+};
+
+jest.mock("../../../generated/prisma-client", () => ({
+  prisma: {
+    form: () => prisma.form(),
+    updateForm: (...args) => prisma.updateForm(...args),
+    createForm: (...args) => prisma.createForm(...args),
+    createStatusLog: (...args) => prisma.createStatusLog(...args),
+    updateManyForms: (...args) => prisma.updateManyForms(...args)
+  }
+}));
 
 describe("Forms -> markAsTempStored mutation", () => {
-  const formMock = jest.fn();
-  const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
-  const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
-  function mockFormWith(value) {
-    const result: any = Promise.resolve(value);
-    result.temporaryStorageDetail = temporaryStorageDetailMock;
-    result.appendix2Forms = appendix2FormsMock;
-    formMock.mockReturnValue(result);
-  }
-
-  const prisma = {
-    form: formMock,
-    updateForm: jest.fn(() => Promise.resolve({})),
-    createForm: jest.fn(() => Promise.resolve({})),
-    createStatusLog: jest.fn(() => Promise.resolve({})),
-    updateManyForms: jest.fn(() => Promise.resolve({}))
-  };
-
   const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
 
-  const defaultContext = {
-    prisma,
-    user: { id: "userId" },
-    request: null
-  } as any;
+  const defaultContext = getContext();
 
   beforeEach(() => {
     getUserCompaniesMock.mockReset();
@@ -45,8 +55,7 @@ describe("Forms -> markAsTempStored mutation", () => {
       mockFormWith({ id: 1, status: FormState.Draft });
 
       await markAsTempStored(
-        null,
-        { id: 1, tempStoredInfos: {} },
+        { id: "1", tempStoredInfos: {} as TempStoredFormInput },
         defaultContext
       );
     } catch (err) {
@@ -65,9 +74,14 @@ describe("Forms -> markAsTempStored mutation", () => {
 
     mockFormWith(flattenObjectForDb(form));
 
+    const ACCEPTED: WasteAcceptationStatusInput = "ACCEPTED";
     await markAsTempStored(
-      null,
-      { id: 1, tempStoredInfos: { wasteAcceptationStatus: "ACCEPTED" } },
+      {
+        id: "1",
+        tempStoredInfos: {
+          wasteAcceptationStatus: ACCEPTED
+        } as TempStoredFormInput
+      },
       defaultContext
     );
 
@@ -90,9 +104,14 @@ describe("Forms -> markAsTempStored mutation", () => {
 
     mockFormWith(flattenObjectForDb(form));
 
+    const REFUSED: WasteAcceptationStatusInput = "REFUSED";
     await markAsTempStored(
-      null,
-      { id: 1, tempStoredInfos: { wasteAcceptationStatus: "REFUSED" } },
+      {
+        id: "1",
+        tempStoredInfos: {
+          wasteAcceptationStatus: REFUSED
+        } as TempStoredFormInput
+      },
       defaultContext
     );
 

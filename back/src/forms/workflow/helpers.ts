@@ -1,4 +1,4 @@
-import { Form } from "../../generated/prisma-client";
+import { Form, prisma } from "../../generated/prisma-client";
 import { GraphQLContext } from "../../types";
 import { unflattenObjectFromDb } from "../form-converter";
 import { logStatusChange } from "../mutations/mark-as";
@@ -12,29 +12,23 @@ export async function validateForm(form: Form) {
 
 export async function validateSecurityCode(
   siret: string,
-  securityCode: number,
-  requestContext: GraphQLContext
+  securityCode: number
 ) {
-  const exists = await requestContext.prisma.$exists.company({
+  const exists = await prisma.$exists.company({
     siret,
     securityCode
   });
   return exists ? Promise.resolve() : Promise.reject();
 }
 
-export async function markFormAppendixAwaitingFormsAsGrouped(
-  formId: string,
-  requestContext: GraphQLContext
-) {
-  const appendix2Forms = await requestContext.prisma
-    .form({ id: formId })
-    .appendix2Forms();
+export async function markFormAppendixAwaitingFormsAsGrouped(formId: string) {
+  const appendix2Forms = await prisma.form({ id: formId }).appendix2Forms();
 
   if (!appendix2Forms.length) {
     return;
   }
 
-  return requestContext.prisma.updateManyForms({
+  return prisma.updateManyForms({
     where: {
       status: "AWAITING_GROUP",
       OR: appendix2Forms.map(f => ({ id: f.id }))
@@ -47,9 +41,7 @@ export async function markFormAppendixGroupedsAsProcessed(
   formId: string,
   requestContext: GraphQLContext
 ) {
-  const appendix2Forms = await requestContext.prisma
-    .form({ id: formId })
-    .appendix2Forms();
+  const appendix2Forms = await prisma.form({ id: formId }).appendix2Forms();
 
   if (appendix2Forms.length) {
     await Promise.all(
@@ -57,7 +49,7 @@ export async function markFormAppendixGroupedsAsProcessed(
         logStatusChange(f.id, "PROCESSED", requestContext, "", {})
       )
     );
-    await requestContext.prisma.updateManyForms({
+    await prisma.updateManyForms({
       where: { OR: appendix2Forms.map(f => ({ id: f.id })) },
       data: { status: "PROCESSED" }
     });
