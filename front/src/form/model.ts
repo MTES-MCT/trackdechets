@@ -4,7 +4,11 @@ export type Form = {
   readableId: string;
   status: string;
   stateSummary: {
-    quantity: number;
+    wasteVaryingDetails: {
+      quantity: number;
+      packagings: string[];
+      onuCode: string;
+    };
     transporter: FormCompany;
     recipient: FormCompany;
     emitter: FormCompany;

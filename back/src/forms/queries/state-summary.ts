@@ -12,7 +12,7 @@ export const stateSummary = async (
     .temporaryStorageDetail();
 
   return {
-    quantity: getQuantity(parent, temporaryStorageDetail),
+    wasteVaryingDetails: getWasteVaryingDetails(parent, temporaryStorageDetail),
     transporter: getTransporter(parent, temporaryStorageDetail),
     recipient: getRecipient(parent, temporaryStorageDetail),
     emitter: getEmitter(parent, temporaryStorageDetail),
@@ -99,6 +99,20 @@ function getLastActionOn(
     default:
       return form.createdAt;
   }
+}
+
+function getWasteVaryingDetails(
+  form: Form,
+  temporaryStorageDetail: TemporaryStorageDetail
+) {
+  return {
+    quantity: getQuantity(form, temporaryStorageDetail),
+    packagings:
+      temporaryStorageDetail?.wasteDetailsPackagings ??
+      form.wasteDetails.packagings,
+    onuCode:
+      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails.onuCode
+  };
 }
 
 function getQuantity(

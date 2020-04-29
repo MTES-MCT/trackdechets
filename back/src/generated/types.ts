@@ -1171,8 +1171,8 @@ export type Stat = {
  */
 export type StateSummary = {
    __typename?: 'StateSummary';
-  /** Quantité la plus à jour */
-  quantity?: Maybe<Scalars['Float']>;
+  /** Infos variables du détail du déchet */
+  wasteVaryingDetails?: Maybe<WasteVaryingDetails>;
   /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
   transporter?: Maybe<FormCompany>;
   /** Prochaine entreprise à recevoir le déchet (entreprise en case 2 ou 14) */
@@ -1465,6 +1465,16 @@ export enum WasteType {
   /** Déchet dangereux */
   Dangerous = 'DANGEROUS'
 }
+
+export type WasteVaryingDetails = {
+   __typename?: 'WasteVaryingDetails';
+  /** Quantité la plus à jour */
+  quantity?: Maybe<Scalars['Float']>;
+  /** Packaging le plus à jour */
+  packagings?: Maybe<Array<Maybe<Packagings>>>;
+  /** Code ONU le plus à jour */
+  onuCode?: Maybe<Scalars['String']>;
+};
 
 /** Informations sur une adresse chantier */
 export type WorkSite = {

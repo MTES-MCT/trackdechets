@@ -346,8 +346,8 @@ En fonction du statut du bordereau, différentes informations sont à lire pour 
 Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
 """
 type StateSummary {
-  "Quantité la plus à jour"
-  quantity: Float
+  "Infos variables du détail du déchet"
+  wasteVaryingDetails: WasteVaryingDetails
 
   "Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)"
   transporter: FormCompany
@@ -360,6 +360,17 @@ type StateSummary {
 
   "Date de la dernière action sur le bordereau"
   lastActionOn: DateTime
+}
+
+type WasteVaryingDetails {
+  "Quantité la plus à jour"
+  quantity: Float
+
+  "Packaging le plus à jour"
+  packagings: [Packagings]
+
+  "Code ONU le plus à jour"
+  onuCode: String
 }
 
 "Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant"

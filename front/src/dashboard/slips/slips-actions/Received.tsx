@@ -114,7 +114,7 @@ export default function Received(props: SlipActionProps) {
                 />
                 <FieldError fieldError={errors.quantityReceived} />
                 <span>
-                  Poids indicatif émis: {props.form.stateSummary.quantity}{" "}
+                  Poids indicatif émis: {props.form.stateSummary.wasteVaryingDetails.quantity}{" "}
                   tonnes
                 </span>
               </label>
