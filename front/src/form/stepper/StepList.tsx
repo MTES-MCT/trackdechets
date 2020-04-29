@@ -166,6 +166,8 @@ export function getComputedState(initialState, actualForm) {
     return initialState;
   }
 
+  const startingObject = actualForm.id ? { id: actualForm.id } : {};
+
   return Object.keys(initialState).reduce((prev, curKey) => {
     const initialValue = initialState[curKey];
     if (
@@ -179,5 +181,5 @@ export function getComputedState(initialState, actualForm) {
     }
 
     return prev;
-  }, {});
+  }, startingObject);
 }
