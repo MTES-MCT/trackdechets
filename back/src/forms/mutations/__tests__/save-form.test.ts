@@ -5,10 +5,12 @@ import * as queries from "../../../companies/queries";
 
 describe("Forms -> saveForm mutation", () => {
   const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+  const ecoOrganismeMock = jest.fn(() => Promise.resolve(null));
   const formMock = jest.fn(() => Promise.resolve({}));
   function mockFormWith(value) {
     const result: any = Promise.resolve(value);
     result.temporaryStorageDetail = temporaryStorageDetailMock;
+    result.ecoOrganisme = ecoOrganismeMock;
     formMock.mockReturnValue(result);
   }
 
@@ -29,6 +31,9 @@ describe("Forms -> saveForm mutation", () => {
   });
 
   it("should fail when creating a form the current user is not part of", async () => {
+    expect.assertions(1);
+    mockFormWith(null);
+
     const formInput = {
       emitterCompanySiret: "an unknown siret",
       traderCompanySiret: "an unknown siret",
@@ -42,14 +47,15 @@ describe("Forms -> saveForm mutation", () => {
         user: { id: "userId" },
         request: null
       } as any);
-
-      expect("Should throw").toBe("Error");
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
 
   it("should fail when editing a form the current user is not part of", async () => {
+    expect.assertions(1);
+    mockFormWith(null);
+
     const formInput = {
       id: "existing id",
       emitterCompanySiret: "an unknown siret",
@@ -64,8 +70,6 @@ describe("Forms -> saveForm mutation", () => {
         user: { id: "userId" },
         request: null
       } as any);
-
-      expect("Should throw").toBe("Error");
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -88,7 +92,26 @@ describe("Forms -> saveForm mutation", () => {
     expect(result).not.toBeNull();
   });
 
+  it("should work when editing a form the current user is eco-organisme, with partial input", async () => {
+    const formInput = {
+      id: "existing id"
+      // No siret infos
+    };
+
+    ecoOrganismeMock.mockResolvedValueOnce({ siret: "user siret" });
+    mockFormWith({});
+
+    const result = await saveForm(null, { formInput }, {
+      prisma,
+      user: { id: "userId" },
+      request: null
+    } as any);
+
+    expect(result).not.toBeNull();
+  });
+
   it("should fail when editing a form the current user is not part of, with partial input", async () => {
+    expect.assertions(1);
     const formInput = {
       id: "existing id"
       // No siret infos
@@ -104,14 +127,15 @@ describe("Forms -> saveForm mutation", () => {
         user: { id: "userId" },
         request: null
       } as any);
-
-      expect("Should throw").toBe("Error");
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
 
   it("should fail when creating a form the current user is not part of, with partial input", async () => {
+    expect.assertions(1);
+    mockFormWith(null);
+
     const formInput = {
       // No id
       // No siret infos
@@ -123,8 +147,6 @@ describe("Forms -> saveForm mutation", () => {
         user: { id: "userId" },
         request: null
       } as any);
-
-      expect("Should throw").toBe("Error");
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }

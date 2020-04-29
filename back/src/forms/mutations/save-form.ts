@@ -84,16 +84,19 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
   return unflattenObjectFromDb(newForm);
 }
 
-const formSiretsGetter = (form: Partial<Form>) => [
+const formSiretsGetter = (
+  form: Partial<Form> & { ecoOrganisme?: { siret: string } }
+) => [
   form.emitterCompanySiret,
   form.traderCompanySiret,
   form.recipientCompanySiret,
-  form.transporterCompanySiret
+  form.transporterCompanySiret,
+  form.ecoOrganisme?.siret
 ];
 
 async function checkThatUserIsPartOftheForm(
   userId: string,
-  form: Partial<Form>,
+  form: Partial<Form> & { ecoOrganisme?: { siret: string } },
   context: GraphQLContext
 ) {
   const isEdition = form.id != null;
@@ -102,7 +105,11 @@ async function checkThatUserIsPartOftheForm(
 
   if (isEdition && hasPartialFormInput) {
     const savedForm = await context.prisma.form({ id: form.id });
-    const savedFormSirets = formSiretsGetter(savedForm);
+    const ecoOrganisme = await context.prisma
+      .form({ id: form.id })
+      .ecoOrganisme();
+
+    const savedFormSirets = formSiretsGetter({ ...savedForm, ecoOrganisme });
     formSirets.push(...savedFormSirets);
   }
 
