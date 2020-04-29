@@ -113,20 +113,6 @@ function getLastActionOn(
   }
 }
 
-function getWasteVaryingDetails(
-  form: Form,
-  temporaryStorageDetail: TemporaryStorageDetail
-) {
-  return {
-    quantity: getQuantity(form, temporaryStorageDetail),
-    packagings:
-      temporaryStorageDetail?.wasteDetailsPackagings ??
-      form.wasteDetails.packagings,
-    onuCode:
-      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails.onuCode
-  };
-}
-
 function getQuantity(
   form: Form,
   temporaryStorageDetail: TemporaryStorageDetail
