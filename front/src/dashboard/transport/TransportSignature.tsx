@@ -80,9 +80,9 @@ export default function TransportSignature({ form }: Props) {
               securityCode: "",
               signedByTransporter: false,
               signedByProducer: false,
-              packagings: form.stateSummary.wasteVaryingDetails.packagings,
-              quantity: form.stateSummary.wasteVaryingDetails.quantity,
-              onuCode: form.stateSummary.wasteVaryingDetails.onuCode,
+              packagings: form.stateSummary.packagings,
+              quantity: form.stateSummary.quantity,
+              onuCode: form.stateSummary.onuCode,
             }}
             onSubmit={(values: any) =>
               signedByTransporter({

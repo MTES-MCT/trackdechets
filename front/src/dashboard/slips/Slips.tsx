@@ -127,7 +127,7 @@ export default function Slips({
                 </React.Fragment>
               )}
             </td>
-            <td>{s.stateSummary.wasteVaryingDetails.quantity ?? "?"} t</td>
+            <td>{s.stateSummary.quantity ?? "?"} t</td>
             {hiddenFields.indexOf("status") === -1 && (
               <td>{statusLabels[s.status]}</td>
             )}

@@ -4,11 +4,11 @@ export type Form = {
   readableId: string;
   status: string;
   stateSummary: {
-    wasteVaryingDetails: {
-      quantity: number;
-      packagings: string[];
-      onuCode: string;
-    };
+    quantity: number;
+    packagings: string[];
+    onuCode: string;
+    transporterNumberPlate: string;
+    transporterCustomInfo: string;
     transporter: FormCompany;
     recipient: FormCompany;
     emitter: FormCompany;

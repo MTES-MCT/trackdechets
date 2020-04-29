@@ -12,7 +12,19 @@ export const stateSummary = async (
     .temporaryStorageDetail();
 
   return {
-    wasteVaryingDetails: getWasteVaryingDetails(parent, temporaryStorageDetail),
+    quantity: getQuantity(parent, temporaryStorageDetail),
+    packagings:
+      temporaryStorageDetail?.wasteDetailsPackagings ??
+      parent.wasteDetails.packagings,
+    onuCode:
+      temporaryStorageDetail?.wasteDetailsOnuCode ??
+      parent.wasteDetails.onuCode,
+    transporterNumberPlate: temporaryStorageDetail
+      ? temporaryStorageDetail.transporterNumberPlate
+      : parent.transporter.numberPlate,
+    transporterCustomInfo: temporaryStorageDetail
+      ? temporaryStorageDetail.transporterNumberPlate
+      : parent.transporter.customInfo,
     transporter: getTransporter(parent, temporaryStorageDetail),
     recipient: getRecipient(parent, temporaryStorageDetail),
     emitter: getEmitter(parent, temporaryStorageDetail),
