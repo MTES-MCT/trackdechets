@@ -1,11 +1,15 @@
 import React from "react";
 import gql from "graphql-tag";
-import { Formik, Form, Field, FormikProps } from "formik";
+import { Formik, Form, Field } from "formik";
 import { useMutation } from "@apollo/react-hooks";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import PasswordMeter from "../../../common/PasswordMeter";
 import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
+import {
+  MutationChangePasswordArgs,
+  Mutation,
+} from "../../../generated/graphql/types";
 
 type Props = {
   toggleEdition: () => void;
@@ -19,14 +23,15 @@ const CHANGE_PASSWORD = gql`
   }
 `;
 
-type V = {
-  oldPassword: string;
-  newPassword: string;
+type V = MutationChangePasswordArgs & {
   newPasswordConfirmation: string;
 };
 
 export default function AccountFormChangePassword({ toggleEdition }: Props) {
-  const [changePassword, { loading }] = useMutation(CHANGE_PASSWORD, {
+  const [changePassword, { loading }] = useMutation<
+    Pick<Mutation, "changePassword">,
+    MutationChangePasswordArgs
+  >(CHANGE_PASSWORD, {
     onCompleted: () => {
       toggleEdition();
     },
@@ -54,7 +59,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
   };
 
   return (
-    <Formik
+    <Formik<V>
       initialValues={initialValues}
       onSubmit={(values, { setFieldError, setSubmitting }) => {
         changePassword({ variables: values }).catch(() => {
@@ -69,7 +74,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
       validate={validate}
       validationSchema={yupSchema}
     >
-      {(props: FormikProps<V>) => (
+      {(props) => (
         <Form>
           <div className="form__group">
             <label htmlFor="oldPassword">Ancien mot de passe:</label>

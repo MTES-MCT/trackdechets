@@ -9,9 +9,7 @@ import {
   FaPencilAlt,
 } from "react-icons/fa";
 import { IconContext } from "react-icons";
-
 import { Link } from "react-router-dom";
-import { Form } from "../../form/model";
 import "./SlipActions.scss";
 import Delete from "./slips-actions/Delete";
 import DownloadPdf from "./slips-actions/DownloadPdf";
@@ -25,6 +23,7 @@ import Resealed from "./slips-actions/Resealed";
 import Resent from "./slips-actions/Resent";
 import mutations from "./slips-actions/slip-actions.mutations";
 import { NotificationError } from "../../common/Error";
+import { Form } from "../../generated/graphql/types";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;

@@ -1,10 +1,14 @@
 import React from "react";
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
+import {
+  Mutation,
+  MutationRenewSecurityCodeArgs,
+} from "../../../generated/graphql/types";
 
 type Props = {
   toggleEdition: () => void;
-  mutationArgs: object;
+  mutationArgs: MutationRenewSecurityCodeArgs;
 };
 
 const RENEW_SECURITY_CODE = gql`
@@ -20,7 +24,10 @@ export default function AccountFormCompanySecurityCode({
   toggleEdition,
   mutationArgs,
 }: Props) {
-  const [renewSecurityCode, { loading }] = useMutation(RENEW_SECURITY_CODE, {
+  const [renewSecurityCode, { loading }] = useMutation<
+    Pick<Mutation, "renewSecurityCode">,
+    MutationRenewSecurityCodeArgs
+  >(RENEW_SECURITY_CODE, {
     onCompleted: () => {
       toggleEdition();
     },

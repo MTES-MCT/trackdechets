@@ -1,11 +1,7 @@
 import React from "react";
+import { CompanyPublic } from "../generated/graphql/types";
 
-type Props = {
-  name: string;
-  siret: string;
-  naf: string;
-  libelleNaf: string;
-};
+type Props = Pick<CompanyPublic, "name" | "siret" | "naf" | "libelleNaf">;
 
 export default function CompanyHeader(props: Props) {
   return (

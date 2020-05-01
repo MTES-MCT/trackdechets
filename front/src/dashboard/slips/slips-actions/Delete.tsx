@@ -5,22 +5,32 @@ import { GET_SLIPS } from "../query";
 import { currentSiretService } from "../../CompanySelector";
 import { useMutation } from "@apollo/react-hooks";
 import { updateApolloCache } from "../../../common/helper";
-import { Form } from "../../../form/model";
+import {
+  Form,
+  Mutation,
+  MutationDuplicateFormArgs,
+} from "../../../generated/graphql/types";
 
 type Props = { formId: string };
 
 export default function Delete({ formId }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [deleteForm] = useMutation(mutations.DELETE_FORM, {
+  const [deleteForm] = useMutation<
+    Pick<Mutation, "deleteForm">,
+    MutationDuplicateFormArgs
+  >(mutations.DELETE_FORM, {
     variables: { id: formId },
-    update: (store, { data: { deleteForm } }) => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_SLIPS,
-        variables: { siret: currentSiretService.getSiret() },
-        getNewData: (data) => ({
-          forms: [...data.forms.filter((f) => f.id !== deleteForm.id)],
-        }),
-      });
+    update: (store, { data }) => {
+      if (data?.deleteForm) {
+        const deleteForm = data.deleteForm;
+        updateApolloCache<{ forms: Form[] }>(store, {
+          query: GET_SLIPS,
+          variables: { siret: currentSiretService.getSiret() },
+          getNewData: (data) => ({
+            forms: [...data.forms.filter((f) => f.id !== deleteForm.id)],
+          }),
+        });
+      }
     },
   });
 

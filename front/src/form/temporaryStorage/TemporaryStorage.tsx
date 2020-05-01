@@ -1,7 +1,7 @@
 import { useFormikContext, Field } from "formik";
 import React, { useEffect } from "react";
 import CompanySelector from "../company/CompanySelector";
-import { Form } from "../model";
+import { Form } from "../../generated/graphql/types";
 import { Operations } from "../processing-operation/ProcessingOperation";
 import initialState from "../initial-state";
 
@@ -17,9 +17,9 @@ export default function TemporaryStorage(props) {
     }
 
     if (
-      values.recipient.processingOperation &&
+      values.recipient?.processingOperation &&
       values.temporaryStorageDetail &&
-      !values.temporaryStorageDetail.destination.processingOperation
+      !values.temporaryStorageDetail.destination?.processingOperation
     ) {
       setFieldValue(
         "temporaryStorageDetail.destination.processingOperation",

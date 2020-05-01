@@ -5,16 +5,16 @@ import { Link } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InlineError } from "../../common/Error";
 import Loader from "../../common/Loader";
-import { Me } from "../../login/model";
 import { GET_SLIPS } from "./query";
 import Slips from "./Slips";
 import { getTabForms, SlipTabs } from "./slips-actions/next-step";
 import "./SlipsTabs.scss";
+import { User, Query } from "../../generated/graphql/types";
 
-type Props = { me: Me; siret: string };
+type Props = { me: User; siret: string };
 
 export default function SlipsTabs({ me, siret }: Props) {
-  const { loading, error, data } = useQuery(GET_SLIPS, {
+  const { loading, error, data } = useQuery<Pick<Query, "forms">>(GET_SLIPS, {
     variables: { siret },
   });
 

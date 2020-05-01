@@ -1,6 +1,6 @@
 import { Field, useFormikContext } from "formik";
 import React, { useState, useEffect } from "react";
-import { Form } from "../model";
+import { Form } from "../../generated/graphql/types";
 import WorkSiteAddress from "./WorkSiteAddress";
 
 const FIELDS = ["name", "address", "city", "postalCode", "infos"];
@@ -8,7 +8,9 @@ const FIELDS = ["name", "address", "city", "postalCode", "infos"];
 export default function WorkSite() {
   const { values, setFieldValue } = useFormikContext<Form>();
   const [showWorkSite, setShowWorkSite] = useState(
-    FIELDS.some((field) => values.emitter.workSite[field])
+    FIELDS.some((field) =>
+      values.emitter?.workSite ? values.emitter?.workSite[field] : null
+    )
   );
 
   useEffect(() => {
@@ -52,9 +54,9 @@ export default function WorkSite() {
 
           <div className="form__group">
             <WorkSiteAddress
-              adress={values.emitter.workSite.address}
-              city={values.emitter.workSite.city}
-              postalCode={values.emitter.workSite.postalCode}
+              adress={values.emitter?.workSite?.address}
+              city={values.emitter?.workSite?.city}
+              postalCode={values.emitter?.workSite?.postalCode}
               onAddressSelection={(details) => setAddress(details)}
             />
           </div>

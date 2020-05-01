@@ -1,7 +1,5 @@
 import gql from "graphql-tag";
 import React from "react";
-
-import { Me } from "../../login/model";
 import "./Transport.scss";
 import TransportSignature from "./TransportSignature";
 import TransporterInfoEdit from "./TransporterInfoEdit";
@@ -11,11 +9,18 @@ import { useFormsTable } from "../slips/use-forms-table";
 import { FaSync, FaSort } from "react-icons/fa";
 import { useState } from "react";
 import useLocalStorage from "./hooks";
-import { Form } from "../../form/model";
 import { fullFormFragment } from "../../common/fragments";
+import {
+  User,
+  Form,
+  Query,
+  QueryFormsArgs,
+  FormType,
+  FormStatus,
+} from "../../generated/graphql/types";
 
 type Props = {
-  me: Me;
+  me: User;
   siret: string;
 };
 export const GET_TRANSPORT_SLIPS = gql`
@@ -114,7 +119,7 @@ const Table = ({ forms, displayActions }) => {
               {form.stateSummary.recipient?.name}
             </td>
             <td>
-              <div>{form.wasteDetails.name}</div>
+              <div>{form.wasteDetails?.name}</div>
             </td>
             <td className="hide-on-mobile">
               {form.stateSummary.quantity} tonnes
@@ -151,12 +156,18 @@ const Table = ({ forms, displayActions }) => {
 };
 const TRANSPORTER_FILTER_STORAGE_KEY = "TRANSPORTER_FILTER_STORAGE_KEY";
 export default function Transport({ siret }: Props & any) {
-  const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
+  const [filterStatus, setFilterStatus] = useState([
+    FormStatus.Sealed,
+    FormStatus.Resealed,
+  ]);
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
   );
-  const { loading, error, data, refetch } = useQuery(GET_TRANSPORT_SLIPS, {
-    variables: { siret, type: "TRANSPORTER" },
+  const { loading, error, data, refetch } = useQuery<
+    Pick<Query, "forms">,
+    QueryFormsArgs
+  >(GET_TRANSPORT_SLIPS, {
+    variables: { siret, type: FormType.Transporter },
   });
   if (loading) return <div>loading</div>;
   if (error) return <div>error</div>;
@@ -173,7 +184,7 @@ export default function Transport({ siret }: Props & any) {
           (f) =>
             filterStatus.includes(f.status) &&
             filterAgainstPersistenFilter(
-              f.stateSummary.transporterCustomInfo,
+              f.stateSummary?.transporterCustomInfo,
               persistentFilter
             )
         )
@@ -181,7 +192,7 @@ export default function Transport({ siret }: Props & any) {
           ...f,
           wasteDetails: {
             ...f.wasteDetails,
-            name: `${f.wasteDetails.code} ${f.wasteDetails.name} `,
+            name: `${f.wasteDetails?.code} ${f.wasteDetails?.name} `,
           },
         }))
     : [];
@@ -193,20 +204,26 @@ export default function Transport({ siret }: Props & any) {
 
       <div className="transport-menu">
         <button
-          onClick={() => setFilterStatus(["SEALED", "RESEALED"])}
-          className={`link ${filterStatus.includes("SEALED") ? "active" : ""}`}
+          onClick={() =>
+            setFilterStatus([FormStatus.Sealed, FormStatus.Resealed])
+          }
+          className={`link ${
+            filterStatus.includes(FormStatus.Sealed) ? "active" : ""
+          }`}
         >
           Déchets à collecter
         </button>
         <button
-          onClick={() => setFilterStatus(["SENT", "RESENT"])}
-          className={`link ${filterStatus.includes("SENT") ? "active" : ""}`}
+          onClick={() => setFilterStatus([FormStatus.Sent, FormStatus.Resent])}
+          className={`link ${
+            filterStatus.includes(FormStatus.Sent) ? "active" : ""
+          }`}
         >
           Déchets chargés, en attente de réception
         </button>
         <button
           className="button button-primary transport-refresh"
-          onClick={() => refetch({ siret, type: "TRANSPORTER" })}
+          onClick={() => refetch({ siret, type: FormType.Transporter })}
         >
           <FaSync /> Rafraîchir
         </button>
@@ -232,7 +249,7 @@ export default function Transport({ siret }: Props & any) {
 
       <Table
         forms={filteredForms}
-        displayActions={filterStatus.includes("SEALED")}
+        displayActions={filterStatus.includes(FormStatus.Sealed)}
       />
     </div>
   );
@@ -255,7 +272,7 @@ function getTransportInfos(form: Form) {
     },
     wasteDetails: {
       ...form.wasteDetails,
-      ...(form.temporaryStorageDetail.wasteDetails.quantity &&
+      ...(form.temporaryStorageDetail?.wasteDetails?.quantity &&
         form.temporaryStorageDetail.wasteDetails),
     },
   };

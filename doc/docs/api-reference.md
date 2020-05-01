@@ -18,7 +18,7 @@ sidebar_label: Référence de l'API
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>apiKey</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 USAGE INTERNE > Mon Compte > Générer un token
@@ -28,7 +28,7 @@ Renvoie un token permettant de s'authentifier à l'API Trackdéchets
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>appendixForms</strong></td>
-<td valign="top">[<a href="#form">Form</a>]</td>
+<td valign="top">[<a href="#form">Form</a>!]!</td>
 <td>
 
 Renvoie des BSD candidats à un regroupement dans une annexe 2
@@ -55,7 +55,7 @@ Siret d'un des établissements dont je suis membre
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyInfos</strong></td>
-<td valign="top"><a href="#companypublic">CompanyPublic</a></td>
+<td valign="top"><a href="#companypublic">CompanyPublic</a>!</td>
 <td>
 
 Renvoie des informations publiques sur un établissement
@@ -75,7 +75,7 @@ SIRET de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>ecoOrganismes</strong></td>
-<td valign="top">[<a href="#ecoorganisme">EcoOrganisme</a>]</td>
+<td valign="top">[<a href="#ecoorganisme">EcoOrganisme</a>!]!</td>
 <td>
 
 USAGE INTERNE
@@ -85,7 +85,7 @@ Renvoie la liste des éco-organismes
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>favorites</strong></td>
-<td valign="top">[<a href="#companyfavorite">CompanyFavorite</a>]</td>
+<td valign="top">[<a href="#companyfavorite">CompanyFavorite</a>!]!</td>
 <td>
 
 Renvoie les établissements favoris de l'utilisateur. C'est à dire les
@@ -104,7 +104,7 @@ type de favoris
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>form</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#form">Form</a>!</td>
 <td>
 
 Renvoie un BSD, sélectionné par ID
@@ -122,7 +122,7 @@ Identifiant opaque du BSD
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>formPdf</strong></td>
-<td valign="top"><a href="#filedownload">FileDownload</a></td>
+<td valign="top"><a href="#filedownload">FileDownload</a>!</td>
 <td>
 
 Renvoie un token pour télécharger un pdf de BSD
@@ -142,7 +142,7 @@ ID d'un BSD
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>forms</strong></td>
-<td valign="top">[<a href="#form">Form</a>]</td>
+<td valign="top">[<a href="#form">Form</a>!]!</td>
 <td>
 
 Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
@@ -173,7 +173,7 @@ TRANSPORTER = BSD's dont on est transporteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>formsLifeCycle</strong></td>
-<td valign="top"><a href="#formslifecycledata">formsLifeCycleData</a></td>
+<td valign="top"><a href="#formslifecycledata">formsLifeCycleData</a>!</td>
 <td>
 
 Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
@@ -238,7 +238,7 @@ Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont re
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>formsRegister</strong></td>
-<td valign="top"><a href="#filedownload">FileDownload</a></td>
+<td valign="top"><a href="#filedownload">FileDownload</a>!</td>
 <td>
 
 Renvoie un token pour télécharger un csv du regsitre
@@ -267,7 +267,7 @@ Type d'export
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>me</strong></td>
-<td valign="top"><a href="#user">User</a></td>
+<td valign="top"><a href="#user">User</a>!</td>
 <td>
 
 Renvoie les informations sur l'utilisateur authentifié
@@ -276,7 +276,7 @@ Renvoie les informations sur l'utilisateur authentifié
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>searchCompanies</strong></td>
-<td valign="top">[<a href="#companysearchresult">CompanySearchResult</a>]</td>
+<td valign="top">[<a href="#companysearchresult">CompanySearchResult</a>!]!</td>
 <td>
 
 Effectue une recherche floue sur la base SIRENE et enrichit
@@ -305,7 +305,7 @@ sur la nom de l'établissement, ex: 'Boulangerie Dupont'
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>stats</strong></td>
-<td valign="top">[<a href="#companystat">CompanyStat</a>]</td>
+<td valign="top">[<a href="#companystat">CompanyStat</a>!]!</td>
 <td>
 
 Renvoie des statistiques sur le volume de déchets entrant et sortant
@@ -348,7 +348,7 @@ Modifie le mot de passe d'un utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>createCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -363,7 +363,7 @@ Rattache un établissement à l'utilisateur authentifié
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>createUploadLink</strong></td>
-<td valign="top"><a href="#uploadlink">UploadLink</a></td>
+<td valign="top"><a href="#uploadlink">UploadLink</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -409,7 +409,7 @@ ID d'un BSD
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>deleteInvitation</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -447,7 +447,7 @@ ID d'un BSD
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>editProfile</strong></td>
-<td valign="top"><a href="#user">User</a></td>
+<td valign="top"><a href="#user">User</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -472,7 +472,7 @@ Met à jour les informations de l'utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>inviteUserToCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -701,7 +701,7 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>removeUserFromCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -721,7 +721,7 @@ Supprime les droits d'un utilisateurs sur un établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>renewSecurityCode</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -736,7 +736,7 @@ Renouvelle le code de sécurité de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>resendInvitation</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -756,7 +756,7 @@ Renvoie l'email d'invitation à un établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>resetPassword</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -816,7 +816,7 @@ Informations liées à la signature transporteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signup</strong></td>
-<td valign="top"><a href="#user">User</a></td>
+<td valign="top"><a href="#user">User</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -831,7 +831,7 @@ Permet de créer un nouvel utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>updateCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a></td>
+<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
 
 USAGE INTERNE
@@ -1158,7 +1158,7 @@ Identifiant opaque
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyTypes</strong></td>
-<td valign="top">[<a href="#companytype">CompanyType</a>]</td>
+<td valign="top">[<a href="#companytype">CompanyType</a>!]!</td>
 <td>
 
 Profil de l'établissement
@@ -1212,7 +1212,7 @@ Site web (visible sur la fiche entreprise)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>users</strong></td>
-<td valign="top">[<a href="#companymember">CompanyMember</a>]</td>
+<td valign="top">[<a href="#companymember">CompanyMember</a>!]</td>
 <td>
 
 Liste des utilisateurs appartenant à cet établissement
@@ -1240,7 +1240,7 @@ différents établissements ayant le même nom
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 SIRET de l'établissement
@@ -1573,7 +1573,7 @@ Statistiques d'un établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>stats</strong></td>
-<td valign="top">[<a href="#stat">Stat</a>]</td>
+<td valign="top">[<a href="#stat">Stat</a>!]!</td>
 <td>
 
 Liste des statistiques
@@ -1852,7 +1852,7 @@ Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/p
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 Identifiant interne du BSD
@@ -1861,7 +1861,7 @@ Identifiant interne du BSD
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>readableId</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Identifiant utilisé dans la case 'Bordereau n° ****'
@@ -1952,7 +1952,7 @@ ID de l'utilisateur ayant crée le BSD
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>status</strong></td>
-<td valign="top"><a href="#formstatus">FormStatus</a></td>
+<td valign="top"><a href="#formstatus">FormStatus</a>!</td>
 <td>
 
 Statut du BSD (brouillon, envoyé, reçu, traité, etc)
@@ -2098,7 +2098,7 @@ Destination ultérieure prévue (case 12)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
-<td valign="top">[<a href="#form">Form</a>]</td>
+<td valign="top">[<a href="#form">Form</a>!]!</td>
 <td>
 
 Annexe 2
@@ -2121,7 +2121,7 @@ BSD suite - détail des champs de la partie entreposage provisoire ou reconditio
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>stateSummary</strong></td>
-<td valign="top"><a href="#statesummary">StateSummary</a></td>
+<td valign="top"><a href="#statesummary">StateSummary</a>!</td>
 <td>
 
 Résumé des valeurs clés du bordereau à l'instant T
@@ -2291,7 +2291,7 @@ URL de la fiche ICPE sur Géorisques
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>rubriques</strong></td>
-<td valign="top">[<a href="#rubrique">Rubrique</a>]</td>
+<td valign="top">[<a href="#rubrique">Rubrique</a>!]!</td>
 <td>
 
 Liste des rubriques associées
@@ -2300,7 +2300,7 @@ Liste des rubriques associées
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>declarations</strong></td>
-<td valign="top">[<a href="#declaration">Declaration</a>]</td>
+<td valign="top">[<a href="#declaration">Declaration</a>!]!</td>
 <td>
 
 Liste des déclarations GEREP
@@ -2417,7 +2417,7 @@ Pour plus de détails, se référer à la
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>rubrique</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Numéro de rubrique tel que défini dans la nomenclature des ICPE
@@ -2464,7 +2464,7 @@ Ex: traitement thermique de déchets dangereux
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>category</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Catégorie d'établissement associé: TTR, VHU, Traitement
@@ -2517,7 +2517,7 @@ Statistiques
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>wasteCode</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Code déchet
@@ -2526,7 +2526,7 @@ Code déchet
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>incoming</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td>
 
 Quantité entrante
@@ -2535,7 +2535,7 @@ Quantité entrante
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>outgoing</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td>
 
 Qantité sortante
@@ -2576,7 +2576,7 @@ Quantité la plus à jour
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>packagings</strong></td>
-<td valign="top">[<a href="#packagings">Packagings</a>]</td>
+<td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
 <td>
 
 Packaging le plus à jour
@@ -3153,7 +3153,7 @@ Numéro de téléphone de l'utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companies</strong></td>
-<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>]</td>
+<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>!]!</td>
 <td>
 
 Liste des établissements dont l'utilisateur est membre
@@ -3206,7 +3206,7 @@ Code ONU
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>packagings</strong></td>
-<td valign="top">[<a href="#packagings">Packagings</a>]</td>
+<td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
 <td>
 
 Conditionnement
@@ -3319,7 +3319,7 @@ Informations du cycle de vie des bordereaux
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>statusLogs</strong></td>
-<td valign="top">[<a href="#statuslog">StatusLog</a>]</td>
+<td valign="top">[<a href="#statuslog">StatusLog</a>!]!</td>
 <td>
 
 Liste des changements de statuts

@@ -102,7 +102,7 @@ export type CompanyPrivate = {
   /** Identifiant opaque */
   id: Scalars['ID'];
   /** Profil de l'établissement */
-  companyTypes?: Maybe<Array<Maybe<CompanyType>>>;
+  companyTypes: Array<CompanyType>;
   /** Identifiant GEREP */
   gerepId?: Maybe<Scalars['String']>;
   /** Code de sécurité permettant de signer les BSD */
@@ -114,7 +114,7 @@ export type CompanyPrivate = {
   /** Site web (visible sur la fiche entreprise) */
   website?: Maybe<Scalars['String']>;
   /** Liste des utilisateurs appartenant à cet établissement */
-  users?: Maybe<Array<Maybe<CompanyMember>>>;
+  users?: Maybe<Array<CompanyMember>>;
   /** Rôle de l'utilisateur authentifié cau sein de cet établissement */
   userRole?: Maybe<UserRole>;
   /**
@@ -123,7 +123,7 @@ export type CompanyPrivate = {
    */
   givenName?: Maybe<Scalars['String']>;
   /** SIRET de l'établissement */
-  siret?: Maybe<Scalars['String']>;
+  siret: Scalars['String'];
   /** Adresse de l'établissement */
   address?: Maybe<Scalars['String']>;
   /** Nom de l'établissement */
@@ -209,7 +209,7 @@ export type CompanyStat = {
   /** Établissement */
   company?: Maybe<FormCompany>;
   /** Liste des statistiques */
-  stats?: Maybe<Array<Maybe<Stat>>>;
+  stats: Array<Stat>;
 };
 
 /** Profil entreprise */
@@ -364,9 +364,9 @@ export type FileDownload = {
 export type Form = {
    __typename?: 'Form';
   /** Identifiant interne du BSD */
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   /** Identifiant utilisé dans la case 'Bordereau n° ****' */
-  readableId?: Maybe<Scalars['String']>;
+  readableId: Scalars['String'];
   /**
    * Identifiant personnalisé permettant de faire le lien avec un
    * objet un système d'information tierce
@@ -389,7 +389,7 @@ export type Form = {
   /** ID de l'utilisateur ayant crée le BSD */
   ownerId?: Maybe<Scalars['Int']>;
   /** Statut du BSD (brouillon, envoyé, reçu, traité, etc) */
-  status?: Maybe<FormStatus>;
+  status: FormStatus;
   /** Si oui ou non le BSD a été signé par un transporteur */
   signedByTransporter?: Maybe<Scalars['Boolean']>;
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
@@ -426,12 +426,12 @@ export type Form = {
   /** Destination ultérieure prévue (case 12) */
   nextDestination?: Maybe<NextDestination>;
   /** Annexe 2 */
-  appendix2Forms?: Maybe<Array<Maybe<Form>>>;
+  appendix2Forms: Array<Form>;
   ecoOrganisme?: Maybe<EcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
-  stateSummary?: Maybe<StateSummary>;
+  stateSummary: StateSummary;
 };
 
 /** Information sur un établissement dans un BSD */
@@ -480,7 +480,7 @@ export type FormInput = {
 export type FormsLifeCycleData = {
    __typename?: 'formsLifeCycleData';
   /** Liste des changements de statuts */
-  statusLogs?: Maybe<Array<Maybe<StatusLog>>>;
+  statusLogs: Array<StatusLog>;
   /** pagination, indique si d'autres pages existent après */
   hasNextPage?: Maybe<Scalars['Boolean']>;
   /** pagination, indique si d'autres pages existent avant */
@@ -570,9 +570,9 @@ export type Installation = {
   /** URL de la fiche ICPE sur Géorisques */
   urlFiche?: Maybe<Scalars['String']>;
   /** Liste des rubriques associées */
-  rubriques?: Maybe<Array<Maybe<Rubrique>>>;
+  rubriques: Array<Rubrique>;
   /** Liste des déclarations GEREP */
-  declarations?: Maybe<Array<Maybe<Declaration>>>;
+  declarations: Array<Declaration>;
 };
 
 
@@ -587,31 +587,31 @@ export type Mutation = {
    * USAGE INTERNE
    * Rattache un établissement à l'utilisateur authentifié
    */
-  createCompany?: Maybe<CompanyPrivate>;
+  createCompany: CompanyPrivate;
   /**
    * USAGE INTERNE
    * Récupère une URL signé pour l'upload d'un fichier
    */
-  createUploadLink?: Maybe<UploadLink>;
+  createUploadLink: UploadLink;
   /** Supprime un BSD */
   deleteForm?: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Supprime une invitation à un établissement
    */
-  deleteInvitation?: Maybe<CompanyPrivate>;
+  deleteInvitation: CompanyPrivate;
   /** Duplique un BSD */
   duplicateForm?: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Met à jour les informations de l'utilisateur
    */
-  editProfile?: Maybe<User>;
+  editProfile: User;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
    */
-  inviteUserToCompany?: Maybe<CompanyPrivate>;
+  inviteUserToCompany: CompanyPrivate;
   /**
    * USAGE INTERNE
    * Active le compte d'un utilisateur invité
@@ -643,22 +643,22 @@ export type Mutation = {
    * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
    */
-  removeUserFromCompany?: Maybe<CompanyPrivate>;
+  removeUserFromCompany: CompanyPrivate;
   /**
    * USAGE INTERNE
    * Renouvelle le code de sécurité de l'établissement
    */
-  renewSecurityCode?: Maybe<CompanyPrivate>;
+  renewSecurityCode: CompanyPrivate;
   /**
    * USAGE INTERNE
    * Renvoie l'email d'invitation à un établissement
    */
-  resendInvitation?: Maybe<Scalars['Boolean']>;
+  resendInvitation: Scalars['Boolean'];
   /**
    * USAGE INTERNE
    * Envoie un email pour la réinitialisation du mot de passe
    */
-  resetPassword?: Maybe<Scalars['Boolean']>;
+  resetPassword: Scalars['Boolean'];
   /** Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID) */
   saveForm?: Maybe<Form>;
   /** Valide la prise en charge par le transporteur, et peut valider l'envoi */
@@ -667,12 +667,12 @@ export type Mutation = {
    * USAGE INTERNE
    * Permet de créer un nouvel utilisateur
    */
-  signup?: Maybe<User>;
+  signup: User;
   /**
    * USAGE INTERNE
    * Édite les informations d'un établissement
    */
-  updateCompany?: Maybe<CompanyPrivate>;
+  updateCompany: CompanyPrivate;
   /** Met à jour la plaque d'immatriculation ou le champ libre du transporteur */
   updateTransporterFields?: Maybe<Form>;
 };
@@ -911,60 +911,60 @@ export type Query = {
    * USAGE INTERNE > Mon Compte > Générer un token
    * Renvoie un token permettant de s'authentifier à l'API Trackdéchets
    */
-  apiKey?: Maybe<Scalars['String']>;
+  apiKey: Scalars['String'];
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
-  appendixForms?: Maybe<Array<Maybe<Form>>>;
+  appendixForms: Array<Form>;
   /**
    * Renvoie des informations publiques sur un établissement
    * extrait de la base SIRENE et de la base des installations
    * classées pour la protection de l'environnement (ICPE)
    */
-  companyInfos?: Maybe<CompanyPublic>;
+  companyInfos: CompanyPublic;
   /**
    * USAGE INTERNE
    * Renvoie la liste des éco-organismes
    */
-  ecoOrganismes?: Maybe<Array<Maybe<EcoOrganisme>>>;
+  ecoOrganismes: Array<EcoOrganisme>;
   /**
    * Renvoie les établissements favoris de l'utilisateur. C'est à dire les
    * établissements qui font souvent partis des BSD édités
    */
-  favorites?: Maybe<Array<Maybe<CompanyFavorite>>>;
+  favorites: Array<CompanyFavorite>;
   /** Renvoie un BSD, sélectionné par ID */
-  form?: Maybe<Form>;
+  form: Form;
   /**
    * Renvoie un token pour télécharger un pdf de BSD
    * Ce token doit être transmis à la route /download pour obtenir le fichier.
    * Il est valable 10 secondes
    */
-  formPdf?: Maybe<FileDownload>;
+  formPdf: FileDownload;
   /**
    * Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
    * Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
    * On peut également demander les bordereaux pour lesquels on est transporteur
    */
-  forms?: Maybe<Array<Maybe<Form>>>;
+  forms: Array<Form>;
   /**
    * Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
    * La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
    * Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont retournés
    */
-  formsLifeCycle?: Maybe<FormsLifeCycleData>;
+  formsLifeCycle: FormsLifeCycleData;
   /**
    * Renvoie un token pour télécharger un csv du regsitre
    * Ce token doit être transmis à la route /download pour obtenir le fichier.
    * Il est valable 10 secondes
    */
-  formsRegister?: Maybe<FileDownload>;
+  formsRegister: FileDownload;
   /** Renvoie les informations sur l'utilisateur authentifié */
-  me?: Maybe<User>;
+  me: User;
   /**
    * Effectue une recherche floue sur la base SIRENE et enrichit
    * les résultats avec des informations provenant de Trackdéchets
    */
-  searchCompanies?: Maybe<Array<Maybe<CompanySearchResult>>>;
+  searchCompanies: Array<CompanySearchResult>;
   /** Renvoie des statistiques sur le volume de déchets entrant et sortant */
-  stats?: Maybe<Array<Maybe<CompanyStat>>>;
+  stats: Array<CompanyStat>;
 };
 
 
@@ -1101,7 +1101,7 @@ export type Rubrique = {
    * Numéro de rubrique tel que défini dans la nomenclature des ICPE
    * Ex: 2710
    */
-  rubrique?: Maybe<Scalars['String']>;
+  rubrique: Scalars['String'];
   /** Alinéa pour la rubrique concerné */
   alinea?: Maybe<Scalars['String']>;
   /** État de l'activité, ex: 'En fonct', 'À l'arrêt' */
@@ -1114,7 +1114,7 @@ export type Rubrique = {
    */
   activite?: Maybe<Scalars['String']>;
   /** Catégorie d'établissement associé: TTR, VHU, Traitement */
-  category?: Maybe<Scalars['String']>;
+  category: Scalars['String'];
   /** Volume autorisé */
   volume?: Maybe<Scalars['String']>;
   /** Unité utilisé pour le volume autorisé */
@@ -1146,11 +1146,11 @@ export type SignupInput = {
 export type Stat = {
    __typename?: 'Stat';
   /** Code déchet */
-  wasteCode?: Maybe<Scalars['String']>;
+  wasteCode: Scalars['String'];
   /** Quantité entrante */
-  incoming?: Maybe<Scalars['Float']>;
+  incoming: Scalars['Float'];
   /** Qantité sortante */
-  outgoing?: Maybe<Scalars['Float']>;
+  outgoing: Scalars['Float'];
 };
 
 /**
@@ -1167,7 +1167,7 @@ export type StateSummary = {
   /** Quantité la plus à jour */
   quantity?: Maybe<Scalars['Float']>;
   /** Packaging le plus à jour */
-  packagings?: Maybe<Array<Maybe<Packagings>>>;
+  packagings: Array<Packagings>;
   /** Code ONU le plus à jour */
   onuCode?: Maybe<Scalars['String']>;
   /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
@@ -1379,7 +1379,7 @@ export type User = {
   /** Numéro de téléphone de l'utilisateur */
   phone?: Maybe<Scalars['String']>;
   /** Liste des établissements dont l'utilisateur est membre */
-  companies?: Maybe<Array<Maybe<CompanyPrivate>>>;
+  companies: Array<CompanyPrivate>;
 };
 
 /**
@@ -1420,7 +1420,7 @@ export type WasteDetails = {
   /** Code ONU */
   onuCode?: Maybe<Scalars['String']>;
   /** Conditionnement */
-  packagings?: Maybe<Array<Maybe<Packagings>>>;
+  packagings: Array<Packagings>;
   /** Autre packaging (préciser) */
   otherPackaging?: Maybe<Scalars['String']>;
   /** Nombre de colis */
@@ -1747,16 +1747,16 @@ export type CompanyMemberResolvers<ContextType = GraphQLContext, ParentType exte
 
 export type CompanyPrivateResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyPrivate'] = ResolversParentTypes['CompanyPrivate']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  companyTypes?: Resolver<Maybe<Array<Maybe<ResolversTypes['CompanyType']>>>, ParentType, ContextType>,
+  companyTypes?: Resolver<Array<ResolversTypes['CompanyType']>, ParentType, ContextType>,
   gerepId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   securityCode?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
   contactEmail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   contactPhone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  users?: Resolver<Maybe<Array<Maybe<ResolversTypes['CompanyMember']>>>, ParentType, ContextType>,
+  users?: Resolver<Maybe<Array<ResolversTypes['CompanyMember']>>, ParentType, ContextType>,
   userRole?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType>,
   givenName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  siret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  siret?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   naf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -1799,7 +1799,7 @@ export type CompanySearchResultResolvers<ContextType = GraphQLContext, ParentTyp
 
 export type CompanyStatResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyStat'] = ResolversParentTypes['CompanyStat']> = {
   company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>,
-  stats?: Resolver<Maybe<Array<Maybe<ResolversTypes['Stat']>>>, ParentType, ContextType>,
+  stats?: Resolver<Array<ResolversTypes['Stat']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -1846,8 +1846,8 @@ export type FileDownloadResolvers<ContextType = GraphQLContext, ParentType exten
 };
 
 export type FormResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Form'] = ResolversParentTypes['Form']> = {
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
-  readableId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  readableId?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   emitter?: Resolver<Maybe<ResolversTypes['Emitter']>, ParentType, ContextType>,
   recipient?: Resolver<Maybe<ResolversTypes['Recipient']>, ParentType, ContextType>,
@@ -1857,7 +1857,7 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
   ownerId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  status?: Resolver<Maybe<ResolversTypes['FormStatus']>, ParentType, ContextType>,
+  status?: Resolver<ResolversTypes['FormStatus'], ParentType, ContextType>,
   signedByTransporter?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
   sentAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
   sentBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -1873,10 +1873,10 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   processedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
   noTraceability?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
   nextDestination?: Resolver<Maybe<ResolversTypes['NextDestination']>, ParentType, ContextType>,
-  appendix2Forms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Form']>>>, ParentType, ContextType>,
+  appendix2Forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType>,
   ecoOrganisme?: Resolver<Maybe<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>,
   temporaryStorageDetail?: Resolver<Maybe<ResolversTypes['TemporaryStorageDetail']>, ParentType, ContextType>,
-  stateSummary?: Resolver<Maybe<ResolversTypes['StateSummary']>, ParentType, ContextType>,
+  stateSummary?: Resolver<ResolversTypes['StateSummary'], ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -1891,7 +1891,7 @@ export type FormCompanyResolvers<ContextType = GraphQLContext, ParentType extend
 };
 
 export type FormsLifeCycleDataResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['formsLifeCycleData'] = ResolversParentTypes['formsLifeCycleData']> = {
-  statusLogs?: Resolver<Maybe<Array<Maybe<ResolversTypes['StatusLog']>>>, ParentType, ContextType>,
+  statusLogs?: Resolver<Array<ResolversTypes['StatusLog']>, ParentType, ContextType>,
   hasNextPage?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
   hasPreviousPage?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
   startCursor?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
@@ -1911,8 +1911,8 @@ export type FormSubscriptionResolvers<ContextType = GraphQLContext, ParentType e
 export type InstallationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Installation'] = ResolversParentTypes['Installation']> = {
   codeS3ic?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   urlFiche?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  rubriques?: Resolver<Maybe<Array<Maybe<ResolversTypes['Rubrique']>>>, ParentType, ContextType>,
-  declarations?: Resolver<Maybe<Array<Maybe<ResolversTypes['Declaration']>>>, ParentType, ContextType>,
+  rubriques?: Resolver<Array<ResolversTypes['Rubrique']>, ParentType, ContextType>,
+  declarations?: Resolver<Array<ResolversTypes['Declaration']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -1922,13 +1922,13 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   changePassword?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'oldPassword' | 'newPassword'>>,
-  createCompany?: Resolver<Maybe<ResolversTypes['CompanyPrivate']>, ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>,
-  createUploadLink?: Resolver<Maybe<ResolversTypes['UploadLink']>, ParentType, ContextType, RequireFields<MutationCreateUploadLinkArgs, 'fileName' | 'fileType'>>,
+  createCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>,
+  createUploadLink?: Resolver<ResolversTypes['UploadLink'], ParentType, ContextType, RequireFields<MutationCreateUploadLinkArgs, 'fileName' | 'fileType'>>,
   deleteForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationDeleteFormArgs, 'id'>>,
-  deleteInvitation?: Resolver<Maybe<ResolversTypes['CompanyPrivate']>, ParentType, ContextType, RequireFields<MutationDeleteInvitationArgs, 'email' | 'siret'>>,
+  deleteInvitation?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationDeleteInvitationArgs, 'email' | 'siret'>>,
   duplicateForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationDuplicateFormArgs, 'id'>>,
-  editProfile?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationEditProfileArgs, never>>,
-  inviteUserToCompany?: Resolver<Maybe<ResolversTypes['CompanyPrivate']>, ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>,
+  editProfile?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationEditProfileArgs, never>>,
+  inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>,
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>,
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>,
   markAsProcessed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsProcessedArgs, 'processedInfo'>>,
@@ -1938,14 +1938,14 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   markAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSealedArgs, never>>,
   markAsSent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSentArgs, 'sentInfo'>>,
   markAsTempStored?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStoredArgs, 'id' | 'tempStoredInfos'>>,
-  removeUserFromCompany?: Resolver<Maybe<ResolversTypes['CompanyPrivate']>, ParentType, ContextType, RequireFields<MutationRemoveUserFromCompanyArgs, 'userId' | 'siret'>>,
-  renewSecurityCode?: Resolver<Maybe<ResolversTypes['CompanyPrivate']>, ParentType, ContextType, RequireFields<MutationRenewSecurityCodeArgs, 'siret'>>,
-  resendInvitation?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationResendInvitationArgs, 'email' | 'siret'>>,
-  resetPassword?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email'>>,
+  removeUserFromCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRemoveUserFromCompanyArgs, 'userId' | 'siret'>>,
+  renewSecurityCode?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRenewSecurityCodeArgs, 'siret'>>,
+  resendInvitation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResendInvitationArgs, 'email' | 'siret'>>,
+  resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email'>>,
   saveForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSaveFormArgs, 'formInput'>>,
   signedByTransporter?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSignedByTransporterArgs, 'id' | 'signingInfo'>>,
-  signup?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationSignupArgs, 'userInfos'>>,
-  updateCompany?: Resolver<Maybe<ResolversTypes['CompanyPrivate']>, ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'siret'>>,
+  signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'userInfos'>>,
+  updateCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'siret'>>,
   updateTransporterFields?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationUpdateTransporterFieldsArgs, 'id'>>,
 };
 
@@ -1956,19 +1956,19 @@ export type NextDestinationResolvers<ContextType = GraphQLContext, ParentType ex
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  apiKey?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  appendixForms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Form']>>>, ParentType, ContextType, RequireFields<QueryAppendixFormsArgs, 'siret'>>,
-  companyInfos?: Resolver<Maybe<ResolversTypes['CompanyPublic']>, ParentType, ContextType, RequireFields<QueryCompanyInfosArgs, 'siret'>>,
-  ecoOrganismes?: Resolver<Maybe<Array<Maybe<ResolversTypes['EcoOrganisme']>>>, ParentType, ContextType>,
-  favorites?: Resolver<Maybe<Array<Maybe<ResolversTypes['CompanyFavorite']>>>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'type'>>,
-  form?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormArgs, never>>,
-  formPdf?: Resolver<Maybe<ResolversTypes['FileDownload']>, ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>,
-  forms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Form']>>>, ParentType, ContextType, RequireFields<QueryFormsArgs, 'type'>>,
-  formsLifeCycle?: Resolver<Maybe<ResolversTypes['formsLifeCycleData']>, ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>,
-  formsRegister?: Resolver<Maybe<ResolversTypes['FileDownload']>, ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, never>>,
-  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>,
-  searchCompanies?: Resolver<Maybe<Array<Maybe<ResolversTypes['CompanySearchResult']>>>, ParentType, ContextType, RequireFields<QuerySearchCompaniesArgs, 'clue'>>,
-  stats?: Resolver<Maybe<Array<Maybe<ResolversTypes['CompanyStat']>>>, ParentType, ContextType>,
+  apiKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  appendixForms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryAppendixFormsArgs, 'siret'>>,
+  companyInfos?: Resolver<ResolversTypes['CompanyPublic'], ParentType, ContextType, RequireFields<QueryCompanyInfosArgs, 'siret'>>,
+  ecoOrganismes?: Resolver<Array<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>,
+  favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'type'>>,
+  form?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<QueryFormArgs, never>>,
+  formPdf?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>,
+  forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, 'type'>>,
+  formsLifeCycle?: Resolver<ResolversTypes['formsLifeCycleData'], ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>,
+  formsRegister?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, never>>,
+  me?: Resolver<ResolversTypes['User'], ParentType, ContextType>,
+  searchCompanies?: Resolver<Array<ResolversTypes['CompanySearchResult']>, ParentType, ContextType, RequireFields<QuerySearchCompaniesArgs, 'clue'>>,
+  stats?: Resolver<Array<ResolversTypes['CompanyStat']>, ParentType, ContextType>,
 };
 
 export type RecipientResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Recipient'] = ResolversParentTypes['Recipient']> = {
@@ -1980,12 +1980,12 @@ export type RecipientResolvers<ContextType = GraphQLContext, ParentType extends 
 };
 
 export type RubriqueResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Rubrique'] = ResolversParentTypes['Rubrique']> = {
-  rubrique?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  rubrique?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   alinea?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   etatActivite?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   regimeAutorise?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   activite?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  category?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  category?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   volume?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   unite?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   wasteType?: Resolver<Maybe<ResolversTypes['WasteType']>, ParentType, ContextType>,
@@ -1993,15 +1993,15 @@ export type RubriqueResolvers<ContextType = GraphQLContext, ParentType extends R
 };
 
 export type StatResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Stat'] = ResolversParentTypes['Stat']> = {
-  wasteCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  incoming?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  outgoing?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  wasteCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  incoming?: Resolver<ResolversTypes['Float'], ParentType, ContextType>,
+  outgoing?: Resolver<ResolversTypes['Float'], ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type StateSummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StateSummary'] = ResolversParentTypes['StateSummary']> = {
   quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  packagings?: Resolver<Maybe<Array<Maybe<ResolversTypes['Packagings']>>>, ParentType, ContextType>,
+  packagings?: Resolver<Array<ResolversTypes['Packagings']>, ParentType, ContextType>,
   onuCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   transporter?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>,
   transporterNumberPlate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -2088,7 +2088,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  companies?: Resolver<Maybe<Array<Maybe<ResolversTypes['CompanyPrivate']>>>, ParentType, ContextType>,
+  companies?: Resolver<Array<ResolversTypes['CompanyPrivate']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -2096,7 +2096,7 @@ export type WasteDetailsResolvers<ContextType = GraphQLContext, ParentType exten
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   onuCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  packagings?: Resolver<Maybe<Array<Maybe<ResolversTypes['Packagings']>>>, ParentType, ContextType>,
+  packagings?: Resolver<Array<ResolversTypes['Packagings']>, ParentType, ContextType>,
   otherPackaging?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   numberOfPackages?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
@@ -2159,5 +2159,5 @@ export type Resolvers<ContextType = GraphQLContext> = {
 /**
  * @deprecated
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
-*/
+ */
 export type IResolvers<ContextType = GraphQLContext> = Resolvers<ContextType>;

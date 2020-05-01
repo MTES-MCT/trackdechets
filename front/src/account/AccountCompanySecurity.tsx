@@ -1,9 +1,9 @@
 import React from "react";
 import gql from "graphql-tag";
 import AccountCompanySecurityCodeField from "./fields/AccountFieldCompanySecurityCode";
-import { Company } from "./AccountCompany";
+import { CompanyPrivate } from "../generated/graphql/types";
 
-type Props = { company: Company };
+type Props = { company: CompanyPrivate };
 
 AccountCompanySecurity.fragments = {
   company: gql`

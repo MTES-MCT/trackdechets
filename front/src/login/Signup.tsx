@@ -9,10 +9,14 @@ import RedErrorMessage from "../common/RedErrorMessage";
 import { SIGNUP } from "./mutations";
 import "./Signup.scss";
 import { Wizard } from "./Wizard";
+import { Mutation, MutationSignupArgs } from "../generated/graphql/types";
 
 export default function Signup() {
   const [passwordType, setPasswordType] = useState("password");
-  const [signup, { error: signupError }] = useMutation(SIGNUP);
+  const [signup, { error: signupError }] = useMutation<
+    Pick<Mutation, "signup">,
+    MutationSignupArgs
+  >(SIGNUP);
 
   const history = useHistory();
 

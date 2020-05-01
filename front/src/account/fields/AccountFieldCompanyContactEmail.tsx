@@ -3,11 +3,15 @@ import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
-import { Company, UserRole } from "../AccountCompany";
 import { object, string } from "yup";
+import {
+  CompanyPrivate,
+  UserRole,
+  MutationUpdateCompanyArgs,
+} from "../../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 AccountFielCompanyContactEmail.fragments = {
@@ -41,13 +45,13 @@ export default function AccountFielCompanyContactEmail({ company }: Props) {
 
   return (
     <>
-      {company.userRole === UserRole.ADMIN ? (
+      {company.userRole === UserRole.Admin ? (
         <AccountField
           name={fieldName}
           label={fieldLabel}
           value={company.contactEmail}
           renderForm={(toggleEdition) => (
-            <AccountFormSimpleInput<{ contactEmail: string }>
+            <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
               name="contactEmail"
               type="email"
               value={company.contactEmail}

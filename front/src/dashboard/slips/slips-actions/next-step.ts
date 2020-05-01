@@ -1,5 +1,4 @@
-import { Form } from "../../../form/model";
-import { FormStatus } from "../../../Constants";
+import { Form, FormStatus } from "../../../generated/graphql/types";
 
 export enum SlipTabs {
   DRAFTS,
@@ -58,51 +57,52 @@ export function getTabForms(
 }
 
 export function getNextStep(form: Form, currentSiret: string) {
-  const currentUserIsEmitter = currentSiret === form.emitter.company.siret;
-  const currentUserIsRecipient = currentSiret === form.recipient.company.siret;
+  const currentUserIsEmitter = currentSiret === form.emitter?.company?.siret;
+  const currentUserIsRecipient =
+    currentSiret === form.recipient?.company?.siret;
   const currentUserIsTempStorer =
-    currentUserIsRecipient && form.recipient.isTempStorage;
+    currentUserIsRecipient && form.recipient?.isTempStorage;
   const currentUserIsDestination =
-    currentSiret === form.temporaryStorageDetail?.destination?.company.siret;
+    currentSiret === form.temporaryStorageDetail?.destination?.company?.siret;
 
-  if (form.status === FormStatus.DRAFT) return FormStatus.SEALED;
+  if (form.status === FormStatus.Draft) return FormStatus.Sealed;
 
   if (currentUserIsEmitter) {
-    if (form.status === FormStatus.SEALED) return FormStatus.SENT;
+    if (form.status === FormStatus.Sealed) return FormStatus.Sent;
   }
 
   if (currentUserIsDestination) {
-    if (form.status === FormStatus.RESENT) return FormStatus.RECEIVED;
-    if (form.status === FormStatus.RECEIVED) return FormStatus.PROCESSED;
+    if (form.status === FormStatus.Resent) return FormStatus.Received;
+    if (form.status === FormStatus.Received) return FormStatus.Processed;
   }
 
   if (currentUserIsTempStorer) {
-    if (form.status === FormStatus.SENT) return FormStatus.TEMP_STORED;
-    if (form.status === FormStatus.TEMP_STORED) return FormStatus.RESEALED;
-    if (form.status === FormStatus.RESEALED) return FormStatus.RESENT;
+    if (form.status === FormStatus.Sent) return FormStatus.TempStored;
+    if (form.status === FormStatus.TempStored) return FormStatus.Resealed;
+    if (form.status === FormStatus.Resealed) return FormStatus.Resent;
     return null;
   }
 
   if (currentUserIsRecipient) {
     if (
-      form.status === FormStatus.SENT &&
+      form.status === FormStatus.Sent &&
       form.temporaryStorageDetail?.temporaryStorer == null
     )
-      return FormStatus.RECEIVED;
-    if (form.status === FormStatus.RECEIVED) return FormStatus.PROCESSED;
+      return FormStatus.Received;
+    if (form.status === FormStatus.Received) return FormStatus.Processed;
   }
 
   return null;
 }
 
 function isDraftStatus(status: string) {
-  return status === FormStatus.DRAFT;
+  return status === FormStatus.Draft;
 }
 
 function isHistoryStatus(status: string) {
   return [
-    FormStatus.PROCESSED,
-    FormStatus.NO_TRACEABILITY,
-    FormStatus.REFUSED,
+    FormStatus.Processed,
+    FormStatus.NoTraceability,
+    FormStatus.Refused,
   ].includes(status as FormStatus);
 }

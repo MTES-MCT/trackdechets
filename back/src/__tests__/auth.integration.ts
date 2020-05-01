@@ -173,7 +173,7 @@ describe("Authentification with token", () => {
     const res = await request.post("/").send({ query: "{ me { email } }" });
     expect(res.body.errors).toHaveLength(1);
     expect(res.body.errors[0].message).toEqual("Vous n'êtes pas connecté.");
-    expect(res.body.data.me).toBeNull();
+    expect(res.body.data).toBeNull();
   });
 
   it("should authenticate using JWT token", async () => {

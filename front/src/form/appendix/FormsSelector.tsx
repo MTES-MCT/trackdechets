@@ -1,7 +1,7 @@
 import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer, useState } from "react";
 import useDebounce from "../../utils/use-debounce";
-import { Form } from "../model";
+import { Form } from "../../generated/graphql/types";
 import formatWasteCodeEffect from "../waste-code/format-waste-code.effect";
 import FormsTable from "./FormsTable";
 
@@ -18,13 +18,13 @@ function reducer(
       const sp = action.payload as Form;
       return {
         selected: [sp.readableId, ...state.selected],
-        quantity: round(state.quantity + sp.quantityReceived),
+        quantity: round(state.quantity + (sp.quantityReceived || 0)),
       };
     case "unselect":
       const usp = action.payload as Form;
       return {
         selected: state.selected.filter((v) => v !== usp.readableId),
-        quantity: round(state.quantity - usp.quantityReceived),
+        quantity: round(state.quantity - (usp.quantityReceived || 0)),
       };
     case "selectAll":
       const sap = action.payload as Form[];
@@ -32,7 +32,7 @@ function reducer(
         selected: sap.map((v: Form) => v.readableId),
         quantity: round(
           sap.reduce(
-            (prev: number, cur: Form) => (prev += cur.quantityReceived),
+            (prev: number, cur: Form) => (prev += cur.quantityReceived || 0),
             0
           )
         ),

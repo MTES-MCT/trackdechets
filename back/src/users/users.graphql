@@ -1,24 +1,20 @@
 type Query {
-
   "Renvoie les informations sur l'utilisateur authentifié"
-  me: User
+  me: User!
 
   """
   USAGE INTERNE > Mon Compte > Générer un token
   Renvoie un token permettant de s'authentifier à l'API Trackdéchets
   """
-  apiKey: String
+  apiKey: String!
 }
 
-
-
 type Mutation {
-
   """
   USAGE INTERNE
   Permet de créer un nouvel utilisateur
   """
-  signup(userInfos: SignupInput!): User
+  signup(userInfos: SignupInput!): User!
 
   """
   DEPRECATED - La récupération de token pour le compte de tiers
@@ -39,51 +35,50 @@ type Mutation {
   USAGE INTERNE
   Envoie un email pour la réinitialisation du mot de passe
   """
-  resetPassword(email: String!): Boolean
+  resetPassword(email: String!): Boolean!
 
   """
   USAGE INTERNE
   Met à jour les informations de l'utilisateur
   """
-  editProfile(name: String, phone: String, email: String): User
+  editProfile(name: String, phone: String, email: String): User!
 
   """
   USAGE INTERNE
   Invite un nouvel utilisateur à un établissement
   """
-  inviteUserToCompany(email: String!, siret: String!, role: UserRole!): CompanyPrivate
+  inviteUserToCompany(
+    email: String!
+    siret: String!
+    role: UserRole!
+  ): CompanyPrivate!
 
   """
   USAGE INTERNE
   Renvoie l'email d'invitation à un établissement
   """
-  resendInvitation(email: String!, siret: String!): Boolean
+  resendInvitation(email: String!, siret: String!): Boolean!
 
   """
   USAGE INTERNE
   Active le compte d'un utilisateur invité
   """
-  joinWithInvite(
-    inviteHash: String!
-    name: String!
-    password: String!
-  ): User!
+  joinWithInvite(inviteHash: String!, name: String!, password: String!): User!
 
   """
   USAGE INTERNE
   Supprime les droits d'un utilisateurs sur un établissement
   """
-  removeUserFromCompany(userId: ID!, siret: String!):  CompanyPrivate
+  removeUserFromCompany(userId: ID!, siret: String!): CompanyPrivate!
 
   """
   USAGE INTERNE
   Supprime une invitation à un établissement
   """
-  deleteInvitation(email: String!, siret: String!):  CompanyPrivate
+  deleteInvitation(email: String!, siret: String!): CompanyPrivate!
 }
 
 input SignupInput {
-
   "Email de l'utilisateur"
   email: String!
 
@@ -96,7 +91,6 @@ input SignupInput {
   "Numéro de téléphone de l'utilisateur"
   phone: String
 }
-
 
 "Cet objet est renvoyé par la mutation login qui est dépréciée"
 type AuthPayload {
@@ -133,7 +127,6 @@ enum UserRole {
 
 "Représente un utilisateur sur la plateforme Trackdéchets"
 type User {
-
   "Identifiant opaque"
   id: ID!
 
@@ -147,5 +140,5 @@ type User {
   phone: String
 
   "Liste des établissements dont l'utilisateur est membre"
-  companies: [CompanyPrivate]
+  companies: [CompanyPrivate!]!
 }

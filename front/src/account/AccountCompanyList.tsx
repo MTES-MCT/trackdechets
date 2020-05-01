@@ -1,13 +1,14 @@
 import React from "react";
 import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
-import AccountCompany, { Company } from "./AccountCompany";
+import AccountCompany from "./AccountCompany";
 import { FaPlusCircle } from "react-icons/fa";
 import styles from "./AccountCompanyList.module.scss";
 import { useHistory, useRouteMatch, Link } from "react-router-dom";
+import { CompanyPrivate } from "../generated/graphql/types";
 
 type Props = {
-  companies: [Company];
+  companies: CompanyPrivate[] | null | undefined;
 };
 
 AccountCompanyList.fragments = {
@@ -25,7 +26,7 @@ export default function AccountCompanyList({ companies }: Props) {
 
   return (
     <>
-      {companies.length ? (
+      {companies && companies.length > 0 ? (
         companies.map((company) => (
           <AccountCompany
             key={company.siret}
@@ -60,7 +61,6 @@ export default function AccountCompanyList({ companies }: Props) {
           </p>
         </div>
       )}
-
       <div
         className={["panel", styles.addCompany].join(" ")}
         onClick={() => history.push(`${url}/new`)}

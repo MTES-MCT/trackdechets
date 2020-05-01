@@ -3,10 +3,9 @@ import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
+import { User, MutationEditProfileArgs } from "../../generated/graphql/types";
 
-type Me = {
-  name: string;
-};
+type Me = Pick<User, "name">;
 
 type Props = {
   me: Me;
@@ -41,7 +40,7 @@ export default function AccountFieldName({ me }: Props) {
       label="Nom utilisateur"
       value={me.name}
       renderForm={(toggleEdition) => (
-        <AccountFormSimpleInput<Me>
+        <AccountFormSimpleInput<Partial<MutationEditProfileArgs>>
           name="name"
           type="text"
           value={me.name}

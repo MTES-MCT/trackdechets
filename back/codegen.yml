@@ -8,7 +8,14 @@ generates:
     config:
       contextType: ../../types#GraphQLContext
       enumsAsTypes: true
+  front/generated/graphql/types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+    config:
+      avoidOptionals: true
   documentation/api-reference.md:
     plugins:
       - graphql-markdown-plugin.js
+
 

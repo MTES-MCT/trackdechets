@@ -4,7 +4,7 @@ import RedErrorMessage from "../common/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
 import initialState from "./initial-state";
-import { Form } from "./model";
+import { Form } from "../generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
 import "./Recipient.scss";
@@ -12,7 +12,7 @@ import "./Recipient.scss";
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
 
-  const [hasTrader, setHasTrader] = useState(!!values.trader.company.siret);
+  const [hasTrader, setHasTrader] = useState(!!values.trader?.company?.siret);
 
   useEffect(() => {
     if (!hasTrader) {
@@ -32,7 +32,7 @@ export default function Recipient() {
 
       <h4 className="required">
         Installation{" "}
-        {values.recipient.isTempStorage
+        {values.recipient?.isTempStorage
           ? "d'entreposage ou de reconditionnement"
           : "de destination"}
       </h4>

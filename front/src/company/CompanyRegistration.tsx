@@ -1,8 +1,7 @@
 import React from "react";
+import { CompanyPublic } from "../generated/graphql/types";
 
-type Props = {
-  isRegistered: boolean;
-};
+type Props = Pick<CompanyPublic, "isRegistered">;
 
 export default function CompanyRegistration(props: Props) {
   return (

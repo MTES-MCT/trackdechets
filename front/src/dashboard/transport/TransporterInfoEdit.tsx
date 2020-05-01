@@ -1,12 +1,9 @@
 import { useMutation } from "@apollo/react-hooks";
 import { useFormik } from "formik";
-
 import gql from "graphql-tag";
-
 import React, { useState } from "react";
 import { FaEdit } from "react-icons/fa";
-
-import { Form as FormModel } from "../../form/model";
+import { Form as FormModel } from "../../generated/graphql/types";
 import { NotificationError } from "../../common/Error";
 import { capitalize } from "../../common/helper";
 import "./TransportSignature.scss";
