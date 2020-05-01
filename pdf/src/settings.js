@@ -185,6 +185,7 @@ const temporaryStorageDetailsFieldSettings = {
   transporterReceipt: { x: 350, y: 417 },
   transporterDepartment: { x: 472, y: 417 },
   transporterValidityLimit: { x: 366, y: 425 },
+  transporterSentAt: { x: 388, y: 455 },
 
   signedBy: { x: 75, y: 562 },
   signedAt: { x: 215, y: 562 },
