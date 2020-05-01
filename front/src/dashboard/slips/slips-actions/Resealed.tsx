@@ -22,10 +22,34 @@ export default function Resealed({
     emptyState,
     removeNulls(form.temporaryStorageDetail)
   );
-
   const [isRefurbished, setIsRefurbished] = useState(
     !!form.temporaryStorageDetail.wasteDetails.quantity
   );
+
+  function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
+    setIsRefurbished(!isRefurbished);
+    const keys = [
+      "onuCode",
+      "packagings",
+      "otherPackaging",
+      "numberOfPackages",
+      "quantity",
+      "quantityType",
+    ];
+    const hasBeenFilled = keys.some(
+      (key) => initialValues.wasteDetails[key] !== values.wasteDetails[key]
+    );
+
+    if (isRefurbished && !hasBeenFilled) {
+      setFieldValue(
+        "wasteDetails",
+        keys.reduce((prev, key) => {
+          prev[key] = form.wasteDetails[key];
+          return prev;
+        }, {})
+      );
+    }
+  }
 
   return (
     <div>
@@ -33,7 +57,7 @@ export default function Resealed({
         initialValues={initialValues}
         onSubmit={(values) => onSubmit({ info: values })}
       >
-        {({ values }) => (
+        {({ values, setFieldValue }) => (
           <Form>
             <h5>Installation de destination prévue</h5>
 
@@ -67,7 +91,7 @@ export default function Resealed({
                 <input
                   type="checkbox"
                   checked={isRefurbished}
-                  onChange={() => setIsRefurbished(!isRefurbished)}
+                  onChange={() => onChangeRefurbished(values, setFieldValue)}
                 />
                 Les déchets ont subi un reconditionnement, je dois saisir les
                 détails
