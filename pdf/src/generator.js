@@ -163,6 +163,7 @@ const buildPdf = async (params) => {
       tempStorerCompanyName: params.recipientCompanyName,
       wasteAcceptationStatus:
         params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
+      sentAt: signedAt,
       currentPageNumber: 2,
       totalPagesNumber: 2,
       formReadableId: params.readableId,

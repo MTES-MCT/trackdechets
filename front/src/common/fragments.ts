@@ -104,9 +104,12 @@ export const temporaryStorageDetailFragment = gql`
       processingOperation
     }
     wasteDetails {
-      code
-      name
+      onuCode
+      packagings
+      otherPackaging
+      numberOfPackages
       quantity
+      quantityType
     }
     transporter {
       ...TransporterFragment

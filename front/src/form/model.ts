@@ -73,7 +73,10 @@ type WasteDetails = {
   code: string;
   name: string;
   packagings: string[];
+  otherPackaging: string;
   onuCode: string;
+  numberOfPackages: number;
+  quantityType: string;
 };
 
 type FormCompany = {
