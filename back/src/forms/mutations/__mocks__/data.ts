@@ -61,7 +61,7 @@ export const getNewValidForm = () =>
     }
   );
 
-export const EMPTY_FORM = {
+const EMPTY_FORM = {
   emitter: {
     type: "PRODUCER",
     workSite: {
@@ -149,3 +149,9 @@ export const EMPTY_FORM = {
     }
   }
 };
+
+// Don't expose the object to avoid sharing modified values of it
+// Instead, only pass deep clone
+export function getEmptyForm(): typeof EMPTY_FORM & { id?: string } {
+  return JSON.parse(JSON.stringify(EMPTY_FORM));
+}

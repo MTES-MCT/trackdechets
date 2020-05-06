@@ -5,7 +5,7 @@ import {
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { prisma } from "../../../generated/prisma-client";
-import { EMPTY_FORM } from "../__mocks__/data";
+import { getEmptyForm } from "../__mocks__/data";
 
 describe("{ mutation { saveForm } }", () => {
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload = { ...EMPTY_FORM };
+    const payload = getEmptyForm();
 
     payload.emitter.workSite = {
       name: "The name",
@@ -68,6 +68,36 @@ describe("{ mutation { saveForm } }", () => {
     );
   });
 
+  test("should create a form as an eco-organisme", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const eo = await prisma.createEcoOrganisme({
+      address: "an address",
+      name: "a name",
+      siret: company.siret
+    });
+
+    const { mutate } = makeClient(user);
+    const payload = getEmptyForm();
+
+    // Current user is only present as the eco-organisme on the form
+    payload.ecoOrganisme = { id: eo.id };
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    expect(data.saveForm.id).toBeDefined();
+  });
+
   test("should create a form with an eco organisme, update it, and then remove it", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -84,7 +114,7 @@ describe("{ mutation { saveForm } }", () => {
     });
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
+    const payload = getEmptyForm();
 
     payload.ecoOrganisme = { id: eo.id };
     payload.emitter.company.siret = company.siret;
@@ -138,7 +168,7 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const createPayload = { ...EMPTY_FORM };
+    const createPayload = getEmptyForm();
 
     createPayload.emitter.company.siret = company.siret;
     createPayload.emitter.company.name = company.name;
@@ -198,7 +228,7 @@ describe("{ mutation { saveForm } }", () => {
     const temporaryStorerCompany = await companyFactory();
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
+    const payload = getEmptyForm();
 
     payload.emitter.company.siret = company.siret;
     payload.emitter.company.name = company.name;
@@ -257,7 +287,7 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
+    const payload = getEmptyForm();
 
     payload.emitter.company.siret = company.siret;
     payload.emitter.company.name = company.name;
@@ -313,7 +343,7 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
+    const payload = getEmptyForm();
 
     payload.emitter.company.siret = company.siret;
     payload.emitter.company.name = company.name;

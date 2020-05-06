@@ -3,12 +3,14 @@ import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import {
   Form,
+  EcoOrganisme,
   FormUpdateInput,
   FormCreateInput,
   Status
 } from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/queries";
 import { ForbiddenError } from "apollo-server-express";
+import { FormInput } from "../../generated/types";
 
 export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const userId = context.user.id;
@@ -85,7 +87,7 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
 }
 
 const formSiretsGetter = (
-  form: Partial<Form> & { ecoOrganisme?: { siret: string } }
+  form: Partial<Form> & { ecoOrganisme?: EcoOrganisme }
 ) => [
   form.emitterCompanySiret,
   form.traderCompanySiret,
@@ -96,20 +98,29 @@ const formSiretsGetter = (
 
 async function checkThatUserIsPartOftheForm(
   userId: string,
-  form: Partial<Form> & { ecoOrganisme?: { siret: string } },
+  form: FormInput,
   context: GraphQLContext
 ) {
   const isEdition = form.id != null;
-  const formSirets = formSiretsGetter(form);
+  const ecoOrganisme = form.ecoOrganisme?.id
+    ? await context.prisma.ecoOrganisme({
+        id: form.ecoOrganisme?.id
+      })
+    : null;
+
+  const formSirets = formSiretsGetter({ ...form, ecoOrganisme });
   const hasPartialFormInput = formSirets.some(siret => siret == null);
 
   if (isEdition && hasPartialFormInput) {
     const savedForm = await context.prisma.form({ id: form.id });
-    const ecoOrganisme = await context.prisma
+    const savedEcoOrganisme = await context.prisma
       .form({ id: form.id })
       .ecoOrganisme();
 
-    const savedFormSirets = formSiretsGetter({ ...savedForm, ecoOrganisme });
+    const savedFormSirets = formSiretsGetter({
+      ...savedForm,
+      ecoOrganisme: savedEcoOrganisme
+    });
     formSirets.push(...savedFormSirets);
   }
 
