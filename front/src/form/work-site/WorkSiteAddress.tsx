@@ -7,7 +7,7 @@ function init({ adress, city, postalCode }) {
   return {
     selectedAdress,
     searchInput: selectedAdress,
-    searchResults: []
+    searchResults: [],
   };
 }
 
@@ -21,7 +21,7 @@ function reducer(state, action) {
       return {
         ...state,
         selectedAdress: action.payload,
-        searchInput: action.payload
+        searchInput: action.payload,
       };
   }
 }
@@ -30,7 +30,7 @@ export default function WorkSiteAddress({
   adress,
   city,
   postalCode,
-  onAddressSelection
+  onAddressSelection,
 }) {
   const [state, dispatch] = useReducer(
     reducer,
@@ -47,8 +47,10 @@ export default function WorkSiteAddress({
       fetch(
         `https://api-adresse.data.gouv.fr/search/?q=${state.searchInput}&type=housenumber&autocomplete=1`
       )
-        .then(res => res.json())
-        .then(res => dispatch({ type: "search_done", payload: res.features }));
+        .then((res) => res.json())
+        .then((res) =>
+          dispatch({ type: "search_done", payload: res.features })
+        );
     }, 300);
 
     return () => {
@@ -60,7 +62,7 @@ export default function WorkSiteAddress({
     onAddressSelection(feature.properties);
     dispatch({
       type: "select_address",
-      payload: feature.properties.label
+      payload: feature.properties.label,
     });
   }
 
@@ -72,7 +74,7 @@ export default function WorkSiteAddress({
           type="text"
           placeholder="Recherchez une adresse puis sélectionnez un des choix qui apparait..."
           value={state.searchInput}
-          onChange={e =>
+          onChange={(e) =>
             dispatch({ type: "search_input", payload: e.target.value })
           }
         />
@@ -85,11 +87,11 @@ export default function WorkSiteAddress({
         </button>
       </div>
 
-      {state.searchResults.map(feature => (
+      {state.searchResults.map((feature) => (
         <div
           className={styles.searchResult}
           key={feature.properties.id}
-          onClick={_ => selectAddress(feature)}
+          onClick={(_) => selectAddress(feature)}
         >
           {feature.properties.label}
         </div>

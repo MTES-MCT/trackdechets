@@ -1,5 +1,5 @@
 import { prisma } from "../../generated/prisma-client";
-import axios from "axios";
+import { searchCompany } from "../../companies/sirene";
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -13,24 +13,16 @@ export async function setCompanyName() {
     console.log(`Setting name for company ${company.siret}`);
 
     try {
-      const response = await axios.get(
-        `http://td-insee:81/siret/${company.siret}`
-      );
+      const companyInfo = await searchCompany(company.siret);
 
-      if (response.status === 200) {
-        const companyInfo = response.data;
-
-        await prisma.updateCompany({
-          data: {
-            name: companyInfo.name
-          },
-          where: {
-            id: company.id
-          }
-        });
-      } else {
-        console.log(`Received status code ${response.status}`, response);
-      }
+      await prisma.updateCompany({
+        data: {
+          name: companyInfo.name
+        },
+        where: {
+          id: company.id
+        }
+      });
     } catch (error) {
       console.log(error);
     }

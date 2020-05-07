@@ -5,7 +5,7 @@ import "rc-tree/assets/index.css";
 
 type Node = { fullKey: string; title: string; children: Node[] };
 const loop = (data: Node[]) => {
-  return data.map(item => {
+  return data.map((item) => {
     if (item.children) {
       return (
         <TreeNode key={item.fullKey} title={`${item.fullKey} - ${item.title}`}>

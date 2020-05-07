@@ -30,17 +30,6 @@
       "expected_status_code": 200
     },
     {
-      "name": "td-insee",
-      "target": "https://api.trackdechets.beta.gouv.fr/health/td-insee",
-      "strict": true,
-      "method": "GET",
-      "component_id": 4,
-      "interval": 5,
-      "timeout": 5,
-      "threshold": 80,
-      "expected_status_code": 200
-    },
-    {
       "name": "td-mail",
       "target": "https://api.trackdechets.beta.gouv.fr/health/td-mail",
       "strict": true,

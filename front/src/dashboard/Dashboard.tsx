@@ -39,7 +39,7 @@ type S = {
 export default function Dashboard() {
   const [activeSiret, setActiveSiret] = useState("");
   const { loading, error, data } = useQuery<MeData>(GET_ME, {
-    onCompleted: data => {
+    onCompleted: (data) => {
       // try to retrieve current siret from localstorage, if not set use siret from first associated company
       let currentSiret = currentSiretService.getSiret();
       if (!currentSiret) {
@@ -48,7 +48,7 @@ export default function Dashboard() {
         currentSiretService.setSiret(currentSiret);
       }
       setActiveSiret(currentSiret);
-    }
+    },
   });
   const match = useRouteMatch();
 

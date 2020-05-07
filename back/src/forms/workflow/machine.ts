@@ -1,14 +1,13 @@
-import { Machine, assign } from "xstate";
-import { FormState } from "./model";
+import { assign, Machine } from "xstate";
+import { GROUP_CODES } from "../../common/constants";
 import { WorkflowError } from "./errors";
 import {
   markFormAppendixAwaitingFormsAsGrouped,
+  markFormAppendixGroupedsAsProcessed,
   validateForm,
-  validateSecurityCode,
-  markFormAppendixGroupedsAsProcessed
+  validateSecurityCode
 } from "./helpers";
-
-export const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
+import { FormState } from "./model";
 
 export const formWorkflowMachine = Machine(
   {
@@ -39,7 +38,7 @@ export const formWorkflowMachine = Machine(
               cond: "isMissingSignature"
             },
             {
-              target: `pendingSecurityCodeValidation`
+              target: `pendingEmitterSecurityCodeValidation`
             }
           ]
         }
@@ -48,7 +47,24 @@ export const formWorkflowMachine = Machine(
         entry: "setStable",
         exit: "setUnStable",
         on: {
+          MARK_TEMP_STORED: [
+            {
+              target: FormState.Refused,
+              cond: "isFormRefusedByTempStorage"
+            },
+            {
+              target: FormState.TempStored,
+              cond: "hasTempStorageDestination"
+            },
+            {
+              target: "error.invalidTransition"
+            }
+          ],
           MARK_RECEIVED: [
+            {
+              target: "error.invalidTransition",
+              cond: "hasTempStorageDestination"
+            },
             {
               target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
               cond: "isFormAccepted"
@@ -115,16 +131,30 @@ export const formWorkflowMachine = Machine(
           onError: { target: "error.invalidForm" }
         }
       },
-      pendingSecurityCodeValidation: {
+      pendingEmitterSecurityCodeValidation: {
         invoke: {
           src: (ctx, event) =>
             validateSecurityCode(
-              ctx.form,
+              ctx.form.emitterCompanySiret,
               event.securityCode,
               ctx.requestContext
             ),
           onDone: {
             target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
+          },
+          onError: { target: "error.invalidSecurityCode" }
+        }
+      },
+      pendingTempStorerSecurityCodeValidation: {
+        invoke: {
+          src: (ctx, event) =>
+            validateSecurityCode(
+              ctx.form.recipientCompanySiret,
+              event.securityCode,
+              ctx.requestContext
+            ),
+          onDone: {
+            target: FormState.Resent
           },
           onError: { target: "error.invalidSecurityCode" }
         }
@@ -140,6 +170,57 @@ export const formWorkflowMachine = Machine(
       [FormState.Processed]: { type: "final" },
       [FormState.NoTraceability]: { type: "final" },
       [FormState.AwaitingGroup]: { type: "final" },
+      [FormState.TempStored]: {
+        entry: "setStable",
+        exit: "setUnStable",
+        on: {
+          MARK_RESEALED: [
+            {
+              target: FormState.Resealed
+            }
+          ],
+          MARK_RESENT: [
+            {
+              target: FormState.Resent
+            }
+          ]
+        }
+      },
+      [FormState.Resealed]: {
+        entry: "setStable",
+        exit: "setUnStable",
+        on: {
+          MARK_RESENT: [
+            {
+              target: FormState.Resent
+            }
+          ],
+          MARK_SIGNED_BY_TRANSPORTER: [
+            {
+              target: "error.missingSignature",
+              cond: "isMissingSignature"
+            },
+            {
+              target: `pendingTempStorerSecurityCodeValidation`
+            }
+          ]
+        }
+      },
+      [FormState.Resent]: {
+        entry: "setStable",
+        exit: "setUnStable",
+        on: {
+          MARK_RECEIVED: [
+            {
+              target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
+              cond: "isFormAccepted"
+            },
+            {
+              target: FormState.Refused
+            }
+          ]
+        }
+      },
       error: {
         states: {
           invalidForm: { meta: WorkflowError.InvalidForm },
@@ -174,7 +255,13 @@ export const formWorkflowMachine = Machine(
         return ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
           ctx.form.wasteAcceptationStatus
         );
-      }
+      },
+      isFormRefusedByTempStorage: (_, event: any) => {
+        return !["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+          event.wasteAcceptationStatus
+        );
+      },
+      hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage
     }
   }
 );

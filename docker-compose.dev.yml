@@ -44,7 +44,7 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
-    command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
+    command: npm run dev
     volumes:
       - ./back/src:/usr/src/app/src
       - ./doc/docs:/usr/src/app/documentation
@@ -71,17 +71,6 @@ services:
     volumes:
       - ./front/:/usr/src/front
 
-  td-insee:
-    image: td-insee
-    build:
-      context: ./insee
-      dockerfile: Dockerfile
-    ports:
-      - 81:81
-    environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-
   td-pdf:
     image: td-pdf
     build:
@@ -102,6 +91,8 @@ services:
     environment:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
+      MJ_SENDER_EMAIL_ADDRESS: $MJ_SENDER_EMAIL_ADDRESS
+      MJ_SENDER_NAME: $MJ_SENDER_NAME
 
   td-etl:
     image: td-etl

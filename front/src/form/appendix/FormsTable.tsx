@@ -31,9 +31,9 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
   const { loading, error, data } = useQuery(GET_APPENDIX_FORMS, {
     variables: {
       wasteCode,
-      emitterSiret: values.emitter.company.siret
+      emitterSiret: values.emitter.company.siret,
     },
-    skip: !values.emitter.company.siret
+    skip: !values.emitter.company.siret,
   });
 
   if (loading) return <p>Chargement...</p>;
@@ -65,7 +65,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
             <input
               type="checkbox"
               checked={selectedItems.length === forms.length}
-              onChange={e => onToggle(e.target.checked ? forms : [])}
+              onChange={(e) => onToggle(e.target.checked ? forms : [])}
             />
           </th>
           <th>Numéro</th>
@@ -77,7 +77,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
         </tr>
       </thead>
       <tbody>
-        {forms.map(form => (
+        {forms.map((form) => (
           <tr key={form.readableId} onClick={() => onToggle(form)}>
             <td>
               <input

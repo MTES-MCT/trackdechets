@@ -18,7 +18,7 @@ AccountFielCompanyContactPhone.fragments = {
       contactPhone
       userRole
     }
-  `
+  `,
 };
 
 const UPDATE_CONTACT_PHONE = gql`
@@ -36,8 +36,8 @@ const yupSchema = object().shape({
     .trim()
     .matches(/^(0[1-9])(?:[ _.-]?(\d{2})){4}$/, {
       message: "Le numéro de téléphone est invalide",
-      excludeEmptyString: true
-    })
+      excludeEmptyString: true,
+    }),
 });
 
 export default function AccountFielCompanyContactPhone({ company }: Props) {
@@ -51,7 +51,7 @@ export default function AccountFielCompanyContactPhone({ company }: Props) {
           name={fieldName}
           label={fieldLabel}
           value={company.contactPhone}
-          renderForm={toggleEdition => (
+          renderForm={(toggleEdition) => (
             <AccountFormSimpleInput<{ contactPhone: string }>
               name="contactPhone"
               type="tel"

@@ -8,7 +8,7 @@ type Props = {
 
 export default function CompanyActivity({ installation }: Props) {
   const rubriquesInActivity = installation.rubriques.filter(
-    r => r.etatActivite === "En fonct."
+    (r) => r.etatActivite === "En fonct."
   );
 
   const rubriquesSorted = [...rubriquesInActivity].sort((r1, r2) => {
@@ -23,7 +23,7 @@ export default function CompanyActivity({ installation }: Props) {
       "Installation de collecte de déchets apportés par le producteur initial",
     WASTE_VEHICLES:
       "Installation d'entreposage, dépollution, démontage, découpage de VHU",
-    WASTEPROCESSOR: "Installation de traitement"
+    WASTEPROCESSOR: "Installation de traitement",
   };
 
   return (
@@ -36,7 +36,7 @@ export default function CompanyActivity({ installation }: Props) {
         </p>
 
         {[...new Set(rubriquesSorted.map((r: Rubrique) => r.category))]
-          .filter(category => category !== null)
+          .filter((category) => category !== null)
           .map((category, idx) => {
             return (
               <div className="label" key={idx}>

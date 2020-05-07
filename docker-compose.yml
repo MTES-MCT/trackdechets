@@ -59,13 +59,6 @@ services:
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
-  td-insee:
-    image: betagouv/trackdechets-insee:master
-    restart: always
-    environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-
   td-pdf:
     image: betagouv/trackdechets-pdf:master
     restart: always
@@ -78,6 +71,8 @@ services:
     environment:
       MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
       MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
+      MJ_SENDER_EMAIL_ADDRESS: $MJ_SENDER_EMAIL_ADDRESS
+      MJ_SENDER_NAME: $MJ_SENDER_NAME
 
   td-doc:
     image: betagouv/trackdechets-doc:master

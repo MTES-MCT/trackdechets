@@ -7,7 +7,6 @@ export const healthRouter = express.Router();
 const TIMEOUT = 5000;
 const services = [
   { name: "td-pdf", port: 3201, check: pingCheck },
-  { name: "td-insee", port: 81, check: pingCheck },
   { name: "td-mail", port: 80, check: pingCheck },
   { name: "td-etl", port: 80, check: etlCheck }
 ];

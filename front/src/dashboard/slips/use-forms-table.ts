@@ -7,7 +7,7 @@ function getKey(object: any, key: string) {
 }
 
 function compareBy(key: string) {
-  return function(a: any, b: any) {
+  return function (a: any, b: any) {
     if (getKey(a, key) < getKey(b, key)) return -1;
     if (getKey(a, key) > getKey(b, key)) return 1;
     return 0;
@@ -33,12 +33,12 @@ export function useFormsTable(
   }
 
   function filter(key: string, value: string) {
-    const newFilters = filters.filter(f => f.key !== key && f.value);
+    const newFilters = filters.filter((f) => f.key !== key && f.value);
     newFilters.push({ key, value });
 
-    const newForms = inputForms.filter(f =>
+    const newForms = inputForms.filter((f) =>
       newFilters.every(
-        filter =>
+        (filter) =>
           getKey(f, filter.key)
             .toLowerCase()
             .indexOf(filter.value.toLowerCase()) > -1

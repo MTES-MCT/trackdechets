@@ -1,5 +1,5 @@
 import { prisma, Company } from "../../generated/prisma-client";
-import { getCachedCompanySireneInfo } from "../insee";
+import { searchCompany } from "../sirene";
 import { getInstallation } from "./";
 
 const companyFragment = `
@@ -36,7 +36,7 @@ export async function getUserCompanies(userId: string) {
 
   return Promise.all(
     companies.map(async company => {
-      const companySireneInfo = await getCachedCompanySireneInfo(
+      const companySireneInfo = await searchCompany(
         company.siret
       ).catch(_ => ({}));
       const companyIcpeInfo = {

@@ -15,9 +15,3 @@ services:
       dockerfile: Dockerfile.test
     environment:
       - CI=true
-
-  td-insee:
-    restart: "no"
-    build:
-      context: ./insee
-      dockerfile: Dockerfile.test

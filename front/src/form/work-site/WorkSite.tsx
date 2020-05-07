@@ -8,7 +8,7 @@ const FIELDS = ["name", "address", "city", "postalCode", "infos"];
 export default function WorkSite() {
   const { values, setFieldValue } = useFormikContext<Form>();
   const [showWorkSite, setShowWorkSite] = useState(
-    FIELDS.some(field => values.emitter.workSite[field])
+    FIELDS.some((field) => values.emitter.workSite[field])
   );
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function WorkSite() {
               adress={values.emitter.workSite.address}
               city={values.emitter.workSite.city}
               postalCode={values.emitter.workSite.postalCode}
-              onAddressSelection={details => setAddress(details)}
+              onAddressSelection={(details) => setAddress(details)}
             />
           </div>
 

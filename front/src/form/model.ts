@@ -3,6 +3,17 @@ export type Form = {
   customId: string;
   readableId: string;
   status: string;
+  stateSummary: {
+    quantity: number;
+    packagings: string[];
+    onuCode: string;
+    transporterNumberPlate: string;
+    transporterCustomInfo: string;
+    transporter: FormCompany;
+    recipient: FormCompany;
+    emitter: FormCompany;
+    lastActionOn: string;
+  };
   ecoOrganisme: {
     id: string;
   };
@@ -20,26 +31,52 @@ export type Form = {
   recipient: {
     company: FormCompany;
     processingOperation: String;
+    isTempStorage: boolean;
   };
   trader: {
     company: FormCompany;
   };
-  transporter: {
-    company: FormCompany;
-    numberPlate: string;
-    customInfo: string;
-  };
-  wasteDetails: {
-    quantity: number;
-    code: string;
-    name: string;
-    packagings: string[];
-    onuCode: string;
-  };
+  transporter: Transporter;
+  wasteDetails: WasteDetails;
 
   receivedAt: string;
   quantityReceived: number;
   processingOperationDone: string;
+  temporaryStorageDetail: {
+    temporaryStorer: {
+      quantityType: string;
+      quantityReceived: number;
+      wasteAcceptationStatus: string;
+      wasteRefusalReason: string;
+
+      receivedAt: string;
+      signedAt: string;
+    };
+    destination: {
+      company: FormCompany;
+      processingOperation: string;
+    };
+    transporter: Transporter;
+    wasteDetails: WasteDetails;
+  };
+};
+
+type Transporter = {
+  company: FormCompany;
+  isExemptedOfReceipt: boolean;
+  numberPlate: string;
+  customInfo: string;
+};
+
+type WasteDetails = {
+  quantity: number;
+  code: string;
+  name: string;
+  packagings: string[];
+  otherPackaging: string;
+  onuCode: string;
+  numberOfPackages: number;
+  quantityType: string;
 };
 
 type FormCompany = {

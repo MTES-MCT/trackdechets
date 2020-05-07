@@ -17,15 +17,15 @@ export default function Duplicate({ formId }: Props) {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret: currentSiretService.getSiret() },
-        getNewData: data => ({
-          forms: [...data.forms, duplicateForm]
-        })
+        getNewData: (data) => ({
+          forms: [...data.forms, duplicateForm],
+        }),
       });
     },
     onCompleted: () =>
       cogoToast.success(
         `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`
-      )
+      ),
   });
 
   return (

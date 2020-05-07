@@ -3,11 +3,20 @@ import { markAsSealed } from "../mark-as";
 import { getNewValidForm } from "../__mocks__/data";
 import { flattenObjectForDb } from "../../form-converter";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
-import { formSchema } from "../../validator";
-import { unflattenObjectFromDb } from "../../form-converter";
+
+const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
+const formMock = jest.fn(() => Promise.resolve({}));
+function mockFormWith(value) {
+  const result: any = Promise.resolve(value);
+  result.temporaryStorageDetail = temporaryStorageDetailMock;
+  result.appendix2Forms = appendix2FormsMock;
+  formMock.mockReturnValue(result);
+}
+
 describe("Forms -> markAsSealed mutation", () => {
   const prisma = {
-    form: jest.fn(() => Promise.resolve({})),
+    form: formMock,
     updateForm: jest.fn(() => Promise.resolve({})),
     createForm: jest.fn(() => Promise.resolve({})),
     createStatusLog: jest.fn(() => Promise.resolve({})),
@@ -37,7 +46,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
-      prisma.form.mockResolvedValue(flattenObjectForDb(form));
+      mockFormWith(flattenObjectForDb(form));
 
       await markAsSealed(null, { id: 1 }, defaultContext);
     } catch (err) {
@@ -55,7 +64,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
-      prisma.form.mockResolvedValue(flattenObjectForDb(form));
+      mockFormWith(flattenObjectForDb(form));
 
       await markAsSealed(null, { id: 1 }, defaultContext);
     } catch (err) {
@@ -77,7 +86,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
-      prisma.form.mockResolvedValue(flattenObjectForDb(form));
+      mockFormWith(flattenObjectForDb(form));
 
       await markAsSealed(null, { id: form.id }, defaultContext);
     } catch (err) {
@@ -94,7 +103,7 @@ describe("Forms -> markAsSealed mutation", () => {
     expect.assertions(1);
     try {
       getUserCompaniesMock.mockResolvedValue([{ siret: "any siret" } as any]);
-      prisma.form.mockResolvedValue({ id: 1, status: "SENT" });
+      mockFormWith({ id: 1, status: "SENT" });
 
       await markAsSealed(null, { id: 1 }, defaultContext);
     } catch (err) {
@@ -109,11 +118,8 @@ describe("Forms -> markAsSealed mutation", () => {
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.emitter.company.siret } as any
     ]);
-    prisma.form
-      .mockReturnValue({
-        appendix2Forms: () => Promise.resolve([])
-      } as any)
-      .mockReturnValueOnce(Promise.resolve(flattenObjectForDb(form)));
+    appendix2FormsMock.mockResolvedValue([]);
+    mockFormWith(Promise.resolve(flattenObjectForDb(form)));
 
     await markAsSealed(null, { id: 1 }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
@@ -126,11 +132,8 @@ describe("Forms -> markAsSealed mutation", () => {
       { siret: form.emitter.company.siret } as any
     ]);
 
-    prisma.form
-      .mockReturnValue({
-        appendix2Forms: () => Promise.resolve([{ id: "appendix id" }])
-      } as any)
-      .mockReturnValueOnce(Promise.resolve(flattenObjectForDb(form)));
+    appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
+    mockFormWith(Promise.resolve(flattenObjectForDb(form)));
 
     await markAsSealed(null, { id: 1 }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);

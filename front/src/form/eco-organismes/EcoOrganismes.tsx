@@ -26,25 +26,25 @@ function init(
     isActive,
     ecoOrganismes,
     searchClue: "",
-    selectedOrganismeId
+    selectedOrganismeId,
   };
 }
 
 function reducer(state, action) {
   switch (action.type) {
     case "toggle_activation":
-      return init("", !state.isActive, state.ecoOrganismes);
+      return init(null, !state.isActive, state.ecoOrganismes);
     case "select":
       return {
         ...state,
-        selectedOrganismeId: action.payload
+        selectedOrganismeId: action.payload,
       };
     case "fetch":
       return { ...state, ecoOrganismes: action.payload };
     case "search":
       return {
         ...state,
-        searchClue: action.payload.toLowerCase()
+        searchClue: action.payload.toLowerCase(),
       };
   }
 }
@@ -52,7 +52,7 @@ function reducer(state, action) {
 export default function EcoOrganismes(props) {
   const [field] = useField(props);
   const { setFieldValue } = useFormikContext();
-  const [state, dispatch] = useReducer(reducer, field.value, init);
+  const [state, dispatch] = useReducer(reducer, field.value?.id, init);
 
   const { loading, error, data } = useQuery(GET_ECO_ORGANISMES);
 
@@ -63,7 +63,10 @@ export default function EcoOrganismes(props) {
   }, [data]);
 
   useEffect(() => {
-    setFieldValue(field.name, state.selectedOrganismeId);
+    setFieldValue(
+      field.name,
+      state.selectedOrganismeId ? { id: state.selectedOrganismeId } : null
+    );
   }, [state.selectedOrganismeId, field.name, setFieldValue]);
 
   return (
@@ -100,10 +103,10 @@ export default function EcoOrganismes(props) {
                 <input
                   type="text"
                   placeholder="Filtrer les éco-organismes par nom..."
-                  onChange={e =>
+                  onChange={(e) =>
                     dispatch({
                       type: "search",
-                      payload: e.target.value.toLowerCase()
+                      payload: e.target.value.toLowerCase(),
                     })
                   }
                 />
@@ -117,12 +120,14 @@ export default function EcoOrganismes(props) {
               </div>
               <div className={styles.list}>
                 <CompanyResults
-                  onSelect={eo => dispatch({ type: "select", payload: eo.id })}
-                  results={state.ecoOrganismes.filter(eo =>
+                  onSelect={(eo) =>
+                    dispatch({ type: "select", payload: eo.id })
+                  }
+                  results={state.ecoOrganismes.filter((eo) =>
                     eo.name.toLowerCase().includes(state.searchClue)
                   )}
                   selectedItem={state.ecoOrganismes.find(
-                    eo => eo.id === state.selectedOrganismeId
+                    (eo) => eo.id === state.selectedOrganismeId
                   )}
                 />
               </div>

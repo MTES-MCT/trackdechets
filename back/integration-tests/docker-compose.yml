@@ -44,3 +44,9 @@ services:
       LETSENCRYPT_HOST: $API_HOST
       PRISMA_ENDPOINT: $PRISMA_ENDPOINT
       PRISMA_SECRET: $PRISMA_SECRET
+
+  td-pdf:
+    image: td-pdf
+    build:
+      context: ../../pdf
+      dockerfile: Dockerfile

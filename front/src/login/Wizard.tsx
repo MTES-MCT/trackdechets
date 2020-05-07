@@ -13,19 +13,19 @@ export class Wizard extends React.Component<Props, State> {
     super(props);
     this.state = {
       page: 0,
-      values: props.initialValues
+      values: props.initialValues,
     };
   }
 
   next = (values: Object) =>
-    this.setState(state => ({
+    this.setState((state) => ({
       page: Math.min(state.page + 1, this.props.children.length - 1),
-      values
+      values,
     }));
 
   previous = () =>
-    this.setState(state => ({
-      page: Math.max(state.page - 1, 0)
+    this.setState((state) => ({
+      page: Math.max(state.page - 1, 0),
     }));
 
   validate = (values: Object) => {

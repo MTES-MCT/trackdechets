@@ -1,15 +1,10 @@
-
 type Query {
-
   """
   Renvoie des informations publiques sur un établissement
   extrait de la base SIRENE et de la base des installations
   classées pour la protection de l'environnement (ICPE)
   """
-  companyInfos(
-    "SIRET de l'établissement"
-    siret: String!
-    ): CompanyPublic
+  companyInfos("SIRET de l'établissement" siret: String!): CompanyPublic
 
   """
   Effectue une recherche floue sur la base SIRENE et enrichit
@@ -20,19 +15,16 @@ type Query {
     Champ utilisé pour faire une recherche floue
     sur la nom de l'établissement, ex: 'Boulangerie Dupont'
     """
-    clue: String!,
+    clue: String!
     "(Optionnel) Filtre les résultats par numéro de département"
-    department: Int
-    ): [CompanySearchResult]
+    department: String
+  ): [CompanySearchResult]
 
   """
   Renvoie les établissements favoris de l'utilisateur. C'est à dire les
   établissements qui font souvent partis des BSD édités
   """
-  favorites(
-    "type de favoris"
-    type: FavoriteType!
-    ): [CompanyFavorite]
+  favorites("type de favoris" type: FavoriteType!): [CompanyFavorite]
 
   """
   USAGE INTERNE
@@ -42,7 +34,6 @@ type Query {
 }
 
 type Mutation {
-
   """
   USAGE INTERNE
   Renouvelle le code de sécurité de l'établissement
@@ -82,15 +73,14 @@ type Mutation {
   """
   createUploadLink(
     "nom du fichier"
-    fileName: String!,
+    fileName: String!
     "type de fichier"
     fileType: String!
-    ): UploadLink
+  ): UploadLink
 }
 
 "Profil entreprise"
 enum CompanyType {
-
   "Producteur de déchet"
   PRODUCER
 
@@ -113,10 +103,8 @@ enum CompanyType {
   TRADER
 }
 
-
 "Information sur un établissement accessible par un utilisateur membre"
 type CompanyPrivate {
-
   "Identifiant opaque"
   id: ID!
 
@@ -178,10 +166,8 @@ type CompanyPrivate {
   installation: Installation
 }
 
-
 "Information sur un établissement accessible publiquement"
 type CompanyPublic {
-
   "Email de contact"
   contactEmail: String
 
@@ -193,6 +179,9 @@ type CompanyPublic {
 
   "SIRET de l'établissement"
   siret: String
+
+  "État administratif de l'établissement. A = Actif, F = Fermé"
+  etatAdministratif: String
 
   "Adresse de l'établissement"
   address: String
@@ -222,11 +211,11 @@ type CompanyPublic {
   Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
   """
   isRegistered: Boolean
+
 }
 
 "Information sur un établissement accessible publiquement en recherche"
 type CompanySearchResult {
-
   "SIRET de l'établissement"
   siret: String
 
@@ -264,7 +253,6 @@ La liste des favoris est constituée à partir de l'historique des
 BSD édités
 """
 type CompanyFavorite {
-
   "Nom de l'établissement"
   name: String
 
@@ -306,7 +294,6 @@ type EcoOrganisme {
 
 "Lien d'upload"
 type UploadLink {
-
   "URL signé permettant d'uploader un fichier"
   signedUrl: String
 
@@ -316,7 +303,6 @@ type UploadLink {
 
 "Payload permettant le rattachement d'un établissement à un utilisateur"
 input PrivateCompanyInput {
-
   "SIRET de l'établissement"
   siret: String!
 
@@ -341,7 +327,6 @@ input PrivateCompanyInput {
 
 "Information sur utilisateur au sein d'un établissement"
 type CompanyMember {
-
   "Identifiant opaque"
   id: ID!
 
@@ -371,6 +356,8 @@ enum FavoriteType {
   RECIPIENT
   TRADER
   NEXT_DESTINATION
+  TEMPORARY_STORAGE_DETAIL
+  DESTINATION
 }
 
 """
@@ -379,7 +366,6 @@ Pour plus de détails, se référer à la
 [nomenclature des ICPE](https://www.georisques.gouv.fr/dossiers/installations/nomenclature-ic)
 """
 type Rubrique {
-
   """
   Numéro de rubrique tel que défini dans la nomenclature des ICPE
   Ex: 2710
@@ -422,7 +408,6 @@ enum GerepType {
 
 "Type de déchets autorisé pour une rubrique"
 enum WasteType {
-
   "Déchet inerte"
   INERTE
 
@@ -435,7 +420,6 @@ enum WasteType {
 
 "Représente une ligne dans une déclaration GEREP"
 type Declaration {
-
   "Année de la déclaration"
   annee: String
 
@@ -451,7 +435,6 @@ type Declaration {
 
 "Installation pour la protection de l'environnement (ICPE)"
 type Installation {
-
   "Identifiant S3IC"
   codeS3ic: String
 

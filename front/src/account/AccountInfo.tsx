@@ -23,7 +23,7 @@ AccountInfo.fragments = {
     }
     ${AccountFieldPhone.fragments.me},
     ${AccountFieldName.fragments.me}
-  `
+  `,
 };
 
 export default function AccountInfo({ me }: Props) {

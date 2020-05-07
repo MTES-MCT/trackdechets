@@ -124,6 +124,9 @@ export default function Partners() {
             <figure>
               <img src="/partners-logos/sarp.png" alt="Sarp Veolia" />
             </figure>
+            <figure>
+              <img src="/partners-logos/colleco.png" alt="Colleco" />
+            </figure>
           </div>
         </div>
       </section>

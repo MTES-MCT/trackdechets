@@ -1,3 +1,21 @@
+const initialCompany = {
+  siret: "",
+  name: "",
+  address: "",
+  contact: "",
+  mail: "",
+  phone: "",
+};
+
+const initialTransporter = {
+  isExemptedOfReceipt: false,
+  receipt: "",
+  department: "",
+  validityLimit: null,
+  numberPlate: "",
+  company: initialCompany,
+};
+
 export default {
   emitter: {
     type: "PRODUCER",
@@ -6,56 +24,22 @@ export default {
       address: "",
       city: "",
       postalCode: "",
-      infos: ""
+      infos: "",
     },
-    company: {
-      siret: "",
-      name: "",
-      address: "",
-      contact: "",
-      mail: "",
-      phone: ""
-    }
+    company: initialCompany,
   },
   recipient: {
     cap: "",
     processingOperation: "",
-    company: {
-      siret: "",
-      name: "",
-      address: "",
-      contact: "",
-      mail: "",
-      phone: ""
-    }
+    isTempStorage: false,
+    company: initialCompany,
   },
-  transporter: {
-    isExemptedOfReceipt: false,
-    receipt: "",
-    department: "",
-    validityLimit: null,
-    numberPlate: "",
-    company: {
-      siret: "",
-      name: "",
-      address: "",
-      contact: "",
-      mail: "",
-      phone: ""
-    }
-  },
+  transporter: initialTransporter,
   trader: {
     receipt: "",
     department: "",
     validityLimit: null,
-    company: {
-      siret: "",
-      name: "",
-      address: "",
-      contact: "",
-      mail: "",
-      phone: ""
-    }
+    company: initialCompany,
   },
   wasteDetails: {
     code: "",
@@ -66,8 +50,15 @@ export default {
     numberOfPackages: null,
     quantity: null,
     quantityType: "ESTIMATED",
-    consistence: "SOLID"
+    consistence: "SOLID",
   },
   appendix2Forms: [],
-  ecoOrganisme: {}
+  ecoOrganisme: {},
+  temporaryStorageDetail: {
+    destination: {
+      company: initialCompany,
+      cap: "",
+      processingOperation: "",
+    },
+  },
 };

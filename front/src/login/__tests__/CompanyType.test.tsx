@@ -9,7 +9,7 @@ describe("<CompanyType />", () => {
     const { container, debug, queryByText } = render(
       <Formik
         initialValues={{
-          companyTypes: []
+          companyTypes: [],
         }}
         onSubmit={() => {}}
       >

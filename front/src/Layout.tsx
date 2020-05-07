@@ -11,7 +11,7 @@ const { REACT_APP_WARNING_MESSAGE } = process.env;
  */
 export default function Layout({
   children,
-  isAuthenticated
+  isAuthenticated,
 }: AuthProps & { children: ReactNode }) {
   return (
     <>
@@ -21,7 +21,7 @@ export default function Layout({
             backgroundColor: "#f8d7da",
             padding: "10px",
             fontWeight: "bold",
-            color: "#721c24"
+            color: "#721c24",
           }}
           className="text-center"
         >

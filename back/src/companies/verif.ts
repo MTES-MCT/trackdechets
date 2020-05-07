@@ -1,5 +1,7 @@
 import axios from "axios";
 import { getInstallation, getRubriques, getDeclarations } from "./queries";
+import { searchCompany } from "./sirene";
+import { UserInputError } from "apollo-server-express";
 
 export const anomalies = {
   NO_ANOMALY: "no_anomaly",
@@ -17,22 +19,28 @@ export const anomalies = {
 export async function verifyPrestataire(siret, wasteCode = null) {
   // Liste d'ICPE au régime déclaratif mis à jour à la main
   // à partir des sites des préfectures.
+
+  let company = null;
+
+  try {
+    company = await searchCompany(siret);
+  } catch (err) {
+    // siret does not exist
+    return [{ siret }, anomalies.SIRET_UNKNOWN];
+  }
+
+  // retrieves etablissements with "régime déclaratif"
   const declaUrl =
     "https://trackdechets.fra1.digitaloceanspaces.com/declarations.json";
 
-  const inseeUrl = `http://td-insee:81/siret/${siret}`;
+  let etsDecla = {};
 
-  const [r1, r2] = await Promise.all([
-    axios.get(declaUrl),
-    axios.get(inseeUrl)
-  ]);
-
-  // Dict of etablissements keyed by numero siret
-  const etsDecla = r1.data.etablissements;
-  const company = r2.data;
-
-  if (!company.siret) {
-    return [{ siret }, anomalies.SIRET_UNKNOWN];
+  try {
+    const r = await axios.get<{ etablissements: any[] }>(declaUrl);
+    // Dict of etablissements keyed by numero siret
+    etsDecla = r.data.etablissements;
+  } catch (err) {
+    // pass
   }
 
   const installation = await getInstallation(siret);

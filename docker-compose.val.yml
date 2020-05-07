@@ -11,6 +11,8 @@ services:
       AIRFLOW_POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
     volumes:
       - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   td-api:
     image: betagouv/trackdechets-api:dev
@@ -19,9 +21,6 @@ services:
 
   td-ui:
     image: betagouv/trackdechets-ui:dev
-
-  td-insee:
-    image: betagouv/trackdechets-insee:dev
 
   td-pdf:
     image: betagouv/trackdechets-pdf:dev

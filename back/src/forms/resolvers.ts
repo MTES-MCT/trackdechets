@@ -11,7 +11,10 @@ import {
   markAsReceived,
   markAsSealed,
   markAsSent,
-  signedByTransporter
+  signedByTransporter,
+  markAsTempStored,
+  markAsResent,
+  markAsResealed
 } from "./mutations/mark-as";
 import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
@@ -24,6 +27,7 @@ import {
   UserInputError,
   AuthenticationError
 } from "apollo-server-express";
+import { stateSummary } from "./queries/state-summary";
 
 // formsLifeCycle fragment
 const statusLogFragment = `
@@ -74,7 +78,18 @@ export default {
     },
     ecoOrganisme: (parent, _, context: GraphQLContext) => {
       return context.prisma.form({ id: parent.id }).ecoOrganisme();
-    }
+    },
+    temporaryStorageDetail: async (parent, _, context: GraphQLContext) => {
+      const temporaryStorageDetail = await context.prisma
+        .form({ id: parent.id })
+        .temporaryStorageDetail();
+
+      return temporaryStorageDetail
+        ? unflattenObjectFromDb(temporaryStorageDetail)
+        : null;
+    },
+    // Somme contextual values, depending on the form status / type, mostly to ease the display
+    stateSummary
   },
   Query: {
     form: async (_, { id }, context: GraphQLContext) => {
@@ -236,7 +251,10 @@ export default {
     markAsReceived,
     markAsProcessed,
     signedByTransporter,
-    updateTransporterFields
+    updateTransporterFields,
+    markAsTempStored,
+    markAsResealed,
+    markAsResent
   },
   Subscription: {
     forms: {

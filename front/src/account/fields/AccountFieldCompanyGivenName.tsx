@@ -14,7 +14,7 @@ AccountFielCompanyGivenName.fragments = {
       siret
       givenName
     }
-  `
+  `,
 };
 
 const UPDATE_GIVEN_NAME = gql`
@@ -37,7 +37,7 @@ export default function AccountFielCompanyGivenName({ company }: Props) {
       label="Nom Usuel"
       value={company.givenName}
       tooltip={tooltip}
-      renderForm={toggleEdition => (
+      renderForm={(toggleEdition) => (
         <AccountFormSimpleInput<{ givenName: string }>
           name="givenName"
           type="text"

@@ -17,7 +17,7 @@ export default function DashboardMenu({
   me,
   match,
   siret,
-  handleCompanyChange
+  handleCompanyChange,
 }: IProps) {
   const company = me.companies.find((c: Company) => c.siret === siret);
   const isTransporter = company

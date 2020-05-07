@@ -20,6 +20,8 @@ export const COMPANY_INFOS = gql`
       name
       naf
       address
+      etatAdministratif
+      isRegistered
       installation {
         codeS3ic
         urlFiche
@@ -33,7 +35,7 @@ export const COMPANY_INFOS = gql`
 `;
 
 export const SEARCH_COMPANIES = gql`
-  query SearchCompanies($clue: String!, $department: Int) {
+  query SearchCompanies($clue: String!, $department: String) {
     searchCompanies(clue: $clue, department: $department) {
       siret
       name

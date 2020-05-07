@@ -1,30 +1,32 @@
-import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
-import { mergePermissions } from "./utils";
-import { mergeValidationRules } from "./common/middlewares/schema-validation";
+import { mergeRulesTrees } from "./utils";
+import { mergeTypeDefs } from "@graphql-toolkit/schema-merging";
+import { loadFiles } from "@graphql-toolkit/file-loading";
+import companiesResolvers from "./companies/resolvers";
+import usersResolvers from "./users/resolvers";
+import formsResolvers from "./forms/resolvers";
+import usersShields from "./users/shield-tree";
+import companiesShields from "./companies/shield-tree";
+import formsShields from "./forms/shield-tree";
 
-// Merge GraphQL schema by merging types, resolvers, permissions and validations
+// Merge GraphQL schema by merging types, resolvers and shields
 // definitions from differents modules
 
-const typesArray = fileLoader(`${__dirname}/**/*.graphql`, {
-  recursive: true
-});
-const typeDefs = mergeTypes(typesArray, { all: true });
+const repositories = ["users", "companies", "forms"];
 
-const resolversArray = fileLoader(`${__dirname}/**/resolvers.ts`, {
-  recursive: true
-});
-const resolvers = mergeResolvers(resolversArray);
+const typeDefsPath = repositories.map(
+  repository => `${__dirname}/${repository}/*.graphql`
+);
 
-const permissionsArray = fileLoader(`${__dirname}/**/permissions.ts`, {
-  recursive: true
-});
+const typeDefsArray = loadFiles(typeDefsPath);
 
-const permissions = mergePermissions(permissionsArray);
+const typeDefs = mergeTypeDefs(typeDefsArray);
 
-const validationArray = fileLoader(`${__dirname}/**/schema-validation.ts`, {
-  recursive: true
-});
+const resolvers = [companiesResolvers, formsResolvers, usersResolvers];
 
-const validations = mergeValidationRules(validationArray);
+const shieldRulesTree = mergeRulesTrees([
+  usersShields,
+  companiesShields,
+  formsShields
+]);
 
-export { typeDefs, resolvers, permissions, validations };
+export { typeDefs, resolvers, shieldRulesTree };

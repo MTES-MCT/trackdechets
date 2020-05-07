@@ -25,7 +25,7 @@ export default withRouter(function Invite(props: Props & RouteComponentProps) {
             hash,
             name: "",
             password: "",
-            passwordConfirmation: ""
+            passwordConfirmation: "",
           }}
           validate={(values: any) => {
             let errors: any = {};
@@ -38,9 +38,9 @@ export default withRouter(function Invite(props: Props & RouteComponentProps) {
           onSubmit={(values, { setStatus, setSubmitting }) => {
             const { passwordConfirmation, ...payload } = values;
             joinWithInvite({ variables: payload })
-              .then(_ => props.history.push("/login"))
-              .catch(_ => setStatus("Erreur technique."))
-              .then(_ => setSubmitting(false));
+              .then((_) => props.history.push("/login"))
+              .catch((_) => setStatus("Erreur technique."))
+              .then((_) => setSubmitting(false));
           }}
         >
           {({ isSubmitting }) => (
@@ -77,7 +77,7 @@ export default withRouter(function Invite(props: Props & RouteComponentProps) {
 
                   <ErrorMessage
                     name="passwordConfirmation"
-                    render={msg => (
+                    render={(msg) => (
                       <div className="input-error-message">{msg}</div>
                     )}
                   />

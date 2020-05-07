@@ -1,4 +1,3 @@
-import { sendMail } from "../common/mails.helper";
 import {
   alertTypes,
   createNotICPEAlertCard,
@@ -7,8 +6,7 @@ import {
 import { anomalies, verifyPrestataire } from "../companies/verif";
 import {
   CompanySubscriptionPayload,
-  CompanyType,
-  prisma
+  CompanyType
 } from "../generated/prisma-client";
 
 export async function companiesSubscriptionCallback(
@@ -17,13 +15,6 @@ export async function companiesSubscriptionCallback(
   await Promise.all([
     verifyPresta(payload).catch(err => {
       console.error("Error on company verification form subscription", err);
-    }),
-
-    warnIfUserCreatesTooManyCompanies(payload).catch(err => {
-      console.error(
-        "Error on 'User creates too many Companies' subscription",
-        err
-      );
     })
   ]);
 }
@@ -63,54 +54,4 @@ async function verifyPresta(payload: CompanySubscriptionPayload) {
       }
     }
   }
-}
-
-const NB_OF_COMPANIES_BEFORE_ALERT = 5;
-
-export async function warnIfUserCreatesTooManyCompanies(
-  payload: CompanySubscriptionPayload
-) {
-  if (payload.mutation !== "CREATED") {
-    return Promise.resolve();
-  }
-
-  const company = payload.node;
-  const associationsUsers = await prisma.companyAssociations({
-    where: { company: { id: company.id } }
-  }).$fragment<{ user: { id: string; name: string } }[]>(`
-    fragment Users on companyAssociations {
-      user { id name }
-    }
-  `);
-
-  if (associationsUsers.length !== 1) {
-    throw new Error(
-      "A newly created company should have exactly one association."
-    );
-  }
-
-  const user = associationsUsers[0].user;
-
-  const userCompaniesNumber = await prisma
-    .companyAssociationsConnection({ where: { user: { id: user.id } } })
-    .aggregate()
-    .count();
-
-  if (userCompaniesNumber > NB_OF_COMPANIES_BEFORE_ALERT) {
-    return sendMail({
-      body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
-      subject:
-        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
-      title:
-        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
-      to: [
-        {
-          email: "tech@trackdechets.beta.gouv.fr ",
-          name: "Equipe Trackdéchets"
-        }
-      ]
-    });
-  }
-
-  return Promise.resolve();
 }

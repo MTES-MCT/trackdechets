@@ -32,7 +32,8 @@ export const getNewValidForm = () =>
           contact: "Destination",
           phone: "02",
           mail: "d@d.fr"
-        }
+        },
+        isTempStorage: false
       },
       transporter: {
         receipt: "sdfg",
@@ -60,7 +61,7 @@ export const getNewValidForm = () =>
     }
   );
 
-export const EMPTY_FORM = {
+const EMPTY_FORM = {
   emitter: {
     type: "PRODUCER",
     workSite: {
@@ -82,6 +83,7 @@ export const EMPTY_FORM = {
   recipient: {
     cap: "",
     processingOperation: "",
+    isTempStorage: false,
     company: {
       siret: "",
       name: "",
@@ -131,5 +133,25 @@ export const EMPTY_FORM = {
     consistence: "SOLID"
   },
   appendix2Forms: [],
-  ecoOrganisme: {}
+  ecoOrganisme: {},
+  temporaryStorageDetail: {
+    destination: {
+      company: {
+        siret: "",
+        name: "",
+        address: "",
+        contact: "",
+        mail: "",
+        phone: ""
+      },
+      cap: "",
+      processingOperation: ""
+    }
+  }
 };
+
+// Don't expose the object to avoid sharing modified values of it
+// Instead, only pass deep clone
+export function getEmptyForm(): typeof EMPTY_FORM & { id?: string } {
+  return JSON.parse(JSON.stringify(EMPTY_FORM));
+}

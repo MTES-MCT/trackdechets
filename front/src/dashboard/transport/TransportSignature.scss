@@ -28,6 +28,6 @@ input.no-spinner::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input.no-spinner[type=number] {
+input.no-spinner[type="number"] {
   -moz-appearance: textfield;
 }

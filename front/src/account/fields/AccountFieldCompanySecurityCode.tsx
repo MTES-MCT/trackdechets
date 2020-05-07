@@ -17,7 +17,7 @@ AccountFielCompanySecurityCode.fragments = {
       userRole
       securityCode
     }
-  `
+  `,
 };
 
 const tooltip =
@@ -34,7 +34,7 @@ export default function AccountFielCompanySecurityCode({ company }: Props) {
           name={fieldName}
           label={fieldLabel}
           value={company.securityCode}
-          renderForm={toggleEdition => (
+          renderForm={(toggleEdition) => (
             <AccountFormCompanySecurityCode
               toggleEdition={toggleEdition}
               mutationArgs={{ siret: company.siret }}

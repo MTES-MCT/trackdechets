@@ -17,11 +17,11 @@ export default function Delete({ formId }: Props) {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret: currentSiretService.getSiret() },
-        getNewData: data => ({
-          forms: [...data.forms.filter(f => f.id !== deleteForm.id)]
-        })
+        getNewData: (data) => ({
+          forms: [...data.forms.filter((f) => f.id !== deleteForm.id)],
+        }),
       });
-    }
+    },
   });
 
   return (

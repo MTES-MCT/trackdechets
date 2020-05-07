@@ -27,7 +27,7 @@ export default function Signup() {
             phone: "",
             password: "",
             passwordConfirmation: "",
-            cgu: false
+            cgu: false,
           }}
           onSubmit={(values: any, { setSubmitting }) => {
             const {
@@ -38,8 +38,8 @@ export default function Signup() {
             } = values;
 
             signup({ variables: { userInfos } })
-              .then(_ => history.push("/signup/activation"))
-              .catch(_ => {
+              .then((_) => history.push("/signup/activation"))
+              .catch((_) => {
                 setSubmitting(false);
               });
           }}

@@ -27,7 +27,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <WasteCode name="wasteDetails.code" validate={wasteCodeValidator} />
       </div>
 
-      <div className="text-quote">
+      <div className="text-quote mt-3">
         <p>
           L'appellation du déchet est propre à votre entreprise pour vous aider
           à retrouver facilement le déchet concerné.
@@ -63,11 +63,14 @@ export default connect<{}, Values>(function WasteInfo(props) {
           </label>
         )}
 
-        <Field
-          component={NumberInput}
-          name="wasteDetails.numberOfPackages"
-          label="Nombre de colis"
-        />
+        <label className="mt-2">
+          Nombre de colis
+          <Field
+            component={NumberInput}
+            name="wasteDetails.numberOfPackages"
+            min="0"
+          />
+        </label>
         <RedErrorMessage name="wasteDetails.numberOfPackages" />
       </div>
 
@@ -99,17 +102,19 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
       <h4>Quantité en tonnes</h4>
       <div className="form__group">
-        <Field
-          component={NumberInput}
-          name="wasteDetails.quantity"
-          placeholder="En tonnes"
-          min="0"
-          step="0.001"
-        />
-
+        <label>
+          Quantité
+          <Field
+            component={NumberInput}
+            name="wasteDetails.quantity"
+            placeholder="En tonnes"
+            min="0"
+            step="0.001"
+          />
+        </label>
         <RedErrorMessage name="wasteDetails.quantity" />
 
-        <fieldset>
+        <fieldset className="mt-3">
           <legend>Cette quantité est</legend>
           <Field
             name="wasteDetails.quantityType"

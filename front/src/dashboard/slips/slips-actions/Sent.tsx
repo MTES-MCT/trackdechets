@@ -9,7 +9,7 @@ export default function Sent(props: SlipActionProps) {
     <div>
       <Formik
         initialValues={{ sentBy: "", sentAt: DateTime.local().toISODate() }}
-        onSubmit={values => props.onSubmit({ info: values })}
+        onSubmit={(values) => props.onSubmit({ info: values })}
       >
         {({ isSubmitting }) => (
           <Form>

@@ -3,12 +3,14 @@ import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import {
   Form,
+  EcoOrganisme,
   FormUpdateInput,
   FormCreateInput,
   Status
 } from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/queries";
 import { ForbiddenError } from "apollo-server-express";
+import { FormInput } from "../../generated/types";
 
 export async function saveForm(_, { formInput }, context: GraphQLContext) {
   const userId = context.user.id;
@@ -25,6 +27,10 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
       where: { id, ecoOrganisme: { id_not: null } }
     });
 
+    const temporaryStorageDetail = await context.prisma
+      .form({ id })
+      .temporaryStorageDetail();
+
     const updatedForm = await context.prisma.updateForm({
       where: { id },
       data: {
@@ -34,6 +40,17 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
           ...(formContent.ecoOrganisme?.id
             ? { connect: formContent.ecoOrganisme }
             : !!existingEcoOrganisme.length
+            ? { disconnect: true }
+            : null)
+        },
+        temporaryStorageDetail: {
+          // TODO look for a more elagant way to handle that
+          ...(formContent.recipient?.isTempStorage &&
+          temporaryStorageDetail != null
+            ? { update: flattenObjectForDb(formContent.temporaryStorageDetail) }
+            : formContent.recipient?.isTempStorage
+            ? { create: flattenObjectForDb(formContent.temporaryStorageDetail) }
+            : temporaryStorageDetail != null
             ? { disconnect: true }
             : null)
         }
@@ -48,6 +65,13 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     ...(formContent.ecoOrganisme?.id && {
       ecoOrganisme: { connect: formContent.ecoOrganisme }
     }),
+    temporaryStorageDetail: {
+      ...(formContent.recipient.isTempStorage && {
+        create: formContent.temporaryStorageDetail
+          ? flattenObjectForDb(formContent.temporaryStorageDetail)
+          : {}
+      })
+    },
     readableId: await getReadableId(),
     owner: { connect: { id: userId } }
   });
@@ -62,25 +86,41 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
   return unflattenObjectFromDb(newForm);
 }
 
-const formSiretsGetter = (form: Partial<Form>) => [
+const formSiretsGetter = (
+  form: Partial<Form> & { ecoOrganisme?: EcoOrganisme }
+) => [
   form.emitterCompanySiret,
   form.traderCompanySiret,
   form.recipientCompanySiret,
-  form.transporterCompanySiret
+  form.transporterCompanySiret,
+  form.ecoOrganisme?.siret
 ];
 
 async function checkThatUserIsPartOftheForm(
   userId: string,
-  form: Partial<Form>,
+  form: FormInput,
   context: GraphQLContext
 ) {
   const isEdition = form.id != null;
-  const formSirets = formSiretsGetter(form);
+  const ecoOrganisme = form.ecoOrganisme?.id
+    ? await context.prisma.ecoOrganisme({
+        id: form.ecoOrganisme?.id
+      })
+    : null;
+
+  const formSirets = formSiretsGetter({ ...form, ecoOrganisme });
   const hasPartialFormInput = formSirets.some(siret => siret == null);
 
   if (isEdition && hasPartialFormInput) {
     const savedForm = await context.prisma.form({ id: form.id });
-    const savedFormSirets = formSiretsGetter(savedForm);
+    const savedEcoOrganisme = await context.prisma
+      .form({ id: form.id })
+      .ecoOrganisme();
+
+    const savedFormSirets = formSiretsGetter({
+      ...savedForm,
+      ecoOrganisme: savedEcoOrganisme
+    });
     formSirets.push(...savedFormSirets);
   }
 

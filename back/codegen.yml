@@ -1,0 +1,9 @@
+overwrite: true
+schema: "./src/**/*.graphql"
+generates:
+  src/generated/types.ts:
+    plugins:
+      - "typescript"
+  documentation/api-reference.md:
+    plugins:
+      - graphql-markdown-plugin.js

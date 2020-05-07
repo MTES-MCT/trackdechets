@@ -4,7 +4,7 @@ import useWindowSize from "../utils/use-window-size";
 import { FaBars } from "react-icons/fa";
 
 const MEDIA_QUERIES = {
-  mobile: 480
+  mobile: 480,
 };
 
 /**

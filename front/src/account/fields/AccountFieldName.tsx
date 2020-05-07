@@ -18,7 +18,7 @@ AccountFieldName.fragments = {
       id
       name
     }
-  `
+  `,
 };
 
 const UPDATE_NAME = gql`
@@ -31,7 +31,7 @@ const UPDATE_NAME = gql`
 `;
 
 const yupSchema = object().shape({
-  name: string().required()
+  name: string().required(),
 });
 
 export default function AccountFieldName({ me }: Props) {
@@ -40,7 +40,7 @@ export default function AccountFieldName({ me }: Props) {
       name="name"
       label="Nom utilisateur"
       value={me.name}
-      renderForm={toggleEdition => (
+      renderForm={(toggleEdition) => (
         <AccountFormSimpleInput<Me>
           name="name"
           type="text"

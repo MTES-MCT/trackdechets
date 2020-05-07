@@ -200,6 +200,10 @@ type AggregateStatusLog {
   count: Int!
 }
 
+type AggregateTemporaryStorageDetail {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -1367,6 +1371,7 @@ type Form {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -1405,6 +1410,7 @@ type Form {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganisme
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
+  temporaryStorageDetail: TemporaryStorageDetail
 }
 
 type FormConnection {
@@ -1456,6 +1462,7 @@ input FormCreateInput {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -1494,6 +1501,7 @@ input FormCreateInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
   appendix2Forms: FormCreateManyInput
+  temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
 }
 
 input FormCreateManyInput {
@@ -1504,6 +1512,95 @@ input FormCreateManyInput {
 input FormCreateOneInput {
   create: FormCreateInput
   connect: FormWhereUniqueInput
+}
+
+input FormCreateOneWithoutTemporaryStorageDetailInput {
+  create: FormCreateWithoutTemporaryStorageDetailInput
+  connect: FormWhereUniqueInput
+}
+
+input FormCreateWithoutTemporaryStorageDetailInput {
+  id: ID
+  readableId: String
+  customId: String
+  isDeleted: Boolean
+  owner: UserCreateOneInput!
+  signedByTransporter: Boolean
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
+  receivedBy: String
+  receivedAt: DateTime
+  quantityReceived: Float
+  processedBy: String
+  processedAt: String
+  processingOperationDone: String
+  processingOperationDescription: String
+  noTraceability: Boolean
+  nextDestinationProcessingOperation: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: String
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: String
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  transporterCustomInfo: String
+  wasteDetailsCode: String
+  wasteDetailsName: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeCreateOneInput
+  appendix2Forms: FormCreateManyInput
 }
 
 type FormEdge {
@@ -1598,6 +1695,8 @@ enum FormOrderByInput {
   recipientCap_DESC
   recipientProcessingOperation_ASC
   recipientProcessingOperation_DESC
+  recipientIsTempStorage_ASC
+  recipientIsTempStorage_DESC
   recipientCompanyName_ASC
   recipientCompanyName_DESC
   recipientCompanySiret_ASC
@@ -1716,6 +1815,7 @@ type FormPreviousValues {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -2259,6 +2359,8 @@ input FormScalarWhereInput {
   recipientProcessingOperation_not_starts_with: String
   recipientProcessingOperation_ends_with: String
   recipientProcessingOperation_not_ends_with: String
+  recipientIsTempStorage: Boolean
+  recipientIsTempStorage_not: Boolean
   recipientCompanyName: String
   recipientCompanyName_not: String
   recipientCompanyName_in: [String!]
@@ -2758,6 +2860,7 @@ input FormUpdateDataInput {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -2796,6 +2899,7 @@ input FormUpdateDataInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
+  temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
 }
 
 input FormUpdateInput {
@@ -2840,6 +2944,7 @@ input FormUpdateInput {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -2878,6 +2983,7 @@ input FormUpdateInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
+  temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
 }
 
 input FormUpdateManyDataInput {
@@ -2921,6 +3027,7 @@ input FormUpdateManyDataInput {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -3012,6 +3119,7 @@ input FormUpdateManyMutationInput {
   emitterCompanyMail: String
   recipientCap: String
   recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
@@ -3062,6 +3170,98 @@ input FormUpdateOneRequiredInput {
   connect: FormWhereUniqueInput
 }
 
+input FormUpdateOneWithoutTemporaryStorageDetailInput {
+  create: FormCreateWithoutTemporaryStorageDetailInput
+  update: FormUpdateWithoutTemporaryStorageDetailDataInput
+  upsert: FormUpsertWithoutTemporaryStorageDetailInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: FormWhereUniqueInput
+}
+
+input FormUpdateWithoutTemporaryStorageDetailDataInput {
+  readableId: String
+  customId: String
+  isDeleted: Boolean
+  owner: UserUpdateOneRequiredInput
+  signedByTransporter: Boolean
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
+  receivedBy: String
+  receivedAt: DateTime
+  quantityReceived: Float
+  processedBy: String
+  processedAt: String
+  processingOperationDone: String
+  processingOperationDescription: String
+  noTraceability: Boolean
+  nextDestinationProcessingOperation: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: String
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: String
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  transporterCustomInfo: String
+  wasteDetailsCode: String
+  wasteDetailsName: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeUpdateOneInput
+  appendix2Forms: FormUpdateManyInput
+}
+
 input FormUpdateWithWhereUniqueNestedInput {
   where: FormWhereUniqueInput!
   data: FormUpdateDataInput!
@@ -3070,6 +3270,11 @@ input FormUpdateWithWhereUniqueNestedInput {
 input FormUpsertNestedInput {
   update: FormUpdateDataInput!
   create: FormCreateInput!
+}
+
+input FormUpsertWithoutTemporaryStorageDetailInput {
+  update: FormUpdateWithoutTemporaryStorageDetailDataInput!
+  create: FormCreateWithoutTemporaryStorageDetailInput!
 }
 
 input FormUpsertWithWhereUniqueNestedInput {
@@ -3584,6 +3789,8 @@ input FormWhereInput {
   recipientProcessingOperation_not_starts_with: String
   recipientProcessingOperation_ends_with: String
   recipientProcessingOperation_not_ends_with: String
+  recipientIsTempStorage: Boolean
+  recipientIsTempStorage_not: Boolean
   recipientCompanyName: String
   recipientCompanyName_not: String
   recipientCompanyName_in: [String!]
@@ -4022,6 +4229,7 @@ input FormWhereInput {
   appendix2Forms_every: FormWhereInput
   appendix2Forms_some: FormWhereInput
   appendix2Forms_none: FormWhereInput
+  temporaryStorageDetail: TemporaryStorageDetailWhereInput
   AND: [FormWhereInput!]
   OR: [FormWhereInput!]
   NOT: [FormWhereInput!]
@@ -4592,6 +4800,12 @@ type Mutation {
   upsertStatusLog(where: StatusLogWhereUniqueInput!, create: StatusLogCreateInput!, update: StatusLogUpdateInput!): StatusLog!
   deleteStatusLog(where: StatusLogWhereUniqueInput!): StatusLog
   deleteManyStatusLogs(where: StatusLogWhereInput): BatchPayload!
+  createTemporaryStorageDetail(data: TemporaryStorageDetailCreateInput!): TemporaryStorageDetail!
+  updateTemporaryStorageDetail(data: TemporaryStorageDetailUpdateInput!, where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
+  updateManyTemporaryStorageDetails(data: TemporaryStorageDetailUpdateManyMutationInput!, where: TemporaryStorageDetailWhereInput): BatchPayload!
+  upsertTemporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!, create: TemporaryStorageDetailCreateInput!, update: TemporaryStorageDetailUpdateInput!): TemporaryStorageDetail!
+  deleteTemporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
+  deleteManyTemporaryStorageDetails(where: TemporaryStorageDetailWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -4668,6 +4882,9 @@ type Query {
   statusLog(where: StatusLogWhereUniqueInput!): StatusLog
   statusLogs(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [StatusLog]!
   statusLogsConnection(where: StatusLogWhereInput, orderBy: StatusLogOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): StatusLogConnection!
+  temporaryStorageDetail(where: TemporaryStorageDetailWhereUniqueInput!): TemporaryStorageDetail
+  temporaryStorageDetails(where: TemporaryStorageDetailWhereInput, orderBy: TemporaryStorageDetailOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TemporaryStorageDetail]!
+  temporaryStorageDetailsConnection(where: TemporaryStorageDetailWhereInput, orderBy: TemporaryStorageDetailOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TemporaryStorageDetailConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -4993,6 +5210,9 @@ enum Status {
   GROUPED
   NO_TRACEABILITY
   REFUSED
+  TEMP_STORED
+  RESEALED
+  RESENT
 }
 
 type StatusLog {
@@ -5124,9 +5344,822 @@ type Subscription {
   installation(where: InstallationSubscriptionWhereInput): InstallationSubscriptionPayload
   rubrique(where: RubriqueSubscriptionWhereInput): RubriqueSubscriptionPayload
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
+  temporaryStorageDetail(where: TemporaryStorageDetailSubscriptionWhereInput): TemporaryStorageDetailSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
   userActivationHash(where: UserActivationHashSubscriptionWhereInput): UserActivationHashSubscriptionPayload
+}
+
+type TemporaryStorageDetail {
+  id: ID!
+  form: Form
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+  signedBy: String
+  signedAt: DateTime
+}
+
+type TemporaryStorageDetailConnection {
+  pageInfo: PageInfo!
+  edges: [TemporaryStorageDetailEdge]!
+  aggregate: AggregateTemporaryStorageDetail!
+}
+
+input TemporaryStorageDetailCreateInput {
+  id: ID
+  form: FormCreateOneWithoutTemporaryStorageDetailInput
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+  signedBy: String
+  signedAt: DateTime
+}
+
+input TemporaryStorageDetailCreateOneWithoutFormInput {
+  create: TemporaryStorageDetailCreateWithoutFormInput
+  connect: TemporaryStorageDetailWhereUniqueInput
+}
+
+input TemporaryStorageDetailCreateWithoutFormInput {
+  id: ID
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+  signedBy: String
+  signedAt: DateTime
+}
+
+type TemporaryStorageDetailEdge {
+  node: TemporaryStorageDetail!
+  cursor: String!
+}
+
+enum TemporaryStorageDetailOrderByInput {
+  id_ASC
+  id_DESC
+  tempStorerQuantityType_ASC
+  tempStorerQuantityType_DESC
+  tempStorerQuantityReceived_ASC
+  tempStorerQuantityReceived_DESC
+  tempStorerWasteAcceptationStatus_ASC
+  tempStorerWasteAcceptationStatus_DESC
+  tempStorerWasteRefusalReason_ASC
+  tempStorerWasteRefusalReason_DESC
+  tempStorerReceivedAt_ASC
+  tempStorerReceivedAt_DESC
+  tempStorerReceivedBy_ASC
+  tempStorerReceivedBy_DESC
+  tempStorerSignedAt_ASC
+  tempStorerSignedAt_DESC
+  destinationIsFilledByEmitter_ASC
+  destinationIsFilledByEmitter_DESC
+  destinationCompanyName_ASC
+  destinationCompanyName_DESC
+  destinationCompanySiret_ASC
+  destinationCompanySiret_DESC
+  destinationCompanyAddress_ASC
+  destinationCompanyAddress_DESC
+  destinationCompanyContact_ASC
+  destinationCompanyContact_DESC
+  destinationCompanyPhone_ASC
+  destinationCompanyPhone_DESC
+  destinationCompanyMail_ASC
+  destinationCompanyMail_DESC
+  destinationCap_ASC
+  destinationCap_DESC
+  destinationProcessingOperation_ASC
+  destinationProcessingOperation_DESC
+  wasteDetailsOnuCode_ASC
+  wasteDetailsOnuCode_DESC
+  wasteDetailsPackagings_ASC
+  wasteDetailsPackagings_DESC
+  wasteDetailsOtherPackaging_ASC
+  wasteDetailsOtherPackaging_DESC
+  wasteDetailsNumberOfPackages_ASC
+  wasteDetailsNumberOfPackages_DESC
+  wasteDetailsQuantity_ASC
+  wasteDetailsQuantity_DESC
+  wasteDetailsQuantityType_ASC
+  wasteDetailsQuantityType_DESC
+  transporterCompanyName_ASC
+  transporterCompanyName_DESC
+  transporterCompanySiret_ASC
+  transporterCompanySiret_DESC
+  transporterCompanyAddress_ASC
+  transporterCompanyAddress_DESC
+  transporterCompanyContact_ASC
+  transporterCompanyContact_DESC
+  transporterCompanyPhone_ASC
+  transporterCompanyPhone_DESC
+  transporterCompanyMail_ASC
+  transporterCompanyMail_DESC
+  transporterIsExemptedOfReceipt_ASC
+  transporterIsExemptedOfReceipt_DESC
+  transporterReceipt_ASC
+  transporterReceipt_DESC
+  transporterDepartment_ASC
+  transporterDepartment_DESC
+  transporterValidityLimit_ASC
+  transporterValidityLimit_DESC
+  transporterNumberPlate_ASC
+  transporterNumberPlate_DESC
+  signedByTransporter_ASC
+  signedByTransporter_DESC
+  signedBy_ASC
+  signedBy_DESC
+  signedAt_ASC
+  signedAt_DESC
+}
+
+type TemporaryStorageDetailPreviousValues {
+  id: ID!
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+  signedBy: String
+  signedAt: DateTime
+}
+
+type TemporaryStorageDetailSubscriptionPayload {
+  mutation: MutationType!
+  node: TemporaryStorageDetail
+  updatedFields: [String!]
+  previousValues: TemporaryStorageDetailPreviousValues
+}
+
+input TemporaryStorageDetailSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TemporaryStorageDetailWhereInput
+  AND: [TemporaryStorageDetailSubscriptionWhereInput!]
+  OR: [TemporaryStorageDetailSubscriptionWhereInput!]
+  NOT: [TemporaryStorageDetailSubscriptionWhereInput!]
+}
+
+input TemporaryStorageDetailUpdateInput {
+  form: FormUpdateOneWithoutTemporaryStorageDetailInput
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+  signedBy: String
+  signedAt: DateTime
+}
+
+input TemporaryStorageDetailUpdateManyMutationInput {
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+  signedBy: String
+  signedAt: DateTime
+}
+
+input TemporaryStorageDetailUpdateOneWithoutFormInput {
+  create: TemporaryStorageDetailCreateWithoutFormInput
+  update: TemporaryStorageDetailUpdateWithoutFormDataInput
+  upsert: TemporaryStorageDetailUpsertWithoutFormInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: TemporaryStorageDetailWhereUniqueInput
+}
+
+input TemporaryStorageDetailUpdateWithoutFormDataInput {
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityReceived: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteRefusalReason: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedBy: String
+  tempStorerSignedAt: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationCompanyName: String
+  destinationCompanySiret: String
+  destinationCompanyAddress: String
+  destinationCompanyContact: String
+  destinationCompanyPhone: String
+  destinationCompanyMail: String
+  destinationCap: String
+  destinationProcessingOperation: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  signedByTransporter: Boolean
+  signedBy: String
+  signedAt: DateTime
+}
+
+input TemporaryStorageDetailUpsertWithoutFormInput {
+  update: TemporaryStorageDetailUpdateWithoutFormDataInput!
+  create: TemporaryStorageDetailCreateWithoutFormInput!
+}
+
+input TemporaryStorageDetailWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  form: FormWhereInput
+  tempStorerQuantityType: QuantityType
+  tempStorerQuantityType_not: QuantityType
+  tempStorerQuantityType_in: [QuantityType!]
+  tempStorerQuantityType_not_in: [QuantityType!]
+  tempStorerQuantityReceived: Float
+  tempStorerQuantityReceived_not: Float
+  tempStorerQuantityReceived_in: [Float!]
+  tempStorerQuantityReceived_not_in: [Float!]
+  tempStorerQuantityReceived_lt: Float
+  tempStorerQuantityReceived_lte: Float
+  tempStorerQuantityReceived_gt: Float
+  tempStorerQuantityReceived_gte: Float
+  tempStorerWasteAcceptationStatus: WasteAcceptationStatus
+  tempStorerWasteAcceptationStatus_not: WasteAcceptationStatus
+  tempStorerWasteAcceptationStatus_in: [WasteAcceptationStatus!]
+  tempStorerWasteAcceptationStatus_not_in: [WasteAcceptationStatus!]
+  tempStorerWasteRefusalReason: String
+  tempStorerWasteRefusalReason_not: String
+  tempStorerWasteRefusalReason_in: [String!]
+  tempStorerWasteRefusalReason_not_in: [String!]
+  tempStorerWasteRefusalReason_lt: String
+  tempStorerWasteRefusalReason_lte: String
+  tempStorerWasteRefusalReason_gt: String
+  tempStorerWasteRefusalReason_gte: String
+  tempStorerWasteRefusalReason_contains: String
+  tempStorerWasteRefusalReason_not_contains: String
+  tempStorerWasteRefusalReason_starts_with: String
+  tempStorerWasteRefusalReason_not_starts_with: String
+  tempStorerWasteRefusalReason_ends_with: String
+  tempStorerWasteRefusalReason_not_ends_with: String
+  tempStorerReceivedAt: DateTime
+  tempStorerReceivedAt_not: DateTime
+  tempStorerReceivedAt_in: [DateTime!]
+  tempStorerReceivedAt_not_in: [DateTime!]
+  tempStorerReceivedAt_lt: DateTime
+  tempStorerReceivedAt_lte: DateTime
+  tempStorerReceivedAt_gt: DateTime
+  tempStorerReceivedAt_gte: DateTime
+  tempStorerReceivedBy: String
+  tempStorerReceivedBy_not: String
+  tempStorerReceivedBy_in: [String!]
+  tempStorerReceivedBy_not_in: [String!]
+  tempStorerReceivedBy_lt: String
+  tempStorerReceivedBy_lte: String
+  tempStorerReceivedBy_gt: String
+  tempStorerReceivedBy_gte: String
+  tempStorerReceivedBy_contains: String
+  tempStorerReceivedBy_not_contains: String
+  tempStorerReceivedBy_starts_with: String
+  tempStorerReceivedBy_not_starts_with: String
+  tempStorerReceivedBy_ends_with: String
+  tempStorerReceivedBy_not_ends_with: String
+  tempStorerSignedAt: DateTime
+  tempStorerSignedAt_not: DateTime
+  tempStorerSignedAt_in: [DateTime!]
+  tempStorerSignedAt_not_in: [DateTime!]
+  tempStorerSignedAt_lt: DateTime
+  tempStorerSignedAt_lte: DateTime
+  tempStorerSignedAt_gt: DateTime
+  tempStorerSignedAt_gte: DateTime
+  destinationIsFilledByEmitter: Boolean
+  destinationIsFilledByEmitter_not: Boolean
+  destinationCompanyName: String
+  destinationCompanyName_not: String
+  destinationCompanyName_in: [String!]
+  destinationCompanyName_not_in: [String!]
+  destinationCompanyName_lt: String
+  destinationCompanyName_lte: String
+  destinationCompanyName_gt: String
+  destinationCompanyName_gte: String
+  destinationCompanyName_contains: String
+  destinationCompanyName_not_contains: String
+  destinationCompanyName_starts_with: String
+  destinationCompanyName_not_starts_with: String
+  destinationCompanyName_ends_with: String
+  destinationCompanyName_not_ends_with: String
+  destinationCompanySiret: String
+  destinationCompanySiret_not: String
+  destinationCompanySiret_in: [String!]
+  destinationCompanySiret_not_in: [String!]
+  destinationCompanySiret_lt: String
+  destinationCompanySiret_lte: String
+  destinationCompanySiret_gt: String
+  destinationCompanySiret_gte: String
+  destinationCompanySiret_contains: String
+  destinationCompanySiret_not_contains: String
+  destinationCompanySiret_starts_with: String
+  destinationCompanySiret_not_starts_with: String
+  destinationCompanySiret_ends_with: String
+  destinationCompanySiret_not_ends_with: String
+  destinationCompanyAddress: String
+  destinationCompanyAddress_not: String
+  destinationCompanyAddress_in: [String!]
+  destinationCompanyAddress_not_in: [String!]
+  destinationCompanyAddress_lt: String
+  destinationCompanyAddress_lte: String
+  destinationCompanyAddress_gt: String
+  destinationCompanyAddress_gte: String
+  destinationCompanyAddress_contains: String
+  destinationCompanyAddress_not_contains: String
+  destinationCompanyAddress_starts_with: String
+  destinationCompanyAddress_not_starts_with: String
+  destinationCompanyAddress_ends_with: String
+  destinationCompanyAddress_not_ends_with: String
+  destinationCompanyContact: String
+  destinationCompanyContact_not: String
+  destinationCompanyContact_in: [String!]
+  destinationCompanyContact_not_in: [String!]
+  destinationCompanyContact_lt: String
+  destinationCompanyContact_lte: String
+  destinationCompanyContact_gt: String
+  destinationCompanyContact_gte: String
+  destinationCompanyContact_contains: String
+  destinationCompanyContact_not_contains: String
+  destinationCompanyContact_starts_with: String
+  destinationCompanyContact_not_starts_with: String
+  destinationCompanyContact_ends_with: String
+  destinationCompanyContact_not_ends_with: String
+  destinationCompanyPhone: String
+  destinationCompanyPhone_not: String
+  destinationCompanyPhone_in: [String!]
+  destinationCompanyPhone_not_in: [String!]
+  destinationCompanyPhone_lt: String
+  destinationCompanyPhone_lte: String
+  destinationCompanyPhone_gt: String
+  destinationCompanyPhone_gte: String
+  destinationCompanyPhone_contains: String
+  destinationCompanyPhone_not_contains: String
+  destinationCompanyPhone_starts_with: String
+  destinationCompanyPhone_not_starts_with: String
+  destinationCompanyPhone_ends_with: String
+  destinationCompanyPhone_not_ends_with: String
+  destinationCompanyMail: String
+  destinationCompanyMail_not: String
+  destinationCompanyMail_in: [String!]
+  destinationCompanyMail_not_in: [String!]
+  destinationCompanyMail_lt: String
+  destinationCompanyMail_lte: String
+  destinationCompanyMail_gt: String
+  destinationCompanyMail_gte: String
+  destinationCompanyMail_contains: String
+  destinationCompanyMail_not_contains: String
+  destinationCompanyMail_starts_with: String
+  destinationCompanyMail_not_starts_with: String
+  destinationCompanyMail_ends_with: String
+  destinationCompanyMail_not_ends_with: String
+  destinationCap: String
+  destinationCap_not: String
+  destinationCap_in: [String!]
+  destinationCap_not_in: [String!]
+  destinationCap_lt: String
+  destinationCap_lte: String
+  destinationCap_gt: String
+  destinationCap_gte: String
+  destinationCap_contains: String
+  destinationCap_not_contains: String
+  destinationCap_starts_with: String
+  destinationCap_not_starts_with: String
+  destinationCap_ends_with: String
+  destinationCap_not_ends_with: String
+  destinationProcessingOperation: String
+  destinationProcessingOperation_not: String
+  destinationProcessingOperation_in: [String!]
+  destinationProcessingOperation_not_in: [String!]
+  destinationProcessingOperation_lt: String
+  destinationProcessingOperation_lte: String
+  destinationProcessingOperation_gt: String
+  destinationProcessingOperation_gte: String
+  destinationProcessingOperation_contains: String
+  destinationProcessingOperation_not_contains: String
+  destinationProcessingOperation_starts_with: String
+  destinationProcessingOperation_not_starts_with: String
+  destinationProcessingOperation_ends_with: String
+  destinationProcessingOperation_not_ends_with: String
+  wasteDetailsOnuCode: String
+  wasteDetailsOnuCode_not: String
+  wasteDetailsOnuCode_in: [String!]
+  wasteDetailsOnuCode_not_in: [String!]
+  wasteDetailsOnuCode_lt: String
+  wasteDetailsOnuCode_lte: String
+  wasteDetailsOnuCode_gt: String
+  wasteDetailsOnuCode_gte: String
+  wasteDetailsOnuCode_contains: String
+  wasteDetailsOnuCode_not_contains: String
+  wasteDetailsOnuCode_starts_with: String
+  wasteDetailsOnuCode_not_starts_with: String
+  wasteDetailsOnuCode_ends_with: String
+  wasteDetailsOnuCode_not_ends_with: String
+  wasteDetailsOtherPackaging: String
+  wasteDetailsOtherPackaging_not: String
+  wasteDetailsOtherPackaging_in: [String!]
+  wasteDetailsOtherPackaging_not_in: [String!]
+  wasteDetailsOtherPackaging_lt: String
+  wasteDetailsOtherPackaging_lte: String
+  wasteDetailsOtherPackaging_gt: String
+  wasteDetailsOtherPackaging_gte: String
+  wasteDetailsOtherPackaging_contains: String
+  wasteDetailsOtherPackaging_not_contains: String
+  wasteDetailsOtherPackaging_starts_with: String
+  wasteDetailsOtherPackaging_not_starts_with: String
+  wasteDetailsOtherPackaging_ends_with: String
+  wasteDetailsOtherPackaging_not_ends_with: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsNumberOfPackages_not: Int
+  wasteDetailsNumberOfPackages_in: [Int!]
+  wasteDetailsNumberOfPackages_not_in: [Int!]
+  wasteDetailsNumberOfPackages_lt: Int
+  wasteDetailsNumberOfPackages_lte: Int
+  wasteDetailsNumberOfPackages_gt: Int
+  wasteDetailsNumberOfPackages_gte: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantity_not: Float
+  wasteDetailsQuantity_in: [Float!]
+  wasteDetailsQuantity_not_in: [Float!]
+  wasteDetailsQuantity_lt: Float
+  wasteDetailsQuantity_lte: Float
+  wasteDetailsQuantity_gt: Float
+  wasteDetailsQuantity_gte: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsQuantityType_not: QuantityType
+  wasteDetailsQuantityType_in: [QuantityType!]
+  wasteDetailsQuantityType_not_in: [QuantityType!]
+  transporterCompanyName: String
+  transporterCompanyName_not: String
+  transporterCompanyName_in: [String!]
+  transporterCompanyName_not_in: [String!]
+  transporterCompanyName_lt: String
+  transporterCompanyName_lte: String
+  transporterCompanyName_gt: String
+  transporterCompanyName_gte: String
+  transporterCompanyName_contains: String
+  transporterCompanyName_not_contains: String
+  transporterCompanyName_starts_with: String
+  transporterCompanyName_not_starts_with: String
+  transporterCompanyName_ends_with: String
+  transporterCompanyName_not_ends_with: String
+  transporterCompanySiret: String
+  transporterCompanySiret_not: String
+  transporterCompanySiret_in: [String!]
+  transporterCompanySiret_not_in: [String!]
+  transporterCompanySiret_lt: String
+  transporterCompanySiret_lte: String
+  transporterCompanySiret_gt: String
+  transporterCompanySiret_gte: String
+  transporterCompanySiret_contains: String
+  transporterCompanySiret_not_contains: String
+  transporterCompanySiret_starts_with: String
+  transporterCompanySiret_not_starts_with: String
+  transporterCompanySiret_ends_with: String
+  transporterCompanySiret_not_ends_with: String
+  transporterCompanyAddress: String
+  transporterCompanyAddress_not: String
+  transporterCompanyAddress_in: [String!]
+  transporterCompanyAddress_not_in: [String!]
+  transporterCompanyAddress_lt: String
+  transporterCompanyAddress_lte: String
+  transporterCompanyAddress_gt: String
+  transporterCompanyAddress_gte: String
+  transporterCompanyAddress_contains: String
+  transporterCompanyAddress_not_contains: String
+  transporterCompanyAddress_starts_with: String
+  transporterCompanyAddress_not_starts_with: String
+  transporterCompanyAddress_ends_with: String
+  transporterCompanyAddress_not_ends_with: String
+  transporterCompanyContact: String
+  transporterCompanyContact_not: String
+  transporterCompanyContact_in: [String!]
+  transporterCompanyContact_not_in: [String!]
+  transporterCompanyContact_lt: String
+  transporterCompanyContact_lte: String
+  transporterCompanyContact_gt: String
+  transporterCompanyContact_gte: String
+  transporterCompanyContact_contains: String
+  transporterCompanyContact_not_contains: String
+  transporterCompanyContact_starts_with: String
+  transporterCompanyContact_not_starts_with: String
+  transporterCompanyContact_ends_with: String
+  transporterCompanyContact_not_ends_with: String
+  transporterCompanyPhone: String
+  transporterCompanyPhone_not: String
+  transporterCompanyPhone_in: [String!]
+  transporterCompanyPhone_not_in: [String!]
+  transporterCompanyPhone_lt: String
+  transporterCompanyPhone_lte: String
+  transporterCompanyPhone_gt: String
+  transporterCompanyPhone_gte: String
+  transporterCompanyPhone_contains: String
+  transporterCompanyPhone_not_contains: String
+  transporterCompanyPhone_starts_with: String
+  transporterCompanyPhone_not_starts_with: String
+  transporterCompanyPhone_ends_with: String
+  transporterCompanyPhone_not_ends_with: String
+  transporterCompanyMail: String
+  transporterCompanyMail_not: String
+  transporterCompanyMail_in: [String!]
+  transporterCompanyMail_not_in: [String!]
+  transporterCompanyMail_lt: String
+  transporterCompanyMail_lte: String
+  transporterCompanyMail_gt: String
+  transporterCompanyMail_gte: String
+  transporterCompanyMail_contains: String
+  transporterCompanyMail_not_contains: String
+  transporterCompanyMail_starts_with: String
+  transporterCompanyMail_not_starts_with: String
+  transporterCompanyMail_ends_with: String
+  transporterCompanyMail_not_ends_with: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterIsExemptedOfReceipt_not: Boolean
+  transporterReceipt: String
+  transporterReceipt_not: String
+  transporterReceipt_in: [String!]
+  transporterReceipt_not_in: [String!]
+  transporterReceipt_lt: String
+  transporterReceipt_lte: String
+  transporterReceipt_gt: String
+  transporterReceipt_gte: String
+  transporterReceipt_contains: String
+  transporterReceipt_not_contains: String
+  transporterReceipt_starts_with: String
+  transporterReceipt_not_starts_with: String
+  transporterReceipt_ends_with: String
+  transporterReceipt_not_ends_with: String
+  transporterDepartment: String
+  transporterDepartment_not: String
+  transporterDepartment_in: [String!]
+  transporterDepartment_not_in: [String!]
+  transporterDepartment_lt: String
+  transporterDepartment_lte: String
+  transporterDepartment_gt: String
+  transporterDepartment_gte: String
+  transporterDepartment_contains: String
+  transporterDepartment_not_contains: String
+  transporterDepartment_starts_with: String
+  transporterDepartment_not_starts_with: String
+  transporterDepartment_ends_with: String
+  transporterDepartment_not_ends_with: String
+  transporterValidityLimit: DateTime
+  transporterValidityLimit_not: DateTime
+  transporterValidityLimit_in: [DateTime!]
+  transporterValidityLimit_not_in: [DateTime!]
+  transporterValidityLimit_lt: DateTime
+  transporterValidityLimit_lte: DateTime
+  transporterValidityLimit_gt: DateTime
+  transporterValidityLimit_gte: DateTime
+  transporterNumberPlate: String
+  transporterNumberPlate_not: String
+  transporterNumberPlate_in: [String!]
+  transporterNumberPlate_not_in: [String!]
+  transporterNumberPlate_lt: String
+  transporterNumberPlate_lte: String
+  transporterNumberPlate_gt: String
+  transporterNumberPlate_gte: String
+  transporterNumberPlate_contains: String
+  transporterNumberPlate_not_contains: String
+  transporterNumberPlate_starts_with: String
+  transporterNumberPlate_not_starts_with: String
+  transporterNumberPlate_ends_with: String
+  transporterNumberPlate_not_ends_with: String
+  signedByTransporter: Boolean
+  signedByTransporter_not: Boolean
+  signedBy: String
+  signedBy_not: String
+  signedBy_in: [String!]
+  signedBy_not_in: [String!]
+  signedBy_lt: String
+  signedBy_lte: String
+  signedBy_gt: String
+  signedBy_gte: String
+  signedBy_contains: String
+  signedBy_not_contains: String
+  signedBy_starts_with: String
+  signedBy_not_starts_with: String
+  signedBy_ends_with: String
+  signedBy_not_ends_with: String
+  signedAt: DateTime
+  signedAt_not: DateTime
+  signedAt_in: [DateTime!]
+  signedAt_not_in: [DateTime!]
+  signedAt_lt: DateTime
+  signedAt_lte: DateTime
+  signedAt_gt: DateTime
+  signedAt_gte: DateTime
+  AND: [TemporaryStorageDetailWhereInput!]
+  OR: [TemporaryStorageDetailWhereInput!]
+  NOT: [TemporaryStorageDetailWhereInput!]
+}
+
+input TemporaryStorageDetailWhereUniqueInput {
+  id: ID
 }
 
 type User {

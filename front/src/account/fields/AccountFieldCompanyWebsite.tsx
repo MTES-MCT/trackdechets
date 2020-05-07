@@ -18,7 +18,7 @@ AccountFielCompanyContactWebsite.fragments = {
       website
       userRole
     }
-  `
+  `,
 };
 
 const UPDATE_WEBSITE = gql`
@@ -32,7 +32,7 @@ const UPDATE_WEBSITE = gql`
 `;
 
 const yupSchema = object().shape({
-  website: string().url()
+  website: string().url(),
 });
 
 export default function AccountFielCompanyContactWebsite({ company }: Props) {
@@ -46,7 +46,7 @@ export default function AccountFielCompanyContactWebsite({ company }: Props) {
           name={fieldName}
           label={fieldLabel}
           value={company.website}
-          renderForm={toggleEdition => (
+          renderForm={(toggleEdition) => (
             <AccountFormSimpleInput<{ website: string }>
               name="website"
               type="url"

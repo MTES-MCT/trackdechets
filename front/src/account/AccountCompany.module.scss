@@ -1,6 +1,4 @@
-
 .company {
-
   .title {
     display: flex;
     justify-content: space-between;
@@ -21,7 +19,6 @@
         vertical-align: sub;
       }
     }
-
   }
 
   .menu {
@@ -29,7 +26,6 @@
     flex-direction: row;
     align-items: flex-start;
     margin-bottom: 1em;
-
 
     button {
       cursor: pointer;
@@ -49,4 +45,3 @@
     }
   }
 }
-

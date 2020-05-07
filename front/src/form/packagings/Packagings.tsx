@@ -6,7 +6,7 @@ const packagings = [
   { value: "CITERNE", label: "Citerne" },
   { value: "GRV", label: "GRV" },
   { value: "FUT", label: "Fût" },
-  { value: "AUTRE", label: "Autre (à préciser)" }
+  { value: "AUTRE", label: "Autre (à préciser)" },
 ];
 
 export default function Packagings({
@@ -18,16 +18,16 @@ export default function Packagings({
   return (
     <FieldArray
       name={name}
-      render={arrayHelpers => (
+      render={(arrayHelpers) => (
         <fieldset>
-          {packagings.map(p => (
+          {packagings.map((p) => (
             <label className="label-inline" key={p.value}>
               <input
                 type="checkbox"
                 name={name}
                 value={p.value}
                 checked={value.indexOf(p.value) > -1}
-                onChange={e => {
+                onChange={(e) => {
                   if (e.target.checked) arrayHelpers.push(p.value);
                   else {
                     const idx = value.indexOf(p.value);

@@ -24,13 +24,13 @@ export default class CompanyMap extends React.Component<Props> {
 
   initMap() {
     fetch("/mapbox/style.json")
-      .then(response => response.json())
-      .then(style => {
+      .then((response) => response.json())
+      .then((style) => {
         const mapOptions: mapboxgl.MapboxOptions = {
           container: "map",
           style,
           center: this.getLngLat(),
-          zoom: 13
+          zoom: 13,
         };
         let map = new mapboxgl.Map(mapOptions);
         this.addEtablissementMarker(map);

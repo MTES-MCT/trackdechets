@@ -13,10 +13,6 @@ services:
     build:
       context: ./front
 
-  td-insee:
-    build:
-      context: ./insee
-
   td-pdf:
     build:
       context: ./pdf

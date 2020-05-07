@@ -21,7 +21,7 @@ AccountCompanyPage.fragments = {
     ${AccountFieldCompanyContactEmail.fragments.company}
     ${AccountFieldCompanyContactPhone.fragments.company}
     ${AccountFieldCompanyWebsite.fragments.company}
-  `
+  `,
 };
 
 export default function AccountCompanyPage({ company }: Props) {

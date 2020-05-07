@@ -1,5 +1,9 @@
 endpoint: ${env:PRISMA_ENDPOINT}
-datamodel: datamodel.prisma
+datamodel:
+  - database/form.prisma
+  - database/user.prisma
+  - database/company.prisma
+
 generate:
   - generator: typescript-client
     output: ../src/generated/prisma-client/

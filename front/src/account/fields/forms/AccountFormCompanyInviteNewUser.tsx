@@ -18,7 +18,7 @@ AccountFormCompanyInviteNewUser.fragments = {
       id
       siret
     }
-  `
+  `,
 };
 
 const INVITE_USER_TO_COMPANY = gql`
@@ -38,7 +38,7 @@ const INVITE_USER_TO_COMPANY = gql`
 `;
 
 const yupSchema = object().shape({
-  email: string().email()
+  email: string().email(),
 });
 
 export default function AccountFormCompanyInviteNewUser({ company }: Props) {
@@ -49,7 +49,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
   return (
     <Formik
       initialValues={{ email: "", siret: company.siret, role: "MEMBER" }}
-      validate={values => {
+      validate={(values) => {
         if (!values.email) {
           return { email: "L'email est obligatoire" };
         }
@@ -57,13 +57,13 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
       }}
       onSubmit={(values, { setSubmitting, setFieldError, resetForm }) => {
         inviteUserToCompany({
-          variables: { siret: company.siret, ...values }
+          variables: { siret: company.siret, ...values },
         })
           .then(() => {
             setSubmitting(false);
             resetForm();
           })
-          .catch(e => {
+          .catch((e) => {
             setFieldError("email", e.message);
             setSubmitting(false);
           });

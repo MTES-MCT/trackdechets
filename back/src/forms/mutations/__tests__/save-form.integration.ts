@@ -1,8 +1,11 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  companyFactory
+} from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { prisma } from "../../../generated/prisma-client";
-import { EMPTY_FORM } from "../__mocks__/data";
+import { getEmptyForm } from "../__mocks__/data";
 
 describe("{ mutation { saveForm } }", () => {
   beforeEach(async () => {
@@ -15,7 +18,7 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload = { ...EMPTY_FORM };
+    const payload = getEmptyForm();
 
     payload.emitter.workSite = {
       name: "The name",
@@ -65,6 +68,36 @@ describe("{ mutation { saveForm } }", () => {
     );
   });
 
+  test("should create a form as an eco-organisme", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const eo = await prisma.createEcoOrganisme({
+      address: "an address",
+      name: "a name",
+      siret: company.siret
+    });
+
+    const { mutate } = makeClient(user);
+    const payload = getEmptyForm();
+
+    // Current user is only present as the eco-organisme on the form
+    payload.ecoOrganisme = { id: eo.id };
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    expect(data.saveForm.id).toBeDefined();
+  });
+
   test("should create a form with an eco organisme, update it, and then remove it", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -81,7 +114,7 @@ describe("{ mutation { saveForm } }", () => {
     });
 
     const { mutate } = makeClient(user);
-    const payload: typeof EMPTY_FORM & { id?: string } = { ...EMPTY_FORM };
+    const payload = getEmptyForm();
 
     payload.ecoOrganisme = { id: eo.id };
     payload.emitter.company.siret = company.siret;
@@ -135,7 +168,7 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const createPayload = { ...EMPTY_FORM };
+    const createPayload = getEmptyForm();
 
     createPayload.emitter.company.siret = company.siret;
     createPayload.emitter.company.name = company.name;
@@ -187,5 +220,152 @@ describe("{ mutation { saveForm } }", () => {
     });
 
     expect(name).toBe("things");
+  });
+
+  test("should create a form with a temporary storage, update it, and then remove it", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const temporaryStorerCompany = await companyFactory();
+
+    const { mutate } = makeClient(user);
+    const payload = getEmptyForm();
+
+    payload.emitter.company.siret = company.siret;
+    payload.emitter.company.name = company.name;
+
+    payload.recipient.isTempStorage = true;
+
+    payload.temporaryStorageDetail.destination.company.siret =
+      temporaryStorerCompany.siret;
+    payload.temporaryStorageDetail.destination.company.name =
+      temporaryStorerCompany.name;
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    // First, check that temporaryStorageDetail gets binded on creation
+    const temporaryStorageDetail1 = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail1.id).toBeDefined();
+    payload.id = data.saveForm.id;
+
+    // Then modify it
+    payload.temporaryStorageDetail.destination.cap = "A CAP here";
+    await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+    const temporaryStorageDetail2 = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail2.destinationCap).toBe("A CAP here");
+
+    // Then delete the temporary storage step
+    payload.recipient.isTempStorage = false;
+    await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+    const temporaryStorageDetail3 = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail3).toBe(null);
+  });
+
+  test("should create a form without a temporary storage, and then add one", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const payload = getEmptyForm();
+
+    payload.emitter.company.siret = company.siret;
+    payload.emitter.company.name = company.name;
+
+    payload.recipient.isTempStorage = false;
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    const temporaryStorageDetail1 = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail1).toBeNull();
+
+    // Now edit the form and add a temporary storage
+    const temporaryStorerCompany = await companyFactory();
+
+    payload.id = data.saveForm.id;
+
+    payload.recipient.isTempStorage = true;
+    payload.temporaryStorageDetail.destination.company.siret =
+      temporaryStorerCompany.siret;
+    payload.temporaryStorageDetail.destination.company.name =
+      temporaryStorerCompany.name;
+
+    await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    const temporaryStorageDetail2 = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail2.destinationCompanySiret).toBe(
+      temporaryStorerCompany.siret
+    );
+    expect(temporaryStorageDetail2.destinationCompanyName).toBe(
+      temporaryStorerCompany.name
+    );
+  });
+
+  test("should create a form `isTempStorage=true` but no temp storage details and still create the temporaryStorageDetail object", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const payload = getEmptyForm();
+
+    payload.emitter.company.siret = company.siret;
+    payload.emitter.company.name = company.name;
+
+    payload.recipient.isTempStorage = true;
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    const temporaryStorageDetail = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail).not.toBeNull();
   });
 });

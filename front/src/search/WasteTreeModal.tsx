@@ -8,10 +8,10 @@ type Props = {
   onSelect?: (value: any) => void;
 };
 
-export default function({
+export default function ({
   open = false,
   onClose = () => null,
-  onSelect = () => null
+  onSelect = () => null,
 }: Props) {
   const [selectedKeys, setSelectedKeys] = useState([]);
 
@@ -22,7 +22,7 @@ export default function({
     >
       <div className="modal modal-large">
         <div className="tree">
-          <WasteTree onSelect={keys => setSelectedKeys(keys)} />
+          <WasteTree onSelect={(keys) => setSelectedKeys(keys)} />
         </div>
         <div>
           <p>

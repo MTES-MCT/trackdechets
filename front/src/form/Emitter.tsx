@@ -47,7 +47,7 @@ export default function Emitter() {
         )}
       </div>
 
-      <EcoOrganismes name="ecoOrganisme.id" />
+      <EcoOrganismes name="ecoOrganisme" />
 
       <h4>Type d'émetteur</h4>
 
@@ -60,7 +60,7 @@ export default function Emitter() {
 
       <div className="form__group">
         <fieldset>
-          <legend>L'émetteur est</legend>
+          <legend> L'émetteur est</legend>
           <Field
             name="emitter.type"
             id="PRODUCER"
