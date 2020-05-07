@@ -130,6 +130,51 @@ describe("{ mutation { markAsSealed } }", () => {
     expect(form.status).toEqual("SEALED");
   });
 
+  test("the eco-organisme of the BSD can seal it", async () => {
+    const emitterCompany = await companyFactory();
+    const recipientCompany = await companyFactory();
+    const traderCompany = await companyFactory();
+
+    const { user, company: ecoOrganismeCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const eo = await prisma.createEcoOrganisme({
+      name: "An EO",
+      siret: ecoOrganismeCompany.siret,
+      address: "An address"
+    });
+
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        traderCompanySiret: traderCompany.siret,
+        ecoOrganisme: {
+          connect: { id: eo.id }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutation = `
+      mutation   {
+        markAsSealed(id: "${form.id}") {
+          id
+        }
+      }
+    `;
+
+    await mutate(mutation);
+
+    form = await prisma.form({ id: form.id });
+
+    expect(form.status).toEqual("SEALED");
+  });
+
   test("should fail if user is neither emitter or recipient or trader", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
 
