@@ -6,6 +6,15 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 
+# [2020.05.1] 07/05/2020
+* Ajout logos partenaires [PR 277](https://github.com/MTES-MCT/trackdechets/pull/277)
+* Amélioration délivrabilité des emails [PR 260](https://github.com/MTES-MCT/trackdechets/pull/260)
+* Correction eco-organismes [PR 266](https://github.com/MTES-MCT/trackdechets/pull/266) & [PR 280](https://github.com/MTES-MCT/trackdechets/pull/280)
+* Correction validation des dates [PR 267](https://github.com/MTES-MCT/trackdechets/pull/267)
+* BSD suite - pdf [PR 263](https://github.com/MTES-MCT/trackdechets/pull/260), corrections [271](https://github.com/MTES-MCT/trackdechets/pull/271), [282](https://github.com/MTES-MCT/trackdechets/pull/282), [285](https://github.com/MTES-MCT/trackdechets/pull/285)
+* Corrections annexe2 [276](https://github.com/MTES-MCT/trackdechets/pull/276)
+* Améliorations techniques [283](https://github.com/MTES-MCT/trackdechets/pull/283), [279](https://github.com/MTES-MCT/trackdechets/pull/279), [275](https://github.com/MTES-MCT/trackdechets/pull/275), [272](https://github.com/MTES-MCT/trackdechets/pull/272), [281](https://github.com/MTES-MCT/trackdechets/pull/281), [264](https://github.com/MTES-MCT/trackdechets/pull/264), [265](https://github.com/MTES-MCT/trackdechets/pull/265) 
+
 # [2020.04.1] 2/04/2020
 * Mise en place espace développeurs [PR 225](https://github.com/MTES-MCT/trackdechets/pull/225)
 * Amélioration page transporteur [PR 242](https://github.com/MTES-MCT/trackdechets/pull/242)
