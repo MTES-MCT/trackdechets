@@ -227,7 +227,7 @@ const mutationResolvers: MutationResolvers = {
       where: { id },
       data: { isDeleted: true }
     });
-    return form;
+    return { ...form, status: form.status as Status };
   },
   duplicateForm: (_parent, args, { user }) => duplicateForm(user.id, args),
   markAsSealed: (_parent, args, context) => markAsSealed(args, context),
