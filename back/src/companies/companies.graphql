@@ -441,8 +441,8 @@ type Installation {
   urlFiche: String
 
   "Liste des rubriques associées"
-  rubriques: [Rubrique!]!
+  rubriques: [Rubrique!]
 
   "Liste des déclarations GEREP"
-  declarations: [Declaration!]!
+  declarations: [Declaration!]
 }

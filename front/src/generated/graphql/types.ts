@@ -427,12 +427,12 @@ export type Form = {
   /** Destination ultérieure prévue (case 12) */
   nextDestination: Maybe<NextDestination>;
   /** Annexe 2 */
-  appendix2Forms: Array<Form>;
+  appendix2Forms: Maybe<Array<Form>>;
   ecoOrganisme: Maybe<EcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
-  stateSummary: StateSummary;
+  stateSummary: Maybe<StateSummary>;
 };
 
 /** Information sur un établissement dans un BSD */
@@ -575,9 +575,9 @@ export type Installation = {
   /** URL de la fiche ICPE sur Géorisques */
   urlFiche: Maybe<Scalars['String']>;
   /** Liste des rubriques associées */
-  rubriques: Array<Rubrique>;
+  rubriques: Maybe<Array<Rubrique>>;
   /** Liste des déclarations GEREP */
-  declarations: Array<Declaration>;
+  declarations: Maybe<Array<Declaration>>;
 };
 
 
@@ -1386,7 +1386,7 @@ export type User = {
   /** Numéro de téléphone de l'utilisateur */
   phone: Maybe<Scalars['String']>;
   /** Liste des établissements dont l'utilisateur est membre */
-  companies: Array<CompanyPrivate>;
+  companies: Maybe<Array<CompanyPrivate>>;
 };
 
 /**

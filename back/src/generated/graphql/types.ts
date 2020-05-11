@@ -426,12 +426,12 @@ export type Form = {
   /** Destination ultérieure prévue (case 12) */
   nextDestination?: Maybe<NextDestination>;
   /** Annexe 2 */
-  appendix2Forms: Array<Form>;
+  appendix2Forms?: Maybe<Array<Form>>;
   ecoOrganisme?: Maybe<EcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
-  stateSummary: StateSummary;
+  stateSummary?: Maybe<StateSummary>;
 };
 
 /** Information sur un établissement dans un BSD */
@@ -570,9 +570,9 @@ export type Installation = {
   /** URL de la fiche ICPE sur Géorisques */
   urlFiche?: Maybe<Scalars['String']>;
   /** Liste des rubriques associées */
-  rubriques: Array<Rubrique>;
+  rubriques?: Maybe<Array<Rubrique>>;
   /** Liste des déclarations GEREP */
-  declarations: Array<Declaration>;
+  declarations?: Maybe<Array<Declaration>>;
 };
 
 
@@ -1379,7 +1379,7 @@ export type User = {
   /** Numéro de téléphone de l'utilisateur */
   phone?: Maybe<Scalars['String']>;
   /** Liste des établissements dont l'utilisateur est membre */
-  companies: Array<CompanyPrivate>;
+  companies?: Maybe<Array<CompanyPrivate>>;
 };
 
 /**
@@ -1873,10 +1873,10 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   processedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
   noTraceability?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
   nextDestination?: Resolver<Maybe<ResolversTypes['NextDestination']>, ParentType, ContextType>,
-  appendix2Forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType>,
+  appendix2Forms?: Resolver<Maybe<Array<ResolversTypes['Form']>>, ParentType, ContextType>,
   ecoOrganisme?: Resolver<Maybe<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>,
   temporaryStorageDetail?: Resolver<Maybe<ResolversTypes['TemporaryStorageDetail']>, ParentType, ContextType>,
-  stateSummary?: Resolver<ResolversTypes['StateSummary'], ParentType, ContextType>,
+  stateSummary?: Resolver<Maybe<ResolversTypes['StateSummary']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -1911,8 +1911,8 @@ export type FormSubscriptionResolvers<ContextType = GraphQLContext, ParentType e
 export type InstallationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Installation'] = ResolversParentTypes['Installation']> = {
   codeS3ic?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   urlFiche?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  rubriques?: Resolver<Array<ResolversTypes['Rubrique']>, ParentType, ContextType>,
-  declarations?: Resolver<Array<ResolversTypes['Declaration']>, ParentType, ContextType>,
+  rubriques?: Resolver<Maybe<Array<ResolversTypes['Rubrique']>>, ParentType, ContextType>,
+  declarations?: Resolver<Maybe<Array<ResolversTypes['Declaration']>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -2088,7 +2088,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  companies?: Resolver<Array<ResolversTypes['CompanyPrivate']>, ParentType, ContextType>,
+  companies?: Resolver<Maybe<Array<ResolversTypes['CompanyPrivate']>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 

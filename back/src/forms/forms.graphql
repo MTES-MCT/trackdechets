@@ -325,7 +325,7 @@ type Form {
   nextDestination: NextDestination
 
   "Annexe 2"
-  appendix2Forms: [Form!]!
+  appendix2Forms: [Form!]
 
   ecoOrganisme: EcoOrganisme
 
@@ -333,7 +333,7 @@ type Form {
   temporaryStorageDetail: TemporaryStorageDetail
 
   "Résumé des valeurs clés du bordereau à l'instant T"
-  stateSummary: StateSummary!
+  stateSummary: StateSummary
 }
 
 """

@@ -2098,7 +2098,7 @@ Destination ultérieure prévue (case 12)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
-<td valign="top">[<a href="#form">Form</a>!]!</td>
+<td valign="top">[<a href="#form">Form</a>!]</td>
 <td>
 
 Annexe 2
@@ -2121,7 +2121,7 @@ BSD suite - détail des champs de la partie entreposage provisoire ou reconditio
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>stateSummary</strong></td>
-<td valign="top"><a href="#statesummary">StateSummary</a>!</td>
+<td valign="top"><a href="#statesummary">StateSummary</a></td>
 <td>
 
 Résumé des valeurs clés du bordereau à l'instant T
@@ -2291,7 +2291,7 @@ URL de la fiche ICPE sur Géorisques
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>rubriques</strong></td>
-<td valign="top">[<a href="#rubrique">Rubrique</a>!]!</td>
+<td valign="top">[<a href="#rubrique">Rubrique</a>!]</td>
 <td>
 
 Liste des rubriques associées
@@ -2300,7 +2300,7 @@ Liste des rubriques associées
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>declarations</strong></td>
-<td valign="top">[<a href="#declaration">Declaration</a>!]!</td>
+<td valign="top">[<a href="#declaration">Declaration</a>!]</td>
 <td>
 
 Liste des déclarations GEREP
@@ -3153,7 +3153,7 @@ Numéro de téléphone de l'utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companies</strong></td>
-<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>!]!</td>
+<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>!]</td>
 <td>
 
 Liste des établissements dont l'utilisateur est membre
