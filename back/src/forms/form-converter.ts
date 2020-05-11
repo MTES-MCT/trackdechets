@@ -1,5 +1,5 @@
 import { Form as PrismaForm } from "../generated/prisma-client";
-import { Form } from "../generated/graphql/types";
+import { Form, TemporaryStorageDetail } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
   input,

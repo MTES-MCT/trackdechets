@@ -15,7 +15,8 @@ import {
   MutationMarkAsTempStoredArgs,
   MutationMarkAsResealedArgs,
   MutationMarkAsResentArgs,
-  Form
+  Form,
+  FormStatus
 } from "../../generated/graphql/types";
 
 export async function markAsSealed(
@@ -209,7 +210,7 @@ async function transitionForm(
 
   // Machine transitions are always synchronous
   // We subscribe to the transitions and wait for a stable or final position before returning a result
-  return new Promise((resolve, reject) => {
+  return new Promise<Form>((resolve, reject) => {
     formService.start(startingState).onTransition(async state => {
       if (!state.changed) {
         return;
@@ -235,11 +236,11 @@ async function transitionForm(
           eventParams
         );
 
-        const updatedForm = prisma.updateForm({
+        const updatedForm = await prisma.updateForm({
           where: { id: formId },
           data: { status: newStatus, ...formPropsFromEvent }
         });
-        resolve(updatedForm);
+        resolve({ ...updatedForm, status: updatedForm.status as FormStatus });
         formService.stop();
       }
     });
