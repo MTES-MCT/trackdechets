@@ -1335,7 +1335,7 @@ type Form {
   createdAt: DateTime!
   updatedAt: DateTime!
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1426,7 +1426,7 @@ input FormCreateInput {
   isDeleted: Boolean
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1526,7 +1526,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   isDeleted: Boolean
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1779,7 +1779,7 @@ type FormPreviousValues {
   createdAt: DateTime!
   updatedAt: DateTime!
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1917,10 +1917,20 @@ input FormScalarWhereInput {
   updatedAt_gte: DateTime
   signedByTransporter: Boolean
   signedByTransporter_not: Boolean
-  status: Status
-  status_not: Status
-  status_in: [Status!]
-  status_not_in: [Status!]
+  status: String
+  status_not: String
+  status_in: [String!]
+  status_not_in: [String!]
+  status_lt: String
+  status_lte: String
+  status_gt: String
+  status_gte: String
+  status_contains: String
+  status_not_contains: String
+  status_starts_with: String
+  status_not_starts_with: String
+  status_ends_with: String
+  status_not_ends_with: String
   sentAt: DateTime
   sentAt_not: DateTime
   sentAt_in: [DateTime!]
@@ -2814,7 +2824,7 @@ input FormUpdateDataInput {
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -2898,7 +2908,7 @@ input FormUpdateInput {
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -2981,7 +2991,7 @@ input FormUpdateManyDataInput {
   customId: String
   isDeleted: Boolean
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3073,7 +3083,7 @@ input FormUpdateManyMutationInput {
   customId: String
   isDeleted: Boolean
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3175,7 +3185,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   isDeleted: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
-  status: Status
+  status: String
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3337,10 +3347,20 @@ input FormWhereInput {
   updatedAt_gte: DateTime
   signedByTransporter: Boolean
   signedByTransporter_not: Boolean
-  status: Status
-  status_not: Status
-  status_in: [Status!]
-  status_not_in: [Status!]
+  status: String
+  status_not: String
+  status_in: [String!]
+  status_not_in: [String!]
+  status_lt: String
+  status_lte: String
+  status_gt: String
+  status_gte: String
+  status_contains: String
+  status_not_contains: String
+  status_starts_with: String
+  status_not_starts_with: String
+  status_ends_with: String
+  status_not_ends_with: String
   sentAt: DateTime
   sentAt_not: DateTime
   sentAt_in: [DateTime!]
