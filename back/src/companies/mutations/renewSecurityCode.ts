@@ -4,6 +4,7 @@ import { companyMails } from "../mails";
 import { getCompanyActiveUsers } from "../queries/companyUsers";
 import { sendMail } from "../../common/mails.helper";
 import { UserInputError } from "apollo-server-express";
+import { CompanyPrivate } from "../../generated/graphql/types";
 
 /**
  * This function is used to renew the security code
@@ -11,7 +12,9 @@ import { UserInputError } from "apollo-server-express";
  * identical to the previous one, we generate a new one
  * @param siret
  */
-export default async function renewSecurityCode(siret: string) {
+export default async function renewSecurityCode(
+  siret: string
+): Promise<CompanyPrivate> {
   if (siret.length !== 14) {
     throw new UserInputError("Le siret doit faire 14 caractères", {
       invalidArgs: ["siret"]

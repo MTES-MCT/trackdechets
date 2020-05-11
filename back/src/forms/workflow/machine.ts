@@ -136,8 +136,7 @@ export const formWorkflowMachine = Machine(
           src: (ctx, event) =>
             validateSecurityCode(
               ctx.form.emitterCompanySiret,
-              event.securityCode,
-              ctx.requestContext
+              event.securityCode
             ),
           onDone: {
             target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
@@ -150,8 +149,7 @@ export const formWorkflowMachine = Machine(
           src: (ctx, event) =>
             validateSecurityCode(
               ctx.form.recipientCompanySiret,
-              event.securityCode,
-              ctx.requestContext
+              event.securityCode
             ),
           onDone: {
             target: FormState.Resent
@@ -235,7 +233,7 @@ export const formWorkflowMachine = Machine(
   {
     services: {
       markFormAppendixAwaitingFormsAsGrouped: ctx =>
-        markFormAppendixAwaitingFormsAsGrouped(ctx.form.id, ctx.requestContext),
+        markFormAppendixAwaitingFormsAsGrouped(ctx.form.id),
       markFormAppendixGroupedsAsProcessed: ctx =>
         markFormAppendixGroupedsAsProcessed(ctx.form.id, ctx.requestContext)
     },

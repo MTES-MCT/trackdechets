@@ -1,16 +1,10 @@
-import { prisma, CompanyType } from "../../generated/prisma-client";
+import { prisma } from "../../generated/prisma-client";
+import {
+  MutationUpdateCompanyArgs,
+  CompanyPrivate
+} from "../../generated/graphql/types";
 
-export type Payload = {
-  siret: string;
-  gerepId?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  website?: string;
-  companyTypes?: CompanyType[];
-  givenName?: string;
-};
-
-export default function updateCompany({
+export default async function updateCompany({
   siret,
   companyTypes,
   gerepId,
@@ -18,7 +12,7 @@ export default function updateCompany({
   contactPhone,
   website,
   givenName
-}: Payload) {
+}: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
   const data = {
     ...(companyTypes !== undefined
       ? { companyTypes: { set: companyTypes } }

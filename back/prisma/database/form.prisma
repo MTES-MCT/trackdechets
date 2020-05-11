@@ -21,7 +21,7 @@ type Form {
   # Workflow fields
   signedByTransporter: Boolean
 
-  status: String @default(value: "DRAFT")
+  status: Status @default(value: DRAFT)
   sentAt: DateTime
   sentBy: String
 

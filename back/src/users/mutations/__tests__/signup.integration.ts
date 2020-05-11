@@ -6,7 +6,6 @@ import { prisma } from "../../../generated/prisma-client";
 import { userMails } from "../../mails";
 import { userFactory, companyFactory } from "../../../__tests__/factories";
 import { ErrorCode } from "../../../common/errors";
-import { UserRole } from "../../../generated/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -139,7 +138,7 @@ describe("{ mutation { signup } }", () => {
       email: user.email,
       companySiret: company.siret,
       hash: "hash",
-      role: UserRole.Member
+      role: "MEMBER"
     });
 
     const mutation = `

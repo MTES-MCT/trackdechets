@@ -1,13 +1,12 @@
 import { getPutSignedUrl } from "../../common/s3";
-import { GraphQLContext } from "../../types";
+import { MutationCreateUploadLinkArgs } from "../../generated/graphql/types";
 
 export default async function createUploadLink(
-  _,
-  { fileName, fileType },
-  context: GraphQLContext
+  userId: string,
+  { fileName, fileType }: MutationCreateUploadLinkArgs
 ) {
   const timestamp = new Date().getTime();
-  const computedFileName = [context.user.id, timestamp, fileName].join("-");
+  const computedFileName = [userId, timestamp, fileName].join("-");
 
   const url = await getPutSignedUrl(computedFileName, fileType);
 

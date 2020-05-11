@@ -1,10 +1,5 @@
 import { prisma } from "../../generated/prisma-client";
-
-type Payload = {
-  name?: string;
-  phone?: string;
-  email?: string;
-};
+import { MutationEditProfileArgs } from "../../generated/graphql/types";
 
 /**
  * Edit user profile
@@ -13,7 +8,7 @@ type Payload = {
  * @param userId
  * @param payload
  */
-export function editProfile(userId: string, payload: Payload) {
+export function editProfile(userId: string, payload: MutationEditProfileArgs) {
   const { name, phone, email } = payload;
 
   const data = {

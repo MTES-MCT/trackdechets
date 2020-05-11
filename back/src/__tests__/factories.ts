@@ -6,7 +6,8 @@ import {
   EmitterType,
   QuantityType,
   prisma,
-  UserRole
+  UserRole,
+  Status
 } from "../generated/prisma-client";
 
 /**
@@ -154,7 +155,7 @@ const formdata = {
   traderCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "signe",
-  status: "SENT",
+  status: "SENT" as Status,
   wasteRefusalReason: "",
   recipientCompanySiret: "5678",
   transporterCompanyMail: "transporter@td.io",

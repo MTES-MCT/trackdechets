@@ -1,3 +1,5 @@
+import { GraphQLContext } from "../../../types";
+
 export const getNewValidForm = () =>
   Object.assign(
     {},
@@ -154,4 +156,21 @@ const EMPTY_FORM = {
 // Instead, only pass deep clone
 export function getEmptyForm(): typeof EMPTY_FORM & { id?: string } {
   return JSON.parse(JSON.stringify(EMPTY_FORM));
+}
+/**
+ * return default context object
+ */
+export function getContext(): GraphQLContext {
+  return {
+    user: {
+      id: "userId",
+      name: "username",
+      email: "user@trackdechets.fr",
+      password: "pass",
+      createdAt: "",
+      updatedAt: ""
+    },
+    req: null,
+    res: null
+  };
 }

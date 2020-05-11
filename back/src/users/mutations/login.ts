@@ -2,6 +2,7 @@ import { prisma } from "../../generated/prisma-client";
 import { compare } from "bcrypt";
 import { apiKey } from "../queries";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
+import { MutationLoginArgs } from "../../generated/graphql/types";
 
 /**
  * DEPRECATED
@@ -10,7 +11,7 @@ import { UserInputError, ForbiddenError } from "apollo-server-express";
  * @param email
  * @param password
  */
-export async function login(email: string, password: string) {
+export async function login({ email, password }: MutationLoginArgs) {
   const user = await prisma.user({ email: email.trim() });
   if (!user) {
     throw new UserInputError(`Aucun utilisateur trouvé avec l'email ${email}`, {

@@ -1,16 +1,19 @@
-import { prisma, User, UserRole } from "../../generated/prisma-client";
+import { prisma, User } from "../../generated/prisma-client";
 import { sendMail } from "../../common/mails.helper";
 import { userMails } from "../mails";
 import { associateUserToCompany } from "./associateUserToCompany";
 import { createUserAccountHash } from "./createUserAccountHash";
 import { UserInputError } from "apollo-server-express";
+import {
+  MutationInviteUserToCompanyArgs,
+  MutationResendInvitationArgs,
+  CompanyPrivate
+} from "../../generated/graphql/types";
 
 export async function inviteUserToCompany(
   adminUser: User,
-  email: string,
-  siret: string,
-  role: UserRole
-) {
+  { email, siret, role }: MutationInviteUserToCompanyArgs
+): Promise<CompanyPrivate> {
   const existingUser = await prisma.user({ email }).catch(_ => null);
 
   const company = await prisma.company({ siret });
@@ -44,13 +47,13 @@ export async function inviteUserToCompany(
       )
     );
   }
+
   return company;
 }
 
 export async function resendInvitation(
   adminUser: User,
-  email: string,
-  siret: string
+  { email, siret }: MutationResendInvitationArgs
 ) {
   const hashes = await prisma.userAccountHashes({
     where: { email, companySiret: siret }
