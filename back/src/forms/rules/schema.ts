@@ -4,6 +4,7 @@ import {
   PROCESSING_OPERATION_CODES,
   GROUP_CODES
 } from "../../common/constants";
+import { number } from "yup";
 
 export const getReceivedInfoSchema = yup =>
   yup.object({
@@ -353,4 +354,31 @@ export const markAsResentSchema = inputRule()(
   {
     abortEarly: false
   }
+);
+
+export const formsSchema = inputRule()(yup =>
+  yup.object({
+    siret: yup.string().nullable(),
+    first: yup
+      .number()
+      .lessThan(501)
+      .moreThan(0)
+      .nullable(),
+    skip: yup
+      .number()
+      .moreThan(0)
+      .nullable(),
+    status: yup.string().nullable(),
+    roles: yup
+      .string()
+      .oneOf([
+        "TRANSPORTER",
+        "RECIPIENT",
+        "EMITTER",
+        "TRADER",
+        "ECO_ORGANISME",
+        "TEMPORARY_STORER"
+      ])
+      .nullable()
+  })
 );

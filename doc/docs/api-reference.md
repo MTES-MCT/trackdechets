@@ -161,10 +161,56 @@ SIRET d'un établissement dont je suis membre
 </td>
 </tr>
 <tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+Nombre de bordereaux retournés.
+Défaut à 50, maximum à 500
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">skip</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+Nombre d'éléments à ne pas récupérer en début de liste
+Permet de paginer les résultats
+Défaut à 0
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">status</td>
+<td valign="top">[<a href="#formstatus">FormStatus</a>]</td>
+<td>
+
+(Optionnel) Filtre sur les statuts des bordereaux
+Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">roles</td>
+<td valign="top">[<a href="#formrole">FormRole</a>]</td>
+<td>
+
+(Optionnel) Filtre sur le role de demandeur dams le bordereau
+Par exemple:
+ - `roles: [TRANSPORTER]` renverra les bordereaux pour lesquels je suis transporteur
+ - `roles: [EMITTER, RECIPIENT]` renverra les bordereaux dont je suis l'émetteur ou le destinataire final
+Voir `FormRole` pour la liste des roles sur lesquels il est possible de filtrer.
+Si aucune filtre n'est passé, les bordereaux seront retournés quel que soit votre role dessus.
+
+</td>
+</tr>
+<tr>
 <td colspan="2" align="right" valign="top">type</td>
 <td valign="top"><a href="#formtype">FormType</a></td>
 <td>
 
+DEPRECATED
 (Optionnel) Type de BSD renvoyés
 ACTOR = BSD's dont on est producteur ou destinataire
 TRANSPORTER = BSD's dont on est transporteur
@@ -5325,6 +5371,65 @@ Type d'établissement favoris
 </tbody>
 </table>
 
+### FormRole
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>TRANSPORTER</strong></td>
+<td>
+
+Les BSD's dont je suis transporteur
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>RECIPIENT</strong></td>
+<td>
+
+Les BSD's dont je suis la destination de traitement
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>EMITTER</strong></td>
+<td>
+
+Les BSD's dont je suis l'émetteur
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TRADER</strong></td>
+<td>
+
+Les BSD's dont je suis le négociant
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>ECO_ORGANISME</strong></td>
+<td>
+
+Les BSD's dont je suis éco-organisme
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TEMPORARY_STORER</strong></td>
+<td>
+
+Les BSD's dont je suis destination d'entreposage provisoire ou de reconditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### FormStatus
 
 Différents statuts d'un BSD au cours de son cycle de vie
@@ -5450,7 +5555,7 @@ Valeur possibles pour le filtre de la query `forms`
 <td valign="top"><strong>ACTOR</strong></td>
 <td>
 
-Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)
+DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)
 
 </td>
 </tr>

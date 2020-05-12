@@ -525,6 +525,21 @@ export type FormInput = {
   temporaryStorageDetail: Maybe<TemporaryStorageDetailInput>;
 };
 
+export enum FormRole {
+  /** Les BSD's dont je suis transporteur */
+  Transporter = 'TRANSPORTER',
+  /** Les BSD's dont je suis la destination de traitement */
+  Recipient = 'RECIPIENT',
+  /** Les BSD's dont je suis l'émetteur */
+  Emitter = 'EMITTER',
+  /** Les BSD's dont je suis le négociant */
+  Trader = 'TRADER',
+  /** Les BSD's dont je suis éco-organisme */
+  EcoOrganisme = 'ECO_ORGANISME',
+  /** Les BSD's dont je suis destination d'entreposage provisoire ou de reconditionnement */
+  TemporaryStorer = 'TEMPORARY_STORER'
+}
+
 /** Informations du cycle de vie des bordereaux */
 export type FormsLifeCycleData = {
    __typename?: 'formsLifeCycleData';
@@ -586,7 +601,7 @@ export enum FormStatus {
 
 /**
  * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
- * 
+ *
  * Mise à jour d'un BSD
  */
 export type FormSubscription = {
@@ -603,7 +618,7 @@ export type FormSubscription = {
 
 /** Valeur possibles pour le filtre de la query `forms` */
 export enum FormType {
-  /** Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
+  /** DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
   Actor = 'ACTOR',
   /** Uniquement les BSD's dont je suis transporteur */
   Transporter = 'TRANSPORTER'
@@ -693,7 +708,7 @@ export type Mutation = {
   /**
    * DEPRECATED - La récupération de token pour le compte de tiers
    * doit s'effectuer avec le protocole OAuth2
-   * 
+   *
    * Récupére un token à partir de l'email et du mot de passe
    * d'un utilisateur.
    */
@@ -1116,7 +1131,11 @@ export type QueryFormPdfArgs = {
 
 
 export type QueryFormsArgs = {
-  siret: Maybe<Scalars['String']>;
+  siret?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+  status?: Maybe<Array<Maybe<FormStatus>>>;
+  roles?: Maybe<Array<Maybe<FormRole>>>;
   type?: Maybe<FormType>;
 };
 
@@ -1280,7 +1299,7 @@ export type Stat = {
  * - le bordereau peut naviguer entre plusieurs entreprises.
  * - quand le bordereau a-t-il été modifié pour la dernière fois ? (création, signature, traitement... ?)
  * - si c'est un bordereau avec conditionnement et qu'on attend un transporteur, quel est-il ?
- * 
+ *
  * Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
  */
 export type StateSummary = {
@@ -1342,7 +1361,7 @@ export type Subscription = {
    __typename?: 'Subscription';
   /**
    * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
-   * 
+   *
    * Permet de s'abonner aux changements de statuts d'un BSD
    */
   forms: Maybe<FormSubscription>;
@@ -1557,14 +1576,14 @@ export type User = {
 /**
  * Liste les différents rôles d'un utilisateur au sein
  * d'un établissement.
- * 
+ *
  * Les admins peuvent:
  * * consulter/éditer les bordereaux
  * * gérer les utilisateurs de l'établissement
  * * éditer les informations de la fiche entreprise
  * * demander le renouvellement du code de sécurité
  * * Éditer les informations de la fiche entreprise
- * 
+ *
  * Les membres peuvent:
  * * consulter/éditer les bordereaux
  * * consulter le reste des informations
