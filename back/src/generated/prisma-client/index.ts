@@ -3601,7 +3601,7 @@ export interface EcoOrganismeCreateOneInput {
 
 export interface FormCreateWithoutTemporaryStorageDetailInput {
   id?: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
+  readableId: String;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner: UserCreateOneInput;
@@ -4895,7 +4895,7 @@ export interface FormScalarWhereInput {
 
 export interface FormCreateInput {
   id?: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
+  readableId: String;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   owner: UserCreateOneInput;
@@ -6717,13 +6717,13 @@ export interface ApplicationEdgeSubscription
 
 export interface Form {
   id: ID_Output;
-  readableId?: String;
+  readableId: String;
   customId?: String;
   isDeleted?: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   signedByTransporter?: Boolean;
-  status?: String;
+  status: String;
   sentAt?: DateTimeOutput;
   sentBy?: String;
   isAccepted?: Boolean;
@@ -8544,13 +8544,13 @@ export interface UserConnectionSubscription
 
 export interface FormPreviousValues {
   id: ID_Output;
-  readableId?: String;
+  readableId: String;
   customId?: String;
   isDeleted?: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   signedByTransporter?: Boolean;
-  status?: String;
+  status: String;
   sentAt?: DateTimeOutput;
   sentBy?: String;
   isAccepted?: Boolean;

@@ -14,7 +14,13 @@ import { updateApolloCache } from "../../common/helper";
 import { currentSiretService } from "../../dashboard/CompanySelector";
 import { GET_SLIPS } from "../../dashboard/slips/query";
 import initialState from "../initial-state";
-import { Form } from "../model";
+import {
+  Form,
+  Query,
+  QueryFormArgs,
+  Mutation,
+  MutationSaveFormArgs,
+} from "../../generated/graphql/types";
 import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
@@ -30,24 +36,37 @@ export default withRouter(function StepList(
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = props.children.length - 1;
 
-  const { loading, error, data } = useQuery(GET_FORM, {
-    variables: { formId: props.formId },
-    fetchPolicy: "network-only",
-  });
+  const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
+    GET_FORM,
+    {
+      variables: { id: props.formId as string },
+      skip: !props.formId,
+      fetchPolicy: "network-only",
+    }
+  );
 
   const formState = useMemo(() => getComputedState(initialState, data?.form), [
     data,
   ]);
 
-  const [saveForm] = useMutation(SAVE_FORM, {
-    update: (store, { data: { saveForm } }) => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_SLIPS,
-        variables: { siret: currentSiretService.getSiret() },
-        getNewData: (data) => ({
-          forms: [...data.forms.filter((f) => f.id !== saveForm.id), saveForm],
-        }),
-      });
+  const [saveForm] = useMutation<
+    Pick<Mutation, "saveForm">,
+    MutationSaveFormArgs
+  >(SAVE_FORM, {
+    update: (store, { data }) => {
+      if (data?.saveForm) {
+        const saveForm = data.saveForm;
+        updateApolloCache<{ forms: Form[] }>(store, {
+          query: GET_SLIPS,
+          variables: { siret: currentSiretService.getSiret() },
+          getNewData: (data) => ({
+            forms: [
+              ...data.forms.filter((f) => f.id !== saveForm.id),
+              saveForm,
+            ],
+          }),
+        });
+      }
     },
   });
 

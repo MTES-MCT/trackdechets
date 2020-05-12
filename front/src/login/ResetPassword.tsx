@@ -2,6 +2,10 @@ import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import React, { useState } from "react";
 import { NotificationError } from "../common/Error";
+import {
+  Mutation,
+  MutationResetPasswordArgs,
+} from "../generated/graphql/types";
 
 const RESET_PASSWORD = gql`
   mutation ResetPassword($email: String!) {
@@ -11,7 +15,10 @@ const RESET_PASSWORD = gql`
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [resetPassword, { error }] = useMutation(RESET_PASSWORD);
+  const [resetPassword, { error }] = useMutation<
+    Pick<Mutation, "resetPassword">,
+    MutationResetPasswordArgs
+  >(RESET_PASSWORD);
   return (
     <section className="section section-white">
       <div className="container">

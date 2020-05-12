@@ -20,7 +20,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   );
 
   const [isRefurbished, setIsRefurbished] = useState(
-    !!form.temporaryStorageDetail.wasteDetails.quantity
+    !!form.temporaryStorageDetail?.wasteDetails?.quantity
   );
 
   return (

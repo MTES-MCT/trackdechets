@@ -9,11 +9,11 @@ import { NotificationError } from "../common/Error";
 import Loader from "../common/Loader";
 import RedErrorMessage from "../common/RedErrorMessage";
 import { GET_ME } from "../dashboard/Dashboard";
-import { Company } from "../form/company/CompanySelector";
 import { COMPANY_INFOS } from "../form/company/query";
 import CompanyType from "../login/CompanyType";
 import styles from "./AccountCompanyAdd.module.scss";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
+import { CompanyPublic } from "../generated/graphql/types";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -38,7 +38,7 @@ const CREATE_UPLOAD_LINK = gql`
 
 export default function AccountCompanyAdd() {
   const history = useHistory();
-  const [companyInfos, setCompanyInfos] = useState<Company | null>(null);
+  const [companyInfos, setCompanyInfos] = useState<CompanyPublic | null>(null);
   const [uploadedFile, setUploadedFile] = useState();
 
   const [

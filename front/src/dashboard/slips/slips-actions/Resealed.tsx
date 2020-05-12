@@ -23,7 +23,7 @@ export default function Resealed({
     removeNulls(form.temporaryStorageDetail)
   );
   const [isRefurbished, setIsRefurbished] = useState(
-    !!form.temporaryStorageDetail.wasteDetails.quantity
+    !!form.temporaryStorageDetail?.wasteDetails?.quantity
   );
 
   function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
@@ -44,7 +44,7 @@ export default function Resealed({
       setFieldValue(
         "wasteDetails",
         keys.reduce((prev, key) => {
-          prev[key] = form.wasteDetails[key];
+          prev[key] = form.wasteDetails ? form.wasteDetails[key] : null;
           return prev;
         }, {})
       );

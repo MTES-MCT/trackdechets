@@ -1,13 +1,12 @@
 import React from "react";
-import { Me } from "../login/model";
 import "./DashboardMenu.scss";
 import { NavLink, match } from "react-router-dom";
 import CompanySelector from "./CompanySelector";
-import { Company } from "../login/model";
 import SideMenu from "../common/SideMenu";
+import { User, CompanyType } from "../generated/graphql/types";
 
 interface IProps {
-  me: Me;
+  me: User;
   match: match<{}>;
   siret: string;
   handleCompanyChange: (siret: string) => void;
@@ -19,47 +18,53 @@ export default function DashboardMenu({
   siret,
   handleCompanyChange,
 }: IProps) {
-  const company = me.companies.find((c: Company) => c.siret === siret);
-  const isTransporter = company
-    ? company.companyTypes.indexOf("TRANSPORTER") > -1
-    : false;
+  const companies = me.companies || [];
 
-  return (
-    <SideMenu>
-      <>
-        {me.companies.length === 1 && (
-          <div className="company-title">{me.companies[0].name}</div>
-        )}
-        {me.companies.length > 1 && (
-          <div className="company-select">
-            <CompanySelector
-              siret={siret}
-              companies={me.companies}
-              handleCompanyChange={handleCompanyChange}
-            />
-          </div>
-        )}
+  const company = companies.find((c) => c.siret === siret);
 
-        <ul>
-          <li>
-            <NavLink to={`${match.url}/slips`} activeClassName="active">
-              Mes bordereaux
-            </NavLink>
-          </li>
-          {isTransporter && (
+  if (company) {
+    const isTransporter =
+      company.companyTypes.indexOf(CompanyType.Transporter) > -1;
+
+    return (
+      <SideMenu>
+        <>
+          {companies.length === 1 && (
+            <div className="company-title">{companies[0].name}</div>
+          )}
+          {companies.length > 1 && (
+            <div className="company-select">
+              <CompanySelector
+                siret={siret}
+                companies={companies}
+                handleCompanyChange={handleCompanyChange}
+              />
+            </div>
+          )}
+
+          <ul>
             <li>
-              <NavLink to={`${match.url}/transport`} activeClassName="active">
-                Transport
+              <NavLink to={`${match.url}/slips`} activeClassName="active">
+                Mes bordereaux
               </NavLink>
             </li>
-          )}
-          <li>
-            <NavLink to={`${match.url}/exports`} activeClassName="active">
-              Registre
-            </NavLink>
-          </li>
-        </ul>
-      </>
-    </SideMenu>
-  );
+            {isTransporter && (
+              <li>
+                <NavLink to={`${match.url}/transport`} activeClassName="active">
+                  Transport
+                </NavLink>
+              </li>
+            )}
+            <li>
+              <NavLink to={`${match.url}/exports`} activeClassName="active">
+                Registre
+              </NavLink>
+            </li>
+          </ul>
+        </>
+      </SideMenu>
+    );
+  }
+
+  return null;
 }

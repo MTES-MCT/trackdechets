@@ -1,9 +1,12 @@
 import React from "react";
 import "./CompanyContact.scss";
-import { Company } from "./companyTypes";
+import { CompanyPublic } from "../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: Pick<
+    CompanyPublic,
+    "address" | "contactEmail" | "contactPhone" | "website"
+  >;
 };
 
 export default function CompanyContact({ company }: Props) {

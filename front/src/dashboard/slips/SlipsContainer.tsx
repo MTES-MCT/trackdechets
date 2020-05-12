@@ -1,11 +1,11 @@
 import React from "react";
 import SlipsHeader from "./SlipsHeader";
 import SlipsTabs from "./SlipsTabs";
-import { Me } from "../../login/model";
 import Onboarding from "./onboarding/Onboarding";
+import { User } from "../../generated/graphql/types";
 
 type Props = {
-  me: Me;
+  me: User;
   siret: string;
 };
 

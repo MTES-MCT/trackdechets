@@ -7,9 +7,9 @@ import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
   tooltip as givenNameTooltip,
 } from "./fields/AccountFieldCompanyGivenName";
-import { Company, UserRole } from "./AccountCompany";
+import { CompanyPrivate, UserRole } from "../generated/graphql/types";
 
-type Props = { company: Company };
+type Props = { company: CompanyPrivate };
 
 AccountCompanyInfo.fragments = {
   company: gql`
@@ -51,7 +51,7 @@ export default function AccountCompanyInfo({ company }: Props) {
         label="Adresse"
         value={company.address}
       />
-      {company.installation && (
+      {company.installation && company.installation.urlFiche && (
         <>
           <AccountFieldNotEditable
             name="fiche_ic"
@@ -74,7 +74,7 @@ export default function AccountCompanyInfo({ company }: Props) {
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
-      {company.userRole === UserRole.ADMIN ? (
+      {company.userRole === UserRole.Admin ? (
         <AccountFieldCompanyGivenName
           company={filter(
             AccountFieldCompanyGivenName.fragments.company,

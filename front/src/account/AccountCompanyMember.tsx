@@ -1,13 +1,20 @@
 import React from "react";
 import gql from "graphql-tag";
 import { FaTimes, FaEnvelope } from "react-icons/fa";
-import { Company, CompanyMember, UserRole } from "./AccountCompany";
 import styles from "./AccountCompanyMember.module.scss";
 import { useMutation } from "@apollo/react-hooks";
 import cogoToast from "cogo-toast";
+import {
+  CompanyPrivate,
+  CompanyMember,
+  UserRole,
+  Mutation,
+  MutationRemoveUserFromCompanyArgs,
+  MutationDeleteInvitationArgs,
+} from "../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
   user: CompanyMember;
 };
 
@@ -61,8 +68,14 @@ const RESEND_INVITATION = gql`
 `;
 
 export default function AccountCompanyMember({ company, user }: Props) {
-  const [removeUserFromCompany] = useMutation(REMOVE_USER_FROM_COMPANY);
-  const [deleteInvitation] = useMutation(DELETE_INVITATION, {
+  const [removeUserFromCompany] = useMutation<
+    Pick<Mutation, "removeUserFromCompany">,
+    MutationRemoveUserFromCompanyArgs
+  >(REMOVE_USER_FROM_COMPANY);
+  const [deleteInvitation] = useMutation<
+    Pick<Mutation, "deleteInvitation">,
+    MutationDeleteInvitationArgs
+  >(DELETE_INVITATION, {
     onCompleted: () => {
       cogoToast.success("Invitation supprimée", { hideAfter: 5 });
     },
@@ -90,7 +103,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
         </td>
         <td>{user.email}</td>
         <td>
-          {user.role === UserRole.ADMIN ? "Administrateur" : "Collaborateur"}
+          {user.role === UserRole.Admin ? "Administrateur" : "Collaborateur"}
         </td>
         <td>
           {user.isPendingInvitation

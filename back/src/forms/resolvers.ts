@@ -32,7 +32,8 @@ import {
   QueryResolvers,
   MutationResolvers,
   SubscriptionResolvers,
-  FormResolvers
+  FormResolvers,
+  TemporaryStorageDetail
 } from "../generated/graphql/types";
 
 // formsLifeCycle fragment

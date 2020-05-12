@@ -1,13 +1,13 @@
 import React from "react";
 import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
-import { Company } from "./AccountCompany";
 import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContactEmail";
 import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
+import { CompanyPrivate } from "../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 AccountCompanyPage.fragments = {

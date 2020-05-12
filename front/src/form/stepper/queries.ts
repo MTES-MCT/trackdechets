@@ -2,8 +2,8 @@ import gql from "graphql-tag";
 import { fullFormFragment } from "../../common/fragments";
 
 export const GET_FORM = gql`
-  query Form($formId: ID) {
-    form(id: $formId) {
+  query Form($id: ID) {
+    form(id: $id) {
       ...FullForm
     }
   }

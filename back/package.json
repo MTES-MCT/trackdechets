@@ -57,6 +57,7 @@
     "@graphql-codegen/cli": "^1.13.1",
     "@graphql-codegen/typescript": "1.13.1",
     "@graphql-codegen/typescript-resolvers": "^1.13.3",
+    "@graphql-codegen/typescript-operations": "^1.13.4",
     "@types/bcrypt": "^3.0.0",
     "@types/body-parser": "^1.17.1",
     "@types/connect-redis": "0.0.13",

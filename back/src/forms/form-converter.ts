@@ -1,10 +1,11 @@
-import { Form } from "../generated/prisma-client";
+import { Form as PrismaForm } from "../generated/prisma-client";
+import { Form, TemporaryStorageDetail } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
   input,
   previousKeys = [],
   dbObject = {}
-): Partial<Form> {
+): Partial<PrismaForm> {
   const relations = ["ecoOrganisme", "temporaryStorageDetail"];
 
   Object.keys(input).forEach(key => {
@@ -38,7 +39,7 @@ export function flattenObjectForDb(
   return dbObject;
 }
 
-export function unflattenObjectFromDb(input, apiObject = {}) {
+export function unflattenObjectFromDb(input, apiObject = {}): any {
   const separator = [
     "emitter",
     "recipient",
@@ -82,7 +83,7 @@ export function unflattenObjectFromDb(input, apiObject = {}) {
     return;
   });
 
-  return apiObject;
+  return apiObject as any;
 }
 
 export function cleanUpNotDuplicatableFieldsInForm(form) {

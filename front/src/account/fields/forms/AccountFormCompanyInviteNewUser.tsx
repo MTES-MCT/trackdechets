@@ -2,14 +2,19 @@ import React from "react";
 import { Formik, Form, Field } from "formik";
 import gql from "graphql-tag";
 import RedErrorMessage from "../../../common/RedErrorMessage";
-import { Company } from "../../AccountCompany";
 import styles from "./AccountCompanyInviteNewUser.module.scss";
 import { useMutation } from "@apollo/react-hooks";
 import AccountCompanyMember from "../../AccountCompanyMember";
 import { object, string } from "yup";
+import {
+  CompanyPrivate,
+  UserRole,
+  Mutation,
+  MutationInviteUserToCompanyArgs,
+} from "../../../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 AccountFormCompanyInviteNewUser.fragments = {
@@ -42,13 +47,14 @@ const yupSchema = object().shape({
 });
 
 export default function AccountFormCompanyInviteNewUser({ company }: Props) {
-  const [inviteUserToCompany, { loading }] = useMutation(
-    INVITE_USER_TO_COMPANY
-  );
+  const [inviteUserToCompany, { loading }] = useMutation<
+    Pick<Mutation, "inviteUserToCompany">,
+    MutationInviteUserToCompanyArgs
+  >(INVITE_USER_TO_COMPANY);
 
   return (
     <Formik
-      initialValues={{ email: "", siret: company.siret, role: "MEMBER" }}
+      initialValues={{ email: "", siret: company.siret, role: UserRole.Member }}
       validate={(values) => {
         if (!values.email) {
           return { email: "L'email est obligatoire" };
@@ -79,8 +85,8 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
               placeholder="Email de la personne à inviter"
             />
             <Field component="select" name="role">
-              <option value="MEMBER">Collaborateur</option>
-              <option value="ADMIN">Administrateur</option>
+              <option value={UserRole.Member}>Collaborateur</option>
+              <option value={UserRole.Admin}>Administrateur</option>
             </Field>
             <button type="submit" className="button" disabled={isSubmitting}>
               Inviter

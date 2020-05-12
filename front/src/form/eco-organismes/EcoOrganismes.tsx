@@ -5,6 +5,7 @@ import React, { useEffect, useReducer } from "react";
 import { FaSearch } from "react-icons/fa";
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
+import { Query } from "../../generated/graphql/types";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -54,7 +55,9 @@ export default function EcoOrganismes(props) {
   const { setFieldValue } = useFormikContext();
   const [state, dispatch] = useReducer(reducer, field.value?.id, init);
 
-  const { loading, error, data } = useQuery(GET_ECO_ORGANISMES);
+  const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
+    GET_ECO_ORGANISMES
+  );
 
   useEffect(() => {
     if (data?.ecoOrganismes) {

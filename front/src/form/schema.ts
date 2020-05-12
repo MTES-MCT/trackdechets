@@ -9,7 +9,7 @@ import {
   LocaleObject,
   StringSchema,
 } from "yup";
-import { WasteAcceptationStatus } from "../Constants";
+import { WasteAcceptationStatusInput as WasteAcceptationStatus } from "../generated/graphql/types";
 
 setLocale({
   mixed: {
@@ -102,14 +102,14 @@ export const receivedFormSchema = object().shape({
   receivedBy: string().required("Le champ est requis"),
   receivedAt: date().required("Le champ est requis"),
   wasteAcceptationStatus: string().oneOf([
-    WasteAcceptationStatus.ACCEPTED,
-    WasteAcceptationStatus.REFUSED,
-    WasteAcceptationStatus.PARTIALLY_REFUSED,
+    WasteAcceptationStatus.Accepted,
+    WasteAcceptationStatus.Refused,
+    WasteAcceptationStatus.PartiallyRefused,
   ]),
   quantityReceived: number()
     .required("Le champ est requis et doit être un nombre")
     .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["REFUSED"].includes(wasteAcceptationStatus)
+      [WasteAcceptationStatus.Refused].includes(wasteAcceptationStatus)
         ? schema.test(
             "is-zero",
             "Le champ doit être à 0 si le déchet est refusé",
@@ -121,7 +121,10 @@ export const receivedFormSchema = object().shape({
   wasteRefusalReason: string().when(
     "wasteAcceptationStatus",
     (wasteAcceptationStatus, schema) =>
-      ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+      [
+        WasteAcceptationStatus.Refused,
+        WasteAcceptationStatus.PartiallyRefused,
+      ].includes(wasteAcceptationStatus)
         ? schema.required("Le champ doit être renseigné")
         : schema.test(
             "is-empty",

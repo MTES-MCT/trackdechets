@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import DownloadFileLink from "../../common/DownloadFileLink";
 import { InlineError } from "../../common/Error";
 import Loader from "../../common/Loader";
-import { Me } from "../../login/model";
+import { User, Query } from "../../generated/graphql/types";
 
 interface IProps {
-  me: Me;
+  me: User;
 }
 
 const GET_STATS = gql`
@@ -34,8 +34,10 @@ const FORMS_REGISTER = gql`
 `;
 
 export default function Exports({ me }: IProps) {
-  const [sirets, setSirets] = useState(me.companies.map((c) => c.siret));
-  const { loading, error, data } = useQuery(GET_STATS);
+  const companies = me.companies || [];
+
+  const [sirets, setSirets] = useState(companies.map((c) => c.siret));
+  const { loading, error, data } = useQuery<Pick<Query, "stats">>(GET_STATS);
 
   return (
     <div className="main">
@@ -77,12 +79,12 @@ export default function Exports({ me }: IProps) {
         format UTF-8. Assurez vous que vous l'ouvrez dans le bon format pour
         éviter les problèmes d'accents.
       </p>
-      {me.companies.length > 1 && (
+      {companies.length > 1 && (
         <p>
           Pour quelle entreprise(s) souhaitez vous télécharger le registre ?{" "}
           <select onChange={(evt) => setSirets([evt.target.value])}>
-            <option value={me.companies.map((c) => c.siret)}>Toutes</option>
-            {me.companies.map((c) => (
+            <option value={companies.map((c) => c.siret)}>Toutes</option>
+            {companies.map((c) => (
               <option value={c.siret} key={c.siret}>
                 {c.name}
               </option>

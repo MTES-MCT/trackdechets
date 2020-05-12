@@ -8,7 +8,11 @@ import DownloadFileLink from "../../common/DownloadFileLink";
 import { NotificationError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
 import RedErrorMessage from "../../common/RedErrorMessage";
-import { Form, Form as FormModel } from "../../form/model";
+import {
+  Form,
+  Mutation,
+  MutationSignedByTransporterArgs,
+} from "../../generated/graphql/types";
 import Packagings from "../../form/packagings/Packagings";
 import { currentSiretService } from "../CompanySelector";
 import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
@@ -33,11 +37,14 @@ export const SIGNED_BY_TRANSPORTER = gql`
   }
 `;
 
-type Props = { form: FormModel };
+type Props = { form: any };
 
 export default function TransportSignature({ form }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [signedByTransporter, { error }] = useMutation(SIGNED_BY_TRANSPORTER, {
+  const [signedByTransporter, { error }] = useMutation<
+    Pick<Mutation, "signedByTransporter">,
+    MutationSignedByTransporterArgs
+  >(SIGNED_BY_TRANSPORTER, {
     onCompleted: () => setIsOpen(false),
     refetchQueries: [],
     update: (store) => {
@@ -100,15 +107,17 @@ export default function TransportSignature({ form }: Props) {
                   </div>
                   <h3>Lieu de collecte</h3>
                   <address>
-                    {form.emitter.company.name} ({form.emitter.company.siret})
-                    <br /> {form.emitter.company.address}
+                    {form.emitter?.company?.name} (
+                    {form.emitter?.company?.siret}
+                    )
+                    <br /> {form.emitter?.company?.address}
                   </address>
 
                   <h3>Déchets à collecter</h3>
                   <p>Bordereau numéro {form.readableId}</p>
                   <p>
-                    Appellation du déchet: {form.wasteDetails.name} (
-                    {form.wasteDetails.code})
+                    Appellation du déchet: {form.wasteDetails?.name} (
+                    {form.wasteDetails?.code})
                   </p>
 
                   <div>
@@ -196,8 +205,8 @@ export default function TransportSignature({ form }: Props) {
                     <p>
                       Bordereau numéro {form.readableId}
                       <br />
-                      Appellation du déchet: {form.wasteDetails.name} (
-                      {form.wasteDetails.code})
+                      Appellation du déchet: {form.wasteDetails?.name} (
+                      {form.wasteDetails?.code})
                       <br />
                       Conditionnement: {props.packagings.join(", ")}
                       <br />
@@ -206,9 +215,9 @@ export default function TransportSignature({ form }: Props) {
 
                     <h3>Transporteur</h3>
                     <address>
-                      {form.stateSummary.transporter.name} (
-                      {form.stateSummary.transporter.siret})
-                      <br /> {form.stateSummary.transporter.address}
+                      {form.stateSummary.transporter?.name} (
+                      {form.stateSummary.transporter?.siret})
+                      <br /> {form.stateSummary.transporter?.address}
                     </address>
 
                     <h3>Destination du déchet</h3>

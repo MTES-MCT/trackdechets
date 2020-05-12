@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Form, Field, FormikProps } from "formik";
+import { Formik, Form, Field } from "formik";
 import { useMutation } from "@apollo/react-hooks";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
@@ -8,35 +8,34 @@ import * as Yup from "yup";
 type Props = {
   name: string;
   type: string;
-  value: string | undefined;
+  value: string | null | undefined;
   placeHolder: string;
   mutation: any;
-  mutationArgs?: object;
   yupSchema?: object;
   toggleEdition: () => void;
 };
 
-export default function AccountFormSimpleInput<T>({
+export default function AccountFormSimpleInput<Variables>({
   name,
   type,
   value,
   placeHolder,
   mutation,
-  mutationArgs = {},
+  mutationArgs,
   yupSchema = Yup.object(),
   toggleEdition,
-}: Props) {
-  const [update, { loading }] = useMutation(mutation, {
+}: Props & { mutationArgs?: Variables }) {
+  const [update, { loading }] = useMutation<any, Variables>(mutation, {
     onCompleted: () => {
       toggleEdition();
     },
   });
 
-  const initialValues = {} as T;
+  const initialValues = {} as Variables;
   initialValues[name] = value;
 
   return (
-    <Formik
+    <Formik<Variables>
       initialValues={initialValues}
       onSubmit={(values, { setFieldError, setSubmitting }) => {
         const variables = { ...values, ...mutationArgs };
@@ -48,7 +47,7 @@ export default function AccountFormSimpleInput<T>({
       validateOnChange={false}
       validationSchema={yupSchema}
     >
-      {(props: FormikProps<T>) => (
+      {(props) => (
         <Form>
           <div className="form__group">
             <Field

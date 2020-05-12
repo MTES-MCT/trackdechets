@@ -4,7 +4,7 @@ type Query {
   extrait de la base SIRENE et de la base des installations
   classées pour la protection de l'environnement (ICPE)
   """
-  companyInfos("SIRET de l'établissement" siret: String!): CompanyPublic
+  companyInfos("SIRET de l'établissement" siret: String!): CompanyPublic!
 
   """
   Effectue une recherche floue sur la base SIRENE et enrichit
@@ -18,19 +18,19 @@ type Query {
     clue: String!
     "(Optionnel) Filtre les résultats par numéro de département"
     department: String
-  ): [CompanySearchResult]
+  ): [CompanySearchResult!]!
 
   """
   Renvoie les établissements favoris de l'utilisateur. C'est à dire les
   établissements qui font souvent partis des BSD édités
   """
-  favorites("type de favoris" type: FavoriteType!): [CompanyFavorite]
+  favorites("type de favoris" type: FavoriteType!): [CompanyFavorite!]!
 
   """
   USAGE INTERNE
   Renvoie la liste des éco-organismes
   """
-  ecoOrganismes: [EcoOrganisme]
+  ecoOrganismes: [EcoOrganisme!]!
 }
 
 type Mutation {
@@ -38,7 +38,7 @@ type Mutation {
   USAGE INTERNE
   Renouvelle le code de sécurité de l'établissement
   """
-  renewSecurityCode(siret: String!): CompanyPrivate
+  renewSecurityCode(siret: String!): CompanyPrivate!
 
   """
   USAGE INTERNE
@@ -59,13 +59,13 @@ type Mutation {
     companyTypes: [CompanyType]
     "(Optionnel) Nom d'usage de l'établissement"
     givenName: String
-  ): CompanyPrivate
+  ): CompanyPrivate!
 
   """
   USAGE INTERNE
   Rattache un établissement à l'utilisateur authentifié
   """
-  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate
+  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate!
 
   """
   USAGE INTERNE
@@ -76,7 +76,7 @@ type Mutation {
     fileName: String!
     "type de fichier"
     fileType: String!
-  ): UploadLink
+  ): UploadLink!
 }
 
 "Profil entreprise"
@@ -109,7 +109,7 @@ type CompanyPrivate {
   id: ID!
 
   "Profil de l'établissement"
-  companyTypes: [CompanyType]
+  companyTypes: [CompanyType!]!
 
   "Identifiant GEREP"
   gerepId: String
@@ -127,7 +127,7 @@ type CompanyPrivate {
   website: String
 
   "Liste des utilisateurs appartenant à cet établissement"
-  users: [CompanyMember]
+  users: [CompanyMember!]
 
   "Rôle de l'utilisateur authentifié cau sein de cet établissement"
   userRole: UserRole
@@ -139,7 +139,7 @@ type CompanyPrivate {
   givenName: String
 
   "SIRET de l'établissement"
-  siret: String
+  siret: String!
 
   "Adresse de l'établissement"
   address: String
@@ -211,7 +211,6 @@ type CompanyPublic {
   Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
   """
   isRegistered: Boolean
-
 }
 
 "Information sur un établissement accessible publiquement en recherche"
@@ -370,7 +369,7 @@ type Rubrique {
   Numéro de rubrique tel que défini dans la nomenclature des ICPE
   Ex: 2710
   """
-  rubrique: String
+  rubrique: String!
 
   "Alinéa pour la rubrique concerné"
   alinea: String
@@ -388,7 +387,7 @@ type Rubrique {
   activite: String
 
   "Catégorie d'établissement associé: TTR, VHU, Traitement"
-  category: String
+  category: String!
 
   "Volume autorisé"
   volume: String
@@ -442,8 +441,8 @@ type Installation {
   urlFiche: String
 
   "Liste des rubriques associées"
-  rubriques: [Rubrique]
+  rubriques: [Rubrique!]
 
   "Liste des déclarations GEREP"
-  declarations: [Declaration]
+  declarations: [Declaration!]
 }

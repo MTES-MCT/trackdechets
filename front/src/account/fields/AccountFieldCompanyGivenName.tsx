@@ -2,10 +2,13 @@ import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
-import { Company } from "../AccountCompany";
+import {
+  CompanyPrivate,
+  MutationUpdateCompanyArgs,
+} from "../../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 AccountFielCompanyGivenName.fragments = {
@@ -38,7 +41,7 @@ export default function AccountFielCompanyGivenName({ company }: Props) {
       value={company.givenName}
       tooltip={tooltip}
       renderForm={(toggleEdition) => (
-        <AccountFormSimpleInput<{ givenName: string }>
+        <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
           name="givenName"
           type="text"
           value={company.givenName}

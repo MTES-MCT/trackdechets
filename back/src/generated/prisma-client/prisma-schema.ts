@@ -1328,14 +1328,14 @@ enum EmitterType {
 
 type Form {
   id: ID!
-  readableId: String
+  readableId: String!
   customId: String
   isDeleted: Boolean
   owner: User!
   createdAt: DateTime!
   updatedAt: DateTime!
   signedByTransporter: Boolean
-  status: String
+  status: String!
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1421,7 +1421,7 @@ type FormConnection {
 
 input FormCreateInput {
   id: ID
-  readableId: String
+  readableId: String!
   customId: String
   isDeleted: Boolean
   owner: UserCreateOneInput!
@@ -1521,7 +1521,7 @@ input FormCreateOneWithoutTemporaryStorageDetailInput {
 
 input FormCreateWithoutTemporaryStorageDetailInput {
   id: ID
-  readableId: String
+  readableId: String!
   customId: String
   isDeleted: Boolean
   owner: UserCreateOneInput!
@@ -1773,13 +1773,13 @@ enum FormOrderByInput {
 
 type FormPreviousValues {
   id: ID!
-  readableId: String
+  readableId: String!
   customId: String
   isDeleted: Boolean
   createdAt: DateTime!
   updatedAt: DateTime!
   signedByTransporter: Boolean
-  status: String
+  status: String!
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
