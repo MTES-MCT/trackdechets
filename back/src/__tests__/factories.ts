@@ -9,6 +9,7 @@ import {
   UserRole,
   Status
 } from "../generated/prisma-client";
+import { getReadableId } from "../forms/readable-id";
 
 /**
  * Create a user with name and email
@@ -110,7 +111,6 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
 };
 
 const formdata = {
-  readableId: "TD-xxx",
   wasteDetailsQuantity: 22.5,
   signedByTransporter: true,
   emitterCompanyName: "WASTE PRODUCER",
@@ -188,6 +188,7 @@ const formdata = {
 export const formFactory = async ({ ownerId, opt = {} }) => {
   const formParams = { ...formdata, ...opt };
   return prisma.createForm({
+    readableId: await getReadableId(),
     ...formParams,
     owner: { connect: { id: ownerId } }
   });

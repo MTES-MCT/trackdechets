@@ -10,12 +10,12 @@ import {
 
 function createForms(userId: string, params: any[]) {
   return Promise.all(
-    params.map(p =>
-      formFactory({
+    params.map((p, i) => {
+      return formFactory({
         ownerId: userId,
-        opt: p
-      })
-    )
+        opt: { ...p, readableId: `TD-${i}` }
+      });
+    })
   );
 }
 
@@ -24,13 +24,11 @@ describe("Integration / Forms query", () => {
   let company;
   let query;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const userAndCompany = await userWithCompanyFactory("ADMIN");
     user = userAndCompany.user;
     company = userAndCompany.company;
-  });
 
-  beforeEach(() => {
     const { query: q, setOptions } = createTestClient({
       apolloServer: server
     });
@@ -44,7 +42,7 @@ describe("Integration / Forms query", () => {
     query = q;
   });
 
-  afterAll(() => resetDatabase());
+  afterEach(() => resetDatabase());
 
   it("should return forms for which user is emitter or receiver", async () => {
     // 4 forms
