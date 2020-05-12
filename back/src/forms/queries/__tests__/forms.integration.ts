@@ -204,4 +204,156 @@ describe("Integration / Forms query", () => {
       { wasteDetails: { packagings: [] }, stateSummary: { packagings: [] } }
     ]);
   });
+
+  it("should display my forms if I am a trader", async () => {
+    await createForms(user.id, [
+      {
+        traderCompanyName: company.name,
+        traderCompanySiret: company.siret
+      },
+      {
+        traderCompanyName: company.name,
+        traderCompanySiret: company.siret
+      }
+    ]);
+
+    const { data } = await query(
+      `query {
+          forms {
+            id
+          }
+        }
+      `
+    );
+    expect(data.forms.length).toBe(2);
+  });
+
+  it("should display forms according to the filters I passed in", async () => {
+    // The user has many forms, and a different role in each
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        status: "SENT"
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        status: "DRAFT"
+      },
+      {
+        emitterCompanyName: company.name,
+        emitterCompanySiret: company.siret,
+        status: "PROCESSED"
+      },
+      {
+        traderCompanyName: company.name,
+        traderCompanySiret: company.siret,
+        status: "SEALED"
+      },
+      {
+        ecoOrganisme: {
+          create: {
+            address: "address",
+            name: "an EO",
+            siret: company.siret
+          }
+        }
+      }
+    ]);
+
+    const { data: allForms } = await query(
+      `query {
+          forms {
+            id
+          }
+        }
+      `
+    );
+    expect(allForms.forms.length).toBe(5);
+
+    const { data: statusFiltered } = await query(
+      `query(status: [DRAFT, SENT]) {
+          forms {
+            id
+          }
+        }
+      `
+    );
+    expect(statusFiltered.forms.length).toBe(2);
+
+    const { data: roleFiltered } = await query(
+      `query(role: [TRADER]) {
+          forms {
+            id
+          }
+        }
+      `
+    );
+
+    expect(roleFiltered.forms.length).toBe(1);
+
+    const { data: roleAndStatusFiltered } = await query(
+      `query(role: [EMITTER, RECIPIENT], status: [PROCESSED]) {
+          forms {
+            id
+          }
+        }
+      `
+    );
+    expect(roleAndStatusFiltered.forms.length).toBe(1);
+  });
+
+  it("should display forms according to the filters I passed in", async () => {
+    // The user has many forms, and a different role in each
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        status: "DRAFT"
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        status: "DRAFT"
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        status: "DRAFT"
+      }
+    ]);
+
+    const { data: firstForms } = await query(
+      `query {
+          forms(first: 4) {
+            id
+          }
+        }
+      `
+    );
+    expect(firstForms.forms.length).toBe(4);
+
+    const { data: skippedForms } = await query(
+      `query {
+          forms(first: 4, skip: 4) {
+            id
+          }
+        }
+      `
+    );
+    expect(skippedForms.forms.length).toBe(2);
+  });
 });
