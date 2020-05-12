@@ -32,7 +32,8 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "AWAITING_GROUP"
+        status: "AWAITING_GROUP",
+        readableId: "TD-1"
       }
     });
     // other forms should not be returned
@@ -42,7 +43,8 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "PROCESSED"
+        status: "PROCESSED",
+        readableId: "TD-2"
       }
     });
     await formFactory({
@@ -51,7 +53,8 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "RECEIVED"
+        status: "RECEIVED",
+        readableId: "TD-3"
       }
     });
 
@@ -78,7 +81,8 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "AWAITING_GROUP"
+        status: "AWAITING_GROUP",
+        readableId: "TD-4"
       }
     });
     // the queried siret is not recipientCompanySiret, result should be null
