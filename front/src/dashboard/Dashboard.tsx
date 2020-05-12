@@ -35,8 +35,8 @@ export default function Dashboard() {
       // try to retrieve current siret from localstorage, if not set use siret from first associated company
       let currentSiret = currentSiretService.getSiret();
       if (!currentSiret) {
-        const companies = data.me.companies;
-        currentSiret = companies.length > 0 ? data.me.companies[0].siret : "";
+        const companies = data.me.companies || [];
+        currentSiret = companies.length > 0 ? companies[0].siret : "";
         currentSiretService.setSiret(currentSiret);
       }
       setActiveSiret(currentSiret);
@@ -48,8 +48,10 @@ export default function Dashboard() {
   if (error) return <InlineError apolloError={error} />;
 
   if (data) {
+    const companies = data.me.companies;
+
     // As long as you don't belong to a company, you can't access the dashnoard
-    if (data.me.companies.length === 0) {
+    if (!companies || companies.length === 0) {
       return <Redirect to="/account/companies" />;
     }
 

@@ -114,18 +114,18 @@ const Table = ({ forms, displayActions }) => {
               {form.readableId}
               <DownloadPdf formId={form.id} />
             </td>
-            <td>{form.stateSummary.emitter?.name}</td>
+            <td>{form.stateSummary?.emitter?.name}</td>
             <td className="hide-on-mobile">
-              {form.stateSummary.recipient?.name}
+              {form.stateSummary?.recipient?.name}
             </td>
             <td>
               <div>{form.wasteDetails?.name}</div>
             </td>
             <td className="hide-on-mobile">
-              {form.stateSummary.quantity} tonnes
+              {form.stateSummary?.quantity} tonnes
             </td>
 
-            <td>{form.stateSummary.transporterCustomInfo}</td>
+            <td>{form.stateSummary?.transporterCustomInfo}</td>
             <td style={{ paddingLeft: 0, paddingRight: 0 }}>
               {
                 <TransporterInfoEdit
@@ -135,7 +135,7 @@ const Table = ({ forms, displayActions }) => {
                 />
               }
             </td>
-            <td>{form.stateSummary.transporterNumberPlate}</td>
+            <td>{form.stateSummary?.transporterNumberPlate}</td>
             <td style={{ paddingLeft: 0 }}>
               {
                 <TransporterInfoEdit

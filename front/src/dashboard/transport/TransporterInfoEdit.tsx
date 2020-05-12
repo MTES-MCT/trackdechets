@@ -41,7 +41,9 @@ export default function TransporterInfoEdit({ form, fieldName, title }: Props) {
   });
   const formik = useFormik({
     initialValues: {
-      [fieldName]: form.stateSummary[mutationFieldName],
+      [fieldName]: form.stateSummary
+        ? form.stateSummary[mutationFieldName]
+        : null,
     },
     onSubmit: (values) => {
       updateTransporterPlate({

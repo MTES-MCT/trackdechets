@@ -18,7 +18,9 @@ export default function DashboardMenu({
   siret,
   handleCompanyChange,
 }: IProps) {
-  const company = me.companies.find((c) => c.siret === siret);
+  const companies = me.companies || [];
+
+  const company = companies.find((c) => c.siret === siret);
 
   if (company) {
     const isTransporter =
@@ -27,14 +29,14 @@ export default function DashboardMenu({
     return (
       <SideMenu>
         <>
-          {me.companies.length === 1 && (
-            <div className="company-title">{me.companies[0].name}</div>
+          {companies.length === 1 && (
+            <div className="company-title">{companies[0].name}</div>
           )}
-          {me.companies.length > 1 && (
+          {companies.length > 1 && (
             <div className="company-select">
               <CompanySelector
                 siret={siret}
-                companies={me.companies}
+                companies={companies}
                 handleCompanyChange={handleCompanyChange}
               />
             </div>

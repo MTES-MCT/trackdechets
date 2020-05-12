@@ -4,9 +4,9 @@ import { Installation } from "../generated/graphql/types";
 type Props = { installation: Installation };
 
 export default function CompanyActivity({ installation }: Props) {
-  const rubriquesInActivity = installation.rubriques.filter(
-    (r) => r.etatActivite === "En fonct."
-  );
+  const rubriquesInActivity = installation.rubriques
+    ? installation.rubriques.filter((r) => r.etatActivite === "En fonct.")
+    : [];
 
   const rubriquesSorted = [...rubriquesInActivity].sort((r1, r2) => {
     if (r1.rubrique < r2.rubrique) return -1;
