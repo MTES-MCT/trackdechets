@@ -1,5 +1,5 @@
 import { prisma } from "../../../generated/prisma-client";
-import { DeleteTransporterReceiptInput } from "../../../generated/types";
+import { DeleteTransporterReceiptInput } from "../../../generated/graphql/types";
 
 /**
  * Delete a transporter receipt

@@ -1,7 +1,7 @@
 import {
   UpdateTraderReceiptInput,
   TraderReceipt
-} from "../../../generated/types";
+} from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 
 /**

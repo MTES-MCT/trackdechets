@@ -3,7 +3,6 @@ import { rule, and } from "graphql-shield";
 import { prisma } from "../../generated/prisma-client";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 import { isUserInCompaniesWithRoles } from "../../common/rules";
-import { UserRole } from "../../generated/types";
 
 export const canUpdateDeleteTransporterReceipt = and(
   isAuthenticated,
@@ -33,7 +32,7 @@ export const canUpdateDeleteTransporterReceipt = and(
       const isAuthorized = await isUserInCompaniesWithRoles(
         ctx.user.id,
         sirets,
-        [UserRole.Member, UserRole.Admin],
+        ["MEMBER", "ADMIN"],
         ctx.prisma
       );
       return isAuthorized || forbiddenError;
@@ -69,7 +68,7 @@ export const canUpdateDeleteTraderReceipt = and(
       const isAuthorized = await isUserInCompaniesWithRoles(
         ctx.user.id,
         sirets,
-        [UserRole.Member, UserRole.Admin],
+        ["MEMBER", "ADMIN"],
         ctx.prisma
       );
       return isAuthorized || forbiddenError;
