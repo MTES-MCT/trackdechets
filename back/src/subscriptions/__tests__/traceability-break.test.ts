@@ -25,6 +25,8 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
     const formPayload: FormSubscriptionPayload = {
       node: {
         id: "xyz12345",
+        readableId: "TD-xxx",
+        status: "NO_TRACEABILITY",
         createdAt: "2019-10-16T07:45:13.959Z",
         updatedAt: "2019-10-16T07:45:13.959Z",
         noTraceability: true
@@ -33,6 +35,8 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
       mutation: "UPDATED",
       previousValues: {
         id: "xyz12345",
+        readableId: "TD-xxx",
+        status: "RECEIVED",
         createdAt: "2019-10-16T07:45:13.959Z",
         updatedAt: "2019-10-16T07:45:13.959Z"
       }

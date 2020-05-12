@@ -105,6 +105,8 @@ const mockedCompanyAdmins = {
 const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
   node: {
     id: "xyz12345",
+    readableId: "TD-xxx",
+    status: "REFUSED",
     createdAt: "2019-10-16T07:45:13.959Z",
     updatedAt: "2019-10-16T07:45:13.959Z",
     wasteAcceptationStatus,
@@ -119,6 +121,8 @@ const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
   mutation: "UPDATED",
   previousValues: {
     id: "xyz12345",
+    readableId: "TD-xxx",
+    status: "SENT",
     createdAt: "2019-10-16T07:45:13.959Z",
     updatedAt: "2019-10-16T07:45:13.959Z"
   }

@@ -20,6 +20,7 @@ const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
 const appendixFormData = {
+  readableId: "TD-xxxx",
   wasteDetailsQuantity: 10,
   signedByTransporter: true,
   emitterCompanyName: "WASTE PRODUCER",
@@ -95,6 +96,7 @@ const appendixFormData = {
 };
 
 const groupingFormData = {
+  readableId: "TD-xxxx",
   wasteDetailsQuantity: 10,
   signedByTransporter: true,
   emitterCompanyName: "GROUPING COMPANY",

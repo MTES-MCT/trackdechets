@@ -110,6 +110,7 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
 };
 
 const formdata = {
+  readableId: "TD-xxx",
   wasteDetailsQuantity: 22.5,
   signedByTransporter: true,
   emitterCompanyName: "WASTE PRODUCER",
