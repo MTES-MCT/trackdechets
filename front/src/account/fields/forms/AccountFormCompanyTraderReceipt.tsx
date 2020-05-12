@@ -3,12 +3,12 @@ import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
 import { Formik, FormikProps, Form, Field } from "formik";
 import RedErrorMessage from "../../../common/RedErrorMessage";
-import { Company } from "../../AccountCompany";
 import { NotificationError } from "../../../common/Error";
 import DateInput from "../../../common/DateInput";
+import { CompanyPrivate } from "../../../generated/graphql/types";
 
 type Props = {
-  company: Pick<Company, "id" | "siret" | "traderReceipt">;
+  company: Pick<CompanyPrivate, "id" | "siret" | "traderReceipt">;
   toggleEdition: () => void;
 };
 

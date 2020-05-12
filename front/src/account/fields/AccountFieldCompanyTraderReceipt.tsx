@@ -1,12 +1,12 @@
 import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
-import { Company } from "../AccountCompany";
 import AccountFormCompanyTraderReceipt from "./forms/AccountFormCompanyTraderReceipt";
 import { formatDate } from "../../common/helper";
+import { CompanyPrivate } from "../../generated/graphql/types";
 
 type Props = {
-  company: Pick<Company, "id" | "siret" | "traderReceipt">;
+  company: Pick<CompanyPrivate, "id" | "siret" | "traderReceipt">;
 };
 
 AccountFieldCompanyTraderReceipt.fragments = {
