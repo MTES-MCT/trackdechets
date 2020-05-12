@@ -2,7 +2,6 @@ import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { prisma } from "../../../generated/prisma-client";
 import * as sirene from "../../sirene/";
-import { CompanyType } from "../../../generated/types";
 
 const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
 

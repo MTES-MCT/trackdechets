@@ -1,10 +1,9 @@
 import { userFactory, companyFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import * as mailsHelper from "../../../common/mails.helper";
-import { prisma, MutationType } from "../../../generated/prisma-client";
+import { prisma } from "../../../generated/prisma-client";
 import makeClient from "../../../__tests__/testClient";
 import { ErrorCode } from "../../../common/errors";
-import { CompanyType } from "../../../generated/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -21,7 +20,7 @@ describe("Create company endpoint", () => {
     const siret = "12345678912345";
     const gerepId = "1234";
     const name = "Acme";
-    const companyTypes = [CompanyType.Producer];
+    const companyTypes = ["PRODUCER"];
 
     const mutation = `
     mutation {
@@ -62,7 +61,7 @@ describe("Create company endpoint", () => {
 
     const siret = "12345678912345";
     const name = "Acme";
-    const companyTypes = [CompanyType.Transporter];
+    const companyTypes = ["TRANSPORTER"];
     const transporterReceipt = {
       receiptNumber: "1234",
       validityLimit: "2023-03-31T00:00:00.000Z",
@@ -104,7 +103,7 @@ describe("Create company endpoint", () => {
 
     const siret = "12345678912345";
     const name = "Acme";
-    const companyTypes = [CompanyType.Trader];
+    const companyTypes = ["TRADER"];
     const traderReceipt = {
       receiptNumber: "1234",
       validityLimit: "2023-03-31T00:00:00.000Z",
@@ -145,7 +144,7 @@ describe("Create company endpoint", () => {
 
     const siret = "12345678912345";
     const name = "Acme";
-    const companyTypes = [CompanyType.Producer];
+    const companyTypes = ["PRODUCER"];
 
     const mutation = `
       mutation {
