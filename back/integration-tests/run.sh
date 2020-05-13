@@ -26,7 +26,7 @@ stopcontainers(){
 
 runtest(){
     api_container_id=$(docker ps -qf "name=integration_td-api")
-    docker exec -t $api_container_id npx jest --config ./integration-tests/jest.config.js --runInBand --logHeapUsage -i --forceExit $1
+    docker exec -t $api_container_id npx jest --config ./integration-tests/jest.config.js -i --forceExit $1
     EXIT_CODE=$?
 }
 
