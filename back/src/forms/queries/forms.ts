@@ -46,24 +46,24 @@ export default async function forms(
   return queriedForms.map(f => unflattenObjectFromDb(f));
 }
 
-function getRolesFilter(siretFilter: string, types: FormRole[]) {
+function getRolesFilter(siret: string, types: FormRole[]) {
   const filtersByRole = {
-    [FormRole.Recipient]: [{ recipientCompanySiret: siretFilter }],
-    [FormRole.Recipient]: [{ emitterCompanySiret: siretFilter }],
+    [FormRole.Recipient]: [{ recipientCompanySiret: siret }],
+    [FormRole.Emitter]: [{ emitterCompanySiret: siret }],
     [FormRole.Transporter]: [
-      { transporterCompanySiret: siretFilter },
+      { transporterCompanySiret: siret },
       {
         temporaryStorageDetail: {
-          transporterCompanySiret: siretFilter
+          transporterCompanySiret: siret
         }
       }
     ],
-    [FormRole.Trader]: [{ traderCompanySiret: siretFilter }],
-    [FormRole.EcoOrganisme]: [{ ecoOrganisme: { siret: siretFilter } }],
+    [FormRole.Trader]: [{ traderCompanySiret: siret }],
+    [FormRole.EcoOrganisme]: [{ ecoOrganisme: { siret: siret } }],
     [FormRole.TemporaryStorer]: [
       {
         temporaryStorageDetail: {
-          destinationCompanySiret: siretFilter
+          destinationCompanySiret: siret
         }
       }
     ]

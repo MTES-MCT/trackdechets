@@ -23,11 +23,22 @@ describe("Integration / Forms query", () => {
   let user;
   let company;
   let query;
+  let ecoOrganisme;
 
   beforeEach(async () => {
     const userAndCompany = await userWithCompanyFactory("ADMIN");
     user = userAndCompany.user;
     company = userAndCompany.company;
+
+    ecoOrganisme = await prisma.createEcoOrganisme({
+      address: "address",
+      name: "an EO",
+      siret: company.siret
+    });
+  });
+
+  beforeEach(async () => {
+    await prisma.deleteManyForms();
 
     const { query: q, setOptions } = createTestClient({
       apolloServer: server
@@ -83,7 +94,6 @@ describe("Integration / Forms query", () => {
         }
       `
     );
-
     expect(data.forms.length).toBe(3);
 
     expect(
@@ -100,11 +110,7 @@ describe("Integration / Forms query", () => {
       ownerId: user.id,
       opt: {
         ecoOrganisme: {
-          create: {
-            address: "address",
-            name: "an EO",
-            siret: company.siret
-          }
+          connect: { id: ecoOrganisme.id }
         }
       }
     });
@@ -253,12 +259,9 @@ describe("Integration / Forms query", () => {
       },
       {
         ecoOrganisme: {
-          create: {
-            address: "address",
-            name: "an EO",
-            siret: company.siret
-          }
-        }
+          connect: { id: ecoOrganisme.id }
+        },
+        status: "RESENT"
       }
     ]);
 
@@ -273,8 +276,8 @@ describe("Integration / Forms query", () => {
     expect(allForms.forms.length).toBe(5);
 
     const { data: statusFiltered } = await query(
-      `query(status: [DRAFT, SENT]) {
-          forms {
+      `query {
+          forms(status: [DRAFT, SENT]) {
             id
           }
         }
@@ -283,8 +286,8 @@ describe("Integration / Forms query", () => {
     expect(statusFiltered.forms.length).toBe(2);
 
     const { data: roleFiltered } = await query(
-      `query(role: [TRADER]) {
-          forms {
+      `query {
+          forms(roles: [TRADER]) {
             id
           }
         }
@@ -293,9 +296,9 @@ describe("Integration / Forms query", () => {
 
     expect(roleFiltered.forms.length).toBe(1);
 
-    const { data: roleAndStatusFiltered } = await query(
-      `query(role: [EMITTER, RECIPIENT], status: [PROCESSED]) {
-          forms {
+    const { errors, data: roleAndStatusFiltered } = await query(
+      `query {
+          forms(roles: [EMITTER, RECIPIENT], status: [PROCESSED]) {
             id
           }
         }
@@ -304,7 +307,7 @@ describe("Integration / Forms query", () => {
     expect(roleAndStatusFiltered.forms.length).toBe(1);
   });
 
-  it("should display forms according to the filters I passed in", async () => {
+  it("should display paginated results", async () => {
     // The user has many forms, and a different role in each
     await createForms(user.id, [
       {
@@ -313,8 +316,7 @@ describe("Integration / Forms query", () => {
       },
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret,
-        status: "DRAFT"
+        recipientCompanySiret: company.siret
       },
       {
         recipientCompanyName: company.name,
@@ -322,8 +324,7 @@ describe("Integration / Forms query", () => {
       },
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret,
-        status: "DRAFT"
+        recipientCompanySiret: company.siret
       },
       {
         recipientCompanyName: company.name,
@@ -331,8 +332,7 @@ describe("Integration / Forms query", () => {
       },
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret,
-        status: "DRAFT"
+        recipientCompanySiret: company.siret
       }
     ]);
 
@@ -355,5 +355,41 @@ describe("Integration / Forms query", () => {
       `
     );
     expect(skippedForms.forms.length).toBe(2);
+  });
+
+  it("should filter by siret", async () => {
+    const otherCompany = await companyFactory();
+    await prisma.createCompanyAssociation({
+      company: { connect: { id: otherCompany.id } },
+      user: { connect: { id: user.id } },
+      role: "ADMIN"
+    });
+
+    // 1 form on each company
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: otherCompany.name,
+        recipientCompanySiret: otherCompany.siret
+      }
+    ]);
+
+    const { data } = await query(
+      `query {
+          forms(siret: "${otherCompany.siret}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
   });
 });

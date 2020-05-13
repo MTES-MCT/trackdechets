@@ -368,17 +368,24 @@ export const formsSchema = inputRule()(yup =>
       .number()
       .moreThan(0)
       .nullable(),
-    status: yup.string().nullable(),
+    status: yup
+      .array()
+      .of(yup.string())
+      .nullable(),
     roles: yup
-      .string()
-      .oneOf([
-        "TRANSPORTER",
-        "RECIPIENT",
-        "EMITTER",
-        "TRADER",
-        "ECO_ORGANISME",
-        "TEMPORARY_STORER"
-      ])
+      .array()
+      .of(
+        yup
+          .string()
+          .oneOf([
+            "TRANSPORTER",
+            "RECIPIENT",
+            "EMITTER",
+            "TRADER",
+            "ECO_ORGANISME",
+            "TEMPORARY_STORER"
+          ])
+      )
       .nullable()
   })
 );
