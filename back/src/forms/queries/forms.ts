@@ -6,12 +6,12 @@ import { GraphQLContext } from "../../types";
 const DEFAULT_FIRST = 50;
 
 type FormsParams = {
-  siret: string;
-  type: FormType;
-  roles: FormRole[];
-  status: FormStatus[];
-  first: number;
-  skip: number;
+  siret?: string;
+  type?: FormType;
+  roles?: FormRole[];
+  status?: FormStatus[];
+  first?: number;
+  skip?: number;
 };
 
 export default async function forms(

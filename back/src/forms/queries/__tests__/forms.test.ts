@@ -28,7 +28,7 @@ describe("Forms query", () => {
     getUserCompaniesMock.mockResolvedValue([]);
 
     try {
-      await forms("userId", { type: ACTOR, siret: null });
+      await forms(null, { siret: null }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -38,7 +38,7 @@ describe("Forms query", () => {
     expect.assertions(1);
     getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" }]);
     try {
-      await forms("userId", { type: ACTOR, siret: "another siret" });
+      await forms(null, { siret: "another siret" }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -46,7 +46,7 @@ describe("Forms query", () => {
 
   it("should query forms when user belongs to company", async () => {
     getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" }]);
-    await forms("userId", { type: ACTOR, siret: "a siret" });
+    await forms(null, { siret: "a siret" }, defaultContext);
 
     expect(prisma.forms).toHaveBeenCalled();
   });
