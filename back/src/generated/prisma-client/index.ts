@@ -32,6 +32,10 @@ export interface Exists {
   temporaryStorageDetail: (
     where?: TemporaryStorageDetailWhereInput
   ) => Promise<boolean>;
+  traderReceipt: (where?: TraderReceiptWhereInput) => Promise<boolean>;
+  transporterReceipt: (
+    where?: TransporterReceiptWhereInput
+  ) => Promise<boolean>;
   user: (where?: UserWhereInput) => Promise<boolean>;
   userAccountHash: (where?: UserAccountHashWhereInput) => Promise<boolean>;
   userActivationHash: (
@@ -300,6 +304,48 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => TemporaryStorageDetailConnectionPromise;
+  traderReceipt: (
+    where: TraderReceiptWhereUniqueInput
+  ) => TraderReceiptNullablePromise;
+  traderReceipts: (args?: {
+    where?: TraderReceiptWhereInput;
+    orderBy?: TraderReceiptOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<TraderReceipt>;
+  traderReceiptsConnection: (args?: {
+    where?: TraderReceiptWhereInput;
+    orderBy?: TraderReceiptOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => TraderReceiptConnectionPromise;
+  transporterReceipt: (
+    where: TransporterReceiptWhereUniqueInput
+  ) => TransporterReceiptNullablePromise;
+  transporterReceipts: (args?: {
+    where?: TransporterReceiptWhereInput;
+    orderBy?: TransporterReceiptOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<TransporterReceipt>;
+  transporterReceiptsConnection: (args?: {
+    where?: TransporterReceiptWhereInput;
+    orderBy?: TransporterReceiptOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => TransporterReceiptConnectionPromise;
   user: (where: UserWhereUniqueInput) => UserNullablePromise;
   users: (args?: {
     where?: UserWhereInput;
@@ -585,6 +631,48 @@ export interface Prisma {
   deleteManyTemporaryStorageDetails: (
     where?: TemporaryStorageDetailWhereInput
   ) => BatchPayloadPromise;
+  createTraderReceipt: (data: TraderReceiptCreateInput) => TraderReceiptPromise;
+  updateTraderReceipt: (args: {
+    data: TraderReceiptUpdateInput;
+    where: TraderReceiptWhereUniqueInput;
+  }) => TraderReceiptPromise;
+  updateManyTraderReceipts: (args: {
+    data: TraderReceiptUpdateManyMutationInput;
+    where?: TraderReceiptWhereInput;
+  }) => BatchPayloadPromise;
+  upsertTraderReceipt: (args: {
+    where: TraderReceiptWhereUniqueInput;
+    create: TraderReceiptCreateInput;
+    update: TraderReceiptUpdateInput;
+  }) => TraderReceiptPromise;
+  deleteTraderReceipt: (
+    where: TraderReceiptWhereUniqueInput
+  ) => TraderReceiptPromise;
+  deleteManyTraderReceipts: (
+    where?: TraderReceiptWhereInput
+  ) => BatchPayloadPromise;
+  createTransporterReceipt: (
+    data: TransporterReceiptCreateInput
+  ) => TransporterReceiptPromise;
+  updateTransporterReceipt: (args: {
+    data: TransporterReceiptUpdateInput;
+    where: TransporterReceiptWhereUniqueInput;
+  }) => TransporterReceiptPromise;
+  updateManyTransporterReceipts: (args: {
+    data: TransporterReceiptUpdateManyMutationInput;
+    where?: TransporterReceiptWhereInput;
+  }) => BatchPayloadPromise;
+  upsertTransporterReceipt: (args: {
+    where: TransporterReceiptWhereUniqueInput;
+    create: TransporterReceiptCreateInput;
+    update: TransporterReceiptUpdateInput;
+  }) => TransporterReceiptPromise;
+  deleteTransporterReceipt: (
+    where: TransporterReceiptWhereUniqueInput
+  ) => TransporterReceiptPromise;
+  deleteManyTransporterReceipts: (
+    where?: TransporterReceiptWhereInput
+  ) => BatchPayloadPromise;
   createUser: (data: UserCreateInput) => UserPromise;
   updateUser: (args: {
     data: UserUpdateInput;
@@ -690,6 +778,12 @@ export interface Subscription {
   temporaryStorageDetail: (
     where?: TemporaryStorageDetailSubscriptionWhereInput
   ) => TemporaryStorageDetailSubscriptionPayloadSubscription;
+  traderReceipt: (
+    where?: TraderReceiptSubscriptionWhereInput
+  ) => TraderReceiptSubscriptionPayloadSubscription;
+  transporterReceipt: (
+    where?: TransporterReceiptSubscriptionWhereInput
+  ) => TransporterReceiptSubscriptionPayloadSubscription;
   user: (
     where?: UserSubscriptionWhereInput
   ) => UserSubscriptionPayloadSubscription;
@@ -709,6 +803,22 @@ export interface ClientConstructor<T> {
  * Types
  */
 
+export type Seveso = "NS" | "SB" | "SH";
+
+export type ApplicationOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC"
+  | "clientSecret_ASC"
+  | "clientSecret_DESC"
+  | "name_ASC"
+  | "name_DESC"
+  | "logoUrl_ASC"
+  | "logoUrl_DESC";
+
 export type GrantOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -723,31 +833,15 @@ export type GrantOrderByInput =
   | "redirectUri_ASC"
   | "redirectUri_DESC";
 
-export type CompanyOrderByInput =
+export type UserActivationHashOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "siret_ASC"
-  | "siret_DESC"
-  | "name_ASC"
-  | "name_DESC"
-  | "gerepId_ASC"
-  | "gerepId_DESC"
-  | "codeNaf_ASC"
-  | "codeNaf_DESC"
+  | "hash_ASC"
+  | "hash_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
-  | "updatedAt_DESC"
-  | "securityCode_ASC"
-  | "securityCode_DESC"
-  | "givenName_ASC"
-  | "givenName_DESC"
-  | "contactEmail_ASC"
-  | "contactEmail_DESC"
-  | "contactPhone_ASC"
-  | "contactPhone_DESC"
-  | "website_ASC"
-  | "website_DESC";
+  | "updatedAt_DESC";
 
 export type CompanyType =
   | "PRODUCER"
@@ -758,15 +852,15 @@ export type CompanyType =
   | "WASTE_CENTER"
   | "TRADER";
 
-export type UserActivationHashOrderByInput =
+export type TransporterReceiptOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "hash_ASC"
-  | "hash_DESC"
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "updatedAt_ASC"
-  | "updatedAt_DESC";
+  | "receiptNumber_ASC"
+  | "receiptNumber_DESC"
+  | "validityLimit_ASC"
+  | "validityLimit_DESC"
+  | "department_ASC"
+  | "department_DESC";
 
 export type FormOrderByInput =
   | "id_ASC"
@@ -1006,6 +1100,26 @@ export type TemporaryStorageDetailOrderByInput =
   | "signedAt_ASC"
   | "signedAt_DESC";
 
+export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
+
+export type Status =
+  | "DRAFT"
+  | "SEALED"
+  | "SENT"
+  | "RECEIVED"
+  | "PROCESSED"
+  | "AWAITING_GROUP"
+  | "GROUPED"
+  | "NO_TRACEABILITY"
+  | "REFUSED"
+  | "TEMP_STORED"
+  | "RESEALED"
+  | "RESENT";
+
+export type QuantityType = "REAL" | "ESTIMATED";
+
+export type WasteType = "INERTE" | "NOT_DANGEROUS" | "DANGEROUS";
+
 export type UserOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -1024,27 +1138,26 @@ export type UserOrderByInput =
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
-export type Status =
-  | "DRAFT"
-  | "SEALED"
-  | "SENT"
-  | "RECEIVED"
-  | "PROCESSED"
-  | "AWAITING_GROUP"
-  | "GROUPED"
-  | "NO_TRACEABILITY"
-  | "REFUSED"
-  | "TEMP_STORED"
-  | "RESEALED"
-  | "RESENT";
-
-export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
-
-export type WasteType = "INERTE" | "NOT_DANGEROUS" | "DANGEROUS";
-
-export type QuantityType = "REAL" | "ESTIMATED";
-
 export type UserRole = "MEMBER" | "ADMIN";
+
+export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
+
+export type MutationType = "CREATED" | "UPDATED" | "DELETED";
+
+export type WasteAcceptationStatus =
+  | "ACCEPTED"
+  | "REFUSED"
+  | "PARTIALLY_REFUSED";
+
+export type TraderReceiptOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "receiptNumber_ASC"
+  | "receiptNumber_DESC"
+  | "validityLimit_ASC"
+  | "validityLimit_DESC"
+  | "department_ASC"
+  | "department_DESC";
 
 export type AccessTokenOrderByInput =
   | "id_ASC"
@@ -1059,31 +1172,6 @@ export type AccessTokenOrderByInput =
   | "isRevoked_DESC"
   | "lastUsed_ASC"
   | "lastUsed_DESC";
-
-export type Seveso = "NS" | "SB" | "SH";
-
-export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
-
-export type UserAccountHashOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "email_ASC"
-  | "email_DESC"
-  | "companySiret_ASC"
-  | "companySiret_DESC"
-  | "role_ASC"
-  | "role_DESC"
-  | "hash_ASC"
-  | "hash_DESC"
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "updatedAt_ASC"
-  | "updatedAt_DESC";
-
-export type WasteAcceptationStatus =
-  | "ACCEPTED"
-  | "REFUSED"
-  | "PARTIALLY_REFUSED";
 
 export type RubriqueOrderByInput =
   | "id_ASC"
@@ -1111,19 +1199,31 @@ export type RubriqueOrderByInput =
   | "wasteType_ASC"
   | "wasteType_DESC";
 
-export type ApplicationOrderByInput =
+export type CompanyOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "siret_ASC"
+  | "siret_DESC"
+  | "name_ASC"
+  | "name_DESC"
+  | "gerepId_ASC"
+  | "gerepId_DESC"
+  | "codeNaf_ASC"
+  | "codeNaf_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
   | "updatedAt_DESC"
-  | "clientSecret_ASC"
-  | "clientSecret_DESC"
-  | "name_ASC"
-  | "name_DESC"
-  | "logoUrl_ASC"
-  | "logoUrl_DESC";
+  | "securityCode_ASC"
+  | "securityCode_DESC"
+  | "givenName_ASC"
+  | "givenName_DESC"
+  | "contactEmail_ASC"
+  | "contactEmail_DESC"
+  | "contactPhone_ASC"
+  | "contactPhone_DESC"
+  | "website_ASC"
+  | "website_DESC";
 
 export type GerepType = "Producteur" | "Traiteur";
 
@@ -1191,7 +1291,21 @@ export type StatusLogOrderByInput =
   | "updatedFields_ASC"
   | "updatedFields_DESC";
 
-export type MutationType = "CREATED" | "UPDATED" | "DELETED";
+export type UserAccountHashOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "companySiret_ASC"
+  | "companySiret_DESC"
+  | "role_ASC"
+  | "role_DESC"
+  | "hash_ASC"
+  | "hash_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
 
 export type CompanyAssociationOrderByInput =
   | "id_ASC"
@@ -1199,9 +1313,38 @@ export type CompanyAssociationOrderByInput =
   | "role_ASC"
   | "role_DESC";
 
-export interface CompanyAssociationUpdateWithWhereUniqueWithoutUserInput {
-  where: CompanyAssociationWhereUniqueInput;
-  data: CompanyAssociationUpdateWithoutUserDataInput;
+export interface CompanyAssociationUpdateManyWithoutUserInput {
+  create?: Maybe<
+    | CompanyAssociationCreateWithoutUserInput[]
+    | CompanyAssociationCreateWithoutUserInput
+  >;
+  delete?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  connect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  set?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  disconnect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+  update?: Maybe<
+    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput[]
+    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput
+  >;
+  upsert?: Maybe<
+    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput[]
+    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput
+  >;
+  deleteMany?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | CompanyAssociationUpdateManyWithWhereNestedInput[]
+    | CompanyAssociationUpdateManyWithWhereNestedInput
+  >;
 }
 
 export type AccessTokenWhereUniqueInput = AtLeastOne<{
@@ -1209,16 +1352,52 @@ export type AccessTokenWhereUniqueInput = AtLeastOne<{
   token?: Maybe<String>;
 }>;
 
-export interface FormUpsertWithWhereUniqueNestedInput {
-  where: FormWhereUniqueInput;
-  update: FormUpdateDataInput;
-  create: FormCreateInput;
+export interface CompanyAssociationScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  AND?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  OR?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
+  NOT?: Maybe<
+    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
+  >;
 }
 
-export interface EcoOrganismeUpdateInput {
-  siret?: Maybe<String>;
-  name?: Maybe<String>;
-  address?: Maybe<String>;
+export type ApplicationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export type UserWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  email?: Maybe<String>;
+}>;
+
+export interface DeclarationUpdateManyMutationInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  annee?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
 }
 
 export interface TemporaryStorageDetailUpsertWithoutFormInput {
@@ -1226,24 +1405,9 @@ export interface TemporaryStorageDetailUpsertWithoutFormInput {
   create: TemporaryStorageDetailCreateWithoutFormInput;
 }
 
-export interface UserUpdateManyInput {
-  create?: Maybe<UserCreateInput[] | UserCreateInput>;
-  update?: Maybe<
-    | UserUpdateWithWhereUniqueNestedInput[]
-    | UserUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | UserUpsertWithWhereUniqueNestedInput[]
-    | UserUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  set?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  disconnect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
-  deleteMany?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  updateMany?: Maybe<
-    UserUpdateManyWithWhereNestedInput[] | UserUpdateManyWithWhereNestedInput
-  >;
+export interface CompanyAssociationUpdateManyWithWhereNestedInput {
+  where: CompanyAssociationScalarWhereInput;
+  data: CompanyAssociationUpdateManyDataInput;
 }
 
 export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
@@ -1305,10 +1469,14 @@ export interface UserActivationHashSubscriptionWhereInput {
   >;
 }
 
-export type UserAccountHashWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  hash?: Maybe<String>;
-}>;
+export interface TemporaryStorageDetailUpdateOneWithoutFormInput {
+  create?: Maybe<TemporaryStorageDetailCreateWithoutFormInput>;
+  update?: Maybe<TemporaryStorageDetailUpdateWithoutFormDataInput>;
+  upsert?: Maybe<TemporaryStorageDetailUpsertWithoutFormInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<TemporaryStorageDetailWhereUniqueInput>;
+}
 
 export interface UserSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
@@ -1321,115 +1489,14 @@ export interface UserSubscriptionWhereInput {
   NOT?: Maybe<UserSubscriptionWhereInput[] | UserSubscriptionWhereInput>;
 }
 
-export interface TemporaryStorageDetailUpdateOneWithoutFormInput {
-  create?: Maybe<TemporaryStorageDetailCreateWithoutFormInput>;
-  update?: Maybe<TemporaryStorageDetailUpdateWithoutFormDataInput>;
-  upsert?: Maybe<TemporaryStorageDetailUpsertWithoutFormInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<TemporaryStorageDetailWhereUniqueInput>;
-}
+export type UserAccountHashWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  hash?: Maybe<String>;
+}>;
 
 export type CompanyAssociationWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
-
-export interface UserAccountHashWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  email?: Maybe<String>;
-  email_not?: Maybe<String>;
-  email_in?: Maybe<String[] | String>;
-  email_not_in?: Maybe<String[] | String>;
-  email_lt?: Maybe<String>;
-  email_lte?: Maybe<String>;
-  email_gt?: Maybe<String>;
-  email_gte?: Maybe<String>;
-  email_contains?: Maybe<String>;
-  email_not_contains?: Maybe<String>;
-  email_starts_with?: Maybe<String>;
-  email_not_starts_with?: Maybe<String>;
-  email_ends_with?: Maybe<String>;
-  email_not_ends_with?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  companySiret_not?: Maybe<ID_Input>;
-  companySiret_in?: Maybe<ID_Input[] | ID_Input>;
-  companySiret_not_in?: Maybe<ID_Input[] | ID_Input>;
-  companySiret_lt?: Maybe<ID_Input>;
-  companySiret_lte?: Maybe<ID_Input>;
-  companySiret_gt?: Maybe<ID_Input>;
-  companySiret_gte?: Maybe<ID_Input>;
-  companySiret_contains?: Maybe<ID_Input>;
-  companySiret_not_contains?: Maybe<ID_Input>;
-  companySiret_starts_with?: Maybe<ID_Input>;
-  companySiret_not_starts_with?: Maybe<ID_Input>;
-  companySiret_ends_with?: Maybe<ID_Input>;
-  companySiret_not_ends_with?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
-  hash?: Maybe<String>;
-  hash_not?: Maybe<String>;
-  hash_in?: Maybe<String[] | String>;
-  hash_not_in?: Maybe<String[] | String>;
-  hash_lt?: Maybe<String>;
-  hash_lte?: Maybe<String>;
-  hash_gt?: Maybe<String>;
-  hash_gte?: Maybe<String>;
-  hash_contains?: Maybe<String>;
-  hash_not_contains?: Maybe<String>;
-  hash_starts_with?: Maybe<String>;
-  hash_not_starts_with?: Maybe<String>;
-  hash_ends_with?: Maybe<String>;
-  hash_not_ends_with?: Maybe<String>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
-  OR?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
-  NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
-}
-
-export interface RubriqueSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<RubriqueWhereInput>;
-  AND?: Maybe<
-    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
-  >;
-  OR?: Maybe<RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput>;
-  NOT?: Maybe<
-    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
-  >;
-}
 
 export interface FormUpdateDataInput {
   readableId?: Maybe<String>;
@@ -1517,6 +1584,108 @@ export interface FormUpdateDataInput {
   >;
 }
 
+export interface TemporaryStorageDetailSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<TemporaryStorageDetailWhereInput>;
+  AND?: Maybe<
+    | TemporaryStorageDetailSubscriptionWhereInput[]
+    | TemporaryStorageDetailSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | TemporaryStorageDetailSubscriptionWhereInput[]
+    | TemporaryStorageDetailSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | TemporaryStorageDetailSubscriptionWhereInput[]
+    | TemporaryStorageDetailSubscriptionWhereInput
+  >;
+}
+
+export interface UserAccountHashWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  companySiret_not?: Maybe<ID_Input>;
+  companySiret_in?: Maybe<ID_Input[] | ID_Input>;
+  companySiret_not_in?: Maybe<ID_Input[] | ID_Input>;
+  companySiret_lt?: Maybe<ID_Input>;
+  companySiret_lte?: Maybe<ID_Input>;
+  companySiret_gt?: Maybe<ID_Input>;
+  companySiret_gte?: Maybe<ID_Input>;
+  companySiret_contains?: Maybe<ID_Input>;
+  companySiret_not_contains?: Maybe<ID_Input>;
+  companySiret_starts_with?: Maybe<ID_Input>;
+  companySiret_not_starts_with?: Maybe<ID_Input>;
+  companySiret_ends_with?: Maybe<ID_Input>;
+  companySiret_not_ends_with?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  hash?: Maybe<String>;
+  hash_not?: Maybe<String>;
+  hash_in?: Maybe<String[] | String>;
+  hash_not_in?: Maybe<String[] | String>;
+  hash_lt?: Maybe<String>;
+  hash_lte?: Maybe<String>;
+  hash_gt?: Maybe<String>;
+  hash_gte?: Maybe<String>;
+  hash_contains?: Maybe<String>;
+  hash_not_contains?: Maybe<String>;
+  hash_starts_with?: Maybe<String>;
+  hash_not_starts_with?: Maybe<String>;
+  hash_ends_with?: Maybe<String>;
+  hash_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
+  OR?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
+  NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
+}
+
 export type DeclarationWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
@@ -1526,9 +1695,22 @@ export interface FormUpdateWithWhereUniqueNestedInput {
   data: FormUpdateDataInput;
 }
 
-export type ApplicationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
+export interface InstallationSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<InstallationWhereInput>;
+  AND?: Maybe<
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
+}
 
 export interface FormUpdateManyInput {
   create?: Maybe<FormCreateInput[] | FormCreateInput>;
@@ -1550,15 +1732,15 @@ export interface FormUpdateManyInput {
   >;
 }
 
-export interface FormSubscriptionWhereInput {
+export interface GrantSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<FormWhereInput>;
-  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
-  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  node?: Maybe<GrantWhereInput>;
+  AND?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
+  OR?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
+  NOT?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
 }
 
 export interface EcoOrganismeUpsertNestedInput {
@@ -1566,38 +1748,38 @@ export interface EcoOrganismeUpsertNestedInput {
   create: EcoOrganismeCreateInput;
 }
 
-export interface DeclarationSubscriptionWhereInput {
+export interface EcoOrganismeSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<DeclarationWhereInput>;
+  node?: Maybe<EcoOrganismeWhereInput>;
   AND?: Maybe<
-    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
+    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
   >;
   OR?: Maybe<
-    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
+    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
+    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
   >;
 }
-
-export type UserActivationHashWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  hash?: Maybe<String>;
-}>;
-
-export type EcoOrganismeWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  siret?: Maybe<String>;
-}>;
 
 export interface EcoOrganismeUpdateDataInput {
   siret?: Maybe<String>;
   name?: Maybe<String>;
   address?: Maybe<String>;
 }
+
+export type EcoOrganismeWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  siret?: Maybe<String>;
+}>;
+
+export type UserActivationHashWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  hash?: Maybe<String>;
+}>;
 
 export interface EcoOrganismeWhereInput {
   id?: Maybe<ID_Input>;
@@ -1661,6 +1843,32 @@ export interface EcoOrganismeWhereInput {
   NOT?: Maybe<EcoOrganismeWhereInput[] | EcoOrganismeWhereInput>;
 }
 
+export interface EcoOrganismeUpdateOneInput {
+  create?: Maybe<EcoOrganismeCreateInput>;
+  update?: Maybe<EcoOrganismeUpdateDataInput>;
+  upsert?: Maybe<EcoOrganismeUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
+}
+
+export interface ApplicationSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<ApplicationWhereInput>;
+  AND?: Maybe<
+    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
+  >;
+}
+
 export interface UserActivationHashWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
@@ -1712,34 +1920,7 @@ export interface UserActivationHashWhereInput {
   NOT?: Maybe<UserActivationHashWhereInput[] | UserActivationHashWhereInput>;
 }
 
-export interface AccessTokenSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<AccessTokenWhereInput>;
-  AND?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
-  >;
-}
-
-export interface EcoOrganismeUpdateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  update?: Maybe<EcoOrganismeUpdateDataInput>;
-  upsert?: Maybe<EcoOrganismeUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
-}
-
-export interface UserActivationHashUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
+export interface UserActivationHashUpdateManyMutationInput {
   hash?: Maybe<String>;
 }
 
@@ -1829,10 +2010,9 @@ export interface FormUpdateInput {
   >;
 }
 
-export interface UserActivationHashCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  hash: String;
+export interface UserActivationHashUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  hash?: Maybe<String>;
 }
 
 export interface TemporaryStorageDetailCreateWithoutFormInput {
@@ -1875,11 +2055,10 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   signedAt?: Maybe<DateTimeInput>;
 }
 
-export interface UserAccountHashUpdateInput {
-  email?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  hash?: Maybe<String>;
+export interface UserActivationHashCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneInput;
+  hash: String;
 }
 
 export interface TemporaryStorageDetailCreateOneWithoutFormInput {
@@ -1887,74 +2066,24 @@ export interface TemporaryStorageDetailCreateOneWithoutFormInput {
   connect?: Maybe<TemporaryStorageDetailWhereUniqueInput>;
 }
 
-export interface UserUpdateManyMutationInput {
-  isActive?: Maybe<Boolean>;
+export interface UserAccountHashUpdateManyMutationInput {
   email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  hash?: Maybe<String>;
 }
 
-export interface AccessTokenWhereInput {
+export interface FormCreateManyInput {
+  create?: Maybe<FormCreateInput[] | FormCreateInput>;
+  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+}
+
+export interface UserAccountHashCreateInput {
   id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  user?: Maybe<UserWhereInput>;
-  application?: Maybe<ApplicationWhereInput>;
-  token?: Maybe<String>;
-  token_not?: Maybe<String>;
-  token_in?: Maybe<String[] | String>;
-  token_not_in?: Maybe<String[] | String>;
-  token_lt?: Maybe<String>;
-  token_lte?: Maybe<String>;
-  token_gt?: Maybe<String>;
-  token_gte?: Maybe<String>;
-  token_contains?: Maybe<String>;
-  token_not_contains?: Maybe<String>;
-  token_starts_with?: Maybe<String>;
-  token_not_starts_with?: Maybe<String>;
-  token_ends_with?: Maybe<String>;
-  token_not_ends_with?: Maybe<String>;
-  isRevoked?: Maybe<Boolean>;
-  isRevoked_not?: Maybe<Boolean>;
-  lastUsed?: Maybe<DateTimeInput>;
-  lastUsed_not?: Maybe<DateTimeInput>;
-  lastUsed_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  lastUsed_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  lastUsed_lt?: Maybe<DateTimeInput>;
-  lastUsed_lte?: Maybe<DateTimeInput>;
-  lastUsed_gt?: Maybe<DateTimeInput>;
-  lastUsed_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
-  OR?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
-  NOT?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
+  email: String;
+  companySiret: ID_Input;
+  role: UserRole;
+  hash: String;
 }
 
 export interface TemporaryStorageDetailWhereInput {
@@ -2370,6 +2499,15 @@ export interface TemporaryStorageDetailWhereInput {
   >;
 }
 
+export interface UserUpdateInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+}
+
 export interface AccessTokenCreateInput {
   id?: Maybe<ID_Input>;
   user: UserCreateOneInput;
@@ -2379,43 +2517,10 @@ export interface AccessTokenCreateInput {
   lastUsed?: Maybe<DateTimeInput>;
 }
 
-export interface TemporaryStorageDetailUpdateManyMutationInput {
-  tempStorerQuantityType?: Maybe<QuantityType>;
-  tempStorerQuantityReceived?: Maybe<Float>;
-  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  tempStorerWasteRefusalReason?: Maybe<String>;
-  tempStorerReceivedAt?: Maybe<DateTimeInput>;
-  tempStorerReceivedBy?: Maybe<String>;
-  tempStorerSignedAt?: Maybe<DateTimeInput>;
-  destinationIsFilledByEmitter?: Maybe<Boolean>;
-  destinationCompanyName?: Maybe<String>;
-  destinationCompanySiret?: Maybe<String>;
-  destinationCompanyAddress?: Maybe<String>;
-  destinationCompanyContact?: Maybe<String>;
-  destinationCompanyPhone?: Maybe<String>;
-  destinationCompanyMail?: Maybe<String>;
-  destinationCap?: Maybe<String>;
-  destinationProcessingOperation?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  signedByTransporter?: Maybe<Boolean>;
-  signedBy?: Maybe<String>;
-  signedAt?: Maybe<DateTimeInput>;
+export interface TransporterReceiptUpdateInput {
+  receiptNumber?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
 }
 
 export interface UserCreateOneInput {
@@ -2423,88 +2528,10 @@ export interface UserCreateOneInput {
   connect?: Maybe<UserWhereUniqueInput>;
 }
 
-export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
-  readableId?: Maybe<String>;
-  customId?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  owner?: Maybe<UserUpdateOneRequiredInput>;
-  signedByTransporter?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  wasteRefusalReason?: Maybe<String>;
-  receivedBy?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationCompanyName?: Maybe<String>;
-  nextDestinationCompanySiret?: Maybe<String>;
-  nextDestinationCompanyAddress?: Maybe<String>;
-  nextDestinationCompanyContact?: Maybe<String>;
-  nextDestinationCompanyPhone?: Maybe<String>;
-  nextDestinationCompanyMail?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterWorkSiteName?: Maybe<String>;
-  emitterWorkSiteAddress?: Maybe<String>;
-  emitterWorkSiteCity?: Maybe<String>;
-  emitterWorkSitePostalCode?: Maybe<String>;
-  emitterWorkSiteInfos?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientIsTempStorage?: Maybe<Boolean>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  transporterCustomInfo?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
-  appendix2Forms?: Maybe<FormUpdateManyInput>;
-}
+export type GrantWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  code?: Maybe<String>;
+}>;
 
 export interface UserCreateInput {
   id?: Maybe<ID_Input>;
@@ -2514,21 +2541,6 @@ export interface UserCreateInput {
   name?: Maybe<String>;
   phone?: Maybe<String>;
   companyAssociations?: Maybe<CompanyAssociationCreateManyWithoutUserInput>;
-}
-
-export type GrantWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  code?: Maybe<String>;
-}>;
-
-export interface CompanyAssociationCreateManyWithoutUserInput {
-  create?: Maybe<
-    | CompanyAssociationCreateWithoutUserInput[]
-    | CompanyAssociationCreateWithoutUserInput
-  >;
-  connect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
 }
 
 export interface GrantWhereInput {
@@ -2605,14 +2617,33 @@ export interface GrantWhereInput {
   NOT?: Maybe<GrantWhereInput[] | GrantWhereInput>;
 }
 
+export interface CompanyAssociationCreateManyWithoutUserInput {
+  create?: Maybe<
+    | CompanyAssociationCreateWithoutUserInput[]
+    | CompanyAssociationCreateWithoutUserInput
+  >;
+  connect?: Maybe<
+    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
+  >;
+}
+
+export interface FormUpsertWithoutTemporaryStorageDetailInput {
+  update: FormUpdateWithoutTemporaryStorageDetailDataInput;
+  create: FormCreateWithoutTemporaryStorageDetailInput;
+}
+
 export interface CompanyAssociationCreateWithoutUserInput {
   id?: Maybe<ID_Input>;
   company: CompanyCreateOneInput;
   role: UserRole;
 }
 
-export interface FormCreateOneWithoutTemporaryStorageDetailInput {
+export interface FormUpdateOneWithoutTemporaryStorageDetailInput {
   create?: Maybe<FormCreateWithoutTemporaryStorageDetailInput>;
+  update?: Maybe<FormUpdateWithoutTemporaryStorageDetailDataInput>;
+  upsert?: Maybe<FormUpsertWithoutTemporaryStorageDetailInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
   connect?: Maybe<FormWhereUniqueInput>;
 }
 
@@ -2621,10 +2652,44 @@ export interface CompanyCreateOneInput {
   connect?: Maybe<CompanyWhereUniqueInput>;
 }
 
-export interface StatusLogUpdateManyMutationInput {
-  status?: Maybe<Status>;
-  loggedAt?: Maybe<DateTimeInput>;
-  updatedFields?: Maybe<Json>;
+export interface TemporaryStorageDetailUpdateInput {
+  form?: Maybe<FormUpdateOneWithoutTemporaryStorageDetailInput>;
+  tempStorerQuantityType?: Maybe<QuantityType>;
+  tempStorerQuantityReceived?: Maybe<Float>;
+  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  tempStorerWasteRefusalReason?: Maybe<String>;
+  tempStorerReceivedAt?: Maybe<DateTimeInput>;
+  tempStorerReceivedBy?: Maybe<String>;
+  tempStorerSignedAt?: Maybe<DateTimeInput>;
+  destinationIsFilledByEmitter?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
+  signedBy?: Maybe<String>;
+  signedAt?: Maybe<DateTimeInput>;
 }
 
 export interface CompanyCreateInput {
@@ -2640,15 +2705,8 @@ export interface CompanyCreateInput {
   contactPhone?: Maybe<String>;
   website?: Maybe<String>;
   documentKeys?: Maybe<CompanyCreatedocumentKeysInput>;
-}
-
-export interface FormUpsertNestedInput {
-  update: FormUpdateDataInput;
-  create: FormCreateInput;
-}
-
-export interface CompanyCreatecompanyTypesInput {
-  set?: Maybe<CompanyType[] | CompanyType>;
+  transporterReceipt?: Maybe<TransporterReceiptCreateOneInput>;
+  traderReceipt?: Maybe<TraderReceiptCreateOneInput>;
 }
 
 export interface InstallationWhereInput {
@@ -2829,60 +2887,40 @@ export interface InstallationWhereInput {
   NOT?: Maybe<InstallationWhereInput[] | InstallationWhereInput>;
 }
 
+export interface CompanyCreatecompanyTypesInput {
+  set?: Maybe<CompanyType[] | CompanyType>;
+}
+
+export interface FormCreateOneWithoutTemporaryStorageDetailInput {
+  create?: Maybe<FormCreateWithoutTemporaryStorageDetailInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
 export interface CompanyCreatedocumentKeysInput {
   set?: Maybe<String[] | String>;
 }
 
-export interface FormCreateOneInput {
-  create?: Maybe<FormCreateInput>;
-  connect?: Maybe<FormWhereUniqueInput>;
+export interface StatusLogUpdateManyMutationInput {
+  status?: Maybe<Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
 }
 
-export interface ApplicationCreateOneInput {
-  create?: Maybe<ApplicationCreateInput>;
-  connect?: Maybe<ApplicationWhereUniqueInput>;
+export interface TransporterReceiptCreateOneInput {
+  create?: Maybe<TransporterReceiptCreateInput>;
+  connect?: Maybe<TransporterReceiptWhereUniqueInput>;
 }
 
-export interface RubriqueUpdateManyMutationInput {
-  codeS3ic?: Maybe<String>;
-  rubrique?: Maybe<String>;
-  alinea?: Maybe<String>;
-  dateAutorisation?: Maybe<String>;
-  etatActivite?: Maybe<String>;
-  regimeAutorise?: Maybe<String>;
-  activite?: Maybe<String>;
-  volume?: Maybe<String>;
-  unite?: Maybe<String>;
-  category?: Maybe<String>;
-  wasteType?: Maybe<WasteType>;
+export interface FormUpsertNestedInput {
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
 }
 
-export interface ApplicationCreateInput {
+export interface TransporterReceiptCreateInput {
   id?: Maybe<ID_Input>;
-  clientSecret: String;
-  name: String;
-  admins?: Maybe<UserCreateManyInput>;
-  redirectUris?: Maybe<ApplicationCreateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
-}
-
-export interface RubriqueUpdateInput {
-  codeS3ic?: Maybe<String>;
-  rubrique?: Maybe<String>;
-  alinea?: Maybe<String>;
-  dateAutorisation?: Maybe<String>;
-  etatActivite?: Maybe<String>;
-  regimeAutorise?: Maybe<String>;
-  activite?: Maybe<String>;
-  volume?: Maybe<String>;
-  unite?: Maybe<String>;
-  category?: Maybe<String>;
-  wasteType?: Maybe<WasteType>;
-}
-
-export interface UserCreateManyInput {
-  create?: Maybe<UserCreateInput[] | UserCreateInput>;
-  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  receiptNumber: String;
+  validityLimit: DateTimeInput;
+  department: String;
 }
 
 export interface RubriqueWhereInput {
@@ -3049,12 +3087,41 @@ export interface RubriqueWhereInput {
   NOT?: Maybe<RubriqueWhereInput[] | RubriqueWhereInput>;
 }
 
-export interface ApplicationCreateredirectUrisInput {
-  set?: Maybe<String[] | String>;
+export interface TraderReceiptCreateOneInput {
+  create?: Maybe<TraderReceiptCreateInput>;
+  connect?: Maybe<TraderReceiptWhereUniqueInput>;
 }
 
-export interface RubriqueCreateInput {
+export interface StatusLogUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  form?: Maybe<FormUpdateOneRequiredInput>;
+  status?: Maybe<Status>;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
+}
+
+export interface TraderReceiptCreateInput {
   id?: Maybe<ID_Input>;
+  receiptNumber: String;
+  validityLimit: DateTimeInput;
+  department: String;
+}
+
+export interface StatusLogCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneInput;
+  form: FormCreateOneInput;
+  status: Status;
+  loggedAt?: Maybe<DateTimeInput>;
+  updatedFields?: Maybe<Json>;
+}
+
+export interface ApplicationCreateOneInput {
+  create?: Maybe<ApplicationCreateInput>;
+  connect?: Maybe<ApplicationWhereUniqueInput>;
+}
+
+export interface RubriqueUpdateManyMutationInput {
   codeS3ic?: Maybe<String>;
   rubrique?: Maybe<String>;
   alinea?: Maybe<String>;
@@ -3068,59 +3135,13 @@ export interface RubriqueCreateInput {
   wasteType?: Maybe<WasteType>;
 }
 
-export interface AccessTokenUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  application?: Maybe<ApplicationUpdateOneInput>;
-  token?: Maybe<String>;
-  isRevoked?: Maybe<Boolean>;
-  lastUsed?: Maybe<DateTimeInput>;
-}
-
-export interface InstallationUpdateInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  regime?: Maybe<String>;
-  libRegime?: Maybe<String>;
-  seveso?: Maybe<Seveso>;
-  libSeveso?: Maybe<String>;
-  familleIc?: Maybe<String>;
-  urlFiche?: Maybe<String>;
-  s3icNumeroSiret?: Maybe<String>;
-  irepNumeroSiret?: Maybe<String>;
-  gerepNumeroSiret?: Maybe<String>;
-  sireneNumeroSiret?: Maybe<String>;
-}
-
-export interface UserUpdateOneRequiredInput {
-  create?: Maybe<UserCreateInput>;
-  update?: Maybe<UserUpdateDataInput>;
-  upsert?: Maybe<UserUpsertNestedInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface InstallationCreateInput {
+export interface ApplicationCreateInput {
   id?: Maybe<ID_Input>;
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  regime?: Maybe<String>;
-  libRegime?: Maybe<String>;
-  seveso?: Maybe<Seveso>;
-  libSeveso?: Maybe<String>;
-  familleIc?: Maybe<String>;
-  urlFiche?: Maybe<String>;
-  s3icNumeroSiret?: Maybe<String>;
-  irepNumeroSiret?: Maybe<String>;
-  gerepNumeroSiret?: Maybe<String>;
-  sireneNumeroSiret?: Maybe<String>;
-}
-
-export interface UserUpdateDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+  clientSecret: String;
+  name: String;
+  admins?: Maybe<UserCreateManyInput>;
+  redirectUris?: Maybe<ApplicationCreateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
 }
 
 export interface StatusLogWhereInput {
@@ -3157,59 +3178,210 @@ export interface StatusLogWhereInput {
   NOT?: Maybe<StatusLogWhereInput[] | StatusLogWhereInput>;
 }
 
-export interface CompanyAssociationUpdateManyWithoutUserInput {
-  create?: Maybe<
-    | CompanyAssociationCreateWithoutUserInput[]
-    | CompanyAssociationCreateWithoutUserInput
-  >;
-  delete?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  connect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  set?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  disconnect?: Maybe<
-    CompanyAssociationWhereUniqueInput[] | CompanyAssociationWhereUniqueInput
-  >;
-  update?: Maybe<
-    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput[]
-    | CompanyAssociationUpdateWithWhereUniqueWithoutUserInput
-  >;
-  upsert?: Maybe<
-    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput[]
-    | CompanyAssociationUpsertWithWhereUniqueWithoutUserInput
-  >;
-  deleteMany?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-  updateMany?: Maybe<
-    | CompanyAssociationUpdateManyWithWhereNestedInput[]
-    | CompanyAssociationUpdateManyWithWhereNestedInput
-  >;
+export interface UserCreateManyInput {
+  create?: Maybe<UserCreateInput[] | UserCreateInput>;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
 }
 
-export interface ApplicationUpdateOneRequiredInput {
-  create?: Maybe<ApplicationCreateInput>;
-  update?: Maybe<ApplicationUpdateDataInput>;
-  upsert?: Maybe<ApplicationUpsertNestedInput>;
-  connect?: Maybe<ApplicationWhereUniqueInput>;
+export interface RubriqueUpdateInput {
+  codeS3ic?: Maybe<String>;
+  rubrique?: Maybe<String>;
+  alinea?: Maybe<String>;
+  dateAutorisation?: Maybe<String>;
+  etatActivite?: Maybe<String>;
+  regimeAutorise?: Maybe<String>;
+  activite?: Maybe<String>;
+  volume?: Maybe<String>;
+  unite?: Maybe<String>;
+  category?: Maybe<String>;
+  wasteType?: Maybe<WasteType>;
 }
 
-export interface FormCreateManyInput {
-  create?: Maybe<FormCreateInput[] | FormCreateInput>;
-  connect?: Maybe<FormWhereUniqueInput[] | FormWhereUniqueInput>;
+export interface ApplicationCreateredirectUrisInput {
+  set?: Maybe<String[] | String>;
 }
 
-export interface GrantCreateInput {
+export interface InstallationUpdateManyMutationInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  regime?: Maybe<String>;
+  libRegime?: Maybe<String>;
+  seveso?: Maybe<Seveso>;
+  libSeveso?: Maybe<String>;
+  familleIc?: Maybe<String>;
+  urlFiche?: Maybe<String>;
+  s3icNumeroSiret?: Maybe<String>;
+  irepNumeroSiret?: Maybe<String>;
+  gerepNumeroSiret?: Maybe<String>;
+  sireneNumeroSiret?: Maybe<String>;
+}
+
+export interface AccessTokenUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  application?: Maybe<ApplicationUpdateOneInput>;
+  token?: Maybe<String>;
+  isRevoked?: Maybe<Boolean>;
+  lastUsed?: Maybe<DateTimeInput>;
+}
+
+export interface CompanyAssociationWhereInput {
   id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  code: String;
-  application: ApplicationCreateOneInput;
-  expires: Int;
-  redirectUri: String;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  user?: Maybe<UserWhereInput>;
+  company?: Maybe<CompanyWhereInput>;
+  role?: Maybe<UserRole>;
+  role_not?: Maybe<UserRole>;
+  role_in?: Maybe<UserRole[] | UserRole>;
+  role_not_in?: Maybe<UserRole[] | UserRole>;
+  AND?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+  OR?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+  NOT?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
+}
+
+export interface UserUpdateOneRequiredInput {
+  create?: Maybe<UserCreateInput>;
+  update?: Maybe<UserUpdateDataInput>;
+  upsert?: Maybe<UserUpsertNestedInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface InstallationCreateInput {
+  id?: Maybe<ID_Input>;
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  regime?: Maybe<String>;
+  libRegime?: Maybe<String>;
+  seveso?: Maybe<Seveso>;
+  libSeveso?: Maybe<String>;
+  familleIc?: Maybe<String>;
+  urlFiche?: Maybe<String>;
+  s3icNumeroSiret?: Maybe<String>;
+  irepNumeroSiret?: Maybe<String>;
+  gerepNumeroSiret?: Maybe<String>;
+  sireneNumeroSiret?: Maybe<String>;
+}
+
+export interface UserUpdateDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
+}
+
+export type TraderReceiptWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface EcoOrganismeCreateOneInput {
+  create?: Maybe<EcoOrganismeCreateInput>;
+  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
+}
+
+export interface GrantUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  code?: Maybe<String>;
+  application?: Maybe<ApplicationUpdateOneRequiredInput>;
+  expires?: Maybe<Int>;
+  redirectUri?: Maybe<String>;
+}
+
+export interface CompanyAssociationUpdateWithWhereUniqueWithoutUserInput {
+  where: CompanyAssociationWhereUniqueInput;
+  data: CompanyAssociationUpdateWithoutUserDataInput;
+}
+
+export interface FormUpdateManyMutationInput {
+  readableId?: Maybe<String>;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
 }
 
 export interface CompanyAssociationUpdateWithoutUserDataInput {
@@ -3217,7 +3389,7 @@ export interface CompanyAssociationUpdateWithoutUserDataInput {
   role?: Maybe<UserRole>;
 }
 
-export interface FormUpdateManyMutationInput {
+export interface FormUpdateManyDataInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
@@ -3302,645 +3474,6 @@ export interface CompanyUpdateOneRequiredInput {
   update?: Maybe<CompanyUpdateDataInput>;
   upsert?: Maybe<CompanyUpsertNestedInput>;
   connect?: Maybe<CompanyWhereUniqueInput>;
-}
-
-export interface FormUpdateManyWithWhereNestedInput {
-  where: FormScalarWhereInput;
-  data: FormUpdateManyDataInput;
-}
-
-export interface CompanyUpdateDataInput {
-  siret?: Maybe<String>;
-  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
-  name?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  codeNaf?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  givenName?: Maybe<String>;
-  contactEmail?: Maybe<String>;
-  contactPhone?: Maybe<String>;
-  website?: Maybe<String>;
-  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
-}
-
-export type UserWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  email?: Maybe<String>;
-}>;
-
-export interface CompanyUpdatecompanyTypesInput {
-  set?: Maybe<CompanyType[] | CompanyType>;
-}
-
-export interface UserAccountHashSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<UserAccountHashWhereInput>;
-  AND?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | UserAccountHashSubscriptionWhereInput[]
-    | UserAccountHashSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyUpdatedocumentKeysInput {
-  set?: Maybe<String[] | String>;
-}
-
-export interface StatusLogSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<StatusLogWhereInput>;
-  AND?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyUpsertNestedInput {
-  update: CompanyUpdateDataInput;
-  create: CompanyCreateInput;
-}
-
-export interface GrantSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<GrantWhereInput>;
-  AND?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
-  OR?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
-  NOT?: Maybe<GrantSubscriptionWhereInput[] | GrantSubscriptionWhereInput>;
-}
-
-export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
-  where: CompanyAssociationWhereUniqueInput;
-  update: CompanyAssociationUpdateWithoutUserDataInput;
-  create: CompanyAssociationCreateWithoutUserInput;
-}
-
-export interface EcoOrganismeSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<EcoOrganismeWhereInput>;
-  AND?: Maybe<
-    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    EcoOrganismeSubscriptionWhereInput[] | EcoOrganismeSubscriptionWhereInput
-  >;
-}
-
-export interface CompanyAssociationScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
-  AND?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-  OR?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-  NOT?: Maybe<
-    CompanyAssociationScalarWhereInput[] | CompanyAssociationScalarWhereInput
-  >;
-}
-
-export interface CompanySubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyWhereInput>;
-  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
-}
-
-export interface CompanyAssociationUpdateManyWithWhereNestedInput {
-  where: CompanyAssociationScalarWhereInput;
-  data: CompanyAssociationUpdateManyDataInput;
-}
-
-export interface UserActivationHashUpdateManyMutationInput {
-  hash?: Maybe<String>;
-}
-
-export interface CompanyAssociationUpdateManyDataInput {
-  role?: Maybe<UserRole>;
-}
-
-export interface UserAccountHashUpdateManyMutationInput {
-  email?: Maybe<String>;
-  companySiret?: Maybe<ID_Input>;
-  role?: Maybe<UserRole>;
-  hash?: Maybe<String>;
-}
-
-export interface UserUpsertNestedInput {
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
-}
-
-export interface ApplicationWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  clientSecret?: Maybe<String>;
-  clientSecret_not?: Maybe<String>;
-  clientSecret_in?: Maybe<String[] | String>;
-  clientSecret_not_in?: Maybe<String[] | String>;
-  clientSecret_lt?: Maybe<String>;
-  clientSecret_lte?: Maybe<String>;
-  clientSecret_gt?: Maybe<String>;
-  clientSecret_gte?: Maybe<String>;
-  clientSecret_contains?: Maybe<String>;
-  clientSecret_not_contains?: Maybe<String>;
-  clientSecret_starts_with?: Maybe<String>;
-  clientSecret_not_starts_with?: Maybe<String>;
-  clientSecret_ends_with?: Maybe<String>;
-  clientSecret_not_ends_with?: Maybe<String>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  admins_every?: Maybe<UserWhereInput>;
-  admins_some?: Maybe<UserWhereInput>;
-  admins_none?: Maybe<UserWhereInput>;
-  logoUrl?: Maybe<String>;
-  logoUrl_not?: Maybe<String>;
-  logoUrl_in?: Maybe<String[] | String>;
-  logoUrl_not_in?: Maybe<String[] | String>;
-  logoUrl_lt?: Maybe<String>;
-  logoUrl_lte?: Maybe<String>;
-  logoUrl_gt?: Maybe<String>;
-  logoUrl_gte?: Maybe<String>;
-  logoUrl_contains?: Maybe<String>;
-  logoUrl_not_contains?: Maybe<String>;
-  logoUrl_starts_with?: Maybe<String>;
-  logoUrl_not_starts_with?: Maybe<String>;
-  logoUrl_ends_with?: Maybe<String>;
-  logoUrl_not_ends_with?: Maybe<String>;
-  AND?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
-  OR?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
-  NOT?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
-}
-
-export interface ApplicationUpdateOneInput {
-  create?: Maybe<ApplicationCreateInput>;
-  update?: Maybe<ApplicationUpdateDataInput>;
-  upsert?: Maybe<ApplicationUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<ApplicationWhereUniqueInput>;
-}
-
-export interface UserUpdateInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-  companyAssociations?: Maybe<CompanyAssociationUpdateManyWithoutUserInput>;
-}
-
-export interface ApplicationUpdateDataInput {
-  clientSecret?: Maybe<String>;
-  name?: Maybe<String>;
-  admins?: Maybe<UserUpdateManyInput>;
-  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
-}
-
-export interface FormUpdateOneWithoutTemporaryStorageDetailInput {
-  create?: Maybe<FormCreateWithoutTemporaryStorageDetailInput>;
-  update?: Maybe<FormUpdateWithoutTemporaryStorageDetailDataInput>;
-  upsert?: Maybe<FormUpsertWithoutTemporaryStorageDetailInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<FormWhereUniqueInput>;
-}
-
-export interface EcoOrganismeCreateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
-}
-
-export interface FormCreateWithoutTemporaryStorageDetailInput {
-  id?: Maybe<ID_Input>;
-  readableId: String;
-  customId?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  owner: UserCreateOneInput;
-  signedByTransporter?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  wasteRefusalReason?: Maybe<String>;
-  receivedBy?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationCompanyName?: Maybe<String>;
-  nextDestinationCompanySiret?: Maybe<String>;
-  nextDestinationCompanyAddress?: Maybe<String>;
-  nextDestinationCompanyContact?: Maybe<String>;
-  nextDestinationCompanyPhone?: Maybe<String>;
-  nextDestinationCompanyMail?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterWorkSiteName?: Maybe<String>;
-  emitterWorkSiteAddress?: Maybe<String>;
-  emitterWorkSiteCity?: Maybe<String>;
-  emitterWorkSitePostalCode?: Maybe<String>;
-  emitterWorkSiteInfos?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientIsTempStorage?: Maybe<Boolean>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  transporterCustomInfo?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
-  appendix2Forms?: Maybe<FormCreateManyInput>;
-}
-
-export interface UserUpdateWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput;
-  data: UserUpdateDataInput;
-}
-
-export type InstallationWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface UserUpsertWithWhereUniqueNestedInput {
-  where: UserWhereUniqueInput;
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
-}
-
-export interface StatusLogUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  form?: Maybe<FormUpdateOneRequiredInput>;
-  status?: Maybe<Status>;
-  loggedAt?: Maybe<DateTimeInput>;
-  updatedFields?: Maybe<Json>;
-}
-
-export interface UserScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  isActive_not?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  email_not?: Maybe<String>;
-  email_in?: Maybe<String[] | String>;
-  email_not_in?: Maybe<String[] | String>;
-  email_lt?: Maybe<String>;
-  email_lte?: Maybe<String>;
-  email_gt?: Maybe<String>;
-  email_gte?: Maybe<String>;
-  email_contains?: Maybe<String>;
-  email_not_contains?: Maybe<String>;
-  email_starts_with?: Maybe<String>;
-  email_not_starts_with?: Maybe<String>;
-  email_ends_with?: Maybe<String>;
-  email_not_ends_with?: Maybe<String>;
-  password?: Maybe<String>;
-  password_not?: Maybe<String>;
-  password_in?: Maybe<String[] | String>;
-  password_not_in?: Maybe<String[] | String>;
-  password_lt?: Maybe<String>;
-  password_lte?: Maybe<String>;
-  password_gt?: Maybe<String>;
-  password_gte?: Maybe<String>;
-  password_contains?: Maybe<String>;
-  password_not_contains?: Maybe<String>;
-  password_starts_with?: Maybe<String>;
-  password_not_starts_with?: Maybe<String>;
-  password_ends_with?: Maybe<String>;
-  password_not_ends_with?: Maybe<String>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  phone?: Maybe<String>;
-  phone_not?: Maybe<String>;
-  phone_in?: Maybe<String[] | String>;
-  phone_not_in?: Maybe<String[] | String>;
-  phone_lt?: Maybe<String>;
-  phone_lte?: Maybe<String>;
-  phone_gt?: Maybe<String>;
-  phone_gte?: Maybe<String>;
-  phone_contains?: Maybe<String>;
-  phone_not_contains?: Maybe<String>;
-  phone_starts_with?: Maybe<String>;
-  phone_not_starts_with?: Maybe<String>;
-  phone_ends_with?: Maybe<String>;
-  phone_not_ends_with?: Maybe<String>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  OR?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-  NOT?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
-}
-
-export type RubriqueWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface UserUpdateManyWithWhereNestedInput {
-  where: UserScalarWhereInput;
-  data: UserUpdateManyDataInput;
-}
-
-export interface UserWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  isActive_not?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  email_not?: Maybe<String>;
-  email_in?: Maybe<String[] | String>;
-  email_not_in?: Maybe<String[] | String>;
-  email_lt?: Maybe<String>;
-  email_lte?: Maybe<String>;
-  email_gt?: Maybe<String>;
-  email_gte?: Maybe<String>;
-  email_contains?: Maybe<String>;
-  email_not_contains?: Maybe<String>;
-  email_starts_with?: Maybe<String>;
-  email_not_starts_with?: Maybe<String>;
-  email_ends_with?: Maybe<String>;
-  email_not_ends_with?: Maybe<String>;
-  password?: Maybe<String>;
-  password_not?: Maybe<String>;
-  password_in?: Maybe<String[] | String>;
-  password_not_in?: Maybe<String[] | String>;
-  password_lt?: Maybe<String>;
-  password_lte?: Maybe<String>;
-  password_gt?: Maybe<String>;
-  password_gte?: Maybe<String>;
-  password_contains?: Maybe<String>;
-  password_not_contains?: Maybe<String>;
-  password_starts_with?: Maybe<String>;
-  password_not_starts_with?: Maybe<String>;
-  password_ends_with?: Maybe<String>;
-  password_not_ends_with?: Maybe<String>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  phone?: Maybe<String>;
-  phone_not?: Maybe<String>;
-  phone_in?: Maybe<String[] | String>;
-  phone_not_in?: Maybe<String[] | String>;
-  phone_lt?: Maybe<String>;
-  phone_lte?: Maybe<String>;
-  phone_gt?: Maybe<String>;
-  phone_gte?: Maybe<String>;
-  phone_contains?: Maybe<String>;
-  phone_not_contains?: Maybe<String>;
-  phone_starts_with?: Maybe<String>;
-  phone_not_starts_with?: Maybe<String>;
-  phone_ends_with?: Maybe<String>;
-  phone_not_ends_with?: Maybe<String>;
-  companyAssociations_every?: Maybe<CompanyAssociationWhereInput>;
-  companyAssociations_some?: Maybe<CompanyAssociationWhereInput>;
-  companyAssociations_none?: Maybe<CompanyAssociationWhereInput>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<UserWhereInput[] | UserWhereInput>;
-  OR?: Maybe<UserWhereInput[] | UserWhereInput>;
-  NOT?: Maybe<UserWhereInput[] | UserWhereInput>;
-}
-
-export interface UserUpdateManyDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-}
-
-export type StatusLogWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface ApplicationUpdateredirectUrisInput {
-  set?: Maybe<String[] | String>;
-}
-
-export interface GrantUpdateManyMutationInput {
-  code?: Maybe<String>;
-  expires?: Maybe<Int>;
-  redirectUri?: Maybe<String>;
-}
-
-export interface ApplicationUpsertNestedInput {
-  update: ApplicationUpdateDataInput;
-  create: ApplicationCreateInput;
-}
-
-export type TemporaryStorageDetailWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface AccessTokenUpdateManyMutationInput {
-  token?: Maybe<String>;
-  isRevoked?: Maybe<Boolean>;
-  lastUsed?: Maybe<DateTimeInput>;
 }
 
 export interface FormScalarWhereInput {
@@ -4893,117 +4426,79 @@ export interface FormScalarWhereInput {
   NOT?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
 }
 
-export interface FormCreateInput {
-  id?: Maybe<ID_Input>;
-  readableId: String;
-  customId?: Maybe<String>;
-  isDeleted?: Maybe<Boolean>;
-  owner: UserCreateOneInput;
-  signedByTransporter?: Maybe<Boolean>;
-  status?: Maybe<String>;
-  sentAt?: Maybe<DateTimeInput>;
-  sentBy?: Maybe<String>;
-  isAccepted?: Maybe<Boolean>;
-  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  wasteRefusalReason?: Maybe<String>;
-  receivedBy?: Maybe<String>;
-  receivedAt?: Maybe<DateTimeInput>;
-  quantityReceived?: Maybe<Float>;
-  processedBy?: Maybe<String>;
-  processedAt?: Maybe<String>;
-  processingOperationDone?: Maybe<String>;
-  processingOperationDescription?: Maybe<String>;
-  noTraceability?: Maybe<Boolean>;
-  nextDestinationProcessingOperation?: Maybe<String>;
-  nextDestinationCompanyName?: Maybe<String>;
-  nextDestinationCompanySiret?: Maybe<String>;
-  nextDestinationCompanyAddress?: Maybe<String>;
-  nextDestinationCompanyContact?: Maybe<String>;
-  nextDestinationCompanyPhone?: Maybe<String>;
-  nextDestinationCompanyMail?: Maybe<String>;
-  emitterType?: Maybe<EmitterType>;
-  emitterPickupSite?: Maybe<String>;
-  emitterWorkSiteName?: Maybe<String>;
-  emitterWorkSiteAddress?: Maybe<String>;
-  emitterWorkSiteCity?: Maybe<String>;
-  emitterWorkSitePostalCode?: Maybe<String>;
-  emitterWorkSiteInfos?: Maybe<String>;
-  emitterCompanyName?: Maybe<String>;
-  emitterCompanySiret?: Maybe<String>;
-  emitterCompanyAddress?: Maybe<String>;
-  emitterCompanyContact?: Maybe<String>;
-  emitterCompanyPhone?: Maybe<String>;
-  emitterCompanyMail?: Maybe<String>;
-  recipientCap?: Maybe<String>;
-  recipientProcessingOperation?: Maybe<String>;
-  recipientIsTempStorage?: Maybe<Boolean>;
-  recipientCompanyName?: Maybe<String>;
-  recipientCompanySiret?: Maybe<String>;
-  recipientCompanyAddress?: Maybe<String>;
-  recipientCompanyContact?: Maybe<String>;
-  recipientCompanyPhone?: Maybe<String>;
-  recipientCompanyMail?: Maybe<String>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  transporterCustomInfo?: Maybe<String>;
-  wasteDetailsCode?: Maybe<String>;
-  wasteDetailsName?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  wasteDetailsConsistence?: Maybe<Consistence>;
-  traderCompanyName?: Maybe<String>;
-  traderCompanySiret?: Maybe<String>;
-  traderCompanyAddress?: Maybe<String>;
-  traderCompanyContact?: Maybe<String>;
-  traderCompanyPhone?: Maybe<String>;
-  traderCompanyMail?: Maybe<String>;
-  traderReceipt?: Maybe<String>;
-  traderDepartment?: Maybe<String>;
-  traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
-  appendix2Forms?: Maybe<FormCreateManyInput>;
-  temporaryStorageDetail?: Maybe<
-    TemporaryStorageDetailCreateOneWithoutFormInput
-  >;
+export interface CompanyUpdateDataInput {
+  siret?: Maybe<String>;
+  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  givenName?: Maybe<String>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
+  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+  transporterReceipt?: Maybe<TransporterReceiptUpdateOneInput>;
+  traderReceipt?: Maybe<TraderReceiptUpdateOneInput>;
 }
 
-export interface TemporaryStorageDetailSubscriptionWhereInput {
+export type CompanyWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  siret?: Maybe<String>;
+}>;
+
+export interface CompanyUpdatecompanyTypesInput {
+  set?: Maybe<CompanyType[] | CompanyType>;
+}
+
+export interface TransporterReceiptSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<TemporaryStorageDetailWhereInput>;
+  node?: Maybe<TransporterReceiptWhereInput>;
   AND?: Maybe<
-    | TemporaryStorageDetailSubscriptionWhereInput[]
-    | TemporaryStorageDetailSubscriptionWhereInput
+    | TransporterReceiptSubscriptionWhereInput[]
+    | TransporterReceiptSubscriptionWhereInput
   >;
   OR?: Maybe<
-    | TemporaryStorageDetailSubscriptionWhereInput[]
-    | TemporaryStorageDetailSubscriptionWhereInput
+    | TransporterReceiptSubscriptionWhereInput[]
+    | TransporterReceiptSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    | TemporaryStorageDetailSubscriptionWhereInput[]
-    | TemporaryStorageDetailSubscriptionWhereInput
+    | TransporterReceiptSubscriptionWhereInput[]
+    | TransporterReceiptSubscriptionWhereInput
   >;
 }
 
-export interface EcoOrganismeUpdateManyMutationInput {
-  siret?: Maybe<String>;
-  name?: Maybe<String>;
-  address?: Maybe<String>;
+export interface CompanyUpdatedocumentKeysInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface StatusLogSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<StatusLogWhereInput>;
+  AND?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    StatusLogSubscriptionWhereInput[] | StatusLogSubscriptionWhereInput
+  >;
+}
+
+export interface TransporterReceiptUpdateOneInput {
+  create?: Maybe<TransporterReceiptCreateInput>;
+  update?: Maybe<TransporterReceiptUpdateDataInput>;
+  upsert?: Maybe<TransporterReceiptUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<TransporterReceiptWhereUniqueInput>;
 }
 
 export interface DeclarationWhereInput {
@@ -5100,217 +4595,130 @@ export interface DeclarationWhereInput {
   NOT?: Maybe<DeclarationWhereInput[] | DeclarationWhereInput>;
 }
 
-export interface ApplicationUpdateInput {
-  clientSecret?: Maybe<String>;
-  name?: Maybe<String>;
-  admins?: Maybe<UserUpdateManyInput>;
-  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
+export interface TransporterReceiptUpdateDataInput {
+  receiptNumber?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
 }
 
-export interface ApplicationSubscriptionWhereInput {
+export interface DeclarationSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<ApplicationWhereInput>;
+  node?: Maybe<DeclarationWhereInput>;
   AND?: Maybe<
-    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
+    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
   >;
   OR?: Maybe<
-    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
+    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    ApplicationSubscriptionWhereInput[] | ApplicationSubscriptionWhereInput
+    DeclarationSubscriptionWhereInput[] | DeclarationSubscriptionWhereInput
   >;
 }
 
-export interface ApplicationUpdateManyMutationInput {
-  clientSecret?: Maybe<String>;
-  name?: Maybe<String>;
-  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
-  logoUrl?: Maybe<String>;
+export interface TransporterReceiptUpsertNestedInput {
+  update: TransporterReceiptUpdateDataInput;
+  create: TransporterReceiptCreateInput;
 }
 
-export interface UserAccountHashCreateInput {
-  id?: Maybe<ID_Input>;
-  email: String;
-  companySiret: ID_Input;
-  role: UserRole;
-  hash: String;
+export interface CompanySubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CompanyWhereInput>;
+  AND?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  OR?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
+  NOT?: Maybe<CompanySubscriptionWhereInput[] | CompanySubscriptionWhereInput>;
 }
 
-export interface CompanyUpdateInput {
-  siret?: Maybe<String>;
-  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
-  name?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  codeNaf?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  givenName?: Maybe<String>;
-  contactEmail?: Maybe<String>;
-  contactPhone?: Maybe<String>;
-  website?: Maybe<String>;
-  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+export interface TraderReceiptUpdateOneInput {
+  create?: Maybe<TraderReceiptCreateInput>;
+  update?: Maybe<TraderReceiptUpdateDataInput>;
+  upsert?: Maybe<TraderReceiptUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<TraderReceiptWhereUniqueInput>;
 }
 
-export interface FormUpsertWithoutTemporaryStorageDetailInput {
-  update: FormUpdateWithoutTemporaryStorageDetailDataInput;
-  create: FormCreateWithoutTemporaryStorageDetailInput;
-}
-
-export interface CompanyUpdateManyMutationInput {
-  siret?: Maybe<String>;
-  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
-  name?: Maybe<String>;
-  gerepId?: Maybe<String>;
-  codeNaf?: Maybe<String>;
-  securityCode?: Maybe<Int>;
-  givenName?: Maybe<String>;
-  contactEmail?: Maybe<String>;
-  contactPhone?: Maybe<String>;
-  website?: Maybe<String>;
-  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
-}
-
-export interface TemporaryStorageDetailCreateInput {
-  id?: Maybe<ID_Input>;
-  form?: Maybe<FormCreateOneWithoutTemporaryStorageDetailInput>;
-  tempStorerQuantityType?: Maybe<QuantityType>;
-  tempStorerQuantityReceived?: Maybe<Float>;
-  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
-  tempStorerWasteRefusalReason?: Maybe<String>;
-  tempStorerReceivedAt?: Maybe<DateTimeInput>;
-  tempStorerReceivedBy?: Maybe<String>;
-  tempStorerSignedAt?: Maybe<DateTimeInput>;
-  destinationIsFilledByEmitter?: Maybe<Boolean>;
-  destinationCompanyName?: Maybe<String>;
-  destinationCompanySiret?: Maybe<String>;
-  destinationCompanyAddress?: Maybe<String>;
-  destinationCompanyContact?: Maybe<String>;
-  destinationCompanyPhone?: Maybe<String>;
-  destinationCompanyMail?: Maybe<String>;
-  destinationCap?: Maybe<String>;
-  destinationProcessingOperation?: Maybe<String>;
-  wasteDetailsOnuCode?: Maybe<String>;
-  wasteDetailsPackagings?: Maybe<Json>;
-  wasteDetailsOtherPackaging?: Maybe<String>;
-  wasteDetailsNumberOfPackages?: Maybe<Int>;
-  wasteDetailsQuantity?: Maybe<Float>;
-  wasteDetailsQuantityType?: Maybe<QuantityType>;
-  transporterCompanyName?: Maybe<String>;
-  transporterCompanySiret?: Maybe<String>;
-  transporterCompanyAddress?: Maybe<String>;
-  transporterCompanyContact?: Maybe<String>;
-  transporterCompanyPhone?: Maybe<String>;
-  transporterCompanyMail?: Maybe<String>;
-  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
-  transporterReceipt?: Maybe<String>;
-  transporterDepartment?: Maybe<String>;
-  transporterValidityLimit?: Maybe<DateTimeInput>;
-  transporterNumberPlate?: Maybe<String>;
-  signedByTransporter?: Maybe<Boolean>;
-  signedBy?: Maybe<String>;
-  signedAt?: Maybe<DateTimeInput>;
-}
-
-export interface CompanyAssociationCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneWithoutCompanyAssociationsInput;
-  company: CompanyCreateOneInput;
-  role: UserRole;
-}
-
-export interface StatusLogCreateInput {
-  id?: Maybe<ID_Input>;
-  user: UserCreateOneInput;
-  form: FormCreateOneInput;
-  status: Status;
-  loggedAt?: Maybe<DateTimeInput>;
-  updatedFields?: Maybe<Json>;
-}
-
-export interface UserCreateOneWithoutCompanyAssociationsInput {
-  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
-}
-
-export interface InstallationUpdateManyMutationInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  regime?: Maybe<String>;
-  libRegime?: Maybe<String>;
-  seveso?: Maybe<Seveso>;
-  libSeveso?: Maybe<String>;
-  familleIc?: Maybe<String>;
-  urlFiche?: Maybe<String>;
-  s3icNumeroSiret?: Maybe<String>;
-  irepNumeroSiret?: Maybe<String>;
-  gerepNumeroSiret?: Maybe<String>;
-  sireneNumeroSiret?: Maybe<String>;
-}
-
-export interface UserCreateWithoutCompanyAssociationsInput {
-  id?: Maybe<ID_Input>;
-  isActive?: Maybe<Boolean>;
-  email: String;
-  password: String;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
-}
-
-export interface GrantUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredInput>;
-  code?: Maybe<String>;
-  application?: Maybe<ApplicationUpdateOneRequiredInput>;
-  expires?: Maybe<Int>;
-  redirectUri?: Maybe<String>;
-}
-
-export interface CompanyAssociationUpdateInput {
-  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
-  company?: Maybe<CompanyUpdateOneRequiredInput>;
-  role?: Maybe<UserRole>;
-}
-
-export type CompanyWhereUniqueInput = AtLeastOne<{
+export type FormWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
-  siret?: Maybe<String>;
+  readableId?: Maybe<String>;
 }>;
 
-export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
-  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
-  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
-  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
-  connect?: Maybe<UserWhereUniqueInput>;
+export interface TraderReceiptUpdateDataInput {
+  receiptNumber?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
 }
 
-export interface CompanyAssociationSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CompanyAssociationWhereInput>;
-  AND?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | CompanyAssociationSubscriptionWhereInput[]
-    | CompanyAssociationSubscriptionWhereInput
-  >;
+export interface AccessTokenWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  user?: Maybe<UserWhereInput>;
+  application?: Maybe<ApplicationWhereInput>;
+  token?: Maybe<String>;
+  token_not?: Maybe<String>;
+  token_in?: Maybe<String[] | String>;
+  token_not_in?: Maybe<String[] | String>;
+  token_lt?: Maybe<String>;
+  token_lte?: Maybe<String>;
+  token_gt?: Maybe<String>;
+  token_gte?: Maybe<String>;
+  token_contains?: Maybe<String>;
+  token_not_contains?: Maybe<String>;
+  token_starts_with?: Maybe<String>;
+  token_not_starts_with?: Maybe<String>;
+  token_ends_with?: Maybe<String>;
+  token_not_ends_with?: Maybe<String>;
+  isRevoked?: Maybe<Boolean>;
+  isRevoked_not?: Maybe<Boolean>;
+  lastUsed?: Maybe<DateTimeInput>;
+  lastUsed_not?: Maybe<DateTimeInput>;
+  lastUsed_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  lastUsed_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  lastUsed_lt?: Maybe<DateTimeInput>;
+  lastUsed_lte?: Maybe<DateTimeInput>;
+  lastUsed_gt?: Maybe<DateTimeInput>;
+  lastUsed_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
+  OR?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
+  NOT?: Maybe<AccessTokenWhereInput[] | AccessTokenWhereInput>;
 }
 
-export interface UserUpdateWithoutCompanyAssociationsDataInput {
-  isActive?: Maybe<Boolean>;
-  email?: Maybe<String>;
-  password?: Maybe<String>;
-  name?: Maybe<String>;
-  phone?: Maybe<String>;
+export interface TraderReceiptUpsertNestedInput {
+  update: TraderReceiptUpdateDataInput;
+  create: TraderReceiptCreateInput;
 }
 
 export interface FormWhereInput {
@@ -6269,87 +5677,35 @@ export interface FormWhereInput {
   NOT?: Maybe<FormWhereInput[] | FormWhereInput>;
 }
 
-export interface UserUpsertWithoutCompanyAssociationsInput {
-  update: UserUpdateWithoutCompanyAssociationsDataInput;
-  create: UserCreateWithoutCompanyAssociationsInput;
+export interface CompanyUpsertNestedInput {
+  update: CompanyUpdateDataInput;
+  create: CompanyCreateInput;
 }
 
-export interface FormUpdateOneRequiredInput {
-  create?: Maybe<FormCreateInput>;
-  update?: Maybe<FormUpdateDataInput>;
-  upsert?: Maybe<FormUpsertNestedInput>;
-  connect?: Maybe<FormWhereUniqueInput>;
+export interface TransporterReceiptUpdateManyMutationInput {
+  receiptNumber?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
 }
 
-export interface CompanyAssociationUpdateManyMutationInput {
-  role?: Maybe<UserRole>;
+export interface CompanyAssociationUpsertWithWhereUniqueWithoutUserInput {
+  where: CompanyAssociationWhereUniqueInput;
+  update: CompanyAssociationUpdateWithoutUserDataInput;
+  create: CompanyAssociationCreateWithoutUserInput;
 }
 
-export interface CompanyAssociationWhereInput {
+export interface TraderReceiptUpdateInput {
+  receiptNumber?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
+}
+
+export interface FormCreateInput {
   id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  user?: Maybe<UserWhereInput>;
-  company?: Maybe<CompanyWhereInput>;
-  role?: Maybe<UserRole>;
-  role_not?: Maybe<UserRole>;
-  role_in?: Maybe<UserRole[] | UserRole>;
-  role_not_in?: Maybe<UserRole[] | UserRole>;
-  AND?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-  OR?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-  NOT?: Maybe<CompanyAssociationWhereInput[] | CompanyAssociationWhereInput>;
-}
-
-export interface EcoOrganismeCreateInput {
-  id?: Maybe<ID_Input>;
-  siret: String;
-  name: String;
-  address: String;
-}
-
-export interface DeclarationUpdateManyMutationInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  annee?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-}
-
-export interface DeclarationUpdateInput {
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  annee?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-}
-
-export interface DeclarationCreateInput {
-  id?: Maybe<ID_Input>;
-  codeS3ic?: Maybe<String>;
-  nomEts?: Maybe<String>;
-  annee?: Maybe<String>;
-  codeDechet?: Maybe<String>;
-  libDechet?: Maybe<String>;
-  gerepType?: Maybe<GerepType>;
-}
-
-export interface FormUpdateManyDataInput {
-  readableId?: Maybe<String>;
+  readableId: String;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
@@ -6424,6 +5780,312 @@ export interface FormUpdateManyDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  appendix2Forms?: Maybe<FormCreateManyInput>;
+  temporaryStorageDetail?: Maybe<
+    TemporaryStorageDetailCreateOneWithoutFormInput
+  >;
+}
+
+export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
+  readableId?: Maybe<String>;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner?: Maybe<UserUpdateOneRequiredInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  appendix2Forms?: Maybe<FormUpdateManyInput>;
+}
+
+export interface EcoOrganismeUpdateManyMutationInput {
+  siret?: Maybe<String>;
+  name?: Maybe<String>;
+  address?: Maybe<String>;
+}
+
+export interface FormCreateWithoutTemporaryStorageDetailInput {
+  id?: Maybe<ID_Input>;
+  readableId: String;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner: UserCreateOneInput;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  appendix2Forms?: Maybe<FormCreateManyInput>;
+}
+
+export interface CompanyAssociationUpdateManyDataInput {
+  role?: Maybe<UserRole>;
+}
+
+export interface TemporaryStorageDetailCreateInput {
+  id?: Maybe<ID_Input>;
+  form?: Maybe<FormCreateOneWithoutTemporaryStorageDetailInput>;
+  tempStorerQuantityType?: Maybe<QuantityType>;
+  tempStorerQuantityReceived?: Maybe<Float>;
+  tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  tempStorerWasteRefusalReason?: Maybe<String>;
+  tempStorerReceivedAt?: Maybe<DateTimeInput>;
+  tempStorerReceivedBy?: Maybe<String>;
+  tempStorerSignedAt?: Maybe<DateTimeInput>;
+  destinationIsFilledByEmitter?: Maybe<Boolean>;
+  destinationCompanyName?: Maybe<String>;
+  destinationCompanySiret?: Maybe<String>;
+  destinationCompanyAddress?: Maybe<String>;
+  destinationCompanyContact?: Maybe<String>;
+  destinationCompanyPhone?: Maybe<String>;
+  destinationCompanyMail?: Maybe<String>;
+  destinationCap?: Maybe<String>;
+  destinationProcessingOperation?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  signedByTransporter?: Maybe<Boolean>;
+  signedBy?: Maybe<String>;
+  signedAt?: Maybe<DateTimeInput>;
+}
+
+export interface UserUpsertNestedInput {
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
+}
+
+export interface TransporterReceiptWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  receiptNumber?: Maybe<String>;
+  receiptNumber_not?: Maybe<String>;
+  receiptNumber_in?: Maybe<String[] | String>;
+  receiptNumber_not_in?: Maybe<String[] | String>;
+  receiptNumber_lt?: Maybe<String>;
+  receiptNumber_lte?: Maybe<String>;
+  receiptNumber_gt?: Maybe<String>;
+  receiptNumber_gte?: Maybe<String>;
+  receiptNumber_contains?: Maybe<String>;
+  receiptNumber_not_contains?: Maybe<String>;
+  receiptNumber_starts_with?: Maybe<String>;
+  receiptNumber_not_starts_with?: Maybe<String>;
+  receiptNumber_ends_with?: Maybe<String>;
+  receiptNumber_not_ends_with?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  validityLimit_not?: Maybe<DateTimeInput>;
+  validityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  validityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  validityLimit_lt?: Maybe<DateTimeInput>;
+  validityLimit_lte?: Maybe<DateTimeInput>;
+  validityLimit_gt?: Maybe<DateTimeInput>;
+  validityLimit_gte?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
+  department_not?: Maybe<String>;
+  department_in?: Maybe<String[] | String>;
+  department_not_in?: Maybe<String[] | String>;
+  department_lt?: Maybe<String>;
+  department_lte?: Maybe<String>;
+  department_gt?: Maybe<String>;
+  department_gte?: Maybe<String>;
+  department_contains?: Maybe<String>;
+  department_not_contains?: Maybe<String>;
+  department_starts_with?: Maybe<String>;
+  department_not_starts_with?: Maybe<String>;
+  department_ends_with?: Maybe<String>;
+  department_not_ends_with?: Maybe<String>;
+  AND?: Maybe<TransporterReceiptWhereInput[] | TransporterReceiptWhereInput>;
+  OR?: Maybe<TransporterReceiptWhereInput[] | TransporterReceiptWhereInput>;
+  NOT?: Maybe<TransporterReceiptWhereInput[] | TransporterReceiptWhereInput>;
+}
+
+export interface ApplicationUpdateOneInput {
+  create?: Maybe<ApplicationCreateInput>;
+  update?: Maybe<ApplicationUpdateDataInput>;
+  upsert?: Maybe<ApplicationUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<ApplicationWhereUniqueInput>;
+}
+
+export interface FormCreateOneInput {
+  create?: Maybe<FormCreateInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface ApplicationUpdateDataInput {
+  clientSecret?: Maybe<String>;
+  name?: Maybe<String>;
+  admins?: Maybe<UserUpdateManyInput>;
+  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
 }
 
 export interface CompanyWhereInput {
@@ -6577,13 +6239,659 @@ export interface CompanyWhereInput {
   website_not_starts_with?: Maybe<String>;
   website_ends_with?: Maybe<String>;
   website_not_ends_with?: Maybe<String>;
+  transporterReceipt?: Maybe<TransporterReceiptWhereInput>;
+  traderReceipt?: Maybe<TraderReceiptWhereInput>;
   AND?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
   OR?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
   NOT?: Maybe<CompanyWhereInput[] | CompanyWhereInput>;
 }
 
-export interface TemporaryStorageDetailUpdateInput {
-  form?: Maybe<FormUpdateOneWithoutTemporaryStorageDetailInput>;
+export interface UserUpdateManyInput {
+  create?: Maybe<UserCreateInput[] | UserCreateInput>;
+  update?: Maybe<
+    | UserUpdateWithWhereUniqueNestedInput[]
+    | UserUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | UserUpsertWithWhereUniqueNestedInput[]
+    | UserUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  connect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  set?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  disconnect?: Maybe<UserWhereUniqueInput[] | UserWhereUniqueInput>;
+  deleteMany?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  updateMany?: Maybe<
+    UserUpdateManyWithWhereNestedInput[] | UserUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface RubriqueCreateInput {
+  id?: Maybe<ID_Input>;
+  codeS3ic?: Maybe<String>;
+  rubrique?: Maybe<String>;
+  alinea?: Maybe<String>;
+  dateAutorisation?: Maybe<String>;
+  etatActivite?: Maybe<String>;
+  regimeAutorise?: Maybe<String>;
+  activite?: Maybe<String>;
+  volume?: Maybe<String>;
+  unite?: Maybe<String>;
+  category?: Maybe<String>;
+  wasteType?: Maybe<WasteType>;
+}
+
+export interface UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
+  data: UserUpdateDataInput;
+}
+
+export interface InstallationUpdateInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  regime?: Maybe<String>;
+  libRegime?: Maybe<String>;
+  seveso?: Maybe<Seveso>;
+  libSeveso?: Maybe<String>;
+  familleIc?: Maybe<String>;
+  urlFiche?: Maybe<String>;
+  s3icNumeroSiret?: Maybe<String>;
+  irepNumeroSiret?: Maybe<String>;
+  gerepNumeroSiret?: Maybe<String>;
+  sireneNumeroSiret?: Maybe<String>;
+}
+
+export interface UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput;
+  update: UserUpdateDataInput;
+  create: UserCreateInput;
+}
+
+export interface ApplicationUpdateOneRequiredInput {
+  create?: Maybe<ApplicationCreateInput>;
+  update?: Maybe<ApplicationUpdateDataInput>;
+  upsert?: Maybe<ApplicationUpsertNestedInput>;
+  connect?: Maybe<ApplicationWhereUniqueInput>;
+}
+
+export interface UserScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  isActive_not?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  password?: Maybe<String>;
+  password_not?: Maybe<String>;
+  password_in?: Maybe<String[] | String>;
+  password_not_in?: Maybe<String[] | String>;
+  password_lt?: Maybe<String>;
+  password_lte?: Maybe<String>;
+  password_gt?: Maybe<String>;
+  password_gte?: Maybe<String>;
+  password_contains?: Maybe<String>;
+  password_not_contains?: Maybe<String>;
+  password_starts_with?: Maybe<String>;
+  password_not_starts_with?: Maybe<String>;
+  password_ends_with?: Maybe<String>;
+  password_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  phone?: Maybe<String>;
+  phone_not?: Maybe<String>;
+  phone_in?: Maybe<String[] | String>;
+  phone_not_in?: Maybe<String[] | String>;
+  phone_lt?: Maybe<String>;
+  phone_lte?: Maybe<String>;
+  phone_gt?: Maybe<String>;
+  phone_gte?: Maybe<String>;
+  phone_contains?: Maybe<String>;
+  phone_not_contains?: Maybe<String>;
+  phone_starts_with?: Maybe<String>;
+  phone_not_starts_with?: Maybe<String>;
+  phone_ends_with?: Maybe<String>;
+  phone_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  OR?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+  NOT?: Maybe<UserScalarWhereInput[] | UserScalarWhereInput>;
+}
+
+export type TransporterReceiptWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface UserUpdateManyWithWhereNestedInput {
+  where: UserScalarWhereInput;
+  data: UserUpdateManyDataInput;
+}
+
+export interface FormUpsertWithWhereUniqueNestedInput {
+  where: FormWhereUniqueInput;
+  update: FormUpdateDataInput;
+  create: FormCreateInput;
+}
+
+export interface UserUpdateManyDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+}
+
+export interface TraderReceiptSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<TraderReceiptWhereInput>;
+  AND?: Maybe<
+    TraderReceiptSubscriptionWhereInput[] | TraderReceiptSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    TraderReceiptSubscriptionWhereInput[] | TraderReceiptSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    TraderReceiptSubscriptionWhereInput[] | TraderReceiptSubscriptionWhereInput
+  >;
+}
+
+export interface ApplicationUpdateredirectUrisInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface FormSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<FormWhereInput>;
+  AND?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  OR?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+  NOT?: Maybe<FormSubscriptionWhereInput[] | FormSubscriptionWhereInput>;
+}
+
+export interface ApplicationUpsertNestedInput {
+  update: ApplicationUpdateDataInput;
+  create: ApplicationCreateInput;
+}
+
+export interface AccessTokenSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<AccessTokenWhereInput>;
+  AND?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    AccessTokenSubscriptionWhereInput[] | AccessTokenSubscriptionWhereInput
+  >;
+}
+
+export interface AccessTokenUpdateManyMutationInput {
+  token?: Maybe<String>;
+  isRevoked?: Maybe<Boolean>;
+  lastUsed?: Maybe<DateTimeInput>;
+}
+
+export interface UserAccountHashUpdateInput {
+  email?: Maybe<String>;
+  companySiret?: Maybe<ID_Input>;
+  role?: Maybe<UserRole>;
+  hash?: Maybe<String>;
+}
+
+export interface EcoOrganismeUpdateInput {
+  siret?: Maybe<String>;
+  name?: Maybe<String>;
+  address?: Maybe<String>;
+}
+
+export interface TraderReceiptUpdateManyMutationInput {
+  receiptNumber?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
+}
+
+export interface EcoOrganismeCreateInput {
+  id?: Maybe<ID_Input>;
+  siret: String;
+  name: String;
+  address: String;
+}
+
+export type InstallationWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface ApplicationUpdateInput {
+  clientSecret?: Maybe<String>;
+  name?: Maybe<String>;
+  admins?: Maybe<UserUpdateManyInput>;
+  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
+}
+
+export type RubriqueWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface ApplicationUpdateManyMutationInput {
+  clientSecret?: Maybe<String>;
+  name?: Maybe<String>;
+  redirectUris?: Maybe<ApplicationUpdateredirectUrisInput>;
+  logoUrl?: Maybe<String>;
+}
+
+export type StatusLogWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface CompanyUpdateInput {
+  siret?: Maybe<String>;
+  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  givenName?: Maybe<String>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
+  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+  transporterReceipt?: Maybe<TransporterReceiptUpdateOneInput>;
+  traderReceipt?: Maybe<TraderReceiptUpdateOneInput>;
+}
+
+export type TemporaryStorageDetailWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface CompanyUpdateManyMutationInput {
+  siret?: Maybe<String>;
+  companyTypes?: Maybe<CompanyUpdatecompanyTypesInput>;
+  name?: Maybe<String>;
+  gerepId?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  securityCode?: Maybe<Int>;
+  givenName?: Maybe<String>;
+  contactEmail?: Maybe<String>;
+  contactPhone?: Maybe<String>;
+  website?: Maybe<String>;
+  documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+}
+
+export interface GrantCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneInput;
+  code: String;
+  application: ApplicationCreateOneInput;
+  expires: Int;
+  redirectUri: String;
+}
+
+export interface CompanyAssociationCreateInput {
+  id?: Maybe<ID_Input>;
+  user: UserCreateOneWithoutCompanyAssociationsInput;
+  company: CompanyCreateOneInput;
+  role: UserRole;
+}
+
+export interface UserAccountHashSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<UserAccountHashWhereInput>;
+  AND?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | UserAccountHashSubscriptionWhereInput[]
+    | UserAccountHashSubscriptionWhereInput
+  >;
+}
+
+export interface UserCreateOneWithoutCompanyAssociationsInput {
+  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface CompanyAssociationSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CompanyAssociationWhereInput>;
+  AND?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | CompanyAssociationSubscriptionWhereInput[]
+    | CompanyAssociationSubscriptionWhereInput
+  >;
+}
+
+export interface UserCreateWithoutCompanyAssociationsInput {
+  id?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  email: String;
+  password: String;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+}
+
+export interface UserUpdateManyMutationInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+}
+
+export interface CompanyAssociationUpdateInput {
+  user?: Maybe<UserUpdateOneRequiredWithoutCompanyAssociationsInput>;
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  role?: Maybe<UserRole>;
+}
+
+export interface TraderReceiptWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  receiptNumber?: Maybe<String>;
+  receiptNumber_not?: Maybe<String>;
+  receiptNumber_in?: Maybe<String[] | String>;
+  receiptNumber_not_in?: Maybe<String[] | String>;
+  receiptNumber_lt?: Maybe<String>;
+  receiptNumber_lte?: Maybe<String>;
+  receiptNumber_gt?: Maybe<String>;
+  receiptNumber_gte?: Maybe<String>;
+  receiptNumber_contains?: Maybe<String>;
+  receiptNumber_not_contains?: Maybe<String>;
+  receiptNumber_starts_with?: Maybe<String>;
+  receiptNumber_not_starts_with?: Maybe<String>;
+  receiptNumber_ends_with?: Maybe<String>;
+  receiptNumber_not_ends_with?: Maybe<String>;
+  validityLimit?: Maybe<DateTimeInput>;
+  validityLimit_not?: Maybe<DateTimeInput>;
+  validityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  validityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  validityLimit_lt?: Maybe<DateTimeInput>;
+  validityLimit_lte?: Maybe<DateTimeInput>;
+  validityLimit_gt?: Maybe<DateTimeInput>;
+  validityLimit_gte?: Maybe<DateTimeInput>;
+  department?: Maybe<String>;
+  department_not?: Maybe<String>;
+  department_in?: Maybe<String[] | String>;
+  department_not_in?: Maybe<String[] | String>;
+  department_lt?: Maybe<String>;
+  department_lte?: Maybe<String>;
+  department_gt?: Maybe<String>;
+  department_gte?: Maybe<String>;
+  department_contains?: Maybe<String>;
+  department_not_contains?: Maybe<String>;
+  department_starts_with?: Maybe<String>;
+  department_not_starts_with?: Maybe<String>;
+  department_ends_with?: Maybe<String>;
+  department_not_ends_with?: Maybe<String>;
+  AND?: Maybe<TraderReceiptWhereInput[] | TraderReceiptWhereInput>;
+  OR?: Maybe<TraderReceiptWhereInput[] | TraderReceiptWhereInput>;
+  NOT?: Maybe<TraderReceiptWhereInput[] | TraderReceiptWhereInput>;
+}
+
+export interface UserUpdateOneRequiredWithoutCompanyAssociationsInput {
+  create?: Maybe<UserCreateWithoutCompanyAssociationsInput>;
+  update?: Maybe<UserUpdateWithoutCompanyAssociationsDataInput>;
+  upsert?: Maybe<UserUpsertWithoutCompanyAssociationsInput>;
+  connect?: Maybe<UserWhereUniqueInput>;
+}
+
+export interface UserWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  isActive?: Maybe<Boolean>;
+  isActive_not?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  email_not?: Maybe<String>;
+  email_in?: Maybe<String[] | String>;
+  email_not_in?: Maybe<String[] | String>;
+  email_lt?: Maybe<String>;
+  email_lte?: Maybe<String>;
+  email_gt?: Maybe<String>;
+  email_gte?: Maybe<String>;
+  email_contains?: Maybe<String>;
+  email_not_contains?: Maybe<String>;
+  email_starts_with?: Maybe<String>;
+  email_not_starts_with?: Maybe<String>;
+  email_ends_with?: Maybe<String>;
+  email_not_ends_with?: Maybe<String>;
+  password?: Maybe<String>;
+  password_not?: Maybe<String>;
+  password_in?: Maybe<String[] | String>;
+  password_not_in?: Maybe<String[] | String>;
+  password_lt?: Maybe<String>;
+  password_lte?: Maybe<String>;
+  password_gt?: Maybe<String>;
+  password_gte?: Maybe<String>;
+  password_contains?: Maybe<String>;
+  password_not_contains?: Maybe<String>;
+  password_starts_with?: Maybe<String>;
+  password_not_starts_with?: Maybe<String>;
+  password_ends_with?: Maybe<String>;
+  password_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  phone?: Maybe<String>;
+  phone_not?: Maybe<String>;
+  phone_in?: Maybe<String[] | String>;
+  phone_not_in?: Maybe<String[] | String>;
+  phone_lt?: Maybe<String>;
+  phone_lte?: Maybe<String>;
+  phone_gt?: Maybe<String>;
+  phone_gte?: Maybe<String>;
+  phone_contains?: Maybe<String>;
+  phone_not_contains?: Maybe<String>;
+  phone_starts_with?: Maybe<String>;
+  phone_not_starts_with?: Maybe<String>;
+  phone_ends_with?: Maybe<String>;
+  phone_not_ends_with?: Maybe<String>;
+  companyAssociations_every?: Maybe<CompanyAssociationWhereInput>;
+  companyAssociations_some?: Maybe<CompanyAssociationWhereInput>;
+  companyAssociations_none?: Maybe<CompanyAssociationWhereInput>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<UserWhereInput[] | UserWhereInput>;
+  OR?: Maybe<UserWhereInput[] | UserWhereInput>;
+  NOT?: Maybe<UserWhereInput[] | UserWhereInput>;
+}
+
+export interface UserUpdateWithoutCompanyAssociationsDataInput {
+  isActive?: Maybe<Boolean>;
+  email?: Maybe<String>;
+  password?: Maybe<String>;
+  name?: Maybe<String>;
+  phone?: Maybe<String>;
+}
+
+export interface FormUpdateManyWithWhereNestedInput {
+  where: FormScalarWhereInput;
+  data: FormUpdateManyDataInput;
+}
+
+export interface DeclarationUpdateInput {
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  annee?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+}
+
+export interface DeclarationCreateInput {
+  id?: Maybe<ID_Input>;
+  codeS3ic?: Maybe<String>;
+  nomEts?: Maybe<String>;
+  annee?: Maybe<String>;
+  codeDechet?: Maybe<String>;
+  libDechet?: Maybe<String>;
+  gerepType?: Maybe<GerepType>;
+}
+
+export interface CompanyAssociationUpdateManyMutationInput {
+  role?: Maybe<UserRole>;
+}
+
+export interface UserUpsertWithoutCompanyAssociationsInput {
+  update: UserUpdateWithoutCompanyAssociationsDataInput;
+  create: UserCreateWithoutCompanyAssociationsInput;
+}
+
+export interface RubriqueSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<RubriqueWhereInput>;
+  AND?: Maybe<
+    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
+  >;
+  OR?: Maybe<RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput>;
+  NOT?: Maybe<
+    RubriqueSubscriptionWhereInput[] | RubriqueSubscriptionWhereInput
+  >;
+}
+
+export interface GrantUpdateManyMutationInput {
+  code?: Maybe<String>;
+  expires?: Maybe<Int>;
+  redirectUri?: Maybe<String>;
+}
+
+export interface FormUpdateOneRequiredInput {
+  create?: Maybe<FormCreateInput>;
+  update?: Maybe<FormUpdateDataInput>;
+  upsert?: Maybe<FormUpsertNestedInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerQuantityType?: Maybe<QuantityType>;
   tempStorerQuantityReceived?: Maybe<Float>;
   tempStorerWasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
@@ -6622,26 +6930,85 @@ export interface TemporaryStorageDetailUpdateInput {
   signedAt?: Maybe<DateTimeInput>;
 }
 
-export type FormWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  readableId?: Maybe<String>;
-}>;
-
-export interface InstallationSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<InstallationWhereInput>;
-  AND?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
-  >;
+export interface ApplicationWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  clientSecret?: Maybe<String>;
+  clientSecret_not?: Maybe<String>;
+  clientSecret_in?: Maybe<String[] | String>;
+  clientSecret_not_in?: Maybe<String[] | String>;
+  clientSecret_lt?: Maybe<String>;
+  clientSecret_lte?: Maybe<String>;
+  clientSecret_gt?: Maybe<String>;
+  clientSecret_gte?: Maybe<String>;
+  clientSecret_contains?: Maybe<String>;
+  clientSecret_not_contains?: Maybe<String>;
+  clientSecret_starts_with?: Maybe<String>;
+  clientSecret_not_starts_with?: Maybe<String>;
+  clientSecret_ends_with?: Maybe<String>;
+  clientSecret_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  admins_every?: Maybe<UserWhereInput>;
+  admins_some?: Maybe<UserWhereInput>;
+  admins_none?: Maybe<UserWhereInput>;
+  logoUrl?: Maybe<String>;
+  logoUrl_not?: Maybe<String>;
+  logoUrl_in?: Maybe<String[] | String>;
+  logoUrl_not_in?: Maybe<String[] | String>;
+  logoUrl_lt?: Maybe<String>;
+  logoUrl_lte?: Maybe<String>;
+  logoUrl_gt?: Maybe<String>;
+  logoUrl_gte?: Maybe<String>;
+  logoUrl_contains?: Maybe<String>;
+  logoUrl_not_contains?: Maybe<String>;
+  logoUrl_starts_with?: Maybe<String>;
+  logoUrl_not_starts_with?: Maybe<String>;
+  logoUrl_ends_with?: Maybe<String>;
+  logoUrl_not_ends_with?: Maybe<String>;
+  AND?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
+  OR?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
+  NOT?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
 }
 
 export interface NodeNode {
@@ -6673,27 +7040,97 @@ export interface UserActivationHashPreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface PageInfo {
-  hasNextPage: Boolean;
-  hasPreviousPage: Boolean;
-  startCursor?: String;
-  endCursor?: String;
+export interface TransporterReceipt {
+  id: ID_Output;
+  receiptNumber: String;
+  validityLimit: DateTimeOutput;
+  department: String;
 }
 
-export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
-  hasNextPage: () => Promise<Boolean>;
-  hasPreviousPage: () => Promise<Boolean>;
-  startCursor: () => Promise<String>;
-  endCursor: () => Promise<String>;
-}
-
-export interface PageInfoSubscription
-  extends Promise<AsyncIterator<PageInfo>>,
+export interface TransporterReceiptPromise
+  extends Promise<TransporterReceipt>,
     Fragmentable {
-  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
-  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
-  startCursor: () => Promise<AsyncIterator<String>>;
-  endCursor: () => Promise<AsyncIterator<String>>;
+  id: () => Promise<ID_Output>;
+  receiptNumber: () => Promise<String>;
+  validityLimit: () => Promise<DateTimeOutput>;
+  department: () => Promise<String>;
+}
+
+export interface TransporterReceiptSubscription
+  extends Promise<AsyncIterator<TransporterReceipt>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  receiptNumber: () => Promise<AsyncIterator<String>>;
+  validityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  department: () => Promise<AsyncIterator<String>>;
+}
+
+export interface TransporterReceiptNullablePromise
+  extends Promise<TransporterReceipt | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  receiptNumber: () => Promise<String>;
+  validityLimit: () => Promise<DateTimeOutput>;
+  department: () => Promise<String>;
+}
+
+export interface UserSubscriptionPayload {
+  mutation: MutationType;
+  node: User;
+  updatedFields: String[];
+  previousValues: UserPreviousValues;
+}
+
+export interface UserSubscriptionPayloadPromise
+  extends Promise<UserSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = UserPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserPreviousValuesPromise>() => T;
+}
+
+export interface UserSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserPreviousValuesSubscription>() => T;
+}
+
+export interface TraderReceipt {
+  id: ID_Output;
+  receiptNumber: String;
+  validityLimit: DateTimeOutput;
+  department: String;
+}
+
+export interface TraderReceiptPromise
+  extends Promise<TraderReceipt>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  receiptNumber: () => Promise<String>;
+  validityLimit: () => Promise<DateTimeOutput>;
+  department: () => Promise<String>;
+}
+
+export interface TraderReceiptSubscription
+  extends Promise<AsyncIterator<TraderReceipt>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  receiptNumber: () => Promise<AsyncIterator<String>>;
+  validityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  department: () => Promise<AsyncIterator<String>>;
+}
+
+export interface TraderReceiptNullablePromise
+  extends Promise<TraderReceipt | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  receiptNumber: () => Promise<String>;
+  validityLimit: () => Promise<DateTimeOutput>;
+  department: () => Promise<String>;
 }
 
 export interface ApplicationEdge {
@@ -6713,6 +7150,174 @@ export interface ApplicationEdgeSubscription
     Fragmentable {
   node: <T = ApplicationSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface Application {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  clientSecret: String;
+  name: String;
+  redirectUris: String[];
+  logoUrl?: String;
+}
+
+export interface ApplicationPromise extends Promise<Application>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  clientSecret: () => Promise<String>;
+  name: () => Promise<String>;
+  admins: <T = FragmentableArray<User>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  redirectUris: () => Promise<String[]>;
+  logoUrl: () => Promise<String>;
+}
+
+export interface ApplicationSubscription
+  extends Promise<AsyncIterator<Application>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  clientSecret: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  admins: <T = Promise<AsyncIterator<UserSubscription>>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  redirectUris: () => Promise<AsyncIterator<String[]>>;
+  logoUrl: () => Promise<AsyncIterator<String>>;
+}
+
+export interface ApplicationNullablePromise
+  extends Promise<Application | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  clientSecret: () => Promise<String>;
+  name: () => Promise<String>;
+  admins: <T = FragmentableArray<User>>(args?: {
+    where?: UserWhereInput;
+    orderBy?: UserOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  redirectUris: () => Promise<String[]>;
+  logoUrl: () => Promise<String>;
+}
+
+export interface ApplicationConnection {
+  pageInfo: PageInfo;
+  edges: ApplicationEdge[];
+}
+
+export interface ApplicationConnectionPromise
+  extends Promise<ApplicationConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<ApplicationEdge>>() => T;
+  aggregate: <T = AggregateApplicationPromise>() => T;
+}
+
+export interface ApplicationConnectionSubscription
+  extends Promise<AsyncIterator<ApplicationConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<ApplicationEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateApplicationSubscription>() => T;
+}
+
+export interface BatchPayload {
+  count: Long;
+}
+
+export interface BatchPayloadPromise
+  extends Promise<BatchPayload>,
+    Fragmentable {
+  count: () => Promise<Long>;
+}
+
+export interface BatchPayloadSubscription
+  extends Promise<AsyncIterator<BatchPayload>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Long>>;
+}
+
+export interface AggregateUserActivationHash {
+  count: Int;
+}
+
+export interface AggregateUserActivationHashPromise
+  extends Promise<AggregateUserActivationHash>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateUserActivationHashSubscription
+  extends Promise<AsyncIterator<AggregateUserActivationHash>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface CompanyConnection {
+  pageInfo: PageInfo;
+  edges: CompanyEdge[];
+}
+
+export interface CompanyConnectionPromise
+  extends Promise<CompanyConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CompanyEdge>>() => T;
+  aggregate: <T = AggregateCompanyPromise>() => T;
+}
+
+export interface CompanyConnectionSubscription
+  extends Promise<AsyncIterator<CompanyConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<CompanyEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateCompanySubscription>() => T;
+}
+
+export interface UserActivationHashConnection {
+  pageInfo: PageInfo;
+  edges: UserActivationHashEdge[];
+}
+
+export interface UserActivationHashConnectionPromise
+  extends Promise<UserActivationHashConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<UserActivationHashEdge>>() => T;
+  aggregate: <T = AggregateUserActivationHashPromise>() => T;
+}
+
+export interface UserActivationHashConnectionSubscription
+  extends Promise<AsyncIterator<UserActivationHashConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <
+    T = Promise<AsyncIterator<UserActivationHashEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateUserActivationHashSubscription>() => T;
 }
 
 export interface Form {
@@ -7087,117 +7692,6 @@ export interface FormNullablePromise
   temporaryStorageDetail: <T = TemporaryStorageDetailPromise>() => T;
 }
 
-export interface AggregateApplication {
-  count: Int;
-}
-
-export interface AggregateApplicationPromise
-  extends Promise<AggregateApplication>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateApplicationSubscription
-  extends Promise<AsyncIterator<AggregateApplication>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface AggregateEcoOrganisme {
-  count: Int;
-}
-
-export interface AggregateEcoOrganismePromise
-  extends Promise<AggregateEcoOrganisme>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateEcoOrganismeSubscription
-  extends Promise<AsyncIterator<AggregateEcoOrganisme>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface AggregateUserActivationHash {
-  count: Int;
-}
-
-export interface AggregateUserActivationHashPromise
-  extends Promise<AggregateUserActivationHash>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserActivationHashSubscription
-  extends Promise<AsyncIterator<AggregateUserActivationHash>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface EcoOrganismeEdge {
-  node: EcoOrganisme;
-  cursor: String;
-}
-
-export interface EcoOrganismeEdgePromise
-  extends Promise<EcoOrganismeEdge>,
-    Fragmentable {
-  node: <T = EcoOrganismePromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface EcoOrganismeEdgeSubscription
-  extends Promise<AsyncIterator<EcoOrganismeEdge>>,
-    Fragmentable {
-  node: <T = EcoOrganismeSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface UserActivationHashConnection {
-  pageInfo: PageInfo;
-  edges: UserActivationHashEdge[];
-}
-
-export interface UserActivationHashConnectionPromise
-  extends Promise<UserActivationHashConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserActivationHashEdge>>() => T;
-  aggregate: <T = AggregateUserActivationHashPromise>() => T;
-}
-
-export interface UserActivationHashConnectionSubscription
-  extends Promise<AsyncIterator<UserActivationHashConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <
-    T = Promise<AsyncIterator<UserActivationHashEdgeSubscription>>
-  >() => T;
-  aggregate: <T = AggregateUserActivationHashSubscription>() => T;
-}
-
-export interface EcoOrganismeConnection {
-  pageInfo: PageInfo;
-  edges: EcoOrganismeEdge[];
-}
-
-export interface EcoOrganismeConnectionPromise
-  extends Promise<EcoOrganismeConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<EcoOrganismeEdge>>() => T;
-  aggregate: <T = AggregateEcoOrganismePromise>() => T;
-}
-
-export interface EcoOrganismeConnectionSubscription
-  extends Promise<AsyncIterator<EcoOrganismeConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<EcoOrganismeEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateEcoOrganismeSubscription>() => T;
-}
-
 export interface UserActivationHash {
   id: ID_Output;
   hash: String;
@@ -7235,94 +7729,20 @@ export interface UserActivationHashNullablePromise
   updatedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface UserActivationHashEdge {
-  node: UserActivationHash;
-  cursor: String;
+export interface AggregateEcoOrganisme {
+  count: Int;
 }
 
-export interface UserActivationHashEdgePromise
-  extends Promise<UserActivationHashEdge>,
+export interface AggregateEcoOrganismePromise
+  extends Promise<AggregateEcoOrganisme>,
     Fragmentable {
-  node: <T = UserActivationHashPromise>() => T;
-  cursor: () => Promise<String>;
+  count: () => Promise<Int>;
 }
 
-export interface UserActivationHashEdgeSubscription
-  extends Promise<AsyncIterator<UserActivationHashEdge>>,
+export interface AggregateEcoOrganismeSubscription
+  extends Promise<AsyncIterator<AggregateEcoOrganisme>>,
     Fragmentable {
-  node: <T = UserActivationHashSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface UserSubscriptionPayload {
-  mutation: MutationType;
-  node: User;
-  updatedFields: String[];
-  previousValues: UserPreviousValues;
-}
-
-export interface UserSubscriptionPayloadPromise
-  extends Promise<UserSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserPreviousValuesPromise>() => T;
-}
-
-export interface UserSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserPreviousValuesSubscription>() => T;
-}
-
-export interface AccessToken {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  token: String;
-  isRevoked: Boolean;
-  lastUsed?: DateTimeOutput;
-}
-
-export interface AccessTokenPromise extends Promise<AccessToken>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  user: <T = UserPromise>() => T;
-  application: <T = ApplicationPromise>() => T;
-  token: () => Promise<String>;
-  isRevoked: () => Promise<Boolean>;
-  lastUsed: () => Promise<DateTimeOutput>;
-}
-
-export interface AccessTokenSubscription
-  extends Promise<AsyncIterator<AccessToken>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  user: <T = UserSubscription>() => T;
-  application: <T = ApplicationSubscription>() => T;
-  token: () => Promise<AsyncIterator<String>>;
-  isRevoked: () => Promise<AsyncIterator<Boolean>>;
-  lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface AccessTokenNullablePromise
-  extends Promise<AccessToken | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  user: <T = UserPromise>() => T;
-  application: <T = ApplicationPromise>() => T;
-  token: () => Promise<String>;
-  isRevoked: () => Promise<Boolean>;
-  lastUsed: () => Promise<DateTimeOutput>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface UserAccountHashEdge {
@@ -7344,104 +7764,92 @@ export interface UserAccountHashEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface AggregateUserAccountHash {
+export interface EcoOrganismeEdge {
+  node: EcoOrganisme;
+  cursor: String;
+}
+
+export interface EcoOrganismeEdgePromise
+  extends Promise<EcoOrganismeEdge>,
+    Fragmentable {
+  node: <T = EcoOrganismePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface EcoOrganismeEdgeSubscription
+  extends Promise<AsyncIterator<EcoOrganismeEdge>>,
+    Fragmentable {
+  node: <T = EcoOrganismeSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateAccessToken {
   count: Int;
 }
 
-export interface AggregateUserAccountHashPromise
-  extends Promise<AggregateUserAccountHash>,
+export interface AggregateAccessTokenPromise
+  extends Promise<AggregateAccessToken>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateUserAccountHashSubscription
-  extends Promise<AsyncIterator<AggregateUserAccountHash>>,
+export interface AggregateAccessTokenSubscription
+  extends Promise<AsyncIterator<AggregateAccessToken>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface UserAccountHash {
+export interface UserPreviousValues {
   id: ID_Output;
+  isActive?: Boolean;
   email: String;
-  companySiret: ID_Output;
-  role: UserRole;
-  hash: String;
+  password: String;
+  name?: String;
+  phone?: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
 }
 
-export interface UserAccountHashPromise
-  extends Promise<UserAccountHash>,
+export interface UserPreviousValuesPromise
+  extends Promise<UserPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
   email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface UserAccountHashSubscription
-  extends Promise<AsyncIterator<UserAccountHash>>,
+export interface UserPreviousValuesSubscription
+  extends Promise<AsyncIterator<UserPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  isActive: () => Promise<AsyncIterator<Boolean>>;
   email: () => Promise<AsyncIterator<String>>;
-  companySiret: () => Promise<AsyncIterator<ID_Output>>;
-  role: () => Promise<AsyncIterator<UserRole>>;
-  hash: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  phone: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface UserAccountHashNullablePromise
-  extends Promise<UserAccountHash | null>,
+export interface AggregateUser {
+  count: Int;
+}
+
+export interface AggregateUserPromise
+  extends Promise<AggregateUser>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
+  count: () => Promise<Int>;
 }
 
-export interface UserAccountHashConnection {
-  pageInfo: PageInfo;
-  edges: UserAccountHashEdge[];
-}
-
-export interface UserAccountHashConnectionPromise
-  extends Promise<UserAccountHashConnection>,
+export interface AggregateUserSubscription
+  extends Promise<AsyncIterator<AggregateUser>>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserAccountHashEdge>>() => T;
-  aggregate: <T = AggregateUserAccountHashPromise>() => T;
-}
-
-export interface UserAccountHashConnectionSubscription
-  extends Promise<AsyncIterator<UserAccountHashConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<UserAccountHashEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateUserAccountHashSubscription>() => T;
-}
-
-export interface UserEdge {
-  node: User;
-  cursor: String;
-}
-
-export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
-  node: <T = UserPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface UserEdgeSubscription
-  extends Promise<AsyncIterator<UserEdge>>,
-    Fragmentable {
-  node: <T = UserSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface AccessTokenSubscriptionPayload {
@@ -7469,20 +7877,25 @@ export interface AccessTokenSubscriptionPayloadSubscription
   previousValues: <T = AccessTokenPreviousValuesSubscription>() => T;
 }
 
-export interface AggregateTemporaryStorageDetail {
-  count: Int;
+export interface UserConnection {
+  pageInfo: PageInfo;
+  edges: UserEdge[];
 }
 
-export interface AggregateTemporaryStorageDetailPromise
-  extends Promise<AggregateTemporaryStorageDetail>,
+export interface UserConnectionPromise
+  extends Promise<UserConnection>,
     Fragmentable {
-  count: () => Promise<Int>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<UserEdge>>() => T;
+  aggregate: <T = AggregateUserPromise>() => T;
 }
 
-export interface AggregateTemporaryStorageDetailSubscription
-  extends Promise<AsyncIterator<AggregateTemporaryStorageDetail>>,
+export interface UserConnectionSubscription
+  extends Promise<AsyncIterator<UserConnection>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateUserSubscription>() => T;
 }
 
 export interface AccessTokenPreviousValues {
@@ -7516,62 +7929,121 @@ export interface AccessTokenPreviousValuesSubscription
   lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface TemporaryStorageDetailConnection {
-  pageInfo: PageInfo;
-  edges: TemporaryStorageDetailEdge[];
-}
-
-export interface TemporaryStorageDetailConnectionPromise
-  extends Promise<TemporaryStorageDetailConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<TemporaryStorageDetailEdge>>() => T;
-  aggregate: <T = AggregateTemporaryStorageDetailPromise>() => T;
-}
-
-export interface TemporaryStorageDetailConnectionSubscription
-  extends Promise<AsyncIterator<TemporaryStorageDetailConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <
-    T = Promise<AsyncIterator<TemporaryStorageDetailEdgeSubscription>>
-  >() => T;
-  aggregate: <T = AggregateTemporaryStorageDetailSubscription>() => T;
-}
-
-export interface AccessTokenEdge {
-  node: AccessToken;
+export interface TransporterReceiptEdge {
+  node: TransporterReceipt;
   cursor: String;
 }
 
-export interface AccessTokenEdgePromise
-  extends Promise<AccessTokenEdge>,
+export interface TransporterReceiptEdgePromise
+  extends Promise<TransporterReceiptEdge>,
     Fragmentable {
-  node: <T = AccessTokenPromise>() => T;
+  node: <T = TransporterReceiptPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface AccessTokenEdgeSubscription
-  extends Promise<AsyncIterator<AccessTokenEdge>>,
+export interface TransporterReceiptEdgeSubscription
+  extends Promise<AsyncIterator<TransporterReceiptEdge>>,
     Fragmentable {
-  node: <T = AccessTokenSubscription>() => T;
+  node: <T = TransporterReceiptSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface AggregateStatusLog {
-  count: Int;
+export interface EcoOrganismeConnection {
+  pageInfo: PageInfo;
+  edges: EcoOrganismeEdge[];
 }
 
-export interface AggregateStatusLogPromise
-  extends Promise<AggregateStatusLog>,
+export interface EcoOrganismeConnectionPromise
+  extends Promise<EcoOrganismeConnection>,
     Fragmentable {
-  count: () => Promise<Int>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<EcoOrganismeEdge>>() => T;
+  aggregate: <T = AggregateEcoOrganismePromise>() => T;
 }
 
-export interface AggregateStatusLogSubscription
-  extends Promise<AsyncIterator<AggregateStatusLog>>,
+export interface EcoOrganismeConnectionSubscription
+  extends Promise<AsyncIterator<EcoOrganismeConnection>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<EcoOrganismeEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateEcoOrganismeSubscription>() => T;
+}
+
+export interface User {
+  id: ID_Output;
+  isActive?: Boolean;
+  email: String;
+  password: String;
+  name?: String;
+  phone?: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface UserPromise extends Promise<User>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
+  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserSubscription
+  extends Promise<AsyncIterator<User>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  isActive: () => Promise<AsyncIterator<Boolean>>;
+  email: () => Promise<AsyncIterator<String>>;
+  password: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  phone: () => Promise<AsyncIterator<String>>;
+  companyAssociations: <
+    T = Promise<AsyncIterator<CompanyAssociationSubscription>>
+  >(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserNullablePromise
+  extends Promise<User | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  isActive: () => Promise<Boolean>;
+  email: () => Promise<String>;
+  password: () => Promise<String>;
+  name: () => Promise<String>;
+  phone: () => Promise<String>;
+  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
+    where?: CompanyAssociationWhereInput;
+    orderBy?: CompanyAssociationOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface ApplicationSubscriptionPayload {
@@ -7599,25 +8071,23 @@ export interface ApplicationSubscriptionPayloadSubscription
   previousValues: <T = ApplicationPreviousValuesSubscription>() => T;
 }
 
-export interface StatusLogConnection {
-  pageInfo: PageInfo;
-  edges: StatusLogEdge[];
+export interface TraderReceiptEdge {
+  node: TraderReceipt;
+  cursor: String;
 }
 
-export interface StatusLogConnectionPromise
-  extends Promise<StatusLogConnection>,
+export interface TraderReceiptEdgePromise
+  extends Promise<TraderReceiptEdge>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<StatusLogEdge>>() => T;
-  aggregate: <T = AggregateStatusLogPromise>() => T;
+  node: <T = TraderReceiptPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface StatusLogConnectionSubscription
-  extends Promise<AsyncIterator<StatusLogConnection>>,
+export interface TraderReceiptEdgeSubscription
+  extends Promise<AsyncIterator<TraderReceiptEdge>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<StatusLogEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateStatusLogSubscription>() => T;
+  node: <T = TraderReceiptSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface ApplicationPreviousValues {
@@ -7654,42 +8124,195 @@ export interface ApplicationPreviousValuesSubscription
   logoUrl: () => Promise<AsyncIterator<String>>;
 }
 
-export interface StatusLog {
+export interface UserAccountHashPreviousValues {
   id: ID_Output;
-  status: Status;
-  loggedAt?: DateTimeOutput;
-  updatedFields?: Json;
+  email: String;
+  companySiret: ID_Output;
+  role: UserRole;
+  hash: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
 }
 
-export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
+export interface UserAccountHashPreviousValuesPromise
+  extends Promise<UserAccountHashPreviousValues>,
+    Fragmentable {
   id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  form: <T = FormPromise>() => T;
-  status: () => Promise<Status>;
-  loggedAt: () => Promise<DateTimeOutput>;
-  updatedFields: () => Promise<Json>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface StatusLogSubscription
-  extends Promise<AsyncIterator<StatusLog>>,
+export interface UserAccountHashPreviousValuesSubscription
+  extends Promise<AsyncIterator<UserAccountHashPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  form: <T = FormSubscription>() => T;
-  status: () => Promise<AsyncIterator<Status>>;
-  loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedFields: () => Promise<AsyncIterator<Json>>;
+  email: () => Promise<AsyncIterator<String>>;
+  companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
+  hash: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface StatusLogNullablePromise
-  extends Promise<StatusLog | null>,
+export interface AccessTokenConnection {
+  pageInfo: PageInfo;
+  edges: AccessTokenEdge[];
+}
+
+export interface AccessTokenConnectionPromise
+  extends Promise<AccessTokenConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<AccessTokenEdge>>() => T;
+  aggregate: <T = AggregateAccessTokenPromise>() => T;
+}
+
+export interface AccessTokenConnectionSubscription
+  extends Promise<AsyncIterator<AccessTokenConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<AccessTokenEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateAccessTokenSubscription>() => T;
+}
+
+export interface TemporaryStorageDetailEdge {
+  node: TemporaryStorageDetail;
+  cursor: String;
+}
+
+export interface TemporaryStorageDetailEdgePromise
+  extends Promise<TemporaryStorageDetailEdge>,
+    Fragmentable {
+  node: <T = TemporaryStorageDetailPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface TemporaryStorageDetailEdgeSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetailEdge>>,
+    Fragmentable {
+  node: <T = TemporaryStorageDetailSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface CompanySubscriptionPayload {
+  mutation: MutationType;
+  node: Company;
+  updatedFields: String[];
+  previousValues: CompanyPreviousValues;
+}
+
+export interface CompanySubscriptionPayloadPromise
+  extends Promise<CompanySubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = CompanyPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = CompanyPreviousValuesPromise>() => T;
+}
+
+export interface CompanySubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<CompanySubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = CompanySubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = CompanyPreviousValuesSubscription>() => T;
+}
+
+export interface AggregateStatusLog {
+  count: Int;
+}
+
+export interface AggregateStatusLogPromise
+  extends Promise<AggregateStatusLog>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateStatusLogSubscription
+  extends Promise<AsyncIterator<AggregateStatusLog>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface CompanyPreviousValues {
+  id: ID_Output;
+  siret: String;
+  companyTypes: CompanyType[];
+  name?: String;
+  gerepId?: String;
+  codeNaf?: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  securityCode: Int;
+  givenName?: String;
+  contactEmail?: String;
+  contactPhone?: String;
+  website?: String;
+  documentKeys: String[];
+}
+
+export interface CompanyPreviousValuesPromise
+  extends Promise<CompanyPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  form: <T = FormPromise>() => T;
-  status: () => Promise<Status>;
-  loggedAt: () => Promise<DateTimeOutput>;
-  updatedFields: () => Promise<Json>;
+  siret: () => Promise<String>;
+  companyTypes: () => Promise<CompanyType[]>;
+  name: () => Promise<String>;
+  gerepId: () => Promise<String>;
+  codeNaf: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  securityCode: () => Promise<Int>;
+  givenName: () => Promise<String>;
+  contactEmail: () => Promise<String>;
+  contactPhone: () => Promise<String>;
+  website: () => Promise<String>;
+  documentKeys: () => Promise<String[]>;
+}
+
+export interface CompanyPreviousValuesSubscription
+  extends Promise<AsyncIterator<CompanyPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  siret: () => Promise<AsyncIterator<String>>;
+  companyTypes: () => Promise<AsyncIterator<CompanyType[]>>;
+  name: () => Promise<AsyncIterator<String>>;
+  gerepId: () => Promise<AsyncIterator<String>>;
+  codeNaf: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  securityCode: () => Promise<AsyncIterator<Int>>;
+  givenName: () => Promise<AsyncIterator<String>>;
+  contactEmail: () => Promise<AsyncIterator<String>>;
+  contactPhone: () => Promise<AsyncIterator<String>>;
+  website: () => Promise<AsyncIterator<String>>;
+  documentKeys: () => Promise<AsyncIterator<String[]>>;
+}
+
+export interface StatusLogConnection {
+  pageInfo: PageInfo;
+  edges: StatusLogEdge[];
+}
+
+export interface StatusLogConnectionPromise
+  extends Promise<StatusLogConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<StatusLogEdge>>() => T;
+  aggregate: <T = AggregateStatusLogPromise>() => T;
+}
+
+export interface StatusLogConnectionSubscription
+  extends Promise<AsyncIterator<StatusLogConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<StatusLogEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateStatusLogSubscription>() => T;
 }
 
 export interface EcoOrganisme {
@@ -7726,48 +8349,85 @@ export interface EcoOrganismeNullablePromise
   address: () => Promise<String>;
 }
 
-export interface RubriqueEdge {
-  node: Rubrique;
-  cursor: String;
+export interface AggregateRubrique {
+  count: Int;
 }
 
-export interface RubriqueEdgePromise
-  extends Promise<RubriqueEdge>,
+export interface AggregateRubriquePromise
+  extends Promise<AggregateRubrique>,
     Fragmentable {
-  node: <T = RubriquePromise>() => T;
-  cursor: () => Promise<String>;
+  count: () => Promise<Int>;
 }
 
-export interface RubriqueEdgeSubscription
-  extends Promise<AsyncIterator<RubriqueEdge>>,
+export interface AggregateRubriqueSubscription
+  extends Promise<AsyncIterator<AggregateRubrique>>,
     Fragmentable {
-  node: <T = RubriqueSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface CompanySubscriptionPayload {
+export interface CompanyAssociationSubscriptionPayload {
   mutation: MutationType;
-  node: Company;
+  node: CompanyAssociation;
   updatedFields: String[];
-  previousValues: CompanyPreviousValues;
+  previousValues: CompanyAssociationPreviousValues;
 }
 
-export interface CompanySubscriptionPayloadPromise
-  extends Promise<CompanySubscriptionPayload>,
+export interface CompanyAssociationSubscriptionPayloadPromise
+  extends Promise<CompanyAssociationSubscriptionPayload>,
     Fragmentable {
   mutation: () => Promise<MutationType>;
-  node: <T = CompanyPromise>() => T;
+  node: <T = CompanyAssociationPromise>() => T;
   updatedFields: () => Promise<String[]>;
-  previousValues: <T = CompanyPreviousValuesPromise>() => T;
+  previousValues: <T = CompanyAssociationPreviousValuesPromise>() => T;
 }
 
-export interface CompanySubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<CompanySubscriptionPayload>>,
+export interface CompanyAssociationSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<CompanyAssociationSubscriptionPayload>>,
     Fragmentable {
   mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = CompanySubscription>() => T;
+  node: <T = CompanyAssociationSubscription>() => T;
   updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = CompanyPreviousValuesSubscription>() => T;
+  previousValues: <T = CompanyAssociationPreviousValuesSubscription>() => T;
+}
+
+export interface RubriqueConnection {
+  pageInfo: PageInfo;
+  edges: RubriqueEdge[];
+}
+
+export interface RubriqueConnectionPromise
+  extends Promise<RubriqueConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<RubriqueEdge>>() => T;
+  aggregate: <T = AggregateRubriquePromise>() => T;
+}
+
+export interface RubriqueConnectionSubscription
+  extends Promise<AsyncIterator<RubriqueConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<RubriqueEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateRubriqueSubscription>() => T;
+}
+
+export interface CompanyAssociationPreviousValues {
+  id: ID_Output;
+  role: UserRole;
+}
+
+export interface CompanyAssociationPreviousValuesPromise
+  extends Promise<CompanyAssociationPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+}
+
+export interface CompanyAssociationPreviousValuesSubscription
+  extends Promise<AsyncIterator<CompanyAssociationPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
 }
 
 export interface Rubrique {
@@ -7834,59 +8494,20 @@ export interface RubriqueNullablePromise
   wasteType: () => Promise<WasteType>;
 }
 
-export interface CompanyPreviousValues {
-  id: ID_Output;
-  siret: String;
-  companyTypes: CompanyType[];
-  name?: String;
-  gerepId?: String;
-  codeNaf?: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  securityCode: Int;
-  givenName?: String;
-  contactEmail?: String;
-  contactPhone?: String;
-  website?: String;
-  documentKeys: String[];
+export interface AggregateDeclaration {
+  count: Int;
 }
 
-export interface CompanyPreviousValuesPromise
-  extends Promise<CompanyPreviousValues>,
+export interface AggregateDeclarationPromise
+  extends Promise<AggregateDeclaration>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  siret: () => Promise<String>;
-  companyTypes: () => Promise<CompanyType[]>;
-  name: () => Promise<String>;
-  gerepId: () => Promise<String>;
-  codeNaf: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  securityCode: () => Promise<Int>;
-  givenName: () => Promise<String>;
-  contactEmail: () => Promise<String>;
-  contactPhone: () => Promise<String>;
-  website: () => Promise<String>;
-  documentKeys: () => Promise<String[]>;
+  count: () => Promise<Int>;
 }
 
-export interface CompanyPreviousValuesSubscription
-  extends Promise<AsyncIterator<CompanyPreviousValues>>,
+export interface AggregateDeclarationSubscription
+  extends Promise<AsyncIterator<AggregateDeclaration>>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  siret: () => Promise<AsyncIterator<String>>;
-  companyTypes: () => Promise<AsyncIterator<CompanyType[]>>;
-  name: () => Promise<AsyncIterator<String>>;
-  gerepId: () => Promise<AsyncIterator<String>>;
-  codeNaf: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  securityCode: () => Promise<AsyncIterator<Int>>;
-  givenName: () => Promise<AsyncIterator<String>>;
-  contactEmail: () => Promise<AsyncIterator<String>>;
-  contactPhone: () => Promise<AsyncIterator<String>>;
-  website: () => Promise<AsyncIterator<String>>;
-  documentKeys: () => Promise<AsyncIterator<String[]>>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface InstallationEdge {
@@ -7906,278 +8527,6 @@ export interface InstallationEdgeSubscription
     Fragmentable {
   node: <T = InstallationSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface AggregateDeclaration {
-  count: Int;
-}
-
-export interface AggregateDeclarationPromise
-  extends Promise<AggregateDeclaration>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateDeclarationSubscription
-  extends Promise<AsyncIterator<AggregateDeclaration>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface UserAccountHashPreviousValues {
-  id: ID_Output;
-  email: String;
-  companySiret: ID_Output;
-  role: UserRole;
-  hash: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-}
-
-export interface UserAccountHashPreviousValuesPromise
-  extends Promise<UserAccountHashPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  email: () => Promise<String>;
-  companySiret: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-  hash: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface UserAccountHashPreviousValuesSubscription
-  extends Promise<AsyncIterator<UserAccountHashPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  email: () => Promise<AsyncIterator<String>>;
-  companySiret: () => Promise<AsyncIterator<ID_Output>>;
-  role: () => Promise<AsyncIterator<UserRole>>;
-  hash: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface CompanyAssociationSubscriptionPayload {
-  mutation: MutationType;
-  node: CompanyAssociation;
-  updatedFields: String[];
-  previousValues: CompanyAssociationPreviousValues;
-}
-
-export interface CompanyAssociationSubscriptionPayloadPromise
-  extends Promise<CompanyAssociationSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = CompanyAssociationPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = CompanyAssociationPreviousValuesPromise>() => T;
-}
-
-export interface CompanyAssociationSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<CompanyAssociationSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = CompanyAssociationSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = CompanyAssociationPreviousValuesSubscription>() => T;
-}
-
-export interface Installation {
-  id: ID_Output;
-  codeS3ic?: String;
-  nomEts?: String;
-  regime?: String;
-  libRegime?: String;
-  seveso?: Seveso;
-  libSeveso?: String;
-  familleIc?: String;
-  urlFiche?: String;
-  s3icNumeroSiret?: String;
-  irepNumeroSiret?: String;
-  gerepNumeroSiret?: String;
-  sireneNumeroSiret?: String;
-}
-
-export interface InstallationPromise
-  extends Promise<Installation>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  nomEts: () => Promise<String>;
-  regime: () => Promise<String>;
-  libRegime: () => Promise<String>;
-  seveso: () => Promise<Seveso>;
-  libSeveso: () => Promise<String>;
-  familleIc: () => Promise<String>;
-  urlFiche: () => Promise<String>;
-  s3icNumeroSiret: () => Promise<String>;
-  irepNumeroSiret: () => Promise<String>;
-  gerepNumeroSiret: () => Promise<String>;
-  sireneNumeroSiret: () => Promise<String>;
-}
-
-export interface InstallationSubscription
-  extends Promise<AsyncIterator<Installation>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  codeS3ic: () => Promise<AsyncIterator<String>>;
-  nomEts: () => Promise<AsyncIterator<String>>;
-  regime: () => Promise<AsyncIterator<String>>;
-  libRegime: () => Promise<AsyncIterator<String>>;
-  seveso: () => Promise<AsyncIterator<Seveso>>;
-  libSeveso: () => Promise<AsyncIterator<String>>;
-  familleIc: () => Promise<AsyncIterator<String>>;
-  urlFiche: () => Promise<AsyncIterator<String>>;
-  s3icNumeroSiret: () => Promise<AsyncIterator<String>>;
-  irepNumeroSiret: () => Promise<AsyncIterator<String>>;
-  gerepNumeroSiret: () => Promise<AsyncIterator<String>>;
-  sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
-}
-
-export interface InstallationNullablePromise
-  extends Promise<Installation | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  nomEts: () => Promise<String>;
-  regime: () => Promise<String>;
-  libRegime: () => Promise<String>;
-  seveso: () => Promise<Seveso>;
-  libSeveso: () => Promise<String>;
-  familleIc: () => Promise<String>;
-  urlFiche: () => Promise<String>;
-  s3icNumeroSiret: () => Promise<String>;
-  irepNumeroSiret: () => Promise<String>;
-  gerepNumeroSiret: () => Promise<String>;
-  sireneNumeroSiret: () => Promise<String>;
-}
-
-export interface CompanyAssociationPreviousValues {
-  id: ID_Output;
-  role: UserRole;
-}
-
-export interface CompanyAssociationPreviousValuesPromise
-  extends Promise<CompanyAssociationPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  role: () => Promise<UserRole>;
-}
-
-export interface CompanyAssociationPreviousValuesSubscription
-  extends Promise<AsyncIterator<CompanyAssociationPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  role: () => Promise<AsyncIterator<UserRole>>;
-}
-
-export interface GrantEdge {
-  node: Grant;
-  cursor: String;
-}
-
-export interface GrantEdgePromise extends Promise<GrantEdge>, Fragmentable {
-  node: <T = GrantPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface GrantEdgeSubscription
-  extends Promise<AsyncIterator<GrantEdge>>,
-    Fragmentable {
-  node: <T = GrantSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface DeclarationEdge {
-  node: Declaration;
-  cursor: String;
-}
-
-export interface DeclarationEdgePromise
-  extends Promise<DeclarationEdge>,
-    Fragmentable {
-  node: <T = DeclarationPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface DeclarationEdgeSubscription
-  extends Promise<AsyncIterator<DeclarationEdge>>,
-    Fragmentable {
-  node: <T = DeclarationSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface Company {
-  id: ID_Output;
-  siret: String;
-  companyTypes: CompanyType[];
-  name?: String;
-  gerepId?: String;
-  codeNaf?: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  securityCode: Int;
-  givenName?: String;
-  contactEmail?: String;
-  contactPhone?: String;
-  website?: String;
-  documentKeys: String[];
-}
-
-export interface CompanyPromise extends Promise<Company>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  siret: () => Promise<String>;
-  companyTypes: () => Promise<CompanyType[]>;
-  name: () => Promise<String>;
-  gerepId: () => Promise<String>;
-  codeNaf: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  securityCode: () => Promise<Int>;
-  givenName: () => Promise<String>;
-  contactEmail: () => Promise<String>;
-  contactPhone: () => Promise<String>;
-  website: () => Promise<String>;
-  documentKeys: () => Promise<String[]>;
-}
-
-export interface CompanySubscription
-  extends Promise<AsyncIterator<Company>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  siret: () => Promise<AsyncIterator<String>>;
-  companyTypes: () => Promise<AsyncIterator<CompanyType[]>>;
-  name: () => Promise<AsyncIterator<String>>;
-  gerepId: () => Promise<AsyncIterator<String>>;
-  codeNaf: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  securityCode: () => Promise<AsyncIterator<Int>>;
-  givenName: () => Promise<AsyncIterator<String>>;
-  contactEmail: () => Promise<AsyncIterator<String>>;
-  contactPhone: () => Promise<AsyncIterator<String>>;
-  website: () => Promise<AsyncIterator<String>>;
-  documentKeys: () => Promise<AsyncIterator<String[]>>;
-}
-
-export interface CompanyNullablePromise
-  extends Promise<Company | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  siret: () => Promise<String>;
-  companyTypes: () => Promise<CompanyType[]>;
-  name: () => Promise<String>;
-  gerepId: () => Promise<String>;
-  codeNaf: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  securityCode: () => Promise<Int>;
-  givenName: () => Promise<String>;
-  contactEmail: () => Promise<String>;
-  contactPhone: () => Promise<String>;
-  website: () => Promise<String>;
-  documentKeys: () => Promise<String[]>;
 }
 
 export interface DeclarationSubscriptionPayload {
@@ -8205,20 +8554,36 @@ export interface DeclarationSubscriptionPayloadSubscription
   previousValues: <T = DeclarationPreviousValuesSubscription>() => T;
 }
 
-export interface AggregateForm {
-  count: Int;
+export interface CompanyAssociation {
+  id: ID_Output;
+  role: UserRole;
 }
 
-export interface AggregateFormPromise
-  extends Promise<AggregateForm>,
+export interface CompanyAssociationPromise
+  extends Promise<CompanyAssociation>,
     Fragmentable {
-  count: () => Promise<Int>;
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
+  role: () => Promise<UserRole>;
 }
 
-export interface AggregateFormSubscription
-  extends Promise<AsyncIterator<AggregateForm>>,
+export interface CompanyAssociationSubscription
+  extends Promise<AsyncIterator<CompanyAssociation>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
+  company: <T = CompanySubscription>() => T;
+  role: () => Promise<AsyncIterator<UserRole>>;
+}
+
+export interface CompanyAssociationNullablePromise
+  extends Promise<CompanyAssociation | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
+  role: () => Promise<UserRole>;
 }
 
 export interface DeclarationPreviousValues {
@@ -8255,117 +8620,60 @@ export interface DeclarationPreviousValuesSubscription
   gerepType: () => Promise<AsyncIterator<GerepType>>;
 }
 
-export interface FormConnection {
-  pageInfo: PageInfo;
-  edges: FormEdge[];
+export interface AggregateGrant {
+  count: Int;
 }
 
-export interface FormConnectionPromise
-  extends Promise<FormConnection>,
+export interface AggregateGrantPromise
+  extends Promise<AggregateGrant>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateGrantSubscription
+  extends Promise<AsyncIterator<AggregateGrant>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface DeclarationEdge {
+  node: Declaration;
+  cursor: String;
+}
+
+export interface DeclarationEdgePromise
+  extends Promise<DeclarationEdge>,
+    Fragmentable {
+  node: <T = DeclarationPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface DeclarationEdgeSubscription
+  extends Promise<AsyncIterator<DeclarationEdge>>,
+    Fragmentable {
+  node: <T = DeclarationSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface GrantConnection {
+  pageInfo: PageInfo;
+  edges: GrantEdge[];
+}
+
+export interface GrantConnectionPromise
+  extends Promise<GrantConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<FormEdge>>() => T;
-  aggregate: <T = AggregateFormPromise>() => T;
+  edges: <T = FragmentableArray<GrantEdge>>() => T;
+  aggregate: <T = AggregateGrantPromise>() => T;
 }
 
-export interface FormConnectionSubscription
-  extends Promise<AsyncIterator<FormConnection>>,
+export interface GrantConnectionSubscription
+  extends Promise<AsyncIterator<GrantConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateFormSubscription>() => T;
-}
-
-export interface DeclarationConnection {
-  pageInfo: PageInfo;
-  edges: DeclarationEdge[];
-}
-
-export interface DeclarationConnectionPromise
-  extends Promise<DeclarationConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<DeclarationEdge>>() => T;
-  aggregate: <T = AggregateDeclarationPromise>() => T;
-}
-
-export interface DeclarationConnectionSubscription
-  extends Promise<AsyncIterator<DeclarationConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<DeclarationEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateDeclarationSubscription>() => T;
-}
-
-export interface Application {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  clientSecret: String;
-  name: String;
-  redirectUris: String[];
-  logoUrl?: String;
-}
-
-export interface ApplicationPromise extends Promise<Application>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  clientSecret: () => Promise<String>;
-  name: () => Promise<String>;
-  admins: <T = FragmentableArray<User>>(args?: {
-    where?: UserWhereInput;
-    orderBy?: UserOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  redirectUris: () => Promise<String[]>;
-  logoUrl: () => Promise<String>;
-}
-
-export interface ApplicationSubscription
-  extends Promise<AsyncIterator<Application>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  clientSecret: () => Promise<AsyncIterator<String>>;
-  name: () => Promise<AsyncIterator<String>>;
-  admins: <T = Promise<AsyncIterator<UserSubscription>>>(args?: {
-    where?: UserWhereInput;
-    orderBy?: UserOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  redirectUris: () => Promise<AsyncIterator<String[]>>;
-  logoUrl: () => Promise<AsyncIterator<String>>;
-}
-
-export interface ApplicationNullablePromise
-  extends Promise<Application | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  clientSecret: () => Promise<String>;
-  name: () => Promise<String>;
-  admins: <T = FragmentableArray<User>>(args?: {
-    where?: UserWhereInput;
-    orderBy?: UserOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
-  redirectUris: () => Promise<String[]>;
-  logoUrl: () => Promise<String>;
+  edges: <T = Promise<AsyncIterator<GrantEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateGrantSubscription>() => T;
 }
 
 export interface EcoOrganismeSubscriptionPayload {
@@ -8393,25 +8701,50 @@ export interface EcoOrganismeSubscriptionPayloadSubscription
   previousValues: <T = EcoOrganismePreviousValuesSubscription>() => T;
 }
 
-export interface AccessTokenConnection {
-  pageInfo: PageInfo;
-  edges: AccessTokenEdge[];
+export interface Grant {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  code: String;
+  expires: Int;
+  redirectUri: String;
 }
 
-export interface AccessTokenConnectionPromise
-  extends Promise<AccessTokenConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<AccessTokenEdge>>() => T;
-  aggregate: <T = AggregateAccessTokenPromise>() => T;
+export interface GrantPromise extends Promise<Grant>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  user: <T = UserPromise>() => T;
+  code: () => Promise<String>;
+  application: <T = ApplicationPromise>() => T;
+  expires: () => Promise<Int>;
+  redirectUri: () => Promise<String>;
 }
 
-export interface AccessTokenConnectionSubscription
-  extends Promise<AsyncIterator<AccessTokenConnection>>,
+export interface GrantSubscription
+  extends Promise<AsyncIterator<Grant>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<AccessTokenEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateAccessTokenSubscription>() => T;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  user: <T = UserSubscription>() => T;
+  code: () => Promise<AsyncIterator<String>>;
+  application: <T = ApplicationSubscription>() => T;
+  expires: () => Promise<AsyncIterator<Int>>;
+  redirectUri: () => Promise<AsyncIterator<String>>;
+}
+
+export interface GrantNullablePromise
+  extends Promise<Grant | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  user: <T = UserPromise>() => T;
+  code: () => Promise<String>;
+  application: <T = ApplicationPromise>() => T;
+  expires: () => Promise<Int>;
+  redirectUri: () => Promise<String>;
 }
 
 export interface EcoOrganismePreviousValues {
@@ -8439,61 +8772,213 @@ export interface EcoOrganismePreviousValuesSubscription
   address: () => Promise<AsyncIterator<String>>;
 }
 
-export interface BatchPayload {
-  count: Long;
+export interface FormEdge {
+  node: Form;
+  cursor: String;
 }
 
-export interface BatchPayloadPromise
-  extends Promise<BatchPayload>,
+export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
+  node: <T = FormPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface FormEdgeSubscription
+  extends Promise<AsyncIterator<FormEdge>>,
     Fragmentable {
-  count: () => Promise<Long>;
+  node: <T = FormSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface BatchPayloadSubscription
-  extends Promise<AsyncIterator<BatchPayload>>,
+export interface DeclarationConnection {
+  pageInfo: PageInfo;
+  edges: DeclarationEdge[];
+}
+
+export interface DeclarationConnectionPromise
+  extends Promise<DeclarationConnection>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Long>>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<DeclarationEdge>>() => T;
+  aggregate: <T = AggregateDeclarationPromise>() => T;
 }
 
-export interface AggregateAccessToken {
-  count: Int;
-}
-
-export interface AggregateAccessTokenPromise
-  extends Promise<AggregateAccessToken>,
+export interface DeclarationConnectionSubscription
+  extends Promise<AsyncIterator<DeclarationConnection>>,
     Fragmentable {
-  count: () => Promise<Int>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<DeclarationEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateDeclarationSubscription>() => T;
 }
 
-export interface AggregateAccessTokenSubscription
-  extends Promise<AsyncIterator<AggregateAccessToken>>,
+export interface TemporaryStorageDetail {
+  id: ID_Output;
+  tempStorerQuantityType?: QuantityType;
+  tempStorerQuantityReceived?: Float;
+  tempStorerWasteAcceptationStatus?: WasteAcceptationStatus;
+  tempStorerWasteRefusalReason?: String;
+  tempStorerReceivedAt?: DateTimeOutput;
+  tempStorerReceivedBy?: String;
+  tempStorerSignedAt?: DateTimeOutput;
+  destinationIsFilledByEmitter?: Boolean;
+  destinationCompanyName?: String;
+  destinationCompanySiret?: String;
+  destinationCompanyAddress?: String;
+  destinationCompanyContact?: String;
+  destinationCompanyPhone?: String;
+  destinationCompanyMail?: String;
+  destinationCap?: String;
+  destinationProcessingOperation?: String;
+  wasteDetailsOnuCode?: String;
+  wasteDetailsPackagings?: Json;
+  wasteDetailsOtherPackaging?: String;
+  wasteDetailsNumberOfPackages?: Int;
+  wasteDetailsQuantity?: Float;
+  wasteDetailsQuantityType?: QuantityType;
+  transporterCompanyName?: String;
+  transporterCompanySiret?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterIsExemptedOfReceipt?: Boolean;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeOutput;
+  transporterNumberPlate?: String;
+  signedByTransporter?: Boolean;
+  signedBy?: String;
+  signedAt?: DateTimeOutput;
+}
+
+export interface TemporaryStorageDetailPromise
+  extends Promise<TemporaryStorageDetail>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  id: () => Promise<ID_Output>;
+  form: <T = FormPromise>() => T;
+  tempStorerQuantityType: () => Promise<QuantityType>;
+  tempStorerQuantityReceived: () => Promise<Float>;
+  tempStorerWasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
+  tempStorerWasteRefusalReason: () => Promise<String>;
+  tempStorerReceivedAt: () => Promise<DateTimeOutput>;
+  tempStorerReceivedBy: () => Promise<String>;
+  tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  destinationIsFilledByEmitter: () => Promise<Boolean>;
+  destinationCompanyName: () => Promise<String>;
+  destinationCompanySiret: () => Promise<String>;
+  destinationCompanyAddress: () => Promise<String>;
+  destinationCompanyContact: () => Promise<String>;
+  destinationCompanyPhone: () => Promise<String>;
+  destinationCompanyMail: () => Promise<String>;
+  destinationCap: () => Promise<String>;
+  destinationProcessingOperation: () => Promise<String>;
+  wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagings: () => Promise<Json>;
+  wasteDetailsOtherPackaging: () => Promise<String>;
+  wasteDetailsNumberOfPackages: () => Promise<Int>;
+  wasteDetailsQuantity: () => Promise<Float>;
+  wasteDetailsQuantityType: () => Promise<QuantityType>;
+  transporterCompanyName: () => Promise<String>;
+  transporterCompanySiret: () => Promise<String>;
+  transporterCompanyAddress: () => Promise<String>;
+  transporterCompanyContact: () => Promise<String>;
+  transporterCompanyPhone: () => Promise<String>;
+  transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
+  transporterReceipt: () => Promise<String>;
+  transporterDepartment: () => Promise<String>;
+  transporterValidityLimit: () => Promise<DateTimeOutput>;
+  transporterNumberPlate: () => Promise<String>;
+  signedByTransporter: () => Promise<Boolean>;
+  signedBy: () => Promise<String>;
+  signedAt: () => Promise<DateTimeOutput>;
 }
 
-export interface UserActivationHashSubscriptionPayload {
-  mutation: MutationType;
-  node: UserActivationHash;
-  updatedFields: String[];
-  previousValues: UserActivationHashPreviousValues;
-}
-
-export interface UserActivationHashSubscriptionPayloadPromise
-  extends Promise<UserActivationHashSubscriptionPayload>,
+export interface TemporaryStorageDetailSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetail>>,
     Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = UserActivationHashPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  form: <T = FormSubscription>() => T;
+  tempStorerQuantityType: () => Promise<AsyncIterator<QuantityType>>;
+  tempStorerQuantityReceived: () => Promise<AsyncIterator<Float>>;
+  tempStorerWasteAcceptationStatus: () => Promise<
+    AsyncIterator<WasteAcceptationStatus>
+  >;
+  tempStorerWasteRefusalReason: () => Promise<AsyncIterator<String>>;
+  tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
+  tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
+  destinationCompanyName: () => Promise<AsyncIterator<String>>;
+  destinationCompanySiret: () => Promise<AsyncIterator<String>>;
+  destinationCompanyAddress: () => Promise<AsyncIterator<String>>;
+  destinationCompanyContact: () => Promise<AsyncIterator<String>>;
+  destinationCompanyPhone: () => Promise<AsyncIterator<String>>;
+  destinationCompanyMail: () => Promise<AsyncIterator<String>>;
+  destinationCap: () => Promise<AsyncIterator<String>>;
+  destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
+  wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
+  wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
+  wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
+  wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
+  wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
+  transporterCompanyName: () => Promise<AsyncIterator<String>>;
+  transporterCompanySiret: () => Promise<AsyncIterator<String>>;
+  transporterCompanyAddress: () => Promise<AsyncIterator<String>>;
+  transporterCompanyContact: () => Promise<AsyncIterator<String>>;
+  transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
+  transporterCompanyMail: () => Promise<AsyncIterator<String>>;
+  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
+  transporterReceipt: () => Promise<AsyncIterator<String>>;
+  transporterDepartment: () => Promise<AsyncIterator<String>>;
+  transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
+  signedBy: () => Promise<AsyncIterator<String>>;
+  signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface UserActivationHashSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
+export interface TemporaryStorageDetailNullablePromise
+  extends Promise<TemporaryStorageDetail | null>,
     Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserActivationHashSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
+  id: () => Promise<ID_Output>;
+  form: <T = FormPromise>() => T;
+  tempStorerQuantityType: () => Promise<QuantityType>;
+  tempStorerQuantityReceived: () => Promise<Float>;
+  tempStorerWasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
+  tempStorerWasteRefusalReason: () => Promise<String>;
+  tempStorerReceivedAt: () => Promise<DateTimeOutput>;
+  tempStorerReceivedBy: () => Promise<String>;
+  tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  destinationIsFilledByEmitter: () => Promise<Boolean>;
+  destinationCompanyName: () => Promise<String>;
+  destinationCompanySiret: () => Promise<String>;
+  destinationCompanyAddress: () => Promise<String>;
+  destinationCompanyContact: () => Promise<String>;
+  destinationCompanyPhone: () => Promise<String>;
+  destinationCompanyMail: () => Promise<String>;
+  destinationCap: () => Promise<String>;
+  destinationProcessingOperation: () => Promise<String>;
+  wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagings: () => Promise<Json>;
+  wasteDetailsOtherPackaging: () => Promise<String>;
+  wasteDetailsNumberOfPackages: () => Promise<Int>;
+  wasteDetailsQuantity: () => Promise<Float>;
+  wasteDetailsQuantityType: () => Promise<QuantityType>;
+  transporterCompanyName: () => Promise<String>;
+  transporterCompanySiret: () => Promise<String>;
+  transporterCompanyAddress: () => Promise<String>;
+  transporterCompanyContact: () => Promise<String>;
+  transporterCompanyPhone: () => Promise<String>;
+  transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
+  transporterReceipt: () => Promise<String>;
+  transporterDepartment: () => Promise<String>;
+  transporterValidityLimit: () => Promise<DateTimeOutput>;
+  transporterNumberPlate: () => Promise<String>;
+  signedByTransporter: () => Promise<Boolean>;
+  signedBy: () => Promise<String>;
+  signedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface FormSubscriptionPayload {
@@ -8521,25 +9006,29 @@ export interface FormSubscriptionPayloadSubscription
   previousValues: <T = FormPreviousValuesSubscription>() => T;
 }
 
-export interface UserConnection {
-  pageInfo: PageInfo;
-  edges: UserEdge[];
+export interface UserActivationHashSubscriptionPayload {
+  mutation: MutationType;
+  node: UserActivationHash;
+  updatedFields: String[];
+  previousValues: UserActivationHashPreviousValues;
 }
 
-export interface UserConnectionPromise
-  extends Promise<UserConnection>,
+export interface UserActivationHashSubscriptionPayloadPromise
+  extends Promise<UserActivationHashSubscriptionPayload>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<UserEdge>>() => T;
-  aggregate: <T = AggregateUserPromise>() => T;
+  mutation: () => Promise<MutationType>;
+  node: <T = UserActivationHashPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserActivationHashPreviousValuesPromise>() => T;
 }
 
-export interface UserConnectionSubscription
-  extends Promise<AsyncIterator<UserConnection>>,
+export interface UserActivationHashSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserActivationHashSubscriptionPayload>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateUserSubscription>() => T;
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserActivationHashSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserActivationHashPreviousValuesSubscription>() => T;
 }
 
 export interface FormPreviousValues {
@@ -8795,146 +9284,94 @@ export interface FormPreviousValuesSubscription
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface User {
+export interface AccessToken {
   id: ID_Output;
-  isActive?: Boolean;
-  email: String;
-  password: String;
-  name?: String;
-  phone?: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  token: String;
+  isRevoked: Boolean;
+  lastUsed?: DateTimeOutput;
 }
 
-export interface UserPromise extends Promise<User>, Fragmentable {
+export interface AccessTokenPromise extends Promise<AccessToken>, Fragmentable {
   id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  user: <T = UserPromise>() => T;
+  application: <T = ApplicationPromise>() => T;
+  token: () => Promise<String>;
+  isRevoked: () => Promise<Boolean>;
+  lastUsed: () => Promise<DateTimeOutput>;
 }
 
-export interface UserSubscription
-  extends Promise<AsyncIterator<User>>,
+export interface AccessTokenSubscription
+  extends Promise<AsyncIterator<AccessToken>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  isActive: () => Promise<AsyncIterator<Boolean>>;
-  email: () => Promise<AsyncIterator<String>>;
-  password: () => Promise<AsyncIterator<String>>;
-  name: () => Promise<AsyncIterator<String>>;
-  phone: () => Promise<AsyncIterator<String>>;
-  companyAssociations: <
-    T = Promise<AsyncIterator<CompanyAssociationSubscription>>
-  >(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  user: <T = UserSubscription>() => T;
+  application: <T = ApplicationSubscription>() => T;
+  token: () => Promise<AsyncIterator<String>>;
+  isRevoked: () => Promise<AsyncIterator<Boolean>>;
+  lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface UserNullablePromise
-  extends Promise<User | null>,
+export interface AccessTokenNullablePromise
+  extends Promise<AccessToken | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  companyAssociations: <T = FragmentableArray<CompanyAssociation>>(args?: {
-    where?: CompanyAssociationWhereInput;
-    orderBy?: CompanyAssociationOrderByInput;
-    skip?: Int;
-    after?: String;
-    before?: String;
-    first?: Int;
-    last?: Int;
-  }) => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  user: <T = UserPromise>() => T;
+  application: <T = ApplicationPromise>() => T;
+  token: () => Promise<String>;
+  isRevoked: () => Promise<Boolean>;
+  lastUsed: () => Promise<DateTimeOutput>;
 }
 
-export interface Declaration {
-  id: ID_Output;
-  codeS3ic?: String;
-  nomEts?: String;
-  annee?: String;
-  codeDechet?: String;
-  libDechet?: String;
-  gerepType?: GerepType;
+export interface PageInfo {
+  hasNextPage: Boolean;
+  hasPreviousPage: Boolean;
+  startCursor?: String;
+  endCursor?: String;
 }
 
-export interface DeclarationPromise extends Promise<Declaration>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  nomEts: () => Promise<String>;
-  annee: () => Promise<String>;
-  codeDechet: () => Promise<String>;
-  libDechet: () => Promise<String>;
-  gerepType: () => Promise<GerepType>;
+export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
+  hasNextPage: () => Promise<Boolean>;
+  hasPreviousPage: () => Promise<Boolean>;
+  startCursor: () => Promise<String>;
+  endCursor: () => Promise<String>;
 }
 
-export interface DeclarationSubscription
-  extends Promise<AsyncIterator<Declaration>>,
+export interface PageInfoSubscription
+  extends Promise<AsyncIterator<PageInfo>>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  codeS3ic: () => Promise<AsyncIterator<String>>;
-  nomEts: () => Promise<AsyncIterator<String>>;
-  annee: () => Promise<AsyncIterator<String>>;
-  codeDechet: () => Promise<AsyncIterator<String>>;
-  libDechet: () => Promise<AsyncIterator<String>>;
-  gerepType: () => Promise<AsyncIterator<GerepType>>;
+  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
+  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
+  startCursor: () => Promise<AsyncIterator<String>>;
+  endCursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface DeclarationNullablePromise
-  extends Promise<Declaration | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  codeS3ic: () => Promise<String>;
-  nomEts: () => Promise<String>;
-  annee: () => Promise<String>;
-  codeDechet: () => Promise<String>;
-  libDechet: () => Promise<String>;
-  gerepType: () => Promise<GerepType>;
-}
-
-export interface ApplicationConnection {
+export interface UserAccountHashConnection {
   pageInfo: PageInfo;
-  edges: ApplicationEdge[];
+  edges: UserAccountHashEdge[];
 }
 
-export interface ApplicationConnectionPromise
-  extends Promise<ApplicationConnection>,
+export interface UserAccountHashConnectionPromise
+  extends Promise<UserAccountHashConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<ApplicationEdge>>() => T;
-  aggregate: <T = AggregateApplicationPromise>() => T;
+  edges: <T = FragmentableArray<UserAccountHashEdge>>() => T;
+  aggregate: <T = AggregateUserAccountHashPromise>() => T;
 }
 
-export interface ApplicationConnectionSubscription
-  extends Promise<AsyncIterator<ApplicationConnection>>,
+export interface UserAccountHashConnectionSubscription
+  extends Promise<AsyncIterator<UserAccountHashConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<ApplicationEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateApplicationSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<UserAccountHashEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateUserAccountHashSubscription>() => T;
 }
 
 export interface GrantSubscriptionPayload {
@@ -8962,25 +9399,21 @@ export interface GrantSubscriptionPayloadSubscription
   previousValues: <T = GrantPreviousValuesSubscription>() => T;
 }
 
-export interface RubriqueConnection {
-  pageInfo: PageInfo;
-  edges: RubriqueEdge[];
+export interface UserEdge {
+  node: User;
+  cursor: String;
 }
 
-export interface RubriqueConnectionPromise
-  extends Promise<RubriqueConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<RubriqueEdge>>() => T;
-  aggregate: <T = AggregateRubriquePromise>() => T;
+export interface UserEdgePromise extends Promise<UserEdge>, Fragmentable {
+  node: <T = UserPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface RubriqueConnectionSubscription
-  extends Promise<AsyncIterator<RubriqueConnection>>,
+export interface UserEdgeSubscription
+  extends Promise<AsyncIterator<UserEdge>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<RubriqueEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateRubriqueSubscription>() => T;
+  node: <T = UserSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface GrantPreviousValues {
@@ -9014,57 +9447,67 @@ export interface GrantPreviousValuesSubscription
   redirectUri: () => Promise<AsyncIterator<String>>;
 }
 
-export interface InstallationConnection {
+export interface TransporterReceiptConnection {
   pageInfo: PageInfo;
-  edges: InstallationEdge[];
+  edges: TransporterReceiptEdge[];
 }
 
-export interface InstallationConnectionPromise
-  extends Promise<InstallationConnection>,
+export interface TransporterReceiptConnectionPromise
+  extends Promise<TransporterReceiptConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<InstallationEdge>>() => T;
-  aggregate: <T = AggregateInstallationPromise>() => T;
+  edges: <T = FragmentableArray<TransporterReceiptEdge>>() => T;
+  aggregate: <T = AggregateTransporterReceiptPromise>() => T;
 }
 
-export interface InstallationConnectionSubscription
-  extends Promise<AsyncIterator<InstallationConnection>>,
+export interface TransporterReceiptConnectionSubscription
+  extends Promise<AsyncIterator<TransporterReceiptConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<InstallationEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateInstallationSubscription>() => T;
+  edges: <
+    T = Promise<AsyncIterator<TransporterReceiptEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateTransporterReceiptSubscription>() => T;
 }
 
-export interface AggregateCompanyAssociation {
-  count: Int;
+export interface AccessTokenEdge {
+  node: AccessToken;
+  cursor: String;
 }
 
-export interface AggregateCompanyAssociationPromise
-  extends Promise<AggregateCompanyAssociation>,
+export interface AccessTokenEdgePromise
+  extends Promise<AccessTokenEdge>,
     Fragmentable {
-  count: () => Promise<Int>;
+  node: <T = AccessTokenPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface AggregateCompanyAssociationSubscription
-  extends Promise<AsyncIterator<AggregateCompanyAssociation>>,
+export interface AccessTokenEdgeSubscription
+  extends Promise<AsyncIterator<AccessTokenEdge>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  node: <T = AccessTokenSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface AggregateGrant {
-  count: Int;
+export interface TraderReceiptConnection {
+  pageInfo: PageInfo;
+  edges: TraderReceiptEdge[];
 }
 
-export interface AggregateGrantPromise
-  extends Promise<AggregateGrant>,
+export interface TraderReceiptConnectionPromise
+  extends Promise<TraderReceiptConnection>,
     Fragmentable {
-  count: () => Promise<Int>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<TraderReceiptEdge>>() => T;
+  aggregate: <T = AggregateTraderReceiptPromise>() => T;
 }
 
-export interface AggregateGrantSubscription
-  extends Promise<AsyncIterator<AggregateGrant>>,
+export interface TraderReceiptConnectionSubscription
+  extends Promise<AsyncIterator<TraderReceiptConnection>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<TraderReceiptEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateTraderReceiptSubscription>() => T;
 }
 
 export interface InstallationSubscriptionPayload {
@@ -9092,50 +9535,27 @@ export interface InstallationSubscriptionPayloadSubscription
   previousValues: <T = InstallationPreviousValuesSubscription>() => T;
 }
 
-export interface Grant {
-  id: ID_Output;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-  code: String;
-  expires: Int;
-  redirectUri: String;
+export interface TemporaryStorageDetailConnection {
+  pageInfo: PageInfo;
+  edges: TemporaryStorageDetailEdge[];
 }
 
-export interface GrantPromise extends Promise<Grant>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  user: <T = UserPromise>() => T;
-  code: () => Promise<String>;
-  application: <T = ApplicationPromise>() => T;
-  expires: () => Promise<Int>;
-  redirectUri: () => Promise<String>;
-}
-
-export interface GrantSubscription
-  extends Promise<AsyncIterator<Grant>>,
+export interface TemporaryStorageDetailConnectionPromise
+  extends Promise<TemporaryStorageDetailConnection>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  user: <T = UserSubscription>() => T;
-  code: () => Promise<AsyncIterator<String>>;
-  application: <T = ApplicationSubscription>() => T;
-  expires: () => Promise<AsyncIterator<Int>>;
-  redirectUri: () => Promise<AsyncIterator<String>>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<TemporaryStorageDetailEdge>>() => T;
+  aggregate: <T = AggregateTemporaryStorageDetailPromise>() => T;
 }
 
-export interface GrantNullablePromise
-  extends Promise<Grant | null>,
+export interface TemporaryStorageDetailConnectionSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetailConnection>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-  user: <T = UserPromise>() => T;
-  code: () => Promise<String>;
-  application: <T = ApplicationPromise>() => T;
-  expires: () => Promise<Int>;
-  redirectUri: () => Promise<String>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <
+    T = Promise<AsyncIterator<TemporaryStorageDetailEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateTemporaryStorageDetailSubscription>() => T;
 }
 
 export interface InstallationPreviousValues {
@@ -9190,215 +9610,111 @@ export interface InstallationPreviousValuesSubscription
   sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
 }
 
-export interface TemporaryStorageDetail {
+export interface StatusLog {
   id: ID_Output;
-  tempStorerQuantityType?: QuantityType;
-  tempStorerQuantityReceived?: Float;
-  tempStorerWasteAcceptationStatus?: WasteAcceptationStatus;
-  tempStorerWasteRefusalReason?: String;
-  tempStorerReceivedAt?: DateTimeOutput;
-  tempStorerReceivedBy?: String;
-  tempStorerSignedAt?: DateTimeOutput;
-  destinationIsFilledByEmitter?: Boolean;
-  destinationCompanyName?: String;
-  destinationCompanySiret?: String;
-  destinationCompanyAddress?: String;
-  destinationCompanyContact?: String;
-  destinationCompanyPhone?: String;
-  destinationCompanyMail?: String;
-  destinationCap?: String;
-  destinationProcessingOperation?: String;
-  wasteDetailsOnuCode?: String;
-  wasteDetailsPackagings?: Json;
-  wasteDetailsOtherPackaging?: String;
-  wasteDetailsNumberOfPackages?: Int;
-  wasteDetailsQuantity?: Float;
-  wasteDetailsQuantityType?: QuantityType;
-  transporterCompanyName?: String;
-  transporterCompanySiret?: String;
-  transporterCompanyAddress?: String;
-  transporterCompanyContact?: String;
-  transporterCompanyPhone?: String;
-  transporterCompanyMail?: String;
-  transporterIsExemptedOfReceipt?: Boolean;
-  transporterReceipt?: String;
-  transporterDepartment?: String;
-  transporterValidityLimit?: DateTimeOutput;
-  transporterNumberPlate?: String;
-  signedByTransporter?: Boolean;
-  signedBy?: String;
-  signedAt?: DateTimeOutput;
+  status: Status;
+  loggedAt?: DateTimeOutput;
+  updatedFields?: Json;
 }
 
-export interface TemporaryStorageDetailPromise
-  extends Promise<TemporaryStorageDetail>,
-    Fragmentable {
+export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
   id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
   form: <T = FormPromise>() => T;
-  tempStorerQuantityType: () => Promise<QuantityType>;
-  tempStorerQuantityReceived: () => Promise<Float>;
-  tempStorerWasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
-  tempStorerWasteRefusalReason: () => Promise<String>;
-  tempStorerReceivedAt: () => Promise<DateTimeOutput>;
-  tempStorerReceivedBy: () => Promise<String>;
-  tempStorerSignedAt: () => Promise<DateTimeOutput>;
-  destinationIsFilledByEmitter: () => Promise<Boolean>;
-  destinationCompanyName: () => Promise<String>;
-  destinationCompanySiret: () => Promise<String>;
-  destinationCompanyAddress: () => Promise<String>;
-  destinationCompanyContact: () => Promise<String>;
-  destinationCompanyPhone: () => Promise<String>;
-  destinationCompanyMail: () => Promise<String>;
-  destinationCap: () => Promise<String>;
-  destinationProcessingOperation: () => Promise<String>;
-  wasteDetailsOnuCode: () => Promise<String>;
-  wasteDetailsPackagings: () => Promise<Json>;
-  wasteDetailsOtherPackaging: () => Promise<String>;
-  wasteDetailsNumberOfPackages: () => Promise<Int>;
-  wasteDetailsQuantity: () => Promise<Float>;
-  wasteDetailsQuantityType: () => Promise<QuantityType>;
-  transporterCompanyName: () => Promise<String>;
-  transporterCompanySiret: () => Promise<String>;
-  transporterCompanyAddress: () => Promise<String>;
-  transporterCompanyContact: () => Promise<String>;
-  transporterCompanyPhone: () => Promise<String>;
-  transporterCompanyMail: () => Promise<String>;
-  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
-  transporterReceipt: () => Promise<String>;
-  transporterDepartment: () => Promise<String>;
-  transporterValidityLimit: () => Promise<DateTimeOutput>;
-  transporterNumberPlate: () => Promise<String>;
-  signedByTransporter: () => Promise<Boolean>;
-  signedBy: () => Promise<String>;
-  signedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<Status>;
+  loggedAt: () => Promise<DateTimeOutput>;
+  updatedFields: () => Promise<Json>;
 }
 
-export interface TemporaryStorageDetailSubscription
-  extends Promise<AsyncIterator<TemporaryStorageDetail>>,
+export interface StatusLogSubscription
+  extends Promise<AsyncIterator<StatusLog>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  user: <T = UserSubscription>() => T;
   form: <T = FormSubscription>() => T;
-  tempStorerQuantityType: () => Promise<AsyncIterator<QuantityType>>;
-  tempStorerQuantityReceived: () => Promise<AsyncIterator<Float>>;
-  tempStorerWasteAcceptationStatus: () => Promise<
-    AsyncIterator<WasteAcceptationStatus>
-  >;
-  tempStorerWasteRefusalReason: () => Promise<AsyncIterator<String>>;
-  tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
-  tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
-  destinationCompanyName: () => Promise<AsyncIterator<String>>;
-  destinationCompanySiret: () => Promise<AsyncIterator<String>>;
-  destinationCompanyAddress: () => Promise<AsyncIterator<String>>;
-  destinationCompanyContact: () => Promise<AsyncIterator<String>>;
-  destinationCompanyPhone: () => Promise<AsyncIterator<String>>;
-  destinationCompanyMail: () => Promise<AsyncIterator<String>>;
-  destinationCap: () => Promise<AsyncIterator<String>>;
-  destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
-  wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
-  wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
-  wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
-  wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
-  wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
-  wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
-  transporterCompanyName: () => Promise<AsyncIterator<String>>;
-  transporterCompanySiret: () => Promise<AsyncIterator<String>>;
-  transporterCompanyAddress: () => Promise<AsyncIterator<String>>;
-  transporterCompanyContact: () => Promise<AsyncIterator<String>>;
-  transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
-  transporterCompanyMail: () => Promise<AsyncIterator<String>>;
-  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
-  transporterReceipt: () => Promise<AsyncIterator<String>>;
-  transporterDepartment: () => Promise<AsyncIterator<String>>;
-  transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-  transporterNumberPlate: () => Promise<AsyncIterator<String>>;
-  signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
-  signedBy: () => Promise<AsyncIterator<String>>;
-  signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  status: () => Promise<AsyncIterator<Status>>;
+  loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedFields: () => Promise<AsyncIterator<Json>>;
 }
 
-export interface TemporaryStorageDetailNullablePromise
-  extends Promise<TemporaryStorageDetail | null>,
+export interface StatusLogNullablePromise
+  extends Promise<StatusLog | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  user: <T = UserPromise>() => T;
   form: <T = FormPromise>() => T;
-  tempStorerQuantityType: () => Promise<QuantityType>;
-  tempStorerQuantityReceived: () => Promise<Float>;
-  tempStorerWasteAcceptationStatus: () => Promise<WasteAcceptationStatus>;
-  tempStorerWasteRefusalReason: () => Promise<String>;
-  tempStorerReceivedAt: () => Promise<DateTimeOutput>;
-  tempStorerReceivedBy: () => Promise<String>;
-  tempStorerSignedAt: () => Promise<DateTimeOutput>;
-  destinationIsFilledByEmitter: () => Promise<Boolean>;
-  destinationCompanyName: () => Promise<String>;
-  destinationCompanySiret: () => Promise<String>;
-  destinationCompanyAddress: () => Promise<String>;
-  destinationCompanyContact: () => Promise<String>;
-  destinationCompanyPhone: () => Promise<String>;
-  destinationCompanyMail: () => Promise<String>;
-  destinationCap: () => Promise<String>;
-  destinationProcessingOperation: () => Promise<String>;
-  wasteDetailsOnuCode: () => Promise<String>;
-  wasteDetailsPackagings: () => Promise<Json>;
-  wasteDetailsOtherPackaging: () => Promise<String>;
-  wasteDetailsNumberOfPackages: () => Promise<Int>;
-  wasteDetailsQuantity: () => Promise<Float>;
-  wasteDetailsQuantityType: () => Promise<QuantityType>;
-  transporterCompanyName: () => Promise<String>;
-  transporterCompanySiret: () => Promise<String>;
-  transporterCompanyAddress: () => Promise<String>;
-  transporterCompanyContact: () => Promise<String>;
-  transporterCompanyPhone: () => Promise<String>;
-  transporterCompanyMail: () => Promise<String>;
-  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
-  transporterReceipt: () => Promise<String>;
-  transporterDepartment: () => Promise<String>;
-  transporterValidityLimit: () => Promise<DateTimeOutput>;
-  transporterNumberPlate: () => Promise<String>;
-  signedByTransporter: () => Promise<Boolean>;
-  signedBy: () => Promise<String>;
-  signedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<Status>;
+  loggedAt: () => Promise<DateTimeOutput>;
+  updatedFields: () => Promise<Json>;
 }
 
-export interface CompanyAssociationEdge {
-  node: CompanyAssociation;
-  cursor: String;
+export interface Declaration {
+  id: ID_Output;
+  codeS3ic?: String;
+  nomEts?: String;
+  annee?: String;
+  codeDechet?: String;
+  libDechet?: String;
+  gerepType?: GerepType;
 }
 
-export interface CompanyAssociationEdgePromise
-  extends Promise<CompanyAssociationEdge>,
+export interface DeclarationPromise extends Promise<Declaration>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  codeS3ic: () => Promise<String>;
+  nomEts: () => Promise<String>;
+  annee: () => Promise<String>;
+  codeDechet: () => Promise<String>;
+  libDechet: () => Promise<String>;
+  gerepType: () => Promise<GerepType>;
+}
+
+export interface DeclarationSubscription
+  extends Promise<AsyncIterator<Declaration>>,
     Fragmentable {
-  node: <T = CompanyAssociationPromise>() => T;
-  cursor: () => Promise<String>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  codeS3ic: () => Promise<AsyncIterator<String>>;
+  nomEts: () => Promise<AsyncIterator<String>>;
+  annee: () => Promise<AsyncIterator<String>>;
+  codeDechet: () => Promise<AsyncIterator<String>>;
+  libDechet: () => Promise<AsyncIterator<String>>;
+  gerepType: () => Promise<AsyncIterator<GerepType>>;
 }
 
-export interface CompanyAssociationEdgeSubscription
-  extends Promise<AsyncIterator<CompanyAssociationEdge>>,
+export interface DeclarationNullablePromise
+  extends Promise<Declaration | null>,
     Fragmentable {
-  node: <T = CompanyAssociationSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  id: () => Promise<ID_Output>;
+  codeS3ic: () => Promise<String>;
+  nomEts: () => Promise<String>;
+  annee: () => Promise<String>;
+  codeDechet: () => Promise<String>;
+  libDechet: () => Promise<String>;
+  gerepType: () => Promise<GerepType>;
 }
 
-export interface CompanyConnection {
-  pageInfo: PageInfo;
-  edges: CompanyEdge[];
+export interface UserAccountHashSubscriptionPayload {
+  mutation: MutationType;
+  node: UserAccountHash;
+  updatedFields: String[];
+  previousValues: UserAccountHashPreviousValues;
 }
 
-export interface CompanyConnectionPromise
-  extends Promise<CompanyConnection>,
+export interface UserAccountHashSubscriptionPayloadPromise
+  extends Promise<UserAccountHashSubscriptionPayload>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CompanyEdge>>() => T;
-  aggregate: <T = AggregateCompanyPromise>() => T;
+  mutation: () => Promise<MutationType>;
+  node: <T = UserAccountHashPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = UserAccountHashPreviousValuesPromise>() => T;
 }
 
-export interface CompanyConnectionSubscription
-  extends Promise<AsyncIterator<CompanyConnection>>,
+export interface UserAccountHashSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<UserAccountHashSubscriptionPayload>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<CompanyEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateCompanySubscription>() => T;
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = UserAccountHashSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = UserAccountHashPreviousValuesSubscription>() => T;
 }
 
 export interface RubriqueSubscriptionPayload {
@@ -9426,20 +9742,25 @@ export interface RubriqueSubscriptionPayloadSubscription
   previousValues: <T = RubriquePreviousValuesSubscription>() => T;
 }
 
-export interface AggregateUser {
-  count: Int;
+export interface InstallationConnection {
+  pageInfo: PageInfo;
+  edges: InstallationEdge[];
 }
 
-export interface AggregateUserPromise
-  extends Promise<AggregateUser>,
+export interface InstallationConnectionPromise
+  extends Promise<InstallationConnection>,
     Fragmentable {
-  count: () => Promise<Int>;
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<InstallationEdge>>() => T;
+  aggregate: <T = AggregateInstallationPromise>() => T;
 }
 
-export interface AggregateUserSubscription
-  extends Promise<AsyncIterator<AggregateUser>>,
+export interface InstallationConnectionSubscription
+  extends Promise<AsyncIterator<InstallationConnection>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<InstallationEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateInstallationSubscription>() => T;
 }
 
 export interface RubriquePreviousValues {
@@ -9491,60 +9812,51 @@ export interface RubriquePreviousValuesSubscription
   wasteType: () => Promise<AsyncIterator<WasteType>>;
 }
 
-export interface StatusLogEdge {
-  node: StatusLog;
+export interface GrantEdge {
+  node: Grant;
   cursor: String;
 }
 
-export interface StatusLogEdgePromise
-  extends Promise<StatusLogEdge>,
-    Fragmentable {
-  node: <T = StatusLogPromise>() => T;
+export interface GrantEdgePromise extends Promise<GrantEdge>, Fragmentable {
+  node: <T = GrantPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface StatusLogEdgeSubscription
-  extends Promise<AsyncIterator<StatusLogEdge>>,
+export interface GrantEdgeSubscription
+  extends Promise<AsyncIterator<GrantEdge>>,
     Fragmentable {
-  node: <T = StatusLogSubscription>() => T;
+  node: <T = GrantSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface CompanyAssociationConnection {
-  pageInfo: PageInfo;
-  edges: CompanyAssociationEdge[];
-}
-
-export interface CompanyAssociationConnectionPromise
-  extends Promise<CompanyAssociationConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CompanyAssociationEdge>>() => T;
-  aggregate: <T = AggregateCompanyAssociationPromise>() => T;
-}
-
-export interface CompanyAssociationConnectionSubscription
-  extends Promise<AsyncIterator<CompanyAssociationConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <
-    T = Promise<AsyncIterator<CompanyAssociationEdgeSubscription>>
-  >() => T;
-  aggregate: <T = AggregateCompanyAssociationSubscription>() => T;
-}
-
-export interface AggregateInstallation {
+export interface AggregateCompanyAssociation {
   count: Int;
 }
 
-export interface AggregateInstallationPromise
-  extends Promise<AggregateInstallation>,
+export interface AggregateCompanyAssociationPromise
+  extends Promise<AggregateCompanyAssociation>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateInstallationSubscription
-  extends Promise<AsyncIterator<AggregateInstallation>>,
+export interface AggregateCompanyAssociationSubscription
+  extends Promise<AsyncIterator<AggregateCompanyAssociation>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface AggregateForm {
+  count: Int;
+}
+
+export interface AggregateFormPromise
+  extends Promise<AggregateForm>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateFormSubscription
+  extends Promise<AsyncIterator<AggregateForm>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -9574,25 +9886,20 @@ export interface StatusLogSubscriptionPayloadSubscription
   previousValues: <T = StatusLogPreviousValuesSubscription>() => T;
 }
 
-export interface GrantConnection {
-  pageInfo: PageInfo;
-  edges: GrantEdge[];
+export interface AggregateApplication {
+  count: Int;
 }
 
-export interface GrantConnectionPromise
-  extends Promise<GrantConnection>,
+export interface AggregateApplicationPromise
+  extends Promise<AggregateApplication>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<GrantEdge>>() => T;
-  aggregate: <T = AggregateGrantPromise>() => T;
+  count: () => Promise<Int>;
 }
 
-export interface GrantConnectionSubscription
-  extends Promise<AsyncIterator<GrantConnection>>,
+export interface AggregateApplicationSubscription
+  extends Promise<AsyncIterator<AggregateApplication>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<GrantEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateGrantSubscription>() => T;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface StatusLogPreviousValues {
@@ -9620,65 +9927,96 @@ export interface StatusLogPreviousValuesSubscription
   updatedFields: () => Promise<AsyncIterator<Json>>;
 }
 
-export interface UserAccountHashSubscriptionPayload {
-  mutation: MutationType;
-  node: UserAccountHash;
-  updatedFields: String[];
-  previousValues: UserAccountHashPreviousValues;
+export interface AggregateUserAccountHash {
+  count: Int;
 }
 
-export interface UserAccountHashSubscriptionPayloadPromise
-  extends Promise<UserAccountHashSubscriptionPayload>,
+export interface AggregateUserAccountHashPromise
+  extends Promise<AggregateUserAccountHash>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateUserAccountHashSubscription
+  extends Promise<AsyncIterator<AggregateUserAccountHash>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface CompanyAssociationEdge {
+  node: CompanyAssociation;
+  cursor: String;
+}
+
+export interface CompanyAssociationEdgePromise
+  extends Promise<CompanyAssociationEdge>,
+    Fragmentable {
+  node: <T = CompanyAssociationPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface CompanyAssociationEdgeSubscription
+  extends Promise<AsyncIterator<CompanyAssociationEdge>>,
+    Fragmentable {
+  node: <T = CompanyAssociationSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateTransporterReceipt {
+  count: Int;
+}
+
+export interface AggregateTransporterReceiptPromise
+  extends Promise<AggregateTransporterReceipt>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateTransporterReceiptSubscription
+  extends Promise<AsyncIterator<AggregateTransporterReceipt>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface TemporaryStorageDetailSubscriptionPayload {
+  mutation: MutationType;
+  node: TemporaryStorageDetail;
+  updatedFields: String[];
+  previousValues: TemporaryStorageDetailPreviousValues;
+}
+
+export interface TemporaryStorageDetailSubscriptionPayloadPromise
+  extends Promise<TemporaryStorageDetailSubscriptionPayload>,
     Fragmentable {
   mutation: () => Promise<MutationType>;
-  node: <T = UserAccountHashPromise>() => T;
+  node: <T = TemporaryStorageDetailPromise>() => T;
   updatedFields: () => Promise<String[]>;
-  previousValues: <T = UserAccountHashPreviousValuesPromise>() => T;
+  previousValues: <T = TemporaryStorageDetailPreviousValuesPromise>() => T;
 }
 
-export interface UserAccountHashSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<UserAccountHashSubscriptionPayload>>,
+export interface TemporaryStorageDetailSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<TemporaryStorageDetailSubscriptionPayload>>,
     Fragmentable {
   mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = UserAccountHashSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = UserAccountHashPreviousValuesSubscription>() => T;
-}
-
-export interface TemporaryStorageDetailEdge {
-  node: TemporaryStorageDetail;
-  cursor: String;
-}
-
-export interface TemporaryStorageDetailEdgePromise
-  extends Promise<TemporaryStorageDetailEdge>,
-    Fragmentable {
-  node: <T = TemporaryStorageDetailPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface TemporaryStorageDetailEdgeSubscription
-  extends Promise<AsyncIterator<TemporaryStorageDetailEdge>>,
-    Fragmentable {
   node: <T = TemporaryStorageDetailSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = TemporaryStorageDetailPreviousValuesSubscription>() => T;
 }
 
-export interface CompanyEdge {
-  node: Company;
-  cursor: String;
+export interface AggregateTemporaryStorageDetail {
+  count: Int;
 }
 
-export interface CompanyEdgePromise extends Promise<CompanyEdge>, Fragmentable {
-  node: <T = CompanyPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface CompanyEdgeSubscription
-  extends Promise<AsyncIterator<CompanyEdge>>,
+export interface AggregateTemporaryStorageDetailPromise
+  extends Promise<AggregateTemporaryStorageDetail>,
     Fragmentable {
-  node: <T = CompanySubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<Int>;
+}
+
+export interface AggregateTemporaryStorageDetailSubscription
+  extends Promise<AsyncIterator<AggregateTemporaryStorageDetail>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface TemporaryStorageDetailPreviousValues {
@@ -9807,29 +10145,319 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface TemporaryStorageDetailSubscriptionPayload {
-  mutation: MutationType;
-  node: TemporaryStorageDetail;
-  updatedFields: String[];
-  previousValues: TemporaryStorageDetailPreviousValues;
+export interface RubriqueEdge {
+  node: Rubrique;
+  cursor: String;
 }
 
-export interface TemporaryStorageDetailSubscriptionPayloadPromise
-  extends Promise<TemporaryStorageDetailSubscriptionPayload>,
+export interface RubriqueEdgePromise
+  extends Promise<RubriqueEdge>,
+    Fragmentable {
+  node: <T = RubriquePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface RubriqueEdgeSubscription
+  extends Promise<AsyncIterator<RubriqueEdge>>,
+    Fragmentable {
+  node: <T = RubriqueSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface CompanyAssociationConnection {
+  pageInfo: PageInfo;
+  edges: CompanyAssociationEdge[];
+}
+
+export interface CompanyAssociationConnectionPromise
+  extends Promise<CompanyAssociationConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CompanyAssociationEdge>>() => T;
+  aggregate: <T = AggregateCompanyAssociationPromise>() => T;
+}
+
+export interface CompanyAssociationConnectionSubscription
+  extends Promise<AsyncIterator<CompanyAssociationConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <
+    T = Promise<AsyncIterator<CompanyAssociationEdgeSubscription>>
+  >() => T;
+  aggregate: <T = AggregateCompanyAssociationSubscription>() => T;
+}
+
+export interface Installation {
+  id: ID_Output;
+  codeS3ic?: String;
+  nomEts?: String;
+  regime?: String;
+  libRegime?: String;
+  seveso?: Seveso;
+  libSeveso?: String;
+  familleIc?: String;
+  urlFiche?: String;
+  s3icNumeroSiret?: String;
+  irepNumeroSiret?: String;
+  gerepNumeroSiret?: String;
+  sireneNumeroSiret?: String;
+}
+
+export interface InstallationPromise
+  extends Promise<Installation>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  codeS3ic: () => Promise<String>;
+  nomEts: () => Promise<String>;
+  regime: () => Promise<String>;
+  libRegime: () => Promise<String>;
+  seveso: () => Promise<Seveso>;
+  libSeveso: () => Promise<String>;
+  familleIc: () => Promise<String>;
+  urlFiche: () => Promise<String>;
+  s3icNumeroSiret: () => Promise<String>;
+  irepNumeroSiret: () => Promise<String>;
+  gerepNumeroSiret: () => Promise<String>;
+  sireneNumeroSiret: () => Promise<String>;
+}
+
+export interface InstallationSubscription
+  extends Promise<AsyncIterator<Installation>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  codeS3ic: () => Promise<AsyncIterator<String>>;
+  nomEts: () => Promise<AsyncIterator<String>>;
+  regime: () => Promise<AsyncIterator<String>>;
+  libRegime: () => Promise<AsyncIterator<String>>;
+  seveso: () => Promise<AsyncIterator<Seveso>>;
+  libSeveso: () => Promise<AsyncIterator<String>>;
+  familleIc: () => Promise<AsyncIterator<String>>;
+  urlFiche: () => Promise<AsyncIterator<String>>;
+  s3icNumeroSiret: () => Promise<AsyncIterator<String>>;
+  irepNumeroSiret: () => Promise<AsyncIterator<String>>;
+  gerepNumeroSiret: () => Promise<AsyncIterator<String>>;
+  sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
+}
+
+export interface InstallationNullablePromise
+  extends Promise<Installation | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  codeS3ic: () => Promise<String>;
+  nomEts: () => Promise<String>;
+  regime: () => Promise<String>;
+  libRegime: () => Promise<String>;
+  seveso: () => Promise<Seveso>;
+  libSeveso: () => Promise<String>;
+  familleIc: () => Promise<String>;
+  urlFiche: () => Promise<String>;
+  s3icNumeroSiret: () => Promise<String>;
+  irepNumeroSiret: () => Promise<String>;
+  gerepNumeroSiret: () => Promise<String>;
+  sireneNumeroSiret: () => Promise<String>;
+}
+
+export interface TraderReceiptSubscriptionPayload {
+  mutation: MutationType;
+  node: TraderReceipt;
+  updatedFields: String[];
+  previousValues: TraderReceiptPreviousValues;
+}
+
+export interface TraderReceiptSubscriptionPayloadPromise
+  extends Promise<TraderReceiptSubscriptionPayload>,
     Fragmentable {
   mutation: () => Promise<MutationType>;
-  node: <T = TemporaryStorageDetailPromise>() => T;
+  node: <T = TraderReceiptPromise>() => T;
   updatedFields: () => Promise<String[]>;
-  previousValues: <T = TemporaryStorageDetailPreviousValuesPromise>() => T;
+  previousValues: <T = TraderReceiptPreviousValuesPromise>() => T;
 }
 
-export interface TemporaryStorageDetailSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<TemporaryStorageDetailSubscriptionPayload>>,
+export interface TraderReceiptSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<TraderReceiptSubscriptionPayload>>,
     Fragmentable {
   mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = TemporaryStorageDetailSubscription>() => T;
+  node: <T = TraderReceiptSubscription>() => T;
   updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = TemporaryStorageDetailPreviousValuesSubscription>() => T;
+  previousValues: <T = TraderReceiptPreviousValuesSubscription>() => T;
+}
+
+export interface FormConnection {
+  pageInfo: PageInfo;
+  edges: FormEdge[];
+}
+
+export interface FormConnectionPromise
+  extends Promise<FormConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<FormEdge>>() => T;
+  aggregate: <T = AggregateFormPromise>() => T;
+}
+
+export interface FormConnectionSubscription
+  extends Promise<AsyncIterator<FormConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<FormEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateFormSubscription>() => T;
+}
+
+export interface TraderReceiptPreviousValues {
+  id: ID_Output;
+  receiptNumber: String;
+  validityLimit: DateTimeOutput;
+  department: String;
+}
+
+export interface TraderReceiptPreviousValuesPromise
+  extends Promise<TraderReceiptPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  receiptNumber: () => Promise<String>;
+  validityLimit: () => Promise<DateTimeOutput>;
+  department: () => Promise<String>;
+}
+
+export interface TraderReceiptPreviousValuesSubscription
+  extends Promise<AsyncIterator<TraderReceiptPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  receiptNumber: () => Promise<AsyncIterator<String>>;
+  validityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  department: () => Promise<AsyncIterator<String>>;
+}
+
+export interface UserAccountHash {
+  id: ID_Output;
+  email: String;
+  companySiret: ID_Output;
+  role: UserRole;
+  hash: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface UserAccountHashPromise
+  extends Promise<UserAccountHash>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface UserAccountHashSubscription
+  extends Promise<AsyncIterator<UserAccountHash>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  email: () => Promise<AsyncIterator<String>>;
+  companySiret: () => Promise<AsyncIterator<ID_Output>>;
+  role: () => Promise<AsyncIterator<UserRole>>;
+  hash: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface UserAccountHashNullablePromise
+  extends Promise<UserAccountHash | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  email: () => Promise<String>;
+  companySiret: () => Promise<ID_Output>;
+  role: () => Promise<UserRole>;
+  hash: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface StatusLogEdge {
+  node: StatusLog;
+  cursor: String;
+}
+
+export interface StatusLogEdgePromise
+  extends Promise<StatusLogEdge>,
+    Fragmentable {
+  node: <T = StatusLogPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface StatusLogEdgeSubscription
+  extends Promise<AsyncIterator<StatusLogEdge>>,
+    Fragmentable {
+  node: <T = StatusLogSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface CompanyEdge {
+  node: Company;
+  cursor: String;
+}
+
+export interface CompanyEdgePromise extends Promise<CompanyEdge>, Fragmentable {
+  node: <T = CompanyPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface CompanyEdgeSubscription
+  extends Promise<AsyncIterator<CompanyEdge>>,
+    Fragmentable {
+  node: <T = CompanySubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface TransporterReceiptPreviousValues {
+  id: ID_Output;
+  receiptNumber: String;
+  validityLimit: DateTimeOutput;
+  department: String;
+}
+
+export interface TransporterReceiptPreviousValuesPromise
+  extends Promise<TransporterReceiptPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  receiptNumber: () => Promise<String>;
+  validityLimit: () => Promise<DateTimeOutput>;
+  department: () => Promise<String>;
+}
+
+export interface TransporterReceiptPreviousValuesSubscription
+  extends Promise<AsyncIterator<TransporterReceiptPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  receiptNumber: () => Promise<AsyncIterator<String>>;
+  validityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  department: () => Promise<AsyncIterator<String>>;
+}
+
+export interface TransporterReceiptSubscriptionPayload {
+  mutation: MutationType;
+  node: TransporterReceipt;
+  updatedFields: String[];
+  previousValues: TransporterReceiptPreviousValues;
+}
+
+export interface TransporterReceiptSubscriptionPayloadPromise
+  extends Promise<TransporterReceiptSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = TransporterReceiptPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = TransporterReceiptPreviousValuesPromise>() => T;
+}
+
+export interface TransporterReceiptSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<TransporterReceiptSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = TransporterReceiptSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = TransporterReceiptPreviousValuesSubscription>() => T;
 }
 
 export interface AggregateCompany {
@@ -9848,114 +10476,144 @@ export interface AggregateCompanySubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface AggregateRubrique {
+export interface AggregateInstallation {
   count: Int;
 }
 
-export interface AggregateRubriquePromise
-  extends Promise<AggregateRubrique>,
+export interface AggregateInstallationPromise
+  extends Promise<AggregateInstallation>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateRubriqueSubscription
-  extends Promise<AsyncIterator<AggregateRubrique>>,
+export interface AggregateInstallationSubscription
+  extends Promise<AsyncIterator<AggregateInstallation>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface UserPreviousValues {
-  id: ID_Output;
-  isActive?: Boolean;
-  email: String;
-  password: String;
-  name?: String;
-  phone?: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
+export interface AggregateTraderReceipt {
+  count: Int;
 }
 
-export interface UserPreviousValuesPromise
-  extends Promise<UserPreviousValues>,
+export interface AggregateTraderReceiptPromise
+  extends Promise<AggregateTraderReceipt>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  isActive: () => Promise<Boolean>;
-  email: () => Promise<String>;
-  password: () => Promise<String>;
-  name: () => Promise<String>;
-  phone: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
+  count: () => Promise<Int>;
 }
 
-export interface UserPreviousValuesSubscription
-  extends Promise<AsyncIterator<UserPreviousValues>>,
+export interface AggregateTraderReceiptSubscription
+  extends Promise<AsyncIterator<AggregateTraderReceipt>>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  isActive: () => Promise<AsyncIterator<Boolean>>;
-  email: () => Promise<AsyncIterator<String>>;
-  password: () => Promise<AsyncIterator<String>>;
-  name: () => Promise<AsyncIterator<String>>;
-  phone: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface FormEdge {
-  node: Form;
+export interface UserActivationHashEdge {
+  node: UserActivationHash;
   cursor: String;
 }
 
-export interface FormEdgePromise extends Promise<FormEdge>, Fragmentable {
-  node: <T = FormPromise>() => T;
+export interface UserActivationHashEdgePromise
+  extends Promise<UserActivationHashEdge>,
+    Fragmentable {
+  node: <T = UserActivationHashPromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface FormEdgeSubscription
-  extends Promise<AsyncIterator<FormEdge>>,
+export interface UserActivationHashEdgeSubscription
+  extends Promise<AsyncIterator<UserActivationHashEdge>>,
     Fragmentable {
-  node: <T = FormSubscription>() => T;
+  node: <T = UserActivationHashSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface CompanyAssociation {
+export interface Company {
   id: ID_Output;
-  role: UserRole;
+  siret: String;
+  companyTypes: CompanyType[];
+  name?: String;
+  gerepId?: String;
+  codeNaf?: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  securityCode: Int;
+  givenName?: String;
+  contactEmail?: String;
+  contactPhone?: String;
+  website?: String;
+  documentKeys: String[];
 }
 
-export interface CompanyAssociationPromise
-  extends Promise<CompanyAssociation>,
-    Fragmentable {
+export interface CompanyPromise extends Promise<Company>, Fragmentable {
   id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  company: <T = CompanyPromise>() => T;
-  role: () => Promise<UserRole>;
+  siret: () => Promise<String>;
+  companyTypes: () => Promise<CompanyType[]>;
+  name: () => Promise<String>;
+  gerepId: () => Promise<String>;
+  codeNaf: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  securityCode: () => Promise<Int>;
+  givenName: () => Promise<String>;
+  contactEmail: () => Promise<String>;
+  contactPhone: () => Promise<String>;
+  website: () => Promise<String>;
+  documentKeys: () => Promise<String[]>;
+  transporterReceipt: <T = TransporterReceiptPromise>() => T;
+  traderReceipt: <T = TraderReceiptPromise>() => T;
 }
 
-export interface CompanyAssociationSubscription
-  extends Promise<AsyncIterator<CompanyAssociation>>,
+export interface CompanySubscription
+  extends Promise<AsyncIterator<Company>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  user: <T = UserSubscription>() => T;
-  company: <T = CompanySubscription>() => T;
-  role: () => Promise<AsyncIterator<UserRole>>;
+  siret: () => Promise<AsyncIterator<String>>;
+  companyTypes: () => Promise<AsyncIterator<CompanyType[]>>;
+  name: () => Promise<AsyncIterator<String>>;
+  gerepId: () => Promise<AsyncIterator<String>>;
+  codeNaf: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  securityCode: () => Promise<AsyncIterator<Int>>;
+  givenName: () => Promise<AsyncIterator<String>>;
+  contactEmail: () => Promise<AsyncIterator<String>>;
+  contactPhone: () => Promise<AsyncIterator<String>>;
+  website: () => Promise<AsyncIterator<String>>;
+  documentKeys: () => Promise<AsyncIterator<String[]>>;
+  transporterReceipt: <T = TransporterReceiptSubscription>() => T;
+  traderReceipt: <T = TraderReceiptSubscription>() => T;
 }
 
-export interface CompanyAssociationNullablePromise
-  extends Promise<CompanyAssociation | null>,
+export interface CompanyNullablePromise
+  extends Promise<Company | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  user: <T = UserPromise>() => T;
-  company: <T = CompanyPromise>() => T;
-  role: () => Promise<UserRole>;
+  siret: () => Promise<String>;
+  companyTypes: () => Promise<CompanyType[]>;
+  name: () => Promise<String>;
+  gerepId: () => Promise<String>;
+  codeNaf: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  securityCode: () => Promise<Int>;
+  givenName: () => Promise<String>;
+  contactEmail: () => Promise<String>;
+  contactPhone: () => Promise<String>;
+  website: () => Promise<String>;
+  documentKeys: () => Promise<String[]>;
+  transporterReceipt: <T = TransporterReceiptPromise>() => T;
+  traderReceipt: <T = TraderReceiptPromise>() => T;
 }
 
-/*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string;
+export type Json = any;
 
 export type Long = string;
+
+/*
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+*/
+export type ID_Input = string | number;
+export type ID_Output = string;
 
 /*
 DateTime scalar input type, allowing Date
@@ -9977,18 +10635,15 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 */
 export type Int = number;
 
-export type Json = any;
-
 /*
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).
 */
 export type Float = number;
 
 /*
-The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
 */
-export type ID_Input = string | number;
-export type ID_Output = string;
+export type String = string;
 
 /**
  * Model Metadata
@@ -10065,6 +10720,14 @@ export const models: Model[] = [
   },
   {
     name: "CompanyType",
+    embedded: false
+  },
+  {
+    name: "TransporterReceipt",
+    embedded: false
+  },
+  {
+    name: "TraderReceipt",
     embedded: false
   },
   {

@@ -11,7 +11,9 @@ export default async function updateCompany({
   contactEmail,
   contactPhone,
   website,
-  givenName
+  givenName,
+  transporterReceiptId,
+  traderReceiptId
 }: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
   const data = {
     ...(companyTypes !== undefined
@@ -21,7 +23,13 @@ export default async function updateCompany({
     ...(contactEmail !== undefined ? { contactEmail } : {}),
     ...(contactPhone !== undefined ? { contactPhone } : {}),
     ...(website !== undefined ? { website } : {}),
-    ...(givenName !== undefined ? { givenName } : {})
+    ...(givenName !== undefined ? { givenName } : {}),
+    ...(transporterReceiptId
+      ? { transporterReceipt: { connect: { id: transporterReceiptId } } }
+      : {}),
+    ...(traderReceiptId
+      ? { traderReceipt: { connect: { id: traderReceiptId } } }
+      : {})
   };
 
   return prisma.updateCompany({

@@ -362,6 +362,36 @@ Rattache un établissement à l'utilisateur authentifié
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>createTraderReceipt</strong></td>
+<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
+<td>
+
+USAGE INTERNE
+Crée un récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#createtraderreceiptinput">CreateTraderReceiptInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createTransporterReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+USAGE INTERNE
+Crée un récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#createtransporterreceiptinput">CreateTransporterReceiptInput</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createUploadLink</strong></td>
 <td valign="top"><a href="#uploadlink">UploadLink</a>!</td>
 <td>
@@ -425,6 +455,36 @@ Supprime une invitation à un établissement
 <tr>
 <td colspan="2" align="right" valign="top">siret</td>
 <td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>deleteTraderReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+USAGE INTERNE
+Supprime un récépissé négociant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#deletetraderreceiptinput">DeleteTraderReceiptInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>deleteTransporterReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+USAGE INTERNE
+Supprime un récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#deletetransporterreceiptinput">DeleteTransporterReceiptInput</a></td>
 <td></td>
 </tr>
 <tr>
@@ -903,6 +963,39 @@ SIRET de l'établissement
 </td>
 </tr>
 <tr>
+<td colspan="2" align="right" valign="top">transporterReceiptId</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Identifiant d'un récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">traderReceiptId</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Identifiant d'un récépissé négociant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updateTraderReceipt</strong></td>
+<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
+<td>
+
+USAGE INTERNE
+Édite les informations d'un récépissé négociant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#updatetraderreceiptinput">UpdateTraderReceiptInput</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>updateTransporterFields</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -937,6 +1030,21 @@ Plaque d'immatriculation du transporteur
 Champ libre, utilisable par exemple pour noter les tournées des transporteurs
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updateTransporterReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+USAGE INTERNE
+Édite les informations d'un récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#updatetransporterreceiptinput">UpdateTransporterReceiptInput</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -1047,6 +1155,24 @@ Numéro de téléphone
 <td>
 
 Email de contact
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+Récépissé transporteur associé à cet établissement (le cas échéant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>traderReceipt</strong></td>
+<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
+<td>
+
+Récépissé négociant associé à cet établissement (le cas échant)
 
 </td>
 </tr>
@@ -1311,6 +1437,24 @@ associé à cet établissement (le cas échéant)
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+Récépissé transporteur (le cas échéant, pour les profils transporteur)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>traderReceipt</strong></td>
+<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
+<td>
+
+Récépissé négociant (le cas échéant, pour les profils transporteur)
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -1446,6 +1590,24 @@ Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+Récépissé transporteur associé à cet établissement (le cas échéant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>traderReceipt</strong></td>
+<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
+<td>
+
+Récépissé négociant associé à cet établissement (le cas échant)
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -1542,6 +1704,24 @@ Latitude de l'établissement (info géographique)
 
 Installation classée pour la protection de l'environnement (ICPE)
 associé à cet établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
+<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
+<td>
+
+Récépissé transporteur associé à cet établissement (le cas échéant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>traderReceipt</strong></td>
+<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
+<td>
+
+Récépissé négociant associé à cet établissement (le cas échant)
 
 </td>
 </tr>
@@ -2986,6 +3166,55 @@ Limite de validité
 </tbody>
 </table>
 
+### TraderReceipt
+
+Récépissé négociant
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro de récépissé négociant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Limite de validatié du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### Transporter
 
 Collecteur - transporteur (case 8)
@@ -3060,6 +3289,55 @@ Numéro de plaque d'immatriculation
 <td>
 
 Information libre, destinée aux transporteurs
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### TransporterReceipt
+
+Récépissé transporteur
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro de récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Limite de validatié du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département ayant enregistré la déclaration
 
 </td>
 </tr>
@@ -3471,6 +3749,142 @@ Numéro de téléphone de contact dans l'établissement
 </tbody>
 </table>
 
+### CreateTraderReceiptInput
+
+Payload de création d'un récépissé négociant
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro de récépissé négociant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Limite de validatié du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### CreateTransporterReceiptInput
+
+Payload de création d'un récépissé transporteur
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro de récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Limite de validatié du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### DeleteTraderReceiptInput
+
+Payload de suppression d'un récépissé négociant
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+The id of the trader receipt to delete
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### DeleteTransporterReceiptInput
+
+Payload de suppression d'un récépissé transporteur
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+The id of the transporter receipt to delete
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### DestinationInput
 
 <table>
@@ -3781,6 +4195,24 @@ Nom de l'établissement
 
 Liste de documents permettant de démontrer l'appartenance
 de l'utilisateur à l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporterReceiptId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Récipissé transporteur (le cas échéant, pour les profils transporteur)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>traderReceiptId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Récipissé négociant (le cas échéant, pour les profils négociant)
 
 </td>
 </tr>
@@ -4450,6 +4882,110 @@ Quantité en tonnes
 <td>
 
 Code ONU
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### UpdateTraderReceiptInput
+
+Payload d'édition d'un récépissé transporteur
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+The id of the trader receipt to modify
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validatié du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### UpdateTransporterReceiptInput
+
+Payload d'édition d'un récépissé transporteur
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+The id of the transporter receipt to modify
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validatié du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département ayant enregistré la déclaration
 
 </td>
 </tr>

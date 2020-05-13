@@ -1,4 +1,4 @@
-import { toMacroCase } from "../helper";
+import { toMacroCase, formatDate } from "../helper";
 
 describe("helper methods", () => {
   describe("toMacroCase", () => {
@@ -26,5 +26,10 @@ describe("helper methods", () => {
       const res = toMacroCase("a     String");
       expect(res).toBe("A_STRING");
     });
+  });
+
+  test("formatDate", () => {
+    const date = new Date("2019-10-04 00:00:00");
+    expect(formatDate(date)).toEqual("2019-10-04");
   });
 });

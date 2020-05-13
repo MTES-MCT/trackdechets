@@ -19,10 +19,20 @@ export const ErrorProvider: FunctionComponent<Props> = ({
     return null;
   }
 
-  const errors = apolloError.graphQLErrors ??
-    apolloError.networkError ?? [apolloError];
+  const { graphQLErrors, networkError } = apolloError;
 
-  return <>{errors.map((error, idx) => children({ error, idx }))}</>;
+  if (graphQLErrors.length >= 1) {
+    return <>{graphQLErrors.map((error, idx) => children({ error, idx }))}</>;
+  }
+
+  if (networkError) {
+    return children({ error: networkError });
+  }
+
+  if (apolloError) {
+    return children({ error: apolloError });
+  }
+  return null;
 };
 
 export function InlineError({ apolloError }: Props) {

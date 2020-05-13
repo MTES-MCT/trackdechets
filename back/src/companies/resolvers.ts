@@ -3,6 +3,12 @@ import { searchCompany, searchCompanies } from "./sirene";
 import { renewSecurityCode, updateCompany } from "./mutations";
 import createCompany from "./mutations/create-company";
 import createUploadLink from "./mutations/create-upload-link";
+import createTransporterReceipt from "./mutations/transporterReceipt/createTransporterReceipt";
+import createTraderReceipt from "./mutations/traderReceipt/createTraderReceipt";
+import updateTransporterReceipt from "./mutations/transporterReceipt/updateTransporterReceipt";
+import updateTraderReceipt from "./mutations/traderReceipt/updateTraderReceipt";
+import deleteTransporterReceipt from "./mutations/transporterReceipt/deleteTransporterReceipt";
+import deleteTraderReceipt from "./mutations/traderReceipt/deleteTraderReceipt";
 import {
   getCompanyInfos,
   getCompanyUsers,
@@ -17,8 +23,19 @@ import {
   MutationResolvers,
   CompanyPrivateResolvers,
   CompanyMemberResolvers,
-  InstallationResolvers
+  InstallationResolvers,
+  CompanyPublicResolvers,
+  CompanyFavoriteResolvers,
+  CompanySearchResultResolvers
 } from "../generated/graphql/types";
+
+// lookup for transporter and trader receipt in db
+const receiptsResolvers = {
+  transporterReceipt: parent =>
+    prisma.company({ siret: parent.siret }).transporterReceipt(),
+  traderReceipt: parent =>
+    prisma.company({ siret: parent.siret }).traderReceipt()
+};
 
 const queryResolvers: QueryResolvers = {
   companyInfos: async (_, { siret }) => getCompanyInfos(siret),
@@ -90,6 +107,12 @@ const mutationResolvers: MutationResolvers = {
   renewSecurityCode: (_, { siret }) => renewSecurityCode(siret),
   updateCompany: (_, args) => updateCompany(args),
   createCompany: (_, args, context) => createCompany(context.user, args),
+  createTransporterReceipt: (_, { input }) => createTransporterReceipt(input),
+  updateTransporterReceipt: (_, { input }) => updateTransporterReceipt(input),
+  deleteTransporterReceipt: (_, { input }) => deleteTransporterReceipt(input),
+  deleteTraderReceipt: (_, { input }) => deleteTraderReceipt(input),
+  createTraderReceipt: (_, { input }) => createTraderReceipt(input),
+  updateTraderReceipt: (_, { input }) => updateTraderReceipt(input),
   createUploadLink: (_, args, context) =>
     createUploadLink(context.user.id, args)
 };
@@ -101,7 +124,20 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
   userRole: (parent, _, context) => {
     const userId = context.user.id;
     return getUserRole(userId, parent.siret);
-  }
+  },
+  ...receiptsResolvers
+};
+
+const companyPublicResolvers: CompanyPublicResolvers = {
+  ...receiptsResolvers
+};
+
+const companyFavoriteResolvers: CompanyFavoriteResolvers = {
+  ...receiptsResolvers
+};
+
+const companySearchResultResolvers: CompanySearchResultResolvers = {
+  ...receiptsResolvers
 };
 
 const companyMemberResolvers: CompanyMemberResolvers = {
@@ -119,6 +155,9 @@ const installationResolvers: InstallationResolvers = {
 
 export default {
   CompanyPrivate: companyPrivateResolvers,
+  CompanyPublic: companyPublicResolvers,
+  CompanyFavorite: companyFavoriteResolvers,
+  CompanySearchResult: companySearchResultResolvers,
   CompanyMember: companyMemberResolvers,
   Installation: installationResolvers,
   Query: queryResolvers,

@@ -47,7 +47,7 @@ export default function AccountField({
 
   return (
     <div className={classes.join(" ")}>
-      <label htmlFor={name}>
+      <label htmlFor={name} className="text-right">
         {label}
         {tooltip && <Tooltip msg={tooltip} />}
       </label>

@@ -9,6 +9,16 @@ export const FAVORITES = gql`
       contact
       phone
       mail
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+      traderReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
     }
   }
 `;
@@ -30,6 +40,16 @@ export const COMPANY_INFOS = gql`
           category
         }
       }
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+      traderReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
     }
   }
 `;
@@ -43,6 +63,16 @@ export const SEARCH_COMPANIES = gql`
       installation {
         codeS3ic
         urlFiche
+      }
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+      traderReceipt {
+        receiptNumber
+        validityLimit
+        department
       }
     }
   }

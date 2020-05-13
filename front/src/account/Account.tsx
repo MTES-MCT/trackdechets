@@ -3,7 +3,12 @@ import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
 import { useQuery } from "@apollo/react-hooks";
 import AccountMenu from "./AccountMenu";
-import { Route, withRouter, RouteComponentProps } from "react-router";
+import {
+  Route,
+  withRouter,
+  RouteComponentProps,
+  useHistory,
+} from "react-router";
 import Loader from "../common/Loader";
 import { InlineError } from "../common/Error";
 import AccountInfo from "./AccountInfo";
@@ -13,7 +18,7 @@ import AccountContentWrapper from "./AccountContentWrapper";
 import AccountCompanyAdd from "./AccountCompanyAdd";
 import { Query } from "../generated/graphql/types";
 
-const GET_ME = gql`
+export const GET_ME = gql`
   {
     me {
       ...AccountInfoFragment
@@ -27,6 +32,7 @@ const GET_ME = gql`
 `;
 
 export default withRouter(function Account({ match }: RouteComponentProps) {
+  const history = useHistory();
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   if (loading) return <Loader />;
@@ -58,7 +64,17 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
             exact
             path={`${match.path}/companies`}
             render={() => (
-              <AccountContentWrapper title="Établissements">
+              <AccountContentWrapper
+                title="Établissements"
+                button={
+                  <button
+                    className="button"
+                    onClick={() => history.push(`${match.path}/companies/new`)}
+                  >
+                    Créer un établissement
+                  </button>
+                }
+              >
                 <AccountCompanyList
                   companies={filter(
                     AccountCompanyList.fragments.company,
@@ -69,7 +85,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
             )}
           />
           <Route path={`${match.path}/companies/new`}>
-            <AccountContentWrapper title="Création d'un nouvel établissement">
+            <AccountContentWrapper title="Créer un établissement">
               <AccountCompanyAdd />
             </AccountContentWrapper>
           </Route>

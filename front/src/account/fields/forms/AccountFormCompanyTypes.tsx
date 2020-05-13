@@ -67,7 +67,7 @@ export default function AccountFormCompanyTypes({
           <div className="form__group">
             <Field
               className={styles.input}
-              name="companyTypes"
+              name={name}
               component={CompanyTypes}
             ></Field>
           </div>
