@@ -190,7 +190,7 @@ describe("Create company endpoint", () => {
 
     const { errors, data } = await mutate(mutation);
 
-    expect(data.createCompany).toBeNull();
+    expect(data).toBeNull();
     expect(errors[0].extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
   });
 
