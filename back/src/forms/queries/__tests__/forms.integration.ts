@@ -161,4 +161,41 @@ describe("Integration / Forms query", () => {
     expect(data.forms.length).toBe(1);
     expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
   });
+
+  it("should convert wasteDetails packagings to an empty array if null", async () => {
+    await createForms(user.id, [
+      {
+        recipientCompanySiret: company.siret,
+        wasteDetailsPackagings: ["CITERNE"]
+      },
+      {
+        recipientCompanySiret: company.siret,
+        wasteDetailsPackagings: []
+      },
+      {
+        recipientCompanySiret: company.siret,
+        wasteDetailsPackagings: null
+      }
+    ]);
+
+    const { data, errors } = await query(
+      `query {
+          forms {
+            wasteDetails {
+              packagings
+            }
+          }
+        }
+      `
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data.forms.length).toBe(3);
+
+    expect(data.forms).toEqual([
+      { wasteDetails: { packagings: ["CITERNE"] } },
+      { wasteDetails: { packagings: [] } },
+      { wasteDetails: { packagings: [] } }
+    ]);
+  });
 });

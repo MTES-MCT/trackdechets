@@ -33,7 +33,7 @@ import {
   MutationResolvers,
   SubscriptionResolvers,
   FormResolvers,
-  TemporaryStorageDetail
+  WasteDetailsResolvers
 } from "../generated/graphql/types";
 
 // formsLifeCycle fragment
@@ -263,6 +263,10 @@ const formResolvers: FormResolvers = {
   stateSummary: parent => stateSummary(parent)
 };
 
+const wasteDetailsResolvers: WasteDetailsResolvers = {
+  packagings: parent => parent.packagings || []
+};
+
 const subscriptionResolvers: SubscriptionResolvers = {
   forms: {
     subscribe: async (parent, { token }) => {
@@ -296,6 +300,7 @@ const subscriptionResolvers: SubscriptionResolvers = {
 
 export default {
   Form: formResolvers,
+  WasteDetails: wasteDetailsResolvers,
   Query: queryResolvers,
   Mutation: mutationResolvers,
   Subscription: subscriptionResolvers
