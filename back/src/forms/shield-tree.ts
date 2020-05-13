@@ -11,7 +11,8 @@ import {
   isFormRecipient,
   isFormTempStorer,
   isFormTrader,
-  isFormTransporter
+  isFormTransporter,
+  isFormEcoOrganisme
 } from "./rules/permissions";
 import {
   markAsProcessedSchema,
@@ -37,7 +38,7 @@ export default {
     saveForm: isAuthenticated,
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
-    markAsSealed: or(isFormRecipient, isFormEmitter, isFormTrader),
+    markAsSealed: or(isFormEcoOrganisme, isFormRecipient, isFormEmitter, isFormTrader),
     markAsSent: chain(markAsSentSchema, or(isFormRecipient, isFormEmitter)),
     markAsReceived: chain(markAsReceivedSchema, isFormRecipient),
     markAsProcessed: chain(markAsProcessedSchema, isFormRecipient),

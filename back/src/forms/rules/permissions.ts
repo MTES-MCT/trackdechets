@@ -79,6 +79,24 @@ export const isAllowedToUseAppendix2Forms = rule()(
   }
 );
 
+export const isFormEcoOrganisme = and(
+  isAuthenticated,
+  rule()(async (_, { id }, ctx) => {
+    ensureRuleParametersArePresent(id);
+
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    return (
+      currentUserSirets.includes(formInfos.ecoOrganisme?.siret) ||
+      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+    );
+  })
+);
+
 export const isFormRecipient = and(
   isAuthenticated,
   rule()(async (_, { id }, ctx) => {
