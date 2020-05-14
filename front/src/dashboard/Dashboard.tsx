@@ -1,8 +1,8 @@
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import React, { useState } from "react";
-import { Redirect, Route } from "react-router";
-import { useRouteMatch } from "react-router-dom";
+import React from "react";
+import { Redirect, Route, useHistory } from "react-router";
+import { useParams, useRouteMatch } from "react-router-dom";
 import { InlineError } from "../common/Error";
 import Loader from "../common/Loader";
 import { currentSiretService } from "./CompanySelector";
@@ -29,7 +29,9 @@ export const GET_ME = gql`
 `;
 
 export default function Dashboard() {
-  const [activeSiret, setActiveSiret] = useState("");
+  const { siret } = useParams();
+  const history = useHistory();
+
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: (data) => {
       // try to retrieve current siret from localstorage, if not set use siret from first associated company
@@ -39,7 +41,6 @@ export default function Dashboard() {
         currentSiret = companies.length > 0 ? companies[0].siret : "";
         currentSiretService.setSiret(currentSiret);
       }
-      setActiveSiret(currentSiret);
     },
   });
   const match = useRouteMatch();
@@ -47,23 +48,40 @@ export default function Dashboard() {
   if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
 
-  if (data) {
-    const companies = data.me.companies;
+  // As long as you don't belong to a company, you can't access the dashnoard
+  if (data.me.companies.length === 0) {
+    return <Redirect to="/account/companies" />;
+  }
+  if (!siret)
+    return <Redirect to={`${match.url}/${data.me.companies[0].siret}`} />;
 
-    // As long as you don't belong to a company, you can't access the dashnoard
-    if (!companies || companies.length === 0) {
-      return <Redirect to="/account/companies" />;
-    }
+  return (
+    <div id="dashboard" className="dashboard">
+      <DashboardMenu
+        me={data.me}
+        match={match}
+        siret={siret}
+        handleCompanyChange={(siret) => history.replace(siret)}
+      />
 
-    if (!activeSiret) return null;
+      <div className="dashboard-content">
+        <Route
+          exact
+          path={match.url}
+          render={() => <Redirect to={`${match.url}/slips`} />}
+        />
 
-    return (
-      <div id="dashboard" className="dashboard">
-        <DashboardMenu
-          me={data.me}
-          match={match}
-          siret={activeSiret}
-          handleCompanyChange={setActiveSiret}
+        <Route
+          path={`${match.url}/slips`}
+          render={() => <SlipsContainer me={data.me} siret={siret} />}
+        />
+        <Route
+          path={`${match.url}/transport`}
+          render={() => <Transport me={data.me} siret={siret} />}
+        />
+        <Route
+          path={`${match.url}/exports`}
+          render={() => <Exports me={data.me} />}
         />
 
         <div className="dashboard-content">

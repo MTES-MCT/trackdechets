@@ -96,7 +96,7 @@ export default withRouter(function LayoutContainer({ history }) {
           component={WaitingComponent(FormContainer)}
         />
         <PrivateRoute
-          path="/dashboard"
+          path="/dashboard/:siret?"
           isAuthenticated={isAuthenticated}
           component={WaitingComponent(Dashboard)}
         />

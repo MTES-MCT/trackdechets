@@ -188,6 +188,7 @@ Défaut à 0
 
 (Optionnel) Filtre sur les statuts des bordereaux
 Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+Défaut à vide.
 
 </td>
 </tr>
@@ -202,6 +203,20 @@ Par exemple:
  - `roles: [EMITTER, RECIPIENT]` renverra les bordereaux dont je suis l'émetteur ou le destinataire final
 Voir `FormRole` pour la liste des roles sur lesquels il est possible de filtrer.
 Si aucune filtre n'est passé, les bordereaux seront retournés quel que soit votre role dessus.
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">hasNextStep</td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+(Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+Si `true`, seul les bordereaux attendant une action sont renvoyés
+Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
+Si vide, tous les bordereaux sont renvoyés
+Défaut à vide.
 
 </td>
 </tr>
@@ -5416,14 +5431,6 @@ Les BSD's dont je suis le négociant
 <td>
 
 Les BSD's dont je suis éco-organisme
-
-</td>
-</tr>
-<tr>
-<td valign="top"><strong>TEMPORARY_STORER</strong></td>
-<td>
-
-Les BSD's dont je suis destination d'entreposage provisoire ou de reconditionnement
 
 </td>
 </tr>

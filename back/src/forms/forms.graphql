@@ -35,10 +35,11 @@ type Query {
     Défaut à 0
     """
     skip: Int
-    
+
     """
     (Optionnel) Filtre sur les statuts des bordereaux
     Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+    Défaut à vide.
     """
     status: [FormStatus]
 
@@ -49,8 +50,18 @@ type Query {
      - `roles: [EMITTER, RECIPIENT]` renverra les bordereaux dont je suis l'émetteur ou le destinataire final
     Voir `FormRole` pour la liste des roles sur lesquels il est possible de filtrer.
     Si aucune filtre n'est passé, les bordereaux seront retournés quel que soit votre role dessus.
+    Défaut à vide.
     """
     roles: [FormRole]
+
+    """
+    (Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+    Si `true`, seul les bordereaux attendant une action sont renvoyés
+    Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
+    Si vide, tous les bordereaux sont renvoyés
+    Défaut à vide.
+    """
+    hasNextStep: Boolean
 
     """
     DEPRECATED
@@ -273,8 +284,6 @@ enum FormRole {
   TRADER
   "Les BSD's dont je suis éco-organisme"
   ECO_ORGANISME
-  "Les BSD's dont je suis destination d'entreposage provisoire ou de reconditionnement"
-  TEMPORARY_STORER
 }
 
 """

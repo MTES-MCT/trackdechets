@@ -535,9 +535,7 @@ export enum FormRole {
   /** Les BSD's dont je suis le négociant */
   Trader = 'TRADER',
   /** Les BSD's dont je suis éco-organisme */
-  EcoOrganisme = 'ECO_ORGANISME',
-  /** Les BSD's dont je suis destination d'entreposage provisoire ou de reconditionnement */
-  TemporaryStorer = 'TEMPORARY_STORER'
+  EcoOrganisme = 'ECO_ORGANISME'
 }
 
 /** Informations du cycle de vie des bordereaux */
@@ -1136,6 +1134,7 @@ export type QueryFormsArgs = {
   skip?: Maybe<Scalars['Int']>;
   status?: Maybe<Array<Maybe<FormStatus>>>;
   roles?: Maybe<Array<Maybe<FormRole>>>;
+  hasNextStep?: Maybe<Scalars['Boolean']>;
   type?: Maybe<FormType>;
 };
 

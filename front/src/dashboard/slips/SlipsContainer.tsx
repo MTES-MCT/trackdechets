@@ -1,7 +1,8 @@
 import React from "react";
+import { Me } from "../../login/model";
+import Onboarding from "./onboarding/Onboarding";
 import SlipsHeader from "./SlipsHeader";
 import SlipsTabs from "./SlipsTabs";
-import Onboarding from "./onboarding/Onboarding";
 import { User } from "../../generated/graphql/types";
 
 type Props = {
@@ -9,11 +10,11 @@ type Props = {
   siret: string;
 };
 
-export default function SlipsContainer({ me, siret }: Props) {
+export default function SlipsContainer({ siret }: Props) {
   return (
     <>
       <SlipsHeader />
-      <SlipsTabs me={me} siret={siret} />
+      <SlipsTabs siret={siret} />
       <Onboarding />
     </>
   );
