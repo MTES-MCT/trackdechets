@@ -2,6 +2,7 @@ import { getUserCompanies } from "../../companies/queries";
 import { unflattenObjectFromDb } from "../form-converter";
 import { FormStatus, FormType, FormRole } from "../../generated/types";
 import { GraphQLContext } from "../../types";
+import { prisma } from "../../generated/prisma-client";
 
 const DEFAULT_FIRST = 50;
 
@@ -16,7 +17,7 @@ type FormsParams = {
 };
 
 export default async function forms(
-  _,
+  userId: string,
   {
     siret,
     type,
@@ -25,14 +26,12 @@ export default async function forms(
     hasNextStep,
     first = DEFAULT_FIRST,
     skip = 0
-  }: FormsParams,
-  context: GraphQLContext
+  }: FormsParams
 ) {
   // TODO Remove `type` param and this code after deprecation warning period
   if (type && !roles) {
     roles = type === FormType.Actor ? [] : [FormRole.Transporter];
   }
-  const userId = context.user.id;
   const userCompanies = await getUserCompanies(userId);
 
   const company =
@@ -40,7 +39,7 @@ export default async function forms(
       ? userCompanies.find(uc => uc.siret === siret)
       : userCompanies.shift();
 
-  const queriedForms = await context.prisma.forms({
+  const queriedForms = await prisma.forms({
     first,
     skip,
     orderBy: "createdAt_DESC",
