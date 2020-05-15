@@ -9,7 +9,7 @@ import {
   UserRole,
   Status
 } from "../generated/prisma-client";
-import { getReadableId } from "../forms/readable-id";
+import * as crypto from "crypto";
 
 /**
  * Create a user with name and email
@@ -185,10 +185,18 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
+/**
+ * Thread-safe version of getReadableId for tests
+ */
+export function getReadableId() {
+  const uid = crypto.randomBytes(16).toString("hex");
+  return `TD-${uid}`;
+}
+
 export const formFactory = async ({ ownerId, opt = {} }) => {
   const formParams = { ...formdata, ...opt };
   return prisma.createForm({
-    readableId: await getReadableId(),
+    readableId: getReadableId(),
     ...formParams,
     owner: { connect: { id: ownerId } }
   });

@@ -14,7 +14,7 @@ import {
 } from "../../../generated/prisma-client";
 
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { getReadableId } from "../../readable-id";
+import { getReadableId } from "../../../__tests__/factories";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -190,19 +190,19 @@ describe("Test Form with appendix reception", () => {
     // these forms are in "GROUPED" state
     let initialForm1 = await prisma.createForm({
       ...appendixFormData,
-      readableId: await getReadableId(),
+      readableId: getReadableId(),
       owner: { connect: { id: emitter.id } }
     });
     let initialForm2 = await prisma.createForm({
       ...appendixFormData,
-      readableId: await getReadableId(),
+      readableId: getReadableId(),
       owner: { connect: { id: emitter.id } }
     });
 
     // this form regroups both initialForms
     let formWithAppendix2 = await prisma.createForm({
       ...groupingFormData,
-      readableId: await getReadableId(),
+      readableId: getReadableId(),
       recipientCompanySiret: lastRecipientCompany.siret,
       owner: { connect: { id: emitter.id } },
       appendix2Forms: {
@@ -265,13 +265,13 @@ describe("Test Form with appendix processing", () => {
     // these forms are in "GROUPED" state
     let initialForm1 = await prisma.createForm({
       ...appendixFormData,
-      readableId: await getReadableId(),
+      readableId: getReadableId(),
       status: "PROCESSED",
       owner: { connect: { id: emitter.id } }
     });
     let initialForm2 = await prisma.createForm({
       ...appendixFormData,
-      readableId: await getReadableId(),
+      readableId: getReadableId(),
       status: "PROCESSED",
       owner: { connect: { id: emitter.id } }
     });
@@ -279,7 +279,7 @@ describe("Test Form with appendix processing", () => {
     // this form regroups both initialForms
     let formWithAppendix2 = await prisma.createForm({
       ...groupingFormData,
-      readableId: await getReadableId(),
+      readableId: getReadableId(),
       recipientCompanySiret: lastRecipientCompany.siret,
       status: "RECEIVED",
       owner: { connect: { id: emitter.id } },

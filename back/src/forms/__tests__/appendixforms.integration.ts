@@ -1,9 +1,6 @@
 import * as mailsHelper from "../../common/mails.helper";
-
 import makeClient from "../../__tests__/testClient";
-import { prepareDB } from "./helpers";
-
-import { formFactory } from "../../__tests__/factories";
+import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { ErrorCode } from "../../common/errors";
 
@@ -19,11 +16,13 @@ describe("Test appendixForms", () => {
   });
   it("should return appendixForms data", async () => {
     const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany
-    } = await prepareDB();
+      user: emitter,
+      company: emitterCompany
+    } = await userWithCompanyFactory("ADMIN");
+    const {
+      user: recipient,
+      company: recipientCompany
+    } = await userWithCompanyFactory("ADMIN");
 
     // This form is in AWAITING_GROUP and should be returned
     const form = await formFactory({
@@ -32,8 +31,7 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "AWAITING_GROUP",
-        readableId: "TD-1"
+        status: "AWAITING_GROUP"
       }
     });
     // other forms should not be returned
@@ -43,8 +41,7 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "PROCESSED",
-        readableId: "TD-2"
+        status: "PROCESSED"
       }
     });
     await formFactory({
@@ -53,8 +50,7 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "RECEIVED",
-        readableId: "TD-3"
+        status: "RECEIVED"
       }
     });
 
@@ -69,11 +65,14 @@ describe("Test appendixForms", () => {
 
   it("should not return appendixForms data", async () => {
     const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany
-    } = await prepareDB();
+      user: emitter,
+      company: emitterCompany
+    } = await userWithCompanyFactory("ADMIN");
+
+    const {
+      user: recipient,
+      company: recipientCompany
+    } = await userWithCompanyFactory("ADMIN");
 
     await formFactory({
       ownerId: emitter.id,
@@ -81,8 +80,7 @@ describe("Test appendixForms", () => {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        status: "AWAITING_GROUP",
-        readableId: "TD-4"
+        status: "AWAITING_GROUP"
       }
     });
     // the queried siret is not recipientCompanySiret, result should be null
