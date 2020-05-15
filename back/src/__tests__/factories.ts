@@ -1,13 +1,14 @@
 import { hash } from "bcrypt";
 import {
-  CompanyCreatecompanyTypesInput,
   CompanyType,
   Consistence,
   EmitterType,
   QuantityType,
   prisma,
   UserRole,
-  Status
+  Status,
+  CompanyCreateInput,
+  FormCreateInput
 } from "../generated/prisma-client";
 import crypto from "crypto";
 
@@ -51,17 +52,20 @@ function siretify(index) {
  * Create a company with name, siret, security code and PORDUCER by default
  * @param opt: extram parameters
  */
-export const companyFactory = async (opt = {}, companyType = "PRODUCER") => {
+export const companyFactory = async (
+  companyOpts: Partial<CompanyCreateInput> = {}
+) => {
+  const opts = companyOpts || {};
   const companyIndex =
     (await prisma.companiesConnection().aggregate().count()) + 1;
   return prisma.createCompany({
     siret: siretify(companyIndex),
     companyTypes: {
-      set: [companyType as CompanyType]
-    } as CompanyCreatecompanyTypesInput,
+      set: ["PRODUCER" as CompanyType]
+    },
     name: `company_${companyIndex}`,
     securityCode: 1234,
-    ...opt
+    ...opts
   });
 };
 
@@ -71,9 +75,9 @@ export const companyFactory = async (opt = {}, companyType = "PRODUCER") => {
  */
 export const userWithCompanyFactory = async (
   role,
-  companyType = "PRODUCER"
+  companyOpts: Partial<CompanyCreateInput> = {}
 ) => {
-  const company = await companyFactory({}, companyType);
+  const company = await companyFactory(companyOpts);
 
   const user = await userFactory({
     companyAssociations: {
@@ -193,7 +197,13 @@ export function getReadableId() {
   return `TD-${uid}`;
 }
 
-export const formFactory = async ({ ownerId, opt = {} }) => {
+export const formFactory = async ({
+  ownerId,
+  opt = {}
+}: {
+  ownerId: string;
+  opt?: Partial<FormCreateInput>;
+}) => {
   const formParams = { ...formdata, ...opt };
   return prisma.createForm({
     readableId: getReadableId(),

@@ -310,10 +310,10 @@ Il est valable 10 secondes
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">sirets</td>
-<td valign="top">[<a href="#string">String</a>]</td>
+<td valign="top">[<a href="#string">String</a>!]!</td>
 <td>
 
-Liste de SIRET d'établissements dont je suis membre
+Liste de SIRET pour lesquelles exporter le registre
 
 </td>
 </tr>
@@ -322,7 +322,48 @@ Liste de SIRET d'établissements dont je suis membre
 <td valign="top"><a href="#formsregisterexporttype">FormsRegisterExportType</a></td>
 <td>
 
-Type d'export
+(Optionnel) Modèle de registre (exhaustif, entrants, sortants, transport, négociants)
+Défaut: ALL
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">startDate</td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+(Optionnel) Filtre les données par une date de début
+Défaut: aucune valeur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">endDate</td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+(Optionnel) Filtre les données par une date de fin
+Défaut: aucune valeur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">wasteCode</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Filtre les données par code déchet
+Défaut: Tous les codes déchets
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">exportFormat</td>
+<td valign="top"><a href="#formsregisterexportformat">FormsRegisterExportFormat</a></td>
+<td>
+
+(Optionnel) Format de l'export
+Défaut: csv
 
 </td>
 </tr>
@@ -6093,9 +6134,9 @@ Uniquement les BSD's dont je suis transporteur
 </tbody>
 </table>
 
-### FormsRegisterExportType
+### FormsRegisterExportFormat
 
-Type pour l'export du registre
+Format de l'export du registre
 
 <table>
 <thead>
@@ -6104,10 +6145,41 @@ Type pour l'export du registre
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>INCOMING</strong></td>
+<td valign="top"><strong>CSV</strong></td>
 <td>
 
-Déchets entrants
+Fichier csv
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>XLSX</strong></td>
+<td>
+
+Fichier Excel
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### FormsRegisterExportType
+
+Modèle de registre réglementaire tels que décrits dans l'arrêté du 29 février 2012 fixant
+le contenu des registres mnetionnées aux articles R. 541-43 et R. 541-46 du code de l'environnement
+https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000025454959&categorieLien=id
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>ALL</strong></td>
+<td>
+
+Registre exhaustif, déchets entrants et sortants
 
 </td>
 </tr>
@@ -6115,7 +6187,39 @@ Déchets entrants
 <td valign="top"><strong>OUTGOING</strong></td>
 <td>
 
-Déchets sortants
+Registre producteur, déchets sortants
+Art 1: Les exploitants des établissements produisant ou expédiant des déchets tiennent à jour
+un registre chronologique où sont consignés tous les déchets sortants.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>INCOMING</strong></td>
+<td>
+
+Registre traiteur, TTR
+Art 2: Les exploitants des installations de transit, de regroupement ou de traitement de déchets,
+notamment de tri, établissent et tiennent à jour un registre chronologique où sont consignés
+tous les déchets entrants.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TRANSPORTED</strong></td>
+<td>
+
+Registre transporteur
+Art 3: Les transporteurs et les collecteurs de déchets tiennent à jour un registre chronologique
+des déchets transportés ou collectés.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TRADED</strong></td>
+<td>
+
+Registre négociants
+Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
 
 </td>
 </tr>

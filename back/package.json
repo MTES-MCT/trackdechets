@@ -22,6 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fast-csv/format": "^4.3.0",
     "@graphql-toolkit/file-loading": "^0.10.7",
     "@graphql-toolkit/schema-merging": "^0.10.7",
     "@sentry/integrations": "^5.15.5",
@@ -36,6 +37,7 @@
     "csv-parser": "^2.3.2",
     "dataloader": "^1.4.0",
     "date-fns": "^2.14.0",
+    "exceljs": "^4.1.0",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "graphql": "^14.5.8",
@@ -61,6 +63,7 @@
     "yup": "^0.29.0"
   },
   "devDependencies": {
+    "@fast-csv/parse": "^4.3.0",
     "@graphql-codegen/cli": "^1.13.1",
     "@graphql-codegen/typescript": "1.13.1",
     "@graphql-codegen/typescript-operations": "^1.13.4",

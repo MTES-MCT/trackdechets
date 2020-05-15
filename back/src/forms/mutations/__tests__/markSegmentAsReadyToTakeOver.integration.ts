@@ -21,7 +21,9 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
     const owner = await userFactory();
     const { user: firstTransporter, company } = await userWithCompanyFactory(
       "ADMIN",
-      "TRANSPORTER"
+      {
+        companyTypes: { set: ["TRANSPORTER"] }
+      }
     );
 
     const transporterSiret = company.siret;

@@ -3,7 +3,10 @@ import { redisClient, setInCache } from "./redis";
 import { randomNumber, getAPIBaseURL } from "../utils";
 
 type DownloadInfos = { type: string; params: any };
-type DownloadHandler = (res: Response, params: any) => void | Promise<void>;
+type DownloadHandler = (
+  res: Response,
+  params: any
+) => void | Promise<void> | Response | Promise<Response>;
 
 // TODO register downloaders on server start if code is distributed on several machines
 const fileDownloaders = {};
