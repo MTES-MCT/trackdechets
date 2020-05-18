@@ -670,7 +670,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
               numberOfPackages: 1
               quantity: 1
               quantityType: ESTIMATED
-              consistence: LIQUID
             }
             transporter: {
               company: {
