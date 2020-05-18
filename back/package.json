@@ -50,7 +50,7 @@
     "passport-oauth2-client-password": "^0.1.2",
     "prisma-client-lib": "1.34.10",
     "request": "^2.88.0",
-    "xstate": "^4.7.5",
+    "xstate": "^4.9.1",
     "yup": "^0.27.0"
   },
   "devDependencies": {
@@ -90,6 +90,6 @@
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0",
-    "typescript": "3.7.3"
+    "typescript": "3.9.2"
   }
 }
