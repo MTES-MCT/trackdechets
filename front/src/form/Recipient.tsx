@@ -51,23 +51,7 @@ export default function Recipient() {
         </p>
       </div>
 
-      <CompanySelector
-        name="trader.company"
-        onCompanySelected={(trader) => {
-          if (trader.traderReceipt) {
-            setFieldValue("trader.receipt", trader.traderReceipt.receiptNumber);
-            setFieldValue(
-              "trader.validityLimit",
-              new Date(trader.traderReceipt.validityLimit)
-            );
-            setFieldValue("trader.department", trader.traderReceipt.department);
-          } else {
-            setFieldValue("trader.receipt", "");
-            setFieldValue("trader.validityLimit", "");
-            setFieldValue("trader.department", "");
-          }
-        }}
-      />
+      <CompanySelector name="recipient.company" />
 
       <h4>Informations complémentaires</h4>
 
@@ -100,7 +84,29 @@ export default function Recipient() {
       {hasTrader && (
         <div className="form__group">
           <h4>Négociant</h4>
-          <CompanySelector name="trader.company" />
+          <CompanySelector
+            name="trader.company"
+            onCompanySelected={(trader) => {
+              if (trader.traderReceipt) {
+                setFieldValue(
+                  "trader.receipt",
+                  trader.traderReceipt.receiptNumber
+                );
+                setFieldValue(
+                  "trader.validityLimit",
+                  new Date(trader.traderReceipt.validityLimit)
+                );
+                setFieldValue(
+                  "trader.department",
+                  trader.traderReceipt.department
+                );
+              } else {
+                setFieldValue("trader.receipt", "");
+                setFieldValue("trader.validityLimit", "");
+                setFieldValue("trader.department", "");
+              }
+            }}
+          />
 
           <div className="form__group">
             <label>
