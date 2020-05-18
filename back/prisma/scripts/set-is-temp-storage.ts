@@ -3,7 +3,8 @@ import { prisma } from "../../src/generated/prisma-client";
 
 @registerUpdater(
   "Set recipientIsTempStorage",
-  `The new isTempStorage must have a value. We set it to false by default`
+  `The new isTempStorage must have a value. We set it to false by default`,
+  false
 )
 export class SetIsTempStorage implements Updater {
   run() {
