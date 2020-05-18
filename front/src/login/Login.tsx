@@ -7,6 +7,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import styles from "./Login.module.scss";
+import { localAuthService } from "./auth.service";
 
 export default withRouter(function Login(
   routeProps: RouteComponentProps<{}, {}, { error?: string; returnTo?: string }>
@@ -28,7 +29,11 @@ export default withRouter(function Login(
   return (
     <section className="section section-white">
       <div className="container">
-        <form action={`${REACT_APP_API_ENDPOINT}/login`} method="post">
+        <form
+          action={`${REACT_APP_API_ENDPOINT}/login`}
+          method="post"
+          name="login"
+        >
           <h1>Connexion</h1>
           <div className="form__group">
             <label>
@@ -48,10 +53,16 @@ export default withRouter(function Login(
 
           {error && <div className={styles["form-error-message"]}>{error}</div>}
 
-          <button className="button" type="submit">
+          <button
+            className="button"
+            type="submit"
+            onClick={() => {
+              localAuthService.locallySignOut();
+              document.forms["login"].submit();
+            }}
+          >
             Se connecter
           </button>
-
           <p>
             Vous n'avez pas encore de compte ?{" "}
             <Link to="/signup">Inscrivez vous maintenant</Link>
