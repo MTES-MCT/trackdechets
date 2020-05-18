@@ -39,6 +39,7 @@ export default function Received(props: SlipActionProps) {
         initialValues={{
           receivedBy: "",
           receivedAt: DateTime.local().toISODate(),
+          acceptedAt: DateTime.local().toISODate(),
           quantityReceived: "",
           wasteAcceptationStatus: "",
           wasteRefusalReason: "",
@@ -53,6 +54,12 @@ export default function Received(props: SlipActionProps) {
 
           return (
             <Form>
+              <label>
+                Date d'arrivée
+                <Field component={DateInput} name="receivedAt" />
+                <FieldError fieldError={errors.receivedAt} />
+              </label>
+
               <div className="form__group">
                 <fieldset>
                   <div style={{ display: "flex" }}>
@@ -95,16 +102,6 @@ export default function Received(props: SlipActionProps) {
               </div>
 
               <label>
-                Nom du responsable
-                <Field type="text" name="receivedBy" placeholder="NOM Prénom" />
-                <FieldError fieldError={errors.receivedBy} />
-              </label>
-              <label>
-                Date de réception
-                <Field component={DateInput} name="receivedAt" />
-                <FieldError fieldError={errors.receivedAt} />
-              </label>
-              <label>
                 Poids à l'arrivée
                 <Field
                   component={NumberInput}
@@ -121,6 +118,7 @@ export default function Received(props: SlipActionProps) {
                   tonnes
                 </span>
               </label>
+
               {props.form.recipient?.isTempStorage &&
                 props.form.status === FormStatus.Sent && (
                   <fieldset>
@@ -150,6 +148,19 @@ export default function Received(props: SlipActionProps) {
                   <FieldError fieldError={errors.wasteRefusalReason} />
                 </label>
               )}
+
+              <label>
+                Nom du responsable
+                <Field type="text" name="receivedBy" placeholder="NOM Prénom" />
+                <FieldError fieldError={errors.receivedBy} />
+              </label>
+
+              <label>
+                Date d'acceptation
+                <Field component={DateInput} name="acceptedAt" />
+                <FieldError fieldError={errors.acceptedAt} />
+              </label>
+
               <p>
                 {values.wasteAcceptationStatus &&
                   textConfig[values.wasteAcceptationStatus].validationText}
