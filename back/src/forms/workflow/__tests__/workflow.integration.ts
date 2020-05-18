@@ -702,11 +702,182 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
 
     expect(form.status).toEqual("RESEALED");
 
-    // L’exploitant de l’installation d’entreposage transmet une copie du bordereau à son émetteur dès que le cadre 13 est rempli et dans les délais prévus par le décret du 30 mai 2005. Il ne remplit pas les cadres 10, 11 et 12 du bordereau.
+    await downloadPdf(form.id, producteurToken, "2-bsd-resealed.pdf");
+
+    // Le deuxième transporteur signe le BSD
+    const signedByTransporter2Query = `
+      mutation {
+        signedByTransporter(
+          id: "${form.id}",
+          signingInfo: {
+            sentAt: "2020-08-03T10:00:00",
+            quantity: 1,
+            packagings: [
+              BENNE
+            ],
+            sentBy: "Mr Provisoire"
+            onuCode: "xxxx",
+            signedByTransporter: true,
+            signedByProducer: true,
+            securityCode: ${entreposage.securityCode}
+          }
+        ){
+          id
+          status
+        }
+      }
+    `;
+
+    const signedByTransporter2Response = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur2Token}`)
+      .send({ query: signedByTransporter2Query });
+
+    form = signedByTransporter2Response.body.data.signedByTransporter;
+
+    expect(form.status).toEqual("RESENT");
+
+    await downloadPdf(form.id, producteurToken, "2-bsd-resent.pdf");
+
+    // Sur le lieu de l’installation de destination prévue
+    // le déchet est réceptionné et la case 10 est remplie
+    const markAsReceivedQuery = `
+      mutation {
+        markAsReceived(
+          id: "${form.id}"
+          receivedInfo: {
+            wasteAcceptationStatus: ACCEPTED
+            receivedBy: "Antoine Derieux"
+            receivedAt: "2020-04-05T11:18:00"
+            quantityReceived: 1
+          }
+        ){
+          id
+          status
+        }
+      }
+    `;
+
+    const markAsReceivedResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${traiteurToken}`)
+      .send({ query: markAsReceivedQuery });
+
+    form = markAsReceivedResponse.body.data.markAsReceived;
+    expect(form.status).toEqual("RECEIVED");
+
+    // Télécharge le pdf
+    await downloadPdf(form.id, producteurToken, "2-bsd-received.pdf");
+
+    // Sur le lieu de l'installation de destination prévue
+    // l'opération de traitement est effectué et la case 11
+    // est remplie
+    const markAsProcessedQuery = `
+      mutation {
+        markAsProcessed(
+          id: "${form.id}",
+          processedInfo: {
+            processingOperationDone: "D 10",
+            processingOperationDescription: "Incinération",
+            processedBy: "Alfred Dujardin",
+            processedAt: "2020-04-15T10:22:00"
+          }
+        ){
+          id
+          status
+        }
+      }
+    `;
+
+    const markAsProcessedResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${traiteurToken}`)
+      .send({ query: markAsProcessedQuery });
+
+    form = markAsProcessedResponse.body.data.markAsProcessed;
+
+    expect(form.status).toEqual("PROCESSED");
+    await downloadPdf(form.id, producteurToken, "2-bsd-processed.pdf");
+
+    // Le producteur reçoit les notifications de réception et de traitement
+    // en temps réel en interrogeant la query formsLifeCycle périodiquement
+    // (tous les jours par exemple)
+    const formsLifeCycleQuery = `
+      query {
+        formsLifeCycle(siret: "${producteur.siret}"){
+          statusLogs {
+            status
+            updatedFields
+          }
+        }
+      }
+    `;
+
+    const formsLifeCycleResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${producteurToken}`)
+      .send({ query: formsLifeCycleQuery });
+
+    const statusLogs =
+      formsLifeCycleResponse.body.data.formsLifeCycle.statusLogs;
+
+    expect(statusLogs).toEqual([
+      {
+        status: "PROCESSED",
+        updatedFields: {
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00",
+          processingOperationDone: "D 10",
+          processingOperationDescription: "Incinération"
+        }
+      },
+      {
+        status: "RECEIVED",
+        updatedFields: {
+          receivedBy: "Antoine Derieux",
+          receivedAt: "2020-04-05T11:18:00",
+          quantityReceived: 1
+        }
+      },
+      {
+        status: "RESENT",
+        updatedFields: {
+          sentAt: "2020-08-03T10:00:00",
+          signedByTransporter: true,
+          sentBy: "Mr Provisoire",
+          signedByProducer: true,
+          packagings: ["BENNE"],
+          quantity: 1,
+          onuCode: "xxxx"
+        }
+      },
+      { status: "RESEALED", updatedFields: {} },
+      {
+        status: "TEMP_STORED",
+        updatedFields: {
+          receivedBy: "Mr Provisoire",
+          receivedAt: "2020-05-03T09:00:00",
+          quantityReceived: 1,
+          quantityType: "REAL"
+        }
+      },
+      {
+        status: "SENT",
+        updatedFields: {
+          sentAt: "2020-04-03T14:48:00",
+          signedByTransporter: true,
+          sentBy: "Isabelle Guichard",
+          signedByProducer: true,
+          packagings: ["BENNE"],
+          quantity: 1,
+          onuCode: "xxxx"
+        }
+      },
+      { status: "SEALED", updatedFields: {} },
+      { status: "DRAFT", updatedFields: {} }
+    ]);
   }, 30000);
 
-  // TODO
-  test.todo("Acheminement direct du producteur à l'installation de traitement");
   // TODO
   test.todo(
     "Collecteur de petites quantités de déchets relevant d’une même rubrique"

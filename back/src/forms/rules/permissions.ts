@@ -108,10 +108,18 @@ export const isFormRecipient = and(
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.includes(formInfos.recipientCompanySiret) ||
-      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
-    );
+    if (formInfos.recipientIsTempStorage) {
+      return (
+        currentUserSirets.includes(
+          formInfos.temporaryStorageDetail.destinationCompanySiret
+        ) || new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+      );
+    } else {
+      return (
+        currentUserSirets.includes(formInfos.recipientCompanySiret) ||
+        new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+      );
+    }
   })
 );
 
@@ -175,13 +183,19 @@ export const isFormTrader = and(
 
 export const isFormTempStorer = and(
   isAuthenticated,
-  isFormRecipient,
   rule()(async (_, { id }, ctx) => {
-    const form = await ctx.prisma.form({ id });
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
 
     return (
-      form.recipientIsTempStorage ||
-      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+      (formInfos.recipientIsTempStorage &&
+        currentUserSirets.includes(formInfos.recipientCompanySiret)) ||
+      new ForbiddenError(
+        `Vous n'êtes pas l'installation d'entreposage ou de reconditionnement de ce bordereau.`
+      )
     );
   })
 );
