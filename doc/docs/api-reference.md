@@ -4401,6 +4401,15 @@ Date à laquelle le déchet a été reçu (case 10)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>acceptedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date à laquelle le déchet a été accepté (case 10)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>quantityReceived</strong></td>
 <td valign="top"><a href="#float">Float</a>!</td>
 <td>
@@ -4697,6 +4706,15 @@ Nom de la personne en charge de la réception du déchet (case 10)
 <td>
 
 Date à laquelle le déchet a été reçu (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>acceptedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date à laquelle le déchet a été accepté (case 10)
 
 </td>
 </tr>

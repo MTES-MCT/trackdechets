@@ -1170,6 +1170,8 @@ export type ReceivedFormInput = {
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 10) */
   receivedAt: Scalars['DateTime'];
+  /** Date à laquelle le déchet a été accepté (case 10) */
+  acceptedAt: Scalars['DateTime'];
   /** Quantité réelle présentée (case 10) */
   quantityReceived: Scalars['Float'];
 };
@@ -1414,6 +1416,8 @@ export type TempStoredFormInput = {
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 10) */
   receivedAt: Scalars['DateTime'];
+  /** Date à laquelle le déchet a été accepté (case 10) */
+  acceptedAt: Scalars['DateTime'];
   /** Quantité réelle présentée (case 10) */
   quantityReceived: Scalars['Float'];
   /** Réelle ou estimée */

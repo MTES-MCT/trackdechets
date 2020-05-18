@@ -260,7 +260,7 @@ const fieldsToLog = {
     "quantity",
     "onuCode"
   ],
-  MARK_RECEIVED: ["receivedBy", "receivedAt", "quantityReceived"],
+  MARK_RECEIVED: ["receivedBy", "receivedAt", "acceptedAt", "quantityReceived"],
   MARK_PROCESSED: [
     "processedBy",
     "processedAt",
@@ -279,6 +279,7 @@ const fieldsToLog = {
   MARK_TEMP_STORED: [
     "receivedBy",
     "receivedAt",
+    "acceptedAt",
     "quantityReceived",
     "quantityType"
   ],

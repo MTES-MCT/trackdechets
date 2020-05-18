@@ -30,6 +30,7 @@ type Form {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
 
   processedBy: String
@@ -133,6 +134,7 @@ type TemporaryStorageDetail {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
 
   # Frame 14
