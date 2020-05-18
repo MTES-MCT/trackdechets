@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
 import { Prisma } from "../../generated/prisma-client";
 import {
@@ -185,6 +185,29 @@ export const isFormTempStorer = and(
     );
   })
 );
+
+export const hasFinalDestination = rule()(async (_, { id }, ctx) => {
+  const temporaryStorageDetail = await ctx.prisma
+    .form({ id })
+    .temporaryStorageDetail();
+  const mandatoryKeys = [
+    "destinationCompanyName",
+    "destinationCompanySiret",
+    "destinationCompanyAddress",
+    "destinationCompanyContact",
+    "destinationCompanyPhone",
+    "destinationCompanyMail"
+  ];
+
+  const hasFinalDestination = mandatoryKeys.every(
+    key => !!temporaryStorageDetail[key]
+  );
+
+  return (
+    hasFinalDestination ||
+    new UserInputError(`Vous devez remplit la destination du bordereau.`)
+  );
+});
 
 async function getFormAccessInfos(
   formId: string,

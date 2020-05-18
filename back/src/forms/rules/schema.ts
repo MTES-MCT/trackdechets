@@ -247,19 +247,6 @@ export const markAsResealedSchema = inputRule()(
   yup =>
     yup.object().shape({
       resealedInfos: yup.object({
-        destination: yup.object({
-          company: validCompany(
-            { verboseFieldName: "Destinataire du BSD" },
-            yup
-          ),
-          processingOperation: yup
-            .mixed()
-            .oneOf(
-              PROCESSING_OPERATION_CODES,
-              "Cette opération de traitement n'existe pas."
-            ),
-          cap: yup.string().nullable(true)
-        }),
         wasteDetails: yup.object({}),
         transporter: yup.object({
           isExemptedOfReceipt: yup.boolean().nullable(true),
@@ -297,23 +284,30 @@ export const markAsResealedSchema = inputRule()(
   }
 );
 
+/**
+ * The destination is optionnal in the `markAsResealed` and `markAsResend` mutations if it has already been filled.
+ */
+export const temporaryStorageDestinationSchema = inputRule()(yup =>
+  yup.object({
+    resentInfos: yup.object({
+      destination: yup.object({
+        company: validCompany({ verboseFieldName: "Destinataire du BSD" }, yup),
+        processingOperation: yup
+          .mixed()
+          .oneOf(
+            PROCESSING_OPERATION_CODES,
+            "Cette opération de traitement n'existe pas."
+          ),
+        cap: yup.string().nullable(true)
+      })
+    })
+  })
+);
+
 export const markAsResentSchema = inputRule()(
   yup =>
     yup.object().shape({
       resentInfos: yup.object({
-        destination: yup.object({
-          company: validCompany(
-            { verboseFieldName: "Destinataire du BSD" },
-            yup
-          ),
-          processingOperation: yup
-            .mixed()
-            .oneOf(
-              PROCESSING_OPERATION_CODES,
-              "Cette opération de traitement n'existe pas."
-            ),
-          cap: yup.string().nullable(true)
-        }),
         wasteDetails: yup.object({}),
         transporter: yup.object({
           isExemptedOfReceipt: yup.boolean().nullable(true),
