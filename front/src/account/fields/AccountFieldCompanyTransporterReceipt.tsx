@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import { CompanyPrivate } from "../../generated/graphql/types";
 import AccountFormCompanyTransporterReceipt from "./forms/AccountFormCompanyTransporterReceipt";
-import { formatDate } from "../../common/helper";
+import { DateTime } from "luxon";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "transporterReceipt">;
@@ -37,7 +37,9 @@ export default function AccountFieldCompanyTransporterReceipt({
         <tr>
           <td> Limite de validité </td>
           <td>
-            {formatDate(new Date(company.transporterReceipt.validityLimit))}
+            {DateTime.fromISO(
+              company.transporterReceipt.validityLimit
+            ).toISODate()}
           </td>
         </tr>
         <tr>
