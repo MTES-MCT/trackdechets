@@ -27,6 +27,8 @@ import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
 import { ErrorCode } from "./common/errors";
 import { redisClient } from "./common/redis";
+import loggingMiddleware from "./common/middlewares/loggingMiddleware";
+import errorHandler from "./common/middlewares/errorHandler";
 
 const {
   SENTRY_DSN,
@@ -98,6 +100,9 @@ export const schemaWithMiddleware = applyMiddleware(
   ...[shieldMiddleware, ...(SENTRY_DSN ? [sentryMiddleware()] : [])]
 );
 
+// GraphQL endpoint
+const graphQLPath = "/";
+
 export const server = new ApolloServer({
   schema: schemaWithMiddleware,
   introspection: true, // used to enable the playground in production
@@ -134,8 +139,13 @@ export const app = express();
  */
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(bodyParser.json());
+
 // allow application/graphql header
 app.use(graphqlBodyParser);
+
+// logging middleware
+app.use(loggingMiddleware(graphQLPath));
 
 /**
  * Set the following headers for cross-domain cookie
@@ -187,19 +197,6 @@ app.get("/userActivation", userActivationHandler);
 app.get("/download", downloadFileHandler);
 app.use("/health", healthRouter);
 
-// GraphQL endpoint
-const graphQLPath = "/";
-
-// Apply passport auth middlewares to the graphQL endpoint
-app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
-
-/**
- * Wire up ApolloServer to /
- * UI_BASE_URL is explicitly set in the origin list
- * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
- * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
- */
-
 // TODO Remove
 app.get("/pdf", (_, res) =>
   res.status(410).send("Route dépréciée, utilisez la query GraphQL `formPdf`")
@@ -210,6 +207,15 @@ app.get("/exports", (_, res) =>
     .send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
 );
 
+// Apply passport auth middlewares to the graphQL endpoint
+app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
+
+/**
+ * Wire up ApolloServer to /
+ * UI_BASE_URL is explicitly set in the origin list
+ * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
+ * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
+ */
 server.applyMiddleware({
   app,
   cors: {
@@ -221,3 +227,6 @@ server.applyMiddleware({
   },
   path: graphQLPath
 });
+
+// error handler
+app.use(errorHandler);
