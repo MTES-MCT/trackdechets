@@ -38,13 +38,10 @@ export default function Dashboard() {
   const history = useHistory();
 
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
-    onCompleted: (data) => {
-      // try to retrieve current siret from localstorage, if not set use siret from first associated company
-      let currentSiret = currentSiretService.getSiret();
-      if (!currentSiret) {
-        const companies = data.me.companies || [];
-        currentSiret = companies.length > 0 ? companies[0].siret : "";
-        currentSiretService.setSiret(currentSiret);
+    onCompleted: () => {
+      if (siret) {
+        currentSiretService.setSiret(siret);
+        return;
       }
     },
   });
