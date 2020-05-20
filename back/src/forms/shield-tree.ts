@@ -12,7 +12,8 @@ import {
   isFormTempStorer,
   isFormTrader,
   isFormTransporter,
-  isFormEcoOrganisme
+  isFormEcoOrganisme,
+  hasFinalDestination
 } from "./rules/permissions";
 import {
   markAsProcessedSchema,
@@ -21,7 +22,8 @@ import {
   markAsResentSchema,
   markAsSentSchema,
   markAsTempStoredSchema,
-  signedByTransporterSchema
+  signedByTransporterSchema,
+  temporaryStorageDestinationSchema
 } from "./rules/schema";
 
 export default {
@@ -38,14 +40,27 @@ export default {
     saveForm: isAuthenticated,
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
-    markAsSealed: or(isFormEcoOrganisme, isFormRecipient, isFormEmitter, isFormTrader),
+    markAsSealed: or(
+      isFormEcoOrganisme,
+      isFormRecipient,
+      isFormEmitter,
+      isFormTrader
+    ),
     markAsSent: chain(markAsSentSchema, or(isFormRecipient, isFormEmitter)),
     markAsReceived: chain(markAsReceivedSchema, isFormRecipient),
     markAsProcessed: chain(markAsProcessedSchema, isFormRecipient),
     signedByTransporter: chain(signedByTransporterSchema, isFormTransporter),
     updateTransporterFields: isFormTransporter,
     markAsTempStored: chain(markAsTempStoredSchema, isFormTempStorer),
-    markAsResealed: chain(markAsResealedSchema, isFormTempStorer),
-    markAsResent: chain(markAsResentSchema, isFormTempStorer)
+    markAsResealed: chain(
+      markAsResealedSchema,
+      or(temporaryStorageDestinationSchema, hasFinalDestination),
+      isFormTempStorer
+    ),
+    markAsResent: chain(
+      markAsResentSchema,
+      or(temporaryStorageDestinationSchema, hasFinalDestination),
+      isFormTempStorer
+    )
   }
 };
