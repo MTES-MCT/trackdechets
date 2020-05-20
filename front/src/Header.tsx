@@ -59,7 +59,7 @@ export default withRouter(function Header({
               <>
                 <li className="nav__item">
                   <NavLink
-                    to="/dashboard"
+                    to="/dashboard/"
                     activeClassName="active"
                     onClick={() => trackEvent("navbar", "mon-espace")}
                   >

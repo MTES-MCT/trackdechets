@@ -29,6 +29,7 @@ export const GET_ME = gql`
 `;
 
 export default function Dashboard() {
+  const match = useRouteMatch();
   const { siret } = useParams();
   const history = useHistory();
 
@@ -43,60 +44,47 @@ export default function Dashboard() {
       }
     },
   });
-  const match = useRouteMatch();
 
   if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
 
-  // As long as you don't belong to a company, you can't access the dashnoard
-  if (data.me.companies.length === 0) {
-    return <Redirect to="/account/companies" />;
-  }
-  if (!siret)
-    return <Redirect to={`${match.url}/${data.me.companies[0].siret}`} />;
+  if (data) {
+    const companies = data.me.companies;
 
-  return (
-    <div id="dashboard" className="dashboard">
-      <DashboardMenu
-        me={data.me}
-        match={match}
-        siret={siret}
-        handleCompanyChange={(siret) => history.replace(siret)}
-      />
+    // As long as you don't belong to a company, you can't access the dashnoard
+    if (!companies || companies.length === 0) {
+      return <Redirect to="/account/companies" />;
+    }
 
-      <div className="dashboard-content">
-        <Route
-          exact
-          path={match.url}
-          render={() => <Redirect to={`${match.url}/slips`} />}
-        />
-
-        <Route
-          path={`${match.url}/slips`}
-          render={() => <SlipsContainer me={data.me} siret={siret} />}
-        />
-        <Route
-          path={`${match.url}/transport`}
-          render={() => <Transport me={data.me} siret={siret} />}
-        />
-        <Route
-          path={`${match.url}/exports`}
-          render={() => <Exports me={data.me} />}
+    if (!siret) return <Redirect to={`${match.url}/${companies[0].siret}`} />;
+    console.log(match);
+    return (
+      <div id="dashboard" className="dashboard">
+        <DashboardMenu
+          me={data.me}
+          match={match}
+          siret={siret}
+          handleCompanyChange={(siret) =>
+            history.push(`${match.url}/../${siret}`)
+          }
         />
 
         <div className="dashboard-content">
-          <Route
-            path={`${match.path}/slips`}
-            render={() => <SlipsContainer me={data.me} siret={activeSiret} />}
-          />
-          <Route
-            path={`${match.path}/transport`}
-            render={() => <Transport me={data.me} siret={activeSiret} />}
-          />
-          <Route
-            path={`${match.path}/exports`}
-            render={() => <Exports me={data.me} />}
-          />
+          <Route exact path={match.url}>
+            <Redirect to={`${match.url}/slips`} />
+          </Route>
+
+          <Route path={`${match.url}/slips`}>
+            <SlipsContainer me={data.me} siret={siret} />
+          </Route>
+
+          <Route path={`${match.url}/transport`}>
+            <Transport me={data.me} siret={siret} />
+          </Route>
+
+          <Route path={`${match.url}/exports`}>
+            <Exports me={data.me} />
+          </Route>
         </div>
       </div>
     );

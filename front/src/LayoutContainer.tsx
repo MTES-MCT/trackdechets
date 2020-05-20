@@ -43,77 +43,72 @@ export default withRouter(function LayoutContainer({ history }) {
   }
 
   return (
-    <Switch>
-      <PrivateRoute
-        exact
-        path="/oauth2/authorize/dialog"
-        isAuthenticated={isAuthenticated}
-        component={WaitingComponent(Dialog)}
-      />
-      <Layout isAuthenticated={isAuthenticated}>
-        <Route
-          exact
-          path="/"
-          render={() => <Home isAuthenticated={isAuthenticated} />}
-        />
-        <Route exact path="/cgu" component={WaitingComponent(Cgu)} />
-        <Route exact path="/partners" component={WaitingComponent(Partners)} />
-        <Route exact path="/login" component={WaitingComponent(Login)} />
-        <Route exact path="/invite" component={WaitingComponent(Invite)} />
-        <Route exact path="/signup" component={WaitingComponent(Signup)} />
-
-        <Route
-          exact
-          path="/signup/details"
-          component={WaitingComponent(WasteSelector)}
-        />
-        <Route
-          exact
-          path="/signup/activation"
-          component={WaitingComponent(SignupInfo)}
-        />
-        <Route
-          exact
-          path="/reset-password"
-          component={WaitingComponent(ResetPassword)}
-        />
-
-        <Route
-          exact
-          path="/company/:siret"
-          component={WaitingComponent(Company)}
-        />
-
-        <Route
-          exact
-          path="/wasteTree"
-          component={WaitingComponent(WasteTree)}
-        />
-        <Route exact path="/stats" component={WaitingComponent(Stats)} />
+    <Suspense fallback={<Loader />}>
+      <Switch>
         <PrivateRoute
-          path="/form/:id?"
+          exact
+          path="/oauth2/authorize/dialog"
           isAuthenticated={isAuthenticated}
-          component={WaitingComponent(FormContainer)}
-        />
-        <PrivateRoute
-          path="/dashboard/:siret?"
-          isAuthenticated={isAuthenticated}
-          component={WaitingComponent(Dashboard)}
-        />
-        <PrivateRoute
-          path="/account"
-          isAuthenticated={isAuthenticated}
-          component={WaitingComponent(Account)}
-        />
-      </Layout>
-    </Switch>
-  );
-});
+        >
+          <Dialog />
+        </PrivateRoute>
 
-function WaitingComponent(Component: React.ComponentType<any>) {
-  return (props: any) => (
-    <Suspense fallback={<div>Chargement...</div>}>
-      <Component {...props} />
+        <Layout isAuthenticated={isAuthenticated}>
+          <Route exact path="/">
+            <Home isAuthenticated={isAuthenticated} />
+          </Route>
+          <Route exact path="/cgu">
+            <Cgu />
+          </Route>
+          <Route exact path="/partners">
+            <Partners />
+          </Route>
+          <Route exact path="/login">
+            <Login />
+          </Route>
+          <Route exact path="/invite">
+            <Invite />
+          </Route>
+          <Route exact path="/signup">
+            <Signup />
+          </Route>
+
+          <Route exact path="/signup/details">
+            <WasteSelector />
+          </Route>
+          <Route exact path="/signup/activation">
+            <SignupInfo />
+          </Route>
+          <Route exact path="/reset-password">
+            <ResetPassword />
+          </Route>
+
+          <Route exact path="/company/:siret">
+            <Company />
+          </Route>
+
+          <Route exact path="/wasteTree">
+            <WasteTree />
+          </Route>
+          <Route exact path="/stats">
+            <Stats />
+          </Route>
+          <PrivateRoute path="/form/:id?" isAuthenticated={isAuthenticated}>
+            <FormContainer />
+          </PrivateRoute>
+
+          <PrivateRoute
+            path="/dashboard/:siret?"
+            isAuthenticated={isAuthenticated}
+          >
+            <Dashboard />
+          </PrivateRoute>
+
+          <PrivateRoute path="/account" isAuthenticated={isAuthenticated}>
+            <Account />
+          </PrivateRoute>
+        </Layout>
+      </Switch>
     </Suspense>
   );
-}
+});

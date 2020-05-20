@@ -17,7 +17,7 @@ export default function Home({ isAuthenticated }) {
           </h1>
           {isAuthenticated ? (
             <p>
-              <Link to="/dashboard/slips" className="button">
+              <Link to="/dashboard/" className="button">
                 Accéder à mon espace
               </Link>
             </p>

@@ -142,7 +142,7 @@ export default withRouter(function StepList(
                   saveForm({
                     variables: { formInput: values },
                   })
-                    .then((_) => props.history.push("/dashboard/slips"))
+                    .then((_) => props.history.push("/dashboard/"))
                     .catch((err) => {
                       err.graphQLErrors.map((err) =>
                         cogoToast.error(err.message, { hideAfter: 7 })

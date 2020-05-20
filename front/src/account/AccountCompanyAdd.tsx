@@ -281,7 +281,7 @@ export default function AccountCompanyAdd() {
       },
     });
 
-    history.push("/dashboard/slips");
+    history.push("/dashboard");
   }
 
   return (
