@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/react-hooks/lib/useQuery";
 import gql from "graphql-tag";
 import React from "react";
-import { RouteComponentProps, useParams } from "react-router";
+import { useParams } from "react-router";
 import { InlineError } from "../common/Error";
 import "./Company.scss";
 import CompanyActivity from "./CompanyActivity";

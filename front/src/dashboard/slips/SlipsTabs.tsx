@@ -7,9 +7,7 @@ import DraftsTab from "./tabs/DraftsTab";
 import FollowTab from "./tabs/FollowTab";
 import HistoryTab from "./tabs/HistoryTab";
 
-type Props = { siret: string };
-
-export default function SlipsTabs({ siret }: Props) {
+export default function SlipsTabs() {
   const { url, path } = useRouteMatch();
 
   return (
@@ -28,19 +26,10 @@ export default function SlipsTabs({ siret }: Props) {
           render={() => <Redirect to={`./slips/drafts`} />}
         />
 
-        <Route
-          path={`${path}/drafts`}
-          render={() => <DraftsTab siret={siret} />}
-        />
-        <Route path={`${path}/act`} render={() => <ActTab siret={siret} />} />
-        <Route
-          path={`${path}/follow`}
-          render={() => <FollowTab siret={siret} />}
-        />
-        <Route
-          path={`${path}/history`}
-          render={() => <HistoryTab siret={siret} />}
-        />
+        <Route path={`${path}/drafts`} render={() => <DraftsTab />} />
+        <Route path={`${path}/act`} render={() => <ActTab />} />
+        <Route path={`${path}/follow`} render={() => <FollowTab />} />
+        <Route path={`${path}/history`} render={() => <HistoryTab />} />
       </Switch>
     </div>
   );

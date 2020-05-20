@@ -1,15 +1,15 @@
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import React from "react";
 import "./Transport.scss";
 import TransportSignature from "./TransportSignature";
 import TransporterInfoEdit from "./TransporterInfoEdit";
-import DownloadPdf from "../slips/slips-actions/DownloadPdf";
-import { useQuery } from "@apollo/react-hooks";
-import { useFormsTable } from "../slips/use-forms-table";
-import { FaSync, FaSort } from "react-icons/fa";
-import { useState } from "react";
-import useLocalStorage from "./hooks";
+import React, { useContext, useState } from "react";
+import { FaSort, FaSync } from "react-icons/fa";
 import { fullFormFragment } from "../../common/fragments";
+import { SiretContext } from "../Dashboard";
+import DownloadPdf from "../slips/slips-actions/DownloadPdf";
+import { useFormsTable } from "../slips/use-forms-table";
+import useLocalStorage from "./hooks";
 import {
   User,
   Form,
@@ -23,6 +23,7 @@ type Props = {
   me: User;
   siret: string;
 };
+
 export const GET_TRANSPORT_SLIPS = gql`
   query GetSlips($siret: String, $type: FormType) {
     forms(siret: $siret, type: $type) {
@@ -155,11 +156,9 @@ const Table = ({ forms, displayActions }) => {
   );
 };
 const TRANSPORTER_FILTER_STORAGE_KEY = "TRANSPORTER_FILTER_STORAGE_KEY";
-export default function Transport({ siret }: Props & any) {
-  const [filterStatus, setFilterStatus] = useState([
-    FormStatus.Sealed,
-    FormStatus.Resealed,
-  ]);
+export default function Transport() {
+  const { siret } = useContext(SiretContext);
+  const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
   );

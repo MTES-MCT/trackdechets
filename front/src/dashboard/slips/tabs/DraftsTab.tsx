@@ -1,13 +1,15 @@
 import { useQuery } from "@apollo/react-hooks";
-import React from "react";
+import React, { useContext } from "react";
 import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { InlineError } from "../../../common/Error";
 import Loader from "../../../common/Loader";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
+import { SiretContext } from "../../Dashboard";
 
-export default function DraftsTab({ siret }) {
+export default function DraftsTab() {
+  const { siret } = useContext(SiretContext);
   const { loading, error, data } = useQuery(GET_SLIPS, {
     variables: { siret, status: ["DRAFT"] },
   });

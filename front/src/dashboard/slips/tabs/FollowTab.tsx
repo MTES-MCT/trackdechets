@@ -1,11 +1,13 @@
 import { useQuery } from "@apollo/react-hooks";
-import React from "react";
+import React, { useContext } from "react";
 import { InlineError } from "../../../common/Error";
 import Loader from "../../../common/Loader";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
+import { SiretContext } from "../../Dashboard";
 
-export default function FollowTab({ siret }) {
+export default function FollowTab() {
+  const { siret } = useContext(SiretContext);
   const { loading, error, data } = useQuery(GET_SLIPS, {
     variables: {
       siret,

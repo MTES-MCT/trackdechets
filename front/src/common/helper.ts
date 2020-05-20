@@ -27,6 +27,7 @@ export function updateApolloCache<T>(
   }: { query: DocumentNode; getNewData: (d: T) => T; variables: any }
 ) {
   try {
+    console.log(query, variables)
     const existingData = store.readQuery<T>({
       query,
       variables,

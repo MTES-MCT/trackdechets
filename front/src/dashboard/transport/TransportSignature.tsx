@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { Field } from "formik";
 import gql from "graphql-tag";
 import { DateTime } from "luxon";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { FaFileSignature } from "react-icons/fa";
 import DownloadFileLink from "../../common/DownloadFileLink";
 import { NotificationError } from "../../common/Error";
@@ -14,11 +14,11 @@ import {
   MutationSignedByTransporterArgs,
 } from "../../generated/graphql/types";
 import Packagings from "../../form/packagings/Packagings";
-import { currentSiretService } from "../CompanySelector";
 import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS } from "./Transport";
 import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
+import { SiretContext } from "../Dashboard";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -40,6 +40,7 @@ export const SIGNED_BY_TRANSPORTER = gql`
 type Props = { form: any };
 
 export default function TransportSignature({ form }: Props) {
+  const { siret } = useContext(SiretContext)
   const [isOpen, setIsOpen] = useState(false);
   const [signedByTransporter, { error }] = useMutation<
     Pick<Mutation, "signedByTransporter">,
@@ -51,7 +52,7 @@ export default function TransportSignature({ form }: Props) {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
-          siret: currentSiretService.getSiret(),
+          siret,
           type: "TRANSPORTER",
         },
         getNewData: (data) => ({

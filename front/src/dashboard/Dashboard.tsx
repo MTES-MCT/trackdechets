@@ -28,6 +28,10 @@ export const GET_ME = gql`
   }
 `;
 
+export const SiretContext = React.createContext({
+  siret: "",
+});
+
 export default function Dashboard() {
   const match = useRouteMatch();
   const { siret } = useParams();
@@ -59,14 +63,12 @@ export default function Dashboard() {
     if (!siret) return <Redirect to={`${match.url}/${companies[0].siret}`} />;
     console.log(match);
     return (
+      <SiretContext.Provider value={{ siret }}>
       <div id="dashboard" className="dashboard">
         <DashboardMenu
           me={data.me}
           match={match}
-          siret={siret}
-          handleCompanyChange={(siret) =>
-            history.push(`${match.url}/../${siret}`)
-          }
+          handleCompanyChange={(siret) => history.push(`/dashboard/${siret}`)}
         />
 
         <div className="dashboard-content">
@@ -75,11 +77,11 @@ export default function Dashboard() {
           </Route>
 
           <Route path={`${match.url}/slips`}>
-            <SlipsContainer me={data.me} siret={siret} />
+            <SlipsContainer />
           </Route>
 
           <Route path={`${match.url}/transport`}>
-            <Transport me={data.me} siret={siret} />
+            <Transport />
           </Route>
 
           <Route path={`${match.url}/exports`}>
@@ -87,6 +89,7 @@ export default function Dashboard() {
           </Route>
         </div>
       </div>
+      </SiretContext.Provider>
     );
   }
 
