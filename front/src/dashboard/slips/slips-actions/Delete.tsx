@@ -25,7 +25,7 @@ export default function Delete({ formId }: Props) {
     update: (store, { data: { deleteForm } }) => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
-        variables: { siret },
+        variables: { siret, status: ["DRAFT"] },
         getNewData: (data) => ({
           forms: [...data.forms.filter((f) => f.id !== deleteForm.id)],
         }),

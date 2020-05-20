@@ -50,23 +50,17 @@ export default withRouter(function StepList(
   ]);
 
   const [saveForm] = useMutation<
-    Pick<Mutation, "saveForm">,
-    MutationSaveFormArgs
-  >(SAVE_FORM, {
-    update: (store, { data }) => {
-      if (data?.saveForm) {
-        const saveForm = data.saveForm;
-        updateApolloCache<{ forms: Form[] }>(store, {
-          query: GET_SLIPS,
-          variables: { siret: currentSiretService.getSiret() },
-          getNewData: (data) => ({
-            forms: [
-              ...data.forms.filter((f) => f.id !== saveForm.id),
-              saveForm,
-            ],
-          }),
-        });
-      }
+  Pick<Mutation, "saveForm">,
+  MutationSaveFormArgs
+>(SAVE_FORM, {
+    update: (store, { data: { saveForm } }) => {
+      updateApolloCache<{ forms: Form[] }>(store, {
+        query: GET_SLIPS,
+        variables: { siret: currentSiretService.getSiret(), status: ["DRAFT"] },
+        getNewData: (data) => ({
+          forms: [...data.forms.filter((f) => f.id !== saveForm.id), saveForm],
+        }),
+      });
     },
   });
 

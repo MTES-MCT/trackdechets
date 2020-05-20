@@ -40,7 +40,7 @@ export const SIGNED_BY_TRANSPORTER = gql`
 type Props = { form: any };
 
 export default function TransportSignature({ form }: Props) {
-  const { siret } = useContext(SiretContext)
+  const { siret } = useContext(SiretContext);
   const [isOpen, setIsOpen] = useState(false);
   const [signedByTransporter, { error }] = useMutation<
     Pick<Mutation, "signedByTransporter">,
@@ -53,7 +53,8 @@ export default function TransportSignature({ form }: Props) {
         query: GET_TRANSPORT_SLIPS,
         variables: {
           siret,
-          type: "TRANSPORTER",
+          roles: ["TRANSPORTER"],
+          status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
         getNewData: (data) => ({
           forms: data.forms.filter((f) => f.id !== form.id),
