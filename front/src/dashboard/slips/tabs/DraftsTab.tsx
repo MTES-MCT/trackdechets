@@ -4,13 +4,14 @@ import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { InlineError } from "../../../common/Error";
 import Loader from "../../../common/Loader";
+import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
-import { SiretContext } from "../../Dashboard";
+import LoadMore from "./LoadMore";
 
 export default function DraftsTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data } = useQuery(GET_SLIPS, {
+  const { loading, error, data, fetchMore } = useQuery(GET_SLIPS, {
     variables: { siret, status: ["DRAFT"] },
   });
 
@@ -35,11 +36,15 @@ export default function DraftsTab() {
     );
 
   return (
-    <Slips
-      siret={siret}
-      forms={data.forms}
-      hiddenFields={["status", "readableId"]}
-      dynamicActions={true}
-    />
+    <>
+      <Slips
+        siret={siret}
+        forms={data.forms}
+        hiddenFields={["status", "readableId"]}
+        dynamicActions={true}
+      />
+
+      <LoadMore forms={data.forms} fetchMore={fetchMore} />
+    </>
   );
 }

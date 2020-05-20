@@ -5,10 +5,11 @@ import Loader from "../../../common/Loader";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 import { SiretContext } from "../../Dashboard";
+import LoadMore from "./LoadMore";
 
 export default function ActTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data } = useQuery(GET_SLIPS, {
+  const { loading, error, data, fetchMore } = useQuery(GET_SLIPS, {
     variables: {
       siret,
       status: [
@@ -39,5 +40,10 @@ export default function ActTab() {
       </div>
     );
 
-  return <Slips siret={siret} forms={data.forms} dynamicActions={true} />;
+  return (
+    <>
+      <Slips siret={siret} forms={data.forms} dynamicActions={true} />{" "}
+      <LoadMore forms={data.forms} fetchMore={fetchMore} />{" "}
+    </>
+  );
 }

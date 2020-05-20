@@ -5,10 +5,11 @@ import Loader from "../../../common/Loader";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 import { SiretContext } from "../../Dashboard";
+import LoadMore from "./LoadMore";
 
 export default function HistoryTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data } = useQuery(GET_SLIPS, {
+  const { loading, error, data, fetchMore } = useQuery(GET_SLIPS, {
     variables: { siret, status: ["PROCESSED", "NO_TRACEABILITY", "REFUSED"] },
   });
 
@@ -27,5 +28,10 @@ export default function HistoryTab() {
       </div>
     );
 
-  return <Slips siret={siret} forms={data.forms} />;
+  return (
+    <>
+      <Slips siret={siret} forms={data.forms} />
+      <LoadMore forms={data.forms} fetchMore={fetchMore} />
+    </>
+  );
 }
