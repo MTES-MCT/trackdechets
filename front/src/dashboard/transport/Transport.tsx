@@ -25,8 +25,8 @@ type Props = {
 };
 
 export const GET_TRANSPORT_SLIPS = gql`
-  query GetSlips($siret: String, $type: FormType) {
-    forms(siret: $siret, type: $type) {
+  query GetSlips($siret: String, $status: [FormStatus], $roles: [FormRole]) {
+    forms(siret: $siret, status: $status, roles: $roles) {
       ...FullForm
     }
   }
@@ -163,10 +163,14 @@ export default function Transport() {
     TRANSPORTER_FILTER_STORAGE_KEY
   );
   const { loading, error, data, refetch } = useQuery<
-    Pick<Query, "forms">,
-    QueryFormsArgs
-  >(GET_TRANSPORT_SLIPS, {
-    variables: { siret, type: FormType.Transporter },
+  Pick<Query, "forms">,
+  QueryFormsArgs
+>(GET_TRANSPORT_SLIPS, {
+    variables: {
+      siret,
+      status: ["SEALED", "SENT", "RESEALED", "RESENT"],
+      roles: ["TRANSPORTER"],
+    },
   });
   if (loading) return <div>loading</div>;
   if (error) return <div>error</div>;
@@ -222,7 +226,13 @@ export default function Transport() {
         </button>
         <button
           className="button button-primary transport-refresh"
-          onClick={() => refetch({ siret, type: FormType.Transporter })}
+          onClick={() =>
+            refetch({
+              siret,
+              status: ["SEALED", "SENT", "RESEALED", "RESENT"],
+              roles: ["TRANSPORTER"],
+            })
+          }
         >
           <FaSync /> Rafraîchir
         </button>
