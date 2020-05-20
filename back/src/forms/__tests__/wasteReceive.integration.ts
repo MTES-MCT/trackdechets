@@ -43,6 +43,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Bill",
             receivedAt :"2019-01-17T10:22:00+0100",
+            acceptedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: ACCEPTED,
             quantityReceived: 11
       }
@@ -89,6 +90,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Bill",
             receivedAt :"2019-01-17T10:22:00+0100",
+            acceptedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: ACCEPTED,
             quantityReceived: -2
       }
@@ -128,6 +130,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Bill",
             receivedAt :"2019-01-17T10:22:00+0100",
+            acceptedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: ACCEPTED,
             quantityReceived: 0
       }
@@ -256,6 +259,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Carol",
             receivedAt :"2019-01-17T10:22:00+0100",
+            acceptedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: PARTIALLY_REFUSED,
             wasteRefusalReason: "Dolor sit amet",
             quantityReceived: 12.5
@@ -314,6 +318,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Sandy",
             receivedAt :"2019-01-17T10:22:00+0100",
+            acceptedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: PARTIALLY_REFUSED,
             wasteRefusalReason: "Dolor sit amet",
             quantityReceived: 19
@@ -357,6 +362,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Bill",
             receivedAt :"2019-01-17T10:22:00+0100",
+            acceptedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: ACCEPTED,
             quantityReceived: 11
       }

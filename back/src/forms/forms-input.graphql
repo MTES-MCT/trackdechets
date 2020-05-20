@@ -61,7 +61,7 @@ input ReceivedFormInput {
   receivedAt: DateTime!
 
   "Date à laquelle le déchet a été accepté (case 10)"
-  acceptedAt: DateTime!
+  acceptedAt: DateTime
 
   "Quantité réelle présentée (case 10)"
   quantityReceived: Float!
@@ -298,7 +298,7 @@ input TempStoredFormInput {
   receivedAt: DateTime!
 
   "Date à laquelle le déchet a été accepté (case 10)"
-  acceptedAt: DateTime!
+  acceptedAt: DateTime
 
   "Quantité réelle présentée (case 10)"
   quantityReceived: Float!

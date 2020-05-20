@@ -1361,6 +1361,7 @@ type Form {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1452,6 +1453,7 @@ input FormCreateInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1552,6 +1554,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1657,6 +1660,8 @@ enum FormOrderByInput {
   receivedBy_DESC
   receivedAt_ASC
   receivedAt_DESC
+  acceptedAt_ASC
+  acceptedAt_DESC
   quantityReceived_ASC
   quantityReceived_DESC
   processedBy_ASC
@@ -1805,6 +1810,7 @@ type FormPreviousValues {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -2013,6 +2019,14 @@ input FormScalarWhereInput {
   receivedAt_lte: DateTime
   receivedAt_gt: DateTime
   receivedAt_gte: DateTime
+  acceptedAt: DateTime
+  acceptedAt_not: DateTime
+  acceptedAt_in: [DateTime!]
+  acceptedAt_not_in: [DateTime!]
+  acceptedAt_lt: DateTime
+  acceptedAt_lte: DateTime
+  acceptedAt_gt: DateTime
+  acceptedAt_gte: DateTime
   quantityReceived: Float
   quantityReceived_not: Float
   quantityReceived_in: [Float!]
@@ -2850,6 +2864,7 @@ input FormUpdateDataInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -2934,6 +2949,7 @@ input FormUpdateInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3017,6 +3033,7 @@ input FormUpdateManyDataInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3109,6 +3126,7 @@ input FormUpdateManyMutationInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3211,6 +3229,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  acceptedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3443,6 +3462,14 @@ input FormWhereInput {
   receivedAt_lte: DateTime
   receivedAt_gt: DateTime
   receivedAt_gte: DateTime
+  acceptedAt: DateTime
+  acceptedAt_not: DateTime
+  acceptedAt_in: [DateTime!]
+  acceptedAt_not_in: [DateTime!]
+  acceptedAt_lt: DateTime
+  acceptedAt_lte: DateTime
+  acceptedAt_gt: DateTime
+  acceptedAt_gte: DateTime
   quantityReceived: Float
   quantityReceived_not: Float
   quantityReceived_in: [Float!]
@@ -5397,6 +5424,7 @@ type TemporaryStorageDetail {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5444,6 +5472,7 @@ input TemporaryStorageDetailCreateInput {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5489,6 +5518,7 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5541,6 +5571,8 @@ enum TemporaryStorageDetailOrderByInput {
   tempStorerReceivedAt_DESC
   tempStorerReceivedBy_ASC
   tempStorerReceivedBy_DESC
+  tempStorerAccepteddAt_ASC
+  tempStorerAccepteddAt_DESC
   tempStorerSignedAt_ASC
   tempStorerSignedAt_DESC
   destinationIsFilledByEmitter_ASC
@@ -5611,6 +5643,7 @@ type TemporaryStorageDetailPreviousValues {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5669,6 +5702,7 @@ input TemporaryStorageDetailUpdateInput {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5708,6 +5742,7 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5756,6 +5791,7 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerWasteRefusalReason: String
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
+  tempStorerAccepteddAt: DateTime
   tempStorerSignedAt: DateTime
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
@@ -5861,6 +5897,14 @@ input TemporaryStorageDetailWhereInput {
   tempStorerReceivedBy_not_starts_with: String
   tempStorerReceivedBy_ends_with: String
   tempStorerReceivedBy_not_ends_with: String
+  tempStorerAccepteddAt: DateTime
+  tempStorerAccepteddAt_not: DateTime
+  tempStorerAccepteddAt_in: [DateTime!]
+  tempStorerAccepteddAt_not_in: [DateTime!]
+  tempStorerAccepteddAt_lt: DateTime
+  tempStorerAccepteddAt_lte: DateTime
+  tempStorerAccepteddAt_gt: DateTime
+  tempStorerAccepteddAt_gte: DateTime
   tempStorerSignedAt: DateTime
   tempStorerSignedAt_not: DateTime
   tempStorerSignedAt_in: [DateTime!]

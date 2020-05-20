@@ -893,6 +893,8 @@ export type FormOrderByInput =
   | "receivedBy_DESC"
   | "receivedAt_ASC"
   | "receivedAt_DESC"
+  | "acceptedAt_ASC"
+  | "acceptedAt_DESC"
   | "quantityReceived_ASC"
   | "quantityReceived_DESC"
   | "processedBy_ASC"
@@ -1039,6 +1041,8 @@ export type TemporaryStorageDetailOrderByInput =
   | "tempStorerReceivedAt_DESC"
   | "tempStorerReceivedBy_ASC"
   | "tempStorerReceivedBy_DESC"
+  | "tempStorerAccepteddAt_ASC"
+  | "tempStorerAccepteddAt_DESC"
   | "tempStorerSignedAt_ASC"
   | "tempStorerSignedAt_DESC"
   | "destinationIsFilledByEmitter_ASC"
@@ -1417,6 +1421,7 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerWasteRefusalReason?: Maybe<String>;
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
+  tempStorerAccepteddAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
@@ -1512,6 +1517,7 @@ export interface FormUpdateDataInput {
   wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -1938,6 +1944,7 @@ export interface FormUpdateInput {
   wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -2023,6 +2030,7 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerWasteRefusalReason?: Maybe<String>;
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
+  tempStorerAccepteddAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
@@ -2158,6 +2166,14 @@ export interface TemporaryStorageDetailWhereInput {
   tempStorerReceivedBy_not_starts_with?: Maybe<String>;
   tempStorerReceivedBy_ends_with?: Maybe<String>;
   tempStorerReceivedBy_not_ends_with?: Maybe<String>;
+  tempStorerAccepteddAt?: Maybe<DateTimeInput>;
+  tempStorerAccepteddAt_not?: Maybe<DateTimeInput>;
+  tempStorerAccepteddAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  tempStorerAccepteddAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  tempStorerAccepteddAt_lt?: Maybe<DateTimeInput>;
+  tempStorerAccepteddAt_lte?: Maybe<DateTimeInput>;
+  tempStorerAccepteddAt_gt?: Maybe<DateTimeInput>;
+  tempStorerAccepteddAt_gte?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt_not?: Maybe<DateTimeInput>;
   tempStorerSignedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -2660,6 +2676,7 @@ export interface TemporaryStorageDetailUpdateInput {
   tempStorerWasteRefusalReason?: Maybe<String>;
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
+  tempStorerAccepteddAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
@@ -3317,6 +3334,7 @@ export interface FormUpdateManyMutationInput {
   wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -3402,6 +3420,7 @@ export interface FormUpdateManyDataInput {
   wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -3621,6 +3640,14 @@ export interface FormScalarWhereInput {
   receivedAt_lte?: Maybe<DateTimeInput>;
   receivedAt_gt?: Maybe<DateTimeInput>;
   receivedAt_gte?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
+  acceptedAt_not?: Maybe<DateTimeInput>;
+  acceptedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_lt?: Maybe<DateTimeInput>;
+  acceptedAt_lte?: Maybe<DateTimeInput>;
+  acceptedAt_gt?: Maybe<DateTimeInput>;
+  acceptedAt_gte?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   quantityReceived_not?: Maybe<Float>;
   quantityReceived_in?: Maybe<Float[] | Float>;
@@ -4867,6 +4894,14 @@ export interface FormWhereInput {
   receivedAt_lte?: Maybe<DateTimeInput>;
   receivedAt_gt?: Maybe<DateTimeInput>;
   receivedAt_gte?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
+  acceptedAt_not?: Maybe<DateTimeInput>;
+  acceptedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_lt?: Maybe<DateTimeInput>;
+  acceptedAt_lte?: Maybe<DateTimeInput>;
+  acceptedAt_gt?: Maybe<DateTimeInput>;
+  acceptedAt_gte?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   quantityReceived_not?: Maybe<Float>;
   quantityReceived_in?: Maybe<Float[] | Float>;
@@ -5715,6 +5750,7 @@ export interface FormCreateInput {
   wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5801,6 +5837,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5891,6 +5928,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   wasteRefusalReason?: Maybe<String>;
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5973,6 +6011,7 @@ export interface TemporaryStorageDetailCreateInput {
   tempStorerWasteRefusalReason?: Maybe<String>;
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
+  tempStorerAccepteddAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
@@ -6898,6 +6937,7 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerWasteRefusalReason?: Maybe<String>;
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
+  tempStorerAccepteddAt?: Maybe<DateTimeInput>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
@@ -7336,6 +7376,7 @@ export interface Form {
   wasteRefusalReason?: String;
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
+  acceptedAt?: DateTimeOutput;
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
@@ -7420,6 +7461,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   wasteRefusalReason: () => Promise<String>;
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -7517,6 +7559,7 @@ export interface FormSubscription
   wasteRefusalReason: () => Promise<AsyncIterator<String>>;
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  acceptedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
@@ -7614,6 +7657,7 @@ export interface FormNullablePromise
   wasteRefusalReason: () => Promise<String>;
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -8818,6 +8862,7 @@ export interface TemporaryStorageDetail {
   tempStorerWasteRefusalReason?: String;
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerReceivedBy?: String;
+  tempStorerAccepteddAt?: DateTimeOutput;
   tempStorerSignedAt?: DateTimeOutput;
   destinationIsFilledByEmitter?: Boolean;
   destinationCompanyName?: String;
@@ -8861,6 +8906,7 @@ export interface TemporaryStorageDetailPromise
   tempStorerWasteRefusalReason: () => Promise<String>;
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
+  tempStorerAccepteddAt: () => Promise<DateTimeOutput>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
@@ -8906,6 +8952,7 @@ export interface TemporaryStorageDetailSubscription
   tempStorerWasteRefusalReason: () => Promise<AsyncIterator<String>>;
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
+  tempStorerAccepteddAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
   destinationCompanyName: () => Promise<AsyncIterator<String>>;
@@ -8949,6 +8996,7 @@ export interface TemporaryStorageDetailNullablePromise
   tempStorerWasteRefusalReason: () => Promise<String>;
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
+  tempStorerAccepteddAt: () => Promise<DateTimeOutput>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
@@ -9047,6 +9095,7 @@ export interface FormPreviousValues {
   wasteRefusalReason?: String;
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
+  acceptedAt?: DateTimeOutput;
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
@@ -9132,6 +9181,7 @@ export interface FormPreviousValuesPromise
   wasteRefusalReason: () => Promise<String>;
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -9217,6 +9267,7 @@ export interface FormPreviousValuesSubscription
   wasteRefusalReason: () => Promise<AsyncIterator<String>>;
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  acceptedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
@@ -10027,6 +10078,7 @@ export interface TemporaryStorageDetailPreviousValues {
   tempStorerWasteRefusalReason?: String;
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerReceivedBy?: String;
+  tempStorerAccepteddAt?: DateTimeOutput;
   tempStorerSignedAt?: DateTimeOutput;
   destinationIsFilledByEmitter?: Boolean;
   destinationCompanyName?: String;
@@ -10069,6 +10121,7 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   tempStorerWasteRefusalReason: () => Promise<String>;
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
+  tempStorerAccepteddAt: () => Promise<DateTimeOutput>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
@@ -10113,6 +10166,7 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   tempStorerWasteRefusalReason: () => Promise<AsyncIterator<String>>;
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
+  tempStorerAccepteddAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
   destinationCompanyName: () => Promise<AsyncIterator<String>>;

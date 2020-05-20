@@ -24,6 +24,23 @@ export const getReceivedInfoSchema = yup =>
       },
       yup
     ),
+    acceptedAt: yup
+      .string()
+      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+        ["REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.test(
+              "is-not-set",
+              "Vous ne devez pas saisir de date d'acceptation du déchet lors d'un refus.",
+              v => !v
+            )
+          : validDatetime(
+              {
+                verboseFieldName: "date d'acceptation",
+                required: true
+              },
+              yup
+            )
+      ),
 
     quantityReceived: yup
       .number()
@@ -180,64 +197,7 @@ export const signedByTransporterSchema = inputRule()(
 export const markAsTempStoredSchema = inputRule()(
   yup =>
     yup.object().shape({
-      tempStoredInfos: yup.object({
-        wasteAcceptationStatus: yup
-          .string()
-          .required()
-          .matches(/(ACCEPTED|REFUSED|PARTIALLY_REFUSED)/, {
-            message: "Vous devez préciser si vous acceptez ou non le déchet."
-          }),
-        wasteRefusalReason: yup
-          .string()
-          .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-            ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-              ? schema.required()
-              : schema.test(
-                  "is-empty",
-                  "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                  v => !v
-                )
-          ),
-        receivedBy: yup
-          .string()
-          .required("Vous devez saisir un responsable de la réception."),
-        receivedAt: validDatetime(
-          {
-            verboseFieldName: "date de réception",
-            required: true
-          },
-          yup
-        ),
-        quantityReceived: yup
-          .number()
-          .required()
-          // if waste is refused, quantityReceived must be 0
-          .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-            ["REFUSED"].includes(wasteAcceptationStatus)
-              ? schema.test(
-                  "is-zero",
-                  "Vous devez saisir une quantité reçue égale à 0.",
-                  v => v === 0
-                )
-              : schema
-          )
-          // if waste is partially or totally accepted, we check it is a positive value
-          .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-            ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-              ? schema.test(
-                  "is-strictly-positive",
-                  "Vous devez saisir une quantité reçue supérieure à 0.",
-                  v => v > 0
-                )
-              : schema
-          ),
-        quantityType: yup
-          .string()
-          .matches(
-            /(REAL|ESTIMATED)/,
-            "Le type de quantité (réelle ou estimée) doit être précisé"
-          )
-      })
+      tempStoredInfos: getReceivedInfoSchema(yup)
     }),
   {
     abortEarly: false
