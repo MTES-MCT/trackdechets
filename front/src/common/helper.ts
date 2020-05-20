@@ -61,16 +61,3 @@ export function removeNulls(obj) {
 
   return obj;
 }
-
-/**
- * Format a date to yyyy-MM-dd
- * This format should be used for input of type "date"
- * @param date
- */
-export function formatDate(date: Date) {
-  // Cf https://stackoverflow.com/questions/3605214/javascript-add-leading-zeroes-to-date
-  const yyyy = date.getFullYear();
-  const mm = ("0" + (date.getMonth() + 1)).slice(-2);
-  const dd = ("0" + date.getDate()).slice(-2);
-  return `${yyyy}-${mm}-${dd}`;
-}

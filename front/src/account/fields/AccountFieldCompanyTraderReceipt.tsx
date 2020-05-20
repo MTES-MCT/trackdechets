@@ -2,8 +2,8 @@ import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormCompanyTraderReceipt from "./forms/AccountFormCompanyTraderReceipt";
-import { formatDate } from "../../common/helper";
 import { CompanyPrivate } from "../../generated/graphql/types";
+import { DateTime } from "luxon";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "traderReceipt">;
@@ -34,7 +34,9 @@ export default function AccountFieldCompanyTraderReceipt({ company }: Props) {
         </tr>
         <tr>
           <td> Limite de validité </td>
-          <td>{formatDate(new Date(company.traderReceipt.validityLimit))} </td>
+          <td>
+            {DateTime.fromISO(company.traderReceipt.validityLimit).toISODate()}
+          </td>
         </tr>
         <tr>
           <td> Département</td>

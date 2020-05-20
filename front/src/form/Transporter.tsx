@@ -1,8 +1,8 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
-import DateInput from "../common/DateInput";
 import RedErrorMessage from "../common/RedErrorMessage";
+import DateInput from "./custom-inputs/DateInput";
 
 type Values = {
   transporter: { isExemptedOfReceipt: boolean };
@@ -29,7 +29,7 @@ export default connect<{}, Values>(function Transporter(props) {
             );
           } else {
             props.formik.setFieldValue("transporter.receipt", "");
-            props.formik.setFieldValue("transporter.validityLimit", "");
+            props.formik.setFieldValue("transporter.validityLimit", null);
             props.formik.setFieldValue("transporter.department", "");
           }
         }}

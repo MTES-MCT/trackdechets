@@ -4,7 +4,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { Formik, FormikProps, Form, Field } from "formik";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import { NotificationError } from "../../../common/Error";
-import DateInput from "../../../common/DateInput";
+import DateInput from "../../../form/custom-inputs/DateInput";
 import { CompanyPrivate } from "../../../generated/graphql/types";
 
 type Props = {
