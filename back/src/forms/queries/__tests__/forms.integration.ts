@@ -202,12 +202,12 @@ describe("Integration / Forms query", () => {
     expect(data.forms.length).toBe(3);
 
     expect(data.forms).toEqual([
+      { wasteDetails: { packagings: [] }, stateSummary: { packagings: [] } },
+      { wasteDetails: { packagings: [] }, stateSummary: { packagings: [] } },
       {
         wasteDetails: { packagings: ["CITERNE"] },
         stateSummary: { packagings: ["CITERNE"] }
-      },
-      { wasteDetails: { packagings: [] }, stateSummary: { packagings: [] } },
-      { wasteDetails: { packagings: [] }, stateSummary: { packagings: [] } }
+      }
     ]);
   });
 
