@@ -1,5 +1,5 @@
 import React from "react";
-import { Form } from "../../../form/model";
+import { Form } from "../../../generated/graphql/types";
 
 type Props = {
   forms: Form[];

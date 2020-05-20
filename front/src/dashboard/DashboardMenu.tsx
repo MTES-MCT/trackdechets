@@ -1,11 +1,10 @@
 import React, { useContext } from "react";
-import { Me } from "../login/model";
-import "./DashboardMenu.scss";
-import { NavLink, match } from "react-router-dom";
-import CompanySelector from "./CompanySelector";
+import { match, NavLink } from "react-router-dom";
 import SideMenu from "../common/SideMenu";
-import { SiretContext } from "./Dashboard";
 import { CompanyType, User } from "../generated/graphql/types";
+import CompanySelector from "./CompanySelector";
+import { SiretContext } from "./Dashboard";
+import "./DashboardMenu.scss";
 
 interface IProps {
   me: User;
@@ -18,7 +17,7 @@ export default function DashboardMenu({
   match,
   handleCompanyChange,
 }: IProps) {
-const { siret } = useContext(SiretContext);
+  const { siret } = useContext(SiretContext);
   const companies = me.companies || [];
 
   const company = companies.find((c) => c.siret === siret);

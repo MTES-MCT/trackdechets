@@ -4,6 +4,11 @@ import { FaClone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { InlineError } from "../../../common/Error";
 import Loader from "../../../common/Loader";
+import {
+  FormStatus,
+  Query,
+  QueryFormsArgs,
+} from "../../../generated/graphql/types";
 import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
@@ -11,8 +16,11 @@ import LoadMore from "./LoadMore";
 
 export default function DraftsTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data, fetchMore } = useQuery(GET_SLIPS, {
-    variables: { siret, status: ["DRAFT"] },
+  const { loading, error, data, fetchMore } = useQuery<
+    Pick<Query, "forms">,
+    Partial<QueryFormsArgs>
+  >(GET_SLIPS, {
+    variables: { siret, status: [FormStatus.Draft] },
   });
 
   if (loading) return <Loader />;

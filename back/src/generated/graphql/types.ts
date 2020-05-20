@@ -524,6 +524,18 @@ export type FormInput = {
   temporaryStorageDetail?: Maybe<TemporaryStorageDetailInput>;
 };
 
+export type FormRole = 
+  /** Les BSD's dont je suis transporteur */
+  'TRANSPORTER' |
+  /** Les BSD's dont je suis la destination de traitement */
+  'RECIPIENT' |
+  /** Les BSD's dont je suis l'émetteur */
+  'EMITTER' |
+  /** Les BSD's dont je suis le négociant */
+  'TRADER' |
+  /** Les BSD's dont je suis éco-organisme */
+  'ECO_ORGANISME';
+
 /** Informations du cycle de vie des bordereaux */
 export type FormsLifeCycleData = {
    __typename?: 'formsLifeCycleData';
@@ -600,7 +612,7 @@ export type FormSubscription = {
 
 /** Valeur possibles pour le filtre de la query `forms` */
 export type FormType = 
-  /** Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
+  /** DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
   'ACTOR' |
   /** Uniquement les BSD's dont je suis transporteur */
   'TRANSPORTER';
@@ -1110,6 +1122,11 @@ export type QueryFormPdfArgs = {
 
 export type QueryFormsArgs = {
   siret?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+  status?: Maybe<Array<Maybe<FormStatus>>>;
+  roles?: Maybe<Array<Maybe<FormRole>>>;
+  hasNextStep?: Maybe<Scalars['Boolean']>;
   type?: Maybe<FormType>;
 };
 
@@ -1758,6 +1775,7 @@ export type ResolversTypes = {
   FavoriteType: FavoriteType;
   CompanyFavorite: ResolverTypeWrapper<CompanyFavorite>;
   FileDownload: ResolverTypeWrapper<FileDownload>;
+  FormRole: FormRole;
   FormType: FormType;
   formsLifeCycleData: ResolverTypeWrapper<FormsLifeCycleData>;
   StatusLog: ResolverTypeWrapper<StatusLog>;
@@ -1848,6 +1866,7 @@ export type ResolversParentTypes = {
   FavoriteType: FavoriteType;
   CompanyFavorite: CompanyFavorite;
   FileDownload: FileDownload;
+  FormRole: FormRole;
   FormType: FormType;
   formsLifeCycleData: FormsLifeCycleData;
   StatusLog: StatusLog;

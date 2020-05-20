@@ -2,15 +2,30 @@ import { useQuery } from "@apollo/react-hooks";
 import React, { useContext } from "react";
 import { InlineError } from "../../../common/Error";
 import Loader from "../../../common/Loader";
+import {
+  FormStatus,
+  Query,
+  QueryFormsArgs,
+} from "../../../generated/graphql/types";
+import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
-import { SiretContext } from "../../Dashboard";
 import LoadMore from "./LoadMore";
 
 export default function HistoryTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data, fetchMore } = useQuery(GET_SLIPS, {
-    variables: { siret, status: ["PROCESSED", "NO_TRACEABILITY", "REFUSED"] },
+  const { loading, error, data, fetchMore } = useQuery<
+    Pick<Query, "forms">,
+    Partial<QueryFormsArgs>
+  >(GET_SLIPS, {
+    variables: {
+      siret,
+      status: [
+        FormStatus.Processed,
+        FormStatus.NoTraceability,
+        FormStatus.Refused,
+      ],
+    },
   });
 
   if (loading) return <Loader />;

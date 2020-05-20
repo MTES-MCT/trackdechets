@@ -22,7 +22,11 @@ export default function Delete({ formId }: Props) {
     MutationDuplicateFormArgs
   >(mutations.DELETE_FORM, {
     variables: { id: formId },
-    update: (store, { data: { deleteForm } }) => {
+    update: (store, { data }) => {
+      if (!data?.deleteForm) {
+        return;
+      }
+      const deleteForm = data.deleteForm;
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret, status: ["DRAFT"] },

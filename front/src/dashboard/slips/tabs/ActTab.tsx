@@ -2,23 +2,31 @@ import { useQuery } from "@apollo/react-hooks";
 import React, { useContext } from "react";
 import { InlineError } from "../../../common/Error";
 import Loader from "../../../common/Loader";
+import {
+  FormStatus,
+  Query,
+  QueryFormsArgs,
+} from "../../../generated/graphql/types";
+import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
-import { SiretContext } from "../../Dashboard";
 import LoadMore from "./LoadMore";
 
 export default function ActTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data, fetchMore } = useQuery(GET_SLIPS, {
+  const { loading, error, data, fetchMore } = useQuery<
+    Pick<Query, "forms">,
+    Partial<QueryFormsArgs>
+  >(GET_SLIPS, {
     variables: {
       siret,
       status: [
-        "SEALED",
-        "SENT",
-        "RECEIVED",
-        "TEMP_STORED",
-        "RESEALED",
-        "RESENT",
+        FormStatus.Sealed,
+        FormStatus.Sent,
+        FormStatus.Received,
+        FormStatus.TempStored,
+        FormStatus.Resealed,
+        FormStatus.Resent,
       ],
       hasNextStep: true,
     },

@@ -1,7 +1,6 @@
 import { getUserCompanies } from "../../companies/queries";
 import { unflattenObjectFromDb } from "../form-converter";
-import { FormStatus, FormType, FormRole } from "../../generated/types";
-import { GraphQLContext } from "../../types";
+import { FormStatus, FormType, FormRole } from "../../generated/graphql/types";
 import { prisma } from "../../generated/prisma-client";
 
 const DEFAULT_FIRST = 50;
@@ -30,7 +29,7 @@ export default async function forms(
 ) {
   // TODO Remove `type` param and this code after deprecation warning period
   if (type && !roles) {
-    roles = type === FormType.Actor ? [] : [FormRole.Transporter];
+    roles = type === "ACTOR" ? [] : ["TRANSPORTER"];
   }
   const userCompanies = await getUserCompanies(userId);
 
@@ -58,7 +57,7 @@ export default async function forms(
 
 function getRolesFilter(siret: string, types: FormRole[]) {
   const filtersByRole = {
-    [FormRole.Recipient]: [
+    ["RECIPIENT"]: [
       { recipientCompanySiret: siret },
       {
         temporaryStorageDetail: {
@@ -66,8 +65,8 @@ function getRolesFilter(siret: string, types: FormRole[]) {
         }
       }
     ],
-    [FormRole.Emitter]: [{ emitterCompanySiret: siret }],
-    [FormRole.Transporter]: [
+    ["EMITTER"]: [{ emitterCompanySiret: siret }],
+    ["TRANSPORTER"]: [
       { transporterCompanySiret: siret },
       {
         temporaryStorageDetail: {
@@ -75,8 +74,8 @@ function getRolesFilter(siret: string, types: FormRole[]) {
         }
       }
     ],
-    [FormRole.Trader]: [{ traderCompanySiret: siret }],
-    [FormRole.EcoOrganisme]: [{ ecoOrganisme: { siret: siret } }]
+    ["TRADER"]: [{ traderCompanySiret: siret }],
+    ["ECO_ORGANISME"]: [{ ecoOrganisme: { siret: siret } }]
   };
 
   return {

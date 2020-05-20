@@ -1,28 +1,22 @@
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import "./Transport.scss";
-import TransportSignature from "./TransportSignature";
-import TransporterInfoEdit from "./TransporterInfoEdit";
 import React, { useContext, useState } from "react";
 import { FaSort, FaSync } from "react-icons/fa";
 import { fullFormFragment } from "../../common/fragments";
+import {
+  Form,
+  FormRole,
+  FormStatus,
+  Query,
+  QueryFormsArgs,
+} from "../../generated/graphql/types";
 import { SiretContext } from "../Dashboard";
 import DownloadPdf from "../slips/slips-actions/DownloadPdf";
 import { useFormsTable } from "../slips/use-forms-table";
 import useLocalStorage from "./hooks";
-import {
-  User,
-  Form,
-  Query,
-  QueryFormsArgs,
-  FormType,
-  FormStatus,
-} from "../../generated/graphql/types";
-
-type Props = {
-  me: User;
-  siret: string;
-};
+import "./Transport.scss";
+import TransporterInfoEdit from "./TransporterInfoEdit";
+import TransportSignature from "./TransportSignature";
 
 export const GET_TRANSPORT_SLIPS = gql`
   query GetSlips($siret: String, $status: [FormStatus], $roles: [FormRole]) {
@@ -163,13 +157,18 @@ export default function Transport() {
     TRANSPORTER_FILTER_STORAGE_KEY
   );
   const { loading, error, data, refetch } = useQuery<
-  Pick<Query, "forms">,
-  QueryFormsArgs
->(GET_TRANSPORT_SLIPS, {
+    Pick<Query, "forms">,
+    Partial<QueryFormsArgs>
+  >(GET_TRANSPORT_SLIPS, {
     variables: {
       siret,
-      status: ["SEALED", "SENT", "RESEALED", "RESENT"],
-      roles: ["TRANSPORTER"],
+      status: [
+        FormStatus.Sealed,
+        FormStatus.Sent,
+        FormStatus.Resealed,
+        FormStatus.Resent,
+      ],
+      roles: [FormRole.Transporter],
     },
   });
   if (loading) return <div>loading</div>;
@@ -229,8 +228,13 @@ export default function Transport() {
           onClick={() =>
             refetch({
               siret,
-              status: ["SEALED", "SENT", "RESEALED", "RESENT"],
-              roles: ["TRANSPORTER"],
+              status: [
+                FormStatus.Sealed,
+                FormStatus.Sent,
+                FormStatus.Resealed,
+                FormStatus.Resent,
+              ],
+              roles: [FormRole.Transporter],
             })
           }
         >

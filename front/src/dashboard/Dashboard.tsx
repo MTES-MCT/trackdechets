@@ -58,34 +58,34 @@ export default function Dashboard() {
     }
 
     if (!siret) return <Redirect to={`${match.url}/${companies[0].siret}`} />;
-    console.log(match);
+
     return (
       <SiretContext.Provider value={{ siret }}>
-      <div id="dashboard" className="dashboard">
-        <DashboardMenu
-          me={data.me}
-          match={match}
-          handleCompanyChange={(siret) => history.push(`/dashboard/${siret}`)}
-        />
+        <div id="dashboard" className="dashboard">
+          <DashboardMenu
+            me={data.me}
+            match={match}
+            handleCompanyChange={(siret) => history.push(`/dashboard/${siret}`)}
+          />
 
-        <div className="dashboard-content">
-          <Route exact path={match.url}>
-            <Redirect to={`${match.url}/slips`} />
-          </Route>
+          <div className="dashboard-content">
+            <Route exact path={match.url}>
+              <Redirect to={`${match.url}/slips`} />
+            </Route>
 
-          <Route path={`${match.url}/slips`}>
-            <SlipsContainer />
-          </Route>
+            <Route path={`${match.url}/slips`}>
+              <SlipsContainer />
+            </Route>
 
-          <Route path={`${match.url}/transport`}>
-            <Transport />
-          </Route>
+            <Route path={`${match.url}/transport`}>
+              <Transport />
+            </Route>
 
-          <Route path={`${match.url}/exports`}>
-            <Exports me={data.me} />
-          </Route>
+            <Route path={`${match.url}/exports`}>
+              <Exports me={data.me} />
+            </Route>
+          </div>
         </div>
-      </div>
       </SiretContext.Provider>
     );
   }
