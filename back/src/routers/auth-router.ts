@@ -25,7 +25,7 @@ authRouter.post("/login", (req, res, next) => {
       );
     }
     req.login(user, () => {
-      const returnTo = req.body.returnTo || "/dashboard/slips";
+      const returnTo = req.body.returnTo || "/dashboard/";
       return res.redirect(`${UI_BASE_URL}${returnTo}`);
     });
   })(req, res, next);
