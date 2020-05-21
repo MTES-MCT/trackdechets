@@ -1,19 +1,9 @@
 import { getUserCompanies } from "../../companies/queries";
 import { unflattenObjectFromDb } from "../form-converter";
-import { FormStatus, FormType, FormRole } from "../../generated/graphql/types";
+import { FormRole, QueryFormsArgs } from "../../generated/graphql/types";
 import { prisma } from "../../generated/prisma-client";
 
 const DEFAULT_FIRST = 50;
-
-type FormsParams = {
-  siret?: string;
-  type?: FormType;
-  roles?: FormRole[];
-  status?: FormStatus[];
-  hasNextStep?: boolean;
-  first?: number;
-  skip?: number;
-};
 
 export default async function forms(
   userId: string,
@@ -25,7 +15,7 @@ export default async function forms(
     hasNextStep,
     first = DEFAULT_FIRST,
     skip = 0
-  }: FormsParams
+  }: QueryFormsArgs
 ) {
   // TODO Remove `type` param and this code after deprecation warning period
   if (type && !roles) {

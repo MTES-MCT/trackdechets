@@ -1,5 +1,6 @@
 import React from "react";
 import { Form } from "../../../generated/graphql/types";
+import { ITEMS_PER_PAGE } from "../../constants";
 
 type Props = {
   forms: Form[];
@@ -7,7 +8,7 @@ type Props = {
 };
 
 export default function LoadMore({ forms, fetchMore }: Props) {
-  if (forms.length < 50) {
+  if (forms.length < ITEMS_PER_PAGE) {
     return null;
   }
 
@@ -22,9 +23,10 @@ export default function LoadMore({ forms, fetchMore }: Props) {
             },
             updateQuery: (prev, { fetchMoreResult }) => {
               if (!fetchMoreResult) return prev;
-              return Object.assign({}, prev, {
+              return {
+                ...prev,
                 feed: [...prev.forms, ...fetchMoreResult.forms],
-              });
+              };
             },
           })
         }

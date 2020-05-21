@@ -183,7 +183,7 @@ Défaut à 0
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">status</td>
-<td valign="top">[<a href="#formstatus">FormStatus</a>]</td>
+<td valign="top">[<a href="#formstatus">FormStatus</a>!]</td>
 <td>
 
 (Optionnel) Filtre sur les statuts des bordereaux
@@ -194,7 +194,7 @@ Défaut à vide.
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">roles</td>
-<td valign="top">[<a href="#formrole">FormRole</a>]</td>
+<td valign="top">[<a href="#formrole">FormRole</a>!]</td>
 <td>
 
 (Optionnel) Filtre sur le role de demandeur dams le bordereau

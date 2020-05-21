@@ -41,7 +41,7 @@ type Query {
     Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
     Défaut à vide.
     """
-    status: [FormStatus]
+    status: [FormStatus!]
 
     """
     (Optionnel) Filtre sur le role de demandeur dams le bordereau
@@ -52,7 +52,7 @@ type Query {
     Si aucune filtre n'est passé, les bordereaux seront retournés quel que soit votre role dessus.
     Défaut à vide.
     """
-    roles: [FormRole]
+    roles: [FormRole!]
 
     """
     (Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part

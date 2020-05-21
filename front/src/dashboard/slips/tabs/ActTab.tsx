@@ -50,8 +50,8 @@ export default function ActTab() {
 
   return (
     <>
-      <Slips siret={siret} forms={data.forms} dynamicActions={true} />{" "}
-      <LoadMore forms={data.forms} fetchMore={fetchMore} />{" "}
+      <Slips siret={siret} forms={data.forms} dynamicActions={true} />
+      <LoadMore forms={data.forms} fetchMore={fetchMore} />
     </>
   );
 }

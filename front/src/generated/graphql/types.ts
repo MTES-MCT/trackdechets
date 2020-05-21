@@ -1132,8 +1132,8 @@ export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
   first: Maybe<Scalars['Int']>;
   skip: Maybe<Scalars['Int']>;
-  status: Maybe<Array<Maybe<FormStatus>>>;
-  roles: Maybe<Array<Maybe<FormRole>>>;
+  status: Maybe<Array<FormStatus>>;
+  roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
   type?: Maybe<FormType>;
 };

@@ -41,4 +41,16 @@
       overflow-y: auto;
     }
   }
+
+  .empty-tab {
+    text-align: center;
+    h4,
+    p {
+      margin: 10px 100px;
+    }
+    img {
+      height: 500px;
+    }
+  }
+
 }

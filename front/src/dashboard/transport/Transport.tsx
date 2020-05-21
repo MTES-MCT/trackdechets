@@ -19,7 +19,7 @@ import TransporterInfoEdit from "./TransporterInfoEdit";
 import TransportSignature from "./TransportSignature";
 
 export const GET_TRANSPORT_SLIPS = gql`
-  query GetSlips($siret: String, $status: [FormStatus], $roles: [FormRole]) {
+  query GetSlips($siret: String, $status: [FormStatus!], $roles: [FormRole!]) {
     forms(siret: $siret, status: $status, roles: $roles) {
       ...FullForm
     }
