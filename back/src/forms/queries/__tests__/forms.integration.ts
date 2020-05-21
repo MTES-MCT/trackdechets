@@ -10,10 +10,10 @@ import {
 
 function createForms(userId: string, params: any[]) {
   return Promise.all(
-    params.map((p, i) => {
+    params.map(p => {
       return formFactory({
         ownerId: userId,
-        opt: { ...p, readableId: `TD-${i}` }
+        opt: p
       });
     })
   );
