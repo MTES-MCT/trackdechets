@@ -9,7 +9,6 @@ import express from "express";
 import passport from "passport";
 import session from "express-session";
 import redisStore from "connect-redis";
-import Redis from "ioredis";
 import bodyParser from "body-parser";
 import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
@@ -27,6 +26,7 @@ import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
 import { ErrorCode } from "./common/errors";
+import { redisClient } from "./common/redis";
 
 const {
   SENTRY_DSN,
@@ -151,7 +151,6 @@ app.use(
 
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
-const redisClient = new Redis({ host: "redis" });
 
 export const sess = {
   store: new RedisStore({ client: redisClient }),
