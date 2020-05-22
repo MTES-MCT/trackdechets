@@ -1358,7 +1358,10 @@ export type TemporaryStorageDetail = {
    __typename?: 'TemporaryStorageDetail';
   /** Établissement qui sotcke temporairement le déchet (case 13) */
   temporaryStorer: Maybe<TemporaryStorer>;
-  /** Indique si le cadre 14 est rempli par l'émetteur du bordereau ou l'installation d'entreprosage */
+  /**
+   * Installation de destination prévue (case 14) à remplir par le producteur ou
+   * le site d'entreposage provisoire
+   */
   destination: Maybe<Destination>;
   /** Détails du déchet (cases 15, 16 et 17) */
   wasteDetails: Maybe<WasteDetails>;
