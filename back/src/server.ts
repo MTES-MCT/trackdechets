@@ -5,13 +5,13 @@ import {
   ApolloError,
   UserInputError
 } from "apollo-server-express";
-import * as express from "express";
-import * as passport from "passport";
-import * as session from "express-session";
-import * as redisStore from "connect-redis";
-import * as Redis from "ioredis";
+import express from "express";
+import passport from "passport";
+import session from "express-session";
+import redisStore from "connect-redis";
+import Redis from "ioredis";
 import * as bodyParser from "body-parser";
-import * as cors from "cors";
+import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";

@@ -1,5 +1,5 @@
-import * as passport from "passport";
-import * as express from "express";
+import passport from "passport";
+import express from "express";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as LocalStrategy } from "passport-local";

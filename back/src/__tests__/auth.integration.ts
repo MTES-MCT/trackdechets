@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../integration-tests/helper";
-import * as supertest from "supertest";
+import supertest from "supertest";
 import { app, sess } from "../server";
 import { prisma } from "../generated/prisma-client";
 import { loginError } from "../auth";

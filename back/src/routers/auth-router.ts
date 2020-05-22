@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import * as passport from "passport";
 import * as querystring from "querystring";
 import { getUIBaseURL } from "../utils";

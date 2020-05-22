@@ -1,4 +1,4 @@
-import * as S3 from "aws-sdk/clients/s3";
+import S3 from "aws-sdk/clients/s3";
 
 const s3 = new S3({
   endpoint: process.env.S3_ENDPOINT,
