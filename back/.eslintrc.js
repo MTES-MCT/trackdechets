@@ -10,6 +10,9 @@ module.exports = {
   },
   rules: {
     "prettier/prettier": "error",
-    "no-console": 0,
+    "no-console": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off"
   },
 };
