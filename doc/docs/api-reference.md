@@ -3025,7 +3025,8 @@ Données du BSD suite sur la partie entreposage provisoire ou reconditionnement,
 <td valign="top"><a href="#destination">Destination</a></td>
 <td>
 
-Indique si le cadre 14 est rempli par l'émetteur du bordereau ou l'installation d'entreprosage
+Installation de destination prévue (case 14) à remplir par le producteur ou
+le site d'entreposage provisoire
 
 </td>
 </tr>
