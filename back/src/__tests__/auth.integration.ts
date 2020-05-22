@@ -3,7 +3,7 @@ import supertest from "supertest";
 import { app, sess } from "../server";
 import { prisma } from "../generated/prisma-client";
 import { loginError } from "../auth";
-import * as queryString from "querystring";
+import queryString from "querystring";
 import { sign } from "jsonwebtoken";
 import { getUid } from "../utils";
 import { userFactory } from "./factories";

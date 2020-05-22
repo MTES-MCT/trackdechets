@@ -1,4 +1,4 @@
-import * as parseArgs from "minimist";
+import parseArgs from "minimist";
 import { prisma } from "../../generated/prisma-client";
 import { loadCompanies, loadRoles } from "./loaders";
 import { validateCompany, validateRoleGenerator } from "./validations";

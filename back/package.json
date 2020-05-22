@@ -11,8 +11,8 @@
     "update": "ts-node prisma/scripts/index.ts",
     "test": "jest",
     "build": "tsc && copyfiles src/**/*.graphql dist/",
-    "lint": "tslint --project ./tsconfig.json",
-    "lint:fix": "tslint --project ./tsconfig.json --fix",
+    "lint": "eslint -c .eslintrc.js --ext .ts ./src",
+    "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
     "bulk-create-account": "ts-node src/users/bulk-creation/index.ts",
     "graphql-codegen": "graphql-codegen --config codegen.yml"
   },
@@ -40,6 +40,7 @@
     "graphql-middleware": "^4.0.2",
     "graphql-middleware-sentry": "^3.2.1",
     "graphql-shield": "^7.3.0",
+    "graphql-tools": "^6.0.0",
     "ioredis": "^4.17.1",
     "minimist": "^1.2.5",
     "oauth2orize": "^1.11.0",
@@ -65,7 +66,6 @@
     "@types/cors": "^2.8.6",
     "@types/express-serve-static-core": "^4.17.7",
     "@types/express-session": "^1.15.16",
-    "@types/graphql": "^14.5.0",
     "@types/ioredis": "^4.0.10",
     "@types/jest": "^25.2.3",
     "@types/jsonwebtoken": "^8.3.0",
@@ -79,10 +79,15 @@
     "@types/passport-oauth2-client-password": "^0.1.2",
     "@types/supertest": "^2.0.8",
     "@types/yup": "0.26.35",
+    "@typescript-eslint/eslint-plugin": "^3.0.0",
+    "@typescript-eslint/parser": "^3.0.0",
     "apollo-server-integration-testing": "^2.3.0",
     "apollo-server-testing": "^2.13.1",
     "concurrently": "^5.1.0",
     "copyfiles": "^2.2.0",
+    "eslint": "^7.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
     "graphql-markdown": "^5.2.0",
     "jest": "^26.0.1",
     "jsonwebtoken": "^8.5.1",
@@ -92,9 +97,6 @@
     "supertest": "^4.0.2",
     "ts-jest": "26.0.0",
     "ts-node": "^8.10.1",
-    "tslint": "^6.1.2",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.1.0",
-    "typescript": "3.9.3"
+    "typescript": "3.8.3"
   }
 }

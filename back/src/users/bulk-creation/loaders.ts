@@ -1,5 +1,5 @@
 import csv from "csv-parser";
-import * as fs from "fs";
+import fs from "fs";
 import { CompanyRow, RoleRow } from "./types";
 
 const separator = ";";

@@ -1,6 +1,6 @@
 import express from "express";
-import * as passport from "passport";
-import * as querystring from "querystring";
+import passport from "passport";
+import querystring from "querystring";
 import { getUIBaseURL } from "../utils";
 import { sess } from "../server";
 import nocache from "../common/middlewares/nocache";

@@ -10,7 +10,7 @@ import passport from "passport";
 import session from "express-session";
 import redisStore from "connect-redis";
 import Redis from "ioredis";
-import * as bodyParser from "body-parser";
+import bodyParser from "body-parser";
 import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";

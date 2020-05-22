@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import * as bodyParser from "body-parser";
+import bodyParser from "body-parser";
 
 /**
  * GraphQL server middleware to support application/graphql requests
