@@ -13,12 +13,14 @@ const mockRedisSet = jest.fn((...args) => {
   return Promise.resolve("OK");
 });
 
-jest.mock("ioredis", () => () => ({
-  get: (key: string) => {
-    return Promise.resolve(redisCache[key]).catch(_ => null);
-  },
-  set: (...args) => mockRedisSet(...args)
-}));
+jest.mock("ioredis", () =>
+  jest.fn(() => ({
+    get: (key: string) => {
+      return Promise.resolve(redisCache[key]).catch(_ => null);
+    },
+    set: (...args) => mockRedisSet(...args)
+  }))
+);
 
 const dbFooData = {
   "3000": "sqlBar"
