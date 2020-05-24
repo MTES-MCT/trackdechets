@@ -2369,6 +2369,21 @@ Résumé des valeurs clés du bordereau à l'instant T
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>transportSegments</strong></td>
+<td valign="top">[<a href="#transportsegment">TransportSegment</a>]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>currentTransporterSiret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextTransporterSiret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -2545,6 +2560,84 @@ Liste des rubriques associées
 <td>
 
 Liste des déclarations GEREP
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### MultimodalTransporter
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Établissement transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Exemption de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité du récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>numberPlate</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de plaque d'immatriculation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Information libre, destinée aux transporteurs
 
 </td>
 </tr>
@@ -3273,6 +3366,56 @@ Limite de validatié du récépissé
 Département ayant enregistré la déclaration
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### TransportSegment
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>previousTransporterCompanySiret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#multimodaltransporter">MultimodalTransporter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverBy</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>sealed</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -5723,6 +5866,37 @@ Quntité réelle
 Quantité estimée
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### TransportMode
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>ROAD</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RAIL</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>AIR</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RIVER</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>SEA</strong></td>
+<td></td>
 </tr>
 </tbody>
 </table>

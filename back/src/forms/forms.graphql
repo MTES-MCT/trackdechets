@@ -389,6 +389,11 @@ type Form {
 
   "Résumé des valeurs clés du bordereau à l'instant T"
   stateSummary: StateSummary
+
+  transportSegments: [TransportSegment]
+
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 """
@@ -769,4 +774,45 @@ type formsLifeCycleData {
 
   "Nombre de changements de statuts renvoyés"
   count: Int
+}
+
+enum TransportMode {
+  ROAD
+  RAIL
+  AIR
+  RIVER
+  SEA
+}
+
+type MultimodalTransporter {
+  "Établissement transporteur"
+  company: FormCompany
+
+  "Exemption de récipissé"
+  isExemptedOfReceipt: Boolean
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité du récipissé"
+  validityLimit: DateTime
+
+  "Numéro de plaque d'immatriculation"
+  numberPlate: String
+
+  "Information libre, destinée aux transporteurs"
+  customInfo: String
+}
+
+type TransportSegment {
+  id: ID
+  previousTransporterCompanySiret: String
+  transporter: MultimodalTransporter
+  mode: TransportMode
+  takenOverAt: DateTime
+  takenOverBy: String
+  sealed: Boolean
 }

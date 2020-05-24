@@ -483,6 +483,9 @@ export type Form = {
   temporaryStorageDetail: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
   stateSummary: Maybe<StateSummary>;
+  transportSegments: Maybe<Array<Maybe<TransportSegment>>>;
+  currentTransporterSiret: Maybe<Scalars['String']>;
+  nextTransporterSiret: Maybe<Scalars['String']>;
 };
 
 /** Information sur un établissement dans un BSD */
@@ -643,6 +646,24 @@ export type Installation = {
   declarations: Maybe<Array<Declaration>>;
 };
 
+
+export type MultimodalTransporter = {
+   __typename?: 'MultimodalTransporter';
+  /** Établissement transporteur */
+  company: Maybe<FormCompany>;
+  /** Exemption de récipissé */
+  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
+  /** N° de récipissé */
+  receipt: Maybe<Scalars['String']>;
+  /** Département */
+  department: Maybe<Scalars['String']>;
+  /** Limite de validité du récipissé */
+  validityLimit: Maybe<Scalars['DateTime']>;
+  /** Numéro de plaque d'immatriculation */
+  numberPlate: Maybe<Scalars['String']>;
+  /** Information libre, destinée aux transporteurs */
+  customInfo: Maybe<Scalars['String']>;
+};
 
 export type Mutation = {
    __typename?: 'Mutation';
@@ -1528,6 +1549,25 @@ export type TransporterSignatureFormInput = {
   quantity: Scalars['Float'];
   /** Code ONU */
   onuCode: Maybe<Scalars['String']>;
+};
+
+export enum TransportMode {
+  Road = 'ROAD',
+  Rail = 'RAIL',
+  Air = 'AIR',
+  River = 'RIVER',
+  Sea = 'SEA'
+}
+
+export type TransportSegment = {
+   __typename?: 'TransportSegment';
+  id: Maybe<Scalars['ID']>;
+  previousTransporterCompanySiret: Maybe<Scalars['String']>;
+  transporter: Maybe<MultimodalTransporter>;
+  mode: Maybe<TransportMode>;
+  takenOverAt: Maybe<Scalars['DateTime']>;
+  takenOverBy: Maybe<Scalars['String']>;
+  sealed: Maybe<Scalars['Boolean']>;
 };
 
 /** Payload d'édition d'un récépissé transporteur */

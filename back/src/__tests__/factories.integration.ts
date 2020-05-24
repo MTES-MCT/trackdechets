@@ -4,7 +4,8 @@ import {
   companyFactory,
   userWithCompanyFactory,
   formFactory,
-  statusLogFactory
+  statusLogFactory,
+  transportSegmentFactory,
 } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
 
@@ -32,7 +33,7 @@ describe("Test Factories", () => {
     const usr = await prisma.user({ id: user.id }).$fragment<{
       companyAssociations: {
         id: string;
-        company: { siret: string; id: string };
+        company: { siret: string; id: string; companyTypes: [string] };
       }[];
     }>(`
         fragment UserSirets on User {
@@ -41,6 +42,39 @@ describe("Test Factories", () => {
             company {
               id
               siret
+              companyTypes
+            }
+          }
+        }
+      `);
+
+    const companyAssociations = usr.companyAssociations;
+    expect(companyAssociations.length).toBe(1);
+    expect([...companyAssociations[0].company.companyTypes]).toMatchObject([
+      "PRODUCER",
+    ]);
+    expect(companyAssociations[0].company.siret).toBe(company.siret);
+  });
+
+  test("should create a user with a company of a given type", async () => {
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      "TRANSPORTER"
+    );
+
+    const usr = await prisma.user({ id: user.id }).$fragment<{
+      companyAssociations: {
+        id: string;
+        company: { siret: string; id: string; companyTypes: [string] };
+      }[];
+    }>(`
+        fragment UserSirets on User {
+          companyAssociations {
+            id,
+            company {
+              id
+              siret
+              companyTypes
             }
           }
         }
@@ -49,6 +83,10 @@ describe("Test Factories", () => {
     const companyAssociations = usr.companyAssociations;
     expect(companyAssociations.length).toBe(1);
     expect(companyAssociations[0].company.siret).toBe(company.siret);
+
+    expect(companyAssociations[0].company.companyTypes).toMatchObject([
+      "TRANSPORTER",
+    ]);
   });
 
   test("should create a form", async () => {
@@ -56,7 +94,7 @@ describe("Test Factories", () => {
 
     const newfrm = await formFactory({
       ownerId: usr.id,
-      opt: { emitterCompanyName: "somecompany" }
+      opt: { emitterCompanyName: "somecompany" },
     });
 
     expect(newfrm.id).toBeTruthy();
@@ -67,13 +105,13 @@ describe("Test Factories", () => {
     const usr = await userFactory();
 
     const frm = await formFactory({
-      ownerId: usr.id
+      ownerId: usr.id,
     });
 
     const newStatusLog = await statusLogFactory({
       userId: usr.id,
       status: "SEALED",
-      formId: frm.id
+      formId: frm.id,
     });
 
     expect(newStatusLog.id).toBeTruthy();
@@ -83,18 +121,38 @@ describe("Test Factories", () => {
     const usr = await userFactory();
 
     const frm = await formFactory({
-      ownerId: usr.id
+      ownerId: usr.id,
     });
 
     const newStatusLog = await statusLogFactory({
       userId: usr.id,
       status: "SEALED",
       formId: frm.id,
-      opt: { loggedAt: "2017-03-25" }
+      opt: { loggedAt: "2017-03-25" },
     });
 
     expect(newStatusLog.id).toBeTruthy();
 
     expect(newStatusLog.loggedAt).toEqual("2017-03-25T00:00:00.000Z");
   });
+});
+
+test("should create a transport segment", async () => {
+  const usr = await userFactory();
+
+  const frm = await formFactory({
+    ownerId: usr.id,
+  });
+
+  const newTransportSegment = await transportSegmentFactory({
+    formId: frm.id,
+    segmentPayload: { transporterCompanySiret: "1234" },
+  });
+
+  expect(newTransportSegment.id).toBeTruthy();
+  expect(newTransportSegment.transporterCompanySiret).toEqual("1234");
+  //check reverse access
+  const segments = await prisma.form({ id: frm.id }).transportSegments();
+  expect(segments.length).toEqual(1);
+});
 });

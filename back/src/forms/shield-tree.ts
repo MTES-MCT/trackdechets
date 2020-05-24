@@ -30,7 +30,7 @@ import {
 
 export default {
   Query: {
-    form: canAccessForm,
+    form:  or(canAccessForm, isFormTransporter),
     formPdf: or(canAccessForm, isFormTransporter),
     formsRegister: isCompaniesUser,
     forms: chain(

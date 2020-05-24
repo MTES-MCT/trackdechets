@@ -3,7 +3,7 @@ import {
   prisma,
   StatusLogConnection,
   Company,
-  Status
+  Status,
 } from "../generated/prisma-client";
 import { unflattenObjectFromDb } from "./form-converter";
 import {
@@ -14,7 +14,7 @@ import {
   signedByTransporter,
   markAsTempStored,
   markAsResent,
-  markAsResealed
+  markAsResealed,
 } from "./mutations/mark-as";
 import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
@@ -25,7 +25,7 @@ import { formsRegister } from "./queries/forms-register";
 import {
   ForbiddenError,
   UserInputError,
-  AuthenticationError
+  AuthenticationError,
 } from "apollo-server-express";
 import { stateSummary } from "./queries/state-summary";
 import {
@@ -34,8 +34,9 @@ import {
   SubscriptionResolvers,
   FormResolvers,
   WasteDetailsResolvers,
-  StateSummaryResolvers
+  StateSummaryResolvers,
 } from "../generated/graphql/types";
+import { transportSegments } from "./queries/segments";
 
 // formsLifeCycle fragment
 const statusLogFragment = `
@@ -100,7 +101,7 @@ const queryResolvers: QueryResolvers = {
     const userCompanies = await prisma
       .companyAssociations({ where: { user: { id: userId } } })
       .$fragment<{ company: Pick<Company, "id" | "siret"> }[]>(companyFragment)
-      .then(associations => associations.map(a => a.company));
+      .then((associations) => associations.map((a) => a.company));
 
     // User must be associated with a company
     if (!userCompanies.length) {
@@ -113,19 +114,19 @@ const queryResolvers: QueryResolvers = {
       throw new UserInputError(
         "Vous devez préciser pour quel siret vous souhaitez consulter",
         {
-          invalidArgs: ["siret"]
+          invalidArgs: ["siret"],
         }
       );
     }
     // If requested siret does not belong to user, raise an error
-    if (!!siret && !userCompanies.map(c => c.siret).includes(siret)) {
+    if (!!siret && !userCompanies.map((c) => c.siret).includes(siret)) {
       throw new ForbiddenError(
         "Vous n'avez pas le droit d'accéder au siret précisé"
       );
     }
     // Select user company matching siret or get the first
     const selectedCompany =
-      userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
+      userCompanies.find((uc) => uc.siret === siret) || userCompanies.shift();
 
     const SEALED: Status = "SEALED";
 
@@ -136,9 +137,9 @@ const queryResolvers: QueryResolvers = {
         { emitterCompanySiret: selectedCompany.siret },
         {
           transporterCompanySiret: selectedCompany.siret,
-          status: SEALED
-        }
-      ]
+          status: SEALED,
+        },
+      ],
     };
     const statusLogsCx = await prisma
       .statusLogsConnection({
@@ -150,8 +151,8 @@ const queryResolvers: QueryResolvers = {
           loggedAt_not: null,
           loggedAt_gte: loggedAfter,
           loggedAt_lte: loggedBefore,
-          form: { ...formsFilter, isDeleted: false, id: formId }
-        }
+          form: { ...formsFilter, isDeleted: false, id: formId },
+        },
       })
       .$fragment<
         StatusLogConnection & {
@@ -160,33 +161,33 @@ const queryResolvers: QueryResolvers = {
       >(statusLogFragment);
 
     return {
-      statusLogs: statusLogsCx.edges.map(el => el.node),
+      statusLogs: statusLogsCx.edges.map((el) => el.node),
       ...statusLogsCx.pageInfo,
-      count: statusLogsCx.aggregate.count
+      count: statusLogsCx.aggregate.count,
     };
   },
   stats: async (_parent, _args, context) => {
     const userId = context.user.id;
     const userCompanies = await getUserCompanies(userId);
 
-    return userCompanies.map(async userCompany => {
+    return userCompanies.map(async (userCompany) => {
       const queriedForms = await prisma.forms({
         where: {
           OR: [
             { owner: { id: userId } },
             { recipientCompanySiret: userCompany.siret },
-            { emitterCompanySiret: userCompany.siret }
+            { emitterCompanySiret: userCompany.siret },
           ],
           status: "PROCESSED",
-          isDeleted: false
-        }
+          isDeleted: false,
+        },
       });
 
       const stats = queriedForms.reduce((prev, cur) => {
         prev[cur.wasteDetailsCode] = prev[cur.wasteDetailsCode] || {
           wasteCode: cur.wasteDetailsCode,
           incoming: 0,
-          outgoing: 0
+          outgoing: 0,
         };
         cur.recipientCompanySiret === userCompany.siret
           ? (prev[cur.wasteDetailsCode].incoming += cur.quantityReceived)
@@ -202,7 +203,7 @@ const queryResolvers: QueryResolvers = {
 
       return {
         company: userCompany,
-        stats: Object.keys(stats).map(key => stats[key])
+        stats: Object.keys(stats).map((key) => stats[key]),
       };
     });
   },
@@ -212,14 +213,14 @@ const queryResolvers: QueryResolvers = {
         ...(wasteCode && { wasteDetailsCode: wasteCode }),
         status: "AWAITING_GROUP",
         recipientCompanySiret: siret,
-        isDeleted: false
-      }
+        isDeleted: false,
+      },
     });
 
-    return queriedForms.map(f => unflattenObjectFromDb(f));
+    return queriedForms.map((f) => unflattenObjectFromDb(f));
   },
   formPdf: (_parent, args) => formPdf(args),
-  formsRegister: (_parent, args) => formsRegister(args)
+  formsRegister: (_parent, args) => formsRegister(args),
 };
 
 const mutationResolvers: MutationResolvers = {
@@ -227,7 +228,7 @@ const mutationResolvers: MutationResolvers = {
   deleteForm: async (_parent, { id }) => {
     const form = await prisma.updateForm({
       where: { id },
-      data: { isDeleted: true }
+      data: { isDeleted: true },
     });
     return { ...form, status: form.status as Status };
   },
@@ -241,17 +242,17 @@ const mutationResolvers: MutationResolvers = {
   updateTransporterFields: (_parent, args) => updateTransporterFields(args),
   markAsTempStored: (_parent, args, context) => markAsTempStored(args, context),
   markAsResealed: (_parent, args, context) => markAsResealed(args, context),
-  markAsResent: (_parent, args, context) => markAsResent(args, context)
+  markAsResent: (_parent, args, context) => markAsResent(args, context),
 };
 
 const formResolvers: FormResolvers = {
-  appendix2Forms: parent => {
+  appendix2Forms: (parent) => {
     return prisma.form({ id: parent.id }).appendix2Forms();
   },
-  ecoOrganisme: parent => {
+  ecoOrganisme: (parent) => {
     return prisma.form({ id: parent.id }).ecoOrganisme();
   },
-  temporaryStorageDetail: async parent => {
+  temporaryStorageDetail: async (parent) => {
     const temporaryStorageDetail = await prisma
       .form({ id: parent.id })
       .temporaryStorageDetail();
@@ -261,15 +262,18 @@ const formResolvers: FormResolvers = {
       : null;
   },
   // Somme contextual values, depending on the form status / type, mostly to ease the display
-  stateSummary: parent => stateSummary(parent)
+  stateSummary: (parent) => stateSummary(parent),
+
+  transportSegments: (parent, args, context) =>
+    transportSegments(parent, args, context),
 };
 
 const wasteDetailsResolvers: WasteDetailsResolvers = {
-  packagings: parent => parent.packagings || []
+  packagings: (parent) => parent.packagings || [],
 };
 
 const stateSummaryResolvers: StateSummaryResolvers = {
-  packagings: parent => parent.packagings || []
+  packagings: (parent) => parent.packagings || [],
 };
 
 const subscriptionResolvers: SubscriptionResolvers = {
@@ -287,20 +291,20 @@ const subscriptionResolvers: SubscriptionResolvers = {
 
       return prisma.$subscribe.form({
         OR: [
-          ...userCompanies.map(userCompany => ({
-            node: { emitterCompanySiret: userCompany.siret }
+          ...userCompanies.map((userCompany) => ({
+            node: { emitterCompanySiret: userCompany.siret },
           })),
-          ...userCompanies.map(userCompany => ({
-            node: { recipientCompanySiret: userCompany.siret }
+          ...userCompanies.map((userCompany) => ({
+            node: { recipientCompanySiret: userCompany.siret },
           })),
-          { node: { owner: { id: user.id } } }
-        ]
+          { node: { owner: { id: user.id } } },
+        ],
       });
     },
-    resolve: payload => {
+    resolve: (payload) => {
       return payload;
-    }
-  }
+    },
+  },
 };
 
 export default {
@@ -309,5 +313,5 @@ export default {
   StateSummary: stateSummaryResolvers,
   Query: queryResolvers,
   Mutation: mutationResolvers,
-  Subscription: subscriptionResolvers
+  Subscription: subscriptionResolvers,
 };
