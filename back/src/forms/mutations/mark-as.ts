@@ -16,7 +16,7 @@ import {
   MutationMarkAsResealedArgs,
   MutationMarkAsResentArgs,
   Form,
-  FormStatus
+  FormStatus,
 } from "../../generated/graphql/types";
 
 export async function markAsSealed(
@@ -26,14 +26,20 @@ export async function markAsSealed(
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
 }
 
-export function markAsSent(
+export async function markAsSent(
   { id, sentInfo }: MutationMarkAsSentArgs,
   context: GraphQLContext
 ): Promise<Form> {
+  const form = await prisma.form({ id });
+  // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
   return transitionForm(
     id,
     { eventType: "MARK_SENT", eventParams: sentInfo },
-    context
+    context,
+    (infos) => ({
+      ...infos,
+      currentTransporterSiret: form.transporterCompanySiret,
+    })
   );
 }
 
@@ -59,7 +65,7 @@ export function markAsProcessed(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
-    infos => flattenObjectForDb(infos)
+    (infos) => flattenObjectForDb(infos)
   );
 }
 
@@ -81,11 +87,11 @@ export async function signedByTransporter(
       id,
       { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
       context,
-      infos => {
+      (infos) => {
         const wasteDetails = {
           wasteDetailsPackagings: infos.packagings,
           wasteDetailsQuantity: infos.quantity,
-          wasteDetailsOnuCode: infos.onuCode
+          wasteDetailsOnuCode: infos.onuCode,
         };
 
         return {
@@ -95,21 +101,21 @@ export async function signedByTransporter(
               signedBy: infos.sentBy,
               signedAt: infos.sentAt,
               signedByTransporter: infos.signedByTransporter,
-              ...(hasWasteDetailsOverride && wasteDetails)
-            }
-          }
+              ...(hasWasteDetailsOverride && wasteDetails),
+            },
+          },
         };
       }
     );
   }
 
-  const transformEventToFormParams = infos => ({
+  const transformEventToFormParams = (infos) => ({
     signedByTransporter: infos.signedByTransporter,
     sentAt: infos.sentAt,
     sentBy: infos.sentBy,
     wasteDetailsPackagings: infos.packagings,
     wasteDetailsQuantity: infos.quantity,
-    wasteDetailsOnuCode: infos.onuCode
+    wasteDetailsOnuCode: infos.onuCode,
   });
 
   return transitionForm(
@@ -124,7 +130,7 @@ export function markAsTempStored(
   { id, tempStoredInfos }: MutationMarkAsTempStoredArgs,
   context: GraphQLContext
 ): Promise<Form> {
-  const transformEventToFormParams = infos => ({
+  const transformEventToFormParams = (infos) => ({
     temporaryStorageDetail: {
       update: {
         tempStorerSignedAt: new Date(), // Default value to now
@@ -148,10 +154,10 @@ export function markAsResealed(
   { id, resealedInfos }: MutationMarkAsResealedArgs,
   context: GraphQLContext
 ): Promise<Form> {
-  const transformEventToFormParams = infos => ({
+  const transformEventToFormParams = (infos) => ({
     temporaryStorageDetail: {
-      update: flattenObjectForDb(infos)
-    }
+      update: flattenObjectForDb(infos),
+    },
   });
 
   return transitionForm(
@@ -166,12 +172,12 @@ export function markAsResent(
   { id, resentInfos }: MutationMarkAsResentArgs,
   context: GraphQLContext
 ): Promise<Form> {
-  const transformEventToFormParams = infos => ({
+  const transformEventToFormParams = (infos) => ({
     temporaryStorageDetail: {
       update: {
-        ...flattenObjectForDb(infos)
-      }
-    }
+        ...flattenObjectForDb(infos),
+      },
+    },
   });
 
   return transitionForm(
@@ -186,7 +192,7 @@ async function transitionForm(
   formId: string,
   { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
   context: GraphQLContext,
-  transformEventToFormProps = v => v
+  transformEventToFormProps = (v) => v
 ) {
   const form = await prisma.form({ id: formId });
   const temporaryStorageDetail = await prisma
@@ -198,7 +204,7 @@ async function transitionForm(
   const startingState = State.from(form.status, {
     form: { ...form, ...formPropsFromEvent, temporaryStorageDetail },
     requestContext: context,
-    isStableState: true
+    isStableState: true,
   });
 
   if (
@@ -214,7 +220,7 @@ async function transitionForm(
   // Machine transitions are always synchronous
   // We subscribe to the transitions and wait for a stable or final position before returning a result
   return new Promise<Form>((resolve, reject) => {
-    formService.start(startingState).onTransition(async state => {
+    formService.start(startingState).onTransition(async (state) => {
       if (!state.changed) {
         return;
       }
@@ -241,7 +247,7 @@ async function transitionForm(
 
         const updatedForm = await prisma.updateForm({
           where: { id: formId },
-          data: { status: newStatus, ...formPropsFromEvent }
+          data: { status: newStatus, ...formPropsFromEvent },
         });
         resolve({ ...updatedForm, status: updatedForm.status as FormStatus });
         formService.stop();
@@ -261,7 +267,7 @@ const fieldsToLog = {
     "signedByProducer",
     "packagings",
     "quantity",
-    "onuCode"
+    "onuCode",
   ],
   MARK_RECEIVED: ["receivedBy", "receivedAt", "signedAt", "quantityReceived"],
   MARK_PROCESSED: [
@@ -277,14 +283,14 @@ const fieldsToLog = {
     "nextDestinationCompanyAddress",
     "nextDestinationCompanyContact",
     "nextDestinationCompanyPhone",
-    "nextDestinationCompanyMail"
+    "nextDestinationCompanyMail",
   ],
   MARK_TEMP_STORED: [
     "receivedBy",
     "receivedAt",
     "signedAt",
     "quantityReceived",
-    "quantityType"
+    "quantityType",
   ],
   MARK_RESEALED: [
     "destinationIsFilledByEmitter",
@@ -301,7 +307,7 @@ const fieldsToLog = {
     "wasteDetailsOtherPackaging",
     "wasteDetailsNumberOfPackages",
     "wasteDetailsQuantity",
-    "wasteDetailsQuantityType"
+    "wasteDetailsQuantityType",
   ],
   MARK_RESENT: [
     "destinationIsFilledByEmitter",
@@ -320,11 +326,11 @@ const fieldsToLog = {
     "wasteDetailsOtherPackaging",
     "wasteDetailsNumberOfPackages",
     "wasteDetailsQuantity",
-    "wasteDetailsQuantityType"
-  ]
+    "wasteDetailsQuantityType",
+  ],
 };
 
-const getSubset = fields => o =>
+const getSubset = (fields) => (o) =>
   fields.reduce((acc, curr) => ({ ...acc, [curr]: o[curr] }), {});
 
 const getDiff = (eventType, params) => {
@@ -349,9 +355,9 @@ export function logStatusChange(
       user: { connect: { id: context.user.id } },
       status,
       loggedAt: new Date(),
-      updatedFields: diff
+      updatedFields: diff,
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(
         `Cannot log status change for form ${formId}, user ${context.user.id}, status ${status}`,
         err
