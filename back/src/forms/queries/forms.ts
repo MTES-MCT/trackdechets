@@ -72,6 +72,11 @@ function getRolesFilter(siret: string, types: FormRole[]) {
     ["TRANSPORTER"]: [
       { transporterCompanySiret: siret },
       {
+        transportSegments_some: {
+          transporterCompanySiret: siret,
+        },
+      },
+      {
         temporaryStorageDetail: {
           transporterCompanySiret: siret
         }
