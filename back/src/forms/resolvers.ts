@@ -15,6 +15,7 @@ import {
   prepareSegment,
   markSegmentAsSealed,
   takeOverSegment,
+  editSegment
 } from "./mutations/multiModal";
 import { duplicateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
@@ -130,8 +131,8 @@ const mutationResolvers: MutationResolvers = {
   prepareSegment: (_parent, args, context) => prepareSegment(args, context),
   markSegmentAsSealed: (_parent, args, context) =>
     markSegmentAsSealed(args, context),
-    
   takeOverSegment: (_parent, args, context) => takeOverSegment(args, context),
+  editSegment: (_parent, args, context) => editSegment(args, context),
 };
 
 const formResolvers: FormResolvers = {

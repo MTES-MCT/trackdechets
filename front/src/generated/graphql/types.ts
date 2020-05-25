@@ -716,6 +716,8 @@ export type Mutation = {
    * Met à jour les informations de l'utilisateur
    */
   editProfile: User;
+  /** Édite un segment existant */
+  editSegment: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
@@ -860,6 +862,13 @@ export type MutationEditProfileArgs = {
   name: Maybe<Scalars['String']>;
   phone: Maybe<Scalars['String']>;
   email: Maybe<Scalars['String']>;
+};
+
+
+export type MutationEditSegmentArgs = {
+  id: Scalars['ID'];
+  siret: Scalars['String'];
+  nextSegmentInfo: NextSegmentInfoInput;
 };
 
 

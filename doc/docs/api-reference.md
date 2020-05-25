@@ -592,6 +592,30 @@ Met à jour les informations de l'utilisateur
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>editSegment</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Édite un segment existant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">nextSegmentInfo</td>
+<td valign="top"><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>inviteUserToCompany</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>

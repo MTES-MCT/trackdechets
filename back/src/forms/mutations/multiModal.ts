@@ -191,7 +191,6 @@ export async function prepareSegment(
   return unflattenObjectFromDb(updatedForm);
 }
 
-
 type SegmentAndForm = {
   id;
   form;
@@ -270,7 +269,6 @@ export async function markSegmentAsSealed({ id }, context: GraphQLContext) {
   return unflattenObjectFromDb(form);
 }
 
-
 // when a waste is taken over
 export async function takeOverSegment(
   { id, takeOverInfo },
@@ -317,4 +315,79 @@ export async function takeOverSegment(
   });
 
   return unflattenObjectFromDb(updatedForm);
+}
+
+/**
+ * 
+ * Edit an existing segment
+ * Can be performed by form owner when in DRAFT state, 
+ * By current transporter if segment is not sealed yet
+ * By next transporter if segment is sealed and not taken over
+  
+ */
+export async function editSegment(
+  { id, siret: userSiret, nextSegmentInfo },
+  context: GraphQLContext
+) {
+  const currentSegment = await prisma
+    .transportSegment({ id })
+    .$fragment<SegmentAndForm>(segmentFragment);
+
+  if (!currentSegment) {
+    throw Error("Not found");
+  }
+
+  if (currentSegment.sealed) {
+    throw Error("You can't perform this mutation on a sealed segment");
+  }
+
+  const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
+
+  // check user owns siret
+  const userSirets = await getCurrentUserSirets(context.user.id, prisma);
+  if (!userSirets.includes(userSiret)) {
+    throw Error("you re not allowed");
+  }
+
+  const form = await getForm(currentSegment.form.id);
+
+  const userIsOwner = context.user.id === form.owner.id;
+  const userIsCurrentTransporter = userSiret === form.currentTransporterSiret;
+  const userIsNextTransporter = userSiret === form.nextTransporterSiret;
+
+  if (
+    (userIsCurrentTransporter || userIsNextTransporter) &&
+    form.status !== "SENT"
+  ) {
+    throw Error(
+      "You can't perform this mutation on forms which are not in SENT state"
+    );
+  }
+
+  // segments can be edited by form owners when form is draft
+
+  if (userIsOwner && form.status !== "DRAFT") {
+    throw Error(
+      "You can't perform this mutation on forms which are not in DRAFT state"
+    );
+  }
+  // current transporter can edit until segment is sealed
+  if (userIsCurrentTransporter && currentSegment.sealed) {
+    throw Error("Take over can not be edited anymore");
+  }
+  // next transporter can edit when segment is sealed
+  if (userIsNextTransporter && !currentSegment.sealed) {
+    throw Error("Take over can not be edited yet");
+  }
+
+  if (currentSegment.sealed && !!nextSegmentPayload.transporterCompanySiret) {
+    throw Error("Siret can not be changed anymore");
+  }
+
+  await prisma.updateTransportSegment({
+    where: { id },
+    data: nextSegmentPayload,
+  });
+
+  return unflattenObjectFromDb(form);
 }

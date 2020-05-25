@@ -199,6 +199,13 @@ type Mutation {
 
   "Marque un segment comme pris en charge par le nouveau transporteur"
   takeOverSegment(id: ID!, takeOverInfo: TakeOverInput!): Form
+
+  "Édite un segment existant"
+  editSegment(
+    id: ID!
+    siret: String!
+    nextSegmentInfo: NextSegmentInfoInput!
+  ): Form
 }
 
 type Subscription {
