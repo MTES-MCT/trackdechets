@@ -821,6 +821,20 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>markSegmentAsSealed</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Marque un segemnt de transport comme scellé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>prepareSegment</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>

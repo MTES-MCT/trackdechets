@@ -748,6 +748,8 @@ export type Mutation = {
   markAsSent: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored: Maybe<Form>;
+  /** Marque un segemnt de transport comme scellé */
+  markSegmentAsSealed: Maybe<Form>;
   /** Prépare un nouveau segment de transport multimodal */
   prepareSegment: Maybe<Form>;
   /**
@@ -917,6 +919,11 @@ export type MutationMarkAsSentArgs = {
 export type MutationMarkAsTempStoredArgs = {
   id: Scalars['ID'];
   tempStoredInfos: TempStoredFormInput;
+};
+
+
+export type MutationMarkSegmentAsSealedArgs = {
+  id: Scalars['ID'];
 };
 
 

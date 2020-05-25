@@ -193,6 +193,9 @@ type Mutation {
     siret: String!
     nextSegmentInfo: NextSegmentInfoInput!
   ): Form
+
+  "Marque un segemnt de transport comme scellé"
+  markSegmentAsSealed(id: ID!): Form
 }
 
 type Subscription {

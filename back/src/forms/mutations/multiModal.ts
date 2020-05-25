@@ -190,3 +190,82 @@ export async function prepareSegment(
 
   return unflattenObjectFromDb(updatedForm);
 }
+
+
+type SegmentAndForm = {
+  id;
+  form;
+  transporterCompanySiret: string;
+  transporterCompanyName: string;
+  transporterCompanyAddress: string;
+  transporterCompanyContact: string;
+  transporterCompanyPhone: string;
+  transporterCompanyMail: string;
+  transporterIsExemptedOfReceipt: boolean;
+  transporterReceipt: string;
+  transporterDepartment: string;
+  transporterValidityLimit: string;
+  transporterNumberPlate: string;
+  mode: string;
+
+  sealed: boolean;
+
+  takenOverAt: string;
+  takenOverBy: string;
+};
+
+const segmentFragment = `
+fragment SegmentWithForm on Form {
+  transporterCompanySiret 
+  transporterCompanyName 
+  transporterCompanyAddress 
+  transporterCompanyContact 
+  transporterCompanyPhone 
+  transporterCompanyMail 
+  transporterIsExemptedOfReceipt 
+  transporterReceipt 
+  transporterDepartment 
+  transporterValidityLimit 
+  transporterNumberPlate 
+  mode 
+  sealed 
+  takenOverAt 
+  takenOverBy 
+  
+  form {
+    id
+  }
+   
+}
+`;
+
+export async function markSegmentAsSealed({ id }, context: GraphQLContext) {
+  const currentSegment = await prisma
+    .transportSegment({ id })
+    .$fragment<SegmentAndForm>(segmentFragment);
+
+  if (!currentSegment) {
+    throw new ForbiddenError("Segment not found or not allowed");
+  }
+  const form = await getForm(currentSegment.form.id);
+
+  if (form.status !== "SENT") {
+    throw Error("Form must be in SENT state");
+  }
+  const userSirets = await getCurrentUserSirets(context.user.id, prisma);
+
+  if (!userSirets.includes(form.currentTransporterSiret)) {
+    throw Error("You must be the current transporter");
+  }
+
+  if (currentSegment.sealed) {
+    throw Error("This segment is already marked as sealed");
+  }
+
+  await prisma.updateTransportSegment({
+    where: { id },
+    data: { sealed: true },
+  });
+
+  return unflattenObjectFromDb(form);
+}

@@ -68,5 +68,6 @@ export default {
       isFormTempStorer
     ),
     prepareSegment: isAuthenticated,
+    markSegmentAsSealed: isAuthenticated,
   },
 };
