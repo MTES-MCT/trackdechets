@@ -821,6 +821,30 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>prepareSegment</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Prépare un nouveau segment de transport multimodal
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">nextSegmentInfo</td>
+<td valign="top"><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>removeUserFromCompany</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
@@ -4329,6 +4353,170 @@ Traitement prévue (code D/R)
 <td>
 
 Établissement de destination ultérieur
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### NextSegmentCompanyInput
+
+Payload d'un segment de transport
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+SIRET de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>contact</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom du contact dans l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mail</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Email du contact dans l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>phone</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de téléphone de contact dans l'établissement
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### NextSegmentInfoInput
+
+Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#nextsegmenttransporterinput">NextSegmentTransporterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### NextSegmentTransporterInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Exemption de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité du récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>numberPlate</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de plaque d'immatriculation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#nextsegmentcompanyinput">NextSegmentCompanyInput</a></td>
+<td>
+
+Établissement collecteur - transporteur
 
 </td>
 </tr>

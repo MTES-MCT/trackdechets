@@ -279,7 +279,7 @@ async function getFormAccessInfos(
   return { formInfos, currentUserSirets };
 }
 
-async function getCurrentUserSirets(userId: string, prisma: Prisma) {
+export async function getCurrentUserSirets(userId: string, prisma: Prisma) {
   const user = await prisma.user({ id: userId }).$fragment<{
     companyAssociations: { company: { siret: string } }[];
   }>(`

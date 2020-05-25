@@ -3,7 +3,7 @@ import {
   isAuthenticated,
   isCompaniesUser,
   isCompanyAdmin,
-  isCompanyMember
+  isCompanyMember,
 } from "../common/rules";
 import {
   canAccessForm,
@@ -30,7 +30,7 @@ import {
 
 export default {
   Query: {
-    form:  or(canAccessForm, isFormTransporter),
+    form: or(canAccessForm, isFormTransporter),
     formPdf: or(canAccessForm, isFormTransporter),
     formsRegister: isCompaniesUser,
     forms: chain(
@@ -39,7 +39,7 @@ export default {
     ),
     stats: isAuthenticated,
     formsLifeCycle: isAuthenticated,
-    appendixForms: or(isCompanyMember, isCompanyAdmin)
+    appendixForms: or(isCompanyMember, isCompanyAdmin),
   },
   Mutation: {
     saveForm: isAuthenticated,
@@ -66,6 +66,7 @@ export default {
       markAsResentSchema,
       or(temporaryStorageDestinationSchema, hasFinalDestination),
       isFormTempStorer
-    )
-  }
+    ),
+    prepareSegment: isAuthenticated,
+  },
 };

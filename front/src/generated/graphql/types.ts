@@ -748,6 +748,8 @@ export type Mutation = {
   markAsSent: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored: Maybe<Form>;
+  /** Prépare un nouveau segment de transport multimodal */
+  prepareSegment: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
@@ -918,6 +920,13 @@ export type MutationMarkAsTempStoredArgs = {
 };
 
 
+export type MutationPrepareSegmentArgs = {
+  id: Scalars['ID'];
+  siret: Scalars['String'];
+  nextSegmentInfo: NextSegmentInfoInput;
+};
+
+
 export type MutationRemoveUserFromCompanyArgs = {
   userId: Scalars['ID'];
   siret: Scalars['String'];
@@ -999,6 +1008,43 @@ export type NextDestinationInput = {
   processingOperation: Maybe<Scalars['String']>;
   /** Établissement de destination ultérieur */
   company: Maybe<CompanyInput>;
+};
+
+/** Payload d'un segment de transport */
+export type NextSegmentCompanyInput = {
+  /** SIRET de l'établissement */
+  siret: Maybe<Scalars['String']>;
+  /** Nom de l'établissement */
+  name: Maybe<Scalars['String']>;
+  /** Adresse de l'établissement */
+  address: Maybe<Scalars['String']>;
+  /** Nom du contact dans l'établissement */
+  contact: Maybe<Scalars['String']>;
+  /** Email du contact dans l'établissement */
+  mail: Maybe<Scalars['String']>;
+  /** Numéro de téléphone de contact dans l'établissement */
+  phone: Maybe<Scalars['String']>;
+};
+
+/** Payload lié à l'ajout de segment de transport multimodal (case 20 à 21) */
+export type NextSegmentInfoInput = {
+  transporter: Maybe<NextSegmentTransporterInput>;
+  mode: TransportMode;
+};
+
+export type NextSegmentTransporterInput = {
+  /** Exemption de récipissé */
+  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
+  /** N° de récipissé */
+  receipt: Maybe<Scalars['String']>;
+  /** Département */
+  department: Maybe<Scalars['String']>;
+  /** Limite de validité du récipissé */
+  validityLimit: Maybe<Scalars['DateTime']>;
+  /** Numéro de plaque d'immatriculation */
+  numberPlate: Maybe<Scalars['String']>;
+  /** Établissement collecteur - transporteur */
+  company: Maybe<NextSegmentCompanyInput>;
 };
 
 /** Type de packaging du déchet */

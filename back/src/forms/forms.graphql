@@ -186,6 +186,13 @@ type Mutation {
 
   "Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement"
   markAsResent(id: ID!, resentInfos: ResentFormInput!): Form
+
+  "Prépare un nouveau segment de transport multimodal"
+  prepareSegment(
+    id: ID!
+    siret: String!
+    nextSegmentInfo: NextSegmentInfoInput!
+  ): Form
 }
 
 type Subscription {
