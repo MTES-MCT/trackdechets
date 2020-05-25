@@ -1,5 +1,5 @@
-import * as Redis from "ioredis";
-export const redis = new Redis({ host: "redis" });
+import Redis from "ioredis";
+export const redisClient = new Redis({ host: "redis" });
 
 /**
  * Generate a cache key
@@ -45,7 +45,7 @@ export async function cachedGet(
   const { parser = defaultParser, options = {} } = settings;
   const cacheKey = generateKey(objectType, itemKey);
 
-  const redisValue = await redis.get(cacheKey).catch(_ => null);
+  const redisValue = await redisClient.get(cacheKey).catch(_ => null);
 
   if (redisValue != null) {
     return parser.parse(redisValue);
@@ -79,5 +79,5 @@ export async function setInCache(
     })
     .reduce((acc, val) => acc.concat(val), []);
 
-  return redis.set(key, value, setOptions);
+  return redisClient.set(key, value, setOptions);
 }

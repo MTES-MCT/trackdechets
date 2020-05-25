@@ -1,6 +1,15 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "lib": ["es2016", "esnext.asynciterable"]
-  }
+    "lib": ["es2016", "esnext.asynciterable"],
+    "outDir": "dist",
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "target": "es6",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": [
+      "src/**/*"
+  ]
 }

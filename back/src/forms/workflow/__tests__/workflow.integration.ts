@@ -1,7 +1,7 @@
-import * as supertest from "supertest";
-import * as os from "os";
-import * as fs from "fs";
-import * as path from "path";
+import supertest from "supertest";
+import os from "os";
+import fs from "fs";
+import path from "path";
 import { app } from "../../../server";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";

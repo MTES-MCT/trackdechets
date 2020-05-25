@@ -1,5 +1,5 @@
 import { Express } from "express";
-import supertest = require("supertest");
+import supertest from "supertest";
 
 export async function logIn(
   app: Express,

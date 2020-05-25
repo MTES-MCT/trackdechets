@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { redis, setInCache } from "./redis";
+import { redisClient, setInCache } from "./redis";
 import { randomNumber, getAPIBaseURL } from "../utils";
 
 type DownloadInfos = { type: string; params: any };
@@ -54,7 +54,7 @@ export async function downloadFileHandler(req: Request, res: Response) {
     return res.status(400).send("Le token doit être une chaine de caractères.");
   }
 
-  const redisValue = await redis.get(token).catch(_ => null);
+  const redisValue = await redisClient.get(token).catch(_ => null);
 
   if (redisValue == null) {
     return res.status(403).send("Token invalide ou expiré.");

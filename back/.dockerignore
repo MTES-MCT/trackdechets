@@ -9,4 +9,4 @@ README.md
 LICENSE
 .vscode
 **/__tests__/**/*.pdf
-
+dist

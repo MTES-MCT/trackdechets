@@ -9,7 +9,7 @@ import {
   UserRole,
   Status
 } from "../generated/prisma-client";
-import * as crypto from "crypto";
+import crypto from "crypto";
 
 /**
  * Create a user with name and email

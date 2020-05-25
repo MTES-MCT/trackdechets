@@ -43,7 +43,7 @@ services:
     image: td-api
     build:
       context: ./back
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: npm run dev
     volumes:
       - ./back/src:/usr/src/app/src

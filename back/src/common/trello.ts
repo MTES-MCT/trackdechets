@@ -1,6 +1,6 @@
 import axios from "axios";
-import * as request from "request";
-import * as util from "util";
+import request from "request";
+import util from "util";
 
 export const alertTypes = {
   BSD_CREATION: "CREATION BSD",

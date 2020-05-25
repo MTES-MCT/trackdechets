@@ -1,5 +1,5 @@
 import { app } from "../server";
-import * as supertest from "supertest";
+import supertest from "supertest";
 import { logIn } from "./auth.helper";
 import { userFactory, applicationFactory } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
