@@ -383,3 +383,9 @@ input NextSegmentInfoInput {
   transporter: NextSegmentTransporterInput
   mode: TransportMode!
 }
+
+"Payload de prise en charge de segment"
+input TakeOverInput {
+  takenOverAt: DateTime!
+  takenOverBy: String!
+}

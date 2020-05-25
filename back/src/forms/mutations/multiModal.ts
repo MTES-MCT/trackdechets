@@ -269,3 +269,52 @@ export async function markSegmentAsSealed({ id }, context: GraphQLContext) {
 
   return unflattenObjectFromDb(form);
 }
+
+
+// when a waste is taken over
+export async function takeOverSegment(
+  { id, takeOverInfo },
+  context: GraphQLContext
+) {
+  // PERMISSIONS !!!
+
+  const currentSegment = await prisma
+    .transportSegment({ id })
+    .$fragment<SegmentAndForm>(segmentFragment);
+
+  const form = await getForm(currentSegment.form.id);
+  if (form.status !== "SENT") {
+    throw Error("Form must be in SENT state");
+  }
+
+  const userSirets = await getCurrentUserSirets(context.user.id, prisma);
+
+  //   user must be the nextTransporter
+  const nexTransporterIsFilled = !!form.nextTransporterSiret;
+  if (
+    !nexTransporterIsFilled ||
+    (nexTransporterIsFilled &&
+      !userSirets.includes(form.nextTransporterSiret)) ||
+    !userSirets.includes(currentSegment.transporterCompanySiret)
+  ) {
+    throw Error("You are not the next transporter on this form");
+  }
+
+  await isSegmentValidForTakeOver(currentSegment);
+
+  await prisma.updateTransportSegment({
+    where: { id: id },
+    data: takeOverInfo,
+  });
+
+  const updatedForm = await prisma.updateForm({
+    where: { id: currentSegment.form.id },
+    data: {
+      currentTransporterSiret: currentSegment.transporterCompanySiret,
+      nextTransporterSiret: "",
+      // currentSegment: currentSegment.id,
+    },
+  });
+
+  return unflattenObjectFromDb(updatedForm);
+}

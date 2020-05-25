@@ -748,7 +748,7 @@ export type Mutation = {
   markAsSent: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored: Maybe<Form>;
-  /** Marque un segemnt de transport comme scellé */
+  /** Marque un segment de transport comme scellé */
   markSegmentAsSealed: Maybe<Form>;
   /** Prépare un nouveau segment de transport multimodal */
   prepareSegment: Maybe<Form>;
@@ -781,6 +781,8 @@ export type Mutation = {
    * Permet de créer un nouvel utilisateur
    */
   signup: User;
+  /** Marque un segment comme pris en charge par le nouveau transporteur */
+  takeOverSegment: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Édite les informations d'un établissement
@@ -969,6 +971,12 @@ export type MutationSignedByTransporterArgs = {
 
 export type MutationSignupArgs = {
   userInfos: SignupInput;
+};
+
+
+export type MutationTakeOverSegmentArgs = {
+  id: Scalars['ID'];
+  takeOverInfo: TakeOverInput;
 };
 
 
@@ -1447,6 +1455,12 @@ export type Subscription = {
 
 export type SubscriptionFormsArgs = {
   token: Scalars['String'];
+};
+
+/** Payload de prise en charge de segment */
+export type TakeOverInput = {
+  takenOverAt: Scalars['DateTime'];
+  takenOverBy: Scalars['String'];
 };
 
 /** Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant */

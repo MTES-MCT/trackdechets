@@ -194,8 +194,11 @@ type Mutation {
     nextSegmentInfo: NextSegmentInfoInput!
   ): Form
 
-  "Marque un segemnt de transport comme scellé"
+  "Marque un segment de transport comme scellé"
   markSegmentAsSealed(id: ID!): Form
+
+  "Marque un segment comme pris en charge par le nouveau transporteur"
+  takeOverSegment(id: ID!, takeOverInfo: TakeOverInput!): Form
 }
 
 type Subscription {

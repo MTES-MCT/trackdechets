@@ -69,5 +69,6 @@ export default {
     ),
     prepareSegment: isAuthenticated,
     markSegmentAsSealed: isAuthenticated,
+    takeOverSegment: isAuthenticated,
   },
 };

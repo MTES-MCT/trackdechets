@@ -825,7 +825,7 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Marque un segemnt de transport comme scellé
+Marque un segment de transport comme scellé
 
 </td>
 </tr>
@@ -986,6 +986,25 @@ Permet de créer un nouvel utilisateur
 <tr>
 <td colspan="2" align="right" valign="top">userInfos</td>
 <td valign="top"><a href="#signupinput">SignupInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takeOverSegment</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Marque un segment comme pris en charge par le nouveau transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">takeOverInfo</td>
+<td valign="top"><a href="#takeoverinput">TakeOverInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -5003,6 +5022,32 @@ Nom de l'utilisateur
 Numéro de téléphone de l'utilisateur
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### TakeOverInput
+
+Payload de prise en charge de segment
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverBy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
 </tr>
 </tbody>
 </table>
