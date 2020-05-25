@@ -7,6 +7,7 @@ import {
   formFactory,
   userWithCompanyFactory,
   transportSegmentFactory,
+  userFactory,
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 
