@@ -54,19 +54,17 @@ export default withRouter(function StepList(
     MutationSaveFormArgs
   >(SAVE_FORM, {
     update: (store, { data }) => {
-      if (data?.saveForm) {
-        const saveForm = data.saveForm;
-        updateApolloCache<{ forms: Form[] }>(store, {
-          query: GET_SLIPS,
-          variables: { siret: currentSiretService.getSiret() },
-          getNewData: (data) => ({
-            forms: [
-              ...data.forms.filter((f) => f.id !== saveForm.id),
-              saveForm,
-            ],
-          }),
-        });
+      if (!data?.saveForm) {
+        return;
       }
+      const saveForm = data.saveForm;
+      updateApolloCache<{ forms: Form[] }>(store, {
+        query: GET_SLIPS,
+        variables: { siret: currentSiretService.getSiret(), status: ["DRAFT"] },
+        getNewData: (data) => ({
+          forms: [...data.forms.filter((f) => f.id !== saveForm.id), saveForm],
+        }),
+      });
     },
   });
 
@@ -142,7 +140,7 @@ export default withRouter(function StepList(
                   saveForm({
                     variables: { formInput: values },
                   })
-                    .then((_) => props.history.push("/dashboard/slips"))
+                    .then((_) => props.history.push("/dashboard/"))
                     .catch((err) => {
                       err.graphQLErrors.map((err) =>
                         cogoToast.error(err.message, { hideAfter: 7 })

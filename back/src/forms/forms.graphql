@@ -22,7 +22,49 @@ type Query {
   forms(
     "SIRET d'un établissement dont je suis membre"
     siret: String
+
     """
+    Nombre de bordereaux retournés.
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+
+    """
+    Nombre d'éléments à ne pas récupérer en début de liste
+    Permet de paginer les résultats
+    Défaut à 0
+    """
+    skip: Int
+
+    """
+    (Optionnel) Filtre sur les statuts des bordereaux
+    Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+    Défaut à vide.
+    """
+    status: [FormStatus!]
+
+    """
+    (Optionnel) Filtre sur le role de demandeur dams le bordereau
+    Par exemple:
+     - `roles: [TRANSPORTER]` renverra les bordereaux pour lesquels je suis transporteur
+     - `roles: [EMITTER, RECIPIENT]` renverra les bordereaux dont je suis l'émetteur ou le destinataire final
+    Voir `FormRole` pour la liste des roles sur lesquels il est possible de filtrer.
+    Si aucune filtre n'est passé, les bordereaux seront retournés quel que soit votre role dessus.
+    Défaut à vide.
+    """
+    roles: [FormRole!]
+
+    """
+    (Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+    Si `true`, seul les bordereaux attendant une action sont renvoyés
+    Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
+    Si vide, tous les bordereaux sont renvoyés
+    Défaut à vide.
+    """
+    hasNextStep: Boolean
+
+    """
+    DEPRECATED
     (Optionnel) Type de BSD renvoyés
     ACTOR = BSD's dont on est producteur ou destinataire
     TRANSPORTER = BSD's dont on est transporteur
@@ -224,11 +266,24 @@ enum FormStatus {
 
 "Valeur possibles pour le filtre de la query `forms`"
 enum FormType {
-  "Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)"
+  "DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)"
   ACTOR
 
   "Uniquement les BSD's dont je suis transporteur"
   TRANSPORTER
+}
+
+enum FormRole {
+  "Les BSD's dont je suis transporteur"
+  TRANSPORTER
+  "Les BSD's dont je suis la destination de traitement"
+  RECIPIENT
+  "Les BSD's dont je suis l'émetteur"
+  EMITTER
+  "Les BSD's dont je suis le négociant"
+  TRADER
+  "Les BSD's dont je suis éco-organisme"
+  ECO_ORGANISME
 }
 
 """

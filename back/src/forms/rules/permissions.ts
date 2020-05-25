@@ -223,6 +223,23 @@ export const hasFinalDestination = rule()(async (_, { id }, ctx) => {
   );
 });
 
+export const canAccessFormsWithoutSiret = and(
+  isAuthenticated,
+  rule()(async (_, {}, ctx) => {
+    const currentUserSirets = await getCurrentUserSirets(
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    return (
+      currentUserSirets.length == 1 ||
+      new ForbiddenError(
+        `Vous appartenez à plusieurs entreprises, vous devez spécifier le SIRET dont vous souhaitez récupérer les bordereaux.`
+      )
+    );
+  })
+);
+
 async function getFormAccessInfos(
   formId: string,
   userId: string,

@@ -13,7 +13,8 @@ import {
   isFormTrader,
   isFormTransporter,
   isFormEcoOrganisme,
-  hasFinalDestination
+  hasFinalDestination,
+  canAccessFormsWithoutSiret
 } from "./rules/permissions";
 import {
   markAsProcessedSchema,
@@ -23,7 +24,8 @@ import {
   markAsSentSchema,
   markAsTempStoredSchema,
   signedByTransporterSchema,
-  temporaryStorageDestinationSchema
+  temporaryStorageDestinationSchema,
+  formsSchema
 } from "./rules/schema";
 
 export default {
@@ -31,7 +33,10 @@ export default {
     form: canAccessForm,
     formPdf: or(canAccessForm, isFormTransporter),
     formsRegister: isCompaniesUser,
-    forms: isAuthenticated,
+    forms: chain(
+      formsSchema,
+      or(or(isCompanyMember, isCompanyAdmin), canAccessFormsWithoutSiret)
+    ),
     stats: isAuthenticated,
     formsLifeCycle: isAuthenticated,
     appendixForms: or(isCompanyMember, isCompanyAdmin)

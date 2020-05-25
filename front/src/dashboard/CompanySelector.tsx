@@ -20,7 +20,6 @@ export default function CompanySelector({
   handleCompanyChange,
 }: IProps) {
   const handleChange = (siret: string) => {
-    currentSiretService.setSiret(siret);
     handleCompanyChange(siret);
   };
 

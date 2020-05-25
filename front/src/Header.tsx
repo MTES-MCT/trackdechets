@@ -8,13 +8,13 @@ import {
 import { trackEvent } from "./tracker";
 import "./Header.scss";
 import { localAuthService } from "./login/auth.service";
+import { currentSiretService } from "./dashboard/CompanySelector";
 
 type Props = {
   isAuthenticated: boolean;
 };
 
 export default withRouter(function Header({
-  history,
   isAuthenticated,
 }: RouteComponentProps & Props) {
   const { REACT_APP_API_ENDPOINT, REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
@@ -33,15 +33,13 @@ export default withRouter(function Header({
         <nav>
           <ul className="nav__links">
             <li className="nav__item">
-              {/* <NavLink
-                to="/faq"
-                activeClassName="active"
+              <a href={REACT_APP_DEVELOPERS_ENDPOINT}>Développeurs</a>
+              <a
+                href="https://faq.trackdechets.fr/"
                 onClick={() => trackEvent("navbar", "faq")}
               >
                 FAQ
-              </NavLink> */}
-              <a href={REACT_APP_DEVELOPERS_ENDPOINT}>Développeurs</a>
-              <a href="https://faq.trackdechets.fr/"> FAQ</a>
+              </a>
             </li>
             <li className="nav__item">
               <NavLink
@@ -59,7 +57,7 @@ export default withRouter(function Header({
               <>
                 <li className="nav__item">
                   <NavLink
-                    to="/dashboard/slips"
+                    to={`/dashboard/${currentSiretService.getSiret()}`}
                     activeClassName="active"
                     onClick={() => trackEvent("navbar", "mon-espace")}
                   >

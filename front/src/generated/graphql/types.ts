@@ -525,6 +525,19 @@ export type FormInput = {
   temporaryStorageDetail: Maybe<TemporaryStorageDetailInput>;
 };
 
+export enum FormRole {
+  /** Les BSD's dont je suis transporteur */
+  Transporter = 'TRANSPORTER',
+  /** Les BSD's dont je suis la destination de traitement */
+  Recipient = 'RECIPIENT',
+  /** Les BSD's dont je suis l'émetteur */
+  Emitter = 'EMITTER',
+  /** Les BSD's dont je suis le négociant */
+  Trader = 'TRADER',
+  /** Les BSD's dont je suis éco-organisme */
+  EcoOrganisme = 'ECO_ORGANISME'
+}
+
 /** Informations du cycle de vie des bordereaux */
 export type FormsLifeCycleData = {
    __typename?: 'formsLifeCycleData';
@@ -603,7 +616,7 @@ export type FormSubscription = {
 
 /** Valeur possibles pour le filtre de la query `forms` */
 export enum FormType {
-  /** Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
+  /** DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
   Actor = 'ACTOR',
   /** Uniquement les BSD's dont je suis transporteur */
   Transporter = 'TRANSPORTER'
@@ -1117,6 +1130,11 @@ export type QueryFormPdfArgs = {
 
 export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
+  first: Maybe<Scalars['Int']>;
+  skip: Maybe<Scalars['Int']>;
+  status: Maybe<Array<FormStatus>>;
+  roles: Maybe<Array<FormRole>>;
+  hasNextStep: Maybe<Scalars['Boolean']>;
   type?: Maybe<FormType>;
 };
 

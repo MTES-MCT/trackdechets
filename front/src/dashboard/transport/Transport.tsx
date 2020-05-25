@@ -1,31 +1,26 @@
-import gql from "graphql-tag";
-import React from "react";
-import "./Transport.scss";
-import TransportSignature from "./TransportSignature";
-import TransporterInfoEdit from "./TransporterInfoEdit";
-import DownloadPdf from "../slips/slips-actions/DownloadPdf";
 import { useQuery } from "@apollo/react-hooks";
-import { useFormsTable } from "../slips/use-forms-table";
-import { FaSync, FaSort } from "react-icons/fa";
-import { useState } from "react";
-import useLocalStorage from "./hooks";
+import gql from "graphql-tag";
+import React, { useContext, useState } from "react";
+import { FaSort, FaSync } from "react-icons/fa";
 import { fullFormFragment } from "../../common/fragments";
 import {
-  User,
   Form,
+  FormRole,
+  FormStatus,
   Query,
   QueryFormsArgs,
-  FormType,
-  FormStatus,
 } from "../../generated/graphql/types";
+import { SiretContext } from "../Dashboard";
+import DownloadPdf from "../slips/slips-actions/DownloadPdf";
+import { useFormsTable } from "../slips/use-forms-table";
+import useLocalStorage from "./hooks";
+import "./Transport.scss";
+import TransporterInfoEdit from "./TransporterInfoEdit";
+import TransportSignature from "./TransportSignature";
 
-type Props = {
-  me: User;
-  siret: string;
-};
 export const GET_TRANSPORT_SLIPS = gql`
-  query GetSlips($siret: String, $type: FormType) {
-    forms(siret: $siret, type: $type) {
+  query GetSlips($siret: String, $status: [FormStatus!], $roles: [FormRole!]) {
+    forms(siret: $siret, status: $status, roles: $roles) {
       ...FullForm
     }
   }
@@ -155,19 +150,26 @@ const Table = ({ forms, displayActions }) => {
   );
 };
 const TRANSPORTER_FILTER_STORAGE_KEY = "TRANSPORTER_FILTER_STORAGE_KEY";
-export default function Transport({ siret }: Props & any) {
-  const [filterStatus, setFilterStatus] = useState([
-    FormStatus.Sealed,
-    FormStatus.Resealed,
-  ]);
+export default function Transport() {
+  const { siret } = useContext(SiretContext);
+  const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
   );
   const { loading, error, data, refetch } = useQuery<
     Pick<Query, "forms">,
-    QueryFormsArgs
+    Partial<QueryFormsArgs>
   >(GET_TRANSPORT_SLIPS, {
-    variables: { siret, type: FormType.Transporter },
+    variables: {
+      siret,
+      status: [
+        FormStatus.Sealed,
+        FormStatus.Sent,
+        FormStatus.Resealed,
+        FormStatus.Resent,
+      ],
+      roles: [FormRole.Transporter],
+    },
   });
   if (loading) return <div>loading</div>;
   if (error) return <div>error</div>;
@@ -223,7 +225,18 @@ export default function Transport({ siret }: Props & any) {
         </button>
         <button
           className="button button-primary transport-refresh"
-          onClick={() => refetch({ siret, type: FormType.Transporter })}
+          onClick={() =>
+            refetch({
+              siret,
+              status: [
+                FormStatus.Sealed,
+                FormStatus.Sent,
+                FormStatus.Resealed,
+                FormStatus.Resent,
+              ],
+              roles: [FormRole.Transporter],
+            })
+          }
         >
           <FaSync /> Rafraîchir
         </button>

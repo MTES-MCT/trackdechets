@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/react-hooks/lib/useQuery";
 import gql from "graphql-tag";
 import React from "react";
-import { RouteComponentProps } from "react-router";
+import { useParams } from "react-router";
 import { InlineError } from "../common/Error";
 import "./Company.scss";
 import CompanyActivity from "./CompanyActivity";
@@ -44,14 +44,13 @@ const COMPANY_INFOS = gql`
   }
 `;
 
-export default function CompanyInfo({
-  match,
-}: RouteComponentProps<{ siret: string }>) {
+export default function CompanyInfo() {
+  const { siret } = useParams<{ siret: string }>();
   const { data, loading, error } = useQuery<
     Pick<Query, "companyInfos">,
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
-    variables: { siret: match.params.siret },
+    variables: { siret },
     fetchPolicy: "no-cache",
   });
 
