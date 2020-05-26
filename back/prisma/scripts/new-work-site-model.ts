@@ -1,6 +1,6 @@
 import axios from "axios";
 import { prisma } from "../../src/generated/prisma-client";
-import { Updater, registerUpdater } from ".";
+import { Updater, registerUpdater } from "./helper/helper";
 
 @registerUpdater(
   "Set work site",
