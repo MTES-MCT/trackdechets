@@ -1,4 +1,4 @@
-import { Updater, registerUpdater } from ".";
+import { Updater, registerUpdater } from "./helper/helper";
 import { setCompanyName } from "../../src/scripts/prisma/set-company-name";
 
 @registerUpdater(

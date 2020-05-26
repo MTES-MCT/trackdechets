@@ -1,4 +1,4 @@
-import { Updater, registerUpdater } from ".";
+import { Updater, registerUpdater } from "./helper/helper";
 import { prisma } from "../../src/generated/prisma-client";
 import { randomNumber } from "../../src/utils";
 

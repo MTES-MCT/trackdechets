@@ -1,21 +1,5 @@
 import { loadFiles } from "@graphql-tools/load-files";
-
-export interface Updater {
-  run(): Promise<any>;
-}
-
-const updaters: {
-  constructor: any;
-  name: string;
-  description: string;
-}[] = [];
-
-export function registerUpdater(name: string, description = "", active = true) {
-  return (constructor: new () => object) => {
-    if (!active) return;
-    updaters.push({ constructor, name, description });
-  };
-}
+import { updaters, Updater } from "./helper/helper";
 
 async function loadUpdaters() {
   console.info("⌛ Loading updaters...");
