@@ -1,4 +1,4 @@
-import { loadFilesSync } from "@graphql-tools/load-files";
+import { loadFiles } from "@graphql-tools/load-files";
 
 export interface Updater {
   run(): Promise<any>;
@@ -10,21 +10,23 @@ const updaters: {
   description: string;
 }[] = [];
 
-export function registerUpdater(
-  name: string,
-  description: string = "",
-  active: boolean = true
-) {
+export function registerUpdater(name: string, description = "", active = true) {
   return (constructor: new () => object) => {
     if (!active) return;
     updaters.push({ constructor, name, description });
   };
 }
 
-// Load every uploaders
-loadFilesSync(`${__dirname}/*.[jt]s`);
+async function loadUpdaters() {
+  console.info("⌛ Loading updaters...");
+  const loaded = await loadFiles(`${__dirname}/**`);
+  console.info(`✅ [${loaded.length}] updaters have been loaded.`);
+  console.info(`🔢 [${updaters.length}] updaters are active.`);
+}
 
-(async () => {
+async function run() {
+  await loadUpdaters();
+
   // Run them one by one
   for (const updater of updaters) {
     console.info(`=== About to start "${updater.name}" script ===`);
@@ -35,4 +37,8 @@ loadFilesSync(`${__dirname}/*.[jt]s`);
 
     console.info(`=== Done with ${updater.name} ===`);
   }
-})();
+
+  process.exit();
+}
+
+run();
