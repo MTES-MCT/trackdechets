@@ -11,7 +11,7 @@
     "update": "node prisma/scripts/index.js",
     "update:dev": "ts-node prisma/scripts/index.ts",
     "test": "jest",
-    "build": "tsc && copyfiles src/**/*.graphql dist/ && copyfiles -e **/*.ts prisma/ dist/",
+    "build": "tsc && copyfiles src/**/*.graphql dist/ && copyfiles -e '**/*.ts' prisma/** dist/",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src",
     "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
     "bulk-create-account": "ts-node src/users/bulk-creation/index.ts",
