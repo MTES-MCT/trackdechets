@@ -638,6 +638,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             wasteAcceptationStatus: ACCEPTED
             receivedBy: "Mr Provisoire",
             receivedAt: "2020-05-03T09:00:00"
+            signedAt: "2020-05-03T09:00:00"
             quantityReceived: 1
             quantityType: REAL
           }) {
