@@ -167,6 +167,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Holden",
             receivedAt :"2019-01-17T10:22:00+0100",
+            signedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: REFUSED,
             wasteRefusalReason: "Lorem ipsum",
             quantityReceived: 0
@@ -215,6 +216,7 @@ describe("Test Form reception", () => {
             receivedInfo: {
             receivedBy: "Holden",
             receivedAt :"2019-01-17T10:22:00+0100",
+            signedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: REFUSED,
             wasteRefusalReason: "Lorem ipsum",
             quantityReceived: 21
