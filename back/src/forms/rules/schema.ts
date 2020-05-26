@@ -2,17 +2,17 @@ import { validDatetime, validCompany } from "./validation-helpers";
 import { inputRule } from "graphql-shield";
 import {
   PROCESSING_OPERATION_CODES,
-  GROUP_CODES
+  GROUP_CODES,
 } from "../../common/constants";
 import { number } from "yup";
 
-export const getReceivedInfoSchema = yup =>
+export const getReceivedInfoSchema = (yup) =>
   yup.object({
     wasteAcceptationStatus: yup
       .string()
       .required()
       .matches(/(ACCEPTED|REFUSED|PARTIALLY_REFUSED)/, {
-        message: "Vous devez préciser si vous acceptez ou non le déchet."
+        message: "Vous devez préciser si vous acceptez ou non le déchet.",
       }),
     receivedBy: yup
       .string()
@@ -20,27 +20,17 @@ export const getReceivedInfoSchema = yup =>
     receivedAt: validDatetime(
       {
         verboseFieldName: "date de réception",
-        required: true
+        required: true,
       },
       yup
     ),
-    acceptedAt: yup
-      .string()
-      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-        ["REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-not-set",
-              "Vous ne devez pas saisir de date d'acceptation du déchet lors d'un refus.",
-              v => !v
-            )
-          : validDatetime(
-              {
-                verboseFieldName: "date d'acceptation",
-                required: true
-              },
-              yup
-            )
-      ),
+    signedAt: validDatetime(
+      {
+        verboseFieldName: "date d'acceptation",
+        required: true,
+      },
+      yup
+    ),
 
     quantityReceived: yup
       .number()
@@ -51,7 +41,7 @@ export const getReceivedInfoSchema = yup =>
           ? schema.test(
               "is-zero",
               "Vous devez saisir une quantité reçue égale à 0.",
-              v => v === 0
+              (v) => v === 0
             )
           : schema
       )
@@ -61,7 +51,7 @@ export const getReceivedInfoSchema = yup =>
           ? schema.test(
               "is-strictly-positive",
               "Vous devez saisir une quantité reçue supérieure à 0.",
-              v => v > 0
+              (v) => v > 0
             )
           : schema
       ),
@@ -73,44 +63,44 @@ export const getReceivedInfoSchema = yup =>
           : schema.test(
               "is-empty",
               "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-              v => !v
+              (v) => !v
             )
-      )
+      ),
   });
 
 export const markAsSentSchema = inputRule()(
-  yup =>
+  (yup) =>
     yup.object().shape({
       sentInfo: yup.object({
         sentAt: validDatetime(
           {
             verboseFieldName: "date d'envoi",
-            required: true
+            required: true,
           },
           yup
         ),
         sentBy: yup
           .string()
-          .required("Vous devez saisir un responsable de l'envoi.")
-      })
+          .required("Vous devez saisir un responsable de l'envoi."),
+      }),
     }),
   {
-    abortEarly: false
+    abortEarly: false,
   }
 );
 
 export const markAsReceivedSchema = inputRule()(
-  yup =>
+  (yup) =>
     yup.object().shape({
-      receivedInfo: getReceivedInfoSchema(yup)
+      receivedInfo: getReceivedInfoSchema(yup),
     }),
   {
-    abortEarly: false
+    abortEarly: false,
   }
 );
 
 export const markAsProcessedSchema = inputRule()(
-  yup =>
+  (yup) =>
     yup.object().shape({
       processedInfo: yup.object({
         processingOperationDone: yup
@@ -128,36 +118,36 @@ export const markAsProcessedSchema = inputRule()(
         processedAt: validDatetime(
           {
             verboseFieldName: "date de traitement",
-            required: true
+            required: true,
           },
           yup
         ),
         nextDestination: yup.object().when("processingOperationDone", {
-          is: val => GROUP_CODES.includes(val),
+          is: (val) => GROUP_CODES.includes(val),
           then: yup.object({
             processingOperation: yup.string(),
             company: validCompany(
               { verboseFieldName: "Destination ultérieure prévue" },
               yup
-            )
-          })
+            ),
+          }),
         }),
-        noTraceability: yup.boolean().nullable(true)
-      })
+        noTraceability: yup.boolean().nullable(true),
+      }),
     }),
   {
-    abortEarly: false
+    abortEarly: false,
   }
 );
 
 export const signedByTransporterSchema = inputRule()(
-  yup =>
+  (yup) =>
     yup.object().shape({
       signingInfo: yup.object({
         sentAt: validDatetime(
           {
             verboseFieldName: "date d'envoi",
-            required: true
+            required: true,
           },
           yup
         ),
@@ -186,26 +176,26 @@ export const signedByTransporterSchema = inputRule()(
         quantity: yup
           .number()
           .positive("Vous devez saisir une quantité envoyée supérieure à 0."),
-        onuCode: yup.string().nullable(true)
-      })
+        onuCode: yup.string().nullable(true),
+      }),
     }),
   {
-    abortEarly: false
+    abortEarly: false,
   }
 );
 
 export const markAsTempStoredSchema = inputRule()(
-  yup =>
+  (yup) =>
     yup.object().shape({
-      tempStoredInfos: getReceivedInfoSchema(yup)
+      tempStoredInfos: getReceivedInfoSchema(yup),
     }),
   {
-    abortEarly: false
+    abortEarly: false,
   }
 );
 
 export const markAsResealedSchema = inputRule()(
-  yup =>
+  (yup) =>
     yup.object().shape({
       resealedInfos: yup.object({
         wasteDetails: yup.object({}),
@@ -231,17 +221,17 @@ export const markAsResealedSchema = inputRule()(
             ),
           validityLimit: validDatetime(
             {
-              verboseFieldName: "date de validité"
+              verboseFieldName: "date de validité",
             },
             yup
           ),
           numberPlate: yup.string().nullable(true),
-          company: validCompany({ verboseFieldName: "Transporteur" }, yup)
-        })
-      })
+          company: validCompany({ verboseFieldName: "Transporteur" }, yup),
+        }),
+      }),
     }),
   {
-    abortEarly: false
+    abortEarly: false,
   }
 );
 
@@ -266,7 +256,7 @@ export const temporaryStorageDestinationSchema = inputRule()(yup =>
 );
 
 export const markAsResentSchema = inputRule()(
-  yup =>
+  (yup) =>
     yup.object().shape({
       resentInfos: yup.object({
         wasteDetails: yup.object({}),
@@ -292,12 +282,12 @@ export const markAsResentSchema = inputRule()(
             ),
           validityLimit: validDatetime(
             {
-              verboseFieldName: "date de validité"
+              verboseFieldName: "date de validité",
             },
             yup
           ),
           numberPlate: yup.string().nullable(true),
-          company: validCompany({ verboseFieldName: "Transporteur" }, yup)
+          company: validCompany({ verboseFieldName: "Transporteur" }, yup),
         }),
         signedBy: yup
           .string()
@@ -305,14 +295,14 @@ export const markAsResentSchema = inputRule()(
         signedAt: validDatetime(
           {
             verboseFieldName: "une date d'envoi",
-            required: true
+            required: true,
           },
           yup
-        )
-      })
+        ),
+      }),
     }),
   {
-    abortEarly: false
+    abortEarly: false,
   }
 );
 

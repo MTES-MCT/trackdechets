@@ -88,10 +88,10 @@ const mainFormFieldSettings = {
   recipientPhoneContact10: { x: 124, y: 662 },
   quantityReceived: { x: 198, y: 673, rightAlign: true },
   receivedBy10: { x: 85, y: 735 },
-  receivedAt1: { x: 122, y: 683 },
+  receivedAt: { x: 122, y: 683 },
   wasteRefusalReason: { x: 100, y: 704, lineBreakAt: 50 },
 
-  receivedAt2: { x: 66, y: 746 },
+  signedAt: { x: 66, y: 746 },
 
   wasteAccepted: { x: 116, y: 696, fontSize: 12 },
   wasteNotAccepted: { x: 161, y: 696, fontSize: 12 },
@@ -187,8 +187,8 @@ const temporaryStorageDetailsFieldSettings = {
   transporterValidityLimit: { x: 366, y: 425 },
   transporterSentAt: { x: 388, y: 455 },
 
-  signedBy: { x: 75, y: 562 },
-  signedAt: { x: 215, y: 562 },
+  tempStoredFormSignedBy: { x: 75, y: 562 },
+  tempStoredFormSignedAt: { x: 215, y: 562 },
 };
 
 // appendix2 header field settings

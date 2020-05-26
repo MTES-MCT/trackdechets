@@ -751,6 +751,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             wasteAcceptationStatus: ACCEPTED
             receivedBy: "Antoine Derieux"
             receivedAt: "2020-04-05T11:18:00"
+            signedAt: "2020-04-05T11:18:00"
             quantityReceived: 1
           }
         ){
@@ -838,6 +839,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         updatedFields: {
           receivedBy: "Antoine Derieux",
           receivedAt: "2020-04-05T11:18:00",
+          signedAt: "2020-04-05T11:18:00",
           quantityReceived: 1
         }
       },

@@ -127,8 +127,7 @@ export function markAsTempStored(
         ...Object.keys(infos).reduce((prev, cur) => {
           prev[`tempStorer${capitalize(cur)}`] = infos[cur];
           return prev;
-        }, {}),
-        tempStorerSignedAt: new Date()
+        }, {})
       }
     }
   });
@@ -260,7 +259,7 @@ const fieldsToLog = {
     "quantity",
     "onuCode"
   ],
-  MARK_RECEIVED: ["receivedBy", "receivedAt", "acceptedAt", "quantityReceived"],
+  MARK_RECEIVED: ["receivedBy", "receivedAt", "signedAt", "quantityReceived"],
   MARK_PROCESSED: [
     "processedBy",
     "processedAt",
@@ -279,7 +278,7 @@ const fieldsToLog = {
   MARK_TEMP_STORED: [
     "receivedBy",
     "receivedAt",
-    "acceptedAt",
+    "signedAt",
     "quantityReceived",
     "quantityType"
   ],

@@ -7,7 +7,7 @@ const acceptedInfo = {
   wasteRefusalReason: "",
   receivedBy: "Jim",
   receivedAt: "2020-01-17T10:12:00+0100",
-  acceptedAt: "2020-01-17T10:12:00+0100"
+  signedAt: "2020-01-17T10:12:00+0100"
 };
 
 const receivedInfoSchema = getReceivedInfoSchema(Yup);

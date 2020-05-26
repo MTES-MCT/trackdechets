@@ -351,6 +351,9 @@ type Form {
   "Date à laquelle le déchet a été reçu (case 10)"
   receivedAt: DateTime
 
+  "Date à laquelle le déchet a été accepté ou refusé (case 10)"
+  signedAt: DateTime
+
   "Quantité réelle présentée (case 10)"
   quantityReceived: Float
 

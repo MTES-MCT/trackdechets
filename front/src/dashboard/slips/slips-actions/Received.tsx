@@ -39,7 +39,7 @@ export default function Received(props: SlipActionProps) {
         initialValues={{
           receivedBy: "",
           receivedAt: DateTime.local().toISODate(),
-          acceptedAt: DateTime.local().toISODate(),
+          signedAt: DateTime.local().toISODate(),
           quantityReceived: "",
           wasteAcceptationStatus: "",
           wasteRefusalReason: "",
@@ -157,8 +157,8 @@ export default function Received(props: SlipActionProps) {
 
               <label>
                 Date d'acceptation
-                <Field component={DateInput} name="acceptedAt" />
-                <FieldError fieldError={errors.acceptedAt} />
+                <Field component={DateInput} name="signedAt" />
+                <FieldError fieldError={errors.signedAt} />
               </label>
 
               <p>
