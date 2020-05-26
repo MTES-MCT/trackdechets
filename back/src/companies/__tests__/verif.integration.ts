@@ -23,8 +23,8 @@ const company = {
 };
 
 describe("verifyPrestataire", () => {
-  afterEach(() => {
-    resetDatabase();
+  afterEach(async () => {
+    await resetDatabase();
     mockSearchCompany.mockReset();
   });
 
