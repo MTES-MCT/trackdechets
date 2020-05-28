@@ -237,8 +237,8 @@ export default function TransportSignature({ form }: Props) {
                           required
                         />
                         En tant que producteur du déchet, j'ai vérifié que les
-                        déchets confiés au transporter correspondent au
-                        informations vue ci-avant et je valide l'enlèvement.
+                        déchets confiés au transporteur correspondent aux
+                        informations vues ci-avant et je valide l'enlèvement.
                       </label>
                     </p>
                     <RedErrorMessage name="signedByProducer" />
