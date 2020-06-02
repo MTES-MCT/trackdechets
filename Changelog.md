@@ -6,6 +6,14 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 
+# [2020.06.1] 09/06/2020
+* Ajout logos partenaires [PR 294](https://github.com/MTES-MCT/trackdechets/pull/294)
+* Evolution de la requête forms [PR 297](https://github.com/MTES-MCT/trackdechets/pull/297)
+* Corrections de bugs [PR 291](https://github.com/MTES-MCT/trackdechets/pull/291), [PR 295](https://github.com/MTES-MCT/trackdechets/pull/295), [PR 300](https://github.com/MTES-MCT/trackdechets/pull/300), [PR 301](https://github.com/MTES-MCT/trackdechets/pull/301), [PR 307](https://github.com/MTES-MCT/trackdechets/pull/307),[PR 292](https://github.com/MTES-MCT/trackdechets/pull/292)
+* Tests et améliorations techniques [PR 295](https://github.com/MTES-MCT/trackdechets/pull/295) , [PR 296](https://github.com/MTES-MCT/trackdechets/pull/296), [PR 308](https://github.com/MTES-MCT/trackdechets/pull/308), [PR 309](https://github.com/MTES-MCT/trackdechets/pull/309), [PR 299](https://github.com/MTES-MCT/trackdechets/pull/299), [PR 293](https://github.com/MTES-MCT/trackdechets/pull/293), [PR 284](https://github.com/MTES-MCT/trackdechets/pull/284), [PR 286](https://github.com/MTES-MCT/trackdechets/pull/286)
+* Permissions écoorganismes [PR 287](https://github.com/MTES-MCT/trackdechets/pull/287), [PR 288](https://github.com/MTES-MCT/trackdechets/pull/288)
+
+
 # [2020.05.1] 07/05/2020
 * Ajout logos partenaires [PR 277](https://github.com/MTES-MCT/trackdechets/pull/277)
 * Amélioration délivrabilité des emails [PR 260](https://github.com/MTES-MCT/trackdechets/pull/260)
