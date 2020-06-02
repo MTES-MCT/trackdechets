@@ -1,8 +1,8 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
-import DateInput from "./custom-inputs/DateInput";
 import RedErrorMessage from "../common/RedErrorMessage";
+import DateInput from "./custom-inputs/DateInput";
 
 type Values = {
   transporter: { isExemptedOfReceipt: boolean };
@@ -11,7 +11,29 @@ export default connect<{}, Values>(function Transporter(props) {
   return (
     <>
       <h4>Transporteur</h4>
-      <CompanySelector name="transporter.company" />
+      <CompanySelector
+        name="transporter.company"
+        onCompanySelected={(transporter) => {
+          if (transporter.transporterReceipt) {
+            props.formik.setFieldValue(
+              "transporter.receipt",
+              transporter.transporterReceipt.receiptNumber
+            );
+            props.formik.setFieldValue(
+              "transporter.validityLimit",
+              transporter.transporterReceipt.validityLimit
+            );
+            props.formik.setFieldValue(
+              "transporter.department",
+              transporter.transporterReceipt.department
+            );
+          } else {
+            props.formik.setFieldValue("transporter.receipt", "");
+            props.formik.setFieldValue("transporter.validityLimit", null);
+            props.formik.setFieldValue("transporter.department", "");
+          }
+        }}
+      />
 
       <h4>Autorisations</h4>
       <div className="form__group">

@@ -1,5 +1,5 @@
 import React from "react";
-import { Company } from "../login/model";
+import { CompanyPrivate } from "../generated/graphql/types";
 
 export const currentSiretService = {
   getSiret: () => window.localStorage.getItem(SIRET_STORAGE_KEY) || "",
@@ -9,7 +9,7 @@ export const currentSiretService = {
 
 interface IProps {
   siret: string;
-  companies: Company[];
+  companies: CompanyPrivate[];
   handleCompanyChange: (siret: string) => void;
 }
 
@@ -20,7 +20,6 @@ export default function CompanySelector({
   handleCompanyChange,
 }: IProps) {
   const handleChange = (siret: string) => {
-    currentSiretService.setSiret(siret);
     handleCompanyChange(siret);
   };
 

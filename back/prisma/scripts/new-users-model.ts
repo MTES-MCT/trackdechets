@@ -1,4 +1,4 @@
-import { registerUpdater, Updater } from ".";
+import { registerUpdater, Updater } from "./helper/helper";
 import { prisma } from "../../src/generated/prisma-client";
 
 type UsersInfos = {

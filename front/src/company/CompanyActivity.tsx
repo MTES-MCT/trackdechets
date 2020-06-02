@@ -1,15 +1,12 @@
 import React from "react";
+import { Installation } from "../generated/graphql/types";
 
-import { Installation, Rubrique } from "./companyTypes";
-
-type Props = {
-  installation: Installation;
-};
+type Props = { installation: Installation };
 
 export default function CompanyActivity({ installation }: Props) {
-  const rubriquesInActivity = installation.rubriques.filter(
-    (r) => r.etatActivite === "En fonct."
-  );
+  const rubriquesInActivity = installation.rubriques
+    ? installation.rubriques.filter((r) => r.etatActivite === "En fonct.")
+    : [];
 
   const rubriquesSorted = [...rubriquesInActivity].sort((r1, r2) => {
     if (r1.rubrique < r2.rubrique) return -1;
@@ -30,12 +27,15 @@ export default function CompanyActivity({ installation }: Props) {
     <div className="columns">
       <div className="box">
         <p style={{ fontSize: "1.2em", fontWeight: "bold" }}>Activité</p>
-        <p>
-          Installation classée pour la protection de l'environnement{" "}
-          <a href={installation.urlFiche}>n°{installation.codeS3ic}</a>
-        </p>
 
-        {[...new Set(rubriquesSorted.map((r: Rubrique) => r.category))]
+        {installation.urlFiche && installation.codeS3ic && (
+          <p>
+            Installation classée pour la protection de l'environnement{" "}
+            <a href={installation.urlFiche}>n°{installation.codeS3ic}</a>
+          </p>
+        )}
+
+        {[...new Set(rubriquesSorted.map((r) => r.category))]
           .filter((category) => category !== null)
           .map((category, idx) => {
             return (

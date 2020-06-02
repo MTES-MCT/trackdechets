@@ -61,7 +61,7 @@ export default function Processed(props: SlipActionProps) {
               </Field>
               <div>
                 Code de traitement initialement prévu par le producteur:{" "}
-                {props.form.recipient.processingOperation}
+                {props.form.recipient?.processingOperation}
               </div>
             </div>
             <div className="form__group">

@@ -3,10 +3,10 @@ import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormCompanyTypes from "./forms/AccountFormCompanyTypes";
 import { COMPANY_TYPES } from "../../login/CompanyType";
-import { Company } from "../AccountCompany";
+import { CompanyPrivate } from "../../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 AccountFieldCompanyTypes.fragments = {
@@ -19,7 +19,9 @@ AccountFieldCompanyTypes.fragments = {
 };
 
 export default function AccountFieldCompanyTypes({ company }: Props) {
-  const companyTypesLabel = company.companyTypes.map((ut) => {
+  const companyTypes = company.companyTypes || [];
+
+  const companyTypesLabel = companyTypes.map((ut) => {
     const obj = COMPANY_TYPES.find((t) => t.value === ut);
     return obj ? obj.label : "";
   });
@@ -41,7 +43,7 @@ export default function AccountFieldCompanyTypes({ company }: Props) {
         <AccountFormCompanyTypes
           name="companyTypes"
           siret={company.siret}
-          companyTypes={company.companyTypes}
+          companyTypes={companyTypes}
           toggleEdition={toggleEdition}
         />
       )}

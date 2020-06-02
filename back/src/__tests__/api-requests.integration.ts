@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../integration-tests/helper";
 import { userWithAccessTokenFactory } from "./factories";
-import * as supertest from "supertest";
+import supertest from "supertest";
 import { app } from "../server";
 
 const request = supertest(app);

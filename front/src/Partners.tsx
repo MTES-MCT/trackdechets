@@ -127,6 +127,9 @@ export default function Partners() {
             <figure>
               <img src="/partners-logos/colleco.png" alt="Colleco" />
             </figure>
+            <figure>
+              <img src="/partners-logos/elo-energie.png" alt="Elo Énergie" />
+            </figure>
           </div>
         </div>
       </section>

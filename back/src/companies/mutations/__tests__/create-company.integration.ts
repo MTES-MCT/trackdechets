@@ -1,8 +1,9 @@
-import { userFactory } from "../../../__tests__/factories";
+import { userFactory, companyFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import * as mailsHelper from "../../../common/mails.helper";
-import { prisma, MutationType } from "../../../generated/prisma-client";
+import { prisma } from "../../../generated/prisma-client";
 import makeClient from "../../../__tests__/testClient";
+import { ErrorCode } from "../../../common/errors";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -20,7 +21,6 @@ describe("Create company endpoint", () => {
     const gerepId = "1234";
     const name = "Acme";
     const companyTypes = ["PRODUCER"];
-    const naf = "456";
 
     const mutation = `
     mutation {
@@ -54,6 +54,144 @@ describe("Create company endpoint", () => {
       { company: { siret }, user: { id: user.id } }
     );
     expect(newCompanyAssociationExists).toBe(true);
+  });
+
+  test("should link to a transporterReceipt", async () => {
+    const user = await userFactory();
+
+    const siret = "12345678912345";
+    const name = "Acme";
+    const companyTypes = ["TRANSPORTER"];
+    const transporterReceipt = {
+      receiptNumber: "1234",
+      validityLimit: "2023-03-31T00:00:00.000Z",
+      department: "07"
+    };
+
+    const receiptId = await prisma
+      .createTransporterReceipt(transporterReceipt)
+      .id();
+
+    const mutation = `
+      mutation {
+        createCompany(
+          companyInput: {
+            siret: "${siret}"
+            companyName: "${name}"
+            companyTypes: [${companyTypes}]
+            transporterReceiptId: "${receiptId}"
+          }
+        ) {
+            siret
+            transporterReceipt {
+              receiptNumber
+              validityLimit
+              department
+            }
+          }
+      }`;
+
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate(mutation);
+
+    expect(data.createCompany.transporterReceipt).toEqual(transporterReceipt);
+  });
+
+  test("should link to a traderReceipt", async () => {
+    const user = await userFactory();
+
+    const siret = "12345678912345";
+    const name = "Acme";
+    const companyTypes = ["TRADER"];
+    const traderReceipt = {
+      receiptNumber: "1234",
+      validityLimit: "2023-03-31T00:00:00.000Z",
+      department: "07"
+    };
+
+    const receiptId = await prisma.createTraderReceipt(traderReceipt).id();
+
+    const mutation = `
+      mutation {
+        createCompany(
+          companyInput: {
+            siret: "${siret}"
+            companyName: "${name}"
+            companyTypes: [${companyTypes}]
+            traderReceiptId: "${receiptId}"
+          }
+        ) {
+            siret
+            traderReceipt {
+              receiptNumber
+              validityLimit
+              department
+            }
+          }
+      }`;
+
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate(mutation);
+
+    // check the traderReceipt was created in db
+    expect(data.createCompany.traderReceipt).toEqual(traderReceipt);
+  });
+
+  it("should create document keys", async () => {
+    const user = await userFactory();
+
+    const siret = "12345678912345";
+    const name = "Acme";
+    const companyTypes = ["PRODUCER"];
+
+    const mutation = `
+      mutation {
+        createCompany(
+          companyInput: {
+            siret: "${siret}"
+            companyName: "${name}"
+            companyTypes: [${companyTypes}]
+            documentKeys: ["key1", "key2"]
+          }
+        ) {
+            siret
+          }
+      }`;
+
+    const { mutate } = makeClient(user);
+
+    await mutate(mutation);
+
+    const company = await prisma.company({ siret });
+    expect(company.documentKeys).toEqual(["key1", "key2"]);
+  });
+
+  test("should throw error if the company already exist", async () => {
+    const user = await userFactory();
+
+    const company = await companyFactory();
+
+    // try re-creating the same company
+    const mutation = `
+    mutation {
+      createCompany(
+        companyInput: {
+          siret: "${company.siret}"
+          gerepId: "${company.gerepId}"
+          companyName: "${company.name}"
+          companyTypes: [${company.companyTypes}]
+        }
+        ) { siret, gerepId, name, companyTypes }
+      }
+      `;
+    const { mutate } = makeClient(user);
+
+    const { errors, data } = await mutate(mutation);
+
+    expect(data).toBeNull();
+    expect(errors[0].extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
   });
 
   test("should alert when a user creates too many companies", async () => {

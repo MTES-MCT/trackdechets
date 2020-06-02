@@ -1,28 +1,36 @@
 import { saveForm } from "../save-form";
 import { ErrorCode } from "../../../common/errors";
-
 import * as queries from "../../../companies/queries";
 
-describe("Forms -> saveForm mutation", () => {
-  const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
-  const ecoOrganismeMock = jest.fn(() => Promise.resolve(null));
-  const formMock = jest.fn(() => Promise.resolve({}));
-  function mockFormWith(value) {
-    const result: any = Promise.resolve(value);
-    result.temporaryStorageDetail = temporaryStorageDetailMock;
-    result.ecoOrganisme = ecoOrganismeMock;
-    formMock.mockReturnValue(result);
+const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
+const ecoOrganismeMock = jest.fn(() => Promise.resolve(null));
+const formMock = jest.fn(() => Promise.resolve({}));
+function mockFormWith(value) {
+  const result: any = Promise.resolve(value);
+  result.temporaryStorageDetail = temporaryStorageDetailMock;
+  result.ecoOrganisme = ecoOrganismeMock;
+  formMock.mockReturnValue(result);
+}
+
+const prisma = {
+  form: formMock,
+  forms: jest.fn((...args) => []),
+  updateForm: jest.fn((...args) => ({})),
+  createForm: jest.fn((...args) => ({}))
+};
+
+jest.mock("../../../generated/prisma-client", () => ({
+  prisma: {
+    form: () => prisma.form(),
+    forms: (...args) => prisma.forms(...args),
+    updateForm: (...args) => prisma.updateForm(...args),
+    createForm: (...args) => prisma.createForm(...args)
   }
+}));
 
-  const prisma = {
-    form: formMock,
-    forms: jest.fn(() => []),
-    updateForm: jest.fn(() => ({})),
-    createForm: jest.fn(() => ({}))
-  };
-
-  const getUserCompaniesMcock = jest.spyOn(queries, "getUserCompanies");
-  getUserCompaniesMcock.mockResolvedValue([
+describe("Forms -> saveForm mutation", () => {
+  const getUserCompaniesMock = jest.spyOn(queries, "getUserCompanies");
+  getUserCompaniesMock.mockResolvedValue([
     { id: "", securityCode: 123, companyTypes: [], siret: "user siret" }
   ]);
 
@@ -42,11 +50,7 @@ describe("Forms -> saveForm mutation", () => {
     };
 
     try {
-      await saveForm(null, { formInput }, {
-        prisma,
-        user: { id: "userId" },
-        request: null
-      } as any);
+      await saveForm("userId", { formInput } as any);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -65,11 +69,7 @@ describe("Forms -> saveForm mutation", () => {
     };
 
     try {
-      await saveForm(null, { formInput }, {
-        prisma,
-        user: { id: "userId" },
-        request: null
-      } as any);
+      await saveForm("userId", { formInput } as any);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -83,11 +83,7 @@ describe("Forms -> saveForm mutation", () => {
 
     mockFormWith({ emitterCompanySiret: "user siret" });
 
-    const result = await saveForm(null, { formInput }, {
-      prisma,
-      user: { id: "userId" },
-      request: null
-    } as any);
+    const result = await saveForm("userId", { formInput } as any);
 
     expect(result).not.toBeNull();
   });
@@ -101,11 +97,7 @@ describe("Forms -> saveForm mutation", () => {
     ecoOrganismeMock.mockResolvedValueOnce({ siret: "user siret" });
     mockFormWith({});
 
-    const result = await saveForm(null, { formInput }, {
-      prisma,
-      user: { id: "userId" },
-      request: null
-    } as any);
+    const result = await saveForm("userId", { formInput } as any);
 
     expect(result).not.toBeNull();
   });
@@ -122,11 +114,7 @@ describe("Forms -> saveForm mutation", () => {
     });
 
     try {
-      await saveForm(null, { formInput }, {
-        prisma,
-        user: { id: "userId" },
-        request: null
-      } as any);
+      await saveForm("userId", { formInput } as any);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -142,11 +130,7 @@ describe("Forms -> saveForm mutation", () => {
     };
 
     try {
-      await saveForm(null, { formInput }, {
-        prisma,
-        user: { id: "userId" },
-        request: null
-      } as any);
+      await saveForm("userId", { formInput } as any);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }

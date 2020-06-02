@@ -1,37 +1,42 @@
-import { GraphQLContext } from "../../types";
 import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import {
-  Form,
-  EcoOrganisme,
+  Form as PrismaForm,
   FormUpdateInput,
   FormCreateInput,
-  Status
+  Status,
+  prisma,
+  EcoOrganisme
 } from "../../generated/prisma-client";
 import { getUserCompanies } from "../../companies/queries";
 import { ForbiddenError } from "apollo-server-express";
-import { FormInput } from "../../generated/types";
+import {
+  MutationSaveFormArgs,
+  FormInput,
+  Form
+} from "../../generated/graphql/types";
 
-export async function saveForm(_, { formInput }, context: GraphQLContext) {
-  const userId = context.user.id;
-
+export async function saveForm(
+  userId: string,
+  { formInput }: MutationSaveFormArgs
+): Promise<Form> {
   const { id, ...formContent } = formInput;
   const form = flattenObjectForDb(formContent);
 
-  await checkThatUserIsPartOftheForm(userId, { ...form, id }, context);
+  await checkThatUserIsPartOftheForm(userId, { ...form, id });
 
   if (id) {
     // {disconnect: true} fails if there is no relation, so we have to check ecoOrganisme before
     // calling prims.form().ecoOrganisme() was hard to mock, we use another query for the same puppose
-    const existingEcoOrganisme = await context.prisma.forms({
+    const existingEcoOrganisme = await prisma.forms({
       where: { id, ecoOrganisme: { id_not: null } }
     });
 
-    const temporaryStorageDetail = await context.prisma
+    const temporaryStorageDetail = await prisma
       .form({ id })
       .temporaryStorageDetail();
 
-    const updatedForm = await context.prisma.updateForm({
+    const updatedForm = await prisma.updateForm({
       where: { id },
       data: {
         ...(form as FormUpdateInput),
@@ -59,7 +64,7 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     return unflattenObjectFromDb(updatedForm);
   }
 
-  const newForm = await context.prisma.createForm({
+  const newForm = await prisma.createForm({
     ...(form as FormCreateInput),
     appendix2Forms: { connect: formContent.appendix2Forms },
     ...(formContent.ecoOrganisme?.id && {
@@ -76,9 +81,9 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
     owner: { connect: { id: userId } }
   });
   // create statuslog when and only when form is created
-  await context.prisma.createStatusLog({
+  await prisma.createStatusLog({
     form: { connect: { id: newForm.id } },
-    user: { connect: { id: context.user.id } },
+    user: { connect: { id: userId } },
     status: newForm.status as Status,
     updatedFields: {},
     loggedAt: new Date()
@@ -87,7 +92,7 @@ export async function saveForm(_, { formInput }, context: GraphQLContext) {
 }
 
 const formSiretsGetter = (
-  form: Partial<Form> & { ecoOrganisme?: EcoOrganisme }
+  form: Partial<PrismaForm> & { ecoOrganisme?: EcoOrganisme }
 ) => [
   form.emitterCompanySiret,
   form.traderCompanySiret,
@@ -96,14 +101,10 @@ const formSiretsGetter = (
   form.ecoOrganisme?.siret
 ];
 
-async function checkThatUserIsPartOftheForm(
-  userId: string,
-  form: FormInput,
-  context: GraphQLContext
-) {
+async function checkThatUserIsPartOftheForm(userId: string, form: FormInput) {
   const isEdition = form.id != null;
   const ecoOrganisme = form.ecoOrganisme?.id
-    ? await context.prisma.ecoOrganisme({
+    ? await prisma.ecoOrganisme({
         id: form.ecoOrganisme?.id
       })
     : null;
@@ -112,10 +113,8 @@ async function checkThatUserIsPartOftheForm(
   const hasPartialFormInput = formSirets.some(siret => siret == null);
 
   if (isEdition && hasPartialFormInput) {
-    const savedForm = await context.prisma.form({ id: form.id });
-    const savedEcoOrganisme = await context.prisma
-      .form({ id: form.id })
-      .ecoOrganisme();
+    const savedForm = await prisma.form({ id: form.id });
+    const savedEcoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
 
     const savedFormSirets = formSiretsGetter({
       ...savedForm,

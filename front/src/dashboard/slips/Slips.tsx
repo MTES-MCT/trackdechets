@@ -1,11 +1,11 @@
 import React from "react";
 import { DateTime } from "luxon";
 import { SlipActions, DynamicActions } from "./SlipActions";
-import { Form } from "../../form/model";
 import { useFormsTable } from "./use-forms-table";
 import { statusLabels } from "../constants";
 import { FaSort } from "react-icons/fa";
 import "./Slips.scss";
+import { Form } from "../../generated/graphql/types";
 
 type Props = {
   forms: Form[];

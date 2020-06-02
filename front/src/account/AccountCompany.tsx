@@ -8,46 +8,10 @@ import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyPage from "./AccountCompanyPage";
 import styles from "./AccountCompany.module.scss";
 import { FaUserShield } from "react-icons/fa";
-
-type Installation = {
-  urlFiche: string;
-};
-
-export enum UserRole {
-  ADMIN = "ADMIN",
-  MEMBER = "MEMBER",
-}
-
-export type CompanyMember = {
-  id: string;
-  isMe: boolean;
-  email: string;
-  name: string;
-  role: UserRole;
-  isActive: boolean;
-  isPendingInvitation: boolean;
-};
-
-export type Company = {
-  name: string;
-  siret: string;
-  address: string;
-  naf: string;
-  libelleNaf: string;
-  companyTypes: [string];
-  installation: Installation;
-  securityCode: number;
-  userRole: string;
-  gerepId: string;
-  users: [CompanyMember];
-  contactEmail: string;
-  contactPhone: string;
-  website: string;
-  givenName: string;
-};
+import { CompanyPrivate, UserRole } from "../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 export enum Link {
@@ -79,7 +43,7 @@ AccountCompany.fragments = {
 export default function AccountCompany({ company }: Props) {
   const [activeLink, setActiveLink] = useState<Link>(Link.Info);
 
-  const isAdmin = company.userRole === UserRole.ADMIN;
+  const isAdmin = company.userRole === UserRole.Admin;
 
   const info = (
     <AccountCompanyInfo

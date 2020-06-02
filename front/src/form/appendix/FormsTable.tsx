@@ -4,11 +4,15 @@ import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React from "react";
 import { InlineError } from "../../common/Error";
-import { Form } from "../model";
+import {
+  Form,
+  Query,
+  QueryAppendixFormsArgs,
+} from "../../generated/graphql/types";
 
 const GET_APPENDIX_FORMS = gql`
-  query AppendixForms($emitterSiret: String!, $wasteCode: String) {
-    appendixForms(siret: $emitterSiret, wasteCode: $wasteCode) {
+  query AppendixForms($siret: String!, $wasteCode: String) {
+    appendixForms(siret: $siret, wasteCode: $wasteCode) {
       readableId
       emitter {
         company {
@@ -28,12 +32,15 @@ const GET_APPENDIX_FORMS = gql`
 
 export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
   const { values } = useFormikContext<Form>();
-  const { loading, error, data } = useQuery(GET_APPENDIX_FORMS, {
+  const { loading, error, data } = useQuery<
+    Pick<Query, "appendixForms">,
+    QueryAppendixFormsArgs
+  >(GET_APPENDIX_FORMS, {
     variables: {
       wasteCode,
-      emitterSiret: values.emitter.company.siret,
+      siret: values.emitter?.company?.siret as string,
     },
-    skip: !values.emitter.company.siret,
+    skip: !values.emitter?.company?.siret,
   });
 
   if (loading) return <p>Chargement...</p>;
@@ -88,9 +95,9 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
             </td>
             <td>{form.readableId}</td>
             <td>
-              {form.wasteDetails.code} - {form.wasteDetails.name}
+              {form.wasteDetails?.code} - {form.wasteDetails?.name}
             </td>
-            <td>{form.emitter.company.name}</td>
+            <td>{form.emitter?.company?.name}</td>
             <td>{DateTime.fromISO(form.receivedAt).toLocaleString()}</td>
             <td>{form.quantityReceived} tonnes</td>
             <td>{form.processingOperationDone}</td>

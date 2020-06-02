@@ -2,19 +2,23 @@ import { useMutation } from "@apollo/react-hooks";
 import { Field } from "formik";
 import gql from "graphql-tag";
 import { DateTime } from "luxon";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { FaFileSignature } from "react-icons/fa";
 import DownloadFileLink from "../../common/DownloadFileLink";
 import { NotificationError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
 import RedErrorMessage from "../../common/RedErrorMessage";
-import { Form, Form as FormModel } from "../../form/model";
+import {
+  Form,
+  Mutation,
+  MutationSignedByTransporterArgs,
+} from "../../generated/graphql/types";
 import Packagings from "../../form/packagings/Packagings";
-import { currentSiretService } from "../CompanySelector";
 import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS } from "./Transport";
 import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
+import { SiretContext } from "../Dashboard";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -33,19 +37,24 @@ export const SIGNED_BY_TRANSPORTER = gql`
   }
 `;
 
-type Props = { form: FormModel };
+type Props = { form: any };
 
 export default function TransportSignature({ form }: Props) {
+  const { siret } = useContext(SiretContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [signedByTransporter, { error }] = useMutation(SIGNED_BY_TRANSPORTER, {
+  const [signedByTransporter, { error }] = useMutation<
+    Pick<Mutation, "signedByTransporter">,
+    MutationSignedByTransporterArgs
+  >(SIGNED_BY_TRANSPORTER, {
     onCompleted: () => setIsOpen(false),
     refetchQueries: [],
     update: (store) => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
-          siret: currentSiretService.getSiret(),
-          type: "TRANSPORTER",
+          siret,
+          roles: ["TRANSPORTER"],
+          status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
         getNewData: (data) => ({
           forms: data.forms.filter((f) => f.id !== form.id),
@@ -100,15 +109,17 @@ export default function TransportSignature({ form }: Props) {
                   </div>
                   <h3>Lieu de collecte</h3>
                   <address>
-                    {form.emitter.company.name} ({form.emitter.company.siret})
-                    <br /> {form.emitter.company.address}
+                    {form.emitter?.company?.name} (
+                    {form.emitter?.company?.siret}
+                    )
+                    <br /> {form.emitter?.company?.address}
                   </address>
 
                   <h3>Déchets à collecter</h3>
                   <p>Bordereau numéro {form.readableId}</p>
                   <p>
-                    Appellation du déchet: {form.wasteDetails.name} (
-                    {form.wasteDetails.code})
+                    Appellation du déchet: {form.wasteDetails?.name} (
+                    {form.wasteDetails?.code})
                   </p>
 
                   <div>
@@ -196,8 +207,8 @@ export default function TransportSignature({ form }: Props) {
                     <p>
                       Bordereau numéro {form.readableId}
                       <br />
-                      Appellation du déchet: {form.wasteDetails.name} (
-                      {form.wasteDetails.code})
+                      Appellation du déchet: {form.wasteDetails?.name} (
+                      {form.wasteDetails?.code})
                       <br />
                       Conditionnement: {props.packagings.join(", ")}
                       <br />
@@ -206,9 +217,9 @@ export default function TransportSignature({ form }: Props) {
 
                     <h3>Transporteur</h3>
                     <address>
-                      {form.stateSummary.transporter.name} (
-                      {form.stateSummary.transporter.siret})
-                      <br /> {form.stateSummary.transporter.address}
+                      {form.stateSummary.transporter?.name} (
+                      {form.stateSummary.transporter?.siret})
+                      <br /> {form.stateSummary.transporter?.address}
                     </address>
 
                     <h3>Destination du déchet</h3>
@@ -226,8 +237,8 @@ export default function TransportSignature({ form }: Props) {
                           required
                         />
                         En tant que producteur du déchet, j'ai vérifié que les
-                        déchets confiés au transporter correspondent au
-                        informations vue ci-avant et je valide l'enlèvement.
+                        déchets confiés au transporteur correspondent aux
+                        informations vues ci-avant et je valide l'enlèvement.
                       </label>
                     </p>
                     <RedErrorMessage name="signedByProducer" />

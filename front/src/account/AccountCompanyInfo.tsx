@@ -7,13 +7,20 @@ import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
   tooltip as givenNameTooltip,
 } from "./fields/AccountFieldCompanyGivenName";
-import { Company, UserRole } from "./AccountCompany";
+import {
+  CompanyPrivate,
+  UserRole,
+  CompanyType,
+} from "../generated/graphql/types";
+import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
+import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 
-type Props = { company: Company };
+type Props = { company: CompanyPrivate };
 
 AccountCompanyInfo.fragments = {
   company: gql`
     fragment AccountCompanyInfoFragment on CompanyPrivate {
+      id
       siret
       address
       naf
@@ -23,6 +30,8 @@ AccountCompanyInfo.fragments = {
       ...AccountFieldCompanyTypesFragment
       ...AccountFieldCompanyGerepIdFragment
       ...AccountFieldCompanyGivenNameFragment
+      ...AccountFieldCompanyTransporterReceiptFragment
+      ...AccountFieldCompanyTraderReceiptFragment
       installation {
         urlFiche
       }
@@ -30,6 +39,8 @@ AccountCompanyInfo.fragments = {
     ${AccountFieldCompanyTypes.fragments.company}
     ${AccountFieldCompanyGerepId.fragments.company}
     ${AccountFieldCompanyGivenName.fragments.company}
+    ${AccountFieldCompanyTransporterReceipt.fragments.company}
+    ${AccountFieldCompanyTraderReceipt.fragments.company}
   `,
 };
 
@@ -51,7 +62,7 @@ export default function AccountCompanyInfo({ company }: Props) {
         label="Adresse"
         value={company.address}
       />
-      {company.installation && (
+      {company.installation && company.installation.urlFiche && (
         <>
           <AccountFieldNotEditable
             name="fiche_ic"
@@ -74,7 +85,23 @@ export default function AccountCompanyInfo({ company }: Props) {
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
-      {company.userRole === UserRole.ADMIN ? (
+      {company.companyTypes.includes(CompanyType.Transporter) && (
+        <AccountFieldCompanyTransporterReceipt
+          company={filter(
+            AccountFieldCompanyTransporterReceipt.fragments.company,
+            company
+          )}
+        />
+      )}
+      {company.companyTypes.includes(CompanyType.Trader) && (
+        <AccountFieldCompanyTraderReceipt
+          company={filter(
+            AccountFieldCompanyTraderReceipt.fragments.company,
+            company
+          )}
+        />
+      )}
+      {company.userRole === UserRole.Admin ? (
         <AccountFieldCompanyGivenName
           company={filter(
             AccountFieldCompanyGivenName.fragments.company,

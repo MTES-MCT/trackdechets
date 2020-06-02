@@ -24,7 +24,10 @@ describe("changePassword", () => {
     });
     expect.assertions(1);
     try {
-      await changePassword("userId", "badOldPassword", "newPassword");
+      await changePassword("userId", {
+        oldPassword: "badOldPassword",
+        newPassword: "newPassword"
+      });
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
@@ -35,7 +38,10 @@ describe("changePassword", () => {
     userMock.mockResolvedValueOnce({
       password: hashedPassword
     });
-    await changePassword("userId", "oldPassword", "newPassword");
+    await changePassword("userId", {
+      oldPassword: "oldPassword",
+      newPassword: "newPassword"
+    });
     expect(updateUserMock).toHaveBeenCalled();
   });
 });

@@ -9,10 +9,12 @@ import {
   Consistence,
   EmitterType,
   QuantityType,
+  Status,
   prisma
 } from "../../../generated/prisma-client";
 
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { getReadableId } from "../../../__tests__/factories";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -64,7 +66,7 @@ const appendixFormData = {
   traderCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "signe",
-  status: "GROUPED",
+  status: "GROUPED" as Status,
   wasteRefusalReason: "",
   recipientCompanySiret: "5678",
   transporterCompanyMail: "transporter@td.io",
@@ -139,7 +141,7 @@ const groupingFormData = {
   traderCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "sender",
-  status: "SENT",
+  status: "SENT" as Status,
   wasteRefusalReason: "",
   recipientCompanySiret: "9999",
   transporterCompanyMail: "transporter@td.io",
@@ -188,16 +190,19 @@ describe("Test Form with appendix reception", () => {
     // these forms are in "GROUPED" state
     let initialForm1 = await prisma.createForm({
       ...appendixFormData,
+      readableId: getReadableId(),
       owner: { connect: { id: emitter.id } }
     });
     let initialForm2 = await prisma.createForm({
       ...appendixFormData,
+      readableId: getReadableId(),
       owner: { connect: { id: emitter.id } }
     });
 
     // this form regroups both initialForms
     let formWithAppendix2 = await prisma.createForm({
       ...groupingFormData,
+      readableId: getReadableId(),
       recipientCompanySiret: lastRecipientCompany.siret,
       owner: { connect: { id: emitter.id } },
       appendix2Forms: {
@@ -260,11 +265,13 @@ describe("Test Form with appendix processing", () => {
     // these forms are in "GROUPED" state
     let initialForm1 = await prisma.createForm({
       ...appendixFormData,
+      readableId: getReadableId(),
       status: "PROCESSED",
       owner: { connect: { id: emitter.id } }
     });
     let initialForm2 = await prisma.createForm({
       ...appendixFormData,
+      readableId: getReadableId(),
       status: "PROCESSED",
       owner: { connect: { id: emitter.id } }
     });
@@ -272,6 +279,7 @@ describe("Test Form with appendix processing", () => {
     // this form regroups both initialForms
     let formWithAppendix2 = await prisma.createForm({
       ...groupingFormData,
+      readableId: getReadableId(),
       recipientCompanySiret: lastRecipientCompany.siret,
       status: "RECEIVED",
       owner: { connect: { id: emitter.id } },

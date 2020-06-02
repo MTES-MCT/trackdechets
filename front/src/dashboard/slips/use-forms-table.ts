@@ -1,4 +1,4 @@
-import { Form } from "../../form/model";
+import { Form } from "../../generated/graphql/types";
 import { useState, useEffect } from "react";
 
 function getKey(object: any, key: string) {

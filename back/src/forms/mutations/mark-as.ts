@@ -1,17 +1,35 @@
 import { interpret, State } from "xstate";
-import { getUserCompanies } from "../../companies/queries/userCompanies";
 import { flattenObjectForDb } from "../form-converter";
 import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
 import { ForbiddenError } from "apollo-server-express";
 import { capitalize } from "../../common/strings";
+import { prisma } from "../../generated/prisma-client";
+import {
+  MutationMarkAsSealedArgs,
+  MutationMarkAsSentArgs,
+  MutationMarkAsReceivedArgs,
+  MutationMarkAsProcessedArgs,
+  MutationSignedByTransporterArgs,
+  MutationMarkAsTempStoredArgs,
+  MutationMarkAsResealedArgs,
+  MutationMarkAsResentArgs,
+  Form,
+  FormStatus
+} from "../../generated/graphql/types";
 
-export async function markAsSealed(_, { id }, context: GraphQLContext) {
+export async function markAsSealed(
+  { id }: MutationMarkAsSealedArgs,
+  context: GraphQLContext
+): Promise<Form> {
   return transitionForm(id, { eventType: "MARK_SEALED" }, context);
 }
 
-export function markAsSent(_, { id, sentInfo }, context: GraphQLContext) {
+export function markAsSent(
+  { id, sentInfo }: MutationMarkAsSentArgs,
+  context: GraphQLContext
+): Promise<Form> {
   return transitionForm(
     id,
     { eventType: "MARK_SENT", eventParams: sentInfo },
@@ -20,10 +38,9 @@ export function markAsSent(_, { id, sentInfo }, context: GraphQLContext) {
 }
 
 export function markAsReceived(
-  _,
-  { id, receivedInfo },
+  { id, receivedInfo }: MutationMarkAsReceivedArgs,
   context: GraphQLContext
-) {
+): Promise<Form> {
   return transitionForm(
     id,
     { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
@@ -32,10 +49,9 @@ export function markAsReceived(
 }
 
 export function markAsProcessed(
-  _,
-  { id, processedInfo },
+  { id, processedInfo }: MutationMarkAsProcessedArgs,
   context: GraphQLContext
-) {
+): Promise<Form> {
   return transitionForm(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
@@ -45,15 +61,14 @@ export function markAsProcessed(
 }
 
 export async function signedByTransporter(
-  _,
-  { id, signingInfo },
+  { id, signingInfo }: MutationSignedByTransporterArgs,
   context: GraphQLContext
-) {
-  const form = await context.prisma.form({ id });
+): Promise<Form> {
+  const form = await prisma.form({ id });
 
   // BSD has already been sent, it must be a signature for frame 18
   if (form.sentAt) {
-    const temporaryStorageDetail = await context.prisma
+    const temporaryStorageDetail = await prisma
       .form({ id })
       .temporaryStorageDetail();
 
@@ -103,10 +118,9 @@ export async function signedByTransporter(
 }
 
 export function markAsTempStored(
-  _,
-  { id, tempStoredInfos },
+  { id, tempStoredInfos }: MutationMarkAsTempStoredArgs,
   context: GraphQLContext
-) {
+): Promise<Form> {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
       update: {
@@ -128,10 +142,9 @@ export function markAsTempStored(
 }
 
 export function markAsResealed(
-  _,
-  { id, resealedInfos },
+  { id, resealedInfos }: MutationMarkAsResealedArgs,
   context: GraphQLContext
-) {
+): Promise<Form> {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
       update: flattenObjectForDb(infos)
@@ -146,7 +159,10 @@ export function markAsResealed(
   );
 }
 
-export function markAsResent(_, { id, resentInfos }, context: GraphQLContext) {
+export function markAsResent(
+  { id, resentInfos }: MutationMarkAsResentArgs,
+  context: GraphQLContext
+): Promise<Form> {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
       update: {
@@ -169,8 +185,8 @@ async function transitionForm(
   context: GraphQLContext,
   transformEventToFormProps = v => v
 ) {
-  const form = await context.prisma.form({ id: formId });
-  const temporaryStorageDetail = await context.prisma
+  const form = await prisma.form({ id: formId });
+  const temporaryStorageDetail = await prisma
     .form({ id: formId })
     .temporaryStorageDetail();
 
@@ -194,7 +210,7 @@ async function transitionForm(
 
   // Machine transitions are always synchronous
   // We subscribe to the transitions and wait for a stable or final position before returning a result
-  return new Promise((resolve, reject) => {
+  return new Promise<Form>((resolve, reject) => {
     formService.start(startingState).onTransition(async state => {
       if (!state.changed) {
         return;
@@ -220,11 +236,11 @@ async function transitionForm(
           eventParams
         );
 
-        const updatedForm = context.prisma.updateForm({
+        const updatedForm = await prisma.updateForm({
           where: { id: formId },
           data: { status: newStatus, ...formPropsFromEvent }
         });
-        resolve(updatedForm);
+        resolve({ ...updatedForm, status: updatedForm.status as FormStatus });
         formService.stop();
       }
     });
@@ -323,7 +339,7 @@ export function logStatusChange(
 ) {
   const diff = getDiff(eventType, eventParams);
 
-  return context.prisma
+  return prisma
     .createStatusLog({
       form: { connect: { id: formId } },
       user: { connect: { id: context.user.id } },

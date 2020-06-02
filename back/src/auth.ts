@@ -1,5 +1,5 @@
-import * as passport from "passport";
-import * as express from "express";
+import passport from "passport";
+import express from "express";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as LocalStrategy } from "passport-local";
@@ -19,7 +19,7 @@ const { JWT_SECRET } = process.env;
 // Set specific type for req.user
 declare global {
   namespace Express {
-    // tslint:disable-next-line:no-empty-interface
+    // eslint:disable-next-line:no-empty-interface
     interface User extends PrismaUser {}
   }
 }

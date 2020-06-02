@@ -1,10 +1,11 @@
 import { prisma, User, UserRole } from "../../generated/prisma-client";
+import { CompanyMember } from "../../generated/graphql/types";
 
 /**
  * Concat active company users and invited company users
  * @param siret
  */
-export async function getCompanyUsers(siret: string) {
+export async function getCompanyUsers(siret: string): Promise<CompanyMember[]> {
   const activeUsers = await getCompanyActiveUsers(siret);
   const invitedUsers = await getCompanyInvitedUsers(siret);
 
@@ -24,19 +25,24 @@ fragment CompanyMember on CompanyAssociation {
 }
 `;
 
-type CompanyMember = Pick<User, "email" | "name" | "isActive">;
+type CompanyMemberFragment = Pick<User, "id" | "email" | "name" | "isActive">;
 
 /**
  * Returns company members that already have an account in TD
  * @param siret
  */
-export function getCompanyActiveUsers(siret: string) {
+export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
   return prisma
     .companyAssociations({ where: { company: { siret } } })
-    .$fragment<{ user: CompanyMember; role: UserRole }[]>(companyMemberFragment)
+    .$fragment<{ user: CompanyMemberFragment; role: UserRole }[]>(
+      companyMemberFragment
+    )
     .then(associations =>
       associations.map(a => {
-        return { ...a.user, role: a.role, isPendingInvitation: false };
+        return {
+          ...a.user,
+          isPendingInvitation: false
+        };
       })
     );
 }
@@ -46,7 +52,9 @@ export function getCompanyActiveUsers(siret: string) {
  * but whose account haven't been created yet
  * @param siret
  */
-export async function getCompanyInvitedUsers(siret: string) {
+export async function getCompanyInvitedUsers(
+  siret: string
+): Promise<CompanyMember[]> {
   const hashes = await prisma.userAccountHashes({
     where: { companySiret: siret }
   });

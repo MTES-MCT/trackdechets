@@ -2,7 +2,7 @@ import React from "react";
 import { Mutation } from "@apollo/react-components";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import gql from "graphql-tag";
-import { withRouter, RouteComponentProps } from "react-router";
+import { useLocation, useHistory } from "react-router-dom";
 
 const JOIN_WITH_INVITE = gql`
   mutation JoinWithInvite($hash: String!, $name: String!, $password: String!) {
@@ -13,9 +13,10 @@ const JOIN_WITH_INVITE = gql`
   }
 `;
 
-type Props = { hash: string };
-export default withRouter(function Invite(props: Props & RouteComponentProps) {
-  const hash = decodeURIComponent(props.location.search.replace("?hash=", ""));
+export default function Invite() {
+  const location = useLocation();
+  const history = useHistory();
+  const hash = decodeURIComponent(location.search.replace("?hash=", ""));
 
   return (
     <Mutation mutation={JOIN_WITH_INVITE}>
@@ -38,7 +39,7 @@ export default withRouter(function Invite(props: Props & RouteComponentProps) {
           onSubmit={(values, { setStatus, setSubmitting }) => {
             const { passwordConfirmation, ...payload } = values;
             joinWithInvite({ variables: payload })
-              .then((_) => props.history.push("/login"))
+              .then((_) => history.push("/login"))
               .catch((_) => setStatus("Erreur technique."))
               .then((_) => setSubmitting(false));
           }}
@@ -97,4 +98,4 @@ export default withRouter(function Invite(props: Props & RouteComponentProps) {
       )}
     </Mutation>
   );
-});
+}

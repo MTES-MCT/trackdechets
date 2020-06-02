@@ -1,19 +1,23 @@
-import { useLazyQuery, useMutation } from "@apollo/react-hooks";
-import cogoToast from "cogo-toast";
-import { Field, Form, Formik, useFormikContext } from "formik";
+import React, { useState } from "react";
+import { useMutation } from "@apollo/react-hooks";
+import { Field, Form, Formik, FormikProps, FormikValues } from "formik";
 import gql from "graphql-tag";
-import React, { useEffect, useRef, useState } from "react";
-import { FaHourglassHalf } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
-import { NotificationError } from "../common/Error";
-import Loader from "../common/Loader";
-import RedErrorMessage from "../common/RedErrorMessage";
 import { GET_ME } from "../dashboard/Dashboard";
-import { Company } from "../form/company/CompanySelector";
-import { COMPANY_INFOS } from "../form/company/query";
+import { NotificationError } from "../common/Error";
+import RedErrorMessage from "../common/RedErrorMessage";
 import CompanyType from "../login/CompanyType";
+import AccountCompanyAddTransporterReceipt from "./accountCompanyAdd/AccountCompanyAddTransporterReceipt";
+import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAddTraderReceipt";
+import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
-import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
+import { FaHourglassHalf } from "react-icons/fa";
+import {
+  Mutation,
+  MutationCreateCompanyArgs,
+  Query,
+  CompanyType as _CompanyType,
+} from "../generated/graphql/types";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -36,104 +40,289 @@ const CREATE_UPLOAD_LINK = gql`
   }
 `;
 
+const CREATE_TRANSPORTER_RECEIPT = gql`
+  mutation CreateTransporterReceipt($input: CreateTransporterReceiptInput!) {
+    createTransporterReceipt(input: $input) {
+      id
+    }
+  }
+`;
+
+const CREATE_TRADER_RECEIPT = gql`
+  mutation CreateTraderReceipt($input: CreateTraderReceiptInput!) {
+    createTraderReceipt(input: $input) {
+      id
+    }
+  }
+`;
+
+interface Values extends FormikValues {
+  siret: string;
+  companyName: string;
+  address: string;
+  companyTypes: _CompanyType[];
+  gerepId: string;
+  codeNaf: string;
+  document: File | null;
+  isAllowed: boolean;
+  transporterReceiptNumber: string;
+  transporterReceiptValidity: string;
+  transporterReceiptDepartment: string;
+  traderReceiptNumber: string;
+  traderReceiptValidity: string;
+  traderReceiptDepartment: string;
+}
+
+/**
+ * This component allows to create a company and make
+ * the logged in user admin of it
+ */
 export default function AccountCompanyAdd() {
   const history = useHistory();
-  const [companyInfos, setCompanyInfos] = useState<Company | null>(null);
-  const [uploadedFile, setUploadedFile] = useState();
 
-  const [
-    createCompany,
-    { loading: savingCompany, error: savingError },
-  ] = useMutation(CREATE_COMPANY, {
-    update(cache, { data: { createCompany } }) {
-      const getMeQuery = cache.readQuery<{ me: any }>({ query: GET_ME });
-      if (getMeQuery == null) {
-        return;
+  // STATES
+  const [toggleForm, setToggleForm] = useState(false);
+
+  // QUERIES AND MUTATIONS
+  const [createCompany, { error: savingError }] = useMutation<
+    Pick<Mutation, "createCompany">,
+    MutationCreateCompanyArgs
+  >(CREATE_COMPANY, {
+    update(cache, { data }) {
+      if (data) {
+        const createCompany = data.createCompany;
+        const getMeQuery = cache.readQuery<Pick<Query, "me">>({
+          query: GET_ME,
+        });
+        if (getMeQuery == null) {
+          return;
+        }
+        const { me } = getMeQuery;
+
+        const companies = me.companies || [];
+        companies.push(createCompany);
+
+        me.companies = companies;
+
+        cache.writeQuery({
+          query: GET_ME,
+          data: { me },
+        });
       }
-      const { me } = getMeQuery;
-      me.companies = (me.companies || []).push(createCompany);
-
-      cache.writeQuery({
-        query: GET_ME,
-        data: { me },
-      });
     },
   });
-  const [getCompanyInfos, { loading, data, error }] = useLazyQuery(
-    COMPANY_INFOS
-  );
 
-  const [createUploadLink, { data: uploadLinkData }] = useMutation<{
+  const [
+    createTransporterReceipt,
+    { error: createTransporterReceiptError },
+  ] = useMutation(CREATE_TRANSPORTER_RECEIPT);
+
+  const [
+    createTraderReceipt,
+    { error: createTraderReceiptError },
+  ] = useMutation(CREATE_TRADER_RECEIPT);
+
+  const [createUploadLink, { error: uploadError }] = useMutation<{
     createUploadLink: { signedUrl: string; key: string };
   }>(CREATE_UPLOAD_LINK);
 
-  useEffect(() => {
-    if (data?.companyInfos == null) {
-      return;
+  /**
+   * Callback passed to AccountCompanyAddSiret to update the form
+   * based on the result of { query { companyInfos } }
+   * @param companyInfos
+   * @param param1
+   */
+  function onCompanyInfos(
+    companyInfos,
+    {
+      values,
+      setFieldValue,
+    }: Pick<FormikProps<any>, "values" | "setFieldValue">
+  ) {
+    // auto-complete field name
+    setFieldValue("companyName", companyInfos?.name || "");
+
+    // auto-complete field address
+    setFieldValue("address", companyInfos?.address || "");
+
+    // auto-complete field gerepId
+    setFieldValue("gerepId", companyInfos?.installation?.codeS3ic || "");
+
+    // auto-complete field codeNaf
+    setFieldValue("codeNaf", companyInfos?.naf || "");
+
+    // auto-complete companyTypes
+    if (companyInfos && companyInfos.installation) {
+      let categories = companyInfos.installation.rubriques
+        .filter((r) => !!r.category) // null blocks form submitting
+        .map((r) => r.category);
+      const companyTypes = categories.filter((value, index, self) => {
+        return self.indexOf(value) === index;
+      });
+      const currentValue = values.companyTypes;
+      setFieldValue("companyTypes", [...currentValue, ...companyTypes]);
     }
-    if (data.companyInfos.isRegistered) {
-      cogoToast.error(
-        "Ce SIRET existe déjà dans Trackdéchets, impossible de le re-créer."
-      );
-      setCompanyInfos(null);
 
-      return;
+    setToggleForm(!!companyInfos);
+  }
+
+  function isTransporter(companyTypes) {
+    return companyTypes.includes(_CompanyType.Transporter);
+  }
+
+  function isTrader(companyTypes) {
+    return companyTypes.includes(_CompanyType.Trader);
+  }
+
+  /**
+   * Form submission callback
+   * @param values form values
+   */
+  async function onSubmit(values: Values) {
+    const {
+      address,
+      isAllowed,
+      document,
+      transporterReceiptNumber,
+      transporterReceiptValidity,
+      transporterReceiptDepartment,
+      traderReceiptNumber,
+      traderReceiptValidity,
+      traderReceiptDepartment,
+      ...companyInput
+    } = values;
+
+    let documentKeys = [] as string[];
+
+    if (document) {
+      // upload files if any
+
+      const { name: fileName, type: fileType } = document;
+
+      // Retrieves a signed URL
+
+      const { data } = await createUploadLink({
+        variables: { fileName, fileType },
+      });
+
+      if (data) {
+        // upload file to signed URL
+        const uploadLink = data.createUploadLink;
+        await fetch(uploadLink.signedUrl, {
+          method: "PUT",
+          body: document,
+          headers: {
+            "Content-Type": fileType,
+            "x-amz-acl": "private",
+          },
+        });
+        documentKeys = [uploadLink.key];
+      }
     }
 
-    if (data.companyInfos.etatAdministratif === "F") {
-      cogoToast.error("Cet établissement est fermé, impossible de le créer");
-      setCompanyInfos(null);
-      return;
-    }
+    let transporterReceiptId: string | null = null;
 
-    setCompanyInfos(data.companyInfos);
-  }, [data]);
-
-  // Once we have a signed URL to upload to, upload the file and update `uploadLinkData`
-  useEffect(() => {
+    // create transporter receipt if any
     if (
-      !uploadLinkData?.createUploadLink?.signedUrl ||
-      uploadedFile.key === uploadLinkData.createUploadLink.key
+      !!transporterReceiptNumber &&
+      !!transporterReceiptValidity &&
+      !!transporterReceiptDepartment &&
+      isTransporter(values.companyTypes)
     ) {
-      return;
+      // all fields should be set
+      const input = {
+        receiptNumber: transporterReceiptNumber,
+        validityLimit: transporterReceiptValidity,
+        department: transporterReceiptDepartment,
+      };
+
+      const { data } = await createTransporterReceipt({
+        variables: { input },
+      });
+
+      if (data) {
+        transporterReceiptId = data.createTransporterReceipt.id;
+      }
     }
 
-    fetch(uploadLinkData.createUploadLink.signedUrl, {
-      method: "PUT",
-      body: uploadedFile.file,
-      headers: {
-        "Content-Type": uploadedFile.fileType,
-        "x-amz-acl": "private",
-      },
-    }).then((_) =>
-      setUploadedFile({
-        ...uploadedFile,
-        key: uploadLinkData.createUploadLink.key,
-      })
-    );
-  }, [uploadLinkData, uploadedFile]);
+    let traderReceiptId: string | null = null;
 
-  if (savingCompany) {
-    return <Loader />;
+    // create trader receipt if any
+    if (
+      !!traderReceiptNumber &&
+      !!traderReceiptValidity &&
+      !!traderReceiptDepartment &&
+      isTrader(values.companyTypes)
+    ) {
+      // all fields should be set
+      const input = {
+        receiptNumber: traderReceiptNumber,
+        validityLimit: traderReceiptValidity,
+        department: traderReceiptDepartment,
+      };
+
+      const { data } = await createTraderReceipt({
+        variables: { input },
+      });
+
+      if (data) {
+        traderReceiptId = data.createTraderReceipt.id;
+      }
+    }
+
+    await createCompany({
+      variables: {
+        companyInput: {
+          ...companyInput,
+          documentKeys,
+          transporterReceiptId,
+          traderReceiptId,
+        },
+      },
+    });
+
+    history.push("/dashboard");
   }
 
   return (
     <div className="panel">
-      {savingError && <NotificationError apolloError={savingError} />}
-
-      <Formik
+      <Formik<Values>
         initialValues={{
           siret: "",
+          companyName: "",
+          address: "",
           companyTypes: [],
           gerepId: "",
           codeNaf: "",
-          documentKeys: [],
+          document: null,
           isAllowed: false,
+          transporterReceiptNumber: "",
+          transporterReceiptValidity: "",
+          transporterReceiptDepartment: "",
+          traderReceiptNumber: "",
+          traderReceiptValidity: "",
+          traderReceiptDepartment: "",
         }}
         validate={(values) => {
+          // whether or not one of the transporter receipt field is set
+          const anyTransporterReceipField =
+            !!values.transporterReceiptNumber ||
+            !!values.transporterReceiptValidity ||
+            !!values.transporterReceiptDepartment;
+
+          const isTransporter_ = isTransporter(values.companyTypes);
+
+          // whether or not one of the transporter receipt field is set
+          const anyTraderReceipField =
+            !!values.traderReceiptNumber ||
+            !!values.traderReceiptValidity ||
+            !!values.traderReceiptDepartment;
+
+          const isTrader_ = isTrader(values.companyTypes);
+
           return {
             ...(values.companyTypes.length === 0 && {
-              companyTypes: "Vous devez préciser le type de compagnie",
+              companyTypes: "Vous devez préciser le type d'établissement",
             }),
             ...(!values.isAllowed && {
               isAllowed:
@@ -142,135 +331,146 @@ export default function AccountCompanyAdd() {
             ...(values.siret.replace(/\s/g, "").length !== 14 && {
               siret: "Le SIRET doit faire 14 caractères",
             }),
+            ...(anyTransporterReceipField &&
+              isTransporter_ &&
+              !values.transporterReceiptNumber && {
+                transporterReceiptNumber: "Champ obligatoire",
+              }),
+            ...(anyTransporterReceipField &&
+              isTransporter_ &&
+              !values.transporterReceiptValidity && {
+                transporterReceiptValidity: "Champ obligatoire",
+              }),
+            ...(anyTraderReceipField &&
+              isTrader_ &&
+              !values.traderReceiptDepartment && {
+                traderReceiptDepartment: "Champ obligatoire",
+              }),
+            ...(anyTraderReceipField &&
+              isTrader_ &&
+              !values.traderReceiptNumber && {
+                traderReceiptNumber: "Champ obligatoire",
+              }),
+            ...(anyTraderReceipField &&
+              isTrader_ &&
+              !values.traderReceiptValidity && {
+                traderReceiptValidity: "Champ obligatoire",
+              }),
+            ...(anyTraderReceipField &&
+              isTrader_ &&
+              !values.traderReceiptDepartment && {
+                traderReceiptDepartment: "Champ obligatoire",
+              }),
           };
         }}
-        onSubmit={(values) => {
-          const { isAllowed, ...companyInput } = values;
-          const companyName = companyInfos ? companyInfos.name || "" : "";
-          createCompany({
-            variables: { companyInput: { ...companyInput, companyName } },
-          }).then((_) => {
-            history.push("/dashboard/slips");
-          });
-        }}
+        onSubmit={onSubmit}
       >
-        {({ values, isSubmitting }) => (
-          <Form className={styles.companyForm}>
-            <h5>
-              Commencez par indiquer le SIRET de ce nouvel établissement...
-            </h5>
-            <div className={styles.field}>
-              <label>SIRET*</label>
-
-              <div className="form__group">
-                <Field type="text" name="siret" />
-                <button
-                  className="button secondary"
-                  type="button"
-                  onClick={() => {
-                    const trimedSiret = values.siret.replace(/\s/g, "");
-                    if (trimedSiret.length !== 14) {
-                      return;
-                    }
-                    getCompanyInfos({ variables: { siret: trimedSiret } });
-                  }}
-                >
-                  {loading ? <FaHourglassHalf /> : "Valider"}
-                </button>
-
-                <UpdateSiretRelatedFields companyInfos={companyInfos} />
-
-                <RedErrorMessage name="siret" />
-              </div>
-            </div>
-
-            {error && <NotificationError apolloError={error} />}
-            {companyInfos && (
+        {({ values, setFieldValue, isSubmitting }) => (
+          <Form className={styles.companyAddForm}>
+            <h5 className={styles.subtitle}>Identification</h5>
+            <AccountCompanyAddSiret
+              {...{
+                values,
+                onCompanyInfos: (companyInfo) =>
+                  onCompanyInfos(companyInfo, { values, setFieldValue }),
+              }}
+            />
+            {toggleForm && (
               <>
-                <AccountFieldNotEditable
-                  label="Nom de l'entreprise"
-                  name="name"
-                  value={companyInfos?.name || "____________"}
-                />
-
-                <AccountFieldNotEditable
-                  label="Adresse"
-                  name="address"
-                  value={companyInfos?.address || "____________"}
-                />
-
-                {companyInfos?.installation && (
-                  <AccountFieldNotEditable
-                    label="Installation classée mdresse"
-                    name="codeS3ic"
-                    value={companyInfos?.installation.codeS3ic}
-                  />
-                )}
-
-                <h5>Donnez nous un peu plus de détail...</h5>
+                <div className={styles.field}>
+                  <label className={`text-right ${styles.bold}`}>
+                    Nom de l'entreprise
+                  </label>
+                  <div className={styles.field__value}>
+                    <Field type="text" name="companyName" />
+                  </div>
+                </div>
 
                 <div className={styles.field}>
-                  <label>Vous êtes*</label>
-                  <div className="form__group">
+                  <label className={`text-right ${styles.bold}`}>
+                    Code NAF
+                  </label>
+                  <div className={styles.field__value}>
+                    <Field type="text" name="codeNaf" />
+                  </div>
+                </div>
+
+                <div className={styles.field}>
+                  <label className={`text-right ${styles.bold}`}>Adresse</label>
+                  <div className={styles.field__value}>
+                    <Field type="text" name="address" />
+                  </div>
+                </div>
+
+                <div className={styles.field}>
+                  <label className={`text-right ${styles.bold}`}>
+                    Justificatif (optionnel)
+                  </label>
+
+                  <div className={styles.field__value}>
+                    <input
+                      type="file"
+                      className="button"
+                      accept="image/png, image/jpeg, image/gif, application/pdf "
+                      onChange={async (event) => {
+                        const file = event.currentTarget.files?.item(0);
+                        if (!!file) {
+                          setFieldValue("document", file);
+                        }
+                      }}
+                    />
+                    <div className={styles.smaller}>
+                      KBIS, justificatif du siège social de l'entreprise... Ce
+                      document est suceptible d'être vérifié par l'équipe
+                      Trackdéchets afin de lutter contre la fraude. Formats
+                      acceptés: jpeg, png, pdf.
+                    </div>
+                  </div>
+                </div>
+
+                <h5 className={styles.subtitle}>Activité</h5>
+
+                <div className={styles.field}>
+                  <label className={`text-right ${styles.bold}`}>Profil</label>
+                  <div className={styles.field__value}>
                     <Field name="companyTypes" component={CompanyType} />
 
                     <RedErrorMessage name="companyTypes" />
                   </div>
                 </div>
 
-                <div className={styles.field}>
-                  <label>Code NAF</label>
-                  <div className="form__group">
-                    <Field type="text" name="codeNaf" />
-                  </div>
-                </div>
+                {isTransporter(values.companyTypes) && (
+                  <AccountCompanyAddTransporterReceipt />
+                )}
+
+                {isTrader(values.companyTypes) && (
+                  <AccountCompanyAddTraderReceipt />
+                )}
 
                 <div className={styles.field}>
-                  <label>Identifiant GEREP</label>
-                  <div className="form__group">
+                  <label className={`text-right ${styles.bold}`}>
+                    Identifiant GEREP (optionnel)
+                  </label>
+                  <div className={styles.field__value}>
                     <Field type="text" name="gerepId" />
+                    <div className={styles.smaller}>
+                      Gestion Electronique du Registre des Emissions Polluantes.{" "}
+                      <a
+                        href="https://faq.trackdechets.fr/la-gestion-des-dechets-dangereux#quest-ce-quun-identifiant-gerep"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Plus d'informations sur la FAQ
+                      </a>
+                    </div>
                   </div>
                 </div>
 
                 <div className={styles.field}>
-                  <label>Justificatif</label>
-                  <div className="form__group">
-                    <p className={styles.formDescription}>
-                      Pour nous aider à lutter contre la fraude, joignez un
-                      document justifiant de votre légitimité à créer cet
-                      établissement dans Trackdéchet (KBIS, justificatif du
-                      siège social de l'entreprise, CIN à défaut, ou autre...).
-                      Ce document est suceptible d'être vérifié par l'équipe
-                      Trackdéchets.
-                    </p>
-                    <input
-                      type="file"
-                      accept="image/png, image/jpeg, .pdf"
-                      onChange={async (event) => {
-                        const file = event.currentTarget.files?.item(0);
-                        if (!file) {
-                          return;
-                        }
-                        const fileParts = file.name.split(".");
-                        const fileName = fileParts[0];
-                        const fileType = fileParts[1];
-
-                        setUploadedFile({ file, fileName, fileType });
-                        createUploadLink({ variables: { fileName, fileType } });
-                      }}
-                    />
-
-                    <span className={styles.acceptedFormats}>
-                      Formats acceptés: jpeg, png, pdf.
-                    </span>
-
-                    <UpdateFileField uploadedFile={uploadedFile} />
-                  </div>
-                </div>
-
-                <div className={styles.field}>
-                  <label>Validation*</label>
-                  <div className="form__group">
+                  <label className={`text-right ${styles.bold}`}>
+                    Validation
+                  </label>
+                  <div className={styles.field__value}>
                     <label>
                       <Field type="checkbox" name="isAllowed" />
                       Je certifie disposer du pouvoir pour créer un compte au
@@ -281,13 +481,36 @@ export default function AccountCompanyAdd() {
                   </div>
                 </div>
 
-                <button
-                  className="button large"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  Créer l'entreprise
-                </button>
+                <div className={styles["submit-form"]}>
+                  <button
+                    className="button-outline primary"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      history.goBack();
+                    }}
+                  >
+                    Annuler
+                  </button>
+
+                  <button
+                    className="button"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? <FaHourglassHalf /> : "Créer"}
+                  </button>
+                </div>
+                {/* // ERRORS */}
+                {uploadError && <NotificationError apolloError={uploadError} />}
+                {createTransporterReceiptError && (
+                  <NotificationError
+                    apolloError={createTransporterReceiptError}
+                  />
+                )}
+                {createTraderReceiptError && (
+                  <NotificationError apolloError={createTraderReceiptError} />
+                )}
+                {savingError && <NotificationError apolloError={savingError} />}
               </>
             )}
           </Form>
@@ -296,50 +519,3 @@ export default function AccountCompanyAdd() {
     </div>
   );
 }
-
-const UpdateSiretRelatedFields = ({ companyInfos }) => {
-  const { values, setFieldValue } = useFormikContext<any>();
-  const latestValues = useRef(values);
-  useEffect(() => {
-    latestValues.current = values;
-  });
-
-  useEffect(() => {
-    if (companyInfos == null) {
-      return;
-    }
-
-    // auto-complete field gerepId
-    setFieldValue(
-      "gerepId",
-      companyInfos.installation ? companyInfos.installation.codeS3ic : ""
-    );
-
-    // auto-complete field codeNaf
-    setFieldValue("codeNaf", companyInfos.naf || "");
-
-    // auto-complete companyTypes
-    if (companyInfos.installation) {
-      let categories = companyInfos.installation.rubriques
-        .filter((r) => !!r.category) // null blocks form submitting
-        .map((r) => r.category);
-      const companyTypes = categories.filter((value, index, self) => {
-        return self.indexOf(value) === index;
-      });
-      const currentValue = latestValues.current.companyTypes;
-      setFieldValue("companyTypes", [...currentValue, ...companyTypes]);
-    }
-  }, [companyInfos, setFieldValue]);
-
-  return null;
-};
-
-const UpdateFileField = ({ uploadedFile }) => {
-  const { setFieldValue } = useFormikContext<any>();
-
-  useEffect(() => {
-    setFieldValue("documentKeys", [uploadedFile?.key].filter(Boolean));
-  }, [uploadedFile, setFieldValue]);
-
-  return null;
-};

@@ -1,0 +1,9 @@
+/*
+Do not include Tailwind base from time being because it interferes
+with template.data.gouv.fr. We might include it when we get rid
+of (no longer supported) template.data.gouv.fr
+*/
+/* @tailwind base; */
+
+@tailwind components;
+@tailwind utilities;

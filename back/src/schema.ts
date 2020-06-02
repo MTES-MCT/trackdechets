@@ -1,6 +1,6 @@
 import { mergeRulesTrees } from "./utils";
-import { mergeTypeDefs } from "@graphql-toolkit/schema-merging";
-import { loadFiles } from "@graphql-toolkit/file-loading";
+import { mergeTypeDefs } from "@graphql-tools/merge";
+import { loadFilesSync } from "@graphql-tools/load-files";
 import companiesResolvers from "./companies/resolvers";
 import usersResolvers from "./users/resolvers";
 import formsResolvers from "./forms/resolvers";
@@ -17,7 +17,7 @@ const typeDefsPath = repositories.map(
   repository => `${__dirname}/${repository}/*.graphql`
 );
 
-const typeDefsArray = loadFiles(typeDefsPath);
+const typeDefsArray = loadFilesSync(typeDefsPath);
 
 const typeDefs = mergeTypeDefs(typeDefsArray);
 

@@ -1,11 +1,11 @@
 import React from "react";
 import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
-import { Company, CompanyMember } from "./AccountCompany";
 import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
+import { CompanyPrivate } from "../generated/graphql/types";
 
-type Props = { company: Company };
+type Props = { company: CompanyPrivate };
 
 AccountCompanyMemberList.fragments = {
   company: gql`
@@ -31,17 +31,22 @@ export default function AccountCompanyMemberList({ company }: Props) {
           company
         )}
       />
-      <table className="table">
-        <tbody>
-          {company.users.map((user: CompanyMember) => (
-            <AccountCompanyMember
-              key={user.id}
-              company={filter(AccountCompanyMember.fragments.company, company)}
-              user={filter(AccountCompanyMember.fragments.user, user)}
-            />
-          ))}
-        </tbody>
-      </table>
+      {company && company.users && company.users.length > 0 && (
+        <table className="table">
+          <tbody>
+            {company.users.map((user) => (
+              <AccountCompanyMember
+                key={user.id}
+                company={filter(
+                  AccountCompanyMember.fragments.company,
+                  company
+                )}
+                user={filter(AccountCompanyMember.fragments.user, user)}
+              />
+            ))}
+          </tbody>
+        </table>
+      )}
     </>
   );
 }

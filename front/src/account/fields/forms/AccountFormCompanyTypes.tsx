@@ -6,16 +6,21 @@ import CompanyTypes from "../../../login/CompanyType";
 import RedErrorMessage from "../../../common/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
 import { InlineError } from "../../../common/Error";
+import {
+  CompanyType,
+  Mutation,
+  MutationUpdateCompanyArgs,
+} from "../../../generated/graphql/types";
 
 type Props = {
   name: string;
   siret: string;
-  companyTypes: [string];
+  companyTypes: CompanyType[];
   toggleEdition: () => void;
 };
 
 type V = {
-  companyTypes: [string];
+  companyTypes: CompanyType[];
 };
 
 export const UPDATE_COMPANY_TYPES = gql`
@@ -34,7 +39,10 @@ export default function AccountFormCompanyTypes({
   companyTypes,
   toggleEdition,
 }: Props) {
-  const [update, { loading, error }] = useMutation(UPDATE_COMPANY_TYPES, {
+  const [update, { loading, error }] = useMutation<
+    Pick<Mutation, "updateCompany">,
+    Pick<MutationUpdateCompanyArgs, "siret" | "companyTypes">
+  >(UPDATE_COMPANY_TYPES, {
     onCompleted: () => {
       toggleEdition();
     },
@@ -59,7 +67,7 @@ export default function AccountFormCompanyTypes({
           <div className="form__group">
             <Field
               className={styles.input}
-              name="companyTypes"
+              name={name}
               component={CompanyTypes}
             ></Field>
           </div>

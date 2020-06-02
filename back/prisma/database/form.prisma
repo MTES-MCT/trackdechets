@@ -10,7 +10,7 @@ type EcoOrganisme {
 
 type Form {
   id: ID! @id
-  readableId: String @unique
+  readableId: String! @unique
   customId: String
   isDeleted: Boolean @default(value: false)
 
@@ -21,7 +21,7 @@ type Form {
   # Workflow fields
   signedByTransporter: Boolean
 
-  status: String @default(value: "DRAFT")
+  status: String! @default(value: "DRAFT")
   sentAt: DateTime
   sentBy: String
 

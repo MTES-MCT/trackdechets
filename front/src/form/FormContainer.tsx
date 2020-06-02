@@ -5,15 +5,14 @@ import { StepContainer } from "./stepper/Step";
 import StepList from "./stepper/StepList";
 import Transporter from "./Transporter";
 import WasteInfo from "./WasteInfo";
-import { RouteComponentProps } from "react-router";
+import { useParams } from "react-router";
 
-export default function FormContainer({
-  match,
-}: RouteComponentProps<{ id: string }>) {
+export default function FormContainer() {
+  const { id } = useParams();
   return (
     <main className="main">
       <div className="container">
-        <StepList formId={match.params.id}>
+        <StepList formId={id}>
           <StepContainer component={Emitter} title="Émetteur du déchet" />
           <StepContainer component={WasteInfo} title="Détail du déchet" />
           <StepContainer component={Recipient} title="Destination du déchet" />

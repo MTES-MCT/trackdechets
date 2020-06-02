@@ -8,27 +8,7 @@ import RedErrorMessage from "../../common/RedErrorMessage";
 import CompanyResults from "./CompanyResults";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
-
-export type Rubrique = {
-  rubrique: string;
-  alinea: string;
-  category: string;
-};
-
-export type Company = {
-  address: string;
-  name: string;
-  siret: string;
-  naf: string;
-  contact: string;
-  phone: string;
-  mail: string;
-  installation: {
-    codeS3ic: string;
-    urlFiche: string;
-    rubriques: Rubrique[];
-  };
-};
+import { Query, QuerySearchCompaniesArgs } from "../../generated/graphql/types";
 
 function init(selectedCompany) {
   return {
@@ -41,25 +21,6 @@ function init(selectedCompany) {
   };
 }
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "search_input":
-      return { ...state, clue: action.payload };
-    case "department_filter":
-      return { ...state, displayDepartment: action.payload };
-    case "department_input":
-      return { ...state, department: action.payload };
-    case "search_change":
-      return { ...state, ...action.payload };
-    case "company_selected":
-      return { ...state, selectedCompany: action.payload };
-    case "reset":
-      return init(action.payload);
-    default:
-      throw new Error();
-  }
-}
-
 export default function CompanySelector(props) {
   const [field] = useField(props);
   const { setFieldValue } = useFormikContext();
@@ -67,7 +28,32 @@ export default function CompanySelector(props) {
   const [
     searchCompaniesQuery,
     { loading: searchLoading, data: searchData },
-  ] = useLazyQuery(SEARCH_COMPANIES);
+  ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
+    SEARCH_COMPANIES
+  );
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case "search_input":
+        return { ...state, clue: action.payload };
+      case "department_filter":
+        return { ...state, displayDepartment: action.payload };
+      case "department_input":
+        return { ...state, department: action.payload };
+      case "search_change":
+        return { ...state, ...action.payload };
+      case "company_selected": {
+        if (props.onCompanySelected) {
+          props.onCompanySelected(action.payload);
+        }
+        return { ...state, selectedCompany: action.payload };
+      }
+      case "reset":
+        return init(action.payload);
+      default:
+        throw new Error();
+    }
+  }
 
   useEffect(() => {
     dispatch({
@@ -118,7 +104,7 @@ export default function CompanySelector(props) {
   // Load different favorites depending on the object we are filling
   const type = toMacroCase(field.name.split(".")[0]);
 
-  const { loading, error } = useQuery(FAVORITES, {
+  const { loading, error } = useQuery<Pick<Query, "favorites">>(FAVORITES, {
     variables: { type },
     onCompleted: (data) => {
       if (state.selectedCompany.siret === "") {

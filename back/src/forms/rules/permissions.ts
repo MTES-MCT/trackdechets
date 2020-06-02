@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
 import { Prisma } from "../../generated/prisma-client";
 import {
@@ -79,7 +79,7 @@ export const isAllowedToUseAppendix2Forms = rule()(
   }
 );
 
-export const isFormRecipient = and(
+export const isFormEcoOrganisme = and(
   isAuthenticated,
   rule()(async (_, { id }, ctx) => {
     ensureRuleParametersArePresent(id);
@@ -91,9 +91,35 @@ export const isFormRecipient = and(
     );
 
     return (
-      currentUserSirets.includes(formInfos.recipientCompanySiret) ||
+      currentUserSirets.includes(formInfos.ecoOrganisme?.siret) ||
       new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
     );
+  })
+);
+
+export const isFormRecipient = and(
+  isAuthenticated,
+  rule()(async (_, { id }, ctx) => {
+    ensureRuleParametersArePresent(id);
+
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    if (formInfos.recipientIsTempStorage) {
+      return (
+        currentUserSirets.includes(
+          formInfos.temporaryStorageDetail.destinationCompanySiret
+        ) || new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+      );
+    } else {
+      return (
+        currentUserSirets.includes(formInfos.recipientCompanySiret) ||
+        new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+      );
+    }
   })
 );
 
@@ -157,13 +183,59 @@ export const isFormTrader = and(
 
 export const isFormTempStorer = and(
   isAuthenticated,
-  isFormRecipient,
   rule()(async (_, { id }, ctx) => {
-    const form = await ctx.prisma.form({ id });
+    const { formInfos, currentUserSirets } = await getFormAccessInfos(
+      id,
+      ctx.user.id,
+      ctx.prisma
+    );
 
     return (
-      form.recipientIsTempStorage ||
-      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+      (formInfos.recipientIsTempStorage &&
+        currentUserSirets.includes(formInfos.recipientCompanySiret)) ||
+      new ForbiddenError(
+        `Vous n'êtes pas l'installation d'entreposage ou de reconditionnement de ce bordereau.`
+      )
+    );
+  })
+);
+
+export const hasFinalDestination = rule()(async (_, { id }, ctx) => {
+  const temporaryStorageDetail = await ctx.prisma
+    .form({ id })
+    .temporaryStorageDetail();
+  const mandatoryKeys = [
+    "destinationCompanyName",
+    "destinationCompanySiret",
+    "destinationCompanyAddress",
+    "destinationCompanyContact",
+    "destinationCompanyPhone",
+    "destinationCompanyMail"
+  ];
+
+  const hasFinalDestination = mandatoryKeys.every(
+    key => !!temporaryStorageDetail[key]
+  );
+
+  return (
+    hasFinalDestination ||
+    new UserInputError(`Vous devez remplit la destination du bordereau.`)
+  );
+});
+
+export const canAccessFormsWithoutSiret = and(
+  isAuthenticated,
+  rule()(async (_, {}, ctx) => {
+    const currentUserSirets = await getCurrentUserSirets(
+      ctx.user.id,
+      ctx.prisma
+    );
+
+    return (
+      currentUserSirets.length == 1 ||
+      new ForbiddenError(
+        `Vous appartenez à plusieurs entreprises, vous devez spécifier le SIRET dont vous souhaitez récupérer les bordereaux.`
+      )
     );
   })
 );

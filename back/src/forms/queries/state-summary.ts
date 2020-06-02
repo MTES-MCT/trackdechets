@@ -1,34 +1,27 @@
-import { GraphQLContext } from "../../types";
-import { TemporaryStorageDetail } from "../../generated/prisma-client";
-import { Form, FormStatus } from "../../generated/types";
+import { TemporaryStorageDetail, prisma } from "../../generated/prisma-client";
+import { Form } from "../../generated/graphql/types";
 
-export const stateSummary = async (
-  parent: Form,
-  _,
-  context: GraphQLContext
-) => {
-  const temporaryStorageDetail = await context.prisma
-    .form({ id: parent.id })
+export const stateSummary = async (form: Form) => {
+  const temporaryStorageDetail = await prisma
+    .form({ id: form.id })
     .temporaryStorageDetail();
-
   return {
-    quantity: getQuantity(parent, temporaryStorageDetail),
+    quantity: getQuantity(form, temporaryStorageDetail),
     packagings:
       temporaryStorageDetail?.wasteDetailsPackagings ??
-      parent.wasteDetails.packagings,
+      form.wasteDetails.packagings,
     onuCode:
-      temporaryStorageDetail?.wasteDetailsOnuCode ??
-      parent.wasteDetails.onuCode,
+      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails.onuCode,
     transporterNumberPlate: temporaryStorageDetail
       ? temporaryStorageDetail.transporterNumberPlate
-      : parent.transporter.numberPlate,
+      : form.transporter.numberPlate,
     transporterCustomInfo: temporaryStorageDetail
       ? temporaryStorageDetail.transporterNumberPlate
-      : parent.transporter.customInfo,
-    transporter: getTransporter(parent, temporaryStorageDetail),
-    recipient: getRecipient(parent, temporaryStorageDetail),
-    emitter: getEmitter(parent, temporaryStorageDetail),
-    lastActionOn: getLastActionOn(parent, temporaryStorageDetail)
+      : form.transporter.customInfo,
+    transporter: getTransporter(form, temporaryStorageDetail),
+    recipient: getRecipient(form, temporaryStorageDetail),
+    emitter: getEmitter(form, temporaryStorageDetail),
+    lastActionOn: getLastActionOn(form, temporaryStorageDetail)
   };
 };
 
@@ -36,13 +29,13 @@ function getTransporter(
   form: Form,
   temporaryStorageDetail: TemporaryStorageDetail
 ) {
-  if ([FormStatus.Sealed, FormStatus.Draft].includes(form.status)) {
+  if (["SEALED", "DRAFT"].includes(form.status)) {
     return form.transporter?.company;
   }
 
   if (
     temporaryStorageDetail &&
-    [FormStatus.Resealed, FormStatus.TempStored].includes(form.status)
+    ["RESEALED", "TEMP_STORED"].includes(form.status)
   ) {
     return {
       name: temporaryStorageDetail.transporterCompanyName,
@@ -61,10 +54,7 @@ function getRecipient(
   form: Form,
   temporaryStorageDetail: TemporaryStorageDetail
 ) {
-  if (
-    temporaryStorageDetail &&
-    ![FormStatus.Draft, FormStatus.Sent].includes(form.status)
-  ) {
+  if (temporaryStorageDetail && !["DRAFT", "SENT"].includes(form.status)) {
     return {
       name: temporaryStorageDetail.destinationCompanyName,
       siret: temporaryStorageDetail.destinationCompanySiret,
@@ -84,7 +74,7 @@ function getEmitter(
 ) {
   if (
     temporaryStorageDetail &&
-    [FormStatus.TempStored, FormStatus.Resealed].includes(form.status)
+    ["TEMP_STORED", "RESEALED"].includes(form.status)
   ) {
     return form.recipient?.company;
   }
@@ -97,16 +87,16 @@ function getLastActionOn(
   temporaryStorageDetail: TemporaryStorageDetail
 ): string {
   switch (form.status) {
-    case FormStatus.Sent:
+    case "SENT":
       return form.sentAt;
-    case FormStatus.Received:
+    case "RECEIVED":
       return form.receivedAt;
-    case FormStatus.Processed:
+    case "PROCESSED":
       return form.processedAt;
-    case FormStatus.TempStored:
-    case FormStatus.Resealed:
+    case "TEMP_STORED":
+    case "RESEALED":
       return temporaryStorageDetail.tempStorerReceivedAt;
-    case FormStatus.Resent:
+    case "RESENT":
       return temporaryStorageDetail.signedAt;
     default:
       return form.createdAt;

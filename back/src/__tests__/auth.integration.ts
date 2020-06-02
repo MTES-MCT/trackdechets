@@ -1,9 +1,9 @@
 import { resetDatabase } from "../../integration-tests/helper";
-import * as supertest from "supertest";
+import supertest from "supertest";
 import { app, sess } from "../server";
 import { prisma } from "../generated/prisma-client";
 import { loginError } from "../auth";
-import * as queryString from "querystring";
+import queryString from "querystring";
 import { sign } from "jsonwebtoken";
 import { getUid } from "../utils";
 import { userFactory } from "./factories";
@@ -31,9 +31,9 @@ describe("POST /login", () => {
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
 
-    // should redirect to /dashboard/slips
+    // should redirect to /dashboard/
     expect(login.status).toBe(302);
-    expect(login.header.location).toBe(`http://${UI_HOST}/dashboard/slips`);
+    expect(login.header.location).toBe(`http://${UI_HOST}/dashboard/`);
 
     const cookieValue = sessionCookie.match(cookieRegExp)[1];
 
@@ -173,7 +173,7 @@ describe("Authentification with token", () => {
     const res = await request.post("/").send({ query: "{ me { email } }" });
     expect(res.body.errors).toHaveLength(1);
     expect(res.body.errors[0].message).toEqual("Vous n'êtes pas connecté.");
-    expect(res.body.data.me).toBeNull();
+    expect(res.body.data).toBeNull();
   });
 
   it("should authenticate using JWT token", async () => {

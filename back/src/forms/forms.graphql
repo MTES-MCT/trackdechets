@@ -12,7 +12,7 @@ scalar JSON
 
 type Query {
   "Renvoie un BSD, sélectionné par ID"
-  form("Identifiant opaque du BSD" id: ID): Form
+  form("Identifiant opaque du BSD" id: ID): Form!
 
   """
   Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
@@ -22,16 +22,58 @@ type Query {
   forms(
     "SIRET d'un établissement dont je suis membre"
     siret: String
+
     """
+    Nombre de bordereaux retournés.
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+
+    """
+    Nombre d'éléments à ne pas récupérer en début de liste
+    Permet de paginer les résultats
+    Défaut à 0
+    """
+    skip: Int
+
+    """
+    (Optionnel) Filtre sur les statuts des bordereaux
+    Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+    Défaut à vide.
+    """
+    status: [FormStatus!]
+
+    """
+    (Optionnel) Filtre sur le role de demandeur dams le bordereau
+    Par exemple:
+     - `roles: [TRANSPORTER]` renverra les bordereaux pour lesquels je suis transporteur
+     - `roles: [EMITTER, RECIPIENT]` renverra les bordereaux dont je suis l'émetteur ou le destinataire final
+    Voir `FormRole` pour la liste des roles sur lesquels il est possible de filtrer.
+    Si aucune filtre n'est passé, les bordereaux seront retournés quel que soit votre role dessus.
+    Défaut à vide.
+    """
+    roles: [FormRole!]
+
+    """
+    (Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+    Si `true`, seul les bordereaux attendant une action sont renvoyés
+    Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
+    Si vide, tous les bordereaux sont renvoyés
+    Défaut à vide.
+    """
+    hasNextStep: Boolean
+
+    """
+    DEPRECATED
     (Optionnel) Type de BSD renvoyés
     ACTOR = BSD's dont on est producteur ou destinataire
     TRANSPORTER = BSD's dont on est transporteur
     """
     type: FormType = ACTOR
-  ): [Form]
+  ): [Form!]!
 
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"
-  stats: [CompanyStat]
+  stats: [CompanyStat!]!
 
   "Renvoie des BSD candidats à un regroupement dans une annexe 2"
   appendixForms(
@@ -39,14 +81,14 @@ type Query {
     siret: String!
     "(Optionnel) Code déchet pour affiner la recherche"
     wasteCode: String
-  ): [Form]
+  ): [Form!]!
 
   """
   Renvoie un token pour télécharger un pdf de BSD
   Ce token doit être transmis à la route /download pour obtenir le fichier.
   Il est valable 10 secondes
   """
-  formPdf("ID d'un BSD" id: ID): FileDownload
+  formPdf("ID d'un BSD" id: ID): FileDownload!
 
   """
   Renvoie un token pour télécharger un csv du regsitre
@@ -58,7 +100,7 @@ type Query {
     sirets: [String]
     "Type d'export"
     exportType: FormsRegisterExportType
-  ): FileDownload
+  ): FileDownload!
 
   """
   Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
@@ -78,7 +120,7 @@ type Query {
     cursorBefore: String
     "(Optionnel) ID d'un BSD en particulier"
     formId: ID
-  ): formsLifeCycleData
+  ): formsLifeCycleData!
 }
 
 type Mutation {
@@ -224,11 +266,24 @@ enum FormStatus {
 
 "Valeur possibles pour le filtre de la query `forms`"
 enum FormType {
-  "Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)"
+  "DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)"
   ACTOR
 
   "Uniquement les BSD's dont je suis transporteur"
   TRANSPORTER
+}
+
+enum FormRole {
+  "Les BSD's dont je suis transporteur"
+  TRANSPORTER
+  "Les BSD's dont je suis la destination de traitement"
+  RECIPIENT
+  "Les BSD's dont je suis l'émetteur"
+  EMITTER
+  "Les BSD's dont je suis le négociant"
+  TRADER
+  "Les BSD's dont je suis éco-organisme"
+  ECO_ORGANISME
 }
 
 """
@@ -237,10 +292,10 @@ Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/p
 """
 type Form {
   "Identifiant interne du BSD"
-  id: ID
+  id: ID!
 
   "Identifiant utilisé dans la case 'Bordereau n° ****'"
-  readableId: String
+  readableId: String!
 
   """
   Identifiant personnalisé permettant de faire le lien avec un
@@ -273,7 +328,7 @@ type Form {
   ownerId: Int
 
   "Statut du BSD (brouillon, envoyé, reçu, traité, etc)"
-  status: FormStatus
+  status: FormStatus!
 
   "Si oui ou non le BSD a été signé par un transporteur"
   signedByTransporter: Boolean
@@ -325,7 +380,7 @@ type Form {
   nextDestination: NextDestination
 
   "Annexe 2"
-  appendix2Forms: [Form]
+  appendix2Forms: [Form!]
 
   ecoOrganisme: EcoOrganisme
 
@@ -350,7 +405,7 @@ type StateSummary {
   quantity: Float
 
   "Packaging le plus à jour"
-  packagings: [Packagings]
+  packagings: [Packagings!]!
 
   "Code ONU le plus à jour"
   onuCode: String
@@ -379,7 +434,10 @@ type TemporaryStorageDetail {
   "Établissement qui sotcke temporairement le déchet (case 13)"
   temporaryStorer: TemporaryStorer
 
-  "Indique si le cadre 14 est rempli par l'émetteur du bordereau ou l'installation d'entreprosage"
+  """
+  Installation de destination prévue (case 14) à remplir par le producteur ou
+  le site d'entreposage provisoire
+  """
   destination: Destination
 
   "Détails du déchet (cases 15, 16 et 17)"
@@ -581,7 +639,7 @@ type WasteDetails {
   onuCode: String
 
   "Conditionnement"
-  packagings: [Packagings]
+  packagings: [Packagings!]!
 
   "Autre packaging (préciser)"
   otherPackaging: String
@@ -620,19 +678,19 @@ type CompanyStat {
   company: FormCompany
 
   "Liste des statistiques"
-  stats: [Stat]
+  stats: [Stat!]!
 }
 
 "Statistiques"
 type Stat {
   "Code déchet"
-  wasteCode: String
+  wasteCode: String!
 
   "Quantité entrante"
-  incoming: Float
+  incoming: Float!
 
   "Qantité sortante"
-  outgoing: Float
+  outgoing: Float!
 }
 
 """
@@ -695,7 +753,7 @@ type StatusLog {
 "Informations du cycle de vie des bordereaux"
 type formsLifeCycleData {
   "Liste des changements de statuts"
-  statusLogs: [StatusLog]
+  statusLogs: [StatusLog!]!
 
   "pagination, indique si d'autres pages existent après"
   hasNextPage: Boolean

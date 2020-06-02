@@ -1,4 +1,4 @@
-import { Updater, registerUpdater } from ".";
+import { Updater, registerUpdater } from "./helper/helper";
 import { prisma, CompanyType } from "../../src/generated/prisma-client";
 
 @registerUpdater(

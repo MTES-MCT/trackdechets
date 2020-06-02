@@ -2,10 +2,13 @@ import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
-import { Company } from "../AccountCompany";
+import {
+  CompanyPrivate,
+  MutationUpdateCompanyArgs,
+} from "../../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 AccountFielCompanyGerepId.fragments = {
@@ -34,7 +37,7 @@ export default function AccountFielCompanyGerepId({ company }: Props) {
       label="Identifiant GEREP"
       value={company.gerepId}
       renderForm={(toggleEdition) => (
-        <AccountFormSimpleInput<{ gerepId: string }>
+        <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
           name="gerepId"
           type="text"
           value={company.gerepId}

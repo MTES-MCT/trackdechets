@@ -1,12 +1,12 @@
 import React from "react";
 import gql from "graphql-tag";
-import { Company, UserRole } from "../AccountCompany";
 import AccountField from "./AccountField";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormCompanySecurityCode from "./forms/AccountFormCompanySecurityCode";
+import { CompanyPrivate, UserRole } from "../../generated/graphql/types";
 
 type Props = {
-  company: Company;
+  company: CompanyPrivate;
 };
 
 AccountFielCompanySecurityCode.fragments = {
@@ -29,7 +29,7 @@ const fieldLabel = "Code de sécurité";
 export default function AccountFielCompanySecurityCode({ company }: Props) {
   return (
     <>
-      {company.userRole === UserRole.ADMIN ? (
+      {company.userRole === UserRole.Admin ? (
         <AccountField
           name={fieldName}
           label={fieldLabel}

@@ -2,6 +2,7 @@ import { prisma, Company } from "../../generated/prisma-client";
 import { getInstallation } from "./installation";
 import { searchCompany } from "../sirene";
 import { UserInputError } from "apollo-server-express";
+import { CompanyPublic } from "../../generated/graphql/types";
 /**
  * This function is used to return public company
  * information for a specific siret. It merge info
@@ -10,7 +11,7 @@ import { UserInputError } from "apollo-server-express";
  *
  * @param siret
  */
-export async function getCompanyInfos(siret: string) {
+export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
   // retrieve cached info from SIRENE database
   const sireneCompanyInfo = await searchCompany(siret);
 

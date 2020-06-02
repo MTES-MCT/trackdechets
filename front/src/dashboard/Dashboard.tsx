@@ -1,17 +1,17 @@
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import React, { useState } from "react";
-import { Redirect, Route } from "react-router";
-import { useRouteMatch } from "react-router-dom";
+import React from "react";
+import { Redirect, Route, useHistory } from "react-router";
+import { useParams, useRouteMatch } from "react-router-dom";
 import { InlineError } from "../common/Error";
 import Loader from "../common/Loader";
-import { Me } from "../login/model";
 import { currentSiretService } from "./CompanySelector";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
-import Exports from "./exports/exports";
+import Exports from "./exports/Exports";
 import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
+import { Query } from "../generated/graphql/types";
 
 export const GET_ME = gql`
   {
@@ -28,64 +28,67 @@ export const GET_ME = gql`
   }
 `;
 
-interface MeData {
-  me: Me;
-}
-
-type S = {
-  activeSiret: string;
-};
+export const SiretContext = React.createContext({
+  siret: "",
+});
 
 export default function Dashboard() {
-  const [activeSiret, setActiveSiret] = useState("");
-  const { loading, error, data } = useQuery<MeData>(GET_ME, {
-    onCompleted: (data) => {
-      // try to retrieve current siret from localstorage, if not set use siret from first associated company
-      let currentSiret = currentSiretService.getSiret();
-      if (!currentSiret) {
-        const companies = data.me.companies;
-        currentSiret = companies.length > 0 ? data.me.companies[0].siret : "";
-        currentSiretService.setSiret(currentSiret);
+  const match = useRouteMatch();
+  const { siret } = useParams();
+  const history = useHistory();
+
+  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
+    onCompleted: () => {
+      if (siret) {
+        currentSiretService.setSiret(siret);
+        return;
       }
-      setActiveSiret(currentSiret);
     },
   });
-  const match = useRouteMatch();
 
   if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
-  if (!data) return <p>Aucune donnée à afficher</p>;
 
-  // As long as you don't belong to a company, you can't access the dashnoard
-  if (data.me.companies.length === 0) {
-    return <Redirect to="/account/companies" />;
+  if (data) {
+    const companies = data.me.companies;
+
+    // As long as you don't belong to a company, you can't access the dashnoard
+    if (!companies || companies.length === 0) {
+      return <Redirect to="/account/companies" />;
+    }
+
+    if (!siret) return <Redirect to={`${match.url}/${companies[0].siret}`} />;
+
+    return (
+      <SiretContext.Provider value={{ siret }}>
+        <div id="dashboard" className="dashboard">
+          <DashboardMenu
+            me={data.me}
+            match={match}
+            handleCompanyChange={(siret) => history.push(`/dashboard/${siret}`)}
+          />
+
+          <div className="dashboard-content">
+            <Route exact path={match.url}>
+              <Redirect to={`${match.url}/slips`} />
+            </Route>
+
+            <Route path={`${match.url}/slips`}>
+              <SlipsContainer />
+            </Route>
+
+            <Route path={`${match.url}/transport`}>
+              <Transport />
+            </Route>
+
+            <Route path={`${match.url}/exports`}>
+              <Exports me={data.me} />
+            </Route>
+          </div>
+        </div>
+      </SiretContext.Provider>
+    );
   }
 
-  if (!activeSiret) return null;
-
-  return (
-    <div id="dashboard" className="dashboard">
-      <DashboardMenu
-        me={data.me}
-        match={match}
-        siret={activeSiret}
-        handleCompanyChange={setActiveSiret}
-      />
-
-      <div className="dashboard-content">
-        <Route
-          path={`${match.path}/slips`}
-          render={() => <SlipsContainer me={data.me} siret={activeSiret} />}
-        />
-        <Route
-          path={`${match.path}/transport`}
-          render={() => <Transport me={data.me} siret={activeSiret} />}
-        />
-        <Route
-          path={`${match.path}/exports`}
-          render={() => <Exports me={data.me} />}
-        />
-      </div>
-    </div>
-  );
+  return <p>Aucune donnée à afficher</p>;
 }

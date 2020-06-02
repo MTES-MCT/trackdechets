@@ -1,4 +1,5 @@
 import { inputRule } from "graphql-shield";
+import { validDatetime } from "../../forms/rules/validation-helpers";
 const SUPPORTED_FORMATS = [
   "image/jpg",
   "image/jpeg",
@@ -47,4 +48,122 @@ export const createUploadLinkSchema = inputRule()(
   {
     abortEarly: false
   }
+);
+
+export const createTransporterReceiptSchema = inputRule()(yup =>
+  yup.object({
+    input: yup.object({
+      receiptNumber: yup
+        .string()
+        .required()
+        .nullable(false),
+      validityLimit: validDatetime(
+        {
+          verboseFieldName: "Limite de validité",
+          required: true
+        },
+        yup
+      ),
+      department: yup
+        .string()
+        .required()
+        .nullable(false)
+    })
+  })
+);
+
+export const updateTransporterReceiptSchema = inputRule()(yup =>
+  yup.object({
+    input: yup.object({
+      id: yup
+        .string()
+        .required()
+        .nullable(false),
+      receiptNumber: yup
+        .string()
+        .notRequired()
+        .nullable(),
+      validityLimit: validDatetime(
+        {
+          verboseFieldName: "Limite de validité",
+          required: false
+        },
+        yup
+      ),
+      department: yup
+        .string()
+        .notRequired()
+        .nullable()
+    })
+  })
+);
+
+export const deleteTransporterReceiptSchema = inputRule()(yup =>
+  yup.object({
+    input: yup.object({
+      id: yup
+        .string()
+        .required()
+        .nullable(false)
+    })
+  })
+);
+
+export const createTraderReceiptSchema = inputRule()(yup =>
+  yup.object({
+    input: yup.object({
+      receiptNumber: yup
+        .string()
+        .required()
+        .nullable(false),
+      validityLimit: validDatetime(
+        {
+          verboseFieldName: "Limite de validité",
+          required: true
+        },
+        yup
+      ),
+      department: yup
+        .string()
+        .required()
+        .nullable(false)
+    })
+  })
+);
+
+export const updateTraderReceiptSchema = inputRule()(yup =>
+  yup.object({
+    input: yup.object({
+      id: yup
+        .string()
+        .required()
+        .nullable(false),
+      receiptNumber: yup
+        .string()
+        .notRequired()
+        .nullable(),
+      validityLimit: validDatetime(
+        {
+          verboseFieldName: "Limite de validité",
+          required: false
+        },
+        yup
+      ),
+      department: yup
+        .string()
+        .notRequired()
+        .nullable()
+    })
+  })
+);
+
+export const deleteTraderReceiptSchema = inputRule()(yup =>
+  yup.object({
+    input: yup.object({
+      id: yup
+        .string()
+        .required()
+        .nullable(false)
+    })
+  })
 );

@@ -12,3 +12,5 @@ export const statusLabels: { [key: string]: string } = {
   RESENT: "En attente de réception pour traitement",
   RESEALED: "En attente de départ de l'isntallation provisoire",
 };
+
+export const ITEMS_PER_PAGE = 50;

@@ -95,7 +95,7 @@ export function ensureRuleParametersArePresent(...params: any[]) {
  * @param expectedRoles
  * @param prisma
  */
-async function isUserInCompaniesWithRoles(
+export async function isUserInCompaniesWithRoles(
   userId: string,
   sirets: string[],
   expectedRoles: ["MEMBER" | "ADMIN"] | ["MEMBER", "ADMIN"],

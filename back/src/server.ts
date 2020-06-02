@@ -5,13 +5,12 @@ import {
   ApolloError,
   UserInputError
 } from "apollo-server-express";
-import * as express from "express";
-import * as passport from "passport";
-import * as session from "express-session";
-import * as redisStore from "connect-redis";
-import * as Redis from "ioredis";
-import * as bodyParser from "body-parser";
-import * as cors from "cors";
+import express from "express";
+import passport from "passport";
+import session from "express-session";
+import redisStore from "connect-redis";
+import bodyParser from "body-parser";
+import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
@@ -27,6 +26,7 @@ import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
 import { ErrorCode } from "./common/errors";
+import { redisClient } from "./common/redis";
 
 const {
   SENTRY_DSN,
@@ -151,7 +151,6 @@ app.use(
 
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
-const redisClient = new Redis({ host: "redis" });
 
 export const sess = {
   store: new RedisStore({ client: redisClient }),

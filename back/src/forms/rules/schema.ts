@@ -4,6 +4,7 @@ import {
   PROCESSING_OPERATION_CODES,
   GROUP_CODES
 } from "../../common/constants";
+import { number } from "yup";
 
 export const getReceivedInfoSchema = yup =>
   yup.object({
@@ -247,19 +248,6 @@ export const markAsResealedSchema = inputRule()(
   yup =>
     yup.object().shape({
       resealedInfos: yup.object({
-        destination: yup.object({
-          company: validCompany(
-            { verboseFieldName: "Destinataire du BSD" },
-            yup
-          ),
-          processingOperation: yup
-            .mixed()
-            .oneOf(
-              PROCESSING_OPERATION_CODES,
-              "Cette opération de traitement n'existe pas."
-            ),
-          cap: yup.string().nullable(true)
-        }),
         wasteDetails: yup.object({}),
         transporter: yup.object({
           isExemptedOfReceipt: yup.boolean().nullable(true),
@@ -297,23 +285,30 @@ export const markAsResealedSchema = inputRule()(
   }
 );
 
+/**
+ * The destination is optionnal in the `markAsResealed` and `markAsResend` mutations if it has already been filled.
+ */
+export const temporaryStorageDestinationSchema = inputRule()(yup =>
+  yup.object({
+    resentInfos: yup.object({
+      destination: yup.object({
+        company: validCompany({ verboseFieldName: "Destinataire du BSD" }, yup),
+        processingOperation: yup
+          .mixed()
+          .oneOf(
+            PROCESSING_OPERATION_CODES,
+            "Cette opération de traitement n'existe pas."
+          ),
+        cap: yup.string().nullable(true)
+      })
+    })
+  })
+);
+
 export const markAsResentSchema = inputRule()(
   yup =>
     yup.object().shape({
       resentInfos: yup.object({
-        destination: yup.object({
-          company: validCompany(
-            { verboseFieldName: "Destinataire du BSD" },
-            yup
-          ),
-          processingOperation: yup
-            .mixed()
-            .oneOf(
-              PROCESSING_OPERATION_CODES,
-              "Cette opération de traitement n'existe pas."
-            ),
-          cap: yup.string().nullable(true)
-        }),
         wasteDetails: yup.object({}),
         transporter: yup.object({
           isExemptedOfReceipt: yup.boolean().nullable(true),
@@ -359,4 +354,38 @@ export const markAsResentSchema = inputRule()(
   {
     abortEarly: false
   }
+);
+
+export const formsSchema = inputRule()(yup =>
+  yup.object({
+    siret: yup.string().nullable(),
+    first: yup
+      .number()
+      .lessThan(501)
+      .moreThan(0)
+      .nullable(),
+    skip: yup
+      .number()
+      .moreThan(0)
+      .nullable(),
+    status: yup
+      .array()
+      .of(yup.string())
+      .nullable(),
+    roles: yup
+      .array()
+      .of(
+        yup
+          .string()
+          .oneOf([
+            "TRANSPORTER",
+            "RECIPIENT",
+            "EMITTER",
+            "TRADER",
+            "ECO_ORGANISME",
+            "TEMPORARY_STORER"
+          ])
+      )
+      .nullable()
+  })
 );

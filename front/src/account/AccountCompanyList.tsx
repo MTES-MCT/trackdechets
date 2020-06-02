@@ -1,13 +1,12 @@
 import React from "react";
 import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
-import AccountCompany, { Company } from "./AccountCompany";
-import { FaPlusCircle } from "react-icons/fa";
-import styles from "./AccountCompanyList.module.scss";
-import { useHistory, useRouteMatch, Link } from "react-router-dom";
+import AccountCompany from "./AccountCompany";
+import { useRouteMatch, Link } from "react-router-dom";
+import { CompanyPrivate } from "../generated/graphql/types";
 
 type Props = {
-  companies: [Company];
+  companies: CompanyPrivate[] | null | undefined;
 };
 
 AccountCompanyList.fragments = {
@@ -20,12 +19,11 @@ AccountCompanyList.fragments = {
 };
 
 export default function AccountCompanyList({ companies }: Props) {
-  const history = useHistory();
   const { url } = useRouteMatch();
 
   return (
     <>
-      {companies.length ? (
+      {companies && companies.length > 0 ? (
         companies.map((company) => (
           <AccountCompany
             key={company.siret}
@@ -60,13 +58,6 @@ export default function AccountCompanyList({ companies }: Props) {
           </p>
         </div>
       )}
-
-      <div
-        className={["panel", styles.addCompany].join(" ")}
-        onClick={() => history.push(`${url}/new`)}
-      >
-        <FaPlusCircle /> <h6>Créer un nouvel établissement</h6>
-      </div>
     </>
   );
 }

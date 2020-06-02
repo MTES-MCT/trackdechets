@@ -1,6 +1,7 @@
 import { getNewValidForm } from "../__mocks__/data";
 import { markAsProcessed } from "../mark-as";
 import { flattenObjectForDb } from "../../form-converter";
+import { ProcessedFormInput } from "../../../generated/graphql/types";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
 const formMock = jest.fn(() => Promise.resolve({}));
@@ -12,11 +13,21 @@ function mockFormWith(value) {
 
 const prisma = {
   form: formMock,
-  updateForm: jest.fn(() => Promise.resolve({})),
-  createForm: jest.fn(() => Promise.resolve({})),
-  createStatusLog: jest.fn(() => Promise.resolve({})),
-  updateManyForms: jest.fn(() => Promise.resolve({}))
+  updateForm: jest.fn((...args) => Promise.resolve({})),
+  createForm: jest.fn((...args) => Promise.resolve({})),
+  createStatusLog: jest.fn((...args) => Promise.resolve({})),
+  updateManyForms: jest.fn((...args) => Promise.resolve({}))
 };
+
+jest.mock("../../../generated/prisma-client", () => ({
+  prisma: {
+    form: () => prisma.form(),
+    updateForm: (...args) => prisma.updateForm(...args),
+    createForm: (...args) => prisma.createForm(...args),
+    createStatusLog: (...args) => prisma.createStatusLog(...args),
+    updateManyForms: (...args) => prisma.updateManyForms(...args)
+  }
+}));
 
 const getUserCompaniesMock = jest.fn();
 jest.mock("../../../companies/queries/userCompanies", () => ({
@@ -44,8 +55,10 @@ describe("Forms -> markAsProcessed mutation", () => {
     ]);
 
     await markAsProcessed(
-      null,
-      { id: 1, processedInfo: { noTraceability: true } },
+      {
+        id: "1",
+        processedInfo: { noTraceability: true } as ProcessedFormInput
+      },
       defaultContext
     );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
@@ -66,8 +79,10 @@ describe("Forms -> markAsProcessed mutation", () => {
     ]);
 
     await markAsProcessed(
-      null,
-      { id: 1, processedInfo: { processingOperationDone: "D 14" } },
+      {
+        id: "1",
+        processedInfo: { processingOperationDone: "D 14" } as ProcessedFormInput
+      },
       defaultContext
     );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
@@ -87,7 +102,10 @@ describe("Forms -> markAsProcessed mutation", () => {
       { siret: form.recipient.company.siret }
     ]);
 
-    await markAsProcessed(null, { id: 1, processedInfo: {} }, defaultContext);
+    await markAsProcessed(
+      { id: "1", processedInfo: {} as ProcessedFormInput },
+      defaultContext
+    );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateForm).toHaveBeenCalledWith(
       jasmine.objectContaining({

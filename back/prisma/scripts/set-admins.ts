@@ -1,5 +1,5 @@
 import { prisma } from "../../src/generated/prisma-client";
-import { Updater, registerUpdater } from ".";
+import { Updater, registerUpdater } from "./helper/helper";
 
 @registerUpdater(
   "Set admins",

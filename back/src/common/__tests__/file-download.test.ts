@@ -8,7 +8,7 @@ const redisGetMock: any = jest.fn(() => Promise.reject(null));
 const setInCacheMock = jest.fn(() => Promise.resolve());
 
 jest.mock("../redis", () => ({
-  redis: { get: () => redisGetMock() },
+  redisClient: { get: () => redisGetMock() },
   setInCache: () => setInCacheMock()
 }));
 

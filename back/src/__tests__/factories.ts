@@ -6,8 +6,10 @@ import {
   EmitterType,
   QuantityType,
   prisma,
-  UserRole
+  UserRole,
+  Status
 } from "../generated/prisma-client";
+import crypto from "crypto";
 
 /**
  * Create a user with name and email
@@ -154,7 +156,7 @@ const formdata = {
   traderCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "signe",
-  status: "SENT",
+  status: "SENT" as Status,
   wasteRefusalReason: "",
   recipientCompanySiret: "5678",
   transporterCompanyMail: "transporter@td.io",
@@ -183,9 +185,18 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
+/**
+ * Thread-safe version of getReadableId for tests
+ */
+export function getReadableId() {
+  const uid = crypto.randomBytes(16).toString("hex");
+  return `TD-${uid}`;
+}
+
 export const formFactory = async ({ ownerId, opt = {} }) => {
   const formParams = { ...formdata, ...opt };
   return prisma.createForm({
+    readableId: getReadableId(),
     ...formParams,
     owner: { connect: { id: ownerId } }
   });

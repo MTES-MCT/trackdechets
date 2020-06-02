@@ -4,7 +4,7 @@ import { User, prisma } from "../../generated/prisma-client";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
 import { UserInputError } from "apollo-server-express";
-import { SignupInput } from "../../generated/types";
+import { SignupInput } from "../../generated/graphql/types";
 
 export default async function signup({
   name,

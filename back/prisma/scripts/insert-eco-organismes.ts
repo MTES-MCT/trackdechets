@@ -1,9 +1,10 @@
-import { Updater, registerUpdater } from ".";
+import { Updater, registerUpdater } from "./helper/helper";
 import { prisma } from "../../src/generated/prisma-client";
 
 @registerUpdater(
   "Insert Eco-organismes",
-  `Insert existing eco-organismes in DB if none exist yet`
+  `Insert existing eco-organismes in DB if none exist yet`,
+  false
 )
 export class InsertEcoOrganismesUpdater implements Updater {
   run() {

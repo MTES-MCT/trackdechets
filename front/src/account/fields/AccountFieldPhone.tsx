@@ -3,10 +3,9 @@ import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
+import { User, MutationEditProfileArgs } from "../../generated/graphql/types";
 
-type Me = {
-  phone: string;
-};
+type Me = Pick<User, "phone">;
 
 type Props = {
   me: Me;
@@ -46,12 +45,13 @@ export default function AccountFieldPhone({ me }: Props) {
       label="Téléphone"
       value={me.phone}
       renderForm={(toggleEdition) => (
-        <AccountFormSimpleInput<Me>
+        <AccountFormSimpleInput<Partial<MutationEditProfileArgs>>
           name="phone"
           type="tel"
           value={me.phone}
           placeHolder="Téléphone"
           mutation={UPDATE_PHONE}
+          mutationArgs={{}}
           yupSchema={yupSchema}
           toggleEdition={() => {
             toggleEdition();

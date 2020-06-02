@@ -1,15 +1,39 @@
 import { sendMail } from "../../common/mails.helper";
-import { GraphQLContext } from "../../types";
 import { randomNumber } from "../../utils";
 import { UserInputError } from "apollo-server-express";
-import { User, Company, prisma } from "../../generated/prisma-client";
+import {
+  User,
+  Company,
+  CompanyCreateInput,
+  prisma
+} from "../../generated/prisma-client";
+import {
+  MutationCreateCompanyArgs,
+  CompanyPrivate
+} from "../../generated/graphql/types";
 
+/**
+ * Create a new company and associate it to a user
+ * who becomes the first admin of the company
+ * @param companyInput
+ * @param userId
+ */
 export default async function createCompany(
-  _,
-  { companyInput },
-  context: GraphQLContext
-) {
-  const trimedSiret = companyInput.siret.replace(/\s+/g, "");
+  user: User,
+  { companyInput }: MutationCreateCompanyArgs
+): Promise<CompanyPrivate> {
+  const {
+    siret,
+    codeNaf,
+    gerepId,
+    companyName: name,
+    companyTypes,
+    transporterReceiptId,
+    traderReceiptId,
+    documentKeys
+  } = companyInput;
+
+  const trimedSiret = siret.replace(/\s+/g, "");
 
   const existingCompany = await prisma.$exists
     .company({
@@ -27,24 +51,44 @@ export default async function createCompany(
     );
   }
 
+  const companyCreateInput: CompanyCreateInput = {
+    siret: trimedSiret,
+    codeNaf,
+    gerepId,
+    name,
+    companyTypes: { set: companyTypes },
+    securityCode: randomNumber(4)
+  };
+
+  if (!!transporterReceiptId) {
+    companyCreateInput.transporterReceipt = {
+      connect: { id: transporterReceiptId }
+    };
+  }
+
+  if (!!traderReceiptId) {
+    companyCreateInput.traderReceipt = {
+      connect: { id: traderReceiptId }
+    };
+  }
+
+  if (!!documentKeys && documentKeys.length >= 1) {
+    companyCreateInput.documentKeys = {
+      set: documentKeys
+    };
+  }
+
   const companyAssociationPromise = prisma.createCompanyAssociation({
-    user: { connect: { id: context.user.id } },
+    user: { connect: { id: user.id } },
     company: {
-      create: {
-        siret: trimedSiret,
-        codeNaf: companyInput.codeNaf,
-        gerepId: companyInput.gerepId,
-        name: companyInput.companyName,
-        companyTypes: { set: companyInput.companyTypes },
-        securityCode: randomNumber(4)
-      }
+      create: companyCreateInput
     },
     role: "ADMIN"
   });
 
   const company = await companyAssociationPromise.company();
 
-  await warnIfUserCreatesTooManyCompanies(context.user, company);
+  await warnIfUserCreatesTooManyCompanies(user, company);
 
   return company;
 }

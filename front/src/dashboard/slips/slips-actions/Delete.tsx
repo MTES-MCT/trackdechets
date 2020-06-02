@@ -1,22 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { FaTrash } from "react-icons/fa";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
-import { currentSiretService } from "../../CompanySelector";
 import { useMutation } from "@apollo/react-hooks";
 import { updateApolloCache } from "../../../common/helper";
-import { Form } from "../../../form/model";
+import {
+  Form,
+  Mutation,
+  MutationDuplicateFormArgs,
+} from "../../../generated/graphql/types";
+import { SiretContext } from "../../Dashboard";
 
 type Props = { formId: string };
 
 export default function Delete({ formId }: Props) {
+  const { siret } = useContext(SiretContext);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [deleteForm] = useMutation(mutations.DELETE_FORM, {
+  const [deleteForm] = useMutation<
+    Pick<Mutation, "deleteForm">,
+    MutationDuplicateFormArgs
+  >(mutations.DELETE_FORM, {
     variables: { id: formId },
-    update: (store, { data: { deleteForm } }) => {
+    update: (store, { data }) => {
+      if (!data?.deleteForm) {
+        return;
+      }
+      const deleteForm = data.deleteForm;
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
-        variables: { siret: currentSiretService.getSiret() },
+        variables: { siret, status: ["DRAFT"] },
         getNewData: (data) => ({
           forms: [...data.forms.filter((f) => f.id !== deleteForm.id)],
         }),

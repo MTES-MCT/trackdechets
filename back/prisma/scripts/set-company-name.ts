@@ -1,10 +1,10 @@
-import { Updater, registerUpdater } from ".";
+import { Updater, registerUpdater } from "./helper/helper";
 import { setCompanyName } from "../../src/scripts/prisma/set-company-name";
 
 @registerUpdater(
   "Set company name for records where it was not set at creation",
   `Populate field name`,
-  true
+  false
 )
 export class SetCompanyNameUpdater implements Updater {
   async run() {

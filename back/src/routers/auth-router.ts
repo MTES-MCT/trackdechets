@@ -1,6 +1,6 @@
-import * as express from "express";
-import * as passport from "passport";
-import * as querystring from "querystring";
+import express from "express";
+import passport from "passport";
+import querystring from "querystring";
 import { getUIBaseURL } from "../utils";
 import { sess } from "../server";
 import nocache from "../common/middlewares/nocache";
@@ -25,7 +25,7 @@ authRouter.post("/login", (req, res, next) => {
       );
     }
     req.login(user, () => {
-      const returnTo = req.body.returnTo || "/dashboard/slips";
+      const returnTo = req.body.returnTo || "/dashboard/";
       return res.redirect(`${UI_BASE_URL}${returnTo}`);
     });
   })(req, res, next);
