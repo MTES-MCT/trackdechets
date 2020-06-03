@@ -1,6 +1,6 @@
 import { createLogger, format } from "winston";
-import * as Transport from "winston-transport";
-import * as Graylog2 from "winston-graylog2";
+import Graylog2, { TransportOptions } from "./winston-graylog";
+import Transport from "winston-transport";
 
 // Create a logger with Graylog2 transport to send data
 // to OVH logs data platform. It uses GELF log format over UDP
@@ -22,7 +22,7 @@ const logger = createLogger({
 
 // Add Graylog transport if OVH Logs Data Platform is configured
 if (OVH_LOGS_ACTIVATED === "true") {
-  const graylogOpts: Graylog2.TransportOptions = {
+  const graylogOpts: TransportOptions = {
     graylog: {
       servers: [{ host: OVH_LOGS_HOST, port: parseInt(OVH_LOGS_PORT, 10) }],
       hostname: API_HOST,

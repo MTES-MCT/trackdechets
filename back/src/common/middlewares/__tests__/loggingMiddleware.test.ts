@@ -3,7 +3,7 @@ import * as supertest from "supertest";
 import * as Transport from "winston-transport";
 import * as bodyParser from "body-parser";
 import loggingMiddleware from "../loggingMiddleware";
-import logger from "../../../logger";
+import logger from "../../../logging/logger";
 
 const logMock = jest.fn();
 

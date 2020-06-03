@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import logger from "../../logger";
+import logger from "../../logging/logger";
 
 /**
  * Logging middleware
  */
-export default function(graphQLPath: string) {
+export default function (graphQLPath: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     // Monkey patch res.send to retrieves response body
     let responseBody = null;

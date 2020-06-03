@@ -42,6 +42,7 @@
     "graphql-middleware-sentry": "^3.2.1",
     "graphql-shield": "^7.3.0",
     "graphql-tools": "^6.0.0",
+    "graylog2": "^0.2.1",
     "ioredis": "^4.17.1",
     "minimist": "^1.2.5",
     "oauth2orize": "^1.11.0",
@@ -54,7 +55,7 @@
     "prisma-client-lib": "1.34.10",
     "request": "^2.88.2",
     "winston": "^3.2.1",
-    "winston-graylog2": "^2.1.2",
+    "winston-transport": "^4.3.0",
     "xstate": "^4.10.0",
     "yup": "^0.29.0"
   },
