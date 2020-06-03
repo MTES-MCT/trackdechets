@@ -1,7 +1,7 @@
-import * as express from "express";
-import * as supertest from "supertest";
-import * as Transport from "winston-transport";
-import * as bodyParser from "body-parser";
+import express from "express";
+import supertest from "supertest";
+import Transport from "winston-transport";
+import bodyParser from "body-parser";
 import loggingMiddleware from "../loggingMiddleware";
 import logger from "../../../logging/logger";
 

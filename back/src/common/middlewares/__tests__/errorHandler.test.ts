@@ -1,5 +1,5 @@
-import * as express from "express";
-import * as supertest from "supertest";
+import express from "express";
+import supertest from "supertest";
 
 describe("errorHandler", () => {
   const OLD_ENV = process.env;
@@ -8,6 +8,7 @@ describe("errorHandler", () => {
 
   function setup() {
     const app = express();
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const errorHandler = require("../errorHandler").default;
     app.use(() => {
       throw new Error("Bang");
