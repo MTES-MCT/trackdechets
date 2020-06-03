@@ -384,7 +384,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     ]);
   }, 30000);
 
-  test.only("Entreposage provisoire ou reconditionnement", async () => {
+  test("Entreposage provisoire ou reconditionnement", async () => {
     // 2ème cas: Entreposage provisoire ou reconditionnement
 
     // Établissement producteur de boues organiques
