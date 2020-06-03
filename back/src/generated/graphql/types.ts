@@ -229,7 +229,7 @@ export type CompanyStat = {
 };
 
 /** Profil entreprise */
-export type CompanyType =
+export type CompanyType = 
   /** Producteur de déchet */
   'PRODUCER' |
   /** Installation de Transit, regroupement ou tri de déchets */
@@ -246,7 +246,7 @@ export type CompanyType =
   'TRADER';
 
 /** Consistance du déchet */
-export type Consistence =
+export type Consistence = 
   /** Solide */
   'SOLID' |
   /** Liquide */
@@ -373,7 +373,7 @@ export type EmitterInput = {
 };
 
 /** Types d'émetteur de déchet (choix multiple de la case 1) */
-export type EmitterType =
+export type EmitterType = 
   /** Producetur de déchet */
   'PRODUCER' |
   /** Autre détenteur */
@@ -384,7 +384,7 @@ export type EmitterType =
   'APPENDIX2';
 
 /** Type d'établissement favoris */
-export type FavoriteType =
+export type FavoriteType = 
   'EMITTER' |
   'TRANSPORTER' |
   'RECIPIENT' |
@@ -526,7 +526,7 @@ export type FormInput = {
   temporaryStorageDetail?: Maybe<TemporaryStorageDetailInput>;
 };
 
-export type FormRole =
+export type FormRole = 
   /** Les BSD's dont je suis transporteur */
   'TRANSPORTER' |
   /** Les BSD's dont je suis la destination de traitement */
@@ -556,14 +556,14 @@ export type FormsLifeCycleData = {
 };
 
 /** Type pour l'export du registre */
-export type FormsRegisterExportType =
+export type FormsRegisterExportType = 
   /** Déchets entrants */
   'INCOMING' |
   /** Déchets sortants */
   'OUTGOING';
 
 /** Différents statuts d'un BSD au cours de son cycle de vie */
-export type FormStatus =
+export type FormStatus = 
   /**
    * BSD à l'état de brouillon
    * Des champs obligatoires peuvent manquer
@@ -597,7 +597,7 @@ export type FormStatus =
 
 /**
  * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
- *
+ * 
  * Mise à jour d'un BSD
  */
 export type FormSubscription = {
@@ -613,14 +613,14 @@ export type FormSubscription = {
 };
 
 /** Valeur possibles pour le filtre de la query `forms` */
-export type FormType =
+export type FormType = 
   /** DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
   'ACTOR' |
   /** Uniquement les BSD's dont je suis transporteur */
   'TRANSPORTER';
 
 /** Type d'une déclaration GEREP */
-export type GerepType =
+export type GerepType = 
   'Producteur' |
   'Traiteur';
 
@@ -702,7 +702,7 @@ export type Mutation = {
   /**
    * DEPRECATED - La récupération de token pour le compte de tiers
    * doit s'effectuer avec le protocole OAuth2
-   *
+   * 
    * Récupére un token à partir de l'email et du mot de passe
    * d'un utilisateur.
    */
@@ -975,7 +975,7 @@ export type NextDestinationInput = {
 };
 
 /** Type de packaging du déchet */
-export type Packagings =
+export type Packagings = 
   /** Fut */
   'FUT' |
   /** GRV */
@@ -1027,7 +1027,7 @@ export type ProcessedFormInput = {
 };
 
 /** Type de quantité lors de l'émission */
-export type QuantityType =
+export type QuantityType = 
   /** Quntité réelle */
   'REAL' |
   /** Quantité estimée */
@@ -1221,7 +1221,7 @@ export type ResentFormInput = {
   transporter?: Maybe<TransporterInput>;
   /** Nom du signataire du BSD suite  (case 19) */
   signedBy?: Maybe<Scalars['String']>;
-  /** Date de signature du BSD suite (case 19) */
+  /** Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui. */
   signedAt?: Maybe<Scalars['DateTime']>;
 };
 
@@ -1294,7 +1294,7 @@ export type Stat = {
  * - le bordereau peut naviguer entre plusieurs entreprises.
  * - quand le bordereau a-t-il été modifié pour la dernière fois ? (création, signature, traitement... ?)
  * - si c'est un bordereau avec conditionnement et qu'on attend un transporteur, quel est-il ?
- *
+ * 
  * Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
  */
 export type StateSummary = {
@@ -1356,7 +1356,7 @@ export type Subscription = {
    __typename?: 'Subscription';
   /**
    * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
-   *
+   * 
    * Permet de s'abonner aux changements de statuts d'un BSD
    */
   forms?: Maybe<FormSubscription>;
@@ -1410,7 +1410,7 @@ export type TempStoredFormInput = {
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 13) */
   receivedAt: Scalars['DateTime'];
-  /** Date à laquelle le déchet a été accepté ou refusé (case 13) */
+  /** Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui. */
   signedAt?: Maybe<Scalars['DateTime']>;
   /** Quantité réelle présentée (case 13) */
   quantityReceived: Scalars['Float'];
@@ -1573,24 +1573,24 @@ export type User = {
 /**
  * Liste les différents rôles d'un utilisateur au sein
  * d'un établissement.
- *
+ * 
  * Les admins peuvent:
  * * consulter/éditer les bordereaux
  * * gérer les utilisateurs de l'établissement
  * * éditer les informations de la fiche entreprise
  * * demander le renouvellement du code de sécurité
  * * Éditer les informations de la fiche entreprise
- *
+ * 
  * Les membres peuvent:
  * * consulter/éditer les bordereaux
  * * consulter le reste des informations
  */
-export type UserRole =
+export type UserRole = 
   'MEMBER' |
   'ADMIN';
 
 /** Statut d'acceptation d'un déchet */
-export type WasteAcceptationStatusInput =
+export type WasteAcceptationStatusInput = 
   /** Accepté en totalité */
   'ACCEPTED' |
   /** Refusé */
@@ -1644,7 +1644,7 @@ export type WasteDetailsInput = {
 };
 
 /** Type de déchets autorisé pour une rubrique */
-export type WasteType =
+export type WasteType = 
   /** Déchet inerte */
   'INERTE' |
   /** Déchet non dangereux */

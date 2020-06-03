@@ -1229,7 +1229,7 @@ export type ResentFormInput = {
   transporter: Maybe<TransporterInput>;
   /** Nom du signataire du BSD suite  (case 19) */
   signedBy: Maybe<Scalars['String']>;
-  /** Date de signature du BSD suite (case 19) */
+  /** Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui. */
   signedAt: Maybe<Scalars['DateTime']>;
 };
 
@@ -1418,7 +1418,7 @@ export type TempStoredFormInput = {
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 13) */
   receivedAt: Scalars['DateTime'];
-  /** Date à laquelle le déchet a été accepté ou refusé (case 13) */
+  /** Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui. */
   signedAt: Maybe<Scalars['DateTime']>;
   /** Quantité réelle présentée (case 13) */
   quantityReceived: Scalars['Float'];

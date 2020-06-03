@@ -297,7 +297,7 @@ input TempStoredFormInput {
   "Date à laquelle le déchet a été reçu (case 13)"
   receivedAt: DateTime!
 
-  "Date à laquelle le déchet a été accepté ou refusé (case 13)"
+  "Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui."
   signedAt: DateTime
 
   "Quantité réelle présentée (case 13)"
@@ -321,7 +321,7 @@ input ResentFormInput {
   "Nom du signataire du BSD suite  (case 19)"
   signedBy: String
 
-  "Date de signature du BSD suite (case 19)"
+  "Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui."
   signedAt: DateTime
 }
 

@@ -4580,7 +4580,7 @@ Nom du signataire du BSD suite  (case 19)
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-Date de signature du BSD suite (case 19)
+Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui.
 
 </td>
 </tr>
@@ -4723,7 +4723,7 @@ Date à laquelle le déchet a été reçu (case 13)
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-Date à laquelle le déchet a été accepté ou refusé (case 13)
+Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui.
 
 </td>
 </tr>
