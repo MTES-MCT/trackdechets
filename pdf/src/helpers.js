@@ -64,17 +64,18 @@ const checkBox = ({ fieldName, settings, font, page, yOffset = 0 }) => {
  * @param page - page on which we want to write
  */
 
-const drawImage = (
+const drawImage = ({
   locationName,
   image,
   page,
-  dimensions = { width: 75, height: 37 }
-) => {
+  dimensions = { width: 75, height: 37 },
+  yOffset = 0
+}) => {
   location = imageLocations[locationName];
 
   page.drawImage(image, {
     x: location.x,
-    y: pageHeight - location.y,
+    y: pageHeight - (location.y + yOffset),
 
     ...dimensions,
   });
@@ -286,13 +287,13 @@ const getWasteQuantityRefused = (wasteDetailsQuantity, quantityReceived) =>
 const getWasteRefusalreason = (params) =>
   params.wasteAcceptationStatus === "PARTIALLY_REFUSED"
     ? {
-        wasteRefusalReason: `Refus partiel: ${
-          params.wasteRefusalReason
+      wasteRefusalReason: `Refus partiel: ${
+        params.wasteRefusalReason
         } - Tonnage estimé de refus : ${getWasteQuantityRefused(
           params.wasteDetailsQuantity,
           params.quantityReceived
         )} tonnes`,
-      }
+    }
     : {};
 
 /**
@@ -304,8 +305,8 @@ const getWasteRefusalreason = (params) =>
 const getFlatEcoOrganisme = (params) => {
   return params.ecoOrganisme && params.ecoOrganisme.name
     ? {
-        ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`,
-      }
+      ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`,
+    }
     : {};
 };
 
@@ -346,6 +347,26 @@ function processAnnexParams(params) {
   };
 }
 
+const transportModeLabels = {
+  ROAD: "Route",
+  AIR: "Voie aérienne",
+  RAIL: "Voie ferrée",
+  RIVER: "Voie fluviale",
+};
+
+function verboseMode(mode) {
+  if (!mode) { return "" }
+  return transportModeLabels[mode]
+}
+function processSegment(segment) {
+  return {
+    ...segment,
+    takenOverAt: dateFmt(segment.takenOverAt),
+    mode: verboseMode(segment.mode)
+  }
+
+}
+
 /**
  * Fill a generated PDFDocument according to data and settings
  *
@@ -382,4 +403,5 @@ exports.getWasteRefusalreason = getWasteRefusalreason;
 exports.getWasteDetailsType = getWasteDetailsType;
 exports.processMainFormParams = processMainFormParams;
 exports.processAnnexParams = processAnnexParams;
+exports.processSegment = processSegment;
 exports.fillFields = fillFields;
