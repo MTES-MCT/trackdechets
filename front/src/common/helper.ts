@@ -35,9 +35,9 @@ export function updateApolloCache<T>(
     if (!existingData) {
       return null;
     }
-
+ 
     const newData = getNewData(existingData);
-
+    
     store.writeQuery({
       query,
       variables,

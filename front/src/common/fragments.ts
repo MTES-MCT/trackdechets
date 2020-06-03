@@ -196,3 +196,40 @@ export const fullFormFragment = gql`
   ${mutableFieldsFragment}
   ${staticFieldsFragment}
 `;
+
+export const transporterFormFragment = gql`
+  fragment TransporterForm on Form {
+    ...MutableFieldsFragment
+    ...StaticFieldsFragment
+    currentTransporterSiret
+    nextTransporterSiret
+    transportSegments {
+      id
+      sealed
+      transporter {
+        validityLimit
+        numberPlate
+        isExemptedOfReceipt
+        department
+        receipt
+
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+        }
+      }
+      mode
+      takenOverAt
+      takenOverBy
+      previousTransporterCompanySiret
+      segmentNumber
+    }
+  }
+  ${mutableFieldsFragment}
+  ${staticFieldsFragment}
+
+`;

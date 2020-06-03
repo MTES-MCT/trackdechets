@@ -483,7 +483,7 @@ export type Form = {
   temporaryStorageDetail: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
   stateSummary: Maybe<StateSummary>;
-  transportSegments: Maybe<Array<Maybe<TransportSegment>>>;
+  transportSegments: Maybe<Array<TransportSegment>>;
   currentTransporterSiret: Maybe<Scalars['String']>;
   nextTransporterSiret: Maybe<Scalars['String']>;
 };
@@ -1644,6 +1644,7 @@ export type TransportSegment = {
   takenOverAt: Maybe<Scalars['DateTime']>;
   takenOverBy: Maybe<Scalars['String']>;
   sealed: Maybe<Scalars['Boolean']>;
+  segmentNumber: Maybe<Scalars['Int']>;
 };
 
 /** Payload d'édition d'un récépissé transporteur */
