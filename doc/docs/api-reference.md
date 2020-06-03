@@ -2452,7 +2452,7 @@ Résumé des valeurs clés du bordereau à l'instant T
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transportSegments</strong></td>
-<td valign="top">[<a href="#transportsegment">TransportSegment</a>]</td>
+<td valign="top">[<a href="#transportsegment">TransportSegment</a>!]</td>
 <td></td>
 </tr>
 <tr>
@@ -3496,6 +3496,11 @@ Département ayant enregistré la déclaration
 <tr>
 <td colspan="2" valign="top"><strong>sealed</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>segmentNumber</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
 <td></td>
 </tr>
 </tbody>
