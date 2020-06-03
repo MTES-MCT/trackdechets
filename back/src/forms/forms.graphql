@@ -410,7 +410,7 @@ type Form {
   "Résumé des valeurs clés du bordereau à l'instant T"
   stateSummary: StateSummary
 
-  transportSegments: [TransportSegment]
+  transportSegments: [TransportSegment!]
 
   currentTransporterSiret: String
   nextTransporterSiret: String
@@ -835,4 +835,5 @@ type TransportSegment {
   takenOverAt: DateTime
   takenOverBy: String
   sealed: Boolean
+  segmentNumber: Int
 }

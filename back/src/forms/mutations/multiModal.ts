@@ -6,9 +6,19 @@ import { unflattenObjectFromDb } from "../form-converter";
 import {
   Form,
   MutationPrepareSegmentArgs,
+  TakeOverInput
 } from "../../generated/graphql/types";
-import isSegmentValidForTakeOver from "./segmentValidation";
-import { ForbiddenError } from "apollo-server-express";
+import { segmentSchema, takeOverInfoSchema } from "./segmentValidation";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
+
+const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
+const FORM_NOT_FOUND_OR_NOT_ALLOWED =
+  "Le bordereau n'a pas été trouvé ou vous ne disposez pas des permissions nécessaires";
+const FORM_MUST_BE_SENT = "Le bordereau doit être envoyé";
+const FORM_MUST_BE_DRAFT = "Le bordereau doit être en brouillon";
+const SEGMENT_ALREADY_SEALED = "Ce segment de transport est déjà scellé";
+const SEGMENTS_ALREADY_PREPARED =
+  "Il y a d'autres segments après le votre, vous ne pouvez pas ajouter de segment";
 
 type FormSiretsAndSegments = {
   recipientCompanySiret: string;
@@ -61,10 +71,10 @@ fragment FormWithSegments on Form {
 }
 `;
 
-const getForm = async (formId) => {
+const getForm = async formId => {
   const form = await prisma
     .form({
-      id: formId,
+      id: formId
     })
     .$fragment<FormSiretsAndSegments>(formFragment);
 
@@ -76,7 +86,7 @@ function flattenSegmentForDb(
   previousKeys = [],
   dbObject = {}
 ): Partial<TransportSegment> {
-  Object.keys(input).forEach((key) => {
+  Object.keys(input).forEach(key => {
     if (
       input[key] &&
       !Array.isArray(input[key]) &&
@@ -109,30 +119,29 @@ export async function prepareSegment(
   const currentUserSirets = await getCurrentUserSirets(context.user.id, prisma);
 
   if (!currentUserSirets.includes(siret)) {
-    throw "error";
+    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 
   const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
 
   if (!nextSegmentPayload.transporterCompanySiret) {
-    throw new Error("Transporter siret is mandatory");
+    throw new ForbiddenError("Le siret est obligatoire");
   }
 
   // get form and segments
   const form = await getForm(id);
   if (!form) {
-    throw new ForbiddenError("Form not found or not allowed");
+    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
   const transportSegments = await prisma.transportSegments({
     where: {
-      transporterCompanySiret: nextSegmentPayload.transporterCompanySiret,
-      form: { id: id },
-    },
+      form: { id: id }
+    }
   });
 
   // retrieve segments transporter sirets
   const transportSegmentsSirets = transportSegments.map(
-    (el) => el.transporterCompanySiret
+    el => el.transporterCompanySiret
   );
 
   //   user must be the currentTransporter or form owner
@@ -141,38 +150,32 @@ export async function prepareSegment(
     !!form.currentTransporterSiret && siret === form.currentTransporterSiret;
 
   if (!userIsOwner && !userIsCurrentTransporter) {
-    throw Error("You are not allowed to perform this mutation");
-  }
-  // segments can be created by transporters if formis SENT and they're currently in charge of the form
-  if (userIsCurrentTransporter && form.status !== "SENT") {
-    throw Error(
-      "You can't perform this mutation on forms which are not in SENT state"
+    throw new ForbiddenError(
+      "Vous ne disposez pas des permissions nécessaires"
     );
+  }
+  // segments can be created by transporters if form is SENT and they're currently in charge of the form
+  if (userIsCurrentTransporter && form.status !== "SENT") {
+    throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
   // segments can be created by form owners when form is draft
   if (userIsOwner && form.status !== "DRAFT") {
-    throw Error(
-      "You can't perform this mutation on forms which are not in DRAFT state"
-    );
+    throw new ForbiddenError(FORM_MUST_BE_DRAFT);
   }
-  const lastSegmentId = !!transportSegments.length
-    ? transportSegments.slice(-1)[0].id
+  const lastSegment = !!transportSegments.length
+    ? transportSegments.slice(-1)[0]
     : null;
-  // segments can be edited by transporters if they're currently in charge of the form
-
+  const lastSegmentId = !!lastSegment ? lastSegment.id : null;
   if (
-    userIsCurrentTransporter &&
-    !!transportSegments.length &&
-    form.currentSegment !== lastSegmentId
+    !!lastSegment &&
+    (!lastSegment.takenOverAt || lastSegment.transporterCompanySiret !== siret)
   ) {
-    throw Error(
-      "There are scheduled segments after yours, you'can't add new segments"
-    );
+    throw new ForbiddenError(SEGMENTS_ALREADY_PREPARED);
   }
 
   if (!nextSegmentPayload.transporterCompanySiret) {
-    throw Error("");
+    throw new ForbiddenError("");
   }
 
   await prisma.createTransportSegment({
@@ -180,12 +183,13 @@ export async function prepareSegment(
 
     ...nextSegmentPayload,
     previousTransporterCompanySiret: siret,
+    segmentNumber: transportSegments.length + 1 // additional segments begin at index 1
   });
   const updatedForm = await prisma.updateForm({
     where: { id },
     data: {
-      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret,
-    },
+      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret
+    }
   });
 
   return unflattenObjectFromDb(updatedForm);
@@ -244,45 +248,64 @@ export async function markSegmentAsSealed({ id }, context: GraphQLContext) {
     .$fragment<SegmentAndForm>(segmentFragment);
 
   if (!currentSegment) {
-    throw new ForbiddenError("Segment not found or not allowed");
+    throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
   const form = await getForm(currentSegment.form.id);
 
   if (form.status !== "SENT") {
-    throw Error("Form must be in SENT state");
+    throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
   const userSirets = await getCurrentUserSirets(context.user.id, prisma);
 
   if (!userSirets.includes(form.currentTransporterSiret)) {
-    throw Error("You must be the current transporter");
+    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 
   if (currentSegment.sealed) {
-    throw Error("This segment is already marked as sealed");
+    throw new ForbiddenError(SEGMENT_ALREADY_SEALED);
   }
 
   await prisma.updateTransportSegment({
     where: { id },
-    data: { sealed: true },
+    data: { sealed: true }
   });
 
   return unflattenObjectFromDb(form);
 }
 
+interface TakeOverParameters {
+  id: string;
+  takeOverInfo: TakeOverInput;
+}
+
 // when a waste is taken over
 export async function takeOverSegment(
-  { id, takeOverInfo },
+  { id, takeOverInfo }: TakeOverParameters,
   context: GraphQLContext
 ) {
-  // PERMISSIONS !!!
+  const inputErrors: string[] = await takeOverInfoSchema
+    .validate(takeOverInfo, { abortEarly: false })
+    .catch(err => err.errors);
+
+  if (!!inputErrors.length) {
+    throw new UserInputError(
+      `Erreur, impossible de prendre en charge le bordereau car ces champs ne sont pas renseignés.\nErreur(s): ${inputErrors.join(
+        "\n"
+      )}`
+    );
+  }
 
   const currentSegment = await prisma
     .transportSegment({ id })
     .$fragment<SegmentAndForm>(segmentFragment);
 
+  if (!currentSegment) {
+    throw new ForbiddenError(SEGMENT_NOT_FOUND);
+  }
+
   const form = await getForm(currentSegment.form.id);
   if (form.status !== "SENT") {
-    throw Error("Form must be in SENT state");
+    throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
   const userSirets = await getCurrentUserSirets(context.user.id, prisma);
@@ -295,23 +318,33 @@ export async function takeOverSegment(
       !userSirets.includes(form.nextTransporterSiret)) ||
     !userSirets.includes(currentSegment.transporterCompanySiret)
   ) {
-    throw Error("You are not the next transporter on this form");
+    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 
-  await isSegmentValidForTakeOver(currentSegment);
+  const segmentErrors: string[] = await segmentSchema
+    .validate(currentSegment, { abortEarly: false })
+    .catch(err => err.errors);
+
+  if (!!segmentErrors.length) {
+    throw new UserInputError(
+      `Erreur, impossible de prendre en charge le bordereau car ces champs ne sont pas renseignés, veuillez editer le segment pour le prendre en charge.\nErreur(s): ${segmentErrors.join(
+        "\n"
+      )}`
+    );
+  }
 
   await prisma.updateTransportSegment({
     where: { id: id },
-    data: takeOverInfo,
+    data: takeOverInfo
   });
 
   const updatedForm = await prisma.updateForm({
     where: { id: currentSegment.form.id },
     data: {
       currentTransporterSiret: currentSegment.transporterCompanySiret,
-      nextTransporterSiret: "",
+      nextTransporterSiret: ""
       // currentSegment: currentSegment.id,
-    },
+    }
   });
 
   return unflattenObjectFromDb(updatedForm);
@@ -320,9 +353,9 @@ export async function takeOverSegment(
 /**
  * 
  * Edit an existing segment
- * Can be performed by form owner when in DRAFT state, 
- * By current transporter if segment is not sealed yet
- * By next transporter if segment is sealed and not taken over
+ * Can be performed by form owner when in DRAFT state, everything is editable, 
+ * By current transporter if segment is not sealed yet, everything is editable
+ * By next transporter if segment is sealed and not taken over, siret is not editable
   
  */
 export async function editSegment(
@@ -334,11 +367,7 @@ export async function editSegment(
     .$fragment<SegmentAndForm>(segmentFragment);
 
   if (!currentSegment) {
-    throw Error("Not found");
-  }
-
-  if (currentSegment.sealed) {
-    throw Error("You can't perform this mutation on a sealed segment");
+    throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
 
   const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
@@ -346,7 +375,7 @@ export async function editSegment(
   // check user owns siret
   const userSirets = await getCurrentUserSirets(context.user.id, prisma);
   if (!userSirets.includes(userSiret)) {
-    throw Error("you re not allowed");
+    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 
   const form = await getForm(currentSegment.form.id);
@@ -359,35 +388,38 @@ export async function editSegment(
     (userIsCurrentTransporter || userIsNextTransporter) &&
     form.status !== "SENT"
   ) {
-    throw Error(
-      "You can't perform this mutation on forms which are not in SENT state"
-    );
+    throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
   // segments can be edited by form owners when form is draft
 
   if (userIsOwner && form.status !== "DRAFT") {
-    throw Error(
-      "You can't perform this mutation on forms which are not in DRAFT state"
-    );
+    throw new ForbiddenError(FORM_MUST_BE_DRAFT);
   }
   // current transporter can edit until segment is sealed
   if (userIsCurrentTransporter && currentSegment.sealed) {
-    throw Error("Take over can not be edited anymore");
+    throw new ForbiddenError("Ce segment ne peut plus être modifié");
   }
   // next transporter can edit when segment is sealed
   if (userIsNextTransporter && !currentSegment.sealed) {
-    throw Error("Take over can not be edited yet");
+    throw new ForbiddenError(
+      "Ce segment ne peut pas être modifié tant qu'il n'est pas scellé par le tranporteur précédent"
+    );
   }
 
   if (currentSegment.sealed && !!nextSegmentPayload.transporterCompanySiret) {
-    throw Error("Siret can not be changed anymore");
+    throw new ForbiddenError("Le siret ne peut pas être modifié");
   }
 
   await prisma.updateTransportSegment({
     where: { id },
-    data: nextSegmentPayload,
+    data: nextSegmentPayload
   });
-
-  return unflattenObjectFromDb(form);
+  const updatedForm = await prisma.updateForm({
+    where: { id: currentSegment.form.id },
+    data: {
+      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret
+    }
+  });
+  return unflattenObjectFromDb(updatedForm);
 }

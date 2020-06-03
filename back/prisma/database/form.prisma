@@ -242,6 +242,7 @@ enum TransportMode{
 # Multimodal model
 type TransportSegment {
   id: ID! @id
+  segmentNumber: Int
 
   form: Form!
   

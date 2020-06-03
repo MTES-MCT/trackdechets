@@ -1,18 +1,21 @@
 import * as Yup from "yup";
 import { validDatetime } from "../rules/validation-helpers";
 
-const segmentSchema = Yup.object<any>().shape({
-  id: Yup.string().label("Identifiant (id)").required(),
+export const segmentSchema = Yup.object<any>().shape({
+  // id: Yup.string().label("Identifiant (id)").required(),
+  mode: Yup.string()
+  .label("Mode de transport")
+  .required(),
   transporterCompanySiret: Yup.string()
     .label("Siret du transporteur")
     .required(),
-  transporterCompanyAddress: Yup.string().required(),
-  transporterCompanyContact: Yup.string().required(),
-  transporterCompanyPhone: Yup.string().required(),
-  transporterCompanyMail: Yup.string().required(),
+  transporterCompanyAddress: Yup.string() ,
+  transporterCompanyContact: Yup.string() ,
+  transporterCompanyPhone: Yup.string() ,
+  transporterCompanyMail: Yup.string() ,
   transporterIsExemptedOfReceipt: Yup.boolean().nullable(true),
   transporterReceipt: Yup.string().when(
-    "isExemptedOfReceipt",
+    "transporterIsExemptedOfReceipt",
     (isExemptedOfReceipt, schema) =>
       isExemptedOfReceipt
         ? schema.nullable(true)
@@ -21,22 +24,31 @@ const segmentSchema = Yup.object<any>().shape({
           )
   ),
   transporterDepartment: Yup.string().when(
-    "isExemptedOfReceipt",
+    "transporterIsExemptedOfReceipt",
     (isExemptedOfReceipt, schema) =>
       isExemptedOfReceipt
         ? schema.nullable(true)
         : schema.required("Le département du transporteur est obligatoire")
   ),
+
   transporterValidityLimit: validDatetime(
     {
       verboseFieldName: "date de validité",
-      required: true,
     },
     Yup
   ),
-  transporterNumberPlate: Yup.string().nullable(true),
+  transporterNumberPlate: Yup.string().nullable(true)
 });
 
-export default function isSegmentValidForTakeOver(segment) {
-  return segmentSchema.isValid(segment);
-}
+ 
+
+export const takeOverInfoSchema = Yup.object<any>().shape({
+  takenOverAt: validDatetime(
+    {
+      verboseFieldName: "date de prise en charge",
+      required: true
+    },
+    Yup
+  ),
+  takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
+});

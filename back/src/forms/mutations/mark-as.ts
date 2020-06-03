@@ -97,6 +97,7 @@ export async function signedByTransporter(
 
         return {
           ...(!hasWasteDetailsOverride && wasteDetails),
+       
           temporaryStorageDetail: {
             update: {
               signedBy: infos.sentBy,
@@ -116,7 +117,8 @@ export async function signedByTransporter(
     sentBy: infos.sentBy,
     wasteDetailsPackagings: infos.packagings,
     wasteDetailsQuantity: infos.quantity,
-    wasteDetailsOnuCode: infos.onuCode
+    wasteDetailsOnuCode: infos.onuCode,
+    currentTransporterSiret: form.transporterCompanySiret,
   });
 
   return transitionForm(
@@ -196,14 +198,30 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await prisma.form({ id: formId });
+
   const temporaryStorageDetail = await prisma
     .form({ id: formId })
     .temporaryStorageDetail();
 
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
+  // to receive simple multimodal form, we need to be sure there is no segment left wo need to be taken over 
+  // get segments here for MARK_RECEIVED event because awaiting in xstate is tricky
+  const transportSegments =
+    eventType === "MARK_RECEIVED"
+      ? await prisma.transportSegments({
+          where: {
+            form: { id: formId }
+          }
+        })
+      : [];
   const startingState = State.from(form.status, {
-    form: { ...form, ...formPropsFromEvent, temporaryStorageDetail },
+    form: {
+      ...form,
+      ...formPropsFromEvent,
+      temporaryStorageDetail,
+      transportSegments
+    },
     requestContext: context,
     isStableState: true
   });

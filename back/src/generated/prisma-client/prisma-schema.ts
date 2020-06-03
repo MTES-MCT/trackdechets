@@ -6844,6 +6844,7 @@ enum TransportMode {
 
 type TransportSegment {
   id: ID!
+  segmentNumber: Int
   form: Form!
   transporterCompanySiret: String
   transporterCompanyName: String
@@ -6873,6 +6874,7 @@ type TransportSegmentConnection {
 
 input TransportSegmentCreateInput {
   id: ID
+  segmentNumber: Int
   form: FormCreateOneWithoutTransportSegmentsInput!
   transporterCompanySiret: String
   transporterCompanyName: String
@@ -6899,6 +6901,7 @@ input TransportSegmentCreateManyWithoutFormInput {
 
 input TransportSegmentCreateWithoutFormInput {
   id: ID
+  segmentNumber: Int
   transporterCompanySiret: String
   transporterCompanyName: String
   transporterCompanyAddress: String
@@ -6925,6 +6928,8 @@ type TransportSegmentEdge {
 enum TransportSegmentOrderByInput {
   id_ASC
   id_DESC
+  segmentNumber_ASC
+  segmentNumber_DESC
   transporterCompanySiret_ASC
   transporterCompanySiret_DESC
   transporterCompanyName_ASC
@@ -6965,6 +6970,7 @@ enum TransportSegmentOrderByInput {
 
 type TransportSegmentPreviousValues {
   id: ID!
+  segmentNumber: Int
   transporterCompanySiret: String
   transporterCompanyName: String
   transporterCompanyAddress: String
@@ -7000,6 +7006,14 @@ input TransportSegmentScalarWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  segmentNumber: Int
+  segmentNumber_not: Int
+  segmentNumber_in: [Int!]
+  segmentNumber_not_in: [Int!]
+  segmentNumber_lt: Int
+  segmentNumber_lte: Int
+  segmentNumber_gt: Int
+  segmentNumber_gte: Int
   transporterCompanySiret: String
   transporterCompanySiret_not: String
   transporterCompanySiret_in: [String!]
@@ -7218,6 +7232,7 @@ input TransportSegmentSubscriptionWhereInput {
 }
 
 input TransportSegmentUpdateInput {
+  segmentNumber: Int
   form: FormUpdateOneRequiredWithoutTransportSegmentsInput
   transporterCompanySiret: String
   transporterCompanyName: String
@@ -7238,6 +7253,7 @@ input TransportSegmentUpdateInput {
 }
 
 input TransportSegmentUpdateManyDataInput {
+  segmentNumber: Int
   transporterCompanySiret: String
   transporterCompanyName: String
   transporterCompanyAddress: String
@@ -7257,6 +7273,7 @@ input TransportSegmentUpdateManyDataInput {
 }
 
 input TransportSegmentUpdateManyMutationInput {
+  segmentNumber: Int
   transporterCompanySiret: String
   transporterCompanyName: String
   transporterCompanyAddress: String
@@ -7293,6 +7310,7 @@ input TransportSegmentUpdateManyWithWhereNestedInput {
 }
 
 input TransportSegmentUpdateWithoutFormDataInput {
+  segmentNumber: Int
   transporterCompanySiret: String
   transporterCompanyName: String
   transporterCompanyAddress: String
@@ -7337,6 +7355,14 @@ input TransportSegmentWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  segmentNumber: Int
+  segmentNumber_not: Int
+  segmentNumber_in: [Int!]
+  segmentNumber_not_in: [Int!]
+  segmentNumber_lt: Int
+  segmentNumber_lte: Int
+  segmentNumber_gt: Int
+  segmentNumber_gte: Int
   form: FormWhereInput
   transporterCompanySiret: String
   transporterCompanySiret_not: String

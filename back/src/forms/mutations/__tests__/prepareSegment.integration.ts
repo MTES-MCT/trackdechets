@@ -2,7 +2,7 @@ import {
   userWithCompanyFactory,
   formFactory,
   userFactory,
-  transportSegmentFactory,
+  transportSegmentFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
@@ -10,8 +10,8 @@ import { prisma } from "../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
-    get: jest.fn(() => Promise.resolve({ data: {} })),
-  },
+    get: jest.fn(() => Promise.resolve({ data: {} }))
+  }
 }));
 
 describe("{ mutation { prepareSegment } }", () => {
@@ -31,34 +31,35 @@ describe("{ mutation { prepareSegment } }", () => {
       opt: {
         transporterCompanySiret: transporterSiret,
         status: "SENT",
-        currentTransporterSiret: transporterSiret,
-      },
+        currentTransporterSiret: transporterSiret
+      }
     });
 
     const { mutate } = makeClient(firstTransporter);
     const { data } = await mutate(
       `mutation  {
-        prepareSegment(id:"${form.id}", siret:"${transporterSiret}",   nextSegmentInfo: {
-                transporter: {
-                  company: {
-                    siret: "976345"
-                    name: "Nightwatch fight club"
-                    address: "The north wall"
-                    contact: "John Snow"
-                  }
-                }
-                mode: ROAD
-              }) {
-              
-                transportSegments {
-                  id
-                }
+        prepareSegment(id:"${form.id}",
+         siret:"${transporterSiret}", 
+         nextSegmentInfo: {
+            transporter: {
+              company: {
+                siret: "976345"
+                name: "Nightwatch fight club"
+                address: "The north wall"
+                contact: "John Snow"
               }
-          }`
+            }
+            mode: ROAD
+          }) {
+            transportSegments {
+              id
+            }
+          }
+      }`
     );
 
     const segment = await prisma.transportSegment({
-      id: data.prepareSegment.transportSegments[0].id,
+      id: data.prepareSegment.transportSegments[0].id
     });
 
     expect(segment.transporterCompanySiret).toBe("976345");

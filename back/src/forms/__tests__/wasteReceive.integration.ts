@@ -10,6 +10,7 @@ import {
   formFactory,
   userFactory,
   companyFactory,
+  transportSegmentFactory
 } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 
@@ -27,15 +28,15 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipient,
       recipientCompany,
-      form: initialForm,
+      form: initialForm
     } = await prepareDB();
     const form = await prisma.updateForm({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" },
+      data: { currentTransporterSiret: "5678" }
     });
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
 
     const { mutate } = makeClient(recipient);
@@ -65,10 +66,10 @@ describe("Test Form reception", () => {
 
     // when form is received, we clean up currentTransporterSiret
     expect(frm.currentTransporterSiret).toEqual("");
-    
+
     // A StatusLog object is created
     const logs = await prisma.statusLogs({
-      where: { form: { id: frm.id }, user: { id: recipient.id } },
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("RECEIVED");
@@ -80,11 +81,11 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipient,
       recipientCompany,
-      form,
+      form
     } = await prepareDB();
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
 
     const { mutate } = makeClient(recipient);
@@ -120,11 +121,11 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipient,
       recipientCompany,
-      form,
+      form
     } = await prepareDB();
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
 
     const { mutate } = makeClient(recipient);
@@ -159,11 +160,11 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipient,
       recipientCompany,
-      form,
+      form
     } = await prepareDB();
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
     const { mutate } = makeClient(recipient);
     const mutation = `
@@ -196,7 +197,7 @@ describe("Test Form reception", () => {
 
     // A StatusLog object is created
     const logs = await prisma.statusLogs({
-      where: { form: { id: frm.id }, user: { id: recipient.id } },
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("REFUSED");
@@ -207,11 +208,11 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipient,
       recipientCompany,
-      form,
+      form
     } = await prepareDB();
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
     const { mutate } = makeClient(recipient);
     // trying to refuse waste with a non-zero quantityReceived
@@ -244,7 +245,7 @@ describe("Test Form reception", () => {
 
     // No StatusLog object was created
     const logs = await prisma.statusLogs({
-      where: { form: { id: frm.id }, user: { id: recipient.id } },
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(0);
   });
@@ -253,11 +254,11 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipient,
       recipientCompany,
-      form,
+      form
     } = await prepareDB();
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
     const { mutate } = makeClient(recipient);
     const mutation = `
@@ -289,7 +290,7 @@ describe("Test Form reception", () => {
 
     // A StatusLog object is created
     const logs = await prisma.statusLogs({
-      where: { form: { id: frm.id }, user: { id: recipient.id } },
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("RECEIVED");
@@ -300,11 +301,11 @@ describe("Test Form reception", () => {
       emitter,
       emitterCompany,
       recipient,
-      recipientCompany,
+      recipientCompany
     } = await prepareDB();
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
     const alreadyReceivedForm = await formFactory({
       ownerId: emitter.id,
@@ -315,8 +316,8 @@ describe("Test Form reception", () => {
         status: "RECEIVED",
         wasteAcceptationStatus: "ACCEPTED",
         quantityReceived: 22.7,
-        receivedBy: "Hugo",
-      },
+        receivedBy: "Hugo"
+      }
     });
     const { mutate } = makeClient(recipient);
     const mutation = `
@@ -351,16 +352,16 @@ describe("Test Form reception", () => {
     const { emitterCompany, recipientCompany, form } = await prepareDB();
     await prepareRedis({
       emitterCompany,
-      recipientCompany,
+      recipientCompany
     });
     const randomUserCompany = await companyFactory({ siret: "9999999" }); // this user does not belong to the form
     const randomUser = await userFactory({
       companyAssociations: {
         create: {
           company: { connect: { siret: randomUserCompany.siret } },
-          role: "ADMIN" as UserRole,
-        },
-      },
+          role: "ADMIN" as UserRole
+        }
+      }
     });
     const { mutate } = makeClient(randomUser);
     const mutation = `
@@ -387,5 +388,132 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe(null);
     expect(frm.receivedBy).toBe(null);
     expect(frm.quantityReceived).toBe(null);
+  });
+
+  it("should mark as received a form with taken over segment", async () => {
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.updateForm({
+      where: { id: initialForm.id },
+      data: { currentTransporterSiret: "5678" }
+    });
+
+    // a taken over segment
+    await transportSegmentFactory({
+      formId: form.id,
+      segmentPayload: {
+        transporterCompanySiret: "98765",
+        sealed: true,
+        takenOverAt: "2020-01-01",
+        takenOverBy: "Jason Statham"
+      }
+    });
+
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    const { mutate } = makeClient(recipient);
+    const mutation = `
+      mutation {
+        markAsReceived(
+            id: "${form.id}",
+            receivedInfo: {
+            receivedBy: "Bill",
+            receivedAt :"2019-01-17T10:22:00+0100",
+            wasteAcceptationStatus: ACCEPTED,
+            quantityReceived: 11
+      }
+        ) { status }
+      }
+    `;
+
+    await mutate(mutation);
+
+    const frm = await prisma.form({ id: form.id });
+
+    expect(frm.status).toBe("RECEIVED");
+    expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
+    expect(frm.receivedBy).toBe("Bill");
+    expect(frm.quantityReceived).toBe(11);
+
+    // when form is received, we clean up currentTransporterSiret
+    expect(frm.currentTransporterSiret).toEqual("");
+
+    // A StatusLog object is created
+    const logs = await prisma.statusLogs({
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(1);
+    expect(logs[0].status).toBe("RECEIVED");
+  });
+
+  it("should not mark as received a form with segment not taken over", async () => {
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.updateForm({
+      where: { id: initialForm.id },
+      data: { currentTransporterSiret: "5678" }
+    });
+
+    // a taken over segment
+    await transportSegmentFactory({
+      formId: form.id,
+      segmentPayload: {
+        transporterCompanySiret: "98765",
+        sealed: true,
+        takenOverAt: "2020-01-01",
+        takenOverBy: "Jason Statham"
+      }
+    });
+
+    // this segment is still not yet taken over, the form should not be accepted
+    await transportSegmentFactory({
+      formId: form.id,
+      segmentPayload: { transporterCompanySiret: "7777", sealed: true }
+    });
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    const { mutate } = makeClient(recipient);
+    const mutation = `
+      mutation {
+        markAsReceived(
+            id: "${form.id}",
+            receivedInfo: {
+            receivedBy: "Bill",
+            receivedAt :"2019-01-17T10:22:00+0100",
+            wasteAcceptationStatus: ACCEPTED,
+            quantityReceived: 11
+      }
+        ) { status }
+      }
+    `;
+
+    await mutate(mutation);
+
+    const frm = await prisma.form({ id: form.id });
+
+    expect(frm.status).toBe("SENT");
+
+    // currentTransporterSiret was not cleaned up
+    expect(frm.currentTransporterSiret).toEqual("5678");
+
+    // A StatusLog object is created
+    const logs = await prisma.statusLogs({
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(0);
   });
 });
