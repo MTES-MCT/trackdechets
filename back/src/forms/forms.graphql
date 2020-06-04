@@ -324,9 +324,6 @@ type Form {
   "Date de la dernière modification du BSD"
   updatedAt: DateTime
 
-  "ID de l'utilisateur ayant crée le BSD"
-  ownerId: Int
-
   "Statut du BSD (brouillon, envoyé, reçu, traité, etc)"
   status: FormStatus!
 
