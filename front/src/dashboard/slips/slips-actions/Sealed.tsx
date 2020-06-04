@@ -1,7 +1,15 @@
+import cogoToast from "cogo-toast";
 import React from "react";
 import { SlipActionProps } from "../SlipActions";
 
 export default function Sealed(props: SlipActionProps) {
+  function onSubmit() {
+    cogoToast.success(
+      `Le numéro #${props.form.readableId} a été affecté au bordereau`
+    );
+    props.onSubmit({});
+  }
+
   return (
     <div>
       <p>
@@ -18,11 +26,7 @@ export default function Sealed(props: SlipActionProps) {
         >
           Annuler
         </button>
-        <button
-          type="submit"
-          className="button"
-          onClick={() => props.onSubmit({})}
-        >
+        <button type="submit" className="button" onClick={onSubmit}>
           Je valide
         </button>
       </div>
