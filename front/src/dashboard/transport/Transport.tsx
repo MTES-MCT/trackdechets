@@ -159,15 +159,14 @@ const Table = ({ forms, userSiret }) => {
                 }
               </td>
               <td>
-                <Segments
-                  form={form}
-                  userSiret={userSiret}
-                />
+                <Segments form={form} userSiret={userSiret} />
               </td>
               <td>
-    
-                  <TransportSignature form={transportInfos}  userSiret={userSiret}/>
- 
+                <TransportSignature
+                  form={transportInfos}
+                  userSiret={userSiret}
+                />
+
                 <PrepareSegment form={transportInfos} userSiret={userSiret} />
                 <SealSegment form={transportInfos} userSiret={userSiret} />
                 <EditSegment form={transportInfos} userSiret={userSiret} />
@@ -231,9 +230,6 @@ export default function Transport() {
         !segment.takenOverAt &&
         segment.transporter.company.siret === userSiret
     );
-
-    const lastSegment =
-      form.transportSegments[form.transportSegments.length - 1];
 
     const hasTakenOverASegment = form.transportSegments.filter(
       (segment) =>
