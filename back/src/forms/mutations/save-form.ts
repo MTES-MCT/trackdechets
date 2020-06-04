@@ -53,7 +53,8 @@ export async function saveForm(
           ...(formContent.recipient?.isTempStorage &&
           temporaryStorageDetail != null
             ? { update: flattenObjectForDb(formContent.temporaryStorageDetail) }
-            : formContent.recipient?.isTempStorage
+            : formContent.recipient?.isTempStorage &&
+              formContent.temporaryStorageDetail != null
             ? { create: flattenObjectForDb(formContent.temporaryStorageDetail) }
             : temporaryStorageDetail != null
             ? { disconnect: true }

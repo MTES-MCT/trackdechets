@@ -1,8 +1,7 @@
 import { Form as PrismaForm } from "../generated/prisma-client";
-import { Form, TemporaryStorageDetail } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
-  input,
+  input = {},
   previousKeys = [],
   dbObject = {}
 ): Partial<PrismaForm> {
