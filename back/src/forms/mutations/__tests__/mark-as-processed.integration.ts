@@ -139,7 +139,7 @@ describe("Integration / Mark as processed mutation", () => {
     const { errors } = await mutate(mutation);
 
     expect(errors[0].message).toBe(
-      "Cette opération de traitement n'existe pas."
+      "Cette opération d’élimination / valorisation n'existe pas."
     );
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toBe("RECEIVED");

@@ -100,7 +100,7 @@ export const markAsProcessedSchema = inputRule()(
           .mixed()
           .oneOf(
             PROCESSING_OPERATION_CODES,
-            "Cette opération de traitement n'existe pas."
+            "Cette opération d’élimination / valorisation n'existe pas."
           ),
         processingOperationDescription: yup
           .string()
@@ -297,7 +297,7 @@ export const temporaryStorageDestinationSchema = inputRule()(yup =>
           .mixed()
           .oneOf(
             PROCESSING_OPERATION_CODES,
-            "Cette opération de traitement n'existe pas."
+            "Cette opération d’élimination / valorisation n'existe pas."
           ),
         cap: yup.string().nullable(true)
       })

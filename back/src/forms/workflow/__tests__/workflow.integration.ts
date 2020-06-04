@@ -297,7 +297,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     await downloadPdf(form.id, producteurToken, "1-bsd-received.pdf");
 
     // Sur le lieu de l'installation de destination prévue
-    // l'opération de traitement est effectué et la case 11
+    // l'opération d’élimination / valorisation est effectué et la case 11
     // est remplie
     const markAsProcessedQuery = `
       mutation {
@@ -770,7 +770,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     await downloadPdf(form.id, producteurToken, "2-bsd-received.pdf");
 
     // Sur le lieu de l'installation de destination prévue
-    // l'opération de traitement est effectué et la case 11
+    // l'opération d’élimination / valorisation est effectué et la case 11
     // est remplie
     const markAsProcessedQuery = `
       mutation {

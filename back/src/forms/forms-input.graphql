@@ -69,7 +69,7 @@ input ProcessedFormInput {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String!
 
-  "Description de l'opération de traitement (case 11)"
+  "Description de l'opération d’élimination / valorisation (case 11)"
   processingOperationDescription: String
 
   "Personne en charge du traitement"
