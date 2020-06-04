@@ -1,13 +1,13 @@
 import { Form as PrismaForm } from "../generated/prisma-client";
 
 export function flattenObjectForDb(
-  input = {},
+  input,
   previousKeys = [],
   dbObject = {}
 ): Partial<PrismaForm> {
   const relations = ["ecoOrganisme", "temporaryStorageDetail"];
 
-  Object.keys(input).forEach(key => {
+  Object.keys(input || {}).forEach(key => {
     if (relations.includes(key)) {
       dbObject[key] = {};
       return input[key]
@@ -70,10 +70,8 @@ export function unflattenObjectFromDb(input, apiObject = {}): any {
 
     const localKey = separator[index];
     const newKey =
-      key
-        .replace(localKey, "")
-        .charAt(0)
-        .toLowerCase() + key.replace(localKey, "").slice(1);
+      key.replace(localKey, "").charAt(0).toLowerCase() +
+      key.replace(localKey, "").slice(1);
 
     apiObject[localKey] = {
       ...apiObject[localKey],
