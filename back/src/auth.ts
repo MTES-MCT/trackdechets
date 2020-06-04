@@ -16,11 +16,13 @@ import { User as PrismaUser } from "./generated/prisma-client";
 
 const { JWT_SECRET } = process.env;
 
+export type AuthUser = PrismaUser & { auth?: string };
+
 // Set specific type for req.user
 declare global {
   namespace Express {
     // eslint:disable-next-line:no-empty-interface
-    interface User extends PrismaUser {}
+    interface User extends AuthUser {}
   }
 }
 
@@ -62,7 +64,7 @@ passport.serializeUser((user: User, done) => {
 passport.deserializeUser((id: string, done) => {
   prisma
     .user({ id })
-    .then(user => done(null, user))
+    .then(user => done(null, { ...user, auth: "session" }))
     .catch(err => done(err));
 });
 
@@ -86,7 +88,7 @@ passport.use(
           if (accessToken && accessToken.isRevoked) {
             return done(null, false);
           }
-          return done(null, user, { token });
+          return done(null, { ...user, auth: "jwt" }, { token });
         } else {
           return done(null, false);
         }
@@ -144,7 +146,7 @@ passport.use(
       if (accessToken && !accessToken.isRevoked) {
         const user = accessToken.user;
         await updateAccessTokenLastUsed(accessToken);
-        return done(null, user);
+        return done(null, { ...user, auth: "bearer" });
       } else {
         return done(null, false);
       }
@@ -190,7 +192,7 @@ passport.use(new ClientPasswordStrategy(verifyClient));
 async function passportCallback(
   req: express.Request,
   next: express.NextFunction,
-  user: User,
+  user: AuthUser,
   callback?: () => Promise<any>
 ) {
   if (user) {
