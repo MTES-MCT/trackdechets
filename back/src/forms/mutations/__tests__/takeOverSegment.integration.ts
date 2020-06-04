@@ -2,7 +2,7 @@ import {
   userWithCompanyFactory,
   formFactory,
   userFactory,
-  transportSegmentFactory,
+  transportSegmentFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
@@ -10,23 +10,23 @@ import { prisma } from "../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
-    get: jest.fn(() => Promise.resolve({ data: {} })),
-  },
+    get: jest.fn(() => Promise.resolve({ data: {} }))
+  }
 }));
 
 describe("{ mutation { takeOverSegment } }", () => {
   afterAll(() => resetDatabase());
 
-  it("", async () => {
+  it("should take a segment over", async () => {
     const owner = await userFactory();
-    const {
-      user: firstTransporter,
-      company: firstTransporterCompany,
-    } = await userWithCompanyFactory("ADMIN", "TRANSPORTER");
+    const { company: firstTransporterCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      "TRANSPORTER"
+    );
 
     const {
       user: secondTransporter,
-      company: secondTransporterCompany,
+      company: secondTransporterCompany
     } = await userWithCompanyFactory("ADMIN", "TRANSPORTER");
 
     // create a form whose first transporter is another one
@@ -36,16 +36,23 @@ describe("{ mutation { takeOverSegment } }", () => {
         transporterCompanySiret: firstTransporterCompany.siret,
         status: "SENT",
         currentTransporterSiret: firstTransporterCompany.siret,
-        nextTransporterSiret: secondTransporterCompany.siret,
-      },
+        nextTransporterSiret: secondTransporterCompany.siret
+      }
     });
     // an attached sealed segment to be taken over by the second transporter
     const segment = await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
         transporterCompanySiret: secondTransporterCompany.siret,
+        transporterCompanyAddress: "tatooïne",
+        transporterCompanyContact: "Obi wan kenobi",
+        transporterCompanyPhone: "0612345678",
+        transporterCompanyMail: "obi@theresistance.sw",
+        transporterReceipt: "R2D2",
+        transporterDepartment: "83",
         sealed: true,
-      },
+        mode: "ROAD"
+      }
     });
     const { mutate } = makeClient(secondTransporter);
     await mutate(

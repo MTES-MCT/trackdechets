@@ -3,16 +3,20 @@ import { validDatetime } from "../rules/validation-helpers";
 
 export const segmentSchema = Yup.object<any>().shape({
   // id: Yup.string().label("Identifiant (id)").required(),
-  mode: Yup.string()
-  .label("Mode de transport")
-  .required(),
+  mode: Yup.string().label("Mode de transport").required(),
   transporterCompanySiret: Yup.string()
     .label("Siret du transporteur")
-    .required(),
-  transporterCompanyAddress: Yup.string() ,
-  transporterCompanyContact: Yup.string() ,
-  transporterCompanyPhone: Yup.string() ,
-  transporterCompanyMail: Yup.string() ,
+    .required("La sélection d'une entreprise est obligatoire"),
+  transporterCompanyAddress: Yup.string().required(),
+  transporterCompanyContact: Yup.string().required(
+    "Le contact dans l'entreprise est obligatoire"
+  ),
+  transporterCompanyPhone: Yup.string().required(
+    "Le téléphone de l'entreprise est obligatoire"
+  ),
+  transporterCompanyMail: Yup.string()
+    .email("Le format d'adresse email est incorrect")
+    .required("L'email est obligatoire"),
   transporterIsExemptedOfReceipt: Yup.boolean().nullable(true),
   transporterReceipt: Yup.string().when(
     "transporterIsExemptedOfReceipt",
@@ -33,14 +37,12 @@ export const segmentSchema = Yup.object<any>().shape({
 
   transporterValidityLimit: validDatetime(
     {
-      verboseFieldName: "date de validité",
+      verboseFieldName: "date de validité"
     },
     Yup
   ),
   transporterNumberPlate: Yup.string().nullable(true)
 });
-
- 
 
 export const takeOverInfoSchema = Yup.object<any>().shape({
   takenOverAt: validDatetime(
