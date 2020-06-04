@@ -452,6 +452,8 @@ export type Form = {
   receivedBy?: Maybe<Scalars['String']>;
   /** Date à laquelle le déchet a été reçu (case 10) */
   receivedAt?: Maybe<Scalars['DateTime']>;
+  /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
+  signedAt?: Maybe<Scalars['DateTime']>;
   /** Quantité réelle présentée (case 10) */
   quantityReceived?: Maybe<Scalars['Float']>;
   /**
@@ -1162,6 +1164,8 @@ export type ReceivedFormInput = {
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 10) */
   receivedAt: Scalars['DateTime'];
+  /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
+  signedAt?: Maybe<Scalars['DateTime']>;
   /** Quantité réelle présentée (case 10) */
   quantityReceived: Scalars['Float'];
 };
@@ -1217,7 +1221,7 @@ export type ResentFormInput = {
   transporter?: Maybe<TransporterInput>;
   /** Nom du signataire du BSD suite  (case 19) */
   signedBy?: Maybe<Scalars['String']>;
-  /** Date de signature du BSD suite (case 19) */
+  /** Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui. */
   signedAt?: Maybe<Scalars['DateTime']>;
 };
 
@@ -1398,15 +1402,17 @@ export type TemporaryStorer = {
 };
 
 export type TempStoredFormInput = {
-  /** Statut d'acceptation du déchet (case 10) */
+  /** Statut d'acceptation du déchet (case 13) */
   wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 10) */
+  /** Raison du refus (case 13) */
   wasteRefusalReason?: Maybe<Scalars['String']>;
-  /** Nom de la personne en charge de la réception du déchet (case 10) */
+  /** Nom de la personne en charge de la réception du déchet (case 13) */
   receivedBy: Scalars['String'];
-  /** Date à laquelle le déchet a été reçu (case 10) */
+  /** Date à laquelle le déchet a été reçu (case 13) */
   receivedAt: Scalars['DateTime'];
-  /** Quantité réelle présentée (case 10) */
+  /** Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui. */
+  signedAt?: Maybe<Scalars['DateTime']>;
+  /** Quantité réelle présentée (case 13) */
   quantityReceived: Scalars['Float'];
   /** Réelle ou estimée */
   quantityType: QuantityType;
@@ -2073,6 +2079,7 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   wasteRefusalReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   receivedBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   receivedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  signedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   quantityReceived?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   actualQuantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   processingOperationDone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

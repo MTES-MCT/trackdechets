@@ -60,6 +60,9 @@ input ReceivedFormInput {
   "Date à laquelle le déchet a été reçu (case 10)"
   receivedAt: DateTime!
 
+  "Date à laquelle le déchet a été accepté ou refusé (case 10)"
+  signedAt: DateTime
+
   "Quantité réelle présentée (case 10)"
   quantityReceived: Float!
 }
@@ -282,19 +285,22 @@ input WasteDetailsInput {
 }
 
 input TempStoredFormInput {
-  "Statut d'acceptation du déchet (case 10)"
+  "Statut d'acceptation du déchet (case 13)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
 
-  "Raison du refus (case 10)"
+  "Raison du refus (case 13)"
   wasteRefusalReason: String
 
-  "Nom de la personne en charge de la réception du déchet (case 10)"
+  "Nom de la personne en charge de la réception du déchet (case 13)"
   receivedBy: String!
 
-  "Date à laquelle le déchet a été reçu (case 10)"
+  "Date à laquelle le déchet a été reçu (case 13)"
   receivedAt: DateTime!
 
-  "Quantité réelle présentée (case 10)"
+  "Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui."
+  signedAt: DateTime
+
+  "Quantité réelle présentée (case 13)"
   quantityReceived: Float!
 
   "Réelle ou estimée"
@@ -315,7 +321,7 @@ input ResentFormInput {
   "Nom du signataire du BSD suite  (case 19)"
   signedBy: String
 
-  "Date de signature du BSD suite (case 19)"
+  "Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui."
   signedAt: DateTime
 }
 

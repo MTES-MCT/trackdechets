@@ -2255,6 +2255,15 @@ Date à laquelle le déchet a été reçu (case 10)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date à laquelle le déchet a été accepté ou refusé (case 10)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>quantityReceived</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
 <td>
@@ -4392,6 +4401,15 @@ Date à laquelle le déchet a été reçu (case 10)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date à laquelle le déchet a été accepté ou refusé (case 10)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>quantityReceived</strong></td>
 <td valign="top"><a href="#float">Float</a>!</td>
 <td>
@@ -4553,7 +4571,7 @@ Nom du signataire du BSD suite  (case 19)
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-Date de signature du BSD suite (case 19)
+Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui.
 
 </td>
 </tr>
@@ -4660,7 +4678,7 @@ Numéro de téléphone de l'utilisateur
 <td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
 <td>
 
-Statut d'acceptation du déchet (case 10)
+Statut d'acceptation du déchet (case 13)
 
 </td>
 </tr>
@@ -4669,7 +4687,7 @@ Statut d'acceptation du déchet (case 10)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Raison du refus (case 10)
+Raison du refus (case 13)
 
 </td>
 </tr>
@@ -4678,7 +4696,7 @@ Raison du refus (case 10)
 <td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-Nom de la personne en charge de la réception du déchet (case 10)
+Nom de la personne en charge de la réception du déchet (case 13)
 
 </td>
 </tr>
@@ -4687,7 +4705,16 @@ Nom de la personne en charge de la réception du déchet (case 10)
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
-Date à laquelle le déchet a été reçu (case 10)
+Date à laquelle le déchet a été reçu (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui.
 
 </td>
 </tr>
@@ -4696,7 +4723,7 @@ Date à laquelle le déchet a été reçu (case 10)
 <td valign="top"><a href="#float">Float</a>!</td>
 <td>
 
-Quantité réelle présentée (case 10)
+Quantité réelle présentée (case 13)
 
 </td>
 </tr>

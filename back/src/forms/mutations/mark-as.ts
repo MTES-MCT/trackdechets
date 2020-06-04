@@ -43,7 +43,10 @@ export function markAsReceived(
 ): Promise<Form> {
   return transitionForm(
     id,
-    { eventType: "MARK_RECEIVED", eventParams: receivedInfo },
+    {
+      eventType: "MARK_RECEIVED",
+      eventParams: { signedAt: new Date(), ...receivedInfo }
+    },
     context
   );
 }
@@ -124,11 +127,11 @@ export function markAsTempStored(
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
       update: {
+        tempStorerSignedAt: new Date(), // Default value to now
         ...Object.keys(infos).reduce((prev, cur) => {
           prev[`tempStorer${capitalize(cur)}`] = infos[cur];
           return prev;
-        }, {}),
-        tempStorerSignedAt: new Date()
+        }, {})
       }
     }
   });
@@ -260,7 +263,7 @@ const fieldsToLog = {
     "quantity",
     "onuCode"
   ],
-  MARK_RECEIVED: ["receivedBy", "receivedAt", "quantityReceived"],
+  MARK_RECEIVED: ["receivedBy", "receivedAt", "signedAt", "quantityReceived"],
   MARK_PROCESSED: [
     "processedBy",
     "processedAt",
@@ -279,6 +282,7 @@ const fieldsToLog = {
   MARK_TEMP_STORED: [
     "receivedBy",
     "receivedAt",
+    "signedAt",
     "quantityReceived",
     "quantityType"
   ],

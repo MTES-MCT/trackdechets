@@ -276,6 +276,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             wasteAcceptationStatus: ACCEPTED
             receivedBy: "Antoine Derieux"
             receivedAt: "2020-04-05T11:18:00"
+            acceptedAt: "2020-04-05T11:18:00"
             quantityReceived: 1
           }
         ){
@@ -364,6 +365,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         updatedFields: {
           receivedBy: "Antoine Derieux",
           receivedAt: "2020-04-05T11:18:00",
+          acceptedAt: "2020-04-05T11:18:00",
           quantityReceived: 1
         }
       },
@@ -636,6 +638,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             wasteAcceptationStatus: ACCEPTED
             receivedBy: "Mr Provisoire",
             receivedAt: "2020-05-03T09:00:00"
+            signedAt: "2020-05-03T09:00:00"
             quantityReceived: 1
             quantityType: REAL
           }) {
@@ -749,6 +752,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             wasteAcceptationStatus: ACCEPTED
             receivedBy: "Antoine Derieux"
             receivedAt: "2020-04-05T11:18:00"
+            signedAt: "2020-04-05T11:18:00"
             quantityReceived: 1
           }
         ){
@@ -828,7 +832,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           processedBy: "Alfred Dujardin",
           processedAt: "2020-04-15T10:22:00",
           processingOperationDone: "D 10",
-          processingOperationDescription: "Incinération"
+          processingOperationDescription: "Incinération",
         }
       },
       {
@@ -836,6 +840,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         updatedFields: {
           receivedBy: "Antoine Derieux",
           receivedAt: "2020-04-05T11:18:00",
+          signedAt: "2020-04-05T11:18:00",
           quantityReceived: 1
         }
       },
@@ -857,6 +862,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         updatedFields: {
           receivedBy: "Mr Provisoire",
           receivedAt: "2020-05-03T09:00:00",
+          signedAt: "2020-05-03T09:00:00",
           quantityReceived: 1,
           quantityType: "REAL"
         }

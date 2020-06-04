@@ -58,6 +58,7 @@ const mockedForm = {
   traderDepartment: "",
   recipientCompanyContact: "jean",
   receivedAt: "2019-10-16T00:00:00.000Z",
+  signedAt: "2019-10-16T00:00:00.000Z",
   transporterIsExemptedOfReceipt: false,
   sentAt: "2019-10-16T00:00:00.000Z",
   traderCompanySiret: "",
