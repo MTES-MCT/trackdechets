@@ -349,6 +349,37 @@ describe("{ mutation { saveForm } }", () => {
     payload.emitter.company.name = company.name;
 
     payload.recipient.isTempStorage = true;
+    delete payload.temporaryStorageDetail;
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    const temporaryStorageDetail = await prisma
+      .form({ id: data.saveForm.id })
+      .temporaryStorageDetail();
+
+    expect(temporaryStorageDetail).not.toBeNull();
+  });
+
+  test("should create a form `isTempStorage=true` with an empty temp storage details and still create the temporaryStorageDetail object", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const payload = getEmptyForm();
+
+    payload.emitter.company.siret = company.siret;
+    payload.emitter.company.name = company.name;
+
+    payload.recipient.isTempStorage = true;
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
