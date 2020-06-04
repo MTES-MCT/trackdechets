@@ -219,6 +219,7 @@ describe("Test Form with appendix reception", () => {
             receivedInfo: {
             receivedBy: "Bill",
             receivedAt :"2019-01-17T10:22:00+0100",
+            signedAt :"2019-01-17T10:22:00+0100",
             wasteAcceptationStatus: ACCEPTED,
             quantityReceived: 11
       }

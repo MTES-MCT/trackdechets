@@ -1361,6 +1361,7 @@ type Form {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1452,6 +1453,7 @@ input FormCreateInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1552,6 +1554,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1657,6 +1660,8 @@ enum FormOrderByInput {
   receivedBy_DESC
   receivedAt_ASC
   receivedAt_DESC
+  signedAt_ASC
+  signedAt_DESC
   quantityReceived_ASC
   quantityReceived_DESC
   processedBy_ASC
@@ -1805,6 +1810,7 @@ type FormPreviousValues {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -2013,6 +2019,14 @@ input FormScalarWhereInput {
   receivedAt_lte: DateTime
   receivedAt_gt: DateTime
   receivedAt_gte: DateTime
+  signedAt: DateTime
+  signedAt_not: DateTime
+  signedAt_in: [DateTime!]
+  signedAt_not_in: [DateTime!]
+  signedAt_lt: DateTime
+  signedAt_lte: DateTime
+  signedAt_gt: DateTime
+  signedAt_gte: DateTime
   quantityReceived: Float
   quantityReceived_not: Float
   quantityReceived_in: [Float!]
@@ -2850,6 +2864,7 @@ input FormUpdateDataInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -2934,6 +2949,7 @@ input FormUpdateInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3017,6 +3033,7 @@ input FormUpdateManyDataInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3109,6 +3126,7 @@ input FormUpdateManyMutationInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3211,6 +3229,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3443,6 +3462,14 @@ input FormWhereInput {
   receivedAt_lte: DateTime
   receivedAt_gt: DateTime
   receivedAt_gte: DateTime
+  signedAt: DateTime
+  signedAt_not: DateTime
+  signedAt_in: [DateTime!]
+  signedAt_not_in: [DateTime!]
+  signedAt_lt: DateTime
+  signedAt_lte: DateTime
+  signedAt_gt: DateTime
+  signedAt_gte: DateTime
   quantityReceived: Float
   quantityReceived_not: Float
   quantityReceived_in: [Float!]

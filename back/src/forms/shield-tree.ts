@@ -49,7 +49,8 @@ export default {
       isFormEcoOrganisme,
       isFormRecipient,
       isFormEmitter,
-      isFormTrader
+      isFormTrader,
+      isFormTempStorer
     ),
     markAsSent: chain(markAsSentSchema, or(isFormRecipient, isFormEmitter)),
     markAsReceived: chain(markAsReceivedSchema, isFormRecipient),

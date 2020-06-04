@@ -36,7 +36,7 @@ export default function CompanyActivity({ installation }: Props) {
         )}
 
         {[...new Set(rubriquesSorted.map((r) => r.category))]
-          .filter((category) => category !== null)
+          .filter((category) => !!category)
           .map((category, idx) => {
             return (
               <div className="label" key={idx}>

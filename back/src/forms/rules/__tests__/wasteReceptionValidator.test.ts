@@ -6,7 +6,8 @@ const acceptedInfo = {
   quantityReceived: 12.5,
   wasteRefusalReason: "",
   receivedBy: "Jim",
-  receivedAt: "2020-01-17T10:12:00+0100"
+  receivedAt: "2020-01-17T10:12:00+0100",
+  signedAt: "2020-01-17T10:12:00+0100"
 };
 
 const receivedInfoSchema = getReceivedInfoSchema(Yup);
@@ -52,7 +53,8 @@ const refusedInfo = {
   quantityReceived: 0,
   wasteRefusalReason: "non conformity",
   receivedBy: "Joe",
-  receivedAt: "2020-01-17T10:12:00+0100"
+  receivedAt: "2020-01-17T10:12:00+0100",
+  signedAt: "2020-01-17T10:12:00+0100"
 };
 
 describe("waste is refused", () => {
@@ -92,7 +94,8 @@ const partiallyRefusedInfo = {
   quantityReceived: 11,
   wasteRefusalReason: "mixed waste",
   receivedBy: "Bill",
-  receivedAt: "2020-01-17T10:12:00+0100"
+  receivedAt: "2020-01-17T10:12:00+0100",
+  signedAt: "2020-01-17T10:12:00+0100"
 };
 describe("waste is partially accepted", () => {
   const { wasteAcceptationStatus, quantityReceived } = partiallyRefusedInfo;

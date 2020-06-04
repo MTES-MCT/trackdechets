@@ -53,6 +53,14 @@ describe("flattenInoutObjectForDb", () => {
   test("flattenObject deeply flatten objects", () => {
     expect(flattenObjectForDb(apiShape)).toEqual(dbShape);
   });
+
+  test("flattenObject null object", () => {
+    expect(flattenObjectForDb(null)).toEqual({});
+  });
+
+  test("flattenObject undefined object", () => {
+    expect(flattenObjectForDb(undefined)).toEqual({});
+  });
 });
 
 describe("unflattenObjectFromDb", () => {

@@ -30,6 +30,7 @@ type Form {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
 
   processedBy: String

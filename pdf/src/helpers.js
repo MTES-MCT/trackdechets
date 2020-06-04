@@ -198,7 +198,7 @@ const getTempStorerWasteDetailsType = (params) => {
 /**
  * Format date fields to french fmt and copy some fields values to other fields
  * @param params
- * @returns {{traderValidityLimit: *, senderSentAt: *, transporterSentAt: *, recipientCompanyName10: *, transporterValidityLimit: *, recipientCompanySiret10: *, receivedAt2: *, recipientCompanyContact10: *, receivedAt1: *, recipientCompanyAddress10: *}}
+ * @returns {{traderValidityLimit: *, senderSentAt: *, transporterSentAt: *, recipientCompanyName10: *, transporterValidityLimit: *, recipientCompanySiret10: *, signedAt: *, recipientCompanyContact10: *, receivedAt: *, recipientCompanyAddress10: *}}
  */
 const renameAndFormatMainFormFields = (params) => ({
   transporterValidityLimit: dateFmt(params.transporterValidityLimit),
@@ -210,13 +210,14 @@ const renameAndFormatMainFormFields = (params) => ({
   transporterSentAt: dateFmt(params.sentAt),
   senderSentBy: params.sentBy,
   senderSentAt: dateFmt(params.sentAt),
-  receivedAt1: dateFmt(params.receivedAt),
-  receivedAt2: dateFmt(params.receivedAt),
+  receivedAt: dateFmt(params.receivedAt),
+  signedAt: dateFmt(params.signedAt),
   receivedBy10: params.receivedBy,
   processedAt: dateFmt(params.processedAt),
-  signedAt: dateFmt(params.signedAt),
   tempStorerReceivedAt: dateFmt(params.tempStorerReceivedAt),
   tempStorerSignedAt: dateFmt(params.tempStorerSignedAt),
+  tempStoredFormSignedAt: dateFmt(params.signedAt),
+  tempStoredFormSignedBy: dateFmt(params.signedBy),
 });
 
 /**
