@@ -435,8 +435,6 @@ export type Form = {
   createdAt: Maybe<Scalars['DateTime']>;
   /** Date de la dernière modification du BSD */
   updatedAt: Maybe<Scalars['DateTime']>;
-  /** ID de l'utilisateur ayant crée le BSD */
-  ownerId: Maybe<Scalars['Int']>;
   /** Statut du BSD (brouillon, envoyé, reçu, traité, etc) */
   status: FormStatus;
   /** Si oui ou non le BSD a été signé par un transporteur */

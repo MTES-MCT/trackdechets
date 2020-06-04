@@ -33,6 +33,7 @@ export interface Exists {
     where?: TemporaryStorageDetailWhereInput
   ) => Promise<boolean>;
   traderReceipt: (where?: TraderReceiptWhereInput) => Promise<boolean>;
+  transportSegment: (where?: TransportSegmentWhereInput) => Promise<boolean>;
   transporterReceipt: (
     where?: TransporterReceiptWhereInput
   ) => Promise<boolean>;
@@ -325,6 +326,27 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => TraderReceiptConnectionPromise;
+  transportSegment: (
+    where: TransportSegmentWhereUniqueInput
+  ) => TransportSegmentNullablePromise;
+  transportSegments: (args?: {
+    where?: TransportSegmentWhereInput;
+    orderBy?: TransportSegmentOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<TransportSegment>;
+  transportSegmentsConnection: (args?: {
+    where?: TransportSegmentWhereInput;
+    orderBy?: TransportSegmentOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => TransportSegmentConnectionPromise;
   transporterReceipt: (
     where: TransporterReceiptWhereUniqueInput
   ) => TransporterReceiptNullablePromise;
@@ -651,6 +673,28 @@ export interface Prisma {
   deleteManyTraderReceipts: (
     where?: TraderReceiptWhereInput
   ) => BatchPayloadPromise;
+  createTransportSegment: (
+    data: TransportSegmentCreateInput
+  ) => TransportSegmentPromise;
+  updateTransportSegment: (args: {
+    data: TransportSegmentUpdateInput;
+    where: TransportSegmentWhereUniqueInput;
+  }) => TransportSegmentPromise;
+  updateManyTransportSegments: (args: {
+    data: TransportSegmentUpdateManyMutationInput;
+    where?: TransportSegmentWhereInput;
+  }) => BatchPayloadPromise;
+  upsertTransportSegment: (args: {
+    where: TransportSegmentWhereUniqueInput;
+    create: TransportSegmentCreateInput;
+    update: TransportSegmentUpdateInput;
+  }) => TransportSegmentPromise;
+  deleteTransportSegment: (
+    where: TransportSegmentWhereUniqueInput
+  ) => TransportSegmentPromise;
+  deleteManyTransportSegments: (
+    where?: TransportSegmentWhereInput
+  ) => BatchPayloadPromise;
   createTransporterReceipt: (
     data: TransporterReceiptCreateInput
   ) => TransporterReceiptPromise;
@@ -781,6 +825,9 @@ export interface Subscription {
   traderReceipt: (
     where?: TraderReceiptSubscriptionWhereInput
   ) => TraderReceiptSubscriptionPayloadSubscription;
+  transportSegment: (
+    where?: TransportSegmentSubscriptionWhereInput
+  ) => TransportSegmentSubscriptionPayloadSubscription;
   transporterReceipt: (
     where?: TransporterReceiptSubscriptionWhereInput
   ) => TransporterReceiptSubscriptionPayloadSubscription;
@@ -930,6 +977,8 @@ export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
 export type QuantityType = "REAL" | "ESTIMATED";
 
 export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
+
+export type TransportMode = "ROAD" | "RAIL" | "AIR" | "RIVER" | "SEA";
 
 export type FormOrderByInput =
   | "id_ASC"
@@ -1093,7 +1142,53 @@ export type FormOrderByInput =
   | "traderDepartment_ASC"
   | "traderDepartment_DESC"
   | "traderValidityLimit_ASC"
-  | "traderValidityLimit_DESC";
+  | "traderValidityLimit_DESC"
+  | "currentTransporterSiret_ASC"
+  | "currentTransporterSiret_DESC"
+  | "nextTransporterSiret_ASC"
+  | "nextTransporterSiret_DESC";
+
+export type TransportSegmentOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "segmentNumber_ASC"
+  | "segmentNumber_DESC"
+  | "transporterCompanySiret_ASC"
+  | "transporterCompanySiret_DESC"
+  | "transporterCompanyName_ASC"
+  | "transporterCompanyName_DESC"
+  | "transporterCompanyAddress_ASC"
+  | "transporterCompanyAddress_DESC"
+  | "transporterCompanyContact_ASC"
+  | "transporterCompanyContact_DESC"
+  | "transporterCompanyPhone_ASC"
+  | "transporterCompanyPhone_DESC"
+  | "transporterCompanyMail_ASC"
+  | "transporterCompanyMail_DESC"
+  | "transporterIsExemptedOfReceipt_ASC"
+  | "transporterIsExemptedOfReceipt_DESC"
+  | "transporterReceipt_ASC"
+  | "transporterReceipt_DESC"
+  | "transporterDepartment_ASC"
+  | "transporterDepartment_DESC"
+  | "transporterValidityLimit_ASC"
+  | "transporterValidityLimit_DESC"
+  | "transporterNumberPlate_ASC"
+  | "transporterNumberPlate_DESC"
+  | "mode_ASC"
+  | "mode_DESC"
+  | "sealed_ASC"
+  | "sealed_DESC"
+  | "previousTransporterCompanySiret_ASC"
+  | "previousTransporterCompanySiret_DESC"
+  | "takenOverAt_ASC"
+  | "takenOverAt_DESC"
+  | "takenOverBy_ASC"
+  | "takenOverBy_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
 
 export type GrantOrderByInput =
   | "id_ASC"
@@ -2998,6 +3093,37 @@ export interface FormWhereInput {
   appendix2Forms_some?: Maybe<FormWhereInput>;
   appendix2Forms_none?: Maybe<FormWhereInput>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetailWhereInput>;
+  transportSegments_every?: Maybe<TransportSegmentWhereInput>;
+  transportSegments_some?: Maybe<TransportSegmentWhereInput>;
+  transportSegments_none?: Maybe<TransportSegmentWhereInput>;
+  currentTransporterSiret?: Maybe<String>;
+  currentTransporterSiret_not?: Maybe<String>;
+  currentTransporterSiret_in?: Maybe<String[] | String>;
+  currentTransporterSiret_not_in?: Maybe<String[] | String>;
+  currentTransporterSiret_lt?: Maybe<String>;
+  currentTransporterSiret_lte?: Maybe<String>;
+  currentTransporterSiret_gt?: Maybe<String>;
+  currentTransporterSiret_gte?: Maybe<String>;
+  currentTransporterSiret_contains?: Maybe<String>;
+  currentTransporterSiret_not_contains?: Maybe<String>;
+  currentTransporterSiret_starts_with?: Maybe<String>;
+  currentTransporterSiret_not_starts_with?: Maybe<String>;
+  currentTransporterSiret_ends_with?: Maybe<String>;
+  currentTransporterSiret_not_ends_with?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
+  nextTransporterSiret_not?: Maybe<String>;
+  nextTransporterSiret_in?: Maybe<String[] | String>;
+  nextTransporterSiret_not_in?: Maybe<String[] | String>;
+  nextTransporterSiret_lt?: Maybe<String>;
+  nextTransporterSiret_lte?: Maybe<String>;
+  nextTransporterSiret_gt?: Maybe<String>;
+  nextTransporterSiret_gte?: Maybe<String>;
+  nextTransporterSiret_contains?: Maybe<String>;
+  nextTransporterSiret_not_contains?: Maybe<String>;
+  nextTransporterSiret_starts_with?: Maybe<String>;
+  nextTransporterSiret_not_starts_with?: Maybe<String>;
+  nextTransporterSiret_ends_with?: Maybe<String>;
+  nextTransporterSiret_not_ends_with?: Maybe<String>;
   AND?: Maybe<FormWhereInput[] | FormWhereInput>;
   OR?: Maybe<FormWhereInput[] | FormWhereInput>;
   NOT?: Maybe<FormWhereInput[] | FormWhereInput>;
@@ -3414,6 +3540,229 @@ export interface TemporaryStorageDetailWhereInput {
   NOT?: Maybe<
     TemporaryStorageDetailWhereInput[] | TemporaryStorageDetailWhereInput
   >;
+}
+
+export interface TransportSegmentWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  segmentNumber?: Maybe<Int>;
+  segmentNumber_not?: Maybe<Int>;
+  segmentNumber_in?: Maybe<Int[] | Int>;
+  segmentNumber_not_in?: Maybe<Int[] | Int>;
+  segmentNumber_lt?: Maybe<Int>;
+  segmentNumber_lte?: Maybe<Int>;
+  segmentNumber_gt?: Maybe<Int>;
+  segmentNumber_gte?: Maybe<Int>;
+  form?: Maybe<FormWhereInput>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanySiret_not?: Maybe<String>;
+  transporterCompanySiret_in?: Maybe<String[] | String>;
+  transporterCompanySiret_not_in?: Maybe<String[] | String>;
+  transporterCompanySiret_lt?: Maybe<String>;
+  transporterCompanySiret_lte?: Maybe<String>;
+  transporterCompanySiret_gt?: Maybe<String>;
+  transporterCompanySiret_gte?: Maybe<String>;
+  transporterCompanySiret_contains?: Maybe<String>;
+  transporterCompanySiret_not_contains?: Maybe<String>;
+  transporterCompanySiret_starts_with?: Maybe<String>;
+  transporterCompanySiret_not_starts_with?: Maybe<String>;
+  transporterCompanySiret_ends_with?: Maybe<String>;
+  transporterCompanySiret_not_ends_with?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyName_not?: Maybe<String>;
+  transporterCompanyName_in?: Maybe<String[] | String>;
+  transporterCompanyName_not_in?: Maybe<String[] | String>;
+  transporterCompanyName_lt?: Maybe<String>;
+  transporterCompanyName_lte?: Maybe<String>;
+  transporterCompanyName_gt?: Maybe<String>;
+  transporterCompanyName_gte?: Maybe<String>;
+  transporterCompanyName_contains?: Maybe<String>;
+  transporterCompanyName_not_contains?: Maybe<String>;
+  transporterCompanyName_starts_with?: Maybe<String>;
+  transporterCompanyName_not_starts_with?: Maybe<String>;
+  transporterCompanyName_ends_with?: Maybe<String>;
+  transporterCompanyName_not_ends_with?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyAddress_not?: Maybe<String>;
+  transporterCompanyAddress_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_not_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_lt?: Maybe<String>;
+  transporterCompanyAddress_lte?: Maybe<String>;
+  transporterCompanyAddress_gt?: Maybe<String>;
+  transporterCompanyAddress_gte?: Maybe<String>;
+  transporterCompanyAddress_contains?: Maybe<String>;
+  transporterCompanyAddress_not_contains?: Maybe<String>;
+  transporterCompanyAddress_starts_with?: Maybe<String>;
+  transporterCompanyAddress_not_starts_with?: Maybe<String>;
+  transporterCompanyAddress_ends_with?: Maybe<String>;
+  transporterCompanyAddress_not_ends_with?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyContact_not?: Maybe<String>;
+  transporterCompanyContact_in?: Maybe<String[] | String>;
+  transporterCompanyContact_not_in?: Maybe<String[] | String>;
+  transporterCompanyContact_lt?: Maybe<String>;
+  transporterCompanyContact_lte?: Maybe<String>;
+  transporterCompanyContact_gt?: Maybe<String>;
+  transporterCompanyContact_gte?: Maybe<String>;
+  transporterCompanyContact_contains?: Maybe<String>;
+  transporterCompanyContact_not_contains?: Maybe<String>;
+  transporterCompanyContact_starts_with?: Maybe<String>;
+  transporterCompanyContact_not_starts_with?: Maybe<String>;
+  transporterCompanyContact_ends_with?: Maybe<String>;
+  transporterCompanyContact_not_ends_with?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyPhone_not?: Maybe<String>;
+  transporterCompanyPhone_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_not_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_lt?: Maybe<String>;
+  transporterCompanyPhone_lte?: Maybe<String>;
+  transporterCompanyPhone_gt?: Maybe<String>;
+  transporterCompanyPhone_gte?: Maybe<String>;
+  transporterCompanyPhone_contains?: Maybe<String>;
+  transporterCompanyPhone_not_contains?: Maybe<String>;
+  transporterCompanyPhone_starts_with?: Maybe<String>;
+  transporterCompanyPhone_not_starts_with?: Maybe<String>;
+  transporterCompanyPhone_ends_with?: Maybe<String>;
+  transporterCompanyPhone_not_ends_with?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterCompanyMail_not?: Maybe<String>;
+  transporterCompanyMail_in?: Maybe<String[] | String>;
+  transporterCompanyMail_not_in?: Maybe<String[] | String>;
+  transporterCompanyMail_lt?: Maybe<String>;
+  transporterCompanyMail_lte?: Maybe<String>;
+  transporterCompanyMail_gt?: Maybe<String>;
+  transporterCompanyMail_gte?: Maybe<String>;
+  transporterCompanyMail_contains?: Maybe<String>;
+  transporterCompanyMail_not_contains?: Maybe<String>;
+  transporterCompanyMail_starts_with?: Maybe<String>;
+  transporterCompanyMail_not_starts_with?: Maybe<String>;
+  transporterCompanyMail_ends_with?: Maybe<String>;
+  transporterCompanyMail_not_ends_with?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterIsExemptedOfReceipt_not?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterReceipt_not?: Maybe<String>;
+  transporterReceipt_in?: Maybe<String[] | String>;
+  transporterReceipt_not_in?: Maybe<String[] | String>;
+  transporterReceipt_lt?: Maybe<String>;
+  transporterReceipt_lte?: Maybe<String>;
+  transporterReceipt_gt?: Maybe<String>;
+  transporterReceipt_gte?: Maybe<String>;
+  transporterReceipt_contains?: Maybe<String>;
+  transporterReceipt_not_contains?: Maybe<String>;
+  transporterReceipt_starts_with?: Maybe<String>;
+  transporterReceipt_not_starts_with?: Maybe<String>;
+  transporterReceipt_ends_with?: Maybe<String>;
+  transporterReceipt_not_ends_with?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterDepartment_not?: Maybe<String>;
+  transporterDepartment_in?: Maybe<String[] | String>;
+  transporterDepartment_not_in?: Maybe<String[] | String>;
+  transporterDepartment_lt?: Maybe<String>;
+  transporterDepartment_lte?: Maybe<String>;
+  transporterDepartment_gt?: Maybe<String>;
+  transporterDepartment_gte?: Maybe<String>;
+  transporterDepartment_contains?: Maybe<String>;
+  transporterDepartment_not_contains?: Maybe<String>;
+  transporterDepartment_starts_with?: Maybe<String>;
+  transporterDepartment_not_starts_with?: Maybe<String>;
+  transporterDepartment_ends_with?: Maybe<String>;
+  transporterDepartment_not_ends_with?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterValidityLimit_not?: Maybe<DateTimeInput>;
+  transporterValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_lt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_lte?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gte?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterNumberPlate_not?: Maybe<String>;
+  transporterNumberPlate_in?: Maybe<String[] | String>;
+  transporterNumberPlate_not_in?: Maybe<String[] | String>;
+  transporterNumberPlate_lt?: Maybe<String>;
+  transporterNumberPlate_lte?: Maybe<String>;
+  transporterNumberPlate_gt?: Maybe<String>;
+  transporterNumberPlate_gte?: Maybe<String>;
+  transporterNumberPlate_contains?: Maybe<String>;
+  transporterNumberPlate_not_contains?: Maybe<String>;
+  transporterNumberPlate_starts_with?: Maybe<String>;
+  transporterNumberPlate_not_starts_with?: Maybe<String>;
+  transporterNumberPlate_ends_with?: Maybe<String>;
+  transporterNumberPlate_not_ends_with?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  mode_not?: Maybe<TransportMode>;
+  mode_in?: Maybe<TransportMode[] | TransportMode>;
+  mode_not_in?: Maybe<TransportMode[] | TransportMode>;
+  sealed?: Maybe<Boolean>;
+  sealed_not?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  previousTransporterCompanySiret_not?: Maybe<String>;
+  previousTransporterCompanySiret_in?: Maybe<String[] | String>;
+  previousTransporterCompanySiret_not_in?: Maybe<String[] | String>;
+  previousTransporterCompanySiret_lt?: Maybe<String>;
+  previousTransporterCompanySiret_lte?: Maybe<String>;
+  previousTransporterCompanySiret_gt?: Maybe<String>;
+  previousTransporterCompanySiret_gte?: Maybe<String>;
+  previousTransporterCompanySiret_contains?: Maybe<String>;
+  previousTransporterCompanySiret_not_contains?: Maybe<String>;
+  previousTransporterCompanySiret_starts_with?: Maybe<String>;
+  previousTransporterCompanySiret_not_starts_with?: Maybe<String>;
+  previousTransporterCompanySiret_ends_with?: Maybe<String>;
+  previousTransporterCompanySiret_not_ends_with?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverAt_not?: Maybe<DateTimeInput>;
+  takenOverAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  takenOverAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  takenOverAt_lt?: Maybe<DateTimeInput>;
+  takenOverAt_lte?: Maybe<DateTimeInput>;
+  takenOverAt_gt?: Maybe<DateTimeInput>;
+  takenOverAt_gte?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
+  takenOverBy_not?: Maybe<String>;
+  takenOverBy_in?: Maybe<String[] | String>;
+  takenOverBy_not_in?: Maybe<String[] | String>;
+  takenOverBy_lt?: Maybe<String>;
+  takenOverBy_lte?: Maybe<String>;
+  takenOverBy_gt?: Maybe<String>;
+  takenOverBy_gte?: Maybe<String>;
+  takenOverBy_contains?: Maybe<String>;
+  takenOverBy_not_contains?: Maybe<String>;
+  takenOverBy_starts_with?: Maybe<String>;
+  takenOverBy_not_starts_with?: Maybe<String>;
+  takenOverBy_ends_with?: Maybe<String>;
+  takenOverBy_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<TransportSegmentWhereInput[] | TransportSegmentWhereInput>;
+  OR?: Maybe<TransportSegmentWhereInput[] | TransportSegmentWhereInput>;
+  NOT?: Maybe<TransportSegmentWhereInput[] | TransportSegmentWhereInput>;
 }
 
 export type GrantWhereUniqueInput = AtLeastOne<{
@@ -3888,6 +4237,10 @@ export type TemporaryStorageDetailWhereUniqueInput = AtLeastOne<{
 }>;
 
 export type TraderReceiptWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export type TransportSegmentWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
@@ -4753,6 +5106,9 @@ export interface FormCreateInput {
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailCreateOneWithoutFormInput
   >;
+  transportSegments?: Maybe<TransportSegmentCreateManyWithoutFormInput>;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
 }
 
 export interface EcoOrganismeCreateOneInput {
@@ -4808,6 +5164,37 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   signedByTransporter?: Maybe<Boolean>;
   signedBy?: Maybe<String>;
   signedAt?: Maybe<DateTimeInput>;
+}
+
+export interface TransportSegmentCreateManyWithoutFormInput {
+  create?: Maybe<
+    | TransportSegmentCreateWithoutFormInput[]
+    | TransportSegmentCreateWithoutFormInput
+  >;
+  connect?: Maybe<
+    TransportSegmentWhereUniqueInput[] | TransportSegmentWhereUniqueInput
+  >;
+}
+
+export interface TransportSegmentCreateWithoutFormInput {
+  id?: Maybe<ID_Input>;
+  segmentNumber?: Maybe<Int>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  sealed?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
 }
 
 export interface FormUpdateInput {
@@ -4895,6 +5282,9 @@ export interface FormUpdateInput {
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailUpdateOneWithoutFormInput
   >;
+  transportSegments?: Maybe<TransportSegmentUpdateManyWithoutFormInput>;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
 }
 
 export interface EcoOrganismeUpdateOneInput {
@@ -5027,6 +5417,9 @@ export interface FormUpdateDataInput {
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailUpdateOneWithoutFormInput
   >;
+  transportSegments?: Maybe<TransportSegmentUpdateManyWithoutFormInput>;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
 }
 
 export interface TemporaryStorageDetailUpdateOneWithoutFormInput {
@@ -5080,6 +5473,324 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
 export interface TemporaryStorageDetailUpsertWithoutFormInput {
   update: TemporaryStorageDetailUpdateWithoutFormDataInput;
   create: TemporaryStorageDetailCreateWithoutFormInput;
+}
+
+export interface TransportSegmentUpdateManyWithoutFormInput {
+  create?: Maybe<
+    | TransportSegmentCreateWithoutFormInput[]
+    | TransportSegmentCreateWithoutFormInput
+  >;
+  delete?: Maybe<
+    TransportSegmentWhereUniqueInput[] | TransportSegmentWhereUniqueInput
+  >;
+  connect?: Maybe<
+    TransportSegmentWhereUniqueInput[] | TransportSegmentWhereUniqueInput
+  >;
+  set?: Maybe<
+    TransportSegmentWhereUniqueInput[] | TransportSegmentWhereUniqueInput
+  >;
+  disconnect?: Maybe<
+    TransportSegmentWhereUniqueInput[] | TransportSegmentWhereUniqueInput
+  >;
+  update?: Maybe<
+    | TransportSegmentUpdateWithWhereUniqueWithoutFormInput[]
+    | TransportSegmentUpdateWithWhereUniqueWithoutFormInput
+  >;
+  upsert?: Maybe<
+    | TransportSegmentUpsertWithWhereUniqueWithoutFormInput[]
+    | TransportSegmentUpsertWithWhereUniqueWithoutFormInput
+  >;
+  deleteMany?: Maybe<
+    TransportSegmentScalarWhereInput[] | TransportSegmentScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | TransportSegmentUpdateManyWithWhereNestedInput[]
+    | TransportSegmentUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface TransportSegmentUpdateWithWhereUniqueWithoutFormInput {
+  where: TransportSegmentWhereUniqueInput;
+  data: TransportSegmentUpdateWithoutFormDataInput;
+}
+
+export interface TransportSegmentUpdateWithoutFormDataInput {
+  segmentNumber?: Maybe<Int>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  sealed?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
+}
+
+export interface TransportSegmentUpsertWithWhereUniqueWithoutFormInput {
+  where: TransportSegmentWhereUniqueInput;
+  update: TransportSegmentUpdateWithoutFormDataInput;
+  create: TransportSegmentCreateWithoutFormInput;
+}
+
+export interface TransportSegmentScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  segmentNumber?: Maybe<Int>;
+  segmentNumber_not?: Maybe<Int>;
+  segmentNumber_in?: Maybe<Int[] | Int>;
+  segmentNumber_not_in?: Maybe<Int[] | Int>;
+  segmentNumber_lt?: Maybe<Int>;
+  segmentNumber_lte?: Maybe<Int>;
+  segmentNumber_gt?: Maybe<Int>;
+  segmentNumber_gte?: Maybe<Int>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanySiret_not?: Maybe<String>;
+  transporterCompanySiret_in?: Maybe<String[] | String>;
+  transporterCompanySiret_not_in?: Maybe<String[] | String>;
+  transporterCompanySiret_lt?: Maybe<String>;
+  transporterCompanySiret_lte?: Maybe<String>;
+  transporterCompanySiret_gt?: Maybe<String>;
+  transporterCompanySiret_gte?: Maybe<String>;
+  transporterCompanySiret_contains?: Maybe<String>;
+  transporterCompanySiret_not_contains?: Maybe<String>;
+  transporterCompanySiret_starts_with?: Maybe<String>;
+  transporterCompanySiret_not_starts_with?: Maybe<String>;
+  transporterCompanySiret_ends_with?: Maybe<String>;
+  transporterCompanySiret_not_ends_with?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyName_not?: Maybe<String>;
+  transporterCompanyName_in?: Maybe<String[] | String>;
+  transporterCompanyName_not_in?: Maybe<String[] | String>;
+  transporterCompanyName_lt?: Maybe<String>;
+  transporterCompanyName_lte?: Maybe<String>;
+  transporterCompanyName_gt?: Maybe<String>;
+  transporterCompanyName_gte?: Maybe<String>;
+  transporterCompanyName_contains?: Maybe<String>;
+  transporterCompanyName_not_contains?: Maybe<String>;
+  transporterCompanyName_starts_with?: Maybe<String>;
+  transporterCompanyName_not_starts_with?: Maybe<String>;
+  transporterCompanyName_ends_with?: Maybe<String>;
+  transporterCompanyName_not_ends_with?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyAddress_not?: Maybe<String>;
+  transporterCompanyAddress_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_not_in?: Maybe<String[] | String>;
+  transporterCompanyAddress_lt?: Maybe<String>;
+  transporterCompanyAddress_lte?: Maybe<String>;
+  transporterCompanyAddress_gt?: Maybe<String>;
+  transporterCompanyAddress_gte?: Maybe<String>;
+  transporterCompanyAddress_contains?: Maybe<String>;
+  transporterCompanyAddress_not_contains?: Maybe<String>;
+  transporterCompanyAddress_starts_with?: Maybe<String>;
+  transporterCompanyAddress_not_starts_with?: Maybe<String>;
+  transporterCompanyAddress_ends_with?: Maybe<String>;
+  transporterCompanyAddress_not_ends_with?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyContact_not?: Maybe<String>;
+  transporterCompanyContact_in?: Maybe<String[] | String>;
+  transporterCompanyContact_not_in?: Maybe<String[] | String>;
+  transporterCompanyContact_lt?: Maybe<String>;
+  transporterCompanyContact_lte?: Maybe<String>;
+  transporterCompanyContact_gt?: Maybe<String>;
+  transporterCompanyContact_gte?: Maybe<String>;
+  transporterCompanyContact_contains?: Maybe<String>;
+  transporterCompanyContact_not_contains?: Maybe<String>;
+  transporterCompanyContact_starts_with?: Maybe<String>;
+  transporterCompanyContact_not_starts_with?: Maybe<String>;
+  transporterCompanyContact_ends_with?: Maybe<String>;
+  transporterCompanyContact_not_ends_with?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyPhone_not?: Maybe<String>;
+  transporterCompanyPhone_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_not_in?: Maybe<String[] | String>;
+  transporterCompanyPhone_lt?: Maybe<String>;
+  transporterCompanyPhone_lte?: Maybe<String>;
+  transporterCompanyPhone_gt?: Maybe<String>;
+  transporterCompanyPhone_gte?: Maybe<String>;
+  transporterCompanyPhone_contains?: Maybe<String>;
+  transporterCompanyPhone_not_contains?: Maybe<String>;
+  transporterCompanyPhone_starts_with?: Maybe<String>;
+  transporterCompanyPhone_not_starts_with?: Maybe<String>;
+  transporterCompanyPhone_ends_with?: Maybe<String>;
+  transporterCompanyPhone_not_ends_with?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterCompanyMail_not?: Maybe<String>;
+  transporterCompanyMail_in?: Maybe<String[] | String>;
+  transporterCompanyMail_not_in?: Maybe<String[] | String>;
+  transporterCompanyMail_lt?: Maybe<String>;
+  transporterCompanyMail_lte?: Maybe<String>;
+  transporterCompanyMail_gt?: Maybe<String>;
+  transporterCompanyMail_gte?: Maybe<String>;
+  transporterCompanyMail_contains?: Maybe<String>;
+  transporterCompanyMail_not_contains?: Maybe<String>;
+  transporterCompanyMail_starts_with?: Maybe<String>;
+  transporterCompanyMail_not_starts_with?: Maybe<String>;
+  transporterCompanyMail_ends_with?: Maybe<String>;
+  transporterCompanyMail_not_ends_with?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterIsExemptedOfReceipt_not?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterReceipt_not?: Maybe<String>;
+  transporterReceipt_in?: Maybe<String[] | String>;
+  transporterReceipt_not_in?: Maybe<String[] | String>;
+  transporterReceipt_lt?: Maybe<String>;
+  transporterReceipt_lte?: Maybe<String>;
+  transporterReceipt_gt?: Maybe<String>;
+  transporterReceipt_gte?: Maybe<String>;
+  transporterReceipt_contains?: Maybe<String>;
+  transporterReceipt_not_contains?: Maybe<String>;
+  transporterReceipt_starts_with?: Maybe<String>;
+  transporterReceipt_not_starts_with?: Maybe<String>;
+  transporterReceipt_ends_with?: Maybe<String>;
+  transporterReceipt_not_ends_with?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterDepartment_not?: Maybe<String>;
+  transporterDepartment_in?: Maybe<String[] | String>;
+  transporterDepartment_not_in?: Maybe<String[] | String>;
+  transporterDepartment_lt?: Maybe<String>;
+  transporterDepartment_lte?: Maybe<String>;
+  transporterDepartment_gt?: Maybe<String>;
+  transporterDepartment_gte?: Maybe<String>;
+  transporterDepartment_contains?: Maybe<String>;
+  transporterDepartment_not_contains?: Maybe<String>;
+  transporterDepartment_starts_with?: Maybe<String>;
+  transporterDepartment_not_starts_with?: Maybe<String>;
+  transporterDepartment_ends_with?: Maybe<String>;
+  transporterDepartment_not_ends_with?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterValidityLimit_not?: Maybe<DateTimeInput>;
+  transporterValidityLimit_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  transporterValidityLimit_lt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_lte?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gt?: Maybe<DateTimeInput>;
+  transporterValidityLimit_gte?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterNumberPlate_not?: Maybe<String>;
+  transporterNumberPlate_in?: Maybe<String[] | String>;
+  transporterNumberPlate_not_in?: Maybe<String[] | String>;
+  transporterNumberPlate_lt?: Maybe<String>;
+  transporterNumberPlate_lte?: Maybe<String>;
+  transporterNumberPlate_gt?: Maybe<String>;
+  transporterNumberPlate_gte?: Maybe<String>;
+  transporterNumberPlate_contains?: Maybe<String>;
+  transporterNumberPlate_not_contains?: Maybe<String>;
+  transporterNumberPlate_starts_with?: Maybe<String>;
+  transporterNumberPlate_not_starts_with?: Maybe<String>;
+  transporterNumberPlate_ends_with?: Maybe<String>;
+  transporterNumberPlate_not_ends_with?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  mode_not?: Maybe<TransportMode>;
+  mode_in?: Maybe<TransportMode[] | TransportMode>;
+  mode_not_in?: Maybe<TransportMode[] | TransportMode>;
+  sealed?: Maybe<Boolean>;
+  sealed_not?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  previousTransporterCompanySiret_not?: Maybe<String>;
+  previousTransporterCompanySiret_in?: Maybe<String[] | String>;
+  previousTransporterCompanySiret_not_in?: Maybe<String[] | String>;
+  previousTransporterCompanySiret_lt?: Maybe<String>;
+  previousTransporterCompanySiret_lte?: Maybe<String>;
+  previousTransporterCompanySiret_gt?: Maybe<String>;
+  previousTransporterCompanySiret_gte?: Maybe<String>;
+  previousTransporterCompanySiret_contains?: Maybe<String>;
+  previousTransporterCompanySiret_not_contains?: Maybe<String>;
+  previousTransporterCompanySiret_starts_with?: Maybe<String>;
+  previousTransporterCompanySiret_not_starts_with?: Maybe<String>;
+  previousTransporterCompanySiret_ends_with?: Maybe<String>;
+  previousTransporterCompanySiret_not_ends_with?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverAt_not?: Maybe<DateTimeInput>;
+  takenOverAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  takenOverAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  takenOverAt_lt?: Maybe<DateTimeInput>;
+  takenOverAt_lte?: Maybe<DateTimeInput>;
+  takenOverAt_gt?: Maybe<DateTimeInput>;
+  takenOverAt_gte?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
+  takenOverBy_not?: Maybe<String>;
+  takenOverBy_in?: Maybe<String[] | String>;
+  takenOverBy_not_in?: Maybe<String[] | String>;
+  takenOverBy_lt?: Maybe<String>;
+  takenOverBy_lte?: Maybe<String>;
+  takenOverBy_gt?: Maybe<String>;
+  takenOverBy_gte?: Maybe<String>;
+  takenOverBy_contains?: Maybe<String>;
+  takenOverBy_not_contains?: Maybe<String>;
+  takenOverBy_starts_with?: Maybe<String>;
+  takenOverBy_not_starts_with?: Maybe<String>;
+  takenOverBy_ends_with?: Maybe<String>;
+  takenOverBy_not_ends_with?: Maybe<String>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<
+    TransportSegmentScalarWhereInput[] | TransportSegmentScalarWhereInput
+  >;
+  OR?: Maybe<
+    TransportSegmentScalarWhereInput[] | TransportSegmentScalarWhereInput
+  >;
+  NOT?: Maybe<
+    TransportSegmentScalarWhereInput[] | TransportSegmentScalarWhereInput
+  >;
+}
+
+export interface TransportSegmentUpdateManyWithWhereNestedInput {
+  where: TransportSegmentScalarWhereInput;
+  data: TransportSegmentUpdateManyDataInput;
+}
+
+export interface TransportSegmentUpdateManyDataInput {
+  segmentNumber?: Maybe<Int>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  sealed?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
 }
 
 export interface FormUpsertWithWhereUniqueNestedInput {
@@ -6041,6 +6752,34 @@ export interface FormScalarWhereInput {
   traderValidityLimit_lte?: Maybe<DateTimeInput>;
   traderValidityLimit_gt?: Maybe<DateTimeInput>;
   traderValidityLimit_gte?: Maybe<DateTimeInput>;
+  currentTransporterSiret?: Maybe<String>;
+  currentTransporterSiret_not?: Maybe<String>;
+  currentTransporterSiret_in?: Maybe<String[] | String>;
+  currentTransporterSiret_not_in?: Maybe<String[] | String>;
+  currentTransporterSiret_lt?: Maybe<String>;
+  currentTransporterSiret_lte?: Maybe<String>;
+  currentTransporterSiret_gt?: Maybe<String>;
+  currentTransporterSiret_gte?: Maybe<String>;
+  currentTransporterSiret_contains?: Maybe<String>;
+  currentTransporterSiret_not_contains?: Maybe<String>;
+  currentTransporterSiret_starts_with?: Maybe<String>;
+  currentTransporterSiret_not_starts_with?: Maybe<String>;
+  currentTransporterSiret_ends_with?: Maybe<String>;
+  currentTransporterSiret_not_ends_with?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
+  nextTransporterSiret_not?: Maybe<String>;
+  nextTransporterSiret_in?: Maybe<String[] | String>;
+  nextTransporterSiret_not_in?: Maybe<String[] | String>;
+  nextTransporterSiret_lt?: Maybe<String>;
+  nextTransporterSiret_lte?: Maybe<String>;
+  nextTransporterSiret_gt?: Maybe<String>;
+  nextTransporterSiret_gte?: Maybe<String>;
+  nextTransporterSiret_contains?: Maybe<String>;
+  nextTransporterSiret_not_contains?: Maybe<String>;
+  nextTransporterSiret_starts_with?: Maybe<String>;
+  nextTransporterSiret_not_starts_with?: Maybe<String>;
+  nextTransporterSiret_ends_with?: Maybe<String>;
+  nextTransporterSiret_not_ends_with?: Maybe<String>;
   AND?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
   OR?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
   NOT?: Maybe<FormScalarWhereInput[] | FormScalarWhereInput>;
@@ -6130,6 +6869,8 @@ export interface FormUpdateManyDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
 }
 
 export interface FormUpdateManyMutationInput {
@@ -6211,6 +6952,8 @@ export interface FormUpdateManyMutationInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
 }
 
 export interface GrantCreateInput {
@@ -6501,6 +7244,9 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
+  transportSegments?: Maybe<TransportSegmentCreateManyWithoutFormInput>;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
 }
 
 export interface TemporaryStorageDetailUpdateInput {
@@ -6634,6 +7380,9 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
+  transportSegments?: Maybe<TransportSegmentUpdateManyWithoutFormInput>;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
 }
 
 export interface FormUpsertWithoutTemporaryStorageDetailInput {
@@ -6690,6 +7439,265 @@ export interface TraderReceiptUpdateManyMutationInput {
   receiptNumber?: Maybe<String>;
   validityLimit?: Maybe<DateTimeInput>;
   department?: Maybe<String>;
+}
+
+export interface TransportSegmentCreateInput {
+  id?: Maybe<ID_Input>;
+  segmentNumber?: Maybe<Int>;
+  form: FormCreateOneWithoutTransportSegmentsInput;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  sealed?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
+}
+
+export interface FormCreateOneWithoutTransportSegmentsInput {
+  create?: Maybe<FormCreateWithoutTransportSegmentsInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface FormCreateWithoutTransportSegmentsInput {
+  id?: Maybe<ID_Input>;
+  readableId: String;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner: UserCreateOneInput;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  signedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  appendix2Forms?: Maybe<FormCreateManyInput>;
+  temporaryStorageDetail?: Maybe<
+    TemporaryStorageDetailCreateOneWithoutFormInput
+  >;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
+}
+
+export interface TransportSegmentUpdateInput {
+  segmentNumber?: Maybe<Int>;
+  form?: Maybe<FormUpdateOneRequiredWithoutTransportSegmentsInput>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  sealed?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
+}
+
+export interface FormUpdateOneRequiredWithoutTransportSegmentsInput {
+  create?: Maybe<FormCreateWithoutTransportSegmentsInput>;
+  update?: Maybe<FormUpdateWithoutTransportSegmentsDataInput>;
+  upsert?: Maybe<FormUpsertWithoutTransportSegmentsInput>;
+  connect?: Maybe<FormWhereUniqueInput>;
+}
+
+export interface FormUpdateWithoutTransportSegmentsDataInput {
+  readableId?: Maybe<String>;
+  customId?: Maybe<String>;
+  isDeleted?: Maybe<Boolean>;
+  owner?: Maybe<UserUpdateOneRequiredInput>;
+  signedByTransporter?: Maybe<Boolean>;
+  status?: Maybe<String>;
+  sentAt?: Maybe<DateTimeInput>;
+  sentBy?: Maybe<String>;
+  isAccepted?: Maybe<Boolean>;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatus>;
+  wasteRefusalReason?: Maybe<String>;
+  receivedBy?: Maybe<String>;
+  receivedAt?: Maybe<DateTimeInput>;
+  signedAt?: Maybe<DateTimeInput>;
+  quantityReceived?: Maybe<Float>;
+  processedBy?: Maybe<String>;
+  processedAt?: Maybe<String>;
+  processingOperationDone?: Maybe<String>;
+  processingOperationDescription?: Maybe<String>;
+  noTraceability?: Maybe<Boolean>;
+  nextDestinationProcessingOperation?: Maybe<String>;
+  nextDestinationCompanyName?: Maybe<String>;
+  nextDestinationCompanySiret?: Maybe<String>;
+  nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyContact?: Maybe<String>;
+  nextDestinationCompanyPhone?: Maybe<String>;
+  nextDestinationCompanyMail?: Maybe<String>;
+  emitterType?: Maybe<EmitterType>;
+  emitterPickupSite?: Maybe<String>;
+  emitterWorkSiteName?: Maybe<String>;
+  emitterWorkSiteAddress?: Maybe<String>;
+  emitterWorkSiteCity?: Maybe<String>;
+  emitterWorkSitePostalCode?: Maybe<String>;
+  emitterWorkSiteInfos?: Maybe<String>;
+  emitterCompanyName?: Maybe<String>;
+  emitterCompanySiret?: Maybe<String>;
+  emitterCompanyAddress?: Maybe<String>;
+  emitterCompanyContact?: Maybe<String>;
+  emitterCompanyPhone?: Maybe<String>;
+  emitterCompanyMail?: Maybe<String>;
+  recipientCap?: Maybe<String>;
+  recipientProcessingOperation?: Maybe<String>;
+  recipientIsTempStorage?: Maybe<Boolean>;
+  recipientCompanyName?: Maybe<String>;
+  recipientCompanySiret?: Maybe<String>;
+  recipientCompanyAddress?: Maybe<String>;
+  recipientCompanyContact?: Maybe<String>;
+  recipientCompanyPhone?: Maybe<String>;
+  recipientCompanyMail?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  transporterCustomInfo?: Maybe<String>;
+  wasteDetailsCode?: Maybe<String>;
+  wasteDetailsName?: Maybe<String>;
+  wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagings?: Maybe<Json>;
+  wasteDetailsOtherPackaging?: Maybe<String>;
+  wasteDetailsNumberOfPackages?: Maybe<Int>;
+  wasteDetailsQuantity?: Maybe<Float>;
+  wasteDetailsQuantityType?: Maybe<QuantityType>;
+  wasteDetailsConsistence?: Maybe<Consistence>;
+  traderCompanyName?: Maybe<String>;
+  traderCompanySiret?: Maybe<String>;
+  traderCompanyAddress?: Maybe<String>;
+  traderCompanyContact?: Maybe<String>;
+  traderCompanyPhone?: Maybe<String>;
+  traderCompanyMail?: Maybe<String>;
+  traderReceipt?: Maybe<String>;
+  traderDepartment?: Maybe<String>;
+  traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  appendix2Forms?: Maybe<FormUpdateManyInput>;
+  temporaryStorageDetail?: Maybe<
+    TemporaryStorageDetailUpdateOneWithoutFormInput
+  >;
+  currentTransporterSiret?: Maybe<String>;
+  nextTransporterSiret?: Maybe<String>;
+}
+
+export interface FormUpsertWithoutTransportSegmentsInput {
+  update: FormUpdateWithoutTransportSegmentsDataInput;
+  create: FormCreateWithoutTransportSegmentsInput;
+}
+
+export interface TransportSegmentUpdateManyMutationInput {
+  segmentNumber?: Maybe<Int>;
+  transporterCompanySiret?: Maybe<String>;
+  transporterCompanyName?: Maybe<String>;
+  transporterCompanyAddress?: Maybe<String>;
+  transporterCompanyContact?: Maybe<String>;
+  transporterCompanyPhone?: Maybe<String>;
+  transporterCompanyMail?: Maybe<String>;
+  transporterIsExemptedOfReceipt?: Maybe<Boolean>;
+  transporterReceipt?: Maybe<String>;
+  transporterDepartment?: Maybe<String>;
+  transporterValidityLimit?: Maybe<DateTimeInput>;
+  transporterNumberPlate?: Maybe<String>;
+  mode?: Maybe<TransportMode>;
+  sealed?: Maybe<Boolean>;
+  previousTransporterCompanySiret?: Maybe<String>;
+  takenOverAt?: Maybe<DateTimeInput>;
+  takenOverBy?: Maybe<String>;
 }
 
 export interface TransporterReceiptUpdateInput {
@@ -6962,6 +7970,26 @@ export interface TraderReceiptSubscriptionWhereInput {
   >;
   NOT?: Maybe<
     TraderReceiptSubscriptionWhereInput[] | TraderReceiptSubscriptionWhereInput
+  >;
+}
+
+export interface TransportSegmentSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<TransportSegmentWhereInput>;
+  AND?: Maybe<
+    | TransportSegmentSubscriptionWhereInput[]
+    | TransportSegmentSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | TransportSegmentSubscriptionWhereInput[]
+    | TransportSegmentSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | TransportSegmentSubscriptionWhereInput[]
+    | TransportSegmentSubscriptionWhereInput
   >;
 }
 
@@ -7931,6 +8959,8 @@ export interface Form {
   traderReceipt?: String;
   traderDepartment?: String;
   traderValidityLimit?: DateTimeOutput;
+  currentTransporterSiret?: String;
+  nextTransporterSiret?: String;
 }
 
 export interface FormPromise extends Promise<Form>, Fragmentable {
@@ -8027,6 +9057,17 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
     last?: Int;
   }) => T;
   temporaryStorageDetail: <T = TemporaryStorageDetailPromise>() => T;
+  transportSegments: <T = FragmentableArray<TransportSegment>>(args?: {
+    where?: TransportSegmentWhereInput;
+    orderBy?: TransportSegmentOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  currentTransporterSiret: () => Promise<String>;
+  nextTransporterSiret: () => Promise<String>;
 }
 
 export interface FormSubscription
@@ -8125,6 +9166,19 @@ export interface FormSubscription
     last?: Int;
   }) => T;
   temporaryStorageDetail: <T = TemporaryStorageDetailSubscription>() => T;
+  transportSegments: <
+    T = Promise<AsyncIterator<TransportSegmentSubscription>>
+  >(args?: {
+    where?: TransportSegmentWhereInput;
+    orderBy?: TransportSegmentOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  currentTransporterSiret: () => Promise<AsyncIterator<String>>;
+  nextTransporterSiret: () => Promise<AsyncIterator<String>>;
 }
 
 export interface FormNullablePromise
@@ -8223,6 +9277,17 @@ export interface FormNullablePromise
     last?: Int;
   }) => T;
   temporaryStorageDetail: <T = TemporaryStorageDetailPromise>() => T;
+  transportSegments: <T = FragmentableArray<TransportSegment>>(args?: {
+    where?: TransportSegmentWhereInput;
+    orderBy?: TransportSegmentOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  currentTransporterSiret: () => Promise<String>;
+  nextTransporterSiret: () => Promise<String>;
 }
 
 export interface TemporaryStorageDetail {
@@ -8394,6 +9459,107 @@ export interface TemporaryStorageDetailNullablePromise
   signedByTransporter: () => Promise<Boolean>;
   signedBy: () => Promise<String>;
   signedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface TransportSegment {
+  id: ID_Output;
+  segmentNumber?: Int;
+  transporterCompanySiret?: String;
+  transporterCompanyName?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterIsExemptedOfReceipt?: Boolean;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeOutput;
+  transporterNumberPlate?: String;
+  mode?: TransportMode;
+  sealed?: Boolean;
+  previousTransporterCompanySiret?: String;
+  takenOverAt?: DateTimeOutput;
+  takenOverBy?: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface TransportSegmentPromise
+  extends Promise<TransportSegment>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  segmentNumber: () => Promise<Int>;
+  form: <T = FormPromise>() => T;
+  transporterCompanySiret: () => Promise<String>;
+  transporterCompanyName: () => Promise<String>;
+  transporterCompanyAddress: () => Promise<String>;
+  transporterCompanyContact: () => Promise<String>;
+  transporterCompanyPhone: () => Promise<String>;
+  transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
+  transporterReceipt: () => Promise<String>;
+  transporterDepartment: () => Promise<String>;
+  transporterValidityLimit: () => Promise<DateTimeOutput>;
+  transporterNumberPlate: () => Promise<String>;
+  mode: () => Promise<TransportMode>;
+  sealed: () => Promise<Boolean>;
+  previousTransporterCompanySiret: () => Promise<String>;
+  takenOverAt: () => Promise<DateTimeOutput>;
+  takenOverBy: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface TransportSegmentSubscription
+  extends Promise<AsyncIterator<TransportSegment>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  segmentNumber: () => Promise<AsyncIterator<Int>>;
+  form: <T = FormSubscription>() => T;
+  transporterCompanySiret: () => Promise<AsyncIterator<String>>;
+  transporterCompanyName: () => Promise<AsyncIterator<String>>;
+  transporterCompanyAddress: () => Promise<AsyncIterator<String>>;
+  transporterCompanyContact: () => Promise<AsyncIterator<String>>;
+  transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
+  transporterCompanyMail: () => Promise<AsyncIterator<String>>;
+  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
+  transporterReceipt: () => Promise<AsyncIterator<String>>;
+  transporterDepartment: () => Promise<AsyncIterator<String>>;
+  transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  mode: () => Promise<AsyncIterator<TransportMode>>;
+  sealed: () => Promise<AsyncIterator<Boolean>>;
+  previousTransporterCompanySiret: () => Promise<AsyncIterator<String>>;
+  takenOverAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  takenOverBy: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface TransportSegmentNullablePromise
+  extends Promise<TransportSegment | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  segmentNumber: () => Promise<Int>;
+  form: <T = FormPromise>() => T;
+  transporterCompanySiret: () => Promise<String>;
+  transporterCompanyName: () => Promise<String>;
+  transporterCompanyAddress: () => Promise<String>;
+  transporterCompanyContact: () => Promise<String>;
+  transporterCompanyPhone: () => Promise<String>;
+  transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
+  transporterReceipt: () => Promise<String>;
+  transporterDepartment: () => Promise<String>;
+  transporterValidityLimit: () => Promise<DateTimeOutput>;
+  transporterNumberPlate: () => Promise<String>;
+  mode: () => Promise<TransportMode>;
+  sealed: () => Promise<Boolean>;
+  previousTransporterCompanySiret: () => Promise<String>;
+  takenOverAt: () => Promise<DateTimeOutput>;
+  takenOverBy: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface FormConnection {
@@ -9000,6 +10166,62 @@ export interface AggregateTraderReceiptPromise
 
 export interface AggregateTraderReceiptSubscription
   extends Promise<AsyncIterator<AggregateTraderReceipt>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface TransportSegmentConnection {
+  pageInfo: PageInfo;
+  edges: TransportSegmentEdge[];
+}
+
+export interface TransportSegmentConnectionPromise
+  extends Promise<TransportSegmentConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<TransportSegmentEdge>>() => T;
+  aggregate: <T = AggregateTransportSegmentPromise>() => T;
+}
+
+export interface TransportSegmentConnectionSubscription
+  extends Promise<AsyncIterator<TransportSegmentConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<TransportSegmentEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateTransportSegmentSubscription>() => T;
+}
+
+export interface TransportSegmentEdge {
+  node: TransportSegment;
+  cursor: String;
+}
+
+export interface TransportSegmentEdgePromise
+  extends Promise<TransportSegmentEdge>,
+    Fragmentable {
+  node: <T = TransportSegmentPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface TransportSegmentEdgeSubscription
+  extends Promise<AsyncIterator<TransportSegmentEdge>>,
+    Fragmentable {
+  node: <T = TransportSegmentSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateTransportSegment {
+  count: Int;
+}
+
+export interface AggregateTransportSegmentPromise
+  extends Promise<AggregateTransportSegment>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateTransportSegmentSubscription
+  extends Promise<AsyncIterator<AggregateTransportSegment>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -9784,6 +11006,8 @@ export interface FormPreviousValues {
   traderReceipt?: String;
   traderDepartment?: String;
   traderValidityLimit?: DateTimeOutput;
+  currentTransporterSiret?: String;
+  nextTransporterSiret?: String;
 }
 
 export interface FormPreviousValuesPromise
@@ -9870,6 +11094,8 @@ export interface FormPreviousValuesPromise
   traderReceipt: () => Promise<String>;
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
+  currentTransporterSiret: () => Promise<String>;
+  nextTransporterSiret: () => Promise<String>;
 }
 
 export interface FormPreviousValuesSubscription
@@ -9956,6 +11182,8 @@ export interface FormPreviousValuesSubscription
   traderReceipt: () => Promise<AsyncIterator<String>>;
   traderDepartment: () => Promise<AsyncIterator<String>>;
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  currentTransporterSiret: () => Promise<AsyncIterator<String>>;
+  nextTransporterSiret: () => Promise<AsyncIterator<String>>;
 }
 
 export interface GrantSubscriptionPayload {
@@ -10416,6 +11644,104 @@ export interface TraderReceiptPreviousValuesSubscription
   department: () => Promise<AsyncIterator<String>>;
 }
 
+export interface TransportSegmentSubscriptionPayload {
+  mutation: MutationType;
+  node: TransportSegment;
+  updatedFields: String[];
+  previousValues: TransportSegmentPreviousValues;
+}
+
+export interface TransportSegmentSubscriptionPayloadPromise
+  extends Promise<TransportSegmentSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = TransportSegmentPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = TransportSegmentPreviousValuesPromise>() => T;
+}
+
+export interface TransportSegmentSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<TransportSegmentSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = TransportSegmentSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = TransportSegmentPreviousValuesSubscription>() => T;
+}
+
+export interface TransportSegmentPreviousValues {
+  id: ID_Output;
+  segmentNumber?: Int;
+  transporterCompanySiret?: String;
+  transporterCompanyName?: String;
+  transporterCompanyAddress?: String;
+  transporterCompanyContact?: String;
+  transporterCompanyPhone?: String;
+  transporterCompanyMail?: String;
+  transporterIsExemptedOfReceipt?: Boolean;
+  transporterReceipt?: String;
+  transporterDepartment?: String;
+  transporterValidityLimit?: DateTimeOutput;
+  transporterNumberPlate?: String;
+  mode?: TransportMode;
+  sealed?: Boolean;
+  previousTransporterCompanySiret?: String;
+  takenOverAt?: DateTimeOutput;
+  takenOverBy?: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface TransportSegmentPreviousValuesPromise
+  extends Promise<TransportSegmentPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  segmentNumber: () => Promise<Int>;
+  transporterCompanySiret: () => Promise<String>;
+  transporterCompanyName: () => Promise<String>;
+  transporterCompanyAddress: () => Promise<String>;
+  transporterCompanyContact: () => Promise<String>;
+  transporterCompanyPhone: () => Promise<String>;
+  transporterCompanyMail: () => Promise<String>;
+  transporterIsExemptedOfReceipt: () => Promise<Boolean>;
+  transporterReceipt: () => Promise<String>;
+  transporterDepartment: () => Promise<String>;
+  transporterValidityLimit: () => Promise<DateTimeOutput>;
+  transporterNumberPlate: () => Promise<String>;
+  mode: () => Promise<TransportMode>;
+  sealed: () => Promise<Boolean>;
+  previousTransporterCompanySiret: () => Promise<String>;
+  takenOverAt: () => Promise<DateTimeOutput>;
+  takenOverBy: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface TransportSegmentPreviousValuesSubscription
+  extends Promise<AsyncIterator<TransportSegmentPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  segmentNumber: () => Promise<AsyncIterator<Int>>;
+  transporterCompanySiret: () => Promise<AsyncIterator<String>>;
+  transporterCompanyName: () => Promise<AsyncIterator<String>>;
+  transporterCompanyAddress: () => Promise<AsyncIterator<String>>;
+  transporterCompanyContact: () => Promise<AsyncIterator<String>>;
+  transporterCompanyPhone: () => Promise<AsyncIterator<String>>;
+  transporterCompanyMail: () => Promise<AsyncIterator<String>>;
+  transporterIsExemptedOfReceipt: () => Promise<AsyncIterator<Boolean>>;
+  transporterReceipt: () => Promise<AsyncIterator<String>>;
+  transporterDepartment: () => Promise<AsyncIterator<String>>;
+  transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  transporterNumberPlate: () => Promise<AsyncIterator<String>>;
+  mode: () => Promise<AsyncIterator<TransportMode>>;
+  sealed: () => Promise<AsyncIterator<Boolean>>;
+  previousTransporterCompanySiret: () => Promise<AsyncIterator<String>>;
+  takenOverAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  takenOverBy: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
 export interface TransporterReceiptSubscriptionPayload {
   mutation: MutationType;
   node: TransporterReceipt;
@@ -10716,6 +12042,14 @@ export const models: Model[] = [
   },
   {
     name: "StatusLog",
+    embedded: false
+  },
+  {
+    name: "TransportMode",
+    embedded: false
+  },
+  {
+    name: "TransportSegment",
     embedded: false
   },
   {

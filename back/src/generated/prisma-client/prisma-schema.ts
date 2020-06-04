@@ -1657,6 +1657,7 @@ input FormCreateWithoutTransportSegmentsInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3472,6 +3473,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   wasteRefusalReason: String
   receivedBy: String
   receivedAt: DateTime
+  signedAt: DateTime
   quantityReceived: Float
   processedBy: String
   processedAt: String

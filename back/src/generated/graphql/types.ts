@@ -434,8 +434,6 @@ export type Form = {
   createdAt?: Maybe<Scalars['DateTime']>;
   /** Date de la dernière modification du BSD */
   updatedAt?: Maybe<Scalars['DateTime']>;
-  /** ID de l'utilisateur ayant crée le BSD */
-  ownerId?: Maybe<Scalars['Int']>;
   /** Statut du BSD (brouillon, envoyé, reçu, traité, etc) */
   status: FormStatus;
   /** Si oui ou non le BSD a été signé par un transporteur */
@@ -482,6 +480,9 @@ export type Form = {
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
   stateSummary?: Maybe<StateSummary>;
+  transportSegments?: Maybe<Array<TransportSegment>>;
+  currentTransporterSiret?: Maybe<Scalars['String']>;
+  nextTransporterSiret?: Maybe<Scalars['String']>;
 };
 
 /** Information sur un établissement dans un BSD */
@@ -638,6 +639,24 @@ export type Installation = {
 };
 
 
+export type MultimodalTransporter = {
+   __typename?: 'MultimodalTransporter';
+  /** Établissement transporteur */
+  company?: Maybe<FormCompany>;
+  /** Exemption de récipissé */
+  isExemptedOfReceipt?: Maybe<Scalars['Boolean']>;
+  /** N° de récipissé */
+  receipt?: Maybe<Scalars['String']>;
+  /** Département */
+  department?: Maybe<Scalars['String']>;
+  /** Limite de validité du récipissé */
+  validityLimit?: Maybe<Scalars['DateTime']>;
+  /** Numéro de plaque d'immatriculation */
+  numberPlate?: Maybe<Scalars['String']>;
+  /** Information libre, destinée aux transporteurs */
+  customInfo?: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
    __typename?: 'Mutation';
   /**
@@ -689,6 +708,8 @@ export type Mutation = {
    * Met à jour les informations de l'utilisateur
    */
   editProfile: User;
+  /** Édite un segment existant */
+  editSegment?: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
@@ -721,6 +742,10 @@ export type Mutation = {
   markAsSent?: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored?: Maybe<Form>;
+  /** Marque un segment de transport comme scellé */
+  markSegmentAsSealed?: Maybe<Form>;
+  /** Prépare un nouveau segment de transport multimodal */
+  prepareSegment?: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
@@ -750,6 +775,8 @@ export type Mutation = {
    * Permet de créer un nouvel utilisateur
    */
   signup: User;
+  /** Marque un segment comme pris en charge par le nouveau transporteur */
+  takeOverSegment?: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Édite les informations d'un établissement
@@ -830,6 +857,13 @@ export type MutationEditProfileArgs = {
 };
 
 
+export type MutationEditSegmentArgs = {
+  id: Scalars['ID'];
+  siret: Scalars['String'];
+  nextSegmentInfo: NextSegmentInfoInput;
+};
+
+
 export type MutationInviteUserToCompanyArgs = {
   email: Scalars['String'];
   siret: Scalars['String'];
@@ -891,6 +925,18 @@ export type MutationMarkAsTempStoredArgs = {
 };
 
 
+export type MutationMarkSegmentAsSealedArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationPrepareSegmentArgs = {
+  id: Scalars['ID'];
+  siret: Scalars['String'];
+  nextSegmentInfo: NextSegmentInfoInput;
+};
+
+
 export type MutationRemoveUserFromCompanyArgs = {
   userId: Scalars['ID'];
   siret: Scalars['String'];
@@ -926,6 +972,12 @@ export type MutationSignedByTransporterArgs = {
 
 export type MutationSignupArgs = {
   userInfos: SignupInput;
+};
+
+
+export type MutationTakeOverSegmentArgs = {
+  id: Scalars['ID'];
+  takeOverInfo: TakeOverInput;
 };
 
 
@@ -972,6 +1024,43 @@ export type NextDestinationInput = {
   processingOperation?: Maybe<Scalars['String']>;
   /** Établissement de destination ultérieur */
   company?: Maybe<CompanyInput>;
+};
+
+/** Payload d'un segment de transport */
+export type NextSegmentCompanyInput = {
+  /** SIRET de l'établissement */
+  siret?: Maybe<Scalars['String']>;
+  /** Nom de l'établissement */
+  name?: Maybe<Scalars['String']>;
+  /** Adresse de l'établissement */
+  address?: Maybe<Scalars['String']>;
+  /** Nom du contact dans l'établissement */
+  contact?: Maybe<Scalars['String']>;
+  /** Email du contact dans l'établissement */
+  mail?: Maybe<Scalars['String']>;
+  /** Numéro de téléphone de contact dans l'établissement */
+  phone?: Maybe<Scalars['String']>;
+};
+
+/** Payload lié à l'ajout de segment de transport multimodal (case 20 à 21) */
+export type NextSegmentInfoInput = {
+  transporter?: Maybe<NextSegmentTransporterInput>;
+  mode: TransportMode;
+};
+
+export type NextSegmentTransporterInput = {
+  /** Exemption de récipissé */
+  isExemptedOfReceipt?: Maybe<Scalars['Boolean']>;
+  /** N° de récipissé */
+  receipt?: Maybe<Scalars['String']>;
+  /** Département */
+  department?: Maybe<Scalars['String']>;
+  /** Limite de validité du récipissé */
+  validityLimit?: Maybe<Scalars['DateTime']>;
+  /** Numéro de plaque d'immatriculation */
+  numberPlate?: Maybe<Scalars['String']>;
+  /** Établissement collecteur - transporteur */
+  company?: Maybe<NextSegmentCompanyInput>;
 };
 
 /** Type de packaging du déchet */
@@ -1367,6 +1456,12 @@ export type SubscriptionFormsArgs = {
   token: Scalars['String'];
 };
 
+/** Payload de prise en charge de segment */
+export type TakeOverInput = {
+  takenOverAt: Scalars['DateTime'];
+  takenOverBy: Scalars['String'];
+};
+
 /** Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant */
 export type TemporaryStorageDetail = {
    __typename?: 'TemporaryStorageDetail';
@@ -1520,6 +1615,25 @@ export type TransporterSignatureFormInput = {
   quantity: Scalars['Float'];
   /** Code ONU */
   onuCode?: Maybe<Scalars['String']>;
+};
+
+export type TransportMode = 
+  'ROAD' |
+  'RAIL' |
+  'AIR' |
+  'RIVER' |
+  'SEA';
+
+export type TransportSegment = {
+   __typename?: 'TransportSegment';
+  id?: Maybe<Scalars['ID']>;
+  previousTransporterCompanySiret?: Maybe<Scalars['String']>;
+  transporter?: Maybe<MultimodalTransporter>;
+  mode?: Maybe<TransportMode>;
+  takenOverAt?: Maybe<Scalars['DateTime']>;
+  takenOverBy?: Maybe<Scalars['String']>;
+  sealed?: Maybe<Scalars['Boolean']>;
+  segmentNumber?: Maybe<Scalars['Int']>;
 };
 
 /** Payload d'édition d'un récépissé transporteur */
@@ -1770,6 +1884,9 @@ export type ResolversTypes = {
   TemporaryStorer: ResolverTypeWrapper<TemporaryStorer>;
   Destination: ResolverTypeWrapper<Destination>;
   StateSummary: ResolverTypeWrapper<StateSummary>;
+  TransportSegment: ResolverTypeWrapper<TransportSegment>;
+  MultimodalTransporter: ResolverTypeWrapper<MultimodalTransporter>;
+  TransportMode: TransportMode;
   CompanyPublic: ResolverTypeWrapper<CompanyPublic>;
   Installation: ResolverTypeWrapper<Installation>;
   Rubrique: ResolverTypeWrapper<Rubrique>;
@@ -1804,6 +1921,9 @@ export type ResolversTypes = {
   UploadLink: ResolverTypeWrapper<UploadLink>;
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
+  NextSegmentInfoInput: NextSegmentInfoInput;
+  NextSegmentTransporterInput: NextSegmentTransporterInput;
+  NextSegmentCompanyInput: NextSegmentCompanyInput;
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
@@ -1827,6 +1947,7 @@ export type ResolversTypes = {
   TemporaryStorageDetailInput: TemporaryStorageDetailInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
+  TakeOverInput: TakeOverInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: ResolverTypeWrapper<{}>;
@@ -1861,6 +1982,9 @@ export type ResolversParentTypes = {
   TemporaryStorer: TemporaryStorer;
   Destination: Destination;
   StateSummary: StateSummary;
+  TransportSegment: TransportSegment;
+  MultimodalTransporter: MultimodalTransporter;
+  TransportMode: TransportMode;
   CompanyPublic: CompanyPublic;
   Installation: Installation;
   Rubrique: Rubrique;
@@ -1895,6 +2019,9 @@ export type ResolversParentTypes = {
   UploadLink: UploadLink;
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
+  NextSegmentInfoInput: NextSegmentInfoInput;
+  NextSegmentTransporterInput: NextSegmentTransporterInput;
+  NextSegmentCompanyInput: NextSegmentCompanyInput;
   AuthPayload: AuthPayload;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
@@ -1918,6 +2045,7 @@ export type ResolversParentTypes = {
   TemporaryStorageDetailInput: TemporaryStorageDetailInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
+  TakeOverInput: TakeOverInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: {};
@@ -2070,7 +2198,6 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   trader?: Resolver<Maybe<ResolversTypes['Trader']>, ParentType, ContextType>;
   createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  ownerId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['FormStatus'], ParentType, ContextType>;
   signedByTransporter?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   sentAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
@@ -2092,6 +2219,9 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   ecoOrganisme?: Resolver<Maybe<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>;
   temporaryStorageDetail?: Resolver<Maybe<ResolversTypes['TemporaryStorageDetail']>, ParentType, ContextType>;
   stateSummary?: Resolver<Maybe<ResolversTypes['StateSummary']>, ParentType, ContextType>;
+  transportSegments?: Resolver<Maybe<Array<ResolversTypes['TransportSegment']>>, ParentType, ContextType>;
+  currentTransporterSiret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  nextTransporterSiret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
@@ -2135,6 +2265,17 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'JSON';
 }
 
+export type MultimodalTransporterResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['MultimodalTransporter'] = ResolversParentTypes['MultimodalTransporter']> = {
+  company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
+  isExemptedOfReceipt?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  receipt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  department?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  validityLimit?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  numberPlate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  customInfo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+};
+
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   changePassword?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'oldPassword' | 'newPassword'>>;
   createCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>;
@@ -2147,6 +2288,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteTransporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType, RequireFields<MutationDeleteTransporterReceiptArgs, never>>;
   duplicateForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationDuplicateFormArgs, 'id'>>;
   editProfile?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationEditProfileArgs, never>>;
+  editSegment?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationEditSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
   inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>;
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
@@ -2157,6 +2299,8 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   markAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSealedArgs, never>>;
   markAsSent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSentArgs, 'sentInfo'>>;
   markAsTempStored?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStoredArgs, 'id' | 'tempStoredInfos'>>;
+  markSegmentAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkSegmentAsSealedArgs, 'id'>>;
+  prepareSegment?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationPrepareSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
   removeUserFromCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRemoveUserFromCompanyArgs, 'userId' | 'siret'>>;
   renewSecurityCode?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRenewSecurityCodeArgs, 'siret'>>;
   resendInvitation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResendInvitationArgs, 'email' | 'siret'>>;
@@ -2164,6 +2308,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   saveForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSaveFormArgs, 'formInput'>>;
   signedByTransporter?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSignedByTransporterArgs, 'id' | 'signingInfo'>>;
   signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'userInfos'>>;
+  takeOverSegment?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationTakeOverSegmentArgs, 'id' | 'takeOverInfo'>>;
   updateCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'siret'>>;
   updateTraderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType, RequireFields<MutationUpdateTraderReceiptArgs, never>>;
   updateTransporterFields?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationUpdateTransporterFieldsArgs, 'id'>>;
@@ -2314,6 +2459,18 @@ export type TransporterReceiptResolvers<ContextType = GraphQLContext, ParentType
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
+export type TransportSegmentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TransportSegment'] = ResolversParentTypes['TransportSegment']> = {
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  previousTransporterCompanySiret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  transporter?: Resolver<Maybe<ResolversTypes['MultimodalTransporter']>, ParentType, ContextType>;
+  mode?: Resolver<Maybe<ResolversTypes['TransportMode']>, ParentType, ContextType>;
+  takenOverAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  takenOverBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  sealed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  segmentNumber?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+};
+
 export type UploadLinkResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UploadLink'] = ResolversParentTypes['UploadLink']> = {
   signedUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   key?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -2371,6 +2528,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
   JSON?: GraphQLScalarType;
+  MultimodalTransporter?: MultimodalTransporterResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NextDestination?: NextDestinationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
@@ -2388,6 +2546,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   TraderReceipt?: TraderReceiptResolvers<ContextType>;
   Transporter?: TransporterResolvers<ContextType>;
   TransporterReceipt?: TransporterReceiptResolvers<ContextType>;
+  TransportSegment?: TransportSegmentResolvers<ContextType>;
   UploadLink?: UploadLinkResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   WasteDetails?: WasteDetailsResolvers<ContextType>;
