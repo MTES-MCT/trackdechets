@@ -89,7 +89,7 @@ export default function Home({ isAuthenticated }) {
       <section className="section">
         <div className="container description">
           <div className="description-header">
-            <h3>Editez et transmettez simplement vos bsd</h3>
+            <h3>Editez et transmettez simplement vos BSD</h3>
             <p>
               Pour que la préparation des bordereaux ne soit plus d'une
               complexité inutile{" "}
