@@ -203,10 +203,18 @@ const getTempStorerWasteDetailsType = (params) => {
 const renameAndFormatMainFormFields = (params) => ({
   transporterValidityLimit: dateFmt(params.transporterValidityLimit),
   traderValidityLimit: dateFmt(params.traderValidityLimit),
-  recipientCompanySiret10: params.recipientCompanySiret,
-  recipientCompanyName10: params.recipientCompanyName,
-  recipientCompanyAddress10: params.recipientCompanyAddress,
-  recipientCompanyContact10: params.recipientCompanyContact,
+  recipientCompanySiret10: params.temporaryStorageDetail
+    ? params.temporaryStorageDetail.destinationCompanySiret
+    : params.recipientCompanySiret,
+  recipientCompanyName10: params.temporaryStorageDetail
+    ? params.temporaryStorageDetail.destinationCompanyName
+    : params.recipientCompanyName,
+  recipientCompanyAddress10: params.temporaryStorageDetail
+    ? params.temporaryStorageDetail.destinationCompanyAddress
+    : params.recipientCompanyAddress,
+  recipientCompanyContact10: params.temporaryStorageDetail
+    ? params.temporaryStorageDetail.destinationCompanyContact
+    : params.recipientCompanyContact,
   transporterSentAt: dateFmt(params.sentAt),
   senderSentBy: params.sentBy,
   senderSentAt: dateFmt(params.sentAt),
