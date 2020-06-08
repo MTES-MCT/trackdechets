@@ -23,13 +23,38 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
     !!form.temporaryStorageDetail?.wasteDetails?.quantity
   );
 
+  function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
+    setIsRefurbished(!isRefurbished);
+    const keys = [
+      "onuCode",
+      "packagings",
+      "otherPackaging",
+      "numberOfPackages",
+      "quantity",
+      "quantityType",
+    ];
+    const hasBeenFilled = keys.some(
+      (key) => initialValues.wasteDetails[key] !== values.wasteDetails[key]
+    );
+
+    if (isRefurbished && !hasBeenFilled) {
+      setFieldValue(
+        "wasteDetails",
+        keys.reduce((prev, key) => {
+          prev[key] = form.wasteDetails ? form.wasteDetails[key] : null;
+          return prev;
+        }, {})
+      );
+    }
+  }
+
   return (
     <div>
       <Formik
         initialValues={initialValues}
         onSubmit={values => onSubmit({ info: values })}
       >
-        {({ values }) => (
+        {({ values, setFieldValue }) => (
           <Form>
             <h5>Installation de destination prévue</h5>
 
@@ -62,7 +87,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                 <input
                   type="checkbox"
                   checked={isRefurbished}
-                  onChange={() => setIsRefurbished(!isRefurbished)}
+                  onChange={() => onChangeRefurbished(values, setFieldValue)}
                 />
                 Les déchets ont subi un reconditionnement, je dois saisir les
                 détails
