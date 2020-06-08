@@ -48,7 +48,7 @@ const drawText = ({
 
 /**
  * Draw a × in checkbox
- * @param fieldName - name of the field (see
+ * @param fieldName - name of the field
  * @param font - font object
  * @param page - page on which we want to write
  */
@@ -310,6 +310,8 @@ const getFlatEcoOrganisme = (params) => {
     : {};
 };
 
+const processTransporterData = (data) => ({ ...data, transporterCompanySiren: siretToSiren(data.transporterCompanySiret) })
+
 /**
  * Apply transformers to payload
  * @param params -  the full request payload
@@ -329,6 +331,8 @@ function processMainFormParams(params) {
     ...getFlatEcoOrganisme(data),
     ...getTemporaryStorageExistance(data),
     ...getTempStorerWasteDetailsType(data),
+    ...processTransporterData(data)
+
   };
 }
 
@@ -359,10 +363,12 @@ function verboseMode(mode) {
   return transportModeLabels[mode]
 }
 function processSegment(segment) {
+  const data = stringifyNumberFields(segment);
   return {
-    ...segment,
-    takenOverAt: dateFmt(segment.takenOverAt),
-    mode: verboseMode(segment.mode)
+    ...data,
+    takenOverAt: dateFmt(data.takenOverAt),
+    mode: verboseMode(data.mode),
+    transporterCompanySiren: siretToSiren(data.transporterCompanySiret)
   }
 
 }
@@ -396,6 +402,9 @@ const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
   }
 };
 
+
+const siretToSiren = (siren) => siren.slice(0, 9)
+
 exports.checkBox = checkBox;
 exports.drawImage = drawImage;
 exports.getEmitterType = getEmitterType;
@@ -405,3 +414,4 @@ exports.processMainFormParams = processMainFormParams;
 exports.processAnnexParams = processAnnexParams;
 exports.processSegment = processSegment;
 exports.fillFields = fillFields;
+exports.siretToSiren = siretToSiren;

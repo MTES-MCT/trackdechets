@@ -84,6 +84,7 @@ const buildPdf = async (params) => {
     ...params,
     currentPageNumber: 1,
     totalPagesNumber: 1 + (params.temporaryStorageDetail ? 1 : 0),
+    isMultimodal: !!segments.length
   });
 
   // customId does not belong to original cerfa, so we had to add our own field title and mimic font look and feel
@@ -143,7 +144,7 @@ const buildPdf = async (params) => {
       }
     });
   }
-   // Temporary storage and 2 first multimodal segments
+  // Temporary storage and 2 first multimodal segments
   // ------------------------------------------------
   if (temporaryStorageDetail || !!transportSegments.length) {
     const tempStorageDetailsPdf = await PDFDocument.load(
@@ -193,7 +194,6 @@ const buildPdf = async (params) => {
           font: temporaryStorageArialFont,
           yOffset: multimodalYOffset * (segment.segmentNumber - 1)
         });
-
 
         if (!!segment.takenOverAt) {
           drawImage(
@@ -258,16 +258,16 @@ const buildPdf = async (params) => {
   // Additional segments pages (if more than 2)
   // ------------------------------------------------
   if (transportSegments.length > 2) {
-    const remainingSegments = transportSegments.slice(2); // we already built a page with 2 segments
+    const remainingSegments = transportSegments.slice(2); // we already built a page with first 2 segments
 
     const transportSegmentsFormsByPage = 2;
     const transportSegmentsFormsCount = remainingSegments.length;
-    const transportSegmentsPageCount = Math.trunc(transportSegmentsFormsCount / transportSegmentsFormsByPage); // how many multimodal pages do we need
-
+    const transportSegmentsPageCount = Math.ceil(transportSegmentsFormsCount / transportSegmentsFormsByPage) - 1; // how many multimodal pages do we need
+ 
     let subFormCounter = 0; // each appendix page can hold up to 2 sub-forms, let's use a counter
     for (
       let sheetCounter = 0;
-      sheetCounter <= transportSegmentsPageCount - 1;
+      sheetCounter <= transportSegmentsPageCount;
       sheetCounter++
     ) {
       let multimodalPages = await PDFDocument.load(
@@ -286,6 +286,7 @@ const buildPdf = async (params) => {
 
       let remaining = transportSegmentsFormsCount - sheetCounter * transportSegmentsFormsByPage; // how many sub forms left
       let lastPageFormsCount = Math.min(remaining, transportSegmentsFormsByPage); // if we have less than 2 forms on the last page
+      
       for (
         let pageSubFormCounter = 0;
         pageSubFormCounter <= lastPageFormsCount - 1;
@@ -294,6 +295,7 @@ const buildPdf = async (params) => {
         subFormCounter = pageSubFormCounter + sheetCounter * transportSegmentsFormsByPage;
         let segment = remainingSegments[subFormCounter];
         const yOffset = multimodalYOffset * (pageSubFormCounter)
+
         fillFields({
           data: processSegment(segment),
           page: currentMultimodalPage,
