@@ -38,13 +38,11 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
     );
 
     if (isRefurbished && !hasBeenFilled) {
-      setFieldValue(
-        "wasteDetails",
-        keys.reduce((prev, key) => {
-          prev[key] = form.wasteDetails ? form.wasteDetails[key] : null;
-          return prev;
-        }, {})
-      );
+      keys.forEach((key) => {
+        if (form.wasteDetails?.[key] != null) {
+          setFieldValue(`wasteDetails.${key}`, form.wasteDetails[key]);
+        }
+      });
     }
   }
 
