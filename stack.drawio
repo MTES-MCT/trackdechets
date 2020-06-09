@@ -1,0 +1,52 @@
+<mxfile host="" modified="2020-06-09T17:04:24.070Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.45.1 Chrome/78.0.3904.130 Electron/7.2.4 Safari/537.36" etag="nJspPLnbj3DDuvXvl4Nz" version="13.1.3">
+    <diagram id="6hGFLwfOUW9BJ-s0fimq" name="Page-1">
+        <mxGraphModel dx="1135" dy="815" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="" style="shape=actor;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="20" width="40" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="Serveur web&lt;br&gt;&lt;br&gt;&lt;i&gt;Nginx proxy&lt;br&gt;Let's Encrypt&lt;br&gt;&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="30" y="263" width="810" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="td-ui&lt;br&gt;&lt;br&gt;&lt;i&gt;Typescript&lt;br&gt;React.js&lt;br&gt;Apollo Client&lt;br&gt;Tailwind.css&amp;nbsp;&lt;br&gt;template.data.gouv.fr&lt;br&gt;&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="110" width="130" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="SaaS déchets &lt;br&gt;SI client&lt;i&gt;&lt;br&gt;&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="710" y="120" width="130" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="" style="shape=actor;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="755" y="29" width="40" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="BDD relationnelle&lt;br&gt;&lt;i&gt;PostgreSQL&lt;/i&gt;" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;" vertex="1" parent="1">
+                    <mxGeometry x="735" y="588.75" width="111" height="95" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Cache&amp;nbsp;&lt;br&gt;&lt;br&gt;&lt;i&gt;Redis&lt;/i&gt;" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="591.25" width="100" height="92.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="Object Storage&lt;br&gt;&lt;br&gt;&lt;i&gt;Scaleway&lt;/i&gt;" style="shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="465" y="580" width="125" height="103.75" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="&lt;span&gt;td-api&lt;/span&gt;&lt;br&gt;&lt;i&gt;&lt;br&gt;Node.js&lt;br&gt;Typescript&lt;br&gt;Express.js&lt;br&gt;Apollo Server (GraphQL)&amp;nbsp;&lt;br&gt;Prisma ORM&lt;/i&gt;" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="30" y="380" width="810" height="137.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="td-mail&lt;br&gt;&lt;br&gt;&lt;i&gt;Golang&lt;br&gt;Mailjet&amp;nbsp;&lt;br&gt;&lt;/i&gt;" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="600" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="td-pdf&lt;br&gt;&lt;br&gt;&lt;i&gt;Node.js&lt;br&gt;Express.js&lt;br&gt;&lt;/i&gt;" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="600" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="td-doc&lt;br&gt;&lt;br&gt;&lt;i&gt;Docusaurus&lt;br&gt;&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="110" width="130" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="td-etl&lt;br&gt;&lt;br&gt;&lt;i&gt;Airflow&lt;/i&gt;" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="730" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="API Sirene&amp;nbsp;&lt;br&gt;&lt;br&gt;&lt;i&gt;entrerpise.data.gouv.fr&lt;/i&gt;" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="30" y="602.5" width="150" height="70" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
