@@ -1627,12 +1627,19 @@ export type TransportMode =
 export type TransportSegment = {
    __typename?: 'TransportSegment';
   id: Scalars['ID'];
+  /** Siret du transporteur précédent */
   previousTransporterCompanySiret?: Maybe<Scalars['String']>;
+  /** Transporteur du segment */
   transporter?: Maybe<MultimodalTransporter>;
+  /** Mode de transport */
   mode?: Maybe<TransportMode>;
+  /** Date de prise en charge */
   takenOverAt?: Maybe<Scalars['DateTime']>;
+  /** Reponsable de la prise en charge */
   takenOverBy?: Maybe<Scalars['String']>;
+  /** Prêt à être pris en charge */
   readyToTakeOver?: Maybe<Scalars['Boolean']>;
+  /** Numéro du segment */
   segmentNumber?: Maybe<Scalars['Int']>;
 };
 

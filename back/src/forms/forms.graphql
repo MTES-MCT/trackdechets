@@ -829,11 +829,25 @@ type MultimodalTransporter {
 
 type TransportSegment {
   id: ID!
+  
+  "Siret du transporteur précédent"
   previousTransporterCompanySiret: String
+  
+  "Transporteur du segment"
   transporter: MultimodalTransporter
+
+  "Mode de transport"
   mode: TransportMode
+
+  "Date de prise en charge"
   takenOverAt: DateTime
+
+  "Reponsable de la prise en charge"
   takenOverBy: String
+
+  "Prêt à être pris en charge"
   readyToTakeOver: Boolean
+
+  "Numéro du segment"
   segmentNumber: Int
 }

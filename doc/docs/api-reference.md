@@ -593,7 +593,7 @@ Met à jour les informations de l'utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>editSegment</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
 <td>
 
 Édite un segment existant
@@ -845,11 +845,11 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>markSegmentAsSealed</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td colspan="2" valign="top"><strong>markSegmentAsReadyToTakeOver</strong></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
 <td>
 
-Marque un segment de transport comme scellé
+Marque un segment de transport comme prêt à être emporté
 
 </td>
 </tr>
@@ -860,7 +860,7 @@ Marque un segment de transport comme scellé
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>prepareSegment</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
 <td>
 
 Prépare un nouveau segment de transport multimodal
@@ -1014,7 +1014,7 @@ Permet de créer un nouvel utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>takeOverSegment</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
 <td>
 
 Marque un segment comme pris en charge par le nouveau transporteur
@@ -3465,43 +3465,71 @@ Département ayant enregistré la déclaration
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>previousTransporterCompanySiret</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Siret du transporteur précédent
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#multimodaltransporter">MultimodalTransporter</a></td>
-<td></td>
+<td>
+
+Transporteur du segment
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>mode</strong></td>
 <td valign="top"><a href="#transportmode">TransportMode</a></td>
-<td></td>
+<td>
+
+Mode de transport
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>takenOverAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Date de prise en charge
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>takenOverBy</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Reponsable de la prise en charge
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>sealed</strong></td>
+<td colspan="2" valign="top"><strong>readyToTakeOver</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Prêt à être pris en charge
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>segmentNumber</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
-<td></td>
+<td>
+
+Numéro du segment
+
+</td>
 </tr>
 </tbody>
 </table>

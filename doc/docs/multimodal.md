@@ -15,9 +15,9 @@ Dès qu'un transporteur (transporteur 1) à signé l'enlèvement d'un déchet au
 La mutation *prepareSegment* est dédiée à cette étape. Le nouveau segment est créé en mode brouillon. Pour un maximum de  souplesse, seul le siret du nouveau transporteur est requis.
 Le transporteur peut modifier le segment qu'il vient de créer.
 
-## Sceller le segment
+## Marquer le segment comme prêt à être transmis
 
-Dès que le transporteur (transporteur 1) est prêt à transférer son déchet et bordereau, il scelle le bordereau grâce à la mutation *markSegmentAsSealed*. Le transporteur suivant (transporteur 2) peut alors le compléter ou le prendre en charge. Le transporteur 1 ne peut plus modifier le segment.
+Dès que le transporteur (transporteur 1) est prêt à transférer son déchet et bordereau, il marque le bordereau grâce à la mutation *markSegmentAsReadyToTakeOver*. Le transporteur suivant (transporteur 2) peut alors le compléter ou le prendre en charge. Le transporteur 1 ne peut plus modifier le segment.
 
 ## Prise en charge du déchet
 
@@ -26,5 +26,5 @@ Le transporteur 2 peut alors prendre en charge le déchet grâce à la mutation 
 ## Modification d'un segment
 
 Tant que le segment est en mode brouillon, le transporteur 1 peut le modifier ( tous les champs)
-Dès qu'un segment est scellé, c'est le transporteur 2 qui peut l'éditer(hormis info entreprises, siret etc.)
+Dès qu'un segment est marqué comme prêt à être transmis, c'est le transporteur 2 qui peut l'éditer(hormis info entreprises, siret etc.)
 La modification s'effectue grâce à la mutation *editSegment*.
