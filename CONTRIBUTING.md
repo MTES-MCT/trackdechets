@@ -16,8 +16,3 @@ Les nouvelles fonctionnalités impactant l'API doivent être documentées dans l
 * Typage du code avec les fichiers générées par GraphQL Codegen
   * `back/src/generated/graphql/types.ts` pour le back
   * `front/src/generated/graphql/tyoes.ts` pour le front
-
-
-
-
-
