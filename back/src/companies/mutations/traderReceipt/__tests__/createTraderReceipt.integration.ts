@@ -29,12 +29,9 @@ describe("{ mutation { createTraderReceipt } }", () => {
 
     const { data } = await mutate(mutation);
 
-    expect(
-      await prisma
-        .traderReceiptsConnection()
-        .aggregate()
-        .count()
-    ).toEqual(1);
+    expect(await prisma.traderReceiptsConnection().aggregate().count()).toEqual(
+      1
+    );
 
     expect(data.createTraderReceipt).toEqual(receipt);
   });

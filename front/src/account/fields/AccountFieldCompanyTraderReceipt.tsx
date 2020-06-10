@@ -51,7 +51,7 @@ export default function AccountFieldCompanyTraderReceipt({ company }: Props) {
       name="traderReceipt"
       label="Récépissé négociant"
       value={traderReceipt}
-      renderForm={(toggleEdition) => (
+      renderForm={toggleEdition => (
         <AccountFormCompanyTraderReceipt
           company={company}
           toggleEdition={toggleEdition}

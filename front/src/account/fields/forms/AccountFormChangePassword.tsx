@@ -74,7 +74,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
       validate={validate}
       validationSchema={yupSchema}
     >
-      {(props) => (
+      {props => (
         <Form>
           <div className="form__group">
             <label htmlFor="oldPassword">Ancien mot de passe:</label>

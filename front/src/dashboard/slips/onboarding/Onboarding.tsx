@@ -22,7 +22,7 @@ export default function OnBoarding() {
       style={{ display: isOpen ? "flex" : "none" }}
       onClick={() => setIsOpen(false)}
     >
-      <div className="modal onboarding" onClick={(e) => e.stopPropagation()}>
+      <div className="modal onboarding" onClick={e => e.stopPropagation()}>
         <Slider onClose={() => setIsOpen(false)}>
           <Slide
             image="/onboarding/slide1.png"

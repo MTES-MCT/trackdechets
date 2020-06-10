@@ -1,4 +1,4 @@
-export function randomNumber(length: number = 4) {
+export function randomNumber(length = 4) {
   const basis = Math.pow(10, length - 1);
   return Math.floor(basis + Math.random() * 9 * basis);
 }

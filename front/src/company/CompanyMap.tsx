@@ -24,8 +24,8 @@ export default class CompanyMap extends React.Component<Props> {
 
   initMap() {
     fetch("/mapbox/style.json")
-      .then((response) => response.json())
-      .then((style) => {
+      .then(response => response.json())
+      .then(style => {
         const mapOptions: mapboxgl.MapboxOptions = {
           container: "map",
           style,

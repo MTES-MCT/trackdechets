@@ -62,7 +62,7 @@ export default function TransporterInfoEdit({
         ? form.stateSummary[mutationFieldName]
         : null,
     },
-    onSubmit: (values) => {
+    onSubmit: values => {
       updateTransporterPlate({
         variables: { id: form.id, [mutationFieldName]: values[fieldName] },
       });

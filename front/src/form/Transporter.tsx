@@ -13,7 +13,7 @@ export default connect<{}, Values>(function Transporter(props) {
       <h4>Transporteur</h4>
       <CompanySelector
         name="transporter.company"
-        onCompanySelected={(transporter) => {
+        onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             props.formik.setFieldValue(
               "transporter.receipt",

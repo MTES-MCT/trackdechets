@@ -299,7 +299,7 @@ describe("Integration / Forms query", () => {
 
     expect(roleFiltered.forms.length).toBe(1);
 
-    const { errors, data: roleAndStatusFiltered } = await query(
+    const { data: roleAndStatusFiltered } = await query(
       `query {
           forms(roles: [EMITTER, RECIPIENT], status: [PROCESSED]) {
             id

@@ -23,7 +23,7 @@ function reducer(
     case "unselect":
       const usp = action.payload as Form;
       return {
-        selected: state.selected.filter((v) => v !== usp.readableId),
+        selected: state.selected.filter(v => v !== usp.readableId),
         quantity: round(state.quantity - (usp.quantityReceived || 0)),
       };
     case "selectAll":
@@ -52,14 +52,14 @@ export default function FormsSelector({ name }) {
   }, [wasteCodeFilter]);
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, name).map((f) => f.readableId),
+    selected: getIn(values, name).map(f => f.readableId),
     quantity: getIn(values, "wasteDetails.quantity"),
   });
 
   useEffect(() => {
     setFieldValue(
       name,
-      state.selected.map((s) => ({ readableId: s }))
+      state.selected.map(s => ({ readableId: s }))
     );
     setFieldValue("wasteDetails.quantity", state.quantity);
   }, [state, name, setFieldValue]);
@@ -72,7 +72,7 @@ export default function FormsSelector({ name }) {
       });
     }
 
-    state.selected.find((s) => s === payload.readableId)
+    state.selected.find(s => s === payload.readableId)
       ? dispatch({ type: "unselect", payload })
       : dispatch({ type: "select", payload });
   }
@@ -97,7 +97,7 @@ export default function FormsSelector({ name }) {
           type="text"
           placeholder="Filtre optionnel..."
           value={wasteCodeFilter}
-          onChange={(e) => setWasteCodeFilter(e.target.value)}
+          onChange={e => setWasteCodeFilter(e.target.value)}
         />
       </p>
 

@@ -39,7 +39,7 @@ export default function AccountFieldName({ me }: Props) {
       name="name"
       label="Nom utilisateur"
       value={me.name}
-      renderForm={(toggleEdition) => (
+      renderForm={toggleEdition => (
         <AccountFormSimpleInput<Partial<MutationEditProfileArgs>>
           name="name"
           type="text"

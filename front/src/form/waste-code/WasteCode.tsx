@@ -23,7 +23,7 @@ export default function WasteCode(props) {
     formatWasteCodeEffect(wasteCode, setWasteCode);
   }, [wasteCode, field.name, setFieldValue]);
 
-  const wasteCodeDetail = WasteCodeLookup.find((l) => l.code === wasteCode);
+  const wasteCodeDetail = WasteCodeLookup.find(l => l.code === wasteCode);
   const isDangerous = wasteCode.indexOf("*") > -1;
 
   const [openModal, setOpenModal] = useState(false);
@@ -44,7 +44,7 @@ export default function WasteCode(props) {
             <WasteTreeModal
               open={openModal}
               onClose={() => setOpenModal(false)}
-              onSelect={(codes) => setWasteCode(codes[0])}
+              onSelect={codes => setWasteCode(codes[0])}
             />
           </li>
           <li>Pour les codes déchets dangereux n'oubliez pas l'astérisque</li>
@@ -59,7 +59,7 @@ export default function WasteCode(props) {
           value={wasteCode}
           className={meta.touched && meta.error ? "input-error" : ""}
           onBlur={field.onBlur}
-          onChange={(e) => setWasteCode(e.target.value)}
+          onChange={e => setWasteCode(e.target.value)}
         />
       </label>
 
@@ -69,7 +69,7 @@ export default function WasteCode(props) {
         <React.Fragment>
           <span>Codes récents:</span>
           <ul className="label-list list-inline">
-            {bookmarks.map((bookmark) => (
+            {bookmarks.map(bookmark => (
               <li
                 className="label"
                 key={bookmark.code}

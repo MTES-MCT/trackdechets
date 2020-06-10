@@ -52,7 +52,7 @@ describe("loggingMiddleware", () => {
     expect(metadata.http_status).toEqual(200);
   });
 
-  it.only("should log requests to GraphQL endpoint", async () => {
+  it("should log requests to GraphQL endpoint", async () => {
     await request.post(graphQLPath).send({ query: "{ me { name } }" });
     expect(logMock.mock.calls).toHaveLength(1);
     const { message, level, metadata } = logMock.mock.calls[0][0];

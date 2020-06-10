@@ -46,7 +46,7 @@ export default function Received(props: SlipActionProps) {
           ...(props.form.recipient?.isTempStorage &&
             props.form.status === FormStatus.Sent && { quantityType: "REAL" }),
         }}
-        onSubmit={(values) => props.onSubmit({ info: values })}
+        onSubmit={values => props.onSubmit({ info: values })}
       >
         {({ values, errors, touched, handleReset, setFieldValue }) => {
           const hasErrors = !!Object.keys(errors).length;

@@ -6,7 +6,7 @@ import { omitDeep } from "./utils/omit";
 
 const httpLink = createHttpLink({
   uri: process.env.REACT_APP_API_ENDPOINT,
-  credentials: "include",
+  credentials: "include"
 });
 
 const cleanTypenameLink = new ApolloLink((operation, forward) => {
@@ -16,12 +16,12 @@ const cleanTypenameLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
     operation.variables = omitDeep(operation.variables, "__typename");
   }
-  return forward(operation).map((data) => {
+  return forward(operation).map(data => {
     return data;
   });
 });
 
 export default new ApolloClient({
   link: ApolloLink.from([cleanTypenameLink, httpLink]),
-  cache: new InMemoryCache({ dataIdFromObject: (obj) => obj.id }),
+  cache: new InMemoryCache({ dataIdFromObject: obj => obj.id })
 });

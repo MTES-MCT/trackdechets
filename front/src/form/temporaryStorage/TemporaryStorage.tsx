@@ -52,7 +52,7 @@ export default function TemporaryStorage(props) {
           name={`${props.name}.destination.processingOperation`}
         >
           <option value="">Choisissez...</option>
-          {Operations.map((o) => (
+          {Operations.map(o => (
             <option key={o.code} value={o.code}>
               {o.code} - {o.description.substr(0, 50)}
               {o.description.length > 50 ? "..." : ""}

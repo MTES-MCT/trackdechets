@@ -73,7 +73,7 @@ export default function Slips({
             <th>
               <input
                 type="text"
-                onChange={(e) => filter("readableId", e.target.value)}
+                onChange={e => filter("readableId", e.target.value)}
                 placeholder="Filtrer..."
               />
             </th>
@@ -82,14 +82,14 @@ export default function Slips({
           <th>
             <input
               type="text"
-              onChange={(e) => filter("emitter.company.name", e.target.value)}
+              onChange={e => filter("emitter.company.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th>
             <input
               type="text"
-              onChange={(e) =>
+              onChange={e =>
                 filter("stateSummary.recipient.name", e.target.value)
               }
               placeholder="Filtrer..."
@@ -98,7 +98,7 @@ export default function Slips({
           <th>
             <input
               type="text"
-              onChange={(e) => filter("wasteDetails.code", e.target.value)}
+              onChange={e => filter("wasteDetails.code", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>

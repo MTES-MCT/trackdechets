@@ -53,7 +53,7 @@ describe("<AccountField />", () => {
         name="username"
         label="Nom utilisateur"
         value="John Snow"
-        renderForm={(toggleEdition) => (
+        renderForm={toggleEdition => (
           <form role="form" onSubmit={() => toggleEdition()}>
             <button type="submit" data-test-id="submit-button" />
           </form>

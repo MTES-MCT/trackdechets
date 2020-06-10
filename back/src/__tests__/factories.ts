@@ -17,11 +17,7 @@ import crypto from "crypto";
  */
 export const userFactory = async (opt = {}) => {
   const defaultPassword = await hash("pass", 10);
-  const userIndex =
-    (await prisma
-      .usersConnection()
-      .aggregate()
-      .count()) + 1;
+  const userIndex = (await prisma.usersConnection().aggregate().count()) + 1;
   const data = {
     name: `User_${userIndex}`,
     email: `user_${userIndex}@td.io`,
@@ -57,10 +53,7 @@ function siretify(index) {
  */
 export const companyFactory = async (opt = {}, companyType = "PRODUCER") => {
   const companyIndex =
-    (await prisma
-      .companiesConnection()
-      .aggregate()
-      .count()) + 1;
+    (await prisma.companiesConnection().aggregate().count()) + 1;
   return prisma.createCompany({
     siret: siretify(companyIndex),
     companyTypes: {
@@ -98,10 +91,7 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
 
   const accessTokenIndex =
-    (await prisma
-      .accessTokensConnection()
-      .aggregate()
-      .count()) + 1;
+    (await prisma.accessTokensConnection().aggregate().count()) + 1;
 
   const accessToken = await prisma.createAccessToken({
     token: `token_${accessTokenIndex}`,
@@ -230,10 +220,7 @@ export const applicationFactory = async () => {
   const admin = await userFactory();
 
   const applicationIndex =
-    (await prisma
-      .applicationsConnection()
-      .aggregate()
-      .count()) + 1;
+    (await prisma.applicationsConnection().aggregate().count()) + 1;
 
   const application = await prisma.createApplication({
     admins: { connect: { id: admin.id } },

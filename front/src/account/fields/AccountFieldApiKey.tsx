@@ -14,7 +14,7 @@ const GET_API_KEY = gql`
 export default function AccountFieldApiKey() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [getApiKey] = useLazyQuery(GET_API_KEY, {
-    onCompleted: (data) => {
+    onCompleted: data => {
       if (data && data.apiKey) {
         setApiKey(data.apiKey);
       }

@@ -55,7 +55,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
   return (
     <Formik
       initialValues={{ email: "", siret: company.siret, role: UserRole.Member }}
-      validate={(values) => {
+      validate={values => {
         if (!values.email) {
           return { email: "L'email est obligatoire" };
         }
@@ -69,7 +69,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
             setSubmitting(false);
             resetForm();
           })
-          .catch((e) => {
+          .catch(e => {
             setFieldError("email", e.message);
             setSubmitting(false);
           });

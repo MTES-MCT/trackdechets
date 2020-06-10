@@ -65,7 +65,7 @@ async function createActivationHash(user: User) {
 export async function acceptNewUserCompanyInvitations(user: User) {
   const existingHashes = await prisma
     .userAccountHashes({ where: { email: user.email } })
-    .catch(_ => {
+    .catch(() => {
       throw new Error("Technical error.");
     });
 

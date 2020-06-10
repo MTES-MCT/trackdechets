@@ -29,7 +29,7 @@ export default function Duplicate({ formId }: Props) {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret, status: ["DRAFT"] },
-        getNewData: (data) => ({
+        getNewData: data => ({
           forms: [...data.forms, duplicateForm],
         }),
       });

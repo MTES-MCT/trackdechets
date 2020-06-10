@@ -105,7 +105,7 @@ export function DynamicActions({ form, siret }: DynamicActionsProps) {
           {ButtonComponent && (
             <ButtonComponent
               onCancel={() => setIsOpen(false)}
-              onSubmit={(vars) => {
+              onSubmit={vars => {
                 mark({ variables: { id: form.id, ...vars } });
               }}
               form={form}

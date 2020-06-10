@@ -27,7 +27,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
     <div>
       <Formik
         initialValues={initialValues}
-        onSubmit={(values) => onSubmit({ info: values })}
+        onSubmit={values => onSubmit({ info: values })}
       >
         {({ values }) => (
           <Form>
@@ -49,7 +49,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
 
               <Field component="select" name="destination.processingOperation">
                 <option value="">Choisissez...</option>
-                {Operations.map((o) => (
+                {Operations.map(o => (
                   <option key={o.code} value={o.code}>
                     {o.code} - {o.description.substr(0, 50)}
                     {o.description.length > 50 ? "..." : ""}

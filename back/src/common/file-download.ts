@@ -54,7 +54,7 @@ export async function downloadFileHandler(req: Request, res: Response) {
     return res.status(400).send("Le token doit être une chaine de caractères.");
   }
 
-  const redisValue = await redisClient.get(token).catch(_ => null);
+  const redisValue = await redisClient.get(token).catch(() => null);
 
   if (redisValue == null) {
     return res.status(403).send("Token invalide ou expiré.");
