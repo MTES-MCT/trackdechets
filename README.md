@@ -9,7 +9,7 @@
 
 Dépôt de code de la startup d'état **Trackdéchets** incubée à la Fabrique Numérique du Ministère de la Transition Écologique et Solidaire.
 
-Ce README s'adresse aux intervenant·es  techniques sur le projet. Pour plus d'infos en tant qu'utilisateur.ice du produit ou de l'API, vous pouvez consulter les liens suivants:
+Ce `README` s'adresse aux intervenant·es  techniques sur le projet. Pour plus d'infos en tant qu'utilisateur.ice du produit ou de l'API, vous pouvez consulter les liens suivants:
 
 * [Site web](https://trackdechets.beta.gouv.fr)
 * [FAQ](https://faq.trackdechets.fr/)
@@ -18,7 +18,7 @@ Ce README s'adresse aux intervenant·es  techniques sur le projet. Pour plus d'i
 
 ## Architecture logicielle
 
-Le projet utilise docker-compose avec les différents services suivants:
+Le projet utilise `docker-compose` avec les différents services suivants:
 
 * `td-api` (`./back`) Serveur Express.js avec une API GraphQL (Node.js)
 * `td-ui` (`./front`) Single Page App pour la page d'accueil et le dashboard (React.js)
@@ -27,7 +27,7 @@ Le projet utilise docker-compose avec les différents services suivants:
 * `td-etl` (`./etl`) Service interne de préparation des données de la base des ICPE (Python, Airflow)
 * `td-doc` (`./doc`) Documentation technique du projet (Docusaurus)
 
-La config Nginx pour chaque container exposé est créee de façon automatique grâce à [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy)
+La config `nginx` pour chaque container exposé est créee de façon automatique grâce à [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy)
 
 ![stack](./stack.png)
 
@@ -54,7 +54,7 @@ Les différentes instances sont hébérgées chez OVH et Scaleway. Le détail es
 * [Metabase](https://www.metabase.com/) pour l'analyse et la visualisation des données Trackdéchets
 * [Matomo](https://fr.matomo.org/) pour l'analyse du traffic web
 * [Cachet](http://cachethq.io/) pour la page de statuts et les alertes
-* [graphql-codegen](https://graphql-code-generator.com/) pour générer la référence de l'API et le typage Typescript à partir des fichiers de définition graphql.
+* [graphql-codegen](https://graphql-code-generator.com/) pour générer la référence de l'API et le typage Typescript à partir des fichiers de définition GraphQL.
 
 ## Mise en route
 
@@ -64,7 +64,7 @@ Les différentes instances sont hébérgées chez OVH et Scaleway. Le détail es
 
 ### Nginx-proxy
 
-> jwilder/nginx-proxy va nous permettre d'accéder aux différents services exposées au travers d'URLs de type `http://trackdechets.local`, `http://api.trackdechets.local`, etc sur le port 80 plutôt que de mapper chaque service sur différents ports de `localhost`.
+[jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) permet d'accéder aux différents services exposées au travers d'URLs de type `http://trackdechets.local`, `http://api.trackdechets.local`, etc sur le port 80 plutôt que de mapper chaque service sur différents ports de `localhost`.
 
 
 * Créer un répertoire `nginx-proxy` sur votre espace de travail et y ajouter le fichier `docker-compose.yml` suivant:
@@ -112,7 +112,7 @@ Les différentes instances sont hébérgées chez OVH et Scaleway. Le détail es
   docker-compose up
   ```
 
-Pour plus de détails, se référer au post ["Set a local web development environement with custom urls and https"](https://medium.com/@francoisromain/set-a-local-web-development-environment-with-custom-urls-and-https-3fbe91d2eaf0) by @francoisromain
+Pour plus de détails, se référer au post ["Set a local web development environement with custom urls and https"](https://medium.com/@francoisromain/set-a-local-web-development-environment-with-custom-urls-and-https-3fbe91d2eaf0) par @francoisromain
 
 
 ### Configurer les variables d'environnements
@@ -157,13 +157,13 @@ Il existe également un playground prisma exposant directement les fonctionnalit
 
 ### Tests unitaires (back et front)
 
-#### Tous les tests
+#### Faire tourner tous les tests
 
 ```
 docker-compose -f docker-compose.test.yml up
 ```
 
-#### Uniquement certains tests
+#### Faire tourner uniquement certains tests
 
 Il est également possible de faire tourner les tests unitaires sur l'environnement de `dev` en se connectant à chacun des containers
 
@@ -202,9 +202,9 @@ Il est également possible de faire tourner chaque test de façon indépendante:
 
 ```bash
 cd back/integration-tests
-./run.sh -u # start all the containers
+./run.sh -u # start the containers
 ./run.sh -r workflow.integration.ts
-./run.sh -d # remove all containers
+./run.sh -d # remove the containers
 ```
 
 ## Compatibilité navigateur
