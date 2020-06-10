@@ -715,7 +715,7 @@ export type Mutation = {
    */
   editProfile: User;
   /** Édite un segment existant */
-  editSegment: Maybe<Form>;
+  editSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
@@ -748,10 +748,10 @@ export type Mutation = {
   markAsSent: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored: Maybe<Form>;
-  /** Marque un segment de transport comme scellé */
-  markSegmentAsSealed: Maybe<Form>;
+  /** Marque un segment de transport comme prêt à être emporté */
+  markSegmentAsReadyToTakeOver: Maybe<TransportSegment>;
   /** Prépare un nouveau segment de transport multimodal */
-  prepareSegment: Maybe<Form>;
+  prepareSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
@@ -782,7 +782,7 @@ export type Mutation = {
    */
   signup: User;
   /** Marque un segment comme pris en charge par le nouveau transporteur */
-  takeOverSegment: Maybe<Form>;
+  takeOverSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Édite les informations d'un établissement
@@ -931,7 +931,7 @@ export type MutationMarkAsTempStoredArgs = {
 };
 
 
-export type MutationMarkSegmentAsSealedArgs = {
+export type MutationMarkSegmentAsReadyToTakeOverArgs = {
   id: Scalars['ID'];
 };
 
@@ -1635,13 +1635,20 @@ export enum TransportMode {
 
 export type TransportSegment = {
    __typename?: 'TransportSegment';
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
+  /** Siret du transporteur précédent */
   previousTransporterCompanySiret: Maybe<Scalars['String']>;
+  /** Transporteur du segment */
   transporter: Maybe<MultimodalTransporter>;
+  /** Mode de transport */
   mode: Maybe<TransportMode>;
+  /** Date de prise en charge */
   takenOverAt: Maybe<Scalars['DateTime']>;
+  /** Reponsable de la prise en charge */
   takenOverBy: Maybe<Scalars['String']>;
-  sealed: Maybe<Scalars['Boolean']>;
+  /** Prêt à être pris en charge */
+  readyToTakeOver: Maybe<Scalars['Boolean']>;
+  /** Numéro du segment */
   segmentNumber: Maybe<Scalars['Int']>;
 };
 

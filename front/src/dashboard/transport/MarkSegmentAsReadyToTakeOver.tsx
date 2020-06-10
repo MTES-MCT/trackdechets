@@ -3,29 +3,29 @@ import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import React, { useState } from "react";
-import { GET_TRANSPORT_SLIPS } from "./Transport";
+import { GET_TRANSPORT_SLIPS ,GET_FORM} from "./Transport";
 import {
   Form,
   Mutation,
-  MutationMarkSegmentAsSealedArgs,
+  MutationMarkSegmentAsReadyToTakeOverArgs,
 } from "../../generated/graphql/types";
 import { Form as FormikForm, Formik } from "formik";
-import { transporterFormFragment } from "../../common/fragments";
+import { segmentFragment } from "../../common/fragments";
 import "./TransportSignature.scss";
 import { updateApolloCache } from "../../common/helper";
 import cogoToast from "cogo-toast";
 import { NotificationError } from "../../common/Error";
-
-export const MARK_SEGMENT_AS_SEALED = gql`
-  mutation markSegmentAsSealed($id: ID!) {
-    markSegmentAsSealed(id: $id) {
-      ...TransporterForm
+ 
+export const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
+  mutation markSegmentAsReadyToTakeOver($id: ID!) {
+    markSegmentAsReadyToTakeOver(id: $id) {
+      ...Segment
     }
   }
-  ${transporterFormFragment}
+  ${segmentFragment}
 `;
 
-const getSegmentToSeal = ({ form, userSiret }) => {
+const getSegmentToMarkSegmentAsReadyToTakeOver = ({ form, userSiret }) => {
   const transportSegments = form.transportSegments || [];
   if (form.status !== "SENT") {
     return null;
@@ -34,7 +34,7 @@ const getSegmentToSeal = ({ form, userSiret }) => {
     return null;
   }
   // get unsealed  segments
-  const sealableSegments = transportSegments.filter((f) => !f.sealed);
+  const sealableSegments = transportSegments.filter((f) => !f.readyToTakeOver);
   if (!sealableSegments.length) {
     return null;
   }
@@ -47,21 +47,24 @@ const getSegmentToSeal = ({ form, userSiret }) => {
 
 type Props = { form: any; userSiret: string };
 
-export default function SealSegment({ form, userSiret }: Props) {
+export default function MarkSegmentAsReadyToTakeOver({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const [markSegmentAsSealed, { error }] = useMutation<
-    Pick<Mutation, "markSegmentAsSealed">,
-    MutationMarkSegmentAsSealedArgs
-  >(MARK_SEGMENT_AS_SEALED, {
+  const refetchQuery = {
+    query: GET_FORM,
+    variables: { id: form.id },
+  };
+  const [markSegmentAsReadyToTakeOver, { error }] = useMutation<
+    Pick<Mutation, "markSegmentAsReadyToTakeOver">,
+    MutationMarkSegmentAsReadyToTakeOverArgs
+  >(MARK_SEGMENT_AS_READY_TO_TAKE_OVER, {
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success(
-        "Le bordereau est scellé, prêt à être pris en charge par le transporteur suivant",
+        "Le bordereau est prêt à être pris en charge par le transporteur suivant",
         { hideAfter: 5 }
       );
     },
-    refetchQueries: [],
+    refetchQueries:  [refetchQuery],
     update: (store) => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
@@ -77,7 +80,7 @@ export default function SealSegment({ form, userSiret }: Props) {
     },
   });
 
-  const segment = getSegmentToSeal({ form, userSiret });
+  const segment = getSegmentToMarkSegmentAsReadyToTakeOver({ form, userSiret });
 
   if (!segment) {
     return null;
@@ -87,9 +90,9 @@ export default function SealSegment({ form, userSiret }: Props) {
       <button
         className="button button-small"
         onClick={() => setIsOpen(true)}
-        title="Sceller le segment"
+        title="Marquer comme prêt à transférer"
       >
-        Sceller le segment N°{segment.segmentNumber}
+        Marquer comme prêt à transférer le segment N°{segment.segmentNumber}
       </button>
 
       {isOpen ? (
@@ -107,7 +110,7 @@ export default function SealSegment({ form, userSiret }: Props) {
                 const variables = {
                   id: segment.id,
                 };
-                markSegmentAsSealed({ variables }).catch(() => {});
+                markSegmentAsReadyToTakeOver({ variables }).catch(() => {});
               }}
             >
               {({ values }) => (

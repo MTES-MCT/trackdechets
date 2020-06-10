@@ -205,7 +205,7 @@ export const transporterFormFragment = gql`
     nextTransporterSiret
     transportSegments {
       id
-      sealed
+      readyToTakeOver
       transporter {
         validityLimit
         numberPlate
@@ -231,5 +231,10 @@ export const transporterFormFragment = gql`
   }
   ${mutableFieldsFragment}
   ${staticFieldsFragment}
+`;
 
+export const segmentFragment = gql`
+  fragment Segment on TransportSegment {
+    id
+  }
 `;

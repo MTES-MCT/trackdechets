@@ -5,12 +5,14 @@ import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React, { useState } from "react";
 import {
+  Form,
   Mutation,
-  MutationTakeOverSegmentArgs,
+  MutationTakeOverSegmentArgs
 } from "../../generated/graphql/types";
 import { useMutation } from "@apollo/react-hooks";
 import { NotificationError } from "../../common/Error";
-
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
+import { updateApolloCache } from "../../common/helper";
 import DateInput from "../../form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
 
@@ -28,29 +30,27 @@ const getSegmentToTakeOver = ({ form, userSiret }) => {
   if (!transportSegments.length) {
     return null;
   }
-  // get sealed and not yet taken over segments
-  const sealedSegments = transportSegments.filter(
-    (f) => f.sealed && !f.takenOverAt
+  // get readytoTakeOver and not yet taken over segments
+  const readytoTakeOverSegments = transportSegments.filter(
+    f => f.readyToTakeOver && !f.takenOverAt
   );
-
-  if (!sealedSegments.length) {
+  if (!readytoTakeOverSegments.length) {
     return null;
   }
-  // is the first sealed segment is for current user, return it
-  return sealedSegments[0].transporter.company.siret === userSiret
-    ? sealedSegments[0]
+  // is the first readytoTakeOver segment is for current user, return it
+  return readytoTakeOverSegments[0].transporter.company.siret === userSiret
+    ? readytoTakeOverSegments[0]
     : null;
 };
 
-type Props = { form: any; userSiret: string; refetchQuery: any };
+type Props = { form: any; userSiret: string };
 
-export default function TakeOverSegment({
-  form,
-  userSiret,
-  refetchQuery,
-}: Props) {
+export default function TakeOverSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-
+  const refetchQuery = {
+    query: GET_FORM,
+    variables: { id: form.id }
+  };
   const [takeOverSegment, { error }] = useMutation<
     Pick<Mutation, "takeOverSegment">,
     MutationTakeOverSegmentArgs
@@ -58,16 +58,29 @@ export default function TakeOverSegment({
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success("La prise en charge du bordereau est validée", {
-        hideAfter: 5,
+        hideAfter: 5
       });
     },
     refetchQueries: [refetchQuery],
+    update: store => {
+      updateApolloCache<{ forms: Form[] }>(store, {
+        query: GET_TRANSPORT_SLIPS,
+        variables: {
+          userSiret,
+          roles: ["TRANSPORTER"],
+          status: ["SEALED", "SENT", "RESEALED", "RESENT"]
+        },
+        getNewData: data => ({
+          forms: data.forms
+        })
+      });
+    }
   });
   const segment = getSegmentToTakeOver({ form, userSiret });
 
   const initialValues = {
     takenOverBy: "",
-    takenOverAt: DateTime.local().toISODate(),
+    takenOverAt: DateTime.local().toISODate()
   };
 
   if (!segment) {
@@ -88,16 +101,16 @@ export default function TakeOverSegment({
           className="modal__backdrop"
           id="modal"
           style={{
-            display: isOpen ? "flex" : "none",
+            display: isOpen ? "flex" : "none"
           }}
         >
           <div className="modal">
             <Formik
               initialValues={initialValues}
-              onSubmit={(values) => {
+              onSubmit={values => {
                 const variables = {
                   takeOverInfo: { ...values },
-                  id: segment.id,
+                  id: segment.id
                 };
 
                 takeOverSegment({ variables }).catch(() => {});

@@ -7,9 +7,9 @@ import {
   FormRole,
   FormStatus,
   Query,
-  QueryFormsArgs,
+  QueryFormsArgs
 } from "../../generated/graphql/types";
-import SealSegment from "./SealSegment";
+import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
 import PrepareSegment from "./PrepareSegment";
 import TakeOverSegment from "./TakeOverSegment";
 import EditSegment from "./EditSegment";
@@ -32,6 +32,15 @@ export const GET_TRANSPORT_SLIPS = gql`
   ${transporterFormFragment}
 `;
 
+export const GET_FORM = gql`
+  query form($id: ID!) {
+    form(id: $id) {
+      ...TransporterForm
+    }
+  }
+  ${transporterFormFragment}
+`;
+
 const Table = ({ forms, userSiret }) => {
   const [sortedForms, sortBy, filter] = useFormsTable(forms);
   const refetchQuery = {
@@ -39,8 +48,8 @@ const Table = ({ forms, userSiret }) => {
     variables: {
       siret: userSiret,
       roles: ["TRANSPORTER"],
-      status: ["SEALED", "SENT", "RESEALED", "RESENT"],
-    },
+      status: ["SEALED", "SENT", "RESEALED", "RESENT"]
+    }
   };
 
   return (
@@ -83,21 +92,21 @@ const Table = ({ forms, userSiret }) => {
           <th>
             <input
               type="text"
-              onChange={(e) => filter("readableId", e.target.value)}
+              onChange={e => filter("readableId", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th>
             <input
               type="text"
-              onChange={(e) => filter("emitter.company.name", e.target.value)}
+              onChange={e => filter("emitter.company.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
           <th className="hide-on-mobile">
             <input
               type="text"
-              onChange={(e) =>
+              onChange={e =>
                 filter("stateSummary.recipient.name", e.target.value)
               }
               placeholder="Filtrer..."
@@ -106,7 +115,7 @@ const Table = ({ forms, userSiret }) => {
           <th>
             <input
               type="text"
-              onChange={(e) => filter("wasteDetails.name", e.target.value)}
+              onChange={e => filter("wasteDetails.name", e.target.value)}
               placeholder="Filtrer..."
             />
           </th>
@@ -116,7 +125,7 @@ const Table = ({ forms, userSiret }) => {
         </tr>
       </thead>
       <tbody>
-        {sortedForms.map((form) => {
+        {sortedForms.map(form => {
           const transportInfos = getTransportInfos(form);
           return (
             <tr key={form.id}>
@@ -168,13 +177,12 @@ const Table = ({ forms, userSiret }) => {
                 />
 
                 <PrepareSegment form={transportInfos} userSiret={userSiret} />
-                <SealSegment form={transportInfos} userSiret={userSiret} />
-                <EditSegment form={transportInfos} userSiret={userSiret} />
-                <TakeOverSegment
-                  form={form}
+                <MarkSegmentAsReadyToTakeOver
+                  form={transportInfos}
                   userSiret={userSiret}
-                  refetchQuery={refetchQuery}
                 />
+                <EditSegment form={transportInfos} userSiret={userSiret} />
+                <TakeOverSegment form={form} userSiret={userSiret} />
               </td>
             </tr>
           );
@@ -189,7 +197,7 @@ export default function Transport() {
   const { siret } = useContext(SiretContext);
   // const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
   const [filterFormType, setFilterFormType] = useState({
-    formType: "TO_TAKE_OVER",
+    formType: "TO_TAKE_OVER"
   });
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
@@ -204,10 +212,10 @@ export default function Transport() {
         FormStatus.Sealed,
         FormStatus.Sent,
         FormStatus.Resealed,
-        FormStatus.Resent,
+        FormStatus.Resent
       ],
-      roles: [FormRole.Transporter],
-    },
+      roles: [FormRole.Transporter]
+    }
   });
 
   if (loading) return <div>loading</div>;
@@ -221,18 +229,18 @@ export default function Transport() {
   const filtering = (form, formType, userSiret) => {
     const statuses = {
       TO_TAKE_OVER: ["SEALED", "RESEALED"],
-      TAKEN_OVER: ["SENT", "RESENT"],
+      TAKEN_OVER: ["SENT", "RESENT"]
     }[formType];
 
     const segmentsToTakeOver = form.transportSegments.filter(
-      (segment) =>
-        segment.sealed &&
+      segment =>
+        segment.readyToTakeOver &&
         !segment.takenOverAt &&
         segment.transporter.company.siret === userSiret
     );
 
     const hasTakenOverASegment = form.transportSegments.filter(
-      (segment) =>
+      segment =>
         segment.transporter.company.siret === userSiret && !!segment.takenOverAt
     );
 
@@ -244,7 +252,7 @@ export default function Transport() {
         !!segmentsToTakeOver.length) ||
       (formType === "TAKEN_OVER" &&
         form.status === "SENT" &&
-        hasTakenOverASegment)
+        !!hasTakenOverASegment.length)
     );
   };
 
@@ -252,19 +260,19 @@ export default function Transport() {
   const filteredForms = data
     ? data.forms
         .filter(
-          (f) =>
+          f =>
             filtering(f, filterFormType.formType, siret) &&
             filterAgainstPersistenFilter(
               f.stateSummary?.transporterCustomInfo,
               persistentFilter
             )
         )
-        .map((f) => ({
+        .map(f => ({
           ...f,
           wasteDetails: {
             ...f.wasteDetails,
-            name: `${f.wasteDetails?.code} ${f.wasteDetails?.name} `,
-          },
+            name: `${f.wasteDetails?.code} ${f.wasteDetails?.name} `
+          }
         }))
     : [];
   return (
@@ -288,7 +296,7 @@ export default function Transport() {
             filterFormType.formType === "TAKEN_OVER" ? "active" : ""
           }`}
         >
-          Déchets chargés, en attente de réception
+          Déchets chargés, en attente de réception ou de transfert
         </button>
         <button
           className="button button-primary transport-refresh"
@@ -299,9 +307,9 @@ export default function Transport() {
                 FormStatus.Sealed,
                 FormStatus.Sent,
                 FormStatus.Resealed,
-                FormStatus.Resent,
+                FormStatus.Resent
               ],
-              roles: [FormRole.Transporter],
+              roles: [FormRole.Transporter]
             })
           }
         >
@@ -314,13 +322,13 @@ export default function Transport() {
           type="text"
           placeholder="Filtre champ libre…"
           value={persistentFilter}
-          onChange={(e) => setPersistentFilter(e.target.value)}
+          onChange={e => setPersistentFilter(e.target.value)}
         />
 
         {persistentFilter && (
           <button
             className="button-outline warning"
-            onClick={(e) => setPersistentFilter("")}
+            onClick={e => setPersistentFilter("")}
           >
             Afficher tous les bordereaux
           </button>
@@ -345,16 +353,16 @@ function getTransportInfos(form: Form) {
     ...form,
     emitter: {
       ...form.emitter,
-      ...form.recipient,
+      ...form.recipient
     },
     recipient: {
       ...form.recipient,
-      ...form.temporaryStorageDetail.destination,
+      ...form.temporaryStorageDetail.destination
     },
     wasteDetails: {
       ...form.wasteDetails,
       ...(form.temporaryStorageDetail?.wasteDetails?.quantity &&
-        form.temporaryStorageDetail.wasteDetails),
-    },
+        form.temporaryStorageDetail.wasteDetails)
+    }
   };
 }

@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/react-hooks";
 import { NotificationError } from "../../common/Error";
-
+import { DateTime } from "luxon";
 import gql from "graphql-tag";
 
 import React, { useState } from "react";
@@ -8,11 +8,12 @@ import React, { useState } from "react";
 import { Field, Form as FormikForm, Formik } from "formik";
 
 import CompanySelector from "../../form/company/CompanySelector";
-import { transporterFormFragment } from "../../common/fragments";
+import { segmentFragment } from "../../common/fragments";
 import { transportModeLabels } from "../constants";
 import cogoToast from "cogo-toast";
 import "./TransportSignature.scss";
-import { GET_TRANSPORT_SLIPS } from "./Transport";
+import DateInput from "../../form/custom-inputs/DateInput";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
 import {
   Form,
   Mutation,
@@ -28,10 +29,10 @@ export const PREPARE_SEGMENT = gql`
     $nextSegmentInfo: NextSegmentInfoInput!
   ) {
     prepareSegment(id: $id, siret: $siret, nextSegmentInfo: $nextSegmentInfo) {
-      ...TransporterForm
+      ...Segment
     }
   }
-  ${transporterFormFragment}
+  ${segmentFragment}
 `;
 
 type Props = { form: any; userSiret: String };
@@ -41,7 +42,10 @@ export default function PrepareSegment({ form, userSiret }: Props) {
   const segments = form.transportSegments;
   const unsealedSegments = segments.filter((segment) => !segment.sealed);
   const lastSegment = segments[segments.length - 1];
-
+  const refetchQuery = {
+    query: GET_FORM,
+    variables: { id: form.id },
+  };
   const [prepareSegment, { error }] = useMutation<
     Pick<Mutation, "prepareSegment">,
     MutationPrepareSegmentArgs
@@ -52,7 +56,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
         hideAfter: 5,
       });
     },
-    refetchQueries: [],
+    refetchQueries: [refetchQuery],
     update: (store) => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
@@ -61,9 +65,11 @@ export default function PrepareSegment({ form, userSiret }: Props) {
           roles: ["TRANSPORTER"],
           status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
-        getNewData: (data) => ({
-          forms: data.forms,
-        }),
+        getNewData: (data) => {
+          return {
+            forms: data.forms.filter((f) => f.id === form.id),
+          };
+        },
       });
     },
   });
@@ -81,7 +87,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
       isExemptedOfReceipt: false,
       receipt: "",
       department: "",
-      validityLimit: null,
+      validityLimit: DateTime.local().toISODate(),
       numberPlate: "",
     },
 
@@ -120,11 +126,20 @@ export default function PrepareSegment({ form, userSiret }: Props) {
             <Formik
               initialValues={initialValues}
               onSubmit={(values) => {
+                const { transporter, ...rst } = values;
+                const { validityLimit } = transporter;
+                // prevent empty strings to be sent for validityLimit
                 prepareSegment({
                   variables: {
                     id: form.id,
                     siret: userSiret as string,
-                    nextSegmentInfo: { ...values },
+                    nextSegmentInfo: {
+                      transporter: {
+                        ...transporter,
+                        validityLimit: validityLimit || null,
+                      },
+                      ...rst,
+                    },
                   },
                 });
               }}
@@ -166,7 +181,10 @@ export default function PrepareSegment({ form, userSiret }: Props) {
                       <label htmlFor="department">Département</label>
                       <Field type="text" name="transporter.department" />
                       <label htmlFor="validityLimit">Limite de validité</label>
-                      <Field type="date" name="transporter.validityLimit" />
+                      <Field
+                        name="transporter.validityLimit"
+                        component={DateInput}
+                      />
                       <label htmlFor="numberPlate">Immatriculation</label>
                       <Field type="text" name="transporter.numberPlate" />
                     </>

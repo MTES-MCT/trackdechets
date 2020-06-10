@@ -7,8 +7,7 @@ const verboseTakenOver = ({ segment, userSiret }) => {
       ? `Chargé`
       : `Transmis à ${segment.transporter.company.name}`;
   }
-
-  return segment.sealed ? "Scellé" : "Brouillon";
+  return segment.readyToTakeOver ? "Prêt à transférer" : "Brouillon";
 };
 
 export const Segments = ({ form, userSiret }) => {
@@ -31,7 +30,7 @@ export const Segments = ({ form, userSiret }) => {
           </tr>
         </thead>
         <tbody>
-          {form.transportSegments.map((segment) =>
+          {form.transportSegments.map(segment =>
             !!segment.id ? (
               <tr key={segment.id}>
                 <td>

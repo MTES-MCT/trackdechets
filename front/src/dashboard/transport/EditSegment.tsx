@@ -5,22 +5,24 @@ import gql from "graphql-tag";
 import React, { useState } from "react";
 
 import { Field, Form as FormikForm, Formik } from "formik";
-import { transporterFormFragment } from "../../common/fragments";
+import { segmentFragment } from "../../common/fragments";
 import "./TransportSignature.scss";
 import { transportModeLabels } from "../constants";
 import CompanySelector from "../../form/company/CompanySelector";
 import DateInput from "../../form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
 import {
- 
+  Form,
   Mutation,
-  MutationEditSegmentArgs,
+  MutationEditSegmentArgs
 } from "../../generated/graphql/types";
 import { NotificationError } from "../../common/Error";
+import { updateApolloCache } from "../../common/helper";
 
-/**Remove company data if segment is sealed */
-const removeCompanyData = (values) => {
-  if (!values.sealed) {
+/**Remove company data if segment is readytoTakeOver */
+const removeCompanyData = values => {
+  if (!values.readyToTakeOverXX) {
     return values;
   }
   const { transporter, ...rst } = values;
@@ -40,13 +42,13 @@ export const EDIT_SEGMENT = gql`
       siret: $siret
       nextSegmentInfo: { transporter: $transporter, mode: $mode }
     ) {
-      ...TransporterForm
+      ...Segment
     }
   }
-  ${transporterFormFragment}
+  ${segmentFragment}
 `;
 
-// Select a segement to edit, can be either :
+// Select a segment to edit, can be either :
 // - for the current transporter who prepared a segement and need to edit it before sealing it
 // - for the next transporter who need to edit a segemnt before taking over it
 
@@ -58,30 +60,35 @@ const getSegmentToEdit = ({ form, userSiret }) => {
   if (!transportSegments.length) {
     return null;
   }
-  // unsealed form editable by current transporter before sealing
+  // not readytoTakeOver segment editable by current transporter before sealing
   if (form.currentTransporterSiret === userSiret) {
-    // get unsealed  segments
-    const sealableSegments = transportSegments.filter((f) => !f.sealed);
-    if (!sealableSegments.length) {
+    // get not readytoTakeOver segments
+    const notReadytoTakeOverSegments = transportSegments.filter(
+      f => !f.readytoTakeOver
+    );
+    if (!notReadytoTakeOverSegments.length) {
       return null;
     }
 
-    // is the first unsealed segment is for current user, return it
-    return sealableSegments[0].previousTransporterCompanySiret === userSiret
-      ? sealableSegments[0]
+    // is the first not ReadytoTakeOver segment is for current user, return it
+    return notReadytoTakeOverSegments[0].previousTransporterCompanySiret ===
+      userSiret
+      ? notReadytoTakeOverSegments[0]
       : null;
   }
-  // sealed form editable  by next transporter before take over
+  // readytoTakeOver form editable  by next transporter before take over
   if (form.nextTransporterSiret === userSiret) {
-    // get sealed  segments
-    const sealedSegments = transportSegments.filter((f) => f.sealed);
-    if (!sealedSegments.length) {
+    // get readytoTakeOver segments
+    const readytoTakeOverSegments = transportSegments.filter(
+      f => f.readyToTakeOver
+    );
+    if (!readytoTakeOverSegments.length) {
       return null;
     }
 
-    // is the first unsealed segment is for current user, return it
-    return sealedSegments[0].transporter.company.siret === userSiret
-      ? sealedSegments[0]
+    // is the first readytoTakeOver segment is for current user, return it
+    return readytoTakeOverSegments[0].transporter.company.siret === userSiret
+      ? readytoTakeOverSegments[0]
       : null;
   }
   return null;
@@ -91,16 +98,37 @@ type Props = { form: any; userSiret: string };
 
 export default function EditSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
- 
 
+  const refetchQuery = {
+    query: GET_FORM,
+    variables: { id: form.id }
+  };
   const [editSegment, { error }] = useMutation<
     Pick<Mutation, "editSegment">,
     MutationEditSegmentArgs
   >(EDIT_SEGMENT, {
     onCompleted: () => {
       setIsOpen(false);
-      cogoToast.success("Le segment de transport a été modifié", { hideAfter: 5 });
+      cogoToast.success("Le segment de transport a été modifié", {
+        hideAfter: 5
+      });
     },
+    refetchQueries: [refetchQuery],
+    update: store => {
+      updateApolloCache<{ forms: Form[] }>(store, {
+        query: GET_TRANSPORT_SLIPS,
+        variables: {
+          userSiret,
+          roles: ["TRANSPORTER"],
+          status: ["SEALED", "SENT", "RESEALED", "RESENT"]
+        },
+        getNewData: data => {
+          return {
+            forms: data.forms
+          };
+        }
+      });
+    }
   });
 
   const segment = getSegmentToEdit({ form, userSiret });
@@ -110,7 +138,7 @@ export default function EditSegment({ form, userSiret }: Props) {
   }
 
   const initialValues = {
-    ...segment,
+    ...segment
   };
 
   return (
@@ -128,17 +156,17 @@ export default function EditSegment({ form, userSiret }: Props) {
           className="modal__backdrop"
           id="modal"
           style={{
-            display: isOpen ? "flex" : "none",
+            display: isOpen ? "flex" : "none"
           }}
         >
           <div className="modal">
             <Formik
               initialValues={initialValues}
-              onSubmit={(values ) => {
+              onSubmit={values => {
                 const variables = {
                   ...removeCompanyData(values),
                   id: segment.id,
-                  siret: userSiret,
+                  siret: userSiret
                 };
 
                 editSegment({ variables }).catch(() => {});
@@ -157,12 +185,39 @@ export default function EditSegment({ form, userSiret }: Props) {
                     ))}
                   </Field>
 
-                  {!segment.sealed ? (
+                  {!segment.readyToTakeOver ? (
                     <>
                       <label>Siret</label>{" "}
                       <CompanySelector name="transporter.company" />{" "}
                     </>
-                  ) : null}
+                  ) : (
+                    <>
+                      <div className="form__group">
+                        <label>
+                          Personne à contacter
+                          <Field
+                            type="text"
+                            name="transporter.company.contact"
+                            placeholder="NOM Prénom"
+                          />
+                        </label>
+
+                        <label>
+                          Téléphone ou Fax
+                          <Field
+                            type="text"
+                            name="transporter.company.phone"
+                            placeholder="Numéro"
+                          />
+                        </label>
+
+                        <label>
+                          Mail
+                          <Field type="email" name="transporter.company.mail" />
+                        </label>
+                      </div>
+                    </>
+                  )}
 
                   <h4>Autorisations</h4>
                   <label htmlFor="isExemptedOfReceipt">
