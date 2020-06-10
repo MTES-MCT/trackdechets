@@ -51,19 +51,17 @@ describe("{ mutation { prepareSegment } }", () => {
             }
             mode: ROAD
           }) {
-            transportSegments {
-              id
-            }
+              id     
           }
       }`
     );
 
     const segment = await prisma.transportSegment({
-      id: data.prepareSegment.transportSegments[0].id
+      id: data.prepareSegment.id
     });
 
     expect(segment.transporterCompanySiret).toBe("976345");
     expect(segment.transporterCompanyName).toBe("Nightwatch fight club");
-    expect(segment.sealed).toBe(false);
+    expect(segment.readyToTakeOver).toBe(false);
   });
 });

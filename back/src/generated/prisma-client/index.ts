@@ -1177,8 +1177,8 @@ export type TransportSegmentOrderByInput =
   | "transporterNumberPlate_DESC"
   | "mode_ASC"
   | "mode_DESC"
-  | "sealed_ASC"
-  | "sealed_DESC"
+  | "readyToTakeOver_ASC"
+  | "readyToTakeOver_DESC"
   | "previousTransporterCompanySiret_ASC"
   | "previousTransporterCompanySiret_DESC"
   | "takenOverAt_ASC"
@@ -3706,8 +3706,8 @@ export interface TransportSegmentWhereInput {
   mode_not?: Maybe<TransportMode>;
   mode_in?: Maybe<TransportMode[] | TransportMode>;
   mode_not_in?: Maybe<TransportMode[] | TransportMode>;
-  sealed?: Maybe<Boolean>;
-  sealed_not?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
+  readyToTakeOver_not?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   previousTransporterCompanySiret_not?: Maybe<String>;
   previousTransporterCompanySiret_in?: Maybe<String[] | String>;
@@ -5191,7 +5191,7 @@ export interface TransportSegmentCreateWithoutFormInput {
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
   mode?: Maybe<TransportMode>;
-  sealed?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   takenOverAt?: Maybe<DateTimeInput>;
   takenOverBy?: Maybe<String>;
@@ -5528,7 +5528,7 @@ export interface TransportSegmentUpdateWithoutFormDataInput {
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
   mode?: Maybe<TransportMode>;
-  sealed?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   takenOverAt?: Maybe<DateTimeInput>;
   takenOverBy?: Maybe<String>;
@@ -5703,8 +5703,8 @@ export interface TransportSegmentScalarWhereInput {
   mode_not?: Maybe<TransportMode>;
   mode_in?: Maybe<TransportMode[] | TransportMode>;
   mode_not_in?: Maybe<TransportMode[] | TransportMode>;
-  sealed?: Maybe<Boolean>;
-  sealed_not?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
+  readyToTakeOver_not?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   previousTransporterCompanySiret_not?: Maybe<String>;
   previousTransporterCompanySiret_in?: Maybe<String[] | String>;
@@ -5787,7 +5787,7 @@ export interface TransportSegmentUpdateManyDataInput {
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
   mode?: Maybe<TransportMode>;
-  sealed?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   takenOverAt?: Maybe<DateTimeInput>;
   takenOverBy?: Maybe<String>;
@@ -7457,7 +7457,7 @@ export interface TransportSegmentCreateInput {
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
   mode?: Maybe<TransportMode>;
-  sealed?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   takenOverAt?: Maybe<DateTimeInput>;
   takenOverBy?: Maybe<String>;
@@ -7573,7 +7573,7 @@ export interface TransportSegmentUpdateInput {
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
   mode?: Maybe<TransportMode>;
-  sealed?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   takenOverAt?: Maybe<DateTimeInput>;
   takenOverBy?: Maybe<String>;
@@ -7694,7 +7694,7 @@ export interface TransportSegmentUpdateManyMutationInput {
   transporterValidityLimit?: Maybe<DateTimeInput>;
   transporterNumberPlate?: Maybe<String>;
   mode?: Maybe<TransportMode>;
-  sealed?: Maybe<Boolean>;
+  readyToTakeOver?: Maybe<Boolean>;
   previousTransporterCompanySiret?: Maybe<String>;
   takenOverAt?: Maybe<DateTimeInput>;
   takenOverBy?: Maybe<String>;
@@ -9476,7 +9476,7 @@ export interface TransportSegment {
   transporterValidityLimit?: DateTimeOutput;
   transporterNumberPlate?: String;
   mode?: TransportMode;
-  sealed?: Boolean;
+  readyToTakeOver?: Boolean;
   previousTransporterCompanySiret?: String;
   takenOverAt?: DateTimeOutput;
   takenOverBy?: String;
@@ -9502,7 +9502,7 @@ export interface TransportSegmentPromise
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
   mode: () => Promise<TransportMode>;
-  sealed: () => Promise<Boolean>;
+  readyToTakeOver: () => Promise<Boolean>;
   previousTransporterCompanySiret: () => Promise<String>;
   takenOverAt: () => Promise<DateTimeOutput>;
   takenOverBy: () => Promise<String>;
@@ -9528,7 +9528,7 @@ export interface TransportSegmentSubscription
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
   mode: () => Promise<AsyncIterator<TransportMode>>;
-  sealed: () => Promise<AsyncIterator<Boolean>>;
+  readyToTakeOver: () => Promise<AsyncIterator<Boolean>>;
   previousTransporterCompanySiret: () => Promise<AsyncIterator<String>>;
   takenOverAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   takenOverBy: () => Promise<AsyncIterator<String>>;
@@ -9554,7 +9554,7 @@ export interface TransportSegmentNullablePromise
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
   mode: () => Promise<TransportMode>;
-  sealed: () => Promise<Boolean>;
+  readyToTakeOver: () => Promise<Boolean>;
   previousTransporterCompanySiret: () => Promise<String>;
   takenOverAt: () => Promise<DateTimeOutput>;
   takenOverBy: () => Promise<String>;
@@ -11684,7 +11684,7 @@ export interface TransportSegmentPreviousValues {
   transporterValidityLimit?: DateTimeOutput;
   transporterNumberPlate?: String;
   mode?: TransportMode;
-  sealed?: Boolean;
+  readyToTakeOver?: Boolean;
   previousTransporterCompanySiret?: String;
   takenOverAt?: DateTimeOutput;
   takenOverBy?: String;
@@ -11709,7 +11709,7 @@ export interface TransportSegmentPreviousValuesPromise
   transporterValidityLimit: () => Promise<DateTimeOutput>;
   transporterNumberPlate: () => Promise<String>;
   mode: () => Promise<TransportMode>;
-  sealed: () => Promise<Boolean>;
+  readyToTakeOver: () => Promise<Boolean>;
   previousTransporterCompanySiret: () => Promise<String>;
   takenOverAt: () => Promise<DateTimeOutput>;
   takenOverBy: () => Promise<String>;
@@ -11734,7 +11734,7 @@ export interface TransportSegmentPreviousValuesSubscription
   transporterValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   transporterNumberPlate: () => Promise<AsyncIterator<String>>;
   mode: () => Promise<AsyncIterator<TransportMode>>;
-  sealed: () => Promise<AsyncIterator<Boolean>>;
+  readyToTakeOver: () => Promise<AsyncIterator<Boolean>>;
   previousTransporterCompanySiret: () => Promise<AsyncIterator<String>>;
   takenOverAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   takenOverBy: () => Promise<AsyncIterator<String>>;

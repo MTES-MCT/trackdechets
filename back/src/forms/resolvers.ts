@@ -9,11 +9,11 @@ import {
   signedByTransporter,
   markAsTempStored,
   markAsResent,
-  markAsResealed,
+  markAsResealed
 } from "./mutations/mark-as";
 import {
   prepareSegment,
-  markSegmentAsSealed,
+  markSegmentAsReadyToTakeOver,
   takeOverSegment,
   editSegment
 } from "./mutations/multiModal";
@@ -31,7 +31,7 @@ import {
   SubscriptionResolvers,
   FormResolvers,
   WasteDetailsResolvers,
-  StateSummaryResolvers,
+  StateSummaryResolvers
 } from "../generated/graphql/types";
 import { transportSegments } from "./queries/segments";
 
@@ -55,24 +55,24 @@ const queryResolvers: QueryResolvers = {
     const userId = context.user.id;
     const userCompanies = await getUserCompanies(userId);
 
-    return userCompanies.map(async (userCompany) => {
+    return userCompanies.map(async userCompany => {
       const queriedForms = await prisma.forms({
         where: {
           OR: [
             { owner: { id: userId } },
             { recipientCompanySiret: userCompany.siret },
-            { emitterCompanySiret: userCompany.siret },
+            { emitterCompanySiret: userCompany.siret }
           ],
           status: "PROCESSED",
-          isDeleted: false,
-        },
+          isDeleted: false
+        }
       });
 
       const stats = queriedForms.reduce((prev, cur) => {
         prev[cur.wasteDetailsCode] = prev[cur.wasteDetailsCode] || {
           wasteCode: cur.wasteDetailsCode,
           incoming: 0,
-          outgoing: 0,
+          outgoing: 0
         };
         cur.recipientCompanySiret === userCompany.siret
           ? (prev[cur.wasteDetailsCode].incoming += cur.quantityReceived)
@@ -88,7 +88,7 @@ const queryResolvers: QueryResolvers = {
 
       return {
         company: userCompany,
-        stats: Object.keys(stats).map((key) => stats[key]),
+        stats: Object.keys(stats).map(key => stats[key])
       };
     });
   },
@@ -98,14 +98,14 @@ const queryResolvers: QueryResolvers = {
         ...(wasteCode && { wasteDetailsCode: wasteCode }),
         status: "AWAITING_GROUP",
         recipientCompanySiret: siret,
-        isDeleted: false,
-      },
+        isDeleted: false
+      }
     });
 
-    return queriedForms.map((f) => unflattenObjectFromDb(f));
+    return queriedForms.map(f => unflattenObjectFromDb(f));
   },
   formPdf: (_parent, args) => formPdf(args),
-  formsRegister: (_parent, args) => formsRegister(args),
+  formsRegister: (_parent, args) => formsRegister(args)
 };
 
 const mutationResolvers: MutationResolvers = {
@@ -113,7 +113,7 @@ const mutationResolvers: MutationResolvers = {
   deleteForm: async (_parent, { id }) => {
     const form = await prisma.updateForm({
       where: { id },
-      data: { isDeleted: true },
+      data: { isDeleted: true }
     });
     return { ...form, status: form.status as Status };
   },
@@ -129,20 +129,20 @@ const mutationResolvers: MutationResolvers = {
   markAsResealed: (_parent, args, context) => markAsResealed(args, context),
   markAsResent: (_parent, args, context) => markAsResent(args, context),
   prepareSegment: (_parent, args, context) => prepareSegment(args, context),
-  markSegmentAsSealed: (_parent, args, context) =>
-    markSegmentAsSealed(args, context),
+  markSegmentAsReadyToTakeOver: (_parent, args, context) =>
+    markSegmentAsReadyToTakeOver(args, context),
   takeOverSegment: (_parent, args, context) => takeOverSegment(args, context),
-  editSegment: (_parent, args, context) => editSegment(args, context),
+  editSegment: (_parent, args, context) => editSegment(args, context)
 };
 
 const formResolvers: FormResolvers = {
-  appendix2Forms: (parent) => {
+  appendix2Forms: parent => {
     return prisma.form({ id: parent.id }).appendix2Forms();
   },
-  ecoOrganisme: (parent) => {
+  ecoOrganisme: parent => {
     return prisma.form({ id: parent.id }).ecoOrganisme();
   },
-  temporaryStorageDetail: async (parent) => {
+  temporaryStorageDetail: async parent => {
     const temporaryStorageDetail = await prisma
       .form({ id: parent.id })
       .temporaryStorageDetail();
@@ -152,18 +152,18 @@ const formResolvers: FormResolvers = {
       : null;
   },
   // Somme contextual values, depending on the form status / type, mostly to ease the display
-  stateSummary: (parent) => stateSummary(parent),
+  stateSummary: parent => stateSummary(parent),
 
   transportSegments: (parent, args, context) =>
-    transportSegments(parent, args, context),
+    transportSegments(parent, args, context)
 };
 
 const wasteDetailsResolvers: WasteDetailsResolvers = {
-  packagings: (parent) => parent.packagings || [],
+  packagings: parent => parent.packagings || []
 };
 
 const stateSummaryResolvers: StateSummaryResolvers = {
-  packagings: (parent) => parent.packagings || [],
+  packagings: parent => parent.packagings || []
 };
 
 const subscriptionResolvers: SubscriptionResolvers = {
@@ -181,20 +181,20 @@ const subscriptionResolvers: SubscriptionResolvers = {
 
       return prisma.$subscribe.form({
         OR: [
-          ...userCompanies.map((userCompany) => ({
-            node: { emitterCompanySiret: userCompany.siret },
+          ...userCompanies.map(userCompany => ({
+            node: { emitterCompanySiret: userCompany.siret }
           })),
-          ...userCompanies.map((userCompany) => ({
-            node: { recipientCompanySiret: userCompany.siret },
+          ...userCompanies.map(userCompany => ({
+            node: { recipientCompanySiret: userCompany.siret }
           })),
-          { node: { owner: { id: user.id } } },
-        ],
+          { node: { owner: { id: user.id } } }
+        ]
       });
     },
-    resolve: (payload) => {
+    resolve: payload => {
       return payload;
-    },
-  },
+    }
+  }
 };
 
 export default {
@@ -203,5 +203,5 @@ export default {
   StateSummary: stateSummaryResolvers,
   Query: queryResolvers,
   Mutation: mutationResolvers,
-  Subscription: subscriptionResolvers,
+  Subscription: subscriptionResolvers
 };

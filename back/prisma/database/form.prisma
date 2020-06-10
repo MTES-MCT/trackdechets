@@ -260,7 +260,7 @@ type TransportSegment {
   transporterNumberPlate: String
   mode: TransportMode
 
-  sealed: Boolean @default(value: false)
+  readyToTakeOver: Boolean @default(value: false)
 
   previousTransporterCompanySiret: String
   takenOverAt: DateTime

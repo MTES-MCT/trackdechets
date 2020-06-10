@@ -709,7 +709,7 @@ export type Mutation = {
    */
   editProfile: User;
   /** Édite un segment existant */
-  editSegment?: Maybe<Form>;
+  editSegment?: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
@@ -742,10 +742,10 @@ export type Mutation = {
   markAsSent?: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored?: Maybe<Form>;
-  /** Marque un segment de transport comme scellé */
-  markSegmentAsSealed?: Maybe<Form>;
+  /** Marque un segment de transport comme prêt à être emporté */
+  markSegmentAsReadyToTakeOver?: Maybe<TransportSegment>;
   /** Prépare un nouveau segment de transport multimodal */
-  prepareSegment?: Maybe<Form>;
+  prepareSegment?: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
@@ -776,7 +776,7 @@ export type Mutation = {
    */
   signup: User;
   /** Marque un segment comme pris en charge par le nouveau transporteur */
-  takeOverSegment?: Maybe<Form>;
+  takeOverSegment?: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Édite les informations d'un établissement
@@ -925,7 +925,7 @@ export type MutationMarkAsTempStoredArgs = {
 };
 
 
-export type MutationMarkSegmentAsSealedArgs = {
+export type MutationMarkSegmentAsReadyToTakeOverArgs = {
   id: Scalars['ID'];
 };
 
@@ -1626,13 +1626,13 @@ export type TransportMode =
 
 export type TransportSegment = {
    __typename?: 'TransportSegment';
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   previousTransporterCompanySiret?: Maybe<Scalars['String']>;
   transporter?: Maybe<MultimodalTransporter>;
   mode?: Maybe<TransportMode>;
   takenOverAt?: Maybe<Scalars['DateTime']>;
   takenOverBy?: Maybe<Scalars['String']>;
-  sealed?: Maybe<Scalars['Boolean']>;
+  readyToTakeOver?: Maybe<Scalars['Boolean']>;
   segmentNumber?: Maybe<Scalars['Int']>;
 };
 
@@ -2288,7 +2288,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteTransporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType, RequireFields<MutationDeleteTransporterReceiptArgs, never>>;
   duplicateForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationDuplicateFormArgs, 'id'>>;
   editProfile?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationEditProfileArgs, never>>;
-  editSegment?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationEditSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
+  editSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationEditSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
   inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>;
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
@@ -2299,8 +2299,8 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   markAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSealedArgs, never>>;
   markAsSent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSentArgs, 'sentInfo'>>;
   markAsTempStored?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStoredArgs, 'id' | 'tempStoredInfos'>>;
-  markSegmentAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkSegmentAsSealedArgs, 'id'>>;
-  prepareSegment?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationPrepareSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
+  markSegmentAsReadyToTakeOver?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationMarkSegmentAsReadyToTakeOverArgs, 'id'>>;
+  prepareSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationPrepareSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
   removeUserFromCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRemoveUserFromCompanyArgs, 'userId' | 'siret'>>;
   renewSecurityCode?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRenewSecurityCodeArgs, 'siret'>>;
   resendInvitation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResendInvitationArgs, 'email' | 'siret'>>;
@@ -2308,7 +2308,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   saveForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSaveFormArgs, 'formInput'>>;
   signedByTransporter?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSignedByTransporterArgs, 'id' | 'signingInfo'>>;
   signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'userInfos'>>;
-  takeOverSegment?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationTakeOverSegmentArgs, 'id' | 'takeOverInfo'>>;
+  takeOverSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationTakeOverSegmentArgs, 'id' | 'takeOverInfo'>>;
   updateCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'siret'>>;
   updateTraderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType, RequireFields<MutationUpdateTraderReceiptArgs, never>>;
   updateTransporterFields?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationUpdateTransporterFieldsArgs, 'id'>>;
@@ -2460,13 +2460,13 @@ export type TransporterReceiptResolvers<ContextType = GraphQLContext, ParentType
 };
 
 export type TransportSegmentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TransportSegment'] = ResolversParentTypes['TransportSegment']> = {
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   previousTransporterCompanySiret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   transporter?: Resolver<Maybe<ResolversTypes['MultimodalTransporter']>, ParentType, ContextType>;
   mode?: Resolver<Maybe<ResolversTypes['TransportMode']>, ParentType, ContextType>;
   takenOverAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   takenOverBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  sealed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  readyToTakeOver?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   segmentNumber?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };

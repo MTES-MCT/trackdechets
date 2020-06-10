@@ -39,7 +39,7 @@ describe("{ mutation { takeOverSegment } }", () => {
         nextTransporterSiret: secondTransporterCompany.siret
       }
     });
-    // an attached sealed segment to be taken over by the second transporter
+    // an attached readyToTakeOver segment to be taken over by the second transporter
     const segment = await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
@@ -50,7 +50,7 @@ describe("{ mutation { takeOverSegment } }", () => {
         transporterCompanyMail: "obi@theresistance.sw",
         transporterReceipt: "R2D2",
         transporterDepartment: "83",
-        sealed: true,
+        readyToTakeOver: true,
         mode: "ROAD"
       }
     });

@@ -6860,7 +6860,7 @@ type TransportSegment {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -6890,7 +6890,7 @@ input TransportSegmentCreateInput {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -6916,7 +6916,7 @@ input TransportSegmentCreateWithoutFormInput {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -6956,8 +6956,8 @@ enum TransportSegmentOrderByInput {
   transporterNumberPlate_DESC
   mode_ASC
   mode_DESC
-  sealed_ASC
-  sealed_DESC
+  readyToTakeOver_ASC
+  readyToTakeOver_DESC
   previousTransporterCompanySiret_ASC
   previousTransporterCompanySiret_DESC
   takenOverAt_ASC
@@ -6985,7 +6985,7 @@ type TransportSegmentPreviousValues {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -7156,8 +7156,8 @@ input TransportSegmentScalarWhereInput {
   mode_not: TransportMode
   mode_in: [TransportMode!]
   mode_not_in: [TransportMode!]
-  sealed: Boolean
-  sealed_not: Boolean
+  readyToTakeOver: Boolean
+  readyToTakeOver_not: Boolean
   previousTransporterCompanySiret: String
   previousTransporterCompanySiret_not: String
   previousTransporterCompanySiret_in: [String!]
@@ -7248,7 +7248,7 @@ input TransportSegmentUpdateInput {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -7268,7 +7268,7 @@ input TransportSegmentUpdateManyDataInput {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -7288,7 +7288,7 @@ input TransportSegmentUpdateManyMutationInput {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -7325,7 +7325,7 @@ input TransportSegmentUpdateWithoutFormDataInput {
   transporterValidityLimit: DateTime
   transporterNumberPlate: String
   mode: TransportMode
-  sealed: Boolean
+  readyToTakeOver: Boolean
   previousTransporterCompanySiret: String
   takenOverAt: DateTime
   takenOverBy: String
@@ -7506,8 +7506,8 @@ input TransportSegmentWhereInput {
   mode_not: TransportMode
   mode_in: [TransportMode!]
   mode_not_in: [TransportMode!]
-  sealed: Boolean
-  sealed_not: Boolean
+  readyToTakeOver: Boolean
+  readyToTakeOver_not: Boolean
   previousTransporterCompanySiret: String
   previousTransporterCompanySiret_not: String
   previousTransporterCompanySiret_in: [String!]

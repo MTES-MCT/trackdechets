@@ -7,6 +7,7 @@ import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { associateUserToCompany } from "../../../users/mutations/associateUserToCompany";
 import { apiKey } from "../../../users/queries";
+import { prisma } from "../../../generated/prisma-client";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative
@@ -1132,26 +1133,23 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
         ){
           id
-          transportSegments {
-            id,
-            previousTransporterCompanySiret
-            transporter {
-              company {
-                siret
-              }
-              isExemptedOfReceipt
-              receipt
-              department
-              validityLimit
-              numberPlate
-              customInfo
+          previousTransporterCompanySiret
+          transporter {
+            company {
+              siret
             }
-            mode
-            takenOverAt
-            takenOverBy
-            sealed
-            segmentNumber
+            isExemptedOfReceipt
+            receipt
+            department
+            validityLimit
+            numberPlate
+            customInfo
           }
+          mode
+          takenOverAt
+          takenOverBy
+          readyToTakeOver
+          segmentNumber
         }
       }
     `;
@@ -1160,25 +1158,20 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .post("/")
       .set("Authorization", `Bearer ${transporteur1Token}`)
       .send({ query: prepareSegmentQuery });
-
-    expect(
-      prepareSegmentResponse.body.data.prepareSegment.transportSegments
-    ).toHaveLength(1);
-
-    const transportSegment1 =
-      prepareSegmentResponse.body.data.prepareSegment.transportSegments[0];
+    const transportSegment1 = prepareSegmentResponse.body.data.prepareSegment;
 
     const {
       id: transportSegment1Id,
       ...transportSegment1Info
     } = transportSegment1;
+    expect(transportSegment1Id).toBeTruthy();
 
     expect(transportSegment1Info).toEqual({
       previousTransporterCompanySiret: transporteur1.siret,
       mode: "RAIL",
       takenOverAt: null,
       takenOverBy: null,
-      sealed: false,
+      readyToTakeOver: false,
       segmentNumber: 1,
       transporter: {
         company: {
@@ -1194,35 +1187,29 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     });
 
     // Dès qu'il est prêt à transférer le déchet, le transporteur 1 scelle le segment via
-    // la mutation markSegmentAsSealed . Le transporteur 1 ne peut plus modifier le segment
+    // la mutation markSegmentAsReadyToTakeOver. Le transporteur 1 ne peut plus modifier le segment
 
-    const markSegmentAsSealedQuery = `
+    const markSegmentAsReadyToTakeOverQuery = `
       mutation {
-        markSegmentAsSealed(
+        markSegmentAsReadyToTakeOver(
           id: "${transportSegment1Id}"
-        ){
-          transportSegments {
-            sealed
-          }
+        ){  
+            id
+            readyToTakeOver     
         }
       }
     `;
 
-    const markSegmentAsSealedResponse = await request
+    const markSegmentAsReadyToTakeOverResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${transporteur1Token}`)
-      .send({ query: markSegmentAsSealedQuery });
+      .send({ query: markSegmentAsReadyToTakeOverQuery });
 
-    expect(
-      markSegmentAsSealedResponse.body.data.markSegmentAsSealed
-        .transportSegments
-    ).toHaveLength(1);
+    const transportSegment1ReadyToTakeOver =
+      markSegmentAsReadyToTakeOverResponse.body.data
+        .markSegmentAsReadyToTakeOver;
 
-    const transportSegment1Sealed =
-      markSegmentAsSealedResponse.body.data.markSegmentAsSealed
-        .transportSegments[0];
-
-    expect(transportSegment1Sealed.sealed).toBeTruthy();
+    expect(transportSegment1ReadyToTakeOver.readyToTakeOver).toBeTruthy();
 
     // le transporteur 2 peut prendre en charge le déchet via la mutation takeOverSegment
     const takeOverSegmentQuery = `
@@ -1233,10 +1220,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             takenOverAt: "2020-04-04T09:00:00.000Z"
             takenOverBy: "Mr Transporteur 2"
           }){
-          transportSegments {
             takenOverAt
             takenOverBy
-          }
         }
       }
     `;
@@ -1246,12 +1231,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .set("Authorization", `Bearer ${transporteur2Token}`)
       .send({ query: takeOverSegmentQuery });
 
-    expect(
-      takeOverSegmentResponse.body.data.takeOverSegment.transportSegments
-    ).toHaveLength(1);
-
     const transportSegment1TakenOver =
-      takeOverSegmentResponse.body.data.takeOverSegment.transportSegments[0];
+      takeOverSegmentResponse.body.data.takeOverSegment;
 
     expect(transportSegment1TakenOver).toEqual({
       takenOverAt: "2020-04-04T09:00:00.000Z",
@@ -1283,28 +1264,26 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             }
             mode: RIVER
           }
-        ){
-          id
-          transportSegments {
-            id,
-            previousTransporterCompanySiret
-            transporter {
-              company {
-                siret
-              }
-              isExemptedOfReceipt
-              receipt
-              department
-              validityLimit
-              numberPlate
-              customInfo
+        ){         
+          id,
+          previousTransporterCompanySiret
+          transporter {
+            company {
+              siret
             }
-            mode
-            takenOverAt
-            takenOverBy
-            sealed
-            segmentNumber
+            isExemptedOfReceipt
+            receipt
+            department
+            validityLimit
+            numberPlate
+            customInfo
           }
+          mode
+          takenOverAt
+          takenOverBy
+          readyToTakeOver
+          segmentNumber
+      
         }
       }
     `;
@@ -1314,24 +1293,20 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .set("Authorization", `Bearer ${transporteur2Token}`)
       .send({ query: prepareSegment2Query });
 
-    expect(
-      prepareSegment2Response.body.data.prepareSegment.transportSegments
-    ).toHaveLength(2);
-
-    const transportSegment2 =
-      prepareSegment2Response.body.data.prepareSegment.transportSegments[1];
+    const transportSegment2 = prepareSegment2Response.body.data.prepareSegment;
 
     const {
       id: transportSegment2Id,
       ...transportSegment2Info
     } = transportSegment2;
+    expect(transportSegment2Id).toBeTruthy();
 
     expect(transportSegment2Info).toEqual({
       previousTransporterCompanySiret: transporteur2.siret,
       mode: "RIVER",
       takenOverAt: null,
       takenOverBy: null,
-      sealed: false,
+      readyToTakeOver: false,
       segmentNumber: 2,
       transporter: {
         company: {
@@ -1347,35 +1322,28 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     });
 
     // Dès qu'il est prêt à transférer le déchet, le transporteur 2 scelle le segment via
-    // la mutation markSegmentAsSealed . Le transporteur 2 ne peut plus modifier le segment
+    // la mutation markSegmentAsReadyToTakeOver . Le transporteur 2 ne peut plus modifier le segment
 
-    const markSegment2AsSealedQuery = `
+    const markSegment2AsReadyToTakeOverQuery = `
       mutation {
-        markSegmentAsSealed(
+        markSegmentAsReadyToTakeOver(
           id: "${transportSegment2Id}"
         ){
-          transportSegments {
-            sealed
-          }
+          readyToTakeOver
         }
       }
     `;
 
-    const markSegment2AsSealedResponse = await request
+    const markSegment2AsReadyToTakeOverResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${transporteur2Token}`)
-      .send({ query: markSegment2AsSealedQuery });
+      .send({ query: markSegment2AsReadyToTakeOverQuery });
 
-    expect(
-      markSegment2AsSealedResponse.body.data.markSegmentAsSealed
-        .transportSegments
-    ).toHaveLength(2);
+    const transportSegment2ReadyToTakeOver =
+      markSegment2AsReadyToTakeOverResponse.body.data
+        .markSegmentAsReadyToTakeOver;
 
-    const transportSegment2Sealed =
-      markSegment2AsSealedResponse.body.data.markSegmentAsSealed
-        .transportSegments[1];
-
-    expect(transportSegment2Sealed.sealed).toBeTruthy();
+    expect(transportSegment2ReadyToTakeOver.readyToTakeOver).toBeTruthy();
 
     // le transporteur 3 peut prendre en charge le déchet via la mutation takeOverSegment
     const takeOverSegment2Query = `
@@ -1386,10 +1354,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             takenOverAt: "2020-04-05T09:00:00.000Z"
             takenOverBy: "Mr Transporteur 3"
           }){
-          transportSegments {
             takenOverAt
             takenOverBy
-          }
         }
       }
     `;
@@ -1399,12 +1365,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .set("Authorization", `Bearer ${transporteur3Token}`)
       .send({ query: takeOverSegment2Query });
 
-    expect(
-      takeOverSegment2Response.body.data.takeOverSegment.transportSegments
-    ).toHaveLength(2);
-
     const transportSegment2TakenOver =
-      takeOverSegment2Response.body.data.takeOverSegment.transportSegments[1];
+      takeOverSegment2Response.body.data.takeOverSegment;
 
     expect(transportSegment2TakenOver).toEqual({
       takenOverAt: "2020-04-05T09:00:00.000Z",

@@ -407,7 +407,7 @@ describe("Test Form reception", () => {
       formId: form.id,
       segmentPayload: {
         transporterCompanySiret: "98765",
-        sealed: true,
+        readyToTakeOver: true,
         takenOverAt: "2020-01-01",
         takenOverBy: "Jason Statham"
       }
@@ -470,7 +470,7 @@ describe("Test Form reception", () => {
       formId: form.id,
       segmentPayload: {
         transporterCompanySiret: "98765",
-        sealed: true,
+        readyToTakeOver: true,
         takenOverAt: "2020-01-01",
         takenOverBy: "Jason Statham"
       }
@@ -479,7 +479,7 @@ describe("Test Form reception", () => {
     // this segment is still not yet taken over, the form should not be accepted
     await transportSegmentFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: "7777", sealed: true }
+      segmentPayload: { transporterCompanySiret: "7777", readyToTakeOver: true }
     });
     await prepareRedis({
       emitterCompany,

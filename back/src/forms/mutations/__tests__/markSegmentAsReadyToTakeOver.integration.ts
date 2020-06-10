@@ -14,7 +14,7 @@ jest.mock("axios", () => ({
   }
 }));
 
-describe("{ mutation { markSegmentAsSealed } }", () => {
+describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
   afterAll(() => resetDatabase());
 
   it("", async () => {
@@ -42,13 +42,13 @@ describe("{ mutation { markSegmentAsSealed } }", () => {
     const { mutate } = makeClient(firstTransporter);
     await mutate(
       `mutation  {
-            markSegmentAsSealed(id:"${segment.id}") {
+            markSegmentAsReadyToTakeOver(id:"${segment.id}") {
               id
             }
         }`
     );
 
-    const sealedSegment = await prisma.transportSegment({ id: segment.id });
-    expect(sealedSegment.sealed).toBe(true);
+    const readyToTakeOverSegment = await prisma.transportSegment({ id: segment.id });
+    expect(readyToTakeOverSegment.readyToTakeOver).toBe(true);
   });
 });

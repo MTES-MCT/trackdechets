@@ -68,7 +68,7 @@ export default {
       isFormTempStorer
     ),
     prepareSegment: isAuthenticated,
-    markSegmentAsSealed: isAuthenticated,
+    markSegmentAsReadyToTakeOver: isAuthenticated,
     takeOverSegment: isAuthenticated,
     editSegment: isAuthenticated,
   },
