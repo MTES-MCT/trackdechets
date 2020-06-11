@@ -26,20 +26,13 @@ export default function Signup() {
         <Wizard
           initialValues={{
             email: "",
-
             name: "",
             phone: "",
             password: "",
-            passwordConfirmation: "",
             cgu: false,
           }}
           onSubmit={(values: any, { setSubmitting }) => {
-            const {
-              passwordConfirmation,
-
-              cgu,
-              ...userInfos
-            } = values;
+            const { cgu, ...userInfos } = values;
 
             signup({ variables: { userInfos } })
               .then((_) =>
@@ -81,10 +74,6 @@ export default function Signup() {
             title="Informations utilisateur"
             validate={(values: any) => {
               let errors: any = {};
-              if (values.password !== values.passwordConfirmation) {
-                errors.passwordConfirmation =
-                  "Les deux mots de passe ne sont pas identiques.";
-              }
 
               if (!values.email) {
                 errors.email = "L'email est obligatoire";
@@ -188,14 +177,6 @@ export default function Signup() {
               <RedErrorMessage name="password" />
             </div>
 
-            <div className="form__group">
-              <label>
-                Vérification du mot de passe*
-                <Field type="password" name="passwordConfirmation" />
-              </label>
-
-              <RedErrorMessage name="passwordConfirmation" />
-            </div>
             <div className="form__group">
               <label>
                 <Field name="cgu" type="checkbox" />
