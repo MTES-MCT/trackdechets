@@ -71,11 +71,6 @@ export default function Signup() {
               prélable obligatoire à l'enregistrement ou au rattachement d'une
               entreprise dans Trackdéchets.
             </p>
-
-            <p>
-              <strong>Vous avez déjà un compte ?</strong>{" "}
-              <Link to="/login">Connectez vous maintenant</Link>
-            </p>
           </Wizard.Page>
           <Wizard.Page
             title="Informations utilisateur"
