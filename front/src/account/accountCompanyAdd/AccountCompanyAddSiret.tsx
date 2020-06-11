@@ -50,28 +50,31 @@ export default function AccountCompanyAddSiret({
   });
 
   return (
-    <div className={styles.field}>
-      <label className={`text-right ${styles.bold}`}>SIRET</label>
-      <div className={styles.field__value}>
-        <Field name="siret" component={AutoFormattingSiret} />
-        <br />
-        <button
-          className="button"
-          type="button"
-          onClick={() => {
-            console.log(values);
-            const trimedSiret = values.siret.replace(/\s/g, "");
-            if (trimedSiret.length !== 14) {
-              return;
-            }
-            searchCompany({ variables: { siret: trimedSiret } });
-          }}
-        >
-          {loading ? <FaHourglassHalf /> : "Valider"}
-        </button>
-        <RedErrorMessage name="siret" />
-        {error && <NotificationError apolloError={error} />}
+    <>
+      {error && <NotificationError apolloError={error} />}
+      <div className={styles.field}>
+        <label className={`text-right ${styles.bold}`}>SIRET</label>
+        <div className={styles.field__value}>
+          <Field name="siret" component={AutoFormattingSiret} />
+          <RedErrorMessage name="siret" />
+
+          <br />
+          <button
+            className="button"
+            type="button"
+            onClick={() => {
+              console.log(values);
+              const trimedSiret = values.siret.replace(/\s/g, "");
+              if (trimedSiret.length !== 14) {
+                return;
+              }
+              searchCompany({ variables: { siret: trimedSiret } });
+            }}
+          >
+            {loading ? <FaHourglassHalf /> : "Valider"}
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
