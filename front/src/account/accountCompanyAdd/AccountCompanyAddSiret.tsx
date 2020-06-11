@@ -5,6 +5,7 @@ import { FaHourglassHalf } from "react-icons/fa";
 import cogoToast from "cogo-toast";
 import { COMPANY_INFOS } from "../../form/company/query";
 import RedErrorMessage from "../../common/RedErrorMessage";
+import AutoFormattingSiret from "../../common/AutoFormattingSiret";
 import { NotificationError } from "../../common/Error";
 import styles from "../AccountCompanyAdd.module.scss";
 
@@ -52,12 +53,13 @@ export default function AccountCompanyAddSiret({
     <div className={styles.field}>
       <label className={`text-right ${styles.bold}`}>SIRET</label>
       <div className={styles.field__value}>
-        <Field type="text" name="siret" />
+        <Field name="siret" component={AutoFormattingSiret} />
         <br />
         <button
           className="button"
           type="button"
           onClick={() => {
+            console.log(values);
             const trimedSiret = values.siret.replace(/\s/g, "");
             if (trimedSiret.length !== 14) {
               return;
