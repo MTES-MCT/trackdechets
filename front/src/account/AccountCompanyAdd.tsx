@@ -382,7 +382,11 @@ export default function AccountCompanyAdd() {
                     Nom de l'entreprise
                   </label>
                   <div className={styles.field__value}>
-                    <Field type="text" name="companyName" />
+                    <Field
+                      type="text"
+                      name="companyName"
+                      className={styles.textField}
+                    />
                   </div>
                 </div>
 
@@ -391,14 +395,22 @@ export default function AccountCompanyAdd() {
                     Code NAF
                   </label>
                   <div className={styles.field__value}>
-                    <Field type="text" name="codeNaf" />
+                    <Field
+                      type="text"
+                      name="codeNaf"
+                      className={styles.textField}
+                    />
                   </div>
                 </div>
 
                 <div className={styles.field}>
                   <label className={`text-right ${styles.bold}`}>Adresse</label>
                   <div className={styles.field__value}>
-                    <Field type="text" name="address" />
+                    <Field
+                      type="text"
+                      name="address"
+                      className={styles.textField}
+                    />
                   </div>
                 </div>
 
@@ -410,7 +422,7 @@ export default function AccountCompanyAdd() {
                   <div className={styles.field__value}>
                     <input
                       type="file"
-                      className="button"
+                      className={`button ${styles.textField}`}
                       accept="image/png, image/jpeg, image/gif, application/pdf "
                       onChange={async event => {
                         const file = event.currentTarget.files?.item(0);
@@ -452,7 +464,11 @@ export default function AccountCompanyAdd() {
                     Identifiant GEREP (optionnel)
                   </label>
                   <div className={styles.field__value}>
-                    <Field type="text" name="gerepId" />
+                    <Field
+                      type="text"
+                      name="gerepId"
+                      className={styles.textField}
+                    />
                     <div className={styles.smaller}>
                       Gestion Electronique du Registre des Emissions Polluantes.{" "}
                       <a

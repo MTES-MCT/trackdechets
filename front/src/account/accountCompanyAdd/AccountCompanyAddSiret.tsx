@@ -57,13 +57,11 @@ export default function AccountCompanyAddSiret({
         <div className={styles.field__value}>
           <Field name="siret" component={AutoFormattingSiret} />
           <RedErrorMessage name="siret" />
-
           <br />
           <button
             className="button"
             type="button"
             onClick={() => {
-              console.log(values);
               const trimedSiret = values.siret.replace(/\s/g, "");
               if (trimedSiret.length !== 14) {
                 return;
