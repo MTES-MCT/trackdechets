@@ -12,7 +12,8 @@ Les nouvelles fonctionnalités impactant l'API doivent être documentées dans l
 
 ## Conventions de code
 
-* Formatage du code front et back avec prettier.
+* Formatage du code front avec prettier.
+* Formatage et analyse du code back avec prettier et eslint.
 * Typage du code avec les fichiers générées par GraphQL Codegen
   * `back/src/generated/graphql/types.ts` pour le back
   * `front/src/generated/graphql/types.ts` pour le front
