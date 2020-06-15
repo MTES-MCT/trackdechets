@@ -45,8 +45,11 @@ td.readable-id {
   }
   .transport-refresh {
     margin-left: auto;
-    &:hover {
-      margin-left: auto; //prevent button default rules to be applied on click
+    //prevent button default rules to be applied on click, hover etc…
+    &:hover,
+    &:focus,
+    &:visited {
+      margin-left: auto; 
     }
   }
 }
@@ -57,4 +60,16 @@ td.readable-id {
     max-width: 300px;
     margin-right: 1em;
   }
+}
+.segment-pill {
+  background-color: var(--blue);
+  color: white;
+  font-weight: bold;
+  padding: 3px 6px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+
+  border-radius: 10px;
 }

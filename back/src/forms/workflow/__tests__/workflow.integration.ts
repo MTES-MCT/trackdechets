@@ -7,6 +7,7 @@ import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { associateUserToCompany } from "../../../users/mutations/associateUserToCompany";
 import { apiKey } from "../../../users/queries";
+import { prisma } from "../../../generated/prisma-client";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative
@@ -43,7 +44,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     formId: string,
     token: string,
     filename: string,
-    save: boolean = false
+    save = false
   ): Promise<string> {
     const formPdfQuery = `
       query {
@@ -893,7 +894,606 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     "Opération de transformation ou de traitement aboutissant à produire des déchets dont la provenance reste identifiable"
   );
   // TODO
-  test.todo("Transport multimodal");
+  test("Transport multimodal", async () => {
+    // 5ème cas : Transport multimodal
+
+    // Établissement producteur de boues organiques
+    const producteur = await companyFactory({
+      siret: "11111111111111",
+      name: "Boues and Co"
+    });
+    // Avec un utilisateur membre
+    const producteurUser = await userFactory();
+    await associateUserToCompany(producteurUser.id, producteur.siret, "MEMBER");
+
+    // Installation d'incinération
+    const traiteur = await companyFactory({
+      siret: "22222222222222",
+      name: "Incinérateur du Grand Est"
+    });
+    // Avec un utilisateur membre
+    const traiteurUser = await userFactory();
+    await associateUserToCompany(traiteurUser.id, traiteur.siret, "MEMBER");
+
+    // Entreprise de transport n°1
+    const transporteur1 = await companyFactory({
+      siret: "33333333333333",
+      name: "Transport Qui Roule"
+    });
+    // Avec un utilisateur membre
+    const transporteur1User = await userFactory();
+    await associateUserToCompany(
+      transporteur1User.id,
+      transporteur1.siret,
+      "MEMBER"
+    );
+
+    // Entreprise de transport n°2
+    const transporteur2 = await companyFactory({
+      siret: "44444444444444",
+      name: "Transport sur rails"
+    });
+    // Avec un utilisateur membre
+    const transporteur2User = await userFactory();
+    await associateUserToCompany(
+      transporteur2User.id,
+      transporteur2.siret,
+      "MEMBER"
+    );
+
+    // Entreprise de transport n°3
+    const transporteur3 = await companyFactory({
+      siret: "55555555555555",
+      name: "Transport fluviale"
+    });
+    // Avec un utilisateur membre
+    const transporteur3User = await userFactory();
+    await associateUserToCompany(
+      transporteur3User.id,
+      transporteur3.siret,
+      "MEMBER"
+    );
+
+    // Récupère les tokens utilisateurs pour l'authentification à l'API
+    const producteurToken = await apiKey(producteurUser);
+    const traiteurToken = await apiKey(traiteurUser);
+    const transporteur1Token = await apiKey(transporteur1User);
+    const transporteur2Token = await apiKey(transporteur2User);
+    const transporteur3Token = await apiKey(transporteur3User);
+
+    // Le BSD est rempli du cadre 1 à 8 par l’émetteur du bordereau
+    const saveFormQuery = `
+      mutation {
+        saveForm(formInput: {
+          customId: "TD-20-AAA00256"
+          emitter: {
+            type: PRODUCER
+            company: {
+              siret: "${producteur.siret}"
+              name: "${producteur.name}"
+              address: "1 rue de paradis, 75010 PARIS"
+              contact: "Jean Dupont de la Boue"
+              phone: "01 00 00 00 00"
+              mail: "jean.dupont@boues.fr"
+            },
+            workSite: {
+              address: "5 rue du chantier"
+              postalCode: "07100"
+              city: "Annonay"
+              infos: "Site de stockage de boues"
+            }
+          }
+          recipient: {
+            processingOperation: "D 10"
+            company: {
+              siret: "${traiteur.siret}"
+              name: "${traiteur.name}"
+              address: "1 avenue de Colmar 67100 Strasbourg"
+              contact: "Thomas Largeron"
+              phone: "03 00 00 00 00"
+              mail: "thomas.largeron@incinerateur.fr"
+            }
+          }
+          transporter: {
+            company: {
+              siret: "${transporteur1.siret}"
+              name: "${transporteur1.name}"
+              address: "1 rue des 6 chemins, 07100 ANNONAY"
+              contact: "Claire Dupuis"
+              mail: "claire.dupuis@transportquiroule.fr"
+              phone: "0400000000"
+            }
+            receipt: "12379"
+            department: "07"
+            validityLimit: "2020-06-30"
+            numberPlate: "AD-007-TS"
+          }
+          wasteDetails: {
+            code: "06 05 02*"
+            onuCode: ""
+            name: "Boues"
+            packagings: [
+              BENNE
+            ]
+            numberOfPackages: 1
+            quantity: 1
+            quantityType: ESTIMATED
+            consistence: LIQUID
+          }
+        }){
+          id
+          status
+        }
+      }
+    `;
+
+    const saveFormResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${producteurToken}`)
+      .send({ query: saveFormQuery });
+
+    // La réponse est au format JSON
+    // Uniquement les champs précisés dans la réponse de la requête GraphQL
+    // sont retournés. En l'occurence `id` et `status`
+    //
+    // {
+    //   "saveForm": {
+    //     "id": "ck8k6kwd2006g0a64d219fd24",
+    //     "status": "DRAFT"
+    //   }
+    // }
+    let form = saveFormResponse.body.data.saveForm;
+
+    // Lors de sa création, le BSD se retrouve à l'état de BROUILLON
+    expect(form.status).toEqual("DRAFT");
+
+    // L'émetteur du BSD procède à la finalisation du bordereau. L'ensemble
+    // des champs des cases 1 à 8 sont validés et ne pourront plus être modifiés
+    const markAsSealedQuery = `
+      mutation {
+        markAsSealed(id: "${form.id}") {
+          id
+          status
+        }
+      }`;
+
+    const markAsSealedResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${producteurToken}`)
+      .send({ query: markAsSealedQuery });
+
+    form = markAsSealedResponse.body.data.markAsSealed;
+
+    // Le BSD passe à l'état "Finalisé"
+    expect(form.status).toEqual("SEALED");
+
+    // Télécharge le pdf
+    await downloadPdf(form.id, producteurToken, "5-bsd-sealed.pdf");
+
+    // Le transporteur signe le BSD
+    const signedByTransporterQuery = `
+      mutation {
+        signedByTransporter(
+          id: "${form.id}",
+          signingInfo: {
+            sentAt: "2020-04-03T14:48:00",
+            quantity: 1,
+            packagings: [
+              BENNE
+            ],
+            sentBy: "Isabelle Guichard"
+            onuCode: "xxxx",
+            signedByTransporter: true,
+            signedByProducer: true,
+            securityCode: ${producteur.securityCode}
+          }
+        ){
+          id
+          status
+        }
+      }
+    `;
+
+    const signedByTransporterResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur1Token}`)
+      .send({ query: signedByTransporterQuery });
+
+    form = signedByTransporterResponse.body.data.signedByTransporter;
+
+    expect(form.status).toEqual("SENT");
+
+    // Télécharge le pdf
+    await downloadPdf(form.id, producteurToken, "5-bsd-sent.pdf");
+
+    // Le transporteur 1 prépare un segment en renseignant notamment le siret du transporteur
+    // suivant (tranporteur 2) via la mutation prepareSegment
+    const prepareSegmentQuery = `
+      mutation {
+        prepareSegment(
+          id: "${form.id}",
+          siret: "${transporteur1.siret}",
+          nextSegmentInfo: {
+            transporter: {
+              isExemptedOfReceipt: false
+              receipt: "T-xxxx"
+              department: "07"
+              validityLimit: "2021-08-01"
+              numberPlate: "AA-007-07"
+              company: {
+                siret: "${transporteur2.siret}"
+                name: "${transporteur2.name}"
+                contact: "Mr Transporteur 2"
+                address: "Derrière la voie ferrée"
+                mail: "contact@transportsurrails.com"
+                phone: "0000000000"
+              }
+            }
+            mode: RAIL
+          }
+        ){
+          id
+          previousTransporterCompanySiret
+          transporter {
+            company {
+              siret
+            }
+            isExemptedOfReceipt
+            receipt
+            department
+            validityLimit
+            numberPlate
+            customInfo
+          }
+          mode
+          takenOverAt
+          takenOverBy
+          readyToTakeOver
+          segmentNumber
+        }
+      }
+    `;
+
+    const prepareSegmentResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur1Token}`)
+      .send({ query: prepareSegmentQuery });
+    const transportSegment1 = prepareSegmentResponse.body.data.prepareSegment;
+
+    const {
+      id: transportSegment1Id,
+      ...transportSegment1Info
+    } = transportSegment1;
+    expect(transportSegment1Id).toBeTruthy();
+
+    expect(transportSegment1Info).toEqual({
+      previousTransporterCompanySiret: transporteur1.siret,
+      mode: "RAIL",
+      takenOverAt: null,
+      takenOverBy: null,
+      readyToTakeOver: false,
+      segmentNumber: 1,
+      transporter: {
+        company: {
+          siret: transporteur2.siret
+        },
+        customInfo: null,
+        department: "07",
+        isExemptedOfReceipt: false,
+        numberPlate: "AA-007-07",
+        receipt: "T-xxxx",
+        validityLimit: "2021-08-01T00:00:00.000Z"
+      }
+    });
+
+    // Dès qu'il est prêt à transférer le déchet, le transporteur 1 scelle le segment via
+    // la mutation markSegmentAsReadyToTakeOver. Le transporteur 1 ne peut plus modifier le segment
+
+    const markSegmentAsReadyToTakeOverQuery = `
+      mutation {
+        markSegmentAsReadyToTakeOver(
+          id: "${transportSegment1Id}"
+        ){  
+            id
+            readyToTakeOver     
+        }
+      }
+    `;
+
+    const markSegmentAsReadyToTakeOverResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur1Token}`)
+      .send({ query: markSegmentAsReadyToTakeOverQuery });
+
+    const transportSegment1ReadyToTakeOver =
+      markSegmentAsReadyToTakeOverResponse.body.data
+        .markSegmentAsReadyToTakeOver;
+
+    expect(transportSegment1ReadyToTakeOver.readyToTakeOver).toBeTruthy();
+
+    // le transporteur 2 peut prendre en charge le déchet via la mutation takeOverSegment
+    const takeOverSegmentQuery = `
+      mutation {
+        takeOverSegment(
+          id: "${transportSegment1Id}",
+          takeOverInfo: {
+            takenOverAt: "2020-04-04T09:00:00.000Z"
+            takenOverBy: "Mr Transporteur 2"
+          }){
+            takenOverAt
+            takenOverBy
+        }
+      }
+    `;
+
+    const takeOverSegmentResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur2Token}`)
+      .send({ query: takeOverSegmentQuery });
+
+    const transportSegment1TakenOver =
+      takeOverSegmentResponse.body.data.takeOverSegment;
+
+    expect(transportSegment1TakenOver).toEqual({
+      takenOverAt: "2020-04-04T09:00:00.000Z",
+      takenOverBy: "Mr Transporteur 2"
+    });
+
+    // Le transporteur 2 crée un nouveau segment pour du transport fluvial
+
+    const prepareSegment2Query = `
+      mutation {
+        prepareSegment(
+          id: "${form.id}",
+          siret: "${transporteur2.siret}",
+          nextSegmentInfo: {
+            transporter: {
+              isExemptedOfReceipt: false
+              receipt: "T-xxxx"
+              department: "26"
+              validityLimit: "2022-10-04"
+              numberPlate: "BB-333-26"
+              company: {
+                siret: "${transporteur3.siret}"
+                name: "${transporteur3.name}"
+                contact: "Mr Transporteur 3"
+                address: "Près de la berge"
+                mail: "contact@lapenichemagique.com"
+                phone: "0000000000"
+              }
+            }
+            mode: RIVER
+          }
+        ){         
+          id,
+          previousTransporterCompanySiret
+          transporter {
+            company {
+              siret
+            }
+            isExemptedOfReceipt
+            receipt
+            department
+            validityLimit
+            numberPlate
+            customInfo
+          }
+          mode
+          takenOverAt
+          takenOverBy
+          readyToTakeOver
+          segmentNumber
+      
+        }
+      }
+    `;
+
+    const prepareSegment2Response = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur2Token}`)
+      .send({ query: prepareSegment2Query });
+
+    const transportSegment2 = prepareSegment2Response.body.data.prepareSegment;
+
+    const {
+      id: transportSegment2Id,
+      ...transportSegment2Info
+    } = transportSegment2;
+    expect(transportSegment2Id).toBeTruthy();
+
+    expect(transportSegment2Info).toEqual({
+      previousTransporterCompanySiret: transporteur2.siret,
+      mode: "RIVER",
+      takenOverAt: null,
+      takenOverBy: null,
+      readyToTakeOver: false,
+      segmentNumber: 2,
+      transporter: {
+        company: {
+          siret: transporteur3.siret
+        },
+        customInfo: null,
+        department: "26",
+        isExemptedOfReceipt: false,
+        numberPlate: "BB-333-26",
+        receipt: "T-xxxx",
+        validityLimit: "2022-10-04T00:00:00.000Z"
+      }
+    });
+
+    // Dès qu'il est prêt à transférer le déchet, le transporteur 2 scelle le segment via
+    // la mutation markSegmentAsReadyToTakeOver . Le transporteur 2 ne peut plus modifier le segment
+
+    const markSegment2AsReadyToTakeOverQuery = `
+      mutation {
+        markSegmentAsReadyToTakeOver(
+          id: "${transportSegment2Id}"
+        ){
+          readyToTakeOver
+        }
+      }
+    `;
+
+    const markSegment2AsReadyToTakeOverResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur2Token}`)
+      .send({ query: markSegment2AsReadyToTakeOverQuery });
+
+    const transportSegment2ReadyToTakeOver =
+      markSegment2AsReadyToTakeOverResponse.body.data
+        .markSegmentAsReadyToTakeOver;
+
+    expect(transportSegment2ReadyToTakeOver.readyToTakeOver).toBeTruthy();
+
+    // le transporteur 3 peut prendre en charge le déchet via la mutation takeOverSegment
+    const takeOverSegment2Query = `
+      mutation {
+        takeOverSegment(
+          id: "${transportSegment2Id}",
+          takeOverInfo: {
+            takenOverAt: "2020-04-05T09:00:00.000Z"
+            takenOverBy: "Mr Transporteur 3"
+          }){
+            takenOverAt
+            takenOverBy
+        }
+      }
+    `;
+
+    const takeOverSegment2Response = await request
+      .post("/")
+      .set("Authorization", `Bearer ${transporteur3Token}`)
+      .send({ query: takeOverSegment2Query });
+
+    const transportSegment2TakenOver =
+      takeOverSegment2Response.body.data.takeOverSegment;
+
+    expect(transportSegment2TakenOver).toEqual({
+      takenOverAt: "2020-04-05T09:00:00.000Z",
+      takenOverBy: "Mr Transporteur 3"
+    });
+
+    // Le transporteur 3 livre le déchet chez son prestataire
+
+    // Sur le lieu de l’installation de destination prévue
+    // le déchet est réceptionné et la case 10 est remplie
+    const markAsReceivedQuery = `
+      mutation {
+        markAsReceived(
+          id: "${form.id}"
+          receivedInfo: {
+            wasteAcceptationStatus: ACCEPTED
+            receivedBy: "Antoine Derieux"
+            receivedAt: "2020-04-07T11:18:00"
+            signedAt: "2020-04-07T12:00:00"
+            quantityReceived: 1
+          }
+        ){
+          id
+          status
+        }
+      }
+    `;
+
+    const markAsReceivedResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${traiteurToken}`)
+      .send({ query: markAsReceivedQuery });
+
+    form = markAsReceivedResponse.body.data.markAsReceived;
+    expect(form.status).toEqual("RECEIVED");
+
+    // Télécharge le pdf
+    await downloadPdf(form.id, producteurToken, "5-bsd-received.pdf");
+
+    // Sur le lieu de l'installation de destination prévue
+    // l'opération de traitement est effectué et la case 11
+    // est remplie
+    const markAsProcessedQuery = `
+      mutation {
+        markAsProcessed(
+          id: "${form.id}",
+          processedInfo: {
+            processingOperationDone: "D 10",
+            processingOperationDescription: "Incinération",
+            processedBy: "Alfred Dujardin",
+            processedAt: "2020-04-15T10:22:00"
+          }
+        ){
+          id
+          status
+        }
+      }
+    `;
+
+    const markAsProcessedResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${traiteurToken}`)
+      .send({ query: markAsProcessedQuery });
+
+    form = markAsProcessedResponse.body.data.markAsProcessed;
+
+    expect(form.status).toEqual("PROCESSED");
+    await downloadPdf(form.id, producteurToken, "5-bsd-processed.pdf");
+
+    // Le producteur reçoit les notifications de réception et de traitement
+    // en temps réel en interrogeant la query formsLifeCycle périodiquement
+    // (tous les jours par exemple)
+
+    const formsLifeCycleQuery = `
+      query {
+        formsLifeCycle(siret: "${producteur.siret}"){
+          statusLogs {
+            status
+            updatedFields
+          }
+        }
+      }
+    `;
+
+    const formsLifeCycleResponse = await request
+      .post("/")
+      .set("Authorization", `Bearer ${producteurToken}`)
+      .send({ query: formsLifeCycleQuery });
+
+    const statusLogs =
+      formsLifeCycleResponse.body.data.formsLifeCycle.statusLogs;
+
+    expect(statusLogs).toEqual([
+      {
+        status: "PROCESSED",
+        updatedFields: {
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00",
+          processingOperationDone: "D 10",
+          processingOperationDescription: "Incinération"
+        }
+      },
+      {
+        status: "RECEIVED",
+        updatedFields: {
+          receivedBy: "Antoine Derieux",
+          receivedAt: "2020-04-07T11:18:00",
+          signedAt: "2020-04-07T12:00:00",
+          quantityReceived: 1
+        }
+      },
+      {
+        status: "SENT",
+        updatedFields: {
+          sentAt: "2020-04-03T14:48:00",
+          signedByTransporter: true,
+          sentBy: "Isabelle Guichard",
+          signedByProducer: true,
+          packagings: ["BENNE"],
+          quantity: 1,
+          onuCode: "xxxx"
+        }
+      },
+      { status: "SEALED", updatedFields: {} },
+      { status: "DRAFT", updatedFields: {} }
+    ]);
+  }, 30000);
   // TODO
   test.todo(
     "Expédition de déchets après une transformation ou un traitement aboutissant à des déchets dont la provenance n’est plus identifiable"

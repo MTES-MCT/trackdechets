@@ -19,7 +19,8 @@ Nous intégrons petit à petit l'ensemble des cas d'usage du suivi de déchets a
 | Collecte de petites quantités de déchets relevant d'une même rubrique (Annexe 1)                                           | OK       |
 | Réexpédition après transformation ou traitement aboutissant à des déchets dont la provenance reste identifiable (Annexe 2) | OK       |
 | Entreposage provisoire ou reconditionnement (case 13-19)                                                                   | OK       |
-| Transport multi-modal (case 20-21)                                                                                         | Planifié |
+| Transport multi-modal simple (case 20-21)                                                                                  | OK       |
+| Transport multi-modal complexe                                                                                             | Planifié |
 
 Pour plus d'informations sur le calendrier de déploiement des fonctionnalités, vous pouvez consulter notre [roadmap produit](https://trello.com/b/2pkc7bFg/trackd%C3%A9chets-roadmap-produit)
 

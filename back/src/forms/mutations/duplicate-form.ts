@@ -1,7 +1,8 @@
 import { prisma, Status } from "../../generated/prisma-client";
 import {
   cleanUpNotDuplicatableFieldsInForm,
-  unflattenObjectFromDb
+  unflattenObjectFromDb,
+  cleanUpNonDuplicatableSegmentField
 } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import { MutationDuplicateFormArgs, Form } from "../../generated/graphql/types";
@@ -21,6 +22,13 @@ export async function duplicateForm(
     id: formId
   });
 
+  // get segments to duplicate them after cleanup
+  const transportSegments = await prisma.transportSegments({
+    where: {
+      form: { id: formId }
+    }
+  });
+
   const newForm = await prisma.createForm({
     ...cleanUpNotDuplicatableFieldsInForm(existingForm),
     readableId: await getReadableId(),
@@ -35,5 +43,15 @@ export async function duplicateForm(
     updatedFields: {},
     loggedAt: new Date()
   });
+
+  const segmentDuplicates = transportSegments.map(segment =>
+    prisma.createTransportSegment({
+      form: { connect: { id: newForm.id } },
+      ...cleanUpNonDuplicatableSegmentField(segment)
+    })
+  );
+
+  await Promise.all(segmentDuplicates);
+
   return unflattenObjectFromDb(newForm);
 }

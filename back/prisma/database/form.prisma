@@ -121,6 +121,12 @@ type Form {
 
   appendix2Forms: [Form]
   temporaryStorageDetail: TemporaryStorageDetail @relation(link: INLINE)
+
+  transportSegments: [TransportSegment]
+
+  # Holds information about current segment
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 type TemporaryStorageDetail {
@@ -222,4 +228,45 @@ type StatusLog {
   status: Status!
   loggedAt: DateTime
   updatedFields: Json
+}
+
+
+enum TransportMode{
+  ROAD
+  RAIL
+  AIR
+  RIVER
+  SEA
+}
+
+# Multimodal model
+type TransportSegment {
+  id: ID! @id
+  segmentNumber: Int
+
+  form: Form!
+  
+  # Frame 20-21...
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+
+  readyToTakeOver: Boolean @default(value: false)
+
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  
 }

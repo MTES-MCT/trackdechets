@@ -48,7 +48,7 @@ const drawText = ({
 
 /**
  * Draw a × in checkbox
- * @param fieldName - name of the field (see
+ * @param fieldName - name of the field
  * @param font - font object
  * @param page - page on which we want to write
  */
@@ -64,17 +64,18 @@ const checkBox = ({ fieldName, settings, font, page, yOffset = 0 }) => {
  * @param page - page on which we want to write
  */
 
-const drawImage = (
+const drawImage = ({
   locationName,
   image,
   page,
-  dimensions = { width: 75, height: 37 }
-) => {
+  dimensions = { width: 75, height: 37 },
+  yOffset = 0
+}) => {
   location = imageLocations[locationName];
 
   page.drawImage(image, {
     x: location.x,
-    y: pageHeight - location.y,
+    y: pageHeight - (location.y + yOffset),
 
     ...dimensions,
   });
@@ -138,6 +139,7 @@ const dateFmt = (datestr) => {
  * @returns {object}
  */
 const getTemporaryStorageExistance = (params) => {
+  return {}
   if (params.recipientIsTempStorage) {
     return { temporaryStorageYes: true };
   }
@@ -286,13 +288,13 @@ const getWasteQuantityRefused = (wasteDetailsQuantity, quantityReceived) =>
 const getWasteRefusalreason = (params) =>
   params.wasteAcceptationStatus === "PARTIALLY_REFUSED"
     ? {
-        wasteRefusalReason: `Refus partiel: ${
-          params.wasteRefusalReason
+      wasteRefusalReason: `Refus partiel: ${
+        params.wasteRefusalReason
         } - Tonnage estimé de refus : ${getWasteQuantityRefused(
           params.wasteDetailsQuantity,
           params.quantityReceived
         )} tonnes`,
-      }
+    }
     : {};
 
 /**
@@ -304,10 +306,12 @@ const getWasteRefusalreason = (params) =>
 const getFlatEcoOrganisme = (params) => {
   return params.ecoOrganisme && params.ecoOrganisme.name
     ? {
-        ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`,
-      }
+      ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`,
+    }
     : {};
 };
+
+const processTransporterData = (data) => ({ ...data, transporterCompanySiren: siretToSiren(data.transporterCompanySiret) })
 
 /**
  * Apply transformers to payload
@@ -328,6 +332,8 @@ function processMainFormParams(params) {
     ...getFlatEcoOrganisme(data),
     ...getTemporaryStorageExistance(data),
     ...getTempStorerWasteDetailsType(data),
+    ...processTransporterData(data)
+
   };
 }
 
@@ -344,6 +350,28 @@ function processAnnexParams(params) {
     ...checkWasteDetailsQuantityReal(data),
     receivedAt: dateFmt(params.receivedAt),
   };
+}
+
+const transportModeLabels = {
+  ROAD: "Route",
+  AIR: "Voie aérienne",
+  RAIL: "Voie ferrée",
+  RIVER: "Voie fluviale",
+};
+
+function verboseMode(mode) {
+  if (!mode) { return "" }
+  return transportModeLabels[mode]
+}
+function processSegment(segment) {
+  const data = stringifyNumberFields(segment);
+  return {
+    ...data,
+    takenOverAt: dateFmt(data.takenOverAt),
+    mode: verboseMode(data.mode),
+    transporterCompanySiren: siretToSiren(data.transporterCompanySiret)
+  }
+
 }
 
 /**
@@ -375,6 +403,9 @@ const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
   }
 };
 
+
+const siretToSiren = (siren) => siren.slice(0, 9)
+
 exports.checkBox = checkBox;
 exports.drawImage = drawImage;
 exports.getEmitterType = getEmitterType;
@@ -382,4 +413,6 @@ exports.getWasteRefusalreason = getWasteRefusalreason;
 exports.getWasteDetailsType = getWasteDetailsType;
 exports.processMainFormParams = processMainFormParams;
 exports.processAnnexParams = processAnnexParams;
+exports.processSegment = processSegment;
 exports.fillFields = fillFields;
+exports.siretToSiren = siretToSiren;

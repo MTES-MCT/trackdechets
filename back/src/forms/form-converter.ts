@@ -103,8 +103,24 @@ export function cleanUpNotDuplicatableFieldsInForm(form) {
     receivedAt,
     quantityReceived,
     processingOperationDone,
+    currentTransporterSiret,
     ...rest
   } = form;
 
   return rest;
 }
+
+export const cleanUpNonDuplicatableSegmentField = segment => {
+  const {
+    id,
+    sealed,
+    form,
+    createdAt,
+    updatedAt,
+    takenOverAt,
+    takenOverBy,
+    ...rest
+  } = segment;
+
+  return rest;
+};

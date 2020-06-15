@@ -14,3 +14,10 @@ export const statusLabels: { [key: string]: string } = {
 };
 
 export const ITEMS_PER_PAGE = 50;
+
+export const transportModeLabels: { [key: string]: string } = {
+  ROAD: "Route",
+  AIR: "Voie aérienne",
+  RAIL: "Voie ferrée",
+  RIVER: "Voie fluviale",
+};

@@ -5,6 +5,19 @@ import { prisma } from "../../generated/prisma-client";
 
 const DEFAULT_FIRST = 50;
 
+
+/**
+ *
+ * if type is TRANSPORTER, return forms:
+ * - which status is in "SEALED", "SENT", "RESEALED", "RESENT"
+ * - which transporterCompanySiret  or one segment's transporterCompanySiret matches selectedCompany siret
+ * - which temporaryStorageDetail transporterCompanySiret matches selectedCompany siret
+ *
+ * if type is ACTOR (default), return forms:
+ * - from any status
+ * - which recipientCompanySiret, emitterCompanySiret, ecoOrganisme siret or temporaryStorageDetail destinationCompanySiret
+ *  matches selectedCompany siret
+ */
 export default async function forms(
   userId: string,
   {
@@ -58,6 +71,11 @@ function getRolesFilter(siret: string, types: FormRole[]) {
     ["EMITTER"]: [{ emitterCompanySiret: siret }],
     ["TRANSPORTER"]: [
       { transporterCompanySiret: siret },
+      {
+        transportSegments_some: {
+          transporterCompanySiret: siret,
+        },
+      },
       {
         temporaryStorageDetail: {
           transporterCompanySiret: siret

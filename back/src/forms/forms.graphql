@@ -186,6 +186,26 @@ type Mutation {
 
   "Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement"
   markAsResent(id: ID!, resentInfos: ResentFormInput!): Form
+
+  "Prépare un nouveau segment de transport multimodal"
+  prepareSegment(
+    id: ID!
+    siret: String!
+    nextSegmentInfo: NextSegmentInfoInput!
+  ): TransportSegment
+
+  "Marque un segment de transport comme prêt à être emporté"
+  markSegmentAsReadyToTakeOver(id: ID!): TransportSegment
+
+  "Marque un segment comme pris en charge par le nouveau transporteur"
+  takeOverSegment(id: ID!, takeOverInfo: TakeOverInput!): TransportSegment
+
+  "Édite un segment existant"
+  editSegment(
+    id: ID!
+    siret: String!
+    nextSegmentInfo: NextSegmentInfoInput!
+  ): TransportSegment
 }
 
 type Subscription {
@@ -389,6 +409,11 @@ type Form {
 
   "Résumé des valeurs clés du bordereau à l'instant T"
   stateSummary: StateSummary
+
+  transportSegments: [TransportSegment!]
+
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 """
@@ -769,4 +794,60 @@ type formsLifeCycleData {
 
   "Nombre de changements de statuts renvoyés"
   count: Int
+}
+
+enum TransportMode {
+  ROAD
+  RAIL
+  AIR
+  RIVER
+  SEA
+}
+
+type MultimodalTransporter {
+  "Établissement transporteur"
+  company: FormCompany
+
+  "Exemption de récipissé"
+  isExemptedOfReceipt: Boolean
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité du récipissé"
+  validityLimit: DateTime
+
+  "Numéro de plaque d'immatriculation"
+  numberPlate: String
+
+  "Information libre, destinée aux transporteurs"
+  customInfo: String
+}
+
+type TransportSegment {
+  id: ID!
+  
+  "Siret du transporteur précédent"
+  previousTransporterCompanySiret: String
+  
+  "Transporteur du segment"
+  transporter: MultimodalTransporter
+
+  "Mode de transport"
+  mode: TransportMode
+
+  "Date de prise en charge"
+  takenOverAt: DateTime
+
+  "Reponsable de la prise en charge"
+  takenOverBy: String
+
+  "Prêt à être pris en charge"
+  readyToTakeOver: Boolean
+
+  "Numéro du segment"
+  segmentNumber: Int
 }

@@ -212,6 +212,10 @@ type AggregateTransporterReceipt {
   count: Int!
 }
 
+type AggregateTransportSegment {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -1430,6 +1434,9 @@ type Form {
   ecoOrganisme: EcoOrganisme
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
   temporaryStorageDetail: TemporaryStorageDetail
+  transportSegments(where: TransportSegmentWhereInput, orderBy: TransportSegmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TransportSegment!]
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 type FormConnection {
@@ -1522,6 +1529,9 @@ input FormCreateInput {
   ecoOrganisme: EcoOrganismeCreateOneInput
   appendix2Forms: FormCreateManyInput
   temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
+  transportSegments: TransportSegmentCreateManyWithoutFormInput
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 input FormCreateManyInput {
@@ -1536,6 +1546,11 @@ input FormCreateOneInput {
 
 input FormCreateOneWithoutTemporaryStorageDetailInput {
   create: FormCreateWithoutTemporaryStorageDetailInput
+  connect: FormWhereUniqueInput
+}
+
+input FormCreateOneWithoutTransportSegmentsInput {
+  create: FormCreateWithoutTransportSegmentsInput
   connect: FormWhereUniqueInput
 }
 
@@ -1622,6 +1637,97 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
   appendix2Forms: FormCreateManyInput
+  transportSegments: TransportSegmentCreateManyWithoutFormInput
+  currentTransporterSiret: String
+  nextTransporterSiret: String
+}
+
+input FormCreateWithoutTransportSegmentsInput {
+  id: ID
+  readableId: String!
+  customId: String
+  isDeleted: Boolean
+  owner: UserCreateOneInput!
+  signedByTransporter: Boolean
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
+  receivedBy: String
+  receivedAt: DateTime
+  signedAt: DateTime
+  quantityReceived: Float
+  processedBy: String
+  processedAt: String
+  processingOperationDone: String
+  processingOperationDescription: String
+  noTraceability: Boolean
+  nextDestinationProcessingOperation: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: String
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: String
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  transporterCustomInfo: String
+  wasteDetailsCode: String
+  wasteDetailsName: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeCreateOneInput
+  appendix2Forms: FormCreateManyInput
+  temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 type FormEdge {
@@ -1792,6 +1898,10 @@ enum FormOrderByInput {
   traderDepartment_DESC
   traderValidityLimit_ASC
   traderValidityLimit_DESC
+  currentTransporterSiret_ASC
+  currentTransporterSiret_DESC
+  nextTransporterSiret_ASC
+  nextTransporterSiret_DESC
 }
 
 type FormPreviousValues {
@@ -1876,6 +1986,8 @@ type FormPreviousValues {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 input FormScalarWhereInput {
@@ -2827,6 +2939,34 @@ input FormScalarWhereInput {
   traderValidityLimit_lte: DateTime
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
+  currentTransporterSiret: String
+  currentTransporterSiret_not: String
+  currentTransporterSiret_in: [String!]
+  currentTransporterSiret_not_in: [String!]
+  currentTransporterSiret_lt: String
+  currentTransporterSiret_lte: String
+  currentTransporterSiret_gt: String
+  currentTransporterSiret_gte: String
+  currentTransporterSiret_contains: String
+  currentTransporterSiret_not_contains: String
+  currentTransporterSiret_starts_with: String
+  currentTransporterSiret_not_starts_with: String
+  currentTransporterSiret_ends_with: String
+  currentTransporterSiret_not_ends_with: String
+  nextTransporterSiret: String
+  nextTransporterSiret_not: String
+  nextTransporterSiret_in: [String!]
+  nextTransporterSiret_not_in: [String!]
+  nextTransporterSiret_lt: String
+  nextTransporterSiret_lte: String
+  nextTransporterSiret_gt: String
+  nextTransporterSiret_gte: String
+  nextTransporterSiret_contains: String
+  nextTransporterSiret_not_contains: String
+  nextTransporterSiret_starts_with: String
+  nextTransporterSiret_not_starts_with: String
+  nextTransporterSiret_ends_with: String
+  nextTransporterSiret_not_ends_with: String
   AND: [FormScalarWhereInput!]
   OR: [FormScalarWhereInput!]
   NOT: [FormScalarWhereInput!]
@@ -2933,6 +3073,9 @@ input FormUpdateDataInput {
   ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
+  transportSegments: TransportSegmentUpdateManyWithoutFormInput
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 input FormUpdateInput {
@@ -3018,6 +3161,9 @@ input FormUpdateInput {
   ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
+  transportSegments: TransportSegmentUpdateManyWithoutFormInput
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 input FormUpdateManyDataInput {
@@ -3099,6 +3245,8 @@ input FormUpdateManyDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 input FormUpdateManyInput {
@@ -3192,6 +3340,8 @@ input FormUpdateManyMutationInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 input FormUpdateManyWithWhereNestedInput {
@@ -3203,6 +3353,13 @@ input FormUpdateOneRequiredInput {
   create: FormCreateInput
   update: FormUpdateDataInput
   upsert: FormUpsertNestedInput
+  connect: FormWhereUniqueInput
+}
+
+input FormUpdateOneRequiredWithoutTransportSegmentsInput {
+  create: FormCreateWithoutTransportSegmentsInput
+  update: FormUpdateWithoutTransportSegmentsDataInput
+  upsert: FormUpsertWithoutTransportSegmentsInput
   connect: FormWhereUniqueInput
 }
 
@@ -3297,6 +3454,96 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
   appendix2Forms: FormUpdateManyInput
+  transportSegments: TransportSegmentUpdateManyWithoutFormInput
+  currentTransporterSiret: String
+  nextTransporterSiret: String
+}
+
+input FormUpdateWithoutTransportSegmentsDataInput {
+  readableId: String
+  customId: String
+  isDeleted: Boolean
+  owner: UserUpdateOneRequiredInput
+  signedByTransporter: Boolean
+  status: String
+  sentAt: DateTime
+  sentBy: String
+  isAccepted: Boolean
+  wasteAcceptationStatus: WasteAcceptationStatus
+  wasteRefusalReason: String
+  receivedBy: String
+  receivedAt: DateTime
+  signedAt: DateTime
+  quantityReceived: Float
+  processedBy: String
+  processedAt: String
+  processingOperationDone: String
+  processingOperationDescription: String
+  noTraceability: Boolean
+  nextDestinationProcessingOperation: String
+  nextDestinationCompanyName: String
+  nextDestinationCompanySiret: String
+  nextDestinationCompanyAddress: String
+  nextDestinationCompanyContact: String
+  nextDestinationCompanyPhone: String
+  nextDestinationCompanyMail: String
+  emitterType: EmitterType
+  emitterPickupSite: String
+  emitterWorkSiteName: String
+  emitterWorkSiteAddress: String
+  emitterWorkSiteCity: String
+  emitterWorkSitePostalCode: String
+  emitterWorkSiteInfos: String
+  emitterCompanyName: String
+  emitterCompanySiret: String
+  emitterCompanyAddress: String
+  emitterCompanyContact: String
+  emitterCompanyPhone: String
+  emitterCompanyMail: String
+  recipientCap: String
+  recipientProcessingOperation: String
+  recipientIsTempStorage: Boolean
+  recipientCompanyName: String
+  recipientCompanySiret: String
+  recipientCompanyAddress: String
+  recipientCompanyContact: String
+  recipientCompanyPhone: String
+  recipientCompanyMail: String
+  transporterCompanyName: String
+  transporterCompanySiret: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  transporterCustomInfo: String
+  wasteDetailsCode: String
+  wasteDetailsName: String
+  wasteDetailsOnuCode: String
+  wasteDetailsPackagings: Json
+  wasteDetailsOtherPackaging: String
+  wasteDetailsNumberOfPackages: Int
+  wasteDetailsQuantity: Float
+  wasteDetailsQuantityType: QuantityType
+  wasteDetailsConsistence: Consistence
+  traderCompanyName: String
+  traderCompanySiret: String
+  traderCompanyAddress: String
+  traderCompanyContact: String
+  traderCompanyPhone: String
+  traderCompanyMail: String
+  traderReceipt: String
+  traderDepartment: String
+  traderValidityLimit: DateTime
+  ecoOrganisme: EcoOrganismeUpdateOneInput
+  appendix2Forms: FormUpdateManyInput
+  temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 }
 
 input FormUpdateWithWhereUniqueNestedInput {
@@ -3312,6 +3559,11 @@ input FormUpsertNestedInput {
 input FormUpsertWithoutTemporaryStorageDetailInput {
   update: FormUpdateWithoutTemporaryStorageDetailDataInput!
   create: FormCreateWithoutTemporaryStorageDetailInput!
+}
+
+input FormUpsertWithoutTransportSegmentsInput {
+  update: FormUpdateWithoutTransportSegmentsDataInput!
+  create: FormCreateWithoutTransportSegmentsInput!
 }
 
 input FormUpsertWithWhereUniqueNestedInput {
@@ -4275,6 +4527,37 @@ input FormWhereInput {
   appendix2Forms_some: FormWhereInput
   appendix2Forms_none: FormWhereInput
   temporaryStorageDetail: TemporaryStorageDetailWhereInput
+  transportSegments_every: TransportSegmentWhereInput
+  transportSegments_some: TransportSegmentWhereInput
+  transportSegments_none: TransportSegmentWhereInput
+  currentTransporterSiret: String
+  currentTransporterSiret_not: String
+  currentTransporterSiret_in: [String!]
+  currentTransporterSiret_not_in: [String!]
+  currentTransporterSiret_lt: String
+  currentTransporterSiret_lte: String
+  currentTransporterSiret_gt: String
+  currentTransporterSiret_gte: String
+  currentTransporterSiret_contains: String
+  currentTransporterSiret_not_contains: String
+  currentTransporterSiret_starts_with: String
+  currentTransporterSiret_not_starts_with: String
+  currentTransporterSiret_ends_with: String
+  currentTransporterSiret_not_ends_with: String
+  nextTransporterSiret: String
+  nextTransporterSiret_not: String
+  nextTransporterSiret_in: [String!]
+  nextTransporterSiret_not_in: [String!]
+  nextTransporterSiret_lt: String
+  nextTransporterSiret_lte: String
+  nextTransporterSiret_gt: String
+  nextTransporterSiret_gte: String
+  nextTransporterSiret_contains: String
+  nextTransporterSiret_not_contains: String
+  nextTransporterSiret_starts_with: String
+  nextTransporterSiret_not_starts_with: String
+  nextTransporterSiret_ends_with: String
+  nextTransporterSiret_not_ends_with: String
   AND: [FormWhereInput!]
   OR: [FormWhereInput!]
   NOT: [FormWhereInput!]
@@ -4857,6 +5140,12 @@ type Mutation {
   upsertTraderReceipt(where: TraderReceiptWhereUniqueInput!, create: TraderReceiptCreateInput!, update: TraderReceiptUpdateInput!): TraderReceipt!
   deleteTraderReceipt(where: TraderReceiptWhereUniqueInput!): TraderReceipt
   deleteManyTraderReceipts(where: TraderReceiptWhereInput): BatchPayload!
+  createTransportSegment(data: TransportSegmentCreateInput!): TransportSegment!
+  updateTransportSegment(data: TransportSegmentUpdateInput!, where: TransportSegmentWhereUniqueInput!): TransportSegment
+  updateManyTransportSegments(data: TransportSegmentUpdateManyMutationInput!, where: TransportSegmentWhereInput): BatchPayload!
+  upsertTransportSegment(where: TransportSegmentWhereUniqueInput!, create: TransportSegmentCreateInput!, update: TransportSegmentUpdateInput!): TransportSegment!
+  deleteTransportSegment(where: TransportSegmentWhereUniqueInput!): TransportSegment
+  deleteManyTransportSegments(where: TransportSegmentWhereInput): BatchPayload!
   createTransporterReceipt(data: TransporterReceiptCreateInput!): TransporterReceipt!
   updateTransporterReceipt(data: TransporterReceiptUpdateInput!, where: TransporterReceiptWhereUniqueInput!): TransporterReceipt
   updateManyTransporterReceipts(data: TransporterReceiptUpdateManyMutationInput!, where: TransporterReceiptWhereInput): BatchPayload!
@@ -4945,6 +5234,9 @@ type Query {
   traderReceipt(where: TraderReceiptWhereUniqueInput!): TraderReceipt
   traderReceipts(where: TraderReceiptWhereInput, orderBy: TraderReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TraderReceipt]!
   traderReceiptsConnection(where: TraderReceiptWhereInput, orderBy: TraderReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TraderReceiptConnection!
+  transportSegment(where: TransportSegmentWhereUniqueInput!): TransportSegment
+  transportSegments(where: TransportSegmentWhereInput, orderBy: TransportSegmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TransportSegment]!
+  transportSegmentsConnection(where: TransportSegmentWhereInput, orderBy: TransportSegmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TransportSegmentConnection!
   transporterReceipt(where: TransporterReceiptWhereUniqueInput!): TransporterReceipt
   transporterReceipts(where: TransporterReceiptWhereInput, orderBy: TransporterReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TransporterReceipt]!
   transporterReceiptsConnection(where: TransporterReceiptWhereInput, orderBy: TransporterReceiptOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TransporterReceiptConnection!
@@ -5409,6 +5701,7 @@ type Subscription {
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
   temporaryStorageDetail(where: TemporaryStorageDetailSubscriptionWhereInput): TemporaryStorageDetailSubscriptionPayload
   traderReceipt(where: TraderReceiptSubscriptionWhereInput): TraderReceiptSubscriptionPayload
+  transportSegment(where: TransportSegmentSubscriptionWhereInput): TransportSegmentSubscriptionPayload
   transporterReceipt(where: TransporterReceiptSubscriptionWhereInput): TransporterReceiptSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   userAccountHash(where: UserAccountHashSubscriptionWhereInput): UserAccountHashSubscriptionPayload
@@ -6540,6 +6833,739 @@ input TransporterReceiptWhereInput {
 }
 
 input TransporterReceiptWhereUniqueInput {
+  id: ID
+}
+
+enum TransportMode {
+  ROAD
+  RAIL
+  AIR
+  RIVER
+  SEA
+}
+
+type TransportSegment {
+  id: ID!
+  segmentNumber: Int
+  form: Form!
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransportSegmentConnection {
+  pageInfo: PageInfo!
+  edges: [TransportSegmentEdge]!
+  aggregate: AggregateTransportSegment!
+}
+
+input TransportSegmentCreateInput {
+  id: ID
+  segmentNumber: Int
+  form: FormCreateOneWithoutTransportSegmentsInput!
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+}
+
+input TransportSegmentCreateManyWithoutFormInput {
+  create: [TransportSegmentCreateWithoutFormInput!]
+  connect: [TransportSegmentWhereUniqueInput!]
+}
+
+input TransportSegmentCreateWithoutFormInput {
+  id: ID
+  segmentNumber: Int
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+}
+
+type TransportSegmentEdge {
+  node: TransportSegment!
+  cursor: String!
+}
+
+enum TransportSegmentOrderByInput {
+  id_ASC
+  id_DESC
+  segmentNumber_ASC
+  segmentNumber_DESC
+  transporterCompanySiret_ASC
+  transporterCompanySiret_DESC
+  transporterCompanyName_ASC
+  transporterCompanyName_DESC
+  transporterCompanyAddress_ASC
+  transporterCompanyAddress_DESC
+  transporterCompanyContact_ASC
+  transporterCompanyContact_DESC
+  transporterCompanyPhone_ASC
+  transporterCompanyPhone_DESC
+  transporterCompanyMail_ASC
+  transporterCompanyMail_DESC
+  transporterIsExemptedOfReceipt_ASC
+  transporterIsExemptedOfReceipt_DESC
+  transporterReceipt_ASC
+  transporterReceipt_DESC
+  transporterDepartment_ASC
+  transporterDepartment_DESC
+  transporterValidityLimit_ASC
+  transporterValidityLimit_DESC
+  transporterNumberPlate_ASC
+  transporterNumberPlate_DESC
+  mode_ASC
+  mode_DESC
+  readyToTakeOver_ASC
+  readyToTakeOver_DESC
+  previousTransporterCompanySiret_ASC
+  previousTransporterCompanySiret_DESC
+  takenOverAt_ASC
+  takenOverAt_DESC
+  takenOverBy_ASC
+  takenOverBy_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type TransportSegmentPreviousValues {
+  id: ID!
+  segmentNumber: Int
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input TransportSegmentScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  segmentNumber: Int
+  segmentNumber_not: Int
+  segmentNumber_in: [Int!]
+  segmentNumber_not_in: [Int!]
+  segmentNumber_lt: Int
+  segmentNumber_lte: Int
+  segmentNumber_gt: Int
+  segmentNumber_gte: Int
+  transporterCompanySiret: String
+  transporterCompanySiret_not: String
+  transporterCompanySiret_in: [String!]
+  transporterCompanySiret_not_in: [String!]
+  transporterCompanySiret_lt: String
+  transporterCompanySiret_lte: String
+  transporterCompanySiret_gt: String
+  transporterCompanySiret_gte: String
+  transporterCompanySiret_contains: String
+  transporterCompanySiret_not_contains: String
+  transporterCompanySiret_starts_with: String
+  transporterCompanySiret_not_starts_with: String
+  transporterCompanySiret_ends_with: String
+  transporterCompanySiret_not_ends_with: String
+  transporterCompanyName: String
+  transporterCompanyName_not: String
+  transporterCompanyName_in: [String!]
+  transporterCompanyName_not_in: [String!]
+  transporterCompanyName_lt: String
+  transporterCompanyName_lte: String
+  transporterCompanyName_gt: String
+  transporterCompanyName_gte: String
+  transporterCompanyName_contains: String
+  transporterCompanyName_not_contains: String
+  transporterCompanyName_starts_with: String
+  transporterCompanyName_not_starts_with: String
+  transporterCompanyName_ends_with: String
+  transporterCompanyName_not_ends_with: String
+  transporterCompanyAddress: String
+  transporterCompanyAddress_not: String
+  transporterCompanyAddress_in: [String!]
+  transporterCompanyAddress_not_in: [String!]
+  transporterCompanyAddress_lt: String
+  transporterCompanyAddress_lte: String
+  transporterCompanyAddress_gt: String
+  transporterCompanyAddress_gte: String
+  transporterCompanyAddress_contains: String
+  transporterCompanyAddress_not_contains: String
+  transporterCompanyAddress_starts_with: String
+  transporterCompanyAddress_not_starts_with: String
+  transporterCompanyAddress_ends_with: String
+  transporterCompanyAddress_not_ends_with: String
+  transporterCompanyContact: String
+  transporterCompanyContact_not: String
+  transporterCompanyContact_in: [String!]
+  transporterCompanyContact_not_in: [String!]
+  transporterCompanyContact_lt: String
+  transporterCompanyContact_lte: String
+  transporterCompanyContact_gt: String
+  transporterCompanyContact_gte: String
+  transporterCompanyContact_contains: String
+  transporterCompanyContact_not_contains: String
+  transporterCompanyContact_starts_with: String
+  transporterCompanyContact_not_starts_with: String
+  transporterCompanyContact_ends_with: String
+  transporterCompanyContact_not_ends_with: String
+  transporterCompanyPhone: String
+  transporterCompanyPhone_not: String
+  transporterCompanyPhone_in: [String!]
+  transporterCompanyPhone_not_in: [String!]
+  transporterCompanyPhone_lt: String
+  transporterCompanyPhone_lte: String
+  transporterCompanyPhone_gt: String
+  transporterCompanyPhone_gte: String
+  transporterCompanyPhone_contains: String
+  transporterCompanyPhone_not_contains: String
+  transporterCompanyPhone_starts_with: String
+  transporterCompanyPhone_not_starts_with: String
+  transporterCompanyPhone_ends_with: String
+  transporterCompanyPhone_not_ends_with: String
+  transporterCompanyMail: String
+  transporterCompanyMail_not: String
+  transporterCompanyMail_in: [String!]
+  transporterCompanyMail_not_in: [String!]
+  transporterCompanyMail_lt: String
+  transporterCompanyMail_lte: String
+  transporterCompanyMail_gt: String
+  transporterCompanyMail_gte: String
+  transporterCompanyMail_contains: String
+  transporterCompanyMail_not_contains: String
+  transporterCompanyMail_starts_with: String
+  transporterCompanyMail_not_starts_with: String
+  transporterCompanyMail_ends_with: String
+  transporterCompanyMail_not_ends_with: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterIsExemptedOfReceipt_not: Boolean
+  transporterReceipt: String
+  transporterReceipt_not: String
+  transporterReceipt_in: [String!]
+  transporterReceipt_not_in: [String!]
+  transporterReceipt_lt: String
+  transporterReceipt_lte: String
+  transporterReceipt_gt: String
+  transporterReceipt_gte: String
+  transporterReceipt_contains: String
+  transporterReceipt_not_contains: String
+  transporterReceipt_starts_with: String
+  transporterReceipt_not_starts_with: String
+  transporterReceipt_ends_with: String
+  transporterReceipt_not_ends_with: String
+  transporterDepartment: String
+  transporterDepartment_not: String
+  transporterDepartment_in: [String!]
+  transporterDepartment_not_in: [String!]
+  transporterDepartment_lt: String
+  transporterDepartment_lte: String
+  transporterDepartment_gt: String
+  transporterDepartment_gte: String
+  transporterDepartment_contains: String
+  transporterDepartment_not_contains: String
+  transporterDepartment_starts_with: String
+  transporterDepartment_not_starts_with: String
+  transporterDepartment_ends_with: String
+  transporterDepartment_not_ends_with: String
+  transporterValidityLimit: DateTime
+  transporterValidityLimit_not: DateTime
+  transporterValidityLimit_in: [DateTime!]
+  transporterValidityLimit_not_in: [DateTime!]
+  transporterValidityLimit_lt: DateTime
+  transporterValidityLimit_lte: DateTime
+  transporterValidityLimit_gt: DateTime
+  transporterValidityLimit_gte: DateTime
+  transporterNumberPlate: String
+  transporterNumberPlate_not: String
+  transporterNumberPlate_in: [String!]
+  transporterNumberPlate_not_in: [String!]
+  transporterNumberPlate_lt: String
+  transporterNumberPlate_lte: String
+  transporterNumberPlate_gt: String
+  transporterNumberPlate_gte: String
+  transporterNumberPlate_contains: String
+  transporterNumberPlate_not_contains: String
+  transporterNumberPlate_starts_with: String
+  transporterNumberPlate_not_starts_with: String
+  transporterNumberPlate_ends_with: String
+  transporterNumberPlate_not_ends_with: String
+  mode: TransportMode
+  mode_not: TransportMode
+  mode_in: [TransportMode!]
+  mode_not_in: [TransportMode!]
+  readyToTakeOver: Boolean
+  readyToTakeOver_not: Boolean
+  previousTransporterCompanySiret: String
+  previousTransporterCompanySiret_not: String
+  previousTransporterCompanySiret_in: [String!]
+  previousTransporterCompanySiret_not_in: [String!]
+  previousTransporterCompanySiret_lt: String
+  previousTransporterCompanySiret_lte: String
+  previousTransporterCompanySiret_gt: String
+  previousTransporterCompanySiret_gte: String
+  previousTransporterCompanySiret_contains: String
+  previousTransporterCompanySiret_not_contains: String
+  previousTransporterCompanySiret_starts_with: String
+  previousTransporterCompanySiret_not_starts_with: String
+  previousTransporterCompanySiret_ends_with: String
+  previousTransporterCompanySiret_not_ends_with: String
+  takenOverAt: DateTime
+  takenOverAt_not: DateTime
+  takenOverAt_in: [DateTime!]
+  takenOverAt_not_in: [DateTime!]
+  takenOverAt_lt: DateTime
+  takenOverAt_lte: DateTime
+  takenOverAt_gt: DateTime
+  takenOverAt_gte: DateTime
+  takenOverBy: String
+  takenOverBy_not: String
+  takenOverBy_in: [String!]
+  takenOverBy_not_in: [String!]
+  takenOverBy_lt: String
+  takenOverBy_lte: String
+  takenOverBy_gt: String
+  takenOverBy_gte: String
+  takenOverBy_contains: String
+  takenOverBy_not_contains: String
+  takenOverBy_starts_with: String
+  takenOverBy_not_starts_with: String
+  takenOverBy_ends_with: String
+  takenOverBy_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [TransportSegmentScalarWhereInput!]
+  OR: [TransportSegmentScalarWhereInput!]
+  NOT: [TransportSegmentScalarWhereInput!]
+}
+
+type TransportSegmentSubscriptionPayload {
+  mutation: MutationType!
+  node: TransportSegment
+  updatedFields: [String!]
+  previousValues: TransportSegmentPreviousValues
+}
+
+input TransportSegmentSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TransportSegmentWhereInput
+  AND: [TransportSegmentSubscriptionWhereInput!]
+  OR: [TransportSegmentSubscriptionWhereInput!]
+  NOT: [TransportSegmentSubscriptionWhereInput!]
+}
+
+input TransportSegmentUpdateInput {
+  segmentNumber: Int
+  form: FormUpdateOneRequiredWithoutTransportSegmentsInput
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+}
+
+input TransportSegmentUpdateManyDataInput {
+  segmentNumber: Int
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+}
+
+input TransportSegmentUpdateManyMutationInput {
+  segmentNumber: Int
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+}
+
+input TransportSegmentUpdateManyWithoutFormInput {
+  create: [TransportSegmentCreateWithoutFormInput!]
+  delete: [TransportSegmentWhereUniqueInput!]
+  connect: [TransportSegmentWhereUniqueInput!]
+  set: [TransportSegmentWhereUniqueInput!]
+  disconnect: [TransportSegmentWhereUniqueInput!]
+  update: [TransportSegmentUpdateWithWhereUniqueWithoutFormInput!]
+  upsert: [TransportSegmentUpsertWithWhereUniqueWithoutFormInput!]
+  deleteMany: [TransportSegmentScalarWhereInput!]
+  updateMany: [TransportSegmentUpdateManyWithWhereNestedInput!]
+}
+
+input TransportSegmentUpdateManyWithWhereNestedInput {
+  where: TransportSegmentScalarWhereInput!
+  data: TransportSegmentUpdateManyDataInput!
+}
+
+input TransportSegmentUpdateWithoutFormDataInput {
+  segmentNumber: Int
+  transporterCompanySiret: String
+  transporterCompanyName: String
+  transporterCompanyAddress: String
+  transporterCompanyContact: String
+  transporterCompanyPhone: String
+  transporterCompanyMail: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterReceipt: String
+  transporterDepartment: String
+  transporterValidityLimit: DateTime
+  transporterNumberPlate: String
+  mode: TransportMode
+  readyToTakeOver: Boolean
+  previousTransporterCompanySiret: String
+  takenOverAt: DateTime
+  takenOverBy: String
+}
+
+input TransportSegmentUpdateWithWhereUniqueWithoutFormInput {
+  where: TransportSegmentWhereUniqueInput!
+  data: TransportSegmentUpdateWithoutFormDataInput!
+}
+
+input TransportSegmentUpsertWithWhereUniqueWithoutFormInput {
+  where: TransportSegmentWhereUniqueInput!
+  update: TransportSegmentUpdateWithoutFormDataInput!
+  create: TransportSegmentCreateWithoutFormInput!
+}
+
+input TransportSegmentWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  segmentNumber: Int
+  segmentNumber_not: Int
+  segmentNumber_in: [Int!]
+  segmentNumber_not_in: [Int!]
+  segmentNumber_lt: Int
+  segmentNumber_lte: Int
+  segmentNumber_gt: Int
+  segmentNumber_gte: Int
+  form: FormWhereInput
+  transporterCompanySiret: String
+  transporterCompanySiret_not: String
+  transporterCompanySiret_in: [String!]
+  transporterCompanySiret_not_in: [String!]
+  transporterCompanySiret_lt: String
+  transporterCompanySiret_lte: String
+  transporterCompanySiret_gt: String
+  transporterCompanySiret_gte: String
+  transporterCompanySiret_contains: String
+  transporterCompanySiret_not_contains: String
+  transporterCompanySiret_starts_with: String
+  transporterCompanySiret_not_starts_with: String
+  transporterCompanySiret_ends_with: String
+  transporterCompanySiret_not_ends_with: String
+  transporterCompanyName: String
+  transporterCompanyName_not: String
+  transporterCompanyName_in: [String!]
+  transporterCompanyName_not_in: [String!]
+  transporterCompanyName_lt: String
+  transporterCompanyName_lte: String
+  transporterCompanyName_gt: String
+  transporterCompanyName_gte: String
+  transporterCompanyName_contains: String
+  transporterCompanyName_not_contains: String
+  transporterCompanyName_starts_with: String
+  transporterCompanyName_not_starts_with: String
+  transporterCompanyName_ends_with: String
+  transporterCompanyName_not_ends_with: String
+  transporterCompanyAddress: String
+  transporterCompanyAddress_not: String
+  transporterCompanyAddress_in: [String!]
+  transporterCompanyAddress_not_in: [String!]
+  transporterCompanyAddress_lt: String
+  transporterCompanyAddress_lte: String
+  transporterCompanyAddress_gt: String
+  transporterCompanyAddress_gte: String
+  transporterCompanyAddress_contains: String
+  transporterCompanyAddress_not_contains: String
+  transporterCompanyAddress_starts_with: String
+  transporterCompanyAddress_not_starts_with: String
+  transporterCompanyAddress_ends_with: String
+  transporterCompanyAddress_not_ends_with: String
+  transporterCompanyContact: String
+  transporterCompanyContact_not: String
+  transporterCompanyContact_in: [String!]
+  transporterCompanyContact_not_in: [String!]
+  transporterCompanyContact_lt: String
+  transporterCompanyContact_lte: String
+  transporterCompanyContact_gt: String
+  transporterCompanyContact_gte: String
+  transporterCompanyContact_contains: String
+  transporterCompanyContact_not_contains: String
+  transporterCompanyContact_starts_with: String
+  transporterCompanyContact_not_starts_with: String
+  transporterCompanyContact_ends_with: String
+  transporterCompanyContact_not_ends_with: String
+  transporterCompanyPhone: String
+  transporterCompanyPhone_not: String
+  transporterCompanyPhone_in: [String!]
+  transporterCompanyPhone_not_in: [String!]
+  transporterCompanyPhone_lt: String
+  transporterCompanyPhone_lte: String
+  transporterCompanyPhone_gt: String
+  transporterCompanyPhone_gte: String
+  transporterCompanyPhone_contains: String
+  transporterCompanyPhone_not_contains: String
+  transporterCompanyPhone_starts_with: String
+  transporterCompanyPhone_not_starts_with: String
+  transporterCompanyPhone_ends_with: String
+  transporterCompanyPhone_not_ends_with: String
+  transporterCompanyMail: String
+  transporterCompanyMail_not: String
+  transporterCompanyMail_in: [String!]
+  transporterCompanyMail_not_in: [String!]
+  transporterCompanyMail_lt: String
+  transporterCompanyMail_lte: String
+  transporterCompanyMail_gt: String
+  transporterCompanyMail_gte: String
+  transporterCompanyMail_contains: String
+  transporterCompanyMail_not_contains: String
+  transporterCompanyMail_starts_with: String
+  transporterCompanyMail_not_starts_with: String
+  transporterCompanyMail_ends_with: String
+  transporterCompanyMail_not_ends_with: String
+  transporterIsExemptedOfReceipt: Boolean
+  transporterIsExemptedOfReceipt_not: Boolean
+  transporterReceipt: String
+  transporterReceipt_not: String
+  transporterReceipt_in: [String!]
+  transporterReceipt_not_in: [String!]
+  transporterReceipt_lt: String
+  transporterReceipt_lte: String
+  transporterReceipt_gt: String
+  transporterReceipt_gte: String
+  transporterReceipt_contains: String
+  transporterReceipt_not_contains: String
+  transporterReceipt_starts_with: String
+  transporterReceipt_not_starts_with: String
+  transporterReceipt_ends_with: String
+  transporterReceipt_not_ends_with: String
+  transporterDepartment: String
+  transporterDepartment_not: String
+  transporterDepartment_in: [String!]
+  transporterDepartment_not_in: [String!]
+  transporterDepartment_lt: String
+  transporterDepartment_lte: String
+  transporterDepartment_gt: String
+  transporterDepartment_gte: String
+  transporterDepartment_contains: String
+  transporterDepartment_not_contains: String
+  transporterDepartment_starts_with: String
+  transporterDepartment_not_starts_with: String
+  transporterDepartment_ends_with: String
+  transporterDepartment_not_ends_with: String
+  transporterValidityLimit: DateTime
+  transporterValidityLimit_not: DateTime
+  transporterValidityLimit_in: [DateTime!]
+  transporterValidityLimit_not_in: [DateTime!]
+  transporterValidityLimit_lt: DateTime
+  transporterValidityLimit_lte: DateTime
+  transporterValidityLimit_gt: DateTime
+  transporterValidityLimit_gte: DateTime
+  transporterNumberPlate: String
+  transporterNumberPlate_not: String
+  transporterNumberPlate_in: [String!]
+  transporterNumberPlate_not_in: [String!]
+  transporterNumberPlate_lt: String
+  transporterNumberPlate_lte: String
+  transporterNumberPlate_gt: String
+  transporterNumberPlate_gte: String
+  transporterNumberPlate_contains: String
+  transporterNumberPlate_not_contains: String
+  transporterNumberPlate_starts_with: String
+  transporterNumberPlate_not_starts_with: String
+  transporterNumberPlate_ends_with: String
+  transporterNumberPlate_not_ends_with: String
+  mode: TransportMode
+  mode_not: TransportMode
+  mode_in: [TransportMode!]
+  mode_not_in: [TransportMode!]
+  readyToTakeOver: Boolean
+  readyToTakeOver_not: Boolean
+  previousTransporterCompanySiret: String
+  previousTransporterCompanySiret_not: String
+  previousTransporterCompanySiret_in: [String!]
+  previousTransporterCompanySiret_not_in: [String!]
+  previousTransporterCompanySiret_lt: String
+  previousTransporterCompanySiret_lte: String
+  previousTransporterCompanySiret_gt: String
+  previousTransporterCompanySiret_gte: String
+  previousTransporterCompanySiret_contains: String
+  previousTransporterCompanySiret_not_contains: String
+  previousTransporterCompanySiret_starts_with: String
+  previousTransporterCompanySiret_not_starts_with: String
+  previousTransporterCompanySiret_ends_with: String
+  previousTransporterCompanySiret_not_ends_with: String
+  takenOverAt: DateTime
+  takenOverAt_not: DateTime
+  takenOverAt_in: [DateTime!]
+  takenOverAt_not_in: [DateTime!]
+  takenOverAt_lt: DateTime
+  takenOverAt_lte: DateTime
+  takenOverAt_gt: DateTime
+  takenOverAt_gte: DateTime
+  takenOverBy: String
+  takenOverBy_not: String
+  takenOverBy_in: [String!]
+  takenOverBy_not_in: [String!]
+  takenOverBy_lt: String
+  takenOverBy_lte: String
+  takenOverBy_gt: String
+  takenOverBy_gte: String
+  takenOverBy_contains: String
+  takenOverBy_not_contains: String
+  takenOverBy_starts_with: String
+  takenOverBy_not_starts_with: String
+  takenOverBy_ends_with: String
+  takenOverBy_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [TransportSegmentWhereInput!]
+  OR: [TransportSegmentWhereInput!]
+  NOT: [TransportSegmentWhereInput!]
+}
+
+input TransportSegmentWhereUniqueInput {
   id: ID
 }
 

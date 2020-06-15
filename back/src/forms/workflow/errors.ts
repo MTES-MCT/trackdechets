@@ -11,7 +11,8 @@ export enum WorkflowError {
   InvalidTransition,
   MissingSignature,
   InvalidSecurityCode,
-  AppendixError
+  AppendixError,
+  HasSegmentsToTakeOverError
 }
 
 export async function getError(error: WorkflowError, form: Form) {
@@ -40,7 +41,10 @@ export async function getError(error: WorkflowError, form: Form) {
       return new UserInputError(
         "Le transporteur et le producteur du déchet doivent tous deux valider l'enlèvement"
       );
-
+    case WorkflowError.HasSegmentsToTakeOverError:
+      return new ForbiddenError(
+        "Vous ne pouvez pas passer ce bordereau à l'état souhaité, il n'est pas encore pris en charge par le dernier transporteur"
+      );
     default:
       return new ApolloError("Une erreur est survenue.");
   }
