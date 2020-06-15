@@ -49,7 +49,7 @@ export default function Processed(props: SlipActionProps) {
               </label>
             </div>
             <div className="form__group">
-              <label>Opération de traitement effectuée</label>
+              <label>Opération d’élimination / valorisation effectuée</label>
               <Field component="select" name="processingOperationDone">
                 <option value="">Choisissez...</option>
                 {Operations.map((o) => (
@@ -89,7 +89,7 @@ export default function Processed(props: SlipActionProps) {
                 <CompanySelector name="nextDestination.company" />
 
                 <div className="form__group">
-                  <label>Opération de traitement</label>
+                  <label>Opération d’élimination / valorisation (code D/R)</label>
                   <Field
                     component="select"
                     name="nextDestination.processingOperation"
