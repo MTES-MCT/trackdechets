@@ -2297,7 +2297,7 @@ Traitement réalisé (code D/R)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Description de l'opération de traitement (case 11)
+Description de l'opération d’élimination / valorisation (case 11)
 
 </td>
 </tr>
@@ -4308,7 +4308,7 @@ Traitement réalisé (code D/R)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Description de l'opération de traitement (case 11)
+Description de l'opération d’élimination / valorisation (case 11)
 
 </td>
 </tr>

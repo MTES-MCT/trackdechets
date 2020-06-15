@@ -463,7 +463,7 @@ export type Form = {
   actualQuantity?: Maybe<Scalars['Float']>;
   /** Traitement réalisé (code D/R) */
   processingOperationDone?: Maybe<Scalars['String']>;
-  /** Description de l'opération de traitement (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription?: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy?: Maybe<Scalars['String']>;
@@ -1012,7 +1012,7 @@ export type PrivateCompanyInput = {
 export type ProcessedFormInput = {
   /** Traitement réalisé (code D/R) */
   processingOperationDone: Scalars['String'];
-  /** Description de l'opération de traitement (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription?: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy: Scalars['String'];
