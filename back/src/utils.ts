@@ -71,3 +71,7 @@ export function daysBetween(date1: Date, date2: Date): number {
   const numberOfdays = Math.trunc((millis1 - millis2) / dayMillis);
   return numberOfdays;
 }
+
+export function sanitizeEmail(email: string): string {
+  return email.toLowerCase().trim();
+}

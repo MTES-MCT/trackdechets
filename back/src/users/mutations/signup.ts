@@ -3,15 +3,18 @@ import { sendMail } from "../../common/mails.helper";
 import { User, prisma } from "../../generated/prisma-client";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
+import { sanitizeEmail } from "../../utils";
 import { UserInputError } from "apollo-server-express";
 import { SignupInput } from "../../generated/graphql/types";
 
 export default async function signup({
   name,
-  email,
   password,
-  phone
+  phone,
+  ...rest
 }: SignupInput) {
+  const email = sanitizeEmail(rest.email);
+
   // check user does not exist
   const userExists = await prisma.$exists.user({ email });
 

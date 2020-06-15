@@ -16,7 +16,7 @@ import {
   User as PrismaUser
 } from "./generated/prisma-client";
 import { compare } from "bcrypt";
-import { sameDayMidnight, daysBetween } from "./utils";
+import { sameDayMidnight, daysBetween, sanitizeEmail } from "./utils";
 
 const { JWT_SECRET } = process.env;
 
@@ -60,7 +60,7 @@ passport.use(
   new LocalStrategy(
     { usernameField: "email" },
     async (username, password, done) => {
-      const user = await prisma.user({ email: username.trim() });
+      const user = await prisma.user({ email: sanitizeEmail(username) });
       if (!user) {
         return done(null, false, {
           ...getLoginError(username).UNKNOWN_USER
