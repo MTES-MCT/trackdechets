@@ -27,11 +27,21 @@ declare global {
   }
 }
 
+// verbose error message and related errored field
 export const loginError = {
-  UNKNOWN_USER: "Aucun utilisateur trouvé avec cet email",
-  NOT_ACTIVATED:
-    "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support",
-  INVALID_PASSWORD: "Mot de passe incorrect"
+  UNKNOWN_USER: {
+    message: "Aucun utilisateur trouvé avec cet email",
+    errorField: "email"
+  },
+  NOT_ACTIVATED: {
+    message:
+      "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support",
+    errorField: ""
+  },
+  INVALID_PASSWORD: {
+    message: "Mot de passe incorrect",
+    errorField: "password"
+  }
 };
 
 passport.use(
@@ -41,17 +51,17 @@ passport.use(
       const user = await prisma.user({ email: username.trim() });
       if (!user) {
         return done(null, false, {
-          message: loginError.UNKNOWN_USER
+          ...loginError.UNKNOWN_USER
         });
       }
       if (!user.isActive) {
         return done(null, false, {
-          message: loginError.NOT_ACTIVATED
+          ...loginError.NOT_ACTIVATED
         });
       }
       const passwordValid = await compare(password, user.password);
       if (!passwordValid) {
-        return done(null, false, { message: loginError.INVALID_PASSWORD });
+        return done(null, false, { ...loginError.INVALID_PASSWORD });
       }
       return done(null, user);
     }

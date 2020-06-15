@@ -8,24 +8,48 @@ import {
 } from "react-router-dom";
 import styles from "./Login.module.scss";
 import { localAuthService } from "./auth.service";
+import { fireEvent } from "@testing-library/dom";
 
+const fieldErrorsProps = (fieldName, errorField) => {
+  // console.log(fieldName, errorField)
+  if (!errorField) {
+    return {};
+  }
+  if (errorField === fieldName) {
+    return {
+      autoFocus: true,
+      style: { border: "2px solid red" },
+    };
+  } else {
+    return {};
+  }
+};
 export default withRouter(function Login(
-  routeProps: RouteComponentProps<{}, {}, { error?: string; returnTo?: string }>
+  routeProps: RouteComponentProps<
+    {},
+    {},
+    { error?: string; errorField?: string; returnTo?: string }
+  >
 ) {
   const { REACT_APP_API_ENDPOINT } = process.env;
 
   const queries = queryString.parse(routeProps.location.search);
 
   if (queries.error || queries.returnTo) {
+    
     const state = {
-      ...(queries.error ? { error: queries.error } : {}),
+      ...(queries.error
+        ? { error: queries.error, errorField: queries.errorField }
+        : {}),
       ...(queries.returnTo ? { returnTo: queries.returnTo } : {}),
     };
+
     return <Redirect to={{ pathname: "/login", state }} />;
   }
 
-  const { returnTo, error } = routeProps.location.state || {};
+  const { returnTo, error, errorField } = routeProps.location.state || {};
 
+ 
   return (
     <section className="section section-white">
       <div className="container">
@@ -38,8 +62,15 @@ export default withRouter(function Login(
           <div className="form__group">
             <label>
               Email
-              <input type="email" name="email" />
+              <input
+                type="email"
+                name="email"
+                {...fieldErrorsProps("email", error)}
+              />
             </label>
+            {error && errorField === "email" && (
+              <div className={styles["form-error-message"]}>{error}</div>
+            )}
           </div>
 
           <div className="form__group">
@@ -47,11 +78,14 @@ export default withRouter(function Login(
               Mot de passe
               <input type="password" name="password" />
             </label>
+            {error && errorField === "password" && (
+              <div className={styles["form-error-message"]}>{error}</div>
+            )}
           </div>
-
           {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-
-          {error && <div className={styles["form-error-message"]}>{error}</div>}
+          {error && !errorField && (
+            <div className={styles["form-error-message"]}>{error}</div>
+          )}
 
           <button
             className="button"

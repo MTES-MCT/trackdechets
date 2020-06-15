@@ -61,7 +61,12 @@ describe("POST /login", () => {
     expect(login.status).toBe(302);
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
-    expect(redirect).toContain(queryString.escape(loginError.UNKNOWN_USER));
+    expect(redirect).toContain(
+      queryString.escape(loginError.UNKNOWN_USER.message)
+    );
+    expect(redirect).toContain(
+      queryString.escape(loginError.UNKNOWN_USER.errorField)
+    );
   });
 
   it("should not authenticate a user whose email has not been validated", async () => {
@@ -79,7 +84,9 @@ describe("POST /login", () => {
     expect(login.status).toBe(302);
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
-    expect(redirect).toContain(queryString.escape(loginError.NOT_ACTIVATED));
+    expect(redirect).toContain(
+      queryString.escape(loginError.NOT_ACTIVATED.message)
+    );
   });
 
   it("should not authenticate a user if password is invalid", async () => {
@@ -97,7 +104,12 @@ describe("POST /login", () => {
     expect(login.status).toBe(302);
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
-    expect(redirect).toContain(queryString.escape(loginError.INVALID_PASSWORD));
+    expect(redirect).toContain(
+      queryString.escape(loginError.INVALID_PASSWORD.message)
+    );
+    expect(redirect).toContain(
+      queryString.escape(loginError.INVALID_PASSWORD.errorField)
+    );
   });
 
   it(`should not take into account a session cookie
