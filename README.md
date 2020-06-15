@@ -14,7 +14,7 @@ Ce `README` s'adresse aux intervenant·es  techniques sur le projet. Pour plus d
 * [Site web](https://trackdechets.beta.gouv.fr)
 * [FAQ](https://faq.trackdechets.fr/)
 * [Documentation technique de l'API](https://developers.trackdechets.beta.gouv.fr)
-* [Forum technique](forum.trackdechets.beta.gouv.fr)
+* [Forum technique](https://forum.trackdechets.beta.gouv.fr)
 
 ## Architecture logicielle
 
@@ -232,6 +232,5 @@ La liste des contributeurs au projet est disponible sur [AUTHORS.md](./AUTHORS.m
 ## Licence
 
 [GNU Affero General Public License v3.0 ou plus récent](https://spdx.org/licenses/AGPL-3.0-or-later.html)
-
 
 
