@@ -118,6 +118,7 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 ### Configurer les variables d'environnements
 
 * Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
+* Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
 
 ### Démarrer les containers
 
