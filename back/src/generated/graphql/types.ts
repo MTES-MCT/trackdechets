@@ -736,7 +736,60 @@ export type Mutation = {
   markAsResealed?: Maybe<Form>;
   /** Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement */
   markAsResent?: Maybe<Form>;
-  /** Scelle un BSD */
+  /**
+   * Scelle un BSD
+   * Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+   * doivent avoir été renseignés grâce à la mutation `saveForm`
+   * 
+   * ```
+   * emitter: {
+   *   type
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * recipient: {
+   *   processingOperation
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * transporter: {
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     mail
+   *     phone
+   *   }
+   *   receipt
+   *   department
+   *   validityLimit
+   *   numberPlate
+   * }
+   * wasteDetails: {
+   *   code
+   *   onuCode
+   *   name
+   *   packagings
+   *   numberOfPackages
+   *   quantity
+   *   quantityType
+   *   consistence
+   * }
+   * ```
+   */
   markAsSealed?: Maybe<Form>;
   /** Valide l'envoi d'un BSD */
   markAsSent?: Maybe<Form>;
