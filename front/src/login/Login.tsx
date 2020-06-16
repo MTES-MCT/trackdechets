@@ -8,10 +8,8 @@ import {
 } from "react-router-dom";
 import styles from "./Login.module.scss";
 import { localAuthService } from "./auth.service";
-import { fireEvent } from "@testing-library/dom";
 
 const fieldErrorsProps = (fieldName, errorField) => {
-  // console.log(fieldName, errorField)
   if (!errorField) {
     return {};
   }
@@ -28,7 +26,12 @@ export default withRouter(function Login(
   routeProps: RouteComponentProps<
     {},
     {},
-    { error?: string; errorField?: string; returnTo?: string }
+    {
+      error?: string;
+      errorField?: string;
+      returnTo?: string;
+      username?: string;
+    }
   >
 ) {
   const { REACT_APP_API_ENDPOINT } = process.env;
@@ -36,20 +39,18 @@ export default withRouter(function Login(
   const queries = queryString.parse(routeProps.location.search);
 
   if (queries.error || queries.returnTo) {
-    
+    const { error, errorField, returnTo, username } = queries;
     const state = {
-      ...(queries.error
-        ? { error: queries.error, errorField: queries.errorField }
-        : {}),
-      ...(queries.returnTo ? { returnTo: queries.returnTo } : {}),
+      ...(queries.error ? { error, errorField, username } : {}),
+      ...(!!returnTo ? { returnTo } : {}),
     };
 
     return <Redirect to={{ pathname: "/login", state }} />;
   }
 
-  const { returnTo, error, errorField } = routeProps.location.state || {};
+  const { returnTo, error, errorField, username } =
+    routeProps.location.state || {};
 
- 
   return (
     <section className="section section-white">
       <div className="container">
@@ -65,6 +66,7 @@ export default withRouter(function Login(
               <input
                 type="email"
                 name="email"
+                defaultValue={username}
                 {...fieldErrorsProps("email", error)}
               />
             </label>

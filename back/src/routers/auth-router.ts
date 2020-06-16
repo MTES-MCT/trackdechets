@@ -15,7 +15,7 @@ authRouter.post("/login", (req, res, next) => {
     }
     if (!user) {
       const queries = {
-        ...{ error: info.message , errorField: info.errorField},
+        ...{ error: info.message , errorField: info.errorField, username:info.username},
         ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})
       };
  
