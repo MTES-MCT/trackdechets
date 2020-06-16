@@ -142,7 +142,7 @@ const companySearchResultResolvers: CompanySearchResultResolvers = {
 };
 
 const companyMemberResolvers: CompanyMemberResolvers = {
-  role: (parent, _, context, info) => {
+  role: (parent, _, context) => {
     const siret = context.company?.siret;
     return siret ? getUserRole(parent.id, siret) : null;
   },
