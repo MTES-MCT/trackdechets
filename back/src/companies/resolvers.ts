@@ -118,7 +118,7 @@ const mutationResolvers: MutationResolvers = {
 };
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
-  users: async (parent, _, context) => {
+  users: (parent, _, context) => {
     context.company = parent;
     return getCompanyUsers(parent.siret);
   },
