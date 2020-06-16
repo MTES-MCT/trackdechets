@@ -44,7 +44,7 @@ export default function Processed(props: SlipActionProps) {
             </div>
             <div className="form__group">
               <label>
-                Date de réception
+                Date de traitement
                 <Field component={DateInput} name="processedAt" />
               </label>
             </div>
@@ -89,7 +89,9 @@ export default function Processed(props: SlipActionProps) {
                 <CompanySelector name="nextDestination.company" />
 
                 <div className="form__group">
-                  <label>Opération d’élimination / valorisation (code D/R)</label>
+                  <label>
+                    Opération d’élimination / valorisation (code D/R)
+                  </label>
                   <Field
                     component="select"
                     name="nextDestination.processingOperation"
