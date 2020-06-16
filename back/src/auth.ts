@@ -56,11 +56,31 @@ export const getLoginError = (username: string) => ({
   }
 });
 
+function legacySanitizeEmail(email: string): string {
+  return email.trim();
+}
+
+function isLegacyEmail(email: string): boolean {
+  return sanitizeEmail(email) !== legacySanitizeEmail(email);
+}
+
 passport.use(
   new LocalStrategy(
     { usernameField: "email" },
     async (username, password, done) => {
-      const user = await prisma.user({ email: sanitizeEmail(username) });
+      let user = null;
+
+      if (isLegacyEmail(username)) {
+        // Some users were created before email sanitization was introduced
+        // so we need to look up a potential legacy account before resotring to the new sanitization
+        // We'll be able to get rid of this code once legacy emails have been sanitized
+        user = await prisma.user({ email: legacySanitizeEmail(username) });
+      }
+
+      if (!user) {
+        user = await prisma.user({ email: sanitizeEmail(username) });
+      }
+
       if (!user) {
         return done(null, false, {
           ...getLoginError(username).UNKNOWN_USER
