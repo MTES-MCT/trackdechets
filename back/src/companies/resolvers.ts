@@ -118,8 +118,7 @@ const mutationResolvers: MutationResolvers = {
 };
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
-  users: (parent, _, context) => {
-    context.company = parent;
+  users: parent => {
     return getCompanyUsers(parent.siret);
   },
   userRole: (parent, _, context) => {
@@ -142,10 +141,6 @@ const companySearchResultResolvers: CompanySearchResultResolvers = {
 };
 
 const companyMemberResolvers: CompanyMemberResolvers = {
-  role: (parent, _, context) => {
-    const siret = context.company?.siret;
-    return siret ? getUserRole(parent.id, siret) : null;
-  },
   isMe: (parent, _, context) => {
     return parent.id === context.user.id;
   }
