@@ -172,19 +172,6 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       <label>
                         <Field
                           type="checkbox"
-                          name="signedByProducer"
-                          required
-                        />
-                        En tant que producteur du déchet, j'ai vérifié que les
-                        déchets confiés au transporteur correspondent aux
-                        informations vues ci-avant et je valide l'enlèvement.
-                      </label>
-                    </p>
-
-                    <p>
-                      <label>
-                        <Field
-                          type="checkbox"
                           name="signedByTransporter"
                           required
                         />

@@ -144,7 +144,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
                 });
               }}
             >
-              {({ values }) => (
+              {({ values, setFieldValue }) => (
                 <FormikForm>
                   <h2>Préparer un transfert multimodal</h2>
                   <h4>Transporteur</h4>
@@ -157,7 +157,29 @@ export default function PrepareSegment({ form, userSiret }: Props) {
                     ))}
                   </Field>
                   <label>Siret</label>
-                  <CompanySelector name="transporter.company" />
+                  <CompanySelector
+                    name="transporter.company"
+                    onCompanySelected={(transporter) => {
+                      if (transporter.transporterReceipt) {
+                        setFieldValue(
+                          "transporter.receipt",
+                          transporter.transporterReceipt.receiptNumber
+                        );
+                        setFieldValue(
+                          "transporter.validityLimit",
+                          transporter.transporterReceipt.validityLimit
+                        );
+                        setFieldValue(
+                          "transporter.department",
+                          transporter.transporterReceipt.department
+                        );
+                      } else {
+                        setFieldValue("transporter.receipt", "");
+                        setFieldValue("transporter.validityLimit", null);
+                        setFieldValue("transporter.department", "");
+                      }
+                    }}
+                  />
                   <h4>Autorisations</h4>
                   <label htmlFor="isExemptedOfReceipt">
                     Le transporteur déclare être exempté de récépissé
@@ -166,7 +188,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
                   </label>
                   <Field
                     type="checkbox"
-                    name="nextSegmentInfo.transporter.isExemptedOfReceipt"
+                    name="transporter.isExemptedOfReceipt"
                     id="isExemptedOfReceipt"
                     checked={values.transporter.isExemptedOfReceipt}
                   />
