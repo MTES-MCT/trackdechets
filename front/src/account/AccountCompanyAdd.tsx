@@ -483,9 +483,7 @@ export default function AccountCompanyAdd() {
                 </div>
 
                 <div className={styles.field}>
-                  <label className={`text-right ${styles.bold}`}>
-                    Validation
-                  </label>
+                  <label></label>
                   <div className={styles.field__value}>
                     <label>
                       <Field type="checkbox" name="isAllowed" />
