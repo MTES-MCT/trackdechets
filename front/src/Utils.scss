@@ -20,6 +20,11 @@ $sides: (top, bottom, left, right);
     }
   }
 }
+// forms
+button.no-margin,
+button.no-margin:active {
+  margin: 0;
+}
 
 $breakpoint-mobile: 480px;
 $breakpoint-tablet: 769px;
@@ -27,4 +32,13 @@ $breakpoint-tablet: 769px;
 .button.button--disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+.form__actions {
+  margin-top: 1em;
+  display: flex;
+  justify-content: flex-end;
+  button,
+  button:active {
+    margin-left: 1em;
+  }
 }

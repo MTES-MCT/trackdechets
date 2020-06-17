@@ -111,14 +111,14 @@ export class Wizard extends React.Component<Props, State> {
                   )}
 
                   {!isLastPage && (
-                    <button className="button" type="submit">
+                    <button className="button no-margin" type="submit">
                       Suivant
                     </button>
                   )}
                   {isLastPage && (
                     <button
                       type="submit"
-                      className="button"
+                      className="button o-margin"
                       disabled={isSubmitting}
                     >
                       Valider

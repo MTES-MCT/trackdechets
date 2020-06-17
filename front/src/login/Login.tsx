@@ -88,17 +88,18 @@ export default withRouter(function Login(
           {error && !errorField && (
             <div className={styles["form-error-message"]}>{error}</div>
           )}
-
-          <button
-            className="button"
-            type="submit"
-            onClick={() => {
-              localAuthService.locallySignOut();
-              document.forms["login"].submit();
-            }}
-          >
-            Se connecter
-          </button>
+          <div className="form__actions">
+            <button
+              className="button"
+              type="submit"
+              onClick={() => {
+                localAuthService.locallySignOut();
+                document.forms["login"].submit();
+              }}
+            >
+              Se connecter
+            </button>
+          </div>
           <p>
             Vous n'avez pas encore de compte ?{" "}
             <Link to="/signup">Inscrivez vous maintenant</Link>

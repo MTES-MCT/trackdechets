@@ -54,7 +54,7 @@ export default function Slider({ children, onClose }: any) {
         )}
         {page < numberOfPages && (
           <button
-            className="button-outline secondary"
+            className="button"
             onClick={() => setPage(Math.min(page + 1, numberOfPages))}
           >
             Suivant <FaAngleRight />

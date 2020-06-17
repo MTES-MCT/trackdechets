@@ -18,15 +18,15 @@ export default function Sealed(props: SlipActionProps) {
         bordereau PDF et permet au bordereau d'entrer dans le circuit de
         validation.
       </p>
-      <div className="form__group button__group">
+      <div className="form__actions">
         <button
           type="button"
-          className="button secondary"
+          className="button-outline primary"
           onClick={props.onCancel}
         >
           Annuler
         </button>
-        <button type="submit" className="button" onClick={onSubmit}>
+        <button type="submit" className="button no-margin" onClick={onSubmit}>
           Je valide
         </button>
       </div>

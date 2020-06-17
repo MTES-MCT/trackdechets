@@ -54,12 +54,14 @@ export default function Delete({ formId }: Props) {
         <div className="modal">
           <h3>Confirmer la suppression ?</h3>
           <p>Cette action est irréversible.</p>
-          <button className="button warning" onClick={() => setIsOpen(false)}>
-            Annuler
-          </button>
-          <button className="button" onClick={() => deleteForm()}>
-            Supprimer
-          </button>
+          <div className="form__actions">
+            <button className="button-outline primary" onClick={() => setIsOpen(false)}>
+              Annuler
+            </button>
+            <button className="button no-margin" onClick={() => deleteForm()}>
+              Supprimer
+            </button>
+          </div>
         </div>
       </div>
     </>
