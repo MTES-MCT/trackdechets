@@ -61,8 +61,8 @@ export default withRouter(function StepList(
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret: currentSiretService.getSiret(), status: ["DRAFT"] },
-        getNewData: (data) => ({
-          forms: [...data.forms.filter((f) => f.id !== saveForm.id), saveForm],
+        getNewData: data => ({
+          forms: [...data.forms.filter(f => f.id !== saveForm.id), saveForm],
         }),
       });
     },
@@ -133,16 +133,16 @@ export default withRouter(function StepList(
           {({ values }) => {
             return (
               <form
-                onSubmit={(e) => {
+                onSubmit={e => {
                   e.preventDefault();
                   // As we want to be able to save draft, we skip validation on submit
                   // and don't use the classic Formik mechanism
                   saveForm({
                     variables: { formInput: values },
                   })
-                    .then((_) => props.history.push("/dashboard/"))
-                    .catch((err) => {
-                      err.graphQLErrors.map((err) =>
+                    .then(_ => props.history.push("/dashboard/"))
+                    .catch(err => {
+                      err.graphQLErrors.map(err =>
                         cogoToast.error(err.message, { hideAfter: 7 })
                       );
                     });
@@ -150,7 +150,7 @@ export default withRouter(function StepList(
                 }}
               >
                 <div
-                  onKeyPress={(e) => {
+                  onKeyPress={e => {
                     // Disable submit on Enter key press
                     // We prevent it from bubbling further
                     if (e.key === "Enter") {

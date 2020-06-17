@@ -154,8 +154,8 @@ export default function AccountCompanyAdd() {
     // auto-complete companyTypes
     if (companyInfos && companyInfos.installation) {
       let categories = companyInfos.installation.rubriques
-        .filter((r) => !!r.category) // null blocks form submitting
-        .map((r) => r.category);
+        .filter(r => !!r.category) // null blocks form submitting
+        .map(r => r.category);
       const companyTypes = categories.filter((value, index, self) => {
         return self.indexOf(value) === index;
       });
@@ -303,7 +303,7 @@ export default function AccountCompanyAdd() {
           traderReceiptValidity: "",
           traderReceiptDepartment: "",
         }}
-        validate={(values) => {
+        validate={values => {
           // whether or not one of the transporter receipt field is set
           const anyTransporterReceipField =
             !!values.transporterReceiptNumber ||
@@ -371,7 +371,7 @@ export default function AccountCompanyAdd() {
             <AccountCompanyAddSiret
               {...{
                 values,
-                onCompanyInfos: (companyInfo) =>
+                onCompanyInfos: companyInfo =>
                   onCompanyInfos(companyInfo, { values, setFieldValue }),
               }}
             />
@@ -412,7 +412,7 @@ export default function AccountCompanyAdd() {
                       type="file"
                       className="button"
                       accept="image/png, image/jpeg, image/gif, application/pdf "
-                      onChange={async (event) => {
+                      onChange={async event => {
                         const file = event.currentTarget.files?.item(0);
                         if (!!file) {
                           setFieldValue("document", file);

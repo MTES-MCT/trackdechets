@@ -50,7 +50,7 @@ export default function AccountFielCompanyContactEmail({ company }: Props) {
           name={fieldName}
           label={fieldLabel}
           value={company.contactEmail}
-          renderForm={(toggleEdition) => (
+          renderForm={toggleEdition => (
             <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
               name="contactEmail"
               type="email"

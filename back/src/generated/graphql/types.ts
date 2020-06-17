@@ -463,7 +463,7 @@ export type Form = {
   actualQuantity?: Maybe<Scalars['Float']>;
   /** Traitement réalisé (code D/R) */
   processingOperationDone?: Maybe<Scalars['String']>;
-  /** Description de l'opération de traitement (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription?: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy?: Maybe<Scalars['String']>;
@@ -736,7 +736,60 @@ export type Mutation = {
   markAsResealed?: Maybe<Form>;
   /** Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement */
   markAsResent?: Maybe<Form>;
-  /** Scelle un BSD */
+  /**
+   * Scelle un BSD
+   * Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+   * doivent avoir été renseignés grâce à la mutation `saveForm`
+   * 
+   * ```
+   * emitter: {
+   *   type
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * recipient: {
+   *   processingOperation
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * transporter: {
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     mail
+   *     phone
+   *   }
+   *   receipt
+   *   department
+   *   validityLimit
+   *   numberPlate
+   * }
+   * wasteDetails: {
+   *   code
+   *   onuCode
+   *   name
+   *   packagings
+   *   numberOfPackages
+   *   quantity
+   *   quantityType
+   *   consistence
+   * }
+   * ```
+   */
   markAsSealed?: Maybe<Form>;
   /** Valide l'envoi d'un BSD */
   markAsSent?: Maybe<Form>;
@@ -1103,7 +1156,7 @@ export type PrivateCompanyInput = {
 export type ProcessedFormInput = {
   /** Traitement réalisé (code D/R) */
   processingOperationDone: Scalars['String'];
-  /** Description de l'opération de traitement (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription?: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy: Scalars['String'];

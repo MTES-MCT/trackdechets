@@ -53,10 +53,7 @@ export const createUploadLinkSchema = inputRule()(
 export const createTransporterReceiptSchema = inputRule()(yup =>
   yup.object({
     input: yup.object({
-      receiptNumber: yup
-        .string()
-        .required()
-        .nullable(false),
+      receiptNumber: yup.string().required().nullable(false),
       validityLimit: validDatetime(
         {
           verboseFieldName: "Limite de validité",
@@ -64,10 +61,7 @@ export const createTransporterReceiptSchema = inputRule()(yup =>
         },
         yup
       ),
-      department: yup
-        .string()
-        .required()
-        .nullable(false)
+      department: yup.string().required().nullable(false)
     })
   })
 );
@@ -75,14 +69,8 @@ export const createTransporterReceiptSchema = inputRule()(yup =>
 export const updateTransporterReceiptSchema = inputRule()(yup =>
   yup.object({
     input: yup.object({
-      id: yup
-        .string()
-        .required()
-        .nullable(false),
-      receiptNumber: yup
-        .string()
-        .notRequired()
-        .nullable(),
+      id: yup.string().required().nullable(false),
+      receiptNumber: yup.string().notRequired().nullable(),
       validityLimit: validDatetime(
         {
           verboseFieldName: "Limite de validité",
@@ -90,10 +78,7 @@ export const updateTransporterReceiptSchema = inputRule()(yup =>
         },
         yup
       ),
-      department: yup
-        .string()
-        .notRequired()
-        .nullable()
+      department: yup.string().notRequired().nullable()
     })
   })
 );
@@ -101,10 +86,7 @@ export const updateTransporterReceiptSchema = inputRule()(yup =>
 export const deleteTransporterReceiptSchema = inputRule()(yup =>
   yup.object({
     input: yup.object({
-      id: yup
-        .string()
-        .required()
-        .nullable(false)
+      id: yup.string().required().nullable(false)
     })
   })
 );
@@ -112,10 +94,7 @@ export const deleteTransporterReceiptSchema = inputRule()(yup =>
 export const createTraderReceiptSchema = inputRule()(yup =>
   yup.object({
     input: yup.object({
-      receiptNumber: yup
-        .string()
-        .required()
-        .nullable(false),
+      receiptNumber: yup.string().required().nullable(false),
       validityLimit: validDatetime(
         {
           verboseFieldName: "Limite de validité",
@@ -123,10 +102,7 @@ export const createTraderReceiptSchema = inputRule()(yup =>
         },
         yup
       ),
-      department: yup
-        .string()
-        .required()
-        .nullable(false)
+      department: yup.string().required().nullable(false)
     })
   })
 );
@@ -134,14 +110,8 @@ export const createTraderReceiptSchema = inputRule()(yup =>
 export const updateTraderReceiptSchema = inputRule()(yup =>
   yup.object({
     input: yup.object({
-      id: yup
-        .string()
-        .required()
-        .nullable(false),
-      receiptNumber: yup
-        .string()
-        .notRequired()
-        .nullable(),
+      id: yup.string().required().nullable(false),
+      receiptNumber: yup.string().notRequired().nullable(),
       validityLimit: validDatetime(
         {
           verboseFieldName: "Limite de validité",
@@ -149,10 +119,7 @@ export const updateTraderReceiptSchema = inputRule()(yup =>
         },
         yup
       ),
-      department: yup
-        .string()
-        .notRequired()
-        .nullable()
+      department: yup.string().notRequired().nullable()
     })
   })
 );
@@ -160,10 +127,7 @@ export const updateTraderReceiptSchema = inputRule()(yup =>
 export const deleteTraderReceiptSchema = inputRule()(yup =>
   yup.object({
     input: yup.object({
-      id: yup
-        .string()
-        .required()
-        .nullable(false)
+      id: yup.string().required().nullable(false)
     })
   })
 );

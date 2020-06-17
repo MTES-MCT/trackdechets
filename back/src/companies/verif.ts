@@ -1,7 +1,6 @@
 import axios from "axios";
-import { getInstallation, getRubriques, getDeclarations } from "./queries";
+import { getInstallation, getRubriques } from "./queries";
 import { searchCompany } from "./sirene";
-import { UserInputError } from "apollo-server-express";
 
 export const anomalies = {
   NO_ANOMALY: "no_anomaly",

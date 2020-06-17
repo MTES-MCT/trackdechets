@@ -786,6 +786,57 @@ Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
 <td>
 
 Scelle un BSD
+Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+doivent avoir été renseignés grâce à la mutation `saveForm`
+
+```
+emitter: {
+  type
+  company: {
+    siret
+    name
+    address
+    contact
+    phone
+    mail
+  }
+}
+recipient: {
+  processingOperation
+  company: {
+    siret
+    name
+    address
+    contact
+    phone
+    mail
+  }
+}
+transporter: {
+  company: {
+    siret
+    name
+    address
+    contact
+    mail
+    phone
+  }
+  receipt
+  department
+  validityLimit
+  numberPlate
+}
+wasteDetails: {
+  code
+  onuCode
+  name
+  packagings
+  numberOfPackages
+  quantity
+  quantityType
+  consistence
+}
+```
 
 </td>
 </tr>
@@ -2378,7 +2429,7 @@ Traitement réalisé (code D/R)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Description de l'opération de traitement (case 11)
+Description de l'opération d’élimination / valorisation (case 11)
 
 </td>
 </tr>
@@ -4729,7 +4780,7 @@ Traitement réalisé (code D/R)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Description de l'opération de traitement (case 11)
+Description de l'opération d’élimination / valorisation (case 11)
 
 </td>
 </tr>

@@ -9,14 +9,14 @@ const redisCache = {
   "foo:2000": JSON.stringify({ name: "foo" })
 };
 
-const mockRedisSet = jest.fn((...args) => {
+const mockRedisSet = jest.fn((..._args) => {
   return Promise.resolve("OK");
 });
 
 jest.mock("ioredis", () =>
   jest.fn(() => ({
     get: (key: string) => {
-      return Promise.resolve(redisCache[key]).catch(_ => null);
+      return Promise.resolve(redisCache[key]).catch(() => null);
     },
     set: (...args) => mockRedisSet(...args)
   }))

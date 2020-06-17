@@ -65,7 +65,7 @@ export default function Dashboard() {
           <DashboardMenu
             me={data.me}
             match={match}
-            handleCompanyChange={(siret) => history.push(`/dashboard/${siret}`)}
+            handleCompanyChange={siret => history.push(`/dashboard/${siret}`)}
           />
 
           <div className="dashboard-content">

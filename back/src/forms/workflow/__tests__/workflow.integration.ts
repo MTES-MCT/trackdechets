@@ -7,7 +7,6 @@ import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { associateUserToCompany } from "../../../users/mutations/associateUserToCompany";
 import { apiKey } from "../../../users/queries";
-import { prisma } from "../../../generated/prisma-client";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative
@@ -1193,9 +1192,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       mutation {
         markSegmentAsReadyToTakeOver(
           id: "${transportSegment1Id}"
-        ){  
+        ){
             id
-            readyToTakeOver     
+            readyToTakeOver
         }
       }
     `;
@@ -1264,7 +1263,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             }
             mode: RIVER
           }
-        ){         
+        ){
           id,
           previousTransporterCompanySiret
           transporter {
@@ -1283,7 +1282,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           takenOverBy
           readyToTakeOver
           segmentNumber
-      
+
         }
       }
     `;

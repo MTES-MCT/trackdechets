@@ -4,7 +4,7 @@ export enum SlipTabs {
   DRAFTS,
   TO_SIGN,
   STATUS,
-  HISTORY,
+  HISTORY
 }
 
 export function getTabForms(
@@ -103,6 +103,6 @@ function isHistoryStatus(status: string) {
   return [
     FormStatus.Processed,
     FormStatus.NoTraceability,
-    FormStatus.Refused,
+    FormStatus.Refused
   ].includes(status as FormStatus);
 }

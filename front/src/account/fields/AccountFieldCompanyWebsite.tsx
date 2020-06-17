@@ -50,7 +50,7 @@ export default function AccountFielCompanyContactWebsite({ company }: Props) {
           name={fieldName}
           label={fieldLabel}
           value={company.website}
-          renderForm={(toggleEdition) => (
+          renderForm={toggleEdition => (
             <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
               name="website"
               type="url"

@@ -34,7 +34,7 @@ export default function AccountCompanyMemberList({ company }: Props) {
       {company && company.users && company.users.length > 0 && (
         <table className="table">
           <tbody>
-            {company.users.map((user) => (
+            {company.users.map(user => (
               <AccountCompanyMember
                 key={user.id}
                 company={filter(

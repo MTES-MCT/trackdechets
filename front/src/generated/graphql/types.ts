@@ -464,7 +464,7 @@ export type Form = {
   actualQuantity: Maybe<Scalars['Float']>;
   /** Traitement réalisé (code D/R) */
   processingOperationDone: Maybe<Scalars['String']>;
-  /** Description de l'Opération d’élimination / valorisation prévue (code D/R) (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy: Maybe<Scalars['String']>;
@@ -602,7 +602,7 @@ export enum FormStatus {
 
 /**
  * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
- *
+ * 
  * Mise à jour d'un BSD
  */
 export type FormSubscription = {
@@ -729,7 +729,7 @@ export type Mutation = {
   /**
    * DEPRECATED - La récupération de token pour le compte de tiers
    * doit s'effectuer avec le protocole OAuth2
-   *
+   * 
    * Récupére un token à partir de l'email et du mot de passe
    * d'un utilisateur.
    */
@@ -742,7 +742,60 @@ export type Mutation = {
   markAsResealed: Maybe<Form>;
   /** Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement */
   markAsResent: Maybe<Form>;
-  /** Scelle un BSD */
+  /**
+   * Scelle un BSD
+   * Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+   * doivent avoir été renseignés grâce à la mutation `saveForm`
+   * 
+   * ```
+   * emitter: {
+   *   type
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * recipient: {
+   *   processingOperation
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * transporter: {
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     mail
+   *     phone
+   *   }
+   *   receipt
+   *   department
+   *   validityLimit
+   *   numberPlate
+   * }
+   * wasteDetails: {
+   *   code
+   *   onuCode
+   *   name
+   *   packagings
+   *   numberOfPackages
+   *   quantity
+   *   quantityType
+   *   consistence
+   * }
+   * ```
+   */
   markAsSealed: Maybe<Form>;
   /** Valide l'envoi d'un BSD */
   markAsSent: Maybe<Form>;
@@ -1110,7 +1163,7 @@ export type PrivateCompanyInput = {
 export type ProcessedFormInput = {
   /** Traitement réalisé (code D/R) */
   processingOperationDone: Scalars['String'];
-  /** Description de l'opération de traitement (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy: Scalars['String'];
@@ -1391,7 +1444,7 @@ export type Stat = {
  * - le bordereau peut naviguer entre plusieurs entreprises.
  * - quand le bordereau a-t-il été modifié pour la dernière fois ? (création, signature, traitement... ?)
  * - si c'est un bordereau avec conditionnement et qu'on attend un transporteur, quel est-il ?
- *
+ * 
  * Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
  */
 export type StateSummary = {
@@ -1453,7 +1506,7 @@ export type Subscription = {
    __typename?: 'Subscription';
   /**
    * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
-   *
+   * 
    * Permet de s'abonner aux changements de statuts d'un BSD
    */
   forms: Maybe<FormSubscription>;
@@ -1703,14 +1756,14 @@ export type User = {
 /**
  * Liste les différents rôles d'un utilisateur au sein
  * d'un établissement.
- *
+ * 
  * Les admins peuvent:
  * * consulter/éditer les bordereaux
  * * gérer les utilisateurs de l'établissement
  * * éditer les informations de la fiche entreprise
  * * demander le renouvellement du code de sécurité
  * * Éditer les informations de la fiche entreprise
- *
+ * 
  * Les membres peuvent:
  * * consulter/éditer les bordereaux
  * * consulter le reste des informations

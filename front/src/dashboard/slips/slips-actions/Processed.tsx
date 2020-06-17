@@ -28,7 +28,7 @@ export default function Processed(props: SlipActionProps) {
           },
           noTraceability: false,
         }}
-        onSubmit={(values) => props.onSubmit({ info: values })}
+        onSubmit={values => props.onSubmit({ info: values })}
       >
         {({ values }) => (
           <Form>
@@ -44,7 +44,7 @@ export default function Processed(props: SlipActionProps) {
             </div>
             <div className="form__group">
               <label>
-                Date de réception
+                Date de traitement
                 <Field component={DateInput} name="processedAt" />
               </label>
             </div>
@@ -52,7 +52,7 @@ export default function Processed(props: SlipActionProps) {
               <label>Opération d’élimination / valorisation effectuée</label>
               <Field component="select" name="processingOperationDone">
                 <option value="">Choisissez...</option>
-                {Operations.map((o) => (
+                {Operations.map(o => (
                   <option key={o.code} value={o.code}>
                     {o.code} - {o.description.substr(0, 50)}
                     {o.description.length > 50 ? "..." : ""}
@@ -89,13 +89,15 @@ export default function Processed(props: SlipActionProps) {
                 <CompanySelector name="nextDestination.company" />
 
                 <div className="form__group">
-                  <label>Opération d’élimination / valorisation (code D/R)</label>
+                  <label>
+                    Opération d’élimination / valorisation (code D/R)
+                  </label>
                   <Field
                     component="select"
                     name="nextDestination.processingOperation"
                   >
                     <option value="">Choisissez...</option>
-                    {Operations.map((o) => (
+                    {Operations.map(o => (
                       <option key={o.code} value={o.code}>
                         {o.code} - {o.description.substr(0, 50)}
                         {o.description.length > 50 ? "..." : ""}

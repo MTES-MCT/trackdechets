@@ -77,7 +77,6 @@ describe("Test Form reception", () => {
 
   it("should not accept negative values", async () => {
     const {
-      emitter,
       emitterCompany,
       recipient,
       recipientCompany,
@@ -117,7 +116,6 @@ describe("Test Form reception", () => {
 
   it("should not accept 0 value when form is accepted", async () => {
     const {
-      emitter,
       emitterCompany,
       recipient,
       recipientCompany,

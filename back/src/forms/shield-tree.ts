@@ -3,7 +3,7 @@ import {
   isAuthenticated,
   isCompaniesUser,
   isCompanyAdmin,
-  isCompanyMember,
+  isCompanyMember
 } from "../common/rules";
 import {
   canAccessForm,
@@ -39,7 +39,7 @@ export default {
     ),
     stats: isAuthenticated,
     formsLifeCycle: isAuthenticated,
-    appendixForms: or(isCompanyMember, isCompanyAdmin),
+    appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
     saveForm: isAuthenticated,
@@ -71,6 +71,6 @@ export default {
     prepareSegment: isAuthenticated,
     markSegmentAsReadyToTakeOver: isAuthenticated,
     takeOverSegment: isAuthenticated,
-    editSegment: isAuthenticated,
-  },
+    editSegment: isAuthenticated
+  }
 };

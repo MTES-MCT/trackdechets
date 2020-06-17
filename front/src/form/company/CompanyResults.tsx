@@ -5,7 +5,7 @@ import styles from "./CompanyResult.module.scss";
 export default function CompanyResults({ results, onSelect, selectedItem }) {
   return (
     <ul className={styles.results}>
-      {results.map((item) => (
+      {results.map(item => (
         <li
           className={`${styles.resultsItem}  ${
             selectedItem?.siret === item.siret ? styles.isSelected : ""

@@ -22,7 +22,7 @@ export default function ({
     >
       <div className="modal modal-large">
         <div className="tree">
-          <WasteTree onSelect={(keys) => setSelectedKeys(keys)} />
+          <WasteTree onSelect={keys => setSelectedKeys(keys)} />
         </div>
         <div>
           <p>

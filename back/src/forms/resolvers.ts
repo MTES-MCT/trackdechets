@@ -154,8 +154,7 @@ const formResolvers: FormResolvers = {
   // Somme contextual values, depending on the form status / type, mostly to ease the display
   stateSummary: parent => stateSummary(parent),
 
-  transportSegments: (parent, args, context) =>
-    transportSegments(parent, args, context)
+  transportSegments: parent => transportSegments(parent)
 };
 
 const wasteDetailsResolvers: WasteDetailsResolvers = {

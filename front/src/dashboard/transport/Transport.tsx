@@ -7,7 +7,7 @@ import {
   FormRole,
   FormStatus,
   Query,
-  QueryFormsArgs
+  QueryFormsArgs,
 } from "../../generated/graphql/types";
 import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
 import PrepareSegment from "./PrepareSegment";
@@ -48,8 +48,8 @@ const Table = ({ forms, userSiret }) => {
     variables: {
       siret: userSiret,
       roles: ["TRANSPORTER"],
-      status: ["SEALED", "SENT", "RESEALED", "RESENT"]
-    }
+      status: ["SEALED", "SENT", "RESEALED", "RESENT"],
+    },
   };
 
   return (
@@ -197,7 +197,7 @@ export default function Transport() {
   const { siret } = useContext(SiretContext);
   // const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
   const [filterFormType, setFilterFormType] = useState({
-    formType: "TO_TAKE_OVER"
+    formType: "TO_TAKE_OVER",
   });
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
@@ -212,10 +212,10 @@ export default function Transport() {
         FormStatus.Sealed,
         FormStatus.Sent,
         FormStatus.Resealed,
-        FormStatus.Resent
+        FormStatus.Resent,
       ],
-      roles: [FormRole.Transporter]
-    }
+      roles: [FormRole.Transporter],
+    },
   });
 
   if (loading) return <div>loading</div>;
@@ -229,7 +229,7 @@ export default function Transport() {
   const filtering = (form, formType, userSiret) => {
     const statuses = {
       TO_TAKE_OVER: ["SEALED", "RESEALED"],
-      TAKEN_OVER: ["SENT", "RESENT"]
+      TAKEN_OVER: ["SENT", "RESENT"],
     }[formType];
 
     const segmentsToTakeOver = form.transportSegments.filter(
@@ -271,8 +271,8 @@ export default function Transport() {
           ...f,
           wasteDetails: {
             ...f.wasteDetails,
-            name: `${f.wasteDetails?.code} ${f.wasteDetails?.name} `
-          }
+            name: `${f.wasteDetails?.code} ${f.wasteDetails?.name} `,
+          },
         }))
     : [];
   return (
@@ -307,9 +307,9 @@ export default function Transport() {
                 FormStatus.Sealed,
                 FormStatus.Sent,
                 FormStatus.Resealed,
-                FormStatus.Resent
+                FormStatus.Resent,
               ],
-              roles: [FormRole.Transporter]
+              roles: [FormRole.Transporter],
             })
           }
         >
@@ -353,16 +353,16 @@ function getTransportInfos(form: Form) {
     ...form,
     emitter: {
       ...form.emitter,
-      ...form.recipient
+      ...form.recipient,
     },
     recipient: {
       ...form.recipient,
-      ...form.temporaryStorageDetail.destination
+      ...form.temporaryStorageDetail.destination,
     },
     wasteDetails: {
       ...form.wasteDetails,
       ...(form.temporaryStorageDetail?.wasteDetails?.quantity &&
-        form.temporaryStorageDetail.wasteDetails)
-    }
+        form.temporaryStorageDetail.wasteDetails),
+    },
   };
 }

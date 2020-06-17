@@ -24,7 +24,7 @@ export default function AccountCompanyList({ companies }: Props) {
   return (
     <>
       {companies && companies.length > 0 ? (
-        companies.map((company) => (
+        companies.map(company => (
           <AccountCompany
             key={company.siret}
             company={filter(AccountCompany.fragments.company, company)}

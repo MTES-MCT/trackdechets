@@ -24,8 +24,8 @@ export default function CompanySelector({
   };
 
   return (
-    <select value={siret} onChange={(e) => handleChange(e.target.value)}>
-      {companies.map((c) => (
+    <select value={siret} onChange={e => handleChange(e.target.value)}>
+      {companies.map(c => (
         <option key={c.siret} value={c.siret}>
           {c.givenName || c.name} ({c.siret})
         </option>

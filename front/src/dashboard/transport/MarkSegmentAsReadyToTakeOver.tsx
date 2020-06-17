@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import React, { useState } from "react";
-import { GET_TRANSPORT_SLIPS ,GET_FORM} from "./Transport";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
 import {
   Form,
   Mutation,
@@ -15,7 +15,7 @@ import "./TransportSignature.scss";
 import { updateApolloCache } from "../../common/helper";
 import cogoToast from "cogo-toast";
 import { NotificationError } from "../../common/Error";
- 
+
 export const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
     markSegmentAsReadyToTakeOver(id: $id) {
@@ -34,7 +34,7 @@ const getSegmentToMarkSegmentAsReadyToTakeOver = ({ form, userSiret }) => {
     return null;
   }
   // get unsealed  segments
-  const sealableSegments = transportSegments.filter((f) => !f.readyToTakeOver);
+  const sealableSegments = transportSegments.filter(f => !f.readyToTakeOver);
   if (!sealableSegments.length) {
     return null;
   }
@@ -47,7 +47,10 @@ const getSegmentToMarkSegmentAsReadyToTakeOver = ({ form, userSiret }) => {
 
 type Props = { form: any; userSiret: string };
 
-export default function MarkSegmentAsReadyToTakeOver({ form, userSiret }: Props) {
+export default function MarkSegmentAsReadyToTakeOver({
+  form,
+  userSiret,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const refetchQuery = {
     query: GET_FORM,
@@ -64,8 +67,8 @@ export default function MarkSegmentAsReadyToTakeOver({ form, userSiret }: Props)
         { hideAfter: 5 }
       );
     },
-    refetchQueries:  [refetchQuery],
-    update: (store) => {
+    refetchQueries: [refetchQuery],
+    update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
@@ -73,7 +76,7 @@ export default function MarkSegmentAsReadyToTakeOver({ form, userSiret }: Props)
           roles: ["TRANSPORTER"],
           status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
-        getNewData: (data) => ({
+        getNewData: data => ({
           forms: data.forms,
         }),
       });

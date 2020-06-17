@@ -39,7 +39,7 @@ export default async function createCompany(
     .company({
       siret: trimedSiret
     })
-    .catch(__ => {
+    .catch(() => {
       throw new Error(
         "Erreur lors de la vérification du SIRET. Merci de réessayer."
       );

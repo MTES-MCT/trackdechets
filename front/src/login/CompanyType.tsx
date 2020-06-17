@@ -53,7 +53,7 @@ export default function CompanyType({
   return (
     <FieldArray
       name={name}
-      render={(arrayHelpers) => (
+      render={arrayHelpers => (
         <fieldset className={name + "-fieldset"}>
           {COMPANY_TYPES.map((p, idx) => (
             <div key={idx}>
@@ -63,7 +63,7 @@ export default function CompanyType({
                   name={name}
                   value={p.value}
                   checked={value.indexOf(p.value) > -1}
-                  onChange={(e) => {
+                  onChange={e => {
                     if (e.target.checked) arrayHelpers.push(p.value);
                     else {
                       const idx = value.indexOf(p.value);

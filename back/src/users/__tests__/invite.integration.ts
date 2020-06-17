@@ -1,8 +1,6 @@
 import { prisma } from "../../generated/prisma-client";
 import { createUserAccountHash } from "../mutations/createUserAccountHash";
 
-import { server } from "../../server";
-import { createTestClient } from "apollo-server-integration-testing";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { escape } from "querystring";
 import axios from "axios";
@@ -63,11 +61,7 @@ describe("Invitation resend", () => {
     // set up an user, a company, its admin and an invitation (UserAccountHash)
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");
     const usrToInvite = await userFactory();
-    const accountHash = await createUserAccountHash(
-      usrToInvite.email,
-      "MEMBER",
-      company.siret
-    );
+    await createUserAccountHash(usrToInvite.email, "MEMBER", company.siret);
 
     const { mutate } = makeClient(admin);
 
@@ -120,7 +114,7 @@ describe("Invitation sending", () => {
         }
       }
     `;
-    const res = await mutate(mutation);
+    await mutate(mutation);
 
     // Check userAccountHash has been successfully created
     const hashes = await prisma.userAccountHashes({

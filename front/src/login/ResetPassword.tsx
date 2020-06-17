@@ -23,9 +23,9 @@ export default function ResetPassword() {
     <section className="section section-white">
       <div className="container">
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault();
-            resetPassword({ variables: { email } }).then((_) =>
+            resetPassword({ variables: { email } }).then(_ =>
               setShowSuccess(true)
             );
             setShowSuccess(false);
@@ -43,7 +43,7 @@ export default function ResetPassword() {
                 type="text"
                 placeholder="Saisissez votre email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
               />
             </label>
           </div>

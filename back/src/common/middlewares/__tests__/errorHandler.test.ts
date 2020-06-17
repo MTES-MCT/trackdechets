@@ -1,6 +1,8 @@
 import express from "express";
 import supertest from "supertest";
 
+global.console = { error: jest.fn() } as any;
+
 describe("errorHandler", () => {
   const OLD_ENV = process.env;
 
@@ -36,7 +38,6 @@ describe("errorHandler", () => {
     const response = await request.get("/hello");
     expect(response.status).toEqual(500);
     expect(response.text).toEqual("Erreur serveur");
-    expect(true).toBe(true);
   });
 
   it("should display error message in development", async () => {
