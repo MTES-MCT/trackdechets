@@ -30,10 +30,7 @@ describe("{ mutation { createTransporterReceipt } }", () => {
     const { data } = await mutate(mutation);
 
     expect(
-      await prisma
-        .transporterReceiptsConnection()
-        .aggregate()
-        .count()
+      await prisma.transporterReceiptsConnection().aggregate().count()
     ).toEqual(1);
 
     expect(data.createTransporterReceipt).toEqual(receipt);

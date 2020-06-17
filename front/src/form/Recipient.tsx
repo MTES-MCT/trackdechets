@@ -86,7 +86,7 @@ export default function Recipient() {
           <h4>Négociant</h4>
           <CompanySelector
             name="trader.company"
-            onCompanySelected={(trader) => {
+            onCompanySelected={trader => {
               if (trader.traderReceipt) {
                 setFieldValue(
                   "trader.receipt",

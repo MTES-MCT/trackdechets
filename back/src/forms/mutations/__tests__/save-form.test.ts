@@ -14,17 +14,17 @@ function mockFormWith(value) {
 
 const prisma = {
   form: formMock,
-  forms: jest.fn((...args) => []),
-  updateForm: jest.fn((...args) => ({})),
-  createForm: jest.fn((...args) => ({}))
+  forms: jest.fn(() => []),
+  updateForm: jest.fn(() => ({})),
+  createForm: jest.fn(() => ({}))
 };
 
 jest.mock("../../../generated/prisma-client", () => ({
   prisma: {
     form: () => prisma.form(),
-    forms: (...args) => prisma.forms(...args),
-    updateForm: (...args) => prisma.updateForm(...args),
-    createForm: (...args) => prisma.createForm(...args)
+    forms: () => prisma.forms(),
+    updateForm: () => prisma.updateForm(),
+    createForm: () => prisma.createForm()
   }
 }));
 

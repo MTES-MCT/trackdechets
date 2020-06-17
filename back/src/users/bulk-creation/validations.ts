@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { CompanyRow, RoleRow } from "./types";
+import { CompanyRow } from "./types";
 import { getCompanyThrottled } from "./sirene";
 import { prisma } from "../../generated/prisma-client";
 
@@ -61,10 +61,7 @@ export const companyValidationSchema = yup.object().shape({
       return isCompanyType;
     }),
   givenName: yup.string().notRequired(),
-  contactEmail: yup
-    .string()
-    .notRequired()
-    .email(),
+  contactEmail: yup.string().notRequired().email(),
   contactPhone: yup
     .string()
     .notRequired()
@@ -73,10 +70,7 @@ export const companyValidationSchema = yup.object().shape({
       message: "Le numéro de téléphone de contact est invalide",
       excludeEmptyString: true
     }),
-  website: yup
-    .string()
-    .notRequired()
-    .url(),
+  website: yup.string().notRequired().url(),
   name: yup.string().notRequired(),
   codeNaf: yup.string().notRequired()
 });
@@ -117,10 +111,7 @@ export const roleValidationSchema = (companies: CompanyRow[]) =>
           return true;
         }
       ),
-    role: yup
-      .string()
-      .required()
-      .oneOf(ROLES)
+    role: yup.string().required().oneOf(ROLES)
   });
 
 /** Generates a validateRole function */

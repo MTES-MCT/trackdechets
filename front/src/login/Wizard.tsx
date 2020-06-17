@@ -18,13 +18,13 @@ export class Wizard extends React.Component<Props, State> {
   }
 
   next = (values: Object) =>
-    this.setState((state) => ({
+    this.setState(state => ({
       page: Math.min(state.page + 1, this.props.children.length - 1),
       values,
     }));
 
   previous = () =>
-    this.setState((state) => ({
+    this.setState(state => ({
       page: Math.max(state.page - 1, 0),
     }));
 

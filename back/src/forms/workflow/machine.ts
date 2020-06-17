@@ -8,7 +8,7 @@ import {
   validateSecurityCode
 } from "./helpers";
 import { FormState } from "./model";
- 
+
 export const formWorkflowMachine = Machine(
   {
     id: "form-workflow-machine",
@@ -230,7 +230,9 @@ export const formWorkflowMachine = Machine(
           missingSignature: { meta: WorkflowError.MissingSignature },
           invalidSecurityCode: { meta: WorkflowError.InvalidSecurityCode },
           appendixError: { meta: WorkflowError.AppendixError },
-          hasSegmentsToTakeOverError: { meta: WorkflowError.HasSegmentsToTakeOverError },
+          hasSegmentsToTakeOverError: {
+            meta: WorkflowError.HasSegmentsToTakeOverError
+          }
         }
       }
     }
@@ -265,7 +267,7 @@ export const formWorkflowMachine = Machine(
         );
       },
       hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage,
-      hasSegmentToTakeOver: (ctx) => {
+      hasSegmentToTakeOver: ctx => {
         // if any segment is not yet taken over, return true (form can't be received)
         return ctx.form.transportSegments.some(f => !f.takenOverAt);
       }

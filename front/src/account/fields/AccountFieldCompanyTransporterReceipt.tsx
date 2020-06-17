@@ -55,7 +55,7 @@ export default function AccountFieldCompanyTransporterReceipt({
       name="transporterReceipt"
       label="Récépissé transporteur"
       value={transporterReceipt}
-      renderForm={(toggleEdition) => (
+      renderForm={toggleEdition => (
         <AccountFormCompanyTransporterReceipt
           company={company}
           toggleEdition={toggleEdition}

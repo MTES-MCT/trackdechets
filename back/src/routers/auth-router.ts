@@ -5,8 +5,6 @@ import { getUIBaseURL } from "../utils";
 import { sess } from "../server";
 import nocache from "../common/middlewares/nocache";
 
-const { UI_HOST, SESSION_COOKIE_HOST } = process.env;
-
 const UI_BASE_URL = getUIBaseURL();
 
 const authRouter = express.Router();

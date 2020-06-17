@@ -146,9 +146,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
       if (!user) {
         // No user matches this email. Creates a new one
-        const password = Math.random()
-          .toString(36)
-          .slice(-10);
+        const password = Math.random().toString(36).slice(-10);
 
         const hashedPassword = await hashPassword(password);
 

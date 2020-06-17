@@ -3,7 +3,7 @@ import { rule, and } from "graphql-shield";
 import { Prisma } from "../../generated/prisma-client";
 import {
   isAuthenticated,
-  ensureRuleParametersArePresent,
+  ensureRuleParametersArePresent
 } from "../../common/rules";
 
 type FormSiretsAndOwner = {
@@ -42,8 +42,8 @@ export const canAccessForm = and(
         formInfos.recipientCompanySiret,
         formInfos.ecoOrganisme?.siret,
         formInfos.temporaryStorageDetail?.destinationCompanySiret,
-        formInfos.temporaryStorageDetail?.transporterCompanySiret,
-      ].some((siret) => currentUserSirets.includes(siret)) ||
+        formInfos.temporaryStorageDetail?.transporterCompanySiret
+      ].some(siret => currentUserSirets.includes(siret)) ||
       new ForbiddenError(`Vous n'êtes pas autorisé à accéder à ce bordereau.`)
     );
   })
@@ -61,8 +61,8 @@ export const isAllowedToUseAppendix2Forms = rule()(
 
     const forms = await ctx.prisma.forms({
       where: {
-        OR: appendix2Forms.map((f) => ({ readableId: f.readableId })),
-      },
+        OR: appendix2Forms.map(f => ({ readableId: f.readableId }))
+      }
     });
 
     for (const form of forms) {
@@ -155,7 +155,7 @@ export const isFormTransporter = and(
     );
 
     const segmentSirets = formInfos.transportSegments.map(
-      (segment) => segment.transporterCompanySiret
+      segment => segment.transporterCompanySiret
     );
 
     return (
@@ -164,7 +164,7 @@ export const isFormTransporter = and(
         currentUserSirets.includes(
           formInfos.temporaryStorageDetail.transporterCompanySiret
         )) ||
-      !!segmentSirets.filter((el) => currentUserSirets.includes(el)).length ||
+      !!segmentSirets.filter(el => currentUserSirets.includes(el)).length ||
       new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`)
     );
   })
@@ -217,11 +217,11 @@ export const hasFinalDestination = rule()(async (_, { id }, ctx) => {
     "destinationCompanyAddress",
     "destinationCompanyContact",
     "destinationCompanyPhone",
-    "destinationCompanyMail",
+    "destinationCompanyMail"
   ];
 
   const hasFinalDestination = mandatoryKeys.every(
-    (key) => !!temporaryStorageDetail[key]
+    key => !!temporaryStorageDetail[key]
   );
 
   return (
@@ -291,5 +291,5 @@ export async function getCurrentUserSirets(userId: string, prisma: Prisma) {
     }
   }
 `);
-  return user.companyAssociations.map((a) => a.company.siret);
+  return user.companyAssociations.map(a => a.company.siret);
 }

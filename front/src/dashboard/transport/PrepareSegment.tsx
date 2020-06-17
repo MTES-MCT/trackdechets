@@ -40,7 +40,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const segments = form.transportSegments;
-  const unsealedSegments = segments.filter((segment) => !segment.sealed);
+  const unsealedSegments = segments.filter(segment => !segment.sealed);
   const lastSegment = segments[segments.length - 1];
   const refetchQuery = {
     query: GET_FORM,
@@ -57,7 +57,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
       });
     },
     refetchQueries: [refetchQuery],
-    update: (store) => {
+    update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
@@ -65,9 +65,9 @@ export default function PrepareSegment({ form, userSiret }: Props) {
           roles: ["TRANSPORTER"],
           status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
-        getNewData: (data) => {
+        getNewData: data => {
           return {
-            forms: data.forms.filter((f) => f.id === form.id),
+            forms: data.forms.filter(f => f.id === form.id),
           };
         },
       });
@@ -125,7 +125,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
           <div className="modal">
             <Formik
               initialValues={initialValues}
-              onSubmit={(values) => {
+              onSubmit={values => {
                 const { transporter, ...rst } = values;
                 const { validityLimit } = transporter;
                 // prevent empty strings to be sent for validityLimit

@@ -37,6 +37,7 @@ describe("waste is accepted", () => {
       wasteAcceptationStatus,
       quantityReceived: 0
     });
+    expect(isValid).toBeFalsy();
   });
   it("should be invalid when wasteRefusalReason is here", async () => {
     const isValid = await receivedInfoSchema.isValid({

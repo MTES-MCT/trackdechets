@@ -5,7 +5,7 @@ type Props = { installation: Installation };
 
 export default function CompanyActivity({ installation }: Props) {
   const rubriquesInActivity = installation.rubriques
-    ? installation.rubriques.filter((r) => r.etatActivite === "En fonct.")
+    ? installation.rubriques.filter(r => r.etatActivite === "En fonct.")
     : [];
 
   const rubriquesSorted = [...rubriquesInActivity].sort((r1, r2) => {
@@ -35,8 +35,8 @@ export default function CompanyActivity({ installation }: Props) {
           </p>
         )}
 
-        {[...new Set(rubriquesSorted.map((r) => r.category))]
-          .filter((category) => !!category)
+        {[...new Set(rubriquesSorted.map(r => r.category))]
+          .filter(category => !!category)
           .map((category, idx) => {
             return (
               <div className="label" key={idx}>

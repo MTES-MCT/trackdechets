@@ -17,7 +17,7 @@ type Mail = {
   body: string;
   templateId?: number;
   attachment?: Attachment;
-  vars?: object;
+  vars?: { [id: string]: any };
 };
 
 export function sendMail(mail: Mail) {

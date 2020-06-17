@@ -4,7 +4,7 @@ import {
   userFactory,
   formFactory,
   userWithCompanyFactory,
-  transportSegmentFactory,
+  transportSegmentFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 
@@ -14,18 +14,18 @@ describe("Integration / Forms query", () => {
   it.each([
     "emitterCompanySiret",
     "recipientCompanySiret",
-    "transporterCompanySiret",
+    "transporterCompanySiret"
   ])(
     "should return a given form which user is emitter, receiver or transporter (%p)",
-    async (fieldName) => {
+    async fieldName => {
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const owner = await userFactory();
 
       const form = await formFactory({
         ownerId: owner.id,
         opt: {
-          [fieldName]: company.siret,
-        },
+          [fieldName]: company.siret
+        }
       });
 
       const { query } = makeClient(user);
@@ -45,12 +45,12 @@ describe("Integration / Forms query", () => {
     const owner = await userFactory();
 
     const form = await formFactory({
-      ownerId: owner.id,
+      ownerId: owner.id
     });
 
     await transportSegmentFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: company.siret },
+      segmentPayload: { transporterCompanySiret: company.siret }
     });
     const { query } = makeClient(user);
     const { data } = await query(

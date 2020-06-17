@@ -5,5 +5,5 @@ export const localAuthService = {
   locallySignOut() {
     client.resetStore();
     window.localStorage.removeItem(SIRET_STORAGE_KEY);
-  },
+  }
 };

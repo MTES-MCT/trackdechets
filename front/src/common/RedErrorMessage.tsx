@@ -5,7 +5,7 @@ export default function RedErrorMessage(props: any) {
   return (
     <ErrorMessage
       {...props}
-      render={(msg) => <div className="input-error-message">{msg}</div>}
+      render={msg => <div className="input-error-message">{msg}</div>}
     />
   );
 }

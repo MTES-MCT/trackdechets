@@ -2,7 +2,7 @@ import {
   userWithCompanyFactory,
   formFactory,
   userFactory,
-  transportSegmentFactory,
+  transportSegmentFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
@@ -10,8 +10,8 @@ import { prisma } from "../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
-    get: jest.fn(() => Promise.resolve({ data: {} })),
-  },
+    get: jest.fn(() => Promise.resolve({ data: {} }))
+  }
 }));
 
 describe("{ mutation { editSegment } }", () => {
@@ -31,15 +31,15 @@ describe("{ mutation { editSegment } }", () => {
       opt: {
         transporterCompanySiret: transporterSiret,
         status: "SENT",
-        currentTransporterSiret: transporterSiret,
-      },
+        currentTransporterSiret: transporterSiret
+      }
     });
     // there is already one segment
     const segment = await transportSegmentFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: "98765" },
+      segmentPayload: { transporterCompanySiret: "98765" }
     });
-    
+
     const { mutate } = makeClient(firstTransporter);
     await mutate(
       `mutation  {

@@ -40,7 +40,7 @@ export default function AccountFielCompanyGivenName({ company }: Props) {
       label="Nom Usuel"
       value={company.givenName}
       tooltip={tooltip}
-      renderForm={(toggleEdition) => (
+      renderForm={toggleEdition => (
         <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
           name="givenName"
           type="text"

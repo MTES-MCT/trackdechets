@@ -47,7 +47,7 @@ export default function AccountFormSimpleInput<Variables>({
       validateOnChange={false}
       validationSchema={yupSchema}
     >
-      {(props) => (
+      {props => (
         <Form>
           <div className="form__group">
             <Field

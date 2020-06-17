@@ -25,7 +25,7 @@ export default function AccountCompanyAddSiret({
   onCompanyInfos,
 }: IProps) {
   const [searchCompany, { loading, error }] = useLazyQuery(COMPANY_INFOS, {
-    onCompleted: (data) => {
+    onCompleted: data => {
       if (data && data.companyInfos) {
         const companyInfos = data.companyInfos;
         if (companyInfos.isRegistered) {

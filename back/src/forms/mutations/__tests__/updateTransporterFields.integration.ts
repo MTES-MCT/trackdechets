@@ -113,10 +113,9 @@ describe("Forms -> updateTransporterFields mutation", () => {
 
   it("should not update form if user is not made by a transporter", async () => {
     const { user: emitter } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     let form = await formFactory({
       ownerId: emitter.id,

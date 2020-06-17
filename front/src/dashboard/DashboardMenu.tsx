@@ -20,7 +20,7 @@ export default function DashboardMenu({
   const { siret } = useContext(SiretContext);
   const companies = me.companies || [];
 
-  const company = companies.find((c) => c.siret === siret);
+  const company = companies.find(c => c.siret === siret);
 
   if (company) {
     const isTransporter =

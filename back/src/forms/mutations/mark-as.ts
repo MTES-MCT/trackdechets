@@ -97,7 +97,7 @@ export async function signedByTransporter(
 
         return {
           ...(!hasWasteDetailsOverride && wasteDetails),
-       
+
           temporaryStorageDetail: {
             update: {
               signedBy: infos.sentBy,
@@ -118,7 +118,7 @@ export async function signedByTransporter(
     wasteDetailsPackagings: infos.packagings,
     wasteDetailsQuantity: infos.quantity,
     wasteDetailsOnuCode: infos.onuCode,
-    currentTransporterSiret: form.transporterCompanySiret,
+    currentTransporterSiret: form.transporterCompanySiret
   });
 
   return transitionForm(
@@ -205,7 +205,7 @@ async function transitionForm(
 
   const formPropsFromEvent = transformEventToFormProps(eventParams);
 
-  // to receive simple multimodal form, we need to be sure there is no segment left wo need to be taken over 
+  // to receive simple multimodal form, we need to be sure there is no segment left wo need to be taken over
   // get segments here for MARK_RECEIVED event because awaiting in xstate is tricky
   const transportSegments =
     eventType === "MARK_RECEIVED"

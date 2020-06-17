@@ -9,7 +9,7 @@ export function wasteCodeValidator(wasteCode: string) {
     return "Le code déchet saisi n'existe pas. Il doit être composé de moins de 7 caractères.";
   }
 
-  if (WasteCodeLookup.find((l) => l.code === wasteCode)) {
+  if (WasteCodeLookup.find(l => l.code === wasteCode)) {
     return undefined;
   }
 

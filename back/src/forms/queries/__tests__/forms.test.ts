@@ -1,9 +1,7 @@
 import forms from "../forms";
-import { ErrorCode } from "../../../common/errors";
-import { FormType } from "../../../generated/graphql/types";
 
 const prisma = {
-  forms: jest.fn((...args) => Promise.resolve([]))
+  forms: jest.fn((..._args) => Promise.resolve([]))
 };
 
 jest.mock("../../../generated/prisma-client", () => ({

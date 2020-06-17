@@ -129,7 +129,7 @@ export default function AccountFormCompanyTransporterReceipt({
       {deleteError && <NotificationError apolloError={deleteError} />}
       <Formik
         initialValues={initialValues}
-        onSubmit={async (values) => {
+        onSubmit={async values => {
           const input = {
             ...(traderReceipt?.id ? { id: traderReceipt.id } : {}),
             ...values,
@@ -147,7 +147,7 @@ export default function AccountFormCompanyTransporterReceipt({
           }
           toggleEdition();
         }}
-        validate={(values) => {
+        validate={values => {
           return {
             ...(!values.receiptNumber ? { receiptNumber: "Champ requis" } : {}),
             ...(!values.validityLimit ? { validityLimit: "Champ requis" } : {}),
