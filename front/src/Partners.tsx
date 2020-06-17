@@ -130,6 +130,9 @@ export default function Partners() {
             <figure>
               <img src="/partners-logos/elo-energie.png" alt="Elo Énergie" />
             </figure>
+            <figure>
+              <img src="/partners-logos/norauto.png" alt="Norauto" />
+            </figure>
           </div>
         </div>
       </section>
