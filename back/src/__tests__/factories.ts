@@ -57,7 +57,7 @@ export const companyFactory = async (opt = {}, companyType = "PRODUCER") => {
   return prisma.createCompany({
     siret: siretify(companyIndex),
     companyTypes: {
-      set: [companyType as CompanyType],
+      set: [companyType as CompanyType]
     } as CompanyCreatecompanyTypesInput,
     name: `company_${companyIndex}`,
     securityCode: 1234,
@@ -69,7 +69,10 @@ export const companyFactory = async (opt = {}, companyType = "PRODUCER") => {
  * Create a company and a member
  * @param role: user role in the company
  */
-export const userWithCompanyFactory = async (role, companyType = "PRODUCER") => {
+export const userWithCompanyFactory = async (
+  role,
+  companyType = "PRODUCER"
+) => {
   const company = await companyFactory({}, companyType);
 
   const user = await userFactory({
@@ -178,7 +181,7 @@ const formdata = {
 export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
   return prisma.createTransportSegment({
     form: { connect: { id: formId } },
-    ...segmentPayload,
+    ...segmentPayload
   });
 };
 

@@ -15,7 +15,7 @@ import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
 import {
   Form,
   Mutation,
-  MutationEditSegmentArgs
+  MutationEditSegmentArgs,
 } from "../../generated/graphql/types";
 import { NotificationError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
@@ -101,7 +101,7 @@ export default function EditSegment({ form, userSiret }: Props) {
 
   const refetchQuery = {
     query: GET_FORM,
-    variables: { id: form.id }
+    variables: { id: form.id },
   };
   const [editSegment, { error }] = useMutation<
     Pick<Mutation, "editSegment">,
@@ -110,7 +110,7 @@ export default function EditSegment({ form, userSiret }: Props) {
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success("Le segment de transport a été modifié", {
-        hideAfter: 5
+        hideAfter: 5,
       });
     },
     refetchQueries: [refetchQuery],
@@ -120,15 +120,15 @@ export default function EditSegment({ form, userSiret }: Props) {
         variables: {
           userSiret,
           roles: ["TRANSPORTER"],
-          status: ["SEALED", "SENT", "RESEALED", "RESENT"]
+          status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
         getNewData: data => {
           return {
-            forms: data.forms
+            forms: data.forms,
           };
-        }
+        },
       });
-    }
+    },
   });
 
   const segment = getSegmentToEdit({ form, userSiret });
@@ -138,7 +138,7 @@ export default function EditSegment({ form, userSiret }: Props) {
   }
 
   const initialValues = {
-    ...segment
+    ...segment,
   };
 
   return (
@@ -156,7 +156,7 @@ export default function EditSegment({ form, userSiret }: Props) {
           className="modal__backdrop"
           id="modal"
           style={{
-            display: isOpen ? "flex" : "none"
+            display: isOpen ? "flex" : "none",
           }}
         >
           <div className="modal">
@@ -166,7 +166,7 @@ export default function EditSegment({ form, userSiret }: Props) {
                 const variables = {
                   ...removeCompanyData(values),
                   id: segment.id,
-                  siret: userSiret
+                  siret: userSiret,
                 };
 
                 editSegment({ variables }).catch(() => {});

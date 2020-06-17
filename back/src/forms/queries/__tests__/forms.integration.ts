@@ -7,7 +7,7 @@ import {
   formFactory,
   userWithCompanyFactory,
   transportSegmentFactory,
-  userFactory,
+  userFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 
@@ -414,8 +414,8 @@ describe("Integration / Forms query for transporters", () => {
       ownerId: owner.id,
       opt: {
         transporterCompanySiret: transporterSiret,
-        status: "SEALED",
-      },
+        status: "SEALED"
+      }
     });
 
     // the transporter makes the query
@@ -448,13 +448,13 @@ describe("Integration / Forms query for transporters", () => {
       ownerId: owner.id,
       opt: {
         transporterCompanySiret: "6543",
-        status: "SEALED",
-      },
+        status: "SEALED"
+      }
     });
     // our transporter is on one segment
     await transportSegmentFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: company.siret },
+      segmentPayload: { transporterCompanySiret: company.siret }
     });
 
     // the transporter makes the query

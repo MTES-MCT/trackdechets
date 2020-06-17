@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import {
   Form,
   Mutation,
-  MutationTakeOverSegmentArgs
+  MutationTakeOverSegmentArgs,
 } from "../../generated/graphql/types";
 import { useMutation } from "@apollo/react-hooks";
 import { NotificationError } from "../../common/Error";
@@ -49,7 +49,7 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const refetchQuery = {
     query: GET_FORM,
-    variables: { id: form.id }
+    variables: { id: form.id },
   };
   const [takeOverSegment, { error }] = useMutation<
     Pick<Mutation, "takeOverSegment">,
@@ -58,7 +58,7 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success("La prise en charge du bordereau est validée", {
-        hideAfter: 5
+        hideAfter: 5,
       });
     },
     refetchQueries: [refetchQuery],
@@ -68,19 +68,19 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
         variables: {
           userSiret,
           roles: ["TRANSPORTER"],
-          status: ["SEALED", "SENT", "RESEALED", "RESENT"]
+          status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
         getNewData: data => ({
-          forms: data.forms
-        })
+          forms: data.forms,
+        }),
       });
-    }
+    },
   });
   const segment = getSegmentToTakeOver({ form, userSiret });
 
   const initialValues = {
     takenOverBy: "",
-    takenOverAt: DateTime.local().toISODate()
+    takenOverAt: DateTime.local().toISODate(),
   };
 
   if (!segment) {
@@ -101,7 +101,7 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
           className="modal__backdrop"
           id="modal"
           style={{
-            display: isOpen ? "flex" : "none"
+            display: isOpen ? "flex" : "none",
           }}
         >
           <div className="modal">
@@ -110,7 +110,7 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
               onSubmit={values => {
                 const variables = {
                   takeOverInfo: { ...values },
-                  id: segment.id
+                  id: segment.id,
                 };
 
                 takeOverSegment({ variables }).catch(() => {});

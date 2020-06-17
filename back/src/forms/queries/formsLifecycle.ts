@@ -1,7 +1,7 @@
 import {
   prisma,
   StatusLogConnection,
-  Company,
+  Company
 } from "../../generated/prisma-client";
 import { GraphQLContext } from "../../types";
 
@@ -58,7 +58,7 @@ export const formsLifecycle = async (
   const userCompanies = await prisma
     .companyAssociations({ where: { user: { id: userId } } })
     .$fragment<{ company: Company }[]>(companyFragment)
-    .then((associations) => associations.map((a) => a.company));
+    .then(associations => associations.map(a => a.company));
 
   // User must be associated with a company
   if (!userCompanies.length) {
@@ -71,19 +71,19 @@ export const formsLifecycle = async (
     throw new UserInputError(
       "Vous devez préciser pour quel siret vous souhaitez consulter",
       {
-        invalidArgs: ["siret"],
+        invalidArgs: ["siret"]
       }
     );
   }
   // If requested siret does not belong to user, raise an error
-  if (!!siret && !userCompanies.map((c) => c.siret).includes(siret)) {
+  if (!!siret && !userCompanies.map(c => c.siret).includes(siret)) {
     throw new ForbiddenError(
       "Vous n'avez pas le droit d'accéder au siret précisé"
     );
   }
   // Select user company matching siret or get the first
   const selectedCompany =
-    userCompanies.find((uc) => uc.siret === siret) || userCompanies.shift();
+    userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
 
   const formsFilter = {
     OR: [
@@ -92,9 +92,9 @@ export const formsLifecycle = async (
       { emitterCompanySiret: selectedCompany.siret },
       {
         transporterCompanySiret: selectedCompany.siret,
-        status: "SEALED",
-      },
-    ],
+        status: "SEALED"
+      }
+    ]
   };
   const statusLogsCx = await prisma
     .statusLogsConnection({
@@ -106,8 +106,8 @@ export const formsLifecycle = async (
         loggedAt_not: null,
         loggedAt_gte: loggedAfter,
         loggedAt_lte: loggedBefore,
-        form: { ...formsFilter, isDeleted: false, id: formId },
-      },
+        form: { ...formsFilter, isDeleted: false, id: formId }
+      }
     })
     .$fragment<
       StatusLogConnection & {
@@ -116,8 +116,8 @@ export const formsLifecycle = async (
     >(statusLogFragment);
 
   return {
-    statusLogs: statusLogsCx.edges.map((el) => el.node),
+    statusLogs: statusLogsCx.edges.map(el => el.node),
     ...statusLogsCx.pageInfo,
-    count: statusLogsCx.aggregate.count,
+    count: statusLogsCx.aggregate.count
   };
 };

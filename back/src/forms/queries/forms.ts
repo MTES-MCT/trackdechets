@@ -5,7 +5,6 @@ import { prisma } from "../../generated/prisma-client";
 
 const DEFAULT_FIRST = 50;
 
-
 /**
  *
  * if type is TRANSPORTER, return forms:
@@ -73,8 +72,8 @@ function getRolesFilter(siret: string, types: FormRole[]) {
       { transporterCompanySiret: siret },
       {
         transportSegments_some: {
-          transporterCompanySiret: siret,
-        },
+          transporterCompanySiret: siret
+        }
       },
       {
         temporaryStorageDetail: {

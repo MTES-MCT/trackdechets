@@ -48,7 +48,9 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
         }`
     );
 
-    const readyToTakeOverSegment = await prisma.transportSegment({ id: segment.id });
+    const readyToTakeOverSegment = await prisma.transportSegment({
+      id: segment.id
+    });
     expect(readyToTakeOverSegment.readyToTakeOver).toBe(true);
   });
 });

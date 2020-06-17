@@ -7,7 +7,6 @@ import { Form as FormModel } from "../../generated/graphql/types";
 import { NotificationError } from "../../common/Error";
 import { capitalize } from "../../common/helper";
 import "./TransportSignature.scss";
- 
 
 export const UPDATE_PLATE = gql`
   mutation updateTransporterFields(
@@ -34,16 +33,16 @@ type Props = {
   form: FormModel;
   fieldName: string;
   title: string;
- 
-  refetchQuery:any;
+
+  refetchQuery: any;
 };
 
 export default function TransporterInfoEdit({
   form,
   fieldName,
   title,
- 
-  refetchQuery 
+
+  refetchQuery,
 }: Props) {
   const mutationFieldName = `transporter${capitalize(fieldName)}`;
 
@@ -51,9 +50,7 @@ export default function TransporterInfoEdit({
 
   const [updateTransporterPlate, { error }] = useMutation(UPDATE_PLATE, {
     onCompleted: () => setIsOpen(false),
-    refetchQueries: [
-      refetchQuery
-    ],
+    refetchQueries: [refetchQuery],
   });
 
   const formik = useFormik({

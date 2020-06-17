@@ -1,7 +1,7 @@
 import {
   userWithCompanyFactory,
   formFactory,
-  companyFactory,
+  companyFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
@@ -9,8 +9,8 @@ import { prisma } from "../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
-    get: jest.fn(() => Promise.resolve({ data: {} })),
-  },
+    get: jest.fn(() => Promise.resolve({ data: {} }))
+  }
 }));
 
 describe("{ mutation { markAsSent } }", () => {
@@ -28,8 +28,8 @@ describe("{ mutation { markAsSent } }", () => {
       opt: {
         status: "SEALED",
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-      },
+        recipientCompanySiret: recipientCompany.siret
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -50,7 +50,7 @@ describe("{ mutation { markAsSent } }", () => {
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" },
+      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
 
@@ -70,8 +70,8 @@ describe("{ mutation { markAsSent } }", () => {
       opt: {
         status: "SEALED",
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-      },
+        recipientCompanySiret: recipientCompany.siret
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -92,7 +92,7 @@ describe("{ mutation { markAsSent } }", () => {
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" },
+      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
   });
@@ -109,8 +109,8 @@ describe("{ mutation { markAsSent } }", () => {
       opt: {
         status: "DRAFT",
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-      },
+        recipientCompanySiret: recipientCompany.siret
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -134,7 +134,7 @@ describe("{ mutation { markAsSent } }", () => {
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" },
+      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
   });
@@ -151,8 +151,8 @@ describe("{ mutation { markAsSent } }", () => {
       opt: {
         status: "DRAFT",
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-      },
+        recipientCompanySiret: recipientCompany.siret
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -176,7 +176,7 @@ describe("{ mutation { markAsSent } }", () => {
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" },
+      where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
   });
@@ -191,8 +191,8 @@ describe("{ mutation { markAsSent } }", () => {
       opt: {
         status: "SEALED",
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: emitterCompany.siret,
-      },
+        recipientCompanySiret: emitterCompany.siret
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -216,7 +216,7 @@ describe("{ mutation { markAsSent } }", () => {
 
   test.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(
     "wrong waste code (%p) must invalidate mutation",
-    async (wrongWasteCode) => {
+    async wrongWasteCode => {
       const { user, company: recipientCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -229,8 +229,8 @@ describe("{ mutation { markAsSent } }", () => {
           status: "SEALED",
           emitterCompanySiret: emitterCompany.siret,
           recipientCompanySiret: recipientCompany.siret,
-          wasteDetailsCode: wrongWasteCode,
-        },
+          wasteDetailsCode: wrongWasteCode
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -259,8 +259,8 @@ describe("{ mutation { markAsSent } }", () => {
         where: {
           form: { id: form.id },
           user: { id: user.id },
-          status: "SEALED",
-        },
+          status: "SEALED"
+        }
       });
       expect(statusLogs.length).toEqual(0);
     }
@@ -268,7 +268,7 @@ describe("{ mutation { markAsSent } }", () => {
 
   test.each(["20201211", "junk", "2020 12 11", "2020-12-33"])(
     "sentAt must be a valid date, %p is not valid",
-    async (dateStr) => {
+    async dateStr => {
       const { user, company: emitterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -280,8 +280,8 @@ describe("{ mutation { markAsSent } }", () => {
         opt: {
           status: "SEALED",
           emitterCompanySiret: emitterCompany.siret,
-          recipientCompanySiret: recipientCompany.siret,
-        },
+          recipientCompanySiret: recipientCompany.siret
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -307,8 +307,8 @@ describe("{ mutation { markAsSent } }", () => {
         where: {
           form: { id: form.id },
           user: { id: user.id },
-          status: "SEALED",
-        },
+          status: "SEALED"
+        }
       });
       expect(statusLogs.length).toEqual(0);
     }

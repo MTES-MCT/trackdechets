@@ -1,8 +1,7 @@
 import {
   userWithCompanyFactory,
   formFactory,
-  userFactory,
-  transportSegmentFactory
+  userFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
@@ -39,7 +38,7 @@ describe("{ mutation { prepareSegment } }", () => {
     const { data } = await mutate(
       `mutation  {
         prepareSegment(id:"${form.id}",
-         siret:"${transporterSiret}", 
+         siret:"${transporterSiret}",
          nextSegmentInfo: {
             transporter: {
               company: {
@@ -51,7 +50,7 @@ describe("{ mutation { prepareSegment } }", () => {
             }
             mode: ROAD
           }) {
-              id     
+              id
           }
       }`
     );
