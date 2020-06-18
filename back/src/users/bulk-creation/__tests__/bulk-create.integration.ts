@@ -12,12 +12,8 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 jest.mock("../sirene", () => ({
   getCompanyThrottled: jest.fn(() =>
     Promise.resolve({
-      etablissement: {
-        unite_legale: {
-          denomination: "NAME FROM SIRENE"
-        },
-        activite_principale: "62.01Z"
-      }
+      naf: "62.01Z",
+      name: "NAME FROM SIRENE"
     })
   ),
   sirenify: jest.fn(company =>
@@ -105,7 +101,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(codeEnStock.website).toEqual("https://codeenstock.trackdechets.fr");
     expect(codeEnStock.gerepId).toEqual("1234");
     expect(codeEnStock.contactPhone).toEqual("0600000000");
-  });
+  }, 10000);
 
   test("already existing company", async () => {
     // assume Code en Stock was already created
@@ -119,7 +115,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(await prisma.company({ siret: "85001946400013" })).toEqual(
       codeEnStock
     );
-  });
+  }, 10000);
 
   test("already existing user", async () => {
     // assume a user with this email already exists
@@ -140,7 +136,7 @@ describe("bulk create users and companies from csv files", () => {
     });
     expect(associations).toHaveLength(1);
     expect(associations[0].role).toEqual("ADMIN");
-  });
+  }, 10000);
 
   test("already existing user with existing role in company", async () => {
     // John Snow and Code en Stock already exist
@@ -169,7 +165,7 @@ describe("bulk create users and companies from csv files", () => {
     });
     expect(associations).toHaveLength(1);
     expect(associations[0]).toEqual(role);
-  });
+  }, 10000);
 
   test("user with pending invitation", async () => {
     const company = await companyFactory({ siret: "51212357100022" });
@@ -199,7 +195,7 @@ describe("bulk create users and companies from csv files", () => {
 
     // invitation should be deleted
     expect(await prisma.userAccountHashes()).toHaveLength(0);
-  });
+  }, 10000);
 
   test("role in csv already in pending invitation", async () => {
     // assume John Snow was already invited to Trackdéchets
@@ -225,5 +221,5 @@ describe("bulk create users and companies from csv files", () => {
 
     // invitation should be deleted
     expect(await prisma.userAccountHashes()).toHaveLength(0);
-  });
+  }, 10000);
 });

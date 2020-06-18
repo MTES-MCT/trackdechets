@@ -73,7 +73,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
   // perform validation
   for (const company of companiesRows) {
-    console.log(`Validate company ${company.siret}`);
+    console.info(`Validate company ${company.siret}`);
     const validCompany = await validateCompany(company).catch(err => {
       isValid = false;
       console.error(err);
@@ -110,7 +110,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   // add sirene information
   for (const c of companies) {
     try {
-      console.log(`Add sirene info for company ${c.siret}`);
+      console.info(`Add sirene info for company ${c.siret}`);
       const sirenified = await sirenify(c);
       sirenifiedCompanies.push(sirenified);
     } catch (err) {
@@ -124,7 +124,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   for (const company of sirenifiedCompanies) {
     const existingCompany = await prisma.company({ siret: company.siret });
     if (!existingCompany) {
-      console.log(`Create company ${company.siret}`);
+      console.info(`Create company ${company.siret}`);
       await prisma.createCompany({
         siret: company.siret,
         codeNaf: company.codeNaf,
@@ -155,7 +155,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
       const hashedPassword = await hashPassword(password);
 
-      console.log(`Create user ${email} / ${password}`);
+      console.info(`Create user ${email} / ${password}`);
       user = await prisma.createUser({
         name: email,
         email,
