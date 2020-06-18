@@ -9,11 +9,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Bugfixes [PR 336](https://github.com/MTES-MCT/trackdechets/pull/336)
 
-# [2020.06.2] 119/06/2020
+# [2020.06.2] 05/06/2020
 
 - Bugfixes [PR 319](https://github.com/MTES-MCT/trackdechets/pull/319), [PR 318](https://github.com/MTES-MCT/trackdechets/pull/318), [PR 314](https://github.com/MTES-MCT/trackdechets/pull/314), [PR 313](https://github.com/MTES-MCT/trackdechets/pull/313)
 
-# [2020.06.1] 09/06/2020
+# [2020.06.1] 03/06/2020
 
 - Ajout logos partenaires [PR 294](https://github.com/MTES-MCT/trackdechets/pull/294)
 - Evolution de la requête forms [PR 297](https://github.com/MTES-MCT/trackdechets/pull/297)
