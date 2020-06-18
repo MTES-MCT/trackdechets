@@ -8,6 +8,7 @@ import {
   Form,
   Mutation,
   MutationMarkSegmentAsReadyToTakeOverArgs,
+  TransportSegment,
 } from "../../generated/graphql/types";
 import { Form as FormikForm, Formik } from "formik";
 import { segmentFragment } from "../../common/fragments";
@@ -26,7 +27,7 @@ export const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
 `;
 
 const getSegmentToMarkSegmentAsReadyToTakeOver = ({ form, userSiret }) => {
-  const transportSegments = form.transportSegments || [];
+  const transportSegments: TransportSegment[] = form.transportSegments || [];
   if (form.status !== "SENT") {
     return null;
   }
@@ -45,7 +46,10 @@ const getSegmentToMarkSegmentAsReadyToTakeOver = ({ form, userSiret }) => {
     : null;
 };
 
-type Props = { form: any; userSiret: string };
+type Props = {
+  form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
+  userSiret: string;
+};
 
 export default function MarkSegmentAsReadyToTakeOver({
   form,

@@ -8,6 +8,7 @@ import {
   Form,
   Mutation,
   MutationTakeOverSegmentArgs,
+  TransportSegment,
 } from "../../generated/graphql/types";
 import { useMutation } from "@apollo/react-hooks";
 import { NotificationError } from "../../common/Error";
@@ -25,7 +26,7 @@ export const TAKE_OVER_SEGMENT = gql`
 `;
 
 const getSegmentToTakeOver = ({ form, userSiret }) => {
-  const transportSegments = form?.transportSegments || [];
+  const transportSegments: TransportSegment[] = form?.transportSegments || [];
 
   if (!transportSegments.length) {
     return null;
@@ -38,12 +39,15 @@ const getSegmentToTakeOver = ({ form, userSiret }) => {
     return null;
   }
   // is the first readytoTakeOver segment is for current user, return it
-  return readytoTakeOverSegments[0].transporter.company.siret === userSiret
+  return readytoTakeOverSegments[0].transporter?.company?.siret === userSiret
     ? readytoTakeOverSegments[0]
     : null;
 };
 
-type Props = { form: any; userSiret: string };
+type Props = {
+  form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
+  userSiret: string;
+};
 
 export default function TakeOverSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
