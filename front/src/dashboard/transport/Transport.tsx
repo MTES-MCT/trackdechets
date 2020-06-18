@@ -8,6 +8,8 @@ import {
   FormStatus,
   Query,
   QueryFormsArgs,
+  Destination,
+  WasteDetails,
 } from "../../generated/graphql/types";
 import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
 import PrepareSegment from "./PrepareSegment";
@@ -344,25 +346,38 @@ export default function Transport() {
   );
 }
 
-function getTransportInfos(form: Form) {
+function getTransportInfos(form: Form): Form {
   if (!form.temporaryStorageDetail) {
     return form;
   }
 
+  // Ignore the waste details if it has been omitted or if its quantity is 0
+  const temporaryStorageWasteDetails = form.temporaryStorageDetail.wasteDetails
+    ?.quantity
+    ? form.temporaryStorageDetail.wasteDetails
+    : null;
+
   return {
     ...form,
-    emitter: {
-      ...form.emitter,
-      ...form.recipient,
-    },
+    // FIXME: why was the recipient merged with the emitter in the first place?
+    // It sure is creating a bug but perhaps it's useful in certain situations.
+    // emitter: {
+    //   ...form.emitter,
+    //   ...form.recipient,
+    // },
     recipient: {
-      ...form.recipient,
-      ...form.temporaryStorageDetail.destination,
+      ...form.recipient!,
+      ...(form.temporaryStorageDetail.destination as Omit<
+        Destination,
+        "__typename"
+      >),
     },
-    wasteDetails: {
-      ...form.wasteDetails,
-      ...(form.temporaryStorageDetail?.wasteDetails?.quantity &&
-        form.temporaryStorageDetail.wasteDetails),
-    },
+    wasteDetails:
+      form.wasteDetails == null && temporaryStorageWasteDetails == null
+        ? null
+        : ({
+            ...form.wasteDetails,
+            ...temporaryStorageWasteDetails,
+          } as WasteDetails),
   };
 }
