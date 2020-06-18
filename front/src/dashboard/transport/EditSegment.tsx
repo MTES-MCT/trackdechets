@@ -16,6 +16,7 @@ import {
   Form,
   Mutation,
   MutationEditSegmentArgs,
+  TransportSegment,
 } from "../../generated/graphql/types";
 import { NotificationError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
@@ -56,11 +57,13 @@ const getSegmentToEdit = ({ form, userSiret }) => {
   if (form.status !== "SENT") {
     return null;
   }
-  const transportSegments = form.transportSegments || [];
+  const transportSegments: TransportSegment[] = form.transportSegments || [];
   if (!transportSegments.length) {
     return null;
   }
-  // not readytoTakeOver segment editable by current transporter before sealing
+
+  // not readytoTakeOver segment editable by current transporter before beeign marked as redayToTakeOver
+
   if (form.currentTransporterSiret === userSiret) {
     // get not readytoTakeOver segments
     const notReadytoTakeOverSegments = transportSegments.filter(
@@ -88,14 +91,17 @@ const getSegmentToEdit = ({ form, userSiret }) => {
     }
 
     // is the first readytoTakeOver segment is for current user, return it
-    return readytoTakeOverSegments[0].transporter.company.siret === userSiret
+    return readytoTakeOverSegments[0].transporter?.company?.siret === userSiret
       ? readytoTakeOverSegments[0]
       : null;
   }
   return null;
 };
 
-type Props = { form: any; userSiret: string };
+type Props = {
+  form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
+  userSiret: string;
+};
 
 export default function EditSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -252,9 +258,9 @@ export default function EditSegment({ form, userSiret }: Props) {
                     type="checkbox"
                     name="transporter.isExemptedOfReceipt"
                     id="isExemptedOfReceipt"
-                    checked={values.transporter.isExemptedOfReceipt}
+                    checked={values?.transporter?.isExemptedOfReceipt}
                   />
-                  {!values.transporter.isExemptedOfReceipt && (
+                  {!values?.transporter?.isExemptedOfReceipt && (
                     <>
                       <label htmlFor="receipt">Numéro de récépissé</label>
                       <Field
