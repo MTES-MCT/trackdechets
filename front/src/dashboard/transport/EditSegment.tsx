@@ -21,7 +21,7 @@ import { NotificationError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
 
 /**Remove company data if segment is readytoTakeOver */
-const removeCompanyData = (values) => {
+const removeCompanyData = values => {
   if (!values.readyToTakeOverXX) {
     return values;
   }
@@ -64,8 +64,9 @@ const getSegmentToEdit = ({ form, userSiret }) => {
   if (form.currentTransporterSiret === userSiret) {
     // get not readytoTakeOver segments
     const notReadytoTakeOverSegments = transportSegments.filter(
-      (f) => !f.readytoTakeOver
+      f => !f.readyToTakeOver
     );
+
     if (!notReadytoTakeOverSegments.length) {
       return null;
     }
@@ -76,11 +77,11 @@ const getSegmentToEdit = ({ form, userSiret }) => {
       ? notReadytoTakeOverSegments[0]
       : null;
   }
-  // readytoTakeOver form editable  by next transporter before take over
+  // readytoTakeOver form editable by next transporter before take over
   if (form.nextTransporterSiret === userSiret) {
     // get readytoTakeOver segments
     const readytoTakeOverSegments = transportSegments.filter(
-      (f) => f.readyToTakeOver
+      f => f.readyToTakeOver
     );
     if (!readytoTakeOverSegments.length) {
       return null;
@@ -114,7 +115,7 @@ export default function EditSegment({ form, userSiret }: Props) {
       });
     },
     refetchQueries: [refetchQuery],
-    update: (store) => {
+    update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
@@ -122,7 +123,7 @@ export default function EditSegment({ form, userSiret }: Props) {
           roles: ["TRANSPORTER"],
           status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
-        getNewData: (data) => {
+        getNewData: data => {
           return {
             forms: data.forms,
           };
@@ -162,7 +163,7 @@ export default function EditSegment({ form, userSiret }: Props) {
           <div className="modal">
             <Formik
               initialValues={initialValues}
-              onSubmit={(values) => {
+              onSubmit={values => {
                 const variables = {
                   ...removeCompanyData(values),
                   id: segment.id,
@@ -190,7 +191,7 @@ export default function EditSegment({ form, userSiret }: Props) {
                       <label>Siret</label>
                       <CompanySelector
                         name="transporter.company"
-                        onCompanySelected={(transporter) => {
+                        onCompanySelected={transporter => {
                           if (transporter.transporterReceipt) {
                             setFieldValue(
                               "transporter.receipt",
