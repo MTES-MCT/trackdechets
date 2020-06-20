@@ -8,10 +8,6 @@ export type RoleRow = InferType<typeof r>;
 
 // Company info from SIRENE API
 export interface CompanyInfo {
-  etablissement: {
-    unite_legale: {
-      denomination: string;
-    };
-    activite_principale: string;
-  };
+  name: string;
+  codeNaf: string;
 }
