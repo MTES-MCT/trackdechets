@@ -1,0 +1,40 @@
+button.no-margin,
+button.no-margin:active {
+  margin: 0;
+}
+
+.button.button--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.form__actions {
+  margin-top: 1em;
+  display: flex;
+  justify-content: flex-end;
+  button,
+  button:active {
+    margin-left: 1em;
+  }
+}
+
+// remove ff red shadows around required checkboxes
+input[type="checkbox"]:invalid {
+  box-shadow: none;
+}
+.field__ {
+  &block {
+    display: block;
+  }
+  &weight {
+    width: 6em;
+  }
+  &onu-code {
+    width: 6em;
+  }
+  &security-code {
+    width: 6em;
+  }
+  &full-name {
+    width: 20em;
+  }
+}

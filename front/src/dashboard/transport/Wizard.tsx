@@ -1,5 +1,6 @@
 import React from "react";
 import { Formik, FormikHelpers } from "formik";
+
 import "./Wizard.scss";
 
 type Props = {
@@ -7,16 +8,24 @@ type Props = {
   children: any[];
   onSubmit: Function;
   onCancel: Function;
+  nextButtonCaption?: string;
+  submitButtonCaption?: string;
 };
 type State = { page: number; values: Object };
 
 // Copied from Formik Doc - multi step wizard example
 export class Wizard extends React.Component<Props, State> {
-  static Page = ({ children, values }: Props & any) => children(values);
+  static Page = ({
+    children,
+    values,
+    nextButtonCaption,
+    submitButtonCaption,
+  }: Props & any) => children(values);
   contentRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: Props) {
     super(props);
+
     this.contentRef = React.createRef();
     this.state = {
       page: 0,
@@ -68,6 +77,7 @@ export class Wizard extends React.Component<Props, State> {
     const { children } = this.props;
     const { page, values } = this.state;
     const activePage: any = React.Children.toArray(children)[page];
+    console.log(activePage);
     const isLastPage = page === React.Children.count(children) - 1;
     return (
       <React.Fragment>
@@ -89,45 +99,49 @@ export class Wizard extends React.Component<Props, State> {
             enableReinitialize={false}
             validate={this.validate}
             onSubmit={this.handleSubmit}
-            render={({ values, handleSubmit, isSubmitting, handleReset }) => (
+          >
+            {({ values, handleSubmit, isSubmitting }) => (
               <form onSubmit={handleSubmit}>
                 {React.cloneElement(activePage, { values, isSubmitting })}
-                <div className="buttons">
-                  <button
-                    type="button"
-                    className="button warning"
-                    onClick={() => this.props.onCancel()}
-                  >
-                    Annuler
-                  </button>
+                <div className="form__actions mb-2">
                   {page > 0 && (
                     <button
                       type="button"
-                      className="button secondary"
+                      className="button-outline primary no-margin"
                       onClick={this.previous}
                     >
                       Précédent
                     </button>
                   )}
-
+                  <button
+                    type="button"
+                    className="button-outline primary "
+                    onClick={() => this.props.onCancel()}
+                  >
+                    Annuler
+                  </button>
                   {!isLastPage && (
                     <button className="button no-margin" type="submit">
-                      Suivant
+                      {!!activePage.props.nextButtonCaption
+                        ? activePage.props.nextButtonCaption
+                        : "Suivant"}
                     </button>
                   )}
                   {isLastPage && (
                     <button
                       type="submit"
-                      className="button o-margin"
+                      className="button no-margin"
                       disabled={isSubmitting}
                     >
-                      Valider
+                      {!!activePage.props.submitButtonCaption
+                        ? activePage.props.submitButtonCaption
+                        : "Valider"}
                     </button>
                   )}
                 </div>
               </form>
             )}
-          />
+          </Formik>
         </div>
       </React.Fragment>
     );

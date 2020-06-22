@@ -21,7 +21,7 @@ import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
 import { SiretContext } from "../Dashboard";
 import cogoToast from "cogo-toast";
-
+import { FaFilePdf } from "react-icons/fa";
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
     $id: ID!
@@ -127,15 +127,21 @@ export default function TransportSignature({ form, userSiret }: Props) {
               }
               onCancel={() => setIsOpen(false)}
             >
-              <Wizard.Page title="Signature transporteur">
+              <Wizard.Page
+                title="Signature transporteur"
+                nextButtonCaption="Signer par le transporteur"
+              >
                 {(props: any) => (
                   <>
                     <div className="notification success">
-                      Cet écran est à lire et signer par le{" "}
+                      Cet écran est à signer par le{" "}
                       <strong>transporteur</strong>
                     </div>
                     <h3 id="collect-address">Lieu de collecte</h3>
-                    <address aria-labelledby="collect-address">
+                    <address
+                      aria-labelledby="collect-address"
+                      className="address"
+                    >
                       {form.stateSummary?.emitter?.name} (
                       {form.stateSummary?.emitter?.siret}
                       )
@@ -143,10 +149,15 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     </address>
 
                     <h3>Déchets à collecter</h3>
-                    <p>Bordereau numéro {form.readableId}</p>
                     <p>
-                      Appellation du déchet: {form.wasteDetails?.name} (
-                      {form.wasteDetails?.code})
+                      <span className="waste-label">Bordereau numéro :</span>
+                      {form.readableId}
+                    </p>
+                    <p>
+                      <span className="waste-label">
+                        Appellation du déchet :
+                      </span>
+                      {form.wasteDetails?.name} ({form.wasteDetails?.code})
                     </p>
 
                     <div>
@@ -159,7 +170,11 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     <p>
                       <label>
                         Poids en tonnes
-                        <Field type="number" name="quantity" />
+                        <Field
+                          type="number"
+                          name="quantity"
+                          className="field__weight field__block"
+                        />
                       </label>
                     </p>
 
@@ -167,18 +182,22 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       <label>
                         Code ADR (ONU) - Champ à renseigner selon le déchet
                         transporté, sous votre responsabilité
-                        <Field type="text" name="onuCode" />
+                        <Field
+                          type="text"
+                          name="onuCode"
+                          className="field__onu-code field__block"
+                        />
                       </label>
                     </p>
 
                     <h3 id="destination-address">Destination du déchet</h3>
-                    <address aria-labelledby="destination-address">
+                    <address aria-labelledby="destination-address" className="address">
                       {form.stateSummary?.recipient?.name} (
                       {form.stateSummary?.recipient?.siret})
                       <br /> {form.stateSummary?.recipient?.address}
                     </address>
 
-                    <h3>Validation</h3>
+                    <h3>Signature</h3>
 
                     <p>
                       <label>
@@ -195,12 +214,13 @@ export default function TransportSignature({ form, userSiret }: Props) {
 
                     <p>
                       <small>
-                        Si vous le désirez, vous pouvez accéder à{" "}
                         <DownloadFileLink
                           query={FORMS_PDF}
                           params={{ id: form.id }}
                         >
-                          une vue CERFA du bordereau
+                          {" "}
+                          <FaFilePdf />
+                          CERFA du bordereau
                         </DownloadFileLink>
                       </small>
                     </p>
@@ -208,9 +228,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                 )}
               </Wizard.Page>
               <Wizard.Page
-                title={`Signature ${
-                  isEmittedByProducer ? "Producteur" : "Détenteur"
-                }`}
+                title="Signature Producteur"
+                submitButtonCaption="Signer par le producteur"
               >
                 {(props: any) => (
                   <>
@@ -224,22 +243,26 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       </div>
 
                       <h3 id="collect-address">Lieu de collecte</h3>
-                      <address aria-labelledby="collect-address">
+                      <address aria-labelledby="collect-address" className="address">
                         {form.stateSummary?.emitter?.name} (
                         {form.stateSummary?.emitter?.siret})
                         <br /> {form.stateSummary?.emitter?.address}
                       </address>
 
-                      <h3>Mes déchets</h3>
+                      <h3>Déchets</h3>
                       <p>
-                        Bordereau numéro {form.readableId}
+                        <span className="waste-label">Bordereau numéro:</span>
+                        {form.readableId}
                         <br />
-                        Appellation du déchet: {form.wasteDetails?.name} (
-                        {form.wasteDetails?.code})
-                        <br />
-                        Conditionnement: {props.packagings.join(", ")}
-                        <br />
-                        Poids total: {props.quantity} tonnes
+                        <span className="waste-label">
+                          Appellation du déchet:
+                        </span>
+                        {form.wasteDetails?.name} ({form.wasteDetails?.code})
+                        <br />{" "}
+                        <span className="waste-label">Conditionnement:</span>
+                        {props.packagings.join(", ")}
+                        <br /> <span className="waste-label">Poids total:</span>
+                        {props.quantity} tonnes
                       </p>
 
                       <h3 id="transporter-address">Transporteur</h3>
@@ -278,14 +301,18 @@ export default function TransportSignature({ form, userSiret }: Props) {
                           <Field
                             name="securityCode"
                             type="number"
-                            className="no-spinner"
+                            className="field__security-code field__block no-spinner"
                           />
                         </label>
                       </p>
                       <p>
                         <label>
                           Nom et prénom
-                          <Field type="text" name="sentBy" />
+                          <Field
+                            type="text"
+                            name="sentBy"
+                            className="field__full-name field__block"
+                          />
                         </label>
                       </p>
                       {error && <NotificationError apolloError={error} />}
