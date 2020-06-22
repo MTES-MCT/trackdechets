@@ -10,17 +10,14 @@ import styles from "./Login.module.scss";
 import { localAuthService } from "./auth.service";
 
 const fieldErrorsProps = (fieldName, errorField) => {
-  if (!errorField) {
-    return {};
-  }
+  console.log(fieldName, errorField);
   if (errorField === fieldName) {
     return {
       autoFocus: true,
       style: { border: "2px solid red" },
     };
-  } else {
-    return {};
   }
+  return {};
 };
 export default withRouter(function Login(
   routeProps: RouteComponentProps<
@@ -67,7 +64,7 @@ export default withRouter(function Login(
                 type="email"
                 name="email"
                 defaultValue={username}
-                {...fieldErrorsProps("email", error)}
+                {...fieldErrorsProps("email", errorField)}
               />
             </label>
             {error && errorField === "email" && (
@@ -78,7 +75,11 @@ export default withRouter(function Login(
           <div className="form__group">
             <label>
               Mot de passe
-              <input type="password" name="password" />
+              <input
+                type="password"
+                name="password"
+                {...fieldErrorsProps("password", errorField)}
+              />
             </label>
             {error && errorField === "password" && (
               <div className={styles["form-error-message"]}>{error}</div>
