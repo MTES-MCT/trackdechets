@@ -105,8 +105,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                 signedByTransporter: false,
                 signedByProducer: false,
                 packagings: form.stateSummary?.packagings,
-                quantity: form.stateSummary?.quantity,
-                onuCode: form.stateSummary?.onuCode,
+                quantity: form.stateSummary?.quantity ?? "",
+                onuCode: form.stateSummary?.onuCode ?? "",
               }}
               onSubmit={(values: any) =>
                 signedByTransporter({
@@ -161,9 +161,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
 
                     <h3 id="destination-address">Destination du déchet</h3>
                     <address aria-labelledby="destination-address">
-                      {form.stateSummary?.recipient?.name} (
-                      {form.stateSummary?.recipient?.siret})
-                      <br /> {form.stateSummary?.recipient?.address}
+                      {form.recipient?.company?.name} (
+                      {form.recipient?.company?.siret})
+                      <br /> {form.recipient?.company?.address}
                     </address>
 
                     <h3>Validation</h3>
@@ -223,8 +223,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                         Poids total: {props.quantity} tonnes
                       </p>
 
-                      <h3>Transporteur</h3>
-                      <address>
+                      <h3 id="transporter-address">Transporteur</h3>
+                      <address aria-labelledby="transporter-address">
                         {form.stateSummary?.transporter?.name} (
                         {form.stateSummary?.transporter?.siret})
                         <br /> {form.stateSummary?.transporter?.address}

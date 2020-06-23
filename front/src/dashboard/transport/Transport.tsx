@@ -370,13 +370,13 @@ function getTransportInfos(form: Form): Form {
     //   ...form.emitter,
     //   ...form.recipient,
     // },
-    recipient: {
-      ...form.recipient!,
-      ...(form.temporaryStorageDetail.destination as Omit<
-        Destination,
-        "__typename"
-      >),
-    },
+    // recipient: {
+    //   ...form.recipient!,
+    //   ...(form.temporaryStorageDetail.destination as Omit<
+    //     Destination,
+    //     "__typename"
+    //   >),
+    // },
     wasteDetails:
       form.wasteDetails == null && temporaryStorageWasteDetails == null
         ? null

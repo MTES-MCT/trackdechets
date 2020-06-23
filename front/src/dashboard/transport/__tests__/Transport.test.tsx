@@ -1,6 +1,12 @@
 import * as React from "react";
 import { MockedProvider } from "@apollo/react-testing";
-import { render, screen, wait, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  wait,
+  waitForElement,
+  fireEvent,
+} from "@testing-library/react";
 import {
   AppMocks,
   createCompany,
@@ -100,33 +106,80 @@ describe("<Transport />", () => {
       expect(screen.getAllByText(EMITTER.company!.name!).length).toBe(1);
     });
 
-    it("should open the signature modal", () => {
-      fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+    describe("when the transporter signs", () => {
+      beforeEach(() => {
+        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+      });
 
-      expect(
-        screen.getByText(
-          (content, element) =>
-            element.textContent ===
-            "Cet écran est à lire et signer par le transporteur"
-        )
-      ).toBeInTheDocument();
+      it("should open the signature modal", () => {
+        expect(
+          screen.getByText(
+            (content, element) =>
+              element.textContent ===
+              "Cet écran est à lire et signer par le transporteur"
+          )
+        ).toBeInTheDocument();
+      });
+
+      it("should display the emitter as the collect address", () => {
+        expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
+          EMITTER.company!.name!
+        );
+      });
+
+      it("should display the final destination", () => {
+        expect(
+          screen.getByLabelText("Destination du déchet")
+        ).toHaveTextContent(RECIPIENT.company!.name!);
+      });
     });
 
-    it("should display the emitter as the collect address", () => {
-      fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+    describe("when the emitter signs", () => {
+      beforeEach(async () => {
+        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
 
-      expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-        EMITTER.company!.name!
-      );
+        fireEvent.click(
+          screen.getByLabelText(
+            "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
+          )
+        );
+        fireEvent.click(screen.getByText("Suivant"));
+
+        await waitForElement(() => screen.getByText("Valider"));
+      });
+
+      it("should display the emitter as the collect address", () => {
+        expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
+          EMITTER.company!.name!
+        );
+      });
+
+      it("should display the transporter", () => {
+        expect(screen.getByLabelText("Transporteur")).toHaveTextContent(
+          TRANSPORTER.company!.name!
+        );
+      });
+
+      it("should display the final destination", () => {
+        expect(
+          screen.getByLabelText("Destination du déchet")
+        ).toHaveTextContent(RECIPIENT.company!.name!);
+      });
     });
   });
 
   describe("with a temporary storage", () => {
-    const TEMPORARY_STORAGE_COMPANY = TRANSPORTER.company!;
+    // When there is a temporary storage area, the recipient is that temporary storage area
+    // until it is processed further.
+    // The final recipient can be found in TemporaryStorageDetail.destination.
+    const TEMPORARY_RECIPIENT = createRecipient({
+      company: TRANSPORTER.company,
+    });
 
     beforeEach(async () => {
       await renderWith({
         form: {
+          recipient: TEMPORARY_RECIPIENT,
           temporaryStorageDetail: createTemporaryStorageDetail({
             destination: createDestination({
               company: RECIPIENT.company,
@@ -137,20 +190,56 @@ describe("<Transport />", () => {
       });
     });
 
-    it("should display the emitter as the collect address", () => {
-      fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+    describe("when the transporter signs", () => {
+      beforeEach(() => {
+        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+      });
 
-      expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-        EMITTER.company!.name!
-      );
+      it("should display the emitter as the collect address", () => {
+        expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
+          EMITTER.company!.name!
+        );
+      });
+
+      it("should display the temporary storage as the destination", () => {
+        expect(
+          screen.getByLabelText("Destination du déchet")
+        ).toHaveTextContent(TEMPORARY_RECIPIENT.company!.name!);
+      });
     });
 
-    it("should display the temporary storage as the destination", () => {
-      fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+    describe("when the emitter signs", () => {
+      beforeEach(async () => {
+        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
 
-      expect(screen.getByLabelText("Destination du déchet")).toHaveTextContent(
-        TEMPORARY_STORAGE_COMPANY.name!
-      );
+        fireEvent.click(
+          screen.getByLabelText(
+            "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
+          )
+        );
+        fireEvent.click(screen.getByText("Suivant"));
+
+        await waitForElement(() => screen.getByText("Valider"));
+      });
+
+      it("should display the emitter as the collect address", () => {
+        expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
+          EMITTER.company!.name!
+        );
+      });
+
+      it("should display the transporter", () => {
+        expect(screen.getByLabelText("Transporteur")).toHaveTextContent(
+          TRANSPORTER.company!.name!
+        );
+      });
+
+      // FIXME: the destination should be the temporary storage or the final recipient for this screen?
+      it.skip("should display the temporary storage as the destination", () => {
+        expect(
+          screen.getByLabelText("Destination du déchet")
+        ).toHaveTextContent(TEMPORARY_RECIPIENT.company!.name!);
+      });
     });
   });
 });
