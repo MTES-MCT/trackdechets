@@ -1,5 +1,6 @@
 export * from "./AppMocks";
 export * from "./createCompany";
+export * from "./createDestination";
 export * from "./createEmitter";
 export * from "./createForm";
 export * from "./createRecipient";

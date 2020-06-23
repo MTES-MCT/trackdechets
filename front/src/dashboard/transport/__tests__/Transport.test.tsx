@@ -10,23 +10,30 @@ import {
   createStateSummary,
   createTemporaryStorageDetail,
   createRecipient,
+  createDestination,
 } from "../../../__mocks__";
 import { Form, FormRole, FormStatus } from "../../../generated/graphql/types";
 import Transport, { GET_TRANSPORT_SLIPS } from "../Transport";
 
-const EMITTER_COMPANY = createCompany({
-  siret: "emitter-1",
-  name: "EMITTER 1",
+const EMITTER = createEmitter({
+  company: createCompany({
+    siret: "emitter-1",
+    name: "EMITTER 1",
+  }),
 });
 
-const TRANSPORTER_COMPANY = createCompany({
-  siret: "transporter-1",
-  name: "TRANSPORTER 1",
+const TRANSPORTER = createTransporter({
+  company: createCompany({
+    siret: "transporter-1",
+    name: "TRANSPORTER 1",
+  }),
 });
 
-const RECIPIENT_COMPANY = createCompany({
-  siret: "recipient-1",
-  name: "RECIPIENT 1",
+const RECIPIENT = createRecipient({
+  company: createCompany({
+    siret: "recipient-1",
+    name: "RECIPIENT 1",
+  }),
 });
 
 async function renderWith({ form = {} }: { form?: Partial<Form> }) {
@@ -37,7 +44,7 @@ async function renderWith({ form = {} }: { form?: Partial<Form> }) {
           request: {
             query: GET_TRANSPORT_SLIPS,
             variables: {
-              siret: TRANSPORTER_COMPANY.siret,
+              siret: TRANSPORTER.company!.siret,
               status: [
                 FormStatus.Sealed,
                 FormStatus.Sent,
@@ -53,17 +60,18 @@ async function renderWith({ form = {} }: { form?: Partial<Form> }) {
                 createForm({
                   status: FormStatus.Sealed,
                   emitter: createEmitter({
-                    company: EMITTER_COMPANY,
+                    company: EMITTER.company,
                   }),
                   transporter: createTransporter({
-                    company: TRANSPORTER_COMPANY,
+                    company: TRANSPORTER.company,
                   }),
                   recipient: createRecipient({
-                    company: RECIPIENT_COMPANY,
+                    company: RECIPIENT.company,
                   }),
                   stateSummary: createStateSummary({
-                    emitter: EMITTER_COMPANY,
-                    transporter: TRANSPORTER_COMPANY,
+                    emitter: EMITTER.company,
+                    transporter: TRANSPORTER.company,
+                    recipient: RECIPIENT.company,
                   }),
                   ...form,
                 }),
@@ -73,7 +81,7 @@ async function renderWith({ form = {} }: { form?: Partial<Form> }) {
         },
       ]}
     >
-      <AppMocks siret={TRANSPORTER_COMPANY.siret!}>
+      <AppMocks siret={TRANSPORTER.company!.siret!}>
         <Transport />
       </AppMocks>
     </MockedProvider>
@@ -89,7 +97,7 @@ describe("<Transport />", () => {
     });
 
     it("should list 1 form", () => {
-      expect(screen.getAllByText(EMITTER_COMPANY.name!).length).toBe(1);
+      expect(screen.getAllByText(EMITTER.company!.name!).length).toBe(1);
     });
 
     it("should open the signature modal", () => {
@@ -108,16 +116,23 @@ describe("<Transport />", () => {
       fireEvent.click(screen.getByTitle("Signer ce bordereau"));
 
       expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-        EMITTER_COMPANY.name!
+        EMITTER.company!.name!
       );
     });
   });
 
   describe("with a temporary storage", () => {
+    const TEMPORARY_STORAGE_COMPANY = TRANSPORTER.company!;
+
     beforeEach(async () => {
       await renderWith({
         form: {
-          temporaryStorageDetail: createTemporaryStorageDetail({}),
+          temporaryStorageDetail: createTemporaryStorageDetail({
+            destination: createDestination({
+              company: RECIPIENT.company,
+            }),
+            transporter: TRANSPORTER,
+          }),
         },
       });
     });
@@ -126,7 +141,15 @@ describe("<Transport />", () => {
       fireEvent.click(screen.getByTitle("Signer ce bordereau"));
 
       expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-        EMITTER_COMPANY.name!
+        EMITTER.company!.name!
+      );
+    });
+
+    it("should display the temporary storage as the destination", () => {
+      fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+
+      expect(screen.getByLabelText("Destination du déchet")).toHaveTextContent(
+        TEMPORARY_STORAGE_COMPANY.name!
       );
     });
   });
