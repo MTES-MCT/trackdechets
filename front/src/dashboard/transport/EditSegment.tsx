@@ -16,12 +16,13 @@ import {
   Form,
   Mutation,
   MutationEditSegmentArgs,
+  TransportSegment,
 } from "../../generated/graphql/types";
 import { NotificationError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
 
 /**Remove company data if segment is readytoTakeOver */
-const removeCompanyData = (values) => {
+const removeCompanyData = values => {
   if (!values.readyToTakeOverXX) {
     return values;
   }
@@ -56,16 +57,19 @@ const getSegmentToEdit = ({ form, userSiret }) => {
   if (form.status !== "SENT") {
     return null;
   }
-  const transportSegments = form.transportSegments || [];
+  const transportSegments: TransportSegment[] = form.transportSegments || [];
   if (!transportSegments.length) {
     return null;
   }
-  // not readytoTakeOver segment editable by current transporter before sealing
+
+  // not readytoTakeOver segment editable by current transporter before beeign marked as redayToTakeOver
+
   if (form.currentTransporterSiret === userSiret) {
     // get not readytoTakeOver segments
     const notReadytoTakeOverSegments = transportSegments.filter(
-      (f) => !f.readytoTakeOver
+      f => !f.readyToTakeOver
     );
+
     if (!notReadytoTakeOverSegments.length) {
       return null;
     }
@@ -76,25 +80,28 @@ const getSegmentToEdit = ({ form, userSiret }) => {
       ? notReadytoTakeOverSegments[0]
       : null;
   }
-  // readytoTakeOver form editable  by next transporter before take over
+  // readytoTakeOver form editable by next transporter before take over
   if (form.nextTransporterSiret === userSiret) {
     // get readytoTakeOver segments
     const readytoTakeOverSegments = transportSegments.filter(
-      (f) => f.readyToTakeOver
+      f => f.readyToTakeOver
     );
     if (!readytoTakeOverSegments.length) {
       return null;
     }
 
     // is the first readytoTakeOver segment is for current user, return it
-    return readytoTakeOverSegments[0].transporter.company.siret === userSiret
+    return readytoTakeOverSegments[0].transporter?.company?.siret === userSiret
       ? readytoTakeOverSegments[0]
       : null;
   }
   return null;
 };
 
-type Props = { form: any; userSiret: string };
+type Props = {
+  form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
+  userSiret: string;
+};
 
 export default function EditSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -114,7 +121,7 @@ export default function EditSegment({ form, userSiret }: Props) {
       });
     },
     refetchQueries: [refetchQuery],
-    update: (store) => {
+    update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
         variables: {
@@ -122,7 +129,7 @@ export default function EditSegment({ form, userSiret }: Props) {
           roles: ["TRANSPORTER"],
           status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
-        getNewData: (data) => {
+        getNewData: data => {
           return {
             forms: data.forms,
           };
@@ -162,7 +169,7 @@ export default function EditSegment({ form, userSiret }: Props) {
           <div className="modal">
             <Formik
               initialValues={initialValues}
-              onSubmit={(values) => {
+              onSubmit={values => {
                 const variables = {
                   ...removeCompanyData(values),
                   id: segment.id,
@@ -190,7 +197,7 @@ export default function EditSegment({ form, userSiret }: Props) {
                       <label>Siret</label>
                       <CompanySelector
                         name="transporter.company"
-                        onCompanySelected={(transporter) => {
+                        onCompanySelected={transporter => {
                           if (transporter.transporterReceipt) {
                             setFieldValue(
                               "transporter.receipt",
@@ -251,9 +258,9 @@ export default function EditSegment({ form, userSiret }: Props) {
                     type="checkbox"
                     name="transporter.isExemptedOfReceipt"
                     id="isExemptedOfReceipt"
-                    checked={values.transporter.isExemptedOfReceipt}
+                    checked={values?.transporter?.isExemptedOfReceipt}
                   />
-                  {!values.transporter.isExemptedOfReceipt && (
+                  {!values?.transporter?.isExemptedOfReceipt && (
                     <>
                       <label htmlFor="receipt">Numéro de récépissé</label>
                       <Field

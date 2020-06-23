@@ -33,18 +33,18 @@ export const PREPARE_SEGMENT = gql`
   ${segmentFragment}
 `;
 
-interface Props {
-  form: Form;
-  userSiret: string;
-}
-
+type Props = {
+  form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
+  userSiret: String;
+};
 export default function PrepareSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const segments = form.transportSegments || [];
-  // FIXME: TransportSegment has no property "sealed"
-  const unsealedSegments = segments.filter((segment: any) => !segment.sealed);
-  const lastSegment = segments[segments.length - 1] as TransportSegment | null;
+  const segments: TransportSegment[] = form.transportSegments || [];
+  const notReadytoTakeOverSegments = segments.filter(
+    segment => !segment.readyToTakeOver
+  );
+  const lastSegment = segments[segments.length - 1];
   const refetchQuery = {
     query: GET_FORM,
     variables: { id: form.id },
@@ -96,17 +96,18 @@ export default function PrepareSegment({ form, userSiret }: Props) {
 
     mode: "ROAD" as TransportMode,
   };
+
   // form must be sent
   // user must be marked as current transporter
   // there is no unsealed segment
   const hasTakenOverLastSegment =
     !segments.length ||
-    (!!lastSegment?.takenOverAt &&
-      lastSegment?.transporter?.company?.siret !== userSiret);
+    (!!lastSegment.takenOverAt &&
+      lastSegment.transporter?.company?.siret !== userSiret);
   if (
     form.status !== "SENT" ||
     form.currentTransporterSiret !== userSiret ||
-    !!unsealedSegments.length ||
+    !!notReadytoTakeOverSegments.length ||
     !hasTakenOverLastSegment
   ) {
     return null;
