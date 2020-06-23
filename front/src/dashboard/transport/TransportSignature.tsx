@@ -159,8 +159,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       </label>
                     </p>
 
-                    <h3>Destination du déchet</h3>
-                    <address>
+                    <h3 id="destination-address">Destination du déchet</h3>
+                    <address aria-labelledby="destination-address">
                       {form.stateSummary?.recipient?.name} (
                       {form.stateSummary?.recipient?.siret})
                       <br /> {form.stateSummary?.recipient?.address}
@@ -204,8 +204,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                         <strong>producteur du déchet</strong>
                       </div>
 
-                      <h3>Lieu de collecte</h3>
-                      <address>
+                      <h3 id="collect-address">Lieu de collecte</h3>
+                      <address aria-labelledby="collect-address">
                         {form.stateSummary?.emitter?.name} (
                         {form.stateSummary?.emitter?.siret})
                         <br /> {form.stateSummary?.emitter?.address}
@@ -230,8 +230,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                         <br /> {form.stateSummary?.transporter?.address}
                       </address>
 
-                      <h3>Destination du déchet</h3>
-                      <address>
+                      <h3 id="destination-address">Destination du déchet</h3>
+                      <address aria-labelledby="destination-address">
                         {form.stateSummary?.recipient?.name} (
                         {form.stateSummary?.recipient?.siret})
                         <br /> {form.stateSummary?.recipient?.address}
