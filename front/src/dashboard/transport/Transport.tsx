@@ -8,7 +8,6 @@ import {
   FormStatus,
   Query,
   QueryFormsArgs,
-  Destination,
   WasteDetails,
 } from "../../generated/graphql/types";
 import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
