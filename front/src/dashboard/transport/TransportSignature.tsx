@@ -122,8 +122,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       Cet écran est à lire et signer par le{" "}
                       <strong>transporteur</strong>
                     </div>
-                    <h3>Lieu de collecte</h3>
-                    <address>
+                    <h3 id="collect-address">Lieu de collecte</h3>
+                    <address aria-labelledby="collect-address">
                       {form.emitter?.company?.name} (
                       {form.emitter?.company?.siret}
                       )
