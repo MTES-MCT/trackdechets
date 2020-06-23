@@ -133,6 +133,9 @@ export default function Partners() {
             <figure>
               <img src="/partners-logos/norauto.png" alt="Norauto" />
             </figure>
+            <figure>
+              <img src="/partners-logos/takeawaste.png" alt="Take a waste" />
+            </figure>
           </div>
         </div>
       </section>
