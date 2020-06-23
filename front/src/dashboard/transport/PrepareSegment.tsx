@@ -1,26 +1,24 @@
 import { useMutation } from "@apollo/react-hooks";
-import { NotificationError } from "../../common/Error";
 import { DateTime } from "luxon";
 import gql from "graphql-tag";
-
 import React, { useState } from "react";
-
 import { Field, Form as FormikForm, Formik } from "formik";
-
-import CompanySelector from "../../form/company/CompanySelector";
-import { segmentFragment } from "../../common/fragments";
-import { transportModeLabels } from "../constants";
 import cogoToast from "cogo-toast";
-import "./TransportSignature.scss";
+import { NotificationError } from "../../common/Error";
 import DateInput from "../../form/custom-inputs/DateInput";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
 import {
   Form,
   Mutation,
   MutationPrepareSegmentArgs,
   TransportMode,
+  TransportSegment,
 } from "../../generated/graphql/types";
 import { updateApolloCache } from "../../common/helper";
+import CompanySelector from "../../form/company/CompanySelector";
+import { segmentFragment } from "../../common/fragments";
+import { transportModeLabels } from "../constants";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
+import "./TransportSignature.scss";
 
 export const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -35,13 +33,18 @@ export const PREPARE_SEGMENT = gql`
   ${segmentFragment}
 `;
 
-type Props = { form: any; userSiret: String };
+interface Props {
+  form: Form;
+  userSiret: string;
+}
+
 export default function PrepareSegment({ form, userSiret }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const segments = form.transportSegments;
-  const unsealedSegments = segments.filter(segment => !segment.sealed);
-  const lastSegment = segments[segments.length - 1];
+  const segments = form.transportSegments || [];
+  // FIXME: TransportSegment has no property "sealed"
+  const unsealedSegments = segments.filter((segment: any) => !segment.sealed);
+  const lastSegment = segments[segments.length - 1] as TransportSegment | null;
   const refetchQuery = {
     query: GET_FORM,
     variables: { id: form.id },
@@ -98,8 +101,8 @@ export default function PrepareSegment({ form, userSiret }: Props) {
   // there is no unsealed segment
   const hasTakenOverLastSegment =
     !segments.length ||
-    (!!lastSegment.takenOverAt &&
-      lastSegment.transporter.company.siret !== userSiret);
+    (!!lastSegment?.takenOverAt &&
+      lastSegment?.transporter?.company?.siret !== userSiret);
   if (
     form.status !== "SENT" ||
     form.currentTransporterSiret !== userSiret ||
@@ -159,7 +162,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
                   <label>Siret</label>
                   <CompanySelector
                     name="transporter.company"
-                    onCompanySelected={(transporter) => {
+                    onCompanySelected={transporter => {
                       if (transporter.transporterReceipt) {
                         setFieldValue(
                           "transporter.receipt",
