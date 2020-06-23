@@ -139,7 +139,6 @@ const dateFmt = (datestr) => {
  * @returns {object}
  */
 const getTemporaryStorageExistance = (params) => {
-  return {};
   if (params.recipientIsTempStorage) {
     return { temporaryStorageYes: true };
   }
