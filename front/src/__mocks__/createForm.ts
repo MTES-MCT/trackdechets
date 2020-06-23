@@ -1,10 +1,14 @@
 import { Form, FormStatus } from "../generated/graphql/types";
+import { generateID } from "./generateID";
 
-export function createForm(props: Partial<Form>): Form {
+export function createForm({
+  id = generateID("form"),
+  ...props
+}: Partial<Form>): Form {
   return {
     __typename: "Form",
-    id: "form-1",
-    readableId: "form-1",
+    id: id,
+    readableId: props.readableId || id,
     customId: null,
     emitter: null,
     recipient: null,
