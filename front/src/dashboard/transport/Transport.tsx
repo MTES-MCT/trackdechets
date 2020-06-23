@@ -228,27 +228,32 @@ export default function Transport() {
     return field.toLowerCase().indexOf(filterParam.toLowerCase()) > -1;
   };
 
-  const filtering = (form, formType, userSiret) => {
+  const filtering = (form: Form, formType: string, userSiret: string) => {
     const statuses = {
       TO_TAKE_OVER: ["SEALED", "RESEALED"],
       TAKEN_OVER: ["SENT", "RESENT"],
     }[formType];
 
-    const segmentsToTakeOver = form.transportSegments.filter(
-      segment =>
-        segment.readyToTakeOver &&
-        !segment.takenOverAt &&
-        segment.transporter.company.siret === userSiret
-    );
+    const segmentsToTakeOver = form.transportSegments
+      ? form.transportSegments.filter(
+          segment =>
+            segment.readyToTakeOver &&
+            !segment.takenOverAt &&
+            segment?.transporter?.company?.siret === userSiret
+        )
+      : [];
 
-    const hasTakenOverASegment = form.transportSegments.filter(
-      segment =>
-        segment.transporter.company.siret === userSiret && !!segment.takenOverAt
-    );
+    const hasTakenOverASegment = form.transportSegments
+      ? form.transportSegments.filter(
+          segment =>
+            segment?.transporter?.company?.siret === userSiret &&
+            !!segment.takenOverAt
+        )
+      : [];
 
     return (
       (statuses.includes(form.status) &&
-        form.transporter.company.siret === siret) ||
+        form?.transporter?.company?.siret === siret) ||
       (formType === "TO_TAKE_OVER" &&
         form.status === "SENT" &&
         !!segmentsToTakeOver.length) ||
