@@ -228,25 +228,25 @@ export default function Transport() {
     return field.toLowerCase().indexOf(filterParam.toLowerCase()) > -1;
   };
 
-  const filtering = (form: Form, formType: string, userSiret: string) => {
+  const filtering = (form: Form): boolean => {
     const statuses = {
       TO_TAKE_OVER: ["SEALED", "RESEALED"],
       TAKEN_OVER: ["SENT", "RESENT"],
-    }[formType];
+    }[filterFormType.formType];
 
     const segmentsToTakeOver = form.transportSegments
       ? form.transportSegments.filter(
           segment =>
             segment.readyToTakeOver &&
             !segment.takenOverAt &&
-            segment?.transporter?.company?.siret === userSiret
+            segment?.transporter?.company?.siret === siret
         )
       : [];
 
     const hasTakenOverASegment = form.transportSegments
       ? form.transportSegments.filter(
           segment =>
-            segment?.transporter?.company?.siret === userSiret &&
+            segment?.transporter?.company?.siret === siret &&
             !!segment.takenOverAt
         )
       : [];
@@ -254,10 +254,10 @@ export default function Transport() {
     return (
       (statuses.includes(form.status) &&
         form?.transporter?.company?.siret === siret) ||
-      (formType === "TO_TAKE_OVER" &&
+      (filterFormType.formType === "TO_TAKE_OVER" &&
         form.status === "SENT" &&
         !!segmentsToTakeOver.length) ||
-      (formType === "TAKEN_OVER" &&
+      (filterFormType.formType === "TAKEN_OVER" &&
         form.status === "SENT" &&
         !!hasTakenOverASegment.length)
     );
@@ -267,18 +267,18 @@ export default function Transport() {
   const filteredForms = data
     ? data.forms
         .filter(
-          f =>
-            filtering(f, filterFormType.formType, siret) &&
+          form =>
+            filtering(form) &&
             filterAgainstPersistenFilter(
-              f.stateSummary?.transporterCustomInfo,
+              form.stateSummary?.transporterCustomInfo,
               persistentFilter
             )
         )
-        .map(f => ({
-          ...f,
+        .map(form => ({
+          ...form,
           wasteDetails: {
-            ...f.wasteDetails,
-            name: `${f.wasteDetails?.code} ${f.wasteDetails?.name} `,
+            ...form.wasteDetails,
+            name: `${form.wasteDetails?.code} ${form.wasteDetails?.name} `,
           },
         }))
     : [];
