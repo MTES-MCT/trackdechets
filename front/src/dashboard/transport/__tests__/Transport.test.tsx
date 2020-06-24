@@ -21,10 +21,10 @@ import {
 import { Form, FormRole, FormStatus } from "../../../generated/graphql/types";
 import Transport, { GET_TRANSPORT_SLIPS } from "../Transport";
 
-const EMITTER = createEmitter({
+const PRODUCER = createEmitter({
   company: createCompany({
-    siret: "emitter-1",
-    name: "EMITTER 1",
+    siret: "producer-1",
+    name: "PRODUCER 1",
   }),
 });
 
@@ -35,14 +35,14 @@ const TRANSPORTER = createTransporter({
   }),
 });
 
-const RECIPIENT = createRecipient({
+const COLLECTOR = createRecipient({
   company: createCompany({
-    siret: "recipient-1",
-    name: "RECIPIENT 1",
+    siret: "collector-1",
+    name: "COLLECTOR 1",
   }),
 });
 
-async function renderWith({ form = {} }: { form?: Partial<Form> }) {
+async function renderWith({ forms }: { forms: Form[] }) {
   render(
     <MockedProvider
       mocks={[
@@ -62,26 +62,7 @@ async function renderWith({ form = {} }: { form?: Partial<Form> }) {
           },
           result: {
             data: {
-              forms: [
-                createForm({
-                  status: FormStatus.Sealed,
-                  emitter: createEmitter({
-                    company: EMITTER.company,
-                  }),
-                  transporter: createTransporter({
-                    company: TRANSPORTER.company,
-                  }),
-                  recipient: createRecipient({
-                    company: RECIPIENT.company,
-                  }),
-                  stateSummary: createStateSummary({
-                    emitter: EMITTER.company,
-                    transporter: TRANSPORTER.company,
-                    recipient: RECIPIENT.company,
-                  }),
-                  ...form,
-                }),
-              ],
+              forms,
             },
           },
         },
@@ -97,13 +78,33 @@ async function renderWith({ form = {} }: { form?: Partial<Form> }) {
 }
 
 describe("<Transport />", () => {
-  describe("with a single transport", () => {
+  describe("when leaving the producer for the final collector", () => {
     beforeEach(async () => {
-      await renderWith({});
+      await renderWith({
+        forms: [
+          createForm({
+            status: FormStatus.Sealed,
+            emitter: createEmitter({
+              company: PRODUCER.company,
+            }),
+            transporter: createTransporter({
+              company: TRANSPORTER.company,
+            }),
+            recipient: createRecipient({
+              company: COLLECTOR.company,
+            }),
+            stateSummary: createStateSummary({
+              emitter: PRODUCER.company,
+              transporter: TRANSPORTER.company,
+              recipient: COLLECTOR.company,
+            }),
+          }),
+        ],
+      });
     });
 
     it("should list 1 form", () => {
-      expect(screen.getAllByText(EMITTER.company!.name!).length).toBe(1);
+      expect(screen.getAllByText(PRODUCER.company!.name!).length).toBe(1);
     });
 
     describe("when the transporter signs", () => {
@@ -111,30 +112,20 @@ describe("<Transport />", () => {
         fireEvent.click(screen.getByTitle("Signer ce bordereau"));
       });
 
-      it("should open the signature modal", () => {
-        expect(
-          screen.getByText(
-            (content, element) =>
-              element.textContent ===
-              "Cet écran est à lire et signer par le transporteur"
-          )
-        ).toBeInTheDocument();
-      });
-
-      it("should display the emitter as the collect address", () => {
+      it("should display the producer as the collect address", () => {
         expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-          EMITTER.company!.name!
+          PRODUCER.company!.name!
         );
       });
 
-      it("should display the final destination", () => {
+      it("should display the final collector as the destination", () => {
         expect(
           screen.getByLabelText("Destination du déchet")
-        ).toHaveTextContent(RECIPIENT.company!.name!);
+        ).toHaveTextContent(COLLECTOR.company!.name!);
       });
     });
 
-    describe("when the emitter signs", () => {
+    describe("when the producer signs", () => {
       beforeEach(async () => {
         fireEvent.click(screen.getByTitle("Signer ce bordereau"));
 
@@ -148,9 +139,9 @@ describe("<Transport />", () => {
         await waitForElement(() => screen.getByText("Valider"));
       });
 
-      it("should display the emitter as the collect address", () => {
+      it("should display the producer as the collect address", () => {
         expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-          EMITTER.company!.name!
+          PRODUCER.company!.name!
         );
       });
 
@@ -160,33 +151,44 @@ describe("<Transport />", () => {
         );
       });
 
-      it("should display the final destination", () => {
+      it("should display the final collector as the destination", () => {
         expect(
           screen.getByLabelText("Destination du déchet")
-        ).toHaveTextContent(RECIPIENT.company!.name!);
+        ).toHaveTextContent(COLLECTOR.company!.name!);
       });
     });
   });
 
-  describe("with a temporary storage", () => {
-    // When there is a temporary storage area, the recipient is that temporary storage area
-    // until it is processed further.
-    // The final recipient can be found in TemporaryStorageDetail.destination.
-    const TEMPORARY_RECIPIENT = createRecipient({
+  describe("when leaving the producer for a temporary storage", () => {
+    const TEMPORARY_STORAGE_RECIPIENT = createRecipient({
       company: TRANSPORTER.company,
     });
 
     beforeEach(async () => {
       await renderWith({
-        form: {
-          recipient: TEMPORARY_RECIPIENT,
-          temporaryStorageDetail: createTemporaryStorageDetail({
-            destination: createDestination({
-              company: RECIPIENT.company,
+        forms: [
+          createForm({
+            status: FormStatus.Sealed,
+            emitter: createEmitter({
+              company: PRODUCER.company,
             }),
-            transporter: TRANSPORTER,
+            transporter: createTransporter({
+              company: TRANSPORTER.company,
+            }),
+            recipient: TEMPORARY_STORAGE_RECIPIENT,
+            temporaryStorageDetail: createTemporaryStorageDetail({
+              destination: createDestination({
+                company: COLLECTOR.company,
+              }),
+              transporter: null,
+            }),
+            stateSummary: createStateSummary({
+              emitter: PRODUCER.company,
+              transporter: TRANSPORTER.company,
+              recipient: COLLECTOR.company,
+            }),
           }),
-        },
+        ],
       });
     });
 
@@ -195,20 +197,20 @@ describe("<Transport />", () => {
         fireEvent.click(screen.getByTitle("Signer ce bordereau"));
       });
 
-      it("should display the emitter as the collect address", () => {
+      it("should display the producer as the collect address", () => {
         expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-          EMITTER.company!.name!
+          PRODUCER.company!.name!
         );
       });
 
       it("should display the temporary storage as the destination", () => {
         expect(
           screen.getByLabelText("Destination du déchet")
-        ).toHaveTextContent(TEMPORARY_RECIPIENT.company!.name!);
+        ).toHaveTextContent(TEMPORARY_STORAGE_RECIPIENT.company!.name!);
       });
     });
 
-    describe("when the emitter signs", () => {
+    describe("when the producer signs", () => {
       beforeEach(async () => {
         fireEvent.click(screen.getByTitle("Signer ce bordereau"));
 
@@ -222,9 +224,9 @@ describe("<Transport />", () => {
         await waitForElement(() => screen.getByText("Valider"));
       });
 
-      it("should display the emitter as the collect address", () => {
+      it("should display the producer as the collect address", () => {
         expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
-          EMITTER.company!.name!
+          PRODUCER.company!.name!
         );
       });
 
@@ -234,11 +236,97 @@ describe("<Transport />", () => {
         );
       });
 
-      // FIXME: the destination should be the temporary storage or the final recipient for this screen?
-      it.skip("should display the temporary storage as the destination", () => {
+      it("should display the temporary storage as the destination", () => {
         expect(
           screen.getByLabelText("Destination du déchet")
-        ).toHaveTextContent(TEMPORARY_RECIPIENT.company!.name!);
+        ).toHaveTextContent(TEMPORARY_STORAGE_RECIPIENT.company!.name!);
+      });
+    });
+  });
+
+  describe("when leaving the temporary storage for the final collector", () => {
+    const TEMPORARY_STORAGE_RECIPIENT = createRecipient({
+      company: TRANSPORTER.company,
+    });
+
+    beforeEach(async () => {
+      await renderWith({
+        forms: [
+          createForm({
+            status: FormStatus.Resealed,
+            emitter: createEmitter({
+              company: PRODUCER.company,
+            }),
+            transporter: createTransporter({
+              company: TRANSPORTER.company,
+            }),
+            recipient: TEMPORARY_STORAGE_RECIPIENT,
+            temporaryStorageDetail: createTemporaryStorageDetail({
+              destination: createDestination({
+                company: COLLECTOR.company,
+              }),
+              transporter: TRANSPORTER,
+            }),
+            stateSummary: createStateSummary({
+              emitter: TEMPORARY_STORAGE_RECIPIENT.company,
+              transporter: TRANSPORTER.company,
+              recipient: COLLECTOR.company,
+            }),
+          }),
+        ],
+      });
+
+      fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+    });
+
+    describe("when the transporter signs", () => {
+      beforeEach(() => {
+        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+      });
+
+      it("should display the temporary storage as the collect address", () => {
+        expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
+          TEMPORARY_STORAGE_RECIPIENT.company!.name!
+        );
+      });
+
+      it("should display the final collector as the destination", () => {
+        expect(
+          screen.getByLabelText("Destination du déchet")
+        ).toHaveTextContent(COLLECTOR.company!.name!);
+      });
+    });
+
+    describe("when the temporary storage signs", () => {
+      beforeEach(async () => {
+        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+
+        fireEvent.click(
+          screen.getByLabelText(
+            "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
+          )
+        );
+        fireEvent.click(screen.getByText("Suivant"));
+
+        await waitForElement(() => screen.getByText("Valider"));
+      });
+
+      it("should display the temporary storage as the collect address", () => {
+        expect(screen.getByLabelText("Lieu de collecte")).toHaveTextContent(
+          TEMPORARY_STORAGE_RECIPIENT.company!.name!
+        );
+      });
+
+      it("should display the transporter", () => {
+        expect(screen.getByLabelText("Transporteur")).toHaveTextContent(
+          TRANSPORTER.company!.name!
+        );
+      });
+
+      it("should display final collector as the destination", () => {
+        expect(
+          screen.getByLabelText("Destination du déchet")
+        ).toHaveTextContent(COLLECTOR.company!.name!);
       });
     });
   });

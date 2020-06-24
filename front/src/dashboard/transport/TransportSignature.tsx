@@ -69,11 +69,15 @@ export default function TransportSignature({ form, userSiret }: Props) {
     },
   });
 
-  // display if form is SEALED and user is the first transporter
-  if (
-    form.status !== "SEALED" ||
-    form.transporter?.company?.siret !== userSiret
-  ) {
+  const isPendingTransportFromEmitter =
+    form.status === "SEALED" && form.transporter?.company?.siret === userSiret;
+  const isPendingTransportFromTemporaryStorage =
+    form.status === "RESEALED" &&
+    form.temporaryStorageDetail?.transporter?.company?.siret === userSiret;
+  const isPendingTransport =
+    isPendingTransportFromEmitter || isPendingTransportFromTemporaryStorage;
+
+  if (!isPendingTransport) {
     return null;
   }
 
@@ -124,10 +128,10 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     </div>
                     <h3 id="collect-address">Lieu de collecte</h3>
                     <address aria-labelledby="collect-address">
-                      {form.emitter?.company?.name} (
-                      {form.emitter?.company?.siret}
+                      {form.stateSummary?.emitter?.name} (
+                      {form.stateSummary?.emitter?.siret}
                       )
-                      <br /> {form.emitter?.company?.address}
+                      <br /> {form.stateSummary?.emitter?.address}
                     </address>
 
                     <h3>Déchets à collecter</h3>
@@ -161,9 +165,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
 
                     <h3 id="destination-address">Destination du déchet</h3>
                     <address aria-labelledby="destination-address">
-                      {form.recipient?.company?.name} (
-                      {form.recipient?.company?.siret})
-                      <br /> {form.recipient?.company?.address}
+                      {form.stateSummary?.recipient?.name} (
+                      {form.stateSummary?.recipient?.siret})
+                      <br /> {form.stateSummary?.recipient?.address}
                     </address>
 
                     <h3>Validation</h3>
@@ -200,6 +204,10 @@ export default function TransportSignature({ form, userSiret }: Props) {
                   <>
                     <div>
                       <div className="notification success">
+                        {/*
+                          FIXME: this screen might be shown when the waste is leaving the temporary storage for the final collector.
+                          In this case, should it still be signed by the producer or the temporary storage holder?
+                        */}
                         Cet écran est à lire et signer par le{" "}
                         <strong>producteur du déchet</strong>
                       </div>
@@ -244,6 +252,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
                             name="signedByProducer"
                             required
                           />
+                          {/*
+                            FIXME: same here, what if the waste is leaving a temporary storage?
+                          */}
                           En tant que producteur du déchet, j'ai vérifié que les
                           déchets confiés au transporter correspondent au
                           informations vue ci-avant et je valide l'enlèvement.
@@ -252,6 +263,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       <RedErrorMessage name="signedByProducer" />
 
                       <p>
+                        {/*
+                          FIXME: which raises the question for the following fields.
+                        */}
                         <label>
                           Code de sécurité entreprise
                           <Field
