@@ -8,7 +8,6 @@ import {
   FormStatus,
   Query,
   QueryFormsArgs,
-  WasteDetails,
 } from "../../generated/graphql/types";
 import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
 import PrepareSegment from "./PrepareSegment";
@@ -127,7 +126,6 @@ const Table = ({ forms, userSiret }) => {
       </thead>
       <tbody>
         {sortedForms.map(form => {
-          const transportInfos = getTransportInfos(form);
           return (
             <tr key={form.id}>
               <td>
@@ -172,17 +170,14 @@ const Table = ({ forms, userSiret }) => {
                 <Segments form={form} userSiret={userSiret} />
               </td>
               <td>
-                <TransportSignature
-                  form={transportInfos}
-                  userSiret={userSiret}
-                />
+                <TransportSignature form={form} userSiret={userSiret} />
 
-                <PrepareSegment form={transportInfos} userSiret={userSiret} />
+                <PrepareSegment form={form} userSiret={userSiret} />
                 <MarkSegmentAsReadyToTakeOver
-                  form={transportInfos}
+                  form={form}
                   userSiret={userSiret}
                 />
-                <EditSegment form={transportInfos} userSiret={userSiret} />
+                <EditSegment form={form} userSiret={userSiret} />
                 <TakeOverSegment form={form} userSiret={userSiret} />
               </td>
             </tr>
@@ -348,40 +343,4 @@ export default function Transport() {
       />
     </div>
   );
-}
-
-function getTransportInfos(form: Form): Form {
-  if (!form.temporaryStorageDetail) {
-    return form;
-  }
-
-  // Ignore the waste details if it has been omitted or if its quantity is 0
-  const temporaryStorageWasteDetails = form.temporaryStorageDetail.wasteDetails
-    ?.quantity
-    ? form.temporaryStorageDetail.wasteDetails
-    : null;
-
-  return {
-    ...form,
-    // FIXME: why was the recipient merged with the emitter in the first place?
-    // It sure is creating a bug but perhaps it's useful in certain situations.
-    // emitter: {
-    //   ...form.emitter,
-    //   ...form.recipient,
-    // },
-    // recipient: {
-    //   ...form.recipient!,
-    //   ...(form.temporaryStorageDetail.destination as Omit<
-    //     Destination,
-    //     "__typename"
-    //   >),
-    // },
-    wasteDetails:
-      form.wasteDetails == null && temporaryStorageWasteDetails == null
-        ? null
-        : ({
-            ...form.wasteDetails,
-            ...temporaryStorageWasteDetails,
-          } as WasteDetails),
-  };
 }
