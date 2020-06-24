@@ -48,7 +48,7 @@ describe("loggingMiddleware", () => {
     expect(level).toEqual("info");
     expect(metadata.user).toEqual("anonyme");
     expect(metadata.response_body).toEqual("world");
-    expect(metadata.execution_time_num).toBeGreaterThan(0);
+    expect(metadata.execution_time_num).toBeGreaterThanOrEqual(0);
     expect(metadata.http_status).toEqual(200);
   });
 
@@ -62,7 +62,7 @@ describe("loggingMiddleware", () => {
     expect(metadata.response_body).toEqual(
       '{"data":{"me":{"name":"John Snow"}}}'
     );
-    expect(metadata.execution_time_num).toBeGreaterThan(0);
+    expect(metadata.execution_time_num).toBeGreaterThanOrEqual(0);
     expect(metadata.http_status).toEqual(200);
     expect(metadata.graphql_query).toEqual("{ me { name } }");
   });
