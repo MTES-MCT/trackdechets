@@ -185,7 +185,7 @@ describe("<Transport />", () => {
             stateSummary: createStateSummary({
               emitter: PRODUCER.company,
               transporter: TRANSPORTER.company,
-              recipient: COLLECTOR.company,
+              recipient: TEMPORARY_STORAGE_RECIPIENT.company,
             }),
           }),
         ],
