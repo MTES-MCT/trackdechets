@@ -218,7 +218,7 @@ const renameAndFormatMainFormFields = (params) => ({
   tempStorerReceivedAt: dateFmt(params.tempStorerReceivedAt),
   tempStorerSignedAt: dateFmt(params.tempStorerSignedAt),
   tempStoredFormSignedAt: dateFmt(params.signedAt),
-  tempStoredFormSignedBy: dateFmt(params.signedBy),
+  tempStoredFormSignedBy: params.signedBy,
 });
 
 /**
