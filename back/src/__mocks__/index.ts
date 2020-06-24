@@ -6,3 +6,4 @@ export * from "./createRecipient";
 export * from "./createStateSummary";
 export * from "./createTemporaryStorageDetail";
 export * from "./createTransporter";
+export * from "./createWasteDetails";

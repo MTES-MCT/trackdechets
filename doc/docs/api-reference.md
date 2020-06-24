@@ -3032,30 +3032,57 @@ Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours 
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetails">WasteDetails</a></td>
+<td>
+
+Détail du déchet le plus à jour
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong> ⚠️</td>
 <td valign="top"><a href="#float">Float</a></td>
 <td>
 
-Quantité la plus à jour
+DEPRECATED - Quantité la plus à jour
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Information contenue dans `StateSummary.wasteDetails`
+
+</blockquote>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td colspan="2" valign="top"><strong>packagings</strong> ⚠️</td>
 <td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
 <td>
 
-Packaging le plus à jour
+DEPRECATED - Packaging le plus à jour
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Information contenue dans `StateSummary.wasteDetails`
+
+</blockquote>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>onuCode</strong></td>
+<td colspan="2" valign="top"><strong>onuCode</strong> ⚠️</td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Code ONU le plus à jour
+DEPRECATED - Code ONU le plus à jour
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Information contenue dans `StateSummary.wasteDetails`
+
+</blockquote>
 </td>
 </tr>
 <tr>

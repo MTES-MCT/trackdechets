@@ -1,17 +1,17 @@
 import { TemporaryStorageDetail, prisma } from "../../generated/prisma-client";
-import { Form, StateSummary } from "../../generated/graphql/types";
+import {
+  Form,
+  StateSummary,
+  WasteDetails
+} from "../../generated/graphql/types";
 
 export const stateSummary = async (form: Form): Promise<StateSummary> => {
   const temporaryStorageDetail = await prisma
     .form({ id: form.id })
     .temporaryStorageDetail();
+  const wasteDetails = getWasteDetails(form, temporaryStorageDetail);
+
   return {
-    quantity: getQuantity(form, temporaryStorageDetail),
-    packagings:
-      temporaryStorageDetail?.wasteDetailsPackagings ??
-      form.wasteDetails?.packagings,
-    onuCode:
-      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails?.onuCode,
     transporterNumberPlate: temporaryStorageDetail
       ? temporaryStorageDetail.transporterNumberPlate
       : form.transporter?.numberPlate,
@@ -21,9 +21,42 @@ export const stateSummary = async (form: Form): Promise<StateSummary> => {
     transporter: getTransporter(form, temporaryStorageDetail),
     recipient: getRecipient(form, temporaryStorageDetail),
     emitter: getEmitter(form, temporaryStorageDetail),
-    lastActionOn: getLastActionOn(form, temporaryStorageDetail)
+    lastActionOn: getLastActionOn(form, temporaryStorageDetail),
+
+    wasteDetails,
+
+    // The following fields are deprecated, they can be found in wasteDetails
+    quantity: wasteDetails.quantity,
+    packagings: wasteDetails.packagings,
+    onuCode: wasteDetails.onuCode
   };
 };
+
+function getWasteDetails(
+  form: Form,
+  temporaryStorageDetail: TemporaryStorageDetail
+): WasteDetails {
+  return {
+    code: form.wasteDetails?.code,
+    name: form.wasteDetails?.name,
+    onuCode:
+      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails?.onuCode,
+    packagings:
+      temporaryStorageDetail?.wasteDetailsPackagings ??
+      form.wasteDetails?.packagings,
+    otherPackaging:
+      temporaryStorageDetail?.wasteDetailsOtherPackaging ??
+      form.wasteDetails?.otherPackaging,
+    numberOfPackages:
+      temporaryStorageDetail?.wasteDetailsNumberOfPackages ??
+      form.wasteDetails?.numberOfPackages,
+    quantity: getQuantity(form, temporaryStorageDetail),
+    quantityType:
+      temporaryStorageDetail?.wasteDetailsQuantityType ??
+      form.wasteDetails?.quantityType,
+    consistence: form.wasteDetails?.consistence
+  };
+}
 
 function getTransporter(
   form: Form,

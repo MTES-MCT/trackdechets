@@ -125,6 +125,9 @@ const staticFieldsFragment = gql`
     createdAt
     status
     stateSummary {
+      wasteDetails {
+        ...WasteDetailsFragment
+      }
       packagings
       onuCode
       quantity
@@ -148,6 +151,7 @@ const staticFieldsFragment = gql`
       lastActionOn
     }
   }
+  ${wasteDetailsFragment}
 `;
 
 const mutableFieldsFragment = gql`

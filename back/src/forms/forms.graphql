@@ -479,14 +479,20 @@ En fonction du statut du bordereau, différentes informations sont à lire pour 
 Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
 """
 type StateSummary {
-  "Quantité la plus à jour"
+  "Détail du déchet le plus à jour"
+  wasteDetails: WasteDetails
+
+  "DEPRECATED - Quantité la plus à jour"
   quantity: Float
+    @deprecated(reason: "Information contenue dans `StateSummary.wasteDetails`")
 
-  "Packaging le plus à jour"
+  "DEPRECATED - Packaging le plus à jour"
   packagings: [Packagings!]!
+    @deprecated(reason: "Information contenue dans `StateSummary.wasteDetails`")
 
-  "Code ONU le plus à jour"
+  "DEPRECATED - Code ONU le plus à jour"
   onuCode: String
+    @deprecated(reason: "Information contenue dans `StateSummary.wasteDetails`")
 
   "Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)"
   transporter: FormCompany
@@ -882,10 +888,10 @@ type MultimodalTransporter {
 
 type TransportSegment {
   id: ID!
-  
+
   "Siret du transporteur précédent"
   previousTransporterCompanySiret: String
-  
+
   "Transporteur du segment"
   transporter: MultimodalTransporter
 

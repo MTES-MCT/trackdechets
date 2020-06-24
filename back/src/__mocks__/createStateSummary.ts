@@ -3,6 +3,7 @@ import { StateSummary } from "../generated/graphql/types";
 export function createStateSummary(props: Partial<StateSummary>): StateSummary {
   return {
     __typename: "StateSummary",
+    wasteDetails: null,
     quantity: null,
     packagings: [],
     onuCode: null,

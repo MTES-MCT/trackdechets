@@ -1449,11 +1449,22 @@ export type Stat = {
  */
 export type StateSummary = {
    __typename?: 'StateSummary';
-  /** Quantité la plus à jour */
+  /** Détail du déchet le plus à jour */
+  wasteDetails: Maybe<WasteDetails>;
+  /**
+   * DEPRECATED - Quantité la plus à jour
+   * @deprecated Information contenue dans `StateSummary.wasteDetails`
+   */
   quantity: Maybe<Scalars['Float']>;
-  /** Packaging le plus à jour */
+  /**
+   * DEPRECATED - Packaging le plus à jour
+   * @deprecated Information contenue dans `StateSummary.wasteDetails`
+   */
   packagings: Array<Packagings>;
-  /** Code ONU le plus à jour */
+  /**
+   * DEPRECATED - Code ONU le plus à jour
+   * @deprecated Information contenue dans `StateSummary.wasteDetails`
+   */
   onuCode: Maybe<Scalars['String']>;
   /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
   transporter: Maybe<FormCompany>;
