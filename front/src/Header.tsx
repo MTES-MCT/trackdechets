@@ -25,7 +25,7 @@ export default withRouter(function Header({
         <Link className="navbar__home" to="/">
           <img
             className="navbar__logo"
-            src="/mtes.png"
+            src="/marianne.svg"
             alt="Ministère de la Transition écologique et solidaire"
           />
           <img
