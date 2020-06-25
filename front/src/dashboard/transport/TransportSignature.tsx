@@ -12,6 +12,7 @@ import {
   Form,
   Mutation,
   MutationSignedByTransporterArgs,
+  FormStatus,
 } from "../../generated/graphql/types";
 import Packagings from "../../form/packagings/Packagings";
 import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
@@ -80,6 +81,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
   if (!isPendingTransport) {
     return null;
   }
+
+  const isEmittedByProducer =
+    form.temporaryStorageDetail == null || form.status !== FormStatus.Resealed;
 
   return (
     <>
@@ -199,13 +203,20 @@ export default function TransportSignature({ form, userSiret }: Props) {
                   </>
                 )}
               </Wizard.Page>
-              <Wizard.Page title="Signature Producteur">
+              <Wizard.Page
+                title={`Signature ${
+                  isEmittedByProducer ? "Producteur" : "Détenteur"
+                }`}
+              >
                 {(props: any) => (
                   <>
                     <div>
                       <div className="notification success">
                         Cet écran est à lire et signer par le{" "}
-                        <strong>producteur du déchet</strong>
+                        <strong>
+                          {isEmittedByProducer ? "producteur" : "détenteur"} du
+                          déchet
+                        </strong>
                       </div>
 
                       <h3 id="collect-address">Lieu de collecte</h3>
@@ -248,9 +259,11 @@ export default function TransportSignature({ form, userSiret }: Props) {
                             name="signedByProducer"
                             required
                           />
-                          En tant que producteur du déchet, j'ai vérifié que les
-                          déchets confiés au transporter correspondent au
-                          informations vue ci-avant et je valide l'enlèvement.
+                          En tant que{" "}
+                          {isEmittedByProducer ? "producteur" : "détenteur"} du
+                          déchet, j'ai vérifié que les déchets confiés au
+                          transporter correspondent au informations vue ci-avant
+                          et je valide l'enlèvement.
                         </label>
                       </p>
                       <RedErrorMessage name="signedByProducer" />
