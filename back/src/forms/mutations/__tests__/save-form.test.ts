@@ -3,7 +3,9 @@ import { ErrorCode } from "../../../common/errors";
 import * as queries from "../../../companies/queries";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
-const ecoOrganismeMock = jest.fn(() => Promise.resolve(null));
+const ecoOrganismeMock = jest.fn<Promise<null | { siret: string }>, []>(() =>
+  Promise.resolve(null)
+);
 const formMock = jest.fn(() => Promise.resolve({}));
 function mockFormWith(value) {
   const result: any = Promise.resolve(value);
@@ -31,7 +33,15 @@ jest.mock("../../../generated/prisma-client", () => ({
 describe("Forms -> saveForm mutation", () => {
   const getUserCompaniesMock = jest.spyOn(queries, "getUserCompanies");
   getUserCompaniesMock.mockResolvedValue([
-    { id: "", securityCode: 123, companyTypes: [], siret: "user siret" }
+    {
+      id: "",
+      securityCode: 123,
+      companyTypes: [],
+      siret: "user siret",
+      createdAt: new Date().toString(),
+      updatedAt: new Date().toString(),
+      documentKeys: []
+    }
   ]);
 
   beforeEach(() => {
