@@ -12,10 +12,9 @@ generates:
     plugins:
       - typescript
       - typescript-operations
+      - "@homebound/graphql-typescript-factories"
     config:
       avoidOptionals: true
   documentation/api-reference.md:
     plugins:
       - graphql-markdown-plugin.js
-
-

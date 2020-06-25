@@ -38,7 +38,7 @@ export const SIGNED_BY_TRANSPORTER = gql`
   }
 `;
 
-type Props = { form: any; userSiret: string };
+type Props = { form: Form; userSiret: string };
 
 export default function TransportSignature({ form, userSiret }: Props) {
   const { siret } = useContext(SiretContext);
@@ -69,11 +69,15 @@ export default function TransportSignature({ form, userSiret }: Props) {
     },
   });
 
-  // display if form is SEALED and user is the first transporter
-  if (
-    form.status !== "SEALED" ||
-    form.transporter.company.siret !== userSiret
-  ) {
+  const isPendingTransportFromEmitter =
+    form.status === "SEALED" && form.transporter?.company?.siret === userSiret;
+  const isPendingTransportFromTemporaryStorage =
+    form.status === "RESEALED" &&
+    form.temporaryStorageDetail?.transporter?.company?.siret === userSiret;
+  const isPendingTransport =
+    isPendingTransportFromEmitter || isPendingTransportFromTemporaryStorage;
+
+  if (!isPendingTransport) {
     return null;
   }
 
@@ -104,9 +108,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
                 securityCode: "",
                 signedByTransporter: false,
                 signedByProducer: false,
-                packagings: form.stateSummary.packagings,
-                quantity: form.stateSummary.quantity,
-                onuCode: form.stateSummary.onuCode,
+                packagings: form.stateSummary?.packagings,
+                quantity: form.stateSummary?.quantity ?? "",
+                onuCode: form.stateSummary?.onuCode ?? "",
               }}
               onSubmit={(values: any) =>
                 signedByTransporter({
@@ -122,12 +126,12 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       Cet écran est à lire et signer par le{" "}
                       <strong>transporteur</strong>
                     </div>
-                    <h3>Lieu de collecte</h3>
-                    <address>
-                      {form.emitter?.company?.name} (
-                      {form.emitter?.company?.siret}
+                    <h3 id="collect-address">Lieu de collecte</h3>
+                    <address aria-labelledby="collect-address">
+                      {form.stateSummary?.emitter?.name} (
+                      {form.stateSummary?.emitter?.siret}
                       )
-                      <br /> {form.emitter?.company?.address}
+                      <br /> {form.stateSummary?.emitter?.address}
                     </address>
 
                     <h3>Déchets à collecter</h3>
@@ -159,11 +163,11 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       </label>
                     </p>
 
-                    <h3>Destination du déchet</h3>
-                    <address>
-                      {form.stateSummary.recipient?.name} (
-                      {form.stateSummary.recipient?.siret})
-                      <br /> {form.stateSummary.recipient?.address}
+                    <h3 id="destination-address">Destination du déchet</h3>
+                    <address aria-labelledby="destination-address">
+                      {form.stateSummary?.recipient?.name} (
+                      {form.stateSummary?.recipient?.siret})
+                      <br /> {form.stateSummary?.recipient?.address}
                     </address>
 
                     <h3>Validation</h3>
@@ -204,11 +208,11 @@ export default function TransportSignature({ form, userSiret }: Props) {
                         <strong>producteur du déchet</strong>
                       </div>
 
-                      <h3>Lieu de collecte</h3>
-                      <address>
-                        {form.stateSummary.emitter?.name} (
-                        {form.stateSummary.emitter?.siret})
-                        <br /> {form.stateSummary.emitter?.address}
+                      <h3 id="collect-address">Lieu de collecte</h3>
+                      <address aria-labelledby="collect-address">
+                        {form.stateSummary?.emitter?.name} (
+                        {form.stateSummary?.emitter?.siret})
+                        <br /> {form.stateSummary?.emitter?.address}
                       </address>
 
                       <h3>Mes déchets</h3>
@@ -223,18 +227,18 @@ export default function TransportSignature({ form, userSiret }: Props) {
                         Poids total: {props.quantity} tonnes
                       </p>
 
-                      <h3>Transporteur</h3>
-                      <address>
-                        {form.stateSummary.transporter?.name} (
-                        {form.stateSummary.transporter?.siret})
-                        <br /> {form.stateSummary.transporter?.address}
+                      <h3 id="transporter-address">Transporteur</h3>
+                      <address aria-labelledby="transporter-address">
+                        {form.stateSummary?.transporter?.name} (
+                        {form.stateSummary?.transporter?.siret})
+                        <br /> {form.stateSummary?.transporter?.address}
                       </address>
 
-                      <h3>Destination du déchet</h3>
-                      <address>
-                        {form.stateSummary.recipient?.name} (
-                        {form.stateSummary.recipient?.siret})
-                        <br /> {form.stateSummary.recipient?.address}
+                      <h3 id="destination-address">Destination du déchet</h3>
+                      <address aria-labelledby="destination-address">
+                        {form.stateSummary?.recipient?.name} (
+                        {form.stateSummary?.recipient?.siret})
+                        <br /> {form.stateSummary?.recipient?.address}
                       </address>
 
                       <p>

@@ -125,68 +125,59 @@ const Table = ({ forms, userSiret }) => {
         </tr>
       </thead>
       <tbody>
-        {sortedForms.map(form => {
-          const transportInfos = getTransportInfos(form);
-          return (
-            <tr key={form.id}>
-              <td>
-                <div className="readable-id">
-                  {form.readableId}
-                  <DownloadPdf formId={form.id} />
-                </div>
-              </td>
-              <td>{form.stateSummary?.emitter?.name}</td>
-              <td className="hide-on-mobile">
-                {form.stateSummary?.recipient?.name}
-              </td>
-              <td>
-                <div>{form.wasteDetails?.name}</div>
-              </td>
-              <td className="hide-on-mobile">
-                {form.stateSummary?.quantity} tonnes
-              </td>
-              <td>{form.stateSummary?.transporterCustomInfo}</td>
-              <td style={{ paddingLeft: 0, paddingRight: 0 }}>
-                {
-                  <TransporterInfoEdit
-                    form={form}
-                    fieldName="customInfo"
-                    title={"Modifier le champ libre"}
-                    refetchQuery={refetchQuery}
-                  />
-                }
-              </td>
-              <td>{form.stateSummary?.transporterNumberPlate}</td>
-              <td style={{ paddingLeft: 0 }}>
-                {
-                  <TransporterInfoEdit
-                    form={form}
-                    fieldName="numberPlate"
-                    title={"Modifier la plaque d'immatriculation"}
-                    refetchQuery={refetchQuery}
-                  />
-                }
-              </td>
-              <td>
-                <Segments form={form} userSiret={userSiret} />
-              </td>
-              <td>
-                <TransportSignature
-                  form={transportInfos}
-                  userSiret={userSiret}
+        {sortedForms.map(form => (
+          <tr key={form.id}>
+            <td>
+              <div className="readable-id">
+                {form.readableId}
+                <DownloadPdf formId={form.id} />
+              </div>
+            </td>
+            <td>{form.stateSummary?.emitter?.name}</td>
+            <td className="hide-on-mobile">
+              {form.stateSummary?.recipient?.name}
+            </td>
+            <td>
+              <div>{form.wasteDetails?.name}</div>
+            </td>
+            <td className="hide-on-mobile">
+              {form.stateSummary?.quantity} tonnes
+            </td>
+            <td>{form.stateSummary?.transporterCustomInfo}</td>
+            <td style={{ paddingLeft: 0, paddingRight: 0 }}>
+              {
+                <TransporterInfoEdit
+                  form={form}
+                  fieldName="customInfo"
+                  title={"Modifier le champ libre"}
+                  refetchQuery={refetchQuery}
                 />
+              }
+            </td>
+            <td>{form.stateSummary?.transporterNumberPlate}</td>
+            <td style={{ paddingLeft: 0 }}>
+              {
+                <TransporterInfoEdit
+                  form={form}
+                  fieldName="numberPlate"
+                  title={"Modifier la plaque d'immatriculation"}
+                  refetchQuery={refetchQuery}
+                />
+              }
+            </td>
+            <td>
+              <Segments form={form} userSiret={userSiret} />
+            </td>
+            <td>
+              <TransportSignature form={form} userSiret={userSiret} />
 
-                <PrepareSegment form={transportInfos} userSiret={userSiret} />
-                <MarkSegmentAsReadyToTakeOver
-                  form={transportInfos}
-                  userSiret={userSiret}
-                />
-                <EditSegment form={transportInfos} userSiret={userSiret} />
-                <TakeOverSegment form={form} userSiret={userSiret} />
-              </td>
-            </tr>
-          );
-        })}
+              <PrepareSegment form={form} userSiret={userSiret} />
+              <MarkSegmentAsReadyToTakeOver form={form} userSiret={userSiret} />
+              <EditSegment form={form} userSiret={userSiret} />
+              <TakeOverSegment form={form} userSiret={userSiret} />
+            </td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );
@@ -226,31 +217,33 @@ export default function Transport() {
     return field.toLowerCase().indexOf(filterParam.toLowerCase()) > -1;
   };
 
-  const filtering = (form, formType, userSiret) => {
+  const filtering = (form: Form): boolean => {
     const statuses = {
       TO_TAKE_OVER: ["SEALED", "RESEALED"],
       TAKEN_OVER: ["SENT", "RESENT"],
-    }[formType];
+    }[filterFormType.formType];
 
-    const segmentsToTakeOver = form.transportSegments.filter(
-      segment =>
-        segment.readyToTakeOver &&
-        !segment.takenOverAt &&
-        segment.transporter.company.siret === userSiret
-    );
+    const segmentsToTakeOver =
+      form.transportSegments?.filter(
+        segment =>
+          segment.readyToTakeOver &&
+          !segment.takenOverAt &&
+          segment.transporter?.company?.siret === siret
+      ) ?? [];
 
-    const hasTakenOverASegment = form.transportSegments.filter(
-      segment =>
-        segment.transporter.company.siret === userSiret && !!segment.takenOverAt
-    );
+    const hasTakenOverASegment =
+      form.transportSegments?.filter(
+        segment =>
+          segment.transporter?.company?.siret === siret && !!segment.takenOverAt
+      ) ?? [];
 
     return (
       (statuses.includes(form.status) &&
-        form.transporter.company.siret === siret) ||
-      (formType === "TO_TAKE_OVER" &&
+        form.transporter?.company?.siret === siret) ||
+      (filterFormType.formType === "TO_TAKE_OVER" &&
         form.status === "SENT" &&
         !!segmentsToTakeOver.length) ||
-      (formType === "TAKEN_OVER" &&
+      (filterFormType.formType === "TAKEN_OVER" &&
         form.status === "SENT" &&
         !!hasTakenOverASegment.length)
     );
@@ -261,7 +254,7 @@ export default function Transport() {
     ? data.forms
         .filter(
           f =>
-            filtering(f, filterFormType.formType, siret) &&
+            filtering(f) &&
             filterAgainstPersistenFilter(
               f.stateSummary?.transporterCustomInfo,
               persistentFilter
@@ -342,27 +335,4 @@ export default function Transport() {
       />
     </div>
   );
-}
-
-function getTransportInfos(form: Form) {
-  if (!form.temporaryStorageDetail) {
-    return form;
-  }
-
-  return {
-    ...form,
-    emitter: {
-      ...form.emitter,
-      ...form.recipient,
-    },
-    recipient: {
-      ...form.recipient,
-      ...form.temporaryStorageDetail.destination,
-    },
-    wasteDetails: {
-      ...form.wasteDetails,
-      ...(form.temporaryStorageDetail?.wasteDetails?.quantity &&
-        form.temporaryStorageDetail.wasteDetails),
-    },
-  };
 }
