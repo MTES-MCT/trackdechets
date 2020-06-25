@@ -49,17 +49,6 @@ describe("forms", () => {
     );
   });
 
-  it("should not filter forms with a role when not provided", async () => {
-    await getForms("userId", { roles: null });
-    expect(prismaMock.forms).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          AND: [{}, {}]
-        })
-      })
-    );
-  });
-
   it("should filter forms with a specific role", async () => {
     await getForms("userId", { roles: ["ECO_ORGANISME"] });
     expect(prismaMock.forms).toHaveBeenCalledWith(

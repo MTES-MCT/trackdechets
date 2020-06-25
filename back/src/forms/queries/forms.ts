@@ -60,10 +60,6 @@ export default async function forms(
 }
 
 function getRolesFilter(siret: string, roles: FormRole[]) {
-  if (roles.length <= 0) {
-    return {};
-  }
-
   const filtersByRole = {
     ["RECIPIENT"]: [
       { recipientCompanySiret: siret },
@@ -93,7 +89,7 @@ function getRolesFilter(siret: string, roles: FormRole[]) {
 
   return {
     OR: (Object.keys(filtersByRole) as Array<keyof typeof filtersByRole>)
-      .filter(role => roles.includes(role))
+      .filter(role => (roles.length > 0 ? roles.includes(role) : true))
       .map(role => filtersByRole[role])
       .flat()
   };
