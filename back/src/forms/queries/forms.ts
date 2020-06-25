@@ -19,26 +19,28 @@ const DEFAULT_FIRST = 50;
  */
 export default async function forms(
   userId: string,
-  {
-    siret,
-    type,
-    roles,
-    status,
-    hasNextStep,
-    first = DEFAULT_FIRST,
-    skip = 0
-  }: QueryFormsArgs
+  { siret, type, status, hasNextStep, ...rest }: QueryFormsArgs
 ) {
-  // TODO Remove `type` param and this code after deprecation warning period
-  if (type && !roles) {
-    roles = type === "ACTOR" ? [] : ["TRANSPORTER"];
-  }
+  const first = rest.first ?? DEFAULT_FIRST;
+  const skip = rest.skip ?? 0;
+  const roles: FormRole[] =
+    // TODO Remove `type` param and this code after deprecation warning period
+    type && !rest.roles
+      ? type === "ACTOR"
+        ? []
+        : ["TRANSPORTER"]
+      : rest.roles ?? [];
+
   const userCompanies = await getUserCompanies(userId);
 
   const company =
-    siret != null
-      ? userCompanies.find(uc => uc.siret === siret)
-      : userCompanies.shift();
+    siret == null
+      ? userCompanies.shift()
+      : userCompanies.find(uc => uc.siret === siret);
+
+  if (company == null) {
+    return [];
+  }
 
   const queriedForms = await prisma.forms({
     first,
@@ -48,7 +50,7 @@ export default async function forms(
       ...(status?.length && { status_in: status }),
       AND: [
         getRolesFilter(company.siret, roles),
-        getHasNextStepFilter(siret, hasNextStep)
+        getHasNextStepFilter(company.siret, hasNextStep)
       ],
       isDeleted: false
     }
@@ -57,7 +59,11 @@ export default async function forms(
   return queriedForms.map(f => unflattenObjectFromDb(f));
 }
 
-function getRolesFilter(siret: string, types: FormRole[]) {
+function getRolesFilter(siret: string, roles: FormRole[]) {
+  if (roles.length <= 0) {
+    return {};
+  }
+
   const filtersByRole = {
     ["RECIPIENT"]: [
       { recipientCompanySiret: siret },
@@ -86,14 +92,14 @@ function getRolesFilter(siret: string, types: FormRole[]) {
   };
 
   return {
-    OR: Object.keys(filtersByRole)
-      .filter(type => (types?.length ? types.includes(type as FormRole) : true))
-      .map(type => filtersByRole[type])
+    OR: (Object.keys(filtersByRole) as Array<keyof typeof filtersByRole>)
+      .filter(role => roles.includes(role))
+      .map(role => filtersByRole[role])
       .flat()
   };
 }
 
-function getHasNextStepFilter(siret: string, hasNextStep) {
+function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
   if (hasNextStep == null) {
     return {};
   }
