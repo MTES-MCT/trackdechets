@@ -1,29 +1,29 @@
 import {
-  newForm,
-  newEmitter,
-  newFormCompany,
-  newTransporter,
-  newRecipient,
-  newWasteDetails
+  createFormMock,
+  createEmitterMock,
+  createFormCompanyMock,
+  createTransporterMock,
+  createRecipientMock,
+  createWasteDetailsMock
 } from "../../../generated/graphql/types";
 import { stateSummary as getStateSummary } from "../state-summary";
 
-const PRODUCER = newEmitter({
-  company: newFormCompany({
+const PRODUCER = createEmitterMock({
+  company: createFormCompanyMock({
     siret: "producer",
     name: "PRODUCER"
   })
 });
 
-const TRANSPORTER = newTransporter({
-  company: newFormCompany({
+const TRANSPORTER = createTransporterMock({
+  company: createFormCompanyMock({
     siret: "transporter",
     name: "TRANSPORTER"
   })
 });
 
-const COLLECTOR = newRecipient({
-  company: newFormCompany({
+const COLLECTOR = createRecipientMock({
+  company: createFormCompanyMock({
     siret: "collector",
     name: "COLLECTOR"
   })
@@ -44,12 +44,12 @@ describe("stateSummary", () => {
   });
 
   describe("when leaving the producer for a collector", () => {
-    const FORM = newForm({
+    const FORM = createFormMock({
       status: "SEALED",
       emitter: PRODUCER,
       transporter: TRANSPORTER,
       recipient: COLLECTOR,
-      wasteDetails: newWasteDetails({
+      wasteDetails: createWasteDetailsMock({
         code: "oil-code",
         name: "Oil",
         onuCode: "oil-onu-code",
@@ -82,7 +82,7 @@ describe("stateSummary", () => {
   });
 
   describe("when leaving the producer for a temporary storage", () => {
-    const INITIAL_WASTE_DETAILS = newWasteDetails({
+    const INITIAL_WASTE_DETAILS = createWasteDetailsMock({
       code: "oil-code",
       name: "Oil",
       onuCode: "oil-onu-code",
@@ -93,21 +93,21 @@ describe("stateSummary", () => {
       quantityType: "ESTIMATED",
       consistence: "LIQUID"
     });
-    const TEMPORARY_STORAGE = newRecipient({
-      company: newFormCompany({
+    const TEMPORARY_STORAGE = createRecipientMock({
+      company: createFormCompanyMock({
         siret: "temporary-storage",
         name: "TEMPORARY STORAGE"
       }),
       isTempStorage: true
     });
-    const FORM = newForm({
+    const FORM = createFormMock({
       status: "SEALED",
       emitter: PRODUCER,
       transporter: TRANSPORTER,
       recipient: TEMPORARY_STORAGE,
       wasteDetails: INITIAL_WASTE_DETAILS
     });
-    const TEMPORARY_WASTE_DETAILS = newWasteDetails({
+    const TEMPORARY_WASTE_DETAILS = createWasteDetailsMock({
       onuCode: "temporary-oil-onu-code",
       packagings: [],
       otherPackaging: null,

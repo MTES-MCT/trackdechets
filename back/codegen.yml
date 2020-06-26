@@ -5,10 +5,12 @@ generates:
     plugins:
       - typescript
       - typescript-resolvers
-      - "@homebound/graphql-typescript-factories"
+      - graphql-codegen-factories
     config:
       contextType: ../../types#GraphQLContext
       enumsAsTypes: true
+      scalarDefaults:
+        DateTime: new Date()
   front/generated/graphql/types.ts:
     plugins:
       - typescript
