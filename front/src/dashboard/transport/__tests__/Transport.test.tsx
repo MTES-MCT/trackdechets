@@ -11,34 +11,34 @@ import {
   Form,
   FormRole,
   FormStatus,
-  newFormCompany,
-  newEmitter,
-  newForm,
-  newTransporter,
-  newStateSummary,
-  newTemporaryStorageDetail,
-  newRecipient,
-  newDestination,
+  createFormCompanyMock,
+  createEmitterMock,
+  createFormMock,
+  createTransporterMock,
+  createStateSummaryMock,
+  createTemporaryStorageDetailMock,
+  createRecipientMock,
+  createDestinationMock,
 } from "../../../generated/graphql/types";
 import { SiretContext } from "../../Dashboard";
 import Transport, { GET_TRANSPORT_SLIPS } from "../Transport";
 
-const PRODUCER = newEmitter({
-  company: newFormCompany({
+const PRODUCER = createEmitterMock({
+  company: createFormCompanyMock({
     siret: "producer-1",
     name: "PRODUCER 1",
   }),
 });
 
-const TRANSPORTER = newTransporter({
-  company: newFormCompany({
+const TRANSPORTER = createTransporterMock({
+  company: createFormCompanyMock({
     siret: "transporter-1",
     name: "TRANSPORTER 1",
   }),
 });
 
-const COLLECTOR = newRecipient({
-  company: newFormCompany({
+const COLLECTOR = createRecipientMock({
+  company: createFormCompanyMock({
     siret: "collector-1",
     name: "COLLECTOR 1",
   }),
@@ -84,18 +84,18 @@ describe("<Transport />", () => {
     beforeEach(async () => {
       await renderWith({
         forms: [
-          newForm({
+          createFormMock({
             status: FormStatus.Sealed,
-            emitter: newEmitter({
+            emitter: createEmitterMock({
               company: PRODUCER.company,
             }),
-            transporter: newTransporter({
+            transporter: createTransporterMock({
               company: TRANSPORTER.company,
             }),
-            recipient: newRecipient({
+            recipient: createRecipientMock({
               company: COLLECTOR.company,
             }),
-            stateSummary: newStateSummary({
+            stateSummary: createStateSummaryMock({
               emitter: PRODUCER.company,
               transporter: TRANSPORTER.company,
               recipient: COLLECTOR.company,
@@ -162,29 +162,29 @@ describe("<Transport />", () => {
   });
 
   describe("when leaving the producer for a temporary storage", () => {
-    const TEMPORARY_STORAGE_RECIPIENT = newRecipient({
+    const TEMPORARY_STORAGE_RECIPIENT = createRecipientMock({
       company: TRANSPORTER.company,
     });
 
     beforeEach(async () => {
       await renderWith({
         forms: [
-          newForm({
+          createFormMock({
             status: FormStatus.Sealed,
-            emitter: newEmitter({
+            emitter: createEmitterMock({
               company: PRODUCER.company,
             }),
-            transporter: newTransporter({
+            transporter: createTransporterMock({
               company: TRANSPORTER.company,
             }),
             recipient: TEMPORARY_STORAGE_RECIPIENT,
-            temporaryStorageDetail: newTemporaryStorageDetail({
-              destination: newDestination({
+            temporaryStorageDetail: createTemporaryStorageDetailMock({
+              destination: createDestinationMock({
                 company: COLLECTOR.company,
               }),
               transporter: null,
             }),
-            stateSummary: newStateSummary({
+            stateSummary: createStateSummaryMock({
               emitter: PRODUCER.company,
               transporter: TRANSPORTER.company,
               recipient: TEMPORARY_STORAGE_RECIPIENT.company,
@@ -247,29 +247,29 @@ describe("<Transport />", () => {
   });
 
   describe("when leaving the temporary storage for the final collector", () => {
-    const TEMPORARY_STORAGE_RECIPIENT = newRecipient({
+    const TEMPORARY_STORAGE_RECIPIENT = createRecipientMock({
       company: TRANSPORTER.company,
     });
 
     beforeEach(async () => {
       await renderWith({
         forms: [
-          newForm({
+          createFormMock({
             status: FormStatus.Resealed,
-            emitter: newEmitter({
+            emitter: createEmitterMock({
               company: PRODUCER.company,
             }),
-            transporter: newTransporter({
+            transporter: createTransporterMock({
               company: TRANSPORTER.company,
             }),
             recipient: TEMPORARY_STORAGE_RECIPIENT,
-            temporaryStorageDetail: newTemporaryStorageDetail({
-              destination: newDestination({
+            temporaryStorageDetail: createTemporaryStorageDetailMock({
+              destination: createDestinationMock({
                 company: COLLECTOR.company,
               }),
               transporter: TRANSPORTER,
             }),
-            stateSummary: newStateSummary({
+            stateSummary: createStateSummaryMock({
               emitter: TEMPORARY_STORAGE_RECIPIENT.company,
               transporter: TRANSPORTER.company,
               recipient: COLLECTOR.company,

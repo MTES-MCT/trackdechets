@@ -1858,1745 +1858,561 @@ export type WorkSiteInput = {
 };
 
 
-export type FormOptions = Partial<Form>;
-
-export function newForm(
-  options: FormOptions = {},
-  cache: Record<string, any> = {}
-): Form {
-  const o = (cache["Form"] = {} as Form);
-  o.__typename = "Form";
-  o.id = options.id ?? nextFactoryId("Form");
-  o.readableId = options.readableId ?? "readableId";
-  o.customId = options.customId ?? null;
-  o.emitter = maybeNewOrNullEmitter(options.emitter, cache);
-  o.recipient = maybeNewOrNullRecipient(options.recipient, cache);
-  o.transporter = maybeNewOrNullTransporter(options.transporter, cache);
-  o.wasteDetails = maybeNewOrNullWasteDetails(options.wasteDetails, cache);
-  o.trader = maybeNewOrNullTrader(options.trader, cache);
-  o.createdAt = options.createdAt ?? null;
-  o.updatedAt = options.updatedAt ?? null;
-  o.status = options.status ?? FormStatus.Draft;
-  o.signedByTransporter = options.signedByTransporter ?? null;
-  o.sentAt = options.sentAt ?? null;
-  o.sentBy = options.sentBy ?? null;
-  o.wasteAcceptationStatus = options.wasteAcceptationStatus ?? null;
-  o.wasteRefusalReason = options.wasteRefusalReason ?? null;
-  o.receivedBy = options.receivedBy ?? null;
-  o.receivedAt = options.receivedAt ?? null;
-  o.signedAt = options.signedAt ?? null;
-  o.quantityReceived = options.quantityReceived ?? null;
-  o.actualQuantity = options.actualQuantity ?? null;
-  o.processingOperationDone = options.processingOperationDone ?? null;
-  o.processingOperationDescription =
-    options.processingOperationDescription ?? null;
-  o.processedBy = options.processedBy ?? null;
-  o.processedAt = options.processedAt ?? null;
-  o.noTraceability = options.noTraceability ?? null;
-  o.nextDestination = maybeNewOrNullNextDestination(
-    options.nextDestination,
-    cache
-  );
-  o.appendix2Forms = options.appendix2Forms ?? null;
-  o.ecoOrganisme = maybeNewOrNullEcoOrganisme(options.ecoOrganisme, cache);
-  o.temporaryStorageDetail = maybeNewOrNullTemporaryStorageDetail(
-    options.temporaryStorageDetail,
-    cache
-  );
-  o.stateSummary = maybeNewOrNullStateSummary(options.stateSummary, cache);
-  o.transportSegments = options.transportSegments ?? null;
-  o.currentTransporterSiret = options.currentTransporterSiret ?? null;
-  o.nextTransporterSiret = options.nextTransporterSiret ?? null;
-  return o;
-}
-
-function maybeNewForm(
-  value: FormOptions | undefined,
-  cache: Record<string, any>
-): Form {
-  if (value === undefined) {
-    return (cache["Form"] as Form) ?? newForm({}, cache);
-  } else if (value.__typename) {
-    return value as Form;
-  } else {
-    return newForm(value, cache);
-  }
-}
-
-function maybeNewOrNullForm(
-  value: FormOptions | undefined | null,
-  cache: Record<string, any>
-): Form | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Form;
-  } else {
-    return newForm(value, cache);
-  }
-}
-
-export type EmitterOptions = Partial<Emitter>;
-
-export function newEmitter(
-  options: EmitterOptions = {},
-  cache: Record<string, any> = {}
-): Emitter {
-  const o = (cache["Emitter"] = {} as Emitter);
-  o.__typename = "Emitter";
-  o.type = options.type ?? null;
-  o.workSite = maybeNewOrNullWorkSite(options.workSite, cache);
-  o.pickupSite = options.pickupSite ?? null;
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  return o;
-}
-
-function maybeNewEmitter(
-  value: EmitterOptions | undefined,
-  cache: Record<string, any>
-): Emitter {
-  if (value === undefined) {
-    return (cache["Emitter"] as Emitter) ?? newEmitter({}, cache);
-  } else if (value.__typename) {
-    return value as Emitter;
-  } else {
-    return newEmitter(value, cache);
-  }
-}
-
-function maybeNewOrNullEmitter(
-  value: EmitterOptions | undefined | null,
-  cache: Record<string, any>
-): Emitter | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Emitter;
-  } else {
-    return newEmitter(value, cache);
-  }
-}
-
-export type WorkSiteOptions = Partial<WorkSite>;
-
-export function newWorkSite(
-  options: WorkSiteOptions = {},
-  cache: Record<string, any> = {}
-): WorkSite {
-  const o = (cache["WorkSite"] = {} as WorkSite);
-  o.__typename = "WorkSite";
-  o.name = options.name ?? null;
-  o.address = options.address ?? null;
-  o.city = options.city ?? null;
-  o.postalCode = options.postalCode ?? null;
-  o.infos = options.infos ?? null;
-  return o;
-}
-
-function maybeNewWorkSite(
-  value: WorkSiteOptions | undefined,
-  cache: Record<string, any>
-): WorkSite {
-  if (value === undefined) {
-    return (cache["WorkSite"] as WorkSite) ?? newWorkSite({}, cache);
-  } else if (value.__typename) {
-    return value as WorkSite;
-  } else {
-    return newWorkSite(value, cache);
-  }
-}
-
-function maybeNewOrNullWorkSite(
-  value: WorkSiteOptions | undefined | null,
-  cache: Record<string, any>
-): WorkSite | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as WorkSite;
-  } else {
-    return newWorkSite(value, cache);
-  }
-}
-
-export type FormCompanyOptions = Partial<FormCompany>;
-
-export function newFormCompany(
-  options: FormCompanyOptions = {},
-  cache: Record<string, any> = {}
-): FormCompany {
-  const o = (cache["FormCompany"] = {} as FormCompany);
-  o.__typename = "FormCompany";
-  o.name = options.name ?? null;
-  o.siret = options.siret ?? null;
-  o.address = options.address ?? null;
-  o.contact = options.contact ?? null;
-  o.phone = options.phone ?? null;
-  o.mail = options.mail ?? null;
-  return o;
-}
-
-function maybeNewFormCompany(
-  value: FormCompanyOptions | undefined,
-  cache: Record<string, any>
-): FormCompany {
-  if (value === undefined) {
-    return (cache["FormCompany"] as FormCompany) ?? newFormCompany({}, cache);
-  } else if (value.__typename) {
-    return value as FormCompany;
-  } else {
-    return newFormCompany(value, cache);
-  }
-}
-
-function maybeNewOrNullFormCompany(
-  value: FormCompanyOptions | undefined | null,
-  cache: Record<string, any>
-): FormCompany | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as FormCompany;
-  } else {
-    return newFormCompany(value, cache);
-  }
-}
-
-export type RecipientOptions = Partial<Recipient>;
-
-export function newRecipient(
-  options: RecipientOptions = {},
-  cache: Record<string, any> = {}
-): Recipient {
-  const o = (cache["Recipient"] = {} as Recipient);
-  o.__typename = "Recipient";
-  o.cap = options.cap ?? null;
-  o.processingOperation = options.processingOperation ?? null;
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  o.isTempStorage = options.isTempStorage ?? null;
-  return o;
-}
-
-function maybeNewRecipient(
-  value: RecipientOptions | undefined,
-  cache: Record<string, any>
-): Recipient {
-  if (value === undefined) {
-    return (cache["Recipient"] as Recipient) ?? newRecipient({}, cache);
-  } else if (value.__typename) {
-    return value as Recipient;
-  } else {
-    return newRecipient(value, cache);
-  }
-}
-
-function maybeNewOrNullRecipient(
-  value: RecipientOptions | undefined | null,
-  cache: Record<string, any>
-): Recipient | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Recipient;
-  } else {
-    return newRecipient(value, cache);
-  }
-}
-
-export type TransporterOptions = Partial<Transporter>;
-
-export function newTransporter(
-  options: TransporterOptions = {},
-  cache: Record<string, any> = {}
-): Transporter {
-  const o = (cache["Transporter"] = {} as Transporter);
-  o.__typename = "Transporter";
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  o.isExemptedOfReceipt = options.isExemptedOfReceipt ?? null;
-  o.receipt = options.receipt ?? null;
-  o.department = options.department ?? null;
-  o.validityLimit = options.validityLimit ?? null;
-  o.numberPlate = options.numberPlate ?? null;
-  o.customInfo = options.customInfo ?? null;
-  return o;
-}
-
-function maybeNewTransporter(
-  value: TransporterOptions | undefined,
-  cache: Record<string, any>
-): Transporter {
-  if (value === undefined) {
-    return (cache["Transporter"] as Transporter) ?? newTransporter({}, cache);
-  } else if (value.__typename) {
-    return value as Transporter;
-  } else {
-    return newTransporter(value, cache);
-  }
-}
-
-function maybeNewOrNullTransporter(
-  value: TransporterOptions | undefined | null,
-  cache: Record<string, any>
-): Transporter | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Transporter;
-  } else {
-    return newTransporter(value, cache);
-  }
-}
-
-export type WasteDetailsOptions = Partial<WasteDetails>;
-
-export function newWasteDetails(
-  options: WasteDetailsOptions = {},
-  cache: Record<string, any> = {}
-): WasteDetails {
-  const o = (cache["WasteDetails"] = {} as WasteDetails);
-  o.__typename = "WasteDetails";
-  o.code = options.code ?? null;
-  o.name = options.name ?? null;
-  o.onuCode = options.onuCode ?? null;
-  o.packagings = options.packagings ?? [];
-  o.otherPackaging = options.otherPackaging ?? null;
-  o.numberOfPackages = options.numberOfPackages ?? null;
-  o.quantity = options.quantity ?? null;
-  o.quantityType = options.quantityType ?? null;
-  o.consistence = options.consistence ?? null;
-  return o;
-}
-
-function maybeNewWasteDetails(
-  value: WasteDetailsOptions | undefined,
-  cache: Record<string, any>
-): WasteDetails {
-  if (value === undefined) {
-    return (
-      (cache["WasteDetails"] as WasteDetails) ?? newWasteDetails({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as WasteDetails;
-  } else {
-    return newWasteDetails(value, cache);
-  }
-}
-
-function maybeNewOrNullWasteDetails(
-  value: WasteDetailsOptions | undefined | null,
-  cache: Record<string, any>
-): WasteDetails | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as WasteDetails;
-  } else {
-    return newWasteDetails(value, cache);
-  }
-}
-
-export type TraderOptions = Partial<Trader>;
-
-export function newTrader(
-  options: TraderOptions = {},
-  cache: Record<string, any> = {}
-): Trader {
-  const o = (cache["Trader"] = {} as Trader);
-  o.__typename = "Trader";
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  o.receipt = options.receipt ?? null;
-  o.department = options.department ?? null;
-  o.validityLimit = options.validityLimit ?? null;
-  return o;
-}
-
-function maybeNewTrader(
-  value: TraderOptions | undefined,
-  cache: Record<string, any>
-): Trader {
-  if (value === undefined) {
-    return (cache["Trader"] as Trader) ?? newTrader({}, cache);
-  } else if (value.__typename) {
-    return value as Trader;
-  } else {
-    return newTrader(value, cache);
-  }
-}
-
-function maybeNewOrNullTrader(
-  value: TraderOptions | undefined | null,
-  cache: Record<string, any>
-): Trader | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Trader;
-  } else {
-    return newTrader(value, cache);
-  }
-}
-
-export type NextDestinationOptions = Partial<NextDestination>;
-
-export function newNextDestination(
-  options: NextDestinationOptions = {},
-  cache: Record<string, any> = {}
-): NextDestination {
-  const o = (cache["NextDestination"] = {} as NextDestination);
-  o.__typename = "NextDestination";
-  o.processingOperation = options.processingOperation ?? null;
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  return o;
-}
-
-function maybeNewNextDestination(
-  value: NextDestinationOptions | undefined,
-  cache: Record<string, any>
-): NextDestination {
-  if (value === undefined) {
-    return (
-      (cache["NextDestination"] as NextDestination) ??
-      newNextDestination({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as NextDestination;
-  } else {
-    return newNextDestination(value, cache);
-  }
-}
-
-function maybeNewOrNullNextDestination(
-  value: NextDestinationOptions | undefined | null,
-  cache: Record<string, any>
-): NextDestination | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as NextDestination;
-  } else {
-    return newNextDestination(value, cache);
-  }
-}
-
-export type EcoOrganismeOptions = Partial<EcoOrganisme>;
-
-export function newEcoOrganisme(
-  options: EcoOrganismeOptions = {},
-  cache: Record<string, any> = {}
-): EcoOrganisme {
-  const o = (cache["EcoOrganisme"] = {} as EcoOrganisme);
-  o.__typename = "EcoOrganisme";
-  o.id = options.id ?? nextFactoryId("EcoOrganisme");
-  o.name = options.name ?? "name";
-  o.siret = options.siret ?? "siret";
-  o.address = options.address ?? "address";
-  return o;
-}
-
-function maybeNewEcoOrganisme(
-  value: EcoOrganismeOptions | undefined,
-  cache: Record<string, any>
-): EcoOrganisme {
-  if (value === undefined) {
-    return (
-      (cache["EcoOrganisme"] as EcoOrganisme) ?? newEcoOrganisme({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as EcoOrganisme;
-  } else {
-    return newEcoOrganisme(value, cache);
-  }
-}
-
-function maybeNewOrNullEcoOrganisme(
-  value: EcoOrganismeOptions | undefined | null,
-  cache: Record<string, any>
-): EcoOrganisme | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as EcoOrganisme;
-  } else {
-    return newEcoOrganisme(value, cache);
-  }
-}
-
-export type TemporaryStorageDetailOptions = Partial<TemporaryStorageDetail>;
-
-export function newTemporaryStorageDetail(
-  options: TemporaryStorageDetailOptions = {},
-  cache: Record<string, any> = {}
-): TemporaryStorageDetail {
-  const o = (cache["TemporaryStorageDetail"] = {} as TemporaryStorageDetail);
-  o.__typename = "TemporaryStorageDetail";
-  o.temporaryStorer = maybeNewOrNullTemporaryStorer(
-    options.temporaryStorer,
-    cache
-  );
-  o.destination = maybeNewOrNullDestination(options.destination, cache);
-  o.wasteDetails = maybeNewOrNullWasteDetails(options.wasteDetails, cache);
-  o.transporter = maybeNewOrNullTransporter(options.transporter, cache);
-  o.signedBy = options.signedBy ?? null;
-  o.signedAt = options.signedAt ?? null;
-  return o;
-}
-
-function maybeNewTemporaryStorageDetail(
-  value: TemporaryStorageDetailOptions | undefined,
-  cache: Record<string, any>
-): TemporaryStorageDetail {
-  if (value === undefined) {
-    return (
-      (cache["TemporaryStorageDetail"] as TemporaryStorageDetail) ??
-      newTemporaryStorageDetail({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as TemporaryStorageDetail;
-  } else {
-    return newTemporaryStorageDetail(value, cache);
-  }
-}
-
-function maybeNewOrNullTemporaryStorageDetail(
-  value: TemporaryStorageDetailOptions | undefined | null,
-  cache: Record<string, any>
-): TemporaryStorageDetail | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as TemporaryStorageDetail;
-  } else {
-    return newTemporaryStorageDetail(value, cache);
-  }
-}
-
-export type TemporaryStorerOptions = Partial<TemporaryStorer>;
-
-export function newTemporaryStorer(
-  options: TemporaryStorerOptions = {},
-  cache: Record<string, any> = {}
-): TemporaryStorer {
-  const o = (cache["TemporaryStorer"] = {} as TemporaryStorer);
-  o.__typename = "TemporaryStorer";
-  o.quantityType = options.quantityType ?? null;
-  o.quantityReceived = options.quantityReceived ?? null;
-  o.wasteAcceptationStatus = options.wasteAcceptationStatus ?? null;
-  o.wasteRefusalReason = options.wasteRefusalReason ?? null;
-  o.receivedAt = options.receivedAt ?? null;
-  o.receivedBy = options.receivedBy ?? null;
-  return o;
-}
-
-function maybeNewTemporaryStorer(
-  value: TemporaryStorerOptions | undefined,
-  cache: Record<string, any>
-): TemporaryStorer {
-  if (value === undefined) {
-    return (
-      (cache["TemporaryStorer"] as TemporaryStorer) ??
-      newTemporaryStorer({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as TemporaryStorer;
-  } else {
-    return newTemporaryStorer(value, cache);
-  }
-}
-
-function maybeNewOrNullTemporaryStorer(
-  value: TemporaryStorerOptions | undefined | null,
-  cache: Record<string, any>
-): TemporaryStorer | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as TemporaryStorer;
-  } else {
-    return newTemporaryStorer(value, cache);
-  }
-}
-
-export type DestinationOptions = Partial<Destination>;
-
-export function newDestination(
-  options: DestinationOptions = {},
-  cache: Record<string, any> = {}
-): Destination {
-  const o = (cache["Destination"] = {} as Destination);
-  o.__typename = "Destination";
-  o.cap = options.cap ?? null;
-  o.processingOperation = options.processingOperation ?? null;
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  o.isFilledByEmitter = options.isFilledByEmitter ?? null;
-  return o;
-}
-
-function maybeNewDestination(
-  value: DestinationOptions | undefined,
-  cache: Record<string, any>
-): Destination {
-  if (value === undefined) {
-    return (cache["Destination"] as Destination) ?? newDestination({}, cache);
-  } else if (value.__typename) {
-    return value as Destination;
-  } else {
-    return newDestination(value, cache);
-  }
-}
-
-function maybeNewOrNullDestination(
-  value: DestinationOptions | undefined | null,
-  cache: Record<string, any>
-): Destination | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Destination;
-  } else {
-    return newDestination(value, cache);
-  }
-}
-
-export type StateSummaryOptions = Partial<StateSummary>;
-
-export function newStateSummary(
-  options: StateSummaryOptions = {},
-  cache: Record<string, any> = {}
-): StateSummary {
-  const o = (cache["StateSummary"] = {} as StateSummary);
-  o.__typename = "StateSummary";
-  o.quantity = options.quantity ?? null;
-  o.packagings = options.packagings ?? [];
-  o.onuCode = options.onuCode ?? null;
-  o.transporter = maybeNewOrNullFormCompany(options.transporter, cache);
-  o.transporterNumberPlate = options.transporterNumberPlate ?? null;
-  o.transporterCustomInfo = options.transporterCustomInfo ?? null;
-  o.recipient = maybeNewOrNullFormCompany(options.recipient, cache);
-  o.emitter = maybeNewOrNullFormCompany(options.emitter, cache);
-  o.lastActionOn = options.lastActionOn ?? null;
-  return o;
-}
-
-function maybeNewStateSummary(
-  value: StateSummaryOptions | undefined,
-  cache: Record<string, any>
-): StateSummary {
-  if (value === undefined) {
-    return (
-      (cache["StateSummary"] as StateSummary) ?? newStateSummary({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as StateSummary;
-  } else {
-    return newStateSummary(value, cache);
-  }
-}
-
-function maybeNewOrNullStateSummary(
-  value: StateSummaryOptions | undefined | null,
-  cache: Record<string, any>
-): StateSummary | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as StateSummary;
-  } else {
-    return newStateSummary(value, cache);
-  }
-}
-
-export type TransportSegmentOptions = Partial<TransportSegment>;
-
-export function newTransportSegment(
-  options: TransportSegmentOptions = {},
-  cache: Record<string, any> = {}
-): TransportSegment {
-  const o = (cache["TransportSegment"] = {} as TransportSegment);
-  o.__typename = "TransportSegment";
-  o.id = options.id ?? nextFactoryId("TransportSegment");
-  o.previousTransporterCompanySiret =
-    options.previousTransporterCompanySiret ?? null;
-  o.transporter = maybeNewOrNullMultimodalTransporter(
-    options.transporter,
-    cache
-  );
-  o.mode = options.mode ?? null;
-  o.takenOverAt = options.takenOverAt ?? null;
-  o.takenOverBy = options.takenOverBy ?? null;
-  o.readyToTakeOver = options.readyToTakeOver ?? null;
-  o.segmentNumber = options.segmentNumber ?? null;
-  return o;
-}
-
-function maybeNewTransportSegment(
-  value: TransportSegmentOptions | undefined,
-  cache: Record<string, any>
-): TransportSegment {
-  if (value === undefined) {
-    return (
-      (cache["TransportSegment"] as TransportSegment) ??
-      newTransportSegment({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as TransportSegment;
-  } else {
-    return newTransportSegment(value, cache);
-  }
-}
-
-function maybeNewOrNullTransportSegment(
-  value: TransportSegmentOptions | undefined | null,
-  cache: Record<string, any>
-): TransportSegment | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as TransportSegment;
-  } else {
-    return newTransportSegment(value, cache);
-  }
-}
-
-export type MultimodalTransporterOptions = Partial<MultimodalTransporter>;
-
-export function newMultimodalTransporter(
-  options: MultimodalTransporterOptions = {},
-  cache: Record<string, any> = {}
-): MultimodalTransporter {
-  const o = (cache["MultimodalTransporter"] = {} as MultimodalTransporter);
-  o.__typename = "MultimodalTransporter";
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  o.isExemptedOfReceipt = options.isExemptedOfReceipt ?? null;
-  o.receipt = options.receipt ?? null;
-  o.department = options.department ?? null;
-  o.validityLimit = options.validityLimit ?? null;
-  o.numberPlate = options.numberPlate ?? null;
-  o.customInfo = options.customInfo ?? null;
-  return o;
-}
-
-function maybeNewMultimodalTransporter(
-  value: MultimodalTransporterOptions | undefined,
-  cache: Record<string, any>
-): MultimodalTransporter {
-  if (value === undefined) {
-    return (
-      (cache["MultimodalTransporter"] as MultimodalTransporter) ??
-      newMultimodalTransporter({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as MultimodalTransporter;
-  } else {
-    return newMultimodalTransporter(value, cache);
-  }
-}
-
-function maybeNewOrNullMultimodalTransporter(
-  value: MultimodalTransporterOptions | undefined | null,
-  cache: Record<string, any>
-): MultimodalTransporter | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as MultimodalTransporter;
-  } else {
-    return newMultimodalTransporter(value, cache);
-  }
-}
-
-export type CompanyPublicOptions = Partial<CompanyPublic>;
-
-export function newCompanyPublic(
-  options: CompanyPublicOptions = {},
-  cache: Record<string, any> = {}
-): CompanyPublic {
-  const o = (cache["CompanyPublic"] = {} as CompanyPublic);
-  o.__typename = "CompanyPublic";
-  o.contactEmail = options.contactEmail ?? null;
-  o.contactPhone = options.contactPhone ?? null;
-  o.website = options.website ?? null;
-  o.siret = options.siret ?? null;
-  o.etatAdministratif = options.etatAdministratif ?? null;
-  o.address = options.address ?? null;
-  o.name = options.name ?? null;
-  o.naf = options.naf ?? null;
-  o.libelleNaf = options.libelleNaf ?? null;
-  o.longitude = options.longitude ?? null;
-  o.latitude = options.latitude ?? null;
-  o.installation = maybeNewOrNullInstallation(options.installation, cache);
-  o.isRegistered = options.isRegistered ?? null;
-  o.transporterReceipt = maybeNewOrNullTransporterReceipt(
-    options.transporterReceipt,
-    cache
-  );
-  o.traderReceipt = maybeNewOrNullTraderReceipt(options.traderReceipt, cache);
-  return o;
-}
-
-function maybeNewCompanyPublic(
-  value: CompanyPublicOptions | undefined,
-  cache: Record<string, any>
-): CompanyPublic {
-  if (value === undefined) {
-    return (
-      (cache["CompanyPublic"] as CompanyPublic) ?? newCompanyPublic({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as CompanyPublic;
-  } else {
-    return newCompanyPublic(value, cache);
-  }
-}
-
-function maybeNewOrNullCompanyPublic(
-  value: CompanyPublicOptions | undefined | null,
-  cache: Record<string, any>
-): CompanyPublic | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as CompanyPublic;
-  } else {
-    return newCompanyPublic(value, cache);
-  }
-}
-
-export type InstallationOptions = Partial<Installation>;
-
-export function newInstallation(
-  options: InstallationOptions = {},
-  cache: Record<string, any> = {}
-): Installation {
-  const o = (cache["Installation"] = {} as Installation);
-  o.__typename = "Installation";
-  o.codeS3ic = options.codeS3ic ?? null;
-  o.urlFiche = options.urlFiche ?? null;
-  o.rubriques = options.rubriques ?? null;
-  o.declarations = options.declarations ?? null;
-  return o;
-}
-
-function maybeNewInstallation(
-  value: InstallationOptions | undefined,
-  cache: Record<string, any>
-): Installation {
-  if (value === undefined) {
-    return (
-      (cache["Installation"] as Installation) ?? newInstallation({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as Installation;
-  } else {
-    return newInstallation(value, cache);
-  }
-}
-
-function maybeNewOrNullInstallation(
-  value: InstallationOptions | undefined | null,
-  cache: Record<string, any>
-): Installation | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Installation;
-  } else {
-    return newInstallation(value, cache);
-  }
-}
-
-export type RubriqueOptions = Partial<Rubrique>;
-
-export function newRubrique(
-  options: RubriqueOptions = {},
-  cache: Record<string, any> = {}
-): Rubrique {
-  const o = (cache["Rubrique"] = {} as Rubrique);
-  o.__typename = "Rubrique";
-  o.rubrique = options.rubrique ?? "rubrique";
-  o.alinea = options.alinea ?? null;
-  o.etatActivite = options.etatActivite ?? null;
-  o.regimeAutorise = options.regimeAutorise ?? null;
-  o.activite = options.activite ?? null;
-  o.category = options.category ?? "category";
-  o.volume = options.volume ?? null;
-  o.unite = options.unite ?? null;
-  o.wasteType = options.wasteType ?? null;
-  return o;
-}
-
-function maybeNewRubrique(
-  value: RubriqueOptions | undefined,
-  cache: Record<string, any>
-): Rubrique {
-  if (value === undefined) {
-    return (cache["Rubrique"] as Rubrique) ?? newRubrique({}, cache);
-  } else if (value.__typename) {
-    return value as Rubrique;
-  } else {
-    return newRubrique(value, cache);
-  }
-}
-
-function maybeNewOrNullRubrique(
-  value: RubriqueOptions | undefined | null,
-  cache: Record<string, any>
-): Rubrique | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Rubrique;
-  } else {
-    return newRubrique(value, cache);
-  }
-}
-
-export type DeclarationOptions = Partial<Declaration>;
-
-export function newDeclaration(
-  options: DeclarationOptions = {},
-  cache: Record<string, any> = {}
-): Declaration {
-  const o = (cache["Declaration"] = {} as Declaration);
-  o.__typename = "Declaration";
-  o.annee = options.annee ?? null;
-  o.codeDechet = options.codeDechet ?? null;
-  o.libDechet = options.libDechet ?? null;
-  o.gerepType = options.gerepType ?? null;
-  return o;
-}
-
-function maybeNewDeclaration(
-  value: DeclarationOptions | undefined,
-  cache: Record<string, any>
-): Declaration {
-  if (value === undefined) {
-    return (cache["Declaration"] as Declaration) ?? newDeclaration({}, cache);
-  } else if (value.__typename) {
-    return value as Declaration;
-  } else {
-    return newDeclaration(value, cache);
-  }
-}
-
-function maybeNewOrNullDeclaration(
-  value: DeclarationOptions | undefined | null,
-  cache: Record<string, any>
-): Declaration | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Declaration;
-  } else {
-    return newDeclaration(value, cache);
-  }
-}
-
-export type TransporterReceiptOptions = Partial<TransporterReceipt>;
-
-export function newTransporterReceipt(
-  options: TransporterReceiptOptions = {},
-  cache: Record<string, any> = {}
-): TransporterReceipt {
-  const o = (cache["TransporterReceipt"] = {} as TransporterReceipt);
-  o.__typename = "TransporterReceipt";
-  o.id = options.id ?? nextFactoryId("TransporterReceipt");
-  o.receiptNumber = options.receiptNumber ?? "receiptNumber";
-  o.validityLimit = options.validityLimit ?? ("" as any);
-  o.department = options.department ?? "department";
-  return o;
-}
-
-function maybeNewTransporterReceipt(
-  value: TransporterReceiptOptions | undefined,
-  cache: Record<string, any>
-): TransporterReceipt {
-  if (value === undefined) {
-    return (
-      (cache["TransporterReceipt"] as TransporterReceipt) ??
-      newTransporterReceipt({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as TransporterReceipt;
-  } else {
-    return newTransporterReceipt(value, cache);
-  }
-}
-
-function maybeNewOrNullTransporterReceipt(
-  value: TransporterReceiptOptions | undefined | null,
-  cache: Record<string, any>
-): TransporterReceipt | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as TransporterReceipt;
-  } else {
-    return newTransporterReceipt(value, cache);
-  }
-}
-
-export type TraderReceiptOptions = Partial<TraderReceipt>;
-
-export function newTraderReceipt(
-  options: TraderReceiptOptions = {},
-  cache: Record<string, any> = {}
-): TraderReceipt {
-  const o = (cache["TraderReceipt"] = {} as TraderReceipt);
-  o.__typename = "TraderReceipt";
-  o.id = options.id ?? nextFactoryId("TraderReceipt");
-  o.receiptNumber = options.receiptNumber ?? "receiptNumber";
-  o.validityLimit = options.validityLimit ?? ("" as any);
-  o.department = options.department ?? "department";
-  return o;
-}
-
-function maybeNewTraderReceipt(
-  value: TraderReceiptOptions | undefined,
-  cache: Record<string, any>
-): TraderReceipt {
-  if (value === undefined) {
-    return (
-      (cache["TraderReceipt"] as TraderReceipt) ?? newTraderReceipt({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as TraderReceipt;
-  } else {
-    return newTraderReceipt(value, cache);
-  }
-}
-
-function maybeNewOrNullTraderReceipt(
-  value: TraderReceiptOptions | undefined | null,
-  cache: Record<string, any>
-): TraderReceipt | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as TraderReceipt;
-  } else {
-    return newTraderReceipt(value, cache);
-  }
-}
-
-export type CompanyFavoriteOptions = Partial<CompanyFavorite>;
-
-export function newCompanyFavorite(
-  options: CompanyFavoriteOptions = {},
-  cache: Record<string, any> = {}
-): CompanyFavorite {
-  const o = (cache["CompanyFavorite"] = {} as CompanyFavorite);
-  o.__typename = "CompanyFavorite";
-  o.name = options.name ?? null;
-  o.siret = options.siret ?? null;
-  o.address = options.address ?? null;
-  o.contact = options.contact ?? null;
-  o.phone = options.phone ?? null;
-  o.mail = options.mail ?? null;
-  o.transporterReceipt = maybeNewOrNullTransporterReceipt(
-    options.transporterReceipt,
-    cache
-  );
-  o.traderReceipt = maybeNewOrNullTraderReceipt(options.traderReceipt, cache);
-  return o;
-}
-
-function maybeNewCompanyFavorite(
-  value: CompanyFavoriteOptions | undefined,
-  cache: Record<string, any>
-): CompanyFavorite {
-  if (value === undefined) {
-    return (
-      (cache["CompanyFavorite"] as CompanyFavorite) ??
-      newCompanyFavorite({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as CompanyFavorite;
-  } else {
-    return newCompanyFavorite(value, cache);
-  }
-}
-
-function maybeNewOrNullCompanyFavorite(
-  value: CompanyFavoriteOptions | undefined | null,
-  cache: Record<string, any>
-): CompanyFavorite | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as CompanyFavorite;
-  } else {
-    return newCompanyFavorite(value, cache);
-  }
-}
-
-export type FileDownloadOptions = Partial<FileDownload>;
-
-export function newFileDownload(
-  options: FileDownloadOptions = {},
-  cache: Record<string, any> = {}
-): FileDownload {
-  const o = (cache["FileDownload"] = {} as FileDownload);
-  o.__typename = "FileDownload";
-  o.token = options.token ?? null;
-  o.downloadLink = options.downloadLink ?? null;
-  return o;
-}
-
-function maybeNewFileDownload(
-  value: FileDownloadOptions | undefined,
-  cache: Record<string, any>
-): FileDownload {
-  if (value === undefined) {
-    return (
-      (cache["FileDownload"] as FileDownload) ?? newFileDownload({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as FileDownload;
-  } else {
-    return newFileDownload(value, cache);
-  }
-}
-
-function maybeNewOrNullFileDownload(
-  value: FileDownloadOptions | undefined | null,
-  cache: Record<string, any>
-): FileDownload | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as FileDownload;
-  } else {
-    return newFileDownload(value, cache);
-  }
-}
-
-export type FormsLifeCycleDataOptions = Partial<FormsLifeCycleData>;
-
-export function newFormsLifeCycleData(
-  options: FormsLifeCycleDataOptions = {},
-  cache: Record<string, any> = {}
-): FormsLifeCycleData {
-  const o = (cache["FormsLifeCycleData"] = {} as FormsLifeCycleData);
-  o.__typename = "formsLifeCycleData";
-  o.statusLogs = (options.statusLogs ?? []).map(i =>
-    maybeNewStatusLog(i, cache)
-  );
-  o.hasNextPage = options.hasNextPage ?? null;
-  o.hasPreviousPage = options.hasPreviousPage ?? null;
-  o.startCursor = options.startCursor ?? null;
-  o.endCursor = options.endCursor ?? null;
-  o.count = options.count ?? null;
-  return o;
-}
-
-function maybeNewFormsLifeCycleData(
-  value: FormsLifeCycleDataOptions | undefined,
-  cache: Record<string, any>
-): FormsLifeCycleData {
-  if (value === undefined) {
-    return (
-      (cache["FormsLifeCycleData"] as FormsLifeCycleData) ??
-      newFormsLifeCycleData({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as FormsLifeCycleData;
-  } else {
-    return newFormsLifeCycleData(value, cache);
-  }
-}
-
-function maybeNewOrNullFormsLifeCycleData(
-  value: FormsLifeCycleDataOptions | undefined | null,
-  cache: Record<string, any>
-): FormsLifeCycleData | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as FormsLifeCycleData;
-  } else {
-    return newFormsLifeCycleData(value, cache);
-  }
-}
-
-export type StatusLogOptions = Partial<StatusLog>;
-
-export function newStatusLog(
-  options: StatusLogOptions = {},
-  cache: Record<string, any> = {}
-): StatusLog {
-  const o = (cache["StatusLog"] = {} as StatusLog);
-  o.__typename = "StatusLog";
-  o.id = options.id ?? null;
-  o.status = options.status ?? null;
-  o.loggedAt = options.loggedAt ?? null;
-  o.updatedFields = options.updatedFields ?? null;
-  o.form = maybeNewOrNullStatusLogForm(options.form, cache);
-  o.user = maybeNewOrNullStatusLogUser(options.user, cache);
-  return o;
-}
-
-function maybeNewStatusLog(
-  value: StatusLogOptions | undefined,
-  cache: Record<string, any>
-): StatusLog {
-  if (value === undefined) {
-    return (cache["StatusLog"] as StatusLog) ?? newStatusLog({}, cache);
-  } else if (value.__typename) {
-    return value as StatusLog;
-  } else {
-    return newStatusLog(value, cache);
-  }
-}
-
-function maybeNewOrNullStatusLog(
-  value: StatusLogOptions | undefined | null,
-  cache: Record<string, any>
-): StatusLog | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as StatusLog;
-  } else {
-    return newStatusLog(value, cache);
-  }
-}
-
-export type StatusLogFormOptions = Partial<StatusLogForm>;
-
-export function newStatusLogForm(
-  options: StatusLogFormOptions = {},
-  cache: Record<string, any> = {}
-): StatusLogForm {
-  const o = (cache["StatusLogForm"] = {} as StatusLogForm);
-  o.__typename = "StatusLogForm";
-  o.id = options.id ?? null;
-  o.readableId = options.readableId ?? null;
-  return o;
-}
-
-function maybeNewStatusLogForm(
-  value: StatusLogFormOptions | undefined,
-  cache: Record<string, any>
-): StatusLogForm {
-  if (value === undefined) {
-    return (
-      (cache["StatusLogForm"] as StatusLogForm) ?? newStatusLogForm({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as StatusLogForm;
-  } else {
-    return newStatusLogForm(value, cache);
-  }
-}
-
-function maybeNewOrNullStatusLogForm(
-  value: StatusLogFormOptions | undefined | null,
-  cache: Record<string, any>
-): StatusLogForm | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as StatusLogForm;
-  } else {
-    return newStatusLogForm(value, cache);
-  }
-}
-
-export type StatusLogUserOptions = Partial<StatusLogUser>;
-
-export function newStatusLogUser(
-  options: StatusLogUserOptions = {},
-  cache: Record<string, any> = {}
-): StatusLogUser {
-  const o = (cache["StatusLogUser"] = {} as StatusLogUser);
-  o.__typename = "StatusLogUser";
-  o.id = options.id ?? null;
-  o.email = options.email ?? null;
-  return o;
-}
-
-function maybeNewStatusLogUser(
-  value: StatusLogUserOptions | undefined,
-  cache: Record<string, any>
-): StatusLogUser {
-  if (value === undefined) {
-    return (
-      (cache["StatusLogUser"] as StatusLogUser) ?? newStatusLogUser({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as StatusLogUser;
-  } else {
-    return newStatusLogUser(value, cache);
-  }
-}
-
-function maybeNewOrNullStatusLogUser(
-  value: StatusLogUserOptions | undefined | null,
-  cache: Record<string, any>
-): StatusLogUser | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as StatusLogUser;
-  } else {
-    return newStatusLogUser(value, cache);
-  }
-}
-
-export type UserOptions = Partial<User>;
-
-export function newUser(
-  options: UserOptions = {},
-  cache: Record<string, any> = {}
-): User {
-  const o = (cache["User"] = {} as User);
-  o.__typename = "User";
-  o.id = options.id ?? nextFactoryId("User");
-  o.email = options.email ?? "email";
-  o.name = options.name ?? null;
-  o.phone = options.phone ?? null;
-  o.companies = options.companies ?? null;
-  return o;
-}
-
-function maybeNewUser(
-  value: UserOptions | undefined,
-  cache: Record<string, any>
-): User {
-  if (value === undefined) {
-    return (cache["User"] as User) ?? newUser({}, cache);
-  } else if (value.__typename) {
-    return value as User;
-  } else {
-    return newUser(value, cache);
-  }
-}
-
-function maybeNewOrNullUser(
-  value: UserOptions | undefined | null,
-  cache: Record<string, any>
-): User | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as User;
-  } else {
-    return newUser(value, cache);
-  }
-}
-
-export type CompanyPrivateOptions = Partial<CompanyPrivate>;
-
-export function newCompanyPrivate(
-  options: CompanyPrivateOptions = {},
-  cache: Record<string, any> = {}
-): CompanyPrivate {
-  const o = (cache["CompanyPrivate"] = {} as CompanyPrivate);
-  o.__typename = "CompanyPrivate";
-  o.id = options.id ?? nextFactoryId("CompanyPrivate");
-  o.companyTypes = options.companyTypes ?? [];
-  o.gerepId = options.gerepId ?? null;
-  o.securityCode = options.securityCode ?? 0;
-  o.contactEmail = options.contactEmail ?? null;
-  o.contactPhone = options.contactPhone ?? null;
-  o.website = options.website ?? null;
-  o.users = options.users ?? null;
-  o.userRole = options.userRole ?? null;
-  o.givenName = options.givenName ?? null;
-  o.siret = options.siret ?? "siret";
-  o.address = options.address ?? null;
-  o.name = options.name ?? null;
-  o.naf = options.naf ?? null;
-  o.libelleNaf = options.libelleNaf ?? null;
-  o.longitude = options.longitude ?? null;
-  o.latitude = options.latitude ?? null;
-  o.installation = maybeNewOrNullInstallation(options.installation, cache);
-  o.transporterReceipt = maybeNewOrNullTransporterReceipt(
-    options.transporterReceipt,
-    cache
-  );
-  o.traderReceipt = maybeNewOrNullTraderReceipt(options.traderReceipt, cache);
-  return o;
-}
-
-function maybeNewCompanyPrivate(
-  value: CompanyPrivateOptions | undefined,
-  cache: Record<string, any>
-): CompanyPrivate {
-  if (value === undefined) {
-    return (
-      (cache["CompanyPrivate"] as CompanyPrivate) ??
-      newCompanyPrivate({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as CompanyPrivate;
-  } else {
-    return newCompanyPrivate(value, cache);
-  }
-}
-
-function maybeNewOrNullCompanyPrivate(
-  value: CompanyPrivateOptions | undefined | null,
-  cache: Record<string, any>
-): CompanyPrivate | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as CompanyPrivate;
-  } else {
-    return newCompanyPrivate(value, cache);
-  }
-}
-
-export type CompanyMemberOptions = Partial<CompanyMember>;
-
-export function newCompanyMember(
-  options: CompanyMemberOptions = {},
-  cache: Record<string, any> = {}
-): CompanyMember {
-  const o = (cache["CompanyMember"] = {} as CompanyMember);
-  o.__typename = "CompanyMember";
-  o.id = options.id ?? nextFactoryId("CompanyMember");
-  o.email = options.email ?? "email";
-  o.name = options.name ?? null;
-  o.role = options.role ?? null;
-  o.isActive = options.isActive ?? null;
-  o.isPendingInvitation = options.isPendingInvitation ?? null;
-  o.isMe = options.isMe ?? null;
-  return o;
-}
-
-function maybeNewCompanyMember(
-  value: CompanyMemberOptions | undefined,
-  cache: Record<string, any>
-): CompanyMember {
-  if (value === undefined) {
-    return (
-      (cache["CompanyMember"] as CompanyMember) ?? newCompanyMember({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as CompanyMember;
-  } else {
-    return newCompanyMember(value, cache);
-  }
-}
-
-function maybeNewOrNullCompanyMember(
-  value: CompanyMemberOptions | undefined | null,
-  cache: Record<string, any>
-): CompanyMember | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as CompanyMember;
-  } else {
-    return newCompanyMember(value, cache);
-  }
-}
-
-export type CompanySearchResultOptions = Partial<CompanySearchResult>;
-
-export function newCompanySearchResult(
-  options: CompanySearchResultOptions = {},
-  cache: Record<string, any> = {}
-): CompanySearchResult {
-  const o = (cache["CompanySearchResult"] = {} as CompanySearchResult);
-  o.__typename = "CompanySearchResult";
-  o.siret = options.siret ?? null;
-  o.address = options.address ?? null;
-  o.name = options.name ?? null;
-  o.companyTypes = options.companyTypes ?? null;
-  o.naf = options.naf ?? null;
-  o.libelleNaf = options.libelleNaf ?? null;
-  o.longitude = options.longitude ?? null;
-  o.latitude = options.latitude ?? null;
-  o.installation = maybeNewOrNullInstallation(options.installation, cache);
-  o.transporterReceipt = maybeNewOrNullTransporterReceipt(
-    options.transporterReceipt,
-    cache
-  );
-  o.traderReceipt = maybeNewOrNullTraderReceipt(options.traderReceipt, cache);
-  return o;
-}
-
-function maybeNewCompanySearchResult(
-  value: CompanySearchResultOptions | undefined,
-  cache: Record<string, any>
-): CompanySearchResult {
-  if (value === undefined) {
-    return (
-      (cache["CompanySearchResult"] as CompanySearchResult) ??
-      newCompanySearchResult({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as CompanySearchResult;
-  } else {
-    return newCompanySearchResult(value, cache);
-  }
-}
-
-function maybeNewOrNullCompanySearchResult(
-  value: CompanySearchResultOptions | undefined | null,
-  cache: Record<string, any>
-): CompanySearchResult | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as CompanySearchResult;
-  } else {
-    return newCompanySearchResult(value, cache);
-  }
-}
-
-export type CompanyStatOptions = Partial<CompanyStat>;
-
-export function newCompanyStat(
-  options: CompanyStatOptions = {},
-  cache: Record<string, any> = {}
-): CompanyStat {
-  const o = (cache["CompanyStat"] = {} as CompanyStat);
-  o.__typename = "CompanyStat";
-  o.company = maybeNewOrNullFormCompany(options.company, cache);
-  o.stats = (options.stats ?? []).map(i => maybeNewStat(i, cache));
-  return o;
-}
-
-function maybeNewCompanyStat(
-  value: CompanyStatOptions | undefined,
-  cache: Record<string, any>
-): CompanyStat {
-  if (value === undefined) {
-    return (cache["CompanyStat"] as CompanyStat) ?? newCompanyStat({}, cache);
-  } else if (value.__typename) {
-    return value as CompanyStat;
-  } else {
-    return newCompanyStat(value, cache);
-  }
-}
-
-function maybeNewOrNullCompanyStat(
-  value: CompanyStatOptions | undefined | null,
-  cache: Record<string, any>
-): CompanyStat | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as CompanyStat;
-  } else {
-    return newCompanyStat(value, cache);
-  }
-}
-
-export type StatOptions = Partial<Stat>;
-
-export function newStat(
-  options: StatOptions = {},
-  cache: Record<string, any> = {}
-): Stat {
-  const o = (cache["Stat"] = {} as Stat);
-  o.__typename = "Stat";
-  o.wasteCode = options.wasteCode ?? "wasteCode";
-  o.incoming = options.incoming ?? ("" as any);
-  o.outgoing = options.outgoing ?? ("" as any);
-  return o;
-}
-
-function maybeNewStat(
-  value: StatOptions | undefined,
-  cache: Record<string, any>
-): Stat {
-  if (value === undefined) {
-    return (cache["Stat"] as Stat) ?? newStat({}, cache);
-  } else if (value.__typename) {
-    return value as Stat;
-  } else {
-    return newStat(value, cache);
-  }
-}
-
-function maybeNewOrNullStat(
-  value: StatOptions | undefined | null,
-  cache: Record<string, any>
-): Stat | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Stat;
-  } else {
-    return newStat(value, cache);
-  }
-}
-
-export type UploadLinkOptions = Partial<UploadLink>;
-
-export function newUploadLink(
-  options: UploadLinkOptions = {},
-  cache: Record<string, any> = {}
-): UploadLink {
-  const o = (cache["UploadLink"] = {} as UploadLink);
-  o.__typename = "UploadLink";
-  o.signedUrl = options.signedUrl ?? null;
-  o.key = options.key ?? null;
-  return o;
-}
-
-function maybeNewUploadLink(
-  value: UploadLinkOptions | undefined,
-  cache: Record<string, any>
-): UploadLink {
-  if (value === undefined) {
-    return (cache["UploadLink"] as UploadLink) ?? newUploadLink({}, cache);
-  } else if (value.__typename) {
-    return value as UploadLink;
-  } else {
-    return newUploadLink(value, cache);
-  }
-}
-
-function maybeNewOrNullUploadLink(
-  value: UploadLinkOptions | undefined | null,
-  cache: Record<string, any>
-): UploadLink | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as UploadLink;
-  } else {
-    return newUploadLink(value, cache);
-  }
-}
-
-export type AuthPayloadOptions = Partial<AuthPayload>;
-
-export function newAuthPayload(
-  options: AuthPayloadOptions = {},
-  cache: Record<string, any> = {}
-): AuthPayload {
-  const o = (cache["AuthPayload"] = {} as AuthPayload);
-  o.__typename = "AuthPayload";
-  o.token = options.token ?? "token";
-  o.user = maybeNewUser(options.user, cache);
-  return o;
-}
-
-function maybeNewAuthPayload(
-  value: AuthPayloadOptions | undefined,
-  cache: Record<string, any>
-): AuthPayload {
-  if (value === undefined) {
-    return (cache["AuthPayload"] as AuthPayload) ?? newAuthPayload({}, cache);
-  } else if (value.__typename) {
-    return value as AuthPayload;
-  } else {
-    return newAuthPayload(value, cache);
-  }
-}
-
-function maybeNewOrNullAuthPayload(
-  value: AuthPayloadOptions | undefined | null,
-  cache: Record<string, any>
-): AuthPayload | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as AuthPayload;
-  } else {
-    return newAuthPayload(value, cache);
-  }
-}
-
-export type SubscriptionOptions = Partial<Subscription>;
-
-export function newSubscription(
-  options: SubscriptionOptions = {},
-  cache: Record<string, any> = {}
-): Subscription {
-  const o = (cache["Subscription"] = {} as Subscription);
-  o.__typename = "Subscription";
-  o.forms = maybeNewOrNullFormSubscription(options.forms, cache);
-  return o;
-}
-
-function maybeNewSubscription(
-  value: SubscriptionOptions | undefined,
-  cache: Record<string, any>
-): Subscription {
-  if (value === undefined) {
-    return (
-      (cache["Subscription"] as Subscription) ?? newSubscription({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as Subscription;
-  } else {
-    return newSubscription(value, cache);
-  }
-}
-
-function maybeNewOrNullSubscription(
-  value: SubscriptionOptions | undefined | null,
-  cache: Record<string, any>
-): Subscription | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as Subscription;
-  } else {
-    return newSubscription(value, cache);
-  }
-}
-
-export type FormSubscriptionOptions = Partial<FormSubscription>;
-
-export function newFormSubscription(
-  options: FormSubscriptionOptions = {},
-  cache: Record<string, any> = {}
-): FormSubscription {
-  const o = (cache["FormSubscription"] = {} as FormSubscription);
-  o.__typename = "FormSubscription";
-  o.mutation = options.mutation ?? null;
-  o.node = maybeNewOrNullForm(options.node, cache);
-  o.updatedFields = options.updatedFields ?? null;
-  o.previousValues = maybeNewOrNullForm(options.previousValues, cache);
-  return o;
-}
-
-function maybeNewFormSubscription(
-  value: FormSubscriptionOptions | undefined,
-  cache: Record<string, any>
-): FormSubscription {
-  if (value === undefined) {
-    return (
-      (cache["FormSubscription"] as FormSubscription) ??
-      newFormSubscription({}, cache)
-    );
-  } else if (value.__typename) {
-    return value as FormSubscription;
-  } else {
-    return newFormSubscription(value, cache);
-  }
-}
-
-function maybeNewOrNullFormSubscription(
-  value: FormSubscriptionOptions | undefined | null,
-  cache: Record<string, any>
-): FormSubscription | null {
-  if (!value) {
-    return null;
-  } else if (value.__typename) {
-    return value as FormSubscription;
-  } else {
-    return newFormSubscription(value, cache);
-  }
-}
-
-let nextFactoryIds: Record<string, number> = {};
-
-export function resetFactoryIds() {
-  nextFactoryIds = {};
-}
-
-function nextFactoryId(objectName: string): string {
-  const nextId = nextFactoryIds[objectName] || 1;
-  nextFactoryIds[objectName] = nextId + 1;
-  return String(nextId);
-}
+
+export function createAuthPayloadMock(props: Partial<AuthPayload>): AuthPayload {
+  return {
+    __typename: "AuthPayload",
+    token: "",
+    user: createUserMock({}),
+    ...props,
+  };
+};
+
+export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): CompanyFavorite {
+  return {
+    __typename: "CompanyFavorite",
+    name: null,
+    siret: null,
+    address: null,
+    contact: null,
+    phone: null,
+    mail: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+
+export function createCompanyMemberMock(props: Partial<CompanyMember>): CompanyMember {
+  return {
+    __typename: "CompanyMember",
+    id: "",
+    email: "",
+    name: null,
+    role: null,
+    isActive: null,
+    isPendingInvitation: null,
+    isMe: null,
+    ...props,
+  };
+};
+
+export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): CompanyPrivate {
+  return {
+    __typename: "CompanyPrivate",
+    id: "",
+    companyTypes: [],
+    gerepId: null,
+    securityCode: 0,
+    contactEmail: null,
+    contactPhone: null,
+    website: null,
+    users: null,
+    userRole: null,
+    givenName: null,
+    siret: "",
+    address: null,
+    name: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyPublic {
+  return {
+    __typename: "CompanyPublic",
+    contactEmail: null,
+    contactPhone: null,
+    website: null,
+    siret: null,
+    etatAdministratif: null,
+    address: null,
+    name: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    isRegistered: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanySearchResultMock(props: Partial<CompanySearchResult>): CompanySearchResult {
+  return {
+    __typename: "CompanySearchResult",
+    siret: null,
+    address: null,
+    name: null,
+    companyTypes: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyStatMock(props: Partial<CompanyStat>): CompanyStat {
+  return {
+    __typename: "CompanyStat",
+    company: null,
+    stats: [],
+    ...props,
+  };
+};
+
+
+
+
+
+
+export function createDeclarationMock(props: Partial<Declaration>): Declaration {
+  return {
+    __typename: "Declaration",
+    annee: null,
+    codeDechet: null,
+    libDechet: null,
+    gerepType: null,
+    ...props,
+  };
+};
+
+
+
+export function createDestinationMock(props: Partial<Destination>): Destination {
+  return {
+    __typename: "Destination",
+    cap: null,
+    processingOperation: null,
+    company: null,
+    isFilledByEmitter: null,
+    ...props,
+  };
+};
+
+
+export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganisme {
+  return {
+    __typename: "EcoOrganisme",
+    id: "",
+    name: "",
+    siret: "",
+    address: "",
+    ...props,
+  };
+};
+
+
+export function createEmitterMock(props: Partial<Emitter>): Emitter {
+  return {
+    __typename: "Emitter",
+    type: null,
+    workSite: null,
+    pickupSite: null,
+    company: null,
+    ...props,
+  };
+};
+
+
+
+
+export function createFileDownloadMock(props: Partial<FileDownload>): FileDownload {
+  return {
+    __typename: "FileDownload",
+    token: null,
+    downloadLink: null,
+    ...props,
+  };
+};
+
+export function createFormMock(props: Partial<Form>): Form {
+  return {
+    __typename: "Form",
+    id: "",
+    readableId: "",
+    customId: null,
+    emitter: null,
+    recipient: null,
+    transporter: null,
+    wasteDetails: null,
+    trader: null,
+    createdAt: null,
+    updatedAt: null,
+    status: FormStatus.DRAFT,
+    signedByTransporter: null,
+    sentAt: null,
+    sentBy: null,
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
+    receivedBy: null,
+    receivedAt: null,
+    signedAt: null,
+    quantityReceived: null,
+    actualQuantity: null,
+    processingOperationDone: null,
+    processingOperationDescription: null,
+    processedBy: null,
+    processedAt: null,
+    noTraceability: null,
+    nextDestination: null,
+    appendix2Forms: null,
+    ecoOrganisme: null,
+    temporaryStorageDetail: null,
+    stateSummary: null,
+    transportSegments: null,
+    currentTransporterSiret: null,
+    nextTransporterSiret: null,
+    ...props,
+  };
+};
+
+export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany {
+  return {
+    __typename: "FormCompany",
+    name: null,
+    siret: null,
+    address: null,
+    contact: null,
+    phone: null,
+    mail: null,
+    ...props,
+  };
+};
+
+
+
+export function createFormsLifeCycleDataMock(props: Partial<FormsLifeCycleData>): FormsLifeCycleData {
+  return {
+    __typename: "formsLifeCycleData",
+    statusLogs: [],
+    hasNextPage: null,
+    hasPreviousPage: null,
+    startCursor: null,
+    endCursor: null,
+    count: null,
+    ...props,
+  };
+};
+
+
+
+export function createFormSubscriptionMock(props: Partial<FormSubscription>): FormSubscription {
+  return {
+    __typename: "FormSubscription",
+    mutation: null,
+    node: null,
+    updatedFields: null,
+    previousValues: null,
+    ...props,
+  };
+};
+
+
+
+export function createInstallationMock(props: Partial<Installation>): Installation {
+  return {
+    __typename: "Installation",
+    codeS3ic: null,
+    urlFiche: null,
+    rubriques: null,
+    declarations: null,
+    ...props,
+  };
+};
+
+
+export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
+  return {
+    __typename: "MultimodalTransporter",
+    company: null,
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    customInfo: null,
+    ...props,
+  };
+};
+
+
+export function createNextDestinationMock(props: Partial<NextDestination>): NextDestination {
+  return {
+    __typename: "NextDestination",
+    processingOperation: null,
+    company: null,
+    ...props,
+  };
+};
+
+
+
+
+
+
+
+
+
+
+
+export function createRecipientMock(props: Partial<Recipient>): Recipient {
+  return {
+    __typename: "Recipient",
+    cap: null,
+    processingOperation: null,
+    company: null,
+    isTempStorage: null,
+    ...props,
+  };
+};
+
+
+
+
+export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
+  return {
+    __typename: "Rubrique",
+    rubrique: "",
+    alinea: null,
+    etatActivite: null,
+    regimeAutorise: null,
+    activite: null,
+    category: "",
+    volume: null,
+    unite: null,
+    wasteType: null,
+    ...props,
+  };
+};
+
+
+
+export function createStatMock(props: Partial<Stat>): Stat {
+  return {
+    __typename: "Stat",
+    wasteCode: "",
+    incoming: 0,
+    outgoing: 0,
+    ...props,
+  };
+};
+
+export function createStateSummaryMock(props: Partial<StateSummary>): StateSummary {
+  return {
+    __typename: "StateSummary",
+    quantity: null,
+    packagings: [],
+    onuCode: null,
+    transporter: null,
+    transporterNumberPlate: null,
+    transporterCustomInfo: null,
+    recipient: null,
+    emitter: null,
+    lastActionOn: null,
+    ...props,
+  };
+};
+
+export function createStatusLogMock(props: Partial<StatusLog>): StatusLog {
+  return {
+    __typename: "StatusLog",
+    id: null,
+    status: null,
+    loggedAt: null,
+    updatedFields: null,
+    form: null,
+    user: null,
+    ...props,
+  };
+};
+
+export function createStatusLogFormMock(props: Partial<StatusLogForm>): StatusLogForm {
+  return {
+    __typename: "StatusLogForm",
+    id: null,
+    readableId: null,
+    ...props,
+  };
+};
+
+export function createStatusLogUserMock(props: Partial<StatusLogUser>): StatusLogUser {
+  return {
+    __typename: "StatusLogUser",
+    id: null,
+    email: null,
+    ...props,
+  };
+};
+
+export function createSubscriptionMock(props: Partial<Subscription>): Subscription {
+  return {
+    __typename: "Subscription",
+    forms: null,
+    ...props,
+  };
+};
+
+
+export function createTemporaryStorageDetailMock(props: Partial<TemporaryStorageDetail>): TemporaryStorageDetail {
+  return {
+    __typename: "TemporaryStorageDetail",
+    temporaryStorer: null,
+    destination: null,
+    wasteDetails: null,
+    transporter: null,
+    signedBy: null,
+    signedAt: null,
+    ...props,
+  };
+};
+
+
+export function createTemporaryStorerMock(props: Partial<TemporaryStorer>): TemporaryStorer {
+  return {
+    __typename: "TemporaryStorer",
+    quantityType: null,
+    quantityReceived: null,
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
+    receivedAt: null,
+    receivedBy: null,
+    ...props,
+  };
+};
+
+
+export function createTraderMock(props: Partial<Trader>): Trader {
+  return {
+    __typename: "Trader",
+    company: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    ...props,
+  };
+};
+
+
+export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderReceipt {
+  return {
+    __typename: "TraderReceipt",
+    id: "",
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+};
+
+export function createTransporterMock(props: Partial<Transporter>): Transporter {
+  return {
+    __typename: "Transporter",
+    company: null,
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    customInfo: null,
+    ...props,
+  };
+};
+
+
+export function createTransporterReceiptMock(props: Partial<TransporterReceipt>): TransporterReceipt {
+  return {
+    __typename: "TransporterReceipt",
+    id: "",
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+};
+
+
+
+export function createTransportSegmentMock(props: Partial<TransportSegment>): TransportSegment {
+  return {
+    __typename: "TransportSegment",
+    id: "",
+    previousTransporterCompanySiret: null,
+    transporter: null,
+    mode: null,
+    takenOverAt: null,
+    takenOverBy: null,
+    readyToTakeOver: null,
+    segmentNumber: null,
+    ...props,
+  };
+};
+
+
+
+export function createUploadLinkMock(props: Partial<UploadLink>): UploadLink {
+  return {
+    __typename: "UploadLink",
+    signedUrl: null,
+    key: null,
+    ...props,
+  };
+};
+
+export function createUserMock(props: Partial<User>): User {
+  return {
+    __typename: "User",
+    id: "",
+    email: "",
+    name: null,
+    phone: null,
+    companies: null,
+    ...props,
+  };
+};
+
+
+
+export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetails {
+  return {
+    __typename: "WasteDetails",
+    code: null,
+    name: null,
+    onuCode: null,
+    packagings: [],
+    otherPackaging: null,
+    numberOfPackages: null,
+    quantity: null,
+    quantityType: null,
+    consistence: null,
+    ...props,
+  };
+};
+
+
+
+export function createWorkSiteMock(props: Partial<WorkSite>): WorkSite {
+  return {
+    __typename: "WorkSite",
+    name: null,
+    address: null,
+    city: null,
+    postalCode: null,
+    infos: null,
+    ...props,
+  };
+};
+
