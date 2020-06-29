@@ -15,7 +15,7 @@ import {
 } from "../../generated/graphql/types";
 import Packagings from "../../form/packagings/Packagings";
 import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
-import { GET_TRANSPORT_SLIPS } from "./Transport";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
 import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
 import { SiretContext } from "../Dashboard";
@@ -43,6 +43,10 @@ type Props = { form: any; userSiret: string };
 export default function TransportSignature({ form, userSiret }: Props) {
   const { siret } = useContext(SiretContext);
   const [isOpen, setIsOpen] = useState(false);
+  const refetchQuery = {
+    query: GET_FORM,
+    variables: { id: form.id },
+  };
   const [signedByTransporter, { error }] = useMutation<
     Pick<Mutation, "signedByTransporter">,
     MutationSignedByTransporterArgs
@@ -53,7 +57,7 @@ export default function TransportSignature({ form, userSiret }: Props) {
         hideAfter: 5,
       });
     },
-    refetchQueries: [],
+    refetchQueries: [refetchQuery],
     update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_TRANSPORT_SLIPS,
