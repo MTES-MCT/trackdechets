@@ -428,6 +428,7 @@ export async function editSegment(
   // siret can't be edited once segment is marked as ready
   if (
     currentSegment.readyToTakeOver &&
+    !!nextSegmentPayload.transporterCompanySiret &&
     nextSegmentPayload.transporterCompanySiret !==
       currentSegment.transporterCompanySiret
   ) {

@@ -43,7 +43,7 @@ describe("{ mutation { editSegment } }", () => {
     const { mutate } = makeClient(firstTransporter);
     await mutate(
       `mutation  {
-            editSegment(id:"${segment.id}", siret:"${transporterSiret}",   nextSegmentInfo: {
+            editSegment(id:"${segment.id}", siret:"${transporterSiret}", nextSegmentInfo: {
                 transporter: {
                   company: {
                     siret: "5678956789"
@@ -141,14 +141,13 @@ describe("{ mutation { editSegment } }", () => {
     const { mutate } = makeClient(secondTransporter);
     await mutate(
       `mutation  {
-            editSegment(id:"${segment.id}", siret:"${secondTransporterSiret}",   nextSegmentInfo: {
+            editSegment(id:"${segment.id}", siret:"${secondTransporterSiret}", nextSegmentInfo: {
                 transporter: {
                   company: {
-                     
                     contact: "José Lannister"
                   }
                 }
-                mode: ROAD
+                mode: RAIL
               }) {
                 id
               }
@@ -156,7 +155,7 @@ describe("{ mutation { editSegment } }", () => {
     );
 
     const editedSegment = await prisma.transportSegment({ id: segment.id });
-    console.log(editedSegment);
+
     expect(editedSegment.transporterCompanyContact).toBe("José Lannister");
   });
 });
