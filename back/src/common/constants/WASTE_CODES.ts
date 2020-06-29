@@ -1,37 +1,4 @@
-export const GROUP_CODES = ["D 13", "D 14", "D 15", "R 13"];
-
-export const PROCESSING_OPERATION_CODES = [
-  "D 1",
-  "D 2",
-  "D 3",
-  "D 4",
-  "D 5",
-  "D 6",
-  "D 7",
-  "D 8",
-  "D 9",
-  "D 10",
-  "D 11",
-  "D 12",
-  "D 13",
-  "D 14",
-  "D 15",
-  "R 1",
-  "R 2",
-  "R 3",
-  "R 4",
-  "R 5",
-  "R 6",
-  "R 7",
-  "R 8",
-  "R 9",
-  "R 10",
-  "R 11",
-  "R 12",
-  "R 13"
-];
-
-export const wasteCodes = [
+export const WASTE_CODES = [
   "01 03 04*",
   "01 03 05*",
   "01 03 07*",

@@ -2,7 +2,7 @@ import * as Yup from "yup";
 import { validDatetime, validCompany } from "./validation-helpers";
 import { inputRule } from "graphql-shield";
 import {
-  PROCESSING_OPERATION_CODES,
+  PROCESSING_OPERATIONS_CODES,
   GROUP_CODES
 } from "../../common/constants";
 
@@ -105,12 +105,10 @@ export const markAsProcessedSchema = inputRule()(
         processingOperationDone: yup
           .mixed()
           .oneOf(
-            PROCESSING_OPERATION_CODES,
+            PROCESSING_OPERATIONS_CODES,
             "Cette opération d’élimination / valorisation n'existe pas."
           ),
-        processingOperationDescription: yup
-          .string()
-          .required("Vous devez renseigner la description de l'opération."),
+        processingOperationDescription: yup.string(),
         processedBy: yup
           .string()
           .required("Vous devez saisir un responsable de traitement."),
@@ -245,7 +243,7 @@ export const temporaryStorageDestinationSchema = inputRule()(yup =>
         processingOperation: yup
           .mixed()
           .oneOf(
-            PROCESSING_OPERATION_CODES,
+            PROCESSING_OPERATIONS_CODES,
             "Cette opération d’élimination / valorisation n'existe pas."
           ),
         cap: yup.string().nullable(true)

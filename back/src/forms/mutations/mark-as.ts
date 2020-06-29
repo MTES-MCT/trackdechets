@@ -18,6 +18,7 @@ import {
   Form,
   FormStatus
 } from "../../generated/graphql/types";
+import { PROCESSING_OPERATIONS } from "../../common/constants";
 
 export async function markAsSealed(
   { id }: MutationMarkAsSealedArgs,
@@ -66,7 +67,15 @@ export function markAsProcessed(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
-    infos => flattenObjectForDb(infos)
+    infos =>
+      flattenObjectForDb({
+        ...infos,
+        processingOperationDescription:
+          infos.processingOperationDescription ??
+          PROCESSING_OPERATIONS.find(
+            operation => operation.code === infos.processingOperationDone
+          ).description
+      })
   );
 }
 
