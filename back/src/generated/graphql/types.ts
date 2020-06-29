@@ -2620,7 +2620,6 @@ export type Resolvers<ContextType = GraphQLContext> = {
  */
 export type IResolvers<ContextType = GraphQLContext> = Resolvers<ContextType>;
 
-
 export function createAuthPayloadMock(props: Partial<AuthPayload>): AuthPayload {
   return {
     __typename: "AuthPayload",
@@ -2644,7 +2643,6 @@ export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): Comp
     ...props,
   };
 };
-
 
 export function createCompanyMemberMock(props: Partial<CompanyMember>): CompanyMember {
   return {
@@ -2736,11 +2734,6 @@ export function createCompanyStatMock(props: Partial<CompanyStat>): CompanyStat 
   };
 };
 
-
-
-
-
-
 export function createDeclarationMock(props: Partial<Declaration>): Declaration {
   return {
     __typename: "Declaration",
@@ -2751,8 +2744,6 @@ export function createDeclarationMock(props: Partial<Declaration>): Declaration 
     ...props,
   };
 };
-
-
 
 export function createDestinationMock(props: Partial<Destination>): Destination {
   return {
@@ -2765,7 +2756,6 @@ export function createDestinationMock(props: Partial<Destination>): Destination 
   };
 };
 
-
 export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganisme {
   return {
     __typename: "EcoOrganisme",
@@ -2777,7 +2767,6 @@ export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganis
   };
 };
 
-
 export function createEmitterMock(props: Partial<Emitter>): Emitter {
   return {
     __typename: "Emitter",
@@ -2788,9 +2777,6 @@ export function createEmitterMock(props: Partial<Emitter>): Emitter {
     ...props,
   };
 };
-
-
-
 
 export function createFileDownloadMock(props: Partial<FileDownload>): FileDownload {
   return {
@@ -2855,8 +2841,6 @@ export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany 
   };
 };
 
-
-
 export function createFormsLifeCycleDataMock(props: Partial<FormsLifeCycleData>): FormsLifeCycleData {
   return {
     __typename: "formsLifeCycleData",
@@ -2870,8 +2854,6 @@ export function createFormsLifeCycleDataMock(props: Partial<FormsLifeCycleData>)
   };
 };
 
-
-
 export function createFormSubscriptionMock(props: Partial<FormSubscription>): FormSubscription {
   return {
     __typename: "FormSubscription",
@@ -2883,8 +2865,6 @@ export function createFormSubscriptionMock(props: Partial<FormSubscription>): Fo
   };
 };
 
-
-
 export function createInstallationMock(props: Partial<Installation>): Installation {
   return {
     __typename: "Installation",
@@ -2895,7 +2875,6 @@ export function createInstallationMock(props: Partial<Installation>): Installati
     ...props,
   };
 };
-
 
 export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
   return {
@@ -2911,7 +2890,6 @@ export function createMultimodalTransporterMock(props: Partial<MultimodalTranspo
   };
 };
 
-
 export function createNextDestinationMock(props: Partial<NextDestination>): NextDestination {
   return {
     __typename: "NextDestination",
@@ -2920,16 +2898,6 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
     ...props,
   };
 };
-
-
-
-
-
-
-
-
-
-
 
 export function createRecipientMock(props: Partial<Recipient>): Recipient {
   return {
@@ -2941,9 +2909,6 @@ export function createRecipientMock(props: Partial<Recipient>): Recipient {
     ...props,
   };
 };
-
-
-
 
 export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
   return {
@@ -2960,8 +2925,6 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
     ...props,
   };
 };
-
-
 
 export function createStatMock(props: Partial<Stat>): Stat {
   return {
@@ -3028,7 +2991,6 @@ export function createSubscriptionMock(props: Partial<Subscription>): Subscripti
   };
 };
 
-
 export function createTemporaryStorageDetailMock(props: Partial<TemporaryStorageDetail>): TemporaryStorageDetail {
   return {
     __typename: "TemporaryStorageDetail",
@@ -3041,7 +3003,6 @@ export function createTemporaryStorageDetailMock(props: Partial<TemporaryStorage
     ...props,
   };
 };
-
 
 export function createTemporaryStorerMock(props: Partial<TemporaryStorer>): TemporaryStorer {
   return {
@@ -3056,7 +3017,6 @@ export function createTemporaryStorerMock(props: Partial<TemporaryStorer>): Temp
   };
 };
 
-
 export function createTraderMock(props: Partial<Trader>): Trader {
   return {
     __typename: "Trader",
@@ -3067,7 +3027,6 @@ export function createTraderMock(props: Partial<Trader>): Trader {
     ...props,
   };
 };
-
 
 export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderReceipt {
   return {
@@ -3094,7 +3053,6 @@ export function createTransporterMock(props: Partial<Transporter>): Transporter 
   };
 };
 
-
 export function createTransporterReceiptMock(props: Partial<TransporterReceipt>): TransporterReceipt {
   return {
     __typename: "TransporterReceipt",
@@ -3105,8 +3063,6 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
     ...props,
   };
 };
-
-
 
 export function createTransportSegmentMock(props: Partial<TransportSegment>): TransportSegment {
   return {
@@ -3122,8 +3078,6 @@ export function createTransportSegmentMock(props: Partial<TransportSegment>): Tr
     ...props,
   };
 };
-
-
 
 export function createUploadLinkMock(props: Partial<UploadLink>): UploadLink {
   return {
@@ -3146,8 +3100,6 @@ export function createUserMock(props: Partial<User>): User {
   };
 };
 
-
-
 export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetails {
   return {
     __typename: "WasteDetails",
@@ -3164,8 +3116,6 @@ export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetai
   };
 };
 
-
-
 export function createWorkSiteMock(props: Partial<WorkSite>): WorkSite {
   return {
     __typename: "WorkSite",
@@ -3177,4 +3127,3 @@ export function createWorkSiteMock(props: Partial<WorkSite>): WorkSite {
     ...props,
   };
 };
-
