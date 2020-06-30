@@ -77,7 +77,7 @@ services:
     build:
       context: ./pdf
       dockerfile: Dockerfile
-    command: npm run dev
+    command: sh -c "npm install && npm run dev"
     volumes:
       - ./pdf:/usr/src/app
     ports:
