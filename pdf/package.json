@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "test": "jest --test-match '**/*.test.js'",
-    "test:integration": "jest --test-match '**/*.integration.js'"
+    "test": "jest --test-match '**/*.test.js'"
   },
   "author": "",
   "license": "ISC",
