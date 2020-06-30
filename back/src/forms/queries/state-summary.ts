@@ -1,7 +1,7 @@
 import { TemporaryStorageDetail, prisma } from "../../generated/prisma-client";
-import { Form } from "../../generated/graphql/types";
+import { Form, StateSummary } from "../../generated/graphql/types";
 
-export const stateSummary = async (form: Form) => {
+export const stateSummary = async (form: Form): Promise<StateSummary> => {
   const temporaryStorageDetail = await prisma
     .form({ id: form.id })
     .temporaryStorageDetail();
@@ -54,7 +54,10 @@ function getRecipient(
   form: Form,
   temporaryStorageDetail: TemporaryStorageDetail
 ) {
-  if (temporaryStorageDetail && !["DRAFT", "SENT"].includes(form.status)) {
+  if (
+    temporaryStorageDetail &&
+    !["DRAFT", "SENT", "SEALED"].includes(form.status)
+  ) {
     return {
       name: temporaryStorageDetail.destinationCompanyName,
       siret: temporaryStorageDetail.destinationCompanySiret,
