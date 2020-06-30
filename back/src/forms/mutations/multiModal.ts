@@ -109,6 +109,7 @@ function flattenSegmentForDb(
   });
   return dbObject;
 }
+
 /**
  *
  * Prepare a new transport segment
@@ -137,7 +138,8 @@ export async function prepareSegment(
       form: { id: id }
     }
   });
-  //   user must be the currentTransporter or form owner
+
+  // user must be the currentTransporter or form owner
   const userIsOwner = context.user.id === form.owner.id;
   const userIsCurrentTransporter =
     !!form.currentTransporterSiret && siret === form.currentTransporterSiret;
@@ -147,15 +149,25 @@ export async function prepareSegment(
       "Vous ne disposez pas des permissions nécessaires"
     );
   }
+
   // segments can be created by transporters if form is SENT and they're currently in charge of the form
-  if (userIsCurrentTransporter && form.status !== "SENT") {
-    throw new ForbiddenError(FORM_MUST_BE_SENT);
-  }
+  const userIsForbiddenToPrepareSentForm =
+    userIsCurrentTransporter && form.status !== "SENT";
 
   // segments can be created by form owners when form is draft
-  if (userIsOwner && form.status !== "DRAFT") {
-    throw new ForbiddenError(FORM_MUST_BE_DRAFT);
+  const userIsForbiddenToPrepareDraftForm =
+    userIsOwner && form.status !== "DRAFT";
+
+  // as user can be transporter and form owner, we dont want to forbid at first failing condition
+  if (userIsForbiddenToPrepareSentForm && userIsForbiddenToPrepareDraftForm) {
+    if (userIsForbiddenToPrepareDraftForm) {
+      throw new ForbiddenError(FORM_MUST_BE_DRAFT);
+    }
+    if (userIsForbiddenToPrepareDraftForm) {
+      throw new ForbiddenError(FORM_MUST_BE_DRAFT);
+    }
   }
+
   const lastSegment = !!transportSegments.length
     ? transportSegments.slice(-1)[0]
     : null;
@@ -373,36 +385,50 @@ export async function editSegment(
   const userIsCurrentTransporter = userSiret === form.currentTransporterSiret;
   const userIsNextTransporter = userSiret === form.nextTransporterSiret;
 
-  if (
-    (userIsCurrentTransporter || userIsNextTransporter) &&
-    form.status !== "SENT"
-  ) {
-    throw new ForbiddenError(FORM_MUST_BE_SENT);
-  }
+  // segments can be edited by form transporter when form is sent
+  const transporterIsForbiddenToEditSentForm =
+    userIsCurrentTransporter && form.status !== "SENT";
 
   // segments can be edited by form owners when form is draft
+  const ownerIsForbiddenToEditDraftForm =
+    userIsOwner && form.status !== "DRAFT";
 
-  if (userIsOwner && form.status !== "DRAFT") {
-    throw new ForbiddenError(FORM_MUST_BE_DRAFT);
-  }
   // current transporter can edit until segment is readyToTakeOver
-  if (userIsCurrentTransporter && currentSegment.readyToTakeOver) {
-    throw new ForbiddenError("Ce segment ne peut plus être modifié");
-  }
-  // next transporter can edit when segment is readyToTakeOver
+  const currentTransporterIsForbiddenToEditReadyToTakeOverSegment =
+    userIsCurrentTransporter && currentSegment.readyToTakeOver;
+
   // the first statement (!userIsCurrentTransporter) allows a transporter to edit segment if it is assigned to him
-  if (
+  const nextTransporterIsForbiddenToEditDraftSegment =
     !userIsCurrentTransporter &&
     userIsNextTransporter &&
-    !currentSegment.readyToTakeOver
+    !currentSegment.readyToTakeOver;
+
+  // as user can be transporter and form owner, we dont want to forbid at first failing condition
+  if (
+    transporterIsForbiddenToEditSentForm &&
+    ownerIsForbiddenToEditDraftForm &&
+    currentTransporterIsForbiddenToEditReadyToTakeOverSegment
   ) {
-    throw new ForbiddenError(
-      "Ce segment ne peut pas être modifié tant qu'il n'est pas scellé par le tranporteur précédent"
-    );
+    if (transporterIsForbiddenToEditSentForm) {
+      throw new ForbiddenError(FORM_MUST_BE_SENT);
+    }
+    if (ownerIsForbiddenToEditDraftForm) {
+      throw new ForbiddenError(FORM_MUST_BE_DRAFT);
+    }
+    if (currentTransporterIsForbiddenToEditReadyToTakeOverSegment) {
+      throw new ForbiddenError("Ce segment ne peut plus être modifié");
+    }
+    if (nextTransporterIsForbiddenToEditDraftSegment) {
+      throw new ForbiddenError(
+        "Ce segment ne peut pas être modifié tant qu'il n'est pas scellé par le tranporteur précédent"
+      );
+    }
   }
 
+  // siret can't be edited once segment is marked as ready
   if (
     currentSegment.readyToTakeOver &&
+    !!nextSegmentPayload.transporterCompanySiret &&
     nextSegmentPayload.transporterCompanySiret !==
       currentSegment.transporterCompanySiret
   ) {

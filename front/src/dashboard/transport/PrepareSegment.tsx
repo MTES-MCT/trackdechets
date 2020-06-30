@@ -100,13 +100,16 @@ export default function PrepareSegment({ form, userSiret }: Props) {
     mode: "ROAD" as TransportMode,
   };
 
-  // form must be sent
-  // user must be marked as current transporter
-  // there is no unsealed segment
+  // there is no segment or last segment was taken over by current user
   const hasTakenOverLastSegment =
     !segments.length ||
     (!!lastSegment.takenOverAt &&
-      lastSegment.transporter?.company?.siret !== userSiret);
+      lastSegment.transporter?.company?.siret === userSiret);
+
+  // form must be sent
+  // user must be marked as current transporter
+  // there is no not ReadytoTakeOver segment
+
   if (
     form.status !== "SENT" ||
     form.currentTransporterSiret !== userSiret ||

@@ -62,8 +62,7 @@ const getSegmentToEdit = ({ form, userSiret }) => {
     return null;
   }
 
-  // not readytoTakeOver segment editable by current transporter before beeign marked as redayToTakeOver
-
+  // not readytoTakeOver segment editable by current transporter before beeign marked as readyToTakeOver
   if (form.currentTransporterSiret === userSiret) {
     // get not readytoTakeOver segments
     const notReadytoTakeOverSegments = transportSegments.filter(
@@ -82,10 +81,11 @@ const getSegmentToEdit = ({ form, userSiret }) => {
   }
   // readytoTakeOver form editable by next transporter before take over
   if (form.nextTransporterSiret === userSiret) {
-    // get readytoTakeOver segments
+    // get readytoTakeOver and not yet taken over segments
     const readytoTakeOverSegments = transportSegments.filter(
-      f => f.readyToTakeOver
+      f => f.readyToTakeOver && !f.takenOverAt
     );
+
     if (!readytoTakeOverSegments.length) {
       return null;
     }
@@ -129,11 +129,9 @@ export default function EditSegment({ form, userSiret }: Props) {
           roles: ["TRANSPORTER"],
           status: ["SEALED", "SENT", "RESEALED", "RESENT"],
         },
-        getNewData: data => {
-          return {
-            forms: data.forms,
-          };
-        },
+        getNewData: data => ({
+          forms: data.forms,
+        }),
       });
     },
   });

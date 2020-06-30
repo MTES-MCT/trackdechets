@@ -1,8 +1,7 @@
 import { prisma, Status } from "../../generated/prisma-client";
 import {
   cleanUpNotDuplicatableFieldsInForm,
-  unflattenObjectFromDb,
-  cleanUpNonDuplicatableSegmentField
+  unflattenObjectFromDb
 } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import { MutationDuplicateFormArgs, Form } from "../../generated/graphql/types";
@@ -43,15 +42,15 @@ export async function duplicateForm(
     updatedFields: {},
     loggedAt: new Date()
   });
+  // currently (non tranporter's) UI dashboard does not show segments, so this code is disabled until UI update.
+  // const segmentDuplicates = transportSegments.map(segment =>
+  //   prisma.createTransportSegment({
+  //     form: { connect: { id: newForm.id } },
+  //     ...cleanUpNonDuplicatableSegmentField(segment)
+  //   })
+  // );
 
-  const segmentDuplicates = transportSegments.map(segment =>
-    prisma.createTransportSegment({
-      form: { connect: { id: newForm.id } },
-      ...cleanUpNonDuplicatableSegmentField(segment)
-    })
-  );
-
-  await Promise.all(segmentDuplicates);
+  // await Promise.all(segmentDuplicates);
 
   return unflattenObjectFromDb(newForm);
 }
