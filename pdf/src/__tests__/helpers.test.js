@@ -18,7 +18,7 @@ describe("processMainFormParams", () => {
       processedAt: new Date("01/07/2020"),
       tempStorerReceivedAt: new Date("01/03/2020"),
       tempStorerSignedAt: new Date("01/04/2020"),
-      signedBy: "SIGNED By",
+      signedBy: "SIGNED By"
     };
 
     expect(processMainFormParams(params)).toMatchObject({
@@ -38,7 +38,7 @@ describe("processMainFormParams", () => {
       receivedAt: dateFmt(params.receivedAt),
       processedAt: dateFmt(params.processedAt),
       signedAt: dateFmt(params.signedAt),
-      tempStoredFormSignedAt: dateFmt(params.signedAt),
+      tempStoredFormSignedAt: dateFmt(params.signedAt)
     });
   });
 });

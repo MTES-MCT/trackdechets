@@ -11,7 +11,7 @@ if (!!sentryDsn) {
     dsn: sentryDsn
   });
 
-  Sentry.configureScope(function(scope) {
+  Sentry.configureScope(function (scope) {
     scope.setTag("service", "pdf");
   });
 }
@@ -23,8 +23,9 @@ app.get("/ping", (_, res) => res.end("pong"));
 app.post("/pdf", async (req, res) => {
   const { readableId } = req.body;
   const date = new Date();
-  const fileName = `BSD_${readableId}_${date.getDate()}-${date.getMonth() +
-    1}-${date.getFullYear()}`;
+  const fileName = `BSD_${readableId}_${date.getDate()}-${
+    date.getMonth() + 1
+  }-${date.getFullYear()}`;
 
   try {
     const buffer = await buildPdf(req.body);
