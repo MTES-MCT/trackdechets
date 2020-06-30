@@ -232,17 +232,18 @@ export const hasFinalDestination = rule()(async (_, { id }, ctx) => {
 
 export const canAccessFormsWithoutSiret = and(
   isAuthenticated,
-  rule()(async (_, {}, ctx) => {
+  rule()(async (_, { siret }, ctx) => {
     const currentUserSirets = await getCurrentUserSirets(
       ctx.user.id,
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.length == 1 ||
-      new ForbiddenError(
-        `Vous appartenez à plusieurs entreprises, vous devez spécifier le SIRET dont vous souhaitez récupérer les bordereaux.`
-      )
+    if (currentUserSirets.length === 1) {
+      return siret == null || siret === currentUserSirets[0];
+    }
+
+    return new ForbiddenError(
+      `Vous appartenez à plusieurs entreprises, vous devez spécifier le SIRET dont vous souhaitez récupérer les bordereaux.`
     );
   })
 );

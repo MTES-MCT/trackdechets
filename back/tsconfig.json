@@ -7,7 +7,9 @@
     "module": "CommonJS",
     "target": "es6",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "noImplicitAny": false
   },
   "include": ["src/**/*", "prisma/**/*"]
 }

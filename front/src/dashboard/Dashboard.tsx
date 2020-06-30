@@ -57,7 +57,13 @@ export default function Dashboard() {
       return <Redirect to="/account/companies" />;
     }
 
-    if (!siret) return <Redirect to={`${match.url}/${companies[0].siret}`} />;
+    if (!siret) {
+      return <Redirect to={`${match.url}/${companies[0].siret}`} />;
+    }
+
+    if (!companies.find(company => company.siret === siret)) {
+      return <Redirect to={`/dashboard/${companies[0].siret}`} />;
+    }
 
     return (
       <SiretContext.Provider value={{ siret }}>

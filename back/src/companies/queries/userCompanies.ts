@@ -24,7 +24,7 @@ fragment Company on CompanyAssociation {
  * to make up an instance of CompanyPrivate
  * @param userId
  */
-export async function getUserCompanies(userId: string) {
+export async function getUserCompanies(userId: string): Promise<Company[]> {
   if (!userId) {
     return Promise.resolve([]);
   }

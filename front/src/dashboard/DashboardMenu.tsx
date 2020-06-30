@@ -19,36 +19,31 @@ export default function DashboardMenu({
 }: IProps) {
   const { siret } = useContext(SiretContext);
   const companies = me.companies || [];
-
   const company = companies.find(c => c.siret === siret);
 
-  if (company) {
-    const isTransporter =
-      company.companyTypes.indexOf(CompanyType.Transporter) > -1;
+  return (
+    <SideMenu>
+      <>
+        {companies.length > 1 ? (
+          <div className="company-select">
+            <CompanySelector
+              siret={siret}
+              companies={companies}
+              handleCompanyChange={handleCompanyChange}
+            />
+          </div>
+        ) : (
+          <div className="company-title">{company?.name}</div>
+        )}
 
-    return (
-      <SideMenu>
-        <>
-          {companies.length === 1 && (
-            <div className="company-title">{companies[0].name}</div>
-          )}
-          {companies.length > 1 && (
-            <div className="company-select">
-              <CompanySelector
-                siret={siret}
-                companies={companies}
-                handleCompanyChange={handleCompanyChange}
-              />
-            </div>
-          )}
-
+        {company && (
           <ul>
             <li>
               <NavLink to={`${match.url}/slips`} activeClassName="active">
                 Mes bordereaux
               </NavLink>
             </li>
-            {isTransporter && (
+            {company.companyTypes.includes(CompanyType.Transporter) && (
               <li>
                 <NavLink to={`${match.url}/transport`} activeClassName="active">
                   Transport
@@ -61,10 +56,8 @@ export default function DashboardMenu({
               </NavLink>
             </li>
           </ul>
-        </>
-      </SideMenu>
-    );
-  }
-
-  return null;
+        )}
+      </>
+    </SideMenu>
+  );
 }
