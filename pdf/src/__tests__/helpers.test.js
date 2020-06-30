@@ -4,20 +4,20 @@ describe("processMainFormParams", () => {
   it("should format the fields", () => {
     const params = {
       transporterCompanySiret: "0".repeat(14),
-      transporterValidityLimit: new Date("01/01/2020"),
-      traderValidityLimit: new Date("01/02/2020"),
+      transporterValidityLimit: new Date("01/01/2020").toISOString(),
+      traderValidityLimit: new Date("01/02/2020").toISOString(),
       recipientCompanySiret: "recipient-company-siret",
       recipientCompanyName: "RECIPIENT COMPANY NAME",
       recipientCompanyAddress: "Recipient Company Address",
       recipientCompanyContact: "RECIPIENT Contact",
-      sentAt: new Date("01/05/2020"),
+      sentAt: new Date("01/05/2020").toISOString(),
       sentBy: "SENT By",
-      receivedAt: new Date("01/06/2020"),
-      signedAt: new Date("01/06/2020"),
+      receivedAt: new Date("01/06/2020").toISOString(),
+      signedAt: new Date("01/06/2020").toISOString(),
       receivedBy: "RECEIVED By",
-      processedAt: new Date("01/07/2020"),
-      tempStorerReceivedAt: new Date("01/03/2020"),
-      tempStorerSignedAt: new Date("01/04/2020"),
+      processedAt: new Date("01/07/2020").toISOString(),
+      tempStorerReceivedAt: new Date("01/03/2020").toISOString(),
+      tempStorerSignedAt: new Date("01/04/2020").toISOString(),
       signedBy: "SIGNED By"
     };
 
