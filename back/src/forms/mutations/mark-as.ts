@@ -3,7 +3,7 @@ import { flattenObjectForDb } from "../form-converter";
 import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, ValidationError } from "apollo-server-express";
 import { capitalize } from "../../common/strings";
 import { prisma } from "../../generated/prisma-client";
 import {
@@ -32,6 +32,11 @@ export async function markAsSent(
   context: GraphQLContext
 ): Promise<Form> {
   const form = await prisma.form({ id });
+
+  if (form == null) {
+    throw new ValidationError("Le BSD est introuvable.");
+  }
+
   // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
   return transitionForm(
     id,
@@ -63,6 +68,17 @@ export function markAsProcessed(
   { id, processedInfo }: MutationMarkAsProcessedArgs,
   context: GraphQLContext
 ): Promise<Form> {
+  const operation = PROCESSING_OPERATIONS.find(
+    otherOperation =>
+      otherOperation.code === processedInfo.processingOperationDone
+  );
+
+  if (operation == null) {
+    throw new ValidationError(
+      `Le code d'opération "${processedInfo.processingOperationDone}" n'est pas reconnu.`
+    );
+  }
+
   return transitionForm(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
@@ -71,10 +87,7 @@ export function markAsProcessed(
       flattenObjectForDb({
         ...infos,
         processingOperationDescription:
-          infos.processingOperationDescription ??
-          PROCESSING_OPERATIONS.find(
-            operation => operation.code === infos.processingOperationDone
-          ).description
+          infos.processingOperationDescription ?? operation.description
       })
   );
 }
@@ -84,6 +97,10 @@ export async function signedByTransporter(
   context: GraphQLContext
 ): Promise<Form> {
   const form = await prisma.form({ id });
+
+  if (form == null) {
+    throw new ValidationError("Le BSD est introuvable.");
+  }
 
   // BSD has already been sent, it must be a signature for frame 18
   if (form.sentAt) {
@@ -207,6 +224,10 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await prisma.form({ id: formId });
+
+  if (form == null) {
+    throw new ValidationError("Le BSD est introuvable.");
+  }
 
   const temporaryStorageDetail = await prisma
     .form({ id: formId })
