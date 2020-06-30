@@ -93,11 +93,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Run integration tests
+          name: Run API integration tests
           command: |
             cd back/integration-tests
             sudo chmod +x ./run.sh
             ./run.sh
+      - run:
+          name: Run PDF integration tests
+          command: |
+            cd pdf
+            npm run test:integration
 
 workflows:
   build-and-deploy:
