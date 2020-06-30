@@ -11,5 +11,5 @@
     "strict": false,
     "noImplicitAny": false
   },
-  "include": ["src", "prisma"]
+  "include": ["src/**/*", "prisma/**/*"]
 }
