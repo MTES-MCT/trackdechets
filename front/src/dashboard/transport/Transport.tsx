@@ -145,25 +145,21 @@ const Table = ({ forms, userSiret }) => {
             </td>
             <td>{form.stateSummary?.transporterCustomInfo}</td>
             <td style={{ paddingLeft: 0, paddingRight: 0 }}>
-              {
-                <TransporterInfoEdit
-                  form={form}
-                  fieldName="customInfo"
-                  title={"Modifier le champ libre"}
-                  refetchQuery={refetchQuery}
-                />
-              }
+              <TransporterInfoEdit
+                form={form}
+                fieldName="customInfo"
+                title={"Modifier le champ libre"}
+                refetchQuery={refetchQuery}
+              />
             </td>
             <td>{form.stateSummary?.transporterNumberPlate}</td>
             <td style={{ paddingLeft: 0 }}>
-              {
-                <TransporterInfoEdit
-                  form={form}
-                  fieldName="numberPlate"
-                  title={"Modifier la plaque d'immatriculation"}
-                  refetchQuery={refetchQuery}
-                />
-              }
+              <TransporterInfoEdit
+                form={form}
+                fieldName="numberPlate"
+                title={"Modifier la plaque d'immatriculation"}
+                refetchQuery={refetchQuery}
+              />
             </td>
             <td>
               <Segments form={form} userSiret={userSiret} />
