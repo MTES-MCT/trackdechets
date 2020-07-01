@@ -68,7 +68,9 @@ describe("{ mutation { editSegment } }", () => {
   it("should edit a segment when user is transporter and form owner", async () => {
     const { user: firstTransporter, company } = await userWithCompanyFactory(
       "ADMIN",
-      "TRANSPORTER"
+      {
+        companyTypes: { set: ["TRANSPORTER"] }
+      }
     );
 
     const transporterSiret = company.siret;
@@ -114,11 +116,15 @@ describe("{ mutation { editSegment } }", () => {
     const {
       user: firstTransporter,
       company: firstTransporterCompany
-    } = await userWithCompanyFactory("ADMIN", "TRANSPORTER");
+    } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["TRANSPORTER"] }
+    });
     const {
       user: secondTransporter,
       company: secondTransporterCompany
-    } = await userWithCompanyFactory("ADMIN", "TRANSPORTER");
+    } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["TRANSPORTER"] }
+    });
 
     const firstTransporterSiret = firstTransporterCompany.siret;
     const secondTransporterSiret = secondTransporterCompany.siret;
