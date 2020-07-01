@@ -10,7 +10,8 @@
       "access-token",
       "playground",
       "multimodal",
-      "sirene"
+      "sirene",
+      "registre"
     ],
     "Référence de l'API": ["api-reference", "changelog"]
   }
