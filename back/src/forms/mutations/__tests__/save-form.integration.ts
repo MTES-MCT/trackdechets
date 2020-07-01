@@ -399,4 +399,36 @@ describe("{ mutation { saveForm } }", () => {
 
     expect(temporaryStorageDetail).not.toBeNull();
   });
+
+  test("should create a form with no data except the company siret", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const payload = {
+      emitter: {
+        company: { siret: company.siret }
+      }
+    };
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+          emitter {
+            company {
+              siret
+            }
+          }
+        }
+      }
+    `;
+
+    const { data } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    expect(data.saveForm.id).not.toBeNull();
+    expect(data.saveForm.id).not.toBeUndefined();
+    expect(data.saveForm);
+  });
 });
