@@ -22,9 +22,9 @@ export default withRouter(function Header({
   return (
     <header className="navbar" role="navigation">
       <div className="navbar__container">
-        <div className="navbar__brand">
+        <div className="navbar__branding">
           <img
-            className="navbar__logo"
+            className="navbar__marianne"
             src="/marianne.svg"
             alt="Ministère de la Transition écologique et solidaire"
           />
