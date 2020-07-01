@@ -262,8 +262,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                           En tant que{" "}
                           {isEmittedByProducer ? "producteur" : "détenteur"} du
                           déchet, j'ai vérifié que les déchets confiés au
-                          transporter correspondent au informations vue ci-avant
-                          et je valide l'enlèvement.
+                          transporteur correspondent aux informations vues
+                          ci-avant et je valide l'enlèvement.
                         </label>
                       </p>
                       <RedErrorMessage name="signedByProducer" />
