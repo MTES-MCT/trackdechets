@@ -149,7 +149,12 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
  */
 function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
-    traderCompanySiret_in: sirets
+    AND: [
+      {
+        status_not_in: ["DRAFT", "SEALED"]
+      },
+      { traderCompanySiret_in: sirets }
+    ]
   };
 }
 
