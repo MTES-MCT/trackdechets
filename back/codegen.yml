@@ -15,8 +15,11 @@ generates:
     plugins:
       - typescript
       - typescript-operations
+      - graphql-codegen-factories
     config:
       avoidOptionals: true
+      scalarDefaults:
+        DateTime: new Date()
   documentation/api-reference.md:
     plugins:
       - graphql-markdown-plugin.js

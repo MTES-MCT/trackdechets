@@ -1857,3 +1857,511 @@ export type WorkSiteInput = {
   infos: Maybe<Scalars['String']>;
 };
 
+
+export function createAuthPayloadMock(props: Partial<AuthPayload>): AuthPayload {
+  return {
+    __typename: "AuthPayload",
+    token: "",
+    user: createUserMock({}),
+    ...props,
+  };
+};
+
+export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): CompanyFavorite {
+  return {
+    __typename: "CompanyFavorite",
+    name: null,
+    siret: null,
+    address: null,
+    contact: null,
+    phone: null,
+    mail: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyMemberMock(props: Partial<CompanyMember>): CompanyMember {
+  return {
+    __typename: "CompanyMember",
+    id: "",
+    email: "",
+    name: null,
+    role: null,
+    isActive: null,
+    isPendingInvitation: null,
+    isMe: null,
+    ...props,
+  };
+};
+
+export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): CompanyPrivate {
+  return {
+    __typename: "CompanyPrivate",
+    id: "",
+    companyTypes: [],
+    gerepId: null,
+    securityCode: 0,
+    contactEmail: null,
+    contactPhone: null,
+    website: null,
+    users: null,
+    userRole: null,
+    givenName: null,
+    siret: "",
+    address: null,
+    name: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyPublic {
+  return {
+    __typename: "CompanyPublic",
+    contactEmail: null,
+    contactPhone: null,
+    website: null,
+    siret: null,
+    etatAdministratif: null,
+    address: null,
+    name: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    isRegistered: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanySearchResultMock(props: Partial<CompanySearchResult>): CompanySearchResult {
+  return {
+    __typename: "CompanySearchResult",
+    siret: null,
+    address: null,
+    name: null,
+    companyTypes: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyStatMock(props: Partial<CompanyStat>): CompanyStat {
+  return {
+    __typename: "CompanyStat",
+    company: null,
+    stats: [],
+    ...props,
+  };
+};
+
+export function createDeclarationMock(props: Partial<Declaration>): Declaration {
+  return {
+    __typename: "Declaration",
+    annee: null,
+    codeDechet: null,
+    libDechet: null,
+    gerepType: null,
+    ...props,
+  };
+};
+
+export function createDestinationMock(props: Partial<Destination>): Destination {
+  return {
+    __typename: "Destination",
+    cap: null,
+    processingOperation: null,
+    company: null,
+    isFilledByEmitter: null,
+    ...props,
+  };
+};
+
+export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganisme {
+  return {
+    __typename: "EcoOrganisme",
+    id: "",
+    name: "",
+    siret: "",
+    address: "",
+    ...props,
+  };
+};
+
+export function createEmitterMock(props: Partial<Emitter>): Emitter {
+  return {
+    __typename: "Emitter",
+    type: null,
+    workSite: null,
+    pickupSite: null,
+    company: null,
+    ...props,
+  };
+};
+
+export function createFileDownloadMock(props: Partial<FileDownload>): FileDownload {
+  return {
+    __typename: "FileDownload",
+    token: null,
+    downloadLink: null,
+    ...props,
+  };
+};
+
+export function createFormMock(props: Partial<Form>): Form {
+  return {
+    __typename: "Form",
+    id: "",
+    readableId: "",
+    customId: null,
+    emitter: null,
+    recipient: null,
+    transporter: null,
+    wasteDetails: null,
+    trader: null,
+    createdAt: null,
+    updatedAt: null,
+    status: FormStatus.Draft,
+    signedByTransporter: null,
+    sentAt: null,
+    sentBy: null,
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
+    receivedBy: null,
+    receivedAt: null,
+    signedAt: null,
+    quantityReceived: null,
+    actualQuantity: null,
+    processingOperationDone: null,
+    processingOperationDescription: null,
+    processedBy: null,
+    processedAt: null,
+    noTraceability: null,
+    nextDestination: null,
+    appendix2Forms: null,
+    ecoOrganisme: null,
+    temporaryStorageDetail: null,
+    stateSummary: null,
+    transportSegments: null,
+    currentTransporterSiret: null,
+    nextTransporterSiret: null,
+    ...props,
+  };
+};
+
+export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany {
+  return {
+    __typename: "FormCompany",
+    name: null,
+    siret: null,
+    address: null,
+    contact: null,
+    phone: null,
+    mail: null,
+    ...props,
+  };
+};
+
+export function createFormsLifeCycleDataMock(props: Partial<FormsLifeCycleData>): FormsLifeCycleData {
+  return {
+    __typename: "formsLifeCycleData",
+    statusLogs: [],
+    hasNextPage: null,
+    hasPreviousPage: null,
+    startCursor: null,
+    endCursor: null,
+    count: null,
+    ...props,
+  };
+};
+
+export function createFormSubscriptionMock(props: Partial<FormSubscription>): FormSubscription {
+  return {
+    __typename: "FormSubscription",
+    mutation: null,
+    node: null,
+    updatedFields: null,
+    previousValues: null,
+    ...props,
+  };
+};
+
+export function createInstallationMock(props: Partial<Installation>): Installation {
+  return {
+    __typename: "Installation",
+    codeS3ic: null,
+    urlFiche: null,
+    rubriques: null,
+    declarations: null,
+    ...props,
+  };
+};
+
+export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
+  return {
+    __typename: "MultimodalTransporter",
+    company: null,
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    customInfo: null,
+    ...props,
+  };
+};
+
+export function createNextDestinationMock(props: Partial<NextDestination>): NextDestination {
+  return {
+    __typename: "NextDestination",
+    processingOperation: null,
+    company: null,
+    ...props,
+  };
+};
+
+export function createRecipientMock(props: Partial<Recipient>): Recipient {
+  return {
+    __typename: "Recipient",
+    cap: null,
+    processingOperation: null,
+    company: null,
+    isTempStorage: null,
+    ...props,
+  };
+};
+
+export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
+  return {
+    __typename: "Rubrique",
+    rubrique: "",
+    alinea: null,
+    etatActivite: null,
+    regimeAutorise: null,
+    activite: null,
+    category: "",
+    volume: null,
+    unite: null,
+    wasteType: null,
+    ...props,
+  };
+};
+
+export function createStatMock(props: Partial<Stat>): Stat {
+  return {
+    __typename: "Stat",
+    wasteCode: "",
+    incoming: 0,
+    outgoing: 0,
+    ...props,
+  };
+};
+
+export function createStateSummaryMock(props: Partial<StateSummary>): StateSummary {
+  return {
+    __typename: "StateSummary",
+    quantity: null,
+    packagings: [],
+    onuCode: null,
+    transporter: null,
+    transporterNumberPlate: null,
+    transporterCustomInfo: null,
+    recipient: null,
+    emitter: null,
+    lastActionOn: null,
+    ...props,
+  };
+};
+
+export function createStatusLogMock(props: Partial<StatusLog>): StatusLog {
+  return {
+    __typename: "StatusLog",
+    id: null,
+    status: null,
+    loggedAt: null,
+    updatedFields: null,
+    form: null,
+    user: null,
+    ...props,
+  };
+};
+
+export function createStatusLogFormMock(props: Partial<StatusLogForm>): StatusLogForm {
+  return {
+    __typename: "StatusLogForm",
+    id: null,
+    readableId: null,
+    ...props,
+  };
+};
+
+export function createStatusLogUserMock(props: Partial<StatusLogUser>): StatusLogUser {
+  return {
+    __typename: "StatusLogUser",
+    id: null,
+    email: null,
+    ...props,
+  };
+};
+
+export function createSubscriptionMock(props: Partial<Subscription>): Subscription {
+  return {
+    __typename: "Subscription",
+    forms: null,
+    ...props,
+  };
+};
+
+export function createTemporaryStorageDetailMock(props: Partial<TemporaryStorageDetail>): TemporaryStorageDetail {
+  return {
+    __typename: "TemporaryStorageDetail",
+    temporaryStorer: null,
+    destination: null,
+    wasteDetails: null,
+    transporter: null,
+    signedBy: null,
+    signedAt: null,
+    ...props,
+  };
+};
+
+export function createTemporaryStorerMock(props: Partial<TemporaryStorer>): TemporaryStorer {
+  return {
+    __typename: "TemporaryStorer",
+    quantityType: null,
+    quantityReceived: null,
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
+    receivedAt: null,
+    receivedBy: null,
+    ...props,
+  };
+};
+
+export function createTraderMock(props: Partial<Trader>): Trader {
+  return {
+    __typename: "Trader",
+    company: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    ...props,
+  };
+};
+
+export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderReceipt {
+  return {
+    __typename: "TraderReceipt",
+    id: "",
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+};
+
+export function createTransporterMock(props: Partial<Transporter>): Transporter {
+  return {
+    __typename: "Transporter",
+    company: null,
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    customInfo: null,
+    ...props,
+  };
+};
+
+export function createTransporterReceiptMock(props: Partial<TransporterReceipt>): TransporterReceipt {
+  return {
+    __typename: "TransporterReceipt",
+    id: "",
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+};
+
+export function createTransportSegmentMock(props: Partial<TransportSegment>): TransportSegment {
+  return {
+    __typename: "TransportSegment",
+    id: "",
+    previousTransporterCompanySiret: null,
+    transporter: null,
+    mode: null,
+    takenOverAt: null,
+    takenOverBy: null,
+    readyToTakeOver: null,
+    segmentNumber: null,
+    ...props,
+  };
+};
+
+export function createUploadLinkMock(props: Partial<UploadLink>): UploadLink {
+  return {
+    __typename: "UploadLink",
+    signedUrl: null,
+    key: null,
+    ...props,
+  };
+};
+
+export function createUserMock(props: Partial<User>): User {
+  return {
+    __typename: "User",
+    id: "",
+    email: "",
+    name: null,
+    phone: null,
+    companies: null,
+    ...props,
+  };
+};
+
+export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetails {
+  return {
+    __typename: "WasteDetails",
+    code: null,
+    name: null,
+    onuCode: null,
+    packagings: [],
+    otherPackaging: null,
+    numberOfPackages: null,
+    quantity: null,
+    quantityType: null,
+    consistence: null,
+    ...props,
+  };
+};
+
+export function createWorkSiteMock(props: Partial<WorkSite>): WorkSite {
+  return {
+    __typename: "WorkSite",
+    name: null,
+    address: null,
+    city: null,
+    postalCode: null,
+    infos: null,
+    ...props,
+  };
+};
