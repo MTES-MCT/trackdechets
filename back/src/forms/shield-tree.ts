@@ -39,8 +39,7 @@ export default {
     ),
     stats: isAuthenticated,
     formsLifeCycle: isAuthenticated,
-    appendixForms: or(isCompanyMember, isCompanyAdmin),
-    processingOperations: isAuthenticated
+    appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
     saveForm: isAuthenticated,
