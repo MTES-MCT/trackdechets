@@ -336,6 +336,15 @@ Renvoie les informations sur l'utilisateur authentifié
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>processingOperations</strong></td>
+<td valign="top">[<a href="#processingoperation">ProcessingOperation</a>!]!</td>
+<td>
+
+Renvoie la liste des opérations de traitement supportées.
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>searchCompanies</strong></td>
 <td valign="top">[<a href="#companysearchresult">CompanySearchResult</a>!]!</td>
 <td>
@@ -2805,6 +2814,39 @@ Traitement prévue (code D/R)
 <td>
 
 Établissement ultérieure
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### ProcessingOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Code de l'opération de traitement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>description</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Description de l'opération de traitement
 
 </td>
 </tr>

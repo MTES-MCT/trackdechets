@@ -2,11 +2,12 @@ import { useFormikContext, Field } from "formik";
 import React, { useEffect } from "react";
 import CompanySelector from "../company/CompanySelector";
 import { Form } from "../../generated/graphql/types";
-import { Operations } from "../processing-operation/ProcessingOperation";
+import { useProcessingOperations } from "../../hooks";
 import initialState from "../initial-state";
 
 export default function TemporaryStorage(props) {
   const { values, setFieldValue } = useFormikContext<Form>();
+  const processingOperations = useProcessingOperations();
 
   useEffect(() => {
     if (values.recipient?.isTempStorage && !values.temporaryStorageDetail) {
@@ -52,7 +53,7 @@ export default function TemporaryStorage(props) {
           name={`${props.name}.destination.processingOperation`}
         >
           <option value="">Choisissez...</option>
-          {Operations.map(o => (
+          {processingOperations.map(o => (
             <option key={o.code} value={o.code}>
               {o.code} - {o.description.substr(0, 50)}
               {o.description.length > 50 ? "..." : ""}

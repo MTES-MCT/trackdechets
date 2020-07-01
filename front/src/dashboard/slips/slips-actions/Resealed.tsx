@@ -9,7 +9,7 @@ import NumberInput from "../../../form/custom-inputs/NumberInput";
 import { RadioButton } from "../../../form/custom-inputs/RadioButton";
 import Packagings from "../../../form/packagings/Packagings";
 import { SlipActionProps } from "../SlipActions";
-import { Operations } from "../../../form/processing-operation/ProcessingOperation";
+import { useProcessingOperations } from "../../../hooks";
 
 export default function Resealed({
   form,
@@ -25,6 +25,7 @@ export default function Resealed({
   const [isRefurbished, setIsRefurbished] = useState(
     !!form.temporaryStorageDetail?.wasteDetails?.quantity
   );
+  const processingOperations = useProcessingOperations();
 
   function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
     setIsRefurbished(!isRefurbished);
@@ -77,10 +78,10 @@ export default function Resealed({
 
               <Field component="select" name="destination.processingOperation">
                 <option value="">Choisissez...</option>
-                {Operations.map(o => (
-                  <option key={o.code} value={o.code}>
-                    {o.code} - {o.description.substr(0, 50)}
-                    {o.description.length > 50 ? "..." : ""}
+                {processingOperations.map(operation => (
+                  <option key={operation.code} value={operation.code}>
+                    {operation.code} - {operation.description.substr(0, 50)}
+                    {operation.description.length > 50 ? "..." : ""}
                   </option>
                 ))}
               </Field>

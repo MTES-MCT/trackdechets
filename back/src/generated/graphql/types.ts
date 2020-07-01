@@ -1168,6 +1168,14 @@ export type ProcessedFormInput = {
   noTraceability?: Maybe<Scalars['Boolean']>;
 };
 
+export type ProcessingOperation = {
+   __typename?: 'ProcessingOperation';
+  /** Code de l'opération de traitement */
+  code: Scalars['String'];
+  /** Description de l'opération de traitement */
+  description: Scalars['String'];
+};
+
 /** Type de quantité lors de l'émission */
 export type QuantityType = 
   /** Quntité réelle */
@@ -1228,6 +1236,8 @@ export type Query = {
   formsRegister: FileDownload;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
+  /** Renvoie la liste des opérations de traitement supportées. */
+  processingOperations: Array<ProcessingOperation>;
   /**
    * Effectue une recherche floue sur la base SIRENE et enrichit
    * les résultats avec des informations provenant de Trackdéchets
@@ -1971,6 +1981,7 @@ export type ResolversTypes = {
   CompanyType: CompanyType;
   CompanyMember: ResolverTypeWrapper<CompanyMember>;
   UserRole: UserRole;
+  ProcessingOperation: ResolverTypeWrapper<ProcessingOperation>;
   CompanySearchResult: ResolverTypeWrapper<CompanySearchResult>;
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
@@ -2069,6 +2080,7 @@ export type ResolversParentTypes = {
   CompanyType: CompanyType;
   CompanyMember: CompanyMember;
   UserRole: UserRole;
+  ProcessingOperation: ProcessingOperation;
   CompanySearchResult: CompanySearchResult;
   CompanyStat: CompanyStat;
   Stat: Stat;
@@ -2381,6 +2393,12 @@ export type NextDestinationResolvers<ContextType = GraphQLContext, ParentType ex
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
+export type ProcessingOperationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessingOperation'] = ResolversParentTypes['ProcessingOperation']> = {
+  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+};
+
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   apiKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   appendixForms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryAppendixFormsArgs, 'siret'>>;
@@ -2393,6 +2411,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   formsLifeCycle?: Resolver<ResolversTypes['formsLifeCycleData'], ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>;
   formsRegister?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, never>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  processingOperations?: Resolver<Array<ResolversTypes['ProcessingOperation']>, ParentType, ContextType>;
   searchCompanies?: Resolver<Array<ResolversTypes['CompanySearchResult']>, ParentType, ContextType, RequireFields<QuerySearchCompaniesArgs, 'clue'>>;
   stats?: Resolver<Array<ResolversTypes['CompanyStat']>, ParentType, ContextType>;
 };
@@ -2591,6 +2610,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   MultimodalTransporter?: MultimodalTransporterResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NextDestination?: NextDestinationResolvers<ContextType>;
+  ProcessingOperation?: ProcessingOperationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Recipient?: RecipientResolvers<ContextType>;
   Rubrique?: RubriqueResolvers<ContextType>;
