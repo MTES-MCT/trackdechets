@@ -8,7 +8,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [Unreleased]
 
 - Bugfixes [PR 336](https://github.com/MTES-MCT/trackdechets/pull/336)
-- Export des différents type de registre [PR 328](https://github.com/MTES-MCT/trackdechets/pull/328)
+- Export des différents types de registre [PR 328](https://github.com/MTES-MCT/trackdechets/pull/328)
 
 # [2020.06.2] 05/06/2020
 
