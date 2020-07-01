@@ -2,7 +2,7 @@ import { resetDatabase } from "../../integration-tests/helper";
 import supertest from "supertest";
 import { app, sess } from "../server";
 import { prisma } from "../generated/prisma-client";
-import { loginError } from "../auth";
+import { getLoginError } from "../auth";
 import queryString from "querystring";
 import { sign } from "jsonwebtoken";
 import { getUid } from "../utils";
@@ -11,6 +11,7 @@ import { userFactory } from "./factories";
 const { UI_HOST, JWT_SECRET } = process.env;
 
 const request = supertest(app);
+const loginError = getLoginError("Some User");
 
 describe("POST /login", () => {
   afterEach(() => resetDatabase());

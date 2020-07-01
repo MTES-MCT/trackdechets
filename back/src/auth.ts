@@ -28,7 +28,7 @@ declare global {
 }
 
 // verbose error message and related errored field
-export const loginError = (username: string) => ({
+export const getLoginError = (username: string) => ({
   UNKNOWN_USER: {
     message: "Aucun utilisateur trouvé avec cet email",
     errorField: "email",
@@ -54,17 +54,17 @@ passport.use(
       const user = await prisma.user({ email: username.trim() });
       if (!user) {
         return done(null, false, {
-          ...loginError(username).UNKNOWN_USER
+          ...getLoginError(username).UNKNOWN_USER
         });
       }
       if (!user.isActive) {
         return done(null, false, {
-          ...loginError(username).NOT_ACTIVATED
+          ...getLoginError(username).NOT_ACTIVATED
         });
       }
       const passwordValid = await compare(password, user.password);
       if (!passwordValid) {
-        return done(null, false, { ...loginError(username).INVALID_PASSWORD });
+        return done(null, false, { ...getLoginError(username).INVALID_PASSWORD });
       }
       return done(null, user);
     }
