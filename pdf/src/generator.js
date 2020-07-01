@@ -7,7 +7,7 @@ const {
   fillFields,
   drawImage,
   processSegment,
-  processAnnexParams,
+  processAnnexParams
 } = require("./helpers");
 const {
   pageHeight,
@@ -22,16 +22,22 @@ const {
 const { PDFDocument } = pdflib;
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
-const multimodalYOffset = 85
+const multimodalYOffset = 85;
 /**
  * Render a form as pdf
  * Loads a pdf template, adds text to fill fields and adds stamp images as overlays
  * @param params - payload
  * @return Buffer
  */
-const buildPdf = async (params) => {
-  const { appendix2Forms, temporaryStorageDetail, transportSegments: segments } = params;
-  const transportSegments = segments.sort((a, b) => a.segmentNumber - b.segmentNumber);
+const buildPdf = async params => {
+  const {
+    appendix2Forms,
+    temporaryStorageDetail,
+    transportSegments: segments
+  } = params;
+  const transportSegments = segments.sort(
+    (a, b) => a.segmentNumber - b.segmentNumber
+  );
   const arialBytes = fs.readFileSync(path.join(__dirname, "./fonts/arial.ttf"));
   const timesBoldBytes = fs.readFileSync(
     path.join(__dirname, "./fonts/times-bold.ttf")
@@ -93,7 +99,7 @@ const buildPdf = async (params) => {
       x: customIdTitleParams.x,
       y: pageHeight - customIdTitleParams.y,
       size: customIdTitleParams.fontSize,
-      font: timesBoldFont,
+      font: timesBoldFont
     });
   }
 
@@ -102,45 +108,70 @@ const buildPdf = async (params) => {
     data: formData,
     page: firstPage,
     settings: mainFormFieldSettings,
-    font: arialFont,
+    font: arialFont
   });
 
   // draw watermark if needed
   if (!!process.env.PDF_WATERMARK) {
     drawImage({
-      locationName: "watermark", image: watermarkImage, page: firstPage, dimensions: {
+      locationName: "watermark",
+      image: watermarkImage,
+      page: firstPage,
+      dimensions: {
         width: 600,
-        height: 800,
+        height: 800
       }
     });
   }
   if (!!formData.noTraceability) {
     drawImage({
-      locationName: "noTraceabilityStamp", image: noTraceabilityImage, page: firstPage, dimensions: {
+      locationName: "noTraceabilityStamp",
+      image: noTraceabilityImage,
+      page: firstPage,
+      dimensions: {
         width: 100,
-        height: 50,
+        height: 50
       }
     });
   }
 
   if (!!formData.signedByTransporter) {
-    drawImage({ locationName: "transporterSignature", image: stampImage, page: firstPage });
+    drawImage({
+      locationName: "transporterSignature",
+      image: stampImage,
+      page: firstPage
+    });
   }
   if (!!formData.sentAt) {
-    drawImage({ locationName: "emitterSignature", image: stampImage, page: firstPage });
+    drawImage({
+      locationName: "emitterSignature",
+      image: stampImage,
+      page: firstPage
+    });
   }
   if (!!formData.processingOperationDone) {
-    drawImage({ locationName: "processingSignature", image: stampImage, page: firstPage });
+    drawImage({
+      locationName: "processingSignature",
+      image: stampImage,
+      page: firstPage
+    });
   }
   if (!!formData.receivedBy) {
-    drawImage({ locationName: "receivedSignature", image: stampImage, page: firstPage });
+    drawImage({
+      locationName: "receivedSignature",
+      image: stampImage,
+      page: firstPage
+    });
   }
 
   if (!!formData.transporterIsExemptedOfReceipt) {
     drawImage({
-      locationName: "exemptionStamp", image: exemptionStampImage, page: firstPage, dimensions: {
+      locationName: "exemptionStamp",
+      image: exemptionStampImage,
+      page: firstPage,
+      dimensions: {
         width: 150,
-        height: 65,
+        height: 65
       }
     });
   }
@@ -163,25 +194,27 @@ const buildPdf = async (params) => {
 
     const [tempStoragePage] = tempStorageDetailsPdf.getPages();
 
-    const temporaryStorageData = temporaryStorageDetail ? processMainFormParams({
-      ...temporaryStorageDetail,
-      tempStorerCompanySiret: params.recipientCompanySiret,
-      tempStorerCompanyAddress: params.recipientCompanyAddress,
-      tempStorerCompanyName: params.recipientCompanyName,
-      wasteAcceptationStatus:
-        params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
-      sentAt: params.temporaryStorageDetail.signedAt,
-      currentPageNumber: 2,
-      totalPagesNumber: 2,
-      formReadableId: params.readableId,
-    }) : {};
+    const temporaryStorageData = temporaryStorageDetail
+      ? processMainFormParams({
+          ...temporaryStorageDetail,
+          tempStorerCompanySiret: params.recipientCompanySiret,
+          tempStorerCompanyAddress: params.recipientCompanyAddress,
+          tempStorerCompanyName: params.recipientCompanyName,
+          wasteAcceptationStatus:
+            params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
+          sentAt: params.temporaryStorageDetail.signedAt,
+          currentPageNumber: 2,
+          totalPagesNumber: 2,
+          formReadableId: params.readableId
+        })
+      : {};
     if (temporaryStorageData) {
       // fill form data
       fillFields({
         data: temporaryStorageData,
         page: tempStoragePage,
         settings: temporaryStorageDetailsFieldSettings,
-        font: temporaryStorageArialFont,
+        font: temporaryStorageArialFont
       });
     }
 
@@ -196,61 +229,55 @@ const buildPdf = async (params) => {
         });
 
         if (!!segment.takenOverAt) {
-          drawImage(
-            {
-              locationName: "takenOverSignature",
-              image: tempStorageStampImage,
-              page: tempStoragePage,
-              yOffset: multimodalYOffset * (segment.segmentNumber - 1)
-            }
-          );
+          drawImage({
+            locationName: "takenOverSignature",
+            image: tempStorageStampImage,
+            page: tempStoragePage,
+            yOffset: multimodalYOffset * (segment.segmentNumber - 1)
+          });
         }
       }
     }
 
-
     // draw watermark if needed
     if (!!process.env.PDF_WATERMARK) {
       drawImage({
-        locationName: "watermark", image: temporaryStorageWatermarkImage, page: tempStoragePage, dimensions: {
+        locationName: "watermark",
+        image: temporaryStorageWatermarkImage,
+        page: tempStoragePage,
+        dimensions: {
           width: 600,
-          height: 800,
+          height: 800
         }
       });
     }
 
     if (!!temporaryStorageData.tempStorerSignedAt) {
-      drawImage(
-        {
-          locationName: "tempStorerReceptionSignature",
-          image: tempStorageStampImage,
-          page: tempStoragePage
-        }
-      );
+      drawImage({
+        locationName: "tempStorerReceptionSignature",
+        image: tempStorageStampImage,
+        page: tempStoragePage
+      });
     }
 
     if (!!temporaryStorageData.signedAt) {
-      drawImage(
-        {
-          locationName: "tempStorerSentSignature",
-          image: tempStorageStampImage,
-          page: tempStoragePage
-        }
-      );
+      drawImage({
+        locationName: "tempStorerSentSignature",
+        image: tempStorageStampImage,
+        page: tempStoragePage
+      });
     }
 
     if (!!temporaryStorageData.signedByTransporter) {
-      drawImage(
-        {
-          locationName: "tempStorageTransporterSignature",
-          image: tempStorageStampImage,
-          page: tempStoragePage
-        }
-      );
+      drawImage({
+        locationName: "tempStorageTransporterSignature",
+        image: tempStorageStampImage,
+        page: tempStoragePage
+      });
     }
 
     const [
-      copiedTempStoragePage,
+      copiedTempStoragePage
     ] = await mainForm.copyPages(tempStorageDetailsPdf, [0]);
     mainForm.addPage(copiedTempStoragePage);
   }
@@ -262,8 +289,9 @@ const buildPdf = async (params) => {
 
     const transportSegmentsFormsByPage = 2;
     const transportSegmentsFormsCount = remainingSegments.length;
-    const transportSegmentsPageCount = Math.ceil(transportSegmentsFormsCount / transportSegmentsFormsByPage) - 1; // how many multimodal pages do we need
- 
+    const transportSegmentsPageCount =
+      Math.ceil(transportSegmentsFormsCount / transportSegmentsFormsByPage) - 1; // how many multimodal pages do we need
+
     let subFormCounter = 0; // each appendix page can hold up to 2 sub-forms, let's use a counter
     for (
       let sheetCounter = 0;
@@ -278,23 +306,27 @@ const buildPdf = async (params) => {
       const multimodalWatermarkImage = await multimodalPages.embedPng(
         watermarkBytes
       );
-      const multimodalStampImage = await multimodalPages.embedPng(
-        stampBytes
-      );
+      const multimodalStampImage = await multimodalPages.embedPng(stampBytes);
 
       let currentMultimodalPage = multimodalPages.getPages()[0];
 
-      let remaining = transportSegmentsFormsCount - sheetCounter * transportSegmentsFormsByPage; // how many sub forms left
-      let lastPageFormsCount = Math.min(remaining, transportSegmentsFormsByPage); // if we have less than 2 forms on the last page
-      
+      let remaining =
+        transportSegmentsFormsCount -
+        sheetCounter * transportSegmentsFormsByPage; // how many sub forms left
+      let lastPageFormsCount = Math.min(
+        remaining,
+        transportSegmentsFormsByPage
+      ); // if we have less than 2 forms on the last page
+
       for (
         let pageSubFormCounter = 0;
         pageSubFormCounter <= lastPageFormsCount - 1;
         pageSubFormCounter++
       ) {
-        subFormCounter = pageSubFormCounter + sheetCounter * transportSegmentsFormsByPage;
+        subFormCounter =
+          pageSubFormCounter + sheetCounter * transportSegmentsFormsByPage;
         let segment = remainingSegments[subFormCounter];
-        const yOffset = multimodalYOffset * (pageSubFormCounter)
+        const yOffset = multimodalYOffset * pageSubFormCounter;
 
         fillFields({
           data: processSegment(segment),
@@ -304,33 +336,32 @@ const buildPdf = async (params) => {
           yOffset
         });
 
-
         if (!!segment.takenOverAt) {
-          drawImage(
-            {
-              locationName: "takenOverSignature",
-              image: multimodalStampImage,
-              page: currentMultimodalPage,
-              yOffset
-            }
-          );
+          drawImage({
+            locationName: "takenOverSignature",
+            image: multimodalStampImage,
+            page: currentMultimodalPage,
+            yOffset
+          });
         }
 
         // draw watermark if needed
         if (!!process.env.PDF_WATERMARK) {
           drawImage({
-            locationName: "watermark", image: multimodalWatermarkImage, page: currentMultimodalPage, dimensions: {
+            locationName: "watermark",
+            image: multimodalWatermarkImage,
+            page: currentMultimodalPage,
+            dimensions: {
               width: 600,
-              height: 800,
+              height: 800
             }
           });
         }
       }
-      const [
-        copiedMultimodalPage,
-      ] = await mainForm.copyPages(multimodalPages, [0]);
+      const [copiedMultimodalPage] = await mainForm.copyPages(multimodalPages, [
+        0
+      ]);
       mainForm.addPage(copiedMultimodalPage);
-
     }
   }
 
@@ -364,7 +395,7 @@ const buildPdf = async (params) => {
       data: formData,
       page: currentAppendixPage,
       settings: appendixHeaderFieldSettings,
-      font: appendixArialFont,
+      font: appendixArialFont
     });
 
     let remaining = appendix2FormsCount - sheetCounter * formsByAppendix; // how many sub forms left
@@ -381,7 +412,7 @@ const buildPdf = async (params) => {
       // process each annex and add numbering
       appendix = {
         ...processAnnexParams(appendix),
-        numbering: `${subFormCounter + 1}`,
+        numbering: `${subFormCounter + 1}`
       };
       // to avoid using coordinates for each one of the 5 subForms, we add a vertical offset
       let yOffset = appendixYOffsets[pageSubFormCounter];
@@ -392,16 +423,19 @@ const buildPdf = async (params) => {
         page: currentAppendixPage,
         settings: appendixFieldSettings,
         font: appendixArialFont,
-        yOffset: yOffset,
+        yOffset: yOffset
       });
     }
 
     // draw watermark if needed
     if (!!process.env.PDF_WATERMARK) {
       drawImage({
-        locationName: "watermark", image: appendixWatermarkImage, page: currentAppendixPage, dimensions: {
+        locationName: "watermark",
+        image: appendixWatermarkImage,
+        page: currentAppendixPage,
+        dimensions: {
           width: 600,
-          height: 800,
+          height: 800
         }
       });
     }

@@ -86,8 +86,9 @@ test("server renders pdf", async () => {
   const { headers } = res;
   expect(headers["content-type"]).toBe("application/pdf");
   const date = new Date();
-  const fileNameSuffix = `${date.getDate()}-${date.getMonth() +
-    1}-${date.getFullYear()}`;
+  const fileNameSuffix = `${date.getDate()}-${
+    date.getMonth() + 1
+  }-${date.getFullYear()}`;
 
   expect(headers["content-disposition"]).toBe(
     `attachment;filename=BSD_TD-19-AAA00123_${fileNameSuffix}.pdf`

@@ -15,7 +15,7 @@ const drawText = ({
   content,
   font,
   page,
-  yOffset = 0,
+  yOffset = 0
 }) => {
   let params = settings[fieldName];
   if (!!params) {
@@ -41,7 +41,7 @@ const drawText = ({
       y: pageHeight - params.y - yOffset,
       size: fontSize,
       font: font,
-      lineHeight: fontSize * 1.2,
+      lineHeight: fontSize * 1.2
     });
   }
 };
@@ -77,11 +77,11 @@ const drawImage = ({
     x: location.x,
     y: pageHeight - (location.y + yOffset),
 
-    ...dimensions,
+    ...dimensions
   });
 };
 
-const capitalize = (string) =>
+const capitalize = string =>
   string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 
 /**
@@ -91,7 +91,7 @@ const capitalize = (string) =>
  * @param {object} params -  the full request payload
  * @returns {object}
  */
-const getEmitterType = (params) => {
+const getEmitterType = params => {
   const { emitterType } = params;
   if (emitterType === "PRODUCER") {
     return { emitterTypeProducer: true };
@@ -112,7 +112,7 @@ const getEmitterType = (params) => {
  * @param {string } datestr - a date iso-formatted
  * @returns {string} - date formatted as dd/mm/YYYY
  */
-const dateFmt = (datestr) => {
+const dateFmt = datestr => {
   if (!datestr) {
     return "";
   }
@@ -138,8 +138,7 @@ const dateFmt = (datestr) => {
  * @param {object} params -  the full request payload
  * @returns {object}
  */
-const getTemporaryStorageExistance = (params) => {
-  return {}
+const getTemporaryStorageExistance = params => {
   if (params.recipientIsTempStorage) {
     return { temporaryStorageYes: true };
   }
@@ -153,14 +152,14 @@ const getTemporaryStorageExistance = (params) => {
  * @param {object} params -  the full request payload
  * @returns {object}
  */
-const getWasteDetailsConsistence = (params) => {
+const getWasteDetailsConsistence = params => {
   if (!params.wasteDetailsConsistence) {
     return {};
   }
   return {
     [`wasteDetailsConsistence${capitalize(
       params.wasteDetailsConsistence
-    )}`]: true,
+    )}`]: true
   };
 };
 
@@ -171,29 +170,29 @@ const getWasteDetailsConsistence = (params) => {
  * @param {object} params -  the full request payload
  * @returns {object}
  */
-const getWasteDetailsType = (params) => {
+const getWasteDetailsType = params => {
   if (!params.wasteDetailsQuantityType) {
     return {};
   }
   let field = {
     ESTIMATED: "wasteDetailsQuantityEstimated",
-    REAL: "wasteDetailsQuantityReal",
+    REAL: "wasteDetailsQuantityReal"
   }[params.wasteDetailsQuantityType];
   return {
-    [field]: true,
+    [field]: true
   };
 };
 
-const getTempStorerWasteDetailsType = (params) => {
+const getTempStorerWasteDetailsType = params => {
   if (!params.tempStorerQuantityType) {
     return {};
   }
   let field = {
     ESTIMATED: "tempStorerQuantityEstimated",
-    REAL: "tempStorerQuantityReal",
+    REAL: "tempStorerQuantityReal"
   }[params.tempStorerQuantityType];
   return {
-    [field]: true,
+    [field]: true
   };
 };
 
@@ -202,7 +201,7 @@ const getTempStorerWasteDetailsType = (params) => {
  * @param params
  * @returns {{traderValidityLimit: *, senderSentAt: *, transporterSentAt: *, recipientCompanyName10: *, transporterValidityLimit: *, recipientCompanySiret10: *, signedAt: *, recipientCompanyContact10: *, receivedAt: *, recipientCompanyAddress10: *}}
  */
-const renameAndFormatMainFormFields = (params) => ({
+const renameAndFormatMainFormFields = params => ({
   transporterValidityLimit: dateFmt(params.transporterValidityLimit),
   traderValidityLimit: dateFmt(params.traderValidityLimit),
   recipientCompanySiret10: params.recipientCompanySiret,
@@ -219,7 +218,7 @@ const renameAndFormatMainFormFields = (params) => ({
   tempStorerReceivedAt: dateFmt(params.tempStorerReceivedAt),
   tempStorerSignedAt: dateFmt(params.tempStorerSignedAt),
   tempStoredFormSignedAt: dateFmt(params.signedAt),
-  tempStoredFormSignedBy: dateFmt(params.signedBy),
+  tempStoredFormSignedBy: params.signedBy
 });
 
 /**
@@ -229,7 +228,7 @@ const renameAndFormatMainFormFields = (params) => ({
  * @param {object} params -  the full request payload
  * @returns {object}
  */
-const getWasteDetailsPackagings = (params) => {
+const getWasteDetailsPackagings = params => {
   if (!params.wasteDetailsPackagings) {
     return {};
   }
@@ -237,7 +236,7 @@ const getWasteDetailsPackagings = (params) => {
     let key = `wasteDetailsPackagings${capitalize(elem)}`;
     return {
       ...acc,
-      [key]: true,
+      [key]: true
     };
   }, {});
 };
@@ -247,7 +246,7 @@ const getWasteDetailsPackagings = (params) => {
  * @param params -  the full request payload
  * @returns {object}
  */
-const stringifyNumberFields = (params) => {
+const stringifyNumberFields = params => {
   let data = { ...params };
   for (let [k, v] of Object.entries(data)) {
     if (typeof v === "number") {
@@ -263,7 +262,7 @@ const stringifyNumberFields = (params) => {
  * @param params
  * @returns object
  */
-const getAcceptationStatus = (params) => {
+const getAcceptationStatus = params => {
   if (["ACCEPTED", "PARTIALLY_REFUSED"].includes(params.wasteAcceptationStatus))
     return { wasteAccepted: true };
   if (params.wasteAcceptationStatus === "REFUSED")
@@ -285,16 +284,16 @@ const getWasteQuantityRefused = (wasteDetailsQuantity, quantityReceived) =>
  * @param params
  * @returns object
  */
-const getWasteRefusalreason = (params) =>
+const getWasteRefusalreason = params =>
   params.wasteAcceptationStatus === "PARTIALLY_REFUSED"
     ? {
-      wasteRefusalReason: `Refus partiel: ${
-        params.wasteRefusalReason
+        wasteRefusalReason: `Refus partiel: ${
+          params.wasteRefusalReason
         } - Tonnage estimé de refus : ${getWasteQuantityRefused(
           params.wasteDetailsQuantity,
           params.quantityReceived
-        )} tonnes`,
-    }
+        )} tonnes`
+      }
     : {};
 
 /**
@@ -303,15 +302,18 @@ const getWasteRefusalreason = (params) =>
  * @param params
  * @returns object
  */
-const getFlatEcoOrganisme = (params) => {
+const getFlatEcoOrganisme = params => {
   return params.ecoOrganisme && params.ecoOrganisme.name
     ? {
-      ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`,
-    }
+        ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`
+      }
     : {};
 };
 
-const processTransporterData = (data) => ({ ...data, transporterCompanySiren: siretToSiren(data.transporterCompanySiret) })
+const processTransporterData = data => ({
+  ...data,
+  transporterCompanySiren: siretToSiren(data.transporterCompanySiret)
+});
 
 /**
  * Apply transformers to payload
@@ -321,24 +323,23 @@ const processTransporterData = (data) => ({ ...data, transporterCompanySiren: si
 function processMainFormParams(params) {
   params = { ...params, ...getWasteRefusalreason(params) }; // compute refused quantity before converting number to strings
   const data = stringifyNumberFields(params);
-  return {
-    ...data,
-    ...getEmitterType(data),
-    ...getWasteDetailsConsistence(data),
-    ...getWasteDetailsPackagings(data),
-    ...getWasteDetailsType(data),
-    ...renameAndFormatMainFormFields(data),
-    ...getAcceptationStatus(data),
-    ...getFlatEcoOrganisme(data),
-    ...getTemporaryStorageExistance(data),
-    ...getTempStorerWasteDetailsType(data),
-    ...processTransporterData(data)
 
-  };
+  return [
+    getEmitterType,
+    getWasteDetailsConsistence,
+    getWasteDetailsPackagings,
+    getWasteDetailsType,
+    renameAndFormatMainFormFields,
+    getAcceptationStatus,
+    getFlatEcoOrganisme,
+    getTemporaryStorageExistance,
+    getTempStorerWasteDetailsType,
+    processTransporterData
+  ].reduce((acc, fn) => ({ ...acc, ...fn(acc) }), data);
 }
 
 // on appendix subforms, wasteDetailsQuantityReal checkbox is checked is quantityReceived is filled
-const checkWasteDetailsQuantityReal = (data) =>
+const checkWasteDetailsQuantityReal = data =>
   !!data.quantityReceived ? { wasteDetailsQuantityReal: true } : {};
 
 function processAnnexParams(params) {
@@ -348,7 +349,7 @@ function processAnnexParams(params) {
 
     ...getWasteDetailsType(data),
     ...checkWasteDetailsQuantityReal(data),
-    receivedAt: dateFmt(params.receivedAt),
+    receivedAt: dateFmt(params.receivedAt)
   };
 }
 
@@ -356,12 +357,14 @@ const transportModeLabels = {
   ROAD: "Route",
   AIR: "Voie aérienne",
   RAIL: "Voie ferrée",
-  RIVER: "Voie fluviale",
+  RIVER: "Voie fluviale"
 };
 
 function verboseMode(mode) {
-  if (!mode) { return "" }
-  return transportModeLabels[mode]
+  if (!mode) {
+    return "";
+  }
+  return transportModeLabels[mode];
 }
 function processSegment(segment) {
   const data = stringifyNumberFields(segment);
@@ -370,8 +373,7 @@ function processSegment(segment) {
     takenOverAt: dateFmt(data.takenOverAt),
     mode: verboseMode(data.mode),
     transporterCompanySiren: siretToSiren(data.transporterCompanySiret)
-  }
-
+  };
 }
 
 /**
@@ -387,7 +389,7 @@ const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
         settings: settings,
         font: font,
         page: page,
-        yOffset,
+        yOffset
       });
     }
     if (typeof content === "string") {
@@ -397,15 +399,15 @@ const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
         settings: settings,
         font: font,
         page: page,
-        yOffset,
+        yOffset
       });
     }
   }
 };
 
+const siretToSiren = siren => siren.slice(0, 9);
 
-const siretToSiren = (siren) => siren.slice(0, 9)
-
+exports.dateFmt = dateFmt;
 exports.checkBox = checkBox;
 exports.drawImage = drawImage;
 exports.getEmitterType = getEmitterType;
