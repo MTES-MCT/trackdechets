@@ -1,4 +1,4 @@
-import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
+import { flattenObjectForDb, hasAny, nullIfNoValues } from "../form-converter";
 
 const apiShape = {
   emitter: {
@@ -63,8 +63,20 @@ describe("flattenInoutObjectForDb", () => {
   });
 });
 
-describe("unflattenObjectFromDb", () => {
-  test("unflatten deeply flatten objects", () => {
-    expect(unflattenObjectFromDb(dbShape)).toEqual(apiShape);
-  });
+test("hasAny", () => {
+  expect(hasAny()).toBeFalsy();
+  expect(hasAny(null, null, null, null)).toBeFalsy();
+  expect(hasAny(1, "foo", true, "bar")).toBeTruthy();
+  expect(hasAny(null, null, false, null)).toBeTruthy();
+  expect(hasAny("", null, null, null)).toBeTruthy();
+  expect(hasAny(null, 0, null, null)).toBeTruthy();
+});
+
+test("nullIfNoValues", () => {
+  let obj = { a: null, b: null };
+  expect(nullIfNoValues(obj)).toEqual(null);
+  obj = { a: "a", b: "b" };
+  expect(nullIfNoValues(obj)).toEqual(obj);
+  obj = { a: "a", b: null };
+  expect(nullIfNoValues(obj)).toEqual(obj);
 });

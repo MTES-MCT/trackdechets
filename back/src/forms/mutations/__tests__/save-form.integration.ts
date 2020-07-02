@@ -400,7 +400,7 @@ describe("{ mutation { saveForm } }", () => {
     expect(temporaryStorageDetail).not.toBeNull();
   });
 
-  test("should create a form with no data except the company siret", async () => {
+  test.skip("should create a form with no data except the company siret", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
 
