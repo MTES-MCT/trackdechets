@@ -148,7 +148,7 @@ const Table = ({ forms, userSiret }) => {
               <TransporterInfoEdit
                 form={form}
                 fieldName="customInfo"
-                title={"Modifier le champ libre"}
+                verboseFieldName={"champ libre"}
                 refetchQuery={refetchQuery}
               />
             </td>
@@ -157,7 +157,7 @@ const Table = ({ forms, userSiret }) => {
               <TransporterInfoEdit
                 form={form}
                 fieldName="numberPlate"
-                title={"Modifier la plaque d'immatriculation"}
+                verboseFieldName={"plaque d'immatriculation"}
                 refetchQuery={refetchQuery}
               />
             </td>
