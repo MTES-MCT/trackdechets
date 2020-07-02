@@ -22,19 +22,12 @@ export default function WasteCode(props) {
 
   const [openModal, setOpenModal] = useState(false);
   return (
-    <div className="WasteCode">
+    <div className="waste-code">
       <div className="text-quote">
         <ul>
           <li>
             Vous hésitez sur le type de code déchet à choisir ? Sélectionnez un
-            code via la{" "}
-            <button
-              type="button"
-              className="button-outline small primary"
-              onClick={() => setOpenModal(true)}
-            >
-              liste des codes déchets
-            </button>
+            code via le bouton de liste des codes déchets
             <WasteTreeModal
               open={openModal}
               onClose={() => setOpenModal(false)}
@@ -47,14 +40,25 @@ export default function WasteCode(props) {
 
       <label>
         Code déchet
-        <input
-          type="text"
-          name={field.name}
-          value={wasteCode}
-          className={meta.touched && meta.error ? "input-error" : ""}
-          onBlur={field.onBlur}
-          onChange={e => setWasteCode(e.target.value)}
-        />
+        <div className="waste-code__widgets">
+          <input
+            type="text"
+            name={field.name}
+            value={wasteCode}
+            className={`waste-code__input ${meta.touched &&
+              meta.error &&
+              "input-error"}`}
+            onBlur={field.onBlur}
+            onChange={e => setWasteCode(e.target.value)}
+          />
+          <button
+            type="button"
+            className="button-outline small primary"
+            onClick={() => setOpenModal(true)}
+          >
+            liste des codes déchets
+          </button>
+        </div>
       </label>
 
       <RedErrorMessage name={field.name} />

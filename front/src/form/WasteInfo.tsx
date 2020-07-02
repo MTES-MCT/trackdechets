@@ -8,6 +8,8 @@ import Packagings from "./packagings/Packagings";
 import RedErrorMessage from "../common/RedErrorMessage";
 import FormsSelector from "./appendix/FormsSelector";
 import AppendixInfo from "./appendix/AppendixInfo";
+import Tooltip from "../common/Tooltip";
+import "./WasteInfo.scss";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
@@ -27,16 +29,13 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <WasteCode name="wasteDetails.code" validate={wasteCodeValidator} />
       </div>
 
-      <div className="text-quote mt-3">
-        <p>
-          L'appellation du déchet est propre à votre entreprise pour vous aider
-          à retrouver facilement le déchet concerné.
-        </p>
-      </div>
-
       <div className="form__group">
         <label>
-          Appellation du déchet
+          Votre appellation du déchet (optionnel)
+          <Tooltip
+            msg="L'appellation du déchet est propre à votre entreprise pour vous aider
+          à retrouver facilement le déchet concerné."
+          />
           <Field type="text" name="wasteDetails.name" />
         </label>
 
@@ -67,6 +66,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
           Nombre de colis
           <Field
             component={NumberInput}
+            className="waste-details__number-of-packages"
             name="wasteDetails.numberOfPackages"
             min="0"
           />
@@ -107,6 +107,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
           <Field
             component={NumberInput}
             name="wasteDetails.quantity"
+            className="waste-details__quantity"
             placeholder="En tonnes"
             min="0"
             step="0.001"
@@ -135,8 +136,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
       {values.wasteDetails.code.includes("*") && (
         <div className="form__group">
           <label>
-            Mentions au titre des règlements ADR, RID, ADNR, IMDG (le cas
-            échéant)
+            Mentions au titre des règlements ADR, RID, ADNR, IMDG (optionnel)
             <Field type="text" name="wasteDetails.onuCode" />
           </label>
         </div>

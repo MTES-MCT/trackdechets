@@ -3,7 +3,7 @@ import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
 import RedErrorMessage from "../common/RedErrorMessage";
 import DateInput from "./custom-inputs/DateInput";
-
+import "./Transporter.scss";
 type Values = {
   transporter: { isExemptedOfReceipt: boolean };
 };
@@ -62,22 +62,28 @@ export default connect<{}, Values>(function Transporter(props) {
               type="text"
               name="transporter.department"
               placeholder="Ex: 83"
+              className="transporter__department"
             />
           </label>
 
           <RedErrorMessage name="transporter.department" />
 
           <label>
-            Limite de validité
-            <Field component={DateInput} name="transporter.validityLimit" />
+            Limite de validité (optionnel)
+            <Field
+              component={DateInput}
+              name="transporter.validityLimit"
+              className="transporter__validity-limit"
+            />
           </label>
 
           <RedErrorMessage name="transporter.validityLimit" />
 
           <label>
-            Immatriculation
+            Immatriculation (optionnel)
             <Field
               type="text"
+              className="transporter__number-plate"
               name="transporter.numberPlate"
               placeholder="Plaque d'immatriculation du véhicule"
             />
