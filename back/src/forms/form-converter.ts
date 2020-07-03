@@ -1,7 +1,11 @@
 import {
   Form as PrismaForm,
   TemporaryStorageDetail as PrismaTemporaryStorageDetail,
-  TransportSegment as PrismaTransportSegment
+  TransportSegment as PrismaTransportSegment,
+  FormCreateInput,
+  FormUpdateInput,
+  TemporaryStorageDetailCreateInput,
+  TemporaryStorageDetailUpdateInput
 } from "../generated/prisma-client";
 import {
   Form as GraphQLForm,
@@ -15,7 +19,9 @@ import {
   FormStatus,
   WorkSite,
   FormCompany,
-  NextDestination
+  NextDestination,
+  FormInput,
+  TemporaryStorageDetailInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -71,6 +77,89 @@ export function hasAny(...args: any[]): boolean {
  */
 export function nullIfNoValues<F>(obj: F): F | null {
   return hasAny(...Object.values(obj)) ? obj : null;
+}
+
+export function flattenFormInput(
+  formInput: Pick<
+    FormInput,
+    | "customId"
+    | "emitter"
+    | "recipient"
+    | "transporter"
+    | "wasteDetails"
+    | "trader"
+  >
+): FormCreateInput | FormUpdateInput {
+  return {
+    customId: formInput.customId,
+    emitterType: formInput.emitter.type,
+    emitterPickupSite: formInput.emitter?.pickupSite,
+    emitterWorkSiteName: formInput.emitter?.workSite?.name,
+    emitterWorkSiteAddress: formInput.emitter?.workSite?.address,
+    emitterWorkSiteCity: formInput.emitter?.workSite?.city,
+    emitterWorkSitePostalCode: formInput.emitter?.workSite?.postalCode,
+    emitterWorkSiteInfos: formInput.emitter?.workSite?.infos,
+    emitterCompanyName: formInput.emitter?.company?.name,
+    emitterCompanySiret: formInput.emitter?.company?.siret,
+    emitterCompanyAddress: formInput.emitter?.company?.address,
+    emitterCompanyContact: formInput.emitter?.company?.contact,
+    emitterCompanyPhone: formInput.emitter?.company?.phone,
+    emitterCompanyMail: formInput.emitter?.company?.mail,
+    recipientCap: formInput.recipient?.cap,
+    recipientProcessingOperation: formInput.recipient?.processingOperation,
+    recipientIsTempStorage: formInput.recipient?.isTempStorage,
+    recipientCompanyName: formInput.recipient?.company?.name,
+    recipientCompanySiret: formInput.recipient?.company?.siret,
+    recipientCompanyAddress: formInput.recipient?.company?.address,
+    recipientCompanyContact: formInput.recipient?.company?.contact,
+    recipientCompanyPhone: formInput.recipient?.company?.phone,
+    recipientCompanyMail: formInput.recipient?.company?.mail,
+    transporterCompanyName: formInput.transporter?.company?.name,
+    transporterCompanySiret: formInput.transporter?.company?.siret,
+    transporterCompanyAddress: formInput.transporter?.company?.address,
+    transporterCompanyContact: formInput.transporter?.company?.contact,
+    transporterCompanyPhone: formInput.transporter?.company?.phone,
+    transporterCompanyMail: formInput.transporter?.company?.mail,
+    transporterIsExemptedOfReceipt: formInput.transporter?.isExemptedOfReceipt,
+    transporterReceipt: formInput.transporter?.receipt,
+    transporterDepartment: formInput.transporter?.department,
+    transporterValidityLimit: formInput.transporter?.validityLimit,
+    transporterNumberPlate: formInput.transporter?.numberPlate,
+    wasteDetailsCode: formInput.wasteDetails?.code,
+    wasteDetailsName: formInput.wasteDetails?.name,
+    wasteDetailsOnuCode: formInput.wasteDetails?.onuCode,
+    wasteDetailsPackagings: formInput.wasteDetails?.packagings,
+    wasteDetailsOtherPackaging: formInput.wasteDetails?.otherPackaging,
+    wasteDetailsNumberOfPackages: formInput.wasteDetails?.numberOfPackages,
+    wasteDetailsQuantity: formInput.wasteDetails?.quantity,
+    wasteDetailsQuantityType: formInput.wasteDetails?.quantityType,
+    wasteDetailsConsistence: formInput.wasteDetails?.consistence,
+    traderCompanyName: formInput.trader?.company?.name,
+    traderCompanySiret: formInput.trader?.company?.siret,
+    traderCompanyAddress: formInput.trader?.company?.address,
+    traderCompanyContact: formInput.trader?.company?.contact,
+    traderCompanyPhone: formInput.trader?.company?.phone,
+    traderCompanyMail: formInput.trader?.company?.mail,
+    traderReceipt: formInput.trader?.receipt,
+    traderDepartment: formInput.trader?.department,
+    traderValidityLimit: formInput.trader?.validityLimit
+  };
+}
+
+export function flattenTemporaryStorageDetailInput(
+  tempStorageInput: TemporaryStorageDetailInput
+): TemporaryStorageDetailCreateInput | TemporaryStorageDetailUpdateInput {
+  return {
+    destinationCompanyName: tempStorageInput.destination?.company?.name,
+    destinationCompanySiret: tempStorageInput.destination?.company?.siret,
+    destinationCompanyAddress: tempStorageInput.destination?.company?.address,
+    destinationCompanyContact: tempStorageInput.destination?.company?.contact,
+    destinationCompanyPhone: tempStorageInput.destination?.company?.phone,
+    destinationCompanyMail: tempStorageInput.destination?.company?.mail,
+    destinationCap: tempStorageInput.destination?.cap,
+    destinationProcessingOperation:
+      tempStorageInput.destination.processingOperation
+  };
 }
 
 /**
