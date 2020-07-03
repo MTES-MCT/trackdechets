@@ -1,11 +1,11 @@
 import { Form, prisma } from "../../generated/prisma-client";
 import { GraphQLContext } from "../../types";
-import { unflattenObjectFromDb } from "../form-converter";
+import { expandFormFromDb } from "../form-converter";
 import { logStatusChange } from "../mutations/mark-as";
 import { formSchema } from "../validator";
 
 export async function validateForm(form: Form) {
-  const formattedForm = unflattenObjectFromDb(form);
+  const formattedForm = expandFormFromDb(form);
   const isValid = await formSchema.isValid(formattedForm);
   return isValid ? Promise.resolve() : Promise.reject();
 }

@@ -1,6 +1,9 @@
 import { getUserCompanies } from "../companies/queries";
 import { prisma, Status } from "../generated/prisma-client";
-import { unflattenObjectFromDb } from "./form-converter";
+import {
+  expandFormFromDb,
+  expandTemporaryStorageFromDb
+} from "./form-converter";
 import {
   markAsProcessed,
   markAsReceived,
@@ -45,7 +48,7 @@ const queryResolvers: QueryResolvers = {
     }
 
     const dbForm = await prisma.form({ id });
-    return unflattenObjectFromDb(dbForm);
+    return expandFormFromDb(dbForm);
   },
   forms: (_parent, args, context) => forms(context.user.id, args),
 
@@ -102,7 +105,7 @@ const queryResolvers: QueryResolvers = {
       }
     });
 
-    return queriedForms.map(f => unflattenObjectFromDb(f));
+    return queriedForms.map(f => expandFormFromDb(f));
   },
   formPdf: (_parent, args) => formPdf(args),
   formsRegister: (_parent, args) => formsRegister(args)
@@ -148,7 +151,7 @@ const formResolvers: FormResolvers = {
       .temporaryStorageDetail();
 
     return temporaryStorageDetail
-      ? unflattenObjectFromDb(temporaryStorageDetail)
+      ? expandTemporaryStorageFromDb(temporaryStorageDetail)
       : null;
   },
   // Somme contextual values, depending on the form status / type, mostly to ease the display

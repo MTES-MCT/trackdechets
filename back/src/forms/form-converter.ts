@@ -1,6 +1,12 @@
-import { Form as PrismaForm } from "../generated/prisma-client";
+import {
+  Form as PrismaForm,
+  TemporaryStorageDetail as PrismaTemporaryStorageDetail,
+  TransportSegment as PrismaTransportSegment
+} from "../generated/prisma-client";
 import {
   Form as GraphQLForm,
+  TemporaryStorageDetail as GraphQLTemporaryStorageDetail,
+  TransportSegment as GraphQLTransportSegment,
   Emitter,
   Recipient,
   Transporter,
@@ -67,7 +73,10 @@ export function nullIfNoValues<F>(obj: F): F | null {
   return hasAny(...Object.values(obj)) ? obj : null;
 }
 
-export function unflattenObjectFromDb(form: PrismaForm): GraphQLForm {
+/**
+ * Expand form data from db
+ */
+export function expandFormFromDb(form: PrismaForm): GraphQLForm {
   return {
     id: form.id,
     readableId: form.readableId,
@@ -171,6 +180,99 @@ export function unflattenObjectFromDb(form: PrismaForm): GraphQLForm {
     }),
     currentTransporterSiret: form.currentTransporterSiret,
     nextTransporterSiret: form.nextTransporterSiret
+  };
+}
+
+/**
+ * Expand temporary storage data from db
+ */
+export function expandTemporaryStorageFromDb(
+  temporaryStorageDetail: PrismaTemporaryStorageDetail
+): GraphQLTemporaryStorageDetail {
+  return {
+    temporaryStorer: nullIfNoValues({
+      quantityType: temporaryStorageDetail.tempStorerQuantityType,
+      quantityReceived: temporaryStorageDetail.tempStorerQuantityReceived,
+      wasteAcceptationStatus:
+        temporaryStorageDetail.tempStorerWasteAcceptationStatus,
+      wasteRefusalReason: temporaryStorageDetail.tempStorerWasteRefusalReason,
+      receivedAt: temporaryStorageDetail.tempStorerReceivedAt,
+      receivedBy: temporaryStorageDetail.tempStorerReceivedBy
+    }),
+    destination: nullIfNoValues({
+      cap: temporaryStorageDetail.destinationCap,
+      processingOperation:
+        temporaryStorageDetail.destinationProcessingOperation,
+      company: nullIfNoValues({
+        name: temporaryStorageDetail.destinationCompanyName,
+        siret: temporaryStorageDetail.destinationCompanySiret,
+        address: temporaryStorageDetail.destinationCompanyAddress,
+        contact: temporaryStorageDetail.destinationCompanyContact,
+        phone: temporaryStorageDetail.destinationCompanyPhone,
+        mail: temporaryStorageDetail.destinationCompanyMail
+      }),
+      isFilledByEmitter: temporaryStorageDetail.destinationIsFilledByEmitter
+    }),
+    wasteDetails: nullIfNoValues({
+      code: null,
+      name: null,
+      onuCode: temporaryStorageDetail.wasteDetailsOnuCode,
+      packagings: temporaryStorageDetail.wasteDetailsPackagings,
+      otherPackaging: temporaryStorageDetail.wasteDetailsOtherPackaging,
+      numberOfPackages: temporaryStorageDetail.wasteDetailsNumberOfPackages,
+      quantity: temporaryStorageDetail.wasteDetailsQuantity,
+      quantityType: temporaryStorageDetail.wasteDetailsQuantityType,
+      consistence: null
+    }),
+    transporter: nullIfNoValues({
+      company: nullIfNoValues({
+        name: temporaryStorageDetail.transporterCompanyName,
+        siret: temporaryStorageDetail.transporterCompanySiret,
+        address: temporaryStorageDetail.transporterCompanyAddress,
+        contact: temporaryStorageDetail.transporterCompanyContact,
+        phone: temporaryStorageDetail.transporterCompanyPhone,
+        mail: temporaryStorageDetail.transporterCompanyMail
+      }),
+      isExemptedOfReceipt:
+        temporaryStorageDetail.transporterIsExemptedOfReceipt,
+      receipt: temporaryStorageDetail.transporterReceipt,
+      department: temporaryStorageDetail.transporterDepartment,
+      validityLimit: temporaryStorageDetail.transporterValidityLimit,
+      numberPlate: temporaryStorageDetail.transporterNumberPlate,
+      customInfo: null
+    }),
+    signedBy: temporaryStorageDetail.signedBy,
+    signedAt: temporaryStorageDetail.signedAt
+  };
+}
+
+export function expandTransportSegmentFromDb(
+  segment: PrismaTransportSegment
+): GraphQLTransportSegment {
+  return {
+    id: segment.id,
+    previousTransporterCompanySiret: segment.previousTransporterCompanySiret,
+    transporter: nullIfNoValues({
+      company: nullIfNoValues({
+        name: segment.transporterCompanyName,
+        siret: segment.transporterCompanySiret,
+        address: segment.transporterCompanyAddress,
+        contact: segment.transporterCompanyContact,
+        phone: segment.transporterCompanyPhone,
+        mail: segment.transporterCompanyMail
+      }),
+      isExemptedOfReceipt: segment.transporterIsExemptedOfReceipt,
+      receipt: segment.transporterReceipt,
+      department: segment.transporterDepartment,
+      validityLimit: segment.transporterValidityLimit,
+      numberPlate: segment.transporterNumberPlate,
+      customInfo: null
+    }),
+    mode: segment.mode,
+    takenOverAt: segment.takenOverAt,
+    takenOverBy: segment.takenOverBy,
+    readyToTakeOver: segment.readyToTakeOver,
+    segmentNumber: segment.segmentNumber
   };
 }
 

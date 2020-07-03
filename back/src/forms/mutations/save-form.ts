@@ -1,4 +1,4 @@
-import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
+import { flattenObjectForDb, expandFormFromDb } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import {
   Form as PrismaForm,
@@ -62,7 +62,7 @@ export async function saveForm(
         }
       }
     });
-    return unflattenObjectFromDb(updatedForm);
+    return expandFormFromDb(updatedForm);
   }
 
   const newForm = await prisma.createForm({
@@ -89,7 +89,7 @@ export async function saveForm(
     updatedFields: {},
     loggedAt: new Date()
   });
-  return unflattenObjectFromDb(newForm);
+  return expandFormFromDb(newForm);
 }
 
 const formSiretsGetter = (

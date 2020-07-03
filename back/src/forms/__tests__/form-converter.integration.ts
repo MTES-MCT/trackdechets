@@ -1,11 +1,11 @@
 import { userFactory, formFactory } from "../../__tests__/factories";
-import { unflattenObjectFromDb } from "../form-converter";
+import { expandFormFromDb } from "../form-converter";
 
 test("unflattenObjectFromDb", async () => {
   const user = await userFactory();
   const form = await formFactory({ ownerId: user.id });
 
-  const expanded = unflattenObjectFromDb(form);
+  const expanded = expandFormFromDb(form);
 
   const expected = {
     id: form.id,
