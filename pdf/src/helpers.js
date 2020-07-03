@@ -367,7 +367,7 @@ function verboseMode(mode) {
   return transportModeLabels[mode];
 }
 function processSegment(segment) {
-  const data = stringifyNumberFields(segment);
+  const data = processMainFormParams(stringifyNumberFields(segment));
   return {
     ...data,
     takenOverAt: dateFmt(data.takenOverAt),
