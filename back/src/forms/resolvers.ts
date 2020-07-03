@@ -33,7 +33,6 @@ import {
   WasteDetailsResolvers,
   StateSummaryResolvers
 } from "../generated/graphql/types";
-import { PROCESSING_OPERATIONS } from "../common/constants";
 import { transportSegments } from "./queries/segments";
 
 import { formsLifecycle } from "./queries/formsLifecycle";
@@ -106,8 +105,7 @@ const queryResolvers: QueryResolvers = {
     return queriedForms.map(f => unflattenObjectFromDb(f));
   },
   formPdf: (_parent, args) => formPdf(args),
-  formsRegister: (_parent, args) => formsRegister(args),
-  processingOperations: () => PROCESSING_OPERATIONS
+  formsRegister: (_parent, args) => formsRegister(args)
 };
 
 const mutationResolvers: MutationResolvers = {

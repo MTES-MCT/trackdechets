@@ -1175,14 +1175,6 @@ export type ProcessedFormInput = {
   noTraceability: Maybe<Scalars['Boolean']>;
 };
 
-export type ProcessingOperation = {
-   __typename?: 'ProcessingOperation';
-  /** Code de l'opération de traitement */
-  code: Scalars['String'];
-  /** Description de l'opération de traitement */
-  description: Scalars['String'];
-};
-
 /** Type de quantité lors de l'émission */
 export enum QuantityType {
   /** Quntité réelle */
@@ -1244,8 +1236,6 @@ export type Query = {
   formsRegister: FileDownload;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
-  /** Renvoie la liste des opérations de traitement supportées. */
-  processingOperations: Array<ProcessingOperation>;
   /**
    * Effectue une recherche floue sur la base SIRENE et enrichit
    * les résultats avec des informations provenant de Trackdéchets

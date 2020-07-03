@@ -1,15 +1,18 @@
 import { FieldProps } from "formik";
 import React from "react";
-import { useProcessingOperations } from "../../hooks";
+import Elimination from "./operations-elimination.json";
+import Valorisation from "./operations-valorisation.json";
 import "./ProcessingOperation.scss";
 
-export default function ProcessingOperationPicker({
+export const Operations: {
+  code: string;
+  description: string;
+}[] = Elimination.concat(Valorisation);
+
+export default function ProcessingOperation({
   field: { value, name, onChange },
 }: FieldProps) {
-  const processingOperations = useProcessingOperations();
-  const selectedOperation = processingOperations.find(
-    operation => operation.code === value
-  );
+  const operationDetail = Operations.find(o => o.code === value);
 
   return (
     <div className="ProcessingOperation">
@@ -30,18 +33,18 @@ export default function ProcessingOperationPicker({
       <label>Opération d’élimination / valorisation prévue (code D/R)</label>
       <select id="select" name={name} value={value} onChange={onChange}>
         <option value="">Choisissez...</option>
-        {processingOperations.map(operation => (
-          <option key={operation.code} value={operation.code}>
-            {operation.code} - {operation.description.substr(0, 120)}
-            {operation.description.length > 120 ? "..." : ""}
+        {Operations.map(o => (
+          <option key={o.code} value={o.code}>
+            {o.code} - {o.description.substr(0, 120)}
+            {o.description.length > 120 ? "..." : ""}
           </option>
         ))}
       </select>
 
-      {selectedOperation && (
+      {operationDetail != null && (
         <div className="notification success">
           Vous avez sélectionné l'opération suivante:{" "}
-          <em>{selectedOperation.description}</em>
+          <em>{operationDetail.description}</em>
         </div>
       )}
     </div>

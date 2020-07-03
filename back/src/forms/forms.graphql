@@ -121,11 +121,6 @@ type Query {
     "(Optionnel) ID d'un BSD en particulier"
     formId: ID
   ): formsLifeCycleData!
-
-  """
-  Renvoie la liste des opérations de traitement supportées.
-  """
-  processingOperations: [ProcessingOperation!]!
 }
 
 type Mutation {
@@ -908,11 +903,4 @@ type TransportSegment {
 
   "Numéro du segment"
   segmentNumber: Int
-}
-
-type ProcessingOperation {
-  "Code de l'opération de traitement"
-  code: String!
-  "Description de l'opération de traitement"
-  description: String!
 }

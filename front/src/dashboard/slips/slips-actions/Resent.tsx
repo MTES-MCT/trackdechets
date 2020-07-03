@@ -9,7 +9,7 @@ import NumberInput from "../../../form/custom-inputs/NumberInput";
 import { RadioButton } from "../../../form/custom-inputs/RadioButton";
 import Packagings from "../../../form/packagings/Packagings";
 import { SlipActionProps } from "../SlipActions";
-import { useProcessingOperations } from "../../../hooks";
+import { Operations } from "../../../form/processing-operation/ProcessingOperation";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   // We need a deep merge as sub-objects may be partially filled
@@ -22,7 +22,6 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   const [isRefurbished, setIsRefurbished] = useState(
     !!form.temporaryStorageDetail?.wasteDetails?.quantity
   );
-  const processingOperations = useProcessingOperations();
 
   return (
     <div>
@@ -50,10 +49,10 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
 
               <Field component="select" name="destination.processingOperation">
                 <option value="">Choisissez...</option>
-                {processingOperations.map(operation => (
-                  <option key={operation.code} value={operation.code}>
-                    {operation.code} - {operation.description.substr(0, 50)}
-                    {operation.description.length > 50 ? "..." : ""}
+                {Operations.map(o => (
+                  <option key={o.code} value={o.code}>
+                    {o.code} - {o.description.substr(0, 50)}
+                    {o.description.length > 50 ? "..." : ""}
                   </option>
                 ))}
               </Field>
