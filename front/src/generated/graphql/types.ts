@@ -944,13 +944,13 @@ export type MutationLoginArgs = {
 
 
 export type MutationMarkAsProcessedArgs = {
-  id: Scalars['ID'];
+  id: Maybe<Scalars['ID']>;
   processedInfo: ProcessedFormInput;
 };
 
 
 export type MutationMarkAsReceivedArgs = {
-  id: Scalars['ID'];
+  id: Maybe<Scalars['ID']>;
   receivedInfo: ReceivedFormInput;
 };
 
@@ -968,12 +968,12 @@ export type MutationMarkAsResentArgs = {
 
 
 export type MutationMarkAsSealedArgs = {
-  id: Scalars['ID'];
+  id: Maybe<Scalars['ID']>;
 };
 
 
 export type MutationMarkAsSentArgs = {
-  id: Scalars['ID'];
+  id: Maybe<Scalars['ID']>;
   sentInfo: SentFormInput;
 };
 
