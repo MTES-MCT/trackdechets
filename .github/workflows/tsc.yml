@@ -1,7 +1,15 @@
-steps:
-  - uses: actions/checkout@v2
-  - uses: actions/setup-node@v2-beta
-    with:
-      node-version: "12"
-  - run: npm --prefix ./back install
-  - run: npm --prefix ./back run types
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: "12"
+      - run: npm --prefix ./back install
+      - run: npm --prefix ./back run types
