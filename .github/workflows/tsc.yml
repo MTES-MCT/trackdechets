@@ -1,4 +1,4 @@
-name: Node.js CI
+name: TypeScript
 
 on: [push]
 
@@ -11,5 +11,4 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "12"
-      - run: npm --prefix ./back install
-      - run: npm --prefix ./back run types
+      - run: npx typescript --project ./back --strict
