@@ -16,7 +16,8 @@
     "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
     "bulk-create-account:dev": "ts-node src/users/bulk-creation/index.ts",
     "bulk-create-account": "node src/users/bulk-creation/index.js",
-    "graphql-codegen": "graphql-codegen --config codegen.yml"
+    "graphql-codegen": "graphql-codegen --config codegen.yml",
+    "types": "tsc --noEmit --strict"
   },
   "keywords": [],
   "author": "",
