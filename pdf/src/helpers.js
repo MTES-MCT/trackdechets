@@ -371,8 +371,7 @@ function processSegment(segment) {
   return {
     ...data,
     takenOverAt: dateFmt(data.takenOverAt),
-    mode: verboseMode(data.mode),
-    transporterCompanySiren: siretToSiren(data.transporterCompanySiret)
+    mode: verboseMode(data.mode)
   };
 }
 

@@ -55,6 +55,7 @@ describe("processSegment", () => {
     };
 
     expect(processSegment(params)).toMatchObject({
+      transporterCompanySiren: params.transporterCompanySiret.slice(0, 9),
       transporterValidityLimit: dateFmt(params.transporterValidityLimit)
     });
   });
