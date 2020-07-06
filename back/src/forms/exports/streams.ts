@@ -69,7 +69,7 @@ export function formsTransformer() {
     transform(form: Form, _encoding, callback) {
       const flattened = flattenForm(form);
       const formatted = formatForm(flattened);
-      this.push(formatForm(formatted));
+      this.push(formatted);
       callback();
     }
   });
