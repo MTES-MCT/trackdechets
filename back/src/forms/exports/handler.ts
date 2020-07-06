@@ -6,12 +6,6 @@ import { formsReader, formsTransformer } from "./streams";
 import { formsWhereInput } from "./where-inputs";
 import { formFragment } from "./fragments";
 
-class MissingArgError extends Error {
-  constructor(arg: string) {
-    super(`Couldn't generate exports because of missing ${arg} argument`);
-  }
-}
-
 /**
  * Download handler for forms register
  */
@@ -19,17 +13,8 @@ export async function downloadFormsRegister(
   res: Response,
   args: QueryFormsRegisterArgs
 ) {
-  if (!args.exportFormat) {
-    throw new MissingArgError("exportFormat");
-  }
-
-  if (!args.sirets) {
-    throw new MissingArgError("siret");
-  }
-
-  if (!args.exportType) {
-    throw new MissingArgError("exportType");
-  }
+  args.exportFormat = args.exportFormat || "CSV";
+  args.exportType = args.exportType || "ALL";
 
   const whereInput = formsWhereInput(
     args.exportType,

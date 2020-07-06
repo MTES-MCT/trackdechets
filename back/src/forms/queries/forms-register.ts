@@ -10,18 +10,9 @@ import { UserInputError } from "apollo-server-express";
 
 const TYPE = "forms_register";
 
-export async function formsRegister({
-  exportType,
-  exportFormat,
-  ...rest
-}: QueryFormsRegisterArgs): Promise<FileDownload> {
-  // provide default values for arguments
-  const params: QueryFormsRegisterArgs = {
-    exportType: exportType || "ALL",
-    exportFormat: exportFormat || "CSV",
-    ...rest
-  };
-
+export async function formsRegister(
+  params: QueryFormsRegisterArgs
+): Promise<FileDownload> {
   const whereInput = formsWhereInput(
     params.exportType,
     params.sirets,
