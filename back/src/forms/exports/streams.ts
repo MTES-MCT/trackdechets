@@ -1,11 +1,6 @@
 import { Readable, Transform, ReadableOptions } from "stream";
 import { prisma, Form, FormWhereInput } from "../../generated/prisma-client";
-import {
-  flattenForm,
-  sortFormKeys,
-  formatForm,
-  labelizeForm
-} from "./transformers";
+import { formatForm, flattenForm } from "./transformers";
 
 interface FormReaderOptions extends ReadableOptions {
   read?(this: FormReader, size: number): void;
@@ -71,16 +66,10 @@ export function formsTransformer() {
   return new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
-    transform(chunk: Form, _encoding, callback) {
-      // flatten temporary storage detail
-      const flattened = flattenForm(chunk);
-      // sort keys
-      const sorted = sortFormKeys(flattened);
-      // format dates and booleans
-      const formatted = formatForm(sorted);
-      // use labels as keys
-      const labelized = labelizeForm(formatted);
-      this.push(labelized);
+    transform(form: Form, _encoding, callback) {
+      const flattened = flattenForm(form);
+      const formatted = formatForm(flattened);
+      this.push(formatForm(formatted));
       callback();
     }
   });

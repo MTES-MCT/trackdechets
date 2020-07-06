@@ -10,3 +10,9 @@ export type FormWithTempStorageFlattened = Partial<Form> & {
   temporaryStorageDetailCompanyAddress?: string;
   temporaryStorageDetailCompanyMail?: string;
 };
+
+export type Column = {
+  field: string;
+  label: string;
+  format: (v: any) => any;
+};

@@ -1,7 +1,7 @@
 import { FormWithTempStorageFlattened } from "../types";
-import { sortFormKeys, formatForm, labelizeForm } from "../transformers";
+import { formatForm } from "../transformers";
 
-test("sortFormKeys", () => {
+test("formatForm should sort keys, add label and format values", () => {
   const form: FormWithTempStorageFlattened = {
     wasteDetailsQuantity: 22.5,
     emitterCompanyName: "WASTE PRODUCER",
@@ -16,6 +16,7 @@ test("sortFormKeys", () => {
     receivedAt: null,
     sentAt: "2020-03-01T00:00:00.000Z",
     transporterNumberPlate: "aa22",
+    transporterIsExemptedOfReceipt: true,
     recipientProcessingOperation: "D 6",
     emitterCompanyContact: "Marc Martin",
     recipientCompanyMail: "recipient@td.io",
@@ -24,56 +25,30 @@ test("sortFormKeys", () => {
     recipientCompanyName: "WASTE COMPANY"
   };
 
-  const sorted = sortFormKeys(form);
-
-  expect(sorted).toEqual({
-    readableId: form.readableId,
-    customId: form.customId,
-    emitterCompanySiret: form.emitterCompanySiret,
-    emitterCompanyName: form.emitterCompanyName,
-    emitterCompanyContact: form.emitterCompanyContact,
-    emitterCompanyAddress: form.emitterCompanyAddress,
-    emitterWorkSiteName: form.emitterWorkSiteName,
-    emitterWorkSiteAddress: form.emitterWorkSiteAddress,
-    recipientCompanySiret: form.recipientCompanySiret,
-    recipientCompanyName: form.recipientCompanyName,
-    recipientCompanyAddress: form.recipientCompanyAddress,
-    recipientCompanyMail: form.recipientCompanyMail,
-    recipientProcessingOperation: form.recipientProcessingOperation,
-    wasteDetailsCode: form.wasteDetailsCode,
-    wasteDetailsQuantity: form.wasteDetailsQuantity,
-    transporterNumberPlate: form.transporterNumberPlate,
-    sentAt: form.sentAt,
-    receivedAt: form.receivedAt,
-    isAccepted: form.isAccepted
-  });
-});
-
-test("formatForm", () => {
-  const form: FormWithTempStorageFlattened = {
-    readableId: "TD-8865a853b7da51b9789db6ada3ef8bee",
-    traderValidityLimit: "",
-    sentAt: "2020-03-02T00:00:00.000Z",
-    receivedAt: "2020-03-01T00:00:00.000Z",
-    isAccepted: true,
-    noTraceability: false
-  };
-
   const formatted = formatForm(form);
-  expect(formatted).toEqual({
-    readableId: form.readableId,
-    traderValidityLimit: "",
-    sentAt: "2020-03-02",
-    receivedAt: "2020-03-01",
-    isAccepted: "O",
-    noTraceability: "N"
-  });
-});
 
-test("labelizeForm", () => {
-  const form = {
-    readableId: "TD-8865a853b7da51b9789db6ada3ef8bee"
+  const expected = {
+    "N° de bordereau": form.readableId,
+    "Identifiant secondaire": "",
+    "Émetteur siret": form.emitterCompanySiret,
+    "Émetteur nom": form.emitterCompanyName,
+    "Émetteur contact": form.emitterCompanyContact,
+    "Émetteur adresse": form.emitterCompanyAddress,
+    "Chantier nom": "",
+    "Chantier adresse": "",
+    "Destination siret": form.recipientCompanySiret,
+    "Destination nom": form.recipientCompanyName,
+    "Destination adresse": form.recipientCompanyAddress,
+    "Destination email": form.recipientCompanyMail,
+    "Opération prévue D/R": form.recipientProcessingOperation,
+    "Déchet rubrique": form.wasteDetailsCode,
+    "Déchet quantité (en tonnes)": form.wasteDetailsQuantity,
+    "Transporteur exemption de récépissé": "O",
+    "Transporteur immatriculation": form.transporterNumberPlate,
+    "Date de prise en charge": "2020-03-01",
+    "Date de présentation": "",
+    "Lot accepté": ""
   };
-  const labelized = labelizeForm(form);
-  expect(labelized).toEqual({ "N° de bordereau": form.readableId });
+
+  expect(formatted).toEqual(expected);
 });
