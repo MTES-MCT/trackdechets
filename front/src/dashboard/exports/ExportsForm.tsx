@@ -42,7 +42,7 @@ ExportsForm.fragments = {
 
 const FORMS_REGISTER = gql`
   query FormsRegister(
-    $sirets: [String!]
+    $sirets: [String!]!
     $exportType: FormsRegisterExportType
     $startDate: DateTime
     $endDate: DateTime
