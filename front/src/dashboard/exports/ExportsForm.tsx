@@ -308,6 +308,7 @@ export default function ExportsForm({ companies }: IProps) {
                     className={`${styles["max-w-xxs"]} tw-mr-4`}
                   ></Field>
                   <button
+                    type="button"
                     className={`button-outline primary small tw-text-xs ${styles["max-w-xxs"]} tw-mr-4`}
                     onClick={() => setOpenWasteTreeModal(true)}
                   >
