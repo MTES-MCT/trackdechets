@@ -5,7 +5,7 @@ import {
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { prisma } from "../../../generated/prisma-client";
-import { getEmptyForm } from "../__mocks__/data";
+import { FormInput } from "../../../generated/graphql/types";
 
 describe("{ mutation { saveForm } }", () => {
   beforeEach(async () => {
@@ -18,17 +18,21 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload = getEmptyForm();
-
-    payload.emitter.workSite = {
-      name: "The name",
-      address: "The address",
-      city: "The city",
-      postalCode: "The postalCode",
-      infos: "The infos"
+    const payload: FormInput = {
+      emitter: {
+        workSite: {
+          name: "The name",
+          address: "The address",
+          city: "The city",
+          postalCode: "The postalCode",
+          infos: "The infos"
+        },
+        company: {
+          siret: company.siret,
+          name: company.name
+        }
+      }
     };
-    payload.emitter.company.siret = company.siret;
-    payload.emitter.company.name = company.name;
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -78,10 +82,11 @@ describe("{ mutation { saveForm } }", () => {
     });
 
     const { mutate } = makeClient(user);
-    const payload = getEmptyForm();
+    const payload: FormInput = {
+      ecoOrganisme: { id: eo.id }
+    };
 
     // Current user is only present as the eco-organisme on the form
-    payload.ecoOrganisme = { id: eo.id };
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -114,11 +119,15 @@ describe("{ mutation { saveForm } }", () => {
     });
 
     const { mutate } = makeClient(user);
-    const payload = getEmptyForm();
-
-    payload.ecoOrganisme = { id: eo.id };
-    payload.emitter.company.siret = company.siret;
-    payload.emitter.company.name = company.name;
+    const payload: FormInput = {
+      ecoOrganisme: { id: eo.id },
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: company.name
+        }
+      }
+    };
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -152,7 +161,7 @@ describe("{ mutation { saveForm } }", () => {
     expect(formEcoOrganisme2.id).toBe(otherEo.id);
 
     // Then delete the EO
-    payload.ecoOrganisme = {};
+    payload.ecoOrganisme = null;
     await mutate(mutation, {
       variables: { formInput: payload }
     });
@@ -168,10 +177,14 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const createPayload = getEmptyForm();
-
-    createPayload.emitter.company.siret = company.siret;
-    createPayload.emitter.company.name = company.name;
+    const createPayload: FormInput = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: company.name
+        }
+      }
+    };
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -228,17 +241,25 @@ describe("{ mutation { saveForm } }", () => {
     const temporaryStorerCompany = await companyFactory();
 
     const { mutate } = makeClient(user);
-    const payload = getEmptyForm();
-
-    payload.emitter.company.siret = company.siret;
-    payload.emitter.company.name = company.name;
-
-    payload.recipient.isTempStorage = true;
-
-    payload.temporaryStorageDetail.destination.company.siret =
-      temporaryStorerCompany.siret;
-    payload.temporaryStorageDetail.destination.company.name =
-      temporaryStorerCompany.name;
+    const payload: FormInput = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: company.name
+        }
+      },
+      recipient: {
+        isTempStorage: true
+      },
+      temporaryStorageDetail: {
+        destination: {
+          company: {
+            siret: temporaryStorerCompany.siret,
+            name: temporaryStorerCompany.name
+          }
+        }
+      }
+    };
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -273,6 +294,7 @@ describe("{ mutation { saveForm } }", () => {
 
     // Then delete the temporary storage step
     payload.recipient.isTempStorage = false;
+    payload.temporaryStorageDetail = null;
     await mutate(mutation, {
       variables: { formInput: payload }
     });
@@ -287,12 +309,17 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload = getEmptyForm();
-
-    payload.emitter.company.siret = company.siret;
-    payload.emitter.company.name = company.name;
-
-    payload.recipient.isTempStorage = false;
+    const payload: FormInput = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: company.name
+        }
+      },
+      recipient: {
+        isTempStorage: false
+      }
+    };
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -318,10 +345,15 @@ describe("{ mutation { saveForm } }", () => {
     payload.id = data.saveForm.id;
 
     payload.recipient.isTempStorage = true;
-    payload.temporaryStorageDetail.destination.company.siret =
-      temporaryStorerCompany.siret;
-    payload.temporaryStorageDetail.destination.company.name =
-      temporaryStorerCompany.name;
+
+    payload.temporaryStorageDetail = {
+      destination: {
+        company: {
+          siret: temporaryStorerCompany.siret,
+          name: temporaryStorerCompany.name
+        }
+      }
+    };
 
     await mutate(mutation, {
       variables: { formInput: payload }
@@ -343,13 +375,15 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload = getEmptyForm();
-
-    payload.emitter.company.siret = company.siret;
-    payload.emitter.company.name = company.name;
-
-    payload.recipient.isTempStorage = true;
-    delete payload.temporaryStorageDetail;
+    const payload: FormInput = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: company.name
+        }
+      },
+      recipient: { isTempStorage: true }
+    };
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -374,12 +408,18 @@ describe("{ mutation { saveForm } }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const payload = getEmptyForm();
-
-    payload.emitter.company.siret = company.siret;
-    payload.emitter.company.name = company.name;
-
-    payload.recipient.isTempStorage = true;
+    const payload: FormInput = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: company.name
+        }
+      },
+      recipient: {
+        isTempStorage: true
+      },
+      temporaryStorageDetail: {}
+    };
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
@@ -400,7 +440,7 @@ describe("{ mutation { saveForm } }", () => {
     expect(temporaryStorageDetail).not.toBeNull();
   });
 
-  test.skip("should create a form with no data except the company siret", async () => {
+  test("should create a form with no data except the company siret", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
 

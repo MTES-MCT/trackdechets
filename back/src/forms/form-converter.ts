@@ -92,7 +92,7 @@ export function flattenFormInput(
 ): FormCreateInput | FormUpdateInput {
   return {
     customId: formInput.customId,
-    emitterType: formInput.emitter.type,
+    emitterType: formInput.emitter?.type,
     emitterPickupSite: formInput.emitter?.pickupSite,
     emitterWorkSiteName: formInput.emitter?.workSite?.name,
     emitterWorkSiteAddress: formInput.emitter?.workSite?.address,
@@ -158,7 +158,7 @@ export function flattenTemporaryStorageDetailInput(
     destinationCompanyMail: tempStorageInput.destination?.company?.mail,
     destinationCap: tempStorageInput.destination?.cap,
     destinationProcessingOperation:
-      tempStorageInput.destination.processingOperation
+      tempStorageInput.destination?.processingOperation
   };
 }
 

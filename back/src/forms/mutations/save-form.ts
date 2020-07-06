@@ -50,19 +50,21 @@ export async function saveForm(
   // await checkThatUserIsPartOftheForm(userId, { ...form, id });
 
   if (id) {
-    // update existing form
+    // The mutation is used to update an existing form
 
+    // Check the id is valid or throw an exception
     const existingForm = await prisma.form({ id });
-
     if (!existingForm) {
       throw new UserInputError(`Aucun BSD avec l'id ${id}`);
     }
 
+    // Construct form update payload
     const formUpdateInput: FormUpdateInput = {
       ...form,
       appendix2Forms: { set: appendix2Forms }
     };
 
+    // Link to registered eco organisme by id
     if (ecoOrganisme) {
       formUpdateInput.ecoOrganisme = { connect: ecoOrganisme };
     }
@@ -72,6 +74,7 @@ export async function saveForm(
         where: { id, ecoOrganisme: { id_not: null } }
       });
       if (existingEcoOrganisme && existingEcoOrganisme.length > 0) {
+        // Disconnect linked eco organisme object
         formUpdateInput.ecoOrganisme = { disconnect: true };
       }
     }
@@ -81,14 +84,21 @@ export async function saveForm(
         formContent.recipient?.isTempStorage !== false) ||
       formContent.recipient?.isTempStorage === true;
 
+    const existingTemporaryStorageDetail = await prisma
+      .form({ id })
+      .temporaryStorageDetail();
+
+    if (
+      existingTemporaryStorageDetail &&
+      (!isOrWillBeTempStorage || temporaryStorageDetail === null)
+    ) {
+      formUpdateInput.temporaryStorageDetail = { disconnect: true };
+    }
+
     if (temporaryStorageDetail) {
       if (!isOrWillBeTempStorage) {
         throw new BadTempStorageInput();
       }
-
-      const existingTemporaryStorageDetail = await prisma
-        .form({ id })
-        .temporaryStorageDetail();
 
       if (existingTemporaryStorageDetail) {
         formUpdateInput.temporaryStorageDetail = {
@@ -101,18 +111,13 @@ export async function saveForm(
       }
     }
 
-    if (temporaryStorageDetail === null) {
-      formUpdateInput.temporaryStorageDetail = { disconnect: true };
-    }
-
     const updatedForm = await prisma.updateForm({
       where: { id },
       data: formUpdateInput
     });
     return expandFormFromDb(updatedForm);
   } else {
-    // no id specified, create a brand new form
-
+    // The mutation is used to create a brand new form
     const formCreateInput: FormCreateInput = {
       ...form,
       readableId: await getReadableId(),
@@ -121,19 +126,29 @@ export async function saveForm(
     };
 
     if (ecoOrganisme) {
+      // Connect with eco-organisme
       formCreateInput.ecoOrganisme = {
         connect: ecoOrganisme
       };
     }
 
     if (temporaryStorageDetail) {
-      if (!formContent.recipient?.isTempStorage) {
+      if (formContent.recipient?.isTempStorage === false) {
+        // The user is trying to set a temporary storage without
+        // recipient.isTempStorage=true, throw error
         throw new BadTempStorageInput();
       }
-
       formCreateInput.temporaryStorageDetail = {
         create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
       };
+    } else {
+      if (formContent.recipient?.isTempStorage === true) {
+        // Recipient is temp storage but no details provided
+        // Create empty temporary storage details
+        formCreateInput.temporaryStorageDetail = {
+          create: {}
+        };
+      }
     }
 
     const newForm = await prisma.createForm(formCreateInput);
@@ -161,34 +176,55 @@ const formSiretsGetter = (
   form.ecoOrganisme?.siret
 ];
 
-async function checkThatUserIsPartOftheForm(userId: string, form: FormInput) {
-  const isEdition = form.id != null;
-  const ecoOrganisme = form.ecoOrganisme?.id
-    ? await prisma.ecoOrganisme({
-        id: form.ecoOrganisme?.id
-      })
-    : null;
-
+async function checkUserIsPartOfExistingForm(userId: string, form: PrismaForm) {
+  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
   const formSirets = formSiretsGetter({ ...form, ecoOrganisme });
-  const hasPartialFormInput = formSirets.some(siret => siret == null);
-
-  if (isEdition && hasPartialFormInput) {
-    const savedForm = await prisma.form({ id: form.id });
-    const savedEcoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
-
-    const savedFormSirets = formSiretsGetter({
-      ...savedForm,
-      ecoOrganisme: savedEcoOrganisme
-    });
-    formSirets.push(...savedFormSirets);
-  }
-
   const userCompanies = await getUserCompanies(userId);
   const userSirets = userCompanies.map(c => c.siret);
 
   if (!formSirets.some(siret => userSirets.includes(siret))) {
     throw new ForbiddenError(
-      "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas."
+      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
     );
   }
 }
+
+async function checkThatUserIsPartOfNewForm(
+  userId,
+  formInput: FormCreateInput
+) {
+
+  const formSirets = formsSiretsGetter({...formInput, }})
+}
+
+// async function checkThatUserIsPartOftheForm(userId: string, form: FormInput) {
+//   const isEdition = form.id != null;
+//   const ecoOrganisme = form.ecoOrganisme?.id
+//     ? await prisma.ecoOrganisme({
+//         id: form.ecoOrganisme?.id
+//       })
+//     : null;
+
+//   const formSirets = formSiretsGetter({ ...form, ecoOrganisme });
+//   const hasPartialFormInput = formSirets.some(siret => siret == null);
+
+//   if (isEdition && hasPartialFormInput) {
+//     const savedForm = await prisma.form({ id: form.id });
+//     const savedEcoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
+
+//     const savedFormSirets = formSiretsGetter({
+//       ...savedForm,
+//       ecoOrganisme: savedEcoOrganisme
+//     });
+//     formSirets.push(...savedFormSirets);
+//   }
+
+//   const userCompanies = await getUserCompanies(userId);
+//   const userSirets = userCompanies.map(c => c.siret);
+
+//   if (!formSirets.some(siret => userSirets.includes(siret))) {
+//     throw new ForbiddenError(
+//       "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas."
+//     );
+//   }
+// }
