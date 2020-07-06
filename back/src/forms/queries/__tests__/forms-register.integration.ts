@@ -11,6 +11,34 @@ import { parseString } from "@fast-csv/parse";
 import Excel from "exceljs";
 import { ErrorCode } from "../../../common/errors";
 
+function emitterFormFactory(ownerId: string, siret: string) {
+  return formFactory({
+    ownerId,
+    opt: { emitterCompanySiret: siret, status: "PROCESSED" }
+  });
+}
+
+function recipientFormFactory(ownerId: string, siret: string) {
+  return formFactory({
+    ownerId,
+    opt: { recipientCompanySiret: siret, status: "PROCESSED" }
+  });
+}
+
+function transporterFormFactory(ownerId: string, siret: string) {
+  return formFactory({
+    ownerId,
+    opt: { transporterCompanySiret: siret, status: "PROCESSED" }
+  });
+}
+
+function traderFormFactory(ownerId: string, siret: string) {
+  return formFactory({
+    ownerId,
+    opt: { traderCompanySiret: siret, status: "PROCESSED" }
+  });
+}
+
 describe("query { formsRegister }", () => {
   afterEach(() => resetDatabase());
 
@@ -46,92 +74,120 @@ describe("query { formsRegister }", () => {
     expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
   });
 
-  it("should download CSV exports", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+  // Test CSV export for different exportType
+  ["INCOMING", "OUTGOING", "TRANSPORTED", "TRADED", "ALL"].forEach(
+    exportType => {
+      it(`should download CSV ${exportType} exports`, async () => {
+        const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret, status: "SENT" }
-    });
-    const { query } = makeClient(user);
+        const customFormFactory =
+          exportType === "OUTGOING"
+            ? emitterFormFactory
+            : exportType === "INCOMING"
+            ? recipientFormFactory
+            : exportType === "TRANSPORTED"
+            ? transporterFormFactory
+            : exportType === "TRADED"
+            ? traderFormFactory
+            : emitterFormFactory;
 
-    const { data } = await query(`
-      query {
-        formsRegister(sirets: ["${company.siret}"], exportType: OUTGOING, exportFormat: CSV) {
-          token
-          downloadLink
-        }
-      }
-    `);
+        const form = await customFormFactory(user.id, company.siret);
 
-    expect(data.formsRegister.token).not.toBeUndefined();
-    expect(data.formsRegister.token).not.toBeNull();
+        const { query } = makeClient(user);
 
-    const request = supertest(app);
+        const { data } = await query(`
+          query {
+            formsRegister(sirets: ["${company.siret}"], exportType: ${exportType}, exportFormat: CSV) {
+              token
+              downloadLink
+            }
+          }
+        `);
 
-    const res = await request
-      .get("/download")
-      .query({ token: data.formsRegister.token });
+        expect(data.formsRegister.token).not.toBeUndefined();
+        expect(data.formsRegister.token).not.toBeNull();
 
-    expect(res.status).toBe(200);
+        const request = supertest(app);
 
-    const rows = [];
+        const res = await request
+          .get("/download")
+          .query({ token: data.formsRegister.token });
 
-    parseString(res.text, { headers: true, delimiter: ";" })
-      .on("data", row => rows.push(row))
-      .on("end", (rowCount: number) => {
-        expect(rowCount).toEqual(1);
-        const row = rows[0];
-        expect(row["N° de bordereau"]).toEqual(form.readableId);
+        expect(res.status).toBe(200);
+
+        const rows = [];
+
+        parseString(res.text, { headers: true, delimiter: ";" })
+          .on("data", row => rows.push(row))
+          .on("end", (rowCount: number) => {
+            expect(rowCount).toEqual(1);
+            const row = rows[0];
+            expect(row["N° de bordereau"]).toEqual(form.readableId);
+          });
       });
-  });
+    }
+  );
 
-  it("should download XLSX exports", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+  // Test XLXS export for different exportType
+  ["INCOMING", "OUTGOING", "TRANSPORTED", "TRADED", "ALL"].forEach(
+    exportType => {
+      it(`should download XLXS ${exportType} exports`, async () => {
+        const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret, status: "SENT" }
-    });
-    const { query } = makeClient(user);
+        const customFormFactory =
+          exportType === "OUTGOING"
+            ? emitterFormFactory
+            : exportType === "INCOMING"
+            ? recipientFormFactory
+            : exportType === "TRANSPORTED"
+            ? transporterFormFactory
+            : exportType === "TRADED"
+            ? traderFormFactory
+            : emitterFormFactory;
 
-    const { data } = await query(`
-      query {
-        formsRegister(sirets: ["${company.siret}"], exportType: OUTGOING, exportFormat: XLSX) {
-          token
-          downloadLink
-        }
-      }
-    `);
+        const form = await customFormFactory(user.id, company.siret);
 
-    expect(data.formsRegister.token).not.toBeUndefined();
-    expect(data.formsRegister.token).not.toBeNull();
+        const { query } = makeClient(user);
 
-    const request = supertest(app);
+        const { data } = await query(`
+          query {
+            formsRegister(sirets: ["${company.siret}"], exportType: ${exportType}, exportFormat: XLSX) {
+              token
+              downloadLink
+            }
+          }
+        `);
 
-    const req = request
-      .get("/download")
-      .query({ token: data.formsRegister.token });
+        expect(data.formsRegister.token).not.toBeUndefined();
+        expect(data.formsRegister.token).not.toBeNull();
 
-    const tmpFolder = fs.mkdtempSync("/");
-    const filename = `${tmpFolder}/registre.xlsx`;
-    const writeStream = createWriteStream(filename);
+        const request = supertest(app);
 
-    req.pipe(writeStream);
+        const req = request
+          .get("/download")
+          .query({ token: data.formsRegister.token });
 
-    await new Promise(resolve => {
-      req.on("end", async () => {
-        resolve();
+        const tmpFolder = fs.mkdtempSync("/");
+        const filename = `${tmpFolder}/registre.xlsx`;
+        const writeStream = createWriteStream(filename);
+
+        req.pipe(writeStream);
+
+        await new Promise(resolve => {
+          req.on("end", async () => {
+            resolve();
+          });
+        });
+
+        const workbook = new Excel.Workbook();
+        await workbook.xlsx.readFile(filename);
+        const worksheet = workbook.getWorksheet("registre");
+        expect(worksheet.rowCount).toBe(2);
+        const row1 = worksheet.getRow(1);
+        const row2 = worksheet.getRow(2);
+        expect(row1.getCell(1).value).toEqual("N° de bordereau");
+        expect(row2.getCell(1).value).toEqual(form.readableId);
       });
-    });
-
-    const workbook = new Excel.Workbook();
-    await workbook.xlsx.readFile(filename);
-    const worksheet = workbook.getWorksheet("registre");
-    expect(worksheet.rowCount).toBe(2);
-    const row1 = worksheet.getRow(1);
-    const row2 = worksheet.getRow(2);
-    expect(row1.getCell(1).value).toEqual("N° de bordereau");
-    expect(row2.getCell(1).value).toEqual(form.readableId);
-  });
+    }
+  );
 });
