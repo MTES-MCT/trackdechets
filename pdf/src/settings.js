@@ -230,8 +230,14 @@ const appendixYOffsets = [0, 104, 208, 313, 418];
 const transportSegmentSettings = {
   segmentNumber: { x: 162, y: 628, fontSize: 10 },
   transporterCompanySiren: { x: 90, y: 640, fontSize: 10 },
-  transporterCompanyName: { x: 71, y: 650, fontSize: 10 },
-  transporterCompanyAddress: { x: 77, y: 660, fontSize: 10 },
+  transporterCompanyName: { x: 71, y: 650, fontSize: 10, maxLength: 50 },
+  transporterCompanyAddress: {
+    x: 77,
+    y: 660,
+    fontSize: 10,
+    lineBreakAt: 55,
+    maxLength: 110
+  },
   transporterCompanyPhone: { x: 62, y: 680, fontSize: 10 },
   transporterCompanyMail: { x: 63, y: 691, fontSize: 10 },
   transporterCompanyContact: { x: 122, y: 702, fontSize: 10 },
