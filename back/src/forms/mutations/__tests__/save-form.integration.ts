@@ -2,7 +2,8 @@ import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
   companyFactory,
-  userFactory
+  userFactory,
+  formFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { prisma } from "../../../generated/prisma-client";
@@ -32,7 +33,7 @@ describe("{ mutation { saveForm } }", () => {
     expect(errors[0].extensions.code).toEqual(ErrorCode.UNAUTHENTICATED);
   });
 
-  it("should return FORBIDDEN error if user is not part of the form", async () => {
+  it("should return FORBIDDEN error when creating a form the user is not part of", async () => {
     const user = await userFactory();
 
     const { mutate } = makeClient(user);
@@ -59,6 +60,41 @@ describe("{ mutation { saveForm } }", () => {
 
     expect(errors.length).toEqual(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
+    );
+  });
+
+  it("should return FORBIDDEN error when updating a form the user is not part of", async () => {
+    const user = await userFactory();
+    const form = await formFactory({ ownerId: user.id });
+
+    const { mutate } = makeClient(user);
+
+    const payload: FormInput = {
+      id: form.id,
+      wasteDetails: {
+        code: "06 05 08*"
+      }
+    };
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    expect(errors.length).toEqual(1);
+    expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
+    );
   });
 
   it("should return BAD_USER_INPUT error when trying to edit a form that does not exist", async () => {
@@ -178,37 +214,6 @@ describe("{ mutation { saveForm } }", () => {
     expect(data.saveForm.emitter.workSite.infos).toBe(
       payload.emitter.workSite.infos
     );
-  });
-
-  test("should create a form as an eco-organisme", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-
-    const eo = await prisma.createEcoOrganisme({
-      address: "an address",
-      name: "a name",
-      siret: company.siret
-    });
-
-    const { mutate } = makeClient(user);
-    const payload: FormInput = {
-      ecoOrganisme: { id: eo.id }
-    };
-
-    // Current user is only present as the eco-organisme on the form
-
-    const mutation = `
-      mutation SaveForm($formInput: FormInput!){
-        saveForm(formInput: $formInput) {
-          id
-        }
-      }
-    `;
-
-    const { data } = await mutate(mutation, {
-      variables: { formInput: payload }
-    });
-
-    expect(data.saveForm.id).toBeDefined();
   });
 
   test("should create a form with an eco organisme, update it, and then remove it", async () => {
@@ -585,25 +590,55 @@ describe("{ mutation { saveForm } }", () => {
     }
   );
 
-  test("should create a form with no data except the company siret", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const { mutate } = makeClient(user);
-
-    const payload = {
-      emitter: {
-        company: { siret: company.siret }
+  ["emitter", "trader", "recipient", "transporter"].forEach(role => {
+    it.only(`should create a form as ${role}`, async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { mutate } = makeClient(user);
+      const payload = {
+        [role]: {
+          company: { siret: company.siret }
+        }
+      };
+      const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
       }
+    `;
+
+      const { errors, data } = await mutate(mutation, {
+        variables: { formInput: payload }
+      });
+
+      console.log(errors);
+      console.log(data);
+      expect(data.saveForm.id).not.toBeNull();
+      expect(data.saveForm.id).not.toBeUndefined();
+      expect(data.saveForm);
+    });
+  });
+
+  test("should create a form as an eco-organisme", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const eo = await prisma.createEcoOrganisme({
+      address: "an address",
+      name: "a name",
+      siret: company.siret
+    });
+
+    const { mutate } = makeClient(user);
+    const payload: FormInput = {
+      ecoOrganisme: { id: eo.id }
     };
+
+    // Current user is only present as the eco-organisme on the form
 
     const mutation = `
       mutation SaveForm($formInput: FormInput!){
         saveForm(formInput: $formInput) {
           id
-          emitter {
-            company {
-              siret
-            }
-          }
         }
       }
     `;
@@ -612,8 +647,47 @@ describe("{ mutation { saveForm } }", () => {
       variables: { formInput: payload }
     });
 
-    expect(data.saveForm.id).not.toBeNull();
-    expect(data.saveForm.id).not.toBeUndefined();
-    expect(data.saveForm);
+    expect(data.saveForm.id).toBeDefined();
+  });
+
+  ["emitter", "trader", "recipient", "transporter"].forEach(role => {
+    it.only(`should update a form as ${role}`, async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { mutate } = makeClient(user);
+
+      const siret = `${role}CompanySiret`;
+
+      let form = await formFactory({
+        ownerId: user.id,
+        opt: { [siret]: company.siret }
+      });
+
+      const payload: FormInput = {
+        id: form.id,
+        wasteDetails: {
+          code: "08 05 06*"
+        }
+      };
+      const mutation = `
+        mutation SaveForm($formInput: FormInput!){
+          saveForm(formInput: $formInput) {
+            wasteDetails {
+              code
+            }
+          }
+        }
+      `;
+
+      const { data } = await mutate(mutation, {
+        variables: { formInput: payload }
+      });
+
+      form = await prisma.form({ id: form.id });
+      expect(form.wasteDetailsCode).toEqual(payload.wasteDetails.code);
+
+      expect(data.saveForm.wasteDetails.code).toEqual(
+        payload.wasteDetails.code
+      );
+    });
   });
 });
