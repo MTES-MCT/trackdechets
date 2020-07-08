@@ -1,19 +1,127 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
-  companyFactory
+  companyFactory,
+  userFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { prisma } from "../../../generated/prisma-client";
 import { FormInput } from "../../../generated/graphql/types";
+import { ErrorCode } from "../../../common/errors";
 
 describe("{ mutation { saveForm } }", () => {
-  beforeEach(async () => {
-    await resetDatabase();
+  afterEach(async () => resetDatabase());
+
+  it("should return UNAUTHENTICATED error if user is not authenticated", async () => {
+    const { mutate } = makeClient();
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation, {
+      variables: { formInput: {} }
+    });
+
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
+    expect(errors[0].extensions.code).toEqual(ErrorCode.UNAUTHENTICATED);
   });
-  afterAll(async () => {
-    await resetDatabase();
+
+  it("should return FORBIDDEN error if user is not part of the form", async () => {
+    const user = await userFactory();
+
+    const { mutate } = makeClient(user);
+
+    const payload: FormInput = {
+      emitter: {
+        company: {
+          siret: "siret"
+        }
+      }
+    };
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    expect(errors.length).toEqual(1);
+    expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
   });
+
+  it("should return BAD_USER_INPUT error when trying to edit a form that does not exist", async () => {
+    const user = await userFactory();
+
+    const { mutate } = makeClient(user);
+
+    const payload: FormInput = {
+      id: "does_not_exist"
+    };
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual("Aucun BSD avec l'id does_not_exist");
+    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+  });
+
+  it("should return BAD_USER_INPUT error when trying to add an eco-organisme that does not exist", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+
+    const payload: FormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      ecoOrganisme: { id: "does_not_exist" }
+    };
+
+    const mutation = `
+      mutation SaveForm($formInput: FormInput!){
+        saveForm(formInput: $formInput) {
+          id
+        }
+      }
+    `;
+
+    const { errors } = await mutate(mutation, {
+      variables: { formInput: payload }
+    });
+
+    console.log(errors);
+
+    expect(errors.length).toEqual(1);
+    expect(errors[0].message).toEqual(
+      "Aucun eco-organisme avec l'id does_not_exist"
+    );
+    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+  });
+
   test("should create a form with a pickup site", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -439,6 +547,43 @@ describe("{ mutation { saveForm } }", () => {
 
     expect(temporaryStorageDetail).not.toBeNull();
   });
+
+  it(
+    "should return BAD_USER_INPUT if temporary storage is set" +
+      " but recipient.isTempStorage is not true",
+    async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const { mutate } = makeClient(user);
+      const payload: FormInput = {
+        emitter: {
+          company: {
+            siret: company.siret,
+            name: company.name
+          }
+        },
+        temporaryStorageDetail: {}
+      };
+
+      const mutation = `
+          mutation SaveForm($formInput: FormInput!){
+            saveForm(formInput: $formInput) {
+              id
+            }
+          }
+        `;
+
+      const { errors } = await mutate(mutation, {
+        variables: { formInput: payload }
+      });
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+      expect(errors[0].message).toEqual(
+        "Vous ne pouvez pas préciser d'entreposage provisoire sans spécifier recipient.isTempStorage = true"
+      );
+    }
+  );
 
   test("should create a form with no data except the company siret", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

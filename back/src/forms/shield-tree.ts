@@ -7,6 +7,7 @@ import {
 } from "../common/rules";
 import {
   canAccessForm,
+  canUpdateOrCreateForm,
   isFormEmitter,
   isFormRecipient,
   isFormTempStorer,
@@ -43,7 +44,7 @@ export default {
     appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
-    saveForm: isAuthenticated,
+    saveForm: canUpdateOrCreateForm,
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
     markAsSealed: or(

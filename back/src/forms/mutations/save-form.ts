@@ -5,20 +5,13 @@ import {
 } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import {
-  Form as PrismaForm,
   FormUpdateInput,
   FormCreateInput,
   Status,
-  prisma,
-  EcoOrganisme
+  prisma
 } from "../../generated/prisma-client";
-import { getUserCompanies } from "../../companies/queries";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
-import {
-  MutationSaveFormArgs,
-  FormInput,
-  Form
-} from "../../generated/graphql/types";
+import { UserInputError } from "apollo-server-express";
+import { MutationSaveFormArgs, Form } from "../../generated/graphql/types";
 
 /**
  * Custom exception thrown when trying to set temporaryStorageDetail without
@@ -47,16 +40,11 @@ export async function saveForm(
 
   const form = flattenFormInput(formContent);
 
-  // await checkThatUserIsPartOftheForm(userId, { ...form, id });
-
   if (id) {
     // The mutation is used to update an existing form
 
-    // Check the id is valid or throw an exception
+    // form existence is already check in permissions
     const existingForm = await prisma.form({ id });
-    if (!existingForm) {
-      throw new UserInputError(`Aucun BSD avec l'id ${id}`);
-    }
 
     // Construct form update payload
     const formUpdateInput: FormUpdateInput = {
@@ -97,6 +85,9 @@ export async function saveForm(
 
     if (temporaryStorageDetail) {
       if (!isOrWillBeTempStorage) {
+        // The user is trying to add a temporary storage detail
+        // but recipient is not set as temp storage on existing form
+        // or input
         throw new BadTempStorageInput();
       }
 
@@ -133,7 +124,7 @@ export async function saveForm(
     }
 
     if (temporaryStorageDetail) {
-      if (formContent.recipient?.isTempStorage === false) {
+      if (formContent.recipient?.isTempStorage !== true) {
         // The user is trying to set a temporary storage without
         // recipient.isTempStorage=true, throw error
         throw new BadTempStorageInput();
@@ -165,66 +156,3 @@ export async function saveForm(
     return expandFormFromDb(newForm);
   }
 }
-
-const formSiretsGetter = (
-  form: Partial<PrismaForm> & { ecoOrganisme?: EcoOrganisme }
-) => [
-  form.emitterCompanySiret,
-  form.traderCompanySiret,
-  form.recipientCompanySiret,
-  form.transporterCompanySiret,
-  form.ecoOrganisme?.siret
-];
-
-async function checkUserIsPartOfExistingForm(userId: string, form: PrismaForm) {
-  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
-  const formSirets = formSiretsGetter({ ...form, ecoOrganisme });
-  const userCompanies = await getUserCompanies(userId);
-  const userSirets = userCompanies.map(c => c.siret);
-
-  if (!formSirets.some(siret => userSirets.includes(siret))) {
-    throw new ForbiddenError(
-      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
-    );
-  }
-}
-
-async function checkThatUserIsPartOfNewForm(
-  userId,
-  formInput: FormCreateInput
-) {
-
-  const formSirets = formsSiretsGetter({...formInput, }})
-}
-
-// async function checkThatUserIsPartOftheForm(userId: string, form: FormInput) {
-//   const isEdition = form.id != null;
-//   const ecoOrganisme = form.ecoOrganisme?.id
-//     ? await prisma.ecoOrganisme({
-//         id: form.ecoOrganisme?.id
-//       })
-//     : null;
-
-//   const formSirets = formSiretsGetter({ ...form, ecoOrganisme });
-//   const hasPartialFormInput = formSirets.some(siret => siret == null);
-
-//   if (isEdition && hasPartialFormInput) {
-//     const savedForm = await prisma.form({ id: form.id });
-//     const savedEcoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
-
-//     const savedFormSirets = formSiretsGetter({
-//       ...savedForm,
-//       ecoOrganisme: savedEcoOrganisme
-//     });
-//     formSirets.push(...savedFormSirets);
-//   }
-
-//   const userCompanies = await getUserCompanies(userId);
-//   const userSirets = userCompanies.map(c => c.siret);
-
-//   if (!formSirets.some(siret => userSirets.includes(siret))) {
-//     throw new ForbiddenError(
-//       "Vous ne pouvez pas créer ou modifier un bordereau sur lequel votre entreprise n'apparait pas."
-//     );
-//   }
-// }
