@@ -21,7 +21,8 @@ import {
   FormCompany,
   NextDestination,
   FormInput,
-  TemporaryStorageDetailInput
+  TemporaryStorageDetailInput,
+  EmitterInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -79,6 +80,36 @@ export function nullIfNoValues<F>(obj: F): F | null {
   return hasAny(...Object.values(obj)) ? obj : null;
 }
 
+/**
+ * Discard undefined fields in a flatten input
+ * It is used to prevent overriding existing data when
+ * updating records
+ */
+export function safeInput(obj: { [key: string]: any }) {
+  return Object.keys(obj).reduce((acc, curr) => {
+    return {
+      ...acc,
+      ...(obj[curr] !== undefined ? { [curr]: obj[curr] } : {})
+    };
+  }, {});
+}
+
+/**
+ * Equivalent to a typescript optional chaining operator foo?.bar
+ * except that it returns "null" instead of "undefined" if "null" is encountered in the chain
+ * It allows to differentiate between voluntary null update and field omission that should
+ * not update any data
+ */
+export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
+  if (o === null) {
+    return null;
+  }
+  if (o === undefined || o === {}) {
+    return undefined;
+  }
+  return getter(o);
+}
+
 export function flattenFormInput(
   formInput: Pick<
     FormInput,
@@ -90,76 +121,168 @@ export function flattenFormInput(
     | "trader"
   >
 ): FormCreateInput | FormUpdateInput {
-  return {
+  const flattened = safeInput({
     customId: formInput.customId,
-    emitterType: formInput.emitter?.type,
-    emitterPickupSite: formInput.emitter?.pickupSite,
-    emitterWorkSiteName: formInput.emitter?.workSite?.name,
-    emitterWorkSiteAddress: formInput.emitter?.workSite?.address,
-    emitterWorkSiteCity: formInput.emitter?.workSite?.city,
-    emitterWorkSitePostalCode: formInput.emitter?.workSite?.postalCode,
-    emitterWorkSiteInfos: formInput.emitter?.workSite?.infos,
-    emitterCompanyName: formInput.emitter?.company?.name,
-    emitterCompanySiret: formInput.emitter?.company?.siret,
-    emitterCompanyAddress: formInput.emitter?.company?.address,
-    emitterCompanyContact: formInput.emitter?.company?.contact,
-    emitterCompanyPhone: formInput.emitter?.company?.phone,
-    emitterCompanyMail: formInput.emitter?.company?.mail,
-    recipientCap: formInput.recipient?.cap,
-    recipientProcessingOperation: formInput.recipient?.processingOperation,
-    recipientIsTempStorage: formInput.recipient?.isTempStorage,
-    recipientCompanyName: formInput.recipient?.company?.name,
-    recipientCompanySiret: formInput.recipient?.company?.siret,
-    recipientCompanyAddress: formInput.recipient?.company?.address,
-    recipientCompanyContact: formInput.recipient?.company?.contact,
-    recipientCompanyPhone: formInput.recipient?.company?.phone,
-    recipientCompanyMail: formInput.recipient?.company?.mail,
-    transporterCompanyName: formInput.transporter?.company?.name,
-    transporterCompanySiret: formInput.transporter?.company?.siret,
-    transporterCompanyAddress: formInput.transporter?.company?.address,
-    transporterCompanyContact: formInput.transporter?.company?.contact,
-    transporterCompanyPhone: formInput.transporter?.company?.phone,
-    transporterCompanyMail: formInput.transporter?.company?.mail,
-    transporterIsExemptedOfReceipt: formInput.transporter?.isExemptedOfReceipt,
-    transporterReceipt: formInput.transporter?.receipt,
-    transporterDepartment: formInput.transporter?.department,
-    transporterValidityLimit: formInput.transporter?.validityLimit,
-    transporterNumberPlate: formInput.transporter?.numberPlate,
-    wasteDetailsCode: formInput.wasteDetails?.code,
-    wasteDetailsName: formInput.wasteDetails?.name,
-    wasteDetailsOnuCode: formInput.wasteDetails?.onuCode,
-    wasteDetailsPackagings: formInput.wasteDetails?.packagings,
-    wasteDetailsOtherPackaging: formInput.wasteDetails?.otherPackaging,
-    wasteDetailsNumberOfPackages: formInput.wasteDetails?.numberOfPackages,
-    wasteDetailsQuantity: formInput.wasteDetails?.quantity,
-    wasteDetailsQuantityType: formInput.wasteDetails?.quantityType,
-    wasteDetailsConsistence: formInput.wasteDetails?.consistence,
-    traderCompanyName: formInput.trader?.company?.name,
-    traderCompanySiret: formInput.trader?.company?.siret,
-    traderCompanyAddress: formInput.trader?.company?.address,
-    traderCompanyContact: formInput.trader?.company?.contact,
-    traderCompanyPhone: formInput.trader?.company?.phone,
-    traderCompanyMail: formInput.trader?.company?.mail,
-    traderReceipt: formInput.trader?.receipt,
-    traderDepartment: formInput.trader?.department,
-    traderValidityLimit: formInput.trader?.validityLimit
-  };
+    emitterType: chain(formInput.emitter, e => e.type),
+    emitterPickupSite: chain(formInput.emitter, e => e.pickupSite),
+    emitterWorkSiteName: chain(formInput.emitter, e =>
+      chain(e.workSite, w => w.name)
+    ),
+    emitterWorkSiteAddress: chain(formInput.emitter, e =>
+      chain(e.workSite, w => w.address)
+    ),
+    emitterWorkSiteCity: chain(formInput.emitter, e =>
+      chain(e.workSite, w => w.city)
+    ),
+    emitterWorkSitePostalCode: chain(formInput.emitter, e =>
+      chain(e.workSite, w => w.postalCode)
+    ),
+    emitterWorkSiteInfos: chain(formInput.emitter, e =>
+      chain(e.workSite, w => w.infos)
+    ),
+    emitterCompanyName: chain(formInput.emitter, e =>
+      chain(e.company, c => c.name)
+    ),
+    emitterCompanySiret: chain(formInput.emitter, e =>
+      chain(e.company, c => c.siret)
+    ),
+    emitterCompanyAddress: chain(formInput.emitter, e =>
+      chain(e.company, c => c.address)
+    ),
+    emitterCompanyContact: chain(formInput.emitter, e =>
+      chain(e.company, c => c.contact)
+    ),
+    emitterCompanyPhone: chain(formInput.emitter, e =>
+      chain(e.company, c => c.phone)
+    ),
+    emitterCompanyMail: chain(formInput.emitter, e =>
+      chain(e.company, c => c.mail)
+    ),
+    recipientCap: chain(formInput.recipient, r => r.cap),
+    recipientProcessingOperation: chain(
+      formInput.recipient,
+      r => r.processingOperation
+    ),
+    recipientIsTempStorage: chain(formInput.recipient, r => r.isTempStorage),
+    recipientCompanyName: chain(formInput.recipient, r =>
+      chain(r.company, c => c.name)
+    ),
+    recipientCompanySiret: chain(formInput.recipient, r =>
+      chain(r.company, c => c.siret)
+    ),
+    recipientCompanyAddress: chain(formInput.recipient, r =>
+      chain(r.company, c => c.address)
+    ),
+    recipientCompanyContact: chain(formInput.recipient, r =>
+      chain(r.company, c => c.contact)
+    ),
+    recipientCompanyPhone: chain(formInput.recipient, r =>
+      chain(r.company, c => c.phone)
+    ),
+    recipientCompanyMail: chain(formInput.recipient, r =>
+      chain(r.company, c => c.mail)
+    ),
+    transporterCompanyName: chain(formInput.transporter, t =>
+      chain(t.company, c => c.name)
+    ),
+    transporterCompanySiret: chain(formInput.transporter, t =>
+      chain(t.company, c => c.siret)
+    ),
+    transporterCompanyAddress: chain(formInput.transporter, t =>
+      chain(t.company, c => c.address)
+    ),
+    transporterCompanyContact: chain(formInput.transporter, t =>
+      chain(t.company, c => c.contact)
+    ),
+    transporterCompanyPhone: chain(formInput.transporter, t =>
+      chain(t.company, c => c.phone)
+    ),
+    transporterCompanyMail: chain(formInput.transporter, t =>
+      chain(t.company, c => c.mail)
+    ),
+    transporterIsExemptedOfReceipt: chain(
+      formInput.transporter,
+      t => t.isExemptedOfReceipt
+    ),
+    transporterReceipt: chain(formInput.transporter, t => t.receipt),
+    transporterDepartment: chain(formInput.transporter, t => t.department),
+    transporterValidityLimit: chain(
+      formInput.transporter,
+      t => t.validityLimit
+    ),
+    transporterNumberPlate: chain(formInput.transporter, t => t.numberPlate),
+    wasteDetailsCode: chain(formInput.wasteDetails, w => w.code),
+    wasteDetailsName: chain(formInput.wasteDetails, w => w.name),
+    wasteDetailsOnuCode: chain(formInput.wasteDetails, w => w.onuCode),
+    wasteDetailsPackagings: chain(formInput.wasteDetails, w => w.packagings),
+    wasteDetailsOtherPackaging: chain(
+      formInput.wasteDetails,
+      w => w.otherPackaging
+    ),
+    wasteDetailsNumberOfPackages: chain(
+      formInput.wasteDetails,
+      w => w.numberOfPackages
+    ),
+    wasteDetailsQuantity: chain(formInput.wasteDetails, w => w.quantity),
+    wasteDetailsQuantityType: chain(
+      formInput.wasteDetails,
+      w => w.quantityType
+    ),
+    wasteDetailsConsistence: chain(formInput.wasteDetails, w => w.consistence),
+    traderCompanyName: chain(formInput.trader, t =>
+      chain(t.company, c => c.name)
+    ),
+    traderCompanySiret: chain(formInput.trader, t =>
+      chain(t.company, c => c.siret)
+    ),
+    traderCompanyAddress: chain(formInput.trader, t =>
+      chain(t.company, c => c.address)
+    ),
+    traderCompanyContact: chain(formInput.trader, t =>
+      chain(t.company, c => c.contact)
+    ),
+    traderCompanyPhone: chain(formInput.trader, t =>
+      chain(t.company, c => c.phone)
+    ),
+    traderCompanyMail: chain(formInput.trader, t =>
+      chain(t.company, c => c.mail)
+    ),
+    traderReceipt: chain(formInput.trader, t => t.receipt),
+    traderDepartment: chain(formInput.trader, t => t.department),
+    traderValidityLimit: chain(formInput.trader, t => t.validityLimit)
+  });
+
+  return flattened;
 }
 
 export function flattenTemporaryStorageDetailInput(
   tempStorageInput: TemporaryStorageDetailInput
 ): TemporaryStorageDetailCreateInput | TemporaryStorageDetailUpdateInput {
-  return {
-    destinationCompanyName: tempStorageInput.destination?.company?.name,
-    destinationCompanySiret: tempStorageInput.destination?.company?.siret,
-    destinationCompanyAddress: tempStorageInput.destination?.company?.address,
-    destinationCompanyContact: tempStorageInput.destination?.company?.contact,
-    destinationCompanyPhone: tempStorageInput.destination?.company?.phone,
-    destinationCompanyMail: tempStorageInput.destination?.company?.mail,
-    destinationCap: tempStorageInput.destination?.cap,
-    destinationProcessingOperation:
-      tempStorageInput.destination?.processingOperation
-  };
+  return safeInput({
+    destinationCompanyName: chain(tempStorageInput.destination, d =>
+      chain(d.company, c => c.name)
+    ),
+    destinationCompanySiret: chain(tempStorageInput.destination, d =>
+      chain(d.company, c => c.siret)
+    ),
+    destinationCompanyAddress: chain(tempStorageInput.destination, d =>
+      chain(d.company, c => c.address)
+    ),
+    destinationCompanyContact: chain(tempStorageInput.destination, d =>
+      chain(d.company, c => c.contact)
+    ),
+    destinationCompanyPhone: chain(tempStorageInput.destination, d =>
+      chain(d.company, c => c.phone)
+    ),
+    destinationCompanyMail: chain(tempStorageInput.destination, d =>
+      chain(d.company, c => c.mail)
+    ),
+    destinationCap: chain(tempStorageInput.destination, d => d.cap),
+    destinationProcessingOperation: chain(
+      tempStorageInput.destination,
+      d => d.processingOperation
+    )
+  });
 }
 
 /**

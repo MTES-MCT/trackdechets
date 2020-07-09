@@ -725,7 +725,7 @@ describe("{ mutation { saveForm } }", () => {
     }
   );
 
-  test.skip("create a form and update it with a null value for an object field", async () => {
+  test("create a form with a recipient, and then update it to remove the recipient", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
@@ -734,6 +734,11 @@ describe("{ mutation { saveForm } }", () => {
       mutation SaveForm($formInput: FormInput!){
         saveForm(formInput: $formInput) {
           id
+          recipient {
+            company {
+              siret
+            }
+          }
         }
       }
     `;
@@ -770,5 +775,7 @@ describe("{ mutation { saveForm } }", () => {
     const form = await prisma.form({ id: updateForm.id });
 
     expect(form.recipientCompanySiret).toBeNull();
+
+    expect(updateForm.recipient).toBeNull();
   });
 });
