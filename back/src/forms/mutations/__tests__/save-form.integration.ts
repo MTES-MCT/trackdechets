@@ -471,7 +471,6 @@ describe("{ mutation { saveForm } }", () => {
     };
 
     const {
-      errors,
       data: {
         saveForm: {
           wasteDetails: { name }

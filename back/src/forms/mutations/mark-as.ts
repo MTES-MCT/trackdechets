@@ -10,7 +10,7 @@ import { formWorkflowMachine } from "../workflow/machine";
 import { ValidationError } from "apollo-server-express";
 import { prisma } from "../../generated/prisma-client";
 import { ForbiddenError } from "apollo-server-express";
-import { FormUpdateInput } from "../../generated/prisma-client";
+import { prisma } from "../../generated/prisma-client";
 import {
   MutationMarkAsSentArgs,
   MutationMarkAsReceivedArgs,
@@ -313,97 +313,6 @@ async function transitionForm(
   });
 }
 
-// async function transitionForm<T>(
-//   formId: string,
-//   { eventType, eventParams }: { eventType: string; eventParams?: T },
-//   context: GraphQLContext,
-//   transformEventToFormProps?: (v: T) => FormUpdateInput
-// ) {
-//   const form = await prisma.form({ id: formId });
-
-//   const temporaryStorageDetail = await prisma
-//     .form({ id: formId })
-//     .temporaryStorageDetail();
-
-//   const formPropsFromEvent: FormUpdateInput = {
-//     ...(eventParams
-//       ? transformEventToFormProps
-//         ? transformEventToFormProps(eventParams)
-//         : eventParams
-//       : {})
-//   };
-
-//   // to receive simple multimodal form, we need to be sure there is no segment left wo need to be taken over
-//   // get segments here for MARK_RECEIVED event because awaiting in xstate is tricky
-//   const transportSegments =
-//     eventType === "MARK_RECEIVED"
-//       ? await prisma.transportSegments({
-//           where: {
-//             form: { id: formId }
-//           }
-//         })
-//       : [];
-//   const startingState = State.from(form.status, {
-//     form: {
-//       ...form,
-//       ...formPropsFromEvent,
-//       temporaryStorageDetail,
-//       transportSegments
-//     },
-//     requestContext: context,
-//     isStableState: true
-//   });
-
-//   if (
-//     !formWorkflowMachine
-//       .resolveState(startingState)
-//       .nextEvents.includes(eventType)
-//   ) {
-//     throw new ForbiddenError("Transition impossible");
-//   }
-
-//   const formService = interpret(formWorkflowMachine);
-
-//   // Machine transitions are always synchronous
-//   // We subscribe to the transitions and wait for a stable or final position before returning a result
-//   return new Promise<Form>((resolve, reject) => {
-//     formService.start(startingState).onTransition(async state => {
-//       if (!state.changed) {
-//         return;
-//       }
-
-//       if (state.matches("error")) {
-//         const workflowError = state.meta[Object.keys(state.meta)[0]];
-//         const error = await getError(workflowError, form);
-//         reject(error);
-//         formService.stop();
-//       }
-
-//       // `done` means we reached a final state (xstate concept)
-//       // `context.isStableState` is a concept introduced to differentiate form state with transient states (validation or side effects)
-//       // If we reached one of those, we know the transition is over and we can safely update the form and return
-//       if (state.done || state.context.isStableState) {
-//         const newStatus = state.value;
-//         await logStatusChange(
-//           formId,
-//           newStatus,
-//           context,
-//           eventType,
-//           eventParams
-//         );
-
-//         const updatedForm = await prisma.updateForm({
-//           where: { id: formId },
-//           data: { status: newStatus as string, ...formPropsFromEvent }
-//         });
-//         resolve({ ...updatedForm, status: updatedForm.status as FormStatus });
-//         formService.stop();
-//       }
-//     });
-
-//     formService.send({ type: eventType, ...eventParams });
-//   });
-// }
 const fieldsToLog = {
   MARK_SEALED: [],
   MARK_SENT: ["sentBy", "sentAt"],
