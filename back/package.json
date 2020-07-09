@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "predev": "copyfiles src/common/constants/** front/generated/constants --flat",
     "dev": "concurrently npm:watch-node npm:watch-graphql",
     "watch-node": "npx nodemon -L --watch src --exec \"ts-node\" src/index.ts",
     "watch-graphql": "npm run graphql-codegen -- --watch",
