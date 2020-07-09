@@ -3,7 +3,7 @@ import { validDatetime, validCompany } from "./validation-helpers";
 import { inputRule } from "graphql-shield";
 import {
   PROCESSING_OPERATIONS_CODES,
-  GROUP_CODES
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../../common/constants";
 
 export const getReceivedInfoSchema = yup =>
@@ -120,7 +120,7 @@ export const markAsProcessedSchema = inputRule()(
           yup
         ),
         nextDestination: yup.object().when("processingOperationDone", {
-          is: val => GROUP_CODES.includes(val),
+          is: val => PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(val),
           then: yup.object({
             processingOperation: yup.string(),
             company: validCompany(
