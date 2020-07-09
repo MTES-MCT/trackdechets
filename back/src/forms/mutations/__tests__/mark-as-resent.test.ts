@@ -3,7 +3,7 @@ import { markAsResent } from "../mark-as";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";
-import { flattenObjectForDb } from "../../form-converter";
+import { flattenFormInput } from "../../form-converter";
 
 const formMock = jest.fn();
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -65,7 +65,7 @@ describe("Forms -> markAsResent mutation", () => {
       { siret: form.emitter.company.siret } as any
     ]);
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
 
     await markAsResent({ id: "1", resentInfos: {} }, defaultContext);
 

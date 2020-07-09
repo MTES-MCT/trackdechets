@@ -1,7 +1,7 @@
 import { ErrorCode } from "../../../common/errors";
 import { markAsSealed } from "../mark-as";
 import { getNewValidForm, getContext } from "../__mocks__/data";
-import { flattenObjectForDb } from "../../form-converter";
+import { flattenFormInput } from "../../form-converter";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -52,7 +52,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
-      mockFormWith(flattenObjectForDb(form));
+      mockFormWith(flattenFormInput(form));
 
       await markAsSealed({ id: "1" }, defaultContext);
     } catch (err) {
@@ -70,7 +70,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
-      mockFormWith(flattenObjectForDb(form));
+      mockFormWith(flattenFormInput(form));
 
       await markAsSealed({ id: "1" }, defaultContext);
     } catch (err) {
@@ -92,7 +92,7 @@ describe("Forms -> markAsSealed mutation", () => {
       getUserCompaniesMock.mockResolvedValue([
         { siret: form.emitter.company.siret } as any
       ]);
-      mockFormWith(flattenObjectForDb(form));
+      mockFormWith(flattenFormInput(form));
 
       await markAsSealed({ id: form.id }, defaultContext);
     } catch (err) {
@@ -125,7 +125,7 @@ describe("Forms -> markAsSealed mutation", () => {
       { siret: form.emitter.company.siret } as any
     ]);
     appendix2FormsMock.mockResolvedValue([]);
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
 
     await markAsSealed({ id: "1" }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
@@ -139,7 +139,7 @@ describe("Forms -> markAsSealed mutation", () => {
     ]);
 
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
 
     await markAsSealed({ id: "1" }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);

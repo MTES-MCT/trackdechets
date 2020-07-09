@@ -1,6 +1,6 @@
 import { ErrorCode } from "../../../common/errors";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
-import { flattenObjectForDb } from "../../form-converter";
+import { flattenFormInput } from "../../form-converter";
 import { FormState } from "../../workflow/model";
 import { markAsSent } from "../mark-as";
 import { getNewValidForm, getContext } from "../__mocks__/data";
@@ -65,7 +65,7 @@ describe("Forms -> markAsSealed mutation", () => {
     ]);
 
     appendix2FormsMock.mockResolvedValue([]);
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
 
     await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
@@ -80,7 +80,7 @@ describe("Forms -> markAsSealed mutation", () => {
     ]);
 
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
 
     await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);

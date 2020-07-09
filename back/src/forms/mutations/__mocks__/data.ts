@@ -1,4 +1,6 @@
 import { GraphQLContext } from "../../../types";
+import { EmitterType, QuantityType } from "../../../generated/prisma-client";
+import { Packagings } from "../../../generated/graphql/types";
 
 export const getNewValidForm = () =>
   Object.assign(
@@ -7,7 +9,7 @@ export const getNewValidForm = () =>
       id: "cjplbvecc000d0766j32r19am",
       status: "DRAFT",
       emitter: {
-        type: "PRODUCER",
+        type: "PRODUCER" as EmitterType,
         workSite: {
           name: "",
           address: "",
@@ -54,11 +56,11 @@ export const getNewValidForm = () =>
       wasteDetails: {
         code: "01 03 04*",
         onuCode: "AAA",
-        packagings: ["CITERNE", "GRV"],
+        packagings: ["CITERNE", "GRV"] as Packagings[],
         otherPackaging: "",
         numberOfPackages: 2,
         quantity: 1.5,
-        quantityType: "REAL"
+        quantityType: "REAL" as QuantityType
       }
     }
   );

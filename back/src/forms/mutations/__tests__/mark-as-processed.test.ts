@@ -1,6 +1,7 @@
 import { getNewValidForm } from "../__mocks__/data";
 import { markAsProcessed } from "../mark-as";
-import { flattenObjectForDb } from "../../form-converter";
+import { flattenFormInput } from "../../form-converter";
+import { ProcessedFormInput } from "../../../generated/graphql/types";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
 const formMock = jest.fn(() => Promise.resolve({}));
@@ -48,7 +49,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     const form = getNewValidForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.recipient.company.siret }
     ]);
@@ -80,7 +81,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     const form = getNewValidForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.recipient.company.siret }
     ]);
@@ -111,7 +112,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     const form = getNewValidForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
     getUserCompaniesMock.mockResolvedValue([
       { siret: form.recipient.company.siret }
     ]);

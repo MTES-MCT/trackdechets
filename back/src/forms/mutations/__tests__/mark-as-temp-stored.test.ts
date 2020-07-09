@@ -3,7 +3,7 @@ import { markAsTempStored } from "../mark-as";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";
-import { flattenObjectForDb } from "../../form-converter";
+import { flattenFormInput } from "../../form-converter";
 import {
   TempStoredFormInput,
   WasteAcceptationStatusInput
@@ -72,7 +72,7 @@ describe("Forms -> markAsTempStored mutation", () => {
       { siret: form.emitter.company.siret } as any
     ]);
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
 
     const ACCEPTED: WasteAcceptationStatusInput = "ACCEPTED";
     await markAsTempStored(
@@ -102,7 +102,7 @@ describe("Forms -> markAsTempStored mutation", () => {
       { siret: form.emitter.company.siret } as any
     ]);
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(flattenFormInput(form));
 
     const REFUSED: WasteAcceptationStatusInput = "REFUSED";
     await markAsTempStored(
