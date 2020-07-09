@@ -1,9 +1,8 @@
 import { ErrorCode } from "../../../common/errors";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
-import { flattenFormInput } from "../../form-converter";
 import { FormState } from "../../workflow/model";
 import { markAsSent } from "../mark-as";
-import { getNewValidForm, getContext } from "../__mocks__/data";
+import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 
 const formMock = jest.fn();
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -57,30 +56,30 @@ describe("Forms -> markAsSealed mutation", () => {
 
   it("should work when form is complete and has no appendix 2", async () => {
     expect.assertions(1);
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "SEALED";
 
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitter.company.siret } as any
+      { siret: form.emitterCompanySiret } as any
     ]);
 
     appendix2FormsMock.mockResolvedValue([]);
-    mockFormWith(flattenFormInput(form));
+    mockFormWith(getNewValidPrismaForm());
 
     await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
   it("should work with appendix 2 and mark them as GROUPED", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "SEALED";
 
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitter.company.siret } as any
+      { siret: form.emitterCompanySiret } as any
     ]);
 
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
-    mockFormWith(flattenFormInput(form));
+    mockFormWith(form);
 
     await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);

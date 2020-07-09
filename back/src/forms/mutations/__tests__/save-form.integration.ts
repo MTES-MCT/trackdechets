@@ -471,6 +471,7 @@ describe("{ mutation { saveForm } }", () => {
     };
 
     const {
+      errors,
       data: {
         saveForm: {
           wasteDetails: { name }
@@ -479,7 +480,6 @@ describe("{ mutation { saveForm } }", () => {
     } = await mutate(mutation, {
       variables: { formInput: updatePayload }
     });
-
     expect(name).toBe("things");
   });
 

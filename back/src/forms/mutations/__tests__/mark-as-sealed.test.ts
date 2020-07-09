@@ -1,7 +1,6 @@
 import { ErrorCode } from "../../../common/errors";
 import { markAsSealed } from "../mark-as";
-import { getNewValidForm, getContext } from "../__mocks__/data";
-import { flattenFormInput } from "../../form-converter";
+import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -45,14 +44,15 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should fail when form is not fully valid", async () => {
     expect.assertions(1);
     try {
-      const form = getNewValidForm();
+      const form = getNewValidPrismaForm();
       // unvalidate form
-      form.emitter.company.address = null;
+      form.emitterCompanyAddress = null;
 
       getUserCompaniesMock.mockResolvedValue([
-        { siret: form.emitter.company.siret } as any
+        { siret: form.emitterCompanySiret } as any
       ]);
-      mockFormWith(flattenFormInput(form));
+
+      mockFormWith(form);
 
       await markAsSealed({ id: "1" }, defaultContext);
     } catch (err) {
@@ -63,14 +63,14 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should display the validation error when the form has an invalid field", async () => {
     expect.assertions(1);
     try {
-      const form = getNewValidForm();
+      const form = getNewValidPrismaForm();
       // unvalidate form
-      form.emitter.company.siret = "";
+      form.emitterCompanySiret = "";
 
       getUserCompaniesMock.mockResolvedValue([
-        { siret: form.emitter.company.siret } as any
+        { siret: form.emitterCompanySiret } as any
       ]);
-      mockFormWith(flattenFormInput(form));
+      mockFormWith(form);
 
       await markAsSealed({ id: "1" }, defaultContext);
     } catch (err) {
@@ -84,15 +84,15 @@ describe("Forms -> markAsSealed mutation", () => {
 
   it("should display all validation errors if there are many", async () => {
     try {
-      const form = getNewValidForm();
+      const form = getNewValidPrismaForm();
       // unvalidate form
-      form.emitter.company.siret = "";
-      form.emitter.company.address = "";
+      form.emitterCompanySiret = "";
+      form.emitterCompanyAddress = "";
 
       getUserCompaniesMock.mockResolvedValue([
-        { siret: form.emitter.company.siret } as any
+        { siret: form.emitterCompanySiret } as any
       ]);
-      mockFormWith(flattenFormInput(form));
+      mockFormWith(form);
 
       await markAsSealed({ id: form.id }, defaultContext);
     } catch (err) {
@@ -119,27 +119,27 @@ describe("Forms -> markAsSealed mutation", () => {
 
   it("should work when form is complete and has no appendix 2", async () => {
     expect.assertions(1);
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
 
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitter.company.siret } as any
+      { siret: form.emitterCompanySiret } as any
     ]);
     appendix2FormsMock.mockResolvedValue([]);
-    mockFormWith(flattenFormInput(form));
+    mockFormWith(form);
 
     await markAsSealed({ id: "1" }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
   it("should work with appendix 2 and mark them as GROUPED", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
 
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitter.company.siret } as any
+      { siret: form.emitterCompanySiret } as any
     ]);
 
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
-    mockFormWith(flattenFormInput(form));
+    mockFormWith(form);
 
     await markAsSealed({ id: "1" }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);

@@ -36,6 +36,44 @@ import {
   NextDestinationInput
 } from "../generated/graphql/types";
 
+export function flattenObjectForDb(
+  input,
+  previousKeys = [],
+  dbObject = {}
+): Partial<PrismaForm> {
+  const relations = ["ecoOrganisme", "temporaryStorageDetail"];
+
+  Object.keys(input || {}).forEach(key => {
+    if (relations.includes(key)) {
+      dbObject[key] = {};
+      return input[key]
+        ? flattenObjectForDb(input[key], [], dbObject[key])
+        : {};
+    }
+
+    if (
+      input[key] &&
+      !Array.isArray(input[key]) &&
+      typeof input[key] === "object"
+    ) {
+      return flattenObjectForDb(input[key], [...previousKeys, key], dbObject);
+    }
+
+    const objectKey = [...previousKeys, key]
+      .map((k, i) => {
+        if (i !== 0) {
+          return k.charAt(0).toUpperCase() + k.slice(1);
+        }
+        return k;
+      })
+      .join("");
+
+    dbObject[objectKey] = input[key];
+  });
+
+  return dbObject;
+}
+
 /**
  * Check if any of the passed args is different from null
  */
@@ -127,7 +165,9 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
       w => w.numberOfPackages
     ),
     wasteDetailsQuantity: chain(input.wasteDetails, w => w.quantity),
-    wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType)
+    wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType),
+    wasteDetailsName: chain(input.wasteDetails, w => w.name),
+    wasteDetailsConsistence: chain(input.wasteDetails, w => w.consistence)
   };
 }
 
