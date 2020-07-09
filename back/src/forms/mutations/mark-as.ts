@@ -1,18 +1,23 @@
 import { interpret, State } from "xstate";
-import { flattenObjectForDb } from "../form-converter";
+import {
+  flattenProcessedFormInput,
+  flattenResealedFormInput,
+  flattenResentFormInput
+} from "../form-converter";
 import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
-import { ForbiddenError, ValidationError } from "apollo-server-express";
-import { capitalize } from "../../common/strings";
+import { ValidationError } from "apollo-server-express";
 import { prisma } from "../../generated/prisma-client";
+import { ForbiddenError } from "apollo-server-express";
+import { FormUpdateInput } from "../../generated/prisma-client";
 import {
-  MutationMarkAsSealedArgs,
   MutationMarkAsSentArgs,
   MutationMarkAsReceivedArgs,
   MutationMarkAsProcessedArgs,
   MutationSignedByTransporterArgs,
   MutationMarkAsTempStoredArgs,
+  MutationMarkAsSealedArgs,
   MutationMarkAsResealedArgs,
   MutationMarkAsResentArgs,
   Form,
@@ -83,8 +88,9 @@ export function markAsProcessed(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
+
     infos =>
-      flattenObjectForDb({
+      flattenProcessedFormInput({
         ...infos,
         processingOperationDescription:
           infos.processingOperationDescription ?? operation.description
@@ -159,23 +165,23 @@ export function markAsTempStored(
   { id, tempStoredInfos }: MutationMarkAsTempStoredArgs,
   context: GraphQLContext
 ): Promise<Form> {
-  const transformEventToFormParams = infos => ({
-    temporaryStorageDetail: {
-      update: {
-        tempStorerSignedAt: new Date(), // Default value to now
-        ...Object.keys(infos).reduce((prev, cur) => {
-          prev[`tempStorer${capitalize(cur)}`] = infos[cur];
-          return prev;
-        }, {})
-      }
-    }
-  });
-
   return transitionForm(
     id,
     { eventType: "MARK_TEMP_STORED", eventParams: tempStoredInfos },
     context,
-    transformEventToFormParams
+    infos => ({
+      temporaryStorageDetail: {
+        update: {
+          tempStorerQuantityType: infos.quantityType,
+          tempStorerQuantityReceived: infos.quantityReceived,
+          tempStorerWasteAcceptationStatus: infos.wasteAcceptationStatus,
+          tempStorerWasteRefusalReason: infos.wasteRefusalReason,
+          tempStorerReceivedAt: infos.receivedAt,
+          tempStorerReceivedBy: infos.receivedBy,
+          tempStorerSignedAt: infos.signedAt ?? new Date()
+        }
+      }
+    })
   );
 }
 
@@ -185,7 +191,7 @@ export function markAsResealed(
 ): Promise<Form> {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
-      update: flattenObjectForDb(infos)
+      update: flattenResealedFormInput(infos)
     }
   });
 
@@ -204,7 +210,7 @@ export function markAsResent(
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
       update: {
-        ...flattenObjectForDb(infos)
+        ...flattenResentFormInput(infos)
       }
     }
   });
@@ -217,11 +223,11 @@ export function markAsResent(
   );
 }
 
-async function transitionForm(
+async function transitionForm<T>(
   formId: string,
-  { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
+  { eventType, eventParams }: { eventType: string; eventParams?: T },
   context: GraphQLContext,
-  transformEventToFormProps = v => v
+  transformEventToFormProps?: (v: T) => FormUpdateInput
 ) {
   const form = await prisma.form({ id: formId });
 
@@ -233,7 +239,13 @@ async function transitionForm(
     .form({ id: formId })
     .temporaryStorageDetail();
 
-  const formPropsFromEvent = transformEventToFormProps(eventParams);
+  const formPropsFromEvent: FormUpdateInput = {
+    ...(eventParams
+      ? transformEventToFormProps
+        ? transformEventToFormProps(eventParams)
+        : eventParams
+      : {})
+  };
 
   // to receive simple multimodal form, we need to be sure there is no segment left wo need to be taken over
   // get segments here for MARK_RECEIVED event because awaiting in xstate is tricky
@@ -296,7 +308,7 @@ async function transitionForm(
 
         const updatedForm = await prisma.updateForm({
           where: { id: formId },
-          data: { status: newStatus, ...formPropsFromEvent }
+          data: { status: newStatus as string, ...formPropsFromEvent }
         });
         resolve({ ...updatedForm, status: updatedForm.status as FormStatus });
         formService.stop();
