@@ -5,7 +5,9 @@ import {
   FormCreateInput,
   FormUpdateInput,
   TemporaryStorageDetailCreateInput,
-  TemporaryStorageDetailUpdateInput
+  TemporaryStorageDetailUpdateInput,
+  Form,
+  TransportSegment
 } from "../generated/prisma-client";
 import {
   Form as GraphQLForm,
@@ -540,7 +542,7 @@ export function expandTransportSegmentFromDb(
   };
 }
 
-export function cleanUpNotDuplicatableFieldsInForm(form) {
+export function cleanUpNotDuplicatableFieldsInForm(form: Form): Partial<Form> {
   const {
     id,
     createdAt,
@@ -567,11 +569,11 @@ export function cleanUpNotDuplicatableFieldsInForm(form) {
   return rest;
 }
 
-export const cleanUpNonDuplicatableSegmentField = segment => {
+export function cleanUpNonDuplicatableSegmentField(
+  segment: TransportSegment
+): Partial<TransportSegment> {
   const {
     id,
-    sealed,
-    form,
     createdAt,
     updatedAt,
     takenOverAt,
@@ -580,4 +582,4 @@ export const cleanUpNonDuplicatableSegmentField = segment => {
   } = segment;
 
   return rest;
-};
+}
