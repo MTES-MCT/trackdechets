@@ -75,20 +75,11 @@ export function flattenObjectForDb(
 }
 
 /**
- * Check if any of the passed args is different from null
- */
-export function hasAny(...args: any[]): boolean {
-  return args.reduce((acc, curr) => {
-    return acc || curr !== null;
-  }, false);
-}
-
-/**
  * Return null if all object values are null
  * obj otherwise
  */
 export function nullIfNoValues<T>(obj: T): T | null {
-  return hasAny(...Object.values(obj)) ? obj : null;
+  return Object.values(obj).some(v => v !== null) ? obj : null;
 }
 
 /**
