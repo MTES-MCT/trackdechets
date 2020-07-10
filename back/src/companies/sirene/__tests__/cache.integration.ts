@@ -1,5 +1,4 @@
-import { searchCompanyCached } from "../cache";
-import * as client from "../client";
+import { cache } from "../cache";
 import { resetCache } from "../../../../integration-tests/helper";
 
 const company = {
@@ -7,19 +6,17 @@ const company = {
   address: "4 Boulevard Longchamp 13001 Marseille",
   name: "CODE EN STOCK",
   naf: "62.01Z",
-  libelleNaf: "Programmation informatique",
-  longitude: 5.387141,
-  latitude: 43.300746
+  libelleNaf: "Programmation informatique"
 };
-
-const searchCompanySpy = jest
-  .spyOn(client, "searchCompany")
-  .mockResolvedValue(company);
 
 describe("searchCompany cached", () => {
   afterAll(() => resetCache());
 
   it("should cache company information", async () => {
+    const searchCompany = jest.fn();
+    searchCompany.mockResolvedValueOnce(company);
+    const searchCompanyCached = cache(searchCompany);
+
     // call the function twice on the same siret
     const company1 = await searchCompanyCached("85001946400013");
     const company2 = await searchCompanyCached("85001946400013");
@@ -27,6 +24,6 @@ describe("searchCompany cached", () => {
     expect(company2).toEqual(company);
 
     // check searchCompany has been called only once
-    expect(searchCompanySpy).toHaveBeenCalledTimes(1);
+    expect(searchCompany).toHaveBeenCalledTimes(1);
   });
 });

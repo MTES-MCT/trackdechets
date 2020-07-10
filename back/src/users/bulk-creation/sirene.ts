@@ -1,6 +1,6 @@
 import { CompanyRow } from "./types";
 import { CompanyInfo } from "./types";
-import { searchCompany } from "../../companies/sirene/client";
+import { searchCompany } from "../../companies/sirene/entreprise.data.gouv.fr/client";
 import { CompanySearchResult } from "../../generated/graphql/types";
 
 /**

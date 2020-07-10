@@ -21,9 +21,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746
+      libelleNaf: "Programmation informatique"
     });
 
     const gqlquery = `
@@ -35,8 +33,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
           address
           naf
           libelleNaf
-          longitude
-          latitude
           isRegistered
           contactEmail
           contactPhone
@@ -55,8 +51,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       naf: "62.01Z",
       libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746,
       isRegistered: false,
       contactEmail: null,
       contactPhone: null,
@@ -73,9 +67,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746
+      libelleNaf: "Programmation informatique"
     });
 
     await prisma.createCompany({
@@ -100,8 +92,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
           address
           naf
           libelleNaf
-          longitude
-          latitude
           isRegistered
           contactEmail
           contactPhone
@@ -120,8 +110,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       naf: "62.01Z",
       libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746,
       isRegistered: true,
       contactEmail: "john.snow@trackdechets.fr",
       contactPhone: "0600000000",
@@ -140,9 +128,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746
+      libelleNaf: "Programmation informatique"
     });
 
     const receipt = {
@@ -183,9 +169,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746
+      libelleNaf: "Programmation informatique"
     });
 
     const receipt = {
@@ -233,8 +217,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
         address
         naf
         libelleNaf
-        longitude
-        latitude
         isRegistered
         contactEmail
         contactPhone
@@ -253,8 +235,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "49 Rue de la République 18220 Les Aix-d'Angillon",
       naf: "52.4T",
       libelleNaf: "",
-      longitude: 2.574108,
-      latitude: 47.199802,
       isRegistered: false,
       contactEmail: null,
       contactPhone: null,
@@ -278,8 +258,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
           address
           naf
           libelleNaf
-          longitude
-          latitude
           isRegistered
           contactEmail
           contactPhone
@@ -298,8 +276,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "",
       naf: null,
       libelleNaf: "",
-      longitude: null,
-      latitude: null,
       isRegistered: false,
       contactEmail: null,
       contactPhone: null,

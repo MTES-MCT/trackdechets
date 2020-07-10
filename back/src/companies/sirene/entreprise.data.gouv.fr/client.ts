@@ -1,17 +1,12 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { URL } from "url";
 import { UserInputError } from "apollo-server-express";
+import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
 import {
-  libelleFromCodeNaf,
-  buildAddress,
-  safeParseFloat,
-  removeDiacritics
-} from "./utils";
-import {
-  SearchResponse,
-  FullTextSearchResponse,
+  SearchResponseDataGouv,
+  FullTextSearchResponseDataGouv,
   CompanySearchResult
-} from "./types";
+} from "../types";
 
 const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
 
@@ -21,7 +16,7 @@ const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
  */
 function searchResponseToCompany({
   etablissement
-}: SearchResponse): CompanySearchResult {
+}: SearchResponseDataGouv): CompanySearchResult {
   const address = etablissement.geo_adresse
     ? etablissement.geo_adresse
     : buildAddress(
@@ -39,9 +34,7 @@ function searchResponseToCompany({
     codeCommune: etablissement.code_commune,
     name: etablissement.unite_legale.denomination,
     naf: etablissement.unite_legale.activite_principale,
-    libelleNaf: "",
-    longitude: safeParseFloat(etablissement.longitude),
-    latitude: safeParseFloat(etablissement.latitude)
+    libelleNaf: ""
   };
 
   if (company.naf) {
@@ -71,18 +64,16 @@ function searchResponseToCompany({
 export function searchCompany(siret: string): Promise<CompanySearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/v3/etablissements/${siret}`;
   return axios
-    .get<SearchResponse>(searchUrl)
+    .get<SearchResponseDataGouv>(searchUrl)
     .then(r => searchResponseToCompany(r.data))
-    .catch(error => {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        if (error.response.status === 404) {
-          // 404 "no results found"
-          throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
-            invalidArgs: ["siret"]
-          });
-        }
+    .catch((error: AxiosError) => {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      if (error.response?.status === 404) {
+        // 404 "no results found"
+        throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
+          invalidArgs: ["siret"]
+        });
       }
       throw error;
     });
@@ -93,7 +84,7 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
  * @param data etablissement response object
  */
 function fullTextSearchResponseToCompanies(
-  r: FullTextSearchResponse
+  r: FullTextSearchResponseDataGouv
 ): CompanySearchResult[] {
   return r.etablissement.map(etablissement => {
     const address = etablissement.geo_adresse
@@ -111,9 +102,7 @@ function fullTextSearchResponseToCompanies(
       address,
       name: etablissement.nom_raison_sociale,
       naf: etablissement.activite_principale,
-      libelleNaf: etablissement.libelle_activite_principale,
-      longitude: safeParseFloat(etablissement.longitude),
-      latitude: safeParseFloat(etablissement.latitude)
+      libelleNaf: etablissement.libelle_activite_principale
     };
   });
 }
@@ -137,9 +126,7 @@ export function searchCompanies(
   if (/[0-9]{14}/.test(clue)) {
     // clue is formatted like a SIRET
     // use search by siret instead of full text
-    return searchCompany(clue)
-      .then(c => [c])
-      .catch(_ => []);
+    return searchCompany(clue).then(c => [c]);
   }
 
   let params = {};
@@ -161,18 +148,16 @@ export function searchCompanies(
 
   const opts = { ...(params ? { params } : {}) };
   return axios
-    .get<FullTextSearchResponse>(searchUrl.toString(), opts)
+    .get<FullTextSearchResponseDataGouv>(searchUrl.toString(), opts)
     .then(r => {
       return fullTextSearchResponseToCompanies(r.data);
     })
     .catch(error => {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        if (error.response.status === 404) {
-          // 404 "no results found"
-          return [];
-        }
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      if (error.response?.status === 404) {
+        // 404 "no results found"
+        return [];
       }
       throw error;
     });

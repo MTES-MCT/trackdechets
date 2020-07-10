@@ -133,10 +133,6 @@ export type CompanyPrivate = {
   naf: Maybe<Scalars['String']>;
   /** Libellé NAF de l'établissement */
   libelleNaf: Maybe<Scalars['String']>;
-  /** Longitude de l'établissement (info géographique) */
-  longitude: Maybe<Scalars['Float']>;
-  /** Latitude de l'établissement (info géographique) */
-  latitude: Maybe<Scalars['Float']>;
   /**
    * Installation classée pour la protection de l'environnement (ICPE)
    * associé à cet établissement (le cas échéant)
@@ -169,10 +165,6 @@ export type CompanyPublic = {
   naf: Maybe<Scalars['String']>;
   /** Libellé NAF */
   libelleNaf: Maybe<Scalars['String']>;
-  /** Longitude de l'établissement (info géographique) */
-  longitude: Maybe<Scalars['Float']>;
-  /** Latitude de l'établissement (info géographique) */
-  latitude: Maybe<Scalars['Float']>;
   /**
    * Installation classée pour la protection de l'environnement (ICPE)
    * associé à cet établissement
@@ -191,8 +183,12 @@ export type CompanySearchResult = {
    __typename?: 'CompanySearchResult';
   /** SIRET de l'établissement */
   siret: Maybe<Scalars['String']>;
+  /** État administratif de l'établissement. A = Actif, F = Fermé */
+  etatAdministratif: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address: Maybe<Scalars['String']>;
+  /** Code commune de l'établissement */
+  codeCommune: Maybe<Scalars['String']>;
   /** Nom de l'établissement */
   name: Maybe<Scalars['String']>;
   /** Profil de l'établissement */
@@ -201,10 +197,6 @@ export type CompanySearchResult = {
   naf: Maybe<Scalars['String']>;
   /** Libellé NAF */
   libelleNaf: Maybe<Scalars['String']>;
-  /** Longitude de l'établissement (info géographique) */
-  longitude: Maybe<Scalars['Float']>;
-  /** Latitude de l'établissement (info géographique) */
-  latitude: Maybe<Scalars['Float']>;
   /**
    * Installation classée pour la protection de l'environnement (ICPE)
    * associé à cet établissement
@@ -1955,8 +1947,6 @@ export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): Compan
     name: null,
     naf: null,
     libelleNaf: null,
-    longitude: null,
-    latitude: null,
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,
@@ -1976,8 +1966,6 @@ export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyP
     name: null,
     naf: null,
     libelleNaf: null,
-    longitude: null,
-    latitude: null,
     installation: null,
     isRegistered: null,
     transporterReceipt: null,
@@ -1990,13 +1978,13 @@ export function createCompanySearchResultMock(props: Partial<CompanySearchResult
   return {
     __typename: "CompanySearchResult",
     siret: null,
+    etatAdministratif: null,
     address: null,
+    codeCommune: null,
     name: null,
     companyTypes: null,
     naf: null,
     libelleNaf: null,
-    longitude: null,
-    latitude: null,
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,
