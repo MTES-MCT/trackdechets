@@ -10,7 +10,6 @@ import styles from "./Login.module.scss";
 import { localAuthService } from "./auth.service";
 
 const fieldErrorsProps = (fieldName, errorField) => {
-  console.log(fieldName, errorField);
   if (errorField === fieldName) {
     return {
       autoFocus: true,

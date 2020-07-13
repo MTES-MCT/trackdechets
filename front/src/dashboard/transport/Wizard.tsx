@@ -77,7 +77,6 @@ export class Wizard extends React.Component<Props, State> {
     const { children } = this.props;
     const { page, values } = this.state;
     const activePage: any = React.Children.toArray(children)[page];
-    console.log(activePage);
     const isLastPage = page === React.Children.count(children) - 1;
     return (
       <React.Fragment>
