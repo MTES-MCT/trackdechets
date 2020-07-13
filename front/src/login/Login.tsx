@@ -13,7 +13,7 @@ const fieldErrorsProps = (fieldName, errorField) => {
   if (errorField === fieldName) {
     return {
       autoFocus: true,
-      style: { border: "2px solid red" },
+      style: { border: "1px solid red" },
     };
   }
   return {};
