@@ -68,7 +68,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
             component={NumberInput}
             className="waste-details__number-of-packages"
             name="wasteDetails.numberOfPackages"
-            min="0"
+            min="1"
           />
         </label>
         <RedErrorMessage name="wasteDetails.numberOfPackages" />
