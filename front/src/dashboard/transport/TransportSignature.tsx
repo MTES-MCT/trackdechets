@@ -191,7 +191,10 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     </p>
 
                     <h3 id="destination-address">Destination du déchet</h3>
-                    <address aria-labelledby="destination-address" className="address">
+                    <address
+                      aria-labelledby="destination-address"
+                      className="address"
+                    >
                       {form.stateSummary?.recipient?.name} (
                       {form.stateSummary?.recipient?.siret})
                       <br /> {form.stateSummary?.recipient?.address}
@@ -229,7 +232,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
               </Wizard.Page>
               <Wizard.Page
                 title="Signature Producteur"
-                submitButtonCaption="Signer par le producteur"
+                submitButtonCaption={`Signer par le ${
+                  isEmittedByProducer ? "producteur" : "détenteur"
+                }`}
               >
                 {(props: any) => (
                   <>
@@ -243,7 +248,10 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       </div>
 
                       <h3 id="collect-address">Lieu de collecte</h3>
-                      <address aria-labelledby="collect-address" className="address">
+                      <address
+                        aria-labelledby="collect-address"
+                        className="address"
+                      >
                         {form.stateSummary?.emitter?.name} (
                         {form.stateSummary?.emitter?.siret})
                         <br /> {form.stateSummary?.emitter?.address}
