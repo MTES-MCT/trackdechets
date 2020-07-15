@@ -106,7 +106,7 @@ export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
   if (o === null) {
     return null;
   }
-  if (o === undefined || o === {}) {
+  if (o === undefined) {
     return undefined;
   }
   return getter(o);
