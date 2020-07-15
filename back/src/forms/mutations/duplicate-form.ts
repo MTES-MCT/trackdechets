@@ -22,11 +22,11 @@ export async function duplicateForm(
   });
 
   // get segments to duplicate them after cleanup
-  const transportSegments = await prisma.transportSegments({
-    where: {
-      form: { id: formId }
-    }
-  });
+  // const transportSegments = await prisma.transportSegments({
+  //   where: {
+  //     form: { id: formId }
+  //   }
+  // });
 
   const newForm = await prisma.createForm({
     ...cleanUpNotDuplicatableFieldsInForm(existingForm),
