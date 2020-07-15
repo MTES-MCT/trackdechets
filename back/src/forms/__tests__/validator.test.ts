@@ -135,6 +135,22 @@ describe("Form is valid", () => {
     const isValid = await formSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
+
+  test.each(["PRODUCER", "OTHER", "APPENDIX1", "APPENDIX2"])(
+    "when emitterType is (%p)",
+    async emitterType => {
+      const testForm = {
+        ...form,
+        emitter: {
+          ...form.emitter,
+          type: emitterType
+        }
+      };
+
+      const isValid = await formSchema.isValid(testForm);
+      expect(isValid).toEqual(true);
+    }
+  );
 });
 
 describe("Form is not valid", () => {
