@@ -42,7 +42,15 @@ const {
 
 const UI_BASE_URL = getUIBaseURL();
 
-const shieldMiddleware = shield(shieldRulesTree, { allowExternalErrors: true });
+const shieldMiddleware = shield(shieldRulesTree, {
+  allowExternalErrors: true,
+  fallbackError: (error: any) => {
+    if (process.env.NODE_ENV === "development") {
+      return error;
+    }
+    return new Error("Vous n'êtes pas autorisé à accéder cette ressource.");
+  }
+});
 
 /**
  * Custom report error for sentry middleware
