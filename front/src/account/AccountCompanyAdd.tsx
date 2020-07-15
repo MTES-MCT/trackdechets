@@ -483,7 +483,6 @@ export default function AccountCompanyAdd() {
                 </div>
 
                 <div className={styles.field}>
-                  <label></label>
                   <div className={styles.field__value}>
                     <label>
                       <Field type="checkbox" name="isAllowed" />
