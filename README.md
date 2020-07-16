@@ -220,7 +220,18 @@ Le support des navigateurs est configuré dans le fichier [`./front/.browserslis
 ## Déploiement
 
 Le déploiement est géré par CircleCI à l'aide du fichier [./circle/config.yml](.circleci/config.yml).
-Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod.
+Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod. Le déroulement dans le détails d'une mise en production est le suivant:
+
+* Balayer la colonne Trello "Recette Métier" pour vérifier que l'étiquette "OK PASSAGE EN PROD" a bien été ajouté sur toutes les cartes.
+* Faire le cahier de recette pour vérifier qu'il n'y a pas eu de régression sur les fonctionnalités critiques de l'application (login, signup, rattachement établissement, invitation collaborateur, création BSD)
+* Mettre à jour le Changelog avec un nouveau numéro de version (versionnage calendaire)
+* Créer une PR `dev` -> `master`
+* Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev`
+* Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
+* Si possible faire tourner les migrations sur une copie de la base de prod en local.
+* Merger la PR et suivre l'avancement du déploiement sur le CI
+* Se connecter à l'instance de prod et faire tourner le script `npm run update` dans le container `td-api`. Faire de même sur l'instance sandbox.
+
 
 ## Contribuer
 
