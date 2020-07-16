@@ -111,7 +111,7 @@ describe("Query.form", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Vous n'êtes pas autorisé à accéder à cette ressource."
+      "Vous n'êtes pas autorisé à accéder à ce bordereau."
     );
   });
 });
