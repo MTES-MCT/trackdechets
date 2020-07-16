@@ -45,7 +45,7 @@ const UI_BASE_URL = getUIBaseURL();
 const shieldMiddleware = shield(shieldRulesTree, {
   allowExternalErrors: true,
   fallbackError: (error: any) => {
-    if (process.env.NODE_ENV === "development") {
+    if (NODE_ENV === "dev") {
       return error;
     }
     return new Error("Vous n'êtes pas autorisé à accéder cette ressource.");
