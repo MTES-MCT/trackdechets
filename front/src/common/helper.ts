@@ -12,7 +12,7 @@ export const capitalize = (str: string) =>
 export function toMacroCase(string: string) {
   return string
     .split("")
-    .map((c) => (c.toUpperCase() === c ? `_${c.trim()}` : c))
+    .map(c => (c.toUpperCase() === c ? `_${c.trim()}` : c))
     .join("")
     .replace(/_+/g, "_")
     .toUpperCase();
@@ -23,25 +23,25 @@ export function updateApolloCache<T>(
   {
     query,
     getNewData,
-    variables = {},
+    variables = {}
   }: { query: DocumentNode; getNewData: (d: T) => T; variables: any }
 ) {
   try {
     const existingData = store.readQuery<T>({
       query,
-      variables,
+      variables
     });
 
     if (!existingData) {
       return null;
     }
-
+ 
     const newData = getNewData(existingData);
-
+    
     store.writeQuery({
       query,
       variables,
-      data: { ...existingData, ...newData },
+      data: { ...existingData, ...newData }
     });
   } catch (_) {
     console.info(`Cache miss, skipping update.`);
@@ -49,7 +49,7 @@ export function updateApolloCache<T>(
 }
 
 export function getErrorMessages(err: ApolloError) {
-  return err.graphQLErrors.map((error) => error.message);
+  return err.graphQLErrors.map(error => error.message);
 }
 
 export function removeNulls(obj) {

@@ -5,17 +5,21 @@ generates:
     plugins:
       - typescript
       - typescript-resolvers
+      - graphql-codegen-factories
     config:
       contextType: ../../types#GraphQLContext
       enumsAsTypes: true
+      scalarDefaults:
+        DateTime: new Date()
   front/generated/graphql/types.ts:
     plugins:
       - typescript
       - typescript-operations
+      - graphql-codegen-factories
     config:
       avoidOptionals: true
+      scalarDefaults:
+        DateTime: new Date()
   documentation/api-reference.md:
     plugins:
       - graphql-markdown-plugin.js
-
-

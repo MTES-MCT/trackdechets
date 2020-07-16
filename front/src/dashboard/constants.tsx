@@ -10,7 +10,14 @@ export const statusLabels: { [key: string]: string } = {
   REFUSED: "Refusé",
   TEMP_STORED: "Entreposé temporairement ou en reconditionnement",
   RESENT: "En attente de réception pour traitement",
-  RESEALED: "En attente de départ de l'isntallation provisoire",
+  RESEALED: "En attente de départ de l'installation provisoire",
 };
 
 export const ITEMS_PER_PAGE = 50;
+
+export const transportModeLabels: { [key: string]: string } = {
+  ROAD: "Route",
+  AIR: "Voie aérienne",
+  RAIL: "Voie ferrée",
+  RIVER: "Voie fluviale",
+};

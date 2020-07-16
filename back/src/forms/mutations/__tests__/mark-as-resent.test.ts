@@ -17,19 +17,19 @@ function mockFormWith(value) {
 
 const prisma = {
   form: formMock,
-  updateForm: jest.fn((...args) => Promise.resolve({})),
-  createForm: jest.fn((...args) => Promise.resolve({})),
-  createStatusLog: jest.fn((...args) => Promise.resolve({})),
-  updateManyForms: jest.fn((...args) => Promise.resolve({}))
+  updateForm: jest.fn((..._args) => Promise.resolve({})),
+  createForm: jest.fn(() => Promise.resolve({})),
+  createStatusLog: jest.fn(() => Promise.resolve({})),
+  updateManyForms: jest.fn(() => Promise.resolve({}))
 };
 
 jest.mock("../../../generated/prisma-client", () => ({
   prisma: {
     form: () => prisma.form(),
     updateForm: (...args) => prisma.updateForm(...args),
-    createForm: (...args) => prisma.createForm(...args),
-    createStatusLog: (...args) => prisma.createStatusLog(...args),
-    updateManyForms: (...args) => prisma.updateManyForms(...args)
+    createForm: () => prisma.createForm(),
+    createStatusLog: () => prisma.createStatusLog(),
+    updateManyForms: () => prisma.updateManyForms()
   }
 }));
 

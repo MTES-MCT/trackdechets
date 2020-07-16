@@ -21,6 +21,13 @@ export async function duplicateForm(
     id: formId
   });
 
+  // get segments to duplicate them after cleanup
+  // const transportSegments = await prisma.transportSegments({
+  //   where: {
+  //     form: { id: formId }
+  //   }
+  // });
+
   const newForm = await prisma.createForm({
     ...cleanUpNotDuplicatableFieldsInForm(existingForm),
     readableId: await getReadableId(),
@@ -35,5 +42,15 @@ export async function duplicateForm(
     updatedFields: {},
     loggedAt: new Date()
   });
+  // currently (non tranporter's) UI dashboard does not show segments, so this code is disabled until UI update.
+  // const segmentDuplicates = transportSegments.map(segment =>
+  //   prisma.createTransportSegment({
+  //     form: { connect: { id: newForm.id } },
+  //     ...cleanUpNonDuplicatableSegmentField(segment)
+  //   })
+  // );
+
+  // await Promise.all(segmentDuplicates);
+
   return unflattenObjectFromDb(newForm);
 }

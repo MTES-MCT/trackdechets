@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import {
   fullFormFragment,
-  statusChangeFragment,
+  statusChangeFragment
 } from "../../../common/fragments";
 
 const MARK_SEALED = gql`
@@ -90,5 +90,5 @@ export default {
   RESEALED: MARK_RESEALED,
   RESENT: MARK_RESENT,
   DUPLICATE_FORM,
-  DELETE_FORM,
+  DELETE_FORM
 };

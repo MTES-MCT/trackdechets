@@ -17,11 +17,7 @@ import crypto from "crypto";
  */
 export const userFactory = async (opt = {}) => {
   const defaultPassword = await hash("pass", 10);
-  const userIndex =
-    (await prisma
-      .usersConnection()
-      .aggregate()
-      .count()) + 1;
+  const userIndex = (await prisma.usersConnection().aggregate().count()) + 1;
   const data = {
     name: `User_${userIndex}`,
     email: `user_${userIndex}@td.io`,
@@ -55,16 +51,13 @@ function siretify(index) {
  * Create a company with name, siret, security code and PORDUCER by default
  * @param opt: extram parameters
  */
-export const companyFactory = async (opt = {}) => {
+export const companyFactory = async (opt = {}, companyType = "PRODUCER") => {
   const companyIndex =
-    (await prisma
-      .companiesConnection()
-      .aggregate()
-      .count()) + 1;
+    (await prisma.companiesConnection().aggregate().count()) + 1;
   return prisma.createCompany({
     siret: siretify(companyIndex),
     companyTypes: {
-      set: ["PRODUCER" as CompanyType]
+      set: [companyType as CompanyType]
     } as CompanyCreatecompanyTypesInput,
     name: `company_${companyIndex}`,
     securityCode: 1234,
@@ -76,8 +69,11 @@ export const companyFactory = async (opt = {}) => {
  * Create a company and a member
  * @param role: user role in the company
  */
-export const userWithCompanyFactory = async role => {
-  const company = await companyFactory();
+export const userWithCompanyFactory = async (
+  role,
+  companyType = "PRODUCER"
+) => {
+  const company = await companyFactory({}, companyType);
 
   const user = await userFactory({
     companyAssociations: {
@@ -98,10 +94,7 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
 
   const accessTokenIndex =
-    (await prisma
-      .accessTokensConnection()
-      .aggregate()
-      .count()) + 1;
+    (await prisma.accessTokensConnection().aggregate().count()) + 1;
 
   const accessToken = await prisma.createAccessToken({
     token: `token_${accessTokenIndex}`,
@@ -185,6 +178,13 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
+export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
+  return prisma.createTransportSegment({
+    form: { connect: { id: formId } },
+    ...segmentPayload
+  });
+};
+
 /**
  * Thread-safe version of getReadableId for tests
  */
@@ -223,10 +223,7 @@ export const applicationFactory = async () => {
   const admin = await userFactory();
 
   const applicationIndex =
-    (await prisma
-      .applicationsConnection()
-      .aggregate()
-      .count()) + 1;
+    (await prisma.applicationsConnection().aggregate().count()) + 1;
 
   const application = await prisma.createApplication({
     admins: { connect: { id: admin.id } },

@@ -23,11 +23,9 @@ setLocale({
 const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
 
 export const formSchema = object<any>().shape({
-  id: string()
-    .label("Identifiant (id)")
-    .required(),
+  id: string().label("Identifiant (id)").required(),
   emitter: object().shape({
-    type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
+    type: string().matches(/(PRODUCER|OTHER|APPENDIX1|APPENDIX2)/),
     workSite: object({
       name: string().nullable(),
       address: string().nullable(),
@@ -39,7 +37,7 @@ export const formSchema = object<any>().shape({
   }),
   recipient: object().shape({
     processingOperation: string()
-      .label("Opération de traitement")
+      .label("Opération d’élimination / valorisation")
       .required(),
     cap: string().nullable(true),
     company: validCompany({ verboseFieldName: "Destinataire" }, Yup),
@@ -124,7 +122,7 @@ export const formSchema = object<any>().shape({
           mail: string().nullable()
         }).nullable(),
         processingOperation: string()
-          .label("Opération de traitement")
+          .label("Opération d’élimination / valorisation")
           .nullable(),
         cap: string().nullable(true)
       })

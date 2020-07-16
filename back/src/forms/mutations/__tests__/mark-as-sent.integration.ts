@@ -53,6 +53,9 @@ describe("{ mutation { markAsSent } }", () => {
       where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
+
+    // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
+    expect(form.currentTransporterSiret).toEqual(form.transporterCompanySiret);
   });
 
   test("the recipient of the BSD can send it when it's sealed", async () => {
@@ -126,6 +129,9 @@ describe("{ mutation { markAsSent } }", () => {
 
     expect(form.status).toEqual("SENT");
 
+    // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
+    expect(form.currentTransporterSiret).toEqual(form.transporterCompanySiret);
+
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
       where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
@@ -165,6 +171,9 @@ describe("{ mutation { markAsSent } }", () => {
 
     expect(form.status).toEqual("SENT");
 
+    // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
+    expect(form.currentTransporterSiret).toEqual(form.transporterCompanySiret);
+
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
       where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
@@ -201,6 +210,8 @@ describe("{ mutation { markAsSent } }", () => {
 
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toEqual("SEALED");
+
+    expect(resultingForm.currentTransporterSiret).toBeNull();
   });
 
   test.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(

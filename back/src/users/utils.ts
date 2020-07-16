@@ -7,7 +7,5 @@ export function hashPassword(password: string) {
 }
 
 export function generatePassword() {
-  return Math.random()
-    .toString(36)
-    .slice(-10);
+  return Math.random().toString(36).slice(-10);
 }

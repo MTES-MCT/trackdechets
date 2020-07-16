@@ -39,9 +39,9 @@ export default function Invite() {
           onSubmit={(values, { setStatus, setSubmitting }) => {
             const { passwordConfirmation, ...payload } = values;
             joinWithInvite({ variables: payload })
-              .then((_) => history.push("/login"))
-              .catch((_) => setStatus("Erreur technique."))
-              .then((_) => setSubmitting(false));
+              .then(_ => history.push("/login"))
+              .catch(_ => setStatus("Erreur technique."))
+              .then(_ => setSubmitting(false));
           }}
         >
           {({ isSubmitting }) => (
@@ -78,7 +78,7 @@ export default function Invite() {
 
                   <ErrorMessage
                     name="passwordConfirmation"
-                    render={(msg) => (
+                    render={msg => (
                       <div className="input-error-message">{msg}</div>
                     )}
                   />

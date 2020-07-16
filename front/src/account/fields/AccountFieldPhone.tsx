@@ -44,7 +44,7 @@ export default function AccountFieldPhone({ me }: Props) {
       name="phone"
       label="Téléphone"
       value={me.phone}
-      renderForm={(toggleEdition) => (
+      renderForm={toggleEdition => (
         <AccountFormSimpleInput<Partial<MutationEditProfileArgs>>
           name="phone"
           type="tel"

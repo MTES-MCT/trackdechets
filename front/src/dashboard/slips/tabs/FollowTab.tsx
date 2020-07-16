@@ -5,7 +5,7 @@ import Loader from "../../../common/Loader";
 import {
   FormStatus,
   Query,
-  QueryFormsArgs
+  QueryFormsArgs,
 } from "../../../generated/graphql/types";
 import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
@@ -27,10 +27,10 @@ export default function FollowTab() {
         FormStatus.TempStored,
         FormStatus.Resealed,
         FormStatus.Resent,
-        FormStatus.AwaitingGroup
+        FormStatus.AwaitingGroup,
       ],
-      hasNextStep: false
-    }
+      hasNextStep: false,
+    },
   });
 
   if (loading) return <Loader />;

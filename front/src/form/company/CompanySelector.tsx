@@ -93,7 +93,7 @@ export default function CompanySelector(props) {
   }, [state.clue, state.department, searchCompaniesQuery]);
 
   useEffect(() => {
-    ["siret", "name", "address", "contact", "phone", "mail"].forEach((key) => {
+    ["siret", "name", "address", "contact", "phone", "mail"].forEach(key => {
       if (!state.selectedCompany?.[key]) {
         return;
       }
@@ -106,7 +106,7 @@ export default function CompanySelector(props) {
 
   const { loading, error } = useQuery<Pick<Query, "favorites">>(FAVORITES, {
     variables: { type },
-    onCompleted: (data) => {
+    onCompleted: data => {
       if (state.selectedCompany.siret === "") {
         dispatch({ type: "company_selected", payload: data.favorites[0] });
       }
@@ -128,7 +128,7 @@ export default function CompanySelector(props) {
         <input
           type="text"
           placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-          onChange={(e) =>
+          onChange={e =>
             dispatch({ type: "search_input", payload: e.target.value })
           }
         />
@@ -143,7 +143,7 @@ export default function CompanySelector(props) {
       <button
         className="button-outline small primary"
         type="button"
-        onClick={(_) =>
+        onClick={_ =>
           dispatch({
             type: "department_filter",
             payload: !state.displayDepartment,
@@ -159,7 +159,7 @@ export default function CompanySelector(props) {
             <input
               type="text"
               placeholder="Département ou code postal"
-              onChange={(e) =>
+              onChange={e =>
                 dispatch({
                   type: "department_input",
                   payload: e.target.value,
@@ -172,13 +172,13 @@ export default function CompanySelector(props) {
 
       {state.searchLoading && <span>Chargement...</span>}
       <CompanyResults
-        onSelect={(company) =>
+        onSelect={company =>
           dispatch({ type: "company_selected", payload: company })
         }
         results={[
           ...state.searchResults,
           ...(!state.searchResults.some(
-            (c) => c.siret === state.selectedCompany.siret
+            c => c.siret === state.selectedCompany.siret
           )
             ? [state.selectedCompany]
             : []),

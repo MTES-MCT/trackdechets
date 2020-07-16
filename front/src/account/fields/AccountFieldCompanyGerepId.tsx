@@ -36,7 +36,7 @@ export default function AccountFielCompanyGerepId({ company }: Props) {
       name="gerepId"
       label="Identifiant GEREP"
       value={company.gerepId}
-      renderForm={(toggleEdition) => (
+      renderForm={toggleEdition => (
         <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
           name="gerepId"
           type="text"

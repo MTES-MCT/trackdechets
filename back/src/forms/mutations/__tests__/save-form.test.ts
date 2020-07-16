@@ -3,7 +3,9 @@ import { ErrorCode } from "../../../common/errors";
 import * as queries from "../../../companies/queries";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
-const ecoOrganismeMock = jest.fn(() => Promise.resolve(null));
+const ecoOrganismeMock = jest.fn<Promise<null | { siret: string }>, []>(() =>
+  Promise.resolve(null)
+);
 const formMock = jest.fn(() => Promise.resolve({}));
 function mockFormWith(value) {
   const result: any = Promise.resolve(value);
@@ -14,24 +16,32 @@ function mockFormWith(value) {
 
 const prisma = {
   form: formMock,
-  forms: jest.fn((...args) => []),
-  updateForm: jest.fn((...args) => ({})),
-  createForm: jest.fn((...args) => ({}))
+  forms: jest.fn(() => []),
+  updateForm: jest.fn(() => ({})),
+  createForm: jest.fn(() => ({}))
 };
 
 jest.mock("../../../generated/prisma-client", () => ({
   prisma: {
     form: () => prisma.form(),
-    forms: (...args) => prisma.forms(...args),
-    updateForm: (...args) => prisma.updateForm(...args),
-    createForm: (...args) => prisma.createForm(...args)
+    forms: () => prisma.forms(),
+    updateForm: () => prisma.updateForm(),
+    createForm: () => prisma.createForm()
   }
 }));
 
 describe("Forms -> saveForm mutation", () => {
   const getUserCompaniesMock = jest.spyOn(queries, "getUserCompanies");
   getUserCompaniesMock.mockResolvedValue([
-    { id: "", securityCode: 123, companyTypes: [], siret: "user siret" }
+    {
+      id: "",
+      securityCode: 123,
+      companyTypes: [],
+      siret: "user siret",
+      createdAt: new Date().toString(),
+      updatedAt: new Date().toString(),
+      documentKeys: []
+    }
   ]);
 
   beforeEach(() => {

@@ -8,7 +8,9 @@
       "oauth2",
       "environments",
       "access-token",
-      "playground"
+      "playground",
+      "multimodal",
+      "sirene"
     ],
     "Référence de l'API": ["api-reference", "changelog"]
   }

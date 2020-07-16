@@ -18,6 +18,8 @@ type FormSiretsAndOwner = {
     transporterCompanySiret: string;
   };
   owner: { id: string };
+  transportSegments: [{ transporterCompanySiret: string }];
+  currentTransporterSiret: string;
 };
 
 export const canAccessForm = and(
@@ -152,12 +154,17 @@ export const isFormTransporter = and(
       ctx.prisma
     );
 
+    const segmentSirets = formInfos.transportSegments.map(
+      segment => segment.transporterCompanySiret
+    );
+
     return (
       currentUserSirets.includes(formInfos.transporterCompanySiret) ||
       (formInfos.temporaryStorageDetail?.transporterCompanySiret &&
         currentUserSirets.includes(
           formInfos.temporaryStorageDetail.transporterCompanySiret
         )) ||
+      !!segmentSirets.filter(el => currentUserSirets.includes(el)).length ||
       new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`)
     );
   })
@@ -225,17 +232,18 @@ export const hasFinalDestination = rule()(async (_, { id }, ctx) => {
 
 export const canAccessFormsWithoutSiret = and(
   isAuthenticated,
-  rule()(async (_, {}, ctx) => {
+  rule()(async (_, { siret }, ctx) => {
     const currentUserSirets = await getCurrentUserSirets(
       ctx.user.id,
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.length == 1 ||
-      new ForbiddenError(
-        `Vous appartenez à plusieurs entreprises, vous devez spécifier le SIRET dont vous souhaitez récupérer les bordereaux.`
-      )
+    if (currentUserSirets.length === 1) {
+      return siret == null || siret === currentUserSirets[0];
+    }
+
+    return new ForbiddenError(
+      `Vous appartenez à plusieurs entreprises, vous devez spécifier le SIRET dont vous souhaitez récupérer les bordereaux.`
     );
   })
 );
@@ -259,7 +267,11 @@ async function getFormAccessInfos(
       destinationCompanySiret
       transporterCompanySiret
     }
+    transportSegments{
+      transporterCompanySiret
+    }
     owner { id }
+    currentTransporterSiret
   }
 `);
 
@@ -268,7 +280,7 @@ async function getFormAccessInfos(
   return { formInfos, currentUserSirets };
 }
 
-async function getCurrentUserSirets(userId: string, prisma: Prisma) {
+export async function getCurrentUserSirets(userId: string, prisma: Prisma) {
   const user = await prisma.user({ id: userId }).$fragment<{
     companyAssociations: { company: { siret: string } }[];
   }>(`

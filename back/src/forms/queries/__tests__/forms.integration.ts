@@ -5,8 +5,11 @@ import { server } from "../../../server";
 import {
   companyFactory,
   formFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transportSegmentFactory,
+  userFactory
 } from "../../../__tests__/factories";
+import makeClient from "../../../__tests__/testClient";
 
 function createForms(userId: string, params: any[]) {
   return Promise.all(
@@ -296,7 +299,7 @@ describe("Integration / Forms query", () => {
 
     expect(roleFiltered.forms.length).toBe(1);
 
-    const { errors, data: roleAndStatusFiltered } = await query(
+    const { data: roleAndStatusFiltered } = await query(
       `query {
           forms(roles: [EMITTER, RECIPIENT], status: [PROCESSED]) {
             id
@@ -391,5 +394,82 @@ describe("Integration / Forms query", () => {
 
     expect(data.forms.length).toBe(1);
     expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
+  });
+});
+
+describe("Integration / Forms query for transporters", () => {
+  afterEach(() => resetDatabase());
+
+  it("should return forms transported by initial transporter", async () => {
+    const owner = await userFactory();
+
+    const { user: transporter, company } = await userWithCompanyFactory(
+      "ADMIN",
+      "TRANSPORTER"
+    );
+
+    const transporterSiret = company.siret;
+    // create a form transported by our transporter
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        transporterCompanySiret: transporterSiret,
+        status: "SEALED"
+      }
+    });
+
+    // the transporter makes the query
+
+    const { query } = makeClient(transporter);
+    const { data } = await query(
+      `query {
+          forms(siret: "${transporterSiret}", type: TRANSPORTER) {
+            id
+
+          }
+        }
+      `
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].id).toBe(form.id);
+  });
+
+  it("should return forms transported by a segment transporter", async () => {
+    const owner = await userFactory();
+    const { user: transporter, company } = await userWithCompanyFactory(
+      "ADMIN",
+      "TRANSPORTER"
+    );
+
+    const transporterSiret = company.siret;
+    // create a form whose first tranporter is another one
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        transporterCompanySiret: "6543",
+        status: "SEALED"
+      }
+    });
+    // our transporter is on one segment
+    await transportSegmentFactory({
+      formId: form.id,
+      segmentPayload: { transporterCompanySiret: company.siret }
+    });
+
+    // the transporter makes the query
+
+    const { query } = makeClient(transporter);
+    const { data } = await query(
+      `query {
+          forms(siret: "${transporterSiret}", type: TRANSPORTER) {
+            id
+             }
+           }
+         `
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].id).toBe(form.id);
   });
 });

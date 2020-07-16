@@ -41,6 +41,7 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
       associations.map(a => {
         return {
           ...a.user,
+          role: a.role,
           isPendingInvitation: false
         };
       })

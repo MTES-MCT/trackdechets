@@ -12,17 +12,18 @@ import { prisma, User } from "./generated/prisma-client";
 import { compare } from "bcrypt";
 import { AccessToken } from "./generated/prisma-client";
 import { sameDayMidnight, daysBetween } from "./utils";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { User as PrismaUser } from "./generated/prisma-client";
 
 const { JWT_SECRET } = process.env;
 
-export type AuthUser = PrismaUser & { auth?: string };
-
 // Set specific type for req.user
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
-    // eslint:disable-next-line:no-empty-interface
-    interface User extends AuthUser {}
+    interface User extends PrismaUser {
+      auth?: string;
+    }
   }
 }
 
@@ -192,7 +193,7 @@ passport.use(new ClientPasswordStrategy(verifyClient));
 async function passportCallback(
   req: express.Request,
   next: express.NextFunction,
-  user: AuthUser,
+  user: Express.User,
   callback?: () => Promise<any>
 ) {
   if (user) {

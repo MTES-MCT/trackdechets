@@ -2,7 +2,7 @@
  * Group an array of object by key
  * Ex [{a: 1}, {a: 2}, {b: 1}] => {a : [1, 2], b: [1]}
  */
-export function groupBy(key: string, array: object[]) {
+export function groupBy(key: string, array: { [id: string]: any }[]) {
   const result = {};
   for (const item of array) {
     let added = false;

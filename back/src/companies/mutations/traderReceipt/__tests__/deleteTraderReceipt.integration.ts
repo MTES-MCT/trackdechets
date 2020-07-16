@@ -38,11 +38,8 @@ describe("{ mutation { deleteTraderReceipt } }", () => {
     const { data } = await mutate(mutation);
     expect(data.deleteTraderReceipt.id).toEqual(receiptId);
 
-    expect(
-      await prisma
-        .traderReceiptsConnection()
-        .aggregate()
-        .count()
-    ).toEqual(0);
+    expect(await prisma.traderReceiptsConnection().aggregate().count()).toEqual(
+      0
+    );
   });
 });

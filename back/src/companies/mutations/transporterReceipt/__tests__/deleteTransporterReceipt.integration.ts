@@ -39,10 +39,7 @@ describe("{ mutation { deleteTransporterReceipt } }", () => {
     expect(data.deleteTransporterReceipt.id).toEqual(receiptId);
 
     expect(
-      await prisma
-        .transporterReceiptsConnection()
-        .aggregate()
-        .count()
+      await prisma.transporterReceiptsConnection().aggregate().count()
     ).toEqual(0);
   });
 });

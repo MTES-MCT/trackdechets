@@ -464,7 +464,7 @@ export type Form = {
   actualQuantity: Maybe<Scalars['Float']>;
   /** Traitement réalisé (code D/R) */
   processingOperationDone: Maybe<Scalars['String']>;
-  /** Description de l'opération de traitement (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy: Maybe<Scalars['String']>;
@@ -481,6 +481,9 @@ export type Form = {
   temporaryStorageDetail: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
   stateSummary: Maybe<StateSummary>;
+  transportSegments: Maybe<Array<TransportSegment>>;
+  currentTransporterSiret: Maybe<Scalars['String']>;
+  nextTransporterSiret: Maybe<Scalars['String']>;
 };
 
 /** Information sur un établissement dans un BSD */
@@ -642,6 +645,24 @@ export type Installation = {
 };
 
 
+export type MultimodalTransporter = {
+   __typename?: 'MultimodalTransporter';
+  /** Établissement transporteur */
+  company: Maybe<FormCompany>;
+  /** Exemption de récipissé */
+  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
+  /** N° de récipissé */
+  receipt: Maybe<Scalars['String']>;
+  /** Département */
+  department: Maybe<Scalars['String']>;
+  /** Limite de validité du récipissé */
+  validityLimit: Maybe<Scalars['DateTime']>;
+  /** Numéro de plaque d'immatriculation */
+  numberPlate: Maybe<Scalars['String']>;
+  /** Information libre, destinée aux transporteurs */
+  customInfo: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
    __typename?: 'Mutation';
   /**
@@ -693,6 +714,8 @@ export type Mutation = {
    * Met à jour les informations de l'utilisateur
    */
   editProfile: User;
+  /** Édite un segment existant */
+  editSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
@@ -719,12 +742,69 @@ export type Mutation = {
   markAsResealed: Maybe<Form>;
   /** Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement */
   markAsResent: Maybe<Form>;
-  /** Scelle un BSD */
+  /**
+   * Scelle un BSD
+   * Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+   * doivent avoir été renseignés grâce à la mutation `saveForm`
+   * 
+   * ```
+   * emitter: {
+   *   type
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * recipient: {
+   *   processingOperation
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     phone
+   *     mail
+   *   }
+   * }
+   * transporter: {
+   *   company: {
+   *     siret
+   *     name
+   *     address
+   *     contact
+   *     mail
+   *     phone
+   *   }
+   *   receipt
+   *   department
+   *   validityLimit
+   *   numberPlate
+   * }
+   * wasteDetails: {
+   *   code
+   *   onuCode
+   *   name
+   *   packagings
+   *   numberOfPackages
+   *   quantity
+   *   quantityType
+   *   consistence
+   * }
+   * ```
+   */
   markAsSealed: Maybe<Form>;
   /** Valide l'envoi d'un BSD */
   markAsSent: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored: Maybe<Form>;
+  /** Marque un segment de transport comme prêt à être emporté */
+  markSegmentAsReadyToTakeOver: Maybe<TransportSegment>;
+  /** Prépare un nouveau segment de transport multimodal */
+  prepareSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
@@ -754,6 +834,8 @@ export type Mutation = {
    * Permet de créer un nouvel utilisateur
    */
   signup: User;
+  /** Marque un segment comme pris en charge par le nouveau transporteur */
+  takeOverSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
    * Édite les informations d'un établissement
@@ -834,6 +916,13 @@ export type MutationEditProfileArgs = {
 };
 
 
+export type MutationEditSegmentArgs = {
+  id: Scalars['ID'];
+  siret: Scalars['String'];
+  nextSegmentInfo: NextSegmentInfoInput;
+};
+
+
 export type MutationInviteUserToCompanyArgs = {
   email: Scalars['String'];
   siret: Scalars['String'];
@@ -895,6 +984,18 @@ export type MutationMarkAsTempStoredArgs = {
 };
 
 
+export type MutationMarkSegmentAsReadyToTakeOverArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationPrepareSegmentArgs = {
+  id: Scalars['ID'];
+  siret: Scalars['String'];
+  nextSegmentInfo: NextSegmentInfoInput;
+};
+
+
 export type MutationRemoveUserFromCompanyArgs = {
   userId: Scalars['ID'];
   siret: Scalars['String'];
@@ -930,6 +1031,12 @@ export type MutationSignedByTransporterArgs = {
 
 export type MutationSignupArgs = {
   userInfos: SignupInput;
+};
+
+
+export type MutationTakeOverSegmentArgs = {
+  id: Scalars['ID'];
+  takeOverInfo: TakeOverInput;
 };
 
 
@@ -978,6 +1085,43 @@ export type NextDestinationInput = {
   company: Maybe<CompanyInput>;
 };
 
+/** Payload d'un segment de transport */
+export type NextSegmentCompanyInput = {
+  /** SIRET de l'établissement */
+  siret: Maybe<Scalars['String']>;
+  /** Nom de l'établissement */
+  name: Maybe<Scalars['String']>;
+  /** Adresse de l'établissement */
+  address: Maybe<Scalars['String']>;
+  /** Nom du contact dans l'établissement */
+  contact: Maybe<Scalars['String']>;
+  /** Email du contact dans l'établissement */
+  mail: Maybe<Scalars['String']>;
+  /** Numéro de téléphone de contact dans l'établissement */
+  phone: Maybe<Scalars['String']>;
+};
+
+/** Payload lié à l'ajout de segment de transport multimodal (case 20 à 21) */
+export type NextSegmentInfoInput = {
+  transporter: Maybe<NextSegmentTransporterInput>;
+  mode: TransportMode;
+};
+
+export type NextSegmentTransporterInput = {
+  /** Exemption de récipissé */
+  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
+  /** N° de récipissé */
+  receipt: Maybe<Scalars['String']>;
+  /** Département */
+  department: Maybe<Scalars['String']>;
+  /** Limite de validité du récipissé */
+  validityLimit: Maybe<Scalars['DateTime']>;
+  /** Numéro de plaque d'immatriculation */
+  numberPlate: Maybe<Scalars['String']>;
+  /** Établissement collecteur - transporteur */
+  company: Maybe<NextSegmentCompanyInput>;
+};
+
 /** Type de packaging du déchet */
 export enum Packagings {
   /** Fut */
@@ -1019,7 +1163,7 @@ export type PrivateCompanyInput = {
 export type ProcessedFormInput = {
   /** Traitement réalisé (code D/R) */
   processingOperationDone: Scalars['String'];
-  /** Description de l'opération de traitement (case 11) */
+  /** Description de l'opération d’élimination / valorisation (case 11) */
   processingOperationDescription: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy: Scalars['String'];
@@ -1373,6 +1517,12 @@ export type SubscriptionFormsArgs = {
   token: Scalars['String'];
 };
 
+/** Payload de prise en charge de segment */
+export type TakeOverInput = {
+  takenOverAt: Scalars['DateTime'];
+  takenOverBy: Scalars['String'];
+};
+
 /** Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant */
 export type TemporaryStorageDetail = {
    __typename?: 'TemporaryStorageDetail';
@@ -1528,6 +1678,33 @@ export type TransporterSignatureFormInput = {
   onuCode: Maybe<Scalars['String']>;
 };
 
+export enum TransportMode {
+  Road = 'ROAD',
+  Rail = 'RAIL',
+  Air = 'AIR',
+  River = 'RIVER',
+  Sea = 'SEA'
+}
+
+export type TransportSegment = {
+   __typename?: 'TransportSegment';
+  id: Scalars['ID'];
+  /** Siret du transporteur précédent */
+  previousTransporterCompanySiret: Maybe<Scalars['String']>;
+  /** Transporteur du segment */
+  transporter: Maybe<MultimodalTransporter>;
+  /** Mode de transport */
+  mode: Maybe<TransportMode>;
+  /** Date de prise en charge */
+  takenOverAt: Maybe<Scalars['DateTime']>;
+  /** Reponsable de la prise en charge */
+  takenOverBy: Maybe<Scalars['String']>;
+  /** Prêt à être pris en charge */
+  readyToTakeOver: Maybe<Scalars['Boolean']>;
+  /** Numéro du segment */
+  segmentNumber: Maybe<Scalars['Int']>;
+};
+
 /** Payload d'édition d'un récépissé transporteur */
 export type UpdateTraderReceiptInput = {
   /** The id of the trader receipt to modify */
@@ -1680,3 +1857,511 @@ export type WorkSiteInput = {
   infos: Maybe<Scalars['String']>;
 };
 
+
+export function createAuthPayloadMock(props: Partial<AuthPayload>): AuthPayload {
+  return {
+    __typename: "AuthPayload",
+    token: "",
+    user: createUserMock({}),
+    ...props,
+  };
+};
+
+export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): CompanyFavorite {
+  return {
+    __typename: "CompanyFavorite",
+    name: null,
+    siret: null,
+    address: null,
+    contact: null,
+    phone: null,
+    mail: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyMemberMock(props: Partial<CompanyMember>): CompanyMember {
+  return {
+    __typename: "CompanyMember",
+    id: "",
+    email: "",
+    name: null,
+    role: null,
+    isActive: null,
+    isPendingInvitation: null,
+    isMe: null,
+    ...props,
+  };
+};
+
+export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): CompanyPrivate {
+  return {
+    __typename: "CompanyPrivate",
+    id: "",
+    companyTypes: [],
+    gerepId: null,
+    securityCode: 0,
+    contactEmail: null,
+    contactPhone: null,
+    website: null,
+    users: null,
+    userRole: null,
+    givenName: null,
+    siret: "",
+    address: null,
+    name: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyPublic {
+  return {
+    __typename: "CompanyPublic",
+    contactEmail: null,
+    contactPhone: null,
+    website: null,
+    siret: null,
+    etatAdministratif: null,
+    address: null,
+    name: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    isRegistered: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanySearchResultMock(props: Partial<CompanySearchResult>): CompanySearchResult {
+  return {
+    __typename: "CompanySearchResult",
+    siret: null,
+    address: null,
+    name: null,
+    companyTypes: null,
+    naf: null,
+    libelleNaf: null,
+    longitude: null,
+    latitude: null,
+    installation: null,
+    transporterReceipt: null,
+    traderReceipt: null,
+    ...props,
+  };
+};
+
+export function createCompanyStatMock(props: Partial<CompanyStat>): CompanyStat {
+  return {
+    __typename: "CompanyStat",
+    company: null,
+    stats: [],
+    ...props,
+  };
+};
+
+export function createDeclarationMock(props: Partial<Declaration>): Declaration {
+  return {
+    __typename: "Declaration",
+    annee: null,
+    codeDechet: null,
+    libDechet: null,
+    gerepType: null,
+    ...props,
+  };
+};
+
+export function createDestinationMock(props: Partial<Destination>): Destination {
+  return {
+    __typename: "Destination",
+    cap: null,
+    processingOperation: null,
+    company: null,
+    isFilledByEmitter: null,
+    ...props,
+  };
+};
+
+export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganisme {
+  return {
+    __typename: "EcoOrganisme",
+    id: "",
+    name: "",
+    siret: "",
+    address: "",
+    ...props,
+  };
+};
+
+export function createEmitterMock(props: Partial<Emitter>): Emitter {
+  return {
+    __typename: "Emitter",
+    type: null,
+    workSite: null,
+    pickupSite: null,
+    company: null,
+    ...props,
+  };
+};
+
+export function createFileDownloadMock(props: Partial<FileDownload>): FileDownload {
+  return {
+    __typename: "FileDownload",
+    token: null,
+    downloadLink: null,
+    ...props,
+  };
+};
+
+export function createFormMock(props: Partial<Form>): Form {
+  return {
+    __typename: "Form",
+    id: "",
+    readableId: "",
+    customId: null,
+    emitter: null,
+    recipient: null,
+    transporter: null,
+    wasteDetails: null,
+    trader: null,
+    createdAt: null,
+    updatedAt: null,
+    status: FormStatus.Draft,
+    signedByTransporter: null,
+    sentAt: null,
+    sentBy: null,
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
+    receivedBy: null,
+    receivedAt: null,
+    signedAt: null,
+    quantityReceived: null,
+    actualQuantity: null,
+    processingOperationDone: null,
+    processingOperationDescription: null,
+    processedBy: null,
+    processedAt: null,
+    noTraceability: null,
+    nextDestination: null,
+    appendix2Forms: null,
+    ecoOrganisme: null,
+    temporaryStorageDetail: null,
+    stateSummary: null,
+    transportSegments: null,
+    currentTransporterSiret: null,
+    nextTransporterSiret: null,
+    ...props,
+  };
+};
+
+export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany {
+  return {
+    __typename: "FormCompany",
+    name: null,
+    siret: null,
+    address: null,
+    contact: null,
+    phone: null,
+    mail: null,
+    ...props,
+  };
+};
+
+export function createFormsLifeCycleDataMock(props: Partial<FormsLifeCycleData>): FormsLifeCycleData {
+  return {
+    __typename: "formsLifeCycleData",
+    statusLogs: [],
+    hasNextPage: null,
+    hasPreviousPage: null,
+    startCursor: null,
+    endCursor: null,
+    count: null,
+    ...props,
+  };
+};
+
+export function createFormSubscriptionMock(props: Partial<FormSubscription>): FormSubscription {
+  return {
+    __typename: "FormSubscription",
+    mutation: null,
+    node: null,
+    updatedFields: null,
+    previousValues: null,
+    ...props,
+  };
+};
+
+export function createInstallationMock(props: Partial<Installation>): Installation {
+  return {
+    __typename: "Installation",
+    codeS3ic: null,
+    urlFiche: null,
+    rubriques: null,
+    declarations: null,
+    ...props,
+  };
+};
+
+export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
+  return {
+    __typename: "MultimodalTransporter",
+    company: null,
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    customInfo: null,
+    ...props,
+  };
+};
+
+export function createNextDestinationMock(props: Partial<NextDestination>): NextDestination {
+  return {
+    __typename: "NextDestination",
+    processingOperation: null,
+    company: null,
+    ...props,
+  };
+};
+
+export function createRecipientMock(props: Partial<Recipient>): Recipient {
+  return {
+    __typename: "Recipient",
+    cap: null,
+    processingOperation: null,
+    company: null,
+    isTempStorage: null,
+    ...props,
+  };
+};
+
+export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
+  return {
+    __typename: "Rubrique",
+    rubrique: "",
+    alinea: null,
+    etatActivite: null,
+    regimeAutorise: null,
+    activite: null,
+    category: "",
+    volume: null,
+    unite: null,
+    wasteType: null,
+    ...props,
+  };
+};
+
+export function createStatMock(props: Partial<Stat>): Stat {
+  return {
+    __typename: "Stat",
+    wasteCode: "",
+    incoming: 0,
+    outgoing: 0,
+    ...props,
+  };
+};
+
+export function createStateSummaryMock(props: Partial<StateSummary>): StateSummary {
+  return {
+    __typename: "StateSummary",
+    quantity: null,
+    packagings: [],
+    onuCode: null,
+    transporter: null,
+    transporterNumberPlate: null,
+    transporterCustomInfo: null,
+    recipient: null,
+    emitter: null,
+    lastActionOn: null,
+    ...props,
+  };
+};
+
+export function createStatusLogMock(props: Partial<StatusLog>): StatusLog {
+  return {
+    __typename: "StatusLog",
+    id: null,
+    status: null,
+    loggedAt: null,
+    updatedFields: null,
+    form: null,
+    user: null,
+    ...props,
+  };
+};
+
+export function createStatusLogFormMock(props: Partial<StatusLogForm>): StatusLogForm {
+  return {
+    __typename: "StatusLogForm",
+    id: null,
+    readableId: null,
+    ...props,
+  };
+};
+
+export function createStatusLogUserMock(props: Partial<StatusLogUser>): StatusLogUser {
+  return {
+    __typename: "StatusLogUser",
+    id: null,
+    email: null,
+    ...props,
+  };
+};
+
+export function createSubscriptionMock(props: Partial<Subscription>): Subscription {
+  return {
+    __typename: "Subscription",
+    forms: null,
+    ...props,
+  };
+};
+
+export function createTemporaryStorageDetailMock(props: Partial<TemporaryStorageDetail>): TemporaryStorageDetail {
+  return {
+    __typename: "TemporaryStorageDetail",
+    temporaryStorer: null,
+    destination: null,
+    wasteDetails: null,
+    transporter: null,
+    signedBy: null,
+    signedAt: null,
+    ...props,
+  };
+};
+
+export function createTemporaryStorerMock(props: Partial<TemporaryStorer>): TemporaryStorer {
+  return {
+    __typename: "TemporaryStorer",
+    quantityType: null,
+    quantityReceived: null,
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
+    receivedAt: null,
+    receivedBy: null,
+    ...props,
+  };
+};
+
+export function createTraderMock(props: Partial<Trader>): Trader {
+  return {
+    __typename: "Trader",
+    company: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    ...props,
+  };
+};
+
+export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderReceipt {
+  return {
+    __typename: "TraderReceipt",
+    id: "",
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+};
+
+export function createTransporterMock(props: Partial<Transporter>): Transporter {
+  return {
+    __typename: "Transporter",
+    company: null,
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    customInfo: null,
+    ...props,
+  };
+};
+
+export function createTransporterReceiptMock(props: Partial<TransporterReceipt>): TransporterReceipt {
+  return {
+    __typename: "TransporterReceipt",
+    id: "",
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+};
+
+export function createTransportSegmentMock(props: Partial<TransportSegment>): TransportSegment {
+  return {
+    __typename: "TransportSegment",
+    id: "",
+    previousTransporterCompanySiret: null,
+    transporter: null,
+    mode: null,
+    takenOverAt: null,
+    takenOverBy: null,
+    readyToTakeOver: null,
+    segmentNumber: null,
+    ...props,
+  };
+};
+
+export function createUploadLinkMock(props: Partial<UploadLink>): UploadLink {
+  return {
+    __typename: "UploadLink",
+    signedUrl: null,
+    key: null,
+    ...props,
+  };
+};
+
+export function createUserMock(props: Partial<User>): User {
+  return {
+    __typename: "User",
+    id: "",
+    email: "",
+    name: null,
+    phone: null,
+    companies: null,
+    ...props,
+  };
+};
+
+export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetails {
+  return {
+    __typename: "WasteDetails",
+    code: null,
+    name: null,
+    onuCode: null,
+    packagings: [],
+    otherPackaging: null,
+    numberOfPackages: null,
+    quantity: null,
+    quantityType: null,
+    consistence: null,
+    ...props,
+  };
+};
+
+export function createWorkSiteMock(props: Partial<WorkSite>): WorkSite {
+  return {
+    __typename: "WorkSite",
+    name: null,
+    address: null,
+    city: null,
+    postalCode: null,
+    infos: null,
+    ...props,
+  };
+};

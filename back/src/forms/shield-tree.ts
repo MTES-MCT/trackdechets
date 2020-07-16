@@ -30,7 +30,7 @@ import {
 
 export default {
   Query: {
-    form: canAccessForm,
+    form: or(canAccessForm, isFormTransporter),
     formPdf: or(canAccessForm, isFormTransporter),
     formsRegister: isCompaniesUser,
     forms: chain(
@@ -67,6 +67,10 @@ export default {
       markAsResentSchema,
       or(temporaryStorageDestinationSchema, hasFinalDestination),
       isFormTempStorer
-    )
+    ),
+    prepareSegment: isAuthenticated,
+    markSegmentAsReadyToTakeOver: isAuthenticated,
+    takeOverSegment: isAuthenticated,
+    editSegment: isAuthenticated
   }
 };

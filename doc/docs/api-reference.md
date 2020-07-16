@@ -592,6 +592,30 @@ Met à jour les informations de l'utilisateur
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>editSegment</strong></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
+<td>
+
+Édite un segment existant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">nextSegmentInfo</td>
+<td valign="top"><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>inviteUserToCompany</strong></td>
 <td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
 <td>
@@ -762,6 +786,57 @@ Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
 <td>
 
 Scelle un BSD
+Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+doivent avoir été renseignés grâce à la mutation `saveForm`
+
+```
+emitter: {
+  type
+  company: {
+    siret
+    name
+    address
+    contact
+    phone
+    mail
+  }
+}
+recipient: {
+  processingOperation
+  company: {
+    siret
+    name
+    address
+    contact
+    phone
+    mail
+  }
+}
+transporter: {
+  company: {
+    siret
+    name
+    address
+    contact
+    mail
+    phone
+  }
+  receipt
+  department
+  validityLimit
+  numberPlate
+}
+wasteDetails: {
+  code
+  onuCode
+  name
+  packagings
+  numberOfPackages
+  quantity
+  quantityType
+  consistence
+}
+```
 
 </td>
 </tr>
@@ -818,6 +893,44 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 <tr>
 <td colspan="2" align="right" valign="top">tempStoredInfos</td>
 <td valign="top"><a href="#tempstoredforminput">TempStoredFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markSegmentAsReadyToTakeOver</strong></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
+<td>
+
+Marque un segment de transport comme prêt à être emporté
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>prepareSegment</strong></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
+<td>
+
+Prépare un nouveau segment de transport multimodal
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">nextSegmentInfo</td>
+<td valign="top"><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -948,6 +1061,25 @@ Permet de créer un nouvel utilisateur
 <tr>
 <td colspan="2" align="right" valign="top">userInfos</td>
 <td valign="top"><a href="#signupinput">SignupInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takeOverSegment</strong></td>
+<td valign="top"><a href="#transportsegment">TransportSegment</a></td>
+<td>
+
+Marque un segment comme pris en charge par le nouveau transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">takeOverInfo</td>
+<td valign="top"><a href="#takeoverinput">TakeOverInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -2297,7 +2429,7 @@ Traitement réalisé (code D/R)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Description de l'opération de traitement (case 11)
+Description de l'opération d’élimination / valorisation (case 11)
 
 </td>
 </tr>
@@ -2368,6 +2500,21 @@ BSD suite - détail des champs de la partie entreposage provisoire ou reconditio
 Résumé des valeurs clés du bordereau à l'instant T
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transportSegments</strong></td>
+<td valign="top">[<a href="#transportsegment">TransportSegment</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>currentTransporterSiret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextTransporterSiret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -2545,6 +2692,84 @@ Liste des rubriques associées
 <td>
 
 Liste des déclarations GEREP
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### MultimodalTransporter
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Établissement transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Exemption de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité du récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>numberPlate</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de plaque d'immatriculation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Information libre, destinée aux transporteurs
 
 </td>
 </tr>
@@ -3271,6 +3496,89 @@ Limite de validatié du récépissé
 <td>
 
 Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### TransportSegment
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>previousTransporterCompanySiret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Siret du transporteur précédent
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#multimodaltransporter">MultimodalTransporter</a></td>
+<td>
+
+Transporteur du segment
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a></td>
+<td>
+
+Mode de transport
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de prise en charge
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverBy</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Reponsable de la prise en charge
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>readyToTakeOver</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Prêt à être pris en charge
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>segmentNumber</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+Numéro du segment
 
 </td>
 </tr>
@@ -4192,6 +4500,170 @@ Traitement prévue (code D/R)
 </tbody>
 </table>
 
+### NextSegmentCompanyInput
+
+Payload d'un segment de transport
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+SIRET de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>contact</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom du contact dans l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mail</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Email du contact dans l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>phone</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de téléphone de contact dans l'établissement
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### NextSegmentInfoInput
+
+Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#nextsegmenttransporterinput">NextSegmentTransporterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### NextSegmentTransporterInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Exemption de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité du récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>numberPlate</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de plaque d'immatriculation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#nextsegmentcompanyinput">NextSegmentCompanyInput</a></td>
+<td>
+
+Établissement collecteur - transporteur
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### PrivateCompanyInput
 
 Payload permettant le rattachement d'un établissement à un utilisateur
@@ -4308,7 +4780,7 @@ Traitement réalisé (code D/R)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Description de l'opération de traitement (case 11)
+Description de l'opération d’élimination / valorisation (case 11)
 
 </td>
 </tr>
@@ -4658,6 +5130,32 @@ Nom de l'utilisateur
 Numéro de téléphone de l'utilisateur
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### TakeOverInput
+
+Payload de prise en charge de segment
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverBy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -5723,6 +6221,37 @@ Quntité réelle
 Quantité estimée
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### TransportMode
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>ROAD</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RAIL</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>AIR</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RIVER</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>SEA</strong></td>
+<td></td>
 </tr>
 </tbody>
 </table>

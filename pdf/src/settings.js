@@ -67,7 +67,7 @@ const mainFormFieldSettings = {
   traderValidityLimit: { x: 366, y: 408 },
   traderDepartment: { x: 468, y: 398 },
 
-  transporterCompanySiret: { x: 87, y: 474 },
+  transporterCompanySiren: { x: 87, y: 474 },
   transporterCompanyName: { x: 70, y: 484, maxLength: 50 },
   transporterCompanyAddress: { x: 78, y: 494, lineBreakAt: 55, maxLength: 110 },
   transporterCompanyPhone: { x: 64, y: 515 },
@@ -108,11 +108,12 @@ const mainFormFieldSettings = {
     x: 79,
     y: 808,
     lineBreakAt: 55,
-    maxLength: 110,
+    maxLength: 110
   },
   nextDestinationCompanyContact: { x: 380, y: 787 },
   nextDestinationCompanyPhone: { x: 318, y: 798 },
   nextDestinationCompanyMail: { x: 318, y: 808 },
+  isMultimodal: { x: 303, y: 536, fontSize: 12 }
 };
 
 // coordinates of each stamp image
@@ -127,6 +128,7 @@ const imageLocations = {
   tempStorerReceptionSignature: { x: 195, y: 310 },
   tempStorerSentSignature: { x: 420, y: 590 },
   tempStorageTransporterSignature: { x: 420, y: 480 },
+  takenOverSignature: { x: 420, y: 695 }
 };
 
 // Temporary Storage detail form field settings
@@ -156,7 +158,7 @@ const temporaryStorageDetailsFieldSettings = {
     x: 325,
     y: 161,
     lineBreakAt: 55,
-    maxLength: 110,
+    maxLength: 110
   },
   destinationCompanyPhone: { x: 313, y: 180 },
   destinationCompanyMail: { x: 313, y: 190 },
@@ -188,7 +190,7 @@ const temporaryStorageDetailsFieldSettings = {
   transporterSentAt: { x: 388, y: 455 },
 
   tempStoredFormSignedBy: { x: 75, y: 562 },
-  tempStoredFormSignedAt: { x: 215, y: 562 },
+  tempStoredFormSignedAt: { x: 215, y: 562 }
 };
 
 // appendix2 header field settings
@@ -200,7 +202,7 @@ const appendixHeaderFieldSettings = {
   emitterCompanyMailName: { x: 372, y: 186, fontSize: 10 },
   emitterCompanyPhone: { x: 306, y: 197, fontSize: 10 },
   emitterCompanyMail: { x: 305, y: 208, fontSize: 10 },
-  emitterCompanyContact: { x: 375, y: 186, fontSize: 10 },
+  emitterCompanyContact: { x: 375, y: 186, fontSize: 10 }
 };
 
 // appendix2 attached form field settings
@@ -219,11 +221,33 @@ const appendixFieldSettings = {
   wasteDetailsName: { x: 430, y: 279, fontSize: 10 },
   wasteDetailsQuantityReal: { x: 327, y: 302, fontSize: 10 },
   quantityReceived: { x: 468, y: 302, fontSize: 10, rightAlign: true },
-  receivedAt: { x: 350, y: 326, fontSize: 10 },
+  receivedAt: { x: 350, y: 326, fontSize: 10 }
 };
 
 // vertical offset to be applied to each appending sub form coordinates
 const appendixYOffsets = [0, 104, 208, 313, 418];
+
+const transportSegmentSettings = {
+  segmentNumber: { x: 162, y: 628, fontSize: 10 },
+  transporterCompanySiren: { x: 90, y: 640, fontSize: 10 },
+  transporterCompanyName: { x: 71, y: 650, fontSize: 10, maxLength: 50 },
+  transporterCompanyAddress: {
+    x: 77,
+    y: 660,
+    fontSize: 10,
+    lineBreakAt: 55,
+    maxLength: 110
+  },
+  transporterCompanyPhone: { x: 62, y: 680, fontSize: 10 },
+  transporterCompanyMail: { x: 63, y: 691, fontSize: 10 },
+  transporterCompanyContact: { x: 122, y: 702, fontSize: 10 },
+  transporterReceipt: { x: 350, y: 628, fontSize: 10 },
+  transporterDepartment: { x: 468, y: 628, fontSize: 10 },
+  transporterValidityLimit: { x: 364, y: 638, fontSize: 10 },
+  mode: { x: 368, y: 650, fontSize: 10 },
+  takenOverAt: { x: 391, y: 659, fontSize: 10 },
+  takenOverBy: { x: 332, y: 678, fontSize: 10 }
+};
 
 exports.pageHeight = pageHeight;
 exports.mainFormFieldSettings = mainFormFieldSettings;
@@ -232,3 +256,4 @@ exports.imageLocations = imageLocations;
 exports.appendixHeaderFieldSettings = appendixHeaderFieldSettings;
 exports.appendixFieldSettings = appendixFieldSettings;
 exports.appendixYOffsets = appendixYOffsets;
+exports.transportSegmentSettings = transportSegmentSettings;

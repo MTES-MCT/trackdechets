@@ -22,14 +22,20 @@ export default withRouter(function Header({
   return (
     <header className="navbar" role="navigation">
       <div className="navbar__container">
-        <Link className="navbar__home" to="/">
+        <div className="navbar__branding">
           <img
-            className="navbar__logo"
-            src="/trackdechets.png"
-            alt="trackdechets.data.gouv.fr"
+            className="navbar__marianne"
+            src="/marianne.svg"
+            alt="Ministère de la Transition écologique et solidaire"
           />
-        </Link>
-
+          <Link className="navbar__home" to="/">
+            <img
+              className="navbar__logo"
+              src="/trackdechets.png"
+              alt="trackdechets.data.gouv.fr"
+            />
+          </Link>
+        </div>
         <nav>
           <ul className="nav__links">
             <li className="nav__item">

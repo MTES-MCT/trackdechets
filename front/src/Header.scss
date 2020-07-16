@@ -40,4 +40,11 @@
       background-color: var(--white);
     }
   }
+  &__branding {
+    display: flex;
+  }
+  &__marianne {
+    width: 80px;
+    height: 80px;
+  }
 }

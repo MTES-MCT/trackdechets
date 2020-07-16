@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { CompanyRow, RoleRow } from "./types";
+import { CompanyRow } from "./types";
 import { getCompanyThrottled } from "./sirene";
 import { prisma } from "../../generated/prisma-client";
 

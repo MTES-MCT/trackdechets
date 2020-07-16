@@ -13,7 +13,7 @@ type State = { page: number; values: Object };
 // Copied from Formik Doc - multi step wizard example
 export class Wizard extends React.Component<Props, State> {
   static Page = ({ children, values }: Props & any) => children(values);
-  contentRef: React.RefObject<any>;
+  contentRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: Props) {
     super(props);
@@ -26,13 +26,13 @@ export class Wizard extends React.Component<Props, State> {
 
   private scrollTop = () => {
     this.contentRef.current &&
-      this.contentRef.current.parentNode &&
-      this.contentRef.current.parentNode.scrollTo(0, 0);
+      this.contentRef.current.parentElement &&
+      this.contentRef.current.parentElement.scrollTo(0, 0);
   };
 
   next = (values: Object) => {
     this.scrollTop();
-    this.setState((state) => ({
+    this.setState(state => ({
       page: Math.min(state.page + 1, this.props.children.length - 1),
       values,
     }));
@@ -40,7 +40,7 @@ export class Wizard extends React.Component<Props, State> {
 
   previous = () => {
     this.scrollTop();
-    this.setState((state) => ({
+    this.setState(state => ({
       page: Math.max(state.page - 1, 0),
     }));
   };

@@ -14,16 +14,12 @@ import { UserInputError } from "apollo-server-express";
 function printHelp() {
   console.log(`
   Usage npm run bulk-create-account [options]
-
   Bulk load a list of companies and users to Trackdéchets
   Two csv files are required
   * etablissements.csv
   * roles.csv
-
   See validations.ts for the format of each file
-
   Options:
-
   -- --help                       Print help
   -- --validateOnly               Only perform validation csv files
   -- --csvDir=/path/to/csv/dir    Specify custom csv directory

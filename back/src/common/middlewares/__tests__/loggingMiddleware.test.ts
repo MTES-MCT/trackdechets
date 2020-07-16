@@ -48,11 +48,11 @@ describe("loggingMiddleware", () => {
     expect(level).toEqual("info");
     expect(metadata.user).toEqual("anonyme");
     expect(metadata.response_body).toEqual("world");
-    expect(metadata.execution_time_num).toBeGreaterThan(0);
+    expect(metadata.execution_time_num).toBeGreaterThanOrEqual(0);
     expect(metadata.http_status).toEqual(200);
   });
 
-  it.only("should log requests to GraphQL endpoint", async () => {
+  it("should log requests to GraphQL endpoint", async () => {
     await request.post(graphQLPath).send({ query: "{ me { name } }" });
     expect(logMock.mock.calls).toHaveLength(1);
     const { message, level, metadata } = logMock.mock.calls[0][0];
@@ -62,7 +62,7 @@ describe("loggingMiddleware", () => {
     expect(metadata.response_body).toEqual(
       '{"data":{"me":{"name":"John Snow"}}}'
     );
-    expect(metadata.execution_time_num).toBeGreaterThan(0);
+    expect(metadata.execution_time_num).toBeGreaterThanOrEqual(0);
     expect(metadata.http_status).toEqual(200);
     expect(metadata.graphql_query).toEqual("{ me { name } }");
   });
