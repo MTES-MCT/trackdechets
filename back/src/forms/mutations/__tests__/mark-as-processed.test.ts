@@ -1,6 +1,5 @@
 import { getNewValidPrismaForm } from "../__mocks__/data";
 import { markAsProcessed } from "../mark-as";
-import { ProcessedFormInput } from "../../../generated/graphql/types";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
 const formMock = jest.fn(() => Promise.resolve({}));
