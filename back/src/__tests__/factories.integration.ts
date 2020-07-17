@@ -57,10 +57,9 @@ describe("Test Factories", () => {
   });
 
   test("should create a user with a company of a given type", async () => {
-    const { user, company } = await userWithCompanyFactory(
-      "ADMIN",
-      "TRANSPORTER"
-    );
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["TRANSPORTER"] }
+    });
 
     const usr = await prisma.user({ id: user.id }).$fragment<{
       companyAssociations: {

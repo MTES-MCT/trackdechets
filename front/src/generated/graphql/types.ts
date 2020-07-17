@@ -558,12 +558,46 @@ export type FormsLifeCycleData = {
   count: Maybe<Scalars['Int']>;
 };
 
-/** Type pour l'export du registre */
+/** Format de l'export du registre */
+export enum FormsRegisterExportFormat {
+  /** Fichier csv */
+  Csv = 'CSV',
+  /** Fichier Excel */
+  Xlsx = 'XLSX'
+}
+
+/**
+ * Modèle de registre réglementaire tels que décrits dans l'arrêté du 29 février 2012 fixant
+ * le contenu des registres mnetionnées aux articles R. 541-43 et R. 541-46 du code de l'environnement
+ * https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000025454959&categorieLien=id
+ */
 export enum FormsRegisterExportType {
-  /** Déchets entrants */
+  /** Registre exhaustif, déchets entrants et sortants */
+  All = 'ALL',
+  /**
+   * Registre producteur, déchets sortants
+   * Art 1: Les exploitants des établissements produisant ou expédiant des déchets tiennent à jour
+   * un registre chronologique où sont consignés tous les déchets sortants.
+   */
+  Outgoing = 'OUTGOING',
+  /**
+   * Registre traiteur, TTR
+   * Art 2: Les exploitants des installations de transit, de regroupement ou de traitement de déchets,
+   * notamment de tri, établissent et tiennent à jour un registre chronologique où sont consignés
+   * tous les déchets entrants.
+   */
   Incoming = 'INCOMING',
-  /** Déchets sortants */
-  Outgoing = 'OUTGOING'
+  /**
+   * Registre transporteur
+   * Art 3: Les transporteurs et les collecteurs de déchets tiennent à jour un registre chronologique
+   * des déchets transportés ou collectés.
+   */
+  Transported = 'TRANSPORTED',
+  /**
+   * Registre négociants
+   * Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
+   */
+  Traded = 'TRADED'
 }
 
 /** Différents statuts d'un BSD au cours de son cycle de vie */
@@ -1297,8 +1331,12 @@ export type QueryFormsLifeCycleArgs = {
 
 
 export type QueryFormsRegisterArgs = {
-  sirets: Maybe<Array<Maybe<Scalars['String']>>>;
+  sirets: Array<Scalars['String']>;
   exportType: Maybe<FormsRegisterExportType>;
+  startDate: Maybe<Scalars['DateTime']>;
+  endDate: Maybe<Scalars['DateTime']>;
+  wasteCode: Maybe<Scalars['String']>;
+  exportFormat: Maybe<FormsRegisterExportFormat>;
 };
 
 

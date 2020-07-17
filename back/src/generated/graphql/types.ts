@@ -556,12 +556,45 @@ export type FormsLifeCycleData = {
   count?: Maybe<Scalars['Int']>;
 };
 
-/** Type pour l'export du registre */
+/** Format de l'export du registre */
+export type FormsRegisterExportFormat = 
+  /** Fichier csv */
+  'CSV' |
+  /** Fichier Excel */
+  'XLSX';
+
+/**
+ * Modèle de registre réglementaire tels que décrits dans l'arrêté du 29 février 2012 fixant
+ * le contenu des registres mnetionnées aux articles R. 541-43 et R. 541-46 du code de l'environnement
+ * https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000025454959&categorieLien=id
+ */
 export type FormsRegisterExportType = 
-  /** Déchets entrants */
+  /** Registre exhaustif, déchets entrants et sortants */
+  'ALL' |
+  /**
+   * Registre producteur, déchets sortants
+   * Art 1: Les exploitants des établissements produisant ou expédiant des déchets tiennent à jour
+   * un registre chronologique où sont consignés tous les déchets sortants.
+   */
+  'OUTGOING' |
+  /**
+   * Registre traiteur, TTR
+   * Art 2: Les exploitants des installations de transit, de regroupement ou de traitement de déchets,
+   * notamment de tri, établissent et tiennent à jour un registre chronologique où sont consignés
+   * tous les déchets entrants.
+   */
   'INCOMING' |
-  /** Déchets sortants */
-  'OUTGOING';
+  /**
+   * Registre transporteur
+   * Art 3: Les transporteurs et les collecteurs de déchets tiennent à jour un registre chronologique
+   * des déchets transportés ou collectés.
+   */
+  'TRANSPORTED' |
+  /**
+   * Registre négociants
+   * Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
+   */
+  'TRADED';
 
 /** Différents statuts d'un BSD au cours de son cycle de vie */
 export type FormStatus = 
@@ -1289,8 +1322,12 @@ export type QueryFormsLifeCycleArgs = {
 
 
 export type QueryFormsRegisterArgs = {
-  sirets?: Maybe<Array<Maybe<Scalars['String']>>>;
+  sirets: Array<Scalars['String']>;
   exportType?: Maybe<FormsRegisterExportType>;
+  startDate?: Maybe<Scalars['DateTime']>;
+  endDate?: Maybe<Scalars['DateTime']>;
+  wasteCode?: Maybe<Scalars['String']>;
+  exportFormat?: Maybe<FormsRegisterExportFormat>;
 };
 
 
@@ -1969,6 +2006,7 @@ export type ResolversTypes = {
   StatusLogForm: ResolverTypeWrapper<StatusLogForm>;
   StatusLogUser: ResolverTypeWrapper<StatusLogUser>;
   FormsRegisterExportType: FormsRegisterExportType;
+  FormsRegisterExportFormat: FormsRegisterExportFormat;
   User: ResolverTypeWrapper<User>;
   CompanyPrivate: ResolverTypeWrapper<CompanyPrivate>;
   CompanyType: CompanyType;
@@ -2067,6 +2105,7 @@ export type ResolversParentTypes = {
   StatusLogForm: StatusLogForm;
   StatusLogUser: StatusLogUser;
   FormsRegisterExportType: FormsRegisterExportType;
+  FormsRegisterExportFormat: FormsRegisterExportFormat;
   User: User;
   CompanyPrivate: CompanyPrivate;
   CompanyType: CompanyType;
@@ -2394,7 +2433,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   formPdf?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>;
   forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, 'type'>>;
   formsLifeCycle?: Resolver<ResolversTypes['formsLifeCycleData'], ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>;
-  formsRegister?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, never>>;
+  formsRegister?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, 'sirets'>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   searchCompanies?: Resolver<Array<ResolversTypes['CompanySearchResult']>, ParentType, ContextType, RequireFields<QuerySearchCompaniesArgs, 'clue'>>;
   stats?: Resolver<Array<ResolversTypes['CompanyStat']>, ParentType, ContextType>;

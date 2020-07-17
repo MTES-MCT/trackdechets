@@ -405,7 +405,7 @@ describe("Integration / Forms query for transporters", () => {
 
     const { user: transporter, company } = await userWithCompanyFactory(
       "ADMIN",
-      "TRANSPORTER"
+      { companyTypes: { set: ["TRANSPORTER"] } }
     );
 
     const transporterSiret = company.siret;
@@ -439,7 +439,7 @@ describe("Integration / Forms query for transporters", () => {
     const owner = await userFactory();
     const { user: transporter, company } = await userWithCompanyFactory(
       "ADMIN",
-      "TRANSPORTER"
+      { companyTypes: { set: ["TRANSPORTER"] } }
     );
 
     const transporterSiret = company.siret;

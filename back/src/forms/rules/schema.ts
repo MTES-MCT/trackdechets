@@ -380,3 +380,25 @@ export const takeOverInfoSchema = Yup.object<any>().shape({
   ),
   takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
 });
+
+export const formsRegisterSchema = inputRule()(yup =>
+  yup.object().shape({
+    sirets: yup.array(yup.string()).required(),
+    exportType: yup.string(),
+    startDate: validDatetime(
+      {
+        verboseFieldName: "Date de début",
+        required: false
+      },
+      yup
+    ),
+    endDate: validDatetime(
+      {
+        verboseFieldName: "Date de début",
+        required: false
+      },
+      yup
+    ),
+    exportFormat: yup.string()
+  })
+);
