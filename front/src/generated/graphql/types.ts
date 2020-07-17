@@ -340,7 +340,7 @@ export type EcoOrganisme = {
 
 /** Payload de liason d'un BSD à un eco-organisme */
 export type EcoOrganismeInput = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 /** Émetteur du BSD (case 1) */

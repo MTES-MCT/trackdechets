@@ -1,18 +1,22 @@
 import { interpret, State } from "xstate";
-import { flattenObjectForDb } from "../form-converter";
+import {
+  flattenProcessedFormInput,
+  flattenResealedFormInput,
+  flattenResentFormInput
+} from "../form-converter";
 import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
-import { ForbiddenError, ValidationError } from "apollo-server-express";
-import { capitalize } from "../../common/strings";
+import { ValidationError } from "apollo-server-express";
+import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../../generated/prisma-client";
 import {
-  MutationMarkAsSealedArgs,
   MutationMarkAsSentArgs,
   MutationMarkAsReceivedArgs,
   MutationMarkAsProcessedArgs,
   MutationSignedByTransporterArgs,
   MutationMarkAsTempStoredArgs,
+  MutationMarkAsSealedArgs,
   MutationMarkAsResealedArgs,
   MutationMarkAsResentArgs,
   Form,
@@ -83,8 +87,9 @@ export function markAsProcessed(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
+
     infos =>
-      flattenObjectForDb({
+      flattenProcessedFormInput({
         ...infos,
         processingOperationDescription:
           infos.processingOperationDescription ?? operation.description
@@ -159,23 +164,23 @@ export function markAsTempStored(
   { id, tempStoredInfos }: MutationMarkAsTempStoredArgs,
   context: GraphQLContext
 ): Promise<Form> {
-  const transformEventToFormParams = infos => ({
-    temporaryStorageDetail: {
-      update: {
-        tempStorerSignedAt: new Date(), // Default value to now
-        ...Object.keys(infos).reduce((prev, cur) => {
-          prev[`tempStorer${capitalize(cur)}`] = infos[cur];
-          return prev;
-        }, {})
-      }
-    }
-  });
-
   return transitionForm(
     id,
     { eventType: "MARK_TEMP_STORED", eventParams: tempStoredInfos },
     context,
-    transformEventToFormParams
+    infos => ({
+      temporaryStorageDetail: {
+        update: {
+          tempStorerQuantityType: infos.quantityType,
+          tempStorerQuantityReceived: infos.quantityReceived,
+          tempStorerWasteAcceptationStatus: infos.wasteAcceptationStatus,
+          tempStorerWasteRefusalReason: infos.wasteRefusalReason,
+          tempStorerReceivedAt: infos.receivedAt,
+          tempStorerReceivedBy: infos.receivedBy,
+          tempStorerSignedAt: infos.signedAt ?? new Date()
+        }
+      }
+    })
   );
 }
 
@@ -185,7 +190,7 @@ export function markAsResealed(
 ): Promise<Form> {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
-      update: flattenObjectForDb(infos)
+      update: flattenResealedFormInput(infos)
     }
   });
 
@@ -204,7 +209,7 @@ export function markAsResent(
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
       update: {
-        ...flattenObjectForDb(infos)
+        ...flattenResentFormInput(infos)
       }
     }
   });
@@ -306,6 +311,7 @@ async function transitionForm(
     formService.send({ type: eventType, ...eventParams });
   });
 }
+
 const fieldsToLog = {
   MARK_SEALED: [],
   MARK_SENT: ["sentBy", "sentAt"],

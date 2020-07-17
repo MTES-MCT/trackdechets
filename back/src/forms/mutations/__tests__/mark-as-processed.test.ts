@@ -1,6 +1,5 @@
-import { getNewValidForm } from "../__mocks__/data";
+import { getNewValidPrismaForm } from "../__mocks__/data";
 import { markAsProcessed } from "../mark-as";
-import { flattenObjectForDb } from "../../form-converter";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
 const formMock = jest.fn(() => Promise.resolve({}));
@@ -45,12 +44,12 @@ describe("Forms -> markAsProcessed mutation", () => {
   });
 
   it("set status to NoTraceability if actor is exempt of traceability", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipient.company.siret }
+      { siret: form.recipientCompanySiret }
     ]);
 
     await markAsProcessed(
@@ -77,12 +76,12 @@ describe("Forms -> markAsProcessed mutation", () => {
   });
 
   it("set status to AwaitsGroup if processing operation says so", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipient.company.siret }
+      { siret: form.recipientCompanySiret }
     ]);
 
     await markAsProcessed(
@@ -108,12 +107,12 @@ describe("Forms -> markAsProcessed mutation", () => {
   });
 
   it("set status to Processed", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipient.company.siret }
+      { siret: form.recipientCompanySiret }
     ]);
 
     await markAsProcessed(

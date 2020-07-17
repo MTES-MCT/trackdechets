@@ -1,6 +1,6 @@
 import { getUserCompanies } from "../../companies/queries";
-import { unflattenObjectFromDb } from "../form-converter";
-import { FormRole, QueryFormsArgs } from "../../generated/graphql/types";
+import { expandFormFromDb } from "../form-converter";
+import { FormRole, QueryFormsArgs, Form } from "../../generated/graphql/types";
 import { prisma } from "../../generated/prisma-client";
 
 const DEFAULT_FIRST = 50;
@@ -20,7 +20,7 @@ const DEFAULT_FIRST = 50;
 export default async function forms(
   userId: string,
   { siret, type, status, hasNextStep, ...rest }: QueryFormsArgs
-) {
+): Promise<Form[]> {
   const first = rest.first ?? DEFAULT_FIRST;
   const skip = rest.skip ?? 0;
   const roles: FormRole[] =
@@ -56,7 +56,7 @@ export default async function forms(
     }
   });
 
-  return queriedForms.map(f => unflattenObjectFromDb(f));
+  return queriedForms.map(f => expandFormFromDb(f));
 }
 
 function getRolesFilter(siret: string, roles: FormRole[]) {
