@@ -48,7 +48,7 @@ services:
     volumes:
       - ./back/src:/usr/src/app/src
       - ./doc/docs:/usr/src/app/documentation
-      - ./front/src/generated/graphql:/usr/src/app/front/generated/graphql
+      - ./front/src/generated:/usr/src/app/front/generated
     env_file:
       - .env
     environment:

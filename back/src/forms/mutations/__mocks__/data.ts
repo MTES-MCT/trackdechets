@@ -157,6 +157,7 @@ const EMPTY_FORM = {
 export function getEmptyForm(): typeof EMPTY_FORM & { id?: string } {
   return JSON.parse(JSON.stringify(EMPTY_FORM));
 }
+
 /**
  * return default context object
  */
@@ -170,7 +171,7 @@ export function getContext(): GraphQLContext {
       createdAt: "",
       updatedAt: ""
     },
-    req: null,
-    res: null
+    req: null as any,
+    res: null as any
   };
 }

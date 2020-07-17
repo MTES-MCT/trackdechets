@@ -1,29 +1,23 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
+import { WASTES } from "../../generated/constants";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import WasteTreeModal from "../../search/WasteTreeModal";
 import formatWasteCodeEffect from "./format-waste-code.effect";
-import WasteCodeLookup from "./nomenclature-dechets.json";
 import "./WasteCode.scss";
-
-type Bookmark = {
-  code: string;
-  description: string;
-};
 
 export default function WasteCode(props) {
   const [field, meta] = useField(props);
   const { setFieldValue } = useFormikContext();
 
   const [wasteCode, setWasteCode] = useState(field.value);
-  const [bookmarks] = useState<Bookmark[]>([]); // TODO
 
   useEffect(() => {
     setFieldValue(field.name, wasteCode);
     formatWasteCodeEffect(wasteCode, setWasteCode);
   }, [wasteCode, field.name, setFieldValue]);
 
-  const wasteCodeDetail = WasteCodeLookup.find(l => l.code === wasteCode);
+  const wasteCodeDetail = WASTES.find(waste => waste.code === wasteCode);
   const isDangerous = wasteCode.indexOf("*") > -1;
 
   const [openModal, setOpenModal] = useState(false);
@@ -65,24 +59,7 @@ export default function WasteCode(props) {
 
       <RedErrorMessage name={field.name} />
 
-      {bookmarks.length > 0 && (
-        <React.Fragment>
-          <span>Codes récents:</span>
-          <ul className="label-list list-inline">
-            {bookmarks.map(bookmark => (
-              <li
-                className="label"
-                key={bookmark.code}
-                onClick={() => setWasteCode(bookmark.code)}
-              >
-                <span>{bookmark.code}</span>
-              </li>
-            ))}
-          </ul>
-        </React.Fragment>
-      )}
-
-      {wasteCodeDetail != null && (
+      {wasteCodeDetail && (
         <div className="notification success">
           Vous avez sélectionné le code déchet{" "}
           <strong>{isDangerous ? "dangereux" : "non dangereux"}</strong>{" "}

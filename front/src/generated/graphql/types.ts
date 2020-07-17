@@ -1163,7 +1163,10 @@ export type PrivateCompanyInput = {
 export type ProcessedFormInput = {
   /** Traitement réalisé (code D/R) */
   processingOperationDone: Scalars['String'];
-  /** Description de l'opération d’élimination / valorisation (case 11) */
+  /**
+   * Description de l'opération d’élimination / valorisation (case 11)
+   * Elle se complète automatiquement lorsque non fournie
+   */
   processingOperationDescription: Maybe<Scalars['String']>;
   /** Personne en charge du traitement */
   processedBy: Scalars['String'];
