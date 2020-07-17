@@ -229,6 +229,7 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 * Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev`
 * Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
 * Si possible faire tourner les migrations sur une copie de la base de prod en local.
+* S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur sandbox et prod
 * Merger la PR et suivre l'avancement du déploiement sur le CI
 * Se connecter à l'instance de prod et faire tourner le script `npm run update` dans le container `td-api`. Faire de même sur l'instance sandbox.
 
