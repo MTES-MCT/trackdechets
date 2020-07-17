@@ -4822,6 +4822,7 @@ Traitement réalisé (code D/R)
 <td>
 
 Description de l'opération d’élimination / valorisation (case 11)
+Elle se complète automatiquement lorsque non fournie
 
 </td>
 </tr>

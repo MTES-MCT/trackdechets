@@ -1,4 +1,8 @@
-const { processMainFormParams, dateFmt } = require("../helpers");
+const {
+  processMainFormParams,
+  processSegment,
+  dateFmt
+} = require("../helpers");
 
 describe("processMainFormParams", () => {
   it("should format the fields", () => {
@@ -39,6 +43,20 @@ describe("processMainFormParams", () => {
       processedAt: dateFmt(params.processedAt),
       signedAt: dateFmt(params.signedAt),
       tempStoredFormSignedAt: dateFmt(params.signedAt)
+    });
+  });
+});
+
+describe("processSegment", () => {
+  it("should format the fields", () => {
+    const params = {
+      transporterCompanySiret: "0".repeat(14),
+      transporterValidityLimit: new Date("01/01/2020").toISOString()
+    };
+
+    expect(processSegment(params)).toMatchObject({
+      transporterCompanySiren: params.transporterCompanySiret.slice(0, 9),
+      transporterValidityLimit: dateFmt(params.transporterValidityLimit)
     });
   });
 });

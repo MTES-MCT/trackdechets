@@ -1,5 +1,5 @@
 import { assign, Machine } from "xstate";
-import { GROUP_CODES } from "../../common/constants";
+import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { WorkflowError } from "./errors";
 import {
   markFormAppendixAwaitingFormsAsGrouped,
@@ -255,7 +255,9 @@ export const formWorkflowMachine = Machine(
         !event.signedByTransporter || !event.signedByProducer,
       isExemptOfTraceability: ctx => ctx.form.noTraceability,
       awaitsGroup: ctx =>
-        GROUP_CODES.includes(ctx.form.processingOperationDone),
+        PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+          ctx.form.processingOperationDone
+        ),
       isFormAccepted: ctx => {
         return ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
           ctx.form.wasteAcceptationStatus
