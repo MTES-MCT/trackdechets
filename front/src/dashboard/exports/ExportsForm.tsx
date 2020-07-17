@@ -10,7 +10,7 @@ import {
 } from "../../generated/graphql/types";
 import WasteTreeModal from "../../search/WasteTreeModal";
 import { wasteCodeValidator } from "../../form/waste-code/waste-code.validator";
-import WasteCodeLookup from "../../form/waste-code/nomenclature-dechets.json";
+import { WASTES } from "../../generated/constants";
 import { useLazyQuery } from "@apollo/react-hooks";
 import { NotificationError } from "../../common/Error";
 import RedErrorMessage from "../../common/RedErrorMessage";
@@ -191,8 +191,8 @@ export default function ExportsForm({ companies }: IProps) {
       validate={validate}
     >
       {({ values, setFieldValue }) => {
-        const wasteCodeDetail = WasteCodeLookup.find(
-          l => l.code === values.wasteCode
+        const wasteCodeDetail = WASTES.find(
+          waste => waste.code === values.wasteCode
         );
 
         const exportTypes = getPossibleExportTypes(values.companies);
