@@ -8,7 +8,6 @@ import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
 import { ValidationError } from "apollo-server-express";
-import { prisma } from "../../generated/prisma-client";
 import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../../generated/prisma-client";
 import {
