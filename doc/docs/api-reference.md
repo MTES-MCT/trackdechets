@@ -78,7 +78,6 @@ SIRET de l'établissement
 <td valign="top">[<a href="#ecoorganisme">EcoOrganisme</a>!]!</td>
 <td>
 
-USAGE INTERNE
 Renvoie la liste des éco-organismes
 
 </td>
