@@ -23,8 +23,3 @@ $sides: (top, bottom, left, right);
 
 $breakpoint-mobile: 480px;
 $breakpoint-tablet: 769px;
-
-.button.button--disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}

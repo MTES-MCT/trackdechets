@@ -136,9 +136,11 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Suivant"));
+        fireEvent.click(screen.getByText("Signer par le transporteur"));
 
-        await waitForElement(() => screen.getByText("Valider"));
+        await waitForElement(() =>
+          screen.getByText("Signer par le transporteur")
+        );
       });
 
       it("should display the producer as the collect address", () => {
@@ -215,15 +217,16 @@ describe("<Transport />", () => {
     describe("when the producer signs", () => {
       beforeEach(async () => {
         fireEvent.click(screen.getByTitle("Signer ce bordereau"));
-
         fireEvent.click(
           screen.getByLabelText(
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Suivant"));
+        fireEvent.click(screen.getByText("Signer par le transporteur"));
 
-        await waitForElement(() => screen.getByText("Valider"));
+        await waitForElement(() =>
+          screen.getByText("Signer par le producteur")
+        );
       });
 
       it("should display the producer as the collect address", () => {
@@ -308,9 +311,9 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Suivant"));
+        fireEvent.click(screen.getByText("Signer par le transporteur"));
 
-        await waitForElement(() => screen.getByText("Valider"));
+        await waitForElement(() => screen.getByText("Signer par le détenteur"));
       });
 
       it("should display the temporary storage as the collect address", () => {

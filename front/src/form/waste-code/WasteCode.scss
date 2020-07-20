@@ -1,14 +1,4 @@
-.WasteCode {
-  .WasteCode-item {
-    width: 80px;
-    display: inline-block;
-    margin-right: 10px;
-  }
-
-  .WasteCode-item--star {
-    width: 40px;
-  }
-
+.waste-code {
   .list-inline {
     display: inline-block;
   }
@@ -29,5 +19,12 @@
     background-color: #fff;
     border: 1px solid #adb9c9;
     padding: 1em;
+  }
+  &__widgets {
+    display: flex;
+  }
+  &__input {
+    width: 150px;
+    margin-right: 0.5rem;
   }
 }

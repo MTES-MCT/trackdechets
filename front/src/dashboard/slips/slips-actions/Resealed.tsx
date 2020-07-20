@@ -123,6 +123,7 @@ export default function Resealed({
                     component={NumberInput}
                     name="wasteDetails.numberOfPackages"
                     label="Nombre de colis"
+                    min="1"
                   />
                   <RedErrorMessage name="wasteDetails.numberOfPackages" />
                 </div>
