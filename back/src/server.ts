@@ -43,6 +43,7 @@ const {
 const UI_BASE_URL = getUIBaseURL();
 
 const shieldMiddleware = shield(shieldRulesTree, {
+  debug: NODE_ENV === "dev",
   allowExternalErrors: true,
   fallbackError: (error: any) => {
     if (NODE_ENV === "dev") {
