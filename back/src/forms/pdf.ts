@@ -1,5 +1,6 @@
 import axios from "axios";
 import { prisma } from "../generated/prisma-client";
+import { byId } from "./queries/form";
 
 type ResponseType = "arraybuffer" | "stream";
 
@@ -55,7 +56,7 @@ export async function downloadPdf(res, { id }) {
     return res.status(500).send("Identifiant du bordereau manquant.");
   }
 
-  const form = await prisma.form({ id });
+  const form = await prisma.form(byId(id));
 
   return buildPdf(form, "stream")
     .then(response => {
@@ -78,7 +79,7 @@ export async function downloadPdf(res, { id }) {
  */
 export const pdfEmailAttachment = async id => {
   // retrieve form
-  const form = await prisma.form({ id });
+  const form = await prisma.form(byId(id));
 
   return buildPdf(form, "arraybuffer")
     .then(response => {
