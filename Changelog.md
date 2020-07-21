@@ -7,7 +7,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # Unreleased
 
-- Ajout du support du `readableId` comme alternative à l'`id`.
+- Les champs `readableId` et `id` peuvent être utilisés comme paramètre `id` dans la query `form` et les mutations `duplicateForm`, `deleteForm`, et `formPdf`.
 
   **BREAKING :** La query `form` a changée de signature, le paramètre `id` est maintenant requis :
 
