@@ -23,7 +23,7 @@ export async function getReadableId() {
 }
 
 export function isReadableId(readableId: string): boolean {
-  return /TD-[0-9]{2}-[A-Z0-9]{8}/.test(readableId);
+  return /^TD-[0-9]{2}-[A-Z0-9]{8}$/.test(readableId);
 }
 
 // AAA12345
