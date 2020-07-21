@@ -1293,7 +1293,7 @@ export type Query = {
    */
   favorites: Array<CompanyFavorite>;
   /** Renvoie un BSD, sélectionné par ID */
-  form: Form;
+  form: Maybe<Form>;
   /**
    * Renvoie un token pour télécharger un pdf de BSD
    * Ce token doit être transmis à la route /download pour obtenir le fichier.
@@ -1347,7 +1347,7 @@ export type QueryFavoritesArgs = {
 
 
 export type QueryFormArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 

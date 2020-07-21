@@ -22,6 +22,10 @@ export async function getReadableId() {
   return `TD-${shortYear}-AAA00001`;
 }
 
+export function isReadableId(readableId: string): boolean {
+  return /TD-[0-9]{2}-[A-Z0-9]{8}/.test(readableId);
+}
+
 // AAA12345
 function encodeNumber(n): string {
   if (n <= 99999) {

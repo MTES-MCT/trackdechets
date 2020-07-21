@@ -12,7 +12,7 @@ scalar JSON
 
 type Query {
   "Renvoie un BSD, sélectionné par ID"
-  form("Identifiant opaque du BSD" id: ID): Form!
+  form("Identifiant du BSD" id: ID!): Form
 
   """
   Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)

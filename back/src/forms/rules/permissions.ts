@@ -1,4 +1,8 @@
-import { ForbiddenError, UserInputError } from "apollo-server-express";
+import {
+  ForbiddenError,
+  UserInputError,
+  ValidationError
+} from "apollo-server-express";
 import { rule, and } from "graphql-shield";
 import { Prisma, prisma } from "../../generated/prisma-client";
 import {
@@ -18,6 +22,7 @@ import {
   NotFormContributor,
   FormNotFound
 } from "../errors";
+import { getForm } from "../queries/form";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -48,17 +53,28 @@ export const canAccessForm = and(
       ctx.user.id,
       ctx.prisma
     );
-    return (
-      formInfos.owner.id === ctx.user.id ||
+
+    if (formInfos == null) {
+      return new ValidationError("Ce bordereau n'existe pas.");
+    }
+
+    if (formInfos.owner.id === ctx.user.id) {
+      return true;
+    }
+
+    if (
       [
         formInfos.emitterCompanySiret,
         formInfos.recipientCompanySiret,
         formInfos.ecoOrganisme?.siret,
         formInfos.temporaryStorageDetail?.destinationCompanySiret,
         formInfos.temporaryStorageDetail?.transporterCompanySiret
-      ].some(siret => currentUserSirets.includes(siret)) ||
-      new NotFormContributor()
-    );
+      ].some(siret => currentUserSirets.includes(siret))
+    ) {
+      return true;
+    }
+
+    return new NotFormContributor();
   })
 );
 
@@ -197,10 +213,15 @@ export const isFormEcoOrganisme = and(
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.includes(formInfos.ecoOrganisme?.siret) ||
-      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
-    );
+    if (formInfos == null) {
+      return new ValidationError("Ce bordereau n'existe pas.");
+    }
+
+    if (currentUserSirets.includes(formInfos.ecoOrganisme?.siret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`);
   })
 );
 
@@ -215,18 +236,29 @@ export const isFormRecipient = and(
       ctx.prisma
     );
 
+    if (formInfos == null) {
+      return new ValidationError("Ce bordereau n'existe pas.");
+    }
+
     if (formInfos.recipientIsTempStorage) {
-      return (
+      if (
         currentUserSirets.includes(
           formInfos.temporaryStorageDetail.destinationCompanySiret
-        ) || new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
-      );
-    } else {
-      return (
-        currentUserSirets.includes(formInfos.recipientCompanySiret) ||
-        new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+        )
+      ) {
+        return true;
+      }
+
+      return new ForbiddenError(
+        `Vous n'êtes pas destinataire de ce bordereau.`
       );
     }
+
+    if (currentUserSirets.includes(formInfos.recipientCompanySiret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`);
   })
 );
 
@@ -241,10 +273,15 @@ export const isFormEmitter = and(
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.includes(formInfos.emitterCompanySiret) ||
-      new ForbiddenError(`Vous n'êtes pas émetteur de ce bordereau.`)
-    );
+    if (formInfos == null) {
+      return new ValidationError("Ce bordereau n'existe pas.");
+    }
+
+    if (currentUserSirets.includes(formInfos.emitterCompanySiret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas émetteur de ce bordereau.`);
   })
 );
 
@@ -259,19 +296,32 @@ export const isFormTransporter = and(
       ctx.prisma
     );
 
+    if (formInfos == null) {
+      return new ValidationError("Ce bordereau n'existe pas.");
+    }
+
     const segmentSirets = formInfos.transportSegments.map(
       segment => segment.transporterCompanySiret
     );
 
-    return (
-      currentUserSirets.includes(formInfos.transporterCompanySiret) ||
-      (formInfos.temporaryStorageDetail?.transporterCompanySiret &&
-        currentUserSirets.includes(
-          formInfos.temporaryStorageDetail.transporterCompanySiret
-        )) ||
-      !!segmentSirets.filter(el => currentUserSirets.includes(el)).length ||
-      new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`)
-    );
+    if (currentUserSirets.includes(formInfos.transporterCompanySiret)) {
+      return true;
+    }
+
+    if (
+      formInfos.temporaryStorageDetail?.transporterCompanySiret &&
+      currentUserSirets.includes(
+        formInfos.temporaryStorageDetail.transporterCompanySiret
+      )
+    ) {
+      return true;
+    }
+
+    if (!!segmentSirets.filter(el => currentUserSirets.includes(el)).length) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`);
   })
 );
 
@@ -286,10 +336,15 @@ export const isFormTrader = and(
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.includes(formInfos.traderCompanySiret) ||
-      new ForbiddenError(`Vous n'êtes pas négociant de ce bordereau.`)
-    );
+    if (formInfos == null) {
+      return new ValidationError("Ce bordereau n'existe pas.");
+    }
+
+    if (currentUserSirets.includes(formInfos.traderCompanySiret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas négociant de ce bordereau.`);
   })
 );
 
@@ -302,12 +357,19 @@ export const isFormTempStorer = and(
       ctx.prisma
     );
 
-    return (
-      (formInfos.recipientIsTempStorage &&
-        currentUserSirets.includes(formInfos.recipientCompanySiret)) ||
-      new ForbiddenError(
-        `Vous n'êtes pas l'installation d'entreposage ou de reconditionnement de ce bordereau.`
-      )
+    if (formInfos == null) {
+      return new ValidationError("Ce bordereau n'existe pas.");
+    }
+
+    if (
+      formInfos.recipientIsTempStorage &&
+      currentUserSirets.includes(formInfos.recipientCompanySiret)
+    ) {
+      return true;
+    }
+
+    return new ForbiddenError(
+      `Vous n'êtes pas l'installation d'entreposage ou de reconditionnement de ce bordereau.`
     );
   })
 );
@@ -358,9 +420,7 @@ async function getFormAccessInfos(
   userId: string,
   prisma: Prisma
 ) {
-  const formInfos = await prisma.form({ id: formId }).$fragment<
-    FormSiretsAndOwner
-  >(`
+  const formInfos = await getForm(formId).$fragment<FormSiretsAndOwner | null>(`
   fragment FormWithOwner on Form {
     recipientCompanySiret
     recipientIsTempStorage

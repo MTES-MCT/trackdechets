@@ -1284,7 +1284,7 @@ export type Query = {
    */
   favorites: Array<CompanyFavorite>;
   /** Renvoie un BSD, sélectionné par ID */
-  form: Form;
+  form?: Maybe<Form>;
   /**
    * Renvoie un token pour télécharger un pdf de BSD
    * Ce token doit être transmis à la route /download pour obtenir le fichier.
@@ -1338,7 +1338,7 @@ export type QueryFavoritesArgs = {
 
 
 export type QueryFormArgs = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 
@@ -2520,7 +2520,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   companyInfos?: Resolver<ResolversTypes['CompanyPublic'], ParentType, ContextType, RequireFields<QueryCompanyInfosArgs, 'siret'>>;
   ecoOrganismes?: Resolver<Array<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>;
   favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'type'>>;
-  form?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<QueryFormArgs, never>>;
+  form?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormArgs, 'id'>>;
   formPdf?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>;
   forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, 'type'>>;
   formsLifeCycle?: Resolver<ResolversTypes['formsLifeCycleData'], ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>;

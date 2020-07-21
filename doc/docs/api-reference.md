@@ -74,7 +74,7 @@ Renvoie la liste des éco-organismes
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>form</strong></td>
-<td valign="top"><a href="#form">Form</a>!</td>
+<td valign="top"><a href="#form">Form</a></td>
 <td>
 
 Renvoie un BSD, sélectionné par ID
@@ -83,10 +83,10 @@ Renvoie un BSD, sélectionné par ID
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
-Identifiant opaque du BSD
+Identifiant du BSD
 
 </td>
 </tr>

@@ -12,7 +12,7 @@ import {
 } from "../../../generated/prisma-client";
 
 const GET_FORM_QUERY = `
-  query GetForm($id: ID) {
+  query GetForm($id: ID!) {
     form(id: $id) {
       id
     }
@@ -113,5 +113,21 @@ describe("Query.form", () => {
     expect(errors[0].message).toBe(
       "Vous n'êtes pas autorisé à accéder à ce bordereau."
     );
+  });
+
+  it("should return a form based on its readableId", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await createForm({
+      emitterCompanySiret: company.siret
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query(GET_FORM_QUERY, {
+      variables: {
+        id: form.readableId
+      }
+    });
+
+    expect(data.form.id).toBe(form.id);
   });
 });

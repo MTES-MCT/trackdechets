@@ -23,6 +23,7 @@ import {
 import { duplicateForm, createForm, updateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
 import { updateTransporterFields } from "./mutations/updateTransporterFields";
+import { form } from "./queries/form";
 import { formPdf } from "./queries/form-pdf";
 import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
@@ -41,15 +42,7 @@ import { transportSegments } from "./queries/segments";
 import { formsLifecycle } from "./queries/formsLifecycle";
 
 const queryResolvers: QueryResolvers = {
-  form: async (_, { id }) => {
-    if (!id) {
-      // On form creation, there is no id
-      return null;
-    }
-
-    const dbForm = await prisma.form({ id });
-    return expandFormFromDb(dbForm);
-  },
+  form,
   forms: (_parent, args, context) => forms(context.user.id, args),
 
   formsLifeCycle: formsLifecycle,
