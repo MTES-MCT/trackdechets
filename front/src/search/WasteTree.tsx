@@ -1,19 +1,18 @@
 import React from "react";
 import Tree, { TreeNode } from "rc-tree";
-import Wastes from "../login/nomenclature.json";
+import { WASTES_TREE, WasteNode } from "../generated/constants/WASTES";
 import "rc-tree/assets/index.css";
 
-type Node = { fullKey: string; title: string; children: Node[] };
-const loop = (data: Node[]) => {
+const loop = (data: WasteNode[]) => {
   return data.map(item => {
     if (item.children) {
       return (
-        <TreeNode key={item.fullKey} title={`${item.fullKey} - ${item.title}`}>
+        <TreeNode key={item.code} title={`${item.code} - ${item.description}`}>
           {loop(item.children)}
         </TreeNode>
       );
     }
-    return <TreeNode key={item.fullKey} title={item.title} />;
+    return <TreeNode key={item.code} title={item.description} />;
   });
 };
 
@@ -21,7 +20,7 @@ type Props = { checkable?: boolean; onSelect?: (selectedKeys: any) => void };
 export default function WasteTree(props: Props) {
   return (
     <Tree className="myCls" showLine {...props}>
-      {loop(Wastes)}
+      {loop(WASTES_TREE)}
     </Tree>
   );
 }

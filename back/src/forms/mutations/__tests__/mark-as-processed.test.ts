@@ -1,7 +1,5 @@
-import { getNewValidForm } from "../__mocks__/data";
+import { getNewValidPrismaForm } from "../__mocks__/data";
 import { markAsProcessed } from "../mark-as";
-import { flattenObjectForDb } from "../../form-converter";
-import { ProcessedFormInput } from "../../../generated/graphql/types";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
 const formMock = jest.fn(() => Promise.resolve({}));
@@ -46,70 +44,92 @@ describe("Forms -> markAsProcessed mutation", () => {
   });
 
   it("set status to NoTraceability if actor is exempt of traceability", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipient.company.siret }
+      { siret: form.recipientCompanySiret }
     ]);
 
     await markAsProcessed(
       {
         id: "1",
-        processedInfo: { noTraceability: true } as ProcessedFormInput
+        processedInfo: {
+          noTraceability: true,
+          processingOperationDone: "R 1",
+          processedBy: "",
+          processedAt: new Date().toString()
+        }
       },
       defaultContext
     );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateForm).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        data: { noTraceability: true, status: "NO_TRACEABILITY" }
+      expect.objectContaining({
+        data: expect.objectContaining({
+          noTraceability: true,
+          status: "NO_TRACEABILITY"
+        })
       })
     );
   });
 
   it("set status to AwaitsGroup if processing operation says so", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipient.company.siret }
+      { siret: form.recipientCompanySiret }
     ]);
 
     await markAsProcessed(
       {
         id: "1",
-        processedInfo: { processingOperationDone: "D 14" } as ProcessedFormInput
+        processedInfo: {
+          processingOperationDone: "D 14",
+          processedBy: "",
+          processedAt: new Date().toString()
+        }
       },
       defaultContext
     );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateForm).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        data: { processingOperationDone: "D 14", status: "AWAITING_GROUP" }
+      expect.objectContaining({
+        data: expect.objectContaining({
+          processingOperationDone: "D 14",
+          status: "AWAITING_GROUP"
+        })
       })
     );
   });
 
   it("set status to Processed", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "RECEIVED";
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipient.company.siret }
+      { siret: form.recipientCompanySiret }
     ]);
 
     await markAsProcessed(
-      { id: "1", processedInfo: {} as ProcessedFormInput },
+      {
+        id: "1",
+        processedInfo: {
+          processingOperationDone: "R 1",
+          processedBy: "",
+          processedAt: new Date().toString()
+        }
+      },
       defaultContext
     );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateForm).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        data: { status: "PROCESSED" }
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "PROCESSED" })
       })
     );
   });

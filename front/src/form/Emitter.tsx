@@ -10,7 +10,6 @@ import WorkSite from "./work-site/WorkSite";
 export default function Emitter() {
   const { values, setFieldValue } = useFormikContext<Form>();
 
-  const [displayCustomId, setDisplayCustomId] = useState(!!values.customId);
   const [lockEmitterType, setLockEmitterType] = useState(
     values.ecoOrganisme?.id != null
   );
@@ -27,40 +26,27 @@ export default function Emitter() {
   return (
     <>
       <div className="form__group">
-        <label>
-          <input
-            type="checkbox"
-            defaultChecked={displayCustomId}
-            onChange={() => setDisplayCustomId(!displayCustomId)}
-          />
-          Je souhaite ajouter un numéro de BSD qui m'est propre
-        </label>
-        {displayCustomId && (
-          <>
-            <h4>Autre Numéro Libre</h4>
-            <Field
-              type="text"
-              placeholder="Utilisez votre propre numéro de BSD si nécessaire."
-              name="customId"
-            />
-          </>
-        )}
+        <label htmlFor="id_customId">Autre Numéro Libre (optionnel)</label>
+        <Field
+          id="id_customId"
+          type="text"
+          placeholder="Utilisez votre propre numéro de BSD si nécessaire."
+          name="customId"
+        />
       </div>
 
       <EcoOrganismes name="ecoOrganisme" />
 
-      <h4>Type d'émetteur</h4>
-
       {lockEmitterType && (
         <div className="form__group notification info">
           Lorsqu'un éco-organisme est indiqué comme responsable du déchet, le
-          type d'émetteur est vérouillé à <strong>Autre détenteur</strong>.
+          type d'émetteur est verrouillé à <strong>Autre détenteur</strong>.
         </div>
       )}
 
       <div className="form__group">
         <fieldset>
-          <legend> L'émetteur est</legend>
+          <legend className="tw-font-semibold"> L'émetteur est</legend>
           <Field
             name="emitter.type"
             id="PRODUCER"

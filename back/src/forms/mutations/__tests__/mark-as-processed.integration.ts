@@ -7,6 +7,7 @@ import {
   userWithCompanyFactory,
   companyFactory
 } from "../../../__tests__/factories";
+import { PROCESSING_OPERATIONS } from "../../../common/constants";
 
 jest.mock("axios", () => ({
   default: {
@@ -111,6 +112,46 @@ describe("Integration / Mark as processed mutation", () => {
     });
     expect(statusLogs.length).toEqual(1);
     expect(statusLogs[0].loggedAt).toBeTruthy();
+  });
+
+  it("should fill the description with the operation's", async () => {
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const processingOperation = PROCESSING_OPERATIONS.find(
+      operation => operation.code === "D 1"
+    );
+    const mutation = `
+      mutation($processingOperationDone: String!) {
+        markAsProcessed(id: "${form.id}", processedInfo: {
+          processingOperationDone: $processingOperationDone,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }) {
+          id
+          processingOperationDescription
+        }
+      }
+    `;
+
+    const {
+      data: {
+        markAsProcessed: { processingOperationDescription }
+      }
+    } = await mutate(mutation, {
+      variables: {
+        processingOperationDone: processingOperation.code
+      }
+    });
+    expect(processingOperationDescription).toBe(
+      processingOperation.description
+    );
   });
 
   it("should not mark a form as processed when operation code is not valid", async () => {

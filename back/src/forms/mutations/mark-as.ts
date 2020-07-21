@@ -1,23 +1,28 @@
 import { interpret, State } from "xstate";
-import { flattenObjectForDb } from "../form-converter";
+import {
+  flattenProcessedFormInput,
+  flattenResealedFormInput,
+  flattenResentFormInput
+} from "../form-converter";
 import { GraphQLContext } from "../../types";
 import { getError } from "../workflow/errors";
 import { formWorkflowMachine } from "../workflow/machine";
+import { ValidationError } from "apollo-server-express";
 import { ForbiddenError } from "apollo-server-express";
-import { capitalize } from "../../common/strings";
 import { prisma } from "../../generated/prisma-client";
 import {
-  MutationMarkAsSealedArgs,
   MutationMarkAsSentArgs,
   MutationMarkAsReceivedArgs,
   MutationMarkAsProcessedArgs,
   MutationSignedByTransporterArgs,
   MutationMarkAsTempStoredArgs,
+  MutationMarkAsSealedArgs,
   MutationMarkAsResealedArgs,
   MutationMarkAsResentArgs,
   Form,
   FormStatus
 } from "../../generated/graphql/types";
+import { PROCESSING_OPERATIONS } from "../../common/constants";
 
 export async function markAsSealed(
   { id }: MutationMarkAsSealedArgs,
@@ -31,6 +36,11 @@ export async function markAsSent(
   context: GraphQLContext
 ): Promise<Form> {
   const form = await prisma.form({ id });
+
+  if (form == null) {
+    throw new ValidationError("Le BSD est introuvable.");
+  }
+
   // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
   return transitionForm(
     id,
@@ -62,11 +72,28 @@ export function markAsProcessed(
   { id, processedInfo }: MutationMarkAsProcessedArgs,
   context: GraphQLContext
 ): Promise<Form> {
+  const operation = PROCESSING_OPERATIONS.find(
+    otherOperation =>
+      otherOperation.code === processedInfo.processingOperationDone
+  );
+
+  if (operation == null) {
+    throw new ValidationError(
+      `Le code d'opération "${processedInfo.processingOperationDone}" n'est pas reconnu.`
+    );
+  }
+
   return transitionForm(
     id,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
-    infos => flattenObjectForDb(infos)
+
+    infos =>
+      flattenProcessedFormInput({
+        ...infos,
+        processingOperationDescription:
+          infos.processingOperationDescription ?? operation.description
+      })
   );
 }
 
@@ -75,6 +102,10 @@ export async function signedByTransporter(
   context: GraphQLContext
 ): Promise<Form> {
   const form = await prisma.form({ id });
+
+  if (form == null) {
+    throw new ValidationError("Le BSD est introuvable.");
+  }
 
   // BSD has already been sent, it must be a signature for frame 18
   if (form.sentAt) {
@@ -133,23 +164,23 @@ export function markAsTempStored(
   { id, tempStoredInfos }: MutationMarkAsTempStoredArgs,
   context: GraphQLContext
 ): Promise<Form> {
-  const transformEventToFormParams = infos => ({
-    temporaryStorageDetail: {
-      update: {
-        tempStorerSignedAt: new Date(), // Default value to now
-        ...Object.keys(infos).reduce((prev, cur) => {
-          prev[`tempStorer${capitalize(cur)}`] = infos[cur];
-          return prev;
-        }, {})
-      }
-    }
-  });
-
   return transitionForm(
     id,
     { eventType: "MARK_TEMP_STORED", eventParams: tempStoredInfos },
     context,
-    transformEventToFormParams
+    infos => ({
+      temporaryStorageDetail: {
+        update: {
+          tempStorerQuantityType: infos.quantityType,
+          tempStorerQuantityReceived: infos.quantityReceived,
+          tempStorerWasteAcceptationStatus: infos.wasteAcceptationStatus,
+          tempStorerWasteRefusalReason: infos.wasteRefusalReason,
+          tempStorerReceivedAt: infos.receivedAt,
+          tempStorerReceivedBy: infos.receivedBy,
+          tempStorerSignedAt: infos.signedAt ?? new Date()
+        }
+      }
+    })
   );
 }
 
@@ -159,7 +190,7 @@ export function markAsResealed(
 ): Promise<Form> {
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
-      update: flattenObjectForDb(infos)
+      update: flattenResealedFormInput(infos)
     }
   });
 
@@ -178,7 +209,7 @@ export function markAsResent(
   const transformEventToFormParams = infos => ({
     temporaryStorageDetail: {
       update: {
-        ...flattenObjectForDb(infos)
+        ...flattenResentFormInput(infos)
       }
     }
   });
@@ -198,6 +229,10 @@ async function transitionForm(
   transformEventToFormProps = v => v
 ) {
   const form = await prisma.form({ id: formId });
+
+  if (form == null) {
+    throw new ValidationError("Le BSD est introuvable.");
+  }
 
   const temporaryStorageDetail = await prisma
     .form({ id: formId })
@@ -276,6 +311,7 @@ async function transitionForm(
     formService.send({ type: eventType, ...eventParams });
   });
 }
+
 const fieldsToLog = {
   MARK_SEALED: [],
   MARK_SENT: ["sentBy", "sentAt"],

@@ -74,7 +74,6 @@ export default function EcoOrganismes(props) {
 
   return (
     <>
-      <h4>Eco-organisme ?</h4>
       <div className="form__group">
         <label>
           <input

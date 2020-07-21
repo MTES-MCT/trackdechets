@@ -128,6 +128,7 @@ export default function CompanySelector(props) {
         <input
           type="text"
           placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
+          className="company-selector__search"
           onChange={e =>
             dispatch({ type: "search_input", payload: e.target.value })
           }
@@ -206,6 +207,7 @@ export default function CompanySelector(props) {
             type="text"
             name={`${field.name}.phone`}
             placeholder="Numéro"
+            className="company-selector__phone"
           />
         </label>
 
@@ -213,7 +215,11 @@ export default function CompanySelector(props) {
 
         <label>
           Mail
-          <Field type="email" name={`${field.name}.mail`} />
+          <Field
+            type="email"
+            name={`${field.name}.mail`}
+            className="company-selector__email"
+          />
         </label>
 
         <RedErrorMessage name={`${field.name}.mail`} />

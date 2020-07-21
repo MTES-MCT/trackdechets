@@ -7,6 +7,7 @@ import {
 } from "../common/rules";
 import {
   canAccessForm,
+  canUpdateOrCreateForm,
   isFormEmitter,
   isFormRecipient,
   isFormTempStorer,
@@ -25,24 +26,25 @@ import {
   markAsTempStoredSchema,
   signedByTransporterSchema,
   temporaryStorageDestinationSchema,
-  formsSchema
+  formsSchema,
+  formsRegisterSchema
 } from "./rules/schema";
 
 export default {
   Query: {
     form: or(canAccessForm, isFormTransporter),
     formPdf: or(canAccessForm, isFormTransporter),
-    formsRegister: isCompaniesUser,
     forms: chain(
       formsSchema,
       or(or(isCompanyMember, isCompanyAdmin), canAccessFormsWithoutSiret)
     ),
+    formsRegister: chain(formsRegisterSchema, isCompaniesUser),
     stats: isAuthenticated,
     formsLifeCycle: isAuthenticated,
     appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
-    saveForm: isAuthenticated,
+    saveForm: canUpdateOrCreateForm,
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
     markAsSealed: or(

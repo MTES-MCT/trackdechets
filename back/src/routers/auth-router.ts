@@ -15,9 +15,10 @@ authRouter.post("/login", (req, res, next) => {
     }
     if (!user) {
       const queries = {
-        ...{ error: info.message },
+        ...{ error: info.message , errorField: info.errorField, username:info.username},
         ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})
       };
+ 
       return res.redirect(
         `${UI_BASE_URL}/login?${querystring.stringify(queries)}`
       );

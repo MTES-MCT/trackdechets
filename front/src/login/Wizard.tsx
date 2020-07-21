@@ -80,11 +80,11 @@ export class Wizard extends React.Component<Props, State> {
             {({ isSubmitting }) => (
               <Form {...formProps}>
                 {activePage}
-                <div className="buttons">
+                <div className="form__actions">
                   {page > 0 && (
                     <button
                       type="button"
-                      className="button secondary"
+                      className="button-outline primary"
                       onClick={this.previous}
                     >
                       Retour
@@ -99,7 +99,7 @@ export class Wizard extends React.Component<Props, State> {
                   {isLastPage && (
                     <button
                       type="submit"
-                      className="button"
+                      className="button no-margin"
                       disabled={isSubmitting}
                     >
                       S'inscrire

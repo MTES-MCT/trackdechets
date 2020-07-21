@@ -13,7 +13,7 @@ describe("{ mutation { createTraderReceipt } }", () => {
       department: "07"
     };
 
-    const user = userFactory();
+    const user = await userFactory();
 
     const mutation = `
       mutation {

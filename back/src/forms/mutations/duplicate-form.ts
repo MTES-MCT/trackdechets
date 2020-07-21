@@ -1,7 +1,7 @@
 import { prisma, Status } from "../../generated/prisma-client";
 import {
   cleanUpNotDuplicatableFieldsInForm,
-  unflattenObjectFromDb
+  expandFormFromDb
 } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import { MutationDuplicateFormArgs, Form } from "../../generated/graphql/types";
@@ -52,5 +52,5 @@ export async function duplicateForm(
 
   // await Promise.all(segmentDuplicates);
 
-  return unflattenObjectFromDb(newForm);
+  return expandFormFromDb(newForm);
 }

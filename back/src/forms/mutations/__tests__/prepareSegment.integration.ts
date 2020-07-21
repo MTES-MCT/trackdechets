@@ -20,7 +20,9 @@ describe("{ mutation { prepareSegment } }", () => {
     const owner = await userFactory();
     const { user: firstTransporter, company } = await userWithCompanyFactory(
       "ADMIN",
-      "TRANSPORTER"
+      {
+        companyTypes: { set: ["TRANSPORTER"] }
+      }
     );
 
     const transporterSiret = company.siret;
@@ -67,7 +69,9 @@ describe("{ mutation { prepareSegment } }", () => {
   it("should create a segment when user is transporter and form owner", async () => {
     const { user: firstTransporter, company } = await userWithCompanyFactory(
       "ADMIN",
-      "TRANSPORTER"
+      {
+        companyTypes: { set: ["TRANSPORTER"] }
+      }
     );
 
     const transporterSiret = company.siret;

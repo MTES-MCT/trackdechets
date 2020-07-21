@@ -9,7 +9,7 @@ import NumberInput from "../../../form/custom-inputs/NumberInput";
 import { RadioButton } from "../../../form/custom-inputs/RadioButton";
 import Packagings from "../../../form/packagings/Packagings";
 import { SlipActionProps } from "../SlipActions";
-import { Operations } from "../../../form/processing-operation/ProcessingOperation";
+import { PROCESSING_OPERATIONS } from "../../../generated/constants";
 
 export default function Resealed({
   form,
@@ -77,10 +77,10 @@ export default function Resealed({
 
               <Field component="select" name="destination.processingOperation">
                 <option value="">Choisissez...</option>
-                {Operations.map(o => (
-                  <option key={o.code} value={o.code}>
-                    {o.code} - {o.description.substr(0, 50)}
-                    {o.description.length > 50 ? "..." : ""}
+                {PROCESSING_OPERATIONS.map(operation => (
+                  <option key={operation.code} value={operation.code}>
+                    {operation.code} - {operation.description.substr(0, 50)}
+                    {operation.description.length > 50 ? "..." : ""}
                   </option>
                 ))}
               </Field>
@@ -123,6 +123,7 @@ export default function Resealed({
                     component={NumberInput}
                     name="wasteDetails.numberOfPackages"
                     label="Nombre de colis"
+                    min="1"
                   />
                   <RedErrorMessage name="wasteDetails.numberOfPackages" />
                 </div>

@@ -72,7 +72,10 @@ input ProcessedFormInput {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String!
 
-  "Description de l'opération d’élimination / valorisation (case 11)"
+  """
+  Description de l'opération d’élimination / valorisation (case 11)
+  Elle se complète automatiquement lorsque non fournie
+  """
   processingOperationDescription: String
 
   "Personne en charge du traitement"
@@ -137,7 +140,7 @@ input AppendixFormInput {
 
 "Payload de liason d'un BSD à un eco-organisme"
 input EcoOrganismeInput {
-  id: ID
+  id: ID!
 }
 
 input TemporaryStorageDetailInput {

@@ -1,70 +1,336 @@
-import { flattenObjectForDb, unflattenObjectFromDb } from "../form-converter";
+import {
+  expandFormFromDb,
+  flattenFormInput,
+  nullIfNoValues,
+  safeInput,
+  chain
+} from "../form-converter";
+import { Form } from "../../generated/prisma-client";
+import { FormInput } from "../../generated/graphql/types";
 
-const apiShape = {
-  emitter: {
-    company: {
-      name: "test"
-    },
-    pickupSite: "A site",
-    workSite: {
-      name: "A name"
-    },
-    otherField: "other"
-  },
-  boolean: true,
-  number: 2,
-  flat: "flat",
-  null: null,
-  array: [1],
-  arrayOfObject: [{ foo: "bar" }],
-  // relation, no flattening
-  ecoOrganisme: {
-    id: "an id"
-  },
-  temporaryStorageDetail: {
-    destination: {
-      company: { siret: "a siret" },
-      cap: "cap"
-    }
-  }
-};
-
-const dbShape = {
-  emitterCompanyName: "test",
-  emitterPickupSite: "A site",
-  emitterWorkSiteName: "A name",
-  emitterOtherField: "other",
-  boolean: true,
-  number: 2,
-  flat: "flat",
-  null: null,
-  array: [1],
-  arrayOfObject: [{ foo: "bar" }],
-  ecoOrganisme: {
-    id: "an id"
-  },
-  temporaryStorageDetail: {
-    destinationCompanySiret: "a siret",
-    destinationCap: "cap"
-  }
-};
-
-describe("flattenInoutObjectForDb", () => {
-  test("flattenObject deeply flatten objects", () => {
-    expect(flattenObjectForDb(apiShape)).toEqual(dbShape);
-  });
-
-  test("flattenObject null object", () => {
-    expect(flattenObjectForDb(null)).toEqual({});
-  });
-
-  test("flattenObject undefined object", () => {
-    expect(flattenObjectForDb(undefined)).toEqual({});
-  });
+test("nullIfNoValues", () => {
+  let obj = { a: null, b: null };
+  expect(nullIfNoValues(obj)).toEqual(null);
+  obj = { a: "a", b: "b" };
+  expect(nullIfNoValues(obj)).toEqual(obj);
+  obj = { a: "a", b: null };
+  expect(nullIfNoValues(obj)).toEqual(obj);
+  obj = { a: false, b: null };
+  expect(nullIfNoValues(obj)).toEqual(obj);
 });
 
-describe("unflattenObjectFromDb", () => {
-  test("unflatten deeply flatten objects", () => {
-    expect(unflattenObjectFromDb(dbShape)).toEqual(apiShape);
+test("safeInput should remove undefined", () => {
+  const input = {
+    a: "a",
+    b: null
+  };
+
+  const extra = {
+    c: undefined
+  };
+
+  const safe = safeInput({
+    ...input,
+    ...extra
   });
+
+  expect(safe).toEqual(input);
+});
+
+test("chain should optionnally chain data access", () => {
+  type Input = {
+    foo?: {
+      bar1?: string;
+      bar2?: string;
+    };
+    bar?: {
+      foo1?: string;
+    };
+    baz?: {
+      foo1?: string;
+    };
+  };
+
+  const input: Input = {
+    foo: { bar1: "foobar1" },
+    bar: {},
+    baz: null
+  };
+
+  const foobar1 = chain(input.foo, foo => foo.bar1);
+  expect(foobar1).toEqual(input.foo.bar1);
+
+  const foobar2 = chain(input.foo, foo => foo.bar2);
+  expect(foobar2).toBeUndefined();
+
+  const barfoo1 = chain(input.bar, bar => bar.foo1);
+  expect(barfoo1).toBeUndefined();
+
+  const bazfoo1 = chain(input.baz, baz => baz.foo1);
+  expect(bazfoo1).toBeNull();
+});
+
+test("expandFormFromDb", () => {
+  const form: Form = {
+    id: "ckcejngdp00p00895cxaze1e8",
+    readableId: "TD-61feb7d24fd67a5688e761eb1cbcb497",
+    customId: null,
+    isDeleted: false,
+    createdAt: "2020-07-09T08:43:23.434Z",
+    updatedAt: "2020-07-09T08:43:23.434Z",
+    signedByTransporter: true,
+    status: "SENT",
+    sentAt: "2019-11-20T00:00:00.000Z",
+    sentBy: "signe",
+    isAccepted: null,
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: "",
+    receivedBy: null,
+    receivedAt: null,
+    signedAt: null,
+    quantityReceived: null,
+    processedBy: null,
+    processedAt: null,
+    processingOperationDone: null,
+    processingOperationDescription: null,
+    noTraceability: null,
+    nextDestinationCompanyPhone: null,
+    nextDestinationCompanySiret: null,
+    nextDestinationCompanyName: null,
+    nextDestinationCompanyMail: null,
+    nextDestinationProcessingOperation: null,
+    nextDestinationCompanyContact: null,
+    nextDestinationCompanyAddress: null,
+    emitterCompanyName: "WASTE PRODUCER",
+    emitterType: "PRODUCER",
+    emitterWorkSiteAddress: "",
+    emitterWorkSiteName: "",
+    emitterWorkSitePostalCode: "",
+    emitterPickupSite: null,
+    emitterWorkSiteInfos: "",
+    emitterCompanyPhone: "06 18 76 02 96",
+    emitterCompanyMail: "emitter@compnay.fr",
+    emitterWorkSiteCity: "",
+    emitterCompanySiret: "1234",
+    emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
+    emitterCompanyContact: "Marc Martin",
+    recipientCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+    recipientCap: "",
+    recipientIsTempStorage: false,
+    recipientCompanyPhone: "06 18 76 02 99",
+    recipientCompanySiret: "5678",
+    recipientCompanyContact: "Jean Dupont",
+    recipientProcessingOperation: "D 6",
+    recipientCompanyMail: "recipient@td.io",
+    recipientCompanyName: "WASTE COMPANY",
+    transporterCompanyName: "WASTE TRANSPORTER",
+    transporterReceipt: "33AA",
+    transporterCustomInfo: null,
+    transporterDepartment: "86",
+    transporterCompanySiret: "9876",
+    transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+    transporterCompanyContact: "transporter",
+    transporterCompanyMail: "transporter@td.io",
+    transporterIsExemptedOfReceipt: false,
+    transporterNumberPlate: "aa22",
+    transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+    transporterCompanyPhone: "06 18 76 02 66",
+    currentTransporterSiret: null,
+    nextTransporterSiret: null,
+    wasteDetailsQuantity: 22.5,
+    wasteDetailsOnuCode: "",
+    wasteDetailsCode: "05 01 04*",
+    wasteDetailsOtherPackaging: "",
+    wasteDetailsName: "Divers",
+    wasteDetailsPackagings: ["CITERNE"],
+    wasteDetailsQuantityType: "ESTIMATED",
+    wasteDetailsConsistence: "SOLID",
+    wasteDetailsNumberOfPackages: 1,
+    traderCompanyAddress: null,
+    traderValidityLimit: null,
+    traderCompanyContact: null,
+    traderCompanyName: null,
+    traderCompanyMail: null,
+    traderDepartment: null,
+    traderCompanySiret: null,
+    traderReceipt: null,
+    traderCompanyPhone: null
+  };
+
+  const expanded = expandFormFromDb(form);
+
+  const expected = {
+    id: form.id,
+    readableId: form.readableId,
+    customId: form.customId,
+    emitter: {
+      type: form.emitterType,
+      workSite: {
+        name: form.emitterWorkSiteName,
+        address: form.emitterWorkSiteAddress,
+        city: form.emitterWorkSiteCity,
+        postalCode: form.emitterWorkSitePostalCode,
+        infos: form.emitterWorkSiteInfos
+      },
+      pickupSite: form.emitterPickupSite,
+      company: {
+        name: form.emitterCompanyName,
+        siret: form.emitterCompanySiret,
+        address: form.emitterCompanyAddress,
+        contact: form.emitterCompanyContact,
+        phone: form.emitterCompanyPhone,
+        mail: form.emitterCompanyMail
+      }
+    },
+    recipient: {
+      cap: form.recipientCap,
+      processingOperation: form.recipientProcessingOperation,
+      company: {
+        name: form.recipientCompanyName,
+        siret: form.recipientCompanySiret,
+        address: form.recipientCompanyAddress,
+        contact: form.recipientCompanyContact,
+        phone: form.recipientCompanyPhone,
+        mail: form.recipientCompanyMail
+      },
+      isTempStorage: false
+    },
+    transporter: {
+      company: {
+        name: form.transporterCompanyName,
+        siret: form.transporterCompanySiret,
+        address: form.transporterCompanyAddress,
+        contact: form.transporterCompanyContact,
+        phone: form.transporterCompanyPhone,
+        mail: form.transporterCompanyMail
+      },
+      isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
+      receipt: form.transporterReceipt,
+      department: form.transporterDepartment,
+      validityLimit: form.transporterValidityLimit,
+      numberPlate: form.transporterNumberPlate,
+      customInfo: form.transporterCustomInfo
+    },
+    wasteDetails: {
+      code: form.wasteDetailsCode,
+      name: form.wasteDetailsName,
+      onuCode: form.wasteDetailsOnuCode,
+      packagings: form.wasteDetailsPackagings,
+      otherPackaging: form.wasteDetailsOtherPackaging,
+      numberOfPackages: form.wasteDetailsNumberOfPackages,
+      quantity: form.wasteDetailsQuantity,
+      quantityType: form.wasteDetailsQuantityType,
+      consistence: form.wasteDetailsConsistence
+    },
+    trader: null,
+    createdAt: form.createdAt,
+    updatedAt: form.updatedAt,
+    status: form.status,
+    signedByTransporter: form.signedByTransporter,
+    sentAt: form.sentAt,
+    sentBy: form.sentBy,
+    wasteAcceptationStatus: form.wasteAcceptationStatus,
+    wasteRefusalReason: form.wasteRefusalReason,
+    receivedBy: form.receivedBy,
+    receivedAt: form.receivedAt,
+    signedAt: form.signedAt,
+    quantityReceived: form.quantityReceived,
+    processingOperationDone: form.processingOperationDone,
+    processingOperationDescription: form.processingOperationDescription,
+    processedBy: form.processedBy,
+    processedAt: form.processedBy,
+    noTraceability: form.noTraceability,
+    nextDestination: null,
+    currentTransporterSiret: form.currentTransporterSiret,
+    nextTransporterSiret: form.nextTransporterSiret
+  };
+
+  expect(expanded).toEqual(expected);
+});
+
+test("flattenFormInput", () => {
+  const input: FormInput = {
+    customId: "TD-20-AAA00256",
+    emitter: {
+      type: "PRODUCER",
+      workSite: {
+        address: "5 rue du chantier",
+        city: "Annonay",
+        postalCode: "07100",
+        infos: "Site de stockage de boues"
+      },
+      company: {
+        siret: "11111111111111",
+        name: "Boues and Co",
+        address: "1 rue de paradis, 75010 PARIS",
+        contact: "Jean Dupont de la Boue",
+        mail: "jean.dupont@boues.fr",
+        phone: "01 00 00 00 00"
+      }
+    },
+    recipient: {
+      processingOperation: "D 10",
+      company: {
+        siret: "22222222222222",
+        name: "Incinérateur du Grand Est",
+        address: "1 avenue de Colmar 67100 Strasbourg",
+        contact: "Thomas Largeron",
+        mail: "thomas.largeron@incinerateur.fr",
+        phone: "03 00 00 00 00"
+      }
+    },
+    transporter: {
+      receipt: "12379",
+      department: "07",
+      validityLimit: "2020-06-30",
+      numberPlate: "AD-007-TS",
+      company: null
+    },
+    wasteDetails: null
+  };
+
+  const flattened = flattenFormInput(input);
+
+  const expected = {
+    customId: input.customId,
+    emitterType: input.emitter.type,
+    emitterWorkSiteAddress: input.emitter.workSite.address,
+    emitterWorkSiteCity: input.emitter.workSite.city,
+    emitterWorkSitePostalCode: input.emitter.workSite.postalCode,
+    emitterWorkSiteInfos: input.emitter.workSite.infos,
+    emitterCompanyName: input.emitter.company.name,
+    emitterCompanySiret: input.emitter.company.siret,
+    emitterCompanyAddress: input.emitter.company.address,
+    emitterCompanyContact: input.emitter.company.contact,
+    emitterCompanyPhone: input.emitter.company.phone,
+    emitterCompanyMail: input.emitter.company.mail,
+    recipientProcessingOperation: input.recipient.processingOperation,
+    recipientCompanyName: input.recipient.company.name,
+    recipientCompanySiret: input.recipient.company.siret,
+    recipientCompanyAddress: input.recipient.company.address,
+    recipientCompanyContact: input.recipient.company.contact,
+    recipientCompanyPhone: input.recipient.company.phone,
+    recipientCompanyMail: input.recipient.company.mail,
+    transporterCompanyName: null,
+    transporterCompanySiret: null,
+    transporterCompanyAddress: null,
+    transporterCompanyContact: null,
+    transporterCompanyPhone: null,
+    transporterCompanyMail: null,
+    transporterReceipt: input.transporter.receipt,
+    transporterDepartment: input.transporter.department,
+    transporterValidityLimit: input.transporter.validityLimit,
+    transporterNumberPlate: input.transporter.numberPlate,
+    wasteDetailsCode: null,
+    wasteDetailsName: null,
+    wasteDetailsOnuCode: null,
+    wasteDetailsOtherPackaging: null,
+    wasteDetailsPackagings: null,
+    wasteDetailsNumberOfPackages: null,
+    wasteDetailsQuantity: null,
+    wasteDetailsQuantityType: null,
+    wasteDetailsConsistence: null
+  };
+
+  expect(flattened).toEqual(expected);
 });

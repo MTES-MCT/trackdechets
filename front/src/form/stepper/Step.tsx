@@ -30,7 +30,7 @@ export function Step(props: IStepProps) {
   return (
     <React.Fragment>
       {props.children}
-      <div className="step-buttons">
+      <div className="step-buttons form__actions">
         <Previous
           isActive={props.displayPrevious}
           goToPreviousStep={() => props.goToPreviousStep()}
@@ -49,7 +49,7 @@ function Next(props: { isActive: boolean; goToNextStep: Function }) {
   if (props.isActive === false) return null;
 
   return (
-    <button className="button" onClick={() => props.goToNextStep()}>
+    <button className="button no-margin" onClick={() => props.goToNextStep()}>
       Suivant
     </button>
   );
@@ -60,7 +60,7 @@ function Previous(props: { isActive: boolean; goToPreviousStep: Function }) {
 
   return (
     <button
-      className="button secondary"
+      className="button-outline primary"
       onClick={() => props.goToPreviousStep()}
     >
       Précédent
@@ -72,7 +72,7 @@ function Submit(props: { isActive: boolean }) {
   if (props.isActive === false) return null;
 
   return (
-    <button className="button" type="submit">
+    <button className="button no-margin" type="submit">
       Enregistrer
     </button>
   );

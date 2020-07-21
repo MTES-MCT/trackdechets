@@ -1,4 +1,4 @@
-import { unflattenObjectFromDb } from "../form-converter";
+import { expandFormFromDb } from "../form-converter";
 import { ForbiddenError } from "apollo-server-express";
 import { MutationUpdateTransporterFieldsArgs } from "../../generated/graphql/types";
 import { prisma } from "../../generated/prisma-client";
@@ -19,5 +19,5 @@ export async function updateTransporterFields({
     data: { transporterNumberPlate, transporterCustomInfo }
   });
 
-  return unflattenObjectFromDb(updatedForm);
+  return expandFormFromDb(updatedForm);
 }

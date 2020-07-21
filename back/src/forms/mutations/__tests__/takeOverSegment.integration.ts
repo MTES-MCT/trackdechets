@@ -21,13 +21,17 @@ describe("{ mutation { takeOverSegment } }", () => {
     const owner = await userFactory();
     const { company: firstTransporterCompany } = await userWithCompanyFactory(
       "ADMIN",
-      "TRANSPORTER"
+      {
+        companyTypes: { set: ["TRANSPORTER"] }
+      }
     );
 
     const {
       user: secondTransporter,
       company: secondTransporterCompany
-    } = await userWithCompanyFactory("ADMIN", "TRANSPORTER");
+    } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["TRANSPORTER"] }
+    });
 
     // create a form whose first transporter is another one
     const form = await formFactory({
@@ -57,7 +61,7 @@ describe("{ mutation { takeOverSegment } }", () => {
     const { mutate } = makeClient(secondTransporter);
     await mutate(
       `mutation  {
-            takeOverSegment(id:"${segment.id}",     
+            takeOverSegment(id:"${segment.id}",
             takeOverInfo: { takenOverAt: "2020-04-28", takenOverBy: "transporter suivant" }
             ) {
               id

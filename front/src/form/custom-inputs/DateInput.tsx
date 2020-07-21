@@ -4,20 +4,21 @@ import { DateTime } from "luxon";
 
 export default function DateInput({
   field, // { name, value, onChange, onBlur }
-  label,
   ...props
 }: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
   const { value, ...rest } = field;
 
+  const date: DateTime =
+    value instanceof Date
+      ? DateTime.fromJSDate(value)
+      : DateTime.fromISO(value);
+
   return (
-    <label>
-      {label}
-      <input
-        type="date"
-        value={value ? DateTime.fromISO(value).toISODate() : ""}
-        {...rest}
-        {...props}
-      />
-    </label>
+    <input
+      type="date"
+      value={value ? date.toISODate() : ""}
+      {...rest}
+      {...props}
+    />
   );
 }

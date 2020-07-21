@@ -26,24 +26,22 @@ export default function Signup() {
         <Wizard
           initialValues={{
             email: "",
-            emailConfirmation: "",
             name: "",
             phone: "",
             password: "",
-            passwordConfirmation: "",
             cgu: false,
           }}
           onSubmit={(values: any, { setSubmitting }) => {
-            const {
-              passwordConfirmation,
-              emailConfirmation,
-              cgu,
-              ...userInfos
-            } = values;
+            const { cgu, ...userInfos } = values;
 
             signup({ variables: { userInfos } })
-              .then(_ => history.push("/signup/activation"))
-              .catch(_ => {
+              .then((_) =>
+                history.push({
+                  pathname: "/signup/activation",
+                  state: { signupEmail: userInfos.email },
+                })
+              )
+              .catch((_) => {
                 setSubmitting(false);
               });
           }}
@@ -71,25 +69,11 @@ export default function Signup() {
               prélable obligatoire à l'enregistrement ou au rattachement d'une
               entreprise dans Trackdéchets.
             </p>
-
-            <p>
-              <strong>Vous avez déjà un compte ?</strong>{" "}
-              <Link to="/login">Connectez vous maintenant</Link>
-            </p>
           </Wizard.Page>
           <Wizard.Page
             title="Informations utilisateur"
             validate={(values: any) => {
               let errors: any = {};
-              if (values.password !== values.passwordConfirmation) {
-                errors.passwordConfirmation =
-                  "Les deux mots de passe ne sont pas identiques.";
-              }
-
-              if (values.email !== values.emailConfirmation) {
-                errors.emailConfirmation =
-                  "Les deux emails ne sont pas identiques.";
-              }
 
               if (!values.email) {
                 errors.email = "L'email est obligatoire";
@@ -145,15 +129,6 @@ export default function Signup() {
             </div>
 
             <div className="form__group">
-              <label>
-                Confirmation de l'email*
-                <Field type="text" name="emailConfirmation" />
-              </label>
-
-              <RedErrorMessage name="emailConfirmation" />
-            </div>
-
-            <div className="form__group">
               <label>Téléphone</label>
               <div className="search__group">
                 <Field type="text" name="phone" />
@@ -202,14 +177,6 @@ export default function Signup() {
               <RedErrorMessage name="password" />
             </div>
 
-            <div className="form__group">
-              <label>
-                Vérification du mot de passe*
-                <Field type="password" name="passwordConfirmation" />
-              </label>
-
-              <RedErrorMessage name="passwordConfirmation" />
-            </div>
             <div className="form__group">
               <label>
                 <Field name="cgu" type="checkbox" />
