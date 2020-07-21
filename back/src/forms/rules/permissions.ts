@@ -22,7 +22,7 @@ import {
   NotFormContributor,
   FormNotFound
 } from "../errors";
-import { getForm } from "../queries/form";
+import { byId } from "../queries/form";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -420,7 +420,8 @@ async function getFormAccessInfos(
   userId: string,
   prisma: Prisma
 ) {
-  const formInfos = await getForm(formId).$fragment<FormSiretsAndOwner | null>(`
+  const formInfos = await prisma.form(byId(formId))
+    .$fragment<FormSiretsAndOwner | null>(`
   fragment FormWithOwner on Form {
     recipientCompanySiret
     recipientIsTempStorage

@@ -23,7 +23,7 @@ import {
 import { duplicateForm, createForm, updateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
 import { updateTransporterFields } from "./mutations/updateTransporterFields";
-import { form } from "./queries/form";
+import { form, byId } from "./queries/form";
 import { formPdf } from "./queries/form-pdf";
 import forms from "./queries/forms";
 import { formsRegister } from "./queries/forms-register";
@@ -110,7 +110,7 @@ const mutationResolvers: MutationResolvers = {
   saveForm,
   deleteForm: async (_parent, { id }) => {
     const form = await prisma.updateForm({
-      where: { id },
+      where: byId(id),
       data: { isDeleted: true }
     });
     return { ...form, status: form.status as Status };

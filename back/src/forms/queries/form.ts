@@ -7,15 +7,15 @@ import {
 import { isReadableId } from "../readable-id";
 import { expandFormFromDb } from "../form-converter";
 
-export function getForm(id: string) {
-  return prisma.form(isReadableId(id) ? { readableId: id } : { id });
+export function byId(id: string): { id: string } | { readableId: string } {
+  return isReadableId(id) ? { readableId: id } : { id };
 }
 
 export async function form(
   parent: ResolversParentTypes["Query"],
   { id }: QueryFormArgs
 ) {
-  const form = await getForm(id);
+  const form = await prisma.form(byId(id));
 
   if (form == null) {
     throw new ValidationError("Ce bordereau n'existe pas.");

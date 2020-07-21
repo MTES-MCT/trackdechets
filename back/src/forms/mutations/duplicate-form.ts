@@ -4,6 +4,7 @@ import {
   expandFormFromDb
 } from "../form-converter";
 import { getReadableId } from "../readable-id";
+import { byId } from "../queries/form";
 import { MutationDuplicateFormArgs, Form } from "../../generated/graphql/types";
 
 /**
@@ -17,9 +18,7 @@ export async function duplicateForm(
   userId: string,
   { id: formId }: MutationDuplicateFormArgs
 ): Promise<Form> {
-  const existingForm = await prisma.form({
-    id: formId
-  });
+  const existingForm = await prisma.form(byId(formId));
 
   // get segments to duplicate them after cleanup
   // const transportSegments = await prisma.transportSegments({
