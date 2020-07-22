@@ -49,7 +49,7 @@ const shieldMiddleware = shield(shieldRulesTree, {
     if (NODE_ENV === "dev") {
       return error;
     }
-    return new Error("Vous n'êtes pas autorisé à accéder cette ressource.");
+    return new Error("Vous n'êtes pas autorisé à accéder à cette ressource.");
   }
 });
 
