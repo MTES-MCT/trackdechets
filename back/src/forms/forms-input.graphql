@@ -99,6 +99,69 @@ input NextDestinationInput {
   company: CompanyInput
 }
 
+"Payload de création d'un bordereau"
+input CreateFormInput {
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
+  customId: String
+
+  "Établissement émetteur/producteur du déchet (case 1)"
+  emitter: EmitterInput
+
+  "Établissement qui reçoit le déchet (case 2)"
+  recipient: RecipientInput
+
+  "Transporteur du déchet (case 8)"
+  transporter: TransporterInput
+
+  "Détails du déchet (case 3)"
+  wasteDetails: WasteDetailsInput
+
+  "Négociant (case 7)"
+  trader: TraderInput
+
+  "Annexe 2"
+  appendix2Forms: [AppendixFormInput]
+  ecoOrganisme: EcoOrganismeInput
+
+  temporaryStorageDetail: TemporaryStorageDetailInput
+}
+
+"Payload de mise à jour d'un bordereau"
+input UpdateFormInput {
+  "Identifiant opaque"
+  id: ID!
+
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
+  customId: String
+
+  "Établissement émetteur/producteur du déchet (case 1)"
+  emitter: EmitterInput
+
+  "Établissement qui reçoit le déchet (case 2)"
+  recipient: RecipientInput
+
+  "Transporteur du déchet (case 8)"
+  transporter: TransporterInput
+
+  "Détails du déchet (case 3)"
+  wasteDetails: WasteDetailsInput
+
+  "Négociant (case 7)"
+  trader: TraderInput
+
+  "Annexe 2"
+  appendix2Forms: [AppendixFormInput]
+  ecoOrganisme: EcoOrganismeInput
+
+  temporaryStorageDetail: TemporaryStorageDetailInput
+}
+
 "Payload de création d'un BSD"
 input FormInput {
   "Identifiant opaque"

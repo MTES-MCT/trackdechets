@@ -5,7 +5,12 @@ import {
   isAuthenticated,
   ensureRuleParametersArePresent
 } from "../../common/rules";
-import { MutationSaveFormArgs } from "../../generated/graphql/types";
+import {
+  MutationSaveFormArgs,
+  MutationCreateFormArgs,
+  MutationUpdateFormArgs,
+  ResolversParentTypes
+} from "../../generated/graphql/types";
 import { getUserCompanies } from "../../companies/queries";
 import { GraphQLContext } from "../../types";
 
@@ -52,61 +57,94 @@ export const canAccessForm = and(
   })
 );
 
-export const canUpdateOrCreateForm = and(
-  isAuthenticated,
-  rule()(
-    async (_, { formInput }: MutationSaveFormArgs, ctx: GraphQLContext) => {
-      const userCompanies = await getUserCompanies(ctx.user.id);
-      const userSirets = userCompanies.map(c => c.siret);
-      let formSirets: string[] = [];
+const canCreateFormFn = async (
+  parent: ResolversParentTypes["Mutation"],
+  { createFormInput }: MutationCreateFormArgs,
+  ctx: GraphQLContext
+) => {
+  const userCompanies = await getUserCompanies(ctx.user.id);
+  const userSirets = userCompanies.map(c => c.siret);
+  const formSirets = [
+    createFormInput.emitter?.company?.siret,
+    createFormInput.recipient?.company?.siret,
+    createFormInput.trader?.company?.siret,
+    createFormInput.transporter?.company?.siret
+  ].filter(Boolean) as string[];
 
-      if (formInput.id) {
-        // update mode
-        const form = await prisma.form({ id: formInput.id });
-        if (!form) {
-          return new UserInputError(`Aucun BSD avec l'id ${formInput.id}`);
-        }
-        const eo = await prisma.form({ id: formInput.id }).ecoOrganisme();
-
-        formSirets = [
-          form.emitterCompanySiret,
-          form.traderCompanySiret,
-          form.recipientCompanySiret,
-          form.transporterCompanySiret,
-          ...(eo ? [eo.siret] : [])
-        ];
-      } else {
-        // create mode
-        formSirets = [
-          formInput.emitter?.company?.siret,
-          formInput.recipient?.company?.siret,
-          formInput.trader?.company?.siret,
-          formInput.transporter?.company?.siret
-        ].filter(v => !!v);
-
-        if (formInput.ecoOrganisme) {
-          const eo = await prisma.ecoOrganisme({
-            id: formInput.ecoOrganisme.id
-          });
-          if (!eo) {
-            return new UserInputError(
-              `Aucun eco-organisme avec l'id ${formInput.ecoOrganisme.id}`
-            );
-          }
-          formSirets.push(eo.siret);
-        }
-      }
-
-      // check at least of company of the user appears on the form
-      if (!formSirets.some(siret => userSirets.includes(siret))) {
-        return new ForbiddenError(
-          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
-        );
-      }
-
-      return true;
+  if (createFormInput.ecoOrganisme) {
+    const eo = await prisma.ecoOrganisme({
+      id: createFormInput.ecoOrganisme.id
+    });
+    if (!eo) {
+      return new UserInputError(
+        `Aucun eco-organisme avec l'id ${createFormInput.ecoOrganisme.id}`
+      );
     }
-  )
+    formSirets.push(eo.siret);
+  }
+
+  // check at least of company of the user appears on the form
+  if (!formSirets.some(siret => userSirets.includes(siret))) {
+    return new ForbiddenError(
+      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
+    );
+  }
+
+  return true;
+};
+export const canCreateForm = rule()(canCreateFormFn);
+
+const canUpdateFormFn = async (
+  parent: ResolversParentTypes["Mutation"],
+  { updateFormInput }: MutationUpdateFormArgs,
+  ctx: GraphQLContext
+) => {
+  const userCompanies = await getUserCompanies(ctx.user.id);
+  const userSirets = userCompanies.map(c => c.siret);
+
+  const form = await prisma.form({ id: updateFormInput.id });
+  if (!form) {
+    return new UserInputError(`Aucun BSD avec l'id ${updateFormInput.id}`);
+  }
+  const eo = await prisma.form({ id: updateFormInput.id }).ecoOrganisme();
+
+  const formSirets = [
+    form.emitterCompanySiret,
+    form.traderCompanySiret,
+    form.recipientCompanySiret,
+    form.transporterCompanySiret,
+    ...(eo ? [eo.siret] : [])
+  ].filter(Boolean) as string[];
+
+  // check at least of company of the user appears on the form
+  if (!formSirets.some(siret => userSirets.includes(siret))) {
+    return new ForbiddenError(
+      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
+    );
+  }
+
+  return true;
+};
+export const canUpdateForm = rule()(canUpdateFormFn);
+
+export const canSaveForm = rule()(
+  (
+    parent: ResolversParentTypes["Mutation"],
+    args: MutationSaveFormArgs,
+    context: GraphQLContext
+  ) => {
+    const { id, ...input } = args.formInput;
+
+    if (id) {
+      return canUpdateFormFn(
+        parent,
+        { updateFormInput: { id, ...input } },
+        context
+      );
+    }
+
+    return canCreateFormFn(parent, { createFormInput: input }, context);
+  }
 );
 
 export const isAllowedToUseAppendix2Forms = rule()(

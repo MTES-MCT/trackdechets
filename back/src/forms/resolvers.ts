@@ -20,7 +20,7 @@ import {
   takeOverSegment,
   editSegment
 } from "./mutations/multiModal";
-import { duplicateForm } from "./mutations";
+import { duplicateForm, createForm, updateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
 import { updateTransporterFields } from "./mutations/updateTransporterFields";
 import { formPdf } from "./queries/form-pdf";
@@ -112,7 +112,9 @@ const queryResolvers: QueryResolvers = {
 };
 
 const mutationResolvers: MutationResolvers = {
-  saveForm: (_parent, args, context) => saveForm(context.user.id, args),
+  createForm,
+  updateForm,
+  saveForm,
   deleteForm: async (_parent, { id }) => {
     const form = await prisma.updateForm({
       where: { id },

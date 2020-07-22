@@ -253,6 +253,29 @@ export enum Consistence {
   Gaseous = 'GASEOUS'
 }
 
+/** Payload de création d'un bordereau */
+export type CreateFormInput = {
+  /**
+   * Identifiant personnalisé permettant de faire le lien avec un
+   * objet un système d'information tierce
+   */
+  customId: Maybe<Scalars['String']>;
+  /** Établissement émetteur/producteur du déchet (case 1) */
+  emitter: Maybe<EmitterInput>;
+  /** Établissement qui reçoit le déchet (case 2) */
+  recipient: Maybe<RecipientInput>;
+  /** Transporteur du déchet (case 8) */
+  transporter: Maybe<TransporterInput>;
+  /** Détails du déchet (case 3) */
+  wasteDetails: Maybe<WasteDetailsInput>;
+  /** Négociant (case 7) */
+  trader: Maybe<TraderInput>;
+  /** Annexe 2 */
+  appendix2Forms: Maybe<Array<Maybe<AppendixFormInput>>>;
+  ecoOrganisme: Maybe<EcoOrganismeInput>;
+  temporaryStorageDetail: Maybe<TemporaryStorageDetailInput>;
+};
+
 /** Payload de création d'un récépissé négociant */
 export type CreateTraderReceiptInput = {
   /** Numéro de récépissé négociant */
@@ -709,6 +732,8 @@ export type Mutation = {
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
+  /** Crée un nouveau bordereau */
+  createForm: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Crée un récépissé transporteur
@@ -859,7 +884,10 @@ export type Mutation = {
    * Envoie un email pour la réinitialisation du mot de passe
    */
   resetPassword: Scalars['Boolean'];
-  /** Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID) */
+  /**
+   * DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
+   * @deprecated Utiliser createForm / updateForm selon le besoin
+   */
   saveForm: Maybe<Form>;
   /** Valide la prise en charge par le transporteur, et peut valider l'envoi */
   signedByTransporter: Maybe<Form>;
@@ -875,6 +903,8 @@ export type Mutation = {
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
+  /** Met à jour un bordereau existant */
+  updateForm: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Édite les informations d'un récépissé négociant
@@ -898,6 +928,11 @@ export type MutationChangePasswordArgs = {
 
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+
+export type MutationCreateFormArgs = {
+  createFormInput: CreateFormInput;
 };
 
 
@@ -1084,6 +1119,11 @@ export type MutationUpdateCompanyArgs = {
   givenName: Maybe<Scalars['String']>;
   transporterReceiptId: Maybe<Scalars['String']>;
   traderReceiptId: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateFormArgs = {
+  updateFormInput: UpdateFormInput;
 };
 
 
@@ -1744,6 +1784,31 @@ export type TransportSegment = {
   readyToTakeOver: Maybe<Scalars['Boolean']>;
   /** Numéro du segment */
   segmentNumber: Maybe<Scalars['Int']>;
+};
+
+/** Payload de mise à jour d'un bordereau */
+export type UpdateFormInput = {
+  /** Identifiant opaque */
+  id: Scalars['ID'];
+  /**
+   * Identifiant personnalisé permettant de faire le lien avec un
+   * objet un système d'information tierce
+   */
+  customId: Maybe<Scalars['String']>;
+  /** Établissement émetteur/producteur du déchet (case 1) */
+  emitter: Maybe<EmitterInput>;
+  /** Établissement qui reçoit le déchet (case 2) */
+  recipient: Maybe<RecipientInput>;
+  /** Transporteur du déchet (case 8) */
+  transporter: Maybe<TransporterInput>;
+  /** Détails du déchet (case 3) */
+  wasteDetails: Maybe<WasteDetailsInput>;
+  /** Négociant (case 7) */
+  trader: Maybe<TraderInput>;
+  /** Annexe 2 */
+  appendix2Forms: Maybe<Array<Maybe<AppendixFormInput>>>;
+  ecoOrganisme: Maybe<EcoOrganismeInput>;
+  temporaryStorageDetail: Maybe<TemporaryStorageDetailInput>;
 };
 
 /** Payload d'édition d'un récépissé transporteur */
