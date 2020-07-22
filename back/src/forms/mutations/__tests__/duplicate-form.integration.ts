@@ -3,7 +3,7 @@ import {
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
-import { prisma } from "../../../generated/prisma-client";
+import { prisma, Form } from "../../../generated/prisma-client";
 import { cleanUpNotDuplicatableFieldsInForm } from "../../form-converter";
 import { resetDatabase } from "../../../../integration-tests/helper";
 
@@ -16,7 +16,7 @@ const DUPLICATE_FORM = `
 `;
 
 describe("Mutation.duplicateForm", () => {
-  afterAll(() => resetDatabase());
+  afterEach(() => resetDatabase());
 
   it("should duplicate an existing form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -32,16 +32,18 @@ describe("Mutation.duplicateForm", () => {
       }
     });
 
-    const duplicatedForm = await prisma.form({ id: data.duplicateForm.id });
+    const duplicateForm = (await prisma.form({
+      id: data.duplicateForm.id
+    })) as Form;
 
     expect(cleanUpNotDuplicatableFieldsInForm(form)).toEqual(
-      cleanUpNotDuplicatableFieldsInForm(duplicatedForm)
+      cleanUpNotDuplicatableFieldsInForm(duplicateForm)
     );
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
       where: {
-        form: { id: duplicatedForm.id },
+        form: { id: duplicateForm.id },
         user: { id: user.id },
         status: "DRAFT"
       }
@@ -64,10 +66,12 @@ describe("Mutation.duplicateForm", () => {
       }
     });
 
-    const duplicatedForm = await prisma.form({ id: data.duplicateForm.id });
+    const duplicateForm = (await prisma.form({
+      id: data.duplicateForm.id
+    })) as Form;
 
     expect(cleanUpNotDuplicatableFieldsInForm(form)).toEqual(
-      cleanUpNotDuplicatableFieldsInForm(duplicatedForm)
+      cleanUpNotDuplicatableFieldsInForm(duplicateForm)
     );
   });
 });
