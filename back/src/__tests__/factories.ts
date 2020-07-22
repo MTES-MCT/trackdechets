@@ -10,7 +10,6 @@ import {
   CompanyCreateInput,
   FormCreateInput
 } from "../generated/prisma-client";
-import crypto from "crypto";
 
 /**
  * Create a user with name and email
@@ -193,8 +192,13 @@ export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
  * Thread-safe version of getReadableId for tests
  */
 export function getReadableId() {
-  const uid = crypto.randomBytes(16).toString("hex");
-  return `TD-${uid}`;
+  const year = new Date().getFullYear().toString().slice(-2);
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const uid = Array.from({ length: 8 })
+    .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
+    .join("");
+
+  return `TD-${year}-${uid}`;
 }
 
 export const formFactory = async ({
