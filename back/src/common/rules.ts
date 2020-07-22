@@ -1,7 +1,11 @@
 import { rule, chain } from "graphql-shield";
 
 import { Prisma } from "../generated/prisma-client";
-import { AuthenticationError, ForbiddenError } from "apollo-server-express";
+import {
+  AuthenticationError,
+  ForbiddenError,
+  UserInputError
+} from "apollo-server-express";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 
@@ -30,8 +34,12 @@ export const isAuthenticatedFromUI = chain(
 
 export const isCompanyAdmin = chain(
   isAuthenticated,
-  rule()(async (_, { siret }, ctx) => {
-    ensureRuleParametersArePresent(siret);
+  rule()(async (_, { siret }: { siret?: string }, ctx) => {
+    if (siret == null) {
+      return new UserInputError(
+        "Le siret de l'entreprise concernée est requis."
+      );
+    }
 
     const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
@@ -51,8 +59,12 @@ export const isCompanyAdmin = chain(
 
 export const isCompanyMember = chain(
   isAuthenticated,
-  rule()(async (_, { siret }, ctx) => {
-    ensureRuleParametersArePresent(siret);
+  rule()(async (_, { siret }: { siret?: string }, ctx) => {
+    if (siret == null) {
+      return new UserInputError(
+        "Le siret de l'entreprise concernée est requis."
+      );
+    }
 
     const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
@@ -72,8 +84,12 @@ export const isCompanyMember = chain(
 
 export const isCompaniesUser = chain(
   isAuthenticated,
-  rule()(async (_, { sirets }, ctx) => {
-    ensureRuleParametersArePresent(sirets);
+  rule()(async (_, { sirets }: { sirets?: string[] }, ctx) => {
+    if (sirets == null) {
+      return new UserInputError(
+        "Les sirets des entreprises concernées sont requis."
+      );
+    }
 
     const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
@@ -92,14 +108,6 @@ export const isCompaniesUser = chain(
     );
   })
 );
-
-export function ensureRuleParametersArePresent(...params: any[]) {
-  for (const param of params) {
-    if (!param) {
-      throw new Error(`⚠ A required rule parameter is missing!`);
-    }
-  }
-}
 
 /**
  * Checks if `userId` is in the companies with `siret` as a ons of the `expectedRoles`

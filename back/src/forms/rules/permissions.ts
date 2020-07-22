@@ -5,10 +5,7 @@ import {
 } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
 import { Prisma, prisma } from "../../generated/prisma-client";
-import {
-  isAuthenticated,
-  ensureRuleParametersArePresent
-} from "../../common/rules";
+import { isAuthenticated } from "../../common/rules";
 import {
   MutationSaveFormArgs,
   MutationCreateFormArgs,
@@ -204,8 +201,10 @@ export const isAllowedToUseAppendix2Forms = rule()(
 
 export const isFormEcoOrganisme = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -227,8 +226,10 @@ export const isFormEcoOrganisme = and(
 
 export const isFormRecipient = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -264,8 +265,10 @@ export const isFormRecipient = and(
 
 export const isFormEmitter = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -287,8 +290,10 @@ export const isFormEmitter = and(
 
 export const isFormTransporter = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -327,8 +332,10 @@ export const isFormTransporter = and(
 
 export const isFormTrader = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
