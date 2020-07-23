@@ -5536,7 +5536,7 @@ function flatten(wastes: WasteNode[]): WasteNode[] {
   );
 }
 
-const WASTES = flatten(WASTES_TREE).filter(
+export const WASTES = flatten(WASTES_TREE).filter(
   // only keep actual wastes and filter out categories
   waste => waste.code.length >= 8
 );
