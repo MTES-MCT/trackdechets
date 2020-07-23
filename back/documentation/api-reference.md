@@ -5861,7 +5861,10 @@ Payload lié au détails du déchet (case 3, 4, 5, 6)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Rubrique déchet au format |_|_| |_|_| |_|_| (*)
+Code du déchet qui doit faire partie de la liste officielle du code de l'environnement.
+Il doit être composé de 3 paires de deux chiffres séparés par un espace et se termine éventuellement par une astérisque.
+Un exemple valide : 01 01 01 (déchets provenant de l'extraction des minéraux métallifères)
+Un exemple invalide : 010101
 
 </td>
 </tr>
