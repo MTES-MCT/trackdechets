@@ -5,13 +5,14 @@ import {
 } from "../form-converter";
 import { getReadableId } from "../readable-id";
 import { FormCreateInput, Status, prisma } from "../../generated/prisma-client";
-import { UserInputError } from "apollo-server-express";
 import {
   MutationCreateFormArgs,
   Form,
   ResolversParentTypes
 } from "../../generated/graphql/types";
 import { GraphQLContext } from "../../types";
+import { WASTES_CODES } from "../../common/constants";
+import { InvalidWasteCode, MissingTempStorageFlag } from "../errors";
 
 export async function createForm(
   _: ResolversParentTypes["Mutation"],
@@ -33,6 +34,13 @@ export async function createForm(
     appendix2Forms: { connect: appendix2Forms }
   };
 
+  if (
+    formCreateInput.wasteDetailsCode &&
+    !WASTES_CODES.includes(formCreateInput.wasteDetailsCode)
+  ) {
+    throw new InvalidWasteCode(formCreateInput.wasteDetailsCode);
+  }
+
   if (ecoOrganisme) {
     // Connect with eco-organisme
     formCreateInput.ecoOrganisme = {
@@ -44,9 +52,7 @@ export async function createForm(
     if (formContent.recipient?.isTempStorage !== true) {
       // The user is trying to set a temporary storage without
       // recipient.isTempStorage=true, throw error
-      throw new UserInputError(
-        "Vous ne pouvez pas préciser d'entreposage provisoire sans spécifier recipient.isTempStorage = true"
-      );
+      throw new MissingTempStorageFlag();
     }
     formCreateInput.temporaryStorageDetail = {
       create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)

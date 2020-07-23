@@ -5536,9 +5536,9 @@ function flatten(wastes: WasteNode[]): WasteNode[] {
   );
 }
 
-export const WASTES = flatten(WASTES_TREE).filter(
-  // filter out categories as they're not a waste
-  waste => waste.code.length > 2
+const WASTES = flatten(WASTES_TREE).filter(
+  // only keep actual wastes and filter out categories
+  waste => waste.code.length >= 8
 );
 
 export const WASTES_CODES = WASTES.map(waste => waste.code);

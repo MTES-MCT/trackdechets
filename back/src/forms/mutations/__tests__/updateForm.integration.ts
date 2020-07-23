@@ -90,7 +90,7 @@ describe("Mutation.updateForm", () => {
         updateFormInput: {
           id: form.id,
           wasteDetails: {
-            code: "06 05 08*"
+            code: "01 01 01"
           }
         }
       }
@@ -122,7 +122,7 @@ describe("Mutation.updateForm", () => {
       const updateFormInput = {
         id: form.id,
         wasteDetails: {
-          code: "08 05 06*"
+          code: "01 01 01"
         }
       };
       const { data } = await mutate(UPDATE_FORM, {
@@ -156,7 +156,7 @@ describe("Mutation.updateForm", () => {
     const updateFormInput = {
       id: form.id,
       wasteDetails: {
-        code: "08 05 06*"
+        code: "01 01 01"
       }
     };
     const { mutate } = makeClient(user);
@@ -494,4 +494,44 @@ describe("Mutation.updateForm", () => {
 
     expect(data.updateForm.recipient).toBeNull();
   });
+
+  it.each([
+    "abc",
+    // Code of a category, not a waste
+    "01",
+    // Code of a sub-category, not a waste
+    "01 01"
+  ])(
+    "should return an error when update a form with the invalid waste code %p",
+    async wasteCode => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate(UPDATE_FORM, {
+        variables: {
+          updateFormInput: {
+            id: form.id,
+            wasteDetails: {
+              code: wasteCode
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le code déchet "${wasteCode}" n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.`,
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ]);
+    }
+  );
 });

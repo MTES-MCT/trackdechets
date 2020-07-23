@@ -4,13 +4,14 @@ import {
   expandFormFromDb
 } from "../form-converter";
 import { FormUpdateInput, prisma } from "../../generated/prisma-client";
-import { UserInputError } from "apollo-server-express";
 import {
   MutationUpdateFormArgs,
   Form,
   ResolversParentTypes
 } from "../../generated/graphql/types";
 import { GraphQLContext } from "../../types";
+import { MissingTempStorageFlag, InvalidWasteCode } from "../errors";
+import { WASTES_CODES } from "../../common/constants";
 
 export async function updateForm(
   _: ResolversParentTypes["Mutation"],
@@ -27,6 +28,10 @@ export async function updateForm(
   context: GraphQLContext
 ): Promise<Form> {
   const form = flattenFormInput(formContent);
+
+  if (form.wasteDetailsCode && !WASTES_CODES.includes(form.wasteDetailsCode)) {
+    throw new InvalidWasteCode(form.wasteDetailsCode);
+  }
 
   // form existence is already check in permissions
   const existingForm = await prisma.form({ id });
@@ -73,9 +78,7 @@ export async function updateForm(
       // The user is trying to add a temporary storage detail
       // but recipient is not set as temp storage on existing form
       // or input
-      throw new UserInputError(
-        "Vous ne pouvez pas préciser d'entreposage provisoire sans spécifier recipient.isTempStorage = true"
-      );
+      throw new MissingTempStorageFlag();
     }
 
     if (existingTemporaryStorageDetail) {

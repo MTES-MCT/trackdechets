@@ -292,4 +292,42 @@ describe("Mutation.createForm", () => {
       createFormInput.recipient.company
     );
   });
+
+  it.each([
+    "abc",
+    // Code of a category, not a waste
+    "01",
+    // Code of a sub-category, not a waste
+    "01 01"
+  ])(
+    "should return an error when creating a form with the invalid waste code %p",
+    async wasteCode => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              company: {
+                siret: company.siret
+              }
+            },
+            wasteDetails: {
+              code: wasteCode
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le code déchet "${wasteCode}" n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.`,
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ]);
+    }
+  );
 });
