@@ -123,6 +123,18 @@ const canUpdateFormFn = async (
     );
   }
 
+  if (updateFormInput.ecoOrganisme?.id) {
+    const newEO = await prisma.ecoOrganisme({
+      id: updateFormInput.ecoOrganisme.id
+    });
+
+    if (newEO == null) {
+      return new UserInputError(
+        `Aucun eco-organisme avec l'id ${updateFormInput.ecoOrganisme.id}`
+      );
+    }
+  }
+
   return true;
 };
 export const canUpdateForm = rule()(canUpdateFormFn);
