@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-express";
+import { UserInputError, ForbiddenError } from "apollo-server-express";
 
 export class InvalidWasteCode extends UserInputError {
   constructor(wasteCode: string) {
@@ -11,7 +11,27 @@ export class InvalidWasteCode extends UserInputError {
 export class MissingTempStorageFlag extends UserInputError {
   constructor() {
     super(
-      "Vous ne pouvez pas préciser d'entreposage provisoire sans spécifier recipient.isTempStorage = true"
+      `Le champ recipient.isTempStorage doit être "true" lorsqu'un entreprosage provisoire est précisé.`
     );
+  }
+}
+
+export class EcoOrganismeNotFound extends UserInputError {
+  constructor(id: string) {
+    super(`L'éco-organisme avec l'identifiant "${id}" n'existe pas.`);
+  }
+}
+
+export class NotFormContributor extends ForbiddenError {
+  constructor() {
+    super(
+      "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas."
+    );
+  }
+}
+
+export class FormNotFound extends UserInputError {
+  constructor(id: string) {
+    super(`Le bordereau avec l'identifiant "${id}" n'existe pas.`);
   }
 }

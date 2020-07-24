@@ -79,7 +79,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas.",
+          "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -131,23 +131,26 @@ describe("Mutation.createForm", () => {
   it("should return an error when trying to create a form with a non-existing eco-organisme", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      ecoOrganisme: {
+        id: "does_not_exist"
+      }
+    };
     const { mutate } = makeClient(user);
     const { errors } = await mutate(CREATE_FORM, {
       variables: {
-        createFormInput: {
-          emitter: {
-            company: {
-              siret: company.siret
-            }
-          },
-          ecoOrganisme: { id: "does_not_exist" }
-        }
+        createFormInput
       }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Aucun eco-organisme avec l'id does_not_exist",
+        message: `L'éco-organisme avec l'identifiant "${createFormInput.ecoOrganisme.id}" n'existe pas.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -257,8 +260,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas préciser d'entreposage provisoire sans spécifier recipient.isTempStorage = true",
+        message: `Le champ recipient.isTempStorage doit être "true" lorsqu'un entreprosage provisoire est précisé.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

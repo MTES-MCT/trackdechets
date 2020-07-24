@@ -13,6 +13,11 @@ import {
 } from "../../generated/graphql/types";
 import { getUserCompanies } from "../../companies/queries";
 import { GraphQLContext } from "../../types";
+import {
+  EcoOrganismeNotFound,
+  NotFormContributor,
+  FormNotFound
+} from "../errors";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -52,7 +57,7 @@ export const canAccessForm = and(
         formInfos.temporaryStorageDetail?.destinationCompanySiret,
         formInfos.temporaryStorageDetail?.transporterCompanySiret
       ].some(siret => currentUserSirets.includes(siret)) ||
-      new ForbiddenError(`Vous n'êtes pas autorisé à accéder à ce bordereau.`)
+      new NotFormContributor()
     );
   })
 );
@@ -76,18 +81,14 @@ const canCreateFormFn = async (
       id: createFormInput.ecoOrganisme.id
     });
     if (!eo) {
-      return new UserInputError(
-        `Aucun eco-organisme avec l'id ${createFormInput.ecoOrganisme.id}`
-      );
+      return new EcoOrganismeNotFound(createFormInput.ecoOrganisme.id);
     }
     formSirets.push(eo.siret);
   }
 
   // check at least of company of the user appears on the form
   if (!formSirets.some(siret => userSirets.includes(siret))) {
-    return new ForbiddenError(
-      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
-    );
+    return new NotFormContributor();
   }
 
   return true;
@@ -104,7 +105,7 @@ const canUpdateFormFn = async (
 
   const form = await prisma.form({ id: updateFormInput.id });
   if (!form) {
-    return new UserInputError(`Aucun BSD avec l'id ${updateFormInput.id}`);
+    return new FormNotFound(updateFormInput.id);
   }
   const eo = await prisma.form({ id: updateFormInput.id }).ecoOrganisme();
 
@@ -118,20 +119,14 @@ const canUpdateFormFn = async (
 
   // check at least of company of the user appears on the form
   if (!formSirets.some(siret => userSirets.includes(siret))) {
-    return new ForbiddenError(
-      "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
-    );
+    return new NotFormContributor();
   }
 
-  if (updateFormInput.ecoOrganisme?.id) {
-    const newEO = await prisma.ecoOrganisme({
-      id: updateFormInput.ecoOrganisme.id
-    });
+  if (updateFormInput.ecoOrganisme) {
+    const newEO = await prisma.ecoOrganisme(updateFormInput.ecoOrganisme);
 
     if (newEO == null) {
-      return new UserInputError(
-        `Aucun eco-organisme avec l'id ${updateFormInput.ecoOrganisme.id}`
-      );
+      return new EcoOrganismeNotFound(updateFormInput.ecoOrganisme.id);
     }
   }
 

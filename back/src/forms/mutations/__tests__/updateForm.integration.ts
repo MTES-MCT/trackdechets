@@ -99,7 +99,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas.",
+          "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -174,18 +174,19 @@ describe("Mutation.updateForm", () => {
   it("should return an error when updating a non-existing form", async () => {
     const user = await userFactory();
 
+    const updateFormInput = {
+      id: "does_not_exist"
+    };
     const { mutate } = makeClient(user);
     const { errors } = await mutate(UPDATE_FORM, {
       variables: {
-        updateFormInput: {
-          id: "does_not_exist"
-        }
+        updateFormInput
       }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Aucun BSD avec l'id does_not_exist",
+        message: `Le bordereau avec l'identifiant "${updateFormInput.id}" n'existe pas.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -202,21 +203,22 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    const updateFormInput = {
+      id: form.id,
+      ecoOrganisme: {
+        id: "does_not_exist"
+      }
+    };
     const { mutate } = makeClient(user);
     const { errors } = await mutate(UPDATE_FORM, {
       variables: {
-        updateFormInput: {
-          id: form.id,
-          ecoOrganisme: {
-            id: "does_not_exist"
-          }
-        }
+        updateFormInput
       }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Aucun eco-organisme avec l'id does_not_exist",
+        message: `L'éco-organisme avec l'identifiant "${updateFormInput.ecoOrganisme.id}" n'existe pas.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
