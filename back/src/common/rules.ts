@@ -1,7 +1,9 @@
-import { rule, and } from "graphql-shield";
+import { rule, chain } from "graphql-shield";
 
 import { Prisma } from "../generated/prisma-client";
 import { AuthenticationError, ForbiddenError } from "apollo-server-express";
+import { GraphQLContext } from "../types";
+import { AuthType } from "../auth";
 
 /**************************
  * Common permissions rules
@@ -14,7 +16,19 @@ export const isAuthenticated = rule({ cache: "contextual" })(
   }
 );
 
-export const isCompanyAdmin = and(
+export const isAuthenticatedFromUI = chain(
+  isAuthenticated,
+  rule({ cache: "contextual" })(async (_1, _2, ctx: GraphQLContext) => {
+    return (
+      ctx.user?.auth === AuthType.SESSION ||
+      new ForbiddenError(
+        "Cette opération n'est accessible que depuis l'interface graphique Trackdéchets"
+      )
+    );
+  })
+);
+
+export const isCompanyAdmin = chain(
   isAuthenticated,
   rule()(async (_, { siret }, ctx) => {
     ensureRuleParametersArePresent(siret);
@@ -35,7 +49,7 @@ export const isCompanyAdmin = and(
   })
 );
 
-export const isCompanyMember = and(
+export const isCompanyMember = chain(
   isAuthenticated,
   rule()(async (_, { siret }, ctx) => {
     ensureRuleParametersArePresent(siret);
@@ -56,7 +70,7 @@ export const isCompanyMember = and(
   })
 );
 
-export const isCompaniesUser = and(
+export const isCompaniesUser = chain(
   isAuthenticated,
   rule()(async (_, { sirets }, ctx) => {
     ensureRuleParametersArePresent(sirets);

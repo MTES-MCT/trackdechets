@@ -25,9 +25,15 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface User extends PrismaUser {
-      auth?: string;
+      auth?: AuthType;
     }
   }
+}
+
+export enum AuthType {
+  SESSION,
+  JWT,
+  BEARER
 }
 
 // verbose error message and related errored field
@@ -83,7 +89,7 @@ passport.serializeUser((user: User, done) => {
 passport.deserializeUser((id: string, done) => {
   prisma
     .user({ id })
-    .then(user => done(null, { ...user, auth: "session" }))
+    .then(user => done(null, { ...user, auth: AuthType.SESSION }))
     .catch(err => done(err));
 });
 
@@ -107,7 +113,7 @@ passport.use(
           if (accessToken && accessToken.isRevoked) {
             return done(null, false);
           }
-          return done(null, { ...user, auth: "jwt" }, { token });
+          return done(null, { ...user, auth: AuthType.JWT }, { token });
         } else {
           return done(null, false);
         }
@@ -165,7 +171,7 @@ passport.use(
       if (accessToken && !accessToken.isRevoked) {
         const user = accessToken.user;
         await updateAccessTokenLastUsed(accessToken);
-        return done(null, { ...user, auth: "bearer" });
+        return done(null, { ...user, auth: AuthType.BEARER });
       } else {
         return done(null, false);
       }

@@ -2,11 +2,11 @@ import {
   isAuthenticated,
   isUserInCompaniesWithRoles
 } from "../../common/rules";
-import { rule, and } from "graphql-shield";
+import { rule, chain } from "graphql-shield";
 import { prisma } from "../../generated/prisma-client";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 
-export const canUpdateDeleteTransporterReceipt = and(
+export const canUpdateDeleteTransporterReceipt = chain(
   isAuthenticated,
   rule()(async (_, { input }, ctx) => {
     const { id } = input;
@@ -42,7 +42,7 @@ export const canUpdateDeleteTransporterReceipt = and(
   })
 );
 
-export const canUpdateDeleteTraderReceipt = and(
+export const canUpdateDeleteTraderReceipt = chain(
   isAuthenticated,
   rule()(async (_, { input }, ctx) => {
     const { id } = input;
