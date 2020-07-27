@@ -55,7 +55,10 @@ export default function Delete({ formId }: Props) {
           <h3>Confirmer la suppression ?</h3>
           <p>Cette action est irréversible.</p>
           <div className="form__actions">
-            <button className="button-outline primary" onClick={() => setIsOpen(false)}>
+            <button
+              className="button-outline primary"
+              onClick={() => setIsOpen(false)}
+            >
               Annuler
             </button>
             <button className="button no-margin" onClick={() => deleteForm()}>

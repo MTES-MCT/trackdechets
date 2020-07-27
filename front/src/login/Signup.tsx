@@ -35,13 +35,13 @@ export default function Signup() {
             const { cgu, ...userInfos } = values;
 
             signup({ variables: { userInfos } })
-              .then((_) =>
+              .then(_ =>
                 history.push({
                   pathname: "/signup/activation",
                   state: { signupEmail: userInfos.email },
                 })
               )
-              .catch((_) => {
+              .catch(_ => {
                 setSubmitting(false);
               });
           }}
