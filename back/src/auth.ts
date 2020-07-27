@@ -64,7 +64,9 @@ passport.use(
       }
       const passwordValid = await compare(password, user.password);
       if (!passwordValid) {
-        return done(null, false, { ...getLoginError(username).INVALID_PASSWORD });
+        return done(null, false, {
+          ...getLoginError(username).INVALID_PASSWORD
+        });
       }
       return done(null, user);
     }
