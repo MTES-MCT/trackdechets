@@ -20,7 +20,7 @@ export const isAuthenticatedFromUI = chain(
   isAuthenticated,
   rule({ cache: "contextual" })(async (_1, _2, ctx: GraphQLContext) => {
     return (
-      ctx.user?.auth === AuthType.SESSION ||
+      ctx.user?.auth === AuthType.Session ||
       new ForbiddenError(
         "Cette opération n'est accessible que depuis l'interface graphique Trackdéchets"
       )

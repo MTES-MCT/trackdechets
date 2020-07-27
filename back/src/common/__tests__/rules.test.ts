@@ -33,7 +33,7 @@ describe("isAuthenticatedFromUI", () => {
   });
 
   it("should return ForbiddenError if a user is authenticated with Bearer token", async () => {
-    const context = { user: { id: "id", auth: AuthType.BEARER } };
+    const context = { user: { id: "id", auth: AuthType.Bearer } };
     const result = await testRule(isAuthenticatedFromUI)(null, {}, context);
     expect(result).toBeInstanceOf(ForbiddenError);
   });
@@ -45,7 +45,7 @@ describe("isAuthenticatedFromUI", () => {
   });
 
   it("should return true if a user is authenticated with a session cookie", async () => {
-    const context = { user: { id: "id", auth: AuthType.SESSION } };
+    const context = { user: { id: "id", auth: AuthType.Session } };
     const result = await testRule(isAuthenticatedFromUI)(null, {}, context);
     expect(result).toEqual(true);
   });

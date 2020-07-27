@@ -1,11 +1,12 @@
 import { createTestClient } from "apollo-server-integration-testing";
 import { server } from "../server";
 import { User } from "../generated/prisma-client";
+import { AuthType } from "../auth";
 
 /**
  * Instantiate test client
  */
-function makeClient(user?: User) {
+function makeClient(user?: User, authType?: AuthType) {
   const { mutate, query, setOptions } = createTestClient({
     apolloServer: server
   });
@@ -13,7 +14,8 @@ function makeClient(user?: User) {
   if (user) {
     setOptions({
       request: {
-        user
+        user,
+        ...(authType ? { auth: authType } : {})
       }
     });
   }

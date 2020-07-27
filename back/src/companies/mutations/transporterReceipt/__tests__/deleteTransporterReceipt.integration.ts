@@ -2,6 +2,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { AuthType } from "../../../../auth";
 
 describe("{ mutation { deleteTransporterReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -21,7 +22,7 @@ describe("{ mutation { deleteTransporterReceipt } }", () => {
       where: { id: company.id }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(user, AuthType.Session);
 
     const mutation = `
       mutation {

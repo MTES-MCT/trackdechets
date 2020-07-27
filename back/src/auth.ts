@@ -31,9 +31,9 @@ declare global {
 }
 
 export enum AuthType {
-  SESSION,
-  JWT,
-  BEARER
+  Session = "session",
+  JWT = "jwt",
+  Bearer = "bearer"
 }
 
 // verbose error message and related errored field
@@ -89,7 +89,7 @@ passport.serializeUser((user: User, done) => {
 passport.deserializeUser((id: string, done) => {
   prisma
     .user({ id })
-    .then(user => done(null, { ...user, auth: AuthType.SESSION }))
+    .then(user => done(null, { ...user, auth: AuthType.Session }))
     .catch(err => done(err));
 });
 
@@ -171,7 +171,7 @@ passport.use(
       if (accessToken && !accessToken.isRevoked) {
         const user = accessToken.user;
         await updateAccessTokenLastUsed(accessToken);
-        return done(null, { ...user, auth: AuthType.BEARER });
+        return done(null, { ...user, auth: AuthType.Bearer });
       } else {
         return done(null, false);
       }

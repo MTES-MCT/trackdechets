@@ -4,6 +4,7 @@ import * as mailsHelper from "../../../common/mails.helper";
 import { prisma } from "../../../generated/prisma-client";
 import makeClient from "../../../__tests__/testClient";
 import { ErrorCode } from "../../../common/errors";
+import { AuthType } from "../../../auth";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -35,7 +36,7 @@ describe("Create company endpoint", () => {
     }
   `;
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(user, AuthType.Session);
 
     const { data } = await mutate(mutation);
 
@@ -91,7 +92,7 @@ describe("Create company endpoint", () => {
           }
       }`;
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(user, AuthType.Session);
 
     const { data } = await mutate(mutation);
 
@@ -131,7 +132,7 @@ describe("Create company endpoint", () => {
           }
       }`;
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(user, AuthType.Session);
 
     const { data } = await mutate(mutation);
 
@@ -160,7 +161,7 @@ describe("Create company endpoint", () => {
           }
       }`;
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(user, AuthType.Session);
 
     await mutate(mutation);
 
@@ -186,7 +187,7 @@ describe("Create company endpoint", () => {
         ) { siret, gerepId, name, companyTypes }
       }
       `;
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(user, AuthType.Session);
 
     const { errors, data } = await mutate(mutation);
 
@@ -196,7 +197,7 @@ describe("Create company endpoint", () => {
 
   test("should alert when a user creates too many companies", async () => {
     const user = await userFactory();
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(user, AuthType.Session);
 
     async function createCompany(siret) {
       const mutation = `
