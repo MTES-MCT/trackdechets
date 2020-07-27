@@ -1644,24 +1644,6 @@ Libellé NAF de l'établissement
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>longitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Longitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>latitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Latitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>installation</strong></td>
 <td valign="top"><a href="#installation">Installation</a></td>
 <td>
@@ -1788,24 +1770,6 @@ Libellé NAF
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>longitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Longitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>latitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Latitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>installation</strong></td>
 <td valign="top"><a href="#installation">Installation</a></td>
 <td>
@@ -1869,11 +1833,29 @@ SIRET de l'établissement
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>etatAdministratif</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+État administratif de l'établissement. A = Actif, F = Fermé
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
 Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>codeCommune</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code commune de l'établissement
 
 </td>
 </tr>
@@ -1910,24 +1892,6 @@ Code NAF
 <td>
 
 Libellé NAF
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>longitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Longitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>latitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Latitude de l'établissement (info géographique)
 
 </td>
 </tr>

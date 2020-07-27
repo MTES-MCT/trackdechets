@@ -136,10 +136,6 @@ export type CompanyPrivate = {
   naf?: Maybe<Scalars['String']>;
   /** Libellé NAF de l'établissement */
   libelleNaf?: Maybe<Scalars['String']>;
-  /** Longitude de l'établissement (info géographique) */
-  longitude?: Maybe<Scalars['Float']>;
-  /** Latitude de l'établissement (info géographique) */
-  latitude?: Maybe<Scalars['Float']>;
   /**
    * Installation classée pour la protection de l'environnement (ICPE)
    * associé à cet établissement (le cas échéant)
@@ -172,10 +168,6 @@ export type CompanyPublic = {
   naf?: Maybe<Scalars['String']>;
   /** Libellé NAF */
   libelleNaf?: Maybe<Scalars['String']>;
-  /** Longitude de l'établissement (info géographique) */
-  longitude?: Maybe<Scalars['Float']>;
-  /** Latitude de l'établissement (info géographique) */
-  latitude?: Maybe<Scalars['Float']>;
   /**
    * Installation classée pour la protection de l'environnement (ICPE)
    * associé à cet établissement
@@ -194,8 +186,12 @@ export type CompanySearchResult = {
    __typename?: 'CompanySearchResult';
   /** SIRET de l'établissement */
   siret?: Maybe<Scalars['String']>;
+  /** État administratif de l'établissement. A = Actif, F = Fermé */
+  etatAdministratif?: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address?: Maybe<Scalars['String']>;
+  /** Code commune de l'établissement */
+  codeCommune?: Maybe<Scalars['String']>;
   /** Nom de l'établissement */
   name?: Maybe<Scalars['String']>;
   /** Profil de l'établissement */
@@ -204,10 +200,6 @@ export type CompanySearchResult = {
   naf?: Maybe<Scalars['String']>;
   /** Libellé NAF */
   libelleNaf?: Maybe<Scalars['String']>;
-  /** Longitude de l'établissement (info géographique) */
-  longitude?: Maybe<Scalars['Float']>;
-  /** Latitude de l'établissement (info géographique) */
-  latitude?: Maybe<Scalars['Float']>;
   /**
    * Installation classée pour la protection de l'environnement (ICPE)
    * associé à cet établissement
@@ -2199,8 +2191,6 @@ export type CompanyPrivateResolvers<ContextType = GraphQLContext, ParentType ext
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   naf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   libelleNaf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  longitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  latitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   installation?: Resolver<Maybe<ResolversTypes['Installation']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
@@ -2217,8 +2207,6 @@ export type CompanyPublicResolvers<ContextType = GraphQLContext, ParentType exte
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   naf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   libelleNaf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  longitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  latitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   installation?: Resolver<Maybe<ResolversTypes['Installation']>, ParentType, ContextType>;
   isRegistered?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
@@ -2228,13 +2216,13 @@ export type CompanyPublicResolvers<ContextType = GraphQLContext, ParentType exte
 
 export type CompanySearchResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanySearchResult'] = ResolversParentTypes['CompanySearchResult']> = {
   siret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  etatAdministratif?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  codeCommune?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   companyTypes?: Resolver<Maybe<Array<Maybe<ResolversTypes['CompanyType']>>>, ParentType, ContextType>;
   naf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   libelleNaf?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  longitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  latitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   installation?: Resolver<Maybe<ResolversTypes['Installation']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
@@ -2718,8 +2706,6 @@ export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): Compan
     name: null,
     naf: null,
     libelleNaf: null,
-    longitude: null,
-    latitude: null,
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,
@@ -2739,8 +2725,6 @@ export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyP
     name: null,
     naf: null,
     libelleNaf: null,
-    longitude: null,
-    latitude: null,
     installation: null,
     isRegistered: null,
     transporterReceipt: null,
@@ -2753,13 +2737,13 @@ export function createCompanySearchResultMock(props: Partial<CompanySearchResult
   return {
     __typename: "CompanySearchResult",
     siret: null,
+    etatAdministratif: null,
     address: null,
+    codeCommune: null,
     name: null,
     companyTypes: null,
     naf: null,
     libelleNaf: null,
-    longitude: null,
-    latitude: null,
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,

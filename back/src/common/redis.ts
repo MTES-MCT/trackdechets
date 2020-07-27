@@ -36,12 +36,12 @@ type SetOptions = {
   XX?: boolean; // XX -- Only set the key if it already exist.
 };
 
-export async function cachedGet(
-  getter: (itemKey) => Promise<any>,
+export async function cachedGet<T>(
+  getter: (itemKey: string | number) => Promise<T>,
   objectType: string,
   itemKey: string | number,
   settings: { parser?: Parser; options?: SetOptions } = {}
-) {
+): Promise<T> {
   const { parser = defaultParser, options = {} } = settings;
   const cacheKey = generateKey(objectType, itemKey);
 

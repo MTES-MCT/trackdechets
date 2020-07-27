@@ -47,7 +47,9 @@ describe("cachedGet", () => {
 
   test("should be able to get json in cache", async () => {
     const foo = () => null;
-    const res = await cachedGet(foo, "foo", "2000", { parser: JSON });
+    const res = await cachedGet<{ name: string }>(foo, "foo", "2000", {
+      parser: JSON
+    });
 
     expect(res.name).toBe("foo");
   });

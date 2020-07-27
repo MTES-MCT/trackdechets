@@ -199,12 +199,6 @@ type CompanyPrivate {
   "Libellé NAF de l'établissement"
   libelleNaf: String
 
-  "Longitude de l'établissement (info géographique)"
-  longitude: Float
-
-  "Latitude de l'établissement (info géographique)"
-  latitude: Float
-
   """
   Installation classée pour la protection de l'environnement (ICPE)
   associé à cet établissement (le cas échéant)
@@ -251,12 +245,6 @@ type CompanyPublic {
   "Libellé NAF"
   libelleNaf: String
 
-  "Longitude de l'établissement (info géographique)"
-  longitude: Float
-
-  "Latitude de l'établissement (info géographique)"
-  latitude: Float
-
   """
   Installation classée pour la protection de l'environnement (ICPE)
   associé à cet établissement
@@ -284,8 +272,14 @@ type CompanySearchResult {
   "SIRET de l'établissement"
   siret: String
 
+  "État administratif de l'établissement. A = Actif, F = Fermé"
+  etatAdministratif: String
+
   "Adresse de l'établissement"
   address: String
+
+  "Code commune de l'établissement"
+  codeCommune: String
 
   "Nom de l'établissement"
   name: String
@@ -298,12 +292,6 @@ type CompanySearchResult {
 
   "Libellé NAF"
   libelleNaf: String
-
-  "Longitude de l'établissement (info géographique)"
-  longitude: Float
-
-  "Latitude de l'établissement (info géographique)"
-  latitude: Float
 
   """
   Installation classée pour la protection de l'environnement (ICPE)

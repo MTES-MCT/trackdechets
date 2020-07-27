@@ -45,9 +45,9 @@ export default function WasteCode(props) {
             type="text"
             name={field.name}
             value={wasteCode}
-            className={`waste-code__input ${meta.touched &&
-              meta.error &&
-              "input-error"}`}
+            className={`waste-code__input ${
+              meta.touched && meta.error && "input-error"
+            }`}
             onBlur={field.onBlur}
             onChange={e => setWasteCode(e.target.value)}
           />

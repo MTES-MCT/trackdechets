@@ -1,5 +1,5 @@
 import { searchCompany, searchCompanies } from "../client";
-import { ErrorCode } from "../../../common/errors";
+import { ErrorCode } from "../../../../common/errors";
 import axios from "axios";
 
 jest.mock("axios");
@@ -22,8 +22,6 @@ describe("searchCompany", () => {
           code_postal: "13001",
           code_commune: "13201",
           libelle_commune: "MARSEILLE",
-          longitude: "5.387141",
-          latitude: "43.300746",
           geo_adresse: "4 Boulevard Longchamp 13001 Marseille",
           unite_legale: {
             denomination: "CODE EN STOCK",
@@ -40,9 +38,7 @@ describe("searchCompany", () => {
       codeCommune: "13201",
       name: "CODE EN STOCK",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746
+      libelleNaf: "Programmation informatique"
     };
     expect(company).toEqual(expected);
   });
@@ -61,8 +57,6 @@ describe("searchCompany", () => {
           code_postal: "13001",
           code_commune: "13201",
           libelle_commune: "MARSEILLE",
-          longitude: "5.387141",
-          latitude: "43.300746",
           geo_adresse: "4 RUE DES ROSIERS 13001 Marseille",
           unite_legale: {
             denomination: null,
@@ -126,8 +120,6 @@ describe("searchCompanies", () => {
             libelle_commune: "MARSEILLE",
             activite_principale: "6201Z",
             libelle_activite_principale: "Programmation informatique",
-            longitude: "5.387141",
-            latitude: "43.300746",
             geo_adresse: "4 Boulevard Longchamp 13001 Marseille"
           }
         ]
@@ -140,9 +132,7 @@ describe("searchCompanies", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       name: "CODE EN STOCK",
       naf: "6201Z",
-      libelleNaf: "Programmation informatique",
-      longitude: 5.387141,
-      latitude: 43.300746
+      libelleNaf: "Programmation informatique"
     };
     expect(companies[0]).toEqual(expected);
   });
@@ -163,8 +153,6 @@ describe("searchCompanies", () => {
             activite_principale: "1071C",
             libelle_activite_principale:
               "Boulangerie et boulangerie-pâtisserie",
-            longitude: "5.38641",
-            latitude: "43.300208",
             geo_adresse: "18 Cours Joseph Thierry 13001 Marseille"
           }
         ]
@@ -218,8 +206,6 @@ describe("searchCompanies", () => {
             activite_principale: "4724Z",
             libelle_activite_principale:
               "Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",
-            longitude: "4.693487",
-            latitude: "45.258127",
             geo_adresse: "1 route des blés 07100 ANNONAY"
           }
         ]
@@ -234,9 +220,7 @@ describe("searchCompanies", () => {
       name: "BOULANGERIE",
       naf: "4724Z",
       libelleNaf:
-        "Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",
-      longitude: 4.693487,
-      latitude: 45.258127
+        "Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé"
     };
     expect(companies[0]).toEqual(expected);
     expect(
@@ -258,8 +242,6 @@ describe("searchCompanies", () => {
           libelle_voie: "LONGCHAMP",
           code_postal: "13001",
           libelle_commune: "MARSEILLE",
-          longitude: "5.387141",
-          latitude: "43.300746",
           geo_adresse: "4 Boulevard Longchamp 13001 Marseille",
           unite_legale: {
             denomination: "CODE EN STOCK",
