@@ -10,7 +10,6 @@ import { createForm } from "./createForm";
 export async function saveForm(
   _: ResolversParentTypes["Mutation"],
   { formInput }: MutationSaveFormArgs,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   context: GraphQLContext
 ): Promise<Form> {
   const { id, ...input } = formInput;
