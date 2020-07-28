@@ -5861,10 +5861,22 @@ Payload lié au détails du déchet (case 3, 4, 5, 6)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Code du déchet qui doit faire partie de la liste officielle du code de l'environnement.
+Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
+https://aida.ineris.fr/consultation_document/10327
+
 Il doit être composé de 3 paires de deux chiffres séparés par un espace et se termine éventuellement par une astérisque.
-Un exemple valide : 01 01 01 (déchets provenant de l'extraction des minéraux métallifères)
-Un exemple invalide : 010101
+
+Un exemple de déchet non-dangereux valide (déchets provenant de l'extraction des minéraux métallifères) :
+01 01 01
+
+Ce même exemple, mais avec un format invalide :
+010101
+
+Un exemple de déchet dangereux valide (stériles acidogènes provenant de la transformation du sulfure) :
+01 03 04*
+
+Ce même exemple, mais avec un format invalide :
+010304 *
 
 </td>
 </tr>
