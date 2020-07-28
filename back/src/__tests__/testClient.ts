@@ -14,8 +14,10 @@ function makeClient(user?: User, authType?: AuthType) {
   if (user) {
     setOptions({
       request: {
-        user,
-        ...(authType ? { auth: authType } : {})
+        user: {
+          ...user,
+          ...(authType ? { auth: authType } : {})
+        }
       }
     });
   }
