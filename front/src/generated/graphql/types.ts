@@ -1,4 +1,5 @@
 export type Maybe<T> = T | null;
+export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -26,7 +27,7 @@ export type AppendixFormInput = {
 
 /** Cet objet est renvoyé par la mutation login qui est dépréciée */
 export type AuthPayload = {
-   __typename?: 'AuthPayload';
+  __typename?: 'AuthPayload';
   /**
    * Bearer token à durée illimité permettant de s'authentifier
    * à l'API Trackdéchets. Pour ce faire, il doit être passé dans le
@@ -43,7 +44,7 @@ export type AuthPayload = {
  * BSD édités
  */
 export type CompanyFavorite = {
-   __typename?: 'CompanyFavorite';
+  __typename?: 'CompanyFavorite';
   /** Nom de l'établissement */
   name: Maybe<Scalars['String']>;
   /** SIRET de l'établissement */
@@ -80,7 +81,7 @@ export type CompanyInput = {
 
 /** Information sur utilisateur au sein d'un établissement */
 export type CompanyMember = {
-   __typename?: 'CompanyMember';
+  __typename?: 'CompanyMember';
   /** Identifiant opaque */
   id: Scalars['ID'];
   /** Email */
@@ -99,7 +100,7 @@ export type CompanyMember = {
 
 /** Information sur un établissement accessible par un utilisateur membre */
 export type CompanyPrivate = {
-   __typename?: 'CompanyPrivate';
+  __typename?: 'CompanyPrivate';
   /** Identifiant opaque */
   id: Scalars['ID'];
   /** Profil de l'établissement */
@@ -146,7 +147,7 @@ export type CompanyPrivate = {
 
 /** Information sur un établissement accessible publiquement */
 export type CompanyPublic = {
-   __typename?: 'CompanyPublic';
+  __typename?: 'CompanyPublic';
   /** Email de contact */
   contactEmail: Maybe<Scalars['String']>;
   /** Numéro de téléphone de contact */
@@ -180,7 +181,7 @@ export type CompanyPublic = {
 
 /** Information sur un établissement accessible publiquement en recherche */
 export type CompanySearchResult = {
-   __typename?: 'CompanySearchResult';
+  __typename?: 'CompanySearchResult';
   /** SIRET de l'établissement */
   siret: Maybe<Scalars['String']>;
   /** État administratif de l'établissement. A = Actif, F = Fermé */
@@ -210,7 +211,7 @@ export type CompanySearchResult = {
 
 /** Statistiques d'un établissement */
 export type CompanyStat = {
-   __typename?: 'CompanyStat';
+  __typename?: 'CompanyStat';
   /** Établissement */
   company: Maybe<FormCompany>;
   /** Liste des statistiques */
@@ -291,7 +292,7 @@ export type CreateTransporterReceiptInput = {
 
 /** Représente une ligne dans une déclaration GEREP */
 export type Declaration = {
-   __typename?: 'Declaration';
+  __typename?: 'Declaration';
   /** Année de la déclaration */
   annee: Maybe<Scalars['String']>;
   /** Code du déchet */
@@ -315,7 +316,7 @@ export type DeleteTransporterReceiptInput = {
 };
 
 export type Destination = {
-   __typename?: 'Destination';
+  __typename?: 'Destination';
   /** N° de CAP (le cas échéant) */
   cap: Maybe<Scalars['String']>;
   /** Opération d'élimination / valorisation prévue (code D/R) */
@@ -343,7 +344,7 @@ export type DestinationInput = {
  * Seul un éco-organisme enregistré dans Trackdéchet peut être associé.
  */
 export type EcoOrganisme = {
-   __typename?: 'EcoOrganisme';
+  __typename?: 'EcoOrganisme';
   id: Scalars['ID'];
   /** Nom de l'éco-organisme */
   name: Scalars['String'];
@@ -360,7 +361,7 @@ export type EcoOrganismeInput = {
 
 /** Émetteur du BSD (case 1) */
 export type Emitter = {
-   __typename?: 'Emitter';
+  __typename?: 'Emitter';
   /** Type d'émetteur */
   type: Maybe<EmitterType>;
   /** Adresse du chantier */
@@ -414,7 +415,7 @@ export enum FavoriteType {
  * permettant de valider le téléchargement.
  */
 export type FileDownload = {
-   __typename?: 'FileDownload';
+  __typename?: 'FileDownload';
   /** Token ayant une durée de validité de 10s */
   token: Maybe<Scalars['String']>;
   /** Lien de téléchargement */
@@ -426,7 +427,7 @@ export type FileDownload = {
  * Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/professionnels-entreprises/vosdroits/R14334)
  */
 export type Form = {
-   __typename?: 'Form';
+  __typename?: 'Form';
   /** Identifiant interne du BSD */
   id: Scalars['ID'];
   /** Identifiant utilisé dans la case 'Bordereau n° ****' */
@@ -503,7 +504,7 @@ export type Form = {
 
 /** Information sur un établissement dans un BSD */
 export type FormCompany = {
-   __typename?: 'FormCompany';
+  __typename?: 'FormCompany';
   /** Nom de l'établissement */
   name: Maybe<Scalars['String']>;
   /** SIRET de l'établissement */
@@ -558,7 +559,7 @@ export enum FormRole {
 
 /** Informations du cycle de vie des bordereaux */
 export type FormsLifeCycleData = {
-   __typename?: 'formsLifeCycleData';
+  __typename?: 'formsLifeCycleData';
   /** Liste des changements de statuts */
   statusLogs: Array<StatusLog>;
   /** pagination, indique si d'autres pages existent après */
@@ -655,7 +656,7 @@ export enum FormStatus {
  * Mise à jour d'un BSD
  */
 export type FormSubscription = {
-   __typename?: 'FormSubscription';
+  __typename?: 'FormSubscription';
   /** Type de mutation */
   mutation: Maybe<Scalars['String']>;
   /** BSD concerné */
@@ -682,7 +683,7 @@ export enum GerepType {
 
 /** Installation pour la protection de l'environnement (ICPE) */
 export type Installation = {
-   __typename?: 'Installation';
+  __typename?: 'Installation';
   /** Identifiant S3IC */
   codeS3ic: Maybe<Scalars['String']>;
   /** URL de la fiche ICPE sur Géorisques */
@@ -695,7 +696,7 @@ export type Installation = {
 
 
 export type MultimodalTransporter = {
-   __typename?: 'MultimodalTransporter';
+  __typename?: 'MultimodalTransporter';
   /** Établissement transporteur */
   company: Maybe<FormCompany>;
   /** Exemption de récipissé */
@@ -713,7 +714,7 @@ export type MultimodalTransporter = {
 };
 
 export type Mutation = {
-   __typename?: 'Mutation';
+  __typename?: 'Mutation';
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -1137,7 +1138,7 @@ export type MutationUpdateTransporterReceiptArgs = {
 
 /** Destination ultérieure prévue (case 12) */
 export type NextDestination = {
-   __typename?: 'NextDestination';
+  __typename?: 'NextDestination';
   /** Traitement prévue (code D/R) */
   processingOperation: Maybe<Scalars['String']>;
   /** Établissement ultérieure */
@@ -1253,7 +1254,7 @@ export enum QuantityType {
 }
 
 export type Query = {
-   __typename?: 'Query';
+  __typename?: 'Query';
   /**
    * USAGE INTERNE > Mon Compte > Générer un token
    * Renvoie un token permettant de s'authentifier à l'API Trackdéchets
@@ -1398,7 +1399,7 @@ export type ReceivedFormInput = {
  * ou de reconditionnement prévue (case 2)
  */
 export type Recipient = {
-   __typename?: 'Recipient';
+  __typename?: 'Recipient';
   /** N° de CAP (le cas échéant) */
   cap: Maybe<Scalars['String']>;
   /** Opération d'élimination / valorisation prévue (code D/R) */
@@ -1454,7 +1455,7 @@ export type ResentFormInput = {
  * [nomenclature des ICPE](https://www.georisques.gouv.fr/dossiers/installations/nomenclature-ic)
  */
 export type Rubrique = {
-   __typename?: 'Rubrique';
+  __typename?: 'Rubrique';
   /**
    * Numéro de rubrique tel que défini dans la nomenclature des ICPE
    * Ex: 2710
@@ -1502,7 +1503,7 @@ export type SignupInput = {
 
 /** Statistiques */
 export type Stat = {
-   __typename?: 'Stat';
+  __typename?: 'Stat';
   /** Code déchet */
   wasteCode: Scalars['String'];
   /** Quantité entrante */
@@ -1521,7 +1522,7 @@ export type Stat = {
  * Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
  */
 export type StateSummary = {
-   __typename?: 'StateSummary';
+  __typename?: 'StateSummary';
   /** Quantité la plus à jour */
   quantity: Maybe<Scalars['Float']>;
   /** Packaging le plus à jour */
@@ -1544,7 +1545,7 @@ export type StateSummary = {
 
 /** Changement de statut d'un bordereau */
 export type StatusLog = {
-   __typename?: 'StatusLog';
+  __typename?: 'StatusLog';
   /** Identifiant du log */
   id: Maybe<Scalars['ID']>;
   /** Statut du bordereau après le changement de statut */
@@ -1561,7 +1562,7 @@ export type StatusLog = {
 
 /** Information sur un BSD dans les logs de modifications de statuts */
 export type StatusLogForm = {
-   __typename?: 'StatusLogForm';
+  __typename?: 'StatusLogForm';
   /** Identifiant du BSD */
   id: Maybe<Scalars['ID']>;
   /** N° du bordereau */
@@ -1570,13 +1571,13 @@ export type StatusLogForm = {
 
 /** Utilisateur ayant modifié le BSD */
 export type StatusLogUser = {
-   __typename?: 'StatusLogUser';
+  __typename?: 'StatusLogUser';
   id: Maybe<Scalars['ID']>;
   email: Maybe<Scalars['String']>;
 };
 
 export type Subscription = {
-   __typename?: 'Subscription';
+  __typename?: 'Subscription';
   /**
    * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
    * 
@@ -1598,7 +1599,7 @@ export type TakeOverInput = {
 
 /** Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant */
 export type TemporaryStorageDetail = {
-   __typename?: 'TemporaryStorageDetail';
+  __typename?: 'TemporaryStorageDetail';
   /** Établissement qui sotcke temporairement le déchet (case 13) */
   temporaryStorer: Maybe<TemporaryStorer>;
   /**
@@ -1621,7 +1622,7 @@ export type TemporaryStorageDetailInput = {
 };
 
 export type TemporaryStorer = {
-   __typename?: 'TemporaryStorer';
+  __typename?: 'TemporaryStorer';
   quantityType: Maybe<QuantityType>;
   quantityReceived: Maybe<Scalars['Float']>;
   wasteAcceptationStatus: Maybe<Scalars['String']>;
@@ -1649,7 +1650,7 @@ export type TempStoredFormInput = {
 
 /** Négociant (case 7) */
 export type Trader = {
-   __typename?: 'Trader';
+  __typename?: 'Trader';
   /** Établissement négociant */
   company: Maybe<FormCompany>;
   /** N° de récipissé */
@@ -1674,7 +1675,7 @@ export type TraderInput = {
 
 /** Récépissé négociant */
 export type TraderReceipt = {
-   __typename?: 'TraderReceipt';
+  __typename?: 'TraderReceipt';
   id: Scalars['ID'];
   /** Numéro de récépissé négociant */
   receiptNumber: Scalars['String'];
@@ -1686,7 +1687,7 @@ export type TraderReceipt = {
 
 /** Collecteur - transporteur (case 8) */
 export type Transporter = {
-   __typename?: 'Transporter';
+  __typename?: 'Transporter';
   /** Établissement collecteur - transporteur */
   company: Maybe<FormCompany>;
   /** Exemption de récipissé */
@@ -1721,7 +1722,7 @@ export type TransporterInput = {
 
 /** Récépissé transporteur */
 export type TransporterReceipt = {
-   __typename?: 'TransporterReceipt';
+  __typename?: 'TransporterReceipt';
   id: Scalars['ID'];
   /** Numéro de récépissé transporteur */
   receiptNumber: Scalars['String'];
@@ -1760,7 +1761,7 @@ export enum TransportMode {
 }
 
 export type TransportSegment = {
-   __typename?: 'TransportSegment';
+  __typename?: 'TransportSegment';
   id: Scalars['ID'];
   /** Siret du transporteur précédent */
   previousTransporterCompanySiret: Maybe<Scalars['String']>;
@@ -1829,7 +1830,7 @@ export type UpdateTransporterReceiptInput = {
 
 /** Lien d'upload */
 export type UploadLink = {
-   __typename?: 'UploadLink';
+  __typename?: 'UploadLink';
   /** URL signé permettant d'uploader un fichier */
   signedUrl: Maybe<Scalars['String']>;
   /** Clé permettant l'upload du fichier */
@@ -1838,7 +1839,7 @@ export type UploadLink = {
 
 /** Représente un utilisateur sur la plateforme Trackdéchets */
 export type User = {
-   __typename?: 'User';
+  __typename?: 'User';
   /** Identifiant opaque */
   id: Scalars['ID'];
   /** Email de l'utiliateur */
@@ -1883,7 +1884,7 @@ export enum WasteAcceptationStatusInput {
 
 /** Détails du déchet (case 3, 4, 5, 6) */
 export type WasteDetails = {
-   __typename?: 'WasteDetails';
+  __typename?: 'WasteDetails';
   /** Rubrique déchet au format |_|_| |_|_| |_|_| (*) */
   code: Maybe<Scalars['String']>;
   /** Dénomination usuelle */
@@ -1955,7 +1956,7 @@ export enum WasteType {
 
 /** Informations sur une adresse chantier */
 export type WorkSite = {
-   __typename?: 'WorkSite';
+  __typename?: 'WorkSite';
   name: Maybe<Scalars['String']>;
   address: Maybe<Scalars['String']>;
   city: Maybe<Scalars['String']>;
@@ -1973,6 +1974,13 @@ export type WorkSiteInput = {
 };
 
 
+export function createAppendixFormInputMock(props: Partial<AppendixFormInput>): AppendixFormInput {
+  return {
+    readableId: null,
+    ...props,
+  };
+}
+
 export function createAuthPayloadMock(props: Partial<AuthPayload>): AuthPayload {
   return {
     __typename: "AuthPayload",
@@ -1980,7 +1988,7 @@ export function createAuthPayloadMock(props: Partial<AuthPayload>): AuthPayload 
     user: createUserMock({}),
     ...props,
   };
-};
+}
 
 export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): CompanyFavorite {
   return {
@@ -1995,7 +2003,19 @@ export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): Comp
     traderReceipt: null,
     ...props,
   };
-};
+}
+
+export function createCompanyInputMock(props: Partial<CompanyInput>): CompanyInput {
+  return {
+    siret: null,
+    name: null,
+    address: null,
+    contact: null,
+    mail: null,
+    phone: null,
+    ...props,
+  };
+}
 
 export function createCompanyMemberMock(props: Partial<CompanyMember>): CompanyMember {
   return {
@@ -2009,7 +2029,7 @@ export function createCompanyMemberMock(props: Partial<CompanyMember>): CompanyM
     isMe: null,
     ...props,
   };
-};
+}
 
 export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): CompanyPrivate {
   return {
@@ -2034,7 +2054,7 @@ export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): Compan
     traderReceipt: null,
     ...props,
   };
-};
+}
 
 export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyPublic {
   return {
@@ -2054,7 +2074,7 @@ export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyP
     traderReceipt: null,
     ...props,
   };
-};
+}
 
 export function createCompanySearchResultMock(props: Partial<CompanySearchResult>): CompanySearchResult {
   return {
@@ -2072,7 +2092,7 @@ export function createCompanySearchResultMock(props: Partial<CompanySearchResult
     traderReceipt: null,
     ...props,
   };
-};
+}
 
 export function createCompanyStatMock(props: Partial<CompanyStat>): CompanyStat {
   return {
@@ -2081,7 +2101,25 @@ export function createCompanyStatMock(props: Partial<CompanyStat>): CompanyStat 
     stats: [],
     ...props,
   };
-};
+}
+
+export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderReceiptInput>): CreateTraderReceiptInput {
+  return {
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+}
+
+export function createCreateTransporterReceiptInputMock(props: Partial<CreateTransporterReceiptInput>): CreateTransporterReceiptInput {
+  return {
+    receiptNumber: "",
+    validityLimit: new Date(),
+    department: "",
+    ...props,
+  };
+}
 
 export function createDeclarationMock(props: Partial<Declaration>): Declaration {
   return {
@@ -2092,7 +2130,21 @@ export function createDeclarationMock(props: Partial<Declaration>): Declaration 
     gerepType: null,
     ...props,
   };
-};
+}
+
+export function createDeleteTraderReceiptInputMock(props: Partial<DeleteTraderReceiptInput>): DeleteTraderReceiptInput {
+  return {
+    id: "",
+    ...props,
+  };
+}
+
+export function createDeleteTransporterReceiptInputMock(props: Partial<DeleteTransporterReceiptInput>): DeleteTransporterReceiptInput {
+  return {
+    id: "",
+    ...props,
+  };
+}
 
 export function createDestinationMock(props: Partial<Destination>): Destination {
   return {
@@ -2103,7 +2155,16 @@ export function createDestinationMock(props: Partial<Destination>): Destination 
     isFilledByEmitter: null,
     ...props,
   };
-};
+}
+
+export function createDestinationInputMock(props: Partial<DestinationInput>): DestinationInput {
+  return {
+    company: null,
+    cap: null,
+    processingOperation: null,
+    ...props,
+  };
+}
 
 export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganisme {
   return {
@@ -2114,7 +2175,14 @@ export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganis
     address: "",
     ...props,
   };
-};
+}
+
+export function createEcoOrganismeInputMock(props: Partial<EcoOrganismeInput>): EcoOrganismeInput {
+  return {
+    id: "",
+    ...props,
+  };
+}
 
 export function createEmitterMock(props: Partial<Emitter>): Emitter {
   return {
@@ -2125,7 +2193,17 @@ export function createEmitterMock(props: Partial<Emitter>): Emitter {
     company: null,
     ...props,
   };
-};
+}
+
+export function createEmitterInputMock(props: Partial<EmitterInput>): EmitterInput {
+  return {
+    type: null,
+    workSite: null,
+    pickupSite: null,
+    company: null,
+    ...props,
+  };
+}
 
 export function createFileDownloadMock(props: Partial<FileDownload>): FileDownload {
   return {
@@ -2134,7 +2212,7 @@ export function createFileDownloadMock(props: Partial<FileDownload>): FileDownlo
     downloadLink: null,
     ...props,
   };
-};
+}
 
 export function createFormMock(props: Partial<Form>): Form {
   return {
@@ -2175,7 +2253,7 @@ export function createFormMock(props: Partial<Form>): Form {
     nextTransporterSiret: null,
     ...props,
   };
-};
+}
 
 export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany {
   return {
@@ -2188,7 +2266,23 @@ export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany 
     mail: null,
     ...props,
   };
-};
+}
+
+export function createFormInputMock(props: Partial<FormInput>): FormInput {
+  return {
+    id: null,
+    customId: null,
+    emitter: null,
+    recipient: null,
+    transporter: null,
+    wasteDetails: null,
+    trader: null,
+    appendix2Forms: null,
+    ecoOrganisme: null,
+    temporaryStorageDetail: null,
+    ...props,
+  };
+}
 
 export function createFormsLifeCycleDataMock(props: Partial<FormsLifeCycleData>): FormsLifeCycleData {
   return {
@@ -2201,7 +2295,7 @@ export function createFormsLifeCycleDataMock(props: Partial<FormsLifeCycleData>)
     count: null,
     ...props,
   };
-};
+}
 
 export function createFormSubscriptionMock(props: Partial<FormSubscription>): FormSubscription {
   return {
@@ -2212,7 +2306,7 @@ export function createFormSubscriptionMock(props: Partial<FormSubscription>): Fo
     previousValues: null,
     ...props,
   };
-};
+}
 
 export function createInstallationMock(props: Partial<Installation>): Installation {
   return {
@@ -2223,7 +2317,7 @@ export function createInstallationMock(props: Partial<Installation>): Installati
     declarations: null,
     ...props,
   };
-};
+}
 
 export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
   return {
@@ -2237,7 +2331,7 @@ export function createMultimodalTransporterMock(props: Partial<MultimodalTranspo
     customInfo: null,
     ...props,
   };
-};
+}
 
 export function createNextDestinationMock(props: Partial<NextDestination>): NextDestination {
   return {
@@ -2246,7 +2340,85 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
     company: null,
     ...props,
   };
-};
+}
+
+export function createNextDestinationInputMock(props: Partial<NextDestinationInput>): NextDestinationInput {
+  return {
+    processingOperation: null,
+    company: null,
+    ...props,
+  };
+}
+
+export function createNextSegmentCompanyInputMock(props: Partial<NextSegmentCompanyInput>): NextSegmentCompanyInput {
+  return {
+    siret: null,
+    name: null,
+    address: null,
+    contact: null,
+    mail: null,
+    phone: null,
+    ...props,
+  };
+}
+
+export function createNextSegmentInfoInputMock(props: Partial<NextSegmentInfoInput>): NextSegmentInfoInput {
+  return {
+    transporter: null,
+    mode: TransportMode.Road,
+    ...props,
+  };
+}
+
+export function createNextSegmentTransporterInputMock(props: Partial<NextSegmentTransporterInput>): NextSegmentTransporterInput {
+  return {
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    company: null,
+    ...props,
+  };
+}
+
+export function createPrivateCompanyInputMock(props: Partial<PrivateCompanyInput>): PrivateCompanyInput {
+  return {
+    siret: "",
+    gerepId: null,
+    companyTypes: null,
+    codeNaf: null,
+    companyName: null,
+    documentKeys: null,
+    transporterReceiptId: null,
+    traderReceiptId: null,
+    ...props,
+  };
+}
+
+export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>): ProcessedFormInput {
+  return {
+    processingOperationDone: "",
+    processingOperationDescription: null,
+    processedBy: "",
+    processedAt: new Date(),
+    nextDestination: null,
+    noTraceability: null,
+    ...props,
+  };
+}
+
+export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): ReceivedFormInput {
+  return {
+    wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
+    wasteRefusalReason: null,
+    receivedBy: "",
+    receivedAt: new Date(),
+    signedAt: null,
+    quantityReceived: 0,
+    ...props,
+  };
+}
 
 export function createRecipientMock(props: Partial<Recipient>): Recipient {
   return {
@@ -2257,7 +2429,37 @@ export function createRecipientMock(props: Partial<Recipient>): Recipient {
     isTempStorage: null,
     ...props,
   };
-};
+}
+
+export function createRecipientInputMock(props: Partial<RecipientInput>): RecipientInput {
+  return {
+    cap: null,
+    processingOperation: null,
+    company: null,
+    isTempStorage: null,
+    ...props,
+  };
+}
+
+export function createResealedFormInputMock(props: Partial<ResealedFormInput>): ResealedFormInput {
+  return {
+    destination: null,
+    wasteDetails: null,
+    transporter: null,
+    ...props,
+  };
+}
+
+export function createResentFormInputMock(props: Partial<ResentFormInput>): ResentFormInput {
+  return {
+    destination: null,
+    wasteDetails: null,
+    transporter: null,
+    signedBy: null,
+    signedAt: null,
+    ...props,
+  };
+}
 
 export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
   return {
@@ -2273,7 +2475,25 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
     wasteType: null,
     ...props,
   };
-};
+}
+
+export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
+  return {
+    sentAt: null,
+    sentBy: null,
+    ...props,
+  };
+}
+
+export function createSignupInputMock(props: Partial<SignupInput>): SignupInput {
+  return {
+    email: "",
+    password: "",
+    name: "",
+    phone: null,
+    ...props,
+  };
+}
 
 export function createStatMock(props: Partial<Stat>): Stat {
   return {
@@ -2283,7 +2503,7 @@ export function createStatMock(props: Partial<Stat>): Stat {
     outgoing: 0,
     ...props,
   };
-};
+}
 
 export function createStateSummaryMock(props: Partial<StateSummary>): StateSummary {
   return {
@@ -2299,7 +2519,7 @@ export function createStateSummaryMock(props: Partial<StateSummary>): StateSumma
     lastActionOn: null,
     ...props,
   };
-};
+}
 
 export function createStatusLogMock(props: Partial<StatusLog>): StatusLog {
   return {
@@ -2312,7 +2532,7 @@ export function createStatusLogMock(props: Partial<StatusLog>): StatusLog {
     user: null,
     ...props,
   };
-};
+}
 
 export function createStatusLogFormMock(props: Partial<StatusLogForm>): StatusLogForm {
   return {
@@ -2321,7 +2541,7 @@ export function createStatusLogFormMock(props: Partial<StatusLogForm>): StatusLo
     readableId: null,
     ...props,
   };
-};
+}
 
 export function createStatusLogUserMock(props: Partial<StatusLogUser>): StatusLogUser {
   return {
@@ -2330,7 +2550,7 @@ export function createStatusLogUserMock(props: Partial<StatusLogUser>): StatusLo
     email: null,
     ...props,
   };
-};
+}
 
 export function createSubscriptionMock(props: Partial<Subscription>): Subscription {
   return {
@@ -2338,7 +2558,15 @@ export function createSubscriptionMock(props: Partial<Subscription>): Subscripti
     forms: null,
     ...props,
   };
-};
+}
+
+export function createTakeOverInputMock(props: Partial<TakeOverInput>): TakeOverInput {
+  return {
+    takenOverAt: new Date(),
+    takenOverBy: "",
+    ...props,
+  };
+}
 
 export function createTemporaryStorageDetailMock(props: Partial<TemporaryStorageDetail>): TemporaryStorageDetail {
   return {
@@ -2351,7 +2579,14 @@ export function createTemporaryStorageDetailMock(props: Partial<TemporaryStorage
     signedAt: null,
     ...props,
   };
-};
+}
+
+export function createTemporaryStorageDetailInputMock(props: Partial<TemporaryStorageDetailInput>): TemporaryStorageDetailInput {
+  return {
+    destination: null,
+    ...props,
+  };
+}
 
 export function createTemporaryStorerMock(props: Partial<TemporaryStorer>): TemporaryStorer {
   return {
@@ -2364,7 +2599,20 @@ export function createTemporaryStorerMock(props: Partial<TemporaryStorer>): Temp
     receivedBy: null,
     ...props,
   };
-};
+}
+
+export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput>): TempStoredFormInput {
+  return {
+    wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
+    wasteRefusalReason: null,
+    receivedBy: "",
+    receivedAt: new Date(),
+    signedAt: null,
+    quantityReceived: 0,
+    quantityType: QuantityType.Real,
+    ...props,
+  };
+}
 
 export function createTraderMock(props: Partial<Trader>): Trader {
   return {
@@ -2375,7 +2623,17 @@ export function createTraderMock(props: Partial<Trader>): Trader {
     validityLimit: null,
     ...props,
   };
-};
+}
+
+export function createTraderInputMock(props: Partial<TraderInput>): TraderInput {
+  return {
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    company: null,
+    ...props,
+  };
+}
 
 export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderReceipt {
   return {
@@ -2386,7 +2644,7 @@ export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderRe
     department: "",
     ...props,
   };
-};
+}
 
 export function createTransporterMock(props: Partial<Transporter>): Transporter {
   return {
@@ -2400,7 +2658,19 @@ export function createTransporterMock(props: Partial<Transporter>): Transporter 
     customInfo: null,
     ...props,
   };
-};
+}
+
+export function createTransporterInputMock(props: Partial<TransporterInput>): TransporterInput {
+  return {
+    isExemptedOfReceipt: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    numberPlate: null,
+    company: null,
+    ...props,
+  };
+}
 
 export function createTransporterReceiptMock(props: Partial<TransporterReceipt>): TransporterReceipt {
   return {
@@ -2411,7 +2681,21 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
     department: "",
     ...props,
   };
-};
+}
+
+export function createTransporterSignatureFormInputMock(props: Partial<TransporterSignatureFormInput>): TransporterSignatureFormInput {
+  return {
+    sentAt: new Date(),
+    signedByTransporter: false,
+    securityCode: null,
+    sentBy: null,
+    signedByProducer: false,
+    packagings: [],
+    quantity: 0,
+    onuCode: null,
+    ...props,
+  };
+}
 
 export function createTransportSegmentMock(props: Partial<TransportSegment>): TransportSegment {
   return {
@@ -2426,7 +2710,27 @@ export function createTransportSegmentMock(props: Partial<TransportSegment>): Tr
     segmentNumber: null,
     ...props,
   };
-};
+}
+
+export function createUpdateTraderReceiptInputMock(props: Partial<UpdateTraderReceiptInput>): UpdateTraderReceiptInput {
+  return {
+    id: "",
+    receiptNumber: null,
+    validityLimit: null,
+    department: null,
+    ...props,
+  };
+}
+
+export function createUpdateTransporterReceiptInputMock(props: Partial<UpdateTransporterReceiptInput>): UpdateTransporterReceiptInput {
+  return {
+    id: "",
+    receiptNumber: null,
+    validityLimit: null,
+    department: null,
+    ...props,
+  };
+}
 
 export function createUploadLinkMock(props: Partial<UploadLink>): UploadLink {
   return {
@@ -2435,7 +2739,7 @@ export function createUploadLinkMock(props: Partial<UploadLink>): UploadLink {
     key: null,
     ...props,
   };
-};
+}
 
 export function createUserMock(props: Partial<User>): User {
   return {
@@ -2447,7 +2751,7 @@ export function createUserMock(props: Partial<User>): User {
     companies: null,
     ...props,
   };
-};
+}
 
 export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetails {
   return {
@@ -2463,7 +2767,22 @@ export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetai
     consistence: null,
     ...props,
   };
-};
+}
+
+export function createWasteDetailsInputMock(props: Partial<WasteDetailsInput>): WasteDetailsInput {
+  return {
+    code: null,
+    name: null,
+    onuCode: null,
+    packagings: null,
+    otherPackaging: null,
+    numberOfPackages: null,
+    quantity: null,
+    quantityType: null,
+    consistence: null,
+    ...props,
+  };
+}
 
 export function createWorkSiteMock(props: Partial<WorkSite>): WorkSite {
   return {
@@ -2475,4 +2794,15 @@ export function createWorkSiteMock(props: Partial<WorkSite>): WorkSite {
     infos: null,
     ...props,
   };
-};
+}
+
+export function createWorkSiteInputMock(props: Partial<WorkSiteInput>): WorkSiteInput {
+  return {
+    name: null,
+    address: null,
+    city: null,
+    postalCode: null,
+    infos: null,
+    ...props,
+  };
+}
