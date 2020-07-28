@@ -464,6 +464,24 @@ Rattache un établissement à l'utilisateur authentifié
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>createForm</strong></td>
+<td valign="top"><a href="#form">Form</a>!</td>
+<td>
+
+Crée un nouveau bordereau
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">createFormInput</td>
+<td valign="top"><a href="#createforminput">CreateFormInput</a>!</td>
+<td>
+
+Payload de création d'un bordereau
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createTraderReceipt</strong></td>
 <td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
 <td>
@@ -1045,12 +1063,18 @@ Envoie un email pour la réinitialisation du mot de passe
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>saveForm</strong></td>
+<td colspan="2" valign="top"><strong>saveForm</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
+DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser createForm / updateForm selon le besoin
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -1211,6 +1235,24 @@ SIRET de l'établissement
 <td>
 
 (Optionnel) Identifiant d'un récépissé négociant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updateForm</strong></td>
+<td valign="top"><a href="#form">Form</a>!</td>
+<td>
+
+Met à jour un bordereau existant
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">updateFormInput</td>
+<td valign="top"><a href="#updateforminput">UpdateFormInput</a>!</td>
+<td>
+
+Payload de mise à jour d'un bordereau
 
 </td>
 </tr>
@@ -4124,6 +4166,96 @@ Numéro de téléphone de contact dans l'établissement
 </tbody>
 </table>
 
+### CreateFormInput
+
+Payload de création d'un bordereau
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>customId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Identifiant personnalisé permettant de faire le lien avec un
+objet un système d'information tierce
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#emitterinput">EmitterInput</a></td>
+<td>
+
+Établissement émetteur/producteur du déchet (case 1)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#recipientinput">RecipientInput</a></td>
+<td>
+
+Établissement qui reçoit le déchet (case 2)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
+<td>
+
+Transporteur du déchet (case 8)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
+<td>
+
+Détails du déchet (case 3)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>trader</strong></td>
+<td valign="top"><a href="#traderinput">TraderInput</a></td>
+<td>
+
+Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
+<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
+<td>
+
+Annexe 2
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
+<td valign="top"><a href="#ecoorganismeinput">EcoOrganismeInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>temporaryStorageDetail</strong></td>
+<td valign="top"><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### CreateTraderReceiptInput
 
 Payload de création d'un récépissé négociant
@@ -5472,6 +5604,105 @@ Code ONU
 </tbody>
 </table>
 
+### UpdateFormInput
+
+Payload de mise à jour d'un bordereau
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+Identifiant opaque
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Identifiant personnalisé permettant de faire le lien avec un
+objet un système d'information tierce
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#emitterinput">EmitterInput</a></td>
+<td>
+
+Établissement émetteur/producteur du déchet (case 1)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#recipientinput">RecipientInput</a></td>
+<td>
+
+Établissement qui reçoit le déchet (case 2)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
+<td>
+
+Transporteur du déchet (case 8)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
+<td>
+
+Détails du déchet (case 3)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>trader</strong></td>
+<td valign="top"><a href="#traderinput">TraderInput</a></td>
+<td>
+
+Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
+<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
+<td>
+
+Annexe 2
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
+<td valign="top"><a href="#ecoorganismeinput">EcoOrganismeInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>temporaryStorageDetail</strong></td>
+<td valign="top"><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### UpdateTraderReceiptInput
 
 Payload d'édition d'un récépissé transporteur
@@ -5594,7 +5825,22 @@ Payload lié au détails du déchet (case 3, 4, 5, 6)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Rubrique déchet au format |_|_| |_|_| |_|_| (*)
+Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
+https://aida.ineris.fr/consultation_document/10327
+
+Il doit être composé de 3 paires de deux chiffres séparés par un espace et se termine éventuellement par une astérisque.
+
+Un exemple de déchet non-dangereux valide (déchets provenant de l'extraction des minéraux métallifères) :
+01 01 01
+
+Ce même exemple, mais avec un format invalide :
+010101
+
+Un exemple de déchet dangereux valide (stériles acidogènes provenant de la transformation du sulfure) :
+01 03 04*
+
+Ce même exemple, mais avec un format invalide :
+010304 *
 
 </td>
 </tr>

@@ -246,6 +246,29 @@ export type Consistence =
   /** Gazeux */
   'GASEOUS';
 
+/** Payload de création d'un bordereau */
+export type CreateFormInput = {
+  /**
+   * Identifiant personnalisé permettant de faire le lien avec un
+   * objet un système d'information tierce
+   */
+  customId?: Maybe<Scalars['String']>;
+  /** Établissement émetteur/producteur du déchet (case 1) */
+  emitter?: Maybe<EmitterInput>;
+  /** Établissement qui reçoit le déchet (case 2) */
+  recipient?: Maybe<RecipientInput>;
+  /** Transporteur du déchet (case 8) */
+  transporter?: Maybe<TransporterInput>;
+  /** Détails du déchet (case 3) */
+  wasteDetails?: Maybe<WasteDetailsInput>;
+  /** Négociant (case 7) */
+  trader?: Maybe<TraderInput>;
+  /** Annexe 2 */
+  appendix2Forms?: Maybe<Array<Maybe<AppendixFormInput>>>;
+  ecoOrganisme?: Maybe<EcoOrganismeInput>;
+  temporaryStorageDetail?: Maybe<TemporaryStorageDetailInput>;
+};
+
 /** Payload de création d'un récépissé négociant */
 export type CreateTraderReceiptInput = {
   /** Numéro de récépissé négociant */
@@ -694,6 +717,8 @@ export type Mutation = {
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
+  /** Crée un nouveau bordereau */
+  createForm: Form;
   /**
    * USAGE INTERNE
    * Crée un récépissé transporteur
@@ -844,7 +869,10 @@ export type Mutation = {
    * Envoie un email pour la réinitialisation du mot de passe
    */
   resetPassword: Scalars['Boolean'];
-  /** Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID) */
+  /**
+   * DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
+   * @deprecated Utiliser createForm / updateForm selon le besoin
+   */
   saveForm?: Maybe<Form>;
   /** Valide la prise en charge par le transporteur, et peut valider l'envoi */
   signedByTransporter?: Maybe<Form>;
@@ -860,6 +888,8 @@ export type Mutation = {
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
+  /** Met à jour un bordereau existant */
+  updateForm: Form;
   /**
    * USAGE INTERNE
    * Édite les informations d'un récépissé négociant
@@ -883,6 +913,11 @@ export type MutationChangePasswordArgs = {
 
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+
+export type MutationCreateFormArgs = {
+  createFormInput: CreateFormInput;
 };
 
 
@@ -1069,6 +1104,11 @@ export type MutationUpdateCompanyArgs = {
   givenName?: Maybe<Scalars['String']>;
   transporterReceiptId?: Maybe<Scalars['String']>;
   traderReceiptId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateFormArgs = {
+  updateFormInput: UpdateFormInput;
 };
 
 
@@ -1728,6 +1768,31 @@ export type TransportSegment = {
   segmentNumber?: Maybe<Scalars['Int']>;
 };
 
+/** Payload de mise à jour d'un bordereau */
+export type UpdateFormInput = {
+  /** Identifiant opaque */
+  id: Scalars['ID'];
+  /**
+   * Identifiant personnalisé permettant de faire le lien avec un
+   * objet un système d'information tierce
+   */
+  customId?: Maybe<Scalars['String']>;
+  /** Établissement émetteur/producteur du déchet (case 1) */
+  emitter?: Maybe<EmitterInput>;
+  /** Établissement qui reçoit le déchet (case 2) */
+  recipient?: Maybe<RecipientInput>;
+  /** Transporteur du déchet (case 8) */
+  transporter?: Maybe<TransporterInput>;
+  /** Détails du déchet (case 3) */
+  wasteDetails?: Maybe<WasteDetailsInput>;
+  /** Négociant (case 7) */
+  trader?: Maybe<TraderInput>;
+  /** Annexe 2 */
+  appendix2Forms?: Maybe<Array<Maybe<AppendixFormInput>>>;
+  ecoOrganisme?: Maybe<EcoOrganismeInput>;
+  temporaryStorageDetail?: Maybe<TemporaryStorageDetailInput>;
+};
+
 /** Payload d'édition d'un récépissé transporteur */
 export type UpdateTraderReceiptInput = {
   /** The id of the trader receipt to modify */
@@ -1829,7 +1894,24 @@ export type WasteDetails = {
 
 /** Payload lié au détails du déchet (case 3, 4, 5, 6) */
 export type WasteDetailsInput = {
-  /** Rubrique déchet au format |_|_| |_|_| |_|_| (*) */
+  /**
+   * Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
+   * https://aida.ineris.fr/consultation_document/10327
+   * 
+   * Il doit être composé de 3 paires de deux chiffres séparés par un espace et se termine éventuellement par une astérisque.
+   * 
+   * Un exemple de déchet non-dangereux valide (déchets provenant de l'extraction des minéraux métallifères) :
+   * 01 01 01
+   * 
+   * Ce même exemple, mais avec un format invalide :
+   * 010101
+   * 
+   * Un exemple de déchet dangereux valide (stériles acidogènes provenant de la transformation du sulfure) :
+   * 01 03 04*
+   * 
+   * Ce même exemple, mais avec un format invalide :
+   * 010304 *
+   */
   code?: Maybe<Scalars['String']>;
   /** Dénomination usuelle */
   name?: Maybe<Scalars['String']>;
@@ -2009,6 +2091,18 @@ export type ResolversTypes = {
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
   PrivateCompanyInput: PrivateCompanyInput;
+  CreateFormInput: CreateFormInput;
+  EmitterInput: EmitterInput;
+  WorkSiteInput: WorkSiteInput;
+  CompanyInput: CompanyInput;
+  RecipientInput: RecipientInput;
+  TransporterInput: TransporterInput;
+  WasteDetailsInput: WasteDetailsInput;
+  TraderInput: TraderInput;
+  AppendixFormInput: AppendixFormInput;
+  EcoOrganismeInput: EcoOrganismeInput;
+  TemporaryStorageDetailInput: TemporaryStorageDetailInput;
+  DestinationInput: DestinationInput;
   CreateTraderReceiptInput: CreateTraderReceiptInput;
   CreateTransporterReceiptInput: CreateTransporterReceiptInput;
   UploadLink: ResolverTypeWrapper<UploadLink>;
@@ -2020,27 +2114,17 @@ export type ResolversTypes = {
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
-  CompanyInput: CompanyInput;
   ReceivedFormInput: ReceivedFormInput;
   WasteAcceptationStatusInput: WasteAcceptationStatusInput;
   ResealedFormInput: ResealedFormInput;
-  DestinationInput: DestinationInput;
-  WasteDetailsInput: WasteDetailsInput;
-  TransporterInput: TransporterInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
   FormInput: FormInput;
-  EmitterInput: EmitterInput;
-  WorkSiteInput: WorkSiteInput;
-  RecipientInput: RecipientInput;
-  TraderInput: TraderInput;
-  AppendixFormInput: AppendixFormInput;
-  EcoOrganismeInput: EcoOrganismeInput;
-  TemporaryStorageDetailInput: TemporaryStorageDetailInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
+  UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: ResolverTypeWrapper<{}>;
@@ -2108,6 +2192,18 @@ export type ResolversParentTypes = {
   Stat: Stat;
   Mutation: {};
   PrivateCompanyInput: PrivateCompanyInput;
+  CreateFormInput: CreateFormInput;
+  EmitterInput: EmitterInput;
+  WorkSiteInput: WorkSiteInput;
+  CompanyInput: CompanyInput;
+  RecipientInput: RecipientInput;
+  TransporterInput: TransporterInput;
+  WasteDetailsInput: WasteDetailsInput;
+  TraderInput: TraderInput;
+  AppendixFormInput: AppendixFormInput;
+  EcoOrganismeInput: EcoOrganismeInput;
+  TemporaryStorageDetailInput: TemporaryStorageDetailInput;
+  DestinationInput: DestinationInput;
   CreateTraderReceiptInput: CreateTraderReceiptInput;
   CreateTransporterReceiptInput: CreateTransporterReceiptInput;
   UploadLink: UploadLink;
@@ -2119,27 +2215,17 @@ export type ResolversParentTypes = {
   AuthPayload: AuthPayload;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
-  CompanyInput: CompanyInput;
   ReceivedFormInput: ReceivedFormInput;
   WasteAcceptationStatusInput: WasteAcceptationStatusInput;
   ResealedFormInput: ResealedFormInput;
-  DestinationInput: DestinationInput;
-  WasteDetailsInput: WasteDetailsInput;
-  TransporterInput: TransporterInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
   FormInput: FormInput;
-  EmitterInput: EmitterInput;
-  WorkSiteInput: WorkSiteInput;
-  RecipientInput: RecipientInput;
-  TraderInput: TraderInput;
-  AppendixFormInput: AppendixFormInput;
-  EcoOrganismeInput: EcoOrganismeInput;
-  TemporaryStorageDetailInput: TemporaryStorageDetailInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
+  UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: {};
@@ -2369,6 +2455,7 @@ export type MultimodalTransporterResolvers<ContextType = GraphQLContext, ParentT
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   changePassword?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'oldPassword' | 'newPassword'>>;
   createCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>;
+  createForm?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<MutationCreateFormArgs, 'createFormInput'>>;
   createTraderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType, RequireFields<MutationCreateTraderReceiptArgs, never>>;
   createTransporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType, RequireFields<MutationCreateTransporterReceiptArgs, never>>;
   createUploadLink?: Resolver<ResolversTypes['UploadLink'], ParentType, ContextType, RequireFields<MutationCreateUploadLinkArgs, 'fileName' | 'fileType'>>;
@@ -2400,6 +2487,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'userInfos'>>;
   takeOverSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationTakeOverSegmentArgs, 'id' | 'takeOverInfo'>>;
   updateCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'siret'>>;
+  updateForm?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<MutationUpdateFormArgs, 'updateFormInput'>>;
   updateTraderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType, RequireFields<MutationUpdateTraderReceiptArgs, never>>;
   updateTransporterFields?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationUpdateTransporterFieldsArgs, 'id'>>;
   updateTransporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType, RequireFields<MutationUpdateTransporterReceiptArgs, never>>;

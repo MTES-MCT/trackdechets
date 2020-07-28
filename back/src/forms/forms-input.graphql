@@ -99,6 +99,69 @@ input NextDestinationInput {
   company: CompanyInput
 }
 
+"Payload de création d'un bordereau"
+input CreateFormInput {
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
+  customId: String
+
+  "Établissement émetteur/producteur du déchet (case 1)"
+  emitter: EmitterInput
+
+  "Établissement qui reçoit le déchet (case 2)"
+  recipient: RecipientInput
+
+  "Transporteur du déchet (case 8)"
+  transporter: TransporterInput
+
+  "Détails du déchet (case 3)"
+  wasteDetails: WasteDetailsInput
+
+  "Négociant (case 7)"
+  trader: TraderInput
+
+  "Annexe 2"
+  appendix2Forms: [AppendixFormInput]
+  ecoOrganisme: EcoOrganismeInput
+
+  temporaryStorageDetail: TemporaryStorageDetailInput
+}
+
+"Payload de mise à jour d'un bordereau"
+input UpdateFormInput {
+  "Identifiant opaque"
+  id: ID!
+
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
+  customId: String
+
+  "Établissement émetteur/producteur du déchet (case 1)"
+  emitter: EmitterInput
+
+  "Établissement qui reçoit le déchet (case 2)"
+  recipient: RecipientInput
+
+  "Transporteur du déchet (case 8)"
+  transporter: TransporterInput
+
+  "Détails du déchet (case 3)"
+  wasteDetails: WasteDetailsInput
+
+  "Négociant (case 7)"
+  trader: TraderInput
+
+  "Annexe 2"
+  appendix2Forms: [AppendixFormInput]
+  ecoOrganisme: EcoOrganismeInput
+
+  temporaryStorageDetail: TemporaryStorageDetailInput
+}
+
 "Payload de création d'un BSD"
 input FormInput {
   "Identifiant opaque"
@@ -259,7 +322,24 @@ input TraderInput {
 
 "Payload lié au détails du déchet (case 3, 4, 5, 6)"
 input WasteDetailsInput {
-  "Rubrique déchet au format |_|_| |_|_| |_|_| (*)"
+  """
+  Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
+  https://aida.ineris.fr/consultation_document/10327
+
+  Il doit être composé de 3 paires de deux chiffres séparés par un espace et se termine éventuellement par une astérisque.
+
+  Un exemple de déchet non-dangereux valide (déchets provenant de l'extraction des minéraux métallifères) :
+  01 01 01
+
+  Ce même exemple, mais avec un format invalide :
+  010101
+
+  Un exemple de déchet dangereux valide (stériles acidogènes provenant de la transformation du sulfure) :
+  01 03 04*
+
+  Ce même exemple, mais avec un format invalide :
+  010304 *
+  """
   code: String
 
   "Dénomination usuelle"

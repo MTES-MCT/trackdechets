@@ -154,8 +154,21 @@ type Query {
 }
 
 type Mutation {
-  "Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
+  "Crée un nouveau bordereau"
+  createForm(
+    "Payload de création d'un bordereau"
+    createFormInput: CreateFormInput!
+  ): Form!
+
+  "Met à jour un bordereau existant"
+  updateForm(
+    "Payload de mise à jour d'un bordereau"
+    updateFormInput: UpdateFormInput!
+  ): Form!
+
+  "DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
   saveForm("Payload du BSD" formInput: FormInput!): Form
+    @deprecated(reason: "Utiliser createForm / updateForm selon le besoin")
 
   "Met à jour la plaque d'immatriculation ou le champ libre du transporteur"
   updateTransporterFields(
