@@ -726,7 +726,7 @@ export type Mutation = {
    */
   createCompany: CompanyPrivate;
   /** Crée un nouveau bordereau */
-  createForm?: Maybe<Form>;
+  createForm: Form;
   /**
    * USAGE INTERNE
    * Crée un récépissé transporteur
@@ -897,7 +897,7 @@ export type Mutation = {
    */
   updateCompany: CompanyPrivate;
   /** Met à jour un bordereau existant */
-  updateForm?: Maybe<Form>;
+  updateForm: Form;
   /**
    * USAGE INTERNE
    * Édite les informations d'un récépissé négociant
@@ -2467,7 +2467,7 @@ export type MultimodalTransporterResolvers<ContextType = GraphQLContext, ParentT
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   changePassword?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'oldPassword' | 'newPassword'>>;
   createCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>;
-  createForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationCreateFormArgs, 'createFormInput'>>;
+  createForm?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<MutationCreateFormArgs, 'createFormInput'>>;
   createTraderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType, RequireFields<MutationCreateTraderReceiptArgs, never>>;
   createTransporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType, RequireFields<MutationCreateTransporterReceiptArgs, never>>;
   createUploadLink?: Resolver<ResolversTypes['UploadLink'], ParentType, ContextType, RequireFields<MutationCreateUploadLinkArgs, 'fileName' | 'fileType'>>;
@@ -2499,7 +2499,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'userInfos'>>;
   takeOverSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationTakeOverSegmentArgs, 'id' | 'takeOverInfo'>>;
   updateCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'siret'>>;
-  updateForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationUpdateFormArgs, 'updateFormInput'>>;
+  updateForm?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<MutationUpdateFormArgs, 'updateFormInput'>>;
   updateTraderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType, RequireFields<MutationUpdateTraderReceiptArgs, never>>;
   updateTransporterFields?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationUpdateTransporterFieldsArgs, 'id'>>;
   updateTransporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType, RequireFields<MutationUpdateTransporterReceiptArgs, never>>;

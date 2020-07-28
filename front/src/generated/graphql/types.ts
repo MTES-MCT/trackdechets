@@ -733,7 +733,7 @@ export type Mutation = {
    */
   createCompany: CompanyPrivate;
   /** Crée un nouveau bordereau */
-  createForm: Maybe<Form>;
+  createForm: Form;
   /**
    * USAGE INTERNE
    * Crée un récépissé transporteur
@@ -904,7 +904,7 @@ export type Mutation = {
    */
   updateCompany: CompanyPrivate;
   /** Met à jour un bordereau existant */
-  updateForm: Maybe<Form>;
+  updateForm: Form;
   /**
    * USAGE INTERNE
    * Édite les informations d'un récépissé négociant

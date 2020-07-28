@@ -465,7 +465,7 @@ Rattache un établissement à l'utilisateur authentifié
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>createForm</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#form">Form</a>!</td>
 <td>
 
 Crée un nouveau bordereau
@@ -1240,7 +1240,7 @@ SIRET de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>updateForm</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#form">Form</a>!</td>
 <td>
 
 Met à jour un bordereau existant

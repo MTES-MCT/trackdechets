@@ -158,13 +158,13 @@ type Mutation {
   createForm(
     "Payload de création d'un bordereau"
     createFormInput: CreateFormInput!
-  ): Form
+  ): Form!
 
   "Met à jour un bordereau existant"
   updateForm(
     "Payload de mise à jour d'un bordereau"
     updateFormInput: UpdateFormInput!
-  ): Form
+  ): Form!
 
   "DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
   saveForm("Payload du BSD" formInput: FormInput!): Form
