@@ -791,7 +791,10 @@ export type Mutation = {
   markAsReceived: Maybe<Form>;
   /** Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement */
   markAsResealed: Maybe<Form>;
-  /** Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement */
+  /**
+   * Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
+   * @deprecated Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)
+   */
   markAsResent: Maybe<Form>;
   /**
    * Scelle un BSD
@@ -848,7 +851,10 @@ export type Mutation = {
    * ```
    */
   markAsSealed: Maybe<Form>;
-  /** Valide l'envoi d'un BSD */
+  /**
+   * Valide l'envoi d'un BSD
+   * @deprecated Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)
+   */
   markAsSent: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored: Maybe<Form>;
@@ -881,7 +887,18 @@ export type Mutation = {
    * @deprecated Utiliser createForm / updateForm selon le besoin
    */
   saveForm: Maybe<Form>;
-  /** Valide la prise en charge par le transporteur, et peut valider l'envoi */
+  /**
+   * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
+   * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
+   * Cette mutation doit être appelée avec le token du collecteur-transporteur.
+   * L'établissement émetteur (resp. d'entreposage provisoire ou de
+   * reconditionnement) est authentifié quant à lui grâce à son code de sécurité
+   * disponible sur le tableau de bord Trackdéchets
+   * Mon Compte > Établissements > Sécurité.
+   * D'un point de vue pratique, cela implique qu'un responsable de l'établissement
+   * émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le
+   * code de sécurité sur le terminal du collecteur-transporteur.
+   */
   signedByTransporter: Maybe<Form>;
   /**
    * USAGE INTERNE
