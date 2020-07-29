@@ -821,12 +821,18 @@ Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou re
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>markAsResent</strong></td>
+<td colspan="2" valign="top"><strong>markAsResent</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
 Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -909,12 +915,18 @@ ID d'un BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>markAsSent</strong></td>
+<td colspan="2" valign="top"><strong>markAsSent</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
 Valide l'envoi d'un BSD
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -1091,7 +1103,14 @@ Payload du BSD
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Valide la prise en charge par le transporteur, et peut valider l'envoi
+Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
+ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
+Cette mutation doit être appelée avec le token du collecteur-transporteur.
+L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
+disponible sur le tableau de bord Trackdéchets
+Mon Compte > Établissements > Sécurité.
+D'un point de vue pratique, cela implique qu'un responsable de l'établissement
+émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
 
 </td>
 </tr>
@@ -1109,7 +1128,7 @@ ID d'un BSD
 <td valign="top"><a href="#transportersignatureforminput">TransporterSignatureFormInput</a>!</td>
 <td>
 
-Informations liées à la signature transporteur
+Informations liées aux signatures transporteur et émetteur (case 8 et 9)
 
 </td>
 </tr>
