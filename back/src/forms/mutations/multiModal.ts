@@ -3,15 +3,15 @@ import {
   prisma,
   TransportSegment as PrismaTransportSegment
 } from "../../generated/prisma-client";
-import { TransportSegment } from "../../generated/graphql/types";
-import { getCurrentUserSirets } from "../rules/permissions";
-import { expandTransportSegmentFromDb } from "../form-converter";
 import {
+  TransportSegment,
   MutationPrepareSegmentArgs,
   MutationEditSegmentArgs,
   MutationMarkSegmentAsReadyToTakeOverArgs,
   MutationTakeOverSegmentArgs
 } from "../../generated/graphql/types";
+import { getCurrentUserSirets } from "../rules/permissions";
+import { expandTransportSegmentFromDb } from "../form-converter";
 import { segmentSchema, takeOverInfoSchema } from "../../forms/rules/schema";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 

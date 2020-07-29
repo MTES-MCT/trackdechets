@@ -58,6 +58,7 @@ services:
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
   td-ui:
+    stdin_open: true
     image: node:10.14-alpine
     container_name: td-ui
     working_dir: /usr/src/front

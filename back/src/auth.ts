@@ -8,12 +8,15 @@ import {
   Strategy as ClientPasswordStrategy,
   VerifyFunction
 } from "passport-oauth2-client-password";
-import { prisma, User } from "./generated/prisma-client";
+import {
+  prisma,
+  User,
+  AccessToken,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  User as PrismaUser
+} from "./generated/prisma-client";
 import { compare } from "bcrypt";
-import { AccessToken } from "./generated/prisma-client";
 import { sameDayMidnight, daysBetween } from "./utils";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { User as PrismaUser } from "./generated/prisma-client";
 
 const { JWT_SECRET } = process.env;
 

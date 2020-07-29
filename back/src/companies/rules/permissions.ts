@@ -1,8 +1,10 @@
-import { isAuthenticated } from "../../common/rules";
+import {
+  isAuthenticated,
+  isUserInCompaniesWithRoles
+} from "../../common/rules";
 import { rule, and } from "graphql-shield";
 import { prisma } from "../../generated/prisma-client";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
-import { isUserInCompaniesWithRoles } from "../../common/rules";
 
 export const canUpdateDeleteTransporterReceipt = and(
   isAuthenticated,
