@@ -22,7 +22,7 @@ describe("{ mutation { deleteTransporterReceipt } }", () => {
       where: { id: company.id }
     });
 
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const mutation = `
       mutation {

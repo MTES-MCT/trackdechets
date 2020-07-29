@@ -26,7 +26,7 @@ describe("{ mutation { createTransporterReceipt } }", () => {
           }
           ) { receiptNumber, validityLimit, department }
         }`;
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { data } = await mutate(mutation);
 

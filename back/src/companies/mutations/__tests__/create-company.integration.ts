@@ -36,7 +36,7 @@ describe("Create company endpoint", () => {
     }
   `;
 
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { data } = await mutate(mutation);
 
@@ -92,7 +92,7 @@ describe("Create company endpoint", () => {
           }
       }`;
 
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { data } = await mutate(mutation);
 
@@ -132,7 +132,7 @@ describe("Create company endpoint", () => {
           }
       }`;
 
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { data } = await mutate(mutation);
 
@@ -161,7 +161,7 @@ describe("Create company endpoint", () => {
           }
       }`;
 
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     await mutate(mutation);
 
@@ -187,7 +187,7 @@ describe("Create company endpoint", () => {
         ) { siret, gerepId, name, companyTypes }
       }
       `;
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { errors, data } = await mutate(mutation);
 
@@ -197,7 +197,7 @@ describe("Create company endpoint", () => {
 
   test("should alert when a user creates too many companies", async () => {
     const user = await userFactory();
-    const { mutate } = makeClient(user, AuthType.Session);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     async function createCompany(siret) {
       const mutation = `

@@ -9,7 +9,7 @@ describe("{ query { apiKey } }", () => {
 
   it("should return an api key", async () => {
     const user = await userFactory();
-    const { query } = makeClient(user, AuthType.Session);
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query("query { apiKey }");
     expect(data.apiKey).toHaveLength(40);
     // should have created an accessToken in db
