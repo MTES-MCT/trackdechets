@@ -1,5 +1,4 @@
-import oauth2orize from "oauth2orize";
-import { TokenError } from "oauth2orize";
+import oauth2orize, { TokenError } from "oauth2orize";
 import { prisma, Grant, User, Application } from "./generated/prisma-client/";
 import { getUid } from "./utils";
 

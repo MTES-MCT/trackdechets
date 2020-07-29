@@ -1,7 +1,10 @@
 import * as mailsHelper from "../../../common/mails.helper";
 
 import { prepareRedis, prepareDB } from "../../__tests__/helpers";
-import { userWithCompanyFactory } from "../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  getReadableId
+} from "../../../__tests__/factories";
 
 import makeClient from "../../../__tests__/testClient";
 
@@ -14,7 +17,6 @@ import {
 } from "../../../generated/prisma-client";
 
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { getReadableId } from "../../../__tests__/factories";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
