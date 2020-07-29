@@ -2,6 +2,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
+import { AuthType } from "../../../../auth";
 
 describe("{ mutation { updateTraderReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -37,7 +38,7 @@ describe("{ mutation { updateTraderReceipt } }", () => {
           }
           ) { receiptNumber, validityLimit, department }
         }`;
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { data } = await mutate(mutation);
 

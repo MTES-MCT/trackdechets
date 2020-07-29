@@ -1,5 +1,5 @@
 import { chain } from "graphql-shield";
-import { isAuthenticated, isCompanyAdmin } from "../common/rules";
+import { isCompanyAdmin, isAuthenticatedFromUI } from "../common/rules";
 import {
   createCompanySchema,
   createUploadLinkSchema,
@@ -17,32 +17,39 @@ import {
 
 export default {
   Query: {
-    favorites: isAuthenticated
+    favorites: isAuthenticatedFromUI
   },
   Mutation: {
-    updateCompany: isCompanyAdmin,
-    renewSecurityCode: isCompanyAdmin,
-    createCompany: chain(createCompanySchema, isAuthenticated),
-    createUploadLink: chain(createUploadLinkSchema, isAuthenticated),
+    updateCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
+    renewSecurityCode: chain(isAuthenticatedFromUI, isCompanyAdmin),
+    createCompany: chain(createCompanySchema, isAuthenticatedFromUI),
+    createUploadLink: chain(createUploadLinkSchema, isAuthenticatedFromUI),
     createTransporterReceipt: chain(
       createTransporterReceiptSchema,
-      isAuthenticated
+      isAuthenticatedFromUI
     ),
     updateTransporterReceipt: chain(
       updateTransporterReceiptSchema,
+      isAuthenticatedFromUI,
       canUpdateDeleteTransporterReceipt
     ),
     deleteTransporterReceipt: chain(
       deleteTransporterReceiptSchema,
+      isAuthenticatedFromUI,
       canUpdateDeleteTransporterReceipt
     ),
-    createTraderReceipt: chain(createTraderReceiptSchema, isAuthenticated),
+    createTraderReceipt: chain(
+      createTraderReceiptSchema,
+      isAuthenticatedFromUI
+    ),
     updateTraderReceipt: chain(
       updateTraderReceiptSchema,
+      isAuthenticatedFromUI,
       canUpdateDeleteTraderReceipt
     ),
     deleteTraderReceipt: chain(
       deleteTraderReceiptSchema,
+      isAuthenticatedFromUI,
       canUpdateDeleteTraderReceipt
     )
   }

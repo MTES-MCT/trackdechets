@@ -7,6 +7,7 @@ import axios from "axios";
 
 import makeClient from "../../__tests__/testClient";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { AuthType } from "../../auth";
 
 // Intercept mail calls
 const mockedAxiosPost = jest.spyOn(axios, "post");
@@ -31,7 +32,7 @@ describe("Invitation removal", () => {
       company.siret
     );
 
-    const { mutate } = makeClient(admin);
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
 
     // Call the mutation to delete the invitation
     // We pass company siret to allow permission to check requiring user is one admin of this company
@@ -63,7 +64,7 @@ describe("Invitation resend", () => {
     const usrToInvite = await userFactory();
     await createUserAccountHash(usrToInvite.email, "MEMBER", company.siret);
 
-    const { mutate } = makeClient(admin);
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
 
     // Call the mutation to resend the invitation
 
@@ -103,7 +104,7 @@ describe("Invitation sending", () => {
     // set up an user, a company, its admin and an invitation (UserAccountHash)
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");
 
-    const { mutate } = makeClient(admin);
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
 
     // Call the mutation to send an invitation
     const invitedUserEmail = "newuser@example.test";

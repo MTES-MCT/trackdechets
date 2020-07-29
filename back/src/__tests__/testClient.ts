@@ -1,11 +1,10 @@
 import { createTestClient } from "apollo-server-integration-testing";
 import { server } from "../server";
-import { User } from "../generated/prisma-client";
 
 /**
  * Instantiate test client
  */
-function makeClient(user?: User) {
+function makeClient(user?: Express.User) {
   const { mutate, query, setOptions } = createTestClient({
     apolloServer: server
   });
