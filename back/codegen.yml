@@ -21,5 +21,6 @@ generates:
       scalarDefaults:
         DateTime: new Date()
   documentation/api-reference.md:
+    schema: '!./src/**/*.private.graphql'
     plugins:
       - graphql-markdown-plugin.js

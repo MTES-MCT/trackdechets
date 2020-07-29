@@ -1276,10 +1276,7 @@ export type Query = {
    * classées pour la protection de l'environnement (ICPE)
    */
   companyInfos: CompanyPublic;
-  /**
-   * USAGE INTERNE
-   * Renvoie la liste des éco-organismes
-   */
+  /** Renvoie la liste des éco-organismes */
   ecoOrganismes: Array<EcoOrganisme>;
   /**
    * Renvoie les établissements favoris de l'utilisateur. C'est à dire les
@@ -2885,6 +2882,21 @@ export function createCompanyStatMock(props: Partial<CompanyStat>): CompanyStat 
   };
 }
 
+export function createCreateFormInputMock(props: Partial<CreateFormInput>): CreateFormInput {
+  return {
+    customId: null,
+    emitter: null,
+    recipient: null,
+    transporter: null,
+    wasteDetails: null,
+    trader: null,
+    appendix2Forms: null,
+    ecoOrganisme: null,
+    temporaryStorageDetail: null,
+    ...props,
+  };
+}
+
 export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderReceiptInput>): CreateTraderReceiptInput {
   return {
     receiptNumber: "",
@@ -3490,6 +3502,22 @@ export function createTransportSegmentMock(props: Partial<TransportSegment>): Tr
     takenOverBy: null,
     readyToTakeOver: null,
     segmentNumber: null,
+    ...props,
+  };
+}
+
+export function createUpdateFormInputMock(props: Partial<UpdateFormInput>): UpdateFormInput {
+  return {
+    id: "",
+    customId: null,
+    emitter: null,
+    recipient: null,
+    transporter: null,
+    wasteDetails: null,
+    trader: null,
+    appendix2Forms: null,
+    ecoOrganisme: null,
+    temporaryStorageDetail: null,
     ...props,
   };
 }
