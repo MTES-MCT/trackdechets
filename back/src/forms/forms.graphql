@@ -62,14 +62,6 @@ type Query {
     Défaut à vide.
     """
     hasNextStep: Boolean
-
-    """
-    DEPRECATED
-    (Optionnel) Type de BSD renvoyés
-    ACTOR = BSD's dont on est producteur ou destinataire
-    TRANSPORTER = BSD's dont on est transporteur
-    """
-    type: FormType = ACTOR
   ): [Form!]!
 
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"

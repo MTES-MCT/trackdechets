@@ -191,18 +191,6 @@ Défaut à vide.
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">type</td>
-<td valign="top"><a href="#formtype">FormType</a></td>
-<td>
-
-DEPRECATED
-(Optionnel) Type de BSD renvoyés
-ACTOR = BSD's dont on est producteur ou destinataire
-TRANSPORTER = BSD's dont on est transporteur
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>formsLifeCycle</strong></td>
 <td valign="top"><a href="#formslifecycledata">formsLifeCycleData</a>!</td>
 <td>

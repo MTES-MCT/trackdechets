@@ -1363,7 +1363,6 @@ export type QueryFormsArgs = {
   status: Maybe<Array<FormStatus>>;
   roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
-  type?: Maybe<FormType>;
 };
 
 
