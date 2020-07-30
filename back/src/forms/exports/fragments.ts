@@ -27,6 +27,12 @@ const outgoingWasteFragment = `
     processingOperationDone
     wasteDetailsCode
     wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress
@@ -51,6 +57,12 @@ const incomingWasteFragment = `
     recipientProcessingOperation
     wasteDetailsCode
     wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress
@@ -73,6 +85,18 @@ const transportedWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     recipientCompanySiret
     recipientCompanyName
     recipientCompanyAddress
@@ -104,8 +128,12 @@ const tradedWasteFragment = `
     recipientProcessingOperation
     wasteDetailsCode
     wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
     traderReceipt
     traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress
@@ -145,8 +173,12 @@ const allWasteFragment = `
     recipientProcessingOperation
     wasteDetailsCode
     wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
     traderReceipt
     traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress

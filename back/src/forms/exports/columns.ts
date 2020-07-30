@@ -61,11 +61,24 @@ const columns: Column[] = [
     format: identity
   },
   // cadre 7
+  { field: "traderCompanySiret", label: "Négociant siret", format: identity },
+  { field: "traderCompanyName", label: "Négociant nom", format: identity },
+
   { field: "traderReceipt", label: "Négociant récépissé N°", format: identity },
   {
     field: "traderValidityLimit",
     label: "Négociant récépissé validité",
     format: formatDate
+  },
+  {
+    field: "traderCompanyContact",
+    label: "Négociant contact",
+    format: identity
+  },
+  {
+    field: "traderCompanyAddress",
+    label: "Négociant adresse",
+    format: identity
   },
   // cadre 8
   {
