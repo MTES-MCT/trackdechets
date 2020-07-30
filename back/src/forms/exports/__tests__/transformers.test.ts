@@ -1,8 +1,8 @@
-import { FormWithTempStorageFlattened } from "../types";
+import { FormFlattened } from "../types";
 import { formatForm } from "../transformers";
 
 test("formatForm should sort keys, add label and format values", () => {
-  const form: FormWithTempStorageFlattened = {
+  const form: FormFlattened = {
     wasteDetailsQuantity: 22.5,
     emitterCompanyName: "WASTE PRODUCER",
     emitterWorkSiteAddress: "",
@@ -22,7 +22,8 @@ test("formatForm should sort keys, add label and format values", () => {
     recipientCompanyMail: "recipient@td.io",
     emitterCompanySiret: "1234",
     readableId: "TD-8865a853b7da51b9789db6ada3ef8bee",
-    recipientCompanyName: "WASTE COMPANY"
+    recipientCompanyName: "WASTE COMPANY",
+    ecoOrganismeName: ""
   };
 
   const formatted = formatForm(form);
