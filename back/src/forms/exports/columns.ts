@@ -1,6 +1,6 @@
 import { Column } from "./types";
 
-const identity = (v: any) => v || "";
+const identity = (v: any) => v ?? "";
 const formatDate = (d: string | null) => (d ? d.slice(0, 10) : "");
 const formatBoolean = (b: boolean | null) => {
   if (b === null) {
@@ -29,6 +29,11 @@ const columns: Column[] = [
   {
     field: "emitterWorkSiteAddress",
     label: "Chantier adresse",
+    format: identity
+  },
+  {
+    field: "ecoOrganismeName",
+    label: "Éco-organisme nom",
     format: identity
   },
   // cadre 2
