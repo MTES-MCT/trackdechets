@@ -36,7 +36,7 @@ const columns: Column[] = [
     label: "Éco-organisme nom",
     format: identity
   },
-  // cadre 2
+  // cadre 2 ou cadre 14 (entreposage provisoire ou reconditionnement)
   {
     field: "recipientCompanySiret",
     label: "Destination siret",
@@ -56,6 +56,37 @@ const columns: Column[] = [
   {
     field: "recipientProcessingOperation",
     label: "Opération prévue D/R",
+    format: identity
+  },
+  // cadre 2 (entreposage provisoire ou reconditionnement)
+  {
+    field: "temporaryStorageCompanySiret",
+    label: "Entreposage ou reconditonnement siret",
+    format: identity
+  },
+  {
+    field: "temporaryStorageCompanyName",
+    label: "Entreposage ou reconditonnement nom",
+    format: identity
+  },
+  {
+    field: "temporaryStorageCompanyContact",
+    label: "Entreposage ou reconditonnement contact",
+    format: identity
+  },
+  {
+    field: "temporaryStorageCompanyPhone",
+    label: "Entreposage ou reconditonnement N°tél",
+    format: identity
+  },
+  {
+    field: "temporaryStorageCompanyAddress",
+    label: "Entreposage ou reconditonnement adresse",
+    format: identity
+  },
+  {
+    field: "temporaryStorageCompanyMail",
+    label: "Entreposage ou reconditonnement email",
     format: identity
   },
   // cadre 3 à 6
@@ -140,25 +171,43 @@ const columns: Column[] = [
     label: "Perte de traçabilité",
     format: formatBoolean
   },
-  // cadre 14
+  // cadre 18 (entreposage provisoire)
   {
-    field: "temporaryStorageDestinationCompanySiret",
-    label: "Destination siret",
+    field: "temporaryStorageTransporterCompanySiret",
+    label: "Transporteur après entreposage ou reconditionnement siret",
     format: identity
   },
   {
-    field: "temporaryStorageDestinationCompanyName",
-    label: "Entreposage / reconditionnement nom",
+    field: "temporaryStorageTransporterCompanyName",
+    label: "Transporteur après entreposage ou reconditionnement nom",
     format: identity
   },
   {
-    field: "temporaryStorageDetailCompanyAddress",
-    label: "Entreposage / reconditionnement adresse",
+    field: "temporaryStorageTransporterCompanyAddress",
+    label: "Transporteur après entreposage ou reconditionnement adresse",
     format: identity
   },
   {
-    field: "temporaryStorageDetailCompanyMail",
-    label: "Entreposage / reconditionnement email",
+    field: "temporaryStorageTransporterIsExemptedOfReceipt",
+    label:
+      "Transporteur après entreposage ou reconditionnement exemption de récépissé",
+    format: formatBoolean
+  },
+  {
+    field: "temporaryStorageTransporterReceipt",
+    label: "Transporteur après entreposage ou reconditionnement récépissé",
+    format: identity
+  },
+  {
+    field: "temporaryStorageTransporterValidityLimit",
+    label:
+      "Transporteur après entreposage ou reconditionnement récépissé validité",
+    format: formatDate
+  },
+  {
+    field: "temporaryStorageTransporterNumberPlate",
+    label:
+      "Transporteur après entreposage ou reconditionnement plaque d'immatriculation",
     format: identity
   }
 ];

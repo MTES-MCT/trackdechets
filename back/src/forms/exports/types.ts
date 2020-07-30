@@ -10,10 +10,19 @@ export type FormExpanded = Partial<Form> & {
 };
 
 export type FormFlattened = Partial<Form> & {
-  temporaryStorageDestinationCompanySiret?: string;
-  temporaryStorageDestinationCompanyName?: string;
-  temporaryStorageDetailCompanyAddress?: string;
-  temporaryStorageDetailCompanyMail?: string;
+  temporaryStorageCompanySiret?: string;
+  temporaryStorageCompanyName?: string;
+  temporaryStorageCompanyContact?: string;
+  temporaryStorageCompanyPhone?: string;
+  temporaryStorageCompanyAddress?: string;
+  temporaryStorageCompanyMail?: string;
+  temporaryStorageTransporterCompanySiret?: string;
+  temporaryStorageTransporterCompanyName?: string;
+  temporaryStorageTransporterCompanyAddress?: string;
+  temporaryStorageTransporterIsExemptedOfReceipt?: boolean;
+  temporaryStorageTransporterReceipt?: string;
+  temporaryStorageTransporterValidityLimit?: string;
+  temporaryStorageTransporterNumberPlate?: string;
   ecoOrganismeName: string;
 };
 

@@ -26,7 +26,26 @@ const outgoingWasteFragment = `
     recipientCompanyName
     recipientCompanyAddress
     recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
     recipientProcessingOperation
+    recipientIsTempStorage
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
+    }
     processingOperationDone
     wasteDetailsCode
     wasteDetailsQuantity
@@ -61,6 +80,7 @@ const incomingWasteFragment = `
       name
     }
     recipientProcessingOperation
+    recipientIsTempStorage
     wasteDetailsCode
     wasteDetailsQuantity
     traderCompanyName
@@ -93,6 +113,30 @@ const transportedWasteFragment = `
     emitterWorkSiteAddress
     ecoOrganisme {
       name
+    }
+    recipientCompanySiret
+    recipientCompanyName
+    recipientCompanyAddress
+    recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
+    recipientProcessingOperation
+    recipientIsTempStorage
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
     }
     traderCompanyName
     traderCompanySiret
@@ -133,11 +177,29 @@ const tradedWasteFragment = `
       name
     }
     recipientCompanySiret
-    recipientIsTempStorage
     recipientCompanyName
     recipientCompanyAddress
     recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
     recipientProcessingOperation
+    recipientIsTempStorage
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
+    }
     wasteDetailsCode
     wasteDetailsQuantity
     traderCompanyName
@@ -158,12 +220,6 @@ const tradedWasteFragment = `
     isAccepted
     processingOperationDone
     noTraceability
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-    }
   }
 `;
 
@@ -181,11 +237,29 @@ const allWasteFragment = `
       name
     }
     recipientCompanySiret
-    recipientIsTempStorage
     recipientCompanyName
     recipientCompanyAddress
     recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
     recipientProcessingOperation
+    recipientIsTempStorage
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
+    }
     wasteDetailsCode
     wasteDetailsQuantity
     traderCompanyName
@@ -206,11 +280,5 @@ const allWasteFragment = `
     isAccepted
     processingOperationDone
     noTraceability
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-    }
   }
 `;
