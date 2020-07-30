@@ -1,24 +1,23 @@
-import { ValidationError } from "apollo-server-express";
 import { prisma } from "../../generated/prisma-client";
 import {
   ResolversParentTypes,
   QueryFormArgs
 } from "../../generated/graphql/types";
-import { isReadableId } from "../readable-id";
 import { expandFormFromDb } from "../form-converter";
-
-export function byId(id: string): { id: string } | { readableId: string } {
-  return isReadableId(id) ? { readableId: id } : { id };
-}
+import { MissingIdOrReadableId, FormNotFound } from "../errors";
 
 export async function form(
   parent: ResolversParentTypes["Query"],
-  { id }: QueryFormArgs
+  { id, readableId }: QueryFormArgs
 ) {
-  const form = await prisma.form(byId(id));
+  if (id == null && readableId == null) {
+    throw new MissingIdOrReadableId();
+  }
+
+  const form = await prisma.form(id ? { id } : { readableId });
 
   if (form == null) {
-    throw new ValidationError("Ce bordereau n'existe pas.");
+    throw new FormNotFound(id || readableId);
   }
 
   return expandFormFromDb(form);

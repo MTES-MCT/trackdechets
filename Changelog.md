@@ -5,19 +5,6 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# Unreleased
-
-- Les champs `readableId` et `id` peuvent être utilisés comme paramètre `id` dans la query `form` et les mutations `duplicateForm`, `deleteForm`, et `formPdf`.
-
-  **BREAKING :** La query `form` a changée de signature, le paramètre `id` est maintenant requis :
-
-  ```diff
-  - form(id: ID)
-  + form(id: ID!)
-  ```
-
-  [PR 364](https://github.com/MTES-MCT/trackdechets/pull/364)
-
 # [2020.07.1] 15/07/2020
 
 - Multimodal [PR 317](https://github.com/MTES-MCT/trackdechets/pull/317), [PR 337](https://github.com/MTES-MCT/trackdechets/pull/337), [PR 339](https://github.com/MTES-MCT/trackdechets/pull/339), [PR 356](https://github.com/MTES-MCT/trackdechets/pull/356)

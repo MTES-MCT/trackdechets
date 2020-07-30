@@ -51,27 +51,4 @@ describe("Mutation.duplicateForm", () => {
     expect(statusLogs.length).toEqual(1);
     expect(statusLogs[0].loggedAt).toBeTruthy();
   });
-
-  it("should duplicate a form based on its readableId", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret }
-    });
-
-    const { mutate } = makeClient(user);
-    const { data } = await mutate(DUPLICATE_FORM, {
-      variables: {
-        id: form.readableId
-      }
-    });
-
-    const duplicateForm = (await prisma.form({
-      id: data.duplicateForm.id
-    })) as Form;
-
-    expect(cleanUpNotDuplicatableFieldsInForm(form)).toEqual(
-      cleanUpNotDuplicatableFieldsInForm(duplicateForm)
-    );
-  });
 });

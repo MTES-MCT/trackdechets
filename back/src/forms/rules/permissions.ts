@@ -1,8 +1,4 @@
-import {
-  ForbiddenError,
-  UserInputError,
-  ValidationError
-} from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
 import { Prisma, prisma } from "../../generated/prisma-client";
 import { isAuthenticated } from "../../common/rules";
@@ -19,7 +15,6 @@ import {
   NotFormContributor,
   FormNotFound
 } from "../errors";
-import { byId } from "../queries/form";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -52,7 +47,7 @@ export const canAccessForm = and(
     );
 
     if (formInfos == null) {
-      return new ValidationError("Ce bordereau n'existe pas.");
+      return new FormNotFound(id);
     }
 
     if (formInfos.owner.id === ctx.user.id) {
@@ -213,7 +208,7 @@ export const isFormEcoOrganisme = and(
     );
 
     if (formInfos == null) {
-      return new ValidationError("Ce bordereau n'existe pas.");
+      return new FormNotFound(id);
     }
 
     if (currentUserSirets.includes(formInfos.ecoOrganisme?.siret)) {
@@ -238,7 +233,7 @@ export const isFormRecipient = and(
     );
 
     if (formInfos == null) {
-      return new ValidationError("Ce bordereau n'existe pas.");
+      return new FormNotFound(id);
     }
 
     if (formInfos.recipientIsTempStorage) {
@@ -277,7 +272,7 @@ export const isFormEmitter = and(
     );
 
     if (formInfos == null) {
-      return new ValidationError("Ce bordereau n'existe pas.");
+      return new FormNotFound(id);
     }
 
     if (currentUserSirets.includes(formInfos.emitterCompanySiret)) {
@@ -302,7 +297,7 @@ export const isFormTransporter = and(
     );
 
     if (formInfos == null) {
-      return new ValidationError("Ce bordereau n'existe pas.");
+      return new FormNotFound(id);
     }
 
     const segmentSirets = formInfos.transportSegments.map(
@@ -344,7 +339,7 @@ export const isFormTrader = and(
     );
 
     if (formInfos == null) {
-      return new ValidationError("Ce bordereau n'existe pas.");
+      return new FormNotFound(id);
     }
 
     if (currentUserSirets.includes(formInfos.traderCompanySiret)) {
@@ -365,7 +360,7 @@ export const isFormTempStorer = and(
     );
 
     if (formInfos == null) {
-      return new ValidationError("Ce bordereau n'existe pas.");
+      return new FormNotFound(id);
     }
 
     if (
@@ -427,7 +422,7 @@ async function getFormAccessInfos(
   userId: string,
   prisma: Prisma
 ) {
-  const formInfos = await prisma.form(byId(formId))
+  const formInfos = await prisma.form({ id: formId })
     .$fragment<FormSiretsAndOwner | null>(`
   fragment FormWithOwner on Form {
     recipientCompanySiret

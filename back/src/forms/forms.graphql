@@ -11,8 +11,13 @@ scalar DateTime
 scalar JSON
 
 type Query {
-  "Renvoie un BSD, sélectionné par ID"
-  form("Identifiant du BSD" id: ID!): Form
+  "Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)"
+  form(
+    "Identifiant opaque du BSD"
+    id: ID
+    "Identifiant lisible du BSD"
+    readableId: String
+  ): Form
 
   """
   Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)

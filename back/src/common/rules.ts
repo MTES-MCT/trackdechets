@@ -1,4 +1,5 @@
-import { rule, and } from "graphql-shield";
+import { rule, chain } from "graphql-shield";
+import { ForbiddenError } from "apollo-server-express";
 import { Prisma } from "../generated/prisma-client";
 import {
   NotLoggedIn,

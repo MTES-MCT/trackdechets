@@ -12,8 +12,8 @@ import {
 } from "../../../generated/prisma-client";
 
 const GET_FORM_QUERY = `
-  query GetForm($id: ID!) {
-    form(id: $id) {
+  query GetForm($id: ID, $readableId: String) {
+    form(id: $id, readableId: $readableId) {
       id
     }
   }
@@ -32,53 +32,24 @@ async function createForm(opts: Partial<FormCreateInput>): Promise<PrismaForm> {
 describe("Query.form", () => {
   afterEach(() => resetDatabase());
 
-  it("should allow user from the emitter company to read their form", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const form = await createForm({
-      emitterCompanySiret: company.siret
-    });
+  it.each(["emitter", "recipient", "transporter"])(
+    "should allow user from the %p company to read their form",
+    async type => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const form = await createForm({
+        [`${type}CompanySiret`]: company.siret
+      });
 
-    const { query } = makeClient(user);
-    const { data } = await query(GET_FORM_QUERY, {
-      variables: {
-        id: form.id
-      }
-    });
+      const { query } = makeClient(user);
+      const { data } = await query(GET_FORM_QUERY, {
+        variables: {
+          id: form.id
+        }
+      });
 
-    expect(data.form.id).toBe(form.id);
-  });
-
-  it("should allow user from the recipient company to read their form", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const form = await createForm({
-      recipientCompanySiret: company.siret
-    });
-
-    const { query } = makeClient(user);
-    const { data } = await query(GET_FORM_QUERY, {
-      variables: {
-        id: form.id
-      }
-    });
-
-    expect(data.form.id).toBe(form.id);
-  });
-
-  it("should allow user from the transporter company to read their form", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const form = await createForm({
-      transporterCompanySiret: company.siret
-    });
-
-    const { query } = makeClient(user);
-    const { data } = await query(GET_FORM_QUERY, {
-      variables: {
-        id: form.id
-      }
-    });
-
-    expect(data.form.id).toBe(form.id);
-  });
+      expect(data.form.id).toBe(form.id);
+    }
+  );
 
   it("should allow a user from a transporter company part of a segment to read their form", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -124,7 +95,7 @@ describe("Query.form", () => {
     const { query } = makeClient(user);
     const { data } = await query(GET_FORM_QUERY, {
       variables: {
-        id: form.readableId
+        readableId: form.readableId
       }
     });
 

@@ -1292,7 +1292,7 @@ export type Query = {
    * établissements qui font souvent partis des BSD édités
    */
   favorites: Array<CompanyFavorite>;
-  /** Renvoie un BSD, sélectionné par ID */
+  /** Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni) */
   form: Maybe<Form>;
   /**
    * Renvoie un token pour télécharger un pdf de BSD
@@ -1347,7 +1347,8 @@ export type QueryFavoritesArgs = {
 
 
 export type QueryFormArgs = {
-  id: Scalars['ID'];
+  id: Maybe<Scalars['ID']>;
+  readableId: Maybe<Scalars['String']>;
 };
 
 
