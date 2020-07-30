@@ -387,15 +387,6 @@ enum FormStatus {
   RESENT
 }
 
-"Valeur possibles pour le filtre de la query `forms`"
-enum FormType {
-  "DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)"
-  ACTOR
-
-  "Uniquement les BSD's dont je suis transporteur"
-  TRANSPORTER
-}
-
 enum FormRole {
   "Les BSD's dont je suis transporteur"
   TRANSPORTER

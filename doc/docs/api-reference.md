@@ -5364,35 +5364,6 @@ Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination d
 </tbody>
 </table>
 
-### FormType
-
-Valeur possibles pour le filtre de la query `forms`
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>ACTOR</strong></td>
-<td>
-
-DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)
-
-</td>
-</tr>
-<tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
-<td>
-
-Uniquement les BSD's dont je suis transporteur
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### FormsRegisterExportFormat
 
 Format de l'export du registre

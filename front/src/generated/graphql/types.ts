@@ -667,14 +667,6 @@ export type FormSubscription = {
   previousValues: Maybe<Form>;
 };
 
-/** Valeur possibles pour le filtre de la query `forms` */
-export enum FormType {
-  /** DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
-  Actor = 'ACTOR',
-  /** Uniquement les BSD's dont je suis transporteur */
-  Transporter = 'TRANSPORTER'
-}
-
 /** Type d'une déclaration GEREP */
 export enum GerepType {
   Producteur = 'Producteur',

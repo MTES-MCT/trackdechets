@@ -662,13 +662,6 @@ export type FormSubscription = {
   previousValues?: Maybe<Form>;
 };
 
-/** Valeur possibles pour le filtre de la query `forms` */
-export type FormType = 
-  /** DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
-  | 'ACTOR'
-  /** Uniquement les BSD's dont je suis transporteur */
-  | 'TRANSPORTER';
-
 /** Type d'une déclaration GEREP */
 export type GerepType = 
   | 'Producteur'
@@ -2142,7 +2135,6 @@ export type ResolversTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
-  FormType: FormType;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -2243,7 +2235,6 @@ export type ResolversParentTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: {};
   FormSubscription: FormSubscription;
-  FormType: FormType;
 };
 
 export type AuthPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuthPayload'] = ResolversParentTypes['AuthPayload']> = {
