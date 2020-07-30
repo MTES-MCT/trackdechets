@@ -93,7 +93,7 @@ const columns: Column[] = [
   { field: "wasteDetailsCode", label: "Déchet rubrique", format: identity },
   {
     field: "wasteDetailsQuantity",
-    label: "Déchet quantité (en tonnes)",
+    label: "Déchet quantité estimée (en tonnes)",
     format: identity
   },
   // cadre 7
@@ -160,6 +160,11 @@ const columns: Column[] = [
   // cadre 10
   { field: "receivedAt", label: "Date de présentation", format: formatDate },
   { field: "isAccepted", label: "Lot accepté", format: identity },
+  {
+    field: "quantityReceived",
+    label: "Déchet quantité réelle (en tonnes)",
+    format: identity
+  },
   // cadre 11
   {
     field: "processingOperationDone",

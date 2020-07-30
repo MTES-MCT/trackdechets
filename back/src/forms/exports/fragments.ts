@@ -46,6 +46,7 @@ const outgoingWasteFragment = `
       transporterValidityLimit
       transporterNumberPlate
     }
+    quantityReceived
     processingOperationDone
     wasteDetailsCode
     wasteDetailsQuantity
@@ -81,8 +82,8 @@ const incomingWasteFragment = `
     }
     recipientProcessingOperation
     recipientIsTempStorage
+    quantityReceived
     wasteDetailsCode
-    wasteDetailsQuantity
     traderCompanyName
     traderCompanySiret
     traderReceipt
@@ -122,6 +123,7 @@ const transportedWasteFragment = `
     recipientCompanyContact
     recipientProcessingOperation
     recipientIsTempStorage
+    quantityReceived
     temporaryStorageDetail {
       destinationCompanySiret
       destinationCompanyName
@@ -156,7 +158,6 @@ const transportedWasteFragment = `
     recipientCompanyMail
     recipientProcessingOperation
     wasteDetailsCode
-    wasteDetailsQuantity
     transporterNumberPlate
     sentAt
     receivedAt
@@ -184,6 +185,7 @@ const tradedWasteFragment = `
     recipientCompanyContact
     recipientProcessingOperation
     recipientIsTempStorage
+    quantityReceived
     temporaryStorageDetail {
       destinationCompanySiret
       destinationCompanyName
@@ -244,6 +246,7 @@ const allWasteFragment = `
     recipientCompanyContact
     recipientProcessingOperation
     recipientIsTempStorage
+    quantityReceived
     temporaryStorageDetail {
       destinationCompanySiret
       destinationCompanyName
