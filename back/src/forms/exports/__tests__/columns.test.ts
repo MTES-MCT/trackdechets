@@ -33,8 +33,9 @@ describe("formatRow", () => {
     const expected = {
       readableId: form.readableId,
       customId: "",
+      ecoOrganismeName: "",
       emitterCompanySiret: form.emitterCompanySiret,
-      erCompanyName: form.emitterCompanyName,
+      emitterCompanyName: form.emitterCompanyName,
       emitterCompanyContact: form.emitterCompanyContact,
       emitterCompanyAddress: form.emitterCompanyAddress,
       emitterWorkSiteName: "",
