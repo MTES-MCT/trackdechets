@@ -57,8 +57,8 @@ export async function downloadFormsRegister(
       const transformer = formsTransformer();
       reader.pipe(transformer);
       transformer.on("data", form => {
-        console.log(worksheet.columns);
         if (worksheet.columns === null) {
+          // write headers if not present
           worksheet.columns = getXlsxHeaders(form);
         }
         worksheet.addRow(form, "n").commit();
