@@ -6,6 +6,7 @@ import { formsReader, formsTransformer } from "./streams";
 import { formsWhereInput } from "./where-inputs";
 import { formFragment } from "./fragments";
 import { getExportsFileName } from "./filename";
+import { getXlsxHeaders } from "./columns";
 
 /**
  * Download handler for forms register
@@ -28,7 +29,6 @@ export async function downloadFormsRegister(
   const fragment = formFragment(args.exportType);
 
   const reader = formsReader({ whereInput, fragment });
-  const transformer = formsTransformer();
 
   const filename = getExportsFileName(
     args.exportType,
@@ -42,6 +42,7 @@ export async function downloadFormsRegister(
       res.set("Content-Type", "text/csv");
       res.set("Transfer-Encoding", "chunked");
       const csvStream = format({ headers: true, delimiter: ";" });
+      const transformer = formsTransformer({ useLabelAsKey: true });
       reader.pipe(transformer).pipe(csvStream).pipe(res);
       break;
     }
@@ -53,15 +54,14 @@ export async function downloadFormsRegister(
       res.set("Transfer-Encoding", "chunked");
       const workbook = new Excel.stream.xlsx.WorkbookWriter({ stream: res });
       const worksheet = workbook.addWorksheet("registre");
-
+      const transformer = formsTransformer();
       reader.pipe(transformer);
-      let hasHeader = false;
       transformer.on("data", form => {
-        if (!hasHeader) {
-          worksheet.addRow(Object.keys(form), "n").commit();
-          hasHeader = true;
+        if (worksheet.columns === null) {
+          // write headers if not present
+          worksheet.columns = getXlsxHeaders(form);
         }
-        worksheet.addRow(Object.values(form), "n").commit();
+        worksheet.addRow(form, "n").commit();
       });
 
       transformer.on("end", () => {

@@ -19,14 +19,43 @@ const outgoingWasteFragment = `
     customId
     emitterWorkSiteName
     emitterWorkSiteAddress
+    ecoOrganisme {
+      name
+    }
     recipientCompanySiret
     recipientCompanyName
     recipientCompanyAddress
     recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
     recipientProcessingOperation
+    recipientIsTempStorage
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
+    }
+    quantityReceived
     processingOperationDone
     wasteDetailsCode
     wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress
@@ -48,9 +77,19 @@ const incomingWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
+    ecoOrganisme {
+      name
+    }
     recipientProcessingOperation
+    recipientIsTempStorage
+    quantityReceived
     wasteDetailsCode
-    wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress
@@ -73,13 +112,52 @@ const transportedWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
+    ecoOrganisme {
+      name
+    }
+    recipientCompanySiret
+    recipientCompanyName
+    recipientCompanyAddress
+    recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
+    recipientProcessingOperation
+    recipientIsTempStorage
+    quantityReceived
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
+    }
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
+    traderCompanyName
+    traderCompanySiret
+    traderReceipt
+    traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     recipientCompanySiret
     recipientCompanyName
     recipientCompanyAddress
     recipientCompanyMail
     recipientProcessingOperation
     wasteDetailsCode
-    wasteDetailsQuantity
     transporterNumberPlate
     sentAt
     receivedAt
@@ -96,16 +174,42 @@ const tradedWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
+    ecoOrganisme {
+      name
+    }
     recipientCompanySiret
-    recipientIsTempStorage
     recipientCompanyName
     recipientCompanyAddress
     recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
     recipientProcessingOperation
+    recipientIsTempStorage
+    quantityReceived
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
+    }
     wasteDetailsCode
     wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
     traderReceipt
     traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress
@@ -118,12 +222,6 @@ const tradedWasteFragment = `
     isAccepted
     processingOperationDone
     noTraceability
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-    }
   }
 `;
 
@@ -137,16 +235,42 @@ const allWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
+    ecoOrganisme {
+      name
+    }
     recipientCompanySiret
-    recipientIsTempStorage
     recipientCompanyName
     recipientCompanyAddress
     recipientCompanyMail
+    recipientCompanyPhone
+    recipientCompanyContact
     recipientProcessingOperation
+    recipientIsTempStorage
+    quantityReceived
+    temporaryStorageDetail {
+      destinationCompanySiret
+      destinationCompanyName
+      destinationCompanyAddress
+      destinationCompanyMail
+      destinationCompanyPhone
+      destinationCompanyContact
+      destinationProcessingOperation
+      transporterCompanySiret
+      transporterCompanyName
+      transporterCompanyAddress
+      transporterIsExemptedOfReceipt
+      transporterReceipt
+      transporterValidityLimit
+      transporterNumberPlate
+    }
     wasteDetailsCode
     wasteDetailsQuantity
+    traderCompanyName
+    traderCompanySiret
     traderReceipt
     traderValidityLimit
+    traderCompanyContact
+    traderCompanyAddress
     transporterCompanySiret
     transporterCompanyName
     transporterCompanyAddress
@@ -159,11 +283,5 @@ const allWasteFragment = `
     isAccepted
     processingOperationDone
     noTraceability
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-    }
   }
 `;

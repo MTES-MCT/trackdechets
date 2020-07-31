@@ -4,6 +4,8 @@ import {
   Consistence,
   EmitterType,
   QuantityType,
+  WasteAcceptationStatus,
+  TemporaryStorageDetailCreateInput,
   prisma,
   UserRole,
   Status,
@@ -182,6 +184,45 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
+const tempStorageData: TemporaryStorageDetailCreateInput = {
+  tempStorerQuantityType: "ESTIMATED" as QuantityType,
+  tempStorerQuantityReceived: 1,
+  tempStorerWasteAcceptationStatus: "ACCEPTED" as WasteAcceptationStatus,
+  tempStorerWasteRefusalReason: null,
+  tempStorerReceivedAt: "2019-12-20T00:00:00.000Z",
+  tempStorerReceivedBy: "John Dupont",
+  tempStorerSignedAt: "2019-12-20T00:00:00.000Z",
+  destinationIsFilledByEmitter: true,
+  destinationCompanyName: "Incinérateur du Grand Est",
+  destinationCompanySiret: "11111111111111",
+  destinationCompanyAddress: "4 chemin des déchets, Mulhouse",
+  destinationCompanyContact: "Louis Henry",
+  destinationCompanyPhone: "0700000000",
+  destinationCompanyMail: "louis.henry@idge.org",
+  destinationCap: "",
+  destinationProcessingOperation: "",
+  wasteDetailsOnuCode: "",
+  wasteDetailsPackagings: null,
+  wasteDetailsOtherPackaging: null,
+  wasteDetailsNumberOfPackages: 1,
+  wasteDetailsQuantity: 1,
+  wasteDetailsQuantityType: "ESTIMATED" as QuantityType,
+  transporterCompanyName: "Transporteur",
+  transporterCompanySiret: "22222222222222",
+  transporterCompanyAddress: "6 chemin des pneus, 07100 Bourg d'ici",
+  transporterCompanyContact: "Mathieu O'connor",
+  transporterCompanyPhone: "0700000000",
+  transporterCompanyMail: "mathieu@transporteur.org",
+  transporterIsExemptedOfReceipt: false,
+  transporterReceipt: "xxxxxx",
+  transporterDepartment: "07",
+  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+  transporterNumberPlate: "AD-007-XX",
+  signedByTransporter: true,
+  signedBy: "Mathieu O'connor",
+  signedAt: "2019-11-28T00:00:00.000Z"
+};
+
 export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
   return prisma.createTransportSegment({
     form: { connect: { id: formId } },
@@ -209,6 +250,23 @@ export const formFactory = async ({
     readableId: getReadableId(),
     ...formParams,
     owner: { connect: { id: ownerId } }
+  });
+};
+
+export const formWithTempStorageFactory = async ({
+  ownerId,
+  opt = {}
+}: {
+  ownerId: string;
+  opt?: Partial<FormCreateInput>;
+}) => {
+  return formFactory({
+    ownerId,
+    opt: {
+      recipientIsTempStorage: true,
+      temporaryStorageDetail: { create: tempStorageData },
+      ...opt
+    }
   });
 };
 

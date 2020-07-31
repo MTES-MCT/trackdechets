@@ -1,6 +1,7 @@
 import { Readable, Transform, ReadableOptions } from "stream";
 import { prisma, Form, FormWhereInput } from "../../generated/prisma-client";
-import { formatForm, flattenForm } from "./transformers";
+import { flattenForm } from "./transformers";
+import { formatRow } from "./columns";
 
 interface FormReaderOptions extends ReadableOptions {
   read?(this: FormReader, size: number): void;
@@ -62,13 +63,13 @@ export function formsReader({
 /**
  * Format rows as data flow
  */
-export function formsTransformer() {
+export function formsTransformer(opts = { useLabelAsKey: false }) {
   return new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
     transform(form: Form, _encoding, callback) {
       const flattened = flattenForm(form);
-      const formatted = formatForm(flattened);
+      const formatted = formatRow(flattened, opts.useLabelAsKey);
       this.push(formatted);
       callback();
     }
