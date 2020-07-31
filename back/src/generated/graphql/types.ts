@@ -662,13 +662,6 @@ export type FormSubscription = {
   previousValues?: Maybe<Form>;
 };
 
-/** Valeur possibles pour le filtre de la query `forms` */
-export type FormType = 
-  /** DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut) */
-  | 'ACTOR'
-  /** Uniquement les BSD's dont je suis transporteur */
-  | 'TRANSPORTER';
-
 /** Type d'une déclaration GEREP */
 export type GerepType = 
   | 'Producteur'
@@ -1354,7 +1347,6 @@ export type QueryFormsArgs = {
   status?: Maybe<Array<FormStatus>>;
   roles?: Maybe<Array<FormRole>>;
   hasNextStep?: Maybe<Scalars['Boolean']>;
-  type?: Maybe<FormType>;
 };
 
 
@@ -2088,7 +2080,6 @@ export type ResolversTypes = {
   CompanyFavorite: ResolverTypeWrapper<CompanyFavorite>;
   FileDownload: ResolverTypeWrapper<FileDownload>;
   FormRole: FormRole;
-  FormType: FormType;
   formsLifeCycleData: ResolverTypeWrapper<FormsLifeCycleData>;
   StatusLog: ResolverTypeWrapper<StatusLog>;
   JSON: ResolverTypeWrapper<Scalars['JSON']>;
@@ -2189,7 +2180,6 @@ export type ResolversParentTypes = {
   CompanyFavorite: CompanyFavorite;
   FileDownload: FileDownload;
   FormRole: FormRole;
-  FormType: FormType;
   formsLifeCycleData: FormsLifeCycleData;
   StatusLog: StatusLog;
   JSON: Scalars['JSON'];
@@ -2522,7 +2512,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'type'>>;
   form?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<QueryFormArgs, never>>;
   formPdf?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>;
-  forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, 'type'>>;
+  forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, never>>;
   formsLifeCycle?: Resolver<ResolversTypes['formsLifeCycleData'], ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>;
   formsRegister?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, 'sirets'>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;

@@ -191,18 +191,6 @@ Défaut à vide.
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">type</td>
-<td valign="top"><a href="#formtype">FormType</a></td>
-<td>
-
-DEPRECATED
-(Optionnel) Type de BSD renvoyés
-ACTOR = BSD's dont on est producteur ou destinataire
-TRANSPORTER = BSD's dont on est transporteur
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>formsLifeCycle</strong></td>
 <td valign="top"><a href="#formslifecycledata">formsLifeCycleData</a>!</td>
 <td>
@@ -5370,35 +5358,6 @@ Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site 
 <td>
 
 Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement
-
-</td>
-</tr>
-</tbody>
-</table>
-
-### FormType
-
-Valeur possibles pour le filtre de la query `forms`
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>ACTOR</strong></td>
-<td>
-
-DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)
-
-</td>
-</tr>
-<tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
-<td>
-
-Uniquement les BSD's dont je suis transporteur
 
 </td>
 </tr>

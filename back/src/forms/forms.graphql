@@ -62,14 +62,6 @@ type Query {
     Défaut à vide.
     """
     hasNextStep: Boolean
-
-    """
-    DEPRECATED
-    (Optionnel) Type de BSD renvoyés
-    ACTOR = BSD's dont on est producteur ou destinataire
-    TRANSPORTER = BSD's dont on est transporteur
-    """
-    type: FormType = ACTOR
   ): [Form!]!
 
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"
@@ -393,15 +385,6 @@ enum FormStatus {
 
   "Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement"
   RESENT
-}
-
-"Valeur possibles pour le filtre de la query `forms`"
-enum FormType {
-  "DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)"
-  ACTOR
-
-  "Uniquement les BSD's dont je suis transporteur"
-  TRANSPORTER
 }
 
 enum FormRole {

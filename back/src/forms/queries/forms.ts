@@ -19,17 +19,10 @@ const DEFAULT_FIRST = 50;
  */
 export default async function forms(
   userId: string,
-  { siret, type, status, hasNextStep, ...rest }: QueryFormsArgs
+  { siret, status, roles, hasNextStep, ...rest }: QueryFormsArgs
 ): Promise<Form[]> {
   const first = rest.first ?? DEFAULT_FIRST;
   const skip = rest.skip ?? 0;
-  const roles: FormRole[] =
-    // TODO Remove `type` param and this code after deprecation warning period
-    type && !rest.roles
-      ? type === "ACTOR"
-        ? []
-        : ["TRANSPORTER"]
-      : rest.roles ?? [];
 
   const userCompanies = await getUserCompanies(userId);
 
@@ -49,7 +42,7 @@ export default async function forms(
     where: {
       ...(status?.length && { status_in: status }),
       AND: [
-        getRolesFilter(company.siret, roles),
+        getRolesFilter(company.siret, roles ?? []),
         getHasNextStepFilter(company.siret, hasNextStep)
       ],
       isDeleted: false
