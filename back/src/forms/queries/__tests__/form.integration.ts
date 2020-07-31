@@ -82,7 +82,7 @@ describe("Query.form", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Vous n'êtes pas autorisé à accéder à ce bordereau."
+      "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas."
     );
   });
 
