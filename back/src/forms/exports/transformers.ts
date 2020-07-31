@@ -1,4 +1,5 @@
 import { FormExpanded, FormFlattened } from "./types";
+import Excel from "exceljs";
 import columns from "./columns";
 
 /**
@@ -57,18 +58,4 @@ export function flattenForm(formExpanded: FormExpanded): FormFlattened {
   }
 
   return form;
-}
-
-/**
- * Use label as key and format value
- */
-export function formatForm(form: FormFlattened): { [key: string]: string } {
-  return columns.reduce((acc, column) => {
-    return {
-      ...acc,
-      ...(column.field in form
-        ? { [column.label]: column.format(form[column.field]) }
-        : {})
-    };
-  }, {});
 }

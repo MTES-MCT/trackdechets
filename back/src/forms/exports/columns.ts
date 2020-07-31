@@ -1,4 +1,5 @@
-import { Column } from "./types";
+import { Column, FormFlattened } from "./types";
+import Excel from "exceljs";
 
 const identity = (v: any) => v ?? "";
 const formatDate = (d: string | null) => (d ? d.slice(0, 10) : "");
@@ -90,7 +91,11 @@ const columns: Column[] = [
     format: identity
   },
   // cadre 3 à 6
-  { field: "wasteDetailsCode", label: "Déchet rubrique", format: identity },
+  {
+    field: "wasteDetailsCode",
+    label: "Déchet rubrique",
+    format: identity
+  },
   {
     field: "wasteDetailsQuantity",
     label: "Déchet quantité estimée (en tonnes)",
@@ -217,4 +222,40 @@ const columns: Column[] = [
   }
 ];
 
-export default columns;
+/**
+ * Format row values and optionally use label as key
+ */
+export function formatRow(
+  form: FormFlattened,
+  useLabelAsKey = false
+): { [key: string]: string } {
+  return columns.reduce((acc, column) => {
+    if (column.field in form) {
+      const key = useLabelAsKey ? column.label : column.field;
+      return {
+        ...acc,
+        [key]: column.format(form[column.field])
+      };
+    }
+    return acc;
+  }, {});
+}
+
+/**
+ * GET XLSX headers based of the first row
+ */
+export function getXlsxHeaders(form: FormFlattened): Partial<Excel.Column>[] {
+  return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
+    if (column.field in form) {
+      return [
+        ...acc,
+        {
+          header: column.label,
+          key: column.field,
+          width: 20
+        }
+      ];
+    }
+    return acc;
+  }, []);
+}
