@@ -27,7 +27,7 @@ describe("formatRow", () => {
   };
 
   test("useLabelAsKey = false", () => {
-    const formatted = formatRow(form, true);
+    const formatted = formatRow(form, false);
 
     // it should sort and format values
     const expected = {
@@ -75,9 +75,10 @@ describe("formatRow", () => {
       "Destination email": form.recipientCompanyMail,
       "Opération prévue D/R": form.recipientProcessingOperation,
       "Déchet rubrique": form.wasteDetailsCode,
-      "Déchet quantité (en tonnes)": form.wasteDetailsQuantity,
+      "Déchet quantité estimée (en tonnes)": form.wasteDetailsQuantity,
       "Transporteur exemption de récépissé": "O",
       "Transporteur immatriculation": form.transporterNumberPlate,
+      "Éco-organisme nom": "",
       "Date de prise en charge": "2020-03-01",
       "Date de présentation": "",
       "Lot accepté": ""
