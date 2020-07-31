@@ -427,10 +427,14 @@ Bordereau de suivi de déchets (BSD)
 Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/professionnels-entreprises/vosdroits/R14334)
 """
 type Form {
-  "Identifiant interne du BSD"
+  "Identifiant unique du bordereau."
   id: ID!
 
-  "Identifiant utilisé dans la case 'Bordereau n° ****'"
+  """
+  Identifiant lisible utilisé comme numéro sur le CERFA (case "Bordereau n°****").
+  Il est possible de l'utiliser pour récupérer l'identifiant unique du bordereau via la query form,
+  utilisé pour le reste des opérations.
+  """
   readableId: String!
 
   """
@@ -907,6 +911,9 @@ type StatusLogForm {
 
   "N° du bordereau"
   readableId: String
+    @deprecated(
+      reason: "Le readableId apparaît sur le CERFA mais l'id doit être utilisé comme identifiant."
+    )
 }
 
 "Utilisateur ayant modifié le BSD"
