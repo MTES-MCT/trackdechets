@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { Field } from "formik";
 import React, { useState } from "react";
 import { FaEnvelope, FaEye, FaIdCard, FaLock, FaPhone } from "react-icons/fa";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { NotificationError } from "../common/Error";
 import PasswordMeter from "../common/PasswordMeter";
 import RedErrorMessage from "../common/RedErrorMessage";
