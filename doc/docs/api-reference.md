@@ -74,10 +74,10 @@ Renvoie la liste des éco-organismes
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>form</strong></td>
-<td valign="top"><a href="#form">Form</a>!</td>
+<td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Renvoie un BSD, sélectionné par ID
+Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)
 
 </td>
 </tr>
@@ -87,6 +87,15 @@ Renvoie un BSD, sélectionné par ID
 <td>
 
 Identifiant opaque du BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">readableId</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Identifiant lisible du BSD
 
 </td>
 </tr>
@@ -1737,7 +1746,7 @@ Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/p
 <td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
-Identifiant interne du BSD
+Identifiant unique du bordereau.
 
 </td>
 </tr>
@@ -1746,7 +1755,9 @@ Identifiant interne du BSD
 <td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-Identifiant utilisé dans la case 'Bordereau n° ****'
+Identifiant lisible utilisé comme numéro sur le CERFA (case "Bordereau n°****").
+Il est possible de l'utiliser pour récupérer l'identifiant unique du bordereau via la query form,
+utilisé pour le reste des opérations.
 
 </td>
 </tr>
@@ -2719,12 +2730,18 @@ Identifiant du BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>readableId</strong></td>
+<td colspan="2" valign="top"><strong>readableId</strong> ⚠️</td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
 N° du bordereau
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Le readableId apparaît sur le CERFA mais l'id doit être utilisé comme identifiant.
+
+</blockquote>
 </td>
 </tr>
 </tbody>
@@ -3512,11 +3529,23 @@ Payload de création d'une annexe 2
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+Identifiant unique du bordereau
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>readableId</strong></td>
 <td valign="top"><a href="#id">ID</a></td>
 <td>
 
 N° de bordereau
+
+Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
+Le readableId permet de le récupérer via la query form.
 
 </td>
 </tr>

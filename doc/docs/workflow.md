@@ -26,7 +26,9 @@ Pour plus d'informations sur le calendrier de déploiement des fonctionnalités,
 
 ## Numéro de BSD
 
-Chaque BSD est associé à un identifiant opaque unique. Cette identifiant correspond au champ `id` et doit être utilisé lors des différentes requêtes. En plus de l'identifiant opaque, un identifiant "lisible" est généré (champ `readableId`). Cet identifiant apparait sur le bordereau dans la case "Bordereau n°". L'identifiant est sous la forme `TD-{année}-{identifiant}` (Ex: `TD-20-AAA00136`). Vous pouvez également ajouter un identifiant qui vous est propre pour faire le lien avec votre SI. Il vous faut pour cela utiliser le champ `customId`.
+Chaque BSD est associé à un identifiant opaque unique. Cet identifiant correspond au champ `id` et doit être utilisé lors des différentes requêtes. En plus de l'identifiant opaque, un identifiant "lisible" est généré (champ `readableId`). Cet identifiant apparait sur le bordereau dans la case "Bordereau n°". L'identifiant est sous la forme `TD-{année}-{identifiant}` (Ex: `TD-20-AAA00136`). Il peut être utiliser pour récupérer l'identifiant opaque unique via la query `form`.
+
+Vous pouvez également ajouter un identifiant qui vous est propre pour faire le lien avec votre SI. Il vous faut pour cela utiliser le champ `customId`.
 
 ## États du BSD
 
@@ -44,17 +46,16 @@ L'ensemble des champs du BSD numérique est décrit dans la [référence de l'AP
 
 Chaque changement d'état s'effectue grâce à une mutation.
 
-| Mutation              | Transition                                                                                       | Données                                                                           | Permissions                                                         |
-| --------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `createForm`            | `-> DRAFT` <br />  | [FormInput](api-reference.md#forminput) | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>|
-| `updateForm`            | `DRAFT -> DRAFT` <br />  | [FormInput](api-reference.md#forminput) | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>|
-| `markAsSealed`        | `DRAFT -> SEALED`                                                                                |                                                                                   | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                               |
-| `signedByTransporter` | <div><ul><li>`SEALED -> SENT`</li><li>`RESEALED -> RESENT`</li></ul></div>                                                    | [TransporterSignatureFormInput](api-reference.md#s#transportersignatureforminput) | Uniquement le collecteur-transporteur, l'émetteur ou le site d'entreposage provisoire/reconditionnement étant authentifié grâce au code de sécurité présent en paramètre de la mutation  |
-| `markAsReceived`      | <div><ul><li>`SENT -> RECEIVED`</li><li>`SENT -> REFUSED`</li></ul></div>                                                         | [ReceivedFormInput](api-reference.md#receivedforminput)                           | Uniquement le destinataire du BSD                                   |
-| `markAsProcessed`     | <div><ul><li>`RECEIVED -> PROCESSED`</li><li>`RECEIVED -> NO_TRACEABILITY`</li><li>`RECEIVED -> AWAITING_GROUP`</li></ul></div>| [ProcessedFormInput](api-reference.md#processedforminput)                         | Uniquement le destinataire du BSD                                   |
-| `markAsTempStored`    | <div><ul><li>`SENT -> TEMP_STORED`</li><li>`SENT -> REFUSED`</li></ul></div>                                                    | [TempStoredFormInput](api-reference.md#tempstoredforminput)                       | Uniquement le site d'entreposage temporaire ou de reconditionnement |
-| `markAsResealed`      | `TEMP_STORED -> RESEALED`                                                                        | [ResealedFormInput](api-reference.md#resealedtoredforminput)                      | Uniquement le site d'entreposage temporaire ou de reconditionnement |
-
+| Mutation              | Transition                                                                                                                      | Données                                                                           | Permissions                                                                                                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createForm`          | `-> DRAFT` <br />                                                                                                               | [FormInput](api-reference.md#forminput)                                           | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
+| `updateForm`          | `DRAFT -> DRAFT` <br />                                                                                                         | [FormInput](api-reference.md#forminput)                                           | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
+| `markAsSealed`        | `DRAFT -> SEALED`                                                                                                               |                                                                                   | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
+| `signedByTransporter` | <div><ul><li>`SEALED -> SENT`</li><li>`RESEALED -> RESENT`</li></ul></div>                                                      | [TransporterSignatureFormInput](api-reference.md#s#transportersignatureforminput) | Uniquement le collecteur-transporteur, l'émetteur ou le site d'entreposage provisoire/reconditionnement étant authentifié grâce au code de sécurité présent en paramètre de la mutation |
+| `markAsReceived`      | <div><ul><li>`SENT -> RECEIVED`</li><li>`SENT -> REFUSED`</li></ul></div>                                                       | [ReceivedFormInput](api-reference.md#receivedforminput)                           | Uniquement le destinataire du BSD                                                                                                                                                       |
+| `markAsProcessed`     | <div><ul><li>`RECEIVED -> PROCESSED`</li><li>`RECEIVED -> NO_TRACEABILITY`</li><li>`RECEIVED -> AWAITING_GROUP`</li></ul></div> | [ProcessedFormInput](api-reference.md#processedforminput)                         | Uniquement le destinataire du BSD                                                                                                                                                       |
+| `markAsTempStored`    | <div><ul><li>`SENT -> TEMP_STORED`</li><li>`SENT -> REFUSED`</li></ul></div>                                                    | [TempStoredFormInput](api-reference.md#tempstoredforminput)                       | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
+| `markAsResealed`      | `TEMP_STORED -> RESEALED`                                                                                                       | [ResealedFormInput](api-reference.md#resealedtoredforminput)                      | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
 
 <script src="https://unpkg.com/mermaid@8.1.0/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({startOnLoad:true});</script>
@@ -85,7 +86,6 @@ L --> D
 ## Exemples
 
 Vous pouvez consulter [ce test d'intégration](https://github.com/MTES-MCT/trackdechets/blob/master/back/src/forms/workflow/__tests__/workflow.integration.ts) écrit en Node.js pour voir des exemples concrets d'utilisation de l'API pour différents cas d'usage (acheminement direct du producteur à l'installation de traitement, entreposage provisoire, multi-modal, etc)
-
 
 ## BSD au format pdf
 

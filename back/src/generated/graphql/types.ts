@@ -24,7 +24,14 @@ export type Scalars = {
 
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
-  /** N° de bordereau */
+  /** Identifiant unique du bordereau */
+  id?: Maybe<Scalars['ID']>;
+  /**
+   * N° de bordereau
+   * 
+   * Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
+   * Le readableId permet de le récupérer via la query form.
+   */
   readableId?: Maybe<Scalars['ID']>;
 };
 
@@ -427,9 +434,13 @@ export type FileDownload = {
  */
 export type Form = {
   __typename?: 'Form';
-  /** Identifiant interne du BSD */
+  /** Identifiant unique du bordereau. */
   id: Scalars['ID'];
-  /** Identifiant utilisé dans la case 'Bordereau n° ****' */
+  /**
+   * Identifiant lisible utilisé comme numéro sur le CERFA (case "Bordereau n°****").
+   * Il est possible de l'utiliser pour récupérer l'identifiant unique du bordereau via la query form,
+   * utilisé pour le reste des opérations.
+   */
   readableId: Scalars['String'];
   /**
    * Identifiant personnalisé permettant de faire le lien avec un
@@ -1276,8 +1287,8 @@ export type Query = {
    * établissements qui font souvent partis des BSD édités
    */
   favorites: Array<CompanyFavorite>;
-  /** Renvoie un BSD, sélectionné par ID */
-  form: Form;
+  /** Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni) */
+  form?: Maybe<Form>;
   /**
    * Renvoie un token pour télécharger un pdf de BSD
    * Ce token doit être transmis à la route /download pour obtenir le fichier.
@@ -1332,6 +1343,7 @@ export type QueryFavoritesArgs = {
 
 export type QueryFormArgs = {
   id?: Maybe<Scalars['ID']>;
+  readableId?: Maybe<Scalars['String']>;
 };
 
 
@@ -1562,7 +1574,10 @@ export type StatusLogForm = {
   __typename?: 'StatusLogForm';
   /** Identifiant du BSD */
   id?: Maybe<Scalars['ID']>;
-  /** N° du bordereau */
+  /**
+   * N° du bordereau
+   * @deprecated Le readableId apparaît sur le CERFA mais l'id doit être utilisé comme identifiant.
+   */
   readableId?: Maybe<Scalars['String']>;
 };
 
@@ -2510,7 +2525,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   companyInfos?: Resolver<ResolversTypes['CompanyPublic'], ParentType, ContextType, RequireFields<QueryCompanyInfosArgs, 'siret'>>;
   ecoOrganismes?: Resolver<Array<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>;
   favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'type'>>;
-  form?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<QueryFormArgs, never>>;
+  form?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormArgs, never>>;
   formPdf?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>;
   forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, never>>;
   formsLifeCycle?: Resolver<ResolversTypes['formsLifeCycleData'], ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>;
@@ -2745,6 +2760,7 @@ export type IResolvers<ContextType = GraphQLContext> = Resolvers<ContextType>;
 
 export function createAppendixFormInputMock(props: Partial<AppendixFormInput>): AppendixFormInput {
   return {
+    id: null,
     readableId: null,
     ...props,
   };

@@ -1,10 +1,7 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
 import { Prisma, prisma } from "../../generated/prisma-client";
-import {
-  isAuthenticated,
-  ensureRuleParametersArePresent
-} from "../../common/rules";
+import { isAuthenticated } from "../../common/rules";
 import {
   MutationSaveFormArgs,
   MutationCreateFormArgs,
@@ -48,17 +45,28 @@ export const canAccessForm = and(
       ctx.user.id,
       ctx.prisma
     );
-    return (
-      formInfos.owner.id === ctx.user.id ||
+
+    if (formInfos == null) {
+      return new FormNotFound(id);
+    }
+
+    if (formInfos.owner.id === ctx.user.id) {
+      return true;
+    }
+
+    if (
       [
         formInfos.emitterCompanySiret,
         formInfos.recipientCompanySiret,
         formInfos.ecoOrganisme?.siret,
         formInfos.temporaryStorageDetail?.destinationCompanySiret,
         formInfos.temporaryStorageDetail?.transporterCompanySiret
-      ].some(siret => currentUserSirets.includes(siret)) ||
-      new NotFormContributor()
-    );
+      ].some(siret => currentUserSirets.includes(siret))
+    ) {
+      return true;
+    }
+
+    return new NotFormContributor();
   })
 );
 
@@ -188,8 +196,10 @@ export const isAllowedToUseAppendix2Forms = rule()(
 
 export const isFormEcoOrganisme = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -197,17 +207,24 @@ export const isFormEcoOrganisme = and(
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.includes(formInfos.ecoOrganisme?.siret) ||
-      new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
-    );
+    if (formInfos == null) {
+      return new FormNotFound(id);
+    }
+
+    if (currentUserSirets.includes(formInfos.ecoOrganisme?.siret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`);
   })
 );
 
 export const isFormRecipient = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -215,25 +232,38 @@ export const isFormRecipient = and(
       ctx.prisma
     );
 
+    if (formInfos == null) {
+      return new FormNotFound(id);
+    }
+
     if (formInfos.recipientIsTempStorage) {
-      return (
+      if (
         currentUserSirets.includes(
           formInfos.temporaryStorageDetail.destinationCompanySiret
-        ) || new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
-      );
-    } else {
-      return (
-        currentUserSirets.includes(formInfos.recipientCompanySiret) ||
-        new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`)
+        )
+      ) {
+        return true;
+      }
+
+      return new ForbiddenError(
+        `Vous n'êtes pas destinataire de ce bordereau.`
       );
     }
+
+    if (currentUserSirets.includes(formInfos.recipientCompanySiret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas destinataire de ce bordereau.`);
   })
 );
 
 export const isFormEmitter = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -241,44 +271,66 @@ export const isFormEmitter = and(
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.includes(formInfos.emitterCompanySiret) ||
-      new ForbiddenError(`Vous n'êtes pas émetteur de ce bordereau.`)
-    );
+    if (formInfos == null) {
+      return new FormNotFound(id);
+    }
+
+    if (currentUserSirets.includes(formInfos.emitterCompanySiret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas émetteur de ce bordereau.`);
   })
 );
 
 export const isFormTransporter = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
       ctx.user.id,
       ctx.prisma
     );
+
+    if (formInfos == null) {
+      return new FormNotFound(id);
+    }
 
     const segmentSirets = formInfos.transportSegments.map(
       segment => segment.transporterCompanySiret
     );
 
-    return (
-      currentUserSirets.includes(formInfos.transporterCompanySiret) ||
-      (formInfos.temporaryStorageDetail?.transporterCompanySiret &&
-        currentUserSirets.includes(
-          formInfos.temporaryStorageDetail.transporterCompanySiret
-        )) ||
-      !!segmentSirets.filter(el => currentUserSirets.includes(el)).length ||
-      new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`)
-    );
+    if (currentUserSirets.includes(formInfos.transporterCompanySiret)) {
+      return true;
+    }
+
+    if (
+      formInfos.temporaryStorageDetail?.transporterCompanySiret &&
+      currentUserSirets.includes(
+        formInfos.temporaryStorageDetail.transporterCompanySiret
+      )
+    ) {
+      return true;
+    }
+
+    if (!!segmentSirets.filter(el => currentUserSirets.includes(el)).length) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas transporteur de ce bordereau.`);
   })
 );
 
 export const isFormTrader = and(
   isAuthenticated,
-  rule()(async (_, { id }, ctx) => {
-    ensureRuleParametersArePresent(id);
+  rule()(async (_, { id }: { id?: string }, ctx) => {
+    if (id == null) {
+      return new UserInputError("L'id du bordereau concerné est requis.");
+    }
 
     const { formInfos, currentUserSirets } = await getFormAccessInfos(
       id,
@@ -286,10 +338,15 @@ export const isFormTrader = and(
       ctx.prisma
     );
 
-    return (
-      currentUserSirets.includes(formInfos.traderCompanySiret) ||
-      new ForbiddenError(`Vous n'êtes pas négociant de ce bordereau.`)
-    );
+    if (formInfos == null) {
+      return new FormNotFound(id);
+    }
+
+    if (currentUserSirets.includes(formInfos.traderCompanySiret)) {
+      return true;
+    }
+
+    return new ForbiddenError(`Vous n'êtes pas négociant de ce bordereau.`);
   })
 );
 
@@ -302,12 +359,19 @@ export const isFormTempStorer = and(
       ctx.prisma
     );
 
-    return (
-      (formInfos.recipientIsTempStorage &&
-        currentUserSirets.includes(formInfos.recipientCompanySiret)) ||
-      new ForbiddenError(
-        `Vous n'êtes pas l'installation d'entreposage ou de reconditionnement de ce bordereau.`
-      )
+    if (formInfos == null) {
+      return new FormNotFound(id);
+    }
+
+    if (
+      formInfos.recipientIsTempStorage &&
+      currentUserSirets.includes(formInfos.recipientCompanySiret)
+    ) {
+      return true;
+    }
+
+    return new ForbiddenError(
+      `Vous n'êtes pas l'installation d'entreposage ou de reconditionnement de ce bordereau.`
     );
   })
 );
@@ -358,9 +422,8 @@ async function getFormAccessInfos(
   userId: string,
   prisma: Prisma
 ) {
-  const formInfos = await prisma.form({ id: formId }).$fragment<
-    FormSiretsAndOwner
-  >(`
+  const formInfos = await prisma.form({ id: formId })
+    .$fragment<FormSiretsAndOwner | null>(`
   fragment FormWithOwner on Form {
     recipientCompanySiret
     recipientIsTempStorage

@@ -42,7 +42,12 @@ const {
 
 const UI_BASE_URL = getUIBaseURL();
 
-const shieldMiddleware = shield(shieldRulesTree, { allowExternalErrors: true });
+const shieldMiddleware = shield(shieldRulesTree, {
+  allowExternalErrors: true,
+
+  // Disable graphql-shield's error catching since it's already handled by ApolloServer.formatError
+  debug: true
+});
 
 /**
  * Custom report error for sentry middleware
@@ -111,7 +116,7 @@ export const server = new ApolloServer({
     return {
       ...ctx,
       // req.user is made available by passport
-      ...{ user: !!ctx.req ? ctx.req.user : null },
+      user: ctx.req?.user ?? null,
       prisma
     };
   },

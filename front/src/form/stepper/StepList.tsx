@@ -40,7 +40,10 @@ export default withRouter(function StepList(
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_FORM,
     {
-      variables: { id: props.formId as string },
+      variables: {
+        id: props.formId!,
+        readableId: null,
+      },
       skip: !props.formId,
       fetchPolicy: "network-only",
     }
