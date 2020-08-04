@@ -181,9 +181,13 @@ export default function Signup() {
               <label>
                 <Field name="cgu" type="checkbox" />
                 Je certifie avoir lu les{" "}
-                <Link to="cgu" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://trackdechets.beta.gouv.fr/cgu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   conditions générales d'utilisation
-                </Link>
+                </a>
                 *
               </label>
             </div>
