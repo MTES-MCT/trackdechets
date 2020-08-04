@@ -43,8 +43,10 @@ const {
 const UI_BASE_URL = getUIBaseURL();
 
 const shieldMiddleware = shield(shieldRulesTree, {
-  debug: NODE_ENV === "dev",
-  allowExternalErrors: true
+  allowExternalErrors: true,
+
+  // Disable graphql-shield's error catching since it's already handled by ApolloServer.formatError
+  debug: true
 });
 
 /**
