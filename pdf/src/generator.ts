@@ -1,15 +1,15 @@
-const path = require("path");
-const pdflib = require("pdf-lib");
-const fs = require("fs");
-const fontkit = require("@pdf-lib/fontkit");
-const {
+import path from "path";
+import { PDFDocument } from "pdf-lib";
+import fs from "fs";
+import fontkit from "@pdf-lib/fontkit";
+import {
   processMainFormParams,
   fillFields,
   drawImage,
   processSegment,
   processAnnexParams
-} = require("./helpers");
-const {
+} from "./helpers";
+import {
   pageHeight,
   mainFormFieldSettings,
   temporaryStorageDetailsFieldSettings,
@@ -17,9 +17,7 @@ const {
   appendixHeaderFieldSettings,
   appendixYOffsets,
   transportSegmentSettings
-} = require("./settings");
-
-const { PDFDocument } = pdflib;
+} from "./settings";
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
 const multimodalYOffset = 85;
@@ -450,4 +448,4 @@ const buildPdf = async params => {
   return Buffer.from(pdfBytes.buffer);
 };
 
-module.exports = buildPdf;
+export default buildPdf;

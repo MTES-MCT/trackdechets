@@ -4,9 +4,11 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
-    "test": "jest --test-match '**/*.test.js'"
+    "dev": "nodemon --exec \"ts-node\" src/index.ts",
+    "build": "tsc",
+    "postbuild": "copyfiles -u 1 -e '**/*.ts' src/**/** dist",
+    "start": "node dist/index.js",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -15,12 +17,20 @@
     "@sentry/node": "^5.9.0",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "pdf-lib": "^1.2.1"
+    "pdf-lib": "^1.2.1",
+    "typescript": "^3.9.7"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/express": "^4.17.7",
+    "@types/jest": "^26.0.8",
+    "@types/node": "^14.0.27",
+    "copyfiles": "^2.3.0",
     "jest": "^24.9.0",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "ts-jest": "^26.1.4",
+    "ts-node": "^8.10.2"
   }
 }
