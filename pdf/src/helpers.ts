@@ -251,10 +251,8 @@ const getWasteDetailsPackagings = params => {
 
 /**
  * Transform numbers as strings to be accepted by the pdf template
- * @param params -  the full request payload
- * @returns {object}
  */
-const stringifyNumberFields = params => {
+const stringifyNumberFields = <T>(params: T): T => {
   let data = { ...params };
   for (let [k, v] of Object.entries(data)) {
     if (typeof v === "number") {
@@ -318,17 +316,29 @@ const getFlatEcoOrganisme = params => {
     : {};
 };
 
-const processTransporterData = data => ({
+const processTransporterData = (data: MainFormParams) => ({
   ...data,
-  transporterCompanySiren: siretToSiren(data.transporterCompanySiret)
+  transporterCompanySiren: data.transporterCompanySiret
+    ? siretToSiren(data.transporterCompanySiret)
+    : null
 });
 
-/**
- * Apply transformers to payload
- * @param params -  the full request payload
- * @returns {object}
- */
-export function processMainFormParams(params) {
+interface MainFormParams {
+  customId?: string;
+  noTraceability?: boolean;
+  signedByTransporter?: boolean;
+  sentAt?: string;
+  processingOperationDone?: string;
+  receivedBy?: string;
+  transporterIsExemptedOfReceipt?: boolean;
+  tempStorerSignedAt?: string;
+  signedAt?: string;
+  mode?: "ROAD" | "RAIL" | "AIR" | "RIVER" | "SEA";
+  takenOverAt?: string;
+  transporterCompanySiret?: string;
+}
+
+export function processMainFormParams(params: MainFormParams) {
   params = { ...params, ...getWasteRefusalreason(params) }; // compute refused quantity before converting number to strings
   const data = stringifyNumberFields(params);
 
@@ -412,4 +422,4 @@ export const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
   }
 };
 
-export const siretToSiren = siren => siren.slice(0, 9);
+export const siretToSiren = (siren: string) => siren.slice(0, 9);
