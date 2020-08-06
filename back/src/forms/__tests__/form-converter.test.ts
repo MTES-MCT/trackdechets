@@ -274,6 +274,7 @@ test("flattenFormInput", () => {
         siret: "22222222222222",
         name: "Incinérateur du Grand Est",
         address: "1 avenue de Colmar 67100 Strasbourg",
+        country: "FR",
         contact: "Thomas Largeron",
         mail: "thomas.largeron@incinerateur.fr",
         phone: "03 00 00 00 00"
@@ -308,6 +309,7 @@ test("flattenFormInput", () => {
     recipientCompanyName: input.recipient.company.name,
     recipientCompanySiret: input.recipient.company.siret,
     recipientCompanyAddress: input.recipient.company.address,
+    recipientCompanyCountry: input.recipient.company.country,
     recipientCompanyContact: input.recipient.company.contact,
     recipientCompanyPhone: input.recipient.company.phone,
     recipientCompanyMail: input.recipient.company.mail,

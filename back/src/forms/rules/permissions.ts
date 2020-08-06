@@ -1,5 +1,6 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { rule, and } from "graphql-shield";
+import countries from "world-countries";
 import { Prisma, prisma } from "../../generated/prisma-client";
 import { isAuthenticated } from "../../common/rules";
 import {
@@ -13,7 +14,9 @@ import { GraphQLContext } from "../../types";
 import {
   EcoOrganismeNotFound,
   NotFormContributor,
-  FormNotFound
+  FormNotFound,
+  CountryNotFound,
+  MissingForeignCountryData
 } from "../errors";
 
 type FormSiretsAndOwner = {
@@ -99,6 +102,25 @@ const canCreateFormFn = async (
     return new NotFormContributor();
   }
 
+  const countryCode = createFormInput.recipient?.company?.country;
+  if (countryCode) {
+    const matchingCountry = countries.find(
+      country => country.cca2 === countryCode
+    );
+
+    if (matchingCountry == null) {
+      return new CountryNotFound(countryCode);
+    }
+
+    if (
+      countryCode !== "FR" &&
+      (!createFormInput.recipient?.company?.name ||
+        !createFormInput.recipient?.company?.address)
+    ) {
+      return new MissingForeignCountryData();
+    }
+  }
+
   return true;
 };
 export const canCreateForm = rule()(canCreateFormFn);
@@ -135,6 +157,25 @@ const canUpdateFormFn = async (
 
     if (newEO == null) {
       return new EcoOrganismeNotFound(updateFormInput.ecoOrganisme.id);
+    }
+  }
+
+  const countryCode = updateFormInput.recipient?.company?.country;
+  if (countryCode) {
+    const matchingCountry = countries.find(
+      country => country.cca2 === countryCode
+    );
+
+    if (matchingCountry == null) {
+      return new CountryNotFound(countryCode);
+    }
+
+    if (
+      countryCode !== "FR" &&
+      (!updateFormInput.recipient?.company?.name ||
+        !updateFormInput.recipient?.company?.address)
+    ) {
+      return new MissingForeignCountryData();
     }
   }
 

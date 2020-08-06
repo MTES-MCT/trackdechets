@@ -536,4 +536,103 @@ describe("Mutation.updateForm", () => {
       ]);
     }
   );
+
+  it("should return an error when the foreign company is missing a name and address", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      recipient: {
+        company: {
+          country: "DE"
+        }
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: {
+        updateFormInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Les paramètres "name" et "address" sont requis dans le cas d'une entreprise étrangère.`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should update the recipient to a foreign country", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      recipient: {
+        company: {
+          name: "German Company",
+          address: "German Company Address",
+          country: "DE"
+        }
+      }
+    };
+    const { data } = await mutate(UPDATE_FORM, {
+      variables: {
+        updateFormInput
+      }
+    });
+
+    expect(data.updateForm.recipient.company).toMatchObject(
+      updateFormInput.recipient.company
+    );
+  });
+
+  it("should return an error when the country code is invalid", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      recipient: {
+        company: {
+          country: "not a valid code"
+        }
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: {
+        updateFormInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le code "${updateFormInput.recipient.company.country}" n'est pas reconnu comme un code pays ISO 3166-1 alpha-2.`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 });

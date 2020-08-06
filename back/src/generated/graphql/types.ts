@@ -81,6 +81,14 @@ export type CompanyInput = {
   name?: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address?: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * Si l'entreprise est à l'étranger, les paramètres "name" et "address" sont obligatoires.
+   * En l'absence de code, l'entreprise est considérée comme résidant en France.
+   */
+  country?: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
   contact?: Maybe<Scalars['String']>;
   /** Email du contact dans l'établissement */
@@ -521,6 +529,13 @@ export type FormCompany = {
   siret?: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address?: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * En l'absence de code, l'entreprise est considérée comme résidant en France.
+   */
+  country?: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
   contact?: Maybe<Scalars['String']>;
   /** Numéro de téléphone de contact dans l'établissement */
@@ -2425,6 +2440,7 @@ export type FormCompanyResolvers<ContextType = GraphQLContext, ParentType extend
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   siret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   contact?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -2795,6 +2811,7 @@ export function createCompanyInputMock(props: Partial<CompanyInput>): CompanyInp
     siret: null,
     name: null,
     address: null,
+    country: null,
     contact: null,
     mail: null,
     phone: null,
@@ -3061,6 +3078,7 @@ export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany 
     name: null,
     siret: null,
     address: null,
+    country: null,
     contact: null,
     phone: null,
     mail: null,

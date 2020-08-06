@@ -248,6 +248,9 @@ function flattenRecipientInput(input: { recipient?: RecipientInput }) {
     recipientCompanyAddress: chain(input.recipient, r =>
       chain(r.company, c => c.address)
     ),
+    recipientCompanyCountry: chain(input.recipient, r =>
+      chain(r.company, c => c.country)
+    ),
     recipientCompanyContact: chain(input.recipient, r =>
       chain(r.company, c => c.contact)
     ),
@@ -404,6 +407,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
         name: form.recipientCompanyName,
         siret: form.recipientCompanySiret,
         address: form.recipientCompanyAddress,
+        country: form.recipientCompanyCountry,
         contact: form.recipientCompanyContact,
         phone: form.recipientCompanyPhone,
         mail: form.recipientCompanyMail

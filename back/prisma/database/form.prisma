@@ -73,6 +73,7 @@ type Form {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String

@@ -2081,6 +2081,18 @@ Adresse de l'établissement
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>country</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+En l'absence de code, l'entreprise est considérée comme résidant en France.
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>contact</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
@@ -3589,6 +3601,19 @@ Nom de l'établissement
 <td>
 
 Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>country</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+Si l'entreprise est à l'étranger, les paramètres "name" et "address" sont obligatoires.
+En l'absence de code, l'entreprise est considérée comme résidant en France.
 
 </td>
 </tr>

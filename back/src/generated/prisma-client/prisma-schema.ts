@@ -1398,6 +1398,7 @@ type Form {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -1493,6 +1494,7 @@ input FormCreateInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -1602,6 +1604,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -1690,6 +1693,7 @@ input FormCreateWithoutTransportSegmentsInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -1832,6 +1836,8 @@ enum FormOrderByInput {
   recipientCompanySiret_DESC
   recipientCompanyAddress_ASC
   recipientCompanyAddress_DESC
+  recipientCompanyCountry_ASC
+  recipientCompanyCountry_DESC
   recipientCompanyContact_ASC
   recipientCompanyContact_DESC
   recipientCompanyPhone_ASC
@@ -1953,6 +1959,7 @@ type FormPreviousValues {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -2547,6 +2554,20 @@ input FormScalarWhereInput {
   recipientCompanyAddress_not_starts_with: String
   recipientCompanyAddress_ends_with: String
   recipientCompanyAddress_not_ends_with: String
+  recipientCompanyCountry: String
+  recipientCompanyCountry_not: String
+  recipientCompanyCountry_in: [String!]
+  recipientCompanyCountry_not_in: [String!]
+  recipientCompanyCountry_lt: String
+  recipientCompanyCountry_lte: String
+  recipientCompanyCountry_gt: String
+  recipientCompanyCountry_gte: String
+  recipientCompanyCountry_contains: String
+  recipientCompanyCountry_not_contains: String
+  recipientCompanyCountry_starts_with: String
+  recipientCompanyCountry_not_starts_with: String
+  recipientCompanyCountry_ends_with: String
+  recipientCompanyCountry_not_ends_with: String
   recipientCompanyContact: String
   recipientCompanyContact_not: String
   recipientCompanyContact_in: [String!]
@@ -3037,6 +3058,7 @@ input FormUpdateDataInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -3125,6 +3147,7 @@ input FormUpdateInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -3212,6 +3235,7 @@ input FormUpdateManyDataInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -3307,6 +3331,7 @@ input FormUpdateManyMutationInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -3419,6 +3444,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -3506,6 +3532,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   recipientCompanyName: String
   recipientCompanySiret: String
   recipientCompanyAddress: String
+  recipientCompanyCountry: String
   recipientCompanyContact: String
   recipientCompanyPhone: String
   recipientCompanyMail: String
@@ -4130,6 +4157,20 @@ input FormWhereInput {
   recipientCompanyAddress_not_starts_with: String
   recipientCompanyAddress_ends_with: String
   recipientCompanyAddress_not_ends_with: String
+  recipientCompanyCountry: String
+  recipientCompanyCountry_not: String
+  recipientCompanyCountry_in: [String!]
+  recipientCompanyCountry_not_in: [String!]
+  recipientCompanyCountry_lt: String
+  recipientCompanyCountry_lte: String
+  recipientCompanyCountry_gt: String
+  recipientCompanyCountry_gte: String
+  recipientCompanyCountry_contains: String
+  recipientCompanyCountry_not_contains: String
+  recipientCompanyCountry_starts_with: String
+  recipientCompanyCountry_not_starts_with: String
+  recipientCompanyCountry_ends_with: String
+  recipientCompanyCountry_not_ends_with: String
   recipientCompanyContact: String
   recipientCompanyContact_not: String
   recipientCompanyContact_in: [String!]

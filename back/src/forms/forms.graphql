@@ -615,6 +615,14 @@ type FormCompany {
   "Adresse de l'établissement"
   address: String
 
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+  En l'absence de code, l'entreprise est considérée comme résidant en France.
+  """
+  country: String
+
   "Nom du contact dans l'établissement"
   contact: String
 
