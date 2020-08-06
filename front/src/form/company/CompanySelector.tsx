@@ -13,6 +13,7 @@ import {
   QuerySearchCompaniesArgs,
   CompanySearchResult,
   CompanyFavorite,
+  FormCompany,
 } from "../../generated/graphql/types";
 
 type Action =
@@ -37,7 +38,7 @@ interface CompanySelectorState {
   displayDepartment: boolean;
   searchLoading: boolean;
   searchResults: Array<CompanySearchResult | CompanyFavorite>;
-  selectedCompany: CompanySearchResult | CompanyFavorite;
+  selectedCompany: FormCompany | CompanySearchResult | CompanyFavorite;
 }
 
 interface CompanySelectorProps {
@@ -45,9 +46,7 @@ interface CompanySelectorProps {
   onCompanySelected?: (company: CompanySearchResult | CompanyFavorite) => void;
 }
 
-function getInitialState(
-  selectedCompany: CompanySearchResult
-): CompanySelectorState {
+function getInitialState(selectedCompany: FormCompany): CompanySelectorState {
   return {
     clue: "",
     department: null,
@@ -97,7 +96,7 @@ export default function CompanySelector({
   name,
   onCompanySelected,
 }: CompanySelectorProps) {
-  const [field] = useField<CompanySearchResult>({ name });
+  const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
   const [state, dispatch] = useReducer(reducer, field.value, getInitialState);
   const [
@@ -158,7 +157,11 @@ export default function CompanySelector({
       return;
     }
 
-    onCompanySelected(state.selectedCompany);
+    onCompanySelected(
+      // selectedCompany is initialized as a FormCompany
+      // but then updated to a CompanySearchResult or CompanyFavorite
+      state.selectedCompany as CompanySearchResult | CompanyFavorite
+    );
   }, [state.selectedCompany, onCompanySelected]);
 
   // Load different favorites depending on the object we are filling
