@@ -8,9 +8,46 @@ import RedErrorMessage from "../../common/RedErrorMessage";
 import CompanyResults from "./CompanyResults";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
-import { Query, QuerySearchCompaniesArgs } from "../../generated/graphql/types";
+import {
+  Query,
+  QuerySearchCompaniesArgs,
+  CompanySearchResult,
+  CompanyFavorite,
+} from "../../generated/graphql/types";
 
-function init(selectedCompany) {
+type Action =
+  | { type: "search_input"; payload: string }
+  | { type: "department_filter"; payload: boolean }
+  | { type: "department_input"; payload: string }
+  | {
+      type: "search_change";
+      payload: {
+        searchResults: Array<CompanySearchResult | CompanyFavorite>;
+        searchLoading: boolean;
+      };
+    }
+  | {
+      type: "company_selected";
+      payload: CompanySearchResult | CompanyFavorite;
+    };
+
+interface CompanySelectorState {
+  clue: string;
+  department: string | null;
+  displayDepartment: boolean;
+  searchLoading: boolean;
+  searchResults: Array<CompanySearchResult | CompanyFavorite>;
+  selectedCompany: CompanySearchResult | CompanyFavorite;
+}
+
+interface CompanySelectorProps {
+  name: string;
+  onCompanySelected?: (company: CompanySearchResult | CompanyFavorite) => void;
+}
+
+function getInitialState(
+  selectedCompany: CompanySearchResult
+): CompanySelectorState {
   return {
     clue: "",
     department: null,
@@ -21,39 +58,54 @@ function init(selectedCompany) {
   };
 }
 
-export default function CompanySelector(props) {
-  const [field] = useField(props);
+function reducer(
+  state: CompanySelectorState,
+  action: Action
+): CompanySelectorState {
+  switch (action.type) {
+    case "search_input":
+      return {
+        ...state,
+        clue: action.payload,
+      };
+    case "department_filter":
+      return {
+        ...state,
+        displayDepartment: action.payload,
+      };
+    case "department_input":
+      return {
+        ...state,
+        department: action.payload,
+      };
+    case "search_change":
+      return {
+        ...state,
+        ...action.payload,
+      };
+    case "company_selected":
+      return {
+        ...state,
+        selectedCompany: action.payload,
+      };
+    default:
+      return state;
+  }
+}
+
+export default function CompanySelector({
+  name,
+  onCompanySelected,
+}: CompanySelectorProps) {
+  const [field] = useField<CompanySearchResult>({ name });
   const { setFieldValue } = useFormikContext();
-  const [state, dispatch] = useReducer(reducer, field.value, init);
+  const [state, dispatch] = useReducer(reducer, field.value, getInitialState);
   const [
     searchCompaniesQuery,
     { loading: searchLoading, data: searchData },
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES
   );
-
-  function reducer(state, action) {
-    switch (action.type) {
-      case "search_input":
-        return { ...state, clue: action.payload };
-      case "department_filter":
-        return { ...state, displayDepartment: action.payload };
-      case "department_input":
-        return { ...state, department: action.payload };
-      case "search_change":
-        return { ...state, ...action.payload };
-      case "company_selected": {
-        if (props.onCompanySelected) {
-          props.onCompanySelected(action.payload);
-        }
-        return { ...state, selectedCompany: action.payload };
-      }
-      case "reset":
-        return init(action.payload);
-      default:
-        throw new Error();
-    }
-  }
 
   useEffect(() => {
     dispatch({
@@ -101,6 +153,14 @@ export default function CompanySelector(props) {
     });
   }, [state.selectedCompany, field.name, setFieldValue]);
 
+  useEffect(() => {
+    if (onCompanySelected == null) {
+      return;
+    }
+
+    onCompanySelected(state.selectedCompany);
+  }, [state.selectedCompany, onCompanySelected]);
+
   // Load different favorites depending on the object we are filling
   const type = toMacroCase(field.name.split(".")[0]);
 
@@ -114,6 +174,7 @@ export default function CompanySelector(props) {
         type: "search_change",
         payload: {
           searchResults: data.favorites,
+          searchLoading,
         },
       });
     },
