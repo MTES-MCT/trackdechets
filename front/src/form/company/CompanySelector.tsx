@@ -2,8 +2,8 @@ import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
+import { constantCase } from "constant-case";
 import { InlineError } from "../../common/Error";
-import { toMacroCase } from "../../common/helper";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import CompanyResults from "./CompanyResults";
 import "./CompanySelector.scss";
@@ -13,10 +13,19 @@ import {
   QuerySearchCompaniesArgs,
   CompanySearchResult,
   FormCompany,
+  QueryFavoritesArgs,
+  FavoriteType,
 } from "../../generated/graphql/types";
 
 interface CompanySelectorProps {
-  name: string;
+  name:
+    | "nextDestination.company"
+    | "destination.company"
+    | "transporter.company"
+    | "emitter.company"
+    | "recipient.company"
+    | "trader.company"
+    | "temporaryStorageDetail.destination.company";
   onCompanySelected?: (company: CompanySearchResult) => void;
 }
 
@@ -54,10 +63,10 @@ export default function CompanySelector({
     loading: isLoadingFavorites,
     data: favoritesData,
     error: favoritesError,
-  } = useQuery<Pick<Query, "favorites">>(FAVORITES, {
+  } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(FAVORITES, {
     variables: {
       // Load different favorites depending on the object we are filling
-      type: toMacroCase(field.name.split(".")[0]),
+      type: constantCase(field.name.split(".")[0]) as FavoriteType,
     },
   });
 
