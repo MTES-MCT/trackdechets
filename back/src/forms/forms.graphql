@@ -186,7 +186,7 @@ type Mutation {
   """
   Scelle un BSD
   Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
-  doivent avoir été renseignés grâce à la mutation `saveForm`
+  doivent avoir été renseignés au préalable
 
   ```
   emitter: {
@@ -203,6 +203,7 @@ type Mutation {
   recipient: {
     processingOperation
     company: {
+      // Le siret peut être omit si le champ "recipient.company.country" correspond à un pays étranger
       siret
       name
       address

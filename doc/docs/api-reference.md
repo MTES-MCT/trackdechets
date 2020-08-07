@@ -601,7 +601,7 @@ Utiliser la mutation signedByTransporter permettant d'apposer les signatures du 
 
 Scelle un BSD
 Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
-doivent avoir été renseignés grâce à la mutation `saveForm`
+doivent avoir été renseignés au préalable
 
 ```
 emitter: {
@@ -618,6 +618,7 @@ emitter: {
 recipient: {
   processingOperation
   company: {
+    // Le siret peut être omit si le champ "recipient.company.country" correspond à un pays étranger
     siret
     name
     address
@@ -3612,7 +3613,6 @@ Adresse de l'établissement
 Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
 https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
-Si l'entreprise est à l'étranger, les paramètres "name" et "address" sont obligatoires.
 En l'absence de code, l'entreprise est considérée comme résidant en France.
 
 </td>

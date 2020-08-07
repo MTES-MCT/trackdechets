@@ -123,10 +123,9 @@ export const markAsProcessedSchema = inputRule()(
           is: val => PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(val),
           then: yup.object({
             processingOperation: yup.string(),
-            company: validCompany(
-              { verboseFieldName: "Destination ultérieure prévue" },
-              yup
-            )
+            company: validCompany({
+              verboseFieldName: "Destination ultérieure prévue"
+            })
           })
         }),
         noTraceability: yup.boolean().nullable(true)
@@ -223,7 +222,7 @@ export const markAsResealedSchema = inputRule()(
             yup
           ),
           numberPlate: yup.string().nullable(true),
-          company: validCompany({ verboseFieldName: "Transporteur" }, yup)
+          company: validCompany({ verboseFieldName: "Transporteur" })
         })
       })
     }),
@@ -239,7 +238,7 @@ export const temporaryStorageDestinationSchema = inputRule()(yup =>
   yup.object({
     resentInfos: yup.object({
       destination: yup.object({
-        company: validCompany({ verboseFieldName: "Destinataire du BSD" }, yup),
+        company: validCompany({ verboseFieldName: "Destinataire du BSD" }),
         processingOperation: yup
           .mixed()
           .oneOf(
@@ -284,7 +283,7 @@ export const markAsResentSchema = inputRule()(
             yup
           ),
           numberPlate: yup.string().nullable(true),
-          company: validCompany({ verboseFieldName: "Transporteur" }, yup)
+          company: validCompany({ verboseFieldName: "Transporteur" })
         }),
         signedBy: yup
           .string()

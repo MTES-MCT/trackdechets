@@ -301,4 +301,37 @@ describe("{ mutation { markAsSealed } }", () => {
       expect(statusLogs.length).toEqual(0);
     }
   );
+
+  it("should allow to seal a form with a foreign recipient", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanyCountry: "DE",
+        recipientCompanySiret: null
+      }
+    });
+
+    const MARK_AS_SEALED = `
+      mutation MarkAsSealed($id: ID!) {
+        markAsSealed(id: $id) {
+          id
+        }
+      }
+    `;
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    const updatedForm = await prisma.form({ id: form.id });
+
+    expect(updatedForm.status).toEqual("SEALED");
+  });
 });

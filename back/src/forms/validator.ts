@@ -33,14 +33,14 @@ export const formSchema = object<any>().shape({
       postalCode: string().nullable(),
       infos: string().nullable()
     }).nullable(),
-    company: validCompany({ verboseFieldName: "Émetteur" }, Yup)
+    company: validCompany({ verboseFieldName: "Émetteur" })
   }),
   recipient: object().shape({
     processingOperation: string()
       .label("Opération d’élimination / valorisation")
       .required(),
     cap: string().nullable(true),
-    company: validCompany({ verboseFieldName: "Destinataire" }, Yup),
+    company: validCompany({ verboseFieldName: "Destinataire" }),
     isTempStorage: boolean()
   }),
   transporter: object().shape({
@@ -63,7 +63,7 @@ export const formSchema = object<any>().shape({
     ),
     validityLimit: validDatetime({ verboseFieldName: "date de validité" }, Yup),
     numberPlate: string().nullable(true),
-    company: validCompany({ verboseFieldName: "Transporteur" }, Yup)
+    company: validCompany({ verboseFieldName: "Transporteur" })
   }),
   wasteDetails: object().shape({
     code: string().oneOf(
