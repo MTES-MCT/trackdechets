@@ -27,16 +27,19 @@ interface CompanySelectorProps {
     | "trader.company"
     | "temporaryStorageDetail.destination.company";
   onCompanySelected?: (company: CompanySearchResult) => void;
+  allowForeignCountry?: boolean;
 }
 
 export default function CompanySelector({
   name,
   onCompanySelected,
+  allowForeignCountry,
 }: CompanySelectorProps) {
   const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
   const [clue, setClue] = React.useState("");
   const [department, setDepartement] = React.useState<null | string>(null);
+  // FIXME: selectedCompany is somewhat a duplicate of field.value and they're supposed to be synchronized
   const [selectedCompany, setSelectedCompany] = React.useState<
     CompanySearchResult
   >(() => ({
@@ -87,10 +90,10 @@ export default function CompanySelector({
     [];
 
   useEffect(() => {
-    if (searchResults.length === 1 && !selectedCompany.siret) {
+    if (searchResults.length === 1 && field.value.siret === "") {
       setSelectedCompany(searchResults[0]);
     }
-  }, [searchResults, selectedCompany.siret, setSelectedCompany]);
+  }, [searchResults, field.value.siret, setSelectedCompany]);
 
   useEffect(() => {
     const timeoutID = setTimeout(() => {
@@ -112,7 +115,9 @@ export default function CompanySelector({
   }, [clue, department, searchCompaniesQuery]);
 
   useEffect(() => {
-    ["siret", "name", "address", "contact", "phone", "mail"].forEach(key => {
+    setFieldValue(`${field.name}.siret`, selectedCompany.siret);
+
+    ["name", "address", "contact", "phone", "mail"].forEach(key => {
       if (!selectedCompany?.[key]) {
         return;
       }
@@ -138,52 +143,110 @@ export default function CompanySelector({
 
   return (
     <div className="CompanySelector form__group">
-      <div className="search__group">
-        <input
-          type="text"
-          placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-          className="company-selector__search"
-          onChange={event => setClue(event.target.value)}
-        />
-        <button
-          className="overlay-button search-icon"
-          aria-label="Recherche"
-          disabled={true}
-        >
-          <FaSearch />
-        </button>
-      </div>
-      <button
-        className="button-outline small primary"
-        type="button"
-        onClick={() => setDepartement(department == null ? "" : null)}
-      >
-        Affiner la recherche par département?
-      </button>
-      {department != null && (
-        <div className="form__group">
-          <label>
-            Département
+      {field.value.siret != null && (
+        <>
+          <div className="search__group">
             <input
               type="text"
-              placeholder="Département ou code postal"
-              onChange={event => setDepartement(event.target.value)}
+              placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
+              className="company-selector__search"
+              onChange={event => setClue(event.target.value)}
             />
-          </label>
-        </div>
+            <button
+              className="overlay-button search-icon"
+              aria-label="Recherche"
+              disabled={true}
+            >
+              <FaSearch />
+            </button>
+          </div>
+
+          <button
+            className="button-outline small primary"
+            type="button"
+            onClick={() => setDepartement(department == null ? "" : null)}
+          >
+            Affiner la recherche par département?
+          </button>
+
+          {department != null && (
+            <div className="form__group">
+              <label>
+                Département
+                <input
+                  type="text"
+                  placeholder="Département ou code postal"
+                  onChange={event => setDepartement(event.target.value)}
+                />
+              </label>
+            </div>
+          )}
+
+          {isLoadingSearch && <span>Chargement...</span>}
+
+          <CompanyResults
+            onSelect={company => setSelectedCompany(company)}
+            results={searchResults}
+            selectedItem={selectedCompany}
+          />
+        </>
       )}
-
-      {isLoadingSearch && <span>Chargement...</span>}
-
-      <CompanyResults
-        onSelect={company => setSelectedCompany(company)}
-        results={searchResults}
-        selectedItem={selectedCompany}
-      />
 
       <RedErrorMessage name={`${field.name}.siret`} />
 
+      {allowForeignCountry && (
+        <label>
+          <input
+            type="checkbox"
+            onChange={event => {
+              setSelectedCompany({
+                ...selectedCompany,
+                siret: event.target.checked ? null : "",
+              });
+            }}
+            checked={field.value.siret == null}
+          />
+          L'entreprise est à l'étranger
+        </label>
+      )}
+
       <div className="form__group">
+        {field.value.siret == null && (
+          <>
+            <label>
+              Nom de l'entreprise
+              <Field
+                type="text"
+                name={`${field.name}.name`}
+                placeholder="Nom"
+              />
+            </label>
+
+            <RedErrorMessage name={`${field.name}.address`} />
+
+            <label>
+              Adresse de l'entreprise
+              <Field
+                type="text"
+                name={`${field.name}.address`}
+                placeholder="Adresse"
+              />
+            </label>
+
+            <RedErrorMessage name={`${field.name}.address`} />
+
+            <label>
+              Pays de l'entreprise
+              <Field
+                type="text"
+                name={`${field.name}.country`}
+                placeholder="Pays"
+              />
+            </label>
+
+            <RedErrorMessage name={`${field.name}.country`} />
+          </>
+        )}
         <label>
           Personne à contacter
           <Field
