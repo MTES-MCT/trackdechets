@@ -6,7 +6,7 @@ import { CompanySearchResult } from "../../generated/graphql/types";
 interface CompanyResultsProps<T> {
   results: T[];
   onSelect: (item: T) => void;
-  selectedItem: T;
+  selectedItem: T | null;
 }
 
 export default function CompanyResults<
@@ -17,7 +17,7 @@ export default function CompanyResults<
       {results
         .concat(
           // append selectedItem if it's set and it's not in the results
-          !selectedItem.siret ||
+          !selectedItem?.siret ||
             results.find(result => result.siret === selectedItem.siret)
             ? []
             : [selectedItem]
