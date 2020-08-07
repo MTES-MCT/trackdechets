@@ -12,7 +12,6 @@ import {
   Query,
   QuerySearchCompaniesArgs,
   CompanySearchResult,
-  CompanyFavorite,
   FormCompany,
 } from "../../generated/graphql/types";
 
@@ -21,39 +20,41 @@ type Action =
   | { type: "department_filter"; payload: boolean }
   | { type: "department_input"; payload: string }
   | {
-      type: "search_change";
-      payload: {
-        searchResults: Array<CompanySearchResult | CompanyFavorite>;
-        searchLoading: boolean;
-      };
-    }
-  | {
       type: "company_selected";
-      payload: CompanySearchResult | CompanyFavorite;
+      payload: CompanySearchResult;
     };
 
 interface CompanySelectorState {
   clue: string;
   department: string | null;
   displayDepartment: boolean;
-  searchLoading: boolean;
-  searchResults: Array<CompanySearchResult | CompanyFavorite>;
-  selectedCompany: FormCompany | CompanySearchResult | CompanyFavorite;
+  selectedCompany: CompanySearchResult;
 }
 
 interface CompanySelectorProps {
   name: string;
-  onCompanySelected?: (company: CompanySearchResult | CompanyFavorite) => void;
+  onCompanySelected?: (company: CompanySearchResult) => void;
 }
 
-function getInitialState(selectedCompany: FormCompany): CompanySelectorState {
+function getInitialState(initialCompany: FormCompany): CompanySelectorState {
   return {
     clue: "",
     department: null,
     displayDepartment: false,
-    searchLoading: false,
-    searchResults: [],
-    selectedCompany,
+    selectedCompany: {
+      ...initialCompany,
+
+      // Convert FormCompany to CompanySearchResult
+      __typename: "CompanySearchResult",
+      etatAdministratif: null,
+      codeCommune: null,
+      companyTypes: null,
+      naf: null,
+      libelleNaf: null,
+      installation: null,
+      transporterReceipt: null,
+      traderReceipt: null,
+    },
   };
 }
 
@@ -77,11 +78,6 @@ function reducer(
         ...state,
         department: action.payload,
       };
-    case "search_change":
-      return {
-        ...state,
-        ...action.payload,
-      };
     case "company_selected":
       return {
         ...state,
@@ -101,45 +97,62 @@ export default function CompanySelector({
   const [state, dispatch] = useReducer(reducer, field.value, getInitialState);
   const [
     searchCompaniesQuery,
-    { loading: searchLoading, data: searchData },
+    { loading: isLoadingSearch, data: searchData },
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES
   );
+  const {
+    loading: isLoadingFavorites,
+    data: favoritesData,
+    error: favoritesError,
+  } = useQuery<Pick<Query, "favorites">>(FAVORITES, {
+    variables: {
+      // Load different favorites depending on the object we are filling
+      type: toMacroCase(field.name.split(".")[0]),
+    },
+  });
+
+  const searchResults: CompanySearchResult[] =
+    searchData?.searchCompanies ??
+    favoritesData?.favorites?.map(favorite => ({
+      ...favorite,
+
+      // Convert CompanyFavorite to CompanySearchResult
+      __typename: "CompanySearchResult",
+      etatAdministratif: null,
+      codeCommune: null,
+      naf: null,
+      libelleNaf: null,
+      companyTypes: null,
+      installation: null,
+    })) ??
+    [];
 
   useEffect(() => {
-    dispatch({
-      type: "search_change",
-      payload: {
-        searchResults: searchData?.searchCompanies ?? [],
-        searchLoading,
-      },
-    });
-
-    if (searchData?.searchCompanies?.length === 1) {
+    if (searchResults.length === 1 && !state.selectedCompany.siret) {
       dispatch({
         type: "company_selected",
-        payload: searchData.searchCompanies[0],
+        payload: searchResults[0],
       });
     }
-  }, [searchData, searchLoading]);
+  }, [searchResults, state.selectedCompany.siret]);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      if (!state.clue || state.clue.length < 1) {
-        return;
-      }
-      const isNumber = /^[0-9\s]+$/.test(state.clue);
-      if (isNumber && state.clue.length < 14) {
+    const timeoutID = setTimeout(() => {
+      if (state.clue.length < 3) {
         return;
       }
 
       searchCompaniesQuery({
-        variables: { clue: state.clue, department: state.department },
+        variables: {
+          clue: state.clue,
+          department: state.department,
+        },
       });
     }, 300);
 
     return () => {
-      clearTimeout(handler);
+      clearTimeout(timeoutID);
     };
   }, [state.clue, state.department, searchCompaniesQuery]);
 
@@ -157,34 +170,16 @@ export default function CompanySelector({
       return;
     }
 
-    onCompanySelected(
-      // selectedCompany is initialized as a FormCompany
-      // but then updated to a CompanySearchResult or CompanyFavorite
-      state.selectedCompany as CompanySearchResult | CompanyFavorite
-    );
+    onCompanySelected(state.selectedCompany);
   }, [state.selectedCompany, onCompanySelected]);
 
-  // Load different favorites depending on the object we are filling
-  const type = toMacroCase(field.name.split(".")[0]);
+  if (isLoadingFavorites) {
+    return <p>Chargement...</p>;
+  }
 
-  const { loading, error } = useQuery<Pick<Query, "favorites">>(FAVORITES, {
-    variables: { type },
-    onCompleted: data => {
-      if (state.selectedCompany.siret === "") {
-        dispatch({ type: "company_selected", payload: data.favorites[0] });
-      }
-      dispatch({
-        type: "search_change",
-        payload: {
-          searchResults: data.favorites,
-          searchLoading,
-        },
-      });
-    },
-  });
-
-  if (loading) return <p>Chargement...</p>;
-  if (error) return <InlineError apolloError={error} />;
+  if (favoritesError) {
+    return <InlineError apolloError={favoritesError} />;
+  }
 
   return (
     <div className="CompanySelector form__group">
@@ -235,19 +230,13 @@ export default function CompanySelector({
         </div>
       )}
 
-      {state.searchLoading && <span>Chargement...</span>}
+      {isLoadingSearch && <span>Chargement...</span>}
+
       <CompanyResults
         onSelect={company =>
           dispatch({ type: "company_selected", payload: company })
         }
-        results={[
-          ...state.searchResults,
-          ...(!state.searchResults.some(
-            c => c.siret === state.selectedCompany.siret
-          )
-            ? [state.selectedCompany]
-            : []),
-        ]}
+        results={searchResults}
         selectedItem={state.selectedCompany}
       />
 
