@@ -302,7 +302,7 @@ describe("{ mutation { markAsSealed } }", () => {
     }
   );
 
-  it("should allow to seal a form with a foreign recipient", async () => {
+  it("should allow to seal a form with a foreign recipient and no siret", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
