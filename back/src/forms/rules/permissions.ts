@@ -15,8 +15,7 @@ import {
   EcoOrganismeNotFound,
   NotFormContributor,
   FormNotFound,
-  CountryNotFound,
-  MissingForeignCountryData
+  CountryNotFound
 } from "../errors";
 
 type FormSiretsAndOwner = {
@@ -111,14 +110,6 @@ const canCreateFormFn = async (
     if (matchingCountry == null) {
       return new CountryNotFound(countryCode);
     }
-
-    if (
-      countryCode !== "FR" &&
-      (!createFormInput.recipient?.company?.name ||
-        !createFormInput.recipient?.company?.address)
-    ) {
-      return new MissingForeignCountryData();
-    }
   }
 
   return true;
@@ -168,14 +159,6 @@ const canUpdateFormFn = async (
 
     if (matchingCountry == null) {
       return new CountryNotFound(countryCode);
-    }
-
-    if (
-      countryCode !== "FR" &&
-      (!updateFormInput.recipient?.company?.name ||
-        !updateFormInput.recipient?.company?.address)
-    ) {
-      return new MissingForeignCountryData();
     }
   }
 

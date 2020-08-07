@@ -51,11 +51,3 @@ export class CountryNotFound extends UserInputError {
     );
   }
 }
-
-export class MissingForeignCountryData extends UserInputError {
-  constructor() {
-    super(
-      `Les paramètres "name" et "address" sont requis dans le cas d'une entreprise étrangère.`
-    );
-  }
-}
