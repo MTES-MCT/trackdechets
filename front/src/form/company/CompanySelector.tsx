@@ -131,7 +131,11 @@ export default function CompanySelector({
     }
 
     onCompanySelected(selectedCompany);
-  }, [selectedCompany, onCompanySelected]);
+  }, [
+    selectedCompany,
+    // FIXME: onCompanySelected changes too often which freezes the page
+    onCompanySelected,
+  ]);
 
   if (isLoadingFavorites) {
     return <p>Chargement...</p>;
