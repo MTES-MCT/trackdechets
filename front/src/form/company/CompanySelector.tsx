@@ -1,6 +1,6 @@
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import { FaSearch } from "react-icons/fa";
 import { constantCase } from "constant-case";
 import { InlineError } from "../../common/Error";
@@ -39,23 +39,6 @@ export default function CompanySelector({
   const { setFieldValue } = useFormikContext();
   const [clue, setClue] = React.useState("");
   const [department, setDepartement] = React.useState<null | string>(null);
-  // FIXME: selectedCompany is somewhat a duplicate of field.value and they're supposed to be synchronized
-  const [selectedCompany, setSelectedCompany] = React.useState<
-    CompanySearchResult
-  >(() => ({
-    ...field.value,
-
-    // Convert FormCompany to CompanySearchResult
-    __typename: "CompanySearchResult",
-    etatAdministratif: null,
-    codeCommune: null,
-    companyTypes: null,
-    naf: null,
-    libelleNaf: null,
-    installation: null,
-    transporterReceipt: null,
-    traderReceipt: null,
-  }));
   const [
     searchCompaniesQuery,
     { loading: isLoadingSearch, data: searchData },
@@ -72,28 +55,48 @@ export default function CompanySelector({
       type: constantCase(field.name.split(".")[0]) as FavoriteType,
     },
   });
+  const selectCompany = useCallback(
+    (company: CompanySearchResult) => {
+      setFieldValue(`${field.name}.siret`, company.siret);
 
-  const searchResults: CompanySearchResult[] =
-    searchData?.searchCompanies ??
-    favoritesData?.favorites?.map(favorite => ({
-      ...favorite,
+      ["name", "address", "contact", "phone", "mail"].forEach(key => {
+        if (!company?.[key]) {
+          return;
+        }
+        setFieldValue(`${field.name}.${key}`, company[key]);
+      });
 
-      // Convert CompanyFavorite to CompanySearchResult
-      __typename: "CompanySearchResult",
-      etatAdministratif: null,
-      codeCommune: null,
-      naf: null,
-      libelleNaf: null,
-      companyTypes: null,
-      installation: null,
-    })) ??
-    [];
+      if (onCompanySelected) {
+        onCompanySelected(company);
+      }
+    },
+    [field.name, setFieldValue, onCompanySelected]
+  );
+
+  const searchResults: CompanySearchResult[] = useMemo(
+    () =>
+      searchData?.searchCompanies ??
+      favoritesData?.favorites?.map(favorite => ({
+        ...favorite,
+
+        // Convert CompanyFavorite to CompanySearchResult
+        __typename: "CompanySearchResult",
+        etatAdministratif: null,
+        codeCommune: null,
+        naf: null,
+        libelleNaf: null,
+        companyTypes: null,
+        installation: null,
+      })) ??
+      [],
+    [searchData, favoritesData]
+  );
 
   useEffect(() => {
     if (searchResults.length === 1 && field.value.siret === "") {
-      setSelectedCompany(searchResults[0]);
+      selectCompany(searchResults[0]);
     }
-  }, [searchResults, field.value.siret, setSelectedCompany]);
+  }, [searchResults, field.value.siret, selectCompany]);
 
   useEffect(() => {
     const timeoutID = setTimeout(() => {
@@ -113,29 +116,6 @@ export default function CompanySelector({
       clearTimeout(timeoutID);
     };
   }, [clue, department, searchCompaniesQuery]);
-
-  useEffect(() => {
-    setFieldValue(`${field.name}.siret`, selectedCompany.siret);
-
-    ["name", "address", "contact", "phone", "mail"].forEach(key => {
-      if (!selectedCompany?.[key]) {
-        return;
-      }
-      setFieldValue(`${field.name}.${key}`, selectedCompany[key]);
-    });
-  }, [selectedCompany, field.name, setFieldValue]);
-
-  useEffect(() => {
-    if (onCompanySelected == null) {
-      return;
-    }
-
-    onCompanySelected(selectedCompany);
-  }, [
-    selectedCompany,
-    // FIXME: onCompanySelected changes too often which freezes the page
-    onCompanySelected,
-  ]);
 
   if (isLoadingFavorites) {
     return <p>Chargement...</p>;
@@ -189,9 +169,22 @@ export default function CompanySelector({
           {isLoadingSearch && <span>Chargement...</span>}
 
           <CompanyResults
-            onSelect={company => setSelectedCompany(company)}
+            onSelect={company => selectCompany(company)}
             results={searchResults}
-            selectedItem={selectedCompany}
+            selectedItem={{
+              ...field.value,
+
+              // Convert FormCompany to CompanySearchResult
+              __typename: "CompanySearchResult",
+              etatAdministratif: null,
+              codeCommune: null,
+              companyTypes: null,
+              naf: null,
+              libelleNaf: null,
+              installation: null,
+              transporterReceipt: null,
+              traderReceipt: null,
+            }}
           />
         </>
       )}
@@ -203,10 +196,10 @@ export default function CompanySelector({
           <input
             type="checkbox"
             onChange={event => {
-              setSelectedCompany({
-                ...selectedCompany,
-                siret: event.target.checked ? null : "",
-              });
+              setFieldValue(
+                `${field.name}.siret`,
+                event.target.checked ? null : ""
+              );
             }}
             checked={field.value.siret == null}
           />
