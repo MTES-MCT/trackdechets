@@ -13,6 +13,7 @@ export const companyFragment = gql`
     siret
     address
     contact
+    country
     phone
     mail
   }

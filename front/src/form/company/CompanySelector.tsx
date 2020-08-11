@@ -16,6 +16,7 @@ import {
   QueryFavoritesArgs,
   FavoriteType,
 } from "../../generated/graphql/types";
+import CountrySelector from "./CountrySelector";
 
 interface CompanySelectorProps {
   name:
@@ -234,11 +235,16 @@ export default function CompanySelector({
 
             <label>
               Pays de l'entreprise
-              <Field
-                type="text"
-                name={`${field.name}.country`}
-                placeholder="Pays"
-              />
+              <Field name={`${field.name}.country`}>
+                {({ field, form }) => (
+                  <CountrySelector
+                    {...field}
+                    onChange={code => form.setFieldValue(field.name, code)}
+                    value={field.value}
+                    placeholder="Pays"
+                  />
+                )}
+              </Field>
             </label>
 
             <RedErrorMessage name={`${field.name}.country`} />
