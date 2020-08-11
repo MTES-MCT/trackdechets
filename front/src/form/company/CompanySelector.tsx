@@ -27,13 +27,13 @@ interface CompanySelectorProps {
     | "trader.company"
     | "temporaryStorageDetail.destination.company";
   onCompanySelected?: (company: CompanySearchResult) => void;
-  allowForeignCountry?: boolean;
+  allowForeignCompanies?: boolean;
 }
 
 export default function CompanySelector({
   name,
   onCompanySelected,
-  allowForeignCountry,
+  allowForeignCompanies,
 }: CompanySelectorProps) {
   const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
@@ -191,7 +191,7 @@ export default function CompanySelector({
 
       <RedErrorMessage name={`${field.name}.siret`} />
 
-      {allowForeignCountry && (
+      {allowForeignCompanies && (
         <label>
           <input
             type="checkbox"
