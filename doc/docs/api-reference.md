@@ -2090,6 +2090,7 @@ Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
 https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
 En l'absence de code, l'entreprise est considérée comme résidant en France.
+Seul le destinataire (`recipient.company`) peut être à l'étranger.
 
 </td>
 </tr>
@@ -3614,6 +3615,7 @@ Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
 https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
 En l'absence de code, l'entreprise est considérée comme résidant en France.
+Seul le destinataire (`recipient.company`) peut être à l'étranger.
 
 </td>
 </tr>
