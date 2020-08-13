@@ -1,5 +1,6 @@
-import { Column, FormFlattened } from "./types";
 import Excel from "exceljs";
+import countries from "world-countries";
+import { Column, FormFlattened } from "./types";
 
 const identity = (v: any) => v ?? "";
 const formatDate = (d: string | null) => (d ? d.slice(0, 10) : "");
@@ -48,6 +49,14 @@ const columns: Column[] = [
     field: "recipientCompanyAddress",
     label: "Destination adresse",
     format: identity
+  },
+  {
+    field: "recipientCompanyCountry",
+    label: "Destination pays",
+    format: (cca2: string | null) => {
+      const country = countries.find(country => country.cca2 === cca2);
+      return country?.translations.fra.common ?? "France";
+    }
   },
   {
     field: "recipientCompanyMail",
