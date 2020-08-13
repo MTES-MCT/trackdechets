@@ -10,6 +10,7 @@ import { RadioButton } from "../../../form/custom-inputs/RadioButton";
 import Packagings from "../../../form/packagings/Packagings";
 import { SlipActionProps } from "../SlipActions";
 import { PROCESSING_OPERATIONS } from "../../../generated/constants";
+import { WasteDetails } from "../../../generated/graphql/types";
 
 export default function Resealed({
   form,
@@ -27,23 +28,41 @@ export default function Resealed({
   );
 
   function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
-    setIsRefurbished(!isRefurbished);
-    const keys = [
-      "onuCode",
-      "packagings",
-      "otherPackaging",
-      "numberOfPackages",
-      "quantity",
-      "quantityType",
-    ];
-    const hasBeenFilled = keys.some(
-      key => initialValues.wasteDetails[key] !== values.wasteDetails[key]
-    );
+    const willBeRefurbished = !isRefurbished;
+    setIsRefurbished(willBeRefurbished);
 
-    if (isRefurbished && !hasBeenFilled) {
-      keys.forEach((key) => {
-        if (form.wasteDetails?.[key] != null) {
-          setFieldValue(`wasteDetails.${key}`, form.wasteDetails[key]);
+    if (willBeRefurbished) {
+      const { wasteDetails } = form;
+
+      if (wasteDetails == null) {
+        return;
+      }
+
+      const keys: Array<keyof WasteDetails> = [
+        "onuCode",
+        "packagings",
+        "otherPackaging",
+        "numberOfPackages",
+        "quantity",
+        "quantityType",
+      ];
+      keys.forEach(key => {
+        switch (key) {
+          case "packagings": {
+            if (
+              wasteDetails[key].length > 0 &&
+              values.wasteDetails[key].length === 0
+            ) {
+              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
+            }
+            break;
+          }
+          default: {
+            if (wasteDetails[key] && !values.wasteDetails[key]) {
+              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
+            }
+            break;
+          }
         }
       });
     }
