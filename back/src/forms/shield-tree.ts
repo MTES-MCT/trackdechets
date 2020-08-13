@@ -29,7 +29,9 @@ import {
   signedByTransporterSchema,
   temporaryStorageDestinationSchema,
   formsSchema,
-  formsRegisterSchema
+  formsRegisterSchema,
+  createFormSchema,
+  updateFormSchema
 } from "./rules/schema";
 
 export default {
@@ -46,8 +48,8 @@ export default {
     appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
-    createForm: chain(isAuthenticated, canCreateForm),
-    updateForm: chain(isAuthenticated, canUpdateForm),
+    createForm: chain(isAuthenticated, createFormSchema, canCreateForm),
+    updateForm: chain(isAuthenticated, updateFormSchema, canUpdateForm),
     saveForm: chain(isAuthenticated, canSaveForm),
     deleteForm: canAccessForm,
     duplicateForm: canAccessForm,

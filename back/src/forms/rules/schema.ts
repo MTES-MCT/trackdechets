@@ -1,10 +1,12 @@
 import * as Yup from "yup";
 import { validDatetime, validCompany } from "./validation-helpers";
 import { inputRule } from "graphql-shield";
+import countries from "world-countries";
 import {
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../../common/constants";
+import { CountryNotFound } from "../errors";
 
 export const getReceivedInfoSchema = yup =>
   yup.object({
@@ -399,5 +401,36 @@ export const formsRegisterSchema = inputRule()(yup =>
       yup
     ),
     exportFormat: yup.string()
+  })
+);
+
+const formInputSchema = Yup.object().shape({
+  recipient: Yup.object()
+    .shape({
+      company: Yup.object()
+        .shape({
+          country: Yup.string()
+            .oneOf(
+              [...countries.map(country => country.cca2), null],
+              ({ value }) => new CountryNotFound(value).message
+            )
+            .nullable()
+        })
+        .nullable()
+        .default(null)
+    })
+    .nullable()
+    .default(null)
+});
+
+export const createFormSchema = inputRule()(yup =>
+  yup.object().shape({
+    createFormInput: formInputSchema
+  })
+);
+
+export const updateFormSchema = inputRule()(yup =>
+  yup.object().shape({
+    updateFormInput: formInputSchema
   })
 );
