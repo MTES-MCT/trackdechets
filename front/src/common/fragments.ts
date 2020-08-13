@@ -132,23 +132,18 @@ const staticFieldsFragment = gql`
       transporterNumberPlate
       transporterCustomInfo
       transporter {
-        name
-        siret
-        address
+        ...CompanyFragment
       }
       recipient {
-        name
-        siret
-        address
+        ...CompanyFragment
       }
       emitter {
-        name
-        siret
-        address
+        ...CompanyFragment
       }
       lastActionOn
     }
   }
+  ${companyFragment}
 `;
 
 const mutableFieldsFragment = gql`
