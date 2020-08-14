@@ -9,15 +9,16 @@ export const stateSummary = async (form: Form): Promise<StateSummary> => {
     quantity: getQuantity(form, temporaryStorageDetail),
     packagings:
       temporaryStorageDetail?.wasteDetailsPackagings ??
-      form.wasteDetails.packagings,
+      form.wasteDetails?.packagings ??
+      [],
     onuCode:
-      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails.onuCode,
-    transporterNumberPlate: temporaryStorageDetail
-      ? temporaryStorageDetail.transporterNumberPlate
-      : form.transporter.numberPlate,
-    transporterCustomInfo: temporaryStorageDetail
-      ? temporaryStorageDetail.transporterNumberPlate
-      : form.transporter.customInfo,
+      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails?.onuCode,
+    transporterNumberPlate:
+      temporaryStorageDetail?.transporterNumberPlate ??
+      form.transporter?.numberPlate,
+    transporterCustomInfo:
+      temporaryStorageDetail?.transporterNumberPlate ??
+      form.transporter?.customInfo,
     transporter: getTransporter(form, temporaryStorageDetail),
     recipient: getRecipient(form, temporaryStorageDetail),
     emitter: getEmitter(form, temporaryStorageDetail),
