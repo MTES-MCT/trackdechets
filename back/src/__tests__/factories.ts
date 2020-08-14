@@ -10,14 +10,15 @@ import {
   UserRole,
   Status,
   CompanyCreateInput,
-  FormCreateInput
+  FormCreateInput,
+  UserCreateInput
 } from "../generated/prisma-client";
 
 /**
  * Create a user with name and email
  * @param opt: extra parameters
  */
-export const userFactory = async (opt = {}) => {
+export const userFactory = async (opt: Partial<UserCreateInput> = {}) => {
   const defaultPassword = await hash("pass", 10);
   const userIndex = (await prisma.usersConnection().aggregate().count()) + 1;
   const data = {
