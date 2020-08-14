@@ -1,28 +1,19 @@
 import signup from "../signup";
-import { prisma, UserWhereInput } from "../../../generated/prisma-client";
+import { prisma } from "../../../generated/prisma-client";
 
-const newUserInfos = {
+const userInfos = {
   id: "new_user",
   name: "an user",
   email: "an@email.com",
   password: "a password",
   phone: "0000"
 };
-const existingUserInfos = {
-  id: "existing_user",
-  name: "another user",
-  email: "existing@email.com",
-  password: "a password",
-  phone: "0000"
-};
 
 jest.mock("../../../generated/prisma-client", () => ({
   prisma: {
-    createUser: jest.fn(() => Promise.resolve(newUserInfos)),
+    createUser: jest.fn(() => Promise.resolve(userInfos)),
     $exists: {
-      user: jest.fn(({ email }: UserWhereInput) =>
-        Promise.resolve(email === existingUserInfos.email)
-      )
+      user: jest.fn(() => Promise.resolve(false))
     },
     createUserActivationHash: jest.fn(() =>
       Promise.resolve({ hash: "an hash" })
@@ -43,27 +34,13 @@ describe("signup", () => {
   });
 
   test("should create user", async () => {
-    const user = await signup(newUserInfos);
+    const user = await signup(userInfos);
 
     expect(user.id).toBe("new_user");
   });
 
-  test("should not create user if it already exists", async () => {
-    const errorMessage =
-      "Impossible de créer cet utilisateur. Cet email a déjà un compte";
-
-    await expect(signup(existingUserInfos)).rejects.toThrow(errorMessage);
-    await expect(
-      signup({
-        ...existingUserInfos,
-        // it must be case insensitive
-        email: existingUserInfos.email.toUpperCase()
-      })
-    ).rejects.toThrow(errorMessage);
-  });
-
   test("should create activation hash", async () => {
-    await signup(newUserInfos);
+    await signup(userInfos);
 
     expect(prisma.createUserActivationHash).toHaveBeenCalledTimes(1);
   });
@@ -76,7 +53,7 @@ describe("signup", () => {
     ];
     (prisma.userAccountHashes as jest.Mock).mockResolvedValue(hashes);
 
-    await signup(newUserInfos);
+    await signup(userInfos);
 
     expect(prisma.createCompanyAssociation).toHaveBeenCalledTimes(
       hashes.length

@@ -16,7 +16,12 @@ import {
   User as PrismaUser
 } from "./generated/prisma-client";
 import { compare } from "bcrypt";
-import { sameDayMidnight, daysBetween, sanitizeEmail } from "./utils";
+import {
+  sameDayMidnight,
+  daysBetween,
+  legacySanitizeEmail,
+  sanitizeEmail
+} from "./utils";
 
 const { JWT_SECRET } = process.env;
 
@@ -56,21 +61,13 @@ export const getLoginError = (username: string) => ({
   }
 });
 
-function legacySanitizeEmail(email: string): string {
-  return email.trim();
-}
-
-function isLegacyEmail(email: string): boolean {
-  return sanitizeEmail(email) !== legacySanitizeEmail(email);
-}
-
 passport.use(
   new LocalStrategy(
     { usernameField: "email" },
     async (username, password, done) => {
       let user = null;
 
-      if (isLegacyEmail(username)) {
+      if (legacySanitizeEmail(username) !== sanitizeEmail(username)) {
         // Some users were created before email sanitization was introduced
         // so we need to look up a potential legacy account before resotring to the new sanitization
         // We'll be able to get rid of this code once legacy emails have been sanitized

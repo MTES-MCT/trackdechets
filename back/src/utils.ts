@@ -72,6 +72,10 @@ export function daysBetween(date1: Date, date2: Date): number {
   return numberOfdays;
 }
 
+export function legacySanitizeEmail(email: string): string {
+  return email.trim();
+}
+
 export function sanitizeEmail(email: string): string {
   return email.toLowerCase().trim();
 }
