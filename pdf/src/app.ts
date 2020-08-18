@@ -1,6 +1,6 @@
 import express from "express";
 import { json } from "body-parser";
-import Sentry from "@sentry/node";
+import * as Sentry from "@sentry/node";
 import buildPdf from "./generator";
 
 const sentryDsn = process.env.SENTRY_DSN;
