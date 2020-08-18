@@ -77,8 +77,7 @@ services:
     image: td-pdf
     build:
       context: ./pdf
-      dockerfile: Dockerfile
-    command: sh -c "npm install && npm run dev"
+      dockerfile: Dockerfile.dev
     volumes:
       - ./pdf:/usr/src/app
     ports:

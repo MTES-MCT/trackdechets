@@ -1,5 +1,5 @@
 // Standard page height in pixels
-const pageHeight = 842;
+export const pageHeight = 842;
 
 // Main form field settings
 // coordinates: top/left, mandatory
@@ -7,7 +7,7 @@ const pageHeight = 842;
 // maxLength: how many characters do we display, optional
 // lineBreakAt: at which position do we insert a linebreak (optional)
 // rightAlign: right align the content
-const mainFormFieldSettings = {
+export const mainFormFieldSettings = {
   currentPageNumber: { x: 530, y: 70, fontSize: 10 },
   totalPagesNumber: { x: 550, y: 70, fontSize: 10 },
 
@@ -117,7 +117,7 @@ const mainFormFieldSettings = {
 };
 
 // coordinates of each stamp image
-const imageLocations = {
+export const imageLocations = {
   transporterSignature: { x: 450, y: 525 },
   emitterSignature: { x: 450, y: 590 },
   processingSignature: { x: 450, y: 732 },
@@ -132,7 +132,7 @@ const imageLocations = {
 };
 
 // Temporary Storage detail form field settings
-const temporaryStorageDetailsFieldSettings = {
+export const temporaryStorageDetailsFieldSettings = {
   currentPageNumber: { x: 530, y: 70, fontSize: 10 },
   totalPagesNumber: { x: 550, y: 70, fontSize: 10 },
   formReadableId: { x: 220, y: 95, fontSize: 10 },
@@ -194,7 +194,7 @@ const temporaryStorageDetailsFieldSettings = {
 };
 
 // appendix2 header field settings
-const appendixHeaderFieldSettings = {
+export const appendixHeaderFieldSettings = {
   readableId: { x: 240, y: 160, fontSize: 10 },
   emitterCompanySiret: { x: 103, y: 186, fontSize: 10 },
   emitterCompanyName: { x: 84, y: 197, fontSize: 10 },
@@ -206,7 +206,7 @@ const appendixHeaderFieldSettings = {
 };
 
 // appendix2 attached form field settings
-const appendixFieldSettings = {
+export const appendixFieldSettings = {
   numbering: { x: 142, y: 243, fontSize: 10 },
   initialEmitter: { x: 142, y: 243, fontSize: 10 },
   readableId: { x: 392, y: 244, fontSize: 10 },
@@ -225,9 +225,9 @@ const appendixFieldSettings = {
 };
 
 // vertical offset to be applied to each appending sub form coordinates
-const appendixYOffsets = [0, 104, 208, 313, 418];
+export const appendixYOffsets = [0, 104, 208, 313, 418];
 
-const transportSegmentSettings = {
+export const transportSegmentSettings = {
   segmentNumber: { x: 162, y: 628, fontSize: 10 },
   transporterCompanySiren: { x: 90, y: 640, fontSize: 10 },
   transporterCompanyName: { x: 71, y: 650, fontSize: 10, maxLength: 50 },
@@ -248,12 +248,3 @@ const transportSegmentSettings = {
   takenOverAt: { x: 391, y: 659, fontSize: 10 },
   takenOverBy: { x: 332, y: 678, fontSize: 10 }
 };
-
-exports.pageHeight = pageHeight;
-exports.mainFormFieldSettings = mainFormFieldSettings;
-exports.temporaryStorageDetailsFieldSettings = temporaryStorageDetailsFieldSettings;
-exports.imageLocations = imageLocations;
-exports.appendixHeaderFieldSettings = appendixHeaderFieldSettings;
-exports.appendixFieldSettings = appendixFieldSettings;
-exports.appendixYOffsets = appendixYOffsets;
-exports.transportSegmentSettings = transportSegmentSettings;

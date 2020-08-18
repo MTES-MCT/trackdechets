@@ -1,6 +1,5 @@
-const supertest = require("supertest");
-
-const app = require("../app");
+import supertest from "supertest";
+import app from "../app";
 
 const request = supertest(app);
 const testData = {
@@ -70,7 +69,9 @@ const testData = {
   processingOperationDone: null,
   readableId: "TD-19-AAA00123",
   recipientCompanyName: "RECIPIENT SAS",
-  appendix2Forms: []
+  appendix2Forms: [],
+  transportSegments: [],
+  temporaryStorageDetail: null
 };
 
 test("server answers to ping request", async () => {
@@ -83,15 +84,13 @@ test("server renders pdf", async () => {
   const res = await request.post("/pdf").send(testData);
 
   expect(res.status).toBe(200);
-  const { headers } = res;
-  expect(headers["content-type"]).toBe("application/pdf");
+  expect(res.header["content-type"]).toBe("application/pdf");
   const date = new Date();
   const fileNameSuffix = `${date.getDate()}-${
     date.getMonth() + 1
   }-${date.getFullYear()}`;
 
-  expect(headers["content-disposition"]).toBe(
+  expect(res.header["content-disposition"]).toBe(
     `attachment;filename=BSD_TD-19-AAA00123_${fileNameSuffix}.pdf`
   );
 });
-//

@@ -1,8 +1,7 @@
-const express = require("express");
-const { json } = require("body-parser");
-const Sentry = require("@sentry/node");
-
-const buildPdf = require("./generator");
+import express from "express";
+import { json } from "body-parser";
+import Sentry from "@sentry/node";
+import buildPdf from "./generator";
 
 const sentryDsn = process.env.SENTRY_DSN;
 
@@ -45,4 +44,4 @@ app.post("/pdf", async (req, res) => {
   }
 });
 
-module.exports = app;
+export default app;

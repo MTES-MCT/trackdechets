@@ -1,4 +1,4 @@
-const { pageHeight, imageLocations } = require("./settings");
+import { pageHeight, imageLocations } from "./settings";
 
 /**
  * Write text on the pdf by retrieving field params in fieldSettings object
@@ -53,7 +53,7 @@ const drawText = ({
  * @param page - page on which we want to write
  */
 
-const checkBox = ({ fieldName, settings, font, page, yOffset = 0 }) => {
+export const checkBox = ({ fieldName, settings, font, page, yOffset = 0 }) => {
   drawText({ fieldName, settings, font, page, yOffset, content: "×" });
 };
 
@@ -64,14 +64,14 @@ const checkBox = ({ fieldName, settings, font, page, yOffset = 0 }) => {
  * @param page - page on which we want to write
  */
 
-const drawImage = ({
+export const drawImage = ({
   locationName,
   image,
   page,
   dimensions = { width: 75, height: 37 },
   yOffset = 0
 }) => {
-  location = imageLocations[locationName];
+  const location = imageLocations[locationName];
 
   page.drawImage(image, {
     x: location.x,
@@ -91,7 +91,7 @@ const capitalize = string =>
  * @param {object} params -  the full request payload
  * @returns {object}
  */
-const getEmitterType = params => {
+export const getEmitterType = params => {
   const { emitterType } = params;
   if (emitterType === "PRODUCER") {
     return { emitterTypeProducer: true };
@@ -112,14 +112,14 @@ const getEmitterType = params => {
  * @param {string } datestr - a date iso-formatted
  * @returns {string} - date formatted as dd/mm/YYYY
  */
-const dateFmt = datestr => {
+export const dateFmt = datestr => {
   if (!datestr) {
     return "";
   }
   const date = new Date(datestr);
   let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
+  let month: number | string = date.getMonth() + 1;
+  let day: number | string = date.getDate();
 
   if (day < 10) {
     day = "0" + day;
@@ -170,7 +170,7 @@ const getWasteDetailsConsistence = params => {
  * @param {object} params -  the full request payload
  * @returns {object}
  */
-const getWasteDetailsType = params => {
+export const getWasteDetailsType = params => {
   if (!params.wasteDetailsQuantityType) {
     return {};
   }
@@ -251,10 +251,8 @@ const getWasteDetailsPackagings = params => {
 
 /**
  * Transform numbers as strings to be accepted by the pdf template
- * @param params -  the full request payload
- * @returns {object}
  */
-const stringifyNumberFields = params => {
+const stringifyNumberFields = <T>(params: T): T => {
   let data = { ...params };
   for (let [k, v] of Object.entries(data)) {
     if (typeof v === "number") {
@@ -292,7 +290,7 @@ const getWasteQuantityRefused = (wasteDetailsQuantity, quantityReceived) =>
  * @param params
  * @returns object
  */
-const getWasteRefusalreason = params =>
+export const getWasteRefusalreason = params =>
   params.wasteAcceptationStatus === "PARTIALLY_REFUSED"
     ? {
         wasteRefusalReason: `Refus partiel: ${
@@ -318,17 +316,29 @@ const getFlatEcoOrganisme = params => {
     : {};
 };
 
-const processTransporterData = data => ({
+const processTransporterData = (data: MainFormParams) => ({
   ...data,
-  transporterCompanySiren: siretToSiren(data.transporterCompanySiret)
+  transporterCompanySiren: data.transporterCompanySiret
+    ? siretToSiren(data.transporterCompanySiret)
+    : null
 });
 
-/**
- * Apply transformers to payload
- * @param params -  the full request payload
- * @returns {object}
- */
-function processMainFormParams(params) {
+interface MainFormParams {
+  customId?: string;
+  noTraceability?: boolean;
+  signedByTransporter?: boolean;
+  sentAt?: string;
+  processingOperationDone?: string;
+  receivedBy?: string;
+  transporterIsExemptedOfReceipt?: boolean;
+  tempStorerSignedAt?: string;
+  signedAt?: string;
+  mode?: "ROAD" | "RAIL" | "AIR" | "RIVER" | "SEA";
+  takenOverAt?: string;
+  transporterCompanySiret?: string;
+}
+
+export function processMainFormParams(params: MainFormParams) {
   params = { ...params, ...getWasteRefusalreason(params) }; // compute refused quantity before converting number to strings
   const data = stringifyNumberFields(params);
 
@@ -350,7 +360,7 @@ function processMainFormParams(params) {
 const checkWasteDetailsQuantityReal = data =>
   !!data.quantityReceived ? { wasteDetailsQuantityReal: true } : {};
 
-function processAnnexParams(params) {
+export function processAnnexParams(params) {
   const data = stringifyNumberFields(params);
   return {
     ...data,
@@ -374,7 +384,7 @@ function verboseMode(mode) {
   }
   return transportModeLabels[mode];
 }
-function processSegment(segment) {
+export function processSegment(segment) {
   const data = processMainFormParams(stringifyNumberFields(segment));
   return {
     ...data,
@@ -388,7 +398,7 @@ function processSegment(segment) {
  *
  */
 
-const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
+export const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
   for (let [fieldName, content] of Object.entries(data)) {
     if (content === true) {
       checkBox({
@@ -412,16 +422,4 @@ const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
   }
 };
 
-const siretToSiren = siren => siren.slice(0, 9);
-
-exports.dateFmt = dateFmt;
-exports.checkBox = checkBox;
-exports.drawImage = drawImage;
-exports.getEmitterType = getEmitterType;
-exports.getWasteRefusalreason = getWasteRefusalreason;
-exports.getWasteDetailsType = getWasteDetailsType;
-exports.processMainFormParams = processMainFormParams;
-exports.processAnnexParams = processAnnexParams;
-exports.processSegment = processSegment;
-exports.fillFields = fillFields;
-exports.siretToSiren = siretToSiren;
+export const siretToSiren = (siren: string) => siren.slice(0, 9);
