@@ -42,7 +42,7 @@ export default function Recipient() {
           Pour vous assurer que l'entreprise de destination est autorisée à
           recevoir le déchet, vous pouvez consulter{" "}
           <a
-            href="https://www.georisques.gouv.fr/dossiers/installations/donnees#/"
+            href="https://www.georisques.gouv.fr/risques/installations/donnees#/"
             target="_blank"
             rel="noopener noreferrer"
           >
