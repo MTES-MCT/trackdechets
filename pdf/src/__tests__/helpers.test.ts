@@ -1,8 +1,4 @@
-const {
-  processMainFormParams,
-  processSegment,
-  dateFmt
-} = require("../helpers");
+import { processMainFormParams, processSegment, dateFmt } from "../helpers";
 
 describe("processMainFormParams", () => {
   it("should format the fields", () => {
