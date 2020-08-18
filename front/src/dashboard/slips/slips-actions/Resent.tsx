@@ -10,6 +10,7 @@ import { RadioButton } from "../../../form/custom-inputs/RadioButton";
 import Packagings from "../../../form/packagings/Packagings";
 import { SlipActionProps } from "../SlipActions";
 import { PROCESSING_OPERATIONS } from "../../../generated/constants";
+import { WasteDetails } from "../../../generated/graphql/types";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   // We need a deep merge as sub-objects may be partially filled
@@ -23,13 +24,54 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
     !!form.temporaryStorageDetail?.wasteDetails?.quantity
   );
 
+  function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
+    const willBeRefurbished = !isRefurbished;
+    setIsRefurbished(willBeRefurbished);
+
+    if (willBeRefurbished) {
+      const { wasteDetails } = form;
+
+      if (wasteDetails == null) {
+        return;
+      }
+
+      const keys: Array<keyof WasteDetails> = [
+        "onuCode",
+        "packagings",
+        "otherPackaging",
+        "numberOfPackages",
+        "quantity",
+        "quantityType",
+      ];
+      keys.forEach(key => {
+        switch (key) {
+          case "packagings": {
+            if (
+              wasteDetails[key].length > 0 &&
+              values.wasteDetails[key].length === 0
+            ) {
+              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
+            }
+            break;
+          }
+          default: {
+            if (wasteDetails[key] && !values.wasteDetails[key]) {
+              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
+            }
+            break;
+          }
+        }
+      });
+    }
+  }
+
   return (
     <div>
       <Formik
         initialValues={initialValues}
         onSubmit={values => onSubmit({ info: values })}
       >
-        {({ values }) => (
+        {({ values, setFieldValue }) => (
           <Form>
             <h5>Installation de destination prévue</h5>
 
@@ -62,7 +104,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                 <input
                   type="checkbox"
                   checked={isRefurbished}
-                  onChange={() => setIsRefurbished(!isRefurbished)}
+                  onChange={() => onChangeRefurbished(values, setFieldValue)}
                 />
                 Les déchets ont subi un reconditionnement, je dois saisir les
                 détails
