@@ -115,7 +115,7 @@ export default function Signup() {
             <div className="form__group">
               <label>Email*</label>
               <div className="search__group">
-                <Field type="text" name="email" />
+                <Field type="email" name="email" />
                 <button
                   type="button"
                   className="overlay-button"

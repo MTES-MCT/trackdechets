@@ -49,6 +49,30 @@ describe("POST /login", () => {
     });
   });
 
+  it("should authenticate user regarldess of their email's casing", async () => {
+    const user = await userFactory();
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email.toUpperCase()}`)
+      .send(`password=pass`);
+
+    expect(login.header["set-cookie"]).toHaveLength(1);
+  });
+
+  it("should authenticate user with their legacy account if any", async () => {
+    const user = await userFactory({
+      email: "USER_WITH_LEGACY_EMAIL@DOMAIN.COM"
+    });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    expect(login.header["set-cookie"]).toHaveLength(1);
+  });
+
   it("should not authenticate an unknown user", async () => {
     const login = await request
       .post("/login")

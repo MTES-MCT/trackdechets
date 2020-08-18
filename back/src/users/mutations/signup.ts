@@ -3,17 +3,19 @@ import { sendMail } from "../../common/mails.helper";
 import { User, prisma } from "../../generated/prisma-client";
 import { userMails } from "../mails";
 import { hashPassword } from "../utils";
+import { sanitizeEmail, legacySanitizeEmail } from "../../utils";
 import { UserInputError } from "apollo-server-express";
 import { SignupInput } from "../../generated/graphql/types";
 
 export default async function signup({
   name,
-  email,
   password,
-  phone
+  phone,
+  email: unsafeEmail
 }: SignupInput) {
-  // check user does not exist
-  const userExists = await prisma.$exists.user({ email });
+  const userExists = await prisma.$exists.user({
+    email_in: [legacySanitizeEmail(unsafeEmail), sanitizeEmail(unsafeEmail)]
+  });
 
   if (userExists) {
     throw new UserInputError(
@@ -25,7 +27,7 @@ export default async function signup({
 
   const user = await prisma.createUser({
     name,
-    email,
+    email: sanitizeEmail(unsafeEmail),
     password: hashedPassword,
     phone
   });
