@@ -22,6 +22,7 @@ import {
   legacySanitizeEmail,
   sanitizeEmail
 } from "./utils";
+import { GraphQLContext } from "./types";
 
 const { JWT_SECRET } = process.env;
 
@@ -39,6 +40,22 @@ export enum AuthType {
   Session = "session",
   JWT = "jwt",
   Bearer = "bearer"
+}
+
+/**
+ * Passport will use all possible strategies to authenticate user on the GraphQL endpoint
+ * Nevertheless we may want to apply only specific strategies on a particular GraphQL query.
+ * For example the mutation used to renew a user password may only be accessible from a user
+ * logged in from Trackdechets UI. This helper function allow to get rid of user info if
+ * it was not authenticated with the proper stratgey
+ */
+export function useResolverAuthStrategy(
+  authTypes: AuthType[],
+  context: GraphQLContext
+) {
+  if (context.user && !authTypes.includes(context.user.auth)) {
+    context.user = null;
+  }
 }
 
 // verbose error message and related errored field
