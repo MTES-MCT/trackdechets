@@ -8,7 +8,7 @@ import {
   setLocale,
   string
 } from "yup";
-import { wasteCodes } from "../common/constants";
+import { WASTES_CODES } from "../common/constants";
 import { prisma } from "../generated/prisma-client";
 import { validCompany, validDatetime } from "./rules/validation-helpers";
 
@@ -67,7 +67,7 @@ export const formSchema = object<any>().shape({
   }),
   wasteDetails: object().shape({
     code: string().oneOf(
-      wasteCodes,
+      WASTES_CODES,
       "Le code déchet est obligatoire et doit appartenir à la liste  du code de l'environnement (par exemple 16 11 05*)"
     ),
     onuCode: string(),

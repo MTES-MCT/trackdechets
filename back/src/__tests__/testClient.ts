@@ -2,21 +2,22 @@ import { createTestClient } from "apollo-server-integration-testing";
 import { server } from "../server";
 
 /**
- * Instatiate test client and return a mutate helper for an authenticated user
- * @param user
+ * Instantiate test client
  */
-const makeClient = user => {
-  // instantiate test client
+function makeClient(user?: Express.User) {
   const { mutate, query, setOptions } = createTestClient({
     apolloServer: server
   });
 
-  setOptions({
-    request: {
-      user
-    }
-  });
+  if (user) {
+    setOptions({
+      request: {
+        user
+      }
+    });
+  }
+
   return { mutate, query };
-};
+}
 
 export default makeClient;

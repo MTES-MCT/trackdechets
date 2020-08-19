@@ -19,9 +19,7 @@ describe("query { searchCompanies(clue, department) }", () => {
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
-        libelleNaf: "Programmation informatique",
-        longitude: 5.387141,
-        latitude: 43.300746
+        libelleNaf: "Programmation informatique"
       }
     ]);
 
@@ -34,8 +32,6 @@ describe("query { searchCompanies(clue, department) }", () => {
           companyTypes
           naf
           libelleNaf
-          longitude
-          latitude
           installation {
             codeS3ic
           }
@@ -54,9 +50,7 @@ describe("query { searchCompanies(clue, department) }", () => {
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
-        libelleNaf: "Programmation informatique",
-        longitude: 5.387141,
-        latitude: 43.300746
+        libelleNaf: "Programmation informatique"
       }
     ]);
 
@@ -69,8 +63,6 @@ describe("query { searchCompanies(clue, department) }", () => {
           companyTypes
           naf
           libelleNaf
-          longitude
-          latitude
           installation {
             codeS3ic
           }
@@ -97,9 +89,7 @@ describe("query { searchCompanies(clue, department) }", () => {
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
-        libelleNaf: "Programmation informatique",
-        longitude: 5.387141,
-        latitude: 43.300746
+        libelleNaf: "Programmation informatique"
       }
     ]);
 

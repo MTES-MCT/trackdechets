@@ -5,6 +5,7 @@ import { FaHourglassHalf } from "react-icons/fa";
 import cogoToast from "cogo-toast";
 import { COMPANY_INFOS } from "../../form/company/query";
 import RedErrorMessage from "../../common/RedErrorMessage";
+import AutoFormattingSiret from "../../common/AutoFormattingSiret";
 import { NotificationError } from "../../common/Error";
 import styles from "../AccountCompanyAdd.module.scss";
 
@@ -49,27 +50,29 @@ export default function AccountCompanyAddSiret({
   });
 
   return (
-    <div className={styles.field}>
-      <label className={`text-right ${styles.bold}`}>SIRET</label>
-      <div className={styles.field__value}>
-        <Field type="text" name="siret" />
-        <br />
-        <button
-          className="button"
-          type="button"
-          onClick={() => {
-            const trimedSiret = values.siret.replace(/\s/g, "");
-            if (trimedSiret.length !== 14) {
-              return;
-            }
-            searchCompany({ variables: { siret: trimedSiret } });
-          }}
-        >
-          {loading ? <FaHourglassHalf /> : "Valider"}
-        </button>
-        <RedErrorMessage name="siret" />
-        {error && <NotificationError apolloError={error} />}
+    <>
+      {error && <NotificationError apolloError={error} />}
+      <div className={styles.field}>
+        <label className={`text-right ${styles.bold}`}>SIRET</label>
+        <div className={styles.field__value}>
+          <Field name="siret" component={AutoFormattingSiret} />
+          <RedErrorMessage name="siret" />
+          <br />
+          <button
+            className="button"
+            type="button"
+            onClick={() => {
+              const trimedSiret = values.siret.replace(/\s/g, "");
+              if (trimedSiret.length !== 14) {
+                return;
+              }
+              searchCompany({ variables: { siret: trimedSiret } });
+            }}
+          >
+            {loading ? <FaHourglassHalf /> : "Valider"}
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

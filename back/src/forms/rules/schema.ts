@@ -2,8 +2,8 @@ import * as Yup from "yup";
 import { validDatetime, validCompany } from "./validation-helpers";
 import { inputRule } from "graphql-shield";
 import {
-  PROCESSING_OPERATION_CODES,
-  GROUP_CODES
+  PROCESSING_OPERATIONS_CODES,
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../../common/constants";
 
 export const getReceivedInfoSchema = yup =>
@@ -105,12 +105,10 @@ export const markAsProcessedSchema = inputRule()(
         processingOperationDone: yup
           .mixed()
           .oneOf(
-            PROCESSING_OPERATION_CODES,
+            PROCESSING_OPERATIONS_CODES,
             "Cette opération d’élimination / valorisation n'existe pas."
           ),
-        processingOperationDescription: yup
-          .string()
-          .required("Vous devez renseigner la description de l'opération."),
+        processingOperationDescription: yup.string(),
         processedBy: yup
           .string()
           .required("Vous devez saisir un responsable de traitement."),
@@ -122,7 +120,7 @@ export const markAsProcessedSchema = inputRule()(
           yup
         ),
         nextDestination: yup.object().when("processingOperationDone", {
-          is: val => GROUP_CODES.includes(val),
+          is: val => PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(val),
           then: yup.object({
             processingOperation: yup.string(),
             company: validCompany(
@@ -245,7 +243,7 @@ export const temporaryStorageDestinationSchema = inputRule()(yup =>
         processingOperation: yup
           .mixed()
           .oneOf(
-            PROCESSING_OPERATION_CODES,
+            PROCESSING_OPERATIONS_CODES,
             "Cette opération d’élimination / valorisation n'existe pas."
           ),
         cap: yup.string().nullable(true)
@@ -382,3 +380,25 @@ export const takeOverInfoSchema = Yup.object<any>().shape({
   ),
   takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
 });
+
+export const formsRegisterSchema = inputRule()(yup =>
+  yup.object().shape({
+    sirets: yup.array(yup.string()).required(),
+    exportType: yup.string(),
+    startDate: validDatetime(
+      {
+        verboseFieldName: "Date de début",
+        required: false
+      },
+      yup
+    ),
+    endDate: validDatetime(
+      {
+        verboseFieldName: "Date de début",
+        required: false
+      },
+      yup
+    ),
+    exportFormat: yup.string()
+  })
+);

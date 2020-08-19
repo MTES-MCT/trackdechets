@@ -2,7 +2,9 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   extends: [
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript"
   ],
   parserOptions: {
     ecmaVersion: 2018,
@@ -24,7 +26,13 @@ module.exports = {
         ignoreRestSiblings: true
       }
     ],
-    "no-only-tests/no-only-tests": "error"
+    "no-only-tests/no-only-tests": "error",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        devDependencies: ["src/scripts/**", "**/__tests__/**"]
+      }
+    ]
   },
   overrides: [
     {

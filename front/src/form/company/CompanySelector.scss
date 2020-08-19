@@ -45,3 +45,17 @@
     cursor: text;
   }
 }
+.company-selector {
+  &__search {
+    width: 400px;
+    display: block;
+  }
+  &__phone {
+    width: 150px;
+    display: block;
+  }
+  &__email {
+    width: 300px;
+    display: block;
+  }
+}

@@ -1,4 +1,4 @@
-import { unflattenObjectFromDb } from "../form-converter";
+import { expandTransportSegmentFromDb } from "../form-converter";
 import { prisma } from "../../generated/prisma-client";
 
 export const transportSegments = parent => {
@@ -8,7 +8,7 @@ export const transportSegments = parent => {
     .then(segments =>
       segments.map(el => ({
         ...el,
-        ...unflattenObjectFromDb(el)
+        ...expandTransportSegmentFromDb(el)
       }))
     );
 };

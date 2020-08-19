@@ -8,12 +8,20 @@ import {
   Strategy as ClientPasswordStrategy,
   VerifyFunction
 } from "passport-oauth2-client-password";
-import { prisma, User } from "./generated/prisma-client";
+import {
+  prisma,
+  User,
+  AccessToken,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  User as PrismaUser
+} from "./generated/prisma-client";
 import { compare } from "bcrypt";
-import { AccessToken } from "./generated/prisma-client";
-import { sameDayMidnight, daysBetween } from "./utils";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { User as PrismaUser } from "./generated/prisma-client";
+import {
+  sameDayMidnight,
+  daysBetween,
+  legacySanitizeEmail,
+  sanitizeEmail
+} from "./utils";
 
 const { JWT_SECRET } = process.env;
 
@@ -22,36 +30,69 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface User extends PrismaUser {
-      auth?: string;
+      auth?: AuthType;
     }
   }
 }
 
-export const loginError = {
-  UNKNOWN_USER: "Aucun utilisateur trouvé avec cet email",
-  NOT_ACTIVATED:
-    "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support",
-  INVALID_PASSWORD: "Mot de passe incorrect"
-};
+export enum AuthType {
+  Session = "session",
+  JWT = "jwt",
+  Bearer = "bearer"
+}
+
+// verbose error message and related errored field
+export const getLoginError = (username: string) => ({
+  UNKNOWN_USER: {
+    message: "Aucun utilisateur trouvé avec cet email",
+    errorField: "email",
+    username: username
+  },
+  NOT_ACTIVATED: {
+    message:
+      "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support",
+    errorField: "",
+    username: username
+  },
+  INVALID_PASSWORD: {
+    message: "Mot de passe incorrect",
+    errorField: "password",
+    username: username
+  }
+});
 
 passport.use(
   new LocalStrategy(
     { usernameField: "email" },
     async (username, password, done) => {
-      const user = await prisma.user({ email: username.trim() });
+      let user = null;
+
+      if (legacySanitizeEmail(username) !== sanitizeEmail(username)) {
+        // Some users were created before email sanitization was introduced
+        // so we need to look up a potential legacy account before resotring to the new sanitization
+        // We'll be able to get rid of this code once legacy emails have been sanitized
+        user = await prisma.user({ email: legacySanitizeEmail(username) });
+      }
+
+      if (!user) {
+        user = await prisma.user({ email: sanitizeEmail(username) });
+      }
+
       if (!user) {
         return done(null, false, {
-          message: loginError.UNKNOWN_USER
+          ...getLoginError(username).UNKNOWN_USER
         });
       }
       if (!user.isActive) {
         return done(null, false, {
-          message: loginError.NOT_ACTIVATED
+          ...getLoginError(username).NOT_ACTIVATED
         });
       }
       const passwordValid = await compare(password, user.password);
       if (!passwordValid) {
-        return done(null, false, { message: loginError.INVALID_PASSWORD });
+        return done(null, false, {
+          ...getLoginError(username).INVALID_PASSWORD
+        });
       }
       return done(null, user);
     }
@@ -65,7 +106,7 @@ passport.serializeUser((user: User, done) => {
 passport.deserializeUser((id: string, done) => {
   prisma
     .user({ id })
-    .then(user => done(null, { ...user, auth: "session" }))
+    .then(user => done(null, { ...user, auth: AuthType.Session }))
     .catch(err => done(err));
 });
 
@@ -89,7 +130,7 @@ passport.use(
           if (accessToken && accessToken.isRevoked) {
             return done(null, false);
           }
-          return done(null, { ...user, auth: "jwt" }, { token });
+          return done(null, { ...user, auth: AuthType.JWT }, { token });
         } else {
           return done(null, false);
         }
@@ -147,7 +188,7 @@ passport.use(
       if (accessToken && !accessToken.isRevoked) {
         const user = accessToken.user;
         await updateAccessTokenLastUsed(accessToken);
-        return done(null, { ...user, auth: "bearer" });
+        return done(null, { ...user, auth: AuthType.Bearer });
       } else {
         return done(null, false);
       }

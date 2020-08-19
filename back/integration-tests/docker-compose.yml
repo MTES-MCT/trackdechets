@@ -49,4 +49,4 @@ services:
     image: td-pdf
     build:
       context: ../../pdf
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev

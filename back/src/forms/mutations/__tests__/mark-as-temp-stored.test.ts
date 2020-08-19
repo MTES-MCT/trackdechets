@@ -1,9 +1,8 @@
-import { getNewValidForm, getContext } from "../__mocks__/data";
+import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 import { markAsTempStored } from "../mark-as";
 import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";
-import { flattenObjectForDb } from "../../form-converter";
 import {
   TempStoredFormInput,
   WasteAcceptationStatusInput
@@ -64,15 +63,15 @@ describe("Forms -> markAsTempStored mutation", () => {
   });
 
   it("should set status to TEMP_STORED when waste is accepted by temporary storer", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "SENT";
-    form.recipient.isTempStorage = true;
+    form.recipientIsTempStorage = true;
 
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitter.company.siret } as any
+      { siret: form.emitterCompanySiret } as any
     ]);
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
 
     const ACCEPTED: WasteAcceptationStatusInput = "ACCEPTED";
     await markAsTempStored(
@@ -94,15 +93,15 @@ describe("Forms -> markAsTempStored mutation", () => {
   });
 
   it("should set status to REFUSED when waste is refused by temporary storer", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "SENT";
-    form.recipient.isTempStorage = true;
+    form.recipientIsTempStorage = true;
 
     getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitter.company.siret } as any
+      { siret: form.emitterCompanySiret } as any
     ]);
 
-    mockFormWith(flattenObjectForDb(form));
+    mockFormWith(form);
 
     const REFUSED: WasteAcceptationStatusInput = "REFUSED";
     await markAsTempStored(

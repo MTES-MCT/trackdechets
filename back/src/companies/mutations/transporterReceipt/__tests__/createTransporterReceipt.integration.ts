@@ -2,6 +2,7 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
+import { AuthType } from "../../../../auth";
 
 describe("{ mutation { createTransporterReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -13,7 +14,7 @@ describe("{ mutation { createTransporterReceipt } }", () => {
       department: "07"
     };
 
-    const user = userFactory();
+    const user = await userFactory();
 
     const mutation = `
       mutation {
@@ -25,7 +26,7 @@ describe("{ mutation { createTransporterReceipt } }", () => {
           }
           ) { receiptNumber, validityLimit, department }
         }`;
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { data } = await mutate(mutation);
 

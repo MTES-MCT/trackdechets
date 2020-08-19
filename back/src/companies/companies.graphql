@@ -21,108 +21,9 @@ type Query {
   ): [CompanySearchResult!]!
 
   """
-  Renvoie les établissements favoris de l'utilisateur. C'est à dire les
-  établissements qui font souvent partis des BSD édités
-  """
-  favorites("type de favoris" type: FavoriteType!): [CompanyFavorite!]!
-
-  """
-  USAGE INTERNE
   Renvoie la liste des éco-organismes
   """
   ecoOrganismes: [EcoOrganisme!]!
-}
-
-type Mutation {
-  """
-  USAGE INTERNE
-  Renouvelle le code de sécurité de l'établissement
-  """
-  renewSecurityCode(siret: String!): CompanyPrivate!
-
-  """
-  USAGE INTERNE
-  Édite les informations d'un établissement
-  """
-  updateCompany(
-    "SIRET de l'établissement"
-    siret: String!
-    "(Optionnel) Identifiant GEREP"
-    gerepId: String
-    "(Optionnel) Email de contact"
-    contactEmail: String
-    "(Optionnel) Numéro de téléphone de contact"
-    contactPhone: String
-    "(Optionnel) Site web"
-    website: String
-    "(Optionnel) Profil de l'établissement"
-    companyTypes: [CompanyType]
-    "(Optionnel) Nom d'usage de l'établissement"
-    givenName: String
-    "(Optionnel) Identifiant d'un récépissé transporteur"
-    transporterReceiptId: String
-    "(Optionnel) Identifiant d'un récépissé négociant"
-    traderReceiptId: String
-  ): CompanyPrivate!
-
-  """
-  USAGE INTERNE
-  Crée un récépissé transporteur
-  """
-  createTransporterReceipt(
-    input: CreateTransporterReceiptInput
-  ): TransporterReceipt
-
-  """
-  USAGE INTERNE
-  Édite les informations d'un récépissé transporteur
-  """
-  updateTransporterReceipt(
-    input: UpdateTransporterReceiptInput
-  ): TransporterReceipt
-
-  """
-  USAGE INTERNE
-  Supprime un récépissé transporteur
-  """
-  deleteTransporterReceipt(
-    input: DeleteTransporterReceiptInput
-  ): TransporterReceipt
-
-  """
-  USAGE INTERNE
-  Crée un récépissé transporteur
-  """
-  createTraderReceipt(input: CreateTraderReceiptInput): TraderReceipt
-
-  """
-  USAGE INTERNE
-  Édite les informations d'un récépissé négociant
-  """
-  updateTraderReceipt(input: UpdateTraderReceiptInput): TraderReceipt
-
-  """
-  USAGE INTERNE
-  Supprime un récépissé négociant
-  """
-  deleteTraderReceipt(input: DeleteTraderReceiptInput): TransporterReceipt
-
-  """
-  USAGE INTERNE
-  Rattache un établissement à l'utilisateur authentifié
-  """
-  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate!
-
-  """
-  USAGE INTERNE
-  Récupère une URL signé pour l'upload d'un fichier
-  """
-  createUploadLink(
-    "nom du fichier"
-    fileName: String!
-    "type de fichier"
-    fileType: String!
-  ): UploadLink!
 }
 
 "Profil entreprise"
@@ -199,12 +100,6 @@ type CompanyPrivate {
   "Libellé NAF de l'établissement"
   libelleNaf: String
 
-  "Longitude de l'établissement (info géographique)"
-  longitude: Float
-
-  "Latitude de l'établissement (info géographique)"
-  latitude: Float
-
   """
   Installation classée pour la protection de l'environnement (ICPE)
   associé à cet établissement (le cas échéant)
@@ -251,12 +146,6 @@ type CompanyPublic {
   "Libellé NAF"
   libelleNaf: String
 
-  "Longitude de l'établissement (info géographique)"
-  longitude: Float
-
-  "Latitude de l'établissement (info géographique)"
-  latitude: Float
-
   """
   Installation classée pour la protection de l'environnement (ICPE)
   associé à cet établissement
@@ -284,8 +173,14 @@ type CompanySearchResult {
   "SIRET de l'établissement"
   siret: String
 
+  "État administratif de l'établissement. A = Actif, F = Fermé"
+  etatAdministratif: String
+
   "Adresse de l'établissement"
   address: String
+
+  "Code commune de l'établissement"
+  codeCommune: String
 
   "Nom de l'établissement"
   name: String
@@ -299,52 +194,11 @@ type CompanySearchResult {
   "Libellé NAF"
   libelleNaf: String
 
-  "Longitude de l'établissement (info géographique)"
-  longitude: Float
-
-  "Latitude de l'établissement (info géographique)"
-  latitude: Float
-
   """
   Installation classée pour la protection de l'environnement (ICPE)
   associé à cet établissement
   """
   installation: Installation
-
-  """
-  Récépissé transporteur associé à cet établissement (le cas échéant)
-  """
-  transporterReceipt: TransporterReceipt
-
-  """
-  Récépissé négociant associé à cet établissement (le cas échant)
-  """
-  traderReceipt: TraderReceipt
-}
-
-"""
-Information sur établissement accessible dans la liste des favoris
-La liste des favoris est constituée à partir de l'historique des
-BSD édités
-"""
-type CompanyFavorite {
-  "Nom de l'établissement"
-  name: String
-
-  "SIRET de l'établissement"
-  siret: String
-
-  "Adresse de l'établissement"
-  address: String
-
-  "Nom du contact"
-  contact: String
-
-  "Numéro de téléphone"
-  phone: String
-
-  "Email de contact"
-  mail: String
 
   """
   Récépissé transporteur associé à cet établissement (le cas échéant)
@@ -375,15 +229,6 @@ type EcoOrganisme {
 
   "Adresse de l'éco-organisme"
   address: String!
-}
-
-"Lien d'upload"
-type UploadLink {
-  "URL signé permettant d'uploader un fichier"
-  signedUrl: String
-
-  "Clé permettant l'upload du fichier"
-  key: String
 }
 
 """
@@ -428,150 +273,6 @@ type TraderReceipt {
   Département ayant enregistré la déclaration
   """
   department: String!
-}
-
-"""
-Payload de création d'un récépissé transporteur
-"""
-input CreateTransporterReceiptInput {
-  """
-  Numéro de récépissé transporteur
-  """
-  receiptNumber: String!
-
-  """
-  Limite de validatié du récépissé
-  """
-  validityLimit: DateTime!
-
-  """
-  Département ayant enregistré la déclaration
-  """
-  department: String!
-}
-
-"""
-Payload d'édition d'un récépissé transporteur
-"""
-input UpdateTransporterReceiptInput {
-  """
-  The id of the transporter receipt to modify
-  """
-  id: ID!
-
-  """
-  Numéro de récépissé transporteur
-  """
-  receiptNumber: String
-
-  """
-  Limite de validatié du récépissé
-  """
-  validityLimit: DateTime
-
-  """
-  Département ayant enregistré la déclaration
-  """
-  department: String
-}
-
-"""
-Payload de suppression d'un récépissé transporteur
-"""
-input DeleteTransporterReceiptInput {
-  """
-  The id of the transporter receipt to delete
-  """
-  id: ID!
-}
-
-"""
-Payload de création d'un récépissé négociant
-"""
-input CreateTraderReceiptInput {
-  """
-  Numéro de récépissé négociant
-  """
-  receiptNumber: String!
-
-  """
-  Limite de validatié du récépissé
-  """
-  validityLimit: DateTime!
-
-  """
-  Département ayant enregistré la déclaration
-  """
-  department: String!
-}
-
-"""
-Payload d'édition d'un récépissé transporteur
-"""
-input UpdateTraderReceiptInput {
-  """
-  The id of the trader receipt to modify
-  """
-  id: ID!
-
-  """
-  Numéro de récépissé transporteur
-  """
-  receiptNumber: String
-
-  """
-  Limite de validatié du récépissé
-  """
-  validityLimit: DateTime
-
-  """
-  Département ayant enregistré la déclaration
-  """
-  department: String
-}
-
-"""
-Payload de suppression d'un récépissé négociant
-"""
-input DeleteTraderReceiptInput {
-  """
-  The id of the trader receipt to delete
-  """
-  id: ID!
-}
-
-"Payload permettant le rattachement d'un établissement à un utilisateur"
-input PrivateCompanyInput {
-  "SIRET de l'établissement"
-  siret: String!
-
-  "Identifiant GEREP de l'établissement"
-  gerepId: String
-
-  "Profil de l'établissement"
-  companyTypes: [CompanyType]
-
-  "Code NAF"
-  codeNaf: String
-
-  "Nom de l'établissement"
-  companyName: String
-
-  """
-  Liste de documents permettant de démontrer l'appartenance
-  de l'utilisateur à l'établissement
-  """
-  documentKeys: [String]
-
-  """
-  Récipissé transporteur (le cas échéant, pour les profils transporteur)
-  """
-  transporterReceiptId: String
-
-  """
-  Récipissé négociant (le cas échéant, pour les profils négociant)
-  """
-  traderReceiptId: String
 }
 
 "Information sur utilisateur au sein d'un établissement"

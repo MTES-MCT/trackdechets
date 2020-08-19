@@ -20,6 +20,7 @@ import {
   QueryFormArgs,
   Mutation,
   MutationSaveFormArgs,
+  FormInput,
 } from "../../generated/graphql/types";
 import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
@@ -39,7 +40,10 @@ export default withRouter(function StepList(
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_FORM,
     {
-      variables: { id: props.formId as string },
+      variables: {
+        id: props.formId!,
+        readableId: null,
+      },
       skip: !props.formId,
       fetchPolicy: "network-only",
     }
@@ -124,7 +128,7 @@ export default withRouter(function StepList(
         ))}
       </ul>
       <div className="step-content">
-        <Formik
+        <Formik<FormInput>
           innerRef={formikForm}
           initialValues={formState}
           validationSchema={formSchema}
@@ -134,11 +138,29 @@ export default withRouter(function StepList(
             return (
               <form
                 onSubmit={e => {
+                  const {
+                    temporaryStorageDetail,
+                    ecoOrganisme,
+                    ...rest
+                  } = values;
+
+                  const formInput = {
+                    ...rest,
+                    // discard temporaryStorageDetail if recipient.isTempStorage === false
+                    ...(values.recipient?.isTempStorage === true
+                      ? { temporaryStorageDetail }
+                      : { temporaryStorageDetail: null }),
+                    // discard ecoOrganisme if not selected
+                    ...(ecoOrganisme?.id
+                      ? { ecoOrganisme }
+                      : { ecoOrganisme: null }),
+                  };
+
                   e.preventDefault();
                   // As we want to be able to save draft, we skip validation on submit
                   // and don't use the classic Formik mechanism
                   saveForm({
-                    variables: { formInput: values },
+                    variables: { formInput },
                   })
                     .then(_ => props.history.push("/dashboard/"))
                     .catch(err => {

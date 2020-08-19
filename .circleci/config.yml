@@ -7,6 +7,18 @@ executors:
     working_directory: ~/project/trackdechets
 
 jobs:
+  lint:
+    description: "Run linter"
+    executor: node
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install --prefix back
+      - run:
+          name: Run linter
+          command: npm run lint --prefix back
+
   test:
     description: "Run tests"
     executor: node
@@ -102,11 +114,13 @@ jobs:
 workflows:
   build-and-deploy:
     jobs:
+      - lint
       - test
       - integration-tests
       - build-and-push:
           name: build-and-push-prod
           requires:
+            - lint
             - test
             - integration-tests
           filters:
@@ -117,6 +131,7 @@ workflows:
           extra-cfg: "-f docker-compose.sandbox.yml"
           build-args: "--build-arg build_env=sandbox"
           requires:
+            - lint
             - test
             - integration-tests
           filters:
@@ -127,6 +142,7 @@ workflows:
           extra-cfg: "-f docker-compose.val.yml"
           build-args: "--build-arg build_env=recette"
           requires:
+            - lint
             - test
             - integration-tests
           filters:

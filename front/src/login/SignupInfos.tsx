@@ -1,13 +1,19 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
+interface LocationState {
+  signupEmail: string;
+}
 
 export default function SignupInfo() {
+  let location = useLocation<LocationState>();
+  const signupEmail = location.state?.signupEmail;
   return (
     <div className="container">
       <section className="section section-white">
         <h2>On y est presque !</h2>
         <p className="lead-text">
-          Un mail de confirmation vous a été envoyé à l'adresse indiquée{" "}
+          Un mail de confirmation vous a été envoyé à l'adresse {signupEmail}
           <span role="img" aria-label="Valise">
             📨
           </span>

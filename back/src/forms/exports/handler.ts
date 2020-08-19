@@ -1,80 +1,75 @@
-import { prisma, Form } from "../../generated/prisma-client";
-import { getExport, EXPORT_COLUMNS } from "./columns";
+import { Response } from "express";
+import Excel from "exceljs";
+import { format } from "@fast-csv/format";
+import { QueryFormsRegisterArgs } from "../../generated/graphql/types";
+import { formsReader, formsTransformer } from "./streams";
+import { formsWhereInput } from "./where-inputs";
+import { formFragment } from "./fragments";
+import { getExportsFileName } from "./filename";
+import { getXlsxHeaders } from "./columns";
 
-const SEPARATOR = ";";
+/**
+ * Download handler for forms register
+ */
+export async function downloadFormsRegister(
+  res: Response,
+  args: QueryFormsRegisterArgs
+) {
+  args.exportFormat = args.exportFormat || "CSV";
+  args.exportType = args.exportType || "ALL";
 
-enum ExportType {
-  INCOMING = "INCOMING",
-  OUTGOING = "OUTGOING"
-}
-
-export async function downloadCsvExport(res, { sirets, exportType }) {
-  if (!sirets?.length || !exportType) {
-    return res.status(400).send("Paramètres invalides.");
-  }
-
-  try {
-    const csv = await getCsvExport(sirets, exportType);
-    res.setHeader("Content-disposition", "attachment; filename=export.csv");
-    res.set("Content-Type", "text/csv");
-    res.status(200).send(csv);
-  } catch (e) {
-    res.status(500).send(e.message);
-  }
-}
-
-async function getCsvExport(sirets: string[], exportType: ExportType) {
-  const data = await getExportData(sirets, exportType);
-
-  const exportContent = getExport(
-    data,
-    Object.keys(EXPORT_COLUMNS).map(key => EXPORT_COLUMNS[key])
+  const whereInput = formsWhereInput(
+    args.exportType,
+    args.sirets,
+    args.startDate,
+    args.endDate,
+    args.wasteCode
   );
 
-  return exportContent
-    .map(f =>
-      Object.keys(f)
-        .map(k => f[k])
-        .join(SEPARATOR)
-    )
-    .join("\n");
-}
+  const fragment = formFragment(args.exportType);
 
-async function getExportData(
-  sirets: string[],
-  exportType: ExportType
-): Promise<Form[]> {
-  switch (exportType) {
-    case ExportType.INCOMING:
-      return prisma.forms({
-        where: {
-          status_in: [
-            "RECEIVED",
-            "PROCESSED",
-            "AWAITING_GROUP",
-            "GROUPED",
-            "NO_TRACEABILITY"
-          ],
-          recipientCompanySiret_in: sirets
+  const reader = formsReader({ whereInput, fragment });
+
+  const filename = getExportsFileName(
+    args.exportType,
+    args.sirets,
+    args.wasteCode
+  );
+
+  switch (args.exportFormat) {
+    case "CSV": {
+      res.set("Content-disposition", `attachment; filename=${filename}.csv`);
+      res.set("Content-Type", "text/csv");
+      res.set("Transfer-Encoding", "chunked");
+      const csvStream = format({ headers: true, delimiter: ";" });
+      const transformer = formsTransformer({ useLabelAsKey: true });
+      reader.pipe(transformer).pipe(csvStream).pipe(res);
+      break;
+    }
+    case "XLSX": {
+      res.set("Content-Disposition", `attachment; filename=${filename}.xlsx`);
+      const contenType =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      res.set("Content-Type", contenType);
+      res.set("Transfer-Encoding", "chunked");
+      const workbook = new Excel.stream.xlsx.WorkbookWriter({ stream: res });
+      const worksheet = workbook.addWorksheet("registre");
+      const transformer = formsTransformer();
+      reader.pipe(transformer);
+      transformer.on("data", form => {
+        if (worksheet.columns === null) {
+          // write headers if not present
+          worksheet.columns = getXlsxHeaders(form);
         }
+        worksheet.addRow(form, "n").commit();
       });
 
-    case ExportType.OUTGOING:
-      return prisma.forms({
-        where: {
-          status_in: [
-            "SENT",
-            "RECEIVED",
-            "PROCESSED",
-            "AWAITING_GROUP",
-            "GROUPED",
-            "NO_TRACEABILITY"
-          ],
-          emitterCompanySiret_in: sirets
-        }
+      transformer.on("end", () => {
+        worksheet.commit();
+        workbook.commit();
       });
 
-    default:
-      throw new Error("Invalid export type.");
+      break;
+    }
   }
 }

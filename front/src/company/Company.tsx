@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/react-hooks/lib/useQuery";
 import gql from "graphql-tag";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { InlineError } from "../common/Error";
 import "./Company.scss";
@@ -18,8 +18,6 @@ const COMPANY_INFOS = gql`
       siret
       name
       address
-      longitude
-      latitude
       naf
       libelleNaf
       isRegistered
@@ -44,6 +42,11 @@ const COMPANY_INFOS = gql`
   }
 `;
 
+interface GeoInfo {
+  latitude: number;
+  longitude: number;
+}
+
 export default function CompanyInfo() {
   const { siret } = useParams<{ siret: string }>();
   const { data, loading, error } = useQuery<
@@ -53,6 +56,32 @@ export default function CompanyInfo() {
     variables: { siret },
     fetchPolicy: "no-cache",
   });
+
+  const [geoInfo, setGeoInfo] = useState<GeoInfo | null>(null);
+
+  // Retrives geo information from api-adresse.data.gouv.fr
+  useEffect(() => {
+    if (data?.companyInfos?.address) {
+      fetch(
+        `https://api-adresse.data.gouv.fr/search/?q=${data.companyInfos.address}`
+      )
+        .then(res => res.json())
+        .then(search => {
+          if (search.features && search.features.length >= 1) {
+            const featureCandidate = search.features[0];
+            if (featureCandidate.properties?.score > 0.75) {
+              const coordinates = featureCandidate.geometry?.coordinates;
+              if (coordinates && coordinates.length === 2) {
+                setGeoInfo({
+                  longitude: coordinates[0],
+                  latitude: coordinates[1],
+                });
+              }
+            }
+          }
+        });
+    }
+  }, [data]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <InlineError apolloError={error} />;
@@ -80,8 +109,8 @@ export default function CompanyInfo() {
 
           <div className="columns">
             <CompanyContact company={company} />
-            {company.longitude && company.latitude && (
-              <CompanyMap lng={company.longitude} lat={company.latitude} />
+            {geoInfo && (
+              <CompanyMap lng={geoInfo.longitude} lat={geoInfo.latitude} />
             )}
           </div>
 

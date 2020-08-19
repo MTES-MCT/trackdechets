@@ -1,18 +1,23 @@
-import { isAuthenticated, isCompanyAdmin } from "../common/rules";
+import {
+  isAuthenticated,
+  isAuthenticatedFromUI,
+  isCompanyAdmin
+} from "../common/rules";
 import { signupSchema } from "./rules/schema";
+import { chain } from "graphql-shield";
 
 export default {
   Query: {
     me: isAuthenticated,
-    apiKey: isAuthenticated
+    apiKey: isAuthenticatedFromUI
   },
   Mutation: {
-    changePassword: isAuthenticated,
-    editProfile: isAuthenticated,
-    inviteUserToCompany: isCompanyAdmin,
-    resendInvitation: isCompanyAdmin,
-    removeUserFromCompany: isCompanyAdmin,
-    deleteInvitation: isCompanyAdmin,
+    changePassword: isAuthenticatedFromUI,
+    editProfile: isAuthenticatedFromUI,
+    inviteUserToCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
+    resendInvitation: chain(isAuthenticatedFromUI, isCompanyAdmin),
+    removeUserFromCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
+    deleteInvitation: chain(isAuthenticatedFromUI, isCompanyAdmin),
     signup: signupSchema
   }
 };

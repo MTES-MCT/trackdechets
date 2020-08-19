@@ -1,7 +1,6 @@
 import { prisma } from "../generated/prisma-client";
-import express from "express";
+import express, { Request, Response } from "express";
 import passport from "passport";
-import { Request, Response } from "express";
 import { oauth2server } from "../oauth2";
 import ensureLoggedIn from "../common/middlewares/ensureLoggedIn";
 import { OAuth2, AuthorizationError } from "oauth2orize";

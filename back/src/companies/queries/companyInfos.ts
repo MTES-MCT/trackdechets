@@ -13,7 +13,7 @@ import { CompanyPublic } from "../../generated/graphql/types";
  */
 export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
   // retrieve cached info from SIRENE database
-  const sireneCompanyInfo = await searchCompany(siret);
+  const { __typename, ...sireneCompanyInfo } = await searchCompany(siret);
 
   // sireneCompanyInfo default to { siret: '', ...} if the siret is
   // not recognized. Handle this edge case by throwing a NOT_FOUND

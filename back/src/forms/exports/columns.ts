@@ -1,164 +1,261 @@
-import { Form } from "../../generated/prisma-client";
+import { Column, FormFlattened } from "./types";
+import Excel from "exceljs";
 
-type ColumnDetail = {
-  key: string;
-  label: string;
-  getter: (form: Form) => string | number;
-};
-
-/**
- * Format a date as fr format
- * @param {string } datestr - a date iso-formatted
- * @returns {string} - date formatted as dd/mm/YYYY
- */
-const dateFmt = datestr => {
-  if (!datestr) {
+const identity = (v: any) => v ?? "";
+const formatDate = (d: string | null) => (d ? d.slice(0, 10) : "");
+const formatBoolean = (b: boolean | null) => {
+  if (b === null) {
     return "";
   }
-  const date = new Date(datestr);
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-
-  const fmtDay = day < 10 ? `0${day}` : `${day}`;
-  const fmtMonth = month < 10 ? `0${month}` : `${month}`;
-
-  return `${fmtDay}/${fmtMonth}/${year}`;
+  return b ? "O" : "N";
 };
 
-export const EXPORT_COLUMNS: {
-  [key: string]: ColumnDetail;
-} = {
-  number: { key: "number", label: "Numéro de BSD", getter: f => f.readableId },
-  customNumber: {
-    key: "customNumber",
-    label: "Numéro libre",
-    getter: f => f.customId
+const columns: Column[] = [
+  { field: "readableId", label: "N° de bordereau", format: identity },
+  { field: "customId", label: "Identifiant secondaire", format: identity },
+  // cadre 1
+  { field: "emitterCompanySiret", label: "Émetteur siret", format: identity },
+  { field: "emitterCompanyName", label: "Émetteur nom", format: identity },
+  {
+    field: "emitterCompanyContact",
+    label: "Émetteur contact",
+    format: identity
   },
-  wasteCode: {
-    key: "wasteCode",
-    label: "Code déchet",
-    getter: f => f.wasteDetailsCode
+  {
+    field: "emitterCompanyAddress",
+    label: "Émetteur adresse",
+    format: identity
   },
-  wasteName: {
-    key: "wasteName",
-    label: "Désignation usuelle du déchet",
-    getter: f => f.wasteDetailsName
+  { field: "emitterWorkSiteName", label: "Chantier nom", format: identity },
+  {
+    field: "emitterWorkSiteAddress",
+    label: "Chantier adresse",
+    format: identity
   },
-  wasteConsistence: {
-    key: "wasteConsistence",
-    label: "Consistance du déchet",
-    getter: f => f.wasteDetailsConsistence
+  {
+    field: "ecoOrganismeName",
+    label: "Éco-organisme nom",
+    format: identity
   },
-  capNumber: {
-    key: "capNumber",
-    label: "Numéro de CAP",
-    getter: f => f.recipientCap
+  // cadre 2 ou cadre 14 (entreposage provisoire ou reconditionnement)
+  {
+    field: "recipientCompanySiret",
+    label: "Destination siret",
+    format: identity
   },
-  estimatedQuantity: {
-    key: "estimatedQuantity",
-    label: "Quantité estimée (en tonnes)",
-    getter: f => f.wasteDetailsQuantity
+  { field: "recipientCompanyName", label: "Destination nom", format: identity },
+  {
+    field: "recipientCompanyAddress",
+    label: "Destination adresse",
+    format: identity
   },
-  quantity: {
-    key: "quantity",
-    label: "Quantité réelle (en tonnes)",
-    getter: f => f.quantityReceived
+  {
+    field: "recipientCompanyMail",
+    label: "Destination email",
+    format: identity
   },
-  numberOfPackages: {
-    key: "numberOfPackages",
-    label: "Nombre de colis",
-    getter: f => f.wasteDetailsNumberOfPackages
+  {
+    field: "recipientProcessingOperation",
+    label: "Opération prévue D/R",
+    format: identity
   },
-  onuCode: {
-    key: "onuCode",
-    label: "Code ADR",
-    getter: f => f.wasteDetailsOnuCode
+  // cadre 2 (entreposage provisoire ou reconditionnement)
+  {
+    field: "temporaryStorageCompanySiret",
+    label: "Entreposage ou reconditonnement siret",
+    format: identity
   },
-  date: {
-    key: "date",
-    label: "Date d'expédition du déchet",
-    getter: f => dateFmt(f.processedAt)
+  {
+    field: "temporaryStorageCompanyName",
+    label: "Entreposage ou reconditonnement nom",
+    format: identity
   },
-  emitterCompanyName: {
-    key: "emitterCompanyName",
-    label: "Nom de l'émetteur",
-    getter: f => f.emitterCompanyName
+  {
+    field: "temporaryStorageCompanyContact",
+    label: "Entreposage ou reconditonnement contact",
+    format: identity
   },
-  emitterCompanyAddress: {
-    key: "emitterCompanyAddress",
-    label: "Adresse de l'émetteur",
-    getter: f => f.emitterCompanyAddress
+  {
+    field: "temporaryStorageCompanyPhone",
+    label: "Entreposage ou reconditonnement N°tél",
+    format: identity
   },
-  emitterCompanySiret: {
-    key: "emitterCompanySiret",
-    label: "Siret de l'émetteur",
-    getter: f => f.emitterCompanySiret
+  {
+    field: "temporaryStorageCompanyAddress",
+    label: "Entreposage ou reconditonnement adresse",
+    format: identity
   },
-  recipientCompanyName: {
-    key: "recipientCompanyName",
-    label: "Nom du destinataire",
-    getter: f => f.recipientCompanyName
+  {
+    field: "temporaryStorageCompanyMail",
+    label: "Entreposage ou reconditonnement email",
+    format: identity
   },
-  recipientCompanyAddress: {
-    key: "recipientCompanyAddress",
-    label: "Adresse du destinataire",
-    getter: f => f.recipientCompanyAddress
+  // cadre 3 à 6
+  {
+    field: "wasteDetailsCode",
+    label: "Déchet rubrique",
+    format: identity
   },
-  recipientCompanySiret: {
-    key: "recipientCompanySiret",
-    label: "Siret du destinataire",
-    getter: f => f.recipientCompanySiret
+  {
+    field: "wasteDetailsQuantity",
+    label: "Déchet quantité estimée (en tonnes)",
+    format: identity
   },
-  transporterCompanyName: {
-    key: "transporterCompanyName",
-    label: "Nom du transporteur",
-    getter: f => f.transporterCompanyName
+  // cadre 7
+  { field: "traderCompanySiret", label: "Négociant siret", format: identity },
+  { field: "traderCompanyName", label: "Négociant nom", format: identity },
+
+  { field: "traderReceipt", label: "Négociant récépissé N°", format: identity },
+  {
+    field: "traderValidityLimit",
+    label: "Négociant récépissé validité",
+    format: formatDate
   },
-  transporterCompanySiret: {
-    key: "transporterCompanySiret",
-    label: "Siret du transporteur",
-    getter: f => f.transporterCompanySiret
+  {
+    field: "traderCompanyContact",
+    label: "Négociant contact",
+    format: identity
   },
-  transporterCompanyAddress: {
-    key: "transporterCompanyAddress",
-    label: "Adresse du transporteur",
-    getter: f => f.transporterCompanyAddress
+  {
+    field: "traderCompanyAddress",
+    label: "Négociant adresse",
+    format: identity
   },
-  transporterReceipt: {
-    key: "transporterReceipt",
-    label: "Numéro de récépissé transporteur",
-    getter: f => f.transporterReceipt
+  // cadre 8
+  {
+    field: "transporterCompanySiret",
+    label: "Transporteur siret",
+    format: identity
   },
-  processingCode: {
-    key: "processingCode",
-    label: "Code de traitement",
-    getter: f => f.processingOperationDone
+  {
+    field: "transporterCompanyName",
+    label: "Transporteur nom",
+    format: identity
   },
-  processedAt: {
-    key: "processedAt",
-    label: "Date du traitement",
-    getter: f => dateFmt(f.processedAt)
+  {
+    field: "transporterCompanyAddress",
+    label: "Transporteur adresse",
+    format: identity
   },
-  processedBy: {
-    key: "processedBy",
-    label: "Nom de l'opérateur de traitement",
-    getter: f => f.processedBy
+  {
+    field: "transporterIsExemptedOfReceipt",
+    label: "Transporteur exemption de récépissé",
+    format: formatBoolean
+  },
+  {
+    field: "transporterReceipt",
+    label: "Transporteur récépissé N°",
+    format: identity
+  },
+  {
+    field: "transporterValidityLimit",
+    label: "Transporteur récépissé validité",
+    format: formatDate
+  },
+  {
+    field: "transporterNumberPlate",
+    label: "Transporteur immatriculation",
+    format: identity
+  },
+  {
+    field: "sentAt",
+    label: "Date de prise en charge",
+    format: formatDate
+  },
+  // cadre 10
+  { field: "receivedAt", label: "Date de présentation", format: formatDate },
+  { field: "isAccepted", label: "Lot accepté", format: identity },
+  {
+    field: "quantityReceived",
+    label: "Déchet quantité réelle (en tonnes)",
+    format: identity
+  },
+  // cadre 11
+  {
+    field: "processingOperationDone",
+    label: "Opération réalisée D/R",
+    format: identity
+  },
+  {
+    field: "noTraceability",
+    label: "Perte de traçabilité",
+    format: formatBoolean
+  },
+  // cadre 18 (entreposage provisoire)
+  {
+    field: "temporaryStorageTransporterCompanySiret",
+    label: "Transporteur après entreposage ou reconditionnement siret",
+    format: identity
+  },
+  {
+    field: "temporaryStorageTransporterCompanyName",
+    label: "Transporteur après entreposage ou reconditionnement nom",
+    format: identity
+  },
+  {
+    field: "temporaryStorageTransporterCompanyAddress",
+    label: "Transporteur après entreposage ou reconditionnement adresse",
+    format: identity
+  },
+  {
+    field: "temporaryStorageTransporterIsExemptedOfReceipt",
+    label:
+      "Transporteur après entreposage ou reconditionnement exemption de récépissé",
+    format: formatBoolean
+  },
+  {
+    field: "temporaryStorageTransporterReceipt",
+    label: "Transporteur après entreposage ou reconditionnement récépissé",
+    format: identity
+  },
+  {
+    field: "temporaryStorageTransporterValidityLimit",
+    label:
+      "Transporteur après entreposage ou reconditionnement récépissé validité",
+    format: formatDate
+  },
+  {
+    field: "temporaryStorageTransporterNumberPlate",
+    label:
+      "Transporteur après entreposage ou reconditionnement plaque d'immatriculation",
+    format: identity
   }
-};
+];
 
-export function getExport(forms: Form[], columns: ColumnDetail[]) {
-  const headers = columns.reduce((prev, cur) => {
-    prev[cur.key] = cur.label;
-    return prev;
+/**
+ * Format row values and optionally use label as key
+ */
+export function formatRow(
+  form: FormFlattened,
+  useLabelAsKey = false
+): { [key: string]: string } {
+  return columns.reduce((acc, column) => {
+    if (column.field in form) {
+      const key = useLabelAsKey ? column.label : column.field;
+      return {
+        ...acc,
+        [key]: column.format(form[column.field])
+      };
+    }
+    return acc;
   }, {});
+}
 
-  const values = forms.map(form =>
-    columns.reduce((prev, cur) => {
-      prev[cur.key] = cur.getter(form);
-      return prev;
-    }, {})
-  );
-
-  return [headers, ...values];
+/**
+ * GET XLSX headers based of the first row
+ */
+export function getXlsxHeaders(form: FormFlattened): Partial<Excel.Column>[] {
+  return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
+    if (column.field in form) {
+      return [
+        ...acc,
+        {
+          header: column.label,
+          key: column.field,
+          width: 20
+        }
+      ];
+    }
+    return acc;
+  }, []);
 }

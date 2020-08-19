@@ -17,9 +17,7 @@ const company = {
   codeCommune: "13201",
   name: "CODE EN STOCK",
   naf: "62.01Z",
-  libelleNaf: "Programmation informatique",
-  longitude: 5.387141,
-  latitude: 43.300746
+  libelleNaf: "Programmation informatique"
 };
 
 describe("verifyPrestataire", () => {

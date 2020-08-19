@@ -32,7 +32,7 @@ export const UPDATE_PLATE = gql`
 type Props = {
   form: FormModel;
   fieldName: string;
-  title: string;
+  verboseFieldName: string;
 
   refetchQuery: any;
 };
@@ -40,7 +40,7 @@ type Props = {
 export default function TransporterInfoEdit({
   form,
   fieldName,
-  title,
+  verboseFieldName,
 
   refetchQuery,
 }: Props) {
@@ -74,7 +74,7 @@ export default function TransporterInfoEdit({
       <button
         className="link icon"
         onClick={() => setIsOpen(true)}
-        title={title}
+        title={`Modifier ${verboseFieldName}`}
       >
         <FaEdit />
       </button>
@@ -87,9 +87,11 @@ export default function TransporterInfoEdit({
           }}
         >
           <div className="modal">
-            <h2>{title}</h2>
+            <h2>Modifier</h2>
             <form onSubmit={formik.handleSubmit}>
-              <label htmlFor={`id_${fieldName}`}>Nouvelle valeur</label>
+              <label htmlFor={`id_${fieldName}`}>
+                {capitalize(verboseFieldName)}
+              </label>
               <input
                 id={`id_${fieldName}`}
                 name={fieldName}
@@ -99,16 +101,16 @@ export default function TransporterInfoEdit({
               />
               {error && <NotificationError apolloError={error} />}
 
-              <div className="buttons">
+              <div className="form__actions">
                 <button
-                  className="button warning"
+                  className="button-outline primary"
                   type="button"
                   onClick={() => setIsOpen(false)}
                 >
                   Annuler
                 </button>
-                <button className="button" type="submit">
-                  Valider
+                <button className="button no-margin" type="submit">
+                  Modifier
                 </button>
               </div>
             </form>

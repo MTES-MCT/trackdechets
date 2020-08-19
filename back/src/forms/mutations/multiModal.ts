@@ -1,14 +1,17 @@
 import { GraphQLContext } from "../../types";
-import { prisma } from "../../generated/prisma-client";
-import { TransportSegment } from "../../generated/prisma-client";
-import { getCurrentUserSirets } from "../rules/permissions";
-import { unflattenObjectFromDb } from "../form-converter";
 import {
+  prisma,
+  TransportSegment as PrismaTransportSegment
+} from "../../generated/prisma-client";
+import {
+  TransportSegment,
   MutationPrepareSegmentArgs,
   MutationEditSegmentArgs,
   MutationMarkSegmentAsReadyToTakeOverArgs,
   MutationTakeOverSegmentArgs
 } from "../../generated/graphql/types";
+import { getCurrentUserSirets } from "../rules/permissions";
+import { expandTransportSegmentFromDb } from "../form-converter";
 import { segmentSchema, takeOverInfoSchema } from "../../forms/rules/schema";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 
@@ -48,17 +51,17 @@ fragment FormWithSegments on Form {
   wasteDetailsQuantity
   emitterCompanyName
   recipientCompanyName
-  transporterCompanySiret 
-  transporterCompanyName 
-  transporterCompanyAddress 
-  transporterCompanyContact 
-  transporterCompanyPhone 
-  transporterCompanyMail 
-  transporterIsExemptedOfReceipt 
-  transporterReceipt 
-  transporterDepartment 
-  transporterValidityLimit 
-  transporterNumberPlate 
+  transporterCompanySiret
+  transporterCompanyName
+  transporterCompanyAddress
+  transporterCompanyContact
+  transporterCompanyPhone
+  transporterCompanyMail
+  transporterIsExemptedOfReceipt
+  transporterReceipt
+  transporterDepartment
+  transporterValidityLimit
+  transporterNumberPlate
   transporterCustomInfo
   transportSegments  {
     mode
@@ -66,7 +69,7 @@ fragment FormWithSegments on Form {
   owner {
     id
   }
-  
+
   nextTransporterSiret
   currentTransporterSiret
 }
@@ -86,7 +89,7 @@ function flattenSegmentForDb(
   input,
   previousKeys = [],
   dbObject = {}
-): Partial<TransportSegment> {
+): Partial<PrismaTransportSegment> {
   Object.keys(input).forEach(key => {
     if (
       input[key] &&
@@ -196,7 +199,7 @@ export async function prepareSegment(
     }
   });
 
-  return unflattenObjectFromDb(segment);
+  return expandTransportSegmentFromDb(segment);
 }
 
 type SegmentAndForm = {
@@ -223,26 +226,26 @@ type SegmentAndForm = {
 
 const segmentFragment = `
 fragment SegmentWithForm on Form {
-  transporterCompanySiret 
-  transporterCompanyName 
-  transporterCompanyAddress 
-  transporterCompanyContact 
-  transporterCompanyPhone 
-  transporterCompanyMail 
-  transporterIsExemptedOfReceipt 
-  transporterReceipt 
-  transporterDepartment 
-  transporterValidityLimit 
-  transporterNumberPlate 
-  mode 
-  readyToTakeOver 
-  takenOverAt 
-  takenOverBy 
-  
+  transporterCompanySiret
+  transporterCompanyName
+  transporterCompanyAddress
+  transporterCompanyContact
+  transporterCompanyPhone
+  transporterCompanyMail
+  transporterIsExemptedOfReceipt
+  transporterReceipt
+  transporterDepartment
+  transporterValidityLimit
+  transporterNumberPlate
+  mode
+  readyToTakeOver
+  takenOverAt
+  takenOverBy
+
   form {
     id
   }
-   
+
 }
 `;
 
@@ -277,7 +280,7 @@ export async function markSegmentAsReadyToTakeOver(
     data: { readyToTakeOver: true }
   });
 
-  return unflattenObjectFromDb(updatedSegment);
+  return expandTransportSegmentFromDb(updatedSegment);
 }
 
 // when a waste is taken over
@@ -348,16 +351,16 @@ export async function takeOverSegment(
     }
   });
 
-  return unflattenObjectFromDb(updatedSegment);
+  return expandTransportSegmentFromDb(updatedSegment);
 }
 
 /**
- * 
+ *
  * Edit an existing segment
- * Can be performed by form owner when in DRAFT state, everything is editable, 
+ * Can be performed by form owner when in DRAFT state, everything is editable,
  * By current transporter if segment is not readyToTakeOver yet, everything is editable
  * By next transporter if segment is readyToTakeOver and not taken over, siret is not editable
-  
+
  */
 export async function editSegment(
   { id, siret: userSiret, nextSegmentInfo }: MutationEditSegmentArgs,
@@ -445,5 +448,5 @@ export async function editSegment(
       nextTransporterSiret: nextSegmentPayload.transporterCompanySiret
     }
   });
-  return unflattenObjectFromDb(updatedSegment);
+  return expandTransportSegmentFromDb(updatedSegment);
 }

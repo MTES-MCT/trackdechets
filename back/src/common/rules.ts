@@ -1,23 +1,42 @@
-import { rule, and } from "graphql-shield";
-
+import { rule, chain } from "graphql-shield";
+import { ForbiddenError } from "apollo-server-express";
 import { Prisma } from "../generated/prisma-client";
-import { AuthenticationError, ForbiddenError } from "apollo-server-express";
-
-/**************************
- * Common permissions rules
- **************************/
+import {
+  NotLoggedIn,
+  MissingSirets,
+  MissingSiret,
+  NotCompaniesAdmin,
+  NotCompanyAdmin,
+  NotCompanyMember
+} from "./errors";
+import { GraphQLContext } from "../types";
+import { AuthType } from "../auth";
 
 export const isAuthenticated = rule({ cache: "contextual" })(
   async (_1, _2, ctx) => {
     const user = ctx.user;
-    return !!user || new AuthenticationError(`Vous n'êtes pas connecté.`);
+    return !!user || new NotLoggedIn();
   }
 );
 
-export const isCompanyAdmin = and(
+export const isAuthenticatedFromUI = chain(
   isAuthenticated,
-  rule()(async (_, { siret }, ctx) => {
-    ensureRuleParametersArePresent(siret);
+  rule({ cache: "contextual" })(async (_1, _2, ctx: GraphQLContext) => {
+    return (
+      ctx.user?.auth === AuthType.Session ||
+      new ForbiddenError(
+        "Cette opération n'est accessible que depuis l'interface graphique Trackdéchets"
+      )
+    );
+  })
+);
+
+export const isCompanyAdmin = chain(
+  isAuthenticated,
+  rule()(async (_, { siret }: { siret?: string }, ctx) => {
+    if (siret == null) {
+      return new MissingSiret();
+    }
 
     const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
@@ -26,19 +45,16 @@ export const isCompanyAdmin = and(
       ctx.prisma
     );
 
-    return (
-      isAuthorized ||
-      new ForbiddenError(
-        `Vous n'êtes pas administrateur de l'entreprise "${siret}".`
-      )
-    );
+    return isAuthorized || new NotCompanyAdmin(siret);
   })
 );
 
-export const isCompanyMember = and(
+export const isCompanyMember = chain(
   isAuthenticated,
-  rule()(async (_, { siret }, ctx) => {
-    ensureRuleParametersArePresent(siret);
+  rule()(async (_, { siret }: { siret?: string }, ctx) => {
+    if (siret == null) {
+      return new MissingSiret();
+    }
 
     const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
@@ -47,19 +63,16 @@ export const isCompanyMember = and(
       ctx.prisma
     );
 
-    return (
-      isAuthorized ||
-      new ForbiddenError(
-        `Vous ne faites pas partie de l'entreprise "${siret}".`
-      )
-    );
+    return isAuthorized || new NotCompanyMember(siret);
   })
 );
 
-export const isCompaniesUser = and(
+export const isCompaniesUser = chain(
   isAuthenticated,
-  rule()(async (_, { sirets }, ctx) => {
-    ensureRuleParametersArePresent(sirets);
+  rule()(async (_, { sirets }: { sirets?: string[] }, ctx) => {
+    if (sirets == null) {
+      return new MissingSirets();
+    }
 
     const isAuthorized = await isUserInCompaniesWithRoles(
       ctx.user.id,
@@ -68,24 +81,9 @@ export const isCompaniesUser = and(
       ctx.prisma
     );
 
-    return (
-      isAuthorized ||
-      new ForbiddenError(
-        `Vous ne faites pas partie d'au moins une des entreprises dont les SIRETS sont "${sirets.join(
-          ", "
-        )}".`
-      )
-    );
+    return isAuthorized || new NotCompaniesAdmin(sirets);
   })
 );
-
-export function ensureRuleParametersArePresent(...params: any[]) {
-  for (const param of params) {
-    if (!param) {
-      throw new Error(`⚠ A required rule parameter is missing!`);
-    }
-  }
-}
 
 /**
  * Checks if `userId` is in the companies with `siret` as a ons of the `expectedRoles`

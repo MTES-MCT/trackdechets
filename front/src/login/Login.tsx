@@ -9,22 +9,43 @@ import {
 import styles from "./Login.module.scss";
 import { localAuthService } from "./auth.service";
 
+const fieldErrorsProps = (fieldName, errorField) => {
+  if (errorField === fieldName) {
+    return {
+      autoFocus: true,
+      style: { border: "1px solid red" },
+    };
+  }
+  return {};
+};
 export default withRouter(function Login(
-  routeProps: RouteComponentProps<{}, {}, { error?: string; returnTo?: string }>
+  routeProps: RouteComponentProps<
+    {},
+    {},
+    {
+      error?: string;
+      errorField?: string;
+      returnTo?: string;
+      username?: string;
+    }
+  >
 ) {
   const { REACT_APP_API_ENDPOINT } = process.env;
 
   const queries = queryString.parse(routeProps.location.search);
 
   if (queries.error || queries.returnTo) {
+    const { error, errorField, returnTo, username } = queries;
     const state = {
-      ...(queries.error ? { error: queries.error } : {}),
-      ...(queries.returnTo ? { returnTo: queries.returnTo } : {}),
+      ...(queries.error ? { error, errorField, username } : {}),
+      ...(!!returnTo ? { returnTo } : {}),
     };
+
     return <Redirect to={{ pathname: "/login", state }} />;
   }
 
-  const { returnTo, error } = routeProps.location.state || {};
+  const { returnTo, error, errorField, username } =
+    routeProps.location.state || {};
 
   return (
     <section className="section section-white">
@@ -38,31 +59,47 @@ export default withRouter(function Login(
           <div className="form__group">
             <label>
               Email
-              <input type="email" name="email" />
+              <input
+                type="email"
+                name="email"
+                defaultValue={username}
+                {...fieldErrorsProps("email", errorField)}
+              />
             </label>
+            {error && errorField === "email" && (
+              <div className={styles["form-error-message"]}>{error}</div>
+            )}
           </div>
 
           <div className="form__group">
             <label>
               Mot de passe
-              <input type="password" name="password" />
+              <input
+                type="password"
+                name="password"
+                {...fieldErrorsProps("password", errorField)}
+              />
             </label>
+            {error && errorField === "password" && (
+              <div className={styles["form-error-message"]}>{error}</div>
+            )}
           </div>
-
           {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-
-          {error && <div className={styles["form-error-message"]}>{error}</div>}
-
-          <button
-            className="button"
-            type="submit"
-            onClick={() => {
-              localAuthService.locallySignOut();
-              document.forms["login"].submit();
-            }}
-          >
-            Se connecter
-          </button>
+          {error && !errorField && (
+            <div className={styles["form-error-message"]}>{error}</div>
+          )}
+          <div className="form__actions">
+            <button
+              className="button"
+              type="submit"
+              onClick={() => {
+                localAuthService.locallySignOut();
+                document.forms["login"].submit();
+              }}
+            >
+              Se connecter
+            </button>
+          </div>
           <p>
             Vous n'avez pas encore de compte ?{" "}
             <Link to="/signup">Inscrivez vous maintenant</Link>

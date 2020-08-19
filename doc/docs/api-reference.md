@@ -17,16 +17,6 @@ sidebar_label: Référence de l'API
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>apiKey</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-USAGE INTERNE > Mon Compte > Générer un token
-Renvoie un token permettant de s'authentifier à l'API Trackdéchets
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>appendixForms</strong></td>
 <td valign="top">[<a href="#form">Form</a>!]!</td>
 <td>
@@ -78,36 +68,16 @@ SIRET de l'établissement
 <td valign="top">[<a href="#ecoorganisme">EcoOrganisme</a>!]!</td>
 <td>
 
-USAGE INTERNE
 Renvoie la liste des éco-organismes
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>favorites</strong></td>
-<td valign="top">[<a href="#companyfavorite">CompanyFavorite</a>!]!</td>
-<td>
-
-Renvoie les établissements favoris de l'utilisateur. C'est à dire les
-établissements qui font souvent partis des BSD édités
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">type</td>
-<td valign="top"><a href="#favoritetype">FavoriteType</a>!</td>
-<td>
-
-type de favoris
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>form</strong></td>
-<td valign="top"><a href="#form">Form</a>!</td>
+<td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Renvoie un BSD, sélectionné par ID
+Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)
 
 </td>
 </tr>
@@ -117,6 +87,15 @@ Renvoie un BSD, sélectionné par ID
 <td>
 
 Identifiant opaque du BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">readableId</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Identifiant lisible du BSD
 
 </td>
 </tr>
@@ -221,18 +200,6 @@ Défaut à vide.
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">type</td>
-<td valign="top"><a href="#formtype">FormType</a></td>
-<td>
-
-DEPRECATED
-(Optionnel) Type de BSD renvoyés
-ACTOR = BSD's dont on est producteur ou destinataire
-TRANSPORTER = BSD's dont on est transporteur
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>formsLifeCycle</strong></td>
 <td valign="top"><a href="#formslifecycledata">formsLifeCycleData</a>!</td>
 <td>
@@ -310,10 +277,10 @@ Il est valable 10 secondes
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">sirets</td>
-<td valign="top">[<a href="#string">String</a>]</td>
+<td valign="top">[<a href="#string">String</a>!]!</td>
 <td>
 
-Liste de SIRET d'établissements dont je suis membre
+Liste de SIRET pour lesquelles exporter le registre
 
 </td>
 </tr>
@@ -322,7 +289,48 @@ Liste de SIRET d'établissements dont je suis membre
 <td valign="top"><a href="#formsregisterexporttype">FormsRegisterExportType</a></td>
 <td>
 
-Type d'export
+(Optionnel) Modèle de registre (exhaustif, entrants, sortants, transport, négociants)
+Défaut: ALL
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">startDate</td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+(Optionnel) Filtre les données par une date de début
+Défaut: aucune valeur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">endDate</td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+(Optionnel) Filtre les données par une date de fin
+Défaut: aucune valeur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">wasteCode</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Filtre les données par code déchet
+Défaut: Tous les codes déchets
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">exportFormat</td>
+<td valign="top"><a href="#formsregisterexportformat">FormsRegisterExportFormat</a></td>
+<td>
+
+(Optionnel) Format de l'export
+Défaut: csv
 
 </td>
 </tr>
@@ -388,95 +396,20 @@ Renvoie des statistiques sur le volume de déchets entrant et sortant
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>changePassword</strong></td>
-<td valign="top"><a href="#user">User</a>!</td>
+<td colspan="2" valign="top"><strong>createForm</strong></td>
+<td valign="top"><a href="#form">Form</a>!</td>
 <td>
 
-USAGE INTERNE
-Modifie le mot de passe d'un utilisateur
+Crée un nouveau bordereau
 
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">oldPassword</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">newPassword</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>createCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
+<td colspan="2" align="right" valign="top">createFormInput</td>
+<td valign="top"><a href="#createforminput">CreateFormInput</a>!</td>
 <td>
 
-USAGE INTERNE
-Rattache un établissement à l'utilisateur authentifié
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">companyInput</td>
-<td valign="top"><a href="#privatecompanyinput">PrivateCompanyInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>createTraderReceipt</strong></td>
-<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
-<td>
-
-USAGE INTERNE
-Crée un récépissé transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#createtraderreceiptinput">CreateTraderReceiptInput</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>createTransporterReceipt</strong></td>
-<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
-<td>
-
-USAGE INTERNE
-Crée un récépissé transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#createtransporterreceiptinput">CreateTransporterReceiptInput</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>createUploadLink</strong></td>
-<td valign="top"><a href="#uploadlink">UploadLink</a>!</td>
-<td>
-
-USAGE INTERNE
-Récupère une URL signé pour l'upload d'un fichier
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">fileName</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-nom du fichier
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">fileType</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-type de fichier
+Payload de création d'un bordereau
 
 </td>
 </tr>
@@ -499,56 +432,6 @@ ID d'un BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>deleteInvitation</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
-<td>
-
-USAGE INTERNE
-Supprime une invitation à un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>deleteTraderReceipt</strong></td>
-<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
-<td>
-
-USAGE INTERNE
-Supprime un récépissé négociant
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#deletetraderreceiptinput">DeleteTraderReceiptInput</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>deleteTransporterReceipt</strong></td>
-<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
-<td>
-
-USAGE INTERNE
-Supprime un récépissé transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#deletetransporterreceiptinput">DeleteTransporterReceiptInput</a></td>
-<td></td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>duplicateForm</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -565,31 +448,6 @@ Duplique un BSD
 ID d'un BSD
 
 </td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>editProfile</strong></td>
-<td valign="top"><a href="#user">User</a>!</td>
-<td>
-
-USAGE INTERNE
-Met à jour les informations de l'utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">name</td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">phone</td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>editSegment</strong></td>
@@ -613,56 +471,6 @@ Met à jour les informations de l'utilisateur
 <tr>
 <td colspan="2" align="right" valign="top">nextSegmentInfo</td>
 <td valign="top"><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>inviteUserToCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
-<td>
-
-USAGE INTERNE
-Invite un nouvel utilisateur à un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">role</td>
-<td valign="top"><a href="#userrole">UserRole</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>joinWithInvite</strong></td>
-<td valign="top"><a href="#user">User</a>!</td>
-<td>
-
-USAGE INTERNE
-Active le compte d'un utilisateur invité
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">inviteHash</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">name</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">password</td>
-<td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -762,12 +570,18 @@ Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou re
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>markAsResent</strong></td>
+<td colspan="2" valign="top"><strong>markAsResent</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
 Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -850,12 +664,18 @@ ID d'un BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>markAsSent</strong></td>
+<td colspan="2" valign="top"><strong>markAsSent</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
 Valide l'envoi d'un BSD
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -934,82 +754,18 @@ Prépare un nouveau segment de transport multimodal
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>removeUserFromCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
-<td>
-
-USAGE INTERNE
-Supprime les droits d'un utilisateurs sur un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">userId</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>renewSecurityCode</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
-<td>
-
-USAGE INTERNE
-Renouvelle le code de sécurité de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>resendInvitation</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a>!</td>
-<td>
-
-USAGE INTERNE
-Renvoie l'email d'invitation à un établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>resetPassword</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a>!</td>
-<td>
-
-USAGE INTERNE
-Envoie un email pour la réinitialisation du mot de passe
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">email</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>saveForm</strong></td>
+<td colspan="2" valign="top"><strong>saveForm</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
+DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser createForm / updateForm selon le besoin
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -1026,7 +782,14 @@ Payload du BSD
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Valide la prise en charge par le transporteur, et peut valider l'envoi
+Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
+ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
+Cette mutation doit être appelée avec le token du collecteur-transporteur.
+L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
+disponible sur le tableau de bord Trackdéchets
+Mon Compte > Établissements > Sécurité.
+D'un point de vue pratique, cela implique qu'un responsable de l'établissement
+émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
 
 </td>
 </tr>
@@ -1044,24 +807,9 @@ ID d'un BSD
 <td valign="top"><a href="#transportersignatureforminput">TransporterSignatureFormInput</a>!</td>
 <td>
 
-Informations liées à la signature transporteur
+Informations liées aux signatures transporteur et émetteur (case 8 et 9)
 
 </td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signup</strong></td>
-<td valign="top"><a href="#user">User</a>!</td>
-<td>
-
-USAGE INTERNE
-Permet de créer un nouvel utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">userInfos</td>
-<td valign="top"><a href="#signupinput">SignupInput</a>!</td>
-<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>takeOverSegment</strong></td>
@@ -1083,110 +831,22 @@ Marque un segment comme pris en charge par le nouveau transporteur
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>updateCompany</strong></td>
-<td valign="top"><a href="#companyprivate">CompanyPrivate</a>!</td>
+<td colspan="2" valign="top"><strong>updateForm</strong></td>
+<td valign="top"><a href="#form">Form</a>!</td>
 <td>
 
-USAGE INTERNE
-Édite les informations d'un établissement
+Met à jour un bordereau existant
 
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td colspan="2" align="right" valign="top">updateFormInput</td>
+<td valign="top"><a href="#updateforminput">UpdateFormInput</a>!</td>
 <td>
 
-SIRET de l'établissement
+Payload de mise à jour d'un bordereau
 
 </td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">gerepId</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-(Optionnel) Identifiant GEREP
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">contactEmail</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-(Optionnel) Email de contact
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">contactPhone</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-(Optionnel) Numéro de téléphone de contact
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">website</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-(Optionnel) Site web
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">companyTypes</td>
-<td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td>
-
-(Optionnel) Profil de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">givenName</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-(Optionnel) Nom d'usage de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">transporterReceiptId</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-(Optionnel) Identifiant d'un récépissé transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">traderReceiptId</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-(Optionnel) Identifiant d'un récépissé négociant
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>updateTraderReceipt</strong></td>
-<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
-<td>
-
-USAGE INTERNE
-Édite les informations d'un récépissé négociant
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#updatetraderreceiptinput">UpdateTraderReceiptInput</a></td>
-<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>updateTransporterFields</strong></td>
@@ -1224,21 +884,6 @@ Champ libre, utilisable par exemple pour noter les tournées des transporteurs
 
 </td>
 </tr>
-<tr>
-<td colspan="2" valign="top"><strong>updateTransporterReceipt</strong></td>
-<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
-<td>
-
-USAGE INTERNE
-Édite les informations d'un récépissé transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#updatetransporterreceiptinput">UpdateTransporterReceiptInput</a></td>
-<td></td>
-</tr>
 </tbody>
 </table>
 
@@ -1275,97 +920,6 @@ header d'autorisation `Authorization: Bearer ******`
 <td>
 
 Utilisateur lié au token
-
-</td>
-</tr>
-</tbody>
-</table>
-
-### CompanyFavorite
-
-Information sur établissement accessible dans la liste des favoris
-La liste des favoris est constituée à partir de l'historique des
-BSD édités
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Nom de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-SIRET de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>address</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Adresse de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>contact</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Nom du contact
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de téléphone
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>mail</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Email de contact
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
-<td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
-<td>
-
-Récépissé transporteur associé à cet établissement (le cas échéant)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>traderReceipt</strong></td>
-<td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
-<td>
-
-Récépissé négociant associé à cet établissement (le cas échant)
 
 </td>
 </tr>
@@ -1603,24 +1157,6 @@ Libellé NAF de l'établissement
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>longitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Longitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>latitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Latitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>installation</strong></td>
 <td valign="top"><a href="#installation">Installation</a></td>
 <td>
@@ -1747,24 +1283,6 @@ Libellé NAF
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>longitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Longitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>latitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Latitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>installation</strong></td>
 <td valign="top"><a href="#installation">Installation</a></td>
 <td>
@@ -1828,11 +1346,29 @@ SIRET de l'établissement
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>etatAdministratif</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+État administratif de l'établissement. A = Actif, F = Fermé
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
 Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>codeCommune</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code commune de l'établissement
 
 </td>
 </tr>
@@ -1869,24 +1405,6 @@ Code NAF
 <td>
 
 Libellé NAF
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>longitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Longitude de l'établissement (info géographique)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>latitude</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Latitude de l'établissement (info géographique)
 
 </td>
 </tr>
@@ -2228,7 +1746,7 @@ Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/p
 <td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
-Identifiant interne du BSD
+Identifiant unique du bordereau.
 
 </td>
 </tr>
@@ -2237,7 +1755,9 @@ Identifiant interne du BSD
 <td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-Identifiant utilisé dans la case 'Bordereau n° ****'
+Identifiant lisible utilisé comme numéro sur le CERFA (case "Bordereau n°****").
+Il est possible de l'utiliser pour récupérer l'identifiant unique du bordereau via la query form,
+utilisé pour le reste des opérations.
 
 </td>
 </tr>
@@ -3210,12 +2730,18 @@ Identifiant du BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>readableId</strong></td>
+<td colspan="2" valign="top"><strong>readableId</strong> ⚠️</td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
 N° du bordereau
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Le readableId apparaît sur le CERFA mais l'id doit être utilisé comme identifiant.
+
+</blockquote>
 </td>
 </tr>
 </tbody>
@@ -3714,41 +3240,6 @@ Département ayant enregistré la déclaration
 </tbody>
 </table>
 
-### UploadLink
-
-Lien d'upload
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>signedUrl</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-URL signé permettant d'uploader un fichier
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>key</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Clé permettant l'upload du fichier
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### User
 
 Représente un utilisateur sur la plateforme Trackdéchets
@@ -4038,11 +3529,23 @@ Payload de création d'une annexe 2
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+Identifiant unique du bordereau
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>readableId</strong></td>
 <td valign="top"><a href="#id">ID</a></td>
 <td>
 
 N° de bordereau
+
+Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
+Le readableId permet de le récupérer via la query form.
 
 </td>
 </tr>
@@ -4119,52 +3622,9 @@ Numéro de téléphone de contact dans l'établissement
 </tbody>
 </table>
 
-### CreateTraderReceiptInput
+### CreateFormInput
 
-Payload de création d'un récépissé négociant
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Numéro de récépissé négociant
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td>
-
-Limite de validatié du récépissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Département ayant enregistré la déclaration
-
-</td>
-</tr>
-</tbody>
-</table>
-
-### CreateTransporterReceiptInput
-
-Payload de création d'un récépissé transporteur
+Payload de création d'un bordereau
 
 <table>
 <thead>
@@ -4176,81 +3636,78 @@ Payload de création d'un récépissé transporteur
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td colspan="2" valign="top"><strong>customId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
-Numéro de récépissé transporteur
+Identifiant personnalisé permettant de faire le lien avec un
+objet un système d'information tierce
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#emitterinput">EmitterInput</a></td>
 <td>
 
-Limite de validatié du récépissé
+Établissement émetteur/producteur du déchet (case 1)
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Département ayant enregistré la déclaration
+Établissement qui reçoit le déchet (case 2)
 
 </td>
 </tr>
-</tbody>
-</table>
-
-### DeleteTraderReceiptInput
-
-Payload de suppression d'un récépissé négociant
-
-<table>
-<thead>
 <tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
 <td>
 
-The id of the trader receipt to delete
+Transporteur du déchet (case 8)
 
 </td>
 </tr>
-</tbody>
-</table>
-
-### DeleteTransporterReceiptInput
-
-Payload de suppression d'un récépissé transporteur
-
-<table>
-<thead>
 <tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
 <td>
 
-The id of the transporter receipt to delete
+Détails du déchet (case 3)
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>trader</strong></td>
+<td valign="top"><a href="#traderinput">TraderInput</a></td>
+<td>
+
+Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
+<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
+<td>
+
+Annexe 2
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
+<td valign="top"><a href="#ecoorganismeinput">EcoOrganismeInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>temporaryStorageDetail</strong></td>
+<td valign="top"><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -4311,7 +3768,7 @@ Payload de liason d'un BSD à un eco-organisme
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td></td>
 </tr>
 </tbody>
@@ -4664,95 +4121,6 @@ Numéro de plaque d'immatriculation
 </tbody>
 </table>
 
-### PrivateCompanyInput
-
-Payload permettant le rattachement d'un établissement à un utilisateur
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-SIRET de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>gerepId</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Identifiant GEREP de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>companyTypes</strong></td>
-<td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td>
-
-Profil de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>codeNaf</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Code NAF
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>companyName</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Nom de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>documentKeys</strong></td>
-<td valign="top">[<a href="#string">String</a>]</td>
-<td>
-
-Liste de documents permettant de démontrer l'appartenance
-de l'utilisateur à l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>transporterReceiptId</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Récipissé transporteur (le cas échéant, pour les profils transporteur)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>traderReceiptId</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Récipissé négociant (le cas échéant, pour les profils négociant)
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### ProcessedFormInput
 
 Payload de traitement d'un BSD
@@ -4781,6 +4149,7 @@ Traitement réalisé (code D/R)
 <td>
 
 Description de l'opération d’élimination / valorisation (case 11)
+Elle se complète automatiquement lorsque non fournie
 
 </td>
 </tr>
@@ -5078,56 +4447,6 @@ Date de l'envoi du déchet par l'émetteur (case 9)
 <td>
 
 Nom de la personne responsable de l'envoi du déchet (case 9)
-
-</td>
-</tr>
-</tbody>
-</table>
-
-### SignupInput
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>email</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Email de l'utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>password</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Mot de passe de l'utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Nom de l'utilisateur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de téléphone de l'utilisateur
 
 </td>
 </tr>
@@ -5466,61 +4785,9 @@ Code ONU
 </tbody>
 </table>
 
-### UpdateTraderReceiptInput
+### UpdateFormInput
 
-Payload d'édition d'un récépissé transporteur
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td>
-
-The id of the trader receipt to modify
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de récépissé transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td>
-
-Limite de validatié du récépissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Département ayant enregistré la déclaration
-
-</td>
-</tr>
-</tbody>
-</table>
-
-### UpdateTransporterReceiptInput
-
-Payload d'édition d'un récépissé transporteur
+Payload de mise à jour d'un bordereau
 
 <table>
 <thead>
@@ -5536,36 +4803,83 @@ Payload d'édition d'un récépissé transporteur
 <td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
-The id of the transporter receipt to modify
+Identifiant opaque
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td colspan="2" valign="top"><strong>customId</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Numéro de récépissé transporteur
+Identifiant personnalisé permettant de faire le lien avec un
+objet un système d'information tierce
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#emitterinput">EmitterInput</a></td>
 <td>
 
-Limite de validatié du récépissé
+Établissement émetteur/producteur du déchet (case 1)
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Département ayant enregistré la déclaration
+Établissement qui reçoit le déchet (case 2)
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
+<td>
+
+Transporteur du déchet (case 8)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
+<td>
+
+Détails du déchet (case 3)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>trader</strong></td>
+<td valign="top"><a href="#traderinput">TraderInput</a></td>
+<td>
+
+Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
+<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
+<td>
+
+Annexe 2
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
+<td valign="top"><a href="#ecoorganismeinput">EcoOrganismeInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>temporaryStorageDetail</strong></td>
+<td valign="top"><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -5588,7 +4902,22 @@ Payload lié au détails du déchet (case 3, 4, 5, 6)
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Rubrique déchet au format |_|_| |_|_| |_|_| (*)
+Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
+https://aida.ineris.fr/consultation_document/10327
+
+Il doit être composé de 3 paires de deux chiffres séparés par un espace et se termine éventuellement par une astérisque.
+
+Un exemple de déchet non-dangereux valide (déchets provenant de l'extraction des minéraux métallifères) :
+01 01 01
+
+Ce même exemple, mais avec un format invalide :
+010101
+
+Un exemple de déchet dangereux valide (stériles acidogènes provenant de la transformation du sulfure) :
+01 03 04*
+
+Ce même exemple, mais avec un format invalide :
+010304 *
 
 </td>
 </tr>
@@ -6064,9 +5393,9 @@ Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination d
 </tbody>
 </table>
 
-### FormType
+### FormsRegisterExportFormat
 
-Valeur possibles pour le filtre de la query `forms`
+Format de l'export du registre
 
 <table>
 <thead>
@@ -6075,18 +5404,18 @@ Valeur possibles pour le filtre de la query `forms`
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>ACTOR</strong></td>
+<td valign="top"><strong>CSV</strong></td>
 <td>
 
-DEPRECATED - Uniquement les BSD's dont je suis émetteur ou destinataire (cas par défaut)
+Fichier csv
 
 </td>
 </tr>
 <tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
+<td valign="top"><strong>XLSX</strong></td>
 <td>
 
-Uniquement les BSD's dont je suis transporteur
+Fichier Excel
 
 </td>
 </tr>
@@ -6095,7 +5424,9 @@ Uniquement les BSD's dont je suis transporteur
 
 ### FormsRegisterExportType
 
-Type pour l'export du registre
+Modèle de registre réglementaire tels que décrits dans l'arrêté du 29 février 2012 fixant
+le contenu des registres mnetionnées aux articles R. 541-43 et R. 541-46 du code de l'environnement
+https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000025454959&categorieLien=id
 
 <table>
 <thead>
@@ -6104,10 +5435,10 @@ Type pour l'export du registre
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>INCOMING</strong></td>
+<td valign="top"><strong>ALL</strong></td>
 <td>
 
-Déchets entrants
+Registre exhaustif, déchets entrants et sortants
 
 </td>
 </tr>
@@ -6115,7 +5446,39 @@ Déchets entrants
 <td valign="top"><strong>OUTGOING</strong></td>
 <td>
 
-Déchets sortants
+Registre producteur, déchets sortants
+Art 1: Les exploitants des établissements produisant ou expédiant des déchets tiennent à jour
+un registre chronologique où sont consignés tous les déchets sortants.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>INCOMING</strong></td>
+<td>
+
+Registre traiteur, TTR
+Art 2: Les exploitants des installations de transit, de regroupement ou de traitement de déchets,
+notamment de tri, établissent et tiennent à jour un registre chronologique où sont consignés
+tous les déchets entrants.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TRANSPORTED</strong></td>
+<td>
+
+Registre transporteur
+Art 3: Les transporteurs et les collecteurs de déchets tiennent à jour un registre chronologique
+des déchets transportés ou collectés.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TRADED</strong></td>
+<td>
+
+Registre négociants
+Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
 
 </td>
 </tr>
