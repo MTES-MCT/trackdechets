@@ -5,11 +5,11 @@ import { validateCompany, validateRoleGenerator } from "./validations";
 import { sirenify } from "./sirene";
 import { hashPassword } from "../utils";
 import { randomNumber, getUIBaseURL } from "../../utils";
-import { acceptNewUserCompanyInvitations } from "../mutations/signup";
-import { associateUserToCompany } from "../mutations/associateUserToCompany";
+import { acceptNewUserCompanyInvitations } from "../resolvers/mutations/signup";
 import { groupBy } from "./utils";
 import { sendMail } from "../../common/mails.helper";
 import { UserInputError } from "apollo-server-express";
+import { associateUserToCompany } from "../database";
 
 function printHelp() {
   console.log(`

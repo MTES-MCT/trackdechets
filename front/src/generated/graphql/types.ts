@@ -965,12 +965,12 @@ export type MutationCreateFormArgs = {
 
 
 export type MutationCreateTraderReceiptArgs = {
-  input: Maybe<CreateTraderReceiptInput>;
+  input: CreateTraderReceiptInput;
 };
 
 
 export type MutationCreateTransporterReceiptArgs = {
-  input: Maybe<CreateTransporterReceiptInput>;
+  input: CreateTransporterReceiptInput;
 };
 
 
@@ -992,12 +992,12 @@ export type MutationDeleteInvitationArgs = {
 
 
 export type MutationDeleteTraderReceiptArgs = {
-  input: Maybe<DeleteTraderReceiptInput>;
+  input: DeleteTraderReceiptInput;
 };
 
 
 export type MutationDeleteTransporterReceiptArgs = {
-  input: Maybe<DeleteTransporterReceiptInput>;
+  input: DeleteTransporterReceiptInput;
 };
 
 
@@ -1041,13 +1041,13 @@ export type MutationLoginArgs = {
 
 
 export type MutationMarkAsProcessedArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   processedInfo: ProcessedFormInput;
 };
 
 
 export type MutationMarkAsReceivedArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   receivedInfo: ReceivedFormInput;
 };
 
@@ -1065,12 +1065,12 @@ export type MutationMarkAsResentArgs = {
 
 
 export type MutationMarkAsSealedArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 
 export type MutationMarkAsSentArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   sentInfo: SentFormInput;
 };
 
@@ -1156,7 +1156,7 @@ export type MutationUpdateFormArgs = {
 
 
 export type MutationUpdateTraderReceiptArgs = {
-  input: Maybe<UpdateTraderReceiptInput>;
+  input: UpdateTraderReceiptInput;
 };
 
 
@@ -1168,7 +1168,7 @@ export type MutationUpdateTransporterFieldsArgs = {
 
 
 export type MutationUpdateTransporterReceiptArgs = {
-  input: Maybe<UpdateTransporterReceiptInput>;
+  input: UpdateTransporterReceiptInput;
 };
 
 /** Destination ultérieure prévue (case 12) */
@@ -1182,9 +1182,9 @@ export type NextDestination = {
 
 export type NextDestinationInput = {
   /** Traitement prévue (code D/R) */
-  processingOperation: Maybe<Scalars['String']>;
+  processingOperation: Scalars['String'];
   /** Établissement de destination ultérieur */
-  company: Maybe<CompanyInput>;
+  company: CompanyInput;
 };
 
 /** Payload d'un segment de transport */
@@ -1245,7 +1245,7 @@ export type PrivateCompanyInput = {
   /** Identifiant GEREP de l'établissement */
   gerepId: Maybe<Scalars['String']>;
   /** Profil de l'établissement */
-  companyTypes: Maybe<Array<Maybe<CompanyType>>>;
+  companyTypes: Array<CompanyType>;
   /** Code NAF */
   codeNaf: Maybe<Scalars['String']>;
   /** Nom de l'établissement */
@@ -1319,7 +1319,12 @@ export type Query = {
    */
   formPdf: FileDownload;
   /**
-   * Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
+   * Renvoie les BSDs de l'établissement sélectionné.
+   * Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
+   * alors les BSD de cette entreprise sont retournés.
+   * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
+   * préciser un SIRET
+   * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
    * Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
    * On peut également demander les bordereaux pour lesquels on est transporteur
    */
@@ -1476,9 +1481,9 @@ export type ResentFormInput = {
   /** Transporteur du déchet reconditionné */
   transporter: Maybe<TransporterInput>;
   /** Nom du signataire du BSD suite  (case 19) */
-  signedBy: Maybe<Scalars['String']>;
+  signedBy: Scalars['String'];
   /** Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui. */
-  signedAt: Maybe<Scalars['DateTime']>;
+  signedAt: Scalars['DateTime'];
 };
 
 /**
@@ -1517,9 +1522,9 @@ export type Rubrique = {
 /** Payload de signature d'un BSD */
 export type SentFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
-  sentAt: Maybe<Scalars['DateTime']>;
+  sentAt: Scalars['DateTime'];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
-  sentBy: Maybe<Scalars['String']>;
+  sentBy: Scalars['String'];
 };
 
 export type SignupInput = {
@@ -1774,9 +1779,9 @@ export type TransporterSignatureFormInput = {
   /** Si oui ou non le BSD a été signé par un transporteur */
   signedByTransporter: Scalars['Boolean'];
   /** Code de sécurité permettant d'authentifier l'émetteur */
-  securityCode: Maybe<Scalars['Int']>;
+  securityCode: Scalars['Int'];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
-  sentBy: Maybe<Scalars['String']>;
+  sentBy: Scalars['String'];
   /** Si oui on non le BSD a été signé par l'émetteur */
   signedByProducer: Scalars['Boolean'];
   /** Conditionnement */
@@ -2400,8 +2405,8 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
 
 export function createNextDestinationInputMock(props: Partial<NextDestinationInput>): NextDestinationInput {
   return {
-    processingOperation: null,
-    company: null,
+    processingOperation: "",
+    company: createCompanyInputMock({}),
     ...props,
   };
 }
@@ -2442,7 +2447,7 @@ export function createPrivateCompanyInputMock(props: Partial<PrivateCompanyInput
   return {
     siret: "",
     gerepId: null,
-    companyTypes: null,
+    companyTypes: [],
     codeNaf: null,
     companyName: null,
     documentKeys: null,
@@ -2511,8 +2516,8 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     destination: null,
     wasteDetails: null,
     transporter: null,
-    signedBy: null,
-    signedAt: null,
+    signedBy: "",
+    signedAt: new Date(),
     ...props,
   };
 }
@@ -2535,8 +2540,8 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: null,
-    sentBy: null,
+    sentAt: new Date(),
+    sentBy: "",
     ...props,
   };
 }
@@ -2743,8 +2748,8 @@ export function createTransporterSignatureFormInputMock(props: Partial<Transport
   return {
     sentAt: new Date(),
     signedByTransporter: false,
-    securityCode: null,
-    sentBy: null,
+    securityCode: 0,
+    sentBy: "",
     signedByProducer: false,
     packagings: [],
     quantity: 0,

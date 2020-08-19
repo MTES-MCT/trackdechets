@@ -124,7 +124,12 @@ ID d'un BSD
 <td valign="top">[<a href="#form">Form</a>!]!</td>
 <td>
 
-Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
+Renvoie les BSDs de l'établissement sélectionné.
+Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
+alors les BSD de cette entreprise sont retournés.
+Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
+préciser un SIRET
+Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
 Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
 On peut également demander les bordereaux pour lesquels on est transporteur
 
@@ -507,7 +512,7 @@ Valide le traitement d'un BSD
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -534,7 +539,7 @@ Valide la réception d'un BSD
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -656,7 +661,7 @@ wasteDetails: {
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -680,7 +685,7 @@ Utiliser la mutation signedByTransporter permettant d'apposer les signatures col
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -3963,7 +3968,7 @@ Annexe 2
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>processingOperation</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Traitement prévue (code D/R)
@@ -3972,7 +3977,7 @@ Traitement prévue (code D/R)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
 <td>
 
 Établissement de destination ultérieur
@@ -4425,7 +4430,7 @@ Transporteur du déchet reconditionné
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom du signataire du BSD suite  (case 19)
@@ -4434,7 +4439,7 @@ Nom du signataire du BSD suite  (case 19)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedAt</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
 Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui.
@@ -4459,7 +4464,7 @@ Payload de signature d'un BSD
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>sentAt</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
 Date de l'envoi du déchet par l'émetteur (case 9)
@@ -4468,7 +4473,7 @@ Date de l'envoi du déchet par l'émetteur (case 9)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom de la personne responsable de l'envoi du déchet (case 9)
@@ -4755,7 +4760,7 @@ Si oui ou non le BSD a été signé par un transporteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>securityCode</strong></td>
-<td valign="top"><a href="#int">Int</a></td>
+<td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
 Code de sécurité permettant d'authentifier l'émetteur
@@ -4764,7 +4769,7 @@ Code de sécurité permettant d'authentifier l'émetteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom de la personne responsable de l'envoi du déchet (case 9)

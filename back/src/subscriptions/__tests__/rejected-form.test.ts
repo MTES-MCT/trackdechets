@@ -152,7 +152,7 @@ jest.mock("../../forms/pdf", () => ({
   pdfEmailAttachment: jest.fn(() => "base64xyz")
 }));
 // Mock a utils function that hits th db
-jest.mock("../../companies/queries", () => ({
+jest.mock("../../companies/database", () => ({
   getCompanyAdminUsers: jest.fn(siret => mockedCompanyAdmins[siret])
 }));
 
