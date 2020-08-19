@@ -8,11 +8,20 @@ import { prisma } from "../../../generated/prisma-client";
 import { UserInputError } from "apollo-server-express";
 import { MissingIdOrReadableId, FormNotFound } from "../../errors";
 
-const resolveFn: QueryResolvers["form"] = async (_, { id, readableId }) => {
+const resolveFn: QueryResolvers["form"] = async (
+  _,
+  { id, readableId },
+  context
+) => {
   const form = await prisma.form(id ? { id } : { readableId });
+
   if (form == null) {
     throw new FormNotFound(id || readableId);
   }
+  // perform additional object level permissions checks
+  // if (!canAccessForm(context.user, form)) {
+  //   throw new NotFormContributor();
+  // }
   return expandFormFromDb(form);
 };
 
