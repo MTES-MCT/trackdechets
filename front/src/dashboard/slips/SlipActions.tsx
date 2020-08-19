@@ -148,7 +148,7 @@ const buttons = {
     component: Resealed,
   },
   RESENT: {
-    title: "Valider l'envement",
+    title: "Valider l'enlèvement",
     icon: FaTruckMoving,
     component: Resent,
   },
