@@ -7,6 +7,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2020.08.1] 19/08/2020
 
+- Dépréciation des mutations "markAsSent" et "markAsResent", [PR 372](https://github.com/MTES-MCT/trackdechets/pull/372)
 - Autocomplétion de la description de l'opération de traitement lorsque non-fournie dans l'API, [PR 353](https://github.com/MTES-MCT/trackdechets/pull/353) [PR 375](https://github.com/MTES-MCT/trackdechets/pull/375)
 - Amélioration de l'export registre, [PR 328](https://github.com/MTES-MCT/trackdechets/pull/328)
 - Amélioration de l'expérience d'utilisation de l'interface, [PR 333](https://github.com/MTES-MCT/trackdechets/pull/333)
