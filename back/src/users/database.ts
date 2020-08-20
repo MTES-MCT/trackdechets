@@ -13,7 +13,7 @@ import {
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
-import { getUid, legacySanitizeEmail, sanitizeEmail } from "../utils";
+import { getUid, sanitizeEmail } from "../utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma
@@ -142,7 +142,7 @@ export async function createAccessToken(user: User) {
 
 export function userExists(unsafeEmail: string) {
   return prisma.$exists.user({
-    email_in: [legacySanitizeEmail(unsafeEmail), sanitizeEmail(unsafeEmail)]
+    email: sanitizeEmail(unsafeEmail)
   });
 }
 
