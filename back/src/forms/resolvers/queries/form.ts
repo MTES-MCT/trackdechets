@@ -5,12 +5,16 @@ import {
 import { expandFormFromDb } from "../../form-converter";
 import { prisma } from "../../../generated/prisma-client";
 import { UserInputError } from "apollo-server-express";
-import { MissingIdOrReadableId, FormNotFound } from "../../errors";
-import { checkPermissions, isAuthenticated } from "../../../common/permissions";
+import {
+  MissingIdOrReadableId,
+  FormNotFound,
+  NotFormContributor
+} from "../../errors";
+import { checkIsAuthenticated } from "../../../common/permissions";
+import { getUserCompanies } from "../../../companies/queries";
+import { canGetForm } from "../../permissions";
 
-const permissions = [isAuthenticated];
-
-const validateArgs = (args: QueryFormArgs) => {
+function validateArgs(args: QueryFormArgs) {
   if (args.id == null && args.readableId == null) {
     throw new MissingIdOrReadableId();
   }
@@ -19,26 +23,34 @@ const validateArgs = (args: QueryFormArgs) => {
       "Vous devez préciser soit un id soit un readableId mais pas les deux"
     );
   }
-};
+  return args;
+}
 
-const formResolver: QueryResolvers["form"] = async (
-  _,
-  { id, readableId },
-  context
-) => {
-  checkPermissions(permissions, context);
+const formResolver: QueryResolvers["form"] = async (_, args, context) => {
+  // check query level permissions
+  const user = checkIsAuthenticated(context);
 
-  validateArgs({ id, readableId });
+  const { id, readableId } = validateArgs(args);
 
   const form = await prisma.form(id ? { id } : { readableId });
 
   if (form == null) {
-    throw new FormNotFound(id || readableId);
+    throw new FormNotFound(args.id || args.readableId);
   }
-  // perform additional object level permissions checks
-  // if (!canAccessForm(context.user, form)) {
-  //   throw new NotFormContributor();
-  // }
+
+  const userCompanies = await getUserCompanies(context.user.id);
+  const formOwner = await prisma.form({ id: form.id }).owner();
+
+  // check form level permissions
+  if (
+    !canGetForm(
+      { ...user, companies: userCompanies },
+      { ...form, owner: formOwner }
+    )
+  ) {
+    throw new NotFormContributor();
+  }
+
   return expandFormFromDb(form);
 };
 

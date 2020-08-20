@@ -1,19 +1,10 @@
 import { GraphQLContext } from "../types";
 import { NotLoggedIn } from "./errors";
+import { User } from "../generated/prisma-client";
 
-type Permission = (context: GraphQLContext) => void;
-
-export const isAuthenticated: Permission = context => {
+export function checkIsAuthenticated(context: GraphQLContext): User {
   if (!context.user) {
     throw new NotLoggedIn();
   }
-};
-
-export function checkPermissions(
-  permissions: Permission[],
-  context: GraphQLContext
-) {
-  for (const permission of permissions) {
-    permission(context);
-  }
+  return context.user;
 }
