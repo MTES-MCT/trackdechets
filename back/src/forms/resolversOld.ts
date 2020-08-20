@@ -95,7 +95,6 @@ const queryResolvers: QueryResolvers = {
 
     return queriedForms.map(f => expandFormFromDb(f));
   },
-  formPdf: (_parent, args) => formPdf(args),
   formsRegister: (_parent, args) => formsRegister(args)
 };
 

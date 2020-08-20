@@ -10,12 +10,9 @@ import { prisma } from "../../../generated/prisma-client";
 import { FormNotFound, NotFormContributor } from "../../errors";
 import { getUserCompanies } from "../../../companies/queries";
 import { canGetForm } from "../../permissions";
+import { getFullForm } from "../../database";
 
 const TYPE = "form_pdf";
-
-export function formPdf({ id }: QueryFormPdfArgs): Promise<FileDownload> {
-  return getFileDownloadToken({ type: TYPE, params: { id } }, downloadPdf);
-}
 
 const formPdfResolver: QueryResolvers["formPdf"] = async (
   parent,
@@ -32,15 +29,12 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
   }
 
   const userCompanies = await getUserCompanies(context.user.id);
-  const formOwner = await prisma.form({ id: form.id }).owner();
+
+  const fullUser = { ...user, companies: userCompanies };
+  const fullForm = await getFullForm(form);
 
   // check form level permissions
-  if (
-    !canGetForm(
-      { ...user, companies: userCompanies },
-      { ...form, owner: formOwner }
-    )
-  ) {
+  if (!canGetForm(fullUser, fullForm)) {
     throw new NotFormContributor();
   }
 
