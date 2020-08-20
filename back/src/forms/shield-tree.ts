@@ -41,8 +41,8 @@ export default {
     //   or(or(isCompanyMember, isCompanyAdmin), canAccessFormsWithoutSiret)
     // ),
     formsRegister: chain(formsRegisterSchema, isCompaniesUser),
-    stats: isAuthenticated,
-    formsLifeCycle: isAuthenticated
+    stats: isAuthenticated
+    //formsLifeCycle: isAuthenticated
     // appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {

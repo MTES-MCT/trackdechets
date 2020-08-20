@@ -11,8 +11,8 @@ const Query: QueryResolvers = {
   form,
   forms,
   formPdf,
-  appendixForms
-  // formsLifeCycle,
+  appendixForms,
+  formsLifeCycle
   // formsRegister,
   // stats
 };

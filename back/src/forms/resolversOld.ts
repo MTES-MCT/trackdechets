@@ -40,8 +40,6 @@ import { formsLifecycle } from "./queries/formsLifecycle";
 import { getUserCompanies } from "../users/database";
 
 const queryResolvers: QueryResolvers = {
-  formsLifeCycle: formsLifecycle,
-
   stats: async (_parent, _args, context) => {
     const userId = context.user.id;
     const userCompanies = await getUserCompanies(userId);

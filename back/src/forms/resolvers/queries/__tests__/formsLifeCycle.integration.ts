@@ -1,16 +1,17 @@
-import * as mailsHelper from "../../common/mails.helper";
-
-import makeClient from "../../__tests__/testClient";
-import { prepareRedis, prepareDB, storeRedisCompanyInfo } from "./helpers";
-
+import * as mailsHelper from "../../../../common/mails.helper";
+import makeClient from "../../../../__tests__/testClient";
+import {
+  prepareRedis,
+  prepareDB,
+  storeRedisCompanyInfo
+} from "../../../__tests__/helpers";
 import {
   statusLogFactory,
   formFactory,
   companyFactory
-} from "../../__tests__/factories";
-import { resetDatabase } from "../../../integration-tests/helper";
-
-import { prisma, UserRole } from "../../generated/prisma-client";
+} from "../../../../__tests__/factories";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma, UserRole } from "../../../../generated/prisma-client";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
