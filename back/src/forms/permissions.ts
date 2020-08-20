@@ -6,6 +6,7 @@ import {
   TemporaryStorageDetail,
   TransportSegment
 } from "../generated/prisma-client";
+import { FullForm } from "./types";
 
 function isFormOwner(user: User, form: { owner: User }) {
   return form.owner?.id === user.id;
@@ -93,9 +94,7 @@ function isFormMultiModalTransporter(
 
 export function canGetForm(
   user: User & { companies: Company[] },
-  form: Form & { owner: User } & { ecoOrganisme: EcoOrganisme } & {
-    temporaryStorage: TemporaryStorageDetail;
-  } & { transportSegments: TransportSegment[] }
+  form: FullForm
 ) {
   return (
     isFormOwner(user, form) ||

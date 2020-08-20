@@ -50,7 +50,7 @@ export async function getForms(
   const first = rest.first ?? DEFAULT_FIRST;
   const skip = rest.skip ?? 0;
 
-  const userCompanies = await getUserCompanies(user.id);
+  const userCompanies = await getUserCompanies(userId);
 
   let company = null;
 

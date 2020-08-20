@@ -13,6 +13,7 @@ import {
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { canGetForm } from "../../permissions";
 import { getUserCompanies } from "../../../companies/queries";
+import { getFullForm } from "../../database";
 
 function validateArgs(args: QueryFormArgs) {
   if (args.id == null && args.readableId == null) {
@@ -39,26 +40,12 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
   }
 
   const userCompanies = await getUserCompanies(user.id);
-  const formOwner = await prisma.form({ id: form.id }).owner();
-  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
-  const temporaryStorage = await prisma
-    .form({ id: form.id })
-    .temporaryStorageDetail();
-  const transportSegments = await prisma
-    .form({ id: form.id })
-    .transportSegments();
 
   // user with linked objects
   const fullUser = { ...user, companies: userCompanies };
 
   // form with linked objects
-  const fullForm = {
-    ...form,
-    owner: formOwner,
-    ecoOrganisme,
-    temporaryStorage,
-    transportSegments
-  };
+  const fullForm = await getFullForm(form);
 
   // check form level permissions
   if (!canGetForm(fullUser, fullForm)) {
