@@ -22,8 +22,6 @@ import {
 import { duplicateForm, createForm, updateForm } from "./mutations";
 import { saveForm } from "./mutations/save-form";
 import { updateTransporterFields } from "./mutations/updateTransporterFields";
-import { formPdf } from "./queries/form-pdf";
-import { formsRegister } from "./queries/forms-register";
 import { AuthenticationError } from "apollo-server-express";
 import { stateSummary } from "./queries/state-summary";
 import {
@@ -35,54 +33,7 @@ import {
   StateSummaryResolvers
 } from "../generated/graphql/types";
 import { transportSegments } from "./queries/segments";
-
-import { formsLifecycle } from "./queries/formsLifecycle";
 import { getUserCompanies } from "../users/database";
-
-const queryResolvers: QueryResolvers = {
-  stats: async (_parent, _args, context) => {
-    const userId = context.user.id;
-    const userCompanies = await getUserCompanies(userId);
-
-    return userCompanies.map(async userCompany => {
-      const queriedForms = await prisma.forms({
-        where: {
-          OR: [
-            { owner: { id: userId } },
-            { recipientCompanySiret: userCompany.siret },
-            { emitterCompanySiret: userCompany.siret }
-          ],
-          status: "PROCESSED",
-          isDeleted: false
-        }
-      });
-
-      const stats = queriedForms.reduce((prev, cur) => {
-        prev[cur.wasteDetailsCode] = prev[cur.wasteDetailsCode] || {
-          wasteCode: cur.wasteDetailsCode,
-          incoming: 0,
-          outgoing: 0
-        };
-        cur.recipientCompanySiret === userCompany.siret
-          ? (prev[cur.wasteDetailsCode].incoming += cur.quantityReceived)
-          : (prev[cur.wasteDetailsCode].outgoing += cur.quantityReceived);
-
-        prev[cur.wasteDetailsCode].incoming =
-          Math.round(prev[cur.wasteDetailsCode].incoming * 100) / 100;
-        prev[cur.wasteDetailsCode].outgoing =
-          Math.round(prev[cur.wasteDetailsCode].outgoing * 100) / 100;
-
-        return prev;
-      }, {});
-
-      return {
-        company: userCompany,
-        stats: Object.keys(stats).map(key => stats[key])
-      };
-    });
-  },
-  formsRegister: (_parent, args) => formsRegister(args)
-};
 
 const mutationResolvers: MutationResolvers = {
   createForm,
@@ -178,7 +129,6 @@ export default {
   Form: formResolvers,
   WasteDetails: wasteDetailsResolvers,
   StateSummary: stateSummaryResolvers,
-  Query: queryResolvers,
   Mutation: mutationResolvers,
   Subscription: subscriptionResolvers
 };

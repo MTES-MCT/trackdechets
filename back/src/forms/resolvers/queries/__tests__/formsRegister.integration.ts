@@ -3,15 +3,15 @@ import {
   userWithCompanyFactory,
   formFactory,
   formWithTempStorageFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 import supertest from "supertest";
-import { app } from "../../../server";
-import { resetDatabase } from "../../../../integration-tests/helper";
+import { app } from "../../../../server";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import { parseString } from "@fast-csv/parse";
 import Excel from "exceljs";
-import { ErrorCode } from "../../../common/errors";
-import { prisma } from "../../../generated/prisma-client";
+import { ErrorCode } from "../../../../common/errors";
+import { prisma } from "../../../../generated/prisma-client";
 
 function emitterFormFactory(ownerId: string, siret: string) {
   return formFactory({

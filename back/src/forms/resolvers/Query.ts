@@ -12,9 +12,9 @@ const Query: QueryResolvers = {
   forms,
   formPdf,
   appendixForms,
-  formsLifeCycle
-  // formsRegister,
-  // stats
+  formsLifeCycle,
+  formsRegister,
+  stats
 };
 
 export default Query;
