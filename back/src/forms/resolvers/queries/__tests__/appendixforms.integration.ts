@@ -1,8 +1,11 @@
-import * as mailsHelper from "../../common/mails.helper";
-import makeClient from "../../__tests__/testClient";
-import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
-import { resetDatabase } from "../../../integration-tests/helper";
-import { ErrorCode } from "../../common/errors";
+import * as mailsHelper from "../../../../common/mails.helper";
+import makeClient from "../../../../__tests__/testClient";
+import {
+  formFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { ErrorCode } from "../../../../common/errors";
 
 const buildQuery = siret =>
   `query { appendixForms (siret: "${siret}") { id } } `;

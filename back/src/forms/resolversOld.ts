@@ -83,18 +83,6 @@ const queryResolvers: QueryResolvers = {
       };
     });
   },
-  appendixForms: async (_parent, { siret, wasteCode }) => {
-    const queriedForms = await prisma.forms({
-      where: {
-        ...(wasteCode && { wasteDetailsCode: wasteCode }),
-        status: "AWAITING_GROUP",
-        recipientCompanySiret: siret,
-        isDeleted: false
-      }
-    });
-
-    return queriedForms.map(f => expandFormFromDb(f));
-  },
   formsRegister: (_parent, args) => formsRegister(args)
 };
 

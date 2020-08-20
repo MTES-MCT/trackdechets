@@ -42,8 +42,8 @@ export default {
     // ),
     formsRegister: chain(formsRegisterSchema, isCompaniesUser),
     stats: isAuthenticated,
-    formsLifeCycle: isAuthenticated,
-    appendixForms: or(isCompanyMember, isCompanyAdmin)
+    formsLifeCycle: isAuthenticated
+    // appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
     createForm: chain(isAuthenticated, canCreateForm),

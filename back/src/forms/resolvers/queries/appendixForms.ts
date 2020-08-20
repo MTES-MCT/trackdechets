@@ -14,6 +14,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
 
   const userCompanies = await getUserCompanies(user.id);
 
+  // check user is member or admin of the provided siret
   userCompanies.some(uc => uc.siret === siret);
   if (!userCompanies.some(uc => uc.siret === siret)) {
     throw new NotCompanyMember(siret);
