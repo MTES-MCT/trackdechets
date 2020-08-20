@@ -2,7 +2,7 @@ import { getCompanyInfos } from "./companyInfos";
 import { getCompanyUsers, getCompanyAdminUsers } from "./companyUsers";
 import { getInstallation, getRubriques, getDeclarations } from "./installation";
 import { getUserRole } from "./userRole";
-import { getUserCompanies } from "./userCompanies";
+import { getUserCompanies, getUserPrivateCompanies } from "./userCompanies";
 
 export {
   getCompanyInfos,
@@ -12,5 +12,6 @@ export {
   getRubriques,
   getDeclarations,
   getUserRole,
+  getUserPrivateCompanies,
   getUserCompanies
 };

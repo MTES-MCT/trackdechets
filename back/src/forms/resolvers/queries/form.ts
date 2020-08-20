@@ -12,6 +12,7 @@ import {
 } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { canGetForm } from "../../permissions";
+import { getUserCompanies } from "../../../companies/queries";
 
 function validateArgs(args: QueryFormArgs) {
   if (args.id == null && args.readableId == null) {
@@ -37,14 +38,7 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
     throw new FormNotFound(args.id || args.readableId);
   }
 
-  const companyAssociations = await prisma
-    .user({ id: user.id })
-    .companyAssociations();
-  const userCompanies = await Promise.all(
-    companyAssociations.map(association => {
-      return prisma.companyAssociation({ id: association.id }).company();
-    })
-  );
+  const userCompanies = await getUserCompanies(user.id);
   const formOwner = await prisma.form({ id: form.id }).owner();
   const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
   const temporaryStorage = await prisma

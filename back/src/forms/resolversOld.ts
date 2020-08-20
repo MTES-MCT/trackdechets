@@ -1,4 +1,4 @@
-import { getUserCompanies } from "../companies/queries";
+import { getUserPrivateCompanies } from "../companies/queries";
 import { prisma, Status } from "../generated/prisma-client";
 import {
   expandFormFromDb,
@@ -44,7 +44,7 @@ const queryResolvers: QueryResolvers = {
 
   stats: async (_parent, _args, context) => {
     const userId = context.user.id;
-    const userCompanies = await getUserCompanies(userId);
+    const userCompanies = await getUserPrivateCompanies(userId);
 
     return userCompanies.map(async userCompany => {
       const queriedForms = await prisma.forms({
@@ -169,7 +169,7 @@ const subscriptionResolvers: SubscriptionResolvers = {
         throw new AuthenticationError("Vous n'êtes pas connecté");
       }
 
-      const userCompanies = await getUserCompanies(user.id);
+      const userCompanies = await getUserPrivateCompanies(user.id);
 
       return prisma.$subscribe.form({
         OR: [

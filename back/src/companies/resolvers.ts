@@ -14,7 +14,7 @@ import {
   getCompanyUsers,
   getDeclarations,
   getRubriques,
-  getUserCompanies,
+  getUserPrivateCompanies,
   getUserRole,
   getInstallation
 } from "./queries";
@@ -51,7 +51,7 @@ const queryResolvers: QueryResolvers = {
   favorites: async (_parent, { type }, context) => {
     const lowerType = type.toLowerCase();
     const userId = context.user.id;
-    const companies = await getUserCompanies(userId);
+    const companies = await getUserPrivateCompanies(userId);
 
     if (!companies.length) {
       throw new Error(

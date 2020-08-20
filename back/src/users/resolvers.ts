@@ -1,5 +1,5 @@
 import { sendMail } from "../common/mails.helper";
-import { getUserCompanies } from "../companies/queries";
+import { getUserPrivateCompanies } from "../companies/queries";
 import { prisma } from "../generated/prisma-client";
 import { userMails } from "./mails";
 import {
@@ -84,7 +84,7 @@ const mutationResolvers: MutationResolvers = {
 
 const userResolvers: UserResolvers = {
   companies: async parent => {
-    return await getUserCompanies(parent.id);
+    return await getUserPrivateCompanies(parent.id);
   }
 };
 
