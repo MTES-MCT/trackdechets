@@ -11,7 +11,6 @@ import {
   NotFormContributor
 } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getUserCompanies } from "../../../companies/queries";
 import { canGetForm } from "../../permissions";
 
 function validateArgs(args: QueryFormArgs) {
@@ -38,16 +37,37 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
     throw new FormNotFound(args.id || args.readableId);
   }
 
-  const userCompanies = await getUserCompanies(context.user.id);
+  const companyAssociations = await prisma
+    .user({ id: user.id })
+    .companyAssociations();
+  const userCompanies = await Promise.all(
+    companyAssociations.map(association => {
+      return prisma.companyAssociation({ id: association.id }).company();
+    })
+  );
   const formOwner = await prisma.form({ id: form.id }).owner();
+  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
+  const temporaryStorage = await prisma
+    .form({ id: form.id })
+    .temporaryStorageDetail();
+  const transportSegments = await prisma
+    .form({ id: form.id })
+    .transportSegments();
+
+  // user with linked objects
+  const fullUser = { ...user, companies: userCompanies };
+
+  // form with linked objects
+  const fullForm = {
+    ...form,
+    owner: formOwner,
+    ecoOrganisme,
+    temporaryStorage,
+    transportSegments
+  };
 
   // check form level permissions
-  if (
-    !canGetForm(
-      { ...user, companies: userCompanies },
-      { ...form, owner: formOwner }
-    )
-  ) {
+  if (!canGetForm(fullUser, fullForm)) {
     throw new NotFormContributor();
   }
 

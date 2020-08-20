@@ -1,8 +1,8 @@
 import { MutationResolvers } from "../../generated/graphql/types";
 import
 
-const Mutation: MutationResolvers = {
+// const Mutation: MutationResolvers = {
 
-};
+// };
 
-export default Mutation;
+// export default Mutation;

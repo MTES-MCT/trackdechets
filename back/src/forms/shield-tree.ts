@@ -34,12 +34,12 @@ import {
 
 export default {
   Query: {
-    form: or(canAccessForm, isFormTransporter),
+    //form: or(canAccessForm, isFormTransporter),
     formPdf: or(canAccessForm, isFormTransporter),
-    forms: chain(
-      formsSchema,
-      or(or(isCompanyMember, isCompanyAdmin), canAccessFormsWithoutSiret)
-    ),
+    // forms: chain(
+    //   formsSchema,
+    //   or(or(isCompanyMember, isCompanyAdmin), canAccessFormsWithoutSiret)
+    // ),
     formsRegister: chain(formsRegisterSchema, isCompaniesUser),
     stats: isAuthenticated,
     formsLifeCycle: isAuthenticated,

@@ -1,15 +1,15 @@
 import { createTestClient } from "apollo-server-integration-testing";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
-import { server } from "../../../server";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
+import { server } from "../../../../server";
 import {
   companyFactory,
   formFactory,
   userWithCompanyFactory,
   transportSegmentFactory,
   userFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 function createForms(userId: string, params: any[]) {
   return Promise.all(

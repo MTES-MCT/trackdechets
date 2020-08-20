@@ -1,15 +1,15 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userFactory,
   formFactory,
   userWithCompanyFactory,
   transportSegmentFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 import {
   FormCreateInput,
   Form as PrismaForm
-} from "../../../generated/prisma-client";
+} from "../../../../generated/prisma-client";
 
 const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {

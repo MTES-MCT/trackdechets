@@ -1,6 +1,6 @@
-import { prisma } from "../../../generated/prisma-client";
-import * as queries from "../../../companies/queries";
-import getForms from "../forms";
+import { prisma } from "../../../../generated/prisma-client";
+import * as queries from "../../../../companies/queries";
+import { getForms } from "../forms";
 
 const prismaMock = {
   forms: jest.spyOn(prisma, "forms")

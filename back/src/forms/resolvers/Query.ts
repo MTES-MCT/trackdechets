@@ -7,10 +7,10 @@ import stats from "./queries/stats";
 
 const Query: QueryResolvers = {
   form,
-  forms,
-  formsLifeCycle,
-  formsRegister,
-  stats
+  forms
+  // formsLifeCycle,
+  // formsRegister,
+  // stats
 };
 
 export default Query;

@@ -1,13 +1,15 @@
 import {
   QueryResolvers,
   FormRole,
-  QueryFormsArgs
+  QueryFormsArgs,
+  Form
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../companies/queries";
 import { prisma } from "../../../generated/prisma-client";
 import { expandFormFromDb } from "../../form-converter";
 import { UserInputError } from "apollo-server-express";
+import { NotCompanyMember, MissingSiret } from "../../../common/errors";
 
 function validateArgs(args: QueryFormsArgs) {
   if (args.first < 0 || args.first > 500) {
@@ -37,21 +39,38 @@ const DEFAULT_FIRST = 50;
  */
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
+  const validArgs = validateArgs(args);
+  return getForms(user.id, validArgs);
+};
 
-  const { siret, status, roles, hasNextStep, ...rest } = validateArgs(args);
-
+export async function getForms(
+  userId: string,
+  { siret, status, roles, hasNextStep, ...rest }: QueryFormsArgs
+): Promise<Form[]> {
   const first = rest.first ?? DEFAULT_FIRST;
   const skip = rest.skip ?? 0;
 
-  const userCompanies = await getUserCompanies(user.id);
+  const userCompanies = await getUserCompanies(userId);
 
-  const company =
-    siret == null
-      ? userCompanies.shift()
-      : userCompanies.find(uc => uc.siret === siret);
+  let company = null;
 
-  if (company == null) {
-    return [];
+  if (siret) {
+    // a siret is specified, check user has permission on this company
+    company = userCompanies.find(uc => uc.siret === siret);
+    if (!company) {
+      throw new NotCompanyMember(siret);
+    }
+  } else {
+    if (userCompanies.length === 0) {
+      // the user is not member of any companies, return empty array
+      return [];
+    } else if (userCompanies.length > 1) {
+      // the user is member of 2 companies or more, a siret is required
+      throw new MissingSiret();
+    } else {
+      // the user is member of only one company, use it as default
+      company = userCompanies[0];
+    }
   }
 
   const queriedForms = await prisma.forms({
@@ -69,7 +88,7 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   });
 
   return queriedForms.map(f => expandFormFromDb(f));
-};
+}
 
 function getRolesFilter(siret: string, roles: FormRole[]) {
   const filtersByRole = {
