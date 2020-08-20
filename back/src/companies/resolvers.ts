@@ -14,7 +14,6 @@ import {
   getCompanyUsers,
   getDeclarations,
   getRubriques,
-  getUserPrivateCompanies,
   getUserRole,
   getInstallation
 } from "./queries";
@@ -28,6 +27,7 @@ import {
   CompanyFavoriteResolvers,
   CompanySearchResultResolvers
 } from "../generated/graphql/types";
+import { getUserCompanies } from "../users/database";
 
 // lookup for transporter and trader receipt in db
 const receiptsResolvers = {
@@ -51,7 +51,7 @@ const queryResolvers: QueryResolvers = {
   favorites: async (_parent, { type }, context) => {
     const lowerType = type.toLowerCase();
     const userId = context.user.id;
-    const companies = await getUserPrivateCompanies(userId);
+    const companies = await getUserCompanies(userId);
 
     if (!companies.length) {
       throw new Error(

@@ -5,11 +5,11 @@ import {
   Form
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getUserCompanies } from "../../../companies/queries";
 import { prisma } from "../../../generated/prisma-client";
 import { expandFormFromDb } from "../../form-converter";
 import { UserInputError } from "apollo-server-express";
 import { NotCompanyMember, MissingSiret } from "../../../common/errors";
+import { getUserCompanies } from "../../../users/database";
 
 function validateArgs(args: QueryFormsArgs) {
   if (args.first < 0 || args.first > 500) {

@@ -1,16 +1,12 @@
-import {
-  QueryFormPdfArgs,
-  FileDownload,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFileDownloadToken } from "../../../common/file-download";
 import { downloadPdf } from "../../pdf";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "../../../generated/prisma-client";
 import { FormNotFound, NotFormContributor } from "../../errors";
-import { getUserCompanies } from "../../../companies/queries";
 import { canGetForm } from "../../permissions";
 import { getFullForm } from "../../database";
+import { getFullUser } from "../../../users/database";
 
 const TYPE = "form_pdf";
 
@@ -28,9 +24,9 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
     throw new FormNotFound(id);
   }
 
-  const userCompanies = await getUserCompanies(context.user.id);
-
-  const fullUser = { ...user, companies: userCompanies };
+  // user with linked objects
+  const fullUser = await getFullUser(user);
+  // form with linked object
   const fullForm = await getFullForm(form);
 
   // check form level permissions

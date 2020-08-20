@@ -1,5 +1,4 @@
 import { ErrorCode } from "../../../common/errors";
-import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { FormState } from "../../workflow/model";
 import { markAsSent } from "../mark-as";
 import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
@@ -33,19 +32,15 @@ jest.mock("../../../generated/prisma-client", () => ({
 }));
 
 describe("Forms -> markAsSealed mutation", () => {
-  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
-
   const defaultContext = getContext();
 
   beforeEach(() => {
     Object.keys(prisma).forEach(key => prisma[key].mockClear());
-    getUserCompaniesMock.mockReset();
   });
 
   it("should fail when SENT is not a possible next step", async () => {
     expect.assertions(1);
     try {
-      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
       mockFormWith({ id: 1, status: FormState.Sent });
 
       await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
@@ -59,10 +54,6 @@ describe("Forms -> markAsSealed mutation", () => {
     const form = getNewValidPrismaForm();
     form.status = "SEALED";
 
-    getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitterCompanySiret } as any
-    ]);
-
     appendix2FormsMock.mockResolvedValue([]);
     mockFormWith(getNewValidPrismaForm());
 
@@ -73,10 +64,6 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should work with appendix 2 and mark them as GROUPED", async () => {
     const form = getNewValidPrismaForm();
     form.status = "SEALED";
-
-    getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitterCompanySiret } as any
-    ]);
 
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
     mockFormWith(form);

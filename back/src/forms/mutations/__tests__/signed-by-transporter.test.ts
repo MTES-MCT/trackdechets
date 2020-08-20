@@ -1,6 +1,5 @@
 import { ErrorCode } from "../../../common/errors";
 import { signedByTransporter } from "../mark-as";
-import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { getContext } from "../__mocks__/data";
 import { TransporterSignatureFormInput } from "../../../generated/graphql/types";
 
@@ -39,21 +38,17 @@ jest.mock("../../../generated/prisma-client", () => ({
 }));
 
 describe("Forms -> signedByTransporter mutation", () => {
-  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
-
   const defaultContext = getContext();
 
   beforeEach(() => {
     Object.keys(prisma).forEach(
       key => prisma[key].mockClear && prisma[key].mockClear()
     );
-    getUserCompaniesMock.mockReset();
   });
 
   it("should fail when if its not signed by producer", async () => {
     expect.assertions(1);
     try {
-      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
       mockFormWith({
         id: 1,
         status: "SEALED",
@@ -77,7 +72,6 @@ describe("Forms -> signedByTransporter mutation", () => {
   it("should fail when if its not signed by transporter", async () => {
     expect.assertions(1);
     try {
-      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
       mockFormWith({
         id: 1,
         status: "SEALED",
@@ -101,7 +95,6 @@ describe("Forms -> signedByTransporter mutation", () => {
   it("should fail when security code is wrong", async () => {
     expect.assertions(1);
     try {
-      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
       mockFormWith({
         id: 1,
         status: "SEALED",
@@ -125,7 +118,6 @@ describe("Forms -> signedByTransporter mutation", () => {
   });
 
   it("should work when signingInfo are complete and correct", async () => {
-    getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
     mockFormWith({
       id: 1,

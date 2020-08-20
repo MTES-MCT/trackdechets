@@ -1,11 +1,11 @@
 import { prisma } from "../../../../generated/prisma-client";
-import * as queries from "../../../../companies/queries";
+import * as database from "../../../../users/database";
 import { getForms } from "../forms";
 
 const prismaMock = {
   forms: jest.spyOn(prisma, "forms")
 };
-const getUserCompaniesMock = jest.spyOn(queries, "getUserCompanies");
+const getUserCompaniesMock = jest.spyOn(database, "getUserCompanies");
 const USER_COMPANY = {
   id: "",
   siret: "a siret",

@@ -1,6 +1,5 @@
 import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 import { markAsTempStored } from "../mark-as";
-import * as companiesHelpers from "../../../companies/queries/userCompanies";
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";
 import {
@@ -37,12 +36,9 @@ jest.mock("../../../generated/prisma-client", () => ({
 }));
 
 describe("Forms -> markAsTempStored mutation", () => {
-  const getUserCompaniesMock = jest.spyOn(companiesHelpers, "getUserCompanies");
-
   const defaultContext = getContext();
 
   beforeEach(() => {
-    getUserCompaniesMock.mockReset();
     jest.clearAllMocks();
   });
 
@@ -50,7 +46,6 @@ describe("Forms -> markAsTempStored mutation", () => {
     expect.assertions(1);
 
     try {
-      getUserCompaniesMock.mockResolvedValue([{ siret: "a siret" } as any]);
       mockFormWith({ id: 1, status: FormState.Draft });
 
       await markAsTempStored(
@@ -66,10 +61,6 @@ describe("Forms -> markAsTempStored mutation", () => {
     const form = getNewValidPrismaForm();
     form.status = "SENT";
     form.recipientIsTempStorage = true;
-
-    getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitterCompanySiret } as any
-    ]);
 
     mockFormWith(form);
 
@@ -96,10 +87,6 @@ describe("Forms -> markAsTempStored mutation", () => {
     const form = getNewValidPrismaForm();
     form.status = "SENT";
     form.recipientIsTempStorage = true;
-
-    getUserCompaniesMock.mockResolvedValue([
-      { siret: form.emitterCompanySiret } as any
-    ]);
 
     mockFormWith(form);
 

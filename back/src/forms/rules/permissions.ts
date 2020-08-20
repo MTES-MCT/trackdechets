@@ -8,13 +8,13 @@ import {
   MutationUpdateFormArgs,
   ResolversParentTypes
 } from "../../generated/graphql/types";
-import { getUserPrivateCompanies } from "../../companies/queries";
 import { GraphQLContext } from "../../types";
 import {
   EcoOrganismeNotFound,
   NotFormContributor,
   FormNotFound
 } from "../errors";
+import { getUserCompanies } from "../../users/database";
 
 type FormSiretsAndOwner = {
   recipientCompanySiret: string;
@@ -75,7 +75,7 @@ const canCreateFormFn = async (
   { createFormInput }: MutationCreateFormArgs,
   ctx: GraphQLContext
 ) => {
-  const userCompanies = await getUserPrivateCompanies(ctx.user.id);
+  const userCompanies = await getUserCompanies(ctx.user.id);
   const userSirets = userCompanies.map(c => c.siret);
   const formSirets = [
     createFormInput.emitter?.company?.siret,
@@ -108,7 +108,7 @@ const canUpdateFormFn = async (
   { updateFormInput }: MutationUpdateFormArgs,
   ctx: GraphQLContext
 ) => {
-  const userCompanies = await getUserPrivateCompanies(ctx.user.id);
+  const userCompanies = await getUserCompanies(ctx.user.id);
   const userSirets = userCompanies.map(c => c.siret);
 
   const form = await prisma.form({ id: updateFormInput.id });

@@ -12,8 +12,8 @@ import {
 } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { canGetForm } from "../../permissions";
-import { getUserCompanies } from "../../../companies/queries";
 import { getFullForm } from "../../database";
+import { getFullUser } from "../../../users/database";
 
 function validateArgs(args: QueryFormArgs) {
   if (args.id == null && args.readableId == null) {
@@ -39,10 +39,8 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
     throw new FormNotFound(args.id || args.readableId);
   }
 
-  const userCompanies = await getUserCompanies(user.id);
-
   // user with linked objects
-  const fullUser = { ...user, companies: userCompanies };
+  const fullUser = await getFullUser(user);
 
   // form with linked objects
   const fullForm = await getFullForm(form);

@@ -27,11 +27,6 @@ jest.mock("../../../generated/prisma-client", () => ({
   }
 }));
 
-const getUserCompaniesMock = jest.fn();
-jest.mock("../../../companies/queries/userCompanies", () => ({
-  getUserCompanies: () => getUserCompaniesMock()
-}));
-
 const defaultContext = {
   prisma,
   user: { id: "userId" },
@@ -48,9 +43,6 @@ describe("Forms -> markAsProcessed mutation", () => {
     form.status = "RECEIVED";
 
     mockFormWith(form);
-    getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipientCompanySiret }
-    ]);
 
     await markAsProcessed(
       {
@@ -80,9 +72,6 @@ describe("Forms -> markAsProcessed mutation", () => {
     form.status = "RECEIVED";
 
     mockFormWith(form);
-    getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipientCompanySiret }
-    ]);
 
     await markAsProcessed(
       {
@@ -111,9 +100,6 @@ describe("Forms -> markAsProcessed mutation", () => {
     form.status = "RECEIVED";
 
     mockFormWith(form);
-    getUserCompaniesMock.mockResolvedValue([
-      { siret: form.recipientCompanySiret }
-    ]);
 
     await markAsProcessed(
       {
