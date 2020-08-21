@@ -50,7 +50,7 @@ export default {
     //updateForm: chain(isAuthenticated, canUpdateForm),
     //saveForm: chain(isAuthenticated, canSaveForm),
     // deleteForm: canAccessForm,
-    duplicateForm: canAccessForm,
+    // duplicateForm: canAccessForm,
     markAsSealed: or(
       isFormEcoOrganisme,
       isFormRecipient,

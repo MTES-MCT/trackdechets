@@ -16,7 +16,6 @@ import {
   takeOverSegment,
   editSegment
 } from "./mutations/multiModal";
-import { duplicateForm } from "./mutations";
 import { updateTransporterFields } from "./mutations/updateTransporterFields";
 import { AuthenticationError } from "apollo-server-express";
 import { stateSummary } from "./queries/state-summary";
@@ -31,7 +30,6 @@ import { transportSegments } from "./queries/segments";
 import { getUserCompanies } from "../users/database";
 
 const mutationResolvers: MutationResolvers = {
-  duplicateForm: (_parent, args, { user }) => duplicateForm(user.id, args),
   markAsSealed: (_parent, args, context) => markAsSealed(args, context),
   markAsSent: (_parent, args, context) => markAsSent(args, context),
   markAsReceived: (_parent, args, context) => markAsReceived(args, context),

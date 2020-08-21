@@ -1,11 +1,11 @@
 import {
   formFactory,
   userWithCompanyFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
-import { prisma, Form } from "../../../generated/prisma-client";
-import { cleanUpNotDuplicatableFieldsInForm } from "../../form-converter";
-import { resetDatabase } from "../../../../integration-tests/helper";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
+import { prisma, Form } from "../../../../generated/prisma-client";
+import { cleanUpNotDuplicatableFieldsInForm } from "../../../form-converter";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
