@@ -8,18 +8,12 @@ import {
   ResolversParentTypes,
   MutationUpdateFormArgs
 } from "../../../generated/graphql/types";
-import {
-  MissingTempStorageFlag,
-  InvalidWasteCode,
-  NotFormContributor,
-  FormNotFound
-} from "../../errors";
+import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
 import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { isFormContributor } from "../../permissions";
-import { getFullUser } from "../../../users/database";
+import { checkCanReadUpdateDeleteForm } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import { getFullForm, getFormOrFormNotFound } from "../../database";
+import { getFormOrFormNotFound } from "../../database";
 import { validateEcorganisme } from "../../validators";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -36,7 +30,6 @@ const updateFormResolver = async (
   context: GraphQLContext
 ) => {
   const user = checkIsAuthenticated(context);
-  const fullUser = await getFullUser(user);
 
   const { updateFormInput } = validateArgs(args);
 
@@ -49,11 +42,8 @@ const updateFormResolver = async (
   } = updateFormInput;
 
   const existingForm = await getFormOrFormNotFound({ id });
-  const fullExistingForm = await getFullForm(existingForm);
 
-  if (!isFormContributor(fullUser, fullExistingForm)) {
-    throw new NotFormContributor();
-  }
+  await checkCanReadUpdateDeleteForm(user, existingForm);
 
   const form = flattenFormInput(formContent);
 

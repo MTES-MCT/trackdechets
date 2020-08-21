@@ -2,10 +2,8 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFileDownloadToken } from "../../../common/file-download";
 import { downloadPdf } from "../../pdf";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { NotFormContributor } from "../../errors";
-import { isFormContributor } from "../../permissions";
-import { getFullForm, getFormOrFormNotFound } from "../../database";
-import { getFullUser } from "../../../users/database";
+import { getFormOrFormNotFound } from "../../database";
+import { checkCanReadUpdateDeleteForm } from "../../permissions";
 
 const TYPE = "form_pdf";
 
@@ -19,15 +17,7 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  // user with linked objects
-  const fullUser = await getFullUser(user);
-  // form with linked object
-  const fullForm = await getFullForm(form);
-
-  // check form level permissions
-  if (!isFormContributor(fullUser, fullForm)) {
-    throw new NotFormContributor();
-  }
+  await checkCanReadUpdateDeleteForm(user, form);
 
   return getFileDownloadToken({ type: TYPE, params: { id } }, downloadPdf);
 };

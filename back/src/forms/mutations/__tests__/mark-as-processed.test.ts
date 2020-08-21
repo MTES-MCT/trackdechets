@@ -1,4 +1,4 @@
-import { getNewValidPrismaForm } from "../__mocks__/data";
+import { getNewValidPrismaForm } from "../../resolvers/mutations/__mocks__/data";
 import { markAsProcessed } from "../mark-as";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));

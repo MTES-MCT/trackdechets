@@ -4,15 +4,10 @@ import {
 } from "../../../generated/graphql/types";
 import { expandFormFromDb } from "../../form-converter";
 import { UserInputError } from "apollo-server-express";
-import {
-  MissingIdOrReadableId,
-  FormNotFound,
-  NotFormContributor
-} from "../../errors";
+import { MissingIdOrReadableId, FormNotFound } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { isFormContributor } from "../../permissions";
-import { getFullForm, getFormOrFormNotFound } from "../../database";
-import { getFullUser } from "../../../users/database";
+import { checkCanReadUpdateDeleteForm } from "../../permissions";
+import { getFormOrFormNotFound } from "../../database";
 
 function validateArgs(args: QueryFormArgs) {
   if (args.id == null && args.readableId == null) {
@@ -34,20 +29,7 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
 
   const form = await getFormOrFormNotFound(validArgs);
 
-  if (form == null) {
-    throw new FormNotFound(args.id || args.readableId);
-  }
-
-  // user with linked objects
-  const fullUser = await getFullUser(user);
-
-  // form with linked objects
-  const fullForm = await getFullForm(form);
-
-  // check form level permissions
-  if (!isFormContributor(fullUser, fullForm)) {
-    throw new NotFormContributor();
-  }
+  await checkCanReadUpdateDeleteForm(user, form);
 
   return expandFormFromDb(form);
 };

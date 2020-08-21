@@ -1,4 +1,7 @@
-import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
+import {
+  getNewValidPrismaForm,
+  getContext
+} from "../../resolvers/mutations/__mocks__/data";
 import { markAsTempStored } from "../mark-as";
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";

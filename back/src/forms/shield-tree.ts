@@ -51,13 +51,13 @@ export default {
     //saveForm: chain(isAuthenticated, canSaveForm),
     // deleteForm: canAccessForm,
     // duplicateForm: canAccessForm,
-    markAsSealed: or(
-      isFormEcoOrganisme,
-      isFormRecipient,
-      isFormEmitter,
-      isFormTrader,
-      isFormTempStorer
-    ),
+    // markAsSealed: or(
+    //   isFormEcoOrganisme,
+    //   isFormRecipient,
+    //   isFormEmitter,
+    //   isFormTrader,
+    //   isFormTempStorer
+    // ),
     markAsSent: chain(markAsSentSchema, or(isFormRecipient, isFormEmitter)),
     markAsReceived: chain(markAsReceivedSchema, isFormRecipient),
     markAsProcessed: chain(markAsProcessedSchema, isFormRecipient),

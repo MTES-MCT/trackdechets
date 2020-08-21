@@ -4,12 +4,14 @@ import {
   User,
   EcoOrganisme,
   TemporaryStorageDetail,
-  TransportSegment,
-  prisma
+  TransportSegment
 } from "../generated/prisma-client";
 import { FullForm } from "./types";
-import { CreateFormInput } from "../generated/graphql/types";
-import { EcoOrganismeNotFound, NotFormContributor } from "./errors";
+import { NotFormContributor } from "./errors";
+import { getFullUser } from "../users/database";
+import { FullUser } from "../users/types";
+import { getFullForm } from "./database";
+import { ForbiddenError } from "apollo-server-express";
 
 function isFormOwner(user: User, form: { owner: User }) {
   return form.owner?.id === user.id;
@@ -95,10 +97,7 @@ function isFormMultiModalTransporter(
   return transportSegmentSirets.some(s => sirets.includes(s));
 }
 
-export function isFormContributor(
-  user: User & { companies: Company[] },
-  form: FullForm
-) {
+export function isFormContributor(user: FullUser, form: FullForm) {
   return (
     isFormOwner(user, form) ||
     isFormEmitter(user, form) ||
@@ -110,4 +109,35 @@ export function isFormContributor(
     isFormDestinationAfterTempStorage(user, form) ||
     isFormMultiModalTransporter(user, form)
   );
+}
+
+/**
+ * Only users who belongs to a company that appears on the BSD
+ * can read, update or delete it
+ */
+export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
+  // user with companies
+  const fullUser = await getFullUser(user);
+
+  // form with linked objects (tempStorageDetail, transportSegment, owner, etc)
+  const fullForm = await getFullForm(form);
+
+  if (!isFormContributor(fullUser, fullForm)) {
+    throw new NotFormContributor();
+  }
+}
+
+export async function checkCanMarkAsSealed(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+  const isAuthorized =
+    isFormEcoOrganisme(fullUser, fullForm) ||
+    isFormRecipient(fullUser, fullForm) ||
+    isFormTransporter(fullUser, fullForm) ||
+    isFormEmitter(fullUser, fullForm) ||
+    isFormTrader(fullUser, fullForm) ||
+    isFormDestinationAfterTempStorage(fullUser, fullForm);
+  if (!isAuthorized) {
+    throw new ForbiddenError("Vous n'êtes pas autorisé à sceller ce bordereau");
+  }
 }

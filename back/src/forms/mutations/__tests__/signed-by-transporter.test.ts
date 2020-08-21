@@ -1,6 +1,6 @@
 import { ErrorCode } from "../../../common/errors";
 import { signedByTransporter } from "../mark-as";
-import { getContext } from "../__mocks__/data";
+import { getContext } from "../../resolvers/mutations/__mocks__/data";
 import { TransporterSignatureFormInput } from "../../../generated/graphql/types";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));

@@ -1,5 +1,5 @@
-import { ErrorCode } from "../../../common/errors";
-import { markAsSealed } from "../mark-as";
+import { ErrorCode } from "../../../../common/errors";
+import { markAsSealed } from "../markAsSealed";
 import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -15,16 +15,14 @@ function mockFormWith(value) {
 const prisma = {
   form: formMock,
   updateForm: jest.fn((..._args) => Promise.resolve({})),
-  createForm: jest.fn(() => Promise.resolve({})),
   createStatusLog: jest.fn(() => Promise.resolve({})),
   updateManyForms: jest.fn((..._args) => Promise.resolve({}))
 };
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     form: () => prisma.form(),
     updateForm: (...args) => prisma.updateForm(...args),
-    createForm: () => prisma.createForm(),
     createStatusLog: () => prisma.createStatusLog(),
     updateManyForms: (...args) => prisma.updateManyForms(...args)
   }
@@ -34,7 +32,9 @@ describe("Forms -> markAsSealed mutation", () => {
   const defaultContext = getContext();
 
   beforeEach(() => {
-    Object.keys(prisma).forEach(key => prisma[key].mockClear());
+    formMock.mockReset();
+    prisma.updateForm.mockClear();
+    prisma.updateManyForms.mockClear();
   });
 
   it("should fail when form is not fully valid", async () => {
@@ -46,7 +46,7 @@ describe("Forms -> markAsSealed mutation", () => {
 
       mockFormWith(form);
 
-      await markAsSealed({ id: "1" }, defaultContext);
+      await markAsSealed(form, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
     }
@@ -61,7 +61,7 @@ describe("Forms -> markAsSealed mutation", () => {
 
       mockFormWith(form);
 
-      await markAsSealed({ id: "1" }, defaultContext);
+      await markAsSealed(form, defaultContext);
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
@@ -80,7 +80,7 @@ describe("Forms -> markAsSealed mutation", () => {
 
       mockFormWith(form);
 
-      await markAsSealed({ id: form.id }, defaultContext);
+      await markAsSealed(form, defaultContext);
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
@@ -94,9 +94,12 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should fail when SEALED is not a possible next step", async () => {
     expect.assertions(1);
     try {
-      mockFormWith({ id: 1, status: "SENT" });
+      const form = getNewValidPrismaForm();
+      // unvalidate form
+      form.status = "SENT";
+      mockFormWith(form);
 
-      await markAsSealed({ id: "1" }, defaultContext);
+      await markAsSealed(form, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -109,7 +112,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([]);
     mockFormWith(form);
 
-    await markAsSealed({ id: "1" }, defaultContext);
+    await markAsSealed(form, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
@@ -119,7 +122,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
     mockFormWith(form);
 
-    await markAsSealed({ id: "1" }, defaultContext);
+    await markAsSealed(form, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateManyForms).toHaveBeenCalledWith({
       where: {

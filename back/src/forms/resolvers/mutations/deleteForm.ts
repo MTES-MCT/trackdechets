@@ -1,11 +1,9 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
-import { FormNotFound, NotFormContributor } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandFormFromDb } from "../../form-converter";
-import { isFormContributor } from "../../permissions";
-import { getFullUser } from "../../../users/database";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
+import { checkCanReadUpdateDeleteForm } from "../../permissions";
+import { getFormOrFormNotFound } from "../../database";
 import { UserInputError } from "apollo-server-express";
 
 const deleteFormResolver: MutationResolvers["deleteForm"] = async (
@@ -23,11 +21,7 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
     throw new UserInputError(errMessage);
   }
 
-  const fullUser = await getFullUser(user);
-  const fullForm = await getFullForm(form);
-  if (!isFormContributor(fullUser, fullForm)) {
-    throw new NotFormContributor();
-  }
+  await checkCanReadUpdateDeleteForm(user, form);
 
   const deletedForm = await prisma.updateForm({
     where: { id },

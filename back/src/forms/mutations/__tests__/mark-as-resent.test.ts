@@ -1,4 +1,7 @@
-import { getNewValidForm, getContext } from "../__mocks__/data";
+import {
+  getNewValidForm,
+  getContext
+} from "../../resolvers/mutations/__mocks__/data";
 import { markAsResent } from "../mark-as";
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";

@@ -2,10 +2,10 @@ import {
   userWithCompanyFactory,
   formFactory,
   companyFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
@@ -16,25 +16,22 @@ jest.mock("axios", () => ({
 describe("{ mutation { markAsSealed } }", () => {
   afterAll(() => resetDatabase());
 
-  test("the emitter of the BSD can seal it", async () => {
-    const { user, company: emitterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
+  test.each(["emitter", "recipient", "trader", "transporter"])(
+    "%p of the BSD can seal it",
+    async role => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const recipientCompany = await companyFactory();
+      let form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          [`${role}CompanySiret`]: company.siret
+        }
+      });
 
-    let form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret
-      }
-    });
+      const { mutate } = makeClient(user);
 
-    const { mutate } = makeClient(user);
-
-    const mutation = `
+      const mutation = `
       mutation   {
         markAsSealed(id: "${form.id}") {
           id
@@ -42,93 +39,23 @@ describe("{ mutation { markAsSealed } }", () => {
       }
     `;
 
-    await mutate(mutation);
+      await mutate(mutation);
 
-    form = await prisma.form({ id: form.id });
+      form = await prisma.form({ id: form.id });
 
-    expect(form.status).toEqual("SEALED");
+      expect(form.status).toEqual("SEALED");
 
-    // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: { id: user.id }, status: "SEALED" }
-    });
-    expect(statusLogs.length).toEqual(1);
-  });
-
-  test("the recipient of the BSD can seal it", async () => {
-    const { user, company: recipientCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-
-    const emitterCompany = await companyFactory();
-
-    let form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret
-      }
-    });
-
-    const { mutate } = makeClient(user);
-
-    const mutation = `
-      mutation   {
-        markAsSealed(id: "${form.id}") {
-          id
+      // check relevant statusLog is created
+      const statusLogs = await prisma.statusLogs({
+        where: {
+          form: { id: form.id },
+          user: { id: user.id },
+          status: "SEALED"
         }
-      }
-    `;
-
-    await mutate(mutation);
-
-    form = await prisma.form({ id: form.id });
-
-    expect(form.status).toEqual("SEALED");
-
-    // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
-      where: { form: { id: form.id }, user: { id: user.id }, status: "SEALED" }
-    });
-    expect(statusLogs.length).toEqual(1);
-  });
-
-  test("the trader of the BSD can seal it", async () => {
-    const emitterCompany = await companyFactory();
-
-    const recipientCompany = await companyFactory();
-
-    const { user, company: traderCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-
-    let form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        traderCompanySiret: traderCompany.siret
-      }
-    });
-
-    const { mutate } = makeClient(user);
-
-    const mutation = `
-      mutation   {
-        markAsSealed(id: "${form.id}") {
-          id
-        }
-      }
-    `;
-
-    await mutate(mutation);
-
-    form = await prisma.form({ id: form.id });
-
-    expect(form.status).toEqual("SEALED");
-  });
+      });
+      expect(statusLogs.length).toEqual(1);
+    }
+  );
 
   test("the eco-organisme of the BSD can seal it", async () => {
     const emitterCompany = await companyFactory();
@@ -175,7 +102,7 @@ describe("{ mutation { markAsSealed } }", () => {
     expect(form.status).toEqual("SEALED");
   });
 
-  test("should fail if user is neither emitter or recipient or trader", async () => {
+  test("should fail if user is not authorized", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
 
     const emitterCompany = await companyFactory();

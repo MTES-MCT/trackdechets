@@ -1,7 +1,10 @@
 import { ErrorCode } from "../../../common/errors";
 import { FormState } from "../../workflow/model";
 import { markAsSent } from "../mark-as";
-import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
+import {
+  getNewValidPrismaForm,
+  getContext
+} from "../../resolvers/mutations/__mocks__/data";
 
 const formMock = jest.fn();
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
