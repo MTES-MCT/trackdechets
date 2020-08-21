@@ -5,6 +5,7 @@ import saveForm from "./mutations/saveForm";
 import deleteForm from "./mutations/deleteForm";
 import duplicateForm from "./mutations/duplicateForm";
 import markAsSealed from "./mutations/markAsSealed";
+import markAsSent from "./mutations/markAsSent";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -12,7 +13,8 @@ const Mutation: MutationResolvers = {
   saveForm,
   deleteForm,
   duplicateForm,
-  markAsSealed
+  markAsSealed,
+  markAsSent
 };
 
 export default Mutation;

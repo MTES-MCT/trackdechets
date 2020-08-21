@@ -1,10 +1,6 @@
-import { ErrorCode } from "../../../common/errors";
-import { FormState } from "../../workflow/model";
-import { markAsSent } from "../mark-as";
-import {
-  getNewValidPrismaForm,
-  getContext
-} from "../../resolvers/mutations/__mocks__/data";
+import { ErrorCode } from "../../../../common/errors";
+import { markAsSent } from "../markAsSent";
+import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 
 const formMock = jest.fn();
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -24,7 +20,7 @@ const prisma = {
   updateManyForms: jest.fn((..._args) => Promise.resolve({}))
 };
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     form: () => prisma.form(),
     updateForm: (...args) => prisma.updateForm(...args),
@@ -44,9 +40,11 @@ describe("Forms -> markAsSealed mutation", () => {
   it("should fail when SENT is not a possible next step", async () => {
     expect.assertions(1);
     try {
-      mockFormWith({ id: 1, status: FormState.Sent });
+      const form = getNewValidPrismaForm();
+      form.status = "SENT";
+      mockFormWith(form);
 
-      await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
+      await markAsSent(form, { id: "1", sentInfo: {} }, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -60,7 +58,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([]);
     mockFormWith(getNewValidPrismaForm());
 
-    await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
+    await markAsSent(form, { id: "1", sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
@@ -71,7 +69,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
     mockFormWith(form);
 
-    await markAsSent({ id: "1", sentInfo: {} }, defaultContext);
+    await markAsSent(form, { id: "1", sentInfo: {} }, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateManyForms).toHaveBeenCalledWith({
       where: {

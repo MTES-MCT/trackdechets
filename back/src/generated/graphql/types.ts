@@ -1020,13 +1020,13 @@ export type MutationLoginArgs = {
 
 
 export type MutationMarkAsProcessedArgs = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   processedInfo: ProcessedFormInput;
 };
 
 
 export type MutationMarkAsReceivedArgs = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   receivedInfo: ReceivedFormInput;
 };
 
@@ -1044,12 +1044,12 @@ export type MutationMarkAsResentArgs = {
 
 
 export type MutationMarkAsSealedArgs = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 
 export type MutationMarkAsSentArgs = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   sentInfo: SentFormInput;
 };
 
@@ -1296,7 +1296,12 @@ export type Query = {
    */
   formPdf: FileDownload;
   /**
-   * Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
+   * Renvoie les BSDs de l'établissement sélectionné.
+   * Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
+   * alors les BSD de cette entreprise sont retournés.
+   * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
+   * préciser un SIRET
+   * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
    * Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
    * On peut également demander les bordereaux pour lesquels on est transporteur
    */
@@ -1494,9 +1499,9 @@ export type Rubrique = {
 /** Payload de signature d'un BSD */
 export type SentFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
-  sentAt?: Maybe<Scalars['DateTime']>;
+  sentAt: Scalars['DateTime'];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
-  sentBy?: Maybe<Scalars['String']>;
+  sentBy: Scalars['String'];
 };
 
 export type SignupInput = {
@@ -2489,12 +2494,12 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>;
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
-  markAsProcessed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsProcessedArgs, 'processedInfo'>>;
-  markAsReceived?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsReceivedArgs, 'receivedInfo'>>;
+  markAsProcessed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsProcessedArgs, 'id' | 'processedInfo'>>;
+  markAsReceived?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsReceivedArgs, 'id' | 'receivedInfo'>>;
   markAsResealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsResealedArgs, 'id' | 'resealedInfos'>>;
   markAsResent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsResentArgs, 'id' | 'resentInfos'>>;
-  markAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSealedArgs, never>>;
-  markAsSent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSentArgs, 'sentInfo'>>;
+  markAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSealedArgs, 'id'>>;
+  markAsSent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSentArgs, 'id' | 'sentInfo'>>;
   markAsTempStored?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStoredArgs, 'id' | 'tempStoredInfos'>>;
   markSegmentAsReadyToTakeOver?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationMarkSegmentAsReadyToTakeOverArgs, 'id'>>;
   prepareSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationPrepareSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
@@ -3279,8 +3284,8 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: null,
-    sentBy: null,
+    sentAt: new Date(),
+    sentBy: "",
     ...props,
   };
 }

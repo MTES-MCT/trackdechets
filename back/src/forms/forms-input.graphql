@@ -1,10 +1,10 @@
 "Payload de signature d'un BSD"
 input SentFormInput {
   "Date de l'envoi du déchet par l'émetteur (case 9)"
-  sentAt: DateTime
+  sentAt: DateTime!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String
+  sentBy: String!
 }
 
 "Payload de signature d'un BSD par un transporteur"

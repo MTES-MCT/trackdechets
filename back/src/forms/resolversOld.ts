@@ -30,7 +30,6 @@ import { transportSegments } from "./queries/segments";
 import { getUserCompanies } from "../users/database";
 
 const mutationResolvers: MutationResolvers = {
-  markAsSent: (_parent, args, context) => markAsSent(args, context),
   markAsReceived: (_parent, args, context) => markAsReceived(args, context),
   markAsProcessed: (_parent, args, context) => markAsProcessed(args, context),
   signedByTransporter: (_parent, args, context) =>

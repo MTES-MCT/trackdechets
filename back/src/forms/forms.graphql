@@ -242,12 +242,12 @@ type Mutation {
   }
   ```
   """
-  markAsSealed("ID d'un BSD" id: ID): Form
+  markAsSealed("ID d'un BSD" id: ID!): Form
 
   "Valide l'envoi d'un BSD"
   markAsSent(
     "ID d'un BSD"
-    id: ID
+    id: ID!
     "Informations liées à l'envoi"
     sentInfo: SentFormInput!
   ): Form
@@ -258,7 +258,7 @@ type Mutation {
   "Valide la réception d'un BSD"
   markAsReceived(
     "ID d'un BSD"
-    id: ID
+    id: ID!
     "Informations liées à la réception"
     receivedInfo: ReceivedFormInput!
   ): Form
@@ -266,7 +266,7 @@ type Mutation {
   "Valide le traitement d'un BSD"
   markAsProcessed(
     "ID d'un BSD"
-    id: ID
+    id: ID!
     "Informations liées au traitement"
     processedInfo: ProcessedFormInput!
   ): Form

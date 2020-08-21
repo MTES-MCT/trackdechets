@@ -141,3 +141,16 @@ export async function checkCanMarkAsSealed(user: User, form: Form) {
     throw new ForbiddenError("Vous n'êtes pas autorisé à sceller ce bordereau");
   }
 }
+
+export async function checkCanMarkAsSent(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+
+  const isAuthorized =
+    isFormRecipient(fullUser, fullForm) || isFormEmitter(fullUser, fullForm);
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à marquer ce bordereau comme envoyé"
+    );
+  }
+}
