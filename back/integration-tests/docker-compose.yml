@@ -48,5 +48,5 @@ services:
   td-pdf:
     image: td-pdf
     build:
-      context: ../
+      context: ../../pdf
       dockerfile: Dockerfile
