@@ -35,7 +35,7 @@ import {
 export default {
   Query: {
     //form: or(canAccessForm, isFormTransporter),
-    formPdf: or(canAccessForm, isFormTransporter)
+    // formPdf: or(canAccessForm, isFormTransporter)
     // forms: chain(
     //   formsSchema,
     //   or(or(isCompanyMember, isCompanyAdmin), canAccessFormsWithoutSiret)
@@ -46,10 +46,10 @@ export default {
     // appendixForms: or(isCompanyMember, isCompanyAdmin)
   },
   Mutation: {
-    createForm: chain(isAuthenticated, canCreateForm),
-    updateForm: chain(isAuthenticated, canUpdateForm),
-    saveForm: chain(isAuthenticated, canSaveForm),
-    deleteForm: canAccessForm,
+    //createForm: chain(isAuthenticated, canCreateForm),
+    //updateForm: chain(isAuthenticated, canUpdateForm),
+    //saveForm: chain(isAuthenticated, canSaveForm),
+    // deleteForm: canAccessForm,
     duplicateForm: canAccessForm,
     markAsSealed: or(
       isFormEcoOrganisme,

@@ -1,8 +1,5 @@
 import { prisma, Status } from "../generated/prisma-client";
-import {
-  expandFormFromDb,
-  expandTemporaryStorageFromDb
-} from "./form-converter";
+import { expandTemporaryStorageFromDb } from "./form-converter";
 import {
   markAsProcessed,
   markAsReceived,
@@ -19,13 +16,11 @@ import {
   takeOverSegment,
   editSegment
 } from "./mutations/multiModal";
-import { duplicateForm, createForm, updateForm } from "./mutations";
-import { saveForm } from "./mutations/save-form";
+import { duplicateForm } from "./mutations";
 import { updateTransporterFields } from "./mutations/updateTransporterFields";
 import { AuthenticationError } from "apollo-server-express";
 import { stateSummary } from "./queries/state-summary";
 import {
-  QueryResolvers,
   MutationResolvers,
   SubscriptionResolvers,
   FormResolvers,
@@ -36,16 +31,6 @@ import { transportSegments } from "./queries/segments";
 import { getUserCompanies } from "../users/database";
 
 const mutationResolvers: MutationResolvers = {
-  createForm,
-  updateForm,
-  saveForm,
-  deleteForm: async (_parent, { id }) => {
-    const form = await prisma.updateForm({
-      where: { id },
-      data: { isDeleted: true }
-    });
-    return { ...form, status: form.status as Status };
-  },
   duplicateForm: (_parent, args, { user }) => duplicateForm(user.id, args),
   markAsSealed: (_parent, args, context) => markAsSealed(args, context),
   markAsSent: (_parent, args, context) => markAsSent(args, context),

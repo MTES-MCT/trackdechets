@@ -4,9 +4,12 @@ import {
   User,
   EcoOrganisme,
   TemporaryStorageDetail,
-  TransportSegment
+  TransportSegment,
+  prisma
 } from "../generated/prisma-client";
 import { FullForm } from "./types";
+import { CreateFormInput } from "../generated/graphql/types";
+import { EcoOrganismeNotFound, NotFormContributor } from "./errors";
 
 function isFormOwner(user: User, form: { owner: User }) {
   return form.owner?.id === user.id;
@@ -92,7 +95,7 @@ function isFormMultiModalTransporter(
   return transportSegmentSirets.some(s => sirets.includes(s));
 }
 
-export function canGetForm(
+export function isFormContributor(
   user: User & { companies: Company[] },
   form: FullForm
 ) {

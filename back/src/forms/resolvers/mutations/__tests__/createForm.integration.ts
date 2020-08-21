@@ -1,12 +1,12 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
   companyFactory,
   userFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
-import { prisma } from "../../../generated/prisma-client";
-import { ErrorCode } from "../../../common/errors";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
+import { prisma } from "../../../../generated/prisma-client";
+import { ErrorCode } from "../../../../common/errors";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {

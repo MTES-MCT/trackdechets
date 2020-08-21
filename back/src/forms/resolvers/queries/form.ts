@@ -3,7 +3,6 @@ import {
   QueryFormArgs
 } from "../../../generated/graphql/types";
 import { expandFormFromDb } from "../../form-converter";
-import { prisma } from "../../../generated/prisma-client";
 import { UserInputError } from "apollo-server-express";
 import {
   MissingIdOrReadableId,
@@ -11,8 +10,8 @@ import {
   NotFormContributor
 } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { canGetForm } from "../../permissions";
-import { getFullForm } from "../../database";
+import { isFormContributor } from "../../permissions";
+import { getFullForm, getFormOrFormNotFound } from "../../database";
 import { getFullUser } from "../../../users/database";
 
 function validateArgs(args: QueryFormArgs) {
@@ -31,9 +30,9 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
   // check query level permissions
   const user = checkIsAuthenticated(context);
 
-  const { id, readableId } = validateArgs(args);
+  const validArgs = validateArgs(args);
 
-  const form = await prisma.form(id ? { id } : { readableId });
+  const form = await getFormOrFormNotFound(validArgs);
 
   if (form == null) {
     throw new FormNotFound(args.id || args.readableId);
@@ -46,7 +45,7 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
   const fullForm = await getFullForm(form);
 
   // check form level permissions
-  if (!canGetForm(fullUser, fullForm)) {
+  if (!isFormContributor(fullUser, fullForm)) {
     throw new NotFormContributor();
   }
 

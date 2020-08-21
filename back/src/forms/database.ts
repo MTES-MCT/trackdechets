@@ -2,8 +2,9 @@
  * Prisma helpers function
  */
 
-import { Form, prisma } from "../generated/prisma-client";
+import { Form, prisma, FormWhereUniqueInput } from "../generated/prisma-client";
 import { FullForm } from "./types";
+import { FormNotFound } from "./errors";
 
 /**
  * Returns a prisma Form with all linked objects
@@ -26,4 +27,21 @@ export async function getFullForm(form: Form): Promise<FullForm> {
     temporaryStorage,
     transportSegments
   };
+}
+
+/**
+ * Retrives a form by id or readableId or throw a FormNotFound error
+ */
+export async function getFormOrFormNotFound({
+  id,
+  readableId
+}: FormWhereUniqueInput) {
+  if (!id && !readableId) {
+    throw new Error("You should specify an id or a readableId");
+  }
+  const form = await prisma.form(id ? { id } : { readableId });
+  if (form == null || form.isDeleted == true) {
+    throw new FormNotFound(id ? id.toString() : readableId);
+  }
+  return form;
 }

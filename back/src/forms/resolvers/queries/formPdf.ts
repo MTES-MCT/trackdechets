@@ -2,10 +2,9 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFileDownloadToken } from "../../../common/file-download";
 import { downloadPdf } from "../../pdf";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { prisma } from "../../../generated/prisma-client";
-import { FormNotFound, NotFormContributor } from "../../errors";
-import { canGetForm } from "../../permissions";
-import { getFullForm } from "../../database";
+import { NotFormContributor } from "../../errors";
+import { isFormContributor } from "../../permissions";
+import { getFullForm, getFormOrFormNotFound } from "../../database";
 import { getFullUser } from "../../../users/database";
 
 const TYPE = "form_pdf";
@@ -18,11 +17,7 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
   // check query level permission
   const user = checkIsAuthenticated(context);
 
-  const form = await prisma.form({ id });
-
-  if (form == null) {
-    throw new FormNotFound(id);
-  }
+  const form = await getFormOrFormNotFound({ id });
 
   // user with linked objects
   const fullUser = await getFullUser(user);
@@ -30,7 +25,7 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
   const fullForm = await getFullForm(form);
 
   // check form level permissions
-  if (!canGetForm(fullUser, fullForm)) {
+  if (!isFormContributor(fullUser, fullForm)) {
     throw new NotFormContributor();
   }
 
