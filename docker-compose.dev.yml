@@ -74,14 +74,18 @@ services:
       - ./front/:/usr/src/front
 
   td-pdf:
-    image: td-pdf
+    image: node:10.14-alpine
+    container_name: td-pdf
+    working_dir: /usr/src/pdf
     command: sh -c "npm install && npm run dev"
-    volumes:
-      - ./pdf:/usr/src/app
+    expose:
+      - "3201"
     ports:
       - 3201:3201
     environment:
       PDF_WATERMARK: display
+    volumes:
+      - ./pdf:/usr/src/pdf
 
   td-mail:
     image: td-mail
