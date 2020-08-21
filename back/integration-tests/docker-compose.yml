@@ -47,4 +47,6 @@ services:
 
   td-pdf:
     image: td-pdf
-    command: sh -c "npm install && npm run dev"
+    build:
+      context: ../
+      dockerfile: Dockerfile
