@@ -44,7 +44,14 @@ describe("Forms -> markAsSealed mutation", () => {
       form.status = "SENT";
       mockFormWith(form);
 
-      await markAsSent(form, { id: "1", sentInfo: {} }, defaultContext);
+      await markAsSent(
+        form,
+        {
+          id: "1",
+          sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Snow" }
+        },
+        defaultContext
+      );
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -58,7 +65,14 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([]);
     mockFormWith(getNewValidPrismaForm());
 
-    await markAsSent(form, { id: "1", sentInfo: {} }, defaultContext);
+    await markAsSent(
+      form,
+      {
+        id: "1",
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Snow" }
+      },
+      defaultContext
+    );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
@@ -69,7 +83,14 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
     mockFormWith(form);
 
-    await markAsSent(form, { id: "1", sentInfo: {} }, defaultContext);
+    await markAsSent(
+      form,
+      {
+        id: "1",
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Snow" }
+      },
+      defaultContext
+    );
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateManyForms).toHaveBeenCalledWith({
       where: {
