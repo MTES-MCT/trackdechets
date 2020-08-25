@@ -1,13 +1,13 @@
 import { createTestClient } from "apollo-server-integration-testing";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
-import { server } from "../../../server";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
+import { server } from "../../../../server";
 import {
   formFactory,
   userWithCompanyFactory,
   companyFactory
-} from "../../../__tests__/factories";
-import { PROCESSING_OPERATIONS } from "../../../common/constants";
+} from "../../../../__tests__/factories";
+import { PROCESSING_OPERATIONS } from "../../../../common/constants";
 
 jest.mock("axios", () => ({
   default: {

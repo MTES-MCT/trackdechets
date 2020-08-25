@@ -93,10 +93,30 @@ input ProcessedFormInput {
 
 input NextDestinationInput {
   "Traitement prévue (code D/R)"
-  processingOperation: String
+  processingOperation: String!
 
   "Établissement de destination ultérieur"
-  company: CompanyInput
+  company: NextDestinationCompanyInput!
+}
+
+input NextDestinationCompanyInput {
+  "SIRET de l'établissement"
+  siret: String!
+
+  "Nom de l'établissement"
+  name: String!
+
+  "Adresse de l'établissement"
+  address: String!
+
+  "Nom du contact dans l'établissement"
+  contact: String!
+
+  "Email du contact dans l'établissement"
+  mail: String!
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String!
 }
 
 "Payload de création d'un bordereau"

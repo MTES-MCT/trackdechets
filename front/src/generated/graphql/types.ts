@@ -1165,11 +1165,26 @@ export type NextDestination = {
   company: Maybe<FormCompany>;
 };
 
+export type NextDestinationCompanyInput = {
+  /** SIRET de l'établissement */
+  siret: Scalars['String'];
+  /** Nom de l'établissement */
+  name: Scalars['String'];
+  /** Adresse de l'établissement */
+  address: Scalars['String'];
+  /** Nom du contact dans l'établissement */
+  contact: Scalars['String'];
+  /** Email du contact dans l'établissement */
+  mail: Scalars['String'];
+  /** Numéro de téléphone de contact dans l'établissement */
+  phone: Scalars['String'];
+};
+
 export type NextDestinationInput = {
   /** Traitement prévue (code D/R) */
-  processingOperation: Maybe<Scalars['String']>;
+  processingOperation: Scalars['String'];
   /** Établissement de destination ultérieur */
-  company: Maybe<CompanyInput>;
+  company: NextDestinationCompanyInput;
 };
 
 /** Payload d'un segment de transport */
@@ -2383,10 +2398,22 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
   };
 }
 
+export function createNextDestinationCompanyInputMock(props: Partial<NextDestinationCompanyInput>): NextDestinationCompanyInput {
+  return {
+    siret: "",
+    name: "",
+    address: "",
+    contact: "",
+    mail: "",
+    phone: "",
+    ...props,
+  };
+}
+
 export function createNextDestinationInputMock(props: Partial<NextDestinationInput>): NextDestinationInput {
   return {
-    processingOperation: null,
-    company: null,
+    processingOperation: "",
+    company: createNextDestinationCompanyInputMock({}),
     ...props,
   };
 }

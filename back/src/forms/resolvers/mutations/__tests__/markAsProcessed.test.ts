@@ -1,5 +1,5 @@
-import { getNewValidPrismaForm } from "../../resolvers/mutations/__mocks__/data";
-import { markAsProcessed } from "../mark-as";
+import { getNewValidPrismaForm } from "../__mocks__/data";
+import { markAsProcessedFn as markAsProcessed } from "../markAsProcessed";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
 const formMock = jest.fn(() => Promise.resolve({}));
@@ -45,6 +45,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     mockFormWith(form);
 
     await markAsProcessed(
+      form,
       {
         id: "1",
         processedInfo: {
@@ -74,6 +75,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     mockFormWith(form);
 
     await markAsProcessed(
+      form,
       {
         id: "1",
         processedInfo: {
@@ -102,6 +104,7 @@ describe("Forms -> markAsProcessed mutation", () => {
     mockFormWith(form);
 
     await markAsProcessed(
+      form,
       {
         id: "1",
         processedInfo: {
