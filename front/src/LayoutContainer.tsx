@@ -49,56 +49,60 @@ export default withRouter(function LayoutContainer({ history }) {
           <Dialog />
         </PrivateRoute>
 
-        <Layout isAuthenticated={isAuthenticated}>
-          <Route exact path="/login">
-            <Login />
-          </Route>
+        <Route>
+          <Layout isAuthenticated={isAuthenticated}>
+            <Switch>
+              <Route exact path="/login">
+                <Login />
+              </Route>
 
-          <Route exact path="/invite">
-            <Invite />
-          </Route>
+              <Route exact path="/invite">
+                <Invite />
+              </Route>
 
-          <Route exact path="/signup">
-            <Signup />
-          </Route>
+              <Route exact path="/signup">
+                <Signup />
+              </Route>
 
-          <Route exact path="/signup/details">
-            <WasteSelector />
-          </Route>
+              <Route exact path="/signup/details">
+                <WasteSelector />
+              </Route>
 
-          <Route exact path="/signup/activation">
-            <SignupInfo />
-          </Route>
+              <Route exact path="/signup/activation">
+                <SignupInfo />
+              </Route>
 
-          <Route exact path="/reset-password">
-            <ResetPassword />
-          </Route>
+              <Route exact path="/reset-password">
+                <ResetPassword />
+              </Route>
 
-          <Route exact path="/company/:siret">
-            <Company />
-          </Route>
+              <Route exact path="/company/:siret">
+                <Company />
+              </Route>
 
-          <Route exact path="/wasteTree">
-            <WasteTree />
-          </Route>
+              <Route exact path="/wasteTree">
+                <WasteTree />
+              </Route>
 
-          <PrivateRoute path="/form/:id?" isAuthenticated={isAuthenticated}>
-            <FormContainer />
-          </PrivateRoute>
+              <PrivateRoute path="/form/:id?" isAuthenticated={isAuthenticated}>
+                <FormContainer />
+              </PrivateRoute>
 
-          <PrivateRoute
-            path="/dashboard/:siret?"
-            isAuthenticated={isAuthenticated}
-          >
-            <Dashboard />
-          </PrivateRoute>
+              <PrivateRoute
+                path="/dashboard/:siret?"
+                isAuthenticated={isAuthenticated}
+              >
+                <Dashboard />
+              </PrivateRoute>
 
-          <PrivateRoute path="/account" isAuthenticated={isAuthenticated}>
-            <Account />
-          </PrivateRoute>
+              <PrivateRoute path="/account" isAuthenticated={isAuthenticated}>
+                <Account />
+              </PrivateRoute>
 
-          <Redirect to={isAuthenticated ? "/dashboard" : "/login"} />
-        </Layout>
+              <Redirect to={isAuthenticated ? "/dashboard" : "/login"} />
+            </Switch>
+          </Layout>
+        </Route>
       </Switch>
     </Suspense>
   );
