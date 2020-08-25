@@ -1,5 +1,5 @@
 import { ErrorCode } from "../../../../common/errors";
-import { markAsSealed } from "../markAsSealed";
+import { markAsSealedFn } from "../markAsSealed";
 import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -46,7 +46,7 @@ describe("Forms -> markAsSealed mutation", () => {
 
       mockFormWith(form);
 
-      await markAsSealed(form, defaultContext);
+      await markAsSealedFn(form, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
     }
@@ -61,7 +61,7 @@ describe("Forms -> markAsSealed mutation", () => {
 
       mockFormWith(form);
 
-      await markAsSealed(form, defaultContext);
+      await markAsSealedFn(form, defaultContext);
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
@@ -80,7 +80,7 @@ describe("Forms -> markAsSealed mutation", () => {
 
       mockFormWith(form);
 
-      await markAsSealed(form, defaultContext);
+      await markAsSealedFn(form, defaultContext);
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
@@ -99,7 +99,7 @@ describe("Forms -> markAsSealed mutation", () => {
       form.status = "SENT";
       mockFormWith(form);
 
-      await markAsSealed(form, defaultContext);
+      await markAsSealedFn(form, defaultContext);
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
@@ -112,7 +112,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([]);
     mockFormWith(form);
 
-    await markAsSealed(form, defaultContext);
+    await markAsSealedFn(form, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
   });
 
@@ -122,7 +122,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
     mockFormWith(form);
 
-    await markAsSealed(form, defaultContext);
+    await markAsSealedFn(form, defaultContext);
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateManyForms).toHaveBeenCalledWith({
       where: {

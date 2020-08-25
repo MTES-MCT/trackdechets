@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { validDatetime, validCompany } from "./validation-helpers";
+import { validDatetime, validCompany } from "../validation";
 import { inputRule } from "graphql-shield";
 import {
   PROCESSING_OPERATIONS_CODES,

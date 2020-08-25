@@ -1,12 +1,13 @@
 import { createTestClient } from "apollo-server-integration-testing";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
-import { server } from "../../../server";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
+import { server } from "../../../../server";
 import {
   formFactory,
   userWithCompanyFactory,
   companyFactory
-} from "../../../__tests__/factories";
+} from "../../../../__tests__/factories";
+import { ErrorCode } from "../../../../common/errors";
 
 jest.mock("axios", () => ({
   default: {
@@ -73,7 +74,7 @@ describe("Integration / Mark as signed mutation", () => {
           packagings: ${form.wasteDetailsPackagings}
           quantity: ${form.wasteDetailsQuantity}
           ${onuCodeParam}
-          
+
         }) {
           id
         }
@@ -86,6 +87,138 @@ describe("Integration / Mark as signed mutation", () => {
       expect(resultingForm.status).toBe("SENT");
     }
   );
+
+  it("should fail if wrong security code", async () => {
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanyName: company.name,
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const mutation = `
+    mutation   {
+      signedByTransporter(
+        id: "${form.id}",
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z"
+          signedByTransporter: true
+          securityCode: 4567
+          sentBy: "Roger Lapince"
+          signedByProducer: true
+          packagings: ${form.wasteDetailsPackagings}
+          quantity: ${form.wasteDetailsQuantity}
+      }) {
+        id
+      }
+    }
+  `;
+
+    const { errors } = await mutate(mutation);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le code de sécurité de l'émetteur du bordereau est invalide.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+
+  it("should fail when not signed by producer", async () => {
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanyName: company.name,
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const mutation = `
+    mutation   {
+      signedByTransporter(
+        id: "${form.id}",
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z"
+          signedByTransporter: true
+          securityCode: 1234
+          sentBy: "Roger Lapince"
+          signedByProducer: false
+          packagings: ${form.wasteDetailsPackagings}
+          quantity: ${form.wasteDetailsQuantity}
+      }) {
+        id
+      }
+    }
+  `;
+
+    const { errors } = await mutate(mutation);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le producteur doit signer pour valider l'enlèvement.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should fail when not signed by transporter", async () => {
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanyName: company.name,
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const mutation = `
+    mutation   {
+      signedByTransporter(
+        id: "${form.id}",
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z"
+          signedByTransporter: false
+          securityCode: 1234
+          sentBy: "Roger Lapince"
+          signedByProducer: true
+          packagings: ${form.wasteDetailsPackagings}
+          quantity: ${form.wasteDetailsQuantity}
+      }) {
+        id
+      }
+    }
+  `;
+
+    const { errors } = await mutate(mutation);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le transporteur doit signer pour valider l'enlèvement.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 
   it("should mark a form with temporary storage as signed (frame 18)", async () => {
     const receivingCompany = await companyFactory();

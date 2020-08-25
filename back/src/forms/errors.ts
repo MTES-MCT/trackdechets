@@ -43,3 +43,9 @@ export class MissingIdOrReadableId extends UserInputError {
     );
   }
 }
+
+export class InvaliSecurityCode extends ForbiddenError {
+  constructor() {
+    super("Le code de sécurité de l'émetteur du bordereau est invalide.");
+  }
+}

@@ -1,11 +1,8 @@
-import { prisma, Status } from "../generated/prisma-client";
+import { prisma } from "../generated/prisma-client";
 import { expandTemporaryStorageFromDb } from "./form-converter";
 import {
   markAsProcessed,
   markAsReceived,
-  markAsSealed,
-  markAsSent,
-  signedByTransporter,
   markAsTempStored,
   markAsResent,
   markAsResealed
@@ -30,10 +27,7 @@ import { transportSegments } from "./queries/segments";
 import { getUserCompanies } from "../users/database";
 
 const mutationResolvers: MutationResolvers = {
-  markAsReceived: (_parent, args, context) => markAsReceived(args, context),
   markAsProcessed: (_parent, args, context) => markAsProcessed(args, context),
-  signedByTransporter: (_parent, args, context) =>
-    signedByTransporter(args, context),
   updateTransporterFields: (_parent, args) => updateTransporterFields(args),
   markAsTempStored: (_parent, args, context) => markAsTempStored(args, context),
   markAsResealed: (_parent, args, context) => markAsResealed(args, context),

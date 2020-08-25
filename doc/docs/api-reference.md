@@ -4735,7 +4735,7 @@ Si oui ou non le BSD a été signé par un transporteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>securityCode</strong></td>
-<td valign="top"><a href="#int">Int</a></td>
+<td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
 Code de sécurité permettant d'authentifier l'émetteur
@@ -4744,7 +4744,7 @@ Code de sécurité permettant d'authentifier l'émetteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom de la personne responsable de l'envoi du déchet (case 9)

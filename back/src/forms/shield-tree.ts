@@ -59,9 +59,9 @@ export default {
     //   isFormTempStorer
     // ),
     //markAsSent: chain(markAsSentSchema, or(isFormRecipient, isFormEmitter)),
-    markAsReceived: chain(markAsReceivedSchema, isFormRecipient),
+    //markAsReceived: chain(markAsReceivedSchema, isFormRecipient),
     markAsProcessed: chain(markAsProcessedSchema, isFormRecipient),
-    signedByTransporter: chain(signedByTransporterSchema, isFormTransporter),
+    //signedByTransporter: chain(signedByTransporterSchema, isFormTransporter),
     updateTransporterFields: isFormTransporter,
     markAsTempStored: chain(markAsTempStoredSchema, isFormTempStorer),
     markAsResealed: chain(

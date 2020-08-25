@@ -154,3 +154,31 @@ export async function checkCanMarkAsSent(user: User, form: Form) {
     );
   }
 }
+
+export async function checkCanSignedByTransporter(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+  const isAuthorized =
+    isFormTransporter(fullUser, fullForm) ||
+    isFormTransporterAfterTempStorage(fullUser, fullForm);
+
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à signer ce bordereau pour le transport"
+    );
+  }
+}
+
+export async function checkCanMarkAsReceived(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+  const isAuthorized =
+    isFormRecipient(fullUser, fullForm) ||
+    isFormDestinationAfterTempStorage(fullUser, fullForm);
+
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à réceptionner ce bordereau"
+    );
+  }
+}

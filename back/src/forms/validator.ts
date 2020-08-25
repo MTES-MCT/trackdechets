@@ -10,7 +10,7 @@ import {
 } from "yup";
 import { WASTES_CODES } from "../common/constants";
 import { prisma } from "../generated/prisma-client";
-import { validCompany, validDatetime } from "./rules/validation-helpers";
+import { validCompany, validDatetime } from "./validation";
 
 setLocale({
   mixed: {

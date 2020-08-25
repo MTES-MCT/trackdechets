@@ -16,10 +16,10 @@ input TransporterSignatureFormInput {
   signedByTransporter: Boolean!
 
   "Code de sécurité permettant d'authentifier l'émetteur"
-  securityCode: Int
+  securityCode: Int!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String
+  sentBy: String!
 
   "Si oui on non le BSD a été signé par l'émetteur"
   signedByProducer: Boolean!

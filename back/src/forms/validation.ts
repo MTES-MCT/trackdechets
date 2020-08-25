@@ -1,4 +1,6 @@
 import { parse } from "date-fns";
+import { prisma, EcoOrganisme } from "../generated/prisma-client";
+import { EcoOrganismeNotFound, InvaliSecurityCode } from "./errors";
 
 const allowedFormats = [
   "yyyy-MM-dd",
@@ -12,7 +14,7 @@ const allowedFormats = [
  * Check an incoming string is a date formatted according to allowed_formats
  * "2020-11-23", "2020-11-23T13:34:55","2020-11-23T13:34:55Z", "2020-11-23T13:34:55.987", "2020-11-23T13:34:55.987Z"
  */
-const isValidDatetime = str => {
+export const isValidDatetime = str => {
   if (!str) {
     return true;
   }
@@ -83,4 +85,29 @@ export function validCompany({ verboseFieldName }, yup) {
       .string()
       .required(`${verboseFieldName}: L'email de l'entreprise est obligatoire`)
   });
+}
+
+export async function validateEcorganisme(ecoOrganisme: {
+  id: string;
+}): Promise<EcoOrganisme> {
+  const eo = await prisma.ecoOrganisme({
+    id: ecoOrganisme.id
+  });
+  if (!eo) {
+    throw new EcoOrganismeNotFound(ecoOrganisme.id);
+  }
+  return eo;
+}
+
+export async function validateSecurityCode(
+  siret: string,
+  securityCode: number
+) {
+  const exists = await prisma.$exists.company({
+    siret,
+    securityCode
+  });
+  if (!exists) {
+    throw new InvaliSecurityCode();
+  }
 }

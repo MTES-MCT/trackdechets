@@ -14,7 +14,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanReadUpdateDeleteForm } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
-import { validateEcorganisme } from "../../validators";
+import { validateEcorganisme } from "../../validation";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;

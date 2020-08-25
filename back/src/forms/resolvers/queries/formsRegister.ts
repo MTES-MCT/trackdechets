@@ -6,7 +6,7 @@ import { prisma } from "../../../generated/prisma-client";
 import { formsWhereInput } from "../../exports/where-inputs";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { validDatetime } from "../../rules/validation-helpers";
+import { validDatetime } from "../../validation";
 import { getUserCompanies } from "../../../users/database";
 import { NotCompanyMember } from "../../../common/errors";
 

@@ -4,9 +4,9 @@ import { WorkflowError } from "./errors";
 import {
   markFormAppendixAwaitingFormsAsGrouped,
   markFormAppendixGroupedsAsProcessed,
-  validateForm,
-  validateSecurityCode
+  validateForm
 } from "./helpers";
+
 import { FormState } from "./model";
 
 export const formWorkflowMachine = Machine(
@@ -34,11 +34,7 @@ export const formWorkflowMachine = Machine(
           MARK_SENT: [{ target: "pendingSentValidation" }],
           MARK_SIGNED_BY_TRANSPORTER: [
             {
-              target: "error.missingSignature",
-              cond: "isMissingSignature"
-            },
-            {
-              target: `pendingEmitterSecurityCodeValidation`
+              target: FormState.Sent
             }
           ]
         }
@@ -135,32 +131,6 @@ export const formWorkflowMachine = Machine(
           onError: { target: "error.invalidForm" }
         }
       },
-      pendingEmitterSecurityCodeValidation: {
-        invoke: {
-          src: (ctx, event) =>
-            validateSecurityCode(
-              ctx.form.emitterCompanySiret,
-              event.securityCode
-            ),
-          onDone: {
-            target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
-          },
-          onError: { target: "error.invalidSecurityCode" }
-        }
-      },
-      pendingTempStorerSecurityCodeValidation: {
-        invoke: {
-          src: (ctx, event) =>
-            validateSecurityCode(
-              ctx.form.recipientCompanySiret,
-              event.securityCode
-            ),
-          onDone: {
-            target: FormState.Resent
-          },
-          onError: { target: "error.invalidSecurityCode" }
-        }
-      },
       pendingReceivedMarkFormAppendixGroupedsAsProcessed: {
         invoke: {
           id: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
@@ -199,11 +169,7 @@ export const formWorkflowMachine = Machine(
           ],
           MARK_SIGNED_BY_TRANSPORTER: [
             {
-              target: "error.missingSignature",
-              cond: "isMissingSignature"
-            },
-            {
-              target: `pendingTempStorerSecurityCodeValidation`
+              target: FormState.Resent
             }
           ]
         }
@@ -227,8 +193,6 @@ export const formWorkflowMachine = Machine(
         states: {
           invalidForm: { meta: WorkflowError.InvalidForm },
           invalidTransition: { meta: WorkflowError.InvalidTransition },
-          missingSignature: { meta: WorkflowError.MissingSignature },
-          invalidSecurityCode: { meta: WorkflowError.InvalidSecurityCode },
           appendixError: { meta: WorkflowError.AppendixError },
           hasSegmentsToTakeOverError: {
             meta: WorkflowError.HasSegmentsToTakeOverError
@@ -251,8 +215,6 @@ export const formWorkflowMachine = Machine(
       setUnStable: assign({ isStableState: false }) as any
     },
     guards: {
-      isMissingSignature: (_, event: any) =>
-        !event.signedByTransporter || !event.signedByProducer,
       isExemptOfTraceability: ctx => ctx.form.noTraceability,
       awaitsGroup: ctx =>
         PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(

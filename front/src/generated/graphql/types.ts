@@ -1764,9 +1764,9 @@ export type TransporterSignatureFormInput = {
   /** Si oui ou non le BSD a été signé par un transporteur */
   signedByTransporter: Scalars['Boolean'];
   /** Code de sécurité permettant d'authentifier l'émetteur */
-  securityCode: Maybe<Scalars['Int']>;
+  securityCode: Scalars['Int'];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
-  sentBy: Maybe<Scalars['String']>;
+  sentBy: Scalars['String'];
   /** Si oui on non le BSD a été signé par l'émetteur */
   signedByProducer: Scalars['Boolean'];
   /** Conditionnement */
@@ -2728,8 +2728,8 @@ export function createTransporterSignatureFormInputMock(props: Partial<Transport
   return {
     sentAt: new Date(),
     signedByTransporter: false,
-    securityCode: null,
-    sentBy: null,
+    securityCode: 0,
+    sentBy: "",
     signedByProducer: false,
     packagings: [],
     quantity: 0,

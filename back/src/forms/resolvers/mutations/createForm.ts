@@ -22,7 +22,7 @@ import {
 } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
-import { validateEcorganisme } from "../../validators";
+import { validateEcorganisme } from "../../validation";
 import { GraphQLContext } from "../../../types";
 
 const createFormResolver = async (

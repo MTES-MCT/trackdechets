@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 import { object } from "yup";
 
-import { validDatetime } from "../rules/validation-helpers";
+import { validDatetime } from "../validation";
 
 const dummySchema = object({
   someDate: validDatetime(

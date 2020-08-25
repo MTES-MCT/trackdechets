@@ -10,17 +10,6 @@ export async function validateForm(form: Form) {
   return isValid ? Promise.resolve() : Promise.reject();
 }
 
-export async function validateSecurityCode(
-  siret: string,
-  securityCode: number
-) {
-  const exists = await prisma.$exists.company({
-    siret,
-    securityCode
-  });
-  return exists ? Promise.resolve() : Promise.reject();
-}
-
 export async function markFormAppendixAwaitingFormsAsGrouped(formId: string) {
   const appendix2Forms = await prisma.form({ id: formId }).appendix2Forms();
 

@@ -1,5 +1,5 @@
 import { inputRule } from "graphql-shield";
-import { validDatetime } from "../../forms/rules/validation-helpers";
+import { validDatetime } from "../../forms/validation";
 const SUPPORTED_FORMATS = [
   "image/jpg",
   "image/jpeg",

@@ -1,5 +1,5 @@
 import { ErrorCode } from "../../../../common/errors";
-import { markAsSent } from "../markAsSent";
+import { markAsSentFn } from "../markAsSent";
 import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 
 const formMock = jest.fn();
@@ -44,7 +44,7 @@ describe("Forms -> markAsSealed mutation", () => {
       form.status = "SENT";
       mockFormWith(form);
 
-      await markAsSent(
+      await markAsSentFn(
         form,
         {
           id: "1",
@@ -65,7 +65,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([]);
     mockFormWith(getNewValidPrismaForm());
 
-    await markAsSent(
+    await markAsSentFn(
       form,
       {
         id: "1",
@@ -83,7 +83,7 @@ describe("Forms -> markAsSealed mutation", () => {
     appendix2FormsMock.mockResolvedValue([{ id: "appendix id" }]);
     mockFormWith(form);
 
-    await markAsSent(
+    await markAsSentFn(
       form,
       {
         id: "1",

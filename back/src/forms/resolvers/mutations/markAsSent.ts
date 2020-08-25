@@ -9,7 +9,7 @@ import { checkCanMarkAsSent } from "../../permissions";
 import { Form } from "../../../generated/prisma-client";
 import { GraphQLContext } from "../../../types";
 import transitionForm from "../../workflow/transitionForm";
-import { validDatetime } from "../../rules/validation-helpers";
+import { validDatetime } from "../../validation";
 
 export const sentInfovalidationSchema = yup.object().shape({
   sentAt: validDatetime(
@@ -21,7 +21,7 @@ export const sentInfovalidationSchema = yup.object().shape({
   )
 });
 
-export function markAsSent(
+export function markAsSentFn(
   form: Form,
   args: MutationMarkAsSentArgs,
   context: GraphQLContext
@@ -51,7 +51,7 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
 
   await checkCanMarkAsSent(user, form);
 
-  return markAsSent(form, args, context);
+  return markAsSentFn(form, args, context);
 };
 
 export default markAsSentResolver;
