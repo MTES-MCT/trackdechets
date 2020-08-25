@@ -1,7 +1,6 @@
 import React, { lazy, Suspense, useEffect } from "react";
-import { Route, withRouter, Switch } from "react-router";
+import { Route, withRouter, Switch, Redirect } from "react-router";
 import { useAuth } from "./use-auth";
-import Home from "./Home";
 import PrivateRoute from "./login/PrivateRoute";
 import { trackPageView } from "./tracker";
 import Loader from "./common/Loader";
@@ -14,15 +13,12 @@ const FormContainer = lazy(() => import("./form/FormContainer"));
 const SignupInfo = lazy(() => import("./login/SignupInfos"));
 const WasteSelector = lazy(() => import("./login/WasteSelector"));
 const Invite = lazy(() => import("./login/Invite"));
-const Partners = lazy(() => import("./Partners"));
 const ResetPassword = lazy(() => import("./login/ResetPassword"));
-const Cgu = lazy(() => import("./Cgu"));
 const Login = lazy(() => import("./login/Login"));
 const Signup = lazy(() => import("./login/Signup"));
 const Dialog = lazy(() => import("./oauth2/Dialog"));
 const Company = lazy(() => import("./company/Company"));
 const WasteTree = lazy(() => import("./search/WasteTree"));
-const Stats = lazy(() => import("./Stats"));
 
 export default withRouter(function LayoutContainer({ history }) {
   useEffect(() => {
@@ -54,21 +50,14 @@ export default withRouter(function LayoutContainer({ history }) {
         </PrivateRoute>
 
         <Layout isAuthenticated={isAuthenticated}>
-          <Route exact path="/">
-            <Home isAuthenticated={isAuthenticated} />
-          </Route>
-          <Route exact path="/cgu">
-            <Cgu />
-          </Route>
-          <Route exact path="/partners">
-            <Partners />
-          </Route>
           <Route exact path="/login">
             <Login />
           </Route>
+
           <Route exact path="/invite">
             <Invite />
           </Route>
+
           <Route exact path="/signup">
             <Signup />
           </Route>
@@ -76,9 +65,11 @@ export default withRouter(function LayoutContainer({ history }) {
           <Route exact path="/signup/details">
             <WasteSelector />
           </Route>
+
           <Route exact path="/signup/activation">
             <SignupInfo />
           </Route>
+
           <Route exact path="/reset-password">
             <ResetPassword />
           </Route>
@@ -90,9 +81,7 @@ export default withRouter(function LayoutContainer({ history }) {
           <Route exact path="/wasteTree">
             <WasteTree />
           </Route>
-          <Route exact path="/stats">
-            <Stats />
-          </Route>
+
           <PrivateRoute path="/form/:id?" isAuthenticated={isAuthenticated}>
             <FormContainer />
           </PrivateRoute>
@@ -107,6 +96,8 @@ export default withRouter(function LayoutContainer({ history }) {
           <PrivateRoute path="/account" isAuthenticated={isAuthenticated}>
             <Account />
           </PrivateRoute>
+
+          <Redirect to={isAuthenticated ? "/dashboard" : "/login"} />
         </Layout>
       </Switch>
     </Suspense>
