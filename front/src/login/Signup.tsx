@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { Field } from "formik";
 import React, { useState } from "react";
 import { FaEnvelope, FaEye, FaIdCard, FaLock, FaPhone } from "react-icons/fa";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { NotificationError } from "../common/Error";
 import PasswordMeter from "../common/PasswordMeter";
 import RedErrorMessage from "../common/RedErrorMessage";
@@ -181,9 +181,13 @@ export default function Signup() {
               <label>
                 <Field name="cgu" type="checkbox" />
                 Je certifie avoir lu les{" "}
-                <Link to="cgu" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://trackdechets.beta.gouv.fr/cgu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   conditions générales d'utilisation
-                </Link>
+                </a>
                 *
               </label>
             </div>

@@ -48,13 +48,12 @@ export default withRouter(function Header({
               </a>
             </li>
             <li className="nav__item">
-              <NavLink
-                to="/partners"
-                activeClassName="active"
+              <a
+                href="https://trackdechets.beta.gouv.fr/partners"
                 onClick={() => trackEvent("navbar", "partners")}
               >
                 Partenaires
-              </NavLink>
+              </a>
             </li>
             <li className="nav__item" role="separator">
               |

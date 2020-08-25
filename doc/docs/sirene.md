@@ -14,7 +14,7 @@ Exemple d'utilisation:
 
 ```graphql
 query {
-  companyInfos(siret: "13001045700013"){
+  companyInfos(siret: "13001045700013") {
     name
     naf
     address
@@ -37,4 +37,4 @@ query {
 ```
 
 :::note
-Nous avons crée une **fiche entreprise** pour chaque établissement sur l'interface graphique Trackdéchets qui illustre l'utilisation de cette query. Exemple avec la DREAL Nouvelle Aquitaine: [https://trackdechets.beta.gouv.fr/company/13001045700013](https://trackdechets.beta.gouv.fr/company/13001045700013)
+Nous avons crée une **fiche entreprise** pour chaque établissement sur l'interface graphique Trackdéchets qui illustre l'utilisation de cette query. Exemple avec la DREAL Nouvelle Aquitaine: [https://app.trackdechets.beta.gouv.fr/company/13001045700013](https://app.trackdechets.beta.gouv.fr/company/13001045700013)
