@@ -146,12 +146,12 @@ describe("{ mutation { markAsTempStored } }", () => {
     const mutation = `
     mutation   {
       markAsTempStored(id: "${form.id}", tempStoredInfos: {
-        wasteAcceptationStatus: REFUSED,
-        wasteRefusalReason: "Thats isn't what I was expecting man !"
+        wasteAcceptationStatus: ACCEPTED,
+        wasteRefusalReason: ""
         receivedBy: "John Doe",
         receivedAt: "2018-12-11T00:00:00.000Z",
         signedAt: "2018-12-11T00:00:00.000Z",
-        quantityReceived: 0
+        quantityReceived: 2.4
         quantityType: REAL
       }) {
         id
@@ -161,16 +161,10 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { errors } = await mutate(mutation);
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Vous ne pouvez pas marquer ce bordereau comme entreposé provisoirement car " +
-          "le destinataire n'est pas identifé comme installation d'entreposage provisoire " +
-          "ou de reconditionnement",
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
-        })
-      })
-    ]);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+    );
+    expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
   });
 });

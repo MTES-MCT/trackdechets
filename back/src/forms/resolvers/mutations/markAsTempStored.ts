@@ -83,13 +83,13 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   const { id, tempStoredInfos } = validateArgs(args);
   const form = await getFormOrFormNotFound({ id });
 
-  if (form.recipientIsTempStorage !== true) {
-    throw new UserInputError(
-      "Vous ne pouvez pas marquer ce bordereau comme entreposé provisoirement car " +
-        "le destinataire n'est pas identifé comme installation d'entreposage provisoire " +
-        "ou de reconditionnement"
-    );
-  }
+  // if (form.recipientIsTempStorage !== true) {
+  //   throw new UserInputError(
+  //     "Vous ne pouvez pas marquer ce bordereau comme entreposé provisoirement car " +
+  //       "le destinataire n'est pas identifé comme installation d'entreposage provisoire " +
+  //       "ou de reconditionnement"
+  //   );
+  // }
 
   await checkCanMarkAsTempStored(user, form);
 
