@@ -1,14 +1,10 @@
-import {
-  getNewValidPrismaForm,
-  getContext
-} from "../../resolvers/mutations/__mocks__/data";
-import { markAsTempStored } from "../mark-as";
-import { ErrorCode } from "../../../common/errors";
-import { FormState } from "../../workflow/model";
+import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
+import { markAsTempStoredFn as markAsTempStored } from "../markAsTempStored";
+import { ErrorCode } from "../../../../common/errors";
 import {
   TempStoredFormInput,
   WasteAcceptationStatusInput
-} from "../../../generated/graphql/types";
+} from "../../../../generated/graphql/types";
 
 const formMock = jest.fn();
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -28,7 +24,7 @@ const prisma = {
   updateManyForms: jest.fn(() => Promise.resolve({}))
 };
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     form: () => prisma.form(),
     updateForm: (...args) => prisma.updateForm(...args),
@@ -47,11 +43,14 @@ describe("Forms -> markAsTempStored mutation", () => {
 
   it("should fail if form is not SENT", async () => {
     expect.assertions(1);
+    const form = getNewValidPrismaForm();
+    form.status = "DRAFT";
 
     try {
-      mockFormWith({ id: 1, status: FormState.Draft });
+      mockFormWith(form);
 
       await markAsTempStored(
+        form,
         { id: "1", tempStoredInfos: {} as TempStoredFormInput },
         defaultContext
       );
@@ -69,6 +68,7 @@ describe("Forms -> markAsTempStored mutation", () => {
 
     const ACCEPTED: WasteAcceptationStatusInput = "ACCEPTED";
     await markAsTempStored(
+      form,
       {
         id: "1",
         tempStoredInfos: {
@@ -95,6 +95,7 @@ describe("Forms -> markAsTempStored mutation", () => {
 
     const REFUSED: WasteAcceptationStatusInput = "REFUSED";
     await markAsTempStored(
+      form,
       {
         id: "1",
         tempStoredInfos: {

@@ -28,7 +28,6 @@ import { getUserCompanies } from "../users/database";
 
 const mutationResolvers: MutationResolvers = {
   updateTransporterFields: (_parent, args) => updateTransporterFields(args),
-  markAsTempStored: (_parent, args, context) => markAsTempStored(args, context),
   markAsResealed: (_parent, args, context) => markAsResealed(args, context),
   markAsResent: (_parent, args, context) => markAsResent(args, context),
   prepareSegment: (_parent, args, context) => prepareSegment(args, context),

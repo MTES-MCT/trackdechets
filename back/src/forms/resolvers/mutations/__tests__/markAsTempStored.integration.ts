@@ -2,10 +2,11 @@ import {
   userWithCompanyFactory,
   formFactory,
   companyFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
+import { ErrorCode } from "../../../../common/errors";
 
 jest.mock("axios", () => ({
   default: {
@@ -120,5 +121,56 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
     expect(statusLogs.length).toEqual(1);
+  });
+
+  it("should not be possible to mark a BSD as temp stored if recipientIsTempStorage != true", async () => {
+    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: tempStorerCompany.siret,
+        recipientIsTempStorage: false,
+        temporaryStorageDetail: { create: {} }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutation = `
+    mutation   {
+      markAsTempStored(id: "${form.id}", tempStoredInfos: {
+        wasteAcceptationStatus: REFUSED,
+        wasteRefusalReason: "Thats isn't what I was expecting man !"
+        receivedBy: "John Doe",
+        receivedAt: "2018-12-11T00:00:00.000Z",
+        signedAt: "2018-12-11T00:00:00.000Z",
+        quantityReceived: 0
+        quantityType: REAL
+      }) {
+        id
+      }
+    }
+  `;
+
+    const { errors } = await mutate(mutation);
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas marquer ce bordereau comme entreposé provisoirement car " +
+          "le destinataire n'est pas identifé comme installation d'entreposage provisoire " +
+          "ou de reconditionnement",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
   });
 });

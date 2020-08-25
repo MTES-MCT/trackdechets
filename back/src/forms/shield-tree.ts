@@ -63,7 +63,7 @@ export default {
     //markAsProcessed: chain(markAsProcessedSchema, isFormRecipient),
     //signedByTransporter: chain(signedByTransporterSchema, isFormTransporter),
     updateTransporterFields: isFormTransporter,
-    markAsTempStored: chain(markAsTempStoredSchema, isFormTempStorer),
+    //markAsTempStored: chain(markAsTempStoredSchema, isFormTempStorer),
     markAsResealed: chain(
       markAsResealedSchema,
       or(temporaryStorageDestinationSchema, hasFinalDestination),
