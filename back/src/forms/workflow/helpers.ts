@@ -1,8 +1,8 @@
 import { Form, prisma } from "../../generated/prisma-client";
 import { GraphQLContext } from "../../types";
 import { expandFormFromDb } from "../form-converter";
-import { logStatusChange } from "../mutations/mark-as";
-import { formSchema } from "../validator";
+import logStatusChange from "./logStatusChange";
+import { formSchema } from "./validation";
 
 export async function validateForm(form: Form) {
   const formattedForm = expandFormFromDb(form);

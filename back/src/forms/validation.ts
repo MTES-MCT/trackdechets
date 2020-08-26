@@ -1,6 +1,9 @@
 import { parse } from "date-fns";
 import { prisma, EcoOrganisme } from "../generated/prisma-client";
-import { TransporterInput } from "../generated/graphql/types";
+import {
+  TransporterInput,
+  ReceivedFormInput
+} from "../generated/graphql/types";
 import { EcoOrganismeNotFound, InvaliSecurityCode } from "./errors";
 import { UserInputError } from "apollo-server-express";
 import { InvalidDateTime } from "../common/errors";
@@ -59,37 +62,6 @@ export function validDatetime({ verboseFieldName, required = false }, yup) {
   );
 }
 
-export function validCompany({ verboseFieldName }, yup) {
-  return yup.object().shape({
-    name: yup
-      .string()
-      .required(`${verboseFieldName}: Le nom de l'entreprise est obligatoire`),
-    siret: yup
-      .string()
-      .required(
-        `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
-      ),
-    address: yup
-      .string()
-      .required(
-        `${verboseFieldName}: L'adresse d'une entreprise est obligatoire`
-      ),
-    contact: yup
-      .string()
-      .required(
-        `${verboseFieldName}: Le contact dans l'entreprise est obligatoire`
-      ),
-    phone: yup
-      .string()
-      .required(
-        `${verboseFieldName}: Le téléphone de l'entreprise est obligatoire`
-      ),
-    mail: yup
-      .string()
-      .required(`${verboseFieldName}: L'email de l'entreprise est obligatoire`)
-  });
-}
-
 export async function validateEcorganisme(ecoOrganisme: {
   id: string;
 }): Promise<EcoOrganisme> {
@@ -137,4 +109,46 @@ export async function validateTransporter(transporter: TransporterInput) {
       }
     }
   }
+}
+
+export function validateReceivedInfos(receivedInfo: ReceivedFormInput) {
+  if (!isValidDatetime(receivedInfo.receivedAt)) {
+    throw new InvalidDateTime("receivedAt");
+  }
+
+  if (receivedInfo.signedAt && !isValidDatetime(receivedInfo.signedAt)) {
+    throw new InvalidDateTime("signedAt");
+  }
+
+  if (receivedInfo.wasteAcceptationStatus === "REFUSED") {
+    if (receivedInfo.quantityReceived !== 0) {
+      throw new UserInputError(
+        "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+      );
+    }
+    if (!receivedInfo.wasteRefusalReason) {
+      throw new UserInputError("Vous devez saisir un motif de refus");
+    }
+  } else if (receivedInfo.wasteAcceptationStatus === "ACCEPTED") {
+    if (receivedInfo.quantityReceived <= 0) {
+      throw new UserInputError(
+        "Vous devez saisir une quantité reçue supérieure à 0."
+      );
+    }
+    if (receivedInfo.wasteRefusalReason) {
+      throw new UserInputError(
+        "Le champ wasteRefusalReason ne doit pas être renseigné si le déchet est accepté "
+      );
+    }
+  } else if (receivedInfo.wasteAcceptationStatus === "PARTIALLY_REFUSED") {
+    if (receivedInfo.quantityReceived <= 0) {
+      throw new UserInputError(
+        "Vous devez saisir une quantité reçue supérieure à 0."
+      );
+    }
+    if (!receivedInfo.wasteRefusalReason) {
+      throw new UserInputError("Vous devez saisir un motif de refus partiel");
+    }
+  }
+  return receivedInfo;
 }

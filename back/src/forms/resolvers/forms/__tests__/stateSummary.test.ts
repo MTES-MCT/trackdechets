@@ -30,7 +30,7 @@ const COLLECTOR = createRecipientMock({
 });
 
 const temporaryStorageDetail = jest.fn(() => Promise.resolve(null));
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     form: jest.fn(() => ({
       temporaryStorageDetail

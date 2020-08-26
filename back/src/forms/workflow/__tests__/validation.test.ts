@@ -1,4 +1,8 @@
-import { formSchema } from "../validator";
+import { formSchema } from "../validation";
+
+jest.mock("../../generated/prisma-client", () => ({
+  prisma: { $exists: { ecoOrganisme: () => Promise.resolve(true) } }
+}));
 
 const form = {
   id: "cjplbvecc000d0766j32r19am",
@@ -63,7 +67,7 @@ describe("Form is valid", () => {
     expect(isValid).toEqual(true);
   });
 
-  test("with empty strings for optional fields", async () => {
+  test("with empty strings for optionnal fields", async () => {
     const testForm = {
       ...form,
       emitter: { ...form.emitter, workSite: {} },
@@ -74,7 +78,7 @@ describe("Form is valid", () => {
     expect(isValid).toEqual(true);
   });
 
-  test("with null values for optional fields", async () => {
+  test("with null values for optionnal fields", async () => {
     const testForm = {
       ...form,
       emitter: { ...form.emitter, workSite: null },
@@ -103,6 +107,50 @@ describe("Form is valid", () => {
     const isValid = await formSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
+
+  test("when there is an eco-organisme and emitter type is OTHER", async () => {
+    const testForm = {
+      ...form,
+      emitter: {
+        ...form.emitter,
+        type: "OTHER"
+      },
+      ecoOrganisme: { id: "an_id" }
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test("when there is no eco-organisme and emitter type is OTHER", async () => {
+    const testForm = {
+      ...form,
+      emitter: {
+        ...form.emitter,
+        type: "OTHER"
+      },
+      ecoOrganisme: {}
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test.each(["PRODUCER", "OTHER", "APPENDIX1", "APPENDIX2"])(
+    "when emitterType is (%p)",
+    async emitterType => {
+      const testForm = {
+        ...form,
+        emitter: {
+          ...form.emitter,
+          type: emitterType
+        }
+      };
+
+      const isValid = await formSchema.isValid(testForm);
+      expect(isValid).toEqual(true);
+    }
+  );
 });
 
 describe("Form is not valid", () => {
@@ -114,6 +162,20 @@ describe("Form is not valid", () => {
         isExemptedOfReceipt: false,
         receipt: null
       }
+    };
+
+    const isValid = await formSchema.isValid(testForm);
+    expect(isValid).toEqual(false);
+  });
+
+  test("when there is an eco-organisme but emitter type is not OTHER", async () => {
+    const testForm = {
+      ...form,
+      emitter: {
+        ...form.emitter,
+        type: "PRODUCER"
+      },
+      ecoOrganisme: { id: "an_id" }
     };
 
     const isValid = await formSchema.isValid(testForm);

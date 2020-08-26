@@ -1,5 +1,5 @@
 import { Form } from "../../generated/prisma-client";
-import { formSchema } from "../validator";
+import { formSchema } from "./validation";
 import {
   UserInputError,
   ForbiddenError,

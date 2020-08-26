@@ -1,12 +1,12 @@
-import * as mailsHelper from "../../../common/mails.helper";
+import * as mailsHelper from "../../../../common/mails.helper";
 
-import { prepareRedis, prepareDB } from "../../__tests__/helpers";
+import { prepareRedis, prepareDB } from "../../../__tests__/helpers";
 import {
   userWithCompanyFactory,
   getReadableId
-} from "../../../__tests__/factories";
+} from "../../../../__tests__/factories";
 
-import makeClient from "../../../__tests__/testClient";
+import makeClient from "../../../../__tests__/testClient";
 
 import {
   Consistence,
@@ -14,9 +14,9 @@ import {
   QuantityType,
   Status,
   prisma
-} from "../../../generated/prisma-client";
+} from "../../../../generated/prisma-client";
 
-import { resetDatabase } from "../../../../integration-tests/helper";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");

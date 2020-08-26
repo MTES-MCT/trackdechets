@@ -8,9 +8,9 @@ import {
   setLocale,
   string
 } from "yup";
-import { WASTES_CODES } from "../common/constants";
-import { prisma } from "../generated/prisma-client";
-import { validCompany, validDatetime } from "./validation";
+import { WASTES_CODES } from "../../common/constants";
+import { prisma } from "../../generated/prisma-client";
+import { validDatetime } from "../validation";
 
 setLocale({
   mixed: {
@@ -20,12 +20,13 @@ setLocale({
   }
 } as LocaleObject);
 
-const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
-
+/**
+ * A form must comply with this schema before it can be sealed
+ */
 export const formSchema = object<any>().shape({
   id: string().label("Identifiant (id)").required(),
   emitter: object().shape({
-    type: string().matches(/(PRODUCER|OTHER|APPENDIX1|APPENDIX2)/),
+    type: string().required(),
     workSite: object({
       name: string().nullable(),
       address: string().nullable(),
@@ -71,19 +72,17 @@ export const formSchema = object<any>().shape({
       "Le code déchet est obligatoire et doit appartenir à la liste  du code de l'environnement (par exemple 16 11 05*)"
     ),
     onuCode: string(),
-    packagings: array().of(packagingSchema),
+    packagings: array().required(),
     otherPackaging: string().nullable(true),
     numberOfPackages: number()
       .integer()
       .min(1, "Le nombre de colis doit être supérieur à 0")
       .nullable(true),
     quantity: number().min(0, "La quantité doit être supérieure à 0"),
-    quantityType: string().matches(
-      /(REAL|ESTIMATED)/,
+    quantityType: string().required(
       "Le type de quantité (réelle ou estimée) doit être précisé"
     ),
-    consistence: string().matches(
-      /(SOLID|LIQUID|GASEOUS)/,
+    consistence: string().required(
       "La consistance du déchet doit être précisée"
     )
   }),
@@ -130,3 +129,34 @@ export const formSchema = object<any>().shape({
     otherwise: object().nullable()
   })
 });
+
+function validCompany({ verboseFieldName }, yup) {
+  return yup.object().shape({
+    name: yup
+      .string()
+      .required(`${verboseFieldName}: Le nom de l'entreprise est obligatoire`),
+    siret: yup
+      .string()
+      .required(
+        `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
+      ),
+    address: yup
+      .string()
+      .required(
+        `${verboseFieldName}: L'adresse d'une entreprise est obligatoire`
+      ),
+    contact: yup
+      .string()
+      .required(
+        `${verboseFieldName}: Le contact dans l'entreprise est obligatoire`
+      ),
+    phone: yup
+      .string()
+      .required(
+        `${verboseFieldName}: Le téléphone de l'entreprise est obligatoire`
+      ),
+    mail: yup
+      .string()
+      .required(`${verboseFieldName}: L'email de l'entreprise est obligatoire`)
+  });
+}

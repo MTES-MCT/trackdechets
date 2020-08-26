@@ -5,6 +5,7 @@ import { formWorkflowMachine } from "./machine";
 import { ForbiddenError } from "apollo-server-express";
 import { prisma, Form as PrismaForm } from "../../generated/prisma-client";
 import { Form, FormStatus } from "../../generated/graphql/types";
+import logStatusChange from "./logStatusChange";
 
 export default async function transitionForm(
   form: PrismaForm,
@@ -88,113 +89,4 @@ export default async function transitionForm(
 
     formService.send({ type: eventType, ...eventParams });
   });
-}
-
-const fieldsToLog = {
-  MARK_SEALED: [],
-  MARK_SENT: ["sentBy", "sentAt"],
-  MARK_SIGNED_BY_TRANSPORTER: [
-    "sentAt",
-    "signedByTransporter",
-    "sentBy",
-    "signedByProducer",
-    "packagings",
-    "quantity",
-    "onuCode"
-  ],
-  MARK_RECEIVED: ["receivedBy", "receivedAt", "signedAt", "quantityReceived"],
-  MARK_PROCESSED: [
-    "processedBy",
-    "processedAt",
-    "processingOperationDone",
-    "processingOperationDescription",
-    "noTraceability",
-    "nextDestinationProcessingOperation",
-    "nextDestinationDetails",
-    "nextDestinationCompanyName",
-    "nextDestinationCompanySiret",
-    "nextDestinationCompanyAddress",
-    "nextDestinationCompanyContact",
-    "nextDestinationCompanyPhone",
-    "nextDestinationCompanyMail"
-  ],
-  MARK_TEMP_STORED: [
-    "receivedBy",
-    "receivedAt",
-    "signedAt",
-    "quantityReceived",
-    "quantityType"
-  ],
-  MARK_RESEALED: [
-    "destinationIsFilledByEmitter",
-    "destinationCompanyName",
-    "destinationCompanySiret",
-    "destinationCompanyAddress",
-    "destinationCompanyContact",
-    "destinationCompanyPhone",
-    "destinationCompanyMail",
-    "destinationCap",
-    "destinationProcessingOperation",
-    "wasteDetailsOnuCode",
-    "wasteDetailsPackagings",
-    "wasteDetailsOtherPackaging",
-    "wasteDetailsNumberOfPackages",
-    "wasteDetailsQuantity",
-    "wasteDetailsQuantityType"
-  ],
-  MARK_RESENT: [
-    "destinationIsFilledByEmitter",
-    "destinationCompanyName",
-    "destinationCompanySiret",
-    "destinationCompanyAddress",
-    "destinationCompanyContact",
-    "destinationCompanyPhone",
-    "destinationCompanyMail",
-    "destinationCap",
-    "destinationProcessingOperation",
-    "signedBy",
-    "signedAt",
-    "wasteDetailsOnuCode",
-    "wasteDetailsPackagings",
-    "wasteDetailsOtherPackaging",
-    "wasteDetailsNumberOfPackages",
-    "wasteDetailsQuantity",
-    "wasteDetailsQuantityType"
-  ]
-};
-
-const getSubset = fields => o =>
-  fields.reduce((acc, curr) => ({ ...acc, [curr]: o[curr] }), {});
-
-const getDiff = (eventType, params) => {
-  if (!eventType) {
-    return {};
-  }
-  const fields = fieldsToLog[eventType];
-  return getSubset(fields)(params);
-};
-export function logStatusChange(
-  formId,
-  status,
-  context: GraphQLContext,
-  eventType: string,
-  eventParams: any
-) {
-  const diff = getDiff(eventType, eventParams);
-
-  return prisma
-    .createStatusLog({
-      form: { connect: { id: formId } },
-      user: { connect: { id: context.user.id } },
-      status,
-      loggedAt: new Date(),
-      updatedFields: diff
-    })
-    .catch(err => {
-      console.error(
-        `Cannot log status change for form ${formId}, user ${context.user.id}, status ${status}`,
-        err
-      );
-      throw new Error("Problème technique, merci de réessayer plus tard.");
-    });
 }

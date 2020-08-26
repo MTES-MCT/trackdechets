@@ -125,6 +125,8 @@ export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
   if (!isFormContributor(fullUser, fullForm)) {
     throw new NotFormContributor();
   }
+
+  return true;
 }
 
 export async function checkCanUpdateTransporterFields(user: User, form: Form) {
@@ -139,6 +141,7 @@ export async function checkCanMarkAsSealed(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
   const isAuthorized =
+    isFormOwner(user, fullForm) ||
     isFormEcoOrganisme(fullUser, fullForm) ||
     isFormRecipient(fullUser, fullForm) ||
     isFormTransporter(fullUser, fullForm) ||
@@ -148,6 +151,7 @@ export async function checkCanMarkAsSealed(user: User, form: Form) {
   if (!isAuthorized) {
     throw new ForbiddenError("Vous n'êtes pas autorisé à sceller ce bordereau");
   }
+  return true;
 }
 
 export async function checkCanMarkAsSent(user: User, form: Form) {
@@ -161,6 +165,7 @@ export async function checkCanMarkAsSent(user: User, form: Form) {
       "Vous n'êtes pas autorisé à marquer ce bordereau comme envoyé"
     );
   }
+  return true;
 }
 
 export async function checkCanSignedByTransporter(user: User, form: Form) {
@@ -175,6 +180,7 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
       "Vous n'êtes pas autorisé à signer ce bordereau pour le transport"
     );
   }
+  return true;
 }
 
 export async function checkCanMarkAsReceived(user: User, form: Form) {
@@ -189,6 +195,7 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
       "Vous n'êtes pas autorisé à réceptionner ce bordereau"
     );
   }
+  return true;
 }
 
 export async function checkCanMarkAsProcessed(user: User, form: Form) {
@@ -202,6 +209,7 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
       "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"
     );
   }
+  return true;
 }
 
 export async function checkCanMarkAsTempStored(user: User, form: Form) {
@@ -214,6 +222,7 @@ export async function checkCanMarkAsTempStored(user: User, form: Form) {
       "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
     );
   }
+  return true;
 }
 
 export async function checkCanMarkAsResealed(user: User, form: Form) {
@@ -226,6 +235,7 @@ export async function checkCanMarkAsResealed(user: User, form: Form) {
       "Vous n'êtes pas autorisé à sceller ce bordereau après entreposage provisoire"
     );
   }
+  return true;
 }
 
 export async function checkCanMarkAsResent(user: User, form: Form) {
@@ -238,4 +248,5 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
       "Vous n'êtes pas autorisé à marquer ce borderau comme envoyé après entreposage provisoire"
     );
   }
+  return true;
 }
