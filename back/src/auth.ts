@@ -332,3 +332,18 @@ export const passportJwtMiddleware = (
     })
   );
 };
+
+/**
+ * This function is used to restrict authentication strategies
+ * at a per resolver level
+ * @param context
+ */
+export function applyAuthStrategies(
+  context: GraphQLContext,
+  strategies: AuthType[]
+) {
+  if (context.user && !strategies.includes(context.user.auth)) {
+    context.user = null;
+  }
+  return context;
+}
