@@ -3572,7 +3572,7 @@ Payload d'un établissement
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 SIRET de l'établissement
@@ -3581,7 +3581,7 @@ SIRET de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom de l'établissement
@@ -3590,7 +3590,7 @@ Nom de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Adresse de l'établissement
@@ -3599,7 +3599,7 @@ Adresse de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>contact</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom du contact dans l'établissement
@@ -3608,7 +3608,7 @@ Nom du contact dans l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>mail</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Email du contact dans l'établissement
@@ -3617,7 +3617,7 @@ Email du contact dans l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Numéro de téléphone de contact dans l'établissement
@@ -3930,74 +3930,6 @@ Annexe 2
 </tbody>
 </table>
 
-### NextDestinationCompanyInput
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-SIRET de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Nom de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>address</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Adresse de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>contact</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Nom du contact dans l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>mail</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Email du contact dans l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Numéro de téléphone de contact dans l'établissement
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### NextDestinationInput
 
 <table>
@@ -4020,7 +3952,7 @@ Traitement prévue (code D/R)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#nextdestinationcompanyinput">NextDestinationCompanyInput</a>!</td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
 <td>
 
 Établissement de destination ultérieur

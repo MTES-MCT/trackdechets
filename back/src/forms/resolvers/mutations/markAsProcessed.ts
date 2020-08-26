@@ -8,7 +8,7 @@ import {
   PROCESSING_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../../../common/constants";
-import { ValidationError, UserInputError } from "apollo-server-express";
+import { UserInputError } from "apollo-server-express";
 import transitionForm from "../../workflow/transitionForm";
 import { flattenProcessedFormInput } from "../../form-converter";
 import { Form } from "../../../generated/prisma-client";
@@ -16,6 +16,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { isValidDatetime } from "../../validation";
 import { InvalidDateTime } from "../../../common/errors";
 import { checkCanMarkAsProcessed } from "../../permissions";
+import { InvalidProcessingOperation } from "../../errors";
 
 function validateArgs(args: MutationMarkAsProcessedArgs) {
   const { processedInfo } = args;
@@ -26,9 +27,7 @@ function validateArgs(args: MutationMarkAsProcessedArgs) {
   );
 
   if (operation == null) {
-    throw new UserInputError(
-      "Cette opération d’élimination / valorisation n'existe pas."
-    );
+    throw new InvalidProcessingOperation();
   } else {
     // set default value for processingOperationDescription
     args.processedInfo.processingOperationDescription =

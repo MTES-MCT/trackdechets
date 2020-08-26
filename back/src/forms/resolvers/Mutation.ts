@@ -10,6 +10,7 @@ import signedByTransporter from "./mutations/signedByTransporter";
 import markAsReceived from "./mutations/markAsReceived";
 import markAsTempStored from "./mutations/markAsTempStored";
 import markAsProcessed from "./mutations/markAsProcessed";
+import markAsResealed from "./mutations/markAsResealed";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -22,6 +23,7 @@ const Mutation: MutationResolvers = {
   signedByTransporter,
   markAsReceived,
   markAsTempStored,
+  markAsResealed,
   markAsProcessed
 };
 

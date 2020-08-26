@@ -73,17 +73,17 @@ export type CompanyFavorite = {
 /** Payload d'un établissement */
 export type CompanyInput = {
   /** SIRET de l'établissement */
-  siret: Maybe<Scalars['String']>;
+  siret: Scalars['String'];
   /** Nom de l'établissement */
-  name: Maybe<Scalars['String']>;
+  name: Scalars['String'];
   /** Adresse de l'établissement */
-  address: Maybe<Scalars['String']>;
+  address: Scalars['String'];
   /** Nom du contact dans l'établissement */
-  contact: Maybe<Scalars['String']>;
+  contact: Scalars['String'];
   /** Email du contact dans l'établissement */
-  mail: Maybe<Scalars['String']>;
+  mail: Scalars['String'];
   /** Numéro de téléphone de contact dans l'établissement */
-  phone: Maybe<Scalars['String']>;
+  phone: Scalars['String'];
 };
 
 /** Information sur utilisateur au sein d'un établissement */
@@ -1165,26 +1165,11 @@ export type NextDestination = {
   company: Maybe<FormCompany>;
 };
 
-export type NextDestinationCompanyInput = {
-  /** SIRET de l'établissement */
-  siret: Scalars['String'];
-  /** Nom de l'établissement */
-  name: Scalars['String'];
-  /** Adresse de l'établissement */
-  address: Scalars['String'];
-  /** Nom du contact dans l'établissement */
-  contact: Scalars['String'];
-  /** Email du contact dans l'établissement */
-  mail: Scalars['String'];
-  /** Numéro de téléphone de contact dans l'établissement */
-  phone: Scalars['String'];
-};
-
 export type NextDestinationInput = {
   /** Traitement prévue (code D/R) */
   processingOperation: Scalars['String'];
   /** Établissement de destination ultérieur */
-  company: NextDestinationCompanyInput;
+  company: CompanyInput;
 };
 
 /** Payload d'un segment de transport */
@@ -2048,12 +2033,12 @@ export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): Comp
 
 export function createCompanyInputMock(props: Partial<CompanyInput>): CompanyInput {
   return {
-    siret: null,
-    name: null,
-    address: null,
-    contact: null,
-    mail: null,
-    phone: null,
+    siret: "",
+    name: "",
+    address: "",
+    contact: "",
+    mail: "",
+    phone: "",
     ...props,
   };
 }
@@ -2398,22 +2383,10 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
   };
 }
 
-export function createNextDestinationCompanyInputMock(props: Partial<NextDestinationCompanyInput>): NextDestinationCompanyInput {
-  return {
-    siret: "",
-    name: "",
-    address: "",
-    contact: "",
-    mail: "",
-    phone: "",
-    ...props,
-  };
-}
-
 export function createNextDestinationInputMock(props: Partial<NextDestinationInput>): NextDestinationInput {
   return {
     processingOperation: "",
-    company: createNextDestinationCompanyInputMock({}),
+    company: createCompanyInputMock({}),
     ...props,
   };
 }

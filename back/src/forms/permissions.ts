@@ -207,3 +207,15 @@ export async function checkCanMarkAsTempStored(user: User, form: Form) {
     );
   }
 }
+
+export async function checkCanMarkAsResealed(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+
+  const isAuthorized = isFormRecipient(fullUser, fullForm);
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à sceller ce bordereau après entreposage provisoire"
+    );
+  }
+}

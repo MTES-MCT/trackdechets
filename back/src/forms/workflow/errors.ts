@@ -27,20 +27,11 @@ export async function getError(error: WorkflowError, form: Form) {
         )}`
       );
 
-    case WorkflowError.InvalidSecurityCode:
-      return new ForbiddenError(
-        "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'."
-      );
-
     case WorkflowError.InvalidTransition:
       return new ForbiddenError(
         "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
       );
 
-    case WorkflowError.MissingSignature:
-      return new UserInputError(
-        "Le transporteur et le producteur du déchet doivent tous deux valider l'enlèvement"
-      );
     case WorkflowError.HasSegmentsToTakeOverError:
       return new ForbiddenError(
         "Vous ne pouvez pas passer ce bordereau à l'état souhaité, il n'est pas encore pris en charge par le dernier transporteur"

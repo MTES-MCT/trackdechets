@@ -1,6 +1,9 @@
 import { parse } from "date-fns";
 import { prisma, EcoOrganisme } from "../generated/prisma-client";
+import { TransporterInput } from "../generated/graphql/types";
 import { EcoOrganismeNotFound, InvaliSecurityCode } from "./errors";
+import { UserInputError } from "apollo-server-express";
+import { InvalidDateTime } from "../common/errors";
 
 const allowedFormats = [
   "yyyy-MM-dd",
@@ -109,5 +112,29 @@ export async function validateSecurityCode(
   });
   if (!exists) {
     throw new InvaliSecurityCode();
+  }
+}
+
+export async function validateTransporter(transporter: TransporterInput) {
+  if (transporter.isExemptedOfReceipt !== true) {
+    if (!transporter.receipt) {
+      throw new UserInputError(
+        "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le numéro de récépissé est donc est obligatoire"
+      );
+    }
+    if (!transporter.department) {
+      throw new UserInputError(
+        "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le département du récépissé est donc est obligatoire"
+      );
+    }
+    if (!transporter.validityLimit) {
+      throw new UserInputError(
+        "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, la date de limite de validité du récépissé est donc est obligatoire"
+      );
+    } else {
+      if (!isValidDatetime(transporter.validityLimit)) {
+        throw new InvalidDateTime("validityLimit");
+      }
+    }
   }
 }

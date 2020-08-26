@@ -64,11 +64,11 @@ export default {
     //signedByTransporter: chain(signedByTransporterSchema, isFormTransporter),
     updateTransporterFields: isFormTransporter,
     //markAsTempStored: chain(markAsTempStoredSchema, isFormTempStorer),
-    markAsResealed: chain(
-      markAsResealedSchema,
-      or(temporaryStorageDestinationSchema, hasFinalDestination),
-      isFormTempStorer
-    ),
+    // markAsResealed: chain(
+    //   markAsResealedSchema,
+    //   or(temporaryStorageDestinationSchema, hasFinalDestination),
+    //   isFormTempStorer
+    // ),
     markAsResent: chain(
       markAsResentSchema,
       or(temporaryStorageDestinationSchema, hasFinalDestination),

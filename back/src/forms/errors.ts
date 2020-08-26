@@ -8,6 +8,12 @@ export class InvalidWasteCode extends UserInputError {
   }
 }
 
+export class InvalidProcessingOperation extends UserInputError {
+  constructor() {
+    super("Cette opération d’élimination / valorisation n'existe pas.");
+  }
+}
+
 export class MissingTempStorageFlag extends UserInputError {
   constructor() {
     super(
