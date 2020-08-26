@@ -26,28 +26,6 @@ import {
 import { transportSegments } from "./queries/segments";
 import { getUserCompanies } from "../users/database";
 
-const formResolvers: FormResolvers = {
-  appendix2Forms: parent => {
-    return prisma.form({ id: parent.id }).appendix2Forms();
-  },
-  ecoOrganisme: parent => {
-    return prisma.form({ id: parent.id }).ecoOrganisme();
-  },
-  temporaryStorageDetail: async parent => {
-    const temporaryStorageDetail = await prisma
-      .form({ id: parent.id })
-      .temporaryStorageDetail();
-
-    return temporaryStorageDetail
-      ? expandTemporaryStorageFromDb(temporaryStorageDetail)
-      : null;
-  },
-  // Somme contextual values, depending on the form status / type, mostly to ease the display
-  stateSummary: parent => stateSummary(parent),
-
-  transportSegments: parent => transportSegments(parent)
-};
-
 const wasteDetailsResolvers: WasteDetailsResolvers = {
   packagings: parent => parent.packagings || []
 };
@@ -88,7 +66,6 @@ const subscriptionResolvers: SubscriptionResolvers = {
 };
 
 export default {
-  Form: formResolvers,
   WasteDetails: wasteDetailsResolvers,
   StateSummary: stateSummaryResolvers,
   Subscription: subscriptionResolvers

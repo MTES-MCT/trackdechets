@@ -5,8 +5,8 @@ import {
   createTransporterMock,
   createRecipientMock,
   createWasteDetailsMock
-} from "../../../generated/graphql/types";
-import { stateSummary as getStateSummary } from "../state-summary";
+} from "../../../../generated/graphql/types";
+import { getStateSummary } from "../stateSummary";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({
