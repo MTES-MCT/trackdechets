@@ -6,7 +6,6 @@ import usersResolvers from "./users/resolvers";
 import formsResolvers from "./forms/resolvers";
 import usersShields from "./users/shield-tree";
 import companiesShields from "./companies/shield-tree";
-import formsShields from "./forms/shield-tree";
 
 // Merge GraphQL schema by merging types, resolvers and shields
 // definitions from differents modules
@@ -23,10 +22,6 @@ const typeDefs = mergeTypeDefs(typeDefsArray);
 
 const resolvers = [companiesResolvers, formsResolvers, usersResolvers];
 
-const shieldRulesTree = mergeRulesTrees([
-  usersShields,
-  companiesShields,
-  formsShields
-]);
+const shieldRulesTree = mergeRulesTrees([usersShields, companiesShields]);
 
 export { typeDefs, resolvers, shieldRulesTree };
