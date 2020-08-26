@@ -53,7 +53,8 @@ export function getNewValidPrismaForm(): PrismaForm {
     wasteDetailsOtherPackaging: "",
     wasteDetailsNumberOfPackages: 2,
     wasteDetailsQuantity: 1.5,
-    wasteDetailsQuantityType: "REAL"
+    wasteDetailsQuantityType: "REAL",
+    wasteDetailsConsistence: "SOLID"
   };
 }
 

@@ -1,6 +1,6 @@
 import { formSchema } from "../validation";
 
-jest.mock("../../generated/prisma-client", () => ({
+jest.mock("../../../generated/prisma-client", () => ({
   prisma: { $exists: { ecoOrganisme: () => Promise.resolve(true) } }
 }));
 

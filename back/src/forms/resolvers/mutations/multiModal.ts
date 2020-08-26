@@ -1,3 +1,4 @@
+import * as Yup from "yup";
 import { GraphQLContext } from "../../../types";
 import {
   prisma,
@@ -10,11 +11,11 @@ import {
   MutationMarkSegmentAsReadyToTakeOverArgs,
   MutationTakeOverSegmentArgs
 } from "../../../generated/graphql/types";
-import { getCurrentUserSirets } from "../../rules/permissions";
 import { expandTransportSegmentFromDb } from "../../form-converter";
-import { segmentSchema, takeOverInfoSchema } from "../../rules/schema";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { getUserCompanies } from "../../../users/database";
+import { validDatetime } from "../../validation";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -24,6 +25,60 @@ const FORM_MUST_BE_DRAFT = "Le bordereau doit être en brouillon";
 const SEGMENT_ALREADY_SEALED = "Ce segment de transport est déjà scellé";
 const SEGMENTS_ALREADY_PREPARED =
   "Il y a d'autres segments après le votre, vous ne pouvez pas ajouter de segment";
+
+const segmentSchema = Yup.object<any>().shape({
+  // id: Yup.string().label("Identifiant (id)").required(),
+  mode: Yup.string().label("Mode de transport").required(),
+  transporterCompanySiret: Yup.string()
+    .label("Siret du transporteur")
+    .required("La sélection d'une entreprise est obligatoire"),
+  transporterCompanyAddress: Yup.string().required(),
+  transporterCompanyContact: Yup.string().required(
+    "Le contact dans l'entreprise est obligatoire"
+  ),
+  transporterCompanyPhone: Yup.string().required(
+    "Le téléphone de l'entreprise est obligatoire"
+  ),
+  transporterCompanyMail: Yup.string()
+    .email("Le format d'adresse email est incorrect")
+    .required("L'email est obligatoire"),
+  transporterIsExemptedOfReceipt: Yup.boolean().nullable(true),
+  transporterReceipt: Yup.string().when(
+    "transporterIsExemptedOfReceipt",
+    (isExemptedOfReceipt, schema) =>
+      isExemptedOfReceipt
+        ? schema.nullable(true)
+        : schema.required(
+            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+          )
+  ),
+  transporterDepartment: Yup.string().when(
+    "transporterIsExemptedOfReceipt",
+    (isExemptedOfReceipt, schema) =>
+      isExemptedOfReceipt
+        ? schema.nullable(true)
+        : schema.required("Le département du transporteur est obligatoire")
+  ),
+
+  transporterValidityLimit: validDatetime(
+    {
+      verboseFieldName: "date de validité"
+    },
+    Yup
+  ),
+  transporterNumberPlate: Yup.string().nullable(true)
+});
+
+const takeOverInfoSchema = Yup.object<any>().shape({
+  takenOverAt: validDatetime(
+    {
+      verboseFieldName: "date de prise en charge",
+      required: true
+    },
+    Yup
+  ),
+  takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
+});
 
 type FormSiretsAndSegments = {
   recipientCompanySiret: string;
@@ -124,7 +179,8 @@ export async function prepareSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentUserSirets = await getCurrentUserSirets(user.id, prisma);
+  const userCompanies = await getUserCompanies(user.id);
+  const currentUserSirets = userCompanies.map(c => c.siret);
 
   if (!currentUserSirets.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
@@ -270,8 +326,9 @@ export async function markSegmentAsReadyToTakeOver(
   if (form.status !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
-  const userSirets = await getCurrentUserSirets(user.id, prisma);
 
+  const userCompanies = await getUserCompanies(user.id);
+  const userSirets = userCompanies.map(c => c.siret);
   if (!userSirets.includes(form.currentTransporterSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
@@ -320,7 +377,8 @@ export async function takeOverSegment(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const userSirets = await getCurrentUserSirets(user.id, prisma);
+  const userCompanies = await getUserCompanies(user.id);
+  const userSirets = userCompanies.map(c => c.siret);
 
   //   user must be the nextTransporter
   const nexTransporterIsFilled = !!form.nextTransporterSiret;
@@ -386,7 +444,8 @@ export async function editSegment(
   const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
 
   // check user owns siret
-  const userSirets = await getCurrentUserSirets(user.id, prisma);
+  const userCompanies = await getUserCompanies(user.id);
+  const userSirets = userCompanies.map(c => c.siret);
   if (!userSirets.includes(userSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
