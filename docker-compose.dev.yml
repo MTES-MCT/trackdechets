@@ -79,7 +79,7 @@ services:
       context: ./pdf
       dockerfile: Dockerfile.dev
     volumes:
-      - ./pdf/src:/usr/src/pdf/src
+      - ./pdf/src:/usr/src/app/src
     ports:
       - 3201:3201
     environment:
