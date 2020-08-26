@@ -34,7 +34,8 @@ function validateArgs(args: MutationMarkAsResealedArgs) {
   const { resealedInfos } = args;
 
   if (resealedInfos.transporter) {
-    validateTransporter(resealedInfos.transporter);
+    const transporter = resealedInfos.transporter;
+    validateTransporter(transporter);
   }
 
   if (resealedInfos.destination) {

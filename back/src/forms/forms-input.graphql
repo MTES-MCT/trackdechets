@@ -232,22 +232,22 @@ input DestinationInput {
 "Payload d'un établissement"
 input CompanyInput {
   "SIRET de l'établissement"
-  siret: String!
+  siret: String
 
   "Nom de l'établissement"
-  name: String!
+  name: String
 
   "Adresse de l'établissement"
-  address: String!
+  address: String
 
   "Nom du contact dans l'établissement"
-  contact: String!
+  contact: String
 
   "Email du contact dans l'établissement"
-  mail: String!
+  mail: String
 
   "Numéro de téléphone de contact dans l'établissement"
-  phone: String!
+  phone: String
 }
 
 "Payload d'une adresse chantier"
@@ -410,10 +410,10 @@ input ResentFormInput {
   transporter: TransporterInput
 
   "Nom du signataire du BSD suite  (case 19)"
-  signedBy: String
+  signedBy: String!
 
   "Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui."
-  signedAt: DateTime
+  signedAt: DateTime!
 }
 
 "Payload lié au détails du déchet du BSD suite (case 14 à 19)"

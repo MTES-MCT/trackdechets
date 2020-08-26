@@ -69,11 +69,11 @@ export default {
     //   or(temporaryStorageDestinationSchema, hasFinalDestination),
     //   isFormTempStorer
     // ),
-    markAsResent: chain(
-      markAsResentSchema,
-      or(temporaryStorageDestinationSchema, hasFinalDestination),
-      isFormTempStorer
-    ),
+    // markAsResent: chain(
+    //   markAsResentSchema,
+    //   or(temporaryStorageDestinationSchema, hasFinalDestination),
+    //   isFormTempStorer
+    // ),
     prepareSegment: isAuthenticated,
     markSegmentAsReadyToTakeOver: isAuthenticated,
     takeOverSegment: isAuthenticated,

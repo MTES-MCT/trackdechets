@@ -3572,7 +3572,7 @@ Payload d'un établissement
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 SIRET de l'établissement
@@ -3581,7 +3581,7 @@ SIRET de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 Nom de l'établissement
@@ -3590,7 +3590,7 @@ Nom de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 Adresse de l'établissement
@@ -3599,7 +3599,7 @@ Adresse de l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>contact</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 Nom du contact dans l'établissement
@@ -3608,7 +3608,7 @@ Nom du contact dans l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>mail</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 Email du contact dans l'établissement
@@ -3617,7 +3617,7 @@ Email du contact dans l'établissement
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
 Numéro de téléphone de contact dans l'établissement
@@ -4405,7 +4405,7 @@ Transporteur du déchet reconditionné
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom du signataire du BSD suite  (case 19)
@@ -4414,7 +4414,7 @@ Nom du signataire du BSD suite  (case 19)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedAt</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
 Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui.

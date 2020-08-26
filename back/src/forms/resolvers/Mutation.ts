@@ -11,6 +11,7 @@ import markAsReceived from "./mutations/markAsReceived";
 import markAsTempStored from "./mutations/markAsTempStored";
 import markAsProcessed from "./mutations/markAsProcessed";
 import markAsResealed from "./mutations/markAsResealed";
+import markAsResent from "./mutations/markAsResent";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -24,6 +25,7 @@ const Mutation: MutationResolvers = {
   markAsReceived,
   markAsTempStored,
   markAsResealed,
+  markAsResent,
   markAsProcessed
 };
 

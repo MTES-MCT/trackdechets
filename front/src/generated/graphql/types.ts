@@ -73,17 +73,17 @@ export type CompanyFavorite = {
 /** Payload d'un établissement */
 export type CompanyInput = {
   /** SIRET de l'établissement */
-  siret: Scalars['String'];
+  siret: Maybe<Scalars['String']>;
   /** Nom de l'établissement */
-  name: Scalars['String'];
+  name: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
-  address: Scalars['String'];
+  address: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
-  contact: Scalars['String'];
+  contact: Maybe<Scalars['String']>;
   /** Email du contact dans l'établissement */
-  mail: Scalars['String'];
+  mail: Maybe<Scalars['String']>;
   /** Numéro de téléphone de contact dans l'établissement */
-  phone: Scalars['String'];
+  phone: Maybe<Scalars['String']>;
 };
 
 /** Information sur utilisateur au sein d'un établissement */
@@ -1466,9 +1466,9 @@ export type ResentFormInput = {
   /** Transporteur du déchet reconditionné */
   transporter: Maybe<TransporterInput>;
   /** Nom du signataire du BSD suite  (case 19) */
-  signedBy: Maybe<Scalars['String']>;
+  signedBy: Scalars['String'];
   /** Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui. */
-  signedAt: Maybe<Scalars['DateTime']>;
+  signedAt: Scalars['DateTime'];
 };
 
 /**
@@ -2033,12 +2033,12 @@ export function createCompanyFavoriteMock(props: Partial<CompanyFavorite>): Comp
 
 export function createCompanyInputMock(props: Partial<CompanyInput>): CompanyInput {
   return {
-    siret: "",
-    name: "",
-    address: "",
-    contact: "",
-    mail: "",
-    phone: "",
+    siret: null,
+    name: null,
+    address: null,
+    contact: null,
+    mail: null,
+    phone: null,
     ...props,
   };
 }
@@ -2496,8 +2496,8 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     destination: null,
     wasteDetails: null,
     transporter: null,
-    signedBy: null,
-    signedAt: null,
+    signedBy: "",
+    signedAt: new Date(),
     ...props,
   };
 }

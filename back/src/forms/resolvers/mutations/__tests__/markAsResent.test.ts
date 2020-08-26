@@ -1,10 +1,7 @@
-import {
-  getNewValidForm,
-  getContext
-} from "../../resolvers/mutations/__mocks__/data";
-import { markAsResent } from "../mark-as";
-import { ErrorCode } from "../../../common/errors";
-import { FormState } from "../../workflow/model";
+import { getContext, getNewValidPrismaForm } from "../__mocks__/data";
+import { markAsResentFn as markAsResent } from "../markAsResent";
+import { ErrorCode } from "../../../../common/errors";
+import { createResentFormInputMock } from "../../../../generated/graphql/types";
 
 const formMock = jest.fn();
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -43,24 +40,35 @@ describe("Forms -> markAsResent mutation", () => {
 
   it("should fail if form is not TEMP_STORED", async () => {
     expect.assertions(1);
+    const form = getNewValidPrismaForm();
+    form.recipientIsTempStorage = true;
+    form.status = "DRAFT";
 
     try {
-      mockFormWith({ id: 1, status: FormState.Draft });
+      mockFormWith(form);
 
-      await markAsResent({ id: "1", resentInfos: {} }, defaultContext);
+      await markAsResent(
+        form,
+        { id: form.id, resentInfos: createResentFormInputMock({}) },
+        defaultContext
+      );
     } catch (err) {
       expect(err.extensions.code).toBe(ErrorCode.FORBIDDEN);
     }
   });
 
   it("should set status to RESENT", async () => {
-    const form = getNewValidForm();
+    const form = getNewValidPrismaForm();
     form.status = "TEMP_STORED";
-    form.recipient.isTempStorage = true;
+    form.recipientIsTempStorage = true;
 
     mockFormWith(form);
 
-    await markAsResent({ id: "1", resentInfos: {} }, defaultContext);
+    await markAsResent(
+      form,
+      { id: form.id, resentInfos: createResentFormInputMock({}) },
+      defaultContext
+    );
 
     expect(prisma.updateForm).toHaveBeenCalledTimes(1);
     expect(prisma.updateForm).toHaveBeenCalledWith(
