@@ -21,7 +21,7 @@ const prisma = {
   updateManyForms: jest.fn(() => Promise.resolve({}))
 };
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     form: () => prisma.form(),
     updateForm: (...args) => prisma.updateForm(...args),

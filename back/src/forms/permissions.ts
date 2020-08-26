@@ -127,6 +127,14 @@ export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
   }
 }
 
+export async function checkCanUpdateTransporterFields(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+
+  if (!isFormTransporter(fullUser, form)) {
+    throw new ForbiddenError("Vous n'êtes pas transporteur de ce bordereau.");
+  }
+}
+
 export async function checkCanMarkAsSealed(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);

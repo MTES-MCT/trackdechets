@@ -27,7 +27,6 @@ import { transportSegments } from "./queries/segments";
 import { getUserCompanies } from "../users/database";
 
 const mutationResolvers: MutationResolvers = {
-  updateTransporterFields: (_parent, args) => updateTransporterFields(args),
   prepareSegment: (_parent, args, context) => prepareSegment(args, context),
   markSegmentAsReadyToTakeOver: (_parent, args, context) =>
     markSegmentAsReadyToTakeOver(args, context),

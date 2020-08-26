@@ -1,11 +1,10 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
-
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
 import {
   formFactory,
   userWithCompanyFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 jest.mock("axios", () => ({
   default: {
@@ -14,12 +13,7 @@ jest.mock("axios", () => ({
 }));
 
 describe("Forms -> updateTransporterFields mutation", () => {
-  beforeEach(async () => {
-    await resetDatabase();
-  });
-  afterAll(async () => {
-    await resetDatabase();
-  });
+  afterEach(resetDatabase);
 
   it("should update transporter plate", async () => {
     const { user: emitter } = await userWithCompanyFactory("MEMBER");

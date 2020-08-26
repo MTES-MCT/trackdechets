@@ -1,6 +1,7 @@
 import { MutationResolvers } from "../../generated/graphql/types";
 import createForm from "./mutations/createForm";
 import updateForm from "./mutations/updateForm";
+import updateTransporterFields from "./mutations/updateTransporterFields";
 import saveForm from "./mutations/saveForm";
 import deleteForm from "./mutations/deleteForm";
 import duplicateForm from "./mutations/duplicateForm";
@@ -16,6 +17,7 @@ import markAsResent from "./mutations/markAsResent";
 const Mutation: MutationResolvers = {
   createForm,
   updateForm,
+  updateTransporterFields,
   saveForm,
   deleteForm,
   duplicateForm,
