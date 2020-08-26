@@ -13,6 +13,10 @@ import markAsTempStored from "./mutations/markAsTempStored";
 import markAsProcessed from "./mutations/markAsProcessed";
 import markAsResealed from "./mutations/markAsResealed";
 import markAsResent from "./mutations/markAsResent";
+import prepareSegment from "./mutations/prepareSegment";
+import editSegment from "./mutations/editSegment";
+import takeOverSegment from "./mutations/takeOverSegment";
+import markSegmentAsReadyToTakeOver from "./mutations/markSegmentAsReadyToTakeOver";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -28,7 +32,11 @@ const Mutation: MutationResolvers = {
   markAsTempStored,
   markAsResealed,
   markAsResent,
-  markAsProcessed
+  markAsProcessed,
+  prepareSegment,
+  editSegment,
+  markSegmentAsReadyToTakeOver,
+  takeOverSegment
 };
 
 export default Mutation;

@@ -74,9 +74,9 @@ export default {
     //   or(temporaryStorageDestinationSchema, hasFinalDestination),
     //   isFormTempStorer
     // ),
-    prepareSegment: isAuthenticated,
-    markSegmentAsReadyToTakeOver: isAuthenticated,
-    takeOverSegment: isAuthenticated,
-    editSegment: isAuthenticated
+    // prepareSegment: isAuthenticated,
+    // markSegmentAsReadyToTakeOver: isAuthenticated,
+    // takeOverSegment: isAuthenticated,
+    // editSegment: isAuthenticated
   }
 };

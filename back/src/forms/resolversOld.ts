@@ -12,7 +12,7 @@ import {
   markSegmentAsReadyToTakeOver,
   takeOverSegment,
   editSegment
-} from "./mutations/multiModal";
+} from "./resolvers/mutations/multiModal";
 import { updateTransporterFields } from "./mutations/updateTransporterFields";
 import { AuthenticationError } from "apollo-server-express";
 import { stateSummary } from "./queries/state-summary";
@@ -25,14 +25,6 @@ import {
 } from "../generated/graphql/types";
 import { transportSegments } from "./queries/segments";
 import { getUserCompanies } from "../users/database";
-
-const mutationResolvers: MutationResolvers = {
-  prepareSegment: (_parent, args, context) => prepareSegment(args, context),
-  markSegmentAsReadyToTakeOver: (_parent, args, context) =>
-    markSegmentAsReadyToTakeOver(args, context),
-  takeOverSegment: (_parent, args, context) => takeOverSegment(args, context),
-  editSegment: (_parent, args, context) => editSegment(args, context)
-};
 
 const formResolvers: FormResolvers = {
   appendix2Forms: parent => {
@@ -99,6 +91,5 @@ export default {
   Form: formResolvers,
   WasteDetails: wasteDetailsResolvers,
   StateSummary: stateSummaryResolvers,
-  Mutation: mutationResolvers,
   Subscription: subscriptionResolvers
 };

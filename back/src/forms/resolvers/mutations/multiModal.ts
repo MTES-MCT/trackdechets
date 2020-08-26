@@ -1,19 +1,20 @@
-import { GraphQLContext } from "../../types";
+import { GraphQLContext } from "../../../types";
 import {
   prisma,
   TransportSegment as PrismaTransportSegment
-} from "../../generated/prisma-client";
+} from "../../../generated/prisma-client";
 import {
   TransportSegment,
   MutationPrepareSegmentArgs,
   MutationEditSegmentArgs,
   MutationMarkSegmentAsReadyToTakeOverArgs,
   MutationTakeOverSegmentArgs
-} from "../../generated/graphql/types";
-import { getCurrentUserSirets } from "../rules/permissions";
-import { expandTransportSegmentFromDb } from "../form-converter";
-import { segmentSchema, takeOverInfoSchema } from "../../forms/rules/schema";
+} from "../../../generated/graphql/types";
+import { getCurrentUserSirets } from "../../rules/permissions";
+import { expandTransportSegmentFromDb } from "../../form-converter";
+import { segmentSchema, takeOverInfoSchema } from "../../rules/schema";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { checkIsAuthenticated } from "../../../common/permissions";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -121,7 +122,9 @@ export async function prepareSegment(
   { id, siret, nextSegmentInfo }: MutationPrepareSegmentArgs,
   context: GraphQLContext
 ): Promise<TransportSegment> {
-  const currentUserSirets = await getCurrentUserSirets(context.user.id, prisma);
+  const user = checkIsAuthenticated(context);
+
+  const currentUserSirets = await getCurrentUserSirets(user.id, prisma);
 
   if (!currentUserSirets.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
@@ -143,7 +146,7 @@ export async function prepareSegment(
   });
 
   // user must be the currentTransporter or form owner
-  const userIsOwner = context.user.id === form.owner.id;
+  const userIsOwner = user.id === form.owner.id;
   const userIsCurrentTransporter =
     !!form.currentTransporterSiret && siret === form.currentTransporterSiret;
 
@@ -253,6 +256,8 @@ export async function markSegmentAsReadyToTakeOver(
   { id }: MutationMarkSegmentAsReadyToTakeOverArgs,
   context: GraphQLContext
 ): Promise<TransportSegment> {
+  const user = checkIsAuthenticated(context);
+
   const currentSegment = await prisma
     .transportSegment({ id })
     .$fragment<SegmentAndForm>(segmentFragment);
@@ -265,7 +270,7 @@ export async function markSegmentAsReadyToTakeOver(
   if (form.status !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
-  const userSirets = await getCurrentUserSirets(context.user.id, prisma);
+  const userSirets = await getCurrentUserSirets(user.id, prisma);
 
   if (!userSirets.includes(form.currentTransporterSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
@@ -288,6 +293,8 @@ export async function takeOverSegment(
   { id, takeOverInfo }: MutationTakeOverSegmentArgs,
   context: GraphQLContext
 ): Promise<TransportSegment> {
+  const user = checkIsAuthenticated(context);
+
   const inputErrors: string[] = await takeOverInfoSchema
     .validate(takeOverInfo, { abortEarly: false })
     .catch(err => err.errors);
@@ -313,7 +320,7 @@ export async function takeOverSegment(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const userSirets = await getCurrentUserSirets(context.user.id, prisma);
+  const userSirets = await getCurrentUserSirets(user.id, prisma);
 
   //   user must be the nextTransporter
   const nexTransporterIsFilled = !!form.nextTransporterSiret;
@@ -366,6 +373,8 @@ export async function editSegment(
   { id, siret: userSiret, nextSegmentInfo }: MutationEditSegmentArgs,
   context: GraphQLContext
 ): Promise<TransportSegment> {
+  const user = checkIsAuthenticated(context);
+
   const currentSegment = await prisma
     .transportSegment({ id })
     .$fragment<SegmentAndForm>(segmentFragment);
@@ -377,14 +386,14 @@ export async function editSegment(
   const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
 
   // check user owns siret
-  const userSirets = await getCurrentUserSirets(context.user.id, prisma);
+  const userSirets = await getCurrentUserSirets(user.id, prisma);
   if (!userSirets.includes(userSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 
   const form = await getForm(currentSegment.form.id);
 
-  const userIsOwner = context.user.id === form.owner.id;
+  const userIsOwner = user.id === form.owner.id;
   const userIsCurrentTransporter = userSiret === form.currentTransporterSiret;
   const userIsNextTransporter = userSiret === form.nextTransporterSiret;
 
