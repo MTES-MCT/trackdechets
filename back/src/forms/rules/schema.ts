@@ -124,7 +124,8 @@ export const markAsProcessedSchema = inputRule()(
           then: yup.object({
             processingOperation: yup.string(),
             company: validCompany({
-              verboseFieldName: "Destination ultérieure prévue"
+              verboseFieldName: "Destination ultérieure prévue",
+              allowForeign: true
             })
           })
         }),

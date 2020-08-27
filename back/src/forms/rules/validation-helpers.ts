@@ -57,16 +57,18 @@ export function validDatetime({ verboseFieldName, required = false }, yup) {
 }
 
 export function validCompany({
-  verboseFieldName
+  verboseFieldName,
+  allowForeign = false
 }: {
   verboseFieldName: string;
+  allowForeign?: boolean;
 }) {
   return Yup.object().shape({
     name: Yup.string().required(
       `${verboseFieldName}: Le nom de l'entreprise est obligatoire`
     ),
     siret: Yup.string().when("country", {
-      is: country => country == null || country === "FR",
+      is: country => !allowForeign || country == null || country === "FR",
       then: Yup.string().required(
         `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
       ),
