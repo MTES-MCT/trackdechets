@@ -1,11 +1,11 @@
-import { changePassword } from "../changePassword";
-import { ErrorCode } from "../../../common/errors";
-import { hashPassword } from "../../utils";
+import { changePasswordFn as changePassword } from "../changePassword";
+import { ErrorCode } from "../../../../common/errors";
+import { hashPassword } from "../../../utils";
 
 const userMock = jest.fn();
 const updateUserMock = jest.fn();
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     user: jest.fn((...args) => userMock(...args)),
     updateUser: jest.fn((...args) => updateUserMock(...args))

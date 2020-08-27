@@ -3,41 +3,23 @@ import { getInstallation } from "../companies/queries";
 import { prisma } from "../generated/prisma-client";
 import { userMails } from "./mails";
 import {
-  changePassword,
   editProfile,
   inviteUserToCompany,
   resendInvitation,
   login,
   joinWithInvite
 } from "./mutations";
-import signup from "./mutations/signup";
 import { hashPassword, generatePassword } from "./utils";
-import { apiKey } from "./queries";
 import {
-  QueryResolvers,
   MutationResolvers,
   UserResolvers,
   CompanyPrivate
 } from "../generated/graphql/types";
 import { getUserCompanies } from "./database";
-import { checkIsAuthenticated } from "../common/permissions";
 import { searchCompany } from "../companies/sirene";
 
-const queryResolvers: QueryResolvers = {
-  me: async (_parent, _args, context) => {
-    const userId = context.user.id;
-    return prisma.user({ id: userId });
-  },
-  apiKey: (_parent, _args, context) => apiKey(context.user)
-};
-
 const mutationResolvers: MutationResolvers = {
-  signup: (_parent, { userInfos }) => signup(userInfos),
   login: async (_parent, args) => login(args),
-  changePassword: async (_, args, context) => {
-    const userId = context.user.id;
-    return changePassword(userId, args);
-  },
   resetPassword: async (_, { email }) => {
     const user = await prisma.user({ email }).catch(__ => null);
     if (!user) {
@@ -113,6 +95,5 @@ const userResolvers: UserResolvers = {
 
 export default {
   Mutation: mutationResolvers,
-  Query: queryResolvers,
   User: userResolvers
 };

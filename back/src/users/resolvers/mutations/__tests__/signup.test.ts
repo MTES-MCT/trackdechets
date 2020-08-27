@@ -1,5 +1,5 @@
-import signup from "../signup";
-import { prisma } from "../../../generated/prisma-client";
+import { signupFn as signup } from "../signup";
+import { prisma } from "../../../../generated/prisma-client";
 
 const userInfos = {
   id: "new_user",
@@ -9,7 +9,7 @@ const userInfos = {
   phone: "0000"
 };
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     createUser: jest.fn(() => Promise.resolve(userInfos)),
     $exists: {
@@ -24,7 +24,7 @@ jest.mock("../../../generated/prisma-client", () => ({
   }
 }));
 
-jest.mock("../../../common/mails.helper", () => ({
+jest.mock("../../../../common/mails.helper", () => ({
   sendMail: () => null
 }));
 
@@ -34,13 +34,13 @@ describe("signup", () => {
   });
 
   test("should create user", async () => {
-    const user = await signup(userInfos);
+    const user = await signup({ userInfos });
 
     expect(user.id).toBe("new_user");
   });
 
   test("should create activation hash", async () => {
-    await signup(userInfos);
+    await signup({ userInfos });
 
     expect(prisma.createUserActivationHash).toHaveBeenCalledTimes(1);
   });
@@ -53,7 +53,7 @@ describe("signup", () => {
     ];
     (prisma.userAccountHashes as jest.Mock).mockResolvedValue(hashes);
 
-    await signup(userInfos);
+    await signup({ userInfos });
 
     expect(prisma.createCompanyAssociation).toHaveBeenCalledTimes(
       hashes.length

@@ -8,11 +8,11 @@ import { chain } from "graphql-shield";
 
 export default {
   Query: {
-    me: isAuthenticated,
-    apiKey: isAuthenticatedFromUI
+    // me: isAuthenticated,
+    // apiKey: isAuthenticatedFromUI
   },
   Mutation: {
-    changePassword: isAuthenticatedFromUI,
+    // changePassword: isAuthenticatedFromUI,
     editProfile: isAuthenticatedFromUI,
     inviteUserToCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
     resendInvitation: chain(isAuthenticatedFromUI, isCompanyAdmin),

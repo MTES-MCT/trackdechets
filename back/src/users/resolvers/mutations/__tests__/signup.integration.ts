@@ -1,11 +1,11 @@
-import * as mailsHelper from "../../../common/mails.helper";
-import { server } from "../../../server";
+import * as mailsHelper from "../../../../common/mails.helper";
+import { server } from "../../../../server";
 import { createTestClient } from "apollo-server-integration-testing";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
-import { userMails } from "../../mails";
-import { userFactory, companyFactory } from "../../../__tests__/factories";
-import { ErrorCode } from "../../../common/errors";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
+import { userMails } from "../../../mails";
+import { userFactory, companyFactory } from "../../../../__tests__/factories";
+import { ErrorCode } from "../../../../common/errors";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");

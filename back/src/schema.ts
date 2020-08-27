@@ -2,6 +2,7 @@ import { mergeRulesTrees } from "./utils";
 import { mergeTypeDefs } from "@graphql-tools/merge";
 import { loadFilesSync } from "@graphql-tools/load-files";
 import companiesResolvers from "./companies/resolvers";
+import usersResolversOld from "./users/resolversOld";
 import usersResolvers from "./users/resolvers";
 import formsResolvers from "./forms/resolvers";
 import usersShields from "./users/shield-tree";
@@ -20,7 +21,12 @@ const typeDefsArray = loadFilesSync(typeDefsPath);
 
 const typeDefs = mergeTypeDefs(typeDefsArray);
 
-const resolvers = [companiesResolvers, formsResolvers, usersResolvers];
+const resolvers = [
+  companiesResolvers,
+  formsResolvers,
+  usersResolversOld,
+  usersResolvers
+];
 
 const shieldRulesTree = mergeRulesTrees([usersShields, companiesShields]);
 
