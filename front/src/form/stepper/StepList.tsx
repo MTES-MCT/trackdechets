@@ -200,11 +200,7 @@ export default withRouter(function StepList(
  * @param initialState what an empty Form is
  * @param actualForm the actual form
  */
-export function getComputedState(
-  initialState,
-  actualForm,
-  keys: string[] = []
-) {
+export function getComputedState(initialState, actualForm) {
   if (!actualForm) {
     return initialState;
   }
@@ -218,17 +214,9 @@ export function getComputedState(
       initialValue !== null &&
       !(initialValue instanceof Array)
     ) {
-      prev[curKey] = getComputedState(
-        initialValue,
-        actualForm[curKey],
-        keys.concat(curKey)
-      );
+      prev[curKey] = getComputedState(initialValue, actualForm[curKey]);
     } else {
-      prev[curKey] =
-        // recipient.company.siret is null for companies in a foreign country
-        keys.concat(curKey).join(".") === "recipient.company.siret"
-          ? actualForm[curKey]
-          : actualForm[curKey] ?? initialValue;
+      prev[curKey] = actualForm[curKey] ?? initialValue;
     }
 
     return prev;
