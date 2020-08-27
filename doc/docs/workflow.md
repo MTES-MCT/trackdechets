@@ -41,7 +41,7 @@ L'ensemble des champs du BSD numérique est décrit dans la [référence de l'AP
 - `REFUSED` (refusé): Déchet refusé
 - `PROCESSED` (traité): BSD dont l'opération de traitement a été effectué
 - `NO_TRACEABILITY` (rupture de traçabilité): Rupture de traçabilité autorisée par arrêté préfectoral avec transfert de responsabilité.
-- `AWAITING_GROUP`: BSD en attente de regroupement (code de traitement D 13, D 14, D 15, R 13)
+- `AWAITING_GROUP`: BSD en attente de regroupement (code de traitement D 13, D 14, D 15, R 12, R 13)
 - `GROUPED`: BSD qui a été ajouté à une annexe 2
 
 Chaque changement d'état s'effectue grâce à une mutation.
