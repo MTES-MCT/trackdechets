@@ -1,7 +1,8 @@
 import {
   userWithCompanyFactory,
   formFactory,
-  companyFactory
+  companyFactory,
+  userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -102,13 +103,14 @@ describe("{ mutation { markAsSealed } }", () => {
     expect(form.status).toEqual("SEALED");
   });
 
-  test("should fail if user is not authorized", async () => {
+  test.only("should fail if user is not authorized", async () => {
+    const owner = await userFactory();
     const { user } = await userWithCompanyFactory("MEMBER");
 
     const emitterCompany = await companyFactory();
 
     const form = await formFactory({
-      ownerId: user.id,
+      ownerId: owner.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: emitterCompany.siret,

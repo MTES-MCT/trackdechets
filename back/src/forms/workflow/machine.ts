@@ -3,10 +3,9 @@ import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { WorkflowError } from "./errors";
 import {
   markFormAppendixAwaitingFormsAsGrouped,
-  markFormAppendixGroupedsAsProcessed,
-  validateForm
+  markFormAppendixGroupedsAsProcessed
 } from "./helpers";
-
+import { validateForm } from "./validation";
 import { FormState } from "./model";
 
 export const formWorkflowMachine = Machine(

@@ -1,11 +1,14 @@
 import { formSchema } from "../validation";
+import { Form } from "../../../generated/graphql/types";
 
 jest.mock("../../../generated/prisma-client", () => ({
   prisma: { $exists: { ecoOrganisme: () => Promise.resolve(true) } }
 }));
 
-const form = {
+const form: Form = {
   id: "cjplbvecc000d0766j32r19am",
+  readableId: "TD-xxx",
+  status: "DRAFT",
   emitter: {
     type: "PRODUCER",
     workSite: {
@@ -57,7 +60,8 @@ const form = {
     otherPackaging: "",
     numberOfPackages: 2,
     quantity: 1.5,
-    quantityType: "REAL"
+    quantityType: "REAL",
+    consistence: "SOLID"
   }
 };
 

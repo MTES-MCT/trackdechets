@@ -9,8 +9,9 @@ import {
   string
 } from "yup";
 import { WASTES_CODES } from "../../common/constants";
-import { prisma } from "../../generated/prisma-client";
+import { prisma, Form } from "../../generated/prisma-client";
 import { validDatetime } from "../validation";
+import { expandFormFromDb } from "../form-converter";
 
 setLocale({
   mixed: {
@@ -129,6 +130,12 @@ export const formSchema = object<any>().shape({
     otherwise: object().nullable()
   })
 });
+
+export async function validateForm(form: Form) {
+  const formattedForm = expandFormFromDb(form);
+  const isValid = await formSchema.isValid(formattedForm);
+  return isValid ? Promise.resolve() : Promise.reject();
+}
 
 function validCompany({ verboseFieldName }, yup) {
   return yup.object().shape({
