@@ -1,12 +1,10 @@
 import * as Yup from "yup";
 import { validDatetime, validCompany } from "./validation-helpers";
 import { inputRule } from "graphql-shield";
-import countries from "world-countries";
 import {
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../../common/constants";
-import { CountryNotFound } from "../errors";
 
 export const getReceivedInfoSchema = yup =>
   yup.object({
