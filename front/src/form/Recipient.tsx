@@ -51,7 +51,7 @@ export default function Recipient() {
         </p>
       </div>
 
-      <CompanySelector name="recipient.company" allowForeignCompanies />
+      <CompanySelector name="recipient.company" />
 
       <h4>Informations complémentaires</h4>
 

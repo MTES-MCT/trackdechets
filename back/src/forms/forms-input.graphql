@@ -245,7 +245,7 @@ input CompanyInput {
   https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
   En l'absence de code, l'entreprise est considérée comme résidant en France.
-  Seul le destinataire (`recipient.company`) peut être à l'étranger.
+  Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
   """
   country: String
 

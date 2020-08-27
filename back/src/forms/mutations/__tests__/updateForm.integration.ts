@@ -20,7 +20,6 @@ const UPDATE_FORM = `
       recipient {
         company {
           siret
-          country
         }
       }
       emitter {
@@ -537,67 +536,4 @@ describe("Mutation.updateForm", () => {
       ]);
     }
   );
-
-  it("should return an error if the recipient's country code is invalid", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.siret
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const updateFormInput = {
-      id: form.id,
-      recipient: {
-        company: {
-          country: "not a valid code"
-        }
-      }
-    };
-    const { errors } = await mutate(UPDATE_FORM, {
-      variables: {
-        updateFormInput
-      }
-    });
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `Le code "${updateFormInput.recipient.company.country}" n'est pas reconnu comme un code pays ISO 3166-1 alpha-2.`,
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
-        })
-      })
-    ]);
-  });
-
-  it("should add a recipient in a foreign country", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.siret
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const updateFormInput = {
-      id: form.id,
-      recipient: {
-        company: {
-          country: "DE"
-        }
-      }
-    };
-    const { data } = await mutate(UPDATE_FORM, {
-      variables: {
-        updateFormInput
-      }
-    });
-
-    expect(data.updateForm.recipient.company).toMatchObject(
-      updateFormInput.recipient.company
-    );
-  });
 });

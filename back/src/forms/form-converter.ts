@@ -248,9 +248,6 @@ function flattenRecipientInput(input: { recipient?: RecipientInput }) {
     recipientCompanyAddress: chain(input.recipient, r =>
       chain(r.company, c => c.address)
     ),
-    recipientCompanyCountry: chain(input.recipient, r =>
-      chain(r.company, c => c.country)
-    ),
     recipientCompanyContact: chain(input.recipient, r =>
       chain(r.company, c => c.contact)
     ),
@@ -298,6 +295,9 @@ function flattenNextDestinationInput(input: {
     ),
     nextDestinationCompanyAddress: chain(input.nextDestination, nd =>
       chain(nd.company, c => c.address)
+    ),
+    nextDestinationCompanyCountry: chain(input.nextDestination, nd =>
+      chain(nd.company, c => c.country)
     ),
     nextDestinationCompanyContact: chain(input.nextDestination, nd =>
       chain(nd.company, c => c.contact)
@@ -407,7 +407,6 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
         name: form.recipientCompanyName,
         siret: form.recipientCompanySiret,
         address: form.recipientCompanyAddress,
-        country: form.recipientCompanyCountry,
         contact: form.recipientCompanyContact,
         phone: form.recipientCompanyPhone,
         mail: form.recipientCompanyMail
@@ -474,6 +473,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
         name: form.nextDestinationCompanyName,
         siret: form.nextDestinationCompanySiret,
         address: form.nextDestinationCompanyAddress,
+        country: form.nextDestinationCompanyCountry,
         contact: form.nextDestinationCompanyContact,
         phone: form.nextDestinationCompanyPhone,
         mail: form.nextDestinationCompanyMail

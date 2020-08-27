@@ -403,34 +403,3 @@ export const formsRegisterSchema = inputRule()(yup =>
     exportFormat: yup.string()
   })
 );
-
-const formInputSchema = Yup.object().shape({
-  recipient: Yup.object()
-    .shape({
-      company: Yup.object()
-        .shape({
-          country: Yup.string()
-            .oneOf(
-              [...countries.map(country => country.cca2), null],
-              ({ value }) => new CountryNotFound(value).message
-            )
-            .nullable()
-        })
-        .nullable()
-        .default(null)
-    })
-    .nullable()
-    .default(null)
-});
-
-export const createFormSchema = inputRule()(yup =>
-  yup.object().shape({
-    createFormInput: formInputSchema
-  })
-);
-
-export const updateFormSchema = inputRule()(yup =>
-  yup.object().shape({
-    updateFormInput: formInputSchema
-  })
-);

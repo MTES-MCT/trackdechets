@@ -86,7 +86,7 @@ export type CompanyInput = {
    * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
    * 
    * En l'absence de code, l'entreprise est considérée comme résidant en France.
-   * Seul le destinataire (`recipient.company`) peut être à l'étranger.
+   * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
    */
   country?: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
@@ -534,7 +534,7 @@ export type FormCompany = {
    * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
    * 
    * En l'absence de code, l'entreprise est considérée comme résidant en France.
-   * Seul le destinataire (`recipient.company`) peut être à l'étranger.
+   * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
    */
   country?: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
@@ -830,7 +830,6 @@ export type Mutation = {
    * recipient: {
    *   processingOperation
    *   company: {
-   *     // Le siret peut être omit si le champ "recipient.company.country" correspond à un pays étranger
    *     siret
    *     name
    *     address

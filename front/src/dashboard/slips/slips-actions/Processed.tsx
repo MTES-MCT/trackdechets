@@ -86,7 +86,10 @@ export default function Processed(props: SlipActionProps) {
             ) > -1 && (
               <div className="form__group">
                 <h4>Destination ultérieure prévue</h4>
-                <CompanySelector name="nextDestination.company" />
+                <CompanySelector
+                  name="nextDestination.company"
+                  allowForeignCompanies
+                />
 
                 <div className="form__group">
                   <label>

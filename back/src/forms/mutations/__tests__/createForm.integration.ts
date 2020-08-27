@@ -15,7 +15,6 @@ const CREATE_FORM = `
       recipient {
         company {
           siret
-          country
         }
       }
       emitter {
@@ -333,63 +332,4 @@ describe("Mutation.createForm", () => {
       ]);
     }
   );
-
-  it("should return an error if the recipient's country code is invalid", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-
-    const createFormInput = {
-      emitter: {
-        company: {
-          siret: company.siret
-        }
-      },
-      recipient: {
-        company: {
-          country: "not a valid code"
-        }
-      }
-    };
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
-      variables: {
-        createFormInput
-      }
-    });
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `Le code "${createFormInput.recipient.company.country}" n'est pas reconnu comme un code pays ISO 3166-1 alpha-2.`,
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
-        })
-      })
-    ]);
-  });
-
-  it("should create a form with a recipient in a foreign country", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-
-    const createFormInput = {
-      emitter: {
-        company: {
-          siret: company.siret
-        }
-      },
-      recipient: {
-        company: {
-          country: "DE"
-        }
-      }
-    };
-    const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
-      variables: {
-        createFormInput
-      }
-    });
-
-    expect(data.createForm.recipient.company).toMatchObject(
-      createFormInput.recipient.company
-    );
-  });
 });
