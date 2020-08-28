@@ -15,6 +15,15 @@ jest.mock("axios", () => ({
   }
 }));
 
+const MARK_AS_PROCESSED = `
+  mutation MarkAsProcessed($id: ID, $processedInfo: ProcessedFormInput!) {
+    markAsProcessed(id: $id, processedInfo: $processedInfo) {
+      id
+      processingOperationDescription
+    }
+  }
+`;
+
 describe("Integration / Mark as processed mutation", () => {
   let user;
   let company;
@@ -57,20 +66,17 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
-    const mutation = `
-      mutation   {
-        markAsProcessed(id: "${form.id}", processedInfo: {
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
-        }) {
-          id
         }
       }
-    `;
-
-    const { errors } = await mutate(mutation);
+    });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
   });
 
@@ -84,20 +90,17 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
-    const mutation = `
-      mutation   {
-        markAsProcessed(id: "${form.id}", processedInfo: {
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
-        }) {
-          id
         }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toBe("PROCESSED");
@@ -127,26 +130,18 @@ describe("Integration / Mark as processed mutation", () => {
     const processingOperation = PROCESSING_OPERATIONS.find(
       operation => operation.code === "D 1"
     );
-    const mutation = `
-      mutation($processingOperationDone: String!) {
-        markAsProcessed(id: "${form.id}", processedInfo: {
-          processingOperationDone: $processingOperationDone,
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
-        }) {
-          id
-          processingOperationDescription
-        }
-      }
-    `;
-
     const {
       data: {
         markAsProcessed: { processingOperationDescription }
       }
-    } = await mutate(mutation, {
+    } = await mutate(MARK_AS_PROCESSED, {
       variables: {
-        processingOperationDone: processingOperation.code
+        id: form.id,
+        processedInfo: {
+          processingOperationDone: processingOperation.code,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
       }
     });
     expect(processingOperationDescription).toBe(
@@ -164,20 +159,17 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
-    const mutation = `
-      mutation   {
-        markAsProcessed(id: "${form.id}", processedInfo: {
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 18",
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
-        }) {
-          id
         }
       }
-    `;
-
-    const { errors } = await mutate(mutation);
+    });
 
     expect(errors[0].message).toBe(
       "Cette opération d’élimination / valorisation n'existe pas."
@@ -205,31 +197,28 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
-    const mutation = `
-      mutation   {
-        markAsProcessed(id: "${form.id}", processedInfo: {
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
           processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+          processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
-            processingOperation: "D 1"
+            processingOperation: "D 1",
             company: {
-              mail: "m@m.fr"
-              siret: "97874512984578"
-              name: "company"
-              phone: "0101010101"
-              contact: "The famous bot"
+              mail: "m@m.fr",
+              siret: "97874512984578",
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
               address: "A beautiful place..."
             }
           }
-        }) {
-          id
         }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toBe("AWAITING_GROUP");
@@ -245,23 +234,101 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
-    const mutation = `
-      mutation   {
-        markAsProcessed(id: "${form.id}", processedInfo: {
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
           processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+          processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true
-        }) {
-          id
         }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
+  });
+
+  it("should add a foreign next destination", async () => {
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              country: "DE",
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form({ id: form.id });
+    expect(resultingForm.status).toBe("AWAITING_GROUP");
+    expect(resultingForm.nextDestinationCompanyCountry).toBe("DE");
+  });
+
+  it("should disallow a missing siret for a french next destination", async () => {
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              country: "FR",
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Destination ultérieure prévue: La sélection d'une entreprise par SIRET est obligatoire"
+      })
+    ]);
   });
 });
