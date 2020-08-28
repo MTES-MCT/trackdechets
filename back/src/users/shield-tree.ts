@@ -1,9 +1,4 @@
-import {
-  isAuthenticated,
-  isAuthenticatedFromUI,
-  isCompanyAdmin
-} from "../common/rules";
-import { signupSchema } from "./rules/schema";
+import { isAuthenticatedFromUI, isCompanyAdmin } from "../common/rules";
 import { chain } from "graphql-shield";
 
 export default {
@@ -13,11 +8,11 @@ export default {
   },
   Mutation: {
     // changePassword: isAuthenticatedFromUI,
-    editProfile: isAuthenticatedFromUI,
-    inviteUserToCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
+    // editProfile: isAuthenticatedFromUI,
+    // inviteUserToCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
     resendInvitation: chain(isAuthenticatedFromUI, isCompanyAdmin),
     removeUserFromCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
-    deleteInvitation: chain(isAuthenticatedFromUI, isCompanyAdmin),
-    signup: signupSchema
+    deleteInvitation: chain(isAuthenticatedFromUI, isCompanyAdmin)
+    // signup: signupSchema
   }
 };

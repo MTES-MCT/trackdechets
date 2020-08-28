@@ -1,12 +1,3 @@
-import { editProfile } from "./editProfile";
-import { inviteUserToCompany, resendInvitation } from "./inviteUserToCompany";
-import { login } from "./login";
-import { joinWithInvite } from "./joinWithInvite";
+import { resendInvitation } from "../resolvers/mutations/inviteUserToCompany";
 
-export {
-  editProfile,
-  inviteUserToCompany,
-  resendInvitation,
-  login,
-  joinWithInvite
-};
+export { resendInvitation };

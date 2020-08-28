@@ -1,11 +1,11 @@
-import { inviteUserToCompany } from "../inviteUserToCompany";
-import { userMails } from "../../mails";
-import { User } from "../../../generated/prisma-client";
+import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompany";
+import { userMails } from "../../../mails";
+import { User } from "../../../../generated/prisma-client";
 
 const userMock = jest.fn();
 const companyMock = jest.fn();
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     user: jest.fn((...args) => userMock(...args)),
     company: jest.fn((...args) => companyMock(...args))
@@ -14,19 +14,16 @@ jest.mock("../../../generated/prisma-client", () => ({
 
 const sendMailMock = jest.fn();
 
-jest.mock("../../../common/mails.helper", () => ({
+jest.mock("../../../../common/mails.helper", () => ({
   sendMail: jest.fn(mail => sendMailMock(mail))
 }));
 
 const associateUserToCompanyMock = jest.fn();
-jest.mock("../associateUserToCompany", () => ({
+const createUserAccountHashMock = jest.fn();
+jest.mock("../../../database", () => ({
   associateUserToCompany: jest.fn((...args) => {
     associateUserToCompanyMock(...args);
-  })
-}));
-
-const createUserAccountHashMock = jest.fn();
-jest.mock("../createUserAccountHash", () => ({
+  }),
   createUserAccountHash: jest.fn((...args) =>
     createUserAccountHashMock(...args)
   )

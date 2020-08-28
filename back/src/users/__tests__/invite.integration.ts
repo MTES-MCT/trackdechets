@@ -1,10 +1,8 @@
 import { prisma } from "../../generated/prisma-client";
-import { createUserAccountHash } from "../mutations/createUserAccountHash";
-
+import { createUserAccountHash } from "../database";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { escape } from "querystring";
 import axios from "axios";
-
 import makeClient from "../../__tests__/testClient";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { AuthType } from "../../auth";

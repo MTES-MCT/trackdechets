@@ -2,13 +2,7 @@ import { sendMail } from "../common/mails.helper";
 import { getInstallation } from "../companies/queries";
 import { prisma } from "../generated/prisma-client";
 import { userMails } from "./mails";
-import {
-  editProfile,
-  inviteUserToCompany,
-  resendInvitation,
-  login,
-  joinWithInvite
-} from "./mutations";
+import { resendInvitation } from "./mutations";
 import { hashPassword, generatePassword } from "./utils";
 import {
   MutationResolvers,
@@ -19,7 +13,6 @@ import { getUserCompanies } from "./database";
 import { searchCompany } from "../companies/sirene";
 
 const mutationResolvers: MutationResolvers = {
-  login: async (_parent, args) => login(args),
   resetPassword: async (_, { email }) => {
     const user = await prisma.user({ email }).catch(__ => null);
     if (!user) {
@@ -34,15 +27,8 @@ const mutationResolvers: MutationResolvers = {
     await sendMail(userMails.resetPassword(user.email, user.name, newPassword));
     return true;
   },
-  editProfile: (_, args, context) => {
-    const userId = context.user.id;
-    return editProfile(userId, args);
-  },
-  inviteUserToCompany: async (_, args, context) =>
-    inviteUserToCompany(context.user, args),
   resendInvitation: async (_, args, context) =>
     resendInvitation(context.user, args),
-  joinWithInvite: async (_, args) => joinWithInvite(args),
   removeUserFromCompany: async (_, { userId, siret }) => {
     await prisma
       .deleteManyCompanyAssociations({

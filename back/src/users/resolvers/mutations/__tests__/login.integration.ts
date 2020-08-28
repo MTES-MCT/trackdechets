@@ -1,6 +1,6 @@
-import { userFactory } from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
-import { prisma } from "../../../generated/prisma-client";
+import { userFactory } from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
+import { prisma } from "../../../../generated/prisma-client";
 
 describe("{ mutation { login } }", () => {
   it("should return a token", async () => {

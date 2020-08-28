@@ -2,8 +2,10 @@
  * Prisma helpers function
  */
 
-import { prisma, User } from "../generated/prisma-client";
+import { prisma, User, UserRole } from "../generated/prisma-client";
 import { FullUser } from "./types";
+import { UserInputError } from "apollo-server-express";
+import { hash } from "bcrypt";
 
 export async function getUserCompanies(userId: string) {
   const companyAssociations = await prisma
@@ -26,4 +28,73 @@ export async function getFullUser(user: User): Promise<FullUser> {
     ...user,
     companies
   };
+}
+
+/**
+ * Create a temporary association between an email and
+ * a siret
+ * @param email
+ * @param role
+ * @param siret
+ */
+export async function createUserAccountHash(
+  email: string,
+  role: UserRole,
+  siret: string
+) {
+  // check for existing records
+  const existingHashes = await prisma.userAccountHashes({
+    where: { email, companySiret: siret }
+  });
+
+  if (existingHashes && existingHashes.length > 0) {
+    throw new UserInputError("Cet utilisateur a déjà été invité", {
+      invalidArgs: ["email"]
+    });
+  }
+
+  const userAccoutHash = await hash(
+    new Date().valueOf().toString() + Math.random().toString(),
+    10
+  );
+
+  return prisma.createUserAccountHash({
+    hash: userAccoutHash,
+    email,
+    role,
+    companySiret: siret
+  });
+}
+
+/**
+ * Associate an existing user with company
+ * Make sure we do not create a double association
+ * @param userId
+ * @param siret
+ * @param role
+ */
+export async function associateUserToCompany(userId, siret, role) {
+  // check for current associations
+  const associations = await prisma.companyAssociations({
+    where: {
+      user: {
+        id: userId
+      },
+      company: {
+        siret
+      }
+    }
+  });
+
+  if (associations && associations.length > 0) {
+    throw new UserInputError(
+      "L'utilisateur est déjà membre de l'établissement"
+    );
+  }
+
+  return prisma.createCompanyAssociation({
+    user: { connect: { id: userId } },
+    role,
+    company: { connect: { siret } }
+  });
 }

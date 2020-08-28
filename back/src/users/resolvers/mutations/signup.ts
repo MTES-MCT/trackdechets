@@ -1,4 +1,5 @@
 import { hash } from "bcrypt";
+import * as yup from "yup";
 import { sendMail } from "../../../common/mails.helper";
 import { User, prisma } from "../../../generated/prisma-client";
 import { userMails } from "../../mails";
@@ -9,6 +10,24 @@ import {
   MutationResolvers,
   MutationSignupArgs
 } from "../../../generated/graphql/types";
+
+export const signupSchema = yup.object({
+  userInfos: yup.object({
+    email: yup
+      .string()
+      .email("L'email saisi n'est pas conforme.")
+      .required("Vous devez saisir un email."),
+    password: yup
+      .string()
+      .required("Vous devez saisir un mot de passe.")
+      .min(8, "Le mot de passe doit faire au moins 8 caractères")
+  })
+});
+
+function validateArgs(args: MutationSignupArgs) {
+  signupSchema.validateSync(args);
+  return args;
+}
 
 export async function signupFn({
   userInfos: { name, password, phone, email: unsafeEmail }
@@ -40,7 +59,8 @@ export async function signupFn({
 }
 
 const signupResolver: MutationResolvers["signup"] = async (parent, args) => {
-  return signupFn(args);
+  const validArgs = validateArgs(args);
+  return signupFn(validArgs);
 };
 
 /**
