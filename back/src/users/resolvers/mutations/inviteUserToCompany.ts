@@ -1,15 +1,13 @@
 import { prisma, User } from "../../../generated/prisma-client";
 import { sendMail } from "../../../common/mails.helper";
 import { userMails } from "../../mails";
-import { UserInputError } from "apollo-server-express";
 import {
   MutationInviteUserToCompanyArgs,
-  MutationResendInvitationArgs,
   CompanyPrivate,
   MutationResolvers
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsAdmin } from "../../permissions";
+import { checkIsCompanyAdmin } from "../../permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { associateUserToCompany, createUserAccountHash } from "../../database";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -55,24 +53,6 @@ export async function inviteUserToCompanyFn(
   return company;
 }
 
-export async function resendInvitation(
-  adminUser: User,
-  { email, siret }: MutationResendInvitationArgs
-) {
-  const hashes = await prisma.userAccountHashes({
-    where: { email, companySiret: siret }
-  });
-
-  const company = await prisma.company({ siret });
-  if (!company || !hashes.length) {
-    throw new UserInputError("Invitation non trouvée");
-  }
-  await sendMail(
-    userMails.inviteUserToJoin(email, adminUser.name, company.name, hashes[0])
-  );
-  return true;
-}
-
 const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] = async (
   parent,
   args,
@@ -81,7 +61,7 @@ const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] = as
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ siret: args.siret });
-  await checkIsAdmin(user, company);
+  await checkIsCompanyAdmin(user, company);
   return inviteUserToCompanyFn(user, args);
 };
 

@@ -5,7 +5,6 @@ import { userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 
 describe("createUserAccountHash", () => {
-  beforeAll(resetDatabase);
   afterAll(resetDatabase);
 
   it("should return user account hash", async () => {

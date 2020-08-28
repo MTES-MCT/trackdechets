@@ -1,18 +1,26 @@
 import { MutationResolvers } from "../../generated/graphql/types";
 import signup from "./mutations/signup";
-import changePassword from "./mutations/changePassword";
-import editProfile from "./mutations/editProfile";
 import login from "./mutations/login";
+import changePassword from "./mutations/changePassword";
+import resetPassword from "./mutations/resetPassword";
+import editProfile from "./mutations/editProfile";
 import inviteUserToCompany from "./mutations/inviteUserToCompany";
+import deleteInvitation from "./mutations/deleteInvitation";
+import resendInvitation from "./mutations/resendInvitation";
 import joinWithInvite from "./mutations/joinWithInvite";
+import removeUserFromCompany from "./mutations/removeUserFromCompany";
 
 const Mutation: MutationResolvers = {
   signup,
-  changePassword,
-  editProfile,
   login,
+  changePassword,
+  resetPassword,
+  editProfile,
   inviteUserToCompany,
-  joinWithInvite
+  deleteInvitation,
+  resendInvitation,
+  joinWithInvite,
+  removeUserFromCompany
 };
 
 export default Mutation;

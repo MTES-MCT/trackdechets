@@ -2,7 +2,13 @@
  * Prisma helpers function
  */
 
-import { prisma, User, UserRole } from "../generated/prisma-client";
+import {
+  prisma,
+  User,
+  UserRole,
+  UserAccountHashWhereInput,
+  CompanyAssociationWhereInput
+} from "../generated/prisma-client";
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
@@ -97,4 +103,26 @@ export async function associateUserToCompany(userId, siret, role) {
     role,
     company: { connect: { siret } }
   });
+}
+
+export async function getUserAccountHashOrNotFound(
+  where: UserAccountHashWhereInput
+) {
+  const userAccountHashes = await prisma.userAccountHashes({
+    where
+  });
+  if (userAccountHashes.length === 0) {
+    throw new UserInputError(`Cette invitation n'existe pas`);
+  }
+  return userAccountHashes[0];
+}
+
+export async function getCompanyAssociationOrNotFound(
+  where: CompanyAssociationWhereInput
+) {
+  const companyAssociations = await prisma.companyAssociations({ where });
+  if (companyAssociations.length === 0) {
+    throw new UserInputError(`L'utilisateur n'est pas membre de l'entreprise`);
+  }
+  return companyAssociations[0];
 }

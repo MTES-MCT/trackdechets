@@ -5,8 +5,9 @@ import path from "path";
 import { app } from "../../../server";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { associateUserToCompany } from "../../../users/mutations/associateUserToCompany";
+
 import { apiKey } from "../../../users/queries";
+import { associateUserToCompany } from "../../../users/database";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative
