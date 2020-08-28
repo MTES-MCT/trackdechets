@@ -12,6 +12,7 @@ import {
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
+import { getUid } from "../utils";
 
 export async function getUserCompanies(userId: string) {
   const companyAssociations = await prisma
@@ -125,4 +126,15 @@ export async function getCompanyAssociationOrNotFound(
     throw new UserInputError(`L'utilisateur n'est pas membre de l'entreprise`);
   }
   return companyAssociations[0];
+}
+
+export async function createAccessToken(user: User) {
+  const token = getUid(40);
+  const accessToken = await prisma.createAccessToken({
+    user: {
+      connect: { id: user.id }
+    },
+    token
+  });
+  return accessToken;
 }

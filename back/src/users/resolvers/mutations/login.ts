@@ -1,8 +1,8 @@
 import { prisma } from "../../../generated/prisma-client";
 import { compare } from "bcrypt";
-import { apiKey } from "../../queries";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
+import { createAccessToken } from "../../database";
 
 /**
  * DEPRECATED
@@ -33,10 +33,10 @@ const loginResolver: MutationResolvers["login"] = async (
     });
   }
 
-  const token = await apiKey(user);
+  const accesToken = await createAccessToken(user);
 
   return {
-    token,
+    token: accesToken.token,
     user
   };
 };
