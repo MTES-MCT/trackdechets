@@ -261,7 +261,7 @@ input PrivateCompanyInput {
   gerepId: String
 
   "Profil de l'établissement"
-  companyTypes: [CompanyType]
+  companyTypes: [CompanyType!]!
 
   "Code NAF"
   codeNaf: String

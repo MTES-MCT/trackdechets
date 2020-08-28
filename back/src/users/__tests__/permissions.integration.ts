@@ -6,7 +6,7 @@ import {
 import { checkIsCompanyAdmin } from "../permissions";
 import { ErrorCode } from "../../common/errors";
 
-describe("checkIsAdmin", () => {
+describe("checkIsCompanyAdmin", () => {
   it("should return true if user is admin of the company", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const check = await checkIsCompanyAdmin(user, company);
@@ -19,7 +19,7 @@ describe("checkIsAdmin", () => {
     try {
       await checkIsCompanyAdmin(user, company);
     } catch (err) {
-      expect(err.extions.code).toEqual(ErrorCode.FORBIDDEN);
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
       expect(err.message).toEqual(
         `Vous n'êtes pas administrateur de l'entreprise portant le siret "${company.siret}".`
       );
@@ -33,7 +33,7 @@ describe("checkIsAdmin", () => {
     try {
       await checkIsCompanyAdmin(user, company);
     } catch (err) {
-      expect(err.extions.code).toEqual(ErrorCode.FORBIDDEN);
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
       expect(err.message).toEqual(
         `Vous n'êtes pas administrateur de l'entreprise portant le siret "${company.siret}".`
       );

@@ -1,10 +1,10 @@
-import { userFactory, companyFactory } from "../../../__tests__/factories";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import * as mailsHelper from "../../../common/mails.helper";
-import { prisma } from "../../../generated/prisma-client";
-import makeClient from "../../../__tests__/testClient";
-import { ErrorCode } from "../../../common/errors";
-import { AuthType } from "../../../auth";
+import { userFactory, companyFactory } from "../../../../__tests__/factories";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import * as mailsHelper from "../../../../common/mails.helper";
+import { prisma } from "../../../../generated/prisma-client";
+import makeClient from "../../../../__tests__/testClient";
+import { ErrorCode } from "../../../../common/errors";
+import { AuthType } from "../../../../auth";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");

@@ -1,4 +1,4 @@
-import { getInstallation } from "../../companies/queries";
+import { getInstallation } from "../../companies/database";
 import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
 import { getUserCompanies } from "../database";
 import { searchCompany } from "../../companies/sirene";

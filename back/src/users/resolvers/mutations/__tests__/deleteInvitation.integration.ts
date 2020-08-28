@@ -10,7 +10,7 @@ import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
 
 describe("mutation deleteInvitation", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
 
   it("should delete a pending invitation", async () => {
     // set up an user, a company, its admin and an invitation (UserAccountHash)

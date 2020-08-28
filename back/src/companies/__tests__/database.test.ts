@@ -1,4 +1,4 @@
-import { getCompanyActiveUsers } from "../companyUsers";
+import { getCompanyActiveUsers } from "../database";
 
 const ASSOCIATIONS = [
   {

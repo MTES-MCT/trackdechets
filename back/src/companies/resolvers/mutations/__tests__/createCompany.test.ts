@@ -1,5 +1,5 @@
-import { User, Company } from "../../../generated/prisma-client";
-import { warnIfUserCreatesTooManyCompanies } from "../create-company";
+import { User, Company } from "../../../../generated/prisma-client";
+import { warnIfUserCreatesTooManyCompanies } from "../createCompany";
 
 const countMock = jest.fn();
 const mailMock = jest.fn();

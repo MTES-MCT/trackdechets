@@ -1,10 +1,10 @@
-import renewSecurityCode from "../renewSecurityCode";
-import { ErrorCode } from "../../../common/errors";
-import { companyMails } from "../../mails";
+import { renewSecurityCodeFn as renewSecurityCode } from "../renewSecurityCode";
+import { ErrorCode } from "../../../../common/errors";
+import { companyMails } from "../../../mails";
 
 const companyMock = jest.fn();
 const updateCompanyMock = jest.fn();
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     company: jest.fn((...args) => companyMock(...args)),
     updateCompany: jest.fn((...args) => updateCompanyMock(...args))
@@ -12,19 +12,19 @@ jest.mock("../../../generated/prisma-client", () => ({
 }));
 const randomNumberMock = jest.fn();
 
-jest.mock("../../../utils", () => ({
+jest.mock("../../../../utils", () => ({
   randomNumber: jest.fn(() => randomNumberMock())
 }));
 
 const sendMailMock = jest.fn();
 
-jest.mock("../../../common/mails.helper", () => ({
+jest.mock("../../../../common/mails.helper", () => ({
   sendMail: jest.fn((...args) => sendMailMock(...args))
 }));
 
 const getCompanyActiveUsersMock = jest.fn();
 
-jest.mock("../../queries/companyUsers", () => ({
+jest.mock("../../../database", () => ({
   getCompanyActiveUsers: jest.fn(() => getCompanyActiveUsersMock())
 }));
 

@@ -16,13 +16,12 @@ import {
 } from "./rules/permissions";
 
 export default {
-  Query: {
-    favorites: isAuthenticatedFromUI
-  },
+  // Query: {
+  //   favorites: isAuthenticatedFromUI
+  // },
   Mutation: {
     updateCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
-    renewSecurityCode: chain(isAuthenticatedFromUI, isCompanyAdmin),
-    createCompany: chain(createCompanySchema, isAuthenticatedFromUI),
+    // createCompany: chain(createCompanySchema, isAuthenticatedFromUI),
     createUploadLink: chain(createUploadLinkSchema, isAuthenticatedFromUI),
     createTransporterReceipt: chain(
       createTransporterReceiptSchema,

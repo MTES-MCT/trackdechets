@@ -1,14 +1,14 @@
 import { getCompanyInfos } from "../companyInfos";
-import { ErrorCode } from "../../../common/errors";
+import { ErrorCode } from "../../../../common/errors";
 
 const sireneMock = jest.fn();
 
-jest.mock("../../sirene", () => ({
+jest.mock("../../../sirene", () => ({
   searchCompany: jest.fn((...args) => sireneMock(...args))
 }));
 
 const companyMock = jest.fn();
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     company: jest.fn(() => ({
       $fragment: companyMock
@@ -17,7 +17,7 @@ jest.mock("../../../generated/prisma-client", () => ({
 }));
 
 const installationMock = jest.fn();
-jest.mock("../installation", () => ({
+jest.mock("../../../database", () => ({
   getInstallation: jest.fn((...args) => installationMock(...args))
 }));
 

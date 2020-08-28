@@ -1,5 +1,5 @@
 import { User, Company } from "../generated/prisma-client";
-import { getCompanyAdminUsers } from "../companies/queries";
+import { getCompanyAdminUsers } from "../companies/database";
 import { NotCompanyAdmin } from "../common/errors";
 
 export async function checkIsCompanyAdmin(user: User, company: Company) {

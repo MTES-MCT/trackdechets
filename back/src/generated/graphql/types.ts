@@ -1223,7 +1223,7 @@ export type PrivateCompanyInput = {
   /** Identifiant GEREP de l'établissement */
   gerepId?: Maybe<Scalars['String']>;
   /** Profil de l'établissement */
-  companyTypes?: Maybe<Array<Maybe<CompanyType>>>;
+  companyTypes: Array<CompanyType>;
   /** Code NAF */
   codeNaf?: Maybe<Scalars['String']>;
   /** Nom de l'établissement */
@@ -3191,7 +3191,7 @@ export function createPrivateCompanyInputMock(props: Partial<PrivateCompanyInput
   return {
     siret: "",
     gerepId: null,
-    companyTypes: null,
+    companyTypes: [],
     codeNaf: null,
     companyName: null,
     documentKeys: null,

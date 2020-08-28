@@ -13,7 +13,8 @@ const mockedAxiosPost = jest.spyOn(axios, "post");
 mockedAxiosPost.mockResolvedValue({} as any);
 
 describe("mutation resendInvitation", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
+
   beforeEach(() => {
     mockedAxiosPost.mockClear();
   });
