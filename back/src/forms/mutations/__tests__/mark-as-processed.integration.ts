@@ -312,7 +312,6 @@ describe("Integration / Mark as processed mutation", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: null,
               country: "FR",
               name: "company",
               phone: "0101010101",
