@@ -101,6 +101,7 @@ test("expandFormFromDb", () => {
     nextDestinationProcessingOperation: null,
     nextDestinationCompanyContact: null,
     nextDestinationCompanyAddress: null,
+    nextDestinationCompanyCountry: null,
     emitterCompanyName: "WASTE PRODUCER",
     emitterType: "PRODUCER",
     emitterWorkSiteAddress: "",
