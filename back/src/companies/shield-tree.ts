@@ -20,7 +20,7 @@ export default {
   //   favorites: isAuthenticatedFromUI
   // },
   Mutation: {
-    updateCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
+    //updateCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
     // createCompany: chain(createCompanySchema, isAuthenticatedFromUI),
     createUploadLink: chain(createUploadLinkSchema, isAuthenticatedFromUI),
     createTransporterReceipt: chain(

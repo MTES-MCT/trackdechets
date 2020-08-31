@@ -1,5 +1,4 @@
 import { prisma } from "../generated/prisma-client";
-import { updateCompany } from "./mutations";
 import createUploadLink from "./mutations/create-upload-link";
 import createTransporterReceipt from "./mutations/transporterReceipt/createTransporterReceipt";
 import createTraderReceipt from "./mutations/traderReceipt/createTraderReceipt";
@@ -32,7 +31,6 @@ const receiptsResolvers = {
 };
 
 const mutationResolvers: MutationResolvers = {
-  updateCompany: (_, args) => updateCompany(args),
   createTransporterReceipt: (_, { input }) => createTransporterReceipt(input),
   updateTransporterReceipt: (_, { input }) => updateTransporterReceipt(input),
   deleteTransporterReceipt: (_, { input }) => deleteTransporterReceipt(input),

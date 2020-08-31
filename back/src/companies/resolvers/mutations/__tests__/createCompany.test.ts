@@ -4,7 +4,7 @@ import { warnIfUserCreatesTooManyCompanies } from "../createCompany";
 const countMock = jest.fn();
 const mailMock = jest.fn();
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../../../generated/prisma-client", () => ({
   prisma: {
     companyAssociationsConnection: () => ({
       aggregate: () => ({ count: countMock })
@@ -12,7 +12,7 @@ jest.mock("../../../generated/prisma-client", () => ({
   }
 }));
 
-jest.mock("../../../common/mails.helper", () => ({
+jest.mock("../../../../common/mails.helper", () => ({
   sendMail: () => mailMock()
 }));
 

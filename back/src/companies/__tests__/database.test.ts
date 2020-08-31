@@ -17,7 +17,7 @@ const ASSOCIATIONS = [
   }
 ];
 
-jest.mock("../../../generated/prisma-client", () => ({
+jest.mock("../../generated/prisma-client", () => ({
   prisma: {
     companyAssociations: jest.fn(() => ({
       $fragment: jest.fn(() => Promise.resolve(ASSOCIATIONS))

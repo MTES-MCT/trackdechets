@@ -94,6 +94,6 @@ describe("mutation inviteUserToCompany", () => {
       "vous a invité à rejoindre Trackdéchets"
     );
     // Dnd right hash value
-    expect(postArgs[1].body).toContain(escape(hashValue));
+    expect(postArgs[1].body).toContain(encodeURIComponent(hashValue));
   });
 });

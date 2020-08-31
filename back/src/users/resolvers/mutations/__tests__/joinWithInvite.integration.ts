@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { createTestClient } from "apollo-server-integration-testing";
 import { server } from "../../../../server";
 import { prisma } from "../../../../generated/prisma-client";
-import { getCompanyUsers } from "../../../../companies/queries";
+import { getCompanyUsers } from "../../../../companies/database";
 
 describe("joinWithInvite mutation", () => {
   afterAll(() => {

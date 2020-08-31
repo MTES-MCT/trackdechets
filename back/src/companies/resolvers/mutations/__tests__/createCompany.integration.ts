@@ -199,13 +199,16 @@ describe("Create company endpoint", () => {
     const user = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
+    const companyTypes = ["PRODUCER"];
+
     async function createCompany(siret) {
       const mutation = `
         mutation {
           createCompany(
             companyInput: {
               siret: "${siret}"
-              gerepId: "1234"
+              gerepId: "1234",
+              companyTypes: [${companyTypes}]
             }
           ) { id }
         }
