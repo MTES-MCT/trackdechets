@@ -1,5 +1,10 @@
-import { updateAccessTokenLastUsed } from "../auth";
-import { AccessToken } from "../generated/prisma-client";
+import {
+  updateAccessTokenLastUsed,
+  AuthType,
+  applyAuthStrategies
+} from "../auth";
+import { AccessToken, User } from "../generated/prisma-client";
+import { GraphQLContext } from "../types";
 
 const updateAccessTokenMock = jest.fn();
 jest.mock("../generated/prisma-client", () => ({
@@ -67,5 +72,41 @@ describe("updateAccessTokenLastUsed", () => {
       data: { lastUsed: "2019-10-04T00:00:00.000Z" },
       where: { token: "token" }
     });
+  });
+});
+
+describe("applyAuthStrategies", () => {
+  it("should keep user in context if auth strategy is allowed", () => {
+    const user: User = {
+      id: "1",
+      email: "john.snow@trackdechets.fr",
+      password: "pass",
+      createdAt: "",
+      updatedAt: ""
+    };
+    const context: GraphQLContext = {
+      user: { ...user, auth: AuthType.Session },
+      req: null,
+      res: null
+    };
+    applyAuthStrategies(context, [AuthType.Session]);
+    expect(context.user).not.toBeNull();
+  });
+
+  it("should remove user from context if auth strategy is not allowed", () => {
+    const user: User = {
+      id: "1",
+      email: "john.snow@trackdechets.fr",
+      password: "pass",
+      createdAt: "",
+      updatedAt: ""
+    };
+    const context: GraphQLContext = {
+      user: { ...user, auth: AuthType.Bearer },
+      req: null,
+      res: null
+    };
+    applyAuthStrategies(context, [AuthType.Session]);
+    expect(context.user).toBeNull();
   });
 });

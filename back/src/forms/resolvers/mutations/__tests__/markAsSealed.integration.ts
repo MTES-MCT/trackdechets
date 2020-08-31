@@ -103,7 +103,7 @@ describe("{ mutation { markAsSealed } }", () => {
     expect(form.status).toEqual("SEALED");
   });
 
-  test.only("should fail if user is not authorized", async () => {
+  test("should fail if user is not authorized", async () => {
     const owner = await userFactory();
     const { user } = await userWithCompanyFactory("MEMBER");
 

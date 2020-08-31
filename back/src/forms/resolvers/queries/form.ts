@@ -4,7 +4,7 @@ import {
 } from "../../../generated/graphql/types";
 import { expandFormFromDb } from "../../form-converter";
 import { UserInputError } from "apollo-server-express";
-import { MissingIdOrReadableId, FormNotFound } from "../../errors";
+import { MissingIdOrReadableId } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanReadUpdateDeleteForm } from "../../permissions";
 import { getFormOrFormNotFound } from "../../database";

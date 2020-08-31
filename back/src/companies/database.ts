@@ -1,3 +1,7 @@
+/**
+ * PRISMA HELPER FUNCTIONS
+ */
+
 import {
   CompanyWhereUniqueInput,
   prisma,
@@ -12,8 +16,6 @@ import {
   TransporterReceiptNotFound
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
-
-// PRISMA HELPER FUNCTIONS
 
 /**
  * Retrieves a company by siret or or throw a CompanyNotFound error

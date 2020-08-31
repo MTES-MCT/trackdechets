@@ -1,9 +1,5 @@
 import { prisma } from "../../../generated/prisma-client";
-import {
-  MutationJoinWithInviteArgs,
-  User,
-  MutationResolvers
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { hashPassword } from "../../utils";
 
 const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (

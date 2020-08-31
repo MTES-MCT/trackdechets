@@ -42,22 +42,6 @@ export enum AuthType {
   Bearer = "bearer"
 }
 
-/**
- * Passport will use all possible strategies to authenticate user on the GraphQL endpoint
- * Nevertheless we may want to apply only specific strategies on a particular GraphQL query.
- * For example the mutation used to renew a user password may only be accessible from a user
- * logged in from Trackdechets UI. This helper function allow to get rid of user info if
- * it was not authenticated with the proper stratgey
- */
-export function useResolverAuthStrategy(
-  authTypes: AuthType[],
-  context: GraphQLContext
-) {
-  if (context.user && !authTypes.includes(context.user.auth)) {
-    context.user = null;
-  }
-}
-
 // verbose error message and related errored field
 export const getLoginError = (username: string) => ({
   UNKNOWN_USER: {
@@ -334,9 +318,11 @@ export const passportJwtMiddleware = (
 };
 
 /**
- * This function is used to restrict authentication strategies
- * at a per resolver level
- * @param context
+ * Passport will use all possible strategies to authenticate user on the GraphQL endpoint
+ * Nevertheless we may want to apply only specific strategies on a particular GraphQL query.
+ * For example the mutation used to renew a user password may only be accessible from a user
+ * logged in from Trackdechets UI. This helper function allow to get rid of user info if
+ * it was not authenticated with the proper stratgey
  */
 export function applyAuthStrategies(
   context: GraphQLContext,

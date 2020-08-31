@@ -1,6 +1,4 @@
 import {
-  UpdateTraderReceiptInput,
-  TraderReceipt,
   MutationResolvers,
   MutationUpdateTraderReceiptArgs
 } from "../../../generated/graphql/types";

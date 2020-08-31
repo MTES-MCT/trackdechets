@@ -6,10 +6,9 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { UserInputError } from "apollo-server-express";
 import { isValidDatetime, validateSecurityCode } from "../../validation";
-import { prisma, Form } from "../../../generated/prisma-client";
+import { prisma } from "../../../generated/prisma-client";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanSignedByTransporter } from "../../permissions";
-import { GraphQLContext } from "../../../types";
 import { InvalidDateTime } from "../../../common/errors";
 
 function validateArgs(args: MutationSignedByTransporterArgs) {

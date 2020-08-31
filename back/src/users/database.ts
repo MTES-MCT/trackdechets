@@ -1,5 +1,5 @@
 /**
- * Prisma helpers function
+ * PRISMA HELPER FUNCTIONS
  */
 
 import {

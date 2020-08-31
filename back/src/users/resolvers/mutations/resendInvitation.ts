@@ -1,8 +1,5 @@
 import { UserInputError } from "apollo-server-express";
-import {
-  MutationResendInvitationArgs,
-  MutationResolvers
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { sendMail } from "../../../common/mails.helper";
 import { userMails } from "../../mails";

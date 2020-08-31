@@ -1,4 +1,3 @@
-import stateSummaryResolver from "./forms/stateSummary";
 import { StateSummaryResolvers } from "../../generated/graphql/types";
 
 const stateSummaryResolvers: StateSummaryResolvers = {

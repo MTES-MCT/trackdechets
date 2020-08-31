@@ -1,6 +1,4 @@
 import {
-  CreateTransporterReceiptInput,
-  TransporterReceipt,
   MutationResolvers,
   MutationCreateTransporterReceiptArgs
 } from "../../../generated/graphql/types";
