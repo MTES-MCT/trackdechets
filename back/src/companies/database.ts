@@ -2,9 +2,15 @@ import {
   CompanyWhereUniqueInput,
   prisma,
   User,
-  UserRole
+  UserRole,
+  TraderReceiptWhereUniqueInput,
+  TransporterReceiptWhereUniqueInput
 } from "../generated/prisma-client";
-import { CompanyNotFound } from "./errors";
+import {
+  CompanyNotFound,
+  TraderReceiptNotFound,
+  TransporterReceiptNotFound
+} from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
 
 // PRISMA HELPER FUNCTIONS
@@ -172,4 +178,24 @@ export async function getCompanyInvitedUsers(
 export async function getCompanyAdminUsers(siret: string) {
   const users = await getCompanyActiveUsers(siret);
   return users.filter(c => c.role === "ADMIN");
+}
+
+export async function getTraderReceiptOrNotFound({
+  id
+}: TraderReceiptWhereUniqueInput) {
+  const receipt = await prisma.traderReceipt({ id });
+  if (receipt == null) {
+    throw new TraderReceiptNotFound();
+  }
+  return receipt;
+}
+
+export async function getTransporterReceiptOrNotFound({
+  id
+}: TransporterReceiptWhereUniqueInput) {
+  const receipt = await prisma.transporterReceipt({ id });
+  if (receipt == null) {
+    throw new TransporterReceiptNotFound();
+  }
+  return receipt;
 }

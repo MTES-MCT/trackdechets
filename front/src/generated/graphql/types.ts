@@ -950,12 +950,12 @@ export type MutationCreateFormArgs = {
 
 
 export type MutationCreateTraderReceiptArgs = {
-  input: Maybe<CreateTraderReceiptInput>;
+  input: CreateTraderReceiptInput;
 };
 
 
 export type MutationCreateTransporterReceiptArgs = {
-  input: Maybe<CreateTransporterReceiptInput>;
+  input: CreateTransporterReceiptInput;
 };
 
 
@@ -977,12 +977,12 @@ export type MutationDeleteInvitationArgs = {
 
 
 export type MutationDeleteTraderReceiptArgs = {
-  input: Maybe<DeleteTraderReceiptInput>;
+  input: DeleteTraderReceiptInput;
 };
 
 
 export type MutationDeleteTransporterReceiptArgs = {
-  input: Maybe<DeleteTransporterReceiptInput>;
+  input: DeleteTransporterReceiptInput;
 };
 
 
@@ -1141,7 +1141,7 @@ export type MutationUpdateFormArgs = {
 
 
 export type MutationUpdateTraderReceiptArgs = {
-  input: Maybe<UpdateTraderReceiptInput>;
+  input: UpdateTraderReceiptInput;
 };
 
 
@@ -1153,7 +1153,7 @@ export type MutationUpdateTransporterFieldsArgs = {
 
 
 export type MutationUpdateTransporterReceiptArgs = {
-  input: Maybe<UpdateTransporterReceiptInput>;
+  input: UpdateTransporterReceiptInput;
 };
 
 /** Destination ultérieure prévue (case 12) */

@@ -28,21 +28,6 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/**
- * Merge a list of graphql-shield rules tree
- * @param rulesTree
- */
-export function mergeRulesTrees(rulesTree) {
-  const merge = (r1, r2) => {
-    return {
-      Query: { ...r1.Query, ...r2.Query },
-      Mutation: { ...r1.Mutation, ...r2.Mutation }
-    };
-  };
-
-  return rulesTree.reduce((prev, cur) => merge(prev, cur));
-}
-
 export function getUIBaseURL() {
   const { UI_URL_SCHEME, UI_HOST } = process.env;
   return `${UI_URL_SCHEME || "http"}://${UI_HOST}`;

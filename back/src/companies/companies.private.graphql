@@ -43,7 +43,7 @@ type Mutation {
   Crée un récépissé transporteur
   """
   createTransporterReceipt(
-    input: CreateTransporterReceiptInput
+    input: CreateTransporterReceiptInput!
   ): TransporterReceipt
 
   """
@@ -51,7 +51,7 @@ type Mutation {
   Édite les informations d'un récépissé transporteur
   """
   updateTransporterReceipt(
-    input: UpdateTransporterReceiptInput
+    input: UpdateTransporterReceiptInput!
   ): TransporterReceipt
 
   """
@@ -59,26 +59,26 @@ type Mutation {
   Supprime un récépissé transporteur
   """
   deleteTransporterReceipt(
-    input: DeleteTransporterReceiptInput
+    input: DeleteTransporterReceiptInput!
   ): TransporterReceipt
 
   """
   USAGE INTERNE
   Crée un récépissé transporteur
   """
-  createTraderReceipt(input: CreateTraderReceiptInput): TraderReceipt
+  createTraderReceipt(input: CreateTraderReceiptInput!): TraderReceipt
 
   """
   USAGE INTERNE
   Édite les informations d'un récépissé négociant
   """
-  updateTraderReceipt(input: UpdateTraderReceiptInput): TraderReceipt
+  updateTraderReceipt(input: UpdateTraderReceiptInput!): TraderReceipt
 
   """
   USAGE INTERNE
   Supprime un récépissé négociant
   """
-  deleteTraderReceipt(input: DeleteTraderReceiptInput): TransporterReceipt
+  deleteTraderReceipt(input: DeleteTraderReceiptInput!): TransporterReceipt
 
   """
   USAGE INTERNE
