@@ -29,8 +29,7 @@ const createUploadLinkResolver: MutationResolvers["createUploadLink"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const validArgs = validateArgs(args);
-  const { fileName, fileType } = validArgs;
+  const { fileName, fileType } = validateArgs(args);
   const timestamp = new Date().getTime();
   const computedFileName = [user.id, timestamp, fileName].join("-");
   const url = await getPutSignedUrl(computedFileName, fileType);

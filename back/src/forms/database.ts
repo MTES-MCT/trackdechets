@@ -30,7 +30,7 @@ export async function getFullForm(form: Form): Promise<FullForm> {
 }
 
 /**
- * Retrives a form by id or readableId or throw a FormNotFound error
+ * Retrieves a form by id or readableId or throw a FormNotFound error
  */
 export async function getFormOrFormNotFound({
   id,

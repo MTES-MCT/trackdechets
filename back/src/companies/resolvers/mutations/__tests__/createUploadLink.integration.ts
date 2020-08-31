@@ -14,7 +14,7 @@ const CREATE_UPLOAD_LINK = `
 `;
 
 const getPutSignedUrlSpy = jest.spyOn(s3, "getPutSignedUrl");
-(getPutSignedUrlSpy as jest.Mock).mockResolvedValueOnce("signedUrl");
+getPutSignedUrlSpy.mockResolvedValueOnce("signedUrl");
 
 describe("createUploadLink", () => {
   it("should throw UserInputException if file format is not supported", async () => {
