@@ -246,7 +246,7 @@ passport.use(new ClientPasswordStrategy(verifyClient));
  * Custom passport callback that pass to next middleware
  * even if authorization fails (default behavior is to return
  * 401 Not Authorized). Fine grained control of authorization
- * will be handled by graphql-shield
+ * will be handled in resolvers
  */
 async function passportCallback(
   req: express.Request,

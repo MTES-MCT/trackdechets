@@ -14,7 +14,6 @@ import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
-import { shield } from "graphql-shield";
 import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
 import { oauth2Router } from "./routers/oauth2-router";
