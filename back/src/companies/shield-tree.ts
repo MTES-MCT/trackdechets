@@ -2,7 +2,7 @@ import { chain } from "graphql-shield";
 import { isCompanyAdmin, isAuthenticatedFromUI } from "../common/rules";
 import {
   createCompanySchema,
-  createUploadLinkSchema,
+  // createUploadLinkSchema,
   createTransporterReceiptSchema,
   createTraderReceiptSchema,
   updateTransporterReceiptSchema,
@@ -22,7 +22,7 @@ export default {
   Mutation: {
     //updateCompany: chain(isAuthenticatedFromUI, isCompanyAdmin),
     // createCompany: chain(createCompanySchema, isAuthenticatedFromUI),
-    createUploadLink: chain(createUploadLinkSchema, isAuthenticatedFromUI),
+    // createUploadLink: chain(createUploadLinkSchema, isAuthenticatedFromUI),
     createTransporterReceipt: chain(
       createTransporterReceiptSchema,
       isAuthenticatedFromUI
