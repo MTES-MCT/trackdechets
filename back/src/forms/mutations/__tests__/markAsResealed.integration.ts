@@ -5,7 +5,6 @@ import {
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
 
 const MARK_AS_RESEALED = `
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
