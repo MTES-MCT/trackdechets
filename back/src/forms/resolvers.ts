@@ -35,7 +35,8 @@ import {
   SubscriptionResolvers,
   FormResolvers,
   WasteDetailsResolvers,
-  StateSummaryResolvers
+  StateSummaryResolvers,
+  FormCompanyResolvers
 } from "../generated/graphql/types";
 import { transportSegments } from "./queries/segments";
 
@@ -194,8 +195,15 @@ const subscriptionResolvers: SubscriptionResolvers = {
   }
 };
 
+const formCompanyResolvers: FormCompanyResolvers = {
+  country: parent => {
+    return parent.country || "FR";
+  }
+};
+
 export default {
   Form: formResolvers,
+  FormCompany: formCompanyResolvers,
   WasteDetails: wasteDetailsResolvers,
   StateSummary: stateSummaryResolvers,
   Query: queryResolvers,

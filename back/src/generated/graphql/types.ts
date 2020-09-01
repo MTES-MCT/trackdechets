@@ -533,7 +533,6 @@ export type FormCompany = {
    * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
    * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
    * 
-   * En l'absence de code, l'entreprise est considérée comme résidant en France.
    * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
    */
   country?: Maybe<Scalars['String']>;
