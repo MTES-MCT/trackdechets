@@ -5635,6 +5635,9 @@ Les membres peuvent:
 * consulter/éditer les bordereaux
 * consulter le reste des informations
 
+Vous pouvez consulter [cette page](https://docs.google.com/spreadsheets/d/12K9Bd2k5l4uqXhS0h5uI00lNEzW7C-1t-NDOyxy8aKk/edit#gid=0)
+pour le détail de chacun des rôles
+
 <table>
 <thead>
 <th align="left">Value</th>
