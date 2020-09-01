@@ -67,28 +67,39 @@ export function validCompany({
     name: Yup.string().required(
       `${verboseFieldName}: Le nom de l'entreprise est obligatoire`
     ),
-    siret: Yup.string().when("country", {
-      is: country => !allowForeign || country == null || country === "FR",
-      then: Yup.string().required(
-        `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
-      ),
-      otherwise: Yup.string().nullable()
-    }),
+    siret: allowForeign
+      ? Yup.string().when("country", {
+          is: country => country == null || country === "FR",
+          then: Yup.string().required(
+            `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
+          ),
+          otherwise: Yup.string().nullable()
+        })
+      : Yup.string().required(
+          `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
+        ),
     address: Yup.string().required(
       `${verboseFieldName}: L'adresse d'une entreprise est obligatoire`
     ),
-    country: Yup.string()
-      .oneOf(
-        [
-          ...countries.map(country => country.cca2),
+    country: allowForeign
+      ? Yup.string()
+          .oneOf(
+            [
+              ...countries.map(country => country.cca2),
 
-          // .oneOf() has a weird behavior with .nullable(), see:
-          // https://github.com/jquense/yup/issues/104
-          null
-        ],
-        `${verboseFieldName}: Le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu`
-      )
-      .nullable(),
+              // .oneOf() has a weird behavior with .nullable(), see:
+              // https://github.com/jquense/yup/issues/104
+              null
+            ],
+            `${verboseFieldName}: Le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu`
+          )
+          .nullable()
+      : Yup.string()
+          .oneOf(
+            ["FR", null],
+            `${verboseFieldName}: Cette entreprise ne peut pas être à l'étranger`
+          )
+          .nullable(),
     contact: Yup.string().required(
       `${verboseFieldName}: Le contact dans l'entreprise est obligatoire`
     ),
