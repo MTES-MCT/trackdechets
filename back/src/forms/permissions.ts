@@ -183,6 +183,21 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
   return true;
 }
 
+export async function checkCanMarkAsCollected(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+  const isAuthorized =
+    isFormTransporter(fullUser, fullForm) ||
+    isFormTransporterAfterTempStorage(fullUser, fullForm);
+
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à collecter ce bordereau"
+    );
+  }
+  return true;
+}
+
 export async function checkCanMarkAsReceived(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);

@@ -252,7 +252,7 @@ type Mutation {
     sentInfo: SentFormInput!
   ): Form
     @deprecated(
-      reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)"
+      reason: "Utiliser la mutation markAsCollected permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)"
     )
 
   "Valide la réception d'un BSD"
@@ -272,6 +272,16 @@ type Mutation {
   ): Form
 
   """
+  Ancienne appellation de markAsCollected
+  """
+  signedByTransporter(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées aux signatures transporteur et émetteur (case 8 et 9)"
+    signingInfo: TransporterSignatureFormInput!
+  ): Form @deprecated(reason: "Utiliser la mutation markAsCollected")
+
+  """
   Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
   ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
   Cette mutation doit être appelée avec le token du collecteur-transporteur.
@@ -281,11 +291,11 @@ type Mutation {
   D'un point de vue pratique, cela implique qu'un responsable de l'établissement
   émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
   """
-  signedByTransporter(
+  markAsCollected(
     "ID d'un BSD"
     id: ID!
     "Informations liées aux signatures transporteur et émetteur (case 8 et 9)"
-    signingInfo: TransporterSignatureFormInput!
+    collectedInfo: CollectedFormInput!
   ): Form
 
   "Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement"
@@ -297,7 +307,7 @@ type Mutation {
   "Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement"
   markAsResent(id: ID!, resentInfos: ResentFormInput!): Form
     @deprecated(
-      reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)"
+      reason: "Utiliser la mutation markAsCollected permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)"
     )
 
   "Prépare un nouveau segment de transport multimodal"

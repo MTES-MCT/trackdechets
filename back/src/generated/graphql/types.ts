@@ -48,6 +48,21 @@ export type AuthPayload = {
   user: User;
 };
 
+export type CollectedFormInput = {
+  /** Date de l'envoi du déchet par l'émetteur (case 9) */
+  sentAt: Scalars['DateTime'];
+  /** Code de sécurité permettant d'authentifier l'émetteur */
+  securityCode: Scalars['Int'];
+  /** Nom de la personne responsable de l'envoi du déchet (case 9) */
+  sentBy: Scalars['String'];
+  /** Conditionnement */
+  packagings: Array<Maybe<Packagings>>;
+  /** Quantité en tonnes */
+  quantity: Scalars['Float'];
+  /** Code ONU */
+  onuCode?: Maybe<Scalars['String']>;
+};
+
 /**
  * Information sur établissement accessible dans la liste des favoris
  * La liste des favoris est constituée à partir de l'historique des
@@ -783,6 +798,19 @@ export type Mutation = {
    * d'un utilisateur.
    */
   login: AuthPayload;
+  /**
+   * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
+   * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
+   * Cette mutation doit être appelée avec le token du collecteur-transporteur.
+   * L'établissement émetteur (resp. d'entreposage provisoire ou de
+   * reconditionnement) est authentifié quant à lui grâce à son code de sécurité
+   * disponible sur le tableau de bord Trackdéchets
+   * Mon Compte > Établissements > Sécurité.
+   * D'un point de vue pratique, cela implique qu'un responsable de l'établissement
+   * émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le
+   * code de sécurité sur le terminal du collecteur-transporteur.
+   */
+  markAsCollected?: Maybe<Form>;
   /** Valide le traitement d'un BSD */
   markAsProcessed?: Maybe<Form>;
   /** Valide la réception d'un BSD */
@@ -791,7 +819,7 @@ export type Mutation = {
   markAsResealed?: Maybe<Form>;
   /**
    * Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
-   * @deprecated Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)
+   * @deprecated Utiliser la mutation markAsCollected permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)
    */
   markAsResent?: Maybe<Form>;
   /**
@@ -851,7 +879,7 @@ export type Mutation = {
   markAsSealed?: Maybe<Form>;
   /**
    * Valide l'envoi d'un BSD
-   * @deprecated Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)
+   * @deprecated Utiliser la mutation markAsCollected permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)
    */
   markAsSent?: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
@@ -886,16 +914,8 @@ export type Mutation = {
    */
   saveForm?: Maybe<Form>;
   /**
-   * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
-   * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
-   * Cette mutation doit être appelée avec le token du collecteur-transporteur.
-   * L'établissement émetteur (resp. d'entreposage provisoire ou de
-   * reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-   * disponible sur le tableau de bord Trackdéchets
-   * Mon Compte > Établissements > Sécurité.
-   * D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-   * émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le
-   * code de sécurité sur le terminal du collecteur-transporteur.
+   * Ancienne appellation de markAsCollected
+   * @deprecated Utiliser la mutation markAsCollected
    */
   signedByTransporter?: Maybe<Form>;
   /**
@@ -1016,6 +1036,12 @@ export type MutationJoinWithInviteArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationMarkAsCollectedArgs = {
+  id: Scalars['ID'];
+  collectedInfo: CollectedFormInput;
 };
 
 
@@ -1749,7 +1775,7 @@ export type TransporterReceipt = {
   department: Scalars['String'];
 };
 
-/** Payload de signature d'un BSD par un transporteur */
+/** Payload de signature d'un BSD par un transporteur avec la mutation signedByTransporter (DEPRECATED) */
 export type TransporterSignatureFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
   sentAt: Scalars['DateTime'];
@@ -2138,6 +2164,7 @@ export type ResolversTypes = {
   NextSegmentTransporterInput: NextSegmentTransporterInput;
   NextSegmentCompanyInput: NextSegmentCompanyInput;
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
+  CollectedFormInput: CollectedFormInput;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
   ReceivedFormInput: ReceivedFormInput;
@@ -2238,6 +2265,7 @@ export type ResolversParentTypes = {
   NextSegmentTransporterInput: NextSegmentTransporterInput;
   NextSegmentCompanyInput: NextSegmentCompanyInput;
   AuthPayload: AuthPayload;
+  CollectedFormInput: CollectedFormInput;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
   ReceivedFormInput: ReceivedFormInput;
@@ -2494,6 +2522,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>;
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  markAsCollected?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsCollectedArgs, 'id' | 'collectedInfo'>>;
   markAsProcessed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsProcessedArgs, 'id' | 'processedInfo'>>;
   markAsReceived?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsReceivedArgs, 'id' | 'receivedInfo'>>;
   markAsResealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsResealedArgs, 'id' | 'resealedInfos'>>;
@@ -2776,6 +2805,18 @@ export function createAuthPayloadMock(props: Partial<AuthPayload>): AuthPayload 
     __typename: "AuthPayload",
     token: "",
     user: createUserMock({}),
+    ...props,
+  };
+}
+
+export function createCollectedFormInputMock(props: Partial<CollectedFormInput>): CollectedFormInput {
+  return {
+    sentAt: new Date(),
+    securityCode: 0,
+    sentBy: "",
+    packagings: [],
+    quantity: 0,
+    onuCode: null,
     ...props,
   };
 }

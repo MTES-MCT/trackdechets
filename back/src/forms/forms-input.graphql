@@ -7,7 +7,7 @@ input SentFormInput {
   sentBy: String!
 }
 
-"Payload de signature d'un BSD par un transporteur"
+"Payload de signature d'un BSD par un transporteur avec la mutation signedByTransporter (DEPRECATED)"
 input TransporterSignatureFormInput {
   "Date de l'envoi du déchet par l'émetteur (case 9)"
   sentAt: DateTime!
@@ -23,6 +23,26 @@ input TransporterSignatureFormInput {
 
   "Si oui on non le BSD a été signé par l'émetteur"
   signedByProducer: Boolean!
+
+  "Conditionnement"
+  packagings: [Packagings]!
+
+  "Quantité en tonnes"
+  quantity: Float!
+
+  "Code ONU"
+  onuCode: String
+}
+
+input CollectedFormInput {
+  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  sentAt: DateTime!
+
+  "Code de sécurité permettant d'authentifier l'émetteur"
+  securityCode: Int!
+
+  "Nom de la personne responsable de l'envoi du déchet (case 9)"
+  sentBy: String!
 
   "Conditionnement"
   packagings: [Packagings]!

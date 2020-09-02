@@ -8,6 +8,7 @@ import duplicateForm from "./mutations/duplicateForm";
 import markAsSealed from "./mutations/markAsSealed";
 import markAsSent from "./mutations/markAsSent";
 import signedByTransporter from "./mutations/signedByTransporter";
+import markAsCollected from "./mutations/markAsCollected";
 import markAsReceived from "./mutations/markAsReceived";
 import markAsTempStored from "./mutations/markAsTempStored";
 import markAsProcessed from "./mutations/markAsProcessed";
@@ -28,6 +29,7 @@ const Mutation: MutationResolvers = {
   markAsSealed,
   markAsSent,
   signedByTransporter,
+  markAsCollected,
   markAsReceived,
   markAsTempStored,
   markAsResealed,

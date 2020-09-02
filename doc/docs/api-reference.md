@@ -502,6 +502,40 @@ d'un utilisateur.
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>markAsCollected</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
+ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
+Cette mutation doit être appelée avec le token du collecteur-transporteur.
+L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
+disponible sur le tableau de bord Trackdéchets
+Mon Compte > Établissements > Sécurité.
+D'un point de vue pratique, cela implique qu'un responsable de l'établissement
+émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">collectedInfo</td>
+<td valign="top"><a href="#collectedforminput">CollectedFormInput</a>!</td>
+<td>
+
+Informations liées aux signatures transporteur et émetteur (case 8 et 9)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>markAsProcessed</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -584,7 +618,7 @@ Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement
 <p>⚠️ <strong>DEPRECATED</strong></p>
 <blockquote>
 
-Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)
+Utiliser la mutation markAsCollected permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)
 
 </blockquote>
 </td>
@@ -678,7 +712,7 @@ Valide l'envoi d'un BSD
 <p>⚠️ <strong>DEPRECATED</strong></p>
 <blockquote>
 
-Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)
+Utiliser la mutation markAsCollected permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)
 
 </blockquote>
 </td>
@@ -783,19 +817,18 @@ Payload du BSD
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signedByTransporter</strong></td>
+<td colspan="2" valign="top"><strong>signedByTransporter</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
-ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
-Cette mutation doit être appelée avec le token du collecteur-transporteur.
-L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-disponible sur le tableau de bord Trackdéchets
-Mon Compte > Établissements > Sécurité.
-D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+Ancienne appellation de markAsCollected
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser la mutation markAsCollected
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -3557,6 +3590,74 @@ Le readableId permet de le récupérer via la query form.
 </tbody>
 </table>
 
+### CollectedFormInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>sentAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date de l'envoi du déchet par l'émetteur (case 9)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>securityCode</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Code de sécurité permettant d'authentifier l'émetteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>sentBy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom de la personne responsable de l'envoi du déchet (case 9)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#packagings">Packagings</a>]!</td>
+<td>
+
+Conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#float">Float</a>!</td>
+<td>
+
+Quantité en tonnes
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onuCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ONU
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### CompanyInput
 
 Payload d'un établissement
@@ -4704,7 +4805,7 @@ Numéro de plaque d'immatriculation
 
 ### TransporterSignatureFormInput
 
-Payload de signature d'un BSD par un transporteur
+Payload de signature d'un BSD par un transporteur avec la mutation signedByTransporter (DEPRECATED)
 
 <table>
 <thead>
