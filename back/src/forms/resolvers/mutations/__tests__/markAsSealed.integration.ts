@@ -230,4 +230,59 @@ describe("{ mutation { markAsSealed } }", () => {
       expect(statusLogs.length).toEqual(0);
     }
   );
+
+  it("should be optional to provide onuCode for non-dangerous wastes", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "05 01 04*",
+        wasteDetailsOnuCode: null
+      }
+    });
+
+    const MARK_AS_SEALED = `
+      mutation MarkAsSealed($id: ID!) {
+        markAsSealed(id: $id) {
+          status
+        }
+      }
+    `;
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: [
+          "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.",
+          "Erreur(s): wasteDetails.onuCode ne peut pas être null"
+        ].join("\n")
+      })
+    ]);
+
+    await prisma.updateForm({
+      data: {
+        wasteDetailsCode: "01 01 01"
+      },
+      where: {
+        id: form.id
+      }
+    });
+    const { data } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+    expect(data.markAsSealed.status).toBe("SEALED");
+  });
 });

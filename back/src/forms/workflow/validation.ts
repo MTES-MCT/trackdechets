@@ -8,7 +8,7 @@ import {
   setLocale,
   string
 } from "yup";
-import { WASTES_CODES } from "../../common/constants";
+import { WASTES_CODES, isDangerous } from "../../common/constants";
 import { prisma, Form } from "../../generated/prisma-client";
 import { validDatetime } from "../validation";
 import { expandFormFromDb } from "../form-converter";
@@ -73,7 +73,11 @@ export const formSchema = object<any>().shape({
       WASTES_CODES,
       "Le code déchet est obligatoire et doit appartenir à la liste  du code de l'environnement (par exemple 16 11 05*)"
     ),
-    onuCode: string(),
+    onuCode: string().when("code", {
+      is: (wasteCode: string) => isDangerous(wasteCode || ""),
+      then: () => string(),
+      otherwise: () => string().nullable()
+    }),
     packagings: array().required(),
     otherPackaging: string().nullable(true),
     numberOfPackages: number()
