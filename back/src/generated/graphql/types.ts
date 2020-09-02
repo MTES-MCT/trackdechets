@@ -49,11 +49,18 @@ export type AuthPayload = {
 };
 
 export type CollectedFormInput = {
-  /** Date de l'envoi du déchet par l'émetteur (case 9) */
+  /**
+   * Date de l'envoi du déchet par l'émetteur (case 9) ou par
+   * l'exploitant du site d'entreposage provisoire ou reconditionnement
+   * (case 19)
+   */
   sentAt: Scalars['DateTime'];
-  /** Code de sécurité permettant d'authentifier l'émetteur */
+  /**
+   * Code de sécurité permettant d'authentifier l'émetteur
+   * ou le site d'entreposage provisoire ou reconditionnement
+   */
   securityCode: Scalars['Int'];
-  /** Nom de la personne responsable de l'envoi du déchet (case 9) */
+  /** Nom de la personne responsable de l'envoi du déchet (case 9 ou case 19) */
   sentBy: Scalars['String'];
   /** Conditionnement */
   packagings: Array<Maybe<Packagings>>;

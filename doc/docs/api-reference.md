@@ -3606,7 +3606,9 @@ Le readableId permet de le récupérer via la query form.
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
-Date de l'envoi du déchet par l'émetteur (case 9)
+Date de l'envoi du déchet par l'émetteur (case 9) ou par
+l'exploitant du site d'entreposage provisoire ou reconditionnement
+(case 19)
 
 </td>
 </tr>
@@ -3616,6 +3618,7 @@ Date de l'envoi du déchet par l'émetteur (case 9)
 <td>
 
 Code de sécurité permettant d'authentifier l'émetteur
+ou le site d'entreposage provisoire ou reconditionnement
 
 </td>
 </tr>
@@ -3624,7 +3627,7 @@ Code de sécurité permettant d'authentifier l'émetteur
 <td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-Nom de la personne responsable de l'envoi du déchet (case 9)
+Nom de la personne responsable de l'envoi du déchet (case 9 ou case 19)
 
 </td>
 </tr>
