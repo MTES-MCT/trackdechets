@@ -1,4 +1,5 @@
-@import "../../Utils.scss";
+@import "../../scss/Constants.scss";
+@import "../../scss/Breakpoints.scss";
 
 .step-content {
   margin-bottom: 40px;
@@ -113,7 +114,7 @@
   opacity: 0.5;
 }
 
-@media only screen and (max-width: $breakpoint-mobile) {
+@include xs-phone {
   .step-header {
     display: none;
   }

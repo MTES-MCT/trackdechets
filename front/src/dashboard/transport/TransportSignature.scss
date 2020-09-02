@@ -1,4 +1,4 @@
-@import "../../Utils.scss";
+@import "../../scss/Breakpoints.scss";
 
 .modal {
   max-height: 90%;
@@ -13,7 +13,7 @@
     position: initial;
   }
 
-  @media only screen and (max-width: $breakpoint-mobile) {
+  @include xs-phone {
     .step-header {
       display: none;
     }
