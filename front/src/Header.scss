@@ -1,50 +1,172 @@
-.navbar {
-  border-bottom: 1px solid var(--theme-border-lighter);
+@import "./scss/Constants.scss";
+@import "./scss/Breakpoints.scss";
+.btn {
+  appearance: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  justify-content: center;
+  &--primary {
+    background-color: $blue;
+  }
+  &:hover {
+    background-color: $blue-light;
+  }
+}
 
-  .nav__links {
-    margin-right: 3em;
-  }
+.header {
+  background-color: #fff;
+  width: 100%;
+  border-bottom: 1px solid rgba(203, 213, 224, 1);
+  display: flex;
+  justify-content: space-between;
+}
+.header__toggle {
+  padding-right: 1rem;
+  background-color: $blue-dark;
+  height: 100px;
+  display: flex;
+  padding: 0 0.75rem;
 
-  .nav__item {
-    margin: 0 0.1em;
-  }
-
-  .nav__item button {
-    text-decoration: none;
-    color: var(--black);
-    padding: 0.4em 0.8em;
-    border-radius: 3px;
-  }
-
-  .nav__item a.active,
-  .nav__item button.active {
-    background: none;
-    color: var(--theme-primary);
-  }
-
-  .nav__item a:hover,
-  .nav__item button:hover {
-    background: none;
-    color: var(--theme-primary);
-  }
-
-  .nav__item.logout button:hover {
-    color: var(--orange);
-  }
-  &__container {
-    padding: 8px;
-  }
-  &__home {
-    height: 80px;
-    &:hover {
-      background-color: var(--white);
+  align-items: center;
+  button {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 0.5rem;
+    appearance: none;
+    align-items: center;
+    color: $gray-light;
+    width: 36px;
+    border-style: none;
+    background-color: transparent;
+    svg {
+      fill: currentColor;
     }
   }
-  &__branding {
+  &__toggle-text {
+    font-size: 12px;
+  }
+
+  @include desktop {
+    display: none;
+  }
+}
+
+.header__content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  @include desktop {
+    justify-content: flex-start;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+.header__branding {
+  padding-left: 1rem;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+.header__nav {
+  width: 100vw;
+  left: -75px;
+  display: flex;
+  background-color: #fff;
+  margin-left: auto;
+  flex-shrink: 0;
+  z-index: 20;
+  position: absolute;
+  top: 100px;
+
+  @include desktop {
+    width: auto;
+    justify-content: flex-end;
+    margin-top: 0;
+    position: static;
+  }
+}
+.header__nav-items {
+  width: 100%;
+
+  padding-right: 0.5rem;
+  justify-content: flex-end;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  &--hidden {
+    display: none;
+  }
+  @include desktop {
+    display: flex;
+    box-shadow: none;
+  }
+}
+.header__nav-item {
+  display: flex;
+  flex-direction: column;
+  margin-right: 0.75rem;
+  align-items: center;
+}
+a.header__nav-link {
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #000 !important;
+  &:hover {
+    background: none;
+  }
+  &:active,
+  &:visited {
+    text-decoration: none;
+  }
+}
+
+.header__nav-link--active + .header__nav-active {
+  display: block;
+}
+.header__nav-active {
+  border-bottom: 4px solid #000;
+  width: 3rem;
+  display: none;
+}
+
+.header__connexion {
+  display: none;
+
+  @include desktop {
     display: flex;
   }
-  &__marianne {
-    width: 80px;
-    height: 80px;
+
+  & span {
+    color: #fff;
+    white-space: nowrap;
+    margin-right: 1rem;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: Capitalize;
+  }
+}
+
+a:hover {
+  background-color: $blue-light;
+  border-radius: none !important;
+}
+.header__logout-mobile {
+  background-color: $blue-dark;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: none !important;
+  border: none;
+  &:hover {
+    background-color: $blue-light;
+    border-radius: none !important;
+  }
+  @include desktop {
+    display: none;
   }
 }
