@@ -4,15 +4,7 @@ import { prisma } from "../../generated/prisma-client";
 const fieldsToLog = {
   MARK_SEALED: [],
   MARK_SENT: ["sentBy", "sentAt"],
-  MARK_SIGNED_BY_TRANSPORTER: [
-    "sentAt",
-    "signedByTransporter",
-    "sentBy",
-    "signedByProducer",
-    "packagings",
-    "quantity",
-    "onuCode"
-  ],
+  MARK_COLLECTED: ["sentAt", "sentBy", "packagings", "quantity", "onuCode"],
   MARK_RECEIVED: ["receivedBy", "receivedAt", "signedAt", "quantityReceived"],
   MARK_PROCESSED: [
     "processedBy",

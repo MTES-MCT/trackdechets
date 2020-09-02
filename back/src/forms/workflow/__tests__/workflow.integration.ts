@@ -385,9 +385,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -860,9 +858,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "RESENT",
         updatedFields: {
           sentAt: "2020-08-03T10:00:00",
-          signedByTransporter: true,
           sentBy: "Mr Provisoire",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -883,9 +879,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -1493,9 +1487,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"

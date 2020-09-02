@@ -31,7 +31,7 @@ export const formWorkflowMachine = Machine(
         exit: "setUnStable",
         on: {
           MARK_SENT: [{ target: "pendingSentValidation" }],
-          MARK_SIGNED_BY_TRANSPORTER: [
+          MARK_COLLECTED: [
             {
               target: FormState.Sent
             }
@@ -166,7 +166,7 @@ export const formWorkflowMachine = Machine(
               target: FormState.Resent
             }
           ],
-          MARK_SIGNED_BY_TRANSPORTER: [
+          MARK_COLLECTED: [
             {
               target: FormState.Resent
             }

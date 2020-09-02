@@ -53,7 +53,7 @@ const markAsCollectedResolver = async (
 
     return transitionForm(
       form,
-      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: collectedInfo },
+      { eventType: "MARK_COLLECTED", eventParams: collectedInfo },
       context,
       infos => {
         const wasteDetails = {
@@ -96,7 +96,7 @@ const markAsCollectedResolver = async (
 
   return transitionForm(
     form,
-    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: collectedInfo },
+    { eventType: "MARK_COLLECTED", eventParams: collectedInfo },
     context,
     transformEventToFormParams
   );
