@@ -64,6 +64,13 @@ const outgoingWasteFragment = `
     transporterValidityLimit
     transporterNumberPlate
     sentAt
+    nextDestinationProcessingOperation
+    nextDestinationCompanyName
+    nextDestinationCompanyContact
+    nextDestinationCompanyMail
+    nextDestinationCompanyPhone
+    nextDestinationCompanyAddress
+    nextDestinationCompanyCountry
   }
 `;
 
@@ -100,6 +107,13 @@ const incomingWasteFragment = `
     processingOperationDone
     receivedAt
     isAccepted
+    nextDestinationProcessingOperation
+    nextDestinationCompanyName
+    nextDestinationCompanyContact
+    nextDestinationCompanyMail
+    nextDestinationCompanyPhone
+    nextDestinationCompanyAddress
+    nextDestinationCompanyCountry
   }
 `;
 const transportedWasteFragment = `
@@ -162,6 +176,13 @@ const transportedWasteFragment = `
     sentAt
     receivedAt
     isAccepted
+    nextDestinationProcessingOperation
+    nextDestinationCompanyName
+    nextDestinationCompanyContact
+    nextDestinationCompanyMail
+    nextDestinationCompanyPhone
+    nextDestinationCompanyAddress
+    nextDestinationCompanyCountry
   }
 `;
 const tradedWasteFragment = `
@@ -222,6 +243,13 @@ const tradedWasteFragment = `
     isAccepted
     processingOperationDone
     noTraceability
+    nextDestinationProcessingOperation
+    nextDestinationCompanyName
+    nextDestinationCompanyContact
+    nextDestinationCompanyMail
+    nextDestinationCompanyPhone
+    nextDestinationCompanyAddress
+    nextDestinationCompanyCountry
   }
 `;
 
@@ -283,5 +311,12 @@ const allWasteFragment = `
     isAccepted
     processingOperationDone
     noTraceability
+    nextDestinationProcessingOperation
+    nextDestinationCompanyName
+    nextDestinationCompanyContact
+    nextDestinationCompanyMail
+    nextDestinationCompanyPhone
+    nextDestinationCompanyAddress
+    nextDestinationCompanyCountry
   }
 `;

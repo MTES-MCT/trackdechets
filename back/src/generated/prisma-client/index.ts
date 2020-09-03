@@ -1033,6 +1033,8 @@ export type FormOrderByInput =
   | "nextDestinationCompanySiret_DESC"
   | "nextDestinationCompanyAddress_ASC"
   | "nextDestinationCompanyAddress_DESC"
+  | "nextDestinationCompanyCountry_ASC"
+  | "nextDestinationCompanyCountry_DESC"
   | "nextDestinationCompanyContact_ASC"
   | "nextDestinationCompanyContact_DESC"
   | "nextDestinationCompanyPhone_ASC"
@@ -2410,6 +2412,20 @@ export interface FormWhereInput {
   nextDestinationCompanyAddress_not_starts_with?: Maybe<String>;
   nextDestinationCompanyAddress_ends_with?: Maybe<String>;
   nextDestinationCompanyAddress_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
+  nextDestinationCompanyCountry_not?: Maybe<String>;
+  nextDestinationCompanyCountry_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_lt?: Maybe<String>;
+  nextDestinationCompanyCountry_lte?: Maybe<String>;
+  nextDestinationCompanyCountry_gt?: Maybe<String>;
+  nextDestinationCompanyCountry_gte?: Maybe<String>;
+  nextDestinationCompanyCountry_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_not_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_ends_with?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyContact_not?: Maybe<String>;
   nextDestinationCompanyContact_in?: Maybe<String[] | String>;
@@ -5046,6 +5062,7 @@ export interface FormCreateInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -5222,6 +5239,7 @@ export interface FormUpdateInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -5357,6 +5375,7 @@ export interface FormUpdateDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -6074,6 +6093,20 @@ export interface FormScalarWhereInput {
   nextDestinationCompanyAddress_not_starts_with?: Maybe<String>;
   nextDestinationCompanyAddress_ends_with?: Maybe<String>;
   nextDestinationCompanyAddress_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
+  nextDestinationCompanyCountry_not?: Maybe<String>;
+  nextDestinationCompanyCountry_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_lt?: Maybe<String>;
+  nextDestinationCompanyCountry_lte?: Maybe<String>;
+  nextDestinationCompanyCountry_gt?: Maybe<String>;
+  nextDestinationCompanyCountry_gte?: Maybe<String>;
+  nextDestinationCompanyCountry_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_not_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_ends_with?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyContact_not?: Maybe<String>;
   nextDestinationCompanyContact_in?: Maybe<String[] | String>;
@@ -6814,6 +6847,7 @@ export interface FormUpdateManyDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -6897,6 +6931,7 @@ export interface FormUpdateManyMutationInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7187,6 +7222,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7323,6 +7359,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7494,6 +7531,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7611,6 +7649,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -8904,6 +8943,7 @@ export interface Form {
   nextDestinationCompanyName?: String;
   nextDestinationCompanySiret?: String;
   nextDestinationCompanyAddress?: String;
+  nextDestinationCompanyCountry?: String;
   nextDestinationCompanyContact?: String;
   nextDestinationCompanyPhone?: String;
   nextDestinationCompanyMail?: String;
@@ -8991,6 +9031,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
+  nextDestinationCompanyCountry: () => Promise<String>;
   nextDestinationCompanyContact: () => Promise<String>;
   nextDestinationCompanyPhone: () => Promise<String>;
   nextDestinationCompanyMail: () => Promise<String>;
@@ -9100,6 +9141,7 @@ export interface FormSubscription
   nextDestinationCompanyName: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanySiret: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyAddress: () => Promise<AsyncIterator<String>>;
+  nextDestinationCompanyCountry: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyContact: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyPhone: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyMail: () => Promise<AsyncIterator<String>>;
@@ -9211,6 +9253,7 @@ export interface FormNullablePromise
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
+  nextDestinationCompanyCountry: () => Promise<String>;
   nextDestinationCompanyContact: () => Promise<String>;
   nextDestinationCompanyPhone: () => Promise<String>;
   nextDestinationCompanyMail: () => Promise<String>;
@@ -10951,6 +10994,7 @@ export interface FormPreviousValues {
   nextDestinationCompanyName?: String;
   nextDestinationCompanySiret?: String;
   nextDestinationCompanyAddress?: String;
+  nextDestinationCompanyCountry?: String;
   nextDestinationCompanyContact?: String;
   nextDestinationCompanyPhone?: String;
   nextDestinationCompanyMail?: String;
@@ -11039,6 +11083,7 @@ export interface FormPreviousValuesPromise
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
+  nextDestinationCompanyCountry: () => Promise<String>;
   nextDestinationCompanyContact: () => Promise<String>;
   nextDestinationCompanyPhone: () => Promise<String>;
   nextDestinationCompanyMail: () => Promise<String>;
@@ -11127,6 +11172,7 @@ export interface FormPreviousValuesSubscription
   nextDestinationCompanyName: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanySiret: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyAddress: () => Promise<AsyncIterator<String>>;
+  nextDestinationCompanyCountry: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyContact: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyPhone: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyMail: () => Promise<AsyncIterator<String>>;

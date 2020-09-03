@@ -601,7 +601,7 @@ Utiliser la mutation signedByTransporter permettant d'apposer les signatures du 
 
 Scelle un BSD
 Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
-doivent avoir été renseignés grâce à la mutation `saveForm`
+doivent avoir été renseignés au préalable
 
 ```
 emitter: {
@@ -2077,6 +2077,18 @@ SIRET de l'établissement
 <td>
 
 Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>country</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
 
 </td>
 </tr>
@@ -3589,6 +3601,19 @@ Nom de l'établissement
 <td>
 
 Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>country</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+En l'absence de code, l'entreprise est considérée comme résidant en France.
+Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
 
 </td>
 </tr>

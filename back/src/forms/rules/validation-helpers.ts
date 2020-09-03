@@ -1,4 +1,6 @@
 import { parse } from "date-fns";
+import * as Yup from "yup";
+import countries from "world-countries";
 
 const allowedFormats = [
   "yyyy-MM-dd",
@@ -54,33 +56,58 @@ export function validDatetime({ verboseFieldName, required = false }, yup) {
   );
 }
 
-export function validCompany({ verboseFieldName }, yup) {
-  return yup.object().shape({
-    name: yup
-      .string()
-      .required(`${verboseFieldName}: Le nom de l'entreprise est obligatoire`),
-    siret: yup
-      .string()
-      .required(
-        `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
-      ),
-    address: yup
-      .string()
-      .required(
-        `${verboseFieldName}: L'adresse d'une entreprise est obligatoire`
-      ),
-    contact: yup
-      .string()
-      .required(
-        `${verboseFieldName}: Le contact dans l'entreprise est obligatoire`
-      ),
-    phone: yup
-      .string()
-      .required(
-        `${verboseFieldName}: Le téléphone de l'entreprise est obligatoire`
-      ),
-    mail: yup
-      .string()
-      .required(`${verboseFieldName}: L'email de l'entreprise est obligatoire`)
+export function validCompany({
+  verboseFieldName,
+  allowForeign = false
+}: {
+  verboseFieldName: string;
+  allowForeign?: boolean;
+}) {
+  return Yup.object().shape({
+    name: Yup.string().required(
+      `${verboseFieldName}: Le nom de l'entreprise est obligatoire`
+    ),
+    siret: allowForeign
+      ? Yup.string().when("country", {
+          is: country => country == null || country === "FR",
+          then: Yup.string().required(
+            `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
+          ),
+          otherwise: Yup.string().nullable()
+        })
+      : Yup.string().required(
+          `${verboseFieldName}: La sélection d'une entreprise par SIRET est obligatoire`
+        ),
+    address: Yup.string().required(
+      `${verboseFieldName}: L'adresse d'une entreprise est obligatoire`
+    ),
+    country: allowForeign
+      ? Yup.string()
+          .oneOf(
+            [
+              ...countries.map(country => country.cca2),
+
+              // .oneOf() has a weird behavior with .nullable(), see:
+              // https://github.com/jquense/yup/issues/104
+              null
+            ],
+            `${verboseFieldName}: Le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu`
+          )
+          .nullable()
+      : Yup.string()
+          .oneOf(
+            ["FR", null],
+            `${verboseFieldName}: Cette entreprise ne peut pas être à l'étranger`
+          )
+          .nullable(),
+    contact: Yup.string().required(
+      `${verboseFieldName}: Le contact dans l'entreprise est obligatoire`
+    ),
+    phone: Yup.string().required(
+      `${verboseFieldName}: Le téléphone de l'entreprise est obligatoire`
+    ),
+    mail: Yup.string().required(
+      `${verboseFieldName}: L'email de l'entreprise est obligatoire`
+    )
   });
 }

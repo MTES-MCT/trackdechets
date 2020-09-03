@@ -1,7 +1,10 @@
 import React from "react";
 import { Formik, Field, Form } from "formik";
 import { DateTime } from "luxon";
-import { PROCESSING_OPERATIONS } from "../../../generated/constants";
+import {
+  PROCESSING_OPERATIONS,
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+} from "../../../generated/constants";
 import DateInput from "../../../form/custom-inputs/DateInput";
 import CompanySelector from "../../../form/company/CompanySelector";
 import { SlipActionProps } from "../SlipActions";
@@ -81,12 +84,15 @@ export default function Processed(props: SlipActionProps) {
                 transférée
               </label>
             </div>
-            {["D 13", "D 14", "D 15", "R 12", "R 13"].indexOf(
+            {PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
               values.processingOperationDone
-            ) > -1 && (
+            ) && (
               <div className="form__group">
                 <h4>Destination ultérieure prévue</h4>
-                <CompanySelector name="nextDestination.company" />
+                <CompanySelector
+                  name="nextDestination.company"
+                  allowForeignCompanies
+                />
 
                 <div className="form__group">
                   <label>

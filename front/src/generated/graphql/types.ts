@@ -78,6 +78,14 @@ export type CompanyInput = {
   name: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * En l'absence de code, l'entreprise est considérée comme résidant en France.
+   * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
+   */
+  country: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
   contact: Maybe<Scalars['String']>;
   /** Email du contact dans l'établissement */
@@ -522,6 +530,13 @@ export type FormCompany = {
   siret: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
+   */
+  country: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
   contact: Maybe<Scalars['String']>;
   /** Numéro de téléphone de contact dans l'établissement */
@@ -803,7 +818,7 @@ export type Mutation = {
   /**
    * Scelle un BSD
    * Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
-   * doivent avoir été renseignés grâce à la mutation `saveForm`
+   * doivent avoir été renseignés au préalable
    * 
    * ```
    * emitter: {
@@ -2034,6 +2049,7 @@ export function createCompanyInputMock(props: Partial<CompanyInput>): CompanyInp
     siret: null,
     name: null,
     address: null,
+    country: null,
     contact: null,
     mail: null,
     phone: null,
@@ -2300,6 +2316,7 @@ export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany 
     name: null,
     siret: null,
     address: null,
+    country: null,
     contact: null,
     phone: null,
     mail: null,

@@ -186,7 +186,7 @@ type Mutation {
   """
   Scelle un BSD
   Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
-  doivent avoir été renseignés grâce à la mutation `saveForm`
+  doivent avoir été renseignés au préalable
 
   ```
   emitter: {
@@ -614,6 +614,14 @@ type FormCompany {
 
   "Adresse de l'établissement"
   address: String
+
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+  Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
+  """
+  country: String
 
   "Nom du contact dans l'établissement"
   contact: String

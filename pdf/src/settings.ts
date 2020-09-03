@@ -1,3 +1,5 @@
+import countries from "world-countries";
+
 // Standard page height in pixels
 export const pageHeight = 842;
 
@@ -102,7 +104,20 @@ export const mainFormFieldSettings = {
   processedAt: { x: 318, y: 692 },
 
   nextDestinationProcessingOperation: { x: 154, y: 776.5 },
-  nextDestinationCompanySiret: { x: 88, y: 788 },
+  nextDestinationCompanySiret: {
+    x: 88,
+    y: 788,
+    content: data => {
+      if (data.nextDestinationCompanySiret) {
+        return data.nextDestinationCompanySiret;
+      }
+
+      const country = countries.find(
+        country => country.cca2 === data.nextDestinationCompanyCountry
+      );
+      return country ? `/ (${country.translations.fra.common})` : null;
+    }
+  },
   nextDestinationCompanyName: { x: 69, y: 798, maxLength: 50 },
   nextDestinationCompanyAddress: {
     x: 79,

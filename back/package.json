@@ -62,8 +62,9 @@
     "request": "^2.88.2",
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0",
+    "world-countries": "^4.0.0",
     "xstate": "^4.10.0",
-    "yup": "^0.29.1"
+    "yup": "^0.29.3"
   },
   "devDependencies": {
     "@fast-csv/parse": "^4.3.0",
@@ -90,7 +91,7 @@
     "@types/passport-local": "^1.0.33",
     "@types/passport-oauth2-client-password": "^0.1.2",
     "@types/supertest": "^2.0.10",
-    "@types/yup": "0.26.37",
+    "@types/yup": "0.29.4",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
     "apollo-server-integration-testing": "^2.3.0",
