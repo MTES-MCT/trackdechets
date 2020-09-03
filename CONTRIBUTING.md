@@ -1,19 +1,196 @@
-## Conventions Git
+# Contribuer à Trackdéchets
 
-Toutes les fonctionnalités et corrections de bugs doivent être développés sur des branches distinctes à partir de la branche `dev`, puis fusionnés sur `dev` avec une Pull Request. Chaque Pull Request doit faire l'objet d'une revue technique par au moins un autre membre de l'équipe. Si possible faire un rebase de la branche de `dev` avant de soumettre une review et s'assurer que le CI est au vert.
+- [Mise en route](#mise-en-route)
+  - [Pré-requis](#pré-requis)
+  - [Installation](#installation)
+  - [Conventions](#conventions)
+- [Tests unitaires](#tests-unitaires)
+- [Tests d'intégration](#tests-d-intégration)
+- [Créer une PR](#créer-une-pr)
+- [Déploiement](#déploiement)
+- [Guides](#guides)
+  - [Mettre à jour le changelog](#mettre-a-jour-le-changelog)
+  - [Mettre à jour la documentation](#mettre-a-jour-la-documentation)
 
-## Changelog
+## Mise en route
 
-Ajouter les changements inclus dans la PR dans une section *Next release* du [Changelog](./Changelog)
+### Pré-requis
 
-## Documentation
+1. Installer Node.js
+2. Installer Docker et Docker Compose
+
+#### NGINX Proxy
+
+Afin de pouvoir accéder aux différents services via des URLs du type `http://trackdechets.local` plutôt que `http://localhost:1234`, il est nécessaire de créer un container docker se basant sur [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy).
+
+1. Créer un répertoire `nginx-proxy` sur votre espace de travail et y ajouter le fichier `docker-compose.yml` suivant :
+
+   ```docker
+   version: "3.1"
+   services:
+     nginx-proxy:
+       image: jwilder/nginx-proxy:alpine
+       ports:
+         - "80:80"
+       volumes:
+         - /var/run/docker.sock:/tmp/docker.sock:ro
+       restart: unless-stopped
+   networks:
+     default:
+       external:
+         name: nginx-proxy
+   ```
+
+2. Créer le `network` docker `nginx-proxy`.
+
+   ```
+   docker network create nginx-proxy
+   ```
+
+3. Mapper les différentes URLs sur localhost dans votre fichier `host`.
+
+   ```
+   127.0.0.1 api.trackdechets.local
+   127.0.0.1 trackdechets.local
+   127.0.0.1 etl.trackdechets.local
+   127.0.0.1 metabase.trackdechets.local
+   127.0.0.1 doc.trackdechets.local
+   127.0.0.1 developers.trackdechets.local
+   ```
+
+   > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
+
+4. Démarrer le proxy nginx
+   ```
+   docker-compose up
+   ```
+
+Pour plus de détails, se référer au post ["Set a local web development environement with custom urls and https"](https://medium.com/@francoisromain/set-a-local-web-development-environment-with-custom-urls-and-https-3fbe91d2eaf0) par @francoisromain
+
+### Installation
+
+1. Cloner le dépôt sur votre machine.
+   ```bash
+   git clone git@github.com:MTES-MCT/trackdechets.git
+   cd trackdechets
+   git checkout --track origin/dev
+   ```
+2. Configurer les variables d'environnements :
+   1. Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
+   2. Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
+3. Démarrer les containers
+
+   ```bash
+   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-pdf td-ui
+   ```
+
+   Le démarrage du service `td-mail` est déconseillé en développement pour éviter des envois de courriels intempestifs mais vous pouvez l'activer pour le bon fonctionnement de certaines fonctionnalités (ex: validation de l'inscription, invitation à rejoindre un établissement, etc)
+
+   Vous pouvez également démarrer les services `td-doc`, `td-etl` et `metabase` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
+
+4. Synchroniser la base de données avec le schéma prisma.
+
+   Les modèles de données sont définis dans les fichiers `back/prisma/database/*.prisma`.
+   Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
+
+   ```bash
+   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   npx prisma deploy
+   ```
+
+5. Accéder aux différents services.
+
+   C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
+
+   Il existe également un playground prisma exposant directement les fonctionnalités de l'ORM accessible sur `http://localhost:4466`.
+
+### Conventions
+
+- Formatage/analyse du code avec prettier et eslint.
+- Typage du code avec les fichiers générées par GraphQL Codegen
+  - `back/src/generated/graphql/types.ts` pour le back
+  - `front/src/generated/graphql/types.ts` pour le front
+
+[Linux/MacOS uniquement] Avant de pousser votre premier commit, il est recommandé d'installer un hook Github permettant de faire tourner eslint et prettier sur le code source back et front. `~/.githooks/install-hooks.sh` se chargera de l'installation. Si vous avez besoin de forcer un push sans vérifier les conventions de style, il est toujours possible de faire git push --no-verify.
+
+## Tests unitaires
+
+La commande pour faire tourner tous les tests unitaires est la suivante :
+
+```bash
+docker-compose -f docker-compose.test.yml up
+```
+
+Il est également possible de faire tourner les tests unitaires sur l'environnement de `dev` en se connectant à chacun des containers. Par exemple :
+
+1. Démarrer les différents services
+   ```
+   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-pdf td-api td-ui
+   ```
+2. Faire tourner les tests back
+   ```bash
+   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   npm run test # run all the tests
+   npx jest path src/path/to/my-function.test.ts # run only one test
+   ```
+3. Faire tourner les tests front
+   ```bash
+   docker exec -it $(docker ps -aqf "name=td-ui") sh
+   npm run test # run tests in watch mode
+   ```
+
+## Tests d'intégration
+
+Ce sont tous les tests ayant l'extension `.integration.ts` et nécessitant le setup d'une base de données de test.
+
+```bash
+cd back/integration-tests
+./run.sh # run all the tests at once and exit
+```
+
+Il est également possible de faire tourner chaque test de façon indépendante:
+
+```bash
+cd back/integration-tests
+./run.sh -u # start the containers
+./run.sh -r workflow.integration.ts
+./run.sh -d # remove the containers
+```
+
+## Créer une PR
+
+1. Créer une nouvelle branche à partir et à destination de la branche `dev`.
+2. Implémenter vos changements et penser à [mettre à jour la documentation](#documentation) et le [changelog](#changelog) (en ajoutant un bloc "Next release" si il n'existe pas encore).
+3. Une fois la PR complète, passer la branche de "draft" à "ready to review" et demander la revue à au moins 1 autre développeur de l'équipe (idéalement 2). Si possible faire un rebase (éviter le merge autant que possible) de la branche `dev` pour être bien à jour et la CI au vert avant la revue.
+4. Une fois que la PR est approuvée et que les changements demandées ont été apportées, l'auteur de la PR peut la merger dans `dev`.
+
+Note : l'équipe n'a pas de conventions strict concernant le nom des branches et les messages de commit mais compte sur le bon sens de chacun.
+
+## Déploiement
+
+Le déploiement est géré par CircleCI à l'aide du fichier [./circle/config.yml](.circleci/config.yml).
+Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod. Le déroulement dans le détails d'une mise en production est le suivant:
+
+1. Balayer la colonne Trello "Recette Métier" pour vérifier que l'étiquette "OK PASSAGE EN PROD" a bien été ajouté sur toutes les cartes.
+2. Faire le cahier de recette pour vérifier qu'il n'y a pas eu de régression sur les fonctionnalités critiques de l'application (login, signup, rattachement établissement, invitation collaborateur, création BSD)
+3. Mettre à jour le Changelog avec un nouveau numéro de version (versionnage calendaire)
+4. Créer une PR `dev` -> `master`
+5. Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev`
+6. Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
+7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
+8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur sandbox et prod
+9. Merger la PR et suivre l'avancement du déploiement sur le CI
+10. Se connecter à l'instance de prod et faire tourner le script `npm run update` dans le container `td-api`. Faire de même sur l'instance sandbox.
+
+## Guides
+
+### Mettre à jour le changelog
+
+Le [changelog](./Changelog.md) est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+
+Il est possible de documenter les changements à venir en ajoutant une section "Next release".
+
+### Mettre à jour la documentation
 
 Les nouvelles fonctionnalités impactant l'API doivent être documentées dans la documentation technique `./doc` en même temps que leur développement. Si possible faire également un post sur le [forum technique](https://forum.trackdechets.beta.gouv.fr/).
-
-## Conventions de code
-
-* Formatage du code front avec prettier.
-* Formatage et analyse du code back avec prettier et eslint.
-* Typage du code avec les fichiers générées par GraphQL Codegen
-  * `back/src/generated/graphql/types.ts` pour le back
-  * `front/src/generated/graphql/types.ts` pour le front
