@@ -859,6 +859,7 @@ export type Mutation = {
    * }
    * wasteDetails: {
    *   code
+   *   // onuCode est optionnel pour les déchets non-dangereux
    *   onuCode
    *   name
    *   packagings
