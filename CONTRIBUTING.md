@@ -5,12 +5,12 @@
   - [Installation](#installation)
   - [Conventions](#conventions)
 - [Tests unitaires](#tests-unitaires)
-- [Tests d'intégration](#tests-d-intégration)
+- [Tests d'intégration](#tests-dintégration)
 - [Créer une PR](#créer-une-pr)
 - [Déploiement](#déploiement)
 - [Guides](#guides)
-  - [Mettre à jour le changelog](#mettre-a-jour-le-changelog)
-  - [Mettre à jour la documentation](#mettre-a-jour-la-documentation)
+  - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
+  - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
   - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
 
 ## Mise en route
