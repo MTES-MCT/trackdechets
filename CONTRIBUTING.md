@@ -11,6 +11,7 @@
 - [Guides](#guides)
   - [Mettre à jour le changelog](#mettre-a-jour-le-changelog)
   - [Mettre à jour la documentation](#mettre-a-jour-la-documentation)
+  - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
 
 ## Mise en route
 
@@ -194,3 +195,30 @@ Il est possible de documenter les changements à venir en ajoutant une section "
 ### Mettre à jour la documentation
 
 Les nouvelles fonctionnalités impactant l'API doivent être documentées dans la documentation technique `./doc` en même temps que leur développement. Si possible faire également un post sur le [forum technique](https://forum.trackdechets.beta.gouv.fr/).
+
+### Utiliser un backup de base de donnée
+
+Il est possible d'importer un backup d'une base de donnée d'un environnement afin de le tester en local.
+La procédure qui suit aura pour effet de remplacer vos données en local par les données du backup.
+
+1. Télécharger un backup de la base de donnée `prisma` depuis Scaleway
+2. Démarrer le container Postgres
+   ```
+   docker-compose -f docker-compose.dev.yml up --build postgres
+   ```
+3. Copier le fichier de backup à l'intérieur du container
+   ```
+   # docker cp <fichier backup> <nom du container postgres>:<chemin où copier>
+   # exemple :
+   docker cp backup trackdechets_postgres_1:/var/backups
+   ```
+4. Accéder au container Postgres
+   ```
+   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   ```
+5. Restaurer le backup
+   ```
+   # pg_restore -U trackdechets -d prisma --clean <fichier backup>
+   # exemple :
+   pg_restore -U trackdechets -d prisma --clean /var/backups/backup
+   ```
