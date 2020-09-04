@@ -16,7 +16,7 @@ jest.mock("axios", () => ({
 }));
 
 const MARK_AS_PROCESSED = `
-  mutation MarkAsProcessed($id: ID, $processedInfo: ProcessedFormInput!) {
+  mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
     markAsProcessed(id: $id, processedInfo: $processedInfo) {
       id
       processingOperationDescription

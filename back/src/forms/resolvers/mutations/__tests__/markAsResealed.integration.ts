@@ -46,20 +46,26 @@ describe("Mutation markAsResealed", () => {
   });
 
   it("should return an error when transporter is in a foreign country", async () => {
-    const { user, company: emitterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-    const recipientCompany = await companyFactory();
+    const owner = await userFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+
     const form = await formWithTempStorageFactory({
-      ownerId: user.id,
+      ownerId: owner.id,
       opt: {
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        status: "SEALED"
+        status: "TEMP_STORED",
+        recipientCompanySiret: company.siret
       }
     });
 
-    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {}
+      }
+    });
+
     const { errors } = await mutate(MARK_AS_RESEALED, {
       variables: {
         id: form.id,
