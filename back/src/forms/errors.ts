@@ -55,6 +55,8 @@ export class CountryNotFound extends UserInputError {
     super(
       `Le code "${code}" n'est pas reconnu comme un code pays ISO 3166-1 alpha-2.`
     );
+  }
+}
 
 export class InvaliSecurityCode extends ForbiddenError {
   constructor() {
