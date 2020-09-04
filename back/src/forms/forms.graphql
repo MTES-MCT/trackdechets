@@ -300,6 +300,12 @@ type Mutation {
       reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)"
     )
 
+  """
+  Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
+  de traitement
+  """
+  importPaperForm(input: ImportPaperFormInput!): Form
+
   "Prépare un nouveau segment de transport multimodal"
   prepareSegment(
     id: ID!

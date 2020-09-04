@@ -479,6 +479,21 @@ ID d'un BSD
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>importPaperForm</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
+de traitement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#importpaperforminput">ImportPaperFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>login</strong></td>
 <td valign="top"><a href="#authpayload">AuthPayload</a>!</td>
 <td>
@@ -3951,6 +3966,122 @@ Annexe 2
 <td colspan="2" valign="top"><strong>temporaryStorageDetail</strong></td>
 <td valign="top"><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></td>
 <td></td>
+</tr>
+</tbody>
+</table>
+
+### ImportPaperFormInput
+
+Payload d'import d'un BSD papier
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+Numéro de BSD Trackdéchets (s'il existe)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customId</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Identifiant personnalisé permettant de faire le lien avec le BSD papier
+dans le cas où le BSD n'a pas été crée initialement via Trackdéchets
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#emitterinput">EmitterInput</a>!</td>
+<td>
+
+Établissement émetteur/producteur du déchet (case 1)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#recipientinput">RecipientInput</a>!</td>
+<td>
+
+Établissement qui reçoit le déchet (case 2)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a>!</td>
+<td>
+
+Transporteur du déchet (case 8)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a>!</td>
+<td>
+
+Détails du déchet (case 3)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>trader</strong></td>
+<td valign="top"><a href="#traderinput">TraderInput</a></td>
+<td>
+
+Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
+<td valign="top"><a href="#ecoorganismeinput">EcoOrganismeInput</a></td>
+<td>
+
+Éco-organisme (apparait en case 1)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signingInfo</strong></td>
+<td valign="top"><a href="#transportersignatureforminput">TransporterSignatureFormInput</a>!</td>
+<td>
+
+Informations liées aux signatures transporteur et émetteur (case 8 et 9)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receivedInfo</strong></td>
+<td valign="top"><a href="#receivedforminput">ReceivedFormInput</a>!</td>
+<td>
+
+Informations liées à la réception du déchet (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>processedInfo</strong></td>
+<td valign="top"><a href="#processedforminput">ProcessedFormInput</a>!</td>
+<td>
+
+Informations liées au traitement du déchet (case 11)
+
+</td>
 </tr>
 </tbody>
 </table>

@@ -489,3 +489,41 @@ input TakeOverInput {
   takenOverAt: DateTime!
   takenOverBy: String!
 }
+
+"Payload d'import d'un BSD papier"
+input ImportPaperFormInput {
+  "Numéro de BSD Trackdéchets (s'il existe)"
+  id: ID
+  """
+  Identifiant personnalisé permettant de faire le lien avec le BSD papier
+  dans le cas où le BSD n'a pas été crée initialement via Trackdéchets
+  """
+  customId: String
+
+  "Établissement émetteur/producteur du déchet (case 1)"
+  emitter: EmitterInput!
+
+  "Établissement qui reçoit le déchet (case 2)"
+  recipient: RecipientInput!
+
+  "Transporteur du déchet (case 8)"
+  transporter: TransporterInput!
+
+  "Détails du déchet (case 3)"
+  wasteDetails: WasteDetailsInput!
+
+  "Négociant (case 7)"
+  trader: TraderInput
+
+  "Éco-organisme (apparait en case 1)"
+  ecoOrganisme: EcoOrganismeInput
+
+  "Informations liées aux signatures transporteur et émetteur (case 8 et 9)"
+  signingInfo: TransporterSignatureFormInput!
+
+  "Informations liées à la réception du déchet (case 10)"
+  receivedInfo: ReceivedFormInput!
+
+  "Informations liées au traitement du déchet (case 11)"
+  processedInfo: ProcessedFormInput!
+}

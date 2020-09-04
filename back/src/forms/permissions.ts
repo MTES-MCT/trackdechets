@@ -255,3 +255,14 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
   }
   return true;
 }
+
+export async function checkCanImportPaperForm(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const isAuthorized = isFormRecipient(fullUser, form);
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à mettre à jour ce bordereau avec des infos papier"
+    );
+  }
+  return true;
+}

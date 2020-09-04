@@ -693,6 +693,35 @@ export type GerepType =
   | 'Producteur'
   | 'Traiteur';
 
+/** Payload d'import d'un BSD papier */
+export type ImportPaperFormInput = {
+  /** Numéro de BSD Trackdéchets (s'il existe) */
+  id?: Maybe<Scalars['ID']>;
+  /**
+   * Identifiant personnalisé permettant de faire le lien avec le BSD papier
+   * dans le cas où le BSD n'a pas été crée initialement via Trackdéchets
+   */
+  customId?: Maybe<Scalars['String']>;
+  /** Établissement émetteur/producteur du déchet (case 1) */
+  emitter: EmitterInput;
+  /** Établissement qui reçoit le déchet (case 2) */
+  recipient: RecipientInput;
+  /** Transporteur du déchet (case 8) */
+  transporter: TransporterInput;
+  /** Détails du déchet (case 3) */
+  wasteDetails: WasteDetailsInput;
+  /** Négociant (case 7) */
+  trader?: Maybe<TraderInput>;
+  /** Éco-organisme (apparait en case 1) */
+  ecoOrganisme?: Maybe<EcoOrganismeInput>;
+  /** Informations liées aux signatures transporteur et émetteur (case 8 et 9) */
+  signingInfo: TransporterSignatureFormInput;
+  /** Informations liées à la réception du déchet (case 10) */
+  receivedInfo: ReceivedFormInput;
+  /** Informations liées au traitement du déchet (case 11) */
+  processedInfo: ProcessedFormInput;
+};
+
 /** Installation pour la protection de l'environnement (ICPE) */
 export type Installation = {
   __typename?: 'Installation';
@@ -780,6 +809,11 @@ export type Mutation = {
   editProfile: User;
   /** Édite un segment existant */
   editSegment?: Maybe<TransportSegment>;
+  /**
+   * Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
+   * de traitement
+   */
+  importPaperForm?: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
@@ -1011,6 +1045,11 @@ export type MutationEditSegmentArgs = {
   id: Scalars['ID'];
   siret: Scalars['String'];
   nextSegmentInfo: NextSegmentInfoInput;
+};
+
+
+export type MutationImportPaperFormArgs = {
+  input: ImportPaperFormInput;
 };
 
 
@@ -2155,17 +2194,18 @@ export type ResolversTypes = {
   NextSegmentInfoInput: NextSegmentInfoInput;
   NextSegmentTransporterInput: NextSegmentTransporterInput;
   NextSegmentCompanyInput: NextSegmentCompanyInput;
-  AuthPayload: ResolverTypeWrapper<AuthPayload>;
-  ProcessedFormInput: ProcessedFormInput;
-  NextDestinationInput: NextDestinationInput;
+  ImportPaperFormInput: ImportPaperFormInput;
+  TransporterSignatureFormInput: TransporterSignatureFormInput;
   ReceivedFormInput: ReceivedFormInput;
   WasteAcceptationStatusInput: WasteAcceptationStatusInput;
+  ProcessedFormInput: ProcessedFormInput;
+  NextDestinationInput: NextDestinationInput;
+  AuthPayload: ResolverTypeWrapper<AuthPayload>;
   ResealedFormInput: ResealedFormInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
   FormInput: FormInput;
-  TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
   UpdateFormInput: UpdateFormInput;
@@ -2255,17 +2295,18 @@ export type ResolversParentTypes = {
   NextSegmentInfoInput: NextSegmentInfoInput;
   NextSegmentTransporterInput: NextSegmentTransporterInput;
   NextSegmentCompanyInput: NextSegmentCompanyInput;
-  AuthPayload: AuthPayload;
-  ProcessedFormInput: ProcessedFormInput;
-  NextDestinationInput: NextDestinationInput;
+  ImportPaperFormInput: ImportPaperFormInput;
+  TransporterSignatureFormInput: TransporterSignatureFormInput;
   ReceivedFormInput: ReceivedFormInput;
   WasteAcceptationStatusInput: WasteAcceptationStatusInput;
+  ProcessedFormInput: ProcessedFormInput;
+  NextDestinationInput: NextDestinationInput;
+  AuthPayload: AuthPayload;
   ResealedFormInput: ResealedFormInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
   FormInput: FormInput;
-  TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
   UpdateFormInput: UpdateFormInput;
@@ -2510,6 +2551,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   duplicateForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationDuplicateFormArgs, 'id'>>;
   editProfile?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationEditProfileArgs, never>>;
   editSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationEditSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
+  importPaperForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationImportPaperFormArgs, 'input'>>;
   inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>;
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
@@ -3130,6 +3172,23 @@ export function createFormSubscriptionMock(props: Partial<FormSubscription>): Fo
     node: null,
     updatedFields: null,
     previousValues: null,
+    ...props,
+  };
+}
+
+export function createImportPaperFormInputMock(props: Partial<ImportPaperFormInput>): ImportPaperFormInput {
+  return {
+    id: null,
+    customId: null,
+    emitter: createEmitterInputMock({}),
+    recipient: createRecipientInputMock({}),
+    transporter: createTransporterInputMock({}),
+    wasteDetails: createWasteDetailsInputMock({}),
+    trader: null,
+    ecoOrganisme: null,
+    signingInfo: createTransporterSignatureFormInputMock({}),
+    receivedInfo: createReceivedFormInputMock({}),
+    processedInfo: createProcessedFormInputMock({}),
     ...props,
   };
 }
