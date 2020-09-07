@@ -98,17 +98,17 @@ function isFormMultiModalTransporter(
 }
 
 export function isFormContributor(user: FullUser, form: FullForm) {
-  return (
-    isFormOwner(user, form) ||
-    isFormEmitter(user, form) ||
-    isFormRecipient(user, form) ||
-    isFormTrader(user, form) ||
-    isFormTransporter(user, form) ||
-    isFormEcoOrganisme(user, form) ||
-    isFormTransporterAfterTempStorage(user, form) ||
-    isFormDestinationAfterTempStorage(user, form) ||
-    isFormMultiModalTransporter(user, form)
-  );
+  return [
+    isFormOwner,
+    isFormEmitter,
+    isFormRecipient,
+    isFormTrader,
+    isFormTransporter,
+    isFormEcoOrganisme,
+    isFormTransporterAfterTempStorage,
+    isFormDestinationAfterTempStorage,
+    isFormMultiModalTransporter
+  ].some(isFormRole => isFormRole(user, form));
 }
 
 /**
@@ -140,14 +140,15 @@ export async function checkCanUpdateTransporterFields(user: User, form: Form) {
 export async function checkCanMarkAsSealed(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
-  const isAuthorized =
-    isFormOwner(user, fullForm) ||
-    isFormEcoOrganisme(fullUser, fullForm) ||
-    isFormRecipient(fullUser, fullForm) ||
-    isFormTransporter(fullUser, fullForm) ||
-    isFormEmitter(fullUser, fullForm) ||
-    isFormTrader(fullUser, fullForm) ||
-    isFormDestinationAfterTempStorage(fullUser, fullForm);
+  const isAuthorized = [
+    isFormOwner,
+    isFormEcoOrganisme,
+    isFormRecipient,
+    isFormTransporter,
+    isFormEmitter,
+    isFormTrader,
+    isFormDestinationAfterTempStorage
+  ].some(isFormRole => isFormRole(fullUser, fullForm));
   if (!isAuthorized) {
     throw new ForbiddenError("Vous n'êtes pas autorisé à sceller ce bordereau");
   }
@@ -158,8 +159,9 @@ export async function checkCanMarkAsSent(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
 
-  const isAuthorized =
-    isFormRecipient(fullUser, fullForm) || isFormEmitter(fullUser, fullForm);
+  const isAuthorized = [isFormRecipient, isFormEmitter].some(isFormRole =>
+    isFormRole(fullUser, fullForm)
+  );
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme envoyé"
@@ -171,9 +173,10 @@ export async function checkCanMarkAsSent(user: User, form: Form) {
 export async function checkCanSignedByTransporter(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
-  const isAuthorized =
-    isFormTransporter(fullUser, fullForm) ||
-    isFormTransporterAfterTempStorage(fullUser, fullForm);
+  const isAuthorized = [
+    isFormTransporter,
+    isFormTransporterAfterTempStorage
+  ].some(isFormRole => isFormRole(fullUser, fullForm));
 
   if (!isAuthorized) {
     throw new ForbiddenError(
@@ -186,9 +189,10 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
 export async function checkCanMarkAsReceived(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
-  const isAuthorized =
-    isFormRecipient(fullUser, fullForm) ||
-    isFormDestinationAfterTempStorage(fullUser, fullForm);
+  const isAuthorized = [
+    isFormRecipient,
+    isFormDestinationAfterTempStorage
+  ].some(isFormRole => isFormRole(fullUser, fullForm));
 
   if (!isAuthorized) {
     throw new ForbiddenError(
@@ -201,9 +205,10 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
 export async function checkCanMarkAsProcessed(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
-  const isAuthorized =
-    isFormRecipient(fullUser, fullForm) ||
-    isFormDestinationAfterTempStorage(fullUser, fullForm);
+  const isAuthorized = [
+    isFormRecipient,
+    isFormDestinationAfterTempStorage
+  ].some(isFormRole => isFormRole(fullUser, fullForm));
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"

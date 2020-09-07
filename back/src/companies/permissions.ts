@@ -48,7 +48,7 @@ export async function checkCanReadUpdateDeleteTransporterReceipt(
   });
 
   const forbiddenError = new ForbiddenError(
-    `Vous n'avez pas le droit d'éditer ou supprimer ce récépissé négociant`
+    `Vous n'avez pas le droit d'éditer ou supprimer ce récépissé transporteur`
   );
 
   if (companies.length <= 0) {

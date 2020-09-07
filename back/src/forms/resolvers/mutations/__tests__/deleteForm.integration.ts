@@ -15,7 +15,7 @@ mutation DeleteForm($id: ID!) {
   }
 }
 `;
-describe("Mutaion.deleteForm", () => {
+describe("Mutation.deleteForm", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {

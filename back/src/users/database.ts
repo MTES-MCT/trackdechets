@@ -7,14 +7,15 @@ import {
   User,
   UserRole,
   UserAccountHashWhereInput,
-  CompanyAssociationWhereInput
+  CompanyAssociationWhereInput,
+  Company
 } from "../generated/prisma-client";
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid } from "../utils";
 
-export async function getUserCompanies(userId: string) {
+export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma
     .user({ id: userId })
     .companyAssociations();
