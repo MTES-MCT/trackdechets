@@ -10,10 +10,9 @@ import transitionForm from "../../workflow/transitionForm";
 import { Form, prisma } from "../../../generated/prisma-client";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";
-import { validateTransporter } from "../../validation";
+import { validateTransporter, validateCompany } from "../../validation";
 import { PROCESSING_OPERATIONS_CODES } from "../../../common/constants";
 import { InvalidProcessingOperation } from "../../errors";
-import { validCompany } from "../../workflow/validation";
 
 async function hasFinalDestination(form: Form) {
   const temporaryStorageDetail = await prisma
@@ -39,8 +38,9 @@ function validateArgs(args: MutationMarkAsResentArgs) {
     const { transporter } = resentInfos;
     validateTransporter(transporter);
     if (transporter.company) {
-      const validator = validCompany({ verboseFieldName: "Transporteur" });
-      validator.validateSync(transporter.company);
+      validateCompany(transporter.company, {
+        verboseFieldName: "Transporteur"
+      });
     }
   }
 
@@ -53,10 +53,9 @@ function validateArgs(args: MutationMarkAsResentArgs) {
       throw new InvalidProcessingOperation();
     }
     if (destination.company) {
-      const validator = validCompany({
+      validateCompany(destination.company, {
         verboseFieldName: "Destinataire du BSD"
       });
-      validator.validateSync(destination.company);
     }
   }
 

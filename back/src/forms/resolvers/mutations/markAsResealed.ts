@@ -7,12 +7,11 @@ import { getFormOrFormNotFound } from "../../database";
 import { flattenResealedFormInput } from "../../form-converter";
 import { checkCanMarkAsResealed } from "../../permissions";
 import transitionForm from "../../workflow/transitionForm";
-import { validateTransporter } from "../../validation";
+import { validateTransporter, validateCompany } from "../../validation";
 import { InvalidProcessingOperation } from "../../errors";
 import { PROCESSING_OPERATIONS_CODES } from "../../../common/constants";
 import { prisma, Form } from "../../../generated/prisma-client";
 import { UserInputError } from "apollo-server-express";
-import { validCompany } from "../../workflow/validation";
 
 async function hasFinalDestination(form: Form) {
   const temporaryStorageDetail = await prisma
@@ -37,8 +36,11 @@ function validateArgs(args: MutationMarkAsResealedArgs) {
   if (resealedInfos.transporter) {
     const transporter = resealedInfos.transporter;
     validateTransporter(transporter);
-    const validator = validCompany({ verboseFieldName: "Transporteur" });
-    validator.validateSync(transporter.company);
+    if (transporter.company) {
+      validateCompany(transporter.company, {
+        verboseFieldName: "Transporteur"
+      });
+    }
   }
 
   if (resealedInfos.destination) {

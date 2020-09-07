@@ -13,11 +13,10 @@ import transitionForm from "../../workflow/transitionForm";
 import { flattenProcessedFormInput } from "../../form-converter";
 import { Form } from "../../../generated/prisma-client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { isValidDatetime } from "../../validation";
+import { isValidDatetime, validateCompany } from "../../validation";
 import { InvalidDateTime } from "../../../common/errors";
 import { checkCanMarkAsProcessed } from "../../permissions";
 import { InvalidProcessingOperation } from "../../errors";
-import { validCompany } from "../../workflow/validation";
 
 function validateArgs(args: MutationMarkAsProcessedArgs) {
   const { processedInfo } = args;
@@ -48,11 +47,10 @@ function validateArgs(args: MutationMarkAsProcessedArgs) {
 
   if (processedInfo.nextDestination) {
     const { company } = processedInfo.nextDestination;
-    const validator = validCompany({
+    validateCompany(company, {
       verboseFieldName: "Destination ultérieure prévue",
       allowForeign: true
     });
-    validator.validateSync(company);
   }
 
   if (!isValidDatetime(processedInfo.processedAt)) {
