@@ -9,7 +9,7 @@ import { checkCanMarkAsSent } from "../../permissions";
 import { Form } from "../../../generated/prisma-client";
 import { GraphQLContext } from "../../../types";
 import transitionForm from "../../workflow/transitionForm";
-import { validDatetime } from "../../validation";
+import { validDatetime, checkCanBeSealed } from "../../validation";
 
 export const sentInfovalidationSchema = yup.object().shape({
   sentAt: validDatetime(
@@ -50,6 +50,8 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   const form = await getFormOrFormNotFound({ id: args.id });
 
   await checkCanMarkAsSent(user, form);
+
+  await checkCanBeSealed(form);
 
   return markAsSentFn(form, args, context);
 };

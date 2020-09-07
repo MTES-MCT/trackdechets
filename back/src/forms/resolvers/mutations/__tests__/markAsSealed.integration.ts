@@ -77,6 +77,7 @@ describe("{ mutation { markAsSealed } }", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        emitterType: "OTHER",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
         traderCompanySiret: traderCompany.siret,
@@ -166,7 +167,7 @@ describe("{ mutation { markAsSealed } }", () => {
 
     // check error message is relevant and only failing fields are reported
     const errMessage =
-      "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): Émetteur: Le contact dans l'entreprise est obligatoire";
+      "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): Émetteur: Le contact de l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
     form = await prisma.form({ id: form.id });

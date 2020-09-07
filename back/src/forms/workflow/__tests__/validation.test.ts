@@ -1,142 +1,118 @@
-import { formSchema } from "../validation";
-import { Form } from "../../../generated/graphql/types";
+import { sealableFormSchema } from "../validation";
+import { Form } from "../../../generated/prisma-client";
 
-jest.mock("../../../generated/prisma-client", () => ({
-  prisma: { $exists: { ecoOrganisme: () => Promise.resolve(true) } }
-}));
-
-const form: Form = {
+const form: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
   readableId: "TD-xxx",
   status: "DRAFT",
-  emitter: {
-    type: "PRODUCER",
-    workSite: {
-      name: "",
-      address: "",
-      city: "",
-      postalCode: "",
-      infos: ""
-    },
-    company: {
-      name: "A company 2",
-      siret: "XXX XXX XXX 0002",
-      address: "8 rue du Général de Gaulle",
-      contact: "Emetteur",
-      phone: "01",
-      mail: "e@e.fr"
-    }
-  },
-  recipient: {
-    cap: "1234",
-    processingOperation: "D 6",
-    company: {
-      name: "A company 3",
-      siret: "XXX XXX XXX 0003",
-      address: "8 rue du Général de Gaulle",
-      contact: "Destination",
-      phone: "02",
-      mail: "d@d.fr"
-    }
-  },
-  transporter: {
-    receipt: "sdfg",
-    department: "82",
-    validityLimit: "2018-12-11T00:00:00.000Z",
-    numberPlate: "12345",
-    company: {
-      name: "A company 4",
-      siret: "XXX XXX XXX 0004",
-      address: "8 rue du Général de Gaulle",
-      contact: "Transporteur",
-      phone: "03",
-      mail: "t@t.fr"
-    }
-  },
-  wasteDetails: {
-    code: "01 03 04*",
-    onuCode: "AAA",
-    packagings: ["CITERNE", "GRV"],
-    otherPackaging: "",
-    numberOfPackages: 2,
-    quantity: 1.5,
-    quantityType: "REAL",
-    consistence: "SOLID"
-  }
+  emitterType: "PRODUCER",
+  emitterWorkSiteName: "",
+  emitterWorkSiteAddress: "",
+  emitterWorkSiteCity: "",
+  emitterWorkSitePostalCode: "",
+  emitterWorkSiteInfos: "",
+  emitterCompanyName: "A company 2",
+  emitterCompanySiret: "XXX XXX XXX 0002",
+  emitterCompanyAddress: "8 rue du Général de Gaulle",
+  emitterCompanyContact: "Emetteur",
+  emitterCompanyPhone: "01",
+  emitterCompanyMail: "e@e.fr",
+  recipientCap: "1234",
+  recipientProcessingOperation: "D 6",
+  recipientCompanyName: "A company 3",
+  recipientCompanySiret: "XXX XXX XXX 0003",
+  recipientCompanyAddress: "8 rue du Général de Gaulle",
+  recipientCompanyContact: "Destination",
+  recipientCompanyPhone: "02",
+  recipientCompanyMail: "d@d.fr",
+  transporterReceipt: "sdfg",
+  transporterDepartment: "82",
+  transporterValidityLimit: "2018-12-11T00:00:00.000Z",
+  transporterNumberPlate: "12345",
+  transporterCompanyName: "A company 4",
+  transporterCompanySiret: "XXX XXX XXX 0004",
+  transporterCompanyAddress: "8 rue du Général de Gaulle",
+  transporterCompanyContact: "Transporteur",
+  transporterCompanyPhone: "03",
+  transporterCompanyMail: "t@t.fr",
+  wasteDetailsCode: "01 03 04*",
+  wasteDetailsOnuCode: "AAA",
+  wasteDetailsPackagings: ["CITERNE", "GRV"],
+  wasteDetailsOtherPackaging: "",
+  wasteDetailsNumberOfPackages: 2,
+  wasteDetailsQuantity: 1.5,
+  wasteDetailsQuantityType: "REAL",
+  wasteDetailsConsistence: "SOLID"
 };
 
 describe("Form is valid", () => {
   test("when fully filled", async () => {
-    const isValid = await formSchema.isValid({ ...form });
+    const isValid = await sealableFormSchema.isValid({ ...form });
     expect(isValid).toEqual(true);
   });
 
   test("with empty strings for optionnal fields", async () => {
     const testForm = {
       ...form,
-      emitter: { ...form.emitter, workSite: {} },
-      recipient: { ...form.recipient, cap: "" },
-      transporter: { ...form.transporter, numberPlate: "" }
+      recipientCap: "",
+      transporterNumberPlate: ""
     };
-    const isValid = await formSchema.isValid(testForm);
+    const isValid = await sealableFormSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
 
   test("with null values for optionnal fields", async () => {
     const testForm = {
       ...form,
-      emitter: { ...form.emitter, workSite: null },
-      recipient: { ...form.recipient, cap: null },
-      transporter: {
-        ...form.transporter,
-        validityLimit: null,
-        numberPlate: null
-      }
+      recipientCap: null,
+      transporterNumberPlate: null
     };
-    const isValid = await formSchema.isValid(testForm);
+    const isValid = await sealableFormSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
 
   test("with R.541-50 ticked and no transportation infos", async () => {
     const testForm = {
       ...form,
-      transporter: {
-        ...form.transporter,
-        isExemptedOfReceipt: true,
-        receipt: null,
-        department: null
-      }
+      transporterIsExemptedOfReceipt: true,
+      transporterReceipt: null,
+      transporterDepartement: null
     };
 
-    const isValid = await formSchema.isValid(testForm);
+    const isValid = await sealableFormSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
 
   test("when there is an eco-organisme and emitter type is OTHER", async () => {
     const testForm = {
       ...form,
-      emitter: {
-        ...form.emitter,
-        type: "OTHER"
-      },
+      emitterType: "OTHER",
       ecoOrganisme: { id: "an_id" }
     };
 
-    const isValid = await formSchema.isValid(testForm);
+    const isValid = await sealableFormSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
 
   test("when there is no eco-organisme and emitter type is OTHER", async () => {
     const testForm = {
       ...form,
-      emitter: {
-        ...form.emitter,
-        type: "OTHER"
-      },
-      ecoOrganisme: {}
+      emitterType: "OTHER",
+      ecoOrganisme: null
     };
 
-    const isValid = await formSchema.isValid(testForm);
+    const isValid = await sealableFormSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test("when there is a temporaryStorageDetail and recipientIsTempStorage === true", async () => {
+    const testForm = {
+      ...form,
+      recipientIsTempStorage: true,
+      temporaryStorageDetail: { id: "an_id" }
+    };
+
+    const isValid = await sealableFormSchema.isValid(testForm);
     expect(isValid).toEqual(true);
   });
 
@@ -145,13 +121,10 @@ describe("Form is valid", () => {
     async emitterType => {
       const testForm = {
         ...form,
-        emitter: {
-          ...form.emitter,
-          type: emitterType
-        }
+        emitterType
       };
 
-      const isValid = await formSchema.isValid(testForm);
+      const isValid = await sealableFormSchema.isValid(testForm);
       expect(isValid).toEqual(true);
     }
   );
@@ -161,28 +134,38 @@ describe("Form is not valid", () => {
   test("when there is no receipt exemption and no receipt", async () => {
     const testForm = {
       ...form,
-      transporter: {
-        ...form.transporter,
-        isExemptedOfReceipt: false,
-        receipt: null
-      }
+      transporterIsExemptedOfReceipt: false,
+      transporterReceipt: null
     };
 
-    const isValid = await formSchema.isValid(testForm);
+    const isValid = await sealableFormSchema.isValid(testForm);
     expect(isValid).toEqual(false);
   });
 
   test("when there is an eco-organisme but emitter type is not OTHER", async () => {
     const testForm = {
       ...form,
-      emitter: {
-        ...form.emitter,
-        type: "PRODUCER"
-      },
+      emitterType: "PRODUCER",
       ecoOrganisme: { id: "an_id" }
     };
 
-    const isValid = await formSchema.isValid(testForm);
+    const isValid = await sealableFormSchema.isValid(testForm);
     expect(isValid).toEqual(false);
+  });
+
+  test("when there is a temporaryStorageDetail and recipientIsTempstorage === false", () => {
+    expect.assertions(1);
+    const testForm = {
+      ...form,
+      recipientIsTempstorage: false,
+      temporaryStorageDetail: { id: "an_id" }
+    };
+    try {
+      sealableFormSchema.validateSync(testForm);
+    } catch (err) {
+      expect(err.message).toEqual(
+        "temporaryStorageDetail ne peut avoir une valeur que si recipientIsTempStorage === true"
+      );
+    }
   });
 });

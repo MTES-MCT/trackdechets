@@ -5,7 +5,6 @@ import {
   markFormAppendixAwaitingFormsAsGrouped,
   markFormAppendixGroupedsAsProcessed
 } from "./helpers";
-import { validateForm } from "./validation";
 import { FormState } from "./model";
 
 export const formWorkflowMachine = Machine(
@@ -22,15 +21,15 @@ export const formWorkflowMachine = Machine(
         entry: "setStable",
         exit: "setUnStable",
         on: {
-          MARK_SEALED: [{ target: "pendingSealedValidation" }],
-          MARK_SENT: [{ target: "pendingSentValidation" }]
+          MARK_SEALED: [{ target: FormState.Sealed }],
+          MARK_SENT: [{ target: FormState.Sent }]
         }
       },
       [FormState.Sealed]: {
         entry: "setStable",
         exit: "setUnStable",
         on: {
-          MARK_SENT: [{ target: "pendingSentValidation" }],
+          MARK_SENT: [{ target: FormState.Sent }],
           MARK_SIGNED_BY_TRANSPORTER: [
             {
               target: FormState.Sent
@@ -110,26 +109,6 @@ export const formWorkflowMachine = Machine(
           onError: { target: "error.appendixError" }
         }
       },
-      pendingSealedValidation: {
-        invoke: {
-          id: "validateBeforeSent",
-          src: ctx => validateForm(ctx.form),
-          onDone: {
-            target: "pendingSealedMarkFormAppendixAwaitingFormsAsGrouped"
-          },
-          onError: { target: "error.invalidForm" }
-        }
-      },
-      pendingSentValidation: {
-        invoke: {
-          id: "validateBeforeSent",
-          src: ctx => validateForm(ctx.form),
-          onDone: {
-            target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
-          },
-          onError: { target: "error.invalidForm" }
-        }
-      },
       pendingReceivedMarkFormAppendixGroupedsAsProcessed: {
         invoke: {
           id: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
@@ -190,7 +169,6 @@ export const formWorkflowMachine = Machine(
       },
       error: {
         states: {
-          invalidForm: { meta: WorkflowError.InvalidForm },
           invalidTransition: { meta: WorkflowError.InvalidTransition },
           appendixError: { meta: WorkflowError.AppendixError },
           hasSegmentsToTakeOverError: {

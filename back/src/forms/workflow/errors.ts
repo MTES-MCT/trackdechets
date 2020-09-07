@@ -1,11 +1,4 @@
-import { Form } from "../../generated/prisma-client";
-import { formSchema } from "./validation";
-import {
-  UserInputError,
-  ForbiddenError,
-  ApolloError
-} from "apollo-server-express";
-import { expandFormFromDb } from "../form-converter";
+import { ForbiddenError, ApolloError } from "apollo-server-express";
 export enum WorkflowError {
   InvalidForm,
   InvalidTransition,
@@ -15,18 +8,8 @@ export enum WorkflowError {
   HasSegmentsToTakeOverError
 }
 
-export async function getError(error: WorkflowError, form: Form) {
+export async function getError(error: WorkflowError) {
   switch (error) {
-    case WorkflowError.InvalidForm:
-      const errors: string[] = await formSchema
-        .validate(expandFormFromDb(form), { abortEarly: false })
-        .catch(err => err.errors);
-      return new UserInputError(
-        `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${errors.join(
-          "\n"
-        )}`
-      );
-
     case WorkflowError.InvalidTransition:
       return new ForbiddenError(
         "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
