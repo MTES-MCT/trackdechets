@@ -70,3 +70,9 @@ export class NotCompanyMember extends ForbiddenError {
     );
   }
 }
+
+export class InvalidDateTime extends UserInputError {
+  constructor(field: string) {
+    super(`Le format de date du champ ${field} est invalide.`);
+  }
+}

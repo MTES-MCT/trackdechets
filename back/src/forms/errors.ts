@@ -8,6 +8,12 @@ export class InvalidWasteCode extends UserInputError {
   }
 }
 
+export class InvalidProcessingOperation extends UserInputError {
+  constructor() {
+    super("Cette opération d’élimination / valorisation n'existe pas.");
+  }
+}
+
 export class MissingTempStorageFlag extends UserInputError {
   constructor() {
     super(
@@ -49,5 +55,11 @@ export class CountryNotFound extends UserInputError {
     super(
       `Le code "${code}" n'est pas reconnu comme un code pays ISO 3166-1 alpha-2.`
     );
+  }
+}
+
+export class InvaliSecurityCode extends ForbiddenError {
+  constructor() {
+    super("Le code de sécurité de l'émetteur du bordereau est invalide.");
   }
 }

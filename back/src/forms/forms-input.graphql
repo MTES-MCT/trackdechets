@@ -1,10 +1,10 @@
 "Payload de signature d'un BSD"
 input SentFormInput {
   "Date de l'envoi du déchet par l'émetteur (case 9)"
-  sentAt: DateTime
+  sentAt: DateTime!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String
+  sentBy: String!
 }
 
 "Payload de signature d'un BSD par un transporteur"
@@ -16,10 +16,10 @@ input TransporterSignatureFormInput {
   signedByTransporter: Boolean!
 
   "Code de sécurité permettant d'authentifier l'émetteur"
-  securityCode: Int
+  securityCode: Int!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String
+  sentBy: String!
 
   "Si oui on non le BSD a été signé par l'émetteur"
   signedByProducer: Boolean!
@@ -93,10 +93,10 @@ input ProcessedFormInput {
 
 input NextDestinationInput {
   "Traitement prévue (code D/R)"
-  processingOperation: String
+  processingOperation: String!
 
   "Établissement de destination ultérieur"
-  company: CompanyInput
+  company: CompanyInput!
 }
 
 "Payload de création d'un bordereau"
@@ -419,10 +419,10 @@ input ResentFormInput {
   transporter: TransporterInput
 
   "Nom du signataire du BSD suite  (case 19)"
-  signedBy: String
+  signedBy: String!
 
   "Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui."
-  signedAt: DateTime
+  signedAt: DateTime!
 }
 
 "Payload lié au détails du déchet du BSD suite (case 14 à 19)"

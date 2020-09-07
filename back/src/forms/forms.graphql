@@ -20,7 +20,12 @@ type Query {
   ): Form
 
   """
-  Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
+  Renvoie les BSDs de l'établissement sélectionné.
+  Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
+  alors les BSD de cette entreprise sont retournés.
+  Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
+  préciser un SIRET
+  Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
   Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
   On peut également demander les bordereaux pour lesquels on est transporteur
   """
@@ -237,12 +242,12 @@ type Mutation {
   }
   ```
   """
-  markAsSealed("ID d'un BSD" id: ID): Form
+  markAsSealed("ID d'un BSD" id: ID!): Form
 
   "Valide l'envoi d'un BSD"
   markAsSent(
     "ID d'un BSD"
-    id: ID
+    id: ID!
     "Informations liées à l'envoi"
     sentInfo: SentFormInput!
   ): Form
@@ -253,7 +258,7 @@ type Mutation {
   "Valide la réception d'un BSD"
   markAsReceived(
     "ID d'un BSD"
-    id: ID
+    id: ID!
     "Informations liées à la réception"
     receivedInfo: ReceivedFormInput!
   ): Form
@@ -261,7 +266,7 @@ type Mutation {
   "Valide le traitement d'un BSD"
   markAsProcessed(
     "ID d'un BSD"
-    id: ID
+    id: ID!
     "Informations liées au traitement"
     processedInfo: ProcessedFormInput!
   ): Form
