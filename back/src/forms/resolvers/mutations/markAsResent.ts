@@ -13,6 +13,7 @@ import { UserInputError } from "apollo-server-express";
 import { validateTransporter } from "../../validation";
 import { PROCESSING_OPERATIONS_CODES } from "../../../common/constants";
 import { InvalidProcessingOperation } from "../../errors";
+import { validCompany } from "../../workflow/validation";
 
 async function hasFinalDestination(form: Form) {
   const temporaryStorageDetail = await prisma
@@ -35,7 +36,12 @@ function validateArgs(args: MutationMarkAsResentArgs) {
   const { resentInfos } = args;
 
   if (resentInfos.transporter) {
-    validateTransporter(resentInfos.transporter);
+    const { transporter } = resentInfos;
+    validateTransporter(transporter);
+    if (transporter.company) {
+      const validator = validCompany({ verboseFieldName: "Transporteur" });
+      validator.validateSync(transporter.company);
+    }
   }
 
   if (resentInfos.destination) {
@@ -45,6 +51,12 @@ function validateArgs(args: MutationMarkAsResentArgs) {
       !PROCESSING_OPERATIONS_CODES.includes(destination.processingOperation)
     ) {
       throw new InvalidProcessingOperation();
+    }
+    if (destination.company) {
+      const validator = validCompany({
+        verboseFieldName: "Destinataire du BSD"
+      });
+      validator.validateSync(destination.company);
     }
   }
 

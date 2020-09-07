@@ -87,7 +87,7 @@ export async function validateSecurityCode(
   }
 }
 
-export async function validateTransporter(transporter: TransporterInput) {
+export function validateTransporter(transporter: TransporterInput) {
   if (transporter.isExemptedOfReceipt !== true) {
     if (!transporter.receipt) {
       throw new UserInputError(

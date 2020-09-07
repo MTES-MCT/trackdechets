@@ -2,11 +2,11 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
   formWithTempStorageFactory,
-  userFactory,
-  companyFactory
+  userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
+import { ErrorCode } from "../../../../common/errors";
 
 const MARK_AS_RESEALED = `
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!){
@@ -86,13 +86,10 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: [
-          "Transporteur: La sélection d'une entreprise par SIRET est obligatoire",
-          "Transporteur: Cette entreprise ne peut pas être à l'étranger"
-        ].join("\n")
-      })
-    ]);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Transporteur: Cette entreprise ne peut pas être à l'étranger"
+    );
+    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 });

@@ -12,6 +12,7 @@ import { InvalidProcessingOperation } from "../../errors";
 import { PROCESSING_OPERATIONS_CODES } from "../../../common/constants";
 import { prisma, Form } from "../../../generated/prisma-client";
 import { UserInputError } from "apollo-server-express";
+import { validCompany } from "../../workflow/validation";
 
 async function hasFinalDestination(form: Form) {
   const temporaryStorageDetail = await prisma
@@ -36,6 +37,8 @@ function validateArgs(args: MutationMarkAsResealedArgs) {
   if (resealedInfos.transporter) {
     const transporter = resealedInfos.transporter;
     validateTransporter(transporter);
+    const validator = validCompany({ verboseFieldName: "Transporteur" });
+    validator.validateSync(transporter.company);
   }
 
   if (resealedInfos.destination) {

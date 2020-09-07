@@ -17,6 +17,7 @@ import { isValidDatetime } from "../../validation";
 import { InvalidDateTime } from "../../../common/errors";
 import { checkCanMarkAsProcessed } from "../../permissions";
 import { InvalidProcessingOperation } from "../../errors";
+import { validCompany } from "../../workflow/validation";
 
 function validateArgs(args: MutationMarkAsProcessedArgs) {
   const { processedInfo } = args;
@@ -43,6 +44,15 @@ function validateArgs(args: MutationMarkAsProcessedArgs) {
     throw new UserInputError(
       `Vous devez saisir une destination ultérieure prévue pour l'opération de regroupement ${processedInfo.processingOperationDone}`
     );
+  }
+
+  if (processedInfo.nextDestination) {
+    const { company } = processedInfo.nextDestination;
+    const validator = validCompany({
+      verboseFieldName: "Destination ultérieure prévue",
+      allowForeign: true
+    });
+    validator.validateSync(company);
   }
 
   if (!isValidDatetime(processedInfo.processedAt)) {
