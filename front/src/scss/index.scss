@@ -1,6 +1,7 @@
 @import "./Constants.scss";
 @import "./Breakpoints.scss";
 @import "./Utils.scss";
+@import "./Buttons.scss";
 @import "./Forms.scss";
 @import "./Notifications.scss";
 @import "../generated/css/tailwind.generated.css";
@@ -29,12 +30,13 @@
   font-style: normal;
 }
 html,
-body {
-  font-family: marianne, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+body,
+* {
+  font-family: "marianne" !important;
 }
-
+html {
+  font-size: 16px;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
@@ -56,4 +58,7 @@ button.link {
   .modal__backdrop .modal {
     max-height: 100%;
   }
+}
+a:hover{
+  background: none ;
 }

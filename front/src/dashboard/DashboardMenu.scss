@@ -1,10 +1,24 @@
-.dashboard-menu.side-menu {
+@import "../scss/Constants.scss";
+
+.sidebar {
+  background-color: $gray-light;
   .company-title {
-    margin: 30px 30px;
+    margin: 1rem 1rem;
     font-weight: bold;
     overflow-wrap: break-word;
     @media (min-width: 749px) {
       max-width: 200px;
+    }
+  }
+  ul{
+    padding-left: 1rem;
+    margin-top: 0;
+  }
+  li {
+    list-style: none;
+    a{
+      text-decoration: none;
+      color: #000;
     }
   }
 
@@ -29,4 +43,12 @@
       margin: 0;
     }
   }
+}
+
+.sidebar-chapter {
+  font-weight: bold;
+  padding: 1rem 0 0.5rem 0.5rem;
+  color: #223540;
+  font-size: 1rem;
+  margin: 0;
 }

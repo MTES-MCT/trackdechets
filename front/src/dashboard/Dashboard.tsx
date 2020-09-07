@@ -8,7 +8,7 @@ import { InlineError } from "../common/Error";
 import Loader from "../common/Loader";
 import { currentSiretService } from "./CompanySelector";
 import "./Dashboard.scss";
-import DashboardMenu from "./DashboardMenu";
+import DashboardMenu2 from "./DashboardMenu2";
 import Exports from "./exports/Exports";
 import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
@@ -38,7 +38,8 @@ export default function Dashboard() {
   const match = useRouteMatch();
   const { siret } = useParams();
   const history = useHistory();
-
+  
+ 
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: () => {
       if (siret) {
@@ -70,7 +71,7 @@ export default function Dashboard() {
     return (
       <SiretContext.Provider value={{ siret }}>
         <div id="dashboard" className="dashboard">
-          <DashboardMenu
+          <DashboardMenu2
             me={data.me}
             match={match}
             handleCompanyChange={siret => history.push(`/dashboard/${siret}`)}

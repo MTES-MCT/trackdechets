@@ -22,6 +22,7 @@ import TransporterInfoEdit from "./TransporterInfoEdit";
 import TransportSignature from "./TransportSignature";
 import { Segments } from "./Segments";
 import { transporterFormFragment } from "../../common/fragments";
+import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 
 export const GET_TRANSPORT_SLIPS = gql`
   query GetSlips($siret: String, $status: [FormStatus!], $roles: [FormRole!]) {
@@ -181,11 +182,26 @@ const Table = ({ forms, userSiret }) => {
 const TRANSPORTER_FILTER_STORAGE_KEY = "TRANSPORTER_FILTER_STORAGE_KEY";
 
 export default function Transport() {
+  const { path } = useRouteMatch();
+
+  return (
+    <div>
+      <Switch>
+        <Route
+          path={`${path}/to-collect`}
+          render={() => <TransportInside formType="TO_TAKE_OVER" />}
+        />
+        <Route
+          path={`${path}/collected`}
+          render={() => <TransportInside formType="TAKEN_OVER" />}
+        />
+      </Switch>
+    </div>
+  );
+}
+export function TransportInside({ formType }) {
   const { siret } = useContext(SiretContext);
-  // const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
-  const [filterFormType, setFilterFormType] = useState({
-    formType: "TO_TAKE_OVER",
-  });
+
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
   );
@@ -217,7 +233,7 @@ export default function Transport() {
     const statuses = {
       TO_TAKE_OVER: ["SEALED", "RESEALED"],
       TAKEN_OVER: ["SENT", "RESENT"],
-    }[filterFormType.formType];
+    }[formType];
 
     const segmentsToTakeOver =
       form.transportSegments?.filter(
@@ -236,10 +252,10 @@ export default function Transport() {
     return (
       (statuses.includes(form.status) &&
         form.transporter?.company?.siret === siret) ||
-      (filterFormType.formType === "TO_TAKE_OVER" &&
+      (formType === "TO_TAKE_OVER" &&
         form.status === "SENT" &&
         !!segmentsToTakeOver.length) ||
-      (filterFormType.formType === "TAKEN_OVER" &&
+      (formType === "TAKEN_OVER" &&
         form.status === "SENT" &&
         !!hasTakenOverASegment.length)
     );
@@ -267,26 +283,14 @@ export default function Transport() {
   return (
     <div>
       <div className="header-content">
-        <h2>Déchets à transporter</h2>
+        <h2>
+          {formType === "TAKEN_OVER"
+            ? "Déchets chargés, en attente de réception ou de transfert"
+            : "Déchets à collecter"}
+        </h2>
       </div>
 
       <div className="transport-menu">
-        <button
-          onClick={() => setFilterFormType({ formType: "TO_TAKE_OVER" })}
-          className={`link ${
-            filterFormType.formType === "TO_TAKE_OVER" ? "active" : ""
-          }`}
-        >
-          Déchets à collecter
-        </button>
-        <button
-          onClick={() => setFilterFormType({ formType: "TAKEN_OVER" })}
-          className={`link ${
-            filterFormType.formType === "TAKEN_OVER" ? "active" : ""
-          }`}
-        >
-          Déchets chargés, en attente de réception ou de transfert
-        </button>
         <button
           className="button button-primary transport-refresh"
           onClick={() =>
@@ -324,11 +328,7 @@ export default function Transport() {
         )}
       </div>
 
-      <Table
-        forms={filteredForms}
-        userSiret={siret}
-        // displayActions={filterFormType.formType.includes("TO_TAKE_OVER")}
-      />
+      <Table forms={filteredForms} userSiret={siret} />
     </div>
   );
 }

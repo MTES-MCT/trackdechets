@@ -1,7 +1,8 @@
+@import "../scss/Constants.scss";
 .dashboard-menu.side-menu {
-  background-color: #ebeff3;
+  background-color: $gray-light;
   flex: 0 1 auto;
-  padding: 0 20px 10px 0;
+  padding: 0 10px 10px 0;
 
   @media (min-width: 748px) and(max-width: 1110px) {
     max-width: 140px;

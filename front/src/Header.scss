@@ -1,20 +1,6 @@
 @import "./scss/Constants.scss";
 @import "./scss/Breakpoints.scss";
-.btn {
-  appearance: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  justify-content: center;
-  &--primary {
-    background-color: $blue;
-  }
-  &:hover {
-    background-color: $blue-light;
-  }
-}
+
 
 .header {
   background-color: #fff;

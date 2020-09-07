@@ -22,16 +22,8 @@ const SideMenu: FunctionComponent = ({ children }) => {
   }, [windowSize]);
 
   return (
-    <aside className="sidebar" role="navigation">
-      {isMobileDevice && (
-        <div
-          className="side-menu__mobile-trigger"
-          onClick={() => setIsOpened(!isOpened)}
-        >
-          <FaBars /> Menu
-        </div>
-      )}
-      {(!isMobileDevice || isOpened) && children}
+    <aside  role="navigation">
+ 
     </aside>
   );
 };

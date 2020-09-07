@@ -1,23 +1,26 @@
 import React from "react";
 import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
-import { NavTab } from "react-router-tabs";
+ 
 import "./SlipsTabs.scss";
 import ActTab from "./tabs/ActTab";
 import DraftsTab from "./tabs/DraftsTab";
 import FollowTab from "./tabs/FollowTab";
 import HistoryTab from "./tabs/HistoryTab";
+ 
 
-export default function SlipsTabs() {
-  const { url, path } = useRouteMatch();
+ 
 
+export default function SlipsTabs( ) {
+  const { url, path,   } = useRouteMatch();
+ 
   return (
     <div>
-      <div className="nav-tabs">
+      {/* <div className="nav-tabs">
         <NavTab to={`${url}/drafts`}>Mes brouillons</NavTab>
         <NavTab to={`${url}/act`}>Agir sur mes bordereaux</NavTab>
         <NavTab to={`${url}/follow`}>Suivre mes bordereaux</NavTab>
         <NavTab to={`${url}/history`}>Mes bordereaux archivés</NavTab>
-      </div>
+      </div> */}
 
       <Switch>
         <Route

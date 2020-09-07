@@ -54,7 +54,7 @@ export default withRouter(function Header2({
 
         <div className="header__nav">
           <ul className={`header__nav-items  ${menuClass}`}>
-            <li className=" header__nav-item">
+            <li className="header__nav-item">
               <a
                 className="header__nav-link"
                 href="https://faq.trackdechets.fr/"

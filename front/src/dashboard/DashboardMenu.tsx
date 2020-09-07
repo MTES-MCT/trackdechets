@@ -50,14 +50,15 @@ export default function DashboardMenu({
                 </NavLink>
               </li>
             )}
-            <li>
-              <NavLink to={`${match.url}/exports`} activeClassName="active">
-                Registre
-              </NavLink>
-            </li>
+
             <li>
               <NavLink to={`${match.url}/stats`} activeClassName="active">
                 Statistiques
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to={`${match.url}/exports`} activeClassName="active">
+                Registre
               </NavLink>
             </li>
           </ul>

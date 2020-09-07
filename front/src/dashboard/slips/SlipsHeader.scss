@@ -1,17 +1,8 @@
-.SlipsHeader {
-  margin: 20px;
-
+.slips-header {
   .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
     .title {
-      display: flex;
-      align-items: center;
-
       h2 {
-        margin-right: 20px;
+        font-size: 1.5rem;
       }
 
       .searchbar {
