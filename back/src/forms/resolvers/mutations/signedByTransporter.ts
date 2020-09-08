@@ -46,6 +46,12 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 
   await checkCanSignedByTransporter(user, form);
 
+  const wasteDetails = {
+    wasteDetailsPackagings: signingInfo.packagings,
+    wasteDetailsQuantity: signingInfo.quantity,
+    wasteDetailsOnuCode: signingInfo.onuCode || form.wasteDetailsOnuCode
+  };
+
   if (form.sentAt) {
     // BSD has already been sent, it must be a signature for frame 18
 
@@ -66,12 +72,6 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
       { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
       context,
       infos => {
-        const wasteDetails = {
-          wasteDetailsPackagings: infos.packagings,
-          wasteDetailsQuantity: infos.quantity,
-          wasteDetailsOnuCode: infos.onuCode
-        };
-
         return {
           ...(!hasWasteDetailsOverride && wasteDetails),
 
@@ -95,12 +95,10 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   );
 
   const transformEventToFormParams = infos => ({
+    ...wasteDetails,
     signedByTransporter: infos.signedByTransporter,
     sentAt: infos.sentAt,
     sentBy: infos.sentBy,
-    wasteDetailsPackagings: infos.packagings,
-    wasteDetailsQuantity: infos.quantity,
-    wasteDetailsOnuCode: infos.onuCode,
     currentTransporterSiret: form.transporterCompanySiret
   });
 
