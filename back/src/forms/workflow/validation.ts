@@ -75,7 +75,10 @@ export const formSchema = object<any>().shape({
     ),
     onuCode: string().when("code", {
       is: (wasteCode: string) => isDangerous(wasteCode || ""),
-      then: () => string(),
+      then: () =>
+        string()
+          .ensure()
+          .required("Le code ONU est obligatoire pour les déchets dangereux"),
       otherwise: () => string().nullable()
     }),
     packagings: array().required(),

@@ -265,7 +265,7 @@ describe("{ mutation { markAsSealed } }", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.",
-          "Erreur(s): wasteDetails.onuCode ne peut pas être null"
+          "Erreur(s): Le code ONU est obligatoire pour les déchets dangereux"
         ].join("\n")
       })
     ]);
