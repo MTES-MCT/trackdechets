@@ -12,6 +12,7 @@
   - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
   - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
   - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
+  - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
 
 ## Mise en route
 
@@ -222,3 +223,8 @@ La procédure qui suit aura pour effet de remplacer vos données en local par le
    # exemple :
    pg_restore -U trackdechets -d prisma --clean /var/backups/backup
    ```
+
+### Créer un tampon de signature pour la génération PDF
+
+Il est possible de créer de nouveaux tampons à partir du fichier [stamp.drawio.png](./pdf/src/medias/stamp.drawio.png).
+C'est un fichier PNG valide que l'on peut éditer directement dans Visual Code avec l'extension [Draw.io VS Code Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio)
