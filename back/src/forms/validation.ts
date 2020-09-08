@@ -20,6 +20,14 @@ const allowedFormats = [
   "yyyy-MM-dd'T'HH:mm:ss.SSSX"
 ];
 
+Yup.setLocale({
+  mixed: {
+    default: "${path} est invalide",
+    required: "${path} est un champ requis et doit avoir une valeur",
+    notType: "${path} ne peut pas être null"
+  }
+} as Yup.LocaleObject);
+
 /**
  * Check an incoming string is a date formatted according to allowed_formats
  * "2020-11-23", "2020-11-23T13:34:55","2020-11-23T13:34:55Z", "2020-11-23T13:34:55.987", "2020-11-23T13:34:55.987Z"
@@ -222,14 +230,6 @@ export function validateReceivedInfos(receivedInfo: ReceivedFormInput) {
   return receivedInfo;
 }
 
-Yup.setLocale({
-  mixed: {
-    default: "${path} est invalide",
-    required: "${path} est un champ requis et doit avoir une valeur",
-    notType: "${path} ne peut pas être null"
-  }
-} as Yup.LocaleObject);
-
 /**
  * A form must comply with this schema before it can be sealed or sent
  */
@@ -373,7 +373,7 @@ export async function checkCanBeSealed(form: Form) {
     .form({ id: form.id })
     .temporaryStorageDetail();
   try {
-    sealableFormSchema.validateSync(
+    return sealableFormSchema.validateSync(
       { ...form, ecoOrganisme, temporaryStorageDetail },
       { abortEarly: true }
     );

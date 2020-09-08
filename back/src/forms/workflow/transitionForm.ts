@@ -60,7 +60,7 @@ export default async function transitionForm(
 
       if (state.matches("error")) {
         const workflowError = state.meta[Object.keys(state.meta)[0]];
-        const error = await getError(workflowError, form);
+        const error = await getError(workflowError);
         reject(error);
         formService.stop();
       }

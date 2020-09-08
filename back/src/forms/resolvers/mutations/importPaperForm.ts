@@ -1,8 +1,4 @@
-import {
-  MutationResolvers,
-  MutationImportPaperFormArgs,
-  ImportPaperFormInput
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import {
   FormUpdateInput,
