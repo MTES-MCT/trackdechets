@@ -166,7 +166,7 @@ cd back/integration-tests
 3. Une fois la PR complète, passer la branche de "draft" à "ready to review" et demander la revue à au moins 1 autre développeur de l'équipe (idéalement 2). Si possible faire un rebase (éviter le merge autant que possible) de la branche `dev` pour être bien à jour et la CI au vert avant la revue.
 4. Une fois que la PR est approuvée et que les changements demandées ont été apportées, l'auteur de la PR peut la merger dans `dev`.
 
-Note : l'équipe n'a pas de conventions strict concernant le nom des branches et les messages de commit mais compte sur le bon sens de chacun.
+Note : l'équipe n'a pas de conventions strictes concernant le nom des branches et les messages de commit mais compte sur le bon sens de chacun.
 
 ## Déploiement
 
