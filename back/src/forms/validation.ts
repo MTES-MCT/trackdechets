@@ -190,9 +190,16 @@ const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne p
 
 // 1 - Émetteur du bordereau
 export const emitterSchema: yup.ObjectSchema<Emitter> = yup.object().shape({
-  emitterType: yup
-    .mixed<EmitterType>()
-    .required(`Émetteur: Le type d'émetteur est obligatoire`),
+  emitterType: yup.mixed<EmitterType>().when("ecoOrganismeSiret", {
+    is: ecoOrganismeSiret => !ecoOrganismeSiret,
+    then: yup.mixed().required(`Émetteur: Le type d'émetteur est obligatoire`),
+    otherwise: yup
+      .mixed()
+      .oneOf(
+        ["OTHER"],
+        `Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
+      )
+  }),
   emitterCompanyName: yup
     .string()
     .ensure()
@@ -222,23 +229,20 @@ export const emitterSchema: yup.ObjectSchema<Emitter> = yup.object().shape({
 });
 
 // Optional validation schema for eco-organisme appearing in frame 1
-// This schema should only be used in conjunction with emitterSchema
-// on a form where we retrieved linked objet ecoOrganisme
-// prisma.form({ id }).ecoOrganisme()
 export const ecoOrganismeSchema = yup.object().shape({
-  ecoOrganisme: yup
-    .object()
+  ecoOrganismeSiret: yup
+    .string()
     .notRequired()
     .nullable()
-    .when("emitterType", (emitterType, schema) =>
-      emitterType === "OTHER"
-        ? schema
-        : schema.test(
-            "is-not-set",
-            "${path} ne peut avoir une valeur que si l'émetteur est de type `Autre détenteur`",
-            value => value == null
-          )
-    )
+    .test(
+      "is-known-eco-organisme",
+      "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu.",
+      ecoOrganismeSiret =>
+        ecoOrganismeSiret
+          ? prisma.$exists.ecoOrganisme({ siret: ecoOrganismeSiret })
+          : true
+    ),
+  ecoOrganismeName: yup.string().notRequired().nullable()
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
@@ -678,44 +682,48 @@ export const transporterAfterTempStorageSchema: yup.ObjectSchema<TransporterAfte
 // *******************************************************************
 
 // validation schema for a form in draft mode, all fields are nullable
-export const draftFormSchema = yup.object().shape({
-  emitterCompanySiret: yup
-    .string()
-    .nullable()
-    .notRequired()
-    .matches(/^$|^\d{14}$/, {
-      message: `Émetteur: ${INVALID_SIRET_LENGTH}`
-    }),
-  emitterCompanyMail: yup.string().email().nullable().notRequired(),
-  recipientCompanySiret: yup
-    .string()
-    .notRequired()
-    .nullable()
-    .matches(/^$|^\d{14}$/, {
-      message: `Destinataire: ${INVALID_SIRET_LENGTH}`
-    }),
-  recipientCompanyMail: yup.string().notRequired().nullable().email(),
-  wasteDetailsCode: yup
-    .string()
-    .notRequired()
-    .nullable()
-    .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
-  transporterCompanySiret: yup
-    .string()
-    .notRequired()
-    .nullable()
-    .matches(/^$|^\d{14}$/, {
-      message: `Transporteur: ${INVALID_SIRET_LENGTH}`
-    }),
-  transporterCompanyMail: yup.string().notRequired().nullable().email(),
-  transporterValidityLimit: validDatetime({
-    verboseFieldName: "date de validité",
-    required: false
+export const draftFormSchema = yup
+  .object()
+  .shape({
+    emitterCompanySiret: yup
+      .string()
+      .nullable()
+      .notRequired()
+      .matches(/^$|^\d{14}$/, {
+        message: `Émetteur: ${INVALID_SIRET_LENGTH}`
+      }),
+    emitterCompanyMail: yup.string().email().nullable().notRequired(),
+    recipientCompanySiret: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(/^$|^\d{14}$/, {
+        message: `Destinataire: ${INVALID_SIRET_LENGTH}`
+      }),
+    recipientCompanyMail: yup.string().notRequired().nullable().email(),
+    wasteDetailsCode: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
+    transporterCompanySiret: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(/^$|^\d{14}$/, {
+        message: `Transporteur: ${INVALID_SIRET_LENGTH}`
+      }),
+    transporterCompanyMail: yup.string().notRequired().nullable().email(),
+    transporterValidityLimit: validDatetime({
+      verboseFieldName: "date de validité",
+      required: false
+    })
   })
-});
+  .concat(ecoOrganismeSchema);
 
 // validation schema for BSD before it can be sealed
 export const sealedFormSchema = emitterSchema
+  .concat(ecoOrganismeSchema)
   .concat(recipientSchema)
   .concat(wasteDetailsSchema)
   .concat(transporterSchema);
@@ -739,17 +747,10 @@ export const resealedFormSchema = tempStoredInfoSchema
 // *******************************************************************
 
 export async function checkCanBeSealed(form: Form) {
-  // add linked objects schema
-  const fullSchema = sealedFormSchema.concat(ecoOrganismeSchema);
-  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
-
   try {
-    const validForm = await fullSchema.validate(
-      { ...form, ecoOrganisme },
-      {
-        abortEarly: false
-      }
-    );
+    const validForm = await sealedFormSchema.validate(form, {
+      abortEarly: false
+    });
     return validForm;
   } catch (err) {
     if (err.name === "ValidationError") {

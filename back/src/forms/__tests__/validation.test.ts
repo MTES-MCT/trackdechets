@@ -145,7 +145,8 @@ describe("sealedFormSchema", () => {
     const testForm = {
       ...form,
       emitterType: "PRODUCER",
-      ecoOrganisme: { id: "an_id" }
+      ecoOrganismeSiret: "12592018234951",
+      ecoOrganismeName: "Some eco-organisme"
     };
 
     const isValid = await sealedFormSchema

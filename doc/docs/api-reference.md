@@ -808,11 +808,11 @@ Payload du BSD
 Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
 ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
 Cette mutation doit être appelée avec le token du collecteur-transporteur.
-L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-disponible sur le tableau de bord Trackdéchets
-Mon Compte > Établissements > Sécurité.
-D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
+grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
+D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
+renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+Dans le cas où un éco-organisme est responsable du déchet, le code de celui-ci peut être utilisé pour signer.
 
 </td>
 </tr>
@@ -1207,6 +1207,15 @@ Récépissé négociant (le cas échéant, pour les profils transporteur)
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganismeAgreements</strong></td>
+<td valign="top">[<a href="#url">URL</a>!]!</td>
+<td>
+
+Liste des agréments de l'éco-organisme
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -1339,6 +1348,15 @@ Récépissé transporteur associé à cet établissement (le cas échéant)
 <td>
 
 Récépissé négociant associé à cet établissement (le cas échant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganismeAgreements</strong></td>
+<td valign="top">[<a href="#url">URL</a>!]!</td>
+<td>
+
+Liste des agréments de l'éco-organisme
 
 </td>
 </tr>
@@ -2033,7 +2051,7 @@ Annexe 2
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
-<td valign="top"><a href="#ecoorganisme">EcoOrganisme</a></td>
+<td valign="top"><a href="#formecoorganisme">FormEcoOrganisme</a></td>
 <td></td>
 </tr>
 <tr>
@@ -2151,6 +2169,33 @@ Numéro de téléphone de contact dans l'établissement
 Email du contact dans l'établissement
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### FormEcoOrganisme
+
+Information sur l'éco-organisme responsable du BSD
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -3734,8 +3779,13 @@ Payload de liason d'un BSD à un eco-organisme
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
 </tbody>
@@ -5178,6 +5228,14 @@ Négociant
 
 </td>
 </tr>
+<tr>
+<td valign="top"><strong>ECO_ORGANISME</strong></td>
+<td>
+
+Éco-organisme
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -5834,3 +5892,7 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 ### String
 
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+### URL
+
+Chaîne de caractère au format URL, débutant par un protocole http(s).

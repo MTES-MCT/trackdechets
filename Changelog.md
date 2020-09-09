@@ -16,6 +16,27 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Suppression du service metabase suite au basculement vers une instance metabase dédiée [PR 453](https://github.com/MTES-MCT/trackdechets/pull/453)
 
+# Unreleased
+
+**Breaking changes**
+
+- Le champ `Form.ecoOrganisme` n'est plus du type `EcoOrganisme` mais du nouveau type `FormEcoOrganisme`.
+  Concrètement, le nouveau type ne contient plus les champs `id` et `address`.
+  Vous n'êtes pas affecté si vous ne requêtiez pas ces champs ou l'objet `ecoOrganisme`.
+- Le type `EcoOrganismeInput` a évolué suite aux changements du champ `Form.ecoOrganisme` :
+  ```diff
+    input EcoOrganismeInput {
+  -   id: ID!
+  +   name: String!
+  +   siret: String!
+    }
+  ```
+  Vous n'êtes pas affecté si vous ne renseigniez pas l'éco-organisme via les mutations `createForm` ou `updateForm`.
+
+**Changes**
+
+- Ajout du profil d'entreprise "éco-organisme". Ce type d'entreprise peut renseigner ses agréments et signer un BSD à la place du détenteur lorsqu'il est responsable des déchets. [PR 400](https://github.com/MTES-MCT/trackdechets/pull/400)
+
 # [2020.10.1] 05/10/2020
 
 - Ajout d'une limitation de 1000 requêtes possible par une même adresse IP dans une fenêtre de 1 minute, [PR 407](https://github.com/MTES-MCT/trackdechets/pull/407)

@@ -155,7 +155,7 @@ export default function StepList(props: IProps) {
                       ? { temporaryStorageDetail }
                       : { temporaryStorageDetail: null }),
                     // discard ecoOrganisme if not selected
-                    ...(ecoOrganisme?.id
+                    ...(ecoOrganisme?.siret
                       ? { ecoOrganisme }
                       : { ecoOrganisme: null }),
                   };

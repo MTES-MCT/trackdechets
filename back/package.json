@@ -47,6 +47,7 @@
     "graphql": "^14.5.8",
     "graphql-middleware": "^4.0.2",
     "graphql-middleware-sentry": "^3.2.1",
+    "graphql-scalars": "^1.2.7",
     "graphql-tools": "^6.0.14",
     "graylog2": "^0.2.1",
     "ioredis": "^4.17.3",

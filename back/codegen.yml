@@ -9,8 +9,12 @@ generates:
     config:
       contextType: ../../types#GraphQLContext
       enumsAsTypes: true
+      scalars:
+        DateTime: string
+        URL: string
       scalarDefaults:
-        DateTime: new Date()
+        DateTime: new Date().toISOString()
+        URL: "https://example.com"
   front/generated/graphql/types.ts:
     plugins:
       - typescript
@@ -18,9 +22,13 @@ generates:
       - graphql-codegen-factories
     config:
       avoidOptionals: true
+      scalars:
+        DateTime: string
+        URL: string
       scalarDefaults:
-        DateTime: new Date()
+        DateTime: new Date().toISOString()
+        URL: "https://example.com"
   documentation/api-reference.md:
-    schema: '!./src/**/*.private.graphql'
+    schema: "!./src/**/*.private.graphql"
     plugins:
       - graphql-markdown-plugin.js

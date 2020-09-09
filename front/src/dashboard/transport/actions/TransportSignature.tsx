@@ -23,10 +23,7 @@ import { SiretContext } from "dashboard/Dashboard";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
 import { COLORS } from "common/config";
-import {
-  ShipmentSignSmartphoneIcon,
-  PdfIcon,
-} from "common/components/Icons";
+import { ShipmentSignSmartphoneIcon, PdfIcon } from "common/components/Icons";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -84,6 +81,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
       });
     },
   });
+  const [signatureAuthor, setSignatureAuthor] = useState<
+    "EMITTER" | "ECO_ORGANISME"
+  >("EMITTER");
 
   const isPendingTransportFromEmitter =
     form.status === "SEALED" && form.transporter?.company?.siret === userSiret;
@@ -125,7 +125,7 @@ export default function TransportSignature({ form, userSiret }: Props) {
             sentBy: "",
             securityCode: "",
             signedByTransporter: false,
-            signedByProducer: false,
+            signedByProducer: true,
             packagings: form.stateSummary?.packagings,
             quantity: form.stateSummary?.quantity ?? "",
             onuCode: form.stateSummary?.onuCode ?? "",
@@ -261,7 +261,7 @@ export default function TransportSignature({ form, userSiret }: Props) {
               isEmittedByProducer ? "producteur" : "détenteur"
             }`}
           >
-            {(props: any) => (
+            {({ values }) => (
               <>
                 <div>
                   <div className="notification success">
@@ -295,11 +295,11 @@ export default function TransportSignature({ form, userSiret }: Props) {
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Conditionnement:</span>
-                    {props.packagings.join(", ")}
+                    {values.packagings.join(", ")}
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Poids total:</span>
-                    {props.quantity} tonnes
+                    {values.quantity} tonnes
                   </div>
                   <div className="form__row">
                     <span id="transporter-address" className={styles.label}>
@@ -327,46 +327,104 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       <br /> {form.stateSummary?.recipient?.address}
                     </address>
                   </div>
+
                   <div className="form__row">
-                    <label htmlFor="id_signedByProducer">
-                      <Field
-                        type="checkbox"
-                        name="signedByProducer"
-                        id="id_signedByProducer"
-                        className="td-checkbox"
-                        required
+                    <label>
+                      <input
+                        type="radio"
+                        name="signatureAuthor"
+                        onChange={() => setSignatureAuthor("EMITTER")}
+                        checked={signatureAuthor === "EMITTER"}
+                        className="td-radio"
                       />
                       En tant que{" "}
-                      {isEmittedByProducer ? "producteur" : "détenteur"} du
-                      déchet, j'ai vérifié que les déchets confiés au
+                      <strong>
+                        {isEmittedByProducer ? "producteur" : "détenteur"}
+                      </strong>{" "}
+                      du déchet, j'ai vérifié que les déchets confiés au
                       transporteur correspondent aux informations vues ci-avant
                       et je valide l'enlèvement.
                     </label>
                   </div>
-                  <RedErrorMessage name="signedByProducer" />
+                  {signatureAuthor === "EMITTER" && (
+                    <>
+                      <div className="form__row">
+                        <label
+                          className={styles.label}
+                          htmlFor="id_securityCode"
+                        >
+                          Code de sécurité entreprise
+                        </label>
+                        <Field
+                          name="securityCode"
+                          id="id_securityCode"
+                          type="number"
+                          className={`field__block td-input ${styles.fieldSecurityCode} ${styles.noSpinner}`}
+                        />
+                      </div>
+                      <div className="form__row">
+                        <label className={styles.label} htmlFor="id_sentBy">
+                          Nom et prénom
+                        </label>
+                        <Field
+                          type="text"
+                          id="id_sentBy"
+                          name="sentBy"
+                          className={`field__block td-input ${styles.fieldFullName}`}
+                        />
+                      </div>
+                    </>
+                  )}
 
-                  <div className="form__row">
-                    <label className={styles.label} htmlFor="id_securityCode">
-                      Code de sécurité entreprise
-                    </label>
-                    <Field
-                      name="securityCode"
-                      id="id_securityCode"
-                      type="number"
-                      className={`field__block td-input ${styles.fieldSecurityCode} ${styles.noSpinner}`}
-                    />
-                  </div>
-                  <div className="form__row">
-                    <label className={styles.label} htmlFor="id_sentBy">
-                      Nom et prénom
-                    </label>
-                    <Field
-                      type="text"
-                      id="id_sentBy"
-                      name="sentBy"
-                      className={`field__block td-input ${styles.fieldFullName}`}
-                    />
-                  </div>
+                  {form.ecoOrganisme && (
+                    <>
+                      <div className="form__row">
+                        <label>
+                          <input
+                            type="radio"
+                            name="signatureAuthor"
+                            onChange={() => setSignatureAuthor("ECO_ORGANISME")}
+                            checked={signatureAuthor === "ECO_ORGANISME"}
+                            className="td-radio"
+                          />
+                          En tant que <strong>éco-organisme</strong> responsable
+                          du déchet, j'ai vérifié que les déchets confiés au
+                          transporteur correspondent aux informations vues
+                          ci-avant et je valide l'enlèvement.
+                        </label>
+                      </div>
+                      {signatureAuthor === "ECO_ORGANISME" && (
+                        <>
+                          <div className="form__row">
+                            <label
+                              className={styles.label}
+                              htmlFor="id_securityCode"
+                            >
+                              Code de sécurité entreprise
+                            </label>
+                            <Field
+                              name="securityCode"
+                              id="id_securityCode"
+                              type="number"
+                              className={`field__block td-input ${styles.fieldSecurityCode} ${styles.noSpinner}`}
+                            />
+                          </div>
+                          <div className="form__row">
+                            <label className={styles.label} htmlFor="id_sentBy">
+                              Nom et prénom
+                            </label>
+                            <Field
+                              type="text"
+                              id="id_sentBy"
+                              name="sentBy"
+                              className={`field__block td-input ${styles.fieldFullName}`}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+
                   {error && <NotificationError apolloError={error} />}
                 </div>
               </>

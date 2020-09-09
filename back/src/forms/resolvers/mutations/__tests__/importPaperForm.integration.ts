@@ -161,8 +161,12 @@ describe("mutation / importPaperForm", () => {
       const { mutate } = makeClient(user);
 
       const input = getImportPaperFormInput();
+      input.emitter.type = "OTHER";
       input.recipient.company.siret = company.siret;
-      input.ecoOrganisme = { id: ecoOrganisme.id };
+      input.ecoOrganisme = {
+        siret: ecoOrganisme.siret,
+        name: ecoOrganisme.name
+      };
 
       const { data } = await mutate(IMPORT_PAPER_FORM, {
         variables: { input }
@@ -170,11 +174,36 @@ describe("mutation / importPaperForm", () => {
 
       expect(data.importPaperForm.status).toEqual("PROCESSED");
 
-      const formEcoOrganisme = await prisma
-        .form({ id: data.importPaperForm.id })
-        .ecoOrganisme();
+      const updatedForm = await prisma.form({ id: data.importPaperForm.id });
 
-      expect(formEcoOrganisme.id).toEqual(ecoOrganisme.id);
+      expect(updatedForm).toMatchObject({
+        ecoOrganismeName: ecoOrganisme.name,
+        ecoOrganismeSiret: ecoOrganisme.siret
+      });
+    });
+
+    it("should fail if eco-organisme is not known", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const { mutate } = makeClient(user);
+
+      const input = getImportPaperFormInput();
+      input.emitter.type = "OTHER";
+      input.recipient.company.siret = company.siret;
+      input.ecoOrganisme = {
+        siret: "92834192340512",
+        name: "Some Eco-Organisme"
+      };
+
+      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+        variables: { input }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `L'éco-organisme avec le siret "${input.ecoOrganisme.siret}" n'est pas reconnu.`
+        })
+      ]);
     });
   });
 

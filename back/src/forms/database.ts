@@ -6,11 +6,10 @@ import {
   Form,
   prisma,
   FormWhereUniqueInput,
-  EcoOrganismeWhereUniqueInput,
   FormWhereInput
 } from "../generated/prisma-client";
 import { FullForm } from "./types";
-import { FormNotFound, EcoOrganismeNotFound } from "./errors";
+import { FormNotFound } from "./errors";
 import { UserInputError } from "apollo-server-express";
 import { FormRole } from "../generated/graphql/types";
 
@@ -21,7 +20,6 @@ import { FormRole } from "../generated/graphql/types";
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
   const owner = await prisma.form({ id: form.id }).owner();
-  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
   const temporaryStorage = await prisma
     .form({ id: form.id })
     .temporaryStorageDetail();
@@ -31,7 +29,6 @@ export async function getFullForm(form: Form): Promise<FullForm> {
   return {
     ...form,
     owner,
-    ecoOrganisme,
     temporaryStorage,
     transportSegments
   };
@@ -52,21 +49,6 @@ export async function getFormOrFormNotFound({
     throw new FormNotFound(id ? id.toString() : readableId);
   }
   return form;
-}
-
-/**
- * Retrieves an eco-organisme by id or throw a EcoOrganismeNotFound error
- */
-export async function getEcoOrganismeOrNotFound({
-  id
-}: EcoOrganismeWhereUniqueInput) {
-  const eo = await prisma.ecoOrganisme({
-    id
-  });
-  if (!eo) {
-    throw new EcoOrganismeNotFound(id.toString());
-  }
-  return eo;
 }
 
 /**
@@ -102,7 +84,7 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
       }
     ],
     ["TRADER"]: [{ traderCompanySiret: siret }],
-    ["ECO_ORGANISME"]: [{ ecoOrganisme: { siret: siret } }]
+    ["ECO_ORGANISME"]: [{ ecoOrganismeSiret: siret }]
   };
 
   return {

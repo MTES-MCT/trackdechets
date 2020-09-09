@@ -20,22 +20,24 @@ type Mutation {
   updateCompany(
     "SIRET de l'établissement"
     siret: String!
-    "(Optionnel) Identifiant GEREP"
+    "Identifiant GEREP"
     gerepId: String
-    "(Optionnel) Email de contact"
+    "Email de contact"
     contactEmail: String
-    "(Optionnel) Numéro de téléphone de contact"
+    "Numéro de téléphone de contact"
     contactPhone: String
-    "(Optionnel) Site web"
+    "Site web"
     website: String
-    "(Optionnel) Profil de l'établissement"
+    "Profil de l'établissement"
     companyTypes: [CompanyType]
-    "(Optionnel) Nom d'usage de l'établissement"
+    "Nom d'usage de l'établissement"
     givenName: String
-    "(Optionnel) Identifiant d'un récépissé transporteur"
+    "Identifiant d'un récépissé transporteur"
     transporterReceiptId: String
-    "(Optionnel) Identifiant d'un récépissé négociant"
+    "Identifiant d'un récépissé négociant"
     traderReceiptId: String
+    "Agréments de l'éco-organisme"
+    ecoOrganismeAgreements: [URL!]
   ): CompanyPrivate!
 
   """
@@ -284,4 +286,9 @@ input PrivateCompanyInput {
   Récipissé négociant (le cas échéant, pour les profils négociant)
   """
   traderReceiptId: String
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]
 }

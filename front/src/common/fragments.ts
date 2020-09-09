@@ -179,7 +179,8 @@ const mutableFieldsFragment = gql`
       readableId
     }
     ecoOrganisme {
-      id
+      name
+      siret
     }
     temporaryStorageDetail {
       ...TemporaryStorageDetailFragment

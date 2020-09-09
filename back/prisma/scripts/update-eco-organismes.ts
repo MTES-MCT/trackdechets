@@ -1,41 +1,7 @@
 import { Updater, registerUpdater } from "./helper/helper";
 import { prisma } from "../../src/generated/prisma-client";
 
-@registerUpdater(
-  "Insert Eco-organismes",
-  `Insert existing eco-organismes in DB if none exist yet`,
-  false
-)
-export class InsertEcoOrganismesUpdater implements Updater {
-  run() {
-    console.info(
-      "Starting script to insert eco organismes in DB if there is no data yet..."
-    );
-
-    try {
-      return prisma
-        .ecoOrganismesConnection()
-        .aggregate()
-        .count()
-        .then(async count => {
-          if (count !== 0) {
-            console.info(
-              "Some eco-organsimes already exist in DB, skipping..."
-            );
-            return;
-          }
-
-          console.info("Creating eco-organismes...");
-          return Promise.all(organismes.map(o => prisma.createEcoOrganisme(o)));
-        });
-    } catch (err) {
-      console.error("☠ Something went wrong during the update", err);
-      throw new Error();
-    }
-  }
-}
-
-const organismes = [
+const ecoOrganismes = [
   {
     name: "Corepile",
     siret: "42248908800035",
@@ -90,5 +56,64 @@ const organismes = [
     name: "DASTRI",
     siret: "79250555400024",
     address: "17, rue de l’Amiral Hamelin à Paris (75016)"
+  },
+  {
+    name: "ECOSYSTEM",
+    siret: "83033936200022",
+    address: "34 RUE HENRI REGNAULT 92400 COURBEVOIE"
+  },
+  {
+    name: "LEKO",
+    siret: "82330882000021",
+    address: "29 RUE TRONCHET 75008 PARIS"
+  },
+  {
+    name: "CYCLAMED",
+    siret: "39316301900044",
+    address: "60 T RUE DE BELLEVUE - 92100 BOULOGNE-BILLANCOURT"
+  },
+  {
+    name: "ECOFOLIO",
+    siret: "49337909300039",
+    address: "3 PL DES VICTOIRES 75001 PARIS"
+  },
+  {
+    name: "RECYLUM",
+    siret: "48232394600012",
+    address: "17 RUE DE L'AMIRAL HAMELIN 75116 PARIS"
+  },
+  {
+    name: "ERP FRANCE",
+    siret: "51436434800045",
+    address: "10 RUE DE PENTHIEVRE 75008 PARIS"
+  },
+  {
+    name: "APER",
+    siret: "51319280700024",
+    address: "PONT MIRABEAU 75015 PARIS"
+  },
+  {
+    name: "APER PYRO",
+    siret: "81761178300017",
+    address: "PORT DE JAVEL 75015 PARIS"
   }
 ];
+
+@registerUpdater(
+  "Update Eco-organismes",
+  "Update the list of eco-organismes in the database",
+  true
+)
+export class UpdateEcoOrganismesUpdater implements Updater {
+  async run() {
+    for (const ecoOrganisme of ecoOrganismes) {
+      await prisma.upsertEcoOrganisme({
+        create: ecoOrganisme,
+        update: ecoOrganisme,
+        where: {
+          siret: ecoOrganisme.siret
+        }
+      });
+    }
+  }
+}
