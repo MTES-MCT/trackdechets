@@ -326,7 +326,7 @@ describe("Integration / Mark as processed mutation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure prévue: La sélection d'une entreprise par SIRET est obligatoire"
+          "Destination ultérieure prévue: Le siret de l'entreprise est obligatoire"
       })
     ]);
   });

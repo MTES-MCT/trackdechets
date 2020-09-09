@@ -51,8 +51,8 @@ describe("Forms -> markAsProcessed mutation", () => {
         processedInfo: {
           noTraceability: true,
           processingOperationDone: "R 1",
-          processedBy: "",
-          processedAt: new Date().toString()
+          processedBy: "John Snow",
+          processedAt: "2019-12-20T00:00:00.000Z"
         }
       },
       defaultContext
@@ -80,8 +80,20 @@ describe("Forms -> markAsProcessed mutation", () => {
         id: "1",
         processedInfo: {
           processingOperationDone: "D 14",
-          processedBy: "",
-          processedAt: new Date().toString()
+          processedBy: "John Snow",
+          processedAt: "2019-12-20T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "R 1",
+            company: {
+              siret: "65714526789851",
+              address: "9 rue de la destination ultérieure",
+              country: "FR",
+              name: "Destination ultérieure",
+              contact: "Arya Stark",
+              mail: "arya.stark@trackdechets.fr",
+              phone: "0000000000"
+            }
+          }
         }
       },
       defaultContext
@@ -109,8 +121,8 @@ describe("Forms -> markAsProcessed mutation", () => {
         id: "1",
         processedInfo: {
           processingOperationDone: "R 1",
-          processedBy: "",
-          processedAt: new Date().toString()
+          processedBy: "John Snow",
+          processedAt: "2019-12-20T00:00:00.000Z"
         }
       },
       defaultContext

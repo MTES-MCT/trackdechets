@@ -1,24 +1,11 @@
-import {
-  MutationResolvers,
-  MutationUpdateTransporterReceiptArgs
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanReadUpdateDeleteTransporterReceipt } from "../../permissions";
 import { getTransporterReceiptOrNotFound } from "../../database";
-import { isValidDatetime } from "../../../forms/validation";
-import { InvalidDateTime } from "../../../common/errors";
 
-function validateArgs(args: MutationUpdateTransporterReceiptArgs) {
-  if (args.input.validityLimit) {
-    const validityLimit = args.input.validityLimit;
-    if (!isValidDatetime(validityLimit)) {
-      throw new InvalidDateTime("validityLimit");
-    }
-  }
-  return args;
-}
+import { receiptSchema } from "../../validation";
 
 /**
  * Update a transporter receipt
@@ -33,9 +20,10 @@ const updateTransporterReceiptResolver: MutationResolvers["updateTransporterRece
   const user = checkIsAuthenticated(context);
   const {
     input: { id, ...data }
-  } = validateArgs(args);
+  } = args;
   const receipt = await getTransporterReceiptOrNotFound({ id });
   await checkCanReadUpdateDeleteTransporterReceipt(user, receipt);
+  await receiptSchema.validate({ ...receipt, ...data });
   return prisma.updateTransporterReceipt({ data, where: { id } });
 };
 

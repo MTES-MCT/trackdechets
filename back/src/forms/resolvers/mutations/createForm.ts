@@ -7,12 +7,12 @@ import { getReadableId } from "../../readable-id";
 import {
   FormCreateInput,
   Status,
-  prisma,
-  EcoOrganisme
+  prisma
 } from "../../../generated/prisma-client";
 import {
   MutationCreateFormArgs,
-  ResolversParentTypes
+  ResolversParentTypes,
+  EcoOrganisme
 } from "../../../generated/graphql/types";
 import { WASTES_CODES } from "../../../common/constants";
 import {
@@ -22,8 +22,9 @@ import {
 } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
-import { validateEcorganisme } from "../../validation";
 import { GraphQLContext } from "../../../types";
+import { draftFormSchema } from "../../validation";
+import { getEcoOrganismeOrNotFound } from "../../database";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -42,7 +43,7 @@ const createFormResolver = async (
   let validEcoOrganisme: EcoOrganisme = null;
 
   if (ecoOrganisme) {
-    validEcoOrganisme = await validateEcorganisme(ecoOrganisme);
+    validEcoOrganisme = await getEcoOrganismeOrNotFound(ecoOrganisme);
   }
   const formInputSirets = [
     formContent.emitter?.company?.siret,
@@ -65,6 +66,8 @@ const createFormResolver = async (
     owner: { connect: { id: context.user!.id } },
     appendix2Forms: { connect: appendix2Forms }
   };
+
+  await draftFormSchema.validate(formCreateInput);
 
   if (
     formCreateInput.wasteDetailsCode &&

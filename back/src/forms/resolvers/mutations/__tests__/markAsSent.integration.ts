@@ -226,7 +226,7 @@ describe("{ mutation { markAsSent } }", () => {
       let form = await formFactory({
         ownerId: user.id,
         opt: {
-          status: "SEALED",
+          status: "DRAFT",
           emitterCompanySiret: emitterCompany.siret,
           recipientCompanySiret: recipientCompany.siret,
           wasteDetailsCode: wrongWasteCode
@@ -236,23 +236,23 @@ describe("{ mutation { markAsSent } }", () => {
       const { mutate } = makeClient(user);
 
       const mutation = `
-    mutation   {
-      markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
-        id
-      }
-    }
-  `;
+        mutation   {
+          markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
+            id
+          }
+        }
+      `;
 
       const { errors } = await mutate(mutation);
 
       expect(errors[0].message).toEqual(
         expect.stringContaining(
-          "Le code déchet est obligatoire et doit appartenir à la liste  du code"
+          "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
       form = await prisma.form({ id: form.id });
 
-      expect(form.status).toEqual("SEALED");
+      expect(form.status).toEqual("DRAFT");
 
       // check no SEALED statusLog is created
       const statusLogs = await prisma.statusLogs({

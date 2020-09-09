@@ -3,15 +3,19 @@ import { GraphQLContext } from "../../types";
 import { getError } from "./errors";
 import { formWorkflowMachine } from "./machine";
 import { ForbiddenError } from "apollo-server-express";
-import { prisma, Form as PrismaForm } from "../../generated/prisma-client";
+import {
+  prisma,
+  Form as PrismaForm,
+  FormUpdateInput
+} from "../../generated/prisma-client";
 import { Form, FormStatus } from "../../generated/graphql/types";
 import logStatusChange from "./logStatusChange";
 
-export default async function transitionForm(
+export default async function transitionForm<T>(
   form: PrismaForm,
-  { eventType, eventParams = {} }: { eventType: string; eventParams?: any },
+  { eventType, eventParams }: { eventType: string; eventParams: T },
   context: GraphQLContext,
-  transformEventToFormProps = v => v
+  transformEventToFormProps: (v: T) => FormUpdateInput = v => v
 ) {
   const temporaryStorageDetail = await prisma
     .form({ id: form.id })
@@ -60,7 +64,7 @@ export default async function transitionForm(
 
       if (state.matches("error")) {
         const workflowError = state.meta[Object.keys(state.meta)[0]];
-        const error = await getError(workflowError, form);
+        const error = await getError(workflowError);
         reject(error);
         formService.stop();
       }
@@ -80,7 +84,7 @@ export default async function transitionForm(
 
         const updatedForm = await prisma.updateForm({
           where: { id: form.id },
-          data: { status: newStatus, ...formPropsFromEvent }
+          data: { status: newStatus as string, ...formPropsFromEvent }
         });
         resolve({ ...updatedForm, status: updatedForm.status as FormStatus });
         formService.stop();

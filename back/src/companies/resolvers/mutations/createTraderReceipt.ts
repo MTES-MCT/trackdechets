@@ -1,32 +1,22 @@
-import {
-  MutationResolvers,
-  MutationCreateTraderReceiptArgs
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { isValidDatetime } from "../../../forms/validation";
-import { InvalidDateTime } from "../../../common/errors";
-
-function validateArgs(args: MutationCreateTraderReceiptArgs) {
-  if (!isValidDatetime(args.input.validityLimit)) {
-    throw new InvalidDateTime("validityLimit");
-  }
-  return args;
-}
+import { receiptSchema } from "../../validation";
 
 /**
  * Create a trader receipt
  * @param input
  */
-const createTraderReceiptResolver: MutationResolvers["createTraderReceipt"] = (
+const createTraderReceiptResolver: MutationResolvers["createTraderReceipt"] = async (
   parent,
   args,
   context
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAuthenticated(context);
-  const { input } = validateArgs(args);
+  const { input } = args;
+  await receiptSchema.validate(input);
   return prisma.createTraderReceipt(input);
 };
 

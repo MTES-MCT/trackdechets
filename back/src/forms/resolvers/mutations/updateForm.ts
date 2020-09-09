@@ -13,8 +13,11 @@ import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanReadUpdateDeleteForm } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import { getFormOrFormNotFound } from "../../database";
-import { validateEcorganisme } from "../../validation";
+import {
+  getFormOrFormNotFound,
+  getEcoOrganismeOrNotFound
+} from "../../database";
+import { draftFormSchema } from "../../validation";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -53,9 +56,12 @@ const updateFormResolver = async (
     appendix2Forms: { set: appendix2Forms }
   };
 
+  // Validate form input
+  await draftFormSchema.validate(formUpdateInput);
+
   // Link to registered eco organisme by id
   if (ecoOrganisme) {
-    const validEcoOrganisme = await validateEcorganisme(ecoOrganisme);
+    const validEcoOrganisme = await getEcoOrganismeOrNotFound(ecoOrganisme);
     formUpdateInput.ecoOrganisme = { connect: { id: validEcoOrganisme.id } };
   }
 

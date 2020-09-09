@@ -5,9 +5,16 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanMarkAsSealed } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { Form } from "../../../generated/prisma-client";
+import { checkCanBeSealed } from "../../validation";
 
-export function markAsSealedFn(form: Form, context: GraphQLContext) {
-  return transitionForm(form, { eventType: "MARK_SEALED" }, context);
+export async function markAsSealedFn(form: Form, context: GraphQLContext) {
+  // validate form data
+  await checkCanBeSealed(form);
+  return transitionForm(
+    form,
+    { eventType: "MARK_SEALED", eventParams: {} },
+    context
+  );
 }
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (

@@ -385,9 +385,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -435,7 +433,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     // Entreprise de transport entre l'installation de production du déchet
     // et le site d'entreprosage provisoire
     const transporteur1 = await companyFactory({
-      siret: "444444444444444",
+      siret: "44444444444444",
       name: "Transport Qui Roule"
     });
     // Avec un utilisateur membre
@@ -561,6 +559,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .post("/")
       .set("Authorization", `Bearer ${producteurToken}`)
       .send({ query: saveFormQuery });
+
+    console.log(saveFormResponse);
 
     // La réponse est au format JSON
     // Uniquement les champs précisés dans la réponse de la requête GraphQL
@@ -860,9 +860,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "RESENT",
         updatedFields: {
           sentAt: "2020-08-03T10:00:00",
-          signedByTransporter: true,
           sentBy: "Mr Provisoire",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -883,9 +881,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -1493,9 +1489,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"

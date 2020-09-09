@@ -78,14 +78,6 @@ export type CompanyInput = {
   name: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address: Maybe<Scalars['String']>;
-  /**
-   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
-   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-   * 
-   * En l'absence de code, l'entreprise est considérée comme résidant en France.
-   * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
-   */
-  country: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
   contact: Maybe<Scalars['String']>;
   /** Email du contact dans l'établissement */
@@ -1181,11 +1173,37 @@ export type NextDestination = {
   company: Maybe<FormCompany>;
 };
 
+/**
+ * Payload d'un établissement pour la destination ultérieure prévue (case 12)
+ * Cet établissement peut se situer à l'étranger
+ */
+export type NextDestinationCompanyInput = {
+  /** SIRET de l'établissement */
+  siret: Maybe<Scalars['String']>;
+  /** Nom de l'établissement */
+  name: Maybe<Scalars['String']>;
+  /** Adresse de l'établissement */
+  address: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * En l'absence de code, l'entreprise est considérée comme résidant en France.
+   */
+  country: Maybe<Scalars['String']>;
+  /** Nom du contact dans l'établissement */
+  contact: Maybe<Scalars['String']>;
+  /** Email du contact dans l'établissement */
+  mail: Maybe<Scalars['String']>;
+  /** Numéro de téléphone de contact dans l'établissement */
+  phone: Maybe<Scalars['String']>;
+};
+
 export type NextDestinationInput = {
   /** Traitement prévue (code D/R) */
   processingOperation: Scalars['String'];
   /** Établissement de destination ultérieur */
-  company: CompanyInput;
+  company: NextDestinationCompanyInput;
 };
 
 /** Payload d'un segment de transport */
@@ -2055,7 +2073,6 @@ export function createCompanyInputMock(props: Partial<CompanyInput>): CompanyInp
     siret: null,
     name: null,
     address: null,
-    country: null,
     contact: null,
     mail: null,
     phone: null,
@@ -2404,10 +2421,23 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
   };
 }
 
+export function createNextDestinationCompanyInputMock(props: Partial<NextDestinationCompanyInput>): NextDestinationCompanyInput {
+  return {
+    siret: null,
+    name: null,
+    address: null,
+    country: null,
+    contact: null,
+    mail: null,
+    phone: null,
+    ...props,
+  };
+}
+
 export function createNextDestinationInputMock(props: Partial<NextDestinationInput>): NextDestinationInput {
   return {
     processingOperation: "",
-    company: createCompanyInputMock({}),
+    company: createNextDestinationCompanyInputMock({}),
     ...props,
   };
 }

@@ -273,4 +273,29 @@ describe("Mutation.markAsSealed", () => {
 
     expect(data.markAsSealed.status).toBe("SEALED");
   });
+
+  it("should mark appendix2 forms as grouped", async () => {
+    const user = await userFactory();
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "AWAITING_GROUP" }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { status: "DRAFT" }
+    });
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    expect(appendix2grouped.status).toEqual("GROUPED");
+  });
 });

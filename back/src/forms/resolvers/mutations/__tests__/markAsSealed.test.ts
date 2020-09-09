@@ -4,11 +4,13 @@ import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
 const appendix2FormsMock = jest.fn(() => Promise.resolve([]));
+const ecoOrganismeMock = jest.fn(() => Promise.resolve(null));
 const formMock = jest.fn(() => Promise.resolve({}));
 function mockFormWith(value) {
   const result: any = Promise.resolve(value);
   result.temporaryStorageDetail = temporaryStorageDetailMock;
   result.appendix2Forms = appendix2FormsMock;
+  result.ecoOrganisme = ecoOrganismeMock;
   formMock.mockReturnValue(result);
 }
 
@@ -65,7 +67,8 @@ describe("Forms -> markAsSealed mutation", () => {
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
-        `Erreur(s): Émetteur: La sélection d'une entreprise par SIRET est obligatoire`;
+        `Erreur(s): Émetteur: Le siret de l'entreprise est obligatoire\n` +
+        `Émetteur: Le SIRET doit faire 14 caractères`;
 
       expect(err.message).toBe(errMess);
     }
@@ -84,9 +87,9 @@ describe("Forms -> markAsSealed mutation", () => {
     } catch (err) {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
-        `Erreur(s): Émetteur: La sélection d'une entreprise par SIRET est obligatoire\n` +
-        `Émetteur: L'adresse d'une entreprise est obligatoire`;
-
+        `Erreur(s): Émetteur: Le siret de l'entreprise est obligatoire\n` +
+        `Émetteur: Le SIRET doit faire 14 caractères\n` +
+        `Émetteur: L'adresse de l'entreprise est obligatoire`;
       expect(err.message).toBe(errMess);
     }
   });

@@ -5,16 +5,19 @@ import {
   checkCanMarkAsReceived,
   checkCanMarkAsProcessed,
   checkCanMarkAsTempStored,
-  checkCanMarkAsResent
+  checkCanMarkAsResent,
+  checkSecurityCode
 } from "../permissions";
 import {
   userFactory,
   formFactory,
   userWithCompanyFactory,
-  formWithTempStorageFactory
+  formWithTempStorageFactory,
+  companyFactory
 } from "../../__tests__/factories";
 import { prisma, User, Form } from "../../generated/prisma-client";
 import { ErrorCode } from "../../common/errors";
+import { resetDatabase } from "../../../integration-tests/helper";
 
 async function checkOwnerPermission(
   permission: (user: User, form: Form) => Promise<boolean>
@@ -152,6 +155,8 @@ async function checkRandomUserPermission(
 }
 
 describe("checkCanReadUpdateDeleteForm", () => {
+  afterAll(resetDatabase);
+
   const permission = checkCanReadUpdateDeleteForm;
 
   it("should deny access to random user", async () => {
@@ -210,6 +215,8 @@ describe("checkCanReadUpdateDeleteForm", () => {
 });
 
 describe("checkCanMarkAsSealed", () => {
+  afterAll(resetDatabase);
+
   const permission = checkCanMarkAsSealed;
 
   it("should deny access to random user", async () => {
@@ -252,6 +259,8 @@ describe("checkCanMarkAsSealed", () => {
 });
 
 describe("checkCanSignedByTransporter", () => {
+  afterAll(resetDatabase);
+
   const permission = checkCanSignedByTransporter;
 
   it("should deny access to random user", async () => {
@@ -275,6 +284,8 @@ describe("checkCanSignedByTransporter", () => {
 });
 
 describe("checkCanMarkAsReceived", () => {
+  afterAll(resetDatabase);
+
   const permission = checkCanMarkAsReceived;
 
   it("should deny access to random user", async () => {
@@ -298,6 +309,8 @@ describe("checkCanMarkAsReceived", () => {
 });
 
 describe("checkCanMarkAsProcessed", () => {
+  afterAll(resetDatabase);
+
   const permission = checkCanMarkAsProcessed;
 
   it("should deny access to random user", async () => {
@@ -321,6 +334,8 @@ describe("checkCanMarkAsProcessed", () => {
 });
 
 describe("checkCanMarkAsTempStored", async () => {
+  afterAll(resetDatabase);
+
   const permission = checkCanMarkAsTempStored;
 
   it("should deny access to random user", async () => {
@@ -339,6 +354,8 @@ describe("checkCanMarkAsTempStored", async () => {
 });
 
 describe("checkCanMarkAsResent", async () => {
+  afterAll(resetDatabase);
+
   const permission = checkCanMarkAsResent;
 
   it("should deny access to random user", async () => {
@@ -353,5 +370,23 @@ describe("checkCanMarkAsResent", async () => {
   it("should allow recipient", async () => {
     const check = await checkRecipientPermission(permission);
     expect(check).toEqual(true);
+  });
+});
+
+describe("checkSecurityCode", async () => {
+  afterAll(resetDatabase);
+
+  test("securityCode is valid", async () => {
+    const company = await companyFactory();
+    const check = await checkSecurityCode(company.siret, company.securityCode);
+    expect(check).toEqual(true);
+  });
+
+  test("securityCode is invalid", async () => {
+    const company = await companyFactory();
+    const checkFn = () => checkSecurityCode(company.siret, 1258478956);
+    expect(checkFn).rejects.toThrow(
+      "Le code de sécurité de l'émetteur du bordereau est invalide."
+    );
   });
 });

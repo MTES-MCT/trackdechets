@@ -1,8 +1,8 @@
 import { formFactory, userFactory } from "../../__tests__/factories";
-import { getFormOrFormNotFound } from "../database";
+import { getFormOrFormNotFound, getEcoOrganismeOrNotFound } from "../database";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { ErrorCode } from "../../common/errors";
-import { User } from "../../generated/prisma-client";
+import { User, prisma } from "../../generated/prisma-client";
 
 let user: User = null;
 
@@ -67,5 +67,26 @@ describe("getFormOrFormNotFound", () => {
         `Le bordereau avec l'identifiant "${readableId}" n'existe pas.`
       );
     }
+  });
+});
+
+describe("getEcoOrganismeOrNotFound", () => {
+  afterAll(resetDatabase);
+
+  it("should get an EO by id", async () => {
+    const eo = await prisma.createEcoOrganisme({
+      siret: "12569854785964",
+      name: "EO",
+      address: "Somewhere"
+    });
+    const eo2 = await getEcoOrganismeOrNotFound({ id: eo.id });
+    expect(eo2.id).toEqual(eo.id);
+  });
+
+  it("should throw error if EO does not exists", () => {
+    const getEO = () => getEcoOrganismeOrNotFound({ id: "does_not_exist" });
+    expect(getEO).rejects.toThrow(
+      "L'éco-organisme avec l'identifiant \"does_not_exist\" n'existe pas."
+    );
   });
 });

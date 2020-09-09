@@ -15,7 +15,7 @@ import { expandTransportSegmentFromDb } from "../../form-converter";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
-import { validDatetime } from "../../validation";
+import { validDatetime } from "../../../common/yup";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -60,23 +60,17 @@ const segmentSchema = Yup.object<any>().shape({
         : schema.required("Le département du transporteur est obligatoire")
   ),
 
-  transporterValidityLimit: validDatetime(
-    {
-      verboseFieldName: "date de validité"
-    },
-    Yup
-  ),
+  transporterValidityLimit: validDatetime({
+    verboseFieldName: "date de validité"
+  }),
   transporterNumberPlate: Yup.string().nullable(true)
 });
 
 const takeOverInfoSchema = Yup.object<any>().shape({
-  takenOverAt: validDatetime(
-    {
-      verboseFieldName: "date de prise en charge",
-      required: true
-    },
-    Yup
-  ),
+  takenOverAt: validDatetime({
+    verboseFieldName: "date de prise en charge",
+    required: true
+  }),
   takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
 });
 

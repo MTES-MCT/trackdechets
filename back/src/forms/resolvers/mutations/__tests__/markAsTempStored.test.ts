@@ -1,10 +1,6 @@
 import { getNewValidPrismaForm, getContext } from "../__mocks__/data";
 import { markAsTempStoredFn as markAsTempStored } from "../markAsTempStored";
 import { ErrorCode } from "../../../../common/errors";
-import {
-  TempStoredFormInput,
-  WasteAcceptationStatusInput
-} from "../../../../generated/graphql/types";
 
 const formMock = jest.fn();
 const temporaryStorageDetailMock = jest.fn(() => Promise.resolve(null));
@@ -51,7 +47,17 @@ describe("Forms -> markAsTempStored mutation", () => {
 
       await markAsTempStored(
         form,
-        { id: "1", tempStoredInfos: {} as TempStoredFormInput },
+        {
+          id: "1",
+          tempStoredInfos: {
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedBy: "John Snow",
+            receivedAt: "2019-12-20T00:00:00.000Z",
+            signedAt: "2019-12-20T00:00:00.000Z",
+            quantityReceived: 1.0,
+            quantityType: "REAL"
+          }
+        },
         defaultContext
       );
     } catch (err) {
@@ -66,14 +72,18 @@ describe("Forms -> markAsTempStored mutation", () => {
 
     mockFormWith(form);
 
-    const ACCEPTED: WasteAcceptationStatusInput = "ACCEPTED";
     await markAsTempStored(
       form,
       {
         id: "1",
         tempStoredInfos: {
-          wasteAcceptationStatus: ACCEPTED
-        } as TempStoredFormInput
+          wasteAcceptationStatus: "ACCEPTED",
+          receivedBy: "John Snow",
+          receivedAt: "2019-12-20T00:00:00.000Z",
+          signedAt: "2019-12-20T00:00:00.000Z",
+          quantityReceived: 1.0,
+          quantityType: "REAL"
+        }
       },
       defaultContext
     );
@@ -93,14 +103,19 @@ describe("Forms -> markAsTempStored mutation", () => {
 
     mockFormWith(form);
 
-    const REFUSED: WasteAcceptationStatusInput = "REFUSED";
     await markAsTempStored(
       form,
       {
         id: "1",
         tempStoredInfos: {
-          wasteAcceptationStatus: REFUSED
-        } as TempStoredFormInput
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "non conforme",
+          receivedBy: "John Snow",
+          receivedAt: "2019-12-20T00:00:00.000Z",
+          signedAt: "2019-12-20T00:00:00.000Z",
+          quantityReceived: 0.0,
+          quantityType: "REAL"
+        }
       },
       defaultContext
     );

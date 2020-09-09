@@ -6,27 +6,21 @@ import { prisma } from "../../../generated/prisma-client";
 import { formsWhereInput } from "../../exports/where-inputs";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { validDatetime } from "../../validation";
 import { getUserCompanies } from "../../../users/database";
 import { NotCompanyMember } from "../../../common/errors";
+import { validDatetime } from "../../../common/yup";
 
 const TYPE = "forms_register";
 
 const validationSchema = yup.object().shape({
-  startDate: validDatetime(
-    {
-      verboseFieldName: "Date de début",
-      required: false
-    },
-    yup
-  ),
-  endDate: validDatetime(
-    {
-      verboseFieldName: "Date de début",
-      required: false
-    },
-    yup
-  )
+  startDate: validDatetime({
+    verboseFieldName: "Date de début",
+    required: false
+  }),
+  endDate: validDatetime({
+    verboseFieldName: "Date de début",
+    required: false
+  })
 });
 
 const formsRegisterResolver: QueryResolvers["formsRegister"] = async (

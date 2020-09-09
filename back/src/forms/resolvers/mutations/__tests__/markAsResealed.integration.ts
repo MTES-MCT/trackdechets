@@ -45,7 +45,7 @@ describe("Mutation markAsResealed", () => {
     expect(resealedForm.status).toEqual("RESEALED");
   });
 
-  it("should return an error when transporter is in a foreign country", async () => {
+  test("it should fail if temporary storage detail is incomplete", async () => {
     const owner = await userFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -59,37 +59,67 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    await mutate(MARK_AS_RESEALED, {
-      variables: {
-        id: form.id,
-        resealedInfos: {}
+    // assume destination siret missing
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: {
+        temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
       }
     });
 
     const { errors } = await mutate(MARK_AS_RESEALED, {
       variables: {
         id: form.id,
+        resealedInfos: {}
+      }
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Destination prévue: Le siret de l'entreprise est obligatoire"
+    );
+    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    const resealedForm = await prisma.form({ id: form.id });
+    expect(resealedForm.status).toEqual("TEMP_STORED");
+  });
+
+  test("it should work if resealedInfos is completing current data", async () => {
+    const owner = await userFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "TEMP_STORED",
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    // assume destination siret is missing
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: {
+        temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
+      }
+    });
+
+    // provide missing info in resealedInfos
+    await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
         resealedInfos: {
-          transporter: {
-            isExemptedOfReceipt: true,
-            department: "DE",
+          destination: {
             company: {
-              name: "German Transporter",
-              contact: "Hermann Nitsch",
-              mail: "h.nitsch@gmail.com",
-              phone: "0606060606",
-              country: "DE",
-              address: "12 rue de Berlin"
+              siret: "12658974589563"
             }
           }
         }
       }
     });
 
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toEqual(
-      "Transporteur: Cette entreprise ne peut pas être à l'étranger"
-    );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    const resealedForm = await prisma.form({ id: form.id });
+    expect(resealedForm.status).toEqual("RESEALED");
   });
 });

@@ -324,7 +324,8 @@ describe("Mutation.createForm", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: `Le code déchet "${wasteCode}" n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.`,
+          message:
+            "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.",
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })
