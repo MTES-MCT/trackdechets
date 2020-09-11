@@ -118,7 +118,7 @@ const formdata = {
   transporterReceipt: "33AA",
   quantityReceived: null,
   processedAt: null,
-  wasteDetailsOnuCode: "",
+  wasteDetailsOnuCode: "2003",
   emitterType: "PRODUCER" as EmitterType,
   traderValidityLimit: null,
   traderCompanyContact: "",

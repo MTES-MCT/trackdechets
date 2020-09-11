@@ -5542,3 +5542,7 @@ export const WASTES = flatten(WASTES_TREE).filter(
 );
 
 export const WASTES_CODES = WASTES.map(waste => waste.code);
+
+export function isDangerous(wasteCode: string): boolean {
+  return wasteCode.endsWith("*");
+}

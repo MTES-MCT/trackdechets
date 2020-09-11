@@ -1,12 +1,11 @@
-import { createTestClient } from "apollo-server-integration-testing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
-import { server } from "../../../../server";
 import {
   formFactory,
   userWithCompanyFactory,
   companyFactory
 } from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 
 jest.mock("axios", () => ({
@@ -15,82 +14,19 @@ jest.mock("axios", () => ({
   }
 }));
 
-describe("Integration / Mark as signed mutation", () => {
-  let user;
-  let company;
-  let mutate;
+const SIGNED_BY_TRANSPORTER = `mutation SignedByTransporter($id: ID!, $signingInfo: TransporterSignatureFormInput!) {
+  signedByTransporter(id: $id, signingInfo: $signingInfo) {
+    id
+    status
+  }
+}`;
 
-  beforeAll(async () => {
-    const userAndCompany = await userWithCompanyFactory("ADMIN");
-    user = userAndCompany.user;
-    company = userAndCompany.company;
-  });
+describe("Mutation.signedByTransporter", () => {
+  afterAll(() => resetDatabase());
 
-  beforeEach(() => {
-    // instantiate test client
-    const { mutate: m, setOptions } = createTestClient({
-      apolloServer: server
-    });
-
-    setOptions({
-      request: {
-        user
-      }
-    });
-
-    mutate = m;
-  });
-
-  afterAll(async () => {
-    await resetDatabase();
-  });
-
-  it.each([`onuCode: "Code ONU"`, ""])(
-    "should mark a form as signed",
-    async onuCodeParam => {
-      const emittingCompany = await companyFactory();
-
-      const form = await formFactory({
-        ownerId: user.id,
-        opt: {
-          sentAt: null,
-          status: "SEALED",
-          emitterCompanyName: emittingCompany.name,
-          emitterCompanySiret: emittingCompany.siret,
-          transporterCompanyName: company.name,
-          transporterCompanySiret: company.siret
-        }
-      });
-
-      const mutation = `
-      mutation   {
-        signedByTransporter(id: "${form.id}", signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z"
-          signedByTransporter: true
-          securityCode: ${emittingCompany.securityCode}
-          sentBy: "Roger Lapince"
-          signedByProducer: true
-
-          packagings: ${form.wasteDetailsPackagings}
-          quantity: ${form.wasteDetailsQuantity}
-          ${onuCodeParam}
-
-        }) {
-          id
-        }
-      }
-    `;
-
-      await mutate(mutation);
-
-      const resultingForm = await prisma.form({ id: form.id });
-      expect(resultingForm.status).toBe("SENT");
-    }
-  );
-
-  it("should fail if wrong security code", async () => {
+  it("should mark a form as signed", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const emitterCompany = await companyFactory();
-
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -103,25 +39,138 @@ describe("Integration / Mark as signed mutation", () => {
       }
     });
 
-    const mutation = `
-    mutation   {
-      signedByTransporter(
-        id: "${form.id}",
+    const { mutate } = makeClient(user);
+    await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
         signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z"
-          signedByTransporter: true
-          securityCode: 4567
-          sentBy: "Roger Lapince"
-          signedByProducer: true
-          packagings: ${form.wasteDetailsPackagings}
-          quantity: ${form.wasteDetailsQuantity}
-      }) {
-        id
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: emitterCompany.securityCode,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity,
+          onuCode: "Code ONU"
+        }
       }
-    }
-  `;
+    });
 
-    const { errors } = await mutate(mutation);
+    const resultingForm = await prisma.form({ id: form.id });
+    expect(resultingForm.status).toBe("SENT");
+  });
+
+  it("should return an error if onuCode is provided empty for a dangerous waste", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const emitter = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        wasteDetailsCode: "01 01 01*",
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: emitter.securityCode,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity,
+          onuCode: ""
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le code ONU est obligatoire pour les déchets dangereux",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should not return an error if onuCode is provided empty for a non-dangerous waste", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const emitter = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        wasteDetailsCode: "01 01 01",
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: emitter.securityCode,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity,
+          onuCode: ""
+        }
+      }
+    });
+
+    expect(errors).toBe(undefined);
+    expect(data.signedByTransporter.status).toBe("SENT");
+  });
+
+  it("should fail if wrong security code", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const emitterCompany = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanyName: company.name,
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: 4567,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity
+        }
+      }
+    });
+
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Le code de sécurité de l'émetteur du bordereau est invalide.",
@@ -133,8 +182,8 @@ describe("Integration / Mark as signed mutation", () => {
   });
 
   it("should fail when not signed by producer", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const emitterCompany = await companyFactory();
-
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -147,25 +196,22 @@ describe("Integration / Mark as signed mutation", () => {
       }
     });
 
-    const mutation = `
-    mutation   {
-      signedByTransporter(
-        id: "${form.id}",
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
         signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z"
-          signedByTransporter: true
-          securityCode: 1234
-          sentBy: "Roger Lapince"
-          signedByProducer: false
-          packagings: ${form.wasteDetailsPackagings}
-          quantity: ${form.wasteDetailsQuantity}
-      }) {
-        id
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: 1234,
+          sentBy: "Roger Lapince",
+          signedByProducer: false,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity
+        }
       }
-    }
-  `;
+    });
 
-    const { errors } = await mutate(mutation);
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Le producteur doit signer pour valider l'enlèvement.",
@@ -177,8 +223,8 @@ describe("Integration / Mark as signed mutation", () => {
   });
 
   it("should fail when not signed by transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const emitterCompany = await companyFactory();
-
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -191,25 +237,22 @@ describe("Integration / Mark as signed mutation", () => {
       }
     });
 
-    const mutation = `
-    mutation   {
-      signedByTransporter(
-        id: "${form.id}",
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
         signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z"
-          signedByTransporter: false
-          securityCode: 1234
-          sentBy: "Roger Lapince"
-          signedByProducer: true
-          packagings: ${form.wasteDetailsPackagings}
-          quantity: ${form.wasteDetailsQuantity}
-      }) {
-        id
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: false,
+          securityCode: 1234,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity
+        }
       }
-    }
-  `;
+    });
 
-    const { errors } = await mutate(mutation);
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Le transporteur doit signer pour valider l'enlèvement.",
@@ -221,9 +264,9 @@ describe("Integration / Mark as signed mutation", () => {
   });
 
   it("should mark a form with temporary storage as signed (frame 18)", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const receivingCompany = await companyFactory();
     const destinationCompany = await companyFactory();
-
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -256,25 +299,22 @@ describe("Integration / Mark as signed mutation", () => {
       }
     });
 
-    const mutation = `
-      mutation   {
-        signedByTransporter(id: "${form.id}", signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z"
-          signedByTransporter: true
-          securityCode: ${receivingCompany.securityCode}
-          sentBy: "Roger Lapince"
-          signedByProducer: true
-
-          packagings: ${form.wasteDetailsPackagings}
-          quantity: ${form.wasteDetailsQuantity}
+    const { mutate } = makeClient(user);
+    await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: receivingCompany.securityCode,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity,
           onuCode: "Code ONU"
-        }) {
-          id
         }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toBe("RESENT");

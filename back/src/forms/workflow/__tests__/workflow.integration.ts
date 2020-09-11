@@ -182,7 +182,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           wasteDetails: {
             code: "06 05 02*"
-            onuCode: ""
+            onuCode: "2003"
             name: "Boues"
             packagings: [
               BENNE
@@ -527,7 +527,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           wasteDetails: {
               code: "06 05 02*"
-              onuCode: ""
+              onuCode: "2003"
               name: "Boues"
               packagings: [
                 BENNE
@@ -1021,7 +1021,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           wasteDetails: {
             code: "06 05 02*"
-            onuCode: ""
+            onuCode: "2003"
             name: "Boues"
             packagings: [
               BENNE
