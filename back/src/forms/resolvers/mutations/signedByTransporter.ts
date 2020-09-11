@@ -1,17 +1,19 @@
 import {
   MutationResolvers,
-  MutationSignedByTransporterArgs
+  MutationSignedByTransporterArgs,
+  TransporterSignatureFormInput
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { UserInputError } from "apollo-server-express";
 import { isValidDatetime, validateSecurityCode } from "../../validation";
-import { prisma } from "../../../generated/prisma-client";
+import { prisma, Form } from "../../../generated/prisma-client";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanSignedByTransporter } from "../../permissions";
 import { InvalidDateTime } from "../../../common/errors";
+import { isDangerous } from "../../../common/constants";
 
-function validateArgs(args: MutationSignedByTransporterArgs) {
+function validateArgs(args: MutationSignedByTransporterArgs, form: Form) {
   if (args.signingInfo.quantity <= 0) {
     throw new UserInputError("La quantité saisie doit être supérieure à 0");
   }
@@ -30,6 +32,13 @@ function validateArgs(args: MutationSignedByTransporterArgs) {
   if (!isValidDatetime(args.signingInfo.sentAt)) {
     throw new InvalidDateTime("sentAt");
   }
+
+  if (args.signingInfo.onuCode === "" && isDangerous(form.wasteDetailsCode)) {
+    throw new UserInputError(
+      "Le code ONU est obligatoire pour les déchets dangereux"
+    );
+  }
+
   return args;
 }
 
@@ -40,16 +49,22 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { id, signingInfo } = validateArgs(args);
-
-  const form = await getFormOrFormNotFound({ id });
+  const form = await getFormOrFormNotFound({ id: args.id });
+  const { id, signingInfo } = validateArgs(args, form);
 
   await checkCanSignedByTransporter(user, form);
 
-  const wasteDetails = {
-    wasteDetailsPackagings: signingInfo.packagings,
-    wasteDetailsQuantity: signingInfo.quantity,
-    wasteDetailsOnuCode: signingInfo.onuCode || form.wasteDetailsOnuCode
+  const transformEventToWasteDetails = (
+    infos: TransporterSignatureFormInput
+  ) => {
+    return {
+      wasteDetailsPackagings: infos.packagings,
+      wasteDetailsQuantity: infos.quantity,
+
+      // onuCode is optional so it should not overwrite
+      // the current ONU code if it's not provided
+      wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
+    };
   };
 
   if (form.sentAt) {
@@ -72,6 +87,8 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
       { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
       context,
       infos => {
+        const wasteDetails = transformEventToWasteDetails(infos);
+
         return {
           ...(!hasWasteDetailsOverride && wasteDetails),
 
@@ -95,10 +112,10 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   );
 
   const transformEventToFormParams = infos => ({
-    ...wasteDetails,
     signedByTransporter: infos.signedByTransporter,
     sentAt: infos.sentAt,
     sentBy: infos.sentBy,
+    ...transformEventToWasteDetails(infos),
     currentTransporterSiret: form.transporterCompanySiret
   });
 

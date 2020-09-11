@@ -17,6 +17,7 @@ jest.mock("axios", () => ({
 const SIGNED_BY_TRANSPORTER = `mutation SignedByTransporter($id: ID!, $signingInfo: TransporterSignatureFormInput!) {
   signedByTransporter(id: $id, signingInfo: $signingInfo) {
     id
+    status
   }
 }`;
 
@@ -59,29 +60,30 @@ describe("Mutation.signedByTransporter", () => {
     expect(resultingForm.status).toBe("SENT");
   });
 
-  it("should not overwrite onuCode if it's empty", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const emitterCompany = await companyFactory();
+  it("should return an error if onuCode is provided empty for a dangerous waste", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const emitter = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         sentAt: null,
         status: "SEALED",
-        emitterCompanyName: emitterCompany.name,
-        emitterCompanySiret: emitterCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret
+        wasteDetailsCode: "01 01 01*",
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret
       }
     });
 
     const { mutate } = makeClient(user);
-    await mutate(SIGNED_BY_TRANSPORTER, {
+    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
           sentAt: "2018-12-11T00:00:00.000Z",
           signedByTransporter: true,
-          securityCode: emitterCompany.securityCode,
+          securityCode: emitter.securityCode,
           sentBy: "Roger Lapince",
           signedByProducer: true,
           packagings: form.wasteDetailsPackagings,
@@ -91,11 +93,51 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form({ id: form.id });
-    expect(resultingForm).toMatchObject({
-      status: "SENT",
-      wasteDetailsOnuCode: "2003"
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le code ONU est obligatoire pour les déchets dangereux",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should not return an error if onuCode is provided empty for a non-dangerous waste", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const emitter = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        wasteDetailsCode: "01 01 01",
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret
+      }
     });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: emitter.securityCode,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity,
+          onuCode: ""
+        }
+      }
+    });
+
+    expect(errors).toBe(undefined);
+    expect(data.signedByTransporter.status).toBe("SENT");
   });
 
   it("should fail if wrong security code", async () => {
