@@ -14,10 +14,19 @@ jest.mock("axios", () => ({
   }
 }));
 
-describe("{ mutation { markAsSealed } }", () => {
+const MARK_AS_SEALED = `
+  mutation MarkAsSealed($id: ID!) {
+    markAsSealed(id: $id) {
+      id
+      status
+    }
+  }
+`;
+
+describe("Mutation.markAsSealed", () => {
   afterAll(() => resetDatabase());
 
-  test.each(["emitter", "recipient", "trader", "transporter"])(
+  it.each(["emitter", "recipient", "trader", "transporter"])(
     "%p of the BSD can seal it",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -31,16 +40,11 @@ describe("{ mutation { markAsSealed } }", () => {
       });
 
       const { mutate } = makeClient(user);
-
-      const mutation = `
-      mutation   {
-        markAsSealed(id: "${form.id}") {
-          id
+      await mutate(MARK_AS_SEALED, {
+        variables: {
+          id: form.id
         }
-      }
-    `;
-
-      await mutate(mutation);
+      });
 
       form = await prisma.form({ id: form.id });
 
@@ -58,7 +62,7 @@ describe("{ mutation { markAsSealed } }", () => {
     }
   );
 
-  test("the eco-organisme of the BSD can seal it", async () => {
+  it("the eco-organisme of the BSD can seal it", async () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await companyFactory();
     const traderCompany = await companyFactory();
@@ -87,23 +91,18 @@ describe("{ mutation { markAsSealed } }", () => {
     });
 
     const { mutate } = makeClient(user);
-
-    const mutation = `
-      mutation   {
-        markAsSealed(id: "${form.id}") {
-          id
-        }
+    await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     form = await prisma.form({ id: form.id });
 
     expect(form.status).toEqual("SEALED");
   });
 
-  test("should fail if user is not authorized", async () => {
+  it("should fail if user is not authorized", async () => {
     const owner = await userFactory();
     const { user } = await userWithCompanyFactory("MEMBER");
 
@@ -119,23 +118,18 @@ describe("{ mutation { markAsSealed } }", () => {
     });
 
     const { mutate } = makeClient(user);
-
-    const mutation = `
-      mutation   {
-        markAsSealed(id: "${form.id}") {
-          id
-        }
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
       }
-    `;
-
-    const { errors } = await mutate(mutation);
+    });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
 
     const resultingForm = await prisma.form({ id: form.id });
     expect(resultingForm.status).toEqual("DRAFT");
   });
 
-  test("the BSD can not be sealed if data do not validate", async () => {
+  it("the BSD can not be sealed if data do not validate", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
@@ -153,16 +147,11 @@ describe("{ mutation { markAsSealed } }", () => {
     });
 
     const { mutate } = makeClient(user);
-
-    const mutation = `
-      mutation   {
-        markAsSealed(id: "${form.id}") {
-          id
-        }
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
       }
-    `;
-
-    const { errors } = await mutate(mutation);
+    });
 
     // check error message is relevant and only failing fields are reported
     const errMessage =
@@ -179,7 +168,7 @@ describe("{ mutation { markAsSealed } }", () => {
     expect(statusLogs.length).toEqual(0);
   });
 
-  test.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(
+  it.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(
     "wrong waste code (%p) must invalidate mutation",
     async wrongWasteCode => {
       const { user, company: recipientCompany } = await userWithCompanyFactory(
@@ -199,16 +188,11 @@ describe("{ mutation { markAsSealed } }", () => {
       });
 
       const { mutate } = makeClient(user);
-
-      const mutation = `
-      mutation   {
-        markAsSealed(id: "${form.id}") {
-          id
+      const { errors } = await mutate(MARK_AS_SEALED, {
+        variables: {
+          id: form.id
         }
-      }
-    `;
-
-      const { errors } = await mutate(mutation);
+      });
 
       expect(errors[0].message).toEqual(
         expect.stringContaining(
@@ -247,13 +231,6 @@ describe("{ mutation { markAsSealed } }", () => {
       }
     });
 
-    const MARK_AS_SEALED = `
-      mutation MarkAsSealed($id: ID!) {
-        markAsSealed(id: $id) {
-          status
-        }
-      }
-    `;
     const { mutate } = makeClient(user);
 
     const { errors } = await mutate(MARK_AS_SEALED, {
@@ -287,13 +264,6 @@ describe("{ mutation { markAsSealed } }", () => {
       }
     });
 
-    const MARK_AS_SEALED = `
-      mutation MarkAsSealed($id: ID!) {
-        markAsSealed(id: $id) {
-          status
-        }
-      }
-    `;
     const { mutate } = makeClient(user);
     const { data } = await mutate(MARK_AS_SEALED, {
       variables: {
