@@ -11,6 +11,7 @@ import {
 } from "yup";
 import countries from "world-countries";
 import { WasteAcceptationStatusInput as WasteAcceptationStatus } from "../generated/graphql/types";
+import { isDangerous } from "../generated/constants";
 
 setLocale({
   mixed: {
@@ -93,7 +94,14 @@ export const formSchema = object().shape({
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
     name: string().nullable(true),
-    onuCode: string(),
+    onuCode: string().when("code", {
+      is: (wasteCode: string) => isDangerous(wasteCode || ""),
+      then: () =>
+        string()
+          .ensure()
+          .required("Le code ONU est obligatoire pour les déchets dangereux"),
+      otherwise: () => string().nullable(),
+    }),
     packagings: array().of(packagingSchema),
     otherPackaging: string().nullable(true),
     numberOfPackages: number()
