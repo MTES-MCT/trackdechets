@@ -68,7 +68,7 @@ describe("Forms -> markAsSealed mutation", () => {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
         `Erreur(s): Émetteur: Le siret de l'entreprise est obligatoire\n` +
-        `Émetteur: Le SIRET doit faire 14 caractères`;
+        `Émetteur: Le SIRET doit faire 14 caractères numériques`;
 
       expect(err.message).toBe(errMess);
     }
@@ -88,7 +88,7 @@ describe("Forms -> markAsSealed mutation", () => {
       const errMess =
         `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n` +
         `Erreur(s): Émetteur: Le siret de l'entreprise est obligatoire\n` +
-        `Émetteur: Le SIRET doit faire 14 caractères\n` +
+        `Émetteur: Le SIRET doit faire 14 caractères numériques\n` +
         `Émetteur: L'adresse de l'entreprise est obligatoire`;
       expect(err.message).toBe(errMess);
     }

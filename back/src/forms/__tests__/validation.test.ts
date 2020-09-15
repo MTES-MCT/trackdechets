@@ -3,7 +3,6 @@ import {
   sealedFormSchema,
   ecoOrganismeSchema,
   receivedInfoSchema,
-  wasteDetailsSchema,
   draftFormSchema
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
