@@ -14,17 +14,12 @@ import {
   ResolversParentTypes,
   EcoOrganisme
 } from "../../../generated/graphql/types";
-import { WASTES_CODES } from "../../../common/constants";
-import {
-  InvalidWasteCode,
-  MissingTempStorageFlag,
-  NotFormContributor
-} from "../../errors";
+import { MissingTempStorageFlag, NotFormContributor } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
 import { GraphQLContext } from "../../../types";
-import { draftFormSchema } from "../../validation";
 import { getEcoOrganismeOrNotFound } from "../../database";
+import { draftFormSchema } from "../../validation";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -68,13 +63,6 @@ const createFormResolver = async (
   };
 
   await draftFormSchema.validate(formCreateInput);
-
-  if (
-    formCreateInput.wasteDetailsCode &&
-    !WASTES_CODES.includes(formCreateInput.wasteDetailsCode)
-  ) {
-    throw new InvalidWasteCode(formCreateInput.wasteDetailsCode);
-  }
 
   if (ecoOrganisme) {
     // Connect with eco-organisme

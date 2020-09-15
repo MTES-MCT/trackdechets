@@ -173,7 +173,7 @@ const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
 const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
 const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
 
-const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères";
+const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
 
 const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas.";
@@ -299,6 +299,7 @@ export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
         .nullable(true),
       wasteDetailsQuantity: yup
         .number()
+        .required("La quantité du déchet en tonnes est obligatoire")
         .min(0, "La quantité doit être supérieure à 0"),
       wasteDetailsQuantityType: yup
         .mixed<QuantityType>()
@@ -404,7 +405,7 @@ export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
         ["REFUSED"].includes(wasteAcceptationStatus)
           ? schema.test(
               "is-zero",
-              "Vous devez saisir une quantité reçue égale à 0.",
+              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
               v => v === 0
             )
           : schema
@@ -423,7 +424,7 @@ export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
       .string()
       .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
         ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.required("Vous devez préciser la raison du refus")
+          ? schema.ensure().required("Vous devez saisir un motif de refus")
           : schema
               .notRequired()
               .nullable()
@@ -687,20 +688,30 @@ export const draftFormSchema = yup.object().shape({
     .string()
     .nullable()
     .notRequired()
-    .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`),
+    .matches(/^$|^\d{14}$/, {
+      message: `Émetteur: ${INVALID_SIRET_LENGTH}`
+    }),
   emitterCompanyMail: yup.string().email().nullable().notRequired(),
   recipientCompanySiret: yup
     .string()
     .notRequired()
     .nullable()
-    .length(14, `Destinataire: ${INVALID_SIRET_LENGTH}`),
+    .matches(/^$|^\d{14}$/, {
+      message: `Destinataire: ${INVALID_SIRET_LENGTH}`
+    }),
   recipientCompanyMail: yup.string().notRequired().nullable().email(),
   wasteDetailsCode: yup
     .string()
     .notRequired()
     .nullable()
     .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
-  transporterCompanySiret: yup.string().notRequired().nullable().length(14),
+  transporterCompanySiret: yup
+    .string()
+    .notRequired()
+    .nullable()
+    .matches(/^$|^\d{14}$/, {
+      message: `Transporteur: ${INVALID_SIRET_LENGTH}`
+    }),
   transporterCompanyMail: yup.string().notRequired().nullable().email(),
   transporterValidityLimit: validDatetime({
     verboseFieldName: "date de validité",

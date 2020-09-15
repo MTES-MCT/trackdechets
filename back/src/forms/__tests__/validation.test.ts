@@ -2,7 +2,9 @@ import { Form } from "../../generated/prisma-client";
 import {
   sealedFormSchema,
   ecoOrganismeSchema,
-  receivedInfoSchema
+  receivedInfoSchema,
+  wasteDetailsSchema,
+  draftFormSchema
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
 
@@ -170,13 +172,13 @@ describe("receivedInfosSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    it("should be invalid when quantity received is 0", () => {
+    it("should be invalid when quantity received is 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
           quantityReceived: 0
         });
-      expect(validateFn).rejects.toEqual(
+      await expect(validateFn()).rejects.toThrow(
         "Vous devez saisir une quantité reçue supérieure à 0."
       );
     });
@@ -197,19 +199,21 @@ describe("receivedInfosSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    it("should be invalid if wasteRefusalReason is missing", () => {
+    it("should be invalid if wasteRefusalReason is missing", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
           wasteRefusalReason: null
         });
-      expect(validateFn).rejects.toEqual("Vous devez saisir un motif de refus");
+      await expect(validateFn()).rejects.toThrow(
+        "Vous devez saisir un motif de refus"
+      );
     });
 
-    it("should be invalid if quantity received is different from 0", () => {
+    it("should be invalid if quantity received is different from 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 1.0 });
-      expect(validateFn).rejects.toEqual(
+      await expect(validateFn()).rejects.toThrow(
         "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
       );
     });
@@ -230,23 +234,77 @@ describe("receivedInfosSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    it("should be invalid if wasteRefusalReason is missing", () => {
+    it("should be invalid if wasteRefusalReason is missing", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
           wasteRefusalReason: null
         });
-      expect(validateFn).rejects.toEqual(
-        "Vous devez saisir un motif de refus partiel"
+      await expect(validateFn()).rejects.toThrow(
+        "Vous devez saisir un motif de refus"
       );
     });
 
-    it("should be invalid when quantity received is 0", () => {
+    it("should be invalid when quantity received is 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 0 });
-      expect(validateFn).rejects.toEqual(
+      await expect(validateFn()).rejects.toThrow(
         "Vous devez saisir une quantité reçue supérieure à 0."
       );
     });
+  });
+});
+
+describe("draftFormSchema", () => {
+  const form: Partial<Form> = {
+    emitterCompanySiret: "",
+    recipientCompanySiret: "",
+    transporterCompanySiret: "",
+    emitterCompanyMail: "",
+    recipientCompanyMail: "",
+    wasteDetailsCode: "",
+    transporterCompanyMail: "",
+    transporterValidityLimit: ""
+  };
+
+  it("should be valid when passing empty strings", () => {
+    const isValid = draftFormSchema.isValidSync(form);
+    expect(isValid).toBe(true);
+  });
+
+  it("should not be valid when passing an invalid siret", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        emitterCompanySiret: "this is not a siret"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Émetteur: Le SIRET doit faire 14 caractères numériques"
+    );
+  });
+
+  it("should be invalid when passing an invalid waste code", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        wasteDetailsCode: "this is not a waste cde"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
+    );
+  });
+
+  it("should be invalid when passing an invalid email", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        emitterCompanyMail: "this is not an email"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "emitterCompanyMail must be a valid email"
+    );
   });
 });
