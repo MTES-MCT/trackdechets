@@ -560,8 +560,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .set("Authorization", `Bearer ${producteurToken}`)
       .send({ query: saveFormQuery });
 
-    console.log(saveFormResponse);
-
     // La réponse est au format JSON
     // Uniquement les champs précisés dans la réponse de la requête GraphQL
     // sont retournés. En l'occurence `id` et `status`
