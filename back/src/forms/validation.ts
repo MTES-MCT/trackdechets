@@ -178,7 +178,8 @@ const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères";
 const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas.";
 
-const INVALID_WASTE_CODE = `Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.`;
+const INVALID_WASTE_CODE =
+  "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1

@@ -81,6 +81,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        emitterType: "OTHER",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
         traderCompanySiret: traderCompany.siret,
@@ -196,7 +197,7 @@ describe("Mutation.markAsSealed", () => {
 
       expect(errors[0].message).toEqual(
         expect.stringContaining(
-          "Le code déchet est obligatoire et doit appartenir à la liste  du code"
+          "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
       form = await prisma.form({ id: form.id });

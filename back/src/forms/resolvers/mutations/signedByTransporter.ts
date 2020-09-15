@@ -48,9 +48,9 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   });
 
   const wasteDetails = infos => ({
-    wasteDetailsPackagings: infos.packagings || form.wasteDetailsPackagings,
-    wasteDetailsQuantity: infos.quantity || form.wasteDetailsQuantity,
-    wasteDetailsOnuCode: infos.onuCode || form.wasteDetailsOnuCode
+    wasteDetailsPackagings: infos.packagings ?? form.wasteDetailsPackagings,
+    wasteDetailsQuantity: infos.quantity ?? form.wasteDetailsQuantity,
+    wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
   });
 
   // check waste details override is valid
