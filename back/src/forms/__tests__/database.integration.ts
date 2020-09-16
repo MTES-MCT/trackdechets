@@ -83,9 +83,9 @@ describe("getEcoOrganismeOrNotFound", () => {
     expect(eo2.id).toEqual(eo.id);
   });
 
-  it("should throw error if EO does not exists", () => {
+  it("should throw error if EO does not exists", async () => {
     const getEO = () => getEcoOrganismeOrNotFound({ id: "does_not_exist" });
-    expect(getEO).rejects.toThrow(
+    await expect(getEO()).rejects.toThrow(
       "L'éco-organisme avec l'identifiant \"does_not_exist\" n'existe pas."
     );
   });

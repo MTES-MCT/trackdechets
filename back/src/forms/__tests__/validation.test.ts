@@ -271,6 +271,26 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
+  it("should be valid when passing null values", () => {
+    const form = {
+      emitterCompanySiret: null,
+      recipientCompanySiret: null,
+      transporterCompanySiret: null,
+      emitterCompanyMail: null,
+      recipientCompanyMail: null,
+      wasteDetailsCode: null,
+      transporterCompanyMail: null,
+      transporterValidityLimit: null
+    };
+    const isValid = draftFormSchema.isValidSync(form);
+    expect(isValid).toBe(true);
+  });
+
+  it("should be valid when passing undefined values", () => {
+    const isValid = draftFormSchema.isValidSync({});
+    expect(isValid).toBe(true);
+  });
+
   it("should not be valid when passing an invalid siret", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
