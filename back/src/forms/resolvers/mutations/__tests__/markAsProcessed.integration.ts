@@ -244,7 +244,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure prévue: L'opération de traitement renseignée ne permet pas de destination ultérieure"
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure"
       })
     ]);
   });
