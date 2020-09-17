@@ -448,6 +448,11 @@ export type Form = {
    * objet un système d'information tierce
    */
   customId: Maybe<Scalars['String']>;
+  /**
+   * Permet de savoir si les données du BSD ont été importées depuis un
+   * bordereau signé papier via la mutation `importPaperForm`
+   */
+  isImportedFromPaper: Scalars['Boolean'];
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<Emitter>;
   /** Établissement qui reçoit le déchet (case 2) */
@@ -691,6 +696,39 @@ export enum GerepType {
   Traiteur = 'Traiteur'
 }
 
+/** Payload d'import d'un BSD papier */
+export type ImportPaperFormInput = {
+  /**
+   * Numéro de BSD Trackdéchets (uniquement dans le cas d'une mise à jour d'un
+   * bordereau émis initialement dans Trackdéchets)
+   */
+  id: Maybe<Scalars['ID']>;
+  /**
+   * Identifiant libre qui peut éventuellement servir à faire le lien dans Trackdéchets
+   * entre le BSD papier et le BSD numérique dans le cas de l'import d'un BSD n'ayant
+   * pas été émis initialement dans Trackdéchets.
+   */
+  customId: Maybe<Scalars['String']>;
+  /** Établissement émetteur/producteur du déchet (case 1) */
+  emitter: Maybe<EmitterInput>;
+  /** Établissement qui reçoit le déchet (case 2) */
+  recipient: Maybe<RecipientInput>;
+  /** Transporteur du déchet (case 8) */
+  transporter: Maybe<TransporterInput>;
+  /** Détails du déchet (case 3) */
+  wasteDetails: Maybe<WasteDetailsInput>;
+  /** Négociant (case 7) */
+  trader: Maybe<TraderInput>;
+  /** Éco-organisme (apparait en case 1) */
+  ecoOrganisme: Maybe<EcoOrganismeInput>;
+  /** Informations liées aux signatures transporteur et émetteur (case 8 et 9) */
+  signingInfo: SignatureFormInput;
+  /** Informations liées à la réception du déchet (case 10) */
+  receivedInfo: ReceivedFormInput;
+  /** Informations liées au traitement du déchet (case 11) */
+  processedInfo: ProcessedFormInput;
+};
+
 /** Installation pour la protection de l'environnement (ICPE) */
 export type Installation = {
   __typename?: 'Installation';
@@ -825,6 +863,13 @@ export type Mutation = {
   editProfile: User;
   /** Édite un segment existant */
   editSegment: Maybe<TransportSegment>;
+  /**
+   * Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
+   * de traitement. Le BSD signé papier original doit être conservé à l'installation de destination qui doit
+   * être en mesure de retrouver le bordereau papier correspondant à un bordereau numérique. Le champ `customId`
+   * de l'input peut-être utilisé pour faire le lien.
+   */
+  importPaperForm: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Invite un nouvel utilisateur à un établissement
@@ -1057,6 +1102,11 @@ export type MutationEditSegmentArgs = {
   id: Scalars['ID'];
   siret: Scalars['String'];
   nextSegmentInfo: NextSegmentInfoInput;
+};
+
+
+export type MutationImportPaperFormArgs = {
+  input: ImportPaperFormInput;
 };
 
 
@@ -1572,6 +1622,14 @@ export type Rubrique = {
 
 /** Payload de signature d'un BSD */
 export type SentFormInput = {
+  /** Date de l'envoi du déchet par l'émetteur (case 9) */
+  sentAt: Scalars['DateTime'];
+  /** Nom de la personne responsable de l'envoi du déchet (case 9) */
+  sentBy: Scalars['String'];
+};
+
+/** Payload simplifié de signature d'un BSD par un transporteur */
+export type SignatureFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
   sentAt: Scalars['DateTime'];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
@@ -2330,6 +2388,7 @@ export function createFormMock(props: Partial<Form>): Form {
     id: "",
     readableId: "",
     customId: null,
+    isImportedFromPaper: false,
     emitter: null,
     recipient: null,
     transporter: null,
@@ -2415,6 +2474,23 @@ export function createFormSubscriptionMock(props: Partial<FormSubscription>): Fo
     node: null,
     updatedFields: null,
     previousValues: null,
+    ...props,
+  };
+}
+
+export function createImportPaperFormInputMock(props: Partial<ImportPaperFormInput>): ImportPaperFormInput {
+  return {
+    id: null,
+    customId: null,
+    emitter: null,
+    recipient: null,
+    transporter: null,
+    wasteDetails: null,
+    trader: null,
+    ecoOrganisme: null,
+    signingInfo: createSignatureFormInputMock({}),
+    receivedInfo: createReceivedFormInputMock({}),
+    processedInfo: createProcessedFormInputMock({}),
     ...props,
   };
 }
@@ -2615,6 +2691,14 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 }
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
+  return {
+    sentAt: new Date(),
+    sentBy: "",
+    ...props,
+  };
+}
+
+export function createSignatureFormInputMock(props: Partial<SignatureFormInput>): SignatureFormInput {
   return {
     sentAt: new Date(),
     sentBy: "",

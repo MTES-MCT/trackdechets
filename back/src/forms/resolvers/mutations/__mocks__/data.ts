@@ -13,6 +13,7 @@ export function getNewValidPrismaForm(): PrismaForm {
   return {
     id: "cjplbvecc000d0766j32r19am",
     readableId: "TD-xxx",
+    isImportedFromPaper: false,
     createdAt: "2018-12-11T00:00:00.000Z",
     updatedAt: "2018-12-11T00:00:00.000Z",
     status: "DRAFT",
@@ -62,6 +63,7 @@ export function getNewValidForm(): GraphQLForm {
   return {
     id: "cjplbvecc000d0766j32r19am",
     readableId: "TD-xxx",
+    isImportedFromPaper: false,
     status: "DRAFT",
     emitter: {
       type: "PRODUCER" as EmitterType,

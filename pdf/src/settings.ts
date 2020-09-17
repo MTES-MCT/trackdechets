@@ -136,7 +136,7 @@ export const imageLocations = {
   transporterSignature: { x: 450, y: 525 },
   emitterSignature: { x: 450, y: 590 },
   processingSignature: { x: 450, y: 732 },
-  receivedSignature: { x: 210, y: 742 },
+  receivedSignature: { x: 210, y: 728 },
   exemptionStamp: { x: 400, y: 520 },
   noTraceabilityStamp: { x: 300, y: 740 },
   watermark: { x: 0, y: 800 },

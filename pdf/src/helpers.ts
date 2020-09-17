@@ -336,6 +336,7 @@ interface MainFormParams {
   mode?: "ROAD" | "RAIL" | "AIR" | "RIVER" | "SEA";
   takenOverAt?: string;
   transporterCompanySiret?: string;
+  isImportedFromPaper?: boolean;
 }
 
 export function processMainFormParams(params: MainFormParams) {

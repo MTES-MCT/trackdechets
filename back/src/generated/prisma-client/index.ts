@@ -989,6 +989,8 @@ export type FormOrderByInput =
   | "customId_DESC"
   | "isDeleted_ASC"
   | "isDeleted_DESC"
+  | "isImportedFromPaper_ASC"
+  | "isImportedFromPaper_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
@@ -2183,6 +2185,8 @@ export interface FormWhereInput {
   customId_not_ends_with?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   isDeleted_not?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
+  isImportedFromPaper_not?: Maybe<Boolean>;
   owner?: Maybe<UserWhereInput>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
@@ -5051,6 +5055,7 @@ export interface FormCreateInput {
   readableId: String;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -5228,6 +5233,7 @@ export interface FormUpdateInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -5364,6 +5370,7 @@ export interface FormUpdateDataInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -5873,6 +5880,8 @@ export interface FormScalarWhereInput {
   customId_not_ends_with?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
   isDeleted_not?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
+  isImportedFromPaper_not?: Maybe<Boolean>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -6837,6 +6846,7 @@ export interface FormUpdateManyDataInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
@@ -6921,6 +6931,7 @@ export interface FormUpdateManyMutationInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
   sentAt?: Maybe<DateTimeInput>;
@@ -7211,6 +7222,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   readableId: String;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -7348,6 +7360,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -7520,6 +7533,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   readableId: String;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -7638,6 +7652,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   readableId?: Maybe<String>;
   customId?: Maybe<String>;
   isDeleted?: Maybe<Boolean>;
+  isImportedFromPaper?: Maybe<Boolean>;
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
@@ -8934,6 +8949,7 @@ export interface Form {
   readableId: String;
   customId?: String;
   isDeleted?: Boolean;
+  isImportedFromPaper: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   signedByTransporter?: Boolean;
@@ -9021,6 +9037,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   readableId: () => Promise<String>;
   customId: () => Promise<String>;
   isDeleted: () => Promise<Boolean>;
+  isImportedFromPaper: () => Promise<Boolean>;
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -9131,6 +9148,7 @@ export interface FormSubscription
   readableId: () => Promise<AsyncIterator<String>>;
   customId: () => Promise<AsyncIterator<String>>;
   isDeleted: () => Promise<AsyncIterator<Boolean>>;
+  isImportedFromPaper: () => Promise<AsyncIterator<Boolean>>;
   owner: <T = UserSubscription>() => T;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -9243,6 +9261,7 @@ export interface FormNullablePromise
   readableId: () => Promise<String>;
   customId: () => Promise<String>;
   isDeleted: () => Promise<Boolean>;
+  isImportedFromPaper: () => Promise<Boolean>;
   owner: <T = UserPromise>() => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
@@ -10989,6 +11008,7 @@ export interface FormPreviousValues {
   readableId: String;
   customId?: String;
   isDeleted?: Boolean;
+  isImportedFromPaper: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
   signedByTransporter?: Boolean;
@@ -11078,6 +11098,7 @@ export interface FormPreviousValuesPromise
   readableId: () => Promise<String>;
   customId: () => Promise<String>;
   isDeleted: () => Promise<Boolean>;
+  isImportedFromPaper: () => Promise<Boolean>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
   signedByTransporter: () => Promise<Boolean>;
@@ -11167,6 +11188,7 @@ export interface FormPreviousValuesSubscription
   readableId: () => Promise<AsyncIterator<String>>;
   customId: () => Promise<AsyncIterator<String>>;
   isDeleted: () => Promise<AsyncIterator<Boolean>>;
+  isImportedFromPaper: () => Promise<AsyncIterator<Boolean>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   signedByTransporter: () => Promise<AsyncIterator<Boolean>>;

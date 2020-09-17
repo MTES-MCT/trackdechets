@@ -190,7 +190,9 @@ const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne p
 
 // 1 - Émetteur du bordereau
 export const emitterSchema: yup.ObjectSchema<Emitter> = yup.object().shape({
-  emitterType: yup.mixed<EmitterType>().required(),
+  emitterType: yup
+    .mixed<EmitterType>()
+    .required(`Émetteur: Le type d'émetteur est obligatoire`),
   emitterCompanyName: yup
     .string()
     .ensure()
@@ -715,6 +717,12 @@ export const sealedFormSchema = emitterSchema
   .concat(recipientSchema)
   .concat(wasteDetailsSchema)
   .concat(transporterSchema);
+
+// validation schema for a BSD with a processed status
+export const processedFormSchema = sealedFormSchema
+  .concat(signingInfoSchema)
+  .concat(receivedInfoSchema)
+  .concat(processedInfoSchema);
 
 // validation schema for BSD suite before it can be (re)sealed
 export const resealedFormSchema = tempStoredInfoSchema

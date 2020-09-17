@@ -58,7 +58,7 @@ const createFormResolver = async (
   const formCreateInput: FormCreateInput = {
     ...form,
     readableId: await getReadableId(),
-    owner: { connect: { id: context.user!.id } },
+    owner: { connect: { id: user.id } },
     appendix2Forms: { connect: appendix2Forms }
   };
 

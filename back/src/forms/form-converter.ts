@@ -33,7 +33,8 @@ import {
   ResentFormInput,
   RecipientInput,
   TraderInput,
-  NextDestinationInput
+  NextDestinationInput,
+  ImportPaperFormInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -345,6 +346,32 @@ export function flattenProcessedFormInput(
   });
 }
 
+export function flattenImportPaperFormInput(
+  input: ImportPaperFormInput
+): FormCreateInput | FormUpdateInput {
+  const {
+    id,
+    customId,
+    signingInfo,
+    receivedInfo,
+    processedInfo,
+    ...rest
+  } = input;
+
+  return safeInput({
+    id,
+    customId,
+    ...flattenEmitterInput(rest),
+    ...flattenRecipientInput(rest),
+    ...flattenTransporterInput(rest),
+    ...flattenWasteDetailsInput(rest),
+    ...flattenTraderInput(rest),
+    ...signingInfo,
+    ...receivedInfo,
+    ...flattenProcessedFormInput(processedInfo)
+  });
+}
+
 export function flattenTemporaryStorageDetailInput(
   tempStorageInput: TemporaryStorageDetailInput
 ): TemporaryStorageDetailCreateInput | TemporaryStorageDetailUpdateInput {
@@ -381,6 +408,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     id: form.id,
     readableId: form.readableId,
     customId: form.customId,
+    isImportedFromPaper: form.isImportedFromPaper,
     emitter: nullIfNoValues<Emitter>({
       type: form.emitterType,
       workSite: nullIfNoValues<WorkSite>({
