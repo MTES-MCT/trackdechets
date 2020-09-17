@@ -182,6 +182,8 @@ const INVALID_PROCESSING_OPERATION =
 const INVALID_WASTE_CODE =
   "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
 
+const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
+
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
 // *************************************************************
@@ -437,10 +439,90 @@ export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
       )
   });
 
+const withNextDestination = yup.object().shape({
+  nextDestinationProcessingOperation: yup
+    .string()
+    .oneOf(
+      PROCESSING_OPERATIONS_CODES,
+      `Destination ultérieure: ${INVALID_PROCESSING_OPERATION}`
+    ),
+  nextDestinationCompanyName: yup
+    .string()
+    .ensure()
+    .required(`Destination ultérieure: ${MISSING_COMPANY_NAME}`),
+  nextDestinationCompanySiret: yup
+    .string()
+    .when("nextDestinationCompanyCountry", (country, schema) => {
+      return country == null || country === "FR"
+        ? schema
+            .ensure()
+            .required(`Destination ultérieure prévue: ${MISSING_COMPANY_SIRET}`)
+            .length(
+              14,
+              `Destination ultérieure prévue: ${INVALID_SIRET_LENGTH}`
+            )
+        : schema.notRequired().nullable();
+    }),
+  nextDestinationCompanyAddress: yup
+    .string()
+    .ensure()
+    .required(`Destination ultérieure: ${MISSING_COMPANY_ADDRESS}`),
+  nextDestinationCompanyCountry: yup.string().oneOf(
+    countries.map(country => country.cca2),
+    "Destination ultérieure: le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
+  ),
+  nextDestinationCompanyContact: yup
+    .string()
+    .ensure()
+    .required(`Destination ultérieure: ${MISSING_COMPANY_CONTACT}`),
+  nextDestinationCompanyPhone: yup
+    .string()
+    .ensure()
+    .required(`Destination ultérieure: ${MISSING_COMPANY_PHONE}`),
+  nextDestinationCompanyMail: yup
+    .string()
+    .email()
+    .ensure()
+    .required(`Destination ultérieure: ${MISSING_COMPANY_EMAIL}`)
+});
+const withoutNextDestination = yup.object().shape({
+  nextDestinationProcessingOperation: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyName: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanySiret: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyAddress: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyCountry: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyContact: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyPhone: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyMail: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION)
+});
+
 // 11 - Réalisation de l’opération :
-export const processedInfoSchema: yup.ObjectSchema<ProcessedInfo> = yup
-  .object()
-  .shape({
+export const processedInfoSchema = yup.lazy((value: any) => {
+  const base = yup.object().shape({
     processedBy: yup
       .string()
       .ensure()
@@ -451,109 +533,15 @@ export const processedInfoSchema: yup.ObjectSchema<ProcessedInfo> = yup
     }),
     processingOperationDone: yup
       .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
-    nextDestinationProcessingOperation: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema.oneOf(
-              PROCESSING_OPERATIONS_CODES,
-              `Destination ultérieure: ${INVALID_PROCESSING_OPERATION}`
-            )
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyName: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema
-              .ensure()
-              .required(`Destination ultérieure: ${MISSING_COMPANY_NAME}`)
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanySiret: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema.when("nextDestinationCompanyCountry", (country, schema) => {
-              return country == null || country === "FR"
-                ? schema
-                    .ensure()
-                    .required(
-                      `Destination ultérieure prévue: ${MISSING_COMPANY_SIRET}`
-                    )
-                    .length(
-                      14,
-                      `Destination ultérieure prévue: ${INVALID_SIRET_LENGTH}`
-                    )
-                : schema.notRequired().nullable();
-            })
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyAddress: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema
-              .ensure()
-              .required(`Destination ultérieure: ${MISSING_COMPANY_ADDRESS}`)
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyCountry: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema.oneOf(
-              countries.map(country => country.cca2),
-              "Destination ultérieure: le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
-            )
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyContact: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema
-              .ensure()
-              .required(`Destination ultérieure: ${MISSING_COMPANY_CONTACT}`)
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyPhone: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema
-              .ensure()
-              .required(`Destination ultérieure: ${MISSING_COMPANY_PHONE}`)
-          : schema.notRequired().nullable();
-      }),
-    nextDestinationCompanyMail: yup
-      .string()
-      .when("processingOperationDone", (processingOperationDone, schema) => {
-        return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          processingOperationDone
-        )
-          ? schema
-              .email()
-              .ensure()
-              .required(`Destination ultérieure: ${MISSING_COMPANY_EMAIL}`)
-          : schema.notRequired().nullable();
-      })
+      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
   });
+
+  return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+    value?.processingOperationDone
+  )
+    ? base.concat(withNextDestination)
+    : base.concat(withoutNextDestination);
+});
 
 // *********************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 2 (SUITE)
