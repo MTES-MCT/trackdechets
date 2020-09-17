@@ -133,16 +133,14 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
         <RedErrorMessage name="wasteDetails.quantityType" />
       </div>
-      {values.wasteDetails.code.includes("*") && (
-        <div className="form__group">
-          <label>
-            Mentions au titre des règlements ADR, RID, ADNR, IMDG
-            <Field type="text" name="wasteDetails.onuCode" />
-          </label>
+      <div className="form__group">
+        <label>
+          Mentions au titre des règlements ADR, RID, ADNR, IMDG
+          <Field type="text" name="wasteDetails.onuCode" />
+        </label>
 
-          <RedErrorMessage name="wasteDetails.onuCode" />
-        </div>
-      )}
+        <RedErrorMessage name="wasteDetails.onuCode" />
+      </div>
     </>
   );
 });
