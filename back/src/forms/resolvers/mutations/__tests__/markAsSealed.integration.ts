@@ -243,7 +243,7 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.",
-          "Erreur(s): Le code ONU est obligatoire pour les déchets dangereux"
+          `Erreur(s): La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
         ].join("\n")
       })
     ]);
