@@ -10,6 +10,7 @@ import FormsSelector from "./appendix/FormsSelector";
 import AppendixInfo from "./appendix/AppendixInfo";
 import Tooltip from "../common/Tooltip";
 import "./WasteInfo.scss";
+import { isDangerous } from "../generated/constants";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
@@ -135,7 +136,8 @@ export default connect<{}, Values>(function WasteInfo(props) {
       </div>
       <div className="form__group">
         <label>
-          Mentions au titre des règlements ADR, RID, ADNR, IMDG
+          Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
+          {!isDangerous(values.wasteDetails.code) && "(optionnel)"}
           <Field type="text" name="wasteDetails.onuCode" />
         </label>
 
