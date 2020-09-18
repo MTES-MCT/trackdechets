@@ -1,7 +1,6 @@
-import * as yup from "yup";
 import {
   MutationResolvers,
-  MutationMarkAsSentArgs
+  SentFormInput
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
@@ -9,31 +8,25 @@ import { checkCanMarkAsSent } from "../../permissions";
 import { Form } from "../../../generated/prisma-client";
 import { GraphQLContext } from "../../../types";
 import transitionForm from "../../workflow/transitionForm";
-import { validDatetime } from "../../validation";
-
-export const sentInfovalidationSchema = yup.object().shape({
-  sentAt: validDatetime(
-    {
-      verboseFieldName: "date d'envoi",
-      required: true
-    },
-    yup
-  )
-});
+import { signingInfoSchema, checkCanBeSealed } from "../../validation";
 
 export function markAsSentFn(
   form: Form,
-  args: MutationMarkAsSentArgs,
+  sentInfo: SentFormInput,
   context: GraphQLContext
 ) {
   // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
   return transitionForm(
     form,
-    { eventType: "MARK_SENT", eventParams: args.sentInfo },
+    {
+      eventType: "MARK_SENT",
+      eventParams: sentInfo
+    },
     context,
     infos => ({
       ...infos,
-      currentTransporterSiret: form.transporterCompanySiret
+      currentTransporterSiret: form.transporterCompanySiret,
+      signedByTransporter: false
     })
   );
 }
@@ -45,13 +38,21 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  sentInfovalidationSchema.validateSync(args.sentInfo);
+  const { id, sentInfo } = args;
 
-  const form = await getFormOrFormNotFound({ id: args.id });
+  const form = await getFormOrFormNotFound({ id });
 
   await checkCanMarkAsSent(user, form);
 
-  return markAsSentFn(form, args, context);
+  if (form.status === "DRAFT") {
+    // check it can be sealed
+    await checkCanBeSealed(form);
+  }
+
+  // validate input
+  await signingInfoSchema.validate(sentInfo);
+
+  return markAsSentFn(form, sentInfo, context);
 };
 
 export default markAsSentResolver;

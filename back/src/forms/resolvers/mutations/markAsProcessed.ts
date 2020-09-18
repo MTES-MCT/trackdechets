@@ -4,74 +4,37 @@ import {
 } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import { GraphQLContext } from "../../../types";
-import {
-  PROCESSING_OPERATIONS,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES
-} from "../../../common/constants";
-import { UserInputError } from "apollo-server-express";
 import transitionForm from "../../workflow/transitionForm";
 import { flattenProcessedFormInput } from "../../form-converter";
-import { Form } from "../../../generated/prisma-client";
+import { Form, FormUpdateInput } from "../../../generated/prisma-client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { isValidDatetime } from "../../validation";
-import { InvalidDateTime } from "../../../common/errors";
 import { checkCanMarkAsProcessed } from "../../permissions";
-import { InvalidProcessingOperation } from "../../errors";
-import { validCompany } from "../../workflow/validation";
+import { processedInfoSchema } from "../../validation";
+import { PROCESSING_OPERATIONS } from "../../../common/constants";
 
-function validateArgs(args: MutationMarkAsProcessedArgs) {
-  const { processedInfo } = args;
-
-  const operation = PROCESSING_OPERATIONS.find(
-    otherOperation =>
-      otherOperation.code === processedInfo.processingOperationDone
-  );
-
-  if (operation == null) {
-    throw new InvalidProcessingOperation();
-  } else {
-    // set default value for processingOperationDescription
-    args.processedInfo.processingOperationDescription =
-      processedInfo.processingOperationDescription || operation.description;
-  }
-
-  if (
-    PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-      processedInfo.processingOperationDone
-    ) &&
-    !processedInfo.nextDestination
-  ) {
-    throw new UserInputError(
-      `Vous devez saisir une destination ultérieure prévue pour l'opération de regroupement ${processedInfo.processingOperationDone}`
-    );
-  }
-
-  if (processedInfo.nextDestination) {
-    const { company } = processedInfo.nextDestination;
-    const validator = validCompany({
-      verboseFieldName: "Destination ultérieure prévue",
-      allowForeign: true
-    });
-    validator.validateSync(company);
-  }
-
-  if (!isValidDatetime(processedInfo.processedAt)) {
-    throw new InvalidDateTime("processedAt");
-  }
-
-  return args;
-}
-
-export function markAsProcessedFn(
+export async function markAsProcessedFn(
   form: Form,
   { processedInfo }: MutationMarkAsProcessedArgs,
   context: GraphQLContext
 ) {
+  const formUpdateInput: FormUpdateInput = flattenProcessedFormInput(
+    processedInfo
+  );
+  await processedInfoSchema.validate(formUpdateInput);
+
+  // set default value for processingOperationDescription
+  const operation = PROCESSING_OPERATIONS.find(
+    otherOperation =>
+      otherOperation.code === processedInfo.processingOperationDone
+  );
+  formUpdateInput.processingOperationDescription =
+    processedInfo.processingOperationDescription || operation?.description;
+
   return transitionForm(
     form,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },
     context,
-    infos => flattenProcessedFormInput(infos)
+    () => formUpdateInput
   );
 }
 
@@ -82,7 +45,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { id, processedInfo } = validateArgs(args);
+  const { id, processedInfo } = args;
 
   const form = await getFormOrFormNotFound({ id });
 

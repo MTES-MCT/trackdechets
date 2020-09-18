@@ -47,8 +47,8 @@ describe("Forms -> markAsSealed mutation", () => {
       await markAsSentFn(
         form,
         {
-          id: "1",
-          sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Snow" }
+          sentAt: "2018-12-11T00:00:00.000Z",
+          sentBy: "John Snow"
         },
         defaultContext
       );
@@ -68,8 +68,8 @@ describe("Forms -> markAsSealed mutation", () => {
     await markAsSentFn(
       form,
       {
-        id: "1",
-        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Snow" }
+        sentAt: "2018-12-11T00:00:00.000Z",
+        sentBy: "John Snow"
       },
       defaultContext
     );
@@ -86,8 +86,8 @@ describe("Forms -> markAsSealed mutation", () => {
     await markAsSentFn(
       form,
       {
-        id: "1",
-        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Snow" }
+        sentAt: "2018-12-11T00:00:00.000Z",
+        sentBy: "John Snow"
       },
       defaultContext
     );

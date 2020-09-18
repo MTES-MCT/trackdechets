@@ -96,7 +96,7 @@ input NextDestinationInput {
   processingOperation: String!
 
   "Établissement de destination ultérieur"
-  company: CompanyInput!
+  company: InternationalCompanyInput!
 }
 
 "Payload de création d'un bordereau"
@@ -240,12 +240,35 @@ input CompanyInput {
   "Adresse de l'établissement"
   address: String
 
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+}
+
+"""
+Payload d'un établissement pouvant se situer en France
+ou à l'étranger
+"""
+input InternationalCompanyInput {
+  "SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger"
+  siret: String
+
+  "Nom de l'établissement"
+  name: String
+
+  "Adresse de l'établissement"
+  address: String
+
   """
   Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
   https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
   En l'absence de code, l'entreprise est considérée comme résidant en France.
-  Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
   """
   country: String
 

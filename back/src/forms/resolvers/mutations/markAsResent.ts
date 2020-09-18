@@ -10,77 +10,22 @@ import transitionForm from "../../workflow/transitionForm";
 import { Form, prisma } from "../../../generated/prisma-client";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";
-import { validateTransporter } from "../../validation";
-import { PROCESSING_OPERATIONS_CODES } from "../../../common/constants";
-import { InvalidProcessingOperation } from "../../errors";
-import { validCompany } from "../../workflow/validation";
+import { resealedFormSchema } from "../../validation";
 
-async function hasFinalDestination(form: Form) {
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
-    .temporaryStorageDetail();
-
-  const mandatoryKeys = [
-    "destinationCompanyName",
-    "destinationCompanySiret",
-    "destinationCompanyAddress",
-    "destinationCompanyContact",
-    "destinationCompanyPhone",
-    "destinationCompanyMail"
-  ];
-
-  return mandatoryKeys.every(key => !!temporaryStorageDetail[key]);
-}
-
-function validateArgs(args: MutationMarkAsResentArgs) {
-  const { resentInfos } = args;
-
-  if (resentInfos.transporter) {
-    const { transporter } = resentInfos;
-    validateTransporter(transporter);
-    if (transporter.company) {
-      const validator = validCompany({ verboseFieldName: "Transporteur" });
-      validator.validateSync(transporter.company);
-    }
-  }
-
-  if (resentInfos.destination) {
-    const destination = resentInfos.destination;
-    if (
-      destination.processingOperation &&
-      !PROCESSING_OPERATIONS_CODES.includes(destination.processingOperation)
-    ) {
-      throw new InvalidProcessingOperation();
-    }
-    if (destination.company) {
-      const validator = validCompany({
-        verboseFieldName: "Destinataire du BSD"
-      });
-      validator.validateSync(destination.company);
-    }
-  }
-
-  return args;
-}
-
-export function markAsResentFn(
+export async function markAsResentFn(
   form: Form,
   { resentInfos }: MutationMarkAsResentArgs,
   context: GraphQLContext
 ) {
-  const transformEventToFormParams = infos => ({
-    temporaryStorageDetail: {
-      update: {
-        ...flattenResentFormInput(infos)
-      }
-    }
-  });
-
   return transitionForm(
     form,
     { eventType: "MARK_RESENT", eventParams: resentInfos },
     context,
-    transformEventToFormParams
+    infos => ({
+      temporaryStorageDetail: {
+        update: flattenResentFormInput(infos)
+      }
+    })
   );
 }
 
@@ -91,19 +36,27 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { id, resentInfos } = validateArgs(args);
+  const { id, resentInfos } = args;
 
   const form = await getFormOrFormNotFound({ id });
 
-  if (!resentInfos.destination && !hasFinalDestination(form)) {
-    throw new UserInputError(
-      "Vous devez remplir la destination" +
-        "après entreposage provisoire ou reconditionnement" +
-        "pour pouvoir sceller ce bordereau"
-    );
-  }
-
   await checkCanMarkAsResent(user, form);
+
+  if (form.status === "TEMP_STORED") {
+    const temporaryStorageDetail = await prisma
+      .form({ id: form.id })
+      .temporaryStorageDetail();
+
+    if (temporaryStorageDetail === null) {
+      throw new UserInputError(
+        "Ce bordereau ne correspond pas à un entreposage provisoire ou un reconditionnemnt"
+      );
+    }
+    await resealedFormSchema.validate({
+      ...temporaryStorageDetail,
+      ...flattenResentFormInput(resentInfos)
+    });
+  }
 
   return markAsResentFn(form, { id, resentInfos }, context);
 };

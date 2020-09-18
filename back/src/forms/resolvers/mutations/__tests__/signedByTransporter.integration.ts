@@ -70,7 +70,7 @@ describe("Mutation.signedByTransporter", () => {
       opt: {
         sentAt: null,
         status: "SEALED",
-        wasteDetailsCode: "01 01 01*",
+        wasteDetailsCode: "01 03 04*",
         emitterCompanySiret: emitter.siret,
         transporterCompanySiret: transporter.siret
       }

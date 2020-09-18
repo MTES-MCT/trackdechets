@@ -1,16 +1,9 @@
-import {
-  MutationResolvers,
-  MutationMarkAsReceivedArgs
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsReceived } from "../../permissions";
-import { validateReceivedInfos } from "../../validation";
-
-function validateArgs({ id, receivedInfo }: MutationMarkAsReceivedArgs) {
-  return { id, receivedInfo: validateReceivedInfos(receivedInfo) };
-}
+import { receivedInfoSchema } from "../../validation";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -18,9 +11,10 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const { id, receivedInfo } = validateArgs(args);
+  const { id, receivedInfo } = args;
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsReceived(user, form);
+  await receivedInfoSchema.validate(receivedInfo);
   return transitionForm(
     form,
     {

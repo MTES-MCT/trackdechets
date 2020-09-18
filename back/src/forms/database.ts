@@ -2,9 +2,15 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import { Form, prisma, FormWhereUniqueInput } from "../generated/prisma-client";
+import {
+  Form,
+  prisma,
+  FormWhereUniqueInput,
+  EcoOrganismeWhereUniqueInput
+} from "../generated/prisma-client";
 import { FullForm } from "./types";
-import { FormNotFound } from "./errors";
+import { FormNotFound, EcoOrganismeNotFound } from "./errors";
+import { UserInputError } from "apollo-server-express";
 
 /**
  * Returns a prisma Form with all linked objects
@@ -37,11 +43,26 @@ export async function getFormOrFormNotFound({
   readableId
 }: FormWhereUniqueInput) {
   if (!id && !readableId) {
-    throw new Error("You should specify an id or a readableId");
+    throw new UserInputError("You should specify an id or a readableId");
   }
   const form = await prisma.form(id ? { id } : { readableId });
   if (form == null || form.isDeleted == true) {
     throw new FormNotFound(id ? id.toString() : readableId);
   }
   return form;
+}
+
+/**
+ * Retrieves an eco-organisme by id or throw a EcoOrganismeNotFound error
+ */
+export async function getEcoOrganismeOrNotFound({
+  id
+}: EcoOrganismeWhereUniqueInput) {
+  const eo = await prisma.ecoOrganisme({
+    id
+  });
+  if (!eo) {
+    throw new EcoOrganismeNotFound(id.toString());
+  }
+  return eo;
 }

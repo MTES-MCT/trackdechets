@@ -1,32 +1,22 @@
-import {
-  MutationResolvers,
-  MutationCreateTransporterReceiptArgs
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { isValidDatetime } from "../../../forms/validation";
-import { InvalidDateTime } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-
-function validateArgs(args: MutationCreateTransporterReceiptArgs) {
-  if (!isValidDatetime(args.input.validityLimit)) {
-    throw new InvalidDateTime("validityLimit");
-  }
-  return args;
-}
+import { receiptSchema } from "../../validation";
 
 /**
  * Create a transporter receipt
  * @param input
  */
-const createTransporterReceiptResolver: MutationResolvers["createTransporterReceipt"] = (
+const createTransporterReceiptResolver: MutationResolvers["createTransporterReceipt"] = async (
   parent,
   args,
   context
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAuthenticated(context);
-  const { input } = validateArgs(args);
+  const { input } = args;
+  await receiptSchema.validate(input);
   return prisma.createTransporterReceipt(input);
 };
 

@@ -1,58 +1,12 @@
-import {
-  MutationResolvers,
-  MutationMarkAsResealedArgs
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { flattenResealedFormInput } from "../../form-converter";
 import { checkCanMarkAsResealed } from "../../permissions";
 import transitionForm from "../../workflow/transitionForm";
-import { validateTransporter } from "../../validation";
-import { InvalidProcessingOperation } from "../../errors";
-import { PROCESSING_OPERATIONS_CODES } from "../../../common/constants";
-import { prisma, Form } from "../../../generated/prisma-client";
+import { prisma } from "../../../generated/prisma-client";
 import { UserInputError } from "apollo-server-express";
-import { validCompany } from "../../workflow/validation";
-
-async function hasFinalDestination(form: Form) {
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
-    .temporaryStorageDetail();
-
-  const mandatoryKeys = [
-    "destinationCompanyName",
-    "destinationCompanySiret",
-    "destinationCompanyAddress",
-    "destinationCompanyContact",
-    "destinationCompanyPhone",
-    "destinationCompanyMail"
-  ];
-
-  return mandatoryKeys.every(key => !!temporaryStorageDetail[key]);
-}
-
-function validateArgs(args: MutationMarkAsResealedArgs) {
-  const { resealedInfos } = args;
-
-  if (resealedInfos.transporter) {
-    const transporter = resealedInfos.transporter;
-    validateTransporter(transporter);
-    const validator = validCompany({ verboseFieldName: "Transporteur" });
-    validator.validateSync(transporter.company);
-  }
-
-  if (resealedInfos.destination) {
-    const destination = resealedInfos.destination;
-    if (
-      destination.processingOperation &&
-      !PROCESSING_OPERATIONS_CODES.includes(destination.processingOperation)
-    ) {
-      throw new InvalidProcessingOperation();
-    }
-  }
-
-  return args;
-}
+import { resealedFormSchema } from "../../validation";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -61,31 +15,39 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { id, resealedInfos } = validateArgs(args);
+  const { id, resealedInfos } = args;
 
   const form = await getFormOrFormNotFound({ id });
 
-  if (!resealedInfos.destination && !hasFinalDestination(form)) {
+  const temporaryStorageDetail = await prisma
+    .form({ id: form.id })
+    .temporaryStorageDetail();
+
+  if (temporaryStorageDetail === null) {
     throw new UserInputError(
-      "Vous devez remplir la destination" +
-        "après entreposage provisoire ou reconditionnement" +
-        "pour pouvoir sceller ce bordereau"
+      "Ce bordereau ne correspond pas à un entreposage provisoire ou un reconditionnemnt"
     );
   }
 
   await checkCanMarkAsResealed(user, form);
 
-  const transformEventToFormParams = infos => ({
-    temporaryStorageDetail: {
-      update: flattenResealedFormInput(infos)
-    }
+  const updateInput = flattenResealedFormInput(resealedInfos);
+
+  // validate input
+  await resealedFormSchema.validate({
+    ...temporaryStorageDetail,
+    ...updateInput
   });
 
   return transitionForm(
     form,
     { eventType: "MARK_RESEALED", eventParams: resealedInfos },
     context,
-    transformEventToFormParams
+    () => ({
+      temporaryStorageDetail: {
+        update: updateInput
+      }
+    })
   );
 };
 

@@ -2,7 +2,6 @@ const initialCompany = {
   siret: "",
   name: "",
   address: "",
-  country: "",
   contact: "",
   mail: "",
   phone: "",

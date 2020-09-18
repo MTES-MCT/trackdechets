@@ -1,46 +1,14 @@
-import {
-  MutationResolvers,
-  MutationSignedByTransporterArgs,
-  TransporterSignatureFormInput
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { UserInputError } from "apollo-server-express";
-import { isValidDatetime, validateSecurityCode } from "../../validation";
-import { prisma, Form } from "../../../generated/prisma-client";
+import { prisma } from "../../../generated/prisma-client";
 import transitionForm from "../../workflow/transitionForm";
-import { checkCanSignedByTransporter } from "../../permissions";
-import { InvalidDateTime } from "../../../common/errors";
-import { isDangerous } from "../../../common/constants";
-
-function validateArgs(args: MutationSignedByTransporterArgs, form: Form) {
-  if (args.signingInfo.quantity <= 0) {
-    throw new UserInputError("La quantité saisie doit être supérieure à 0");
-  }
-
-  if (args.signingInfo.signedByTransporter === false) {
-    throw new UserInputError(
-      "Le transporteur doit signer pour valider l'enlèvement."
-    );
-  }
-
-  if (args.signingInfo.signedByProducer === false) {
-    throw new UserInputError(
-      "Le producteur doit signer pour valider l'enlèvement."
-    );
-  }
-  if (!isValidDatetime(args.signingInfo.sentAt)) {
-    throw new InvalidDateTime("sentAt");
-  }
-
-  if (args.signingInfo.onuCode === "" && isDangerous(form.wasteDetailsCode)) {
-    throw new UserInputError(
-      "Le code ONU est obligatoire pour les déchets dangereux"
-    );
-  }
-
-  return args;
-}
+import {
+  checkCanSignedByTransporter,
+  checkSecurityCode
+} from "../../permissions";
+import { signingInfoSchema, wasteDetailsSchema } from "../../validation";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = async (
   parent,
@@ -49,32 +17,53 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const form = await getFormOrFormNotFound({ id: args.id });
-  const { id, signingInfo } = validateArgs(args, form);
+  const { id, signingInfo } = args;
+
+  const form = await getFormOrFormNotFound({ id });
 
   await checkCanSignedByTransporter(user, form);
 
-  const transformEventToWasteDetails = (
-    infos: TransporterSignatureFormInput
-  ) => {
-    return {
-      wasteDetailsPackagings: infos.packagings,
-      wasteDetailsQuantity: infos.quantity,
+  const {
+    signedByProducer,
+    signedByTransporter,
+    securityCode,
+    ...infos
+  } = signingInfo;
 
-      // onuCode is optional so it should not overwrite
-      // the current ONU code if it's not provided
-      wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
-    };
-  };
+  if (signedByTransporter === false) {
+    throw new UserInputError(
+      "Le transporteur doit signer pour valider l'enlèvement."
+    );
+  }
+
+  if (signedByProducer === false) {
+    throw new UserInputError(
+      "Le producteur doit signer pour valider l'enlèvement."
+    );
+  }
+
+  await signingInfoSchema.validate({
+    sentAt: infos.sentAt,
+    sentBy: infos.sentBy
+  });
+
+  const wasteDetails = infos => ({
+    wasteDetailsPackagings: infos.packagings ?? form.wasteDetailsPackagings,
+    wasteDetailsQuantity: infos.quantity ?? form.wasteDetailsQuantity,
+    wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
+  });
+
+  // check waste details override is valid
+  await wasteDetailsSchema.validate({
+    ...form,
+    ...wasteDetails(infos)
+  });
 
   if (form.sentAt) {
     // BSD has already been sent, it must be a signature for frame 18
 
     // check security code is temp storer's
-    await validateSecurityCode(
-      form.recipientCompanySiret,
-      signingInfo.securityCode
-    );
+    await checkSecurityCode(form.recipientCompanySiret, securityCode);
 
     const temporaryStorageDetail = await prisma
       .form({ id })
@@ -84,20 +73,17 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 
     return transitionForm(
       form,
-      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
+      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: infos },
       context,
       infos => {
-        const wasteDetails = transformEventToWasteDetails(infos);
-
         return {
-          ...(!hasWasteDetailsOverride && wasteDetails),
-
+          ...(!hasWasteDetailsOverride && wasteDetails(infos)),
           temporaryStorageDetail: {
             update: {
               signedBy: infos.sentBy,
               signedAt: infos.sentAt,
-              signedByTransporter: infos.signedByTransporter,
-              ...(hasWasteDetailsOverride && wasteDetails)
+              signedByTransporter: true,
+              ...(hasWasteDetailsOverride && wasteDetails(infos))
             }
           }
         };
@@ -106,24 +92,19 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   }
 
   // check security code is producer's
-  await validateSecurityCode(
-    form.emitterCompanySiret,
-    signingInfo.securityCode
-  );
-
-  const transformEventToFormParams = infos => ({
-    signedByTransporter: infos.signedByTransporter,
-    sentAt: infos.sentAt,
-    sentBy: infos.sentBy,
-    ...transformEventToWasteDetails(infos),
-    currentTransporterSiret: form.transporterCompanySiret
-  });
+  await checkSecurityCode(form.emitterCompanySiret, securityCode);
 
   return transitionForm(
     form,
-    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: signingInfo },
+    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: infos },
     context,
-    transformEventToFormParams
+    infos => ({
+      signedByTransporter: true,
+      sentAt: infos.sentAt,
+      sentBy: infos.sentBy,
+      ...wasteDetails(infos),
+      currentTransporterSiret: form.transporterCompanySiret
+    })
   );
 };
 

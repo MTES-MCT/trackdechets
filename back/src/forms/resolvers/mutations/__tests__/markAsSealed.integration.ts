@@ -81,6 +81,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        emitterType: "OTHER",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
         traderCompanySiret: traderCompany.siret,
@@ -196,7 +197,7 @@ describe("Mutation.markAsSealed", () => {
 
       expect(errors[0].message).toEqual(
         expect.stringContaining(
-          "Le code déchet est obligatoire et doit appartenir à la liste  du code"
+          "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
       form = await prisma.form({ id: form.id });
@@ -272,5 +273,30 @@ describe("Mutation.markAsSealed", () => {
     });
 
     expect(data.markAsSealed.status).toBe("SEALED");
+  });
+
+  it("should mark appendix2 forms as grouped", async () => {
+    const user = await userFactory();
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "AWAITING_GROUP" }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { status: "DRAFT" }
+    });
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    expect(appendix2grouped.status).toEqual("GROUPED");
   });
 });

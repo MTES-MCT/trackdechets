@@ -4,10 +4,11 @@ import {
   User,
   EcoOrganisme,
   TemporaryStorageDetail,
-  TransportSegment
+  TransportSegment,
+  prisma
 } from "../generated/prisma-client";
 import { FullForm } from "./types";
-import { NotFormContributor } from "./errors";
+import { NotFormContributor, InvaliSecurityCode } from "./errors";
 import { getFullUser } from "../users/database";
 import { FullUser } from "../users/types";
 import { getFullForm } from "./database";
@@ -252,6 +253,17 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce borderau comme envoyé après entreposage provisoire"
     );
+  }
+  return true;
+}
+
+export async function checkSecurityCode(siret: string, securityCode: number) {
+  const exists = await prisma.$exists.company({
+    siret,
+    securityCode
+  });
+  if (!exists) {
+    throw new InvaliSecurityCode();
   }
   return true;
 }
