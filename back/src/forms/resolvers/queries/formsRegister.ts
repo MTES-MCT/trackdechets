@@ -8,7 +8,7 @@ import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
 import { NotCompanyMember } from "../../../common/errors";
-import { validDatetime } from "../../../common/yup";
+import validDatetime from "../../../common/yup/validDatetime";
 
 const TYPE = "forms_register";
 

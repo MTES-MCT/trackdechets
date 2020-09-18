@@ -1,5 +1,6 @@
 import * as yup from "yup";
-import { configure as configureYup, validDatetime } from "../common/yup";
+import validDatetime from "../common/yup/validDatetime";
+import configureYup from "../common/yup/configureYup";
 import {
   Form,
   EmitterType,

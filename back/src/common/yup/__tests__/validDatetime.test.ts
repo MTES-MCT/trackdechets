@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { validDatetime } from "../yup";
+import validDatetime from "../validDatetime";
 
 describe("validDateTime", () => {
   const dummySchema = yup.object({

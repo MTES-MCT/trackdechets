@@ -1,16 +1,6 @@
 import { parse } from "date-fns";
 import * as yup from "yup";
 
-export function configure() {
-  yup.setLocale({
-    mixed: {
-      default: "${path} est invalide",
-      required: "${path} est un champ requis et doit avoir une valeur",
-      notType: "${path} ne peut pas être null"
-    }
-  } as yup.LocaleObject);
-}
-
 const allowedFormats = [
   "yyyy-MM-dd",
   "yyyy-MM-dd'T'HH:mm:ss",
@@ -48,7 +38,7 @@ export const isValidDatetime = str => {
  * @param verboseFieldName - human readable field name, for error messages
  * @param required - is this field required ?
  */
-export function validDatetime({ verboseFieldName, required = false }) {
+export default function validDatetime({ verboseFieldName, required = false }) {
   let validator = yup.string();
   if (!!required) {
     validator = validator.required(`Vous devez saisir une ${verboseFieldName}`);

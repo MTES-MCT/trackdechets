@@ -15,7 +15,7 @@ import { expandTransportSegmentFromDb } from "../../form-converter";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
-import { validDatetime } from "../../../common/yup";
+import validDatetime from "../../../common/yup/validDatetime";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
