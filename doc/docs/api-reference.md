@@ -3943,10 +3943,10 @@ Annexe 2
 </tbody>
 </table>
 
-### NextDestinationCompanyInput
+### InternationalCompanyInput
 
-Payload d'un établissement pour la destination ultérieure prévue (case 12)
-Cet établissement peut se situer à l'étranger
+Payload d'un établissement pouvant se situer en France
+ou à l'étranger
 
 <table>
 <thead>
@@ -3962,7 +3962,7 @@ Cet établissement peut se situer à l'étranger
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-SIRET de l'établissement
+SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger
 
 </td>
 </tr>
@@ -4048,7 +4048,7 @@ Traitement prévue (code D/R)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#nextdestinationcompanyinput">NextDestinationCompanyInput</a>!</td>
+<td valign="top"><a href="#internationalcompanyinput">InternationalCompanyInput</a>!</td>
 <td>
 
 Établissement de destination ultérieur

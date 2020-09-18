@@ -96,7 +96,7 @@ input NextDestinationInput {
   processingOperation: String!
 
   "Établissement de destination ultérieur"
-  company: NextDestinationCompanyInput!
+  company: InternationalCompanyInput!
 }
 
 "Payload de création d'un bordereau"
@@ -251,11 +251,11 @@ input CompanyInput {
 }
 
 """
-Payload d'un établissement pour la destination ultérieure prévue (case 12)
-Cet établissement peut se situer à l'étranger
+Payload d'un établissement pouvant se situer en France
+ou à l'étranger
 """
-input NextDestinationCompanyInput {
-  "SIRET de l'établissement"
+input InternationalCompanyInput {
+  "SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger"
   siret: String
 
   "Nom de l'établissement"

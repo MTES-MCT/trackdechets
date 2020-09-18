@@ -698,6 +698,32 @@ export type Installation = {
   declarations?: Maybe<Array<Declaration>>;
 };
 
+/**
+ * Payload d'un établissement pouvant se situer en France
+ * ou à l'étranger
+ */
+export type InternationalCompanyInput = {
+  /** SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger */
+  siret?: Maybe<Scalars['String']>;
+  /** Nom de l'établissement */
+  name?: Maybe<Scalars['String']>;
+  /** Adresse de l'établissement */
+  address?: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * En l'absence de code, l'entreprise est considérée comme résidant en France.
+   */
+  country?: Maybe<Scalars['String']>;
+  /** Nom du contact dans l'établissement */
+  contact?: Maybe<Scalars['String']>;
+  /** Email du contact dans l'établissement */
+  mail?: Maybe<Scalars['String']>;
+  /** Numéro de téléphone de contact dans l'établissement */
+  phone?: Maybe<Scalars['String']>;
+};
+
 
 export type MultimodalTransporter = {
   __typename?: 'MultimodalTransporter';
@@ -1167,37 +1193,11 @@ export type NextDestination = {
   company?: Maybe<FormCompany>;
 };
 
-/**
- * Payload d'un établissement pour la destination ultérieure prévue (case 12)
- * Cet établissement peut se situer à l'étranger
- */
-export type NextDestinationCompanyInput = {
-  /** SIRET de l'établissement */
-  siret?: Maybe<Scalars['String']>;
-  /** Nom de l'établissement */
-  name?: Maybe<Scalars['String']>;
-  /** Adresse de l'établissement */
-  address?: Maybe<Scalars['String']>;
-  /**
-   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
-   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-   * 
-   * En l'absence de code, l'entreprise est considérée comme résidant en France.
-   */
-  country?: Maybe<Scalars['String']>;
-  /** Nom du contact dans l'établissement */
-  contact?: Maybe<Scalars['String']>;
-  /** Email du contact dans l'établissement */
-  mail?: Maybe<Scalars['String']>;
-  /** Numéro de téléphone de contact dans l'établissement */
-  phone?: Maybe<Scalars['String']>;
-};
-
 export type NextDestinationInput = {
   /** Traitement prévue (code D/R) */
   processingOperation: Scalars['String'];
   /** Établissement de destination ultérieur */
-  company: NextDestinationCompanyInput;
+  company: InternationalCompanyInput;
 };
 
 /** Payload d'un segment de transport */
@@ -2177,7 +2177,7 @@ export type ResolversTypes = {
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
-  NextDestinationCompanyInput: NextDestinationCompanyInput;
+  InternationalCompanyInput: InternationalCompanyInput;
   ReceivedFormInput: ReceivedFormInput;
   WasteAcceptationStatusInput: WasteAcceptationStatusInput;
   ResealedFormInput: ResealedFormInput;
@@ -2278,7 +2278,7 @@ export type ResolversParentTypes = {
   AuthPayload: AuthPayload;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
-  NextDestinationCompanyInput: NextDestinationCompanyInput;
+  InternationalCompanyInput: InternationalCompanyInput;
   ReceivedFormInput: ReceivedFormInput;
   WasteAcceptationStatusInput: WasteAcceptationStatusInput;
   ResealedFormInput: ResealedFormInput;
@@ -3165,6 +3165,19 @@ export function createInstallationMock(props: Partial<Installation>): Installati
   };
 }
 
+export function createInternationalCompanyInputMock(props: Partial<InternationalCompanyInput>): InternationalCompanyInput {
+  return {
+    siret: null,
+    name: null,
+    address: null,
+    country: null,
+    contact: null,
+    mail: null,
+    phone: null,
+    ...props,
+  };
+}
+
 export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
   return {
     __typename: "MultimodalTransporter",
@@ -3188,23 +3201,10 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
   };
 }
 
-export function createNextDestinationCompanyInputMock(props: Partial<NextDestinationCompanyInput>): NextDestinationCompanyInput {
-  return {
-    siret: null,
-    name: null,
-    address: null,
-    country: null,
-    contact: null,
-    mail: null,
-    phone: null,
-    ...props,
-  };
-}
-
 export function createNextDestinationInputMock(props: Partial<NextDestinationInput>): NextDestinationInput {
   return {
     processingOperation: "",
-    company: createNextDestinationCompanyInputMock({}),
+    company: createInternationalCompanyInputMock({}),
     ...props,
   };
 }
