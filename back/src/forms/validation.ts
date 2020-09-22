@@ -290,7 +290,9 @@ export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
         yup
           .string()
           .ensure()
-          .required("Le code ONU est obligatoire pour les déchets dangereux"),
+          .required(
+            `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
+          ),
       otherwise: () => yup.string().nullable(),
       wasteDetailsPackagings: yup.array().ensure().required(),
       wasteDetailsNumberOfPackages: yup

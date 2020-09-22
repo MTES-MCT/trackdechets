@@ -95,7 +95,7 @@ describe("Mutation.signedByTransporter", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le code ONU est obligatoire pour les déchets dangereux",
+        message: `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
