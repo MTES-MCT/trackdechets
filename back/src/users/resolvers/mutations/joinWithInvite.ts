@@ -1,16 +1,18 @@
 import { prisma } from "../../../generated/prisma-client";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { hashPassword } from "../../utils";
+import { getUserAccountHashOrNotFound } from "../../database";
+import { UserInputError } from "apollo-server-express";
 
 const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   parent,
   { inviteHash, name, password }
 ) => {
-  const existingHash = await prisma.userAccountHash({ hash: inviteHash });
+  const existingHash = await getUserAccountHashOrNotFound({ hash: inviteHash });
 
-  if (!existingHash) {
-    throw new Error(
-      `Cette invitation n'est plus valable. Contactez le responsable de votre société.`
+  if (existingHash.joined) {
+    throw new UserInputError(
+      `Le compte de l'utilisateur ${existingHash.email} a déjà été crée`
     );
   }
 
@@ -28,6 +30,8 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
       }
     }
   });
+
+  // persist
 
   await prisma
     .deleteUserAccountHash({ hash: inviteHash })

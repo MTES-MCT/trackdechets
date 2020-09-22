@@ -747,6 +747,8 @@ export type Invitation = {
   hash: Scalars['String'];
   /** Rôle de l'utilisateur au sein de l'entreprise */
   role: UserRole;
+  /** Wether or not the user has already joined with invite */
+  joined: Scalars['Boolean'];
 };
 
 
@@ -2449,6 +2451,7 @@ export function createInvitationMock(props: Partial<Invitation>): Invitation {
     companySiret: "",
     hash: "",
     role: UserRole.Member,
+    joined: false,
     ...props,
   };
 }

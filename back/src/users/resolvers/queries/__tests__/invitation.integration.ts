@@ -1,5 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
+import {
+  companyFactory,
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const INVITATION = `
@@ -8,6 +13,7 @@ const INVITATION = `
       email
       companySiret
       role
+      joined
     }
   }
 `;
@@ -40,4 +46,46 @@ describe("query / invitation", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual("Cette invitation n'existe pas");
   });
+
+  it("should silently join company if user already exists", async () => {
+    const user = await userFactory();
+    const company = await companyFactory();
+    const userAccountHash = await prisma.createUserAccountHash({
+      email: user.email,
+      companySiret: company.siret,
+      hash: "azerty",
+      role: "MEMBER",
+      joined: false
+    });
+    const { query } = makeClient();
+    const { data } = await query(INVITATION, {
+      variables: { hash: userAccountHash.hash }
+    });
+    expect(data.invitation.joined).toEqual(true);
+    const joined = await prisma.$exists.companyAssociation({
+      user: { id: user.id },
+      company: { siret: company.siret }
+    });
+    expect(joined).toEqual(true);
+  });
+
+  it(
+    "should silently mark an invitation as joined if user " +
+      "and company association already exist",
+    async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const userAccountHash = await prisma.createUserAccountHash({
+        email: user.email,
+        companySiret: company.siret,
+        hash: "azerty",
+        role: "MEMBER",
+        joined: false
+      });
+      const { query } = makeClient();
+      const { data } = await query(INVITATION, {
+        variables: { hash: userAccountHash.hash }
+      });
+      expect(data.invitation.joined).toEqual(true);
+    }
+  );
 });

@@ -7628,6 +7628,7 @@ type UserAccountHash {
   companySiret: ID!
   role: UserRole!
   hash: String!
+  joined: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -7644,6 +7645,7 @@ input UserAccountHashCreateInput {
   companySiret: ID!
   role: UserRole!
   hash: String!
+  joined: Boolean
 }
 
 type UserAccountHashEdge {
@@ -7662,6 +7664,8 @@ enum UserAccountHashOrderByInput {
   role_DESC
   hash_ASC
   hash_DESC
+  joined_ASC
+  joined_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -7674,6 +7678,7 @@ type UserAccountHashPreviousValues {
   companySiret: ID!
   role: UserRole!
   hash: String!
+  joined: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -7701,6 +7706,7 @@ input UserAccountHashUpdateInput {
   companySiret: ID
   role: UserRole
   hash: String
+  joined: Boolean
 }
 
 input UserAccountHashUpdateManyMutationInput {
@@ -7708,6 +7714,7 @@ input UserAccountHashUpdateManyMutationInput {
   companySiret: ID
   role: UserRole
   hash: String
+  joined: Boolean
 }
 
 input UserAccountHashWhereInput {
@@ -7771,6 +7778,8 @@ input UserAccountHashWhereInput {
   hash_not_starts_with: String
   hash_ends_with: String
   hash_not_ends_with: String
+  joined: Boolean
+  joined_not: Boolean
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]

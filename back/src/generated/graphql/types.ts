@@ -741,6 +741,8 @@ export type Invitation = {
   hash: Scalars['String'];
   /** Rôle de l'utilisateur au sein de l'entreprise */
   role: UserRole;
+  /** Wether or not the user has already joined with invite */
+  joined: Scalars['Boolean'];
 };
 
 
@@ -2540,6 +2542,7 @@ export type InvitationResolvers<ContextType = GraphQLContext, ParentType extends
   companySiret?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   hash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
+  joined?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
@@ -3229,6 +3232,7 @@ export function createInvitationMock(props: Partial<Invitation>): Invitation {
     companySiret: "",
     hash: "",
     role: "MEMBER",
+    joined: false,
     ...props,
   };
 }

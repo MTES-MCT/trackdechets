@@ -33,6 +33,9 @@ type UserAccountHash {
   role: UserRole!
   hash: String! @unique
 
+  # Wether or not the user has already joined by invit
+  joined: Boolean! @default(value: false)
+
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
 }
