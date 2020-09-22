@@ -724,6 +724,25 @@ export type InternationalCompanyInput = {
   phone?: Maybe<Scalars['String']>;
 };
 
+/**
+ * Invitation à rejoindre une entreprise
+ * lorsque l'utilisateur invité n'est pas encore inscrit
+ * sur Trackdéchets
+ */
+export type Invitation = {
+  __typename?: 'Invitation';
+  /** Identifiant unique */
+  id: Scalars['ID'];
+  /** Email de l'utilisateur invité */
+  email: Scalars['String'];
+  /** Siret de l'entreprise à laquelle l'utilisateur est invité */
+  companySiret: Scalars['String'];
+  /** Hash unique inclus dans le lien d'invitation envoyé par email */
+  hash: Scalars['String'];
+  /** Rôle de l'utilisateur au sein de l'entreprise */
+  role: UserRole;
+};
+
 
 export type MultimodalTransporter = {
   __typename?: 'MultimodalTransporter';
@@ -1352,6 +1371,12 @@ export type Query = {
    * Il est valable 10 secondes
    */
   formsRegister: FileDownload;
+  /**
+   * USAGE INTERNE
+   * Recherche une invitation à rejoindre une entreprise
+   * par son hash
+   */
+  invitation?: Maybe<Invitation>;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
   /**
@@ -1418,6 +1443,11 @@ export type QueryFormsRegisterArgs = {
   endDate?: Maybe<Scalars['DateTime']>;
   wasteCode?: Maybe<Scalars['String']>;
   exportFormat?: Maybe<FormsRegisterExportFormat>;
+};
+
+
+export type QueryInvitationArgs = {
+  hash: Scalars['String'];
 };
 
 
@@ -2144,11 +2174,12 @@ export type ResolversTypes = {
   StatusLogUser: ResolverTypeWrapper<StatusLogUser>;
   FormsRegisterExportType: FormsRegisterExportType;
   FormsRegisterExportFormat: FormsRegisterExportFormat;
+  Invitation: ResolverTypeWrapper<Invitation>;
+  UserRole: UserRole;
   User: ResolverTypeWrapper<User>;
   CompanyPrivate: ResolverTypeWrapper<CompanyPrivate>;
   CompanyType: CompanyType;
   CompanyMember: ResolverTypeWrapper<CompanyMember>;
-  UserRole: UserRole;
   CompanySearchResult: ResolverTypeWrapper<CompanySearchResult>;
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
@@ -2245,11 +2276,12 @@ export type ResolversParentTypes = {
   StatusLogUser: StatusLogUser;
   FormsRegisterExportType: FormsRegisterExportType;
   FormsRegisterExportFormat: FormsRegisterExportFormat;
+  Invitation: Invitation;
+  UserRole: UserRole;
   User: User;
   CompanyPrivate: CompanyPrivate;
   CompanyType: CompanyType;
   CompanyMember: CompanyMember;
-  UserRole: UserRole;
   CompanySearchResult: CompanySearchResult;
   CompanyStat: CompanyStat;
   Stat: Stat;
@@ -2502,6 +2534,15 @@ export type InstallationResolvers<ContextType = GraphQLContext, ParentType exten
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
+export type InvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Invitation'] = ResolversParentTypes['Invitation']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  companySiret?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  hash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
+  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+};
+
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
   name: 'JSON';
 }
@@ -2575,6 +2616,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, never>>;
   formsLifeCycle?: Resolver<ResolversTypes['formsLifeCycleData'], ParentType, ContextType, RequireFields<QueryFormsLifeCycleArgs, never>>;
   formsRegister?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, 'sirets'>>;
+  invitation?: Resolver<Maybe<ResolversTypes['Invitation']>, ParentType, ContextType, RequireFields<QueryInvitationArgs, 'hash'>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   searchCompanies?: Resolver<Array<ResolversTypes['CompanySearchResult']>, ParentType, ContextType, RequireFields<QuerySearchCompaniesArgs, 'clue'>>;
   stats?: Resolver<Array<ResolversTypes['CompanyStat']>, ParentType, ContextType>;
@@ -2770,6 +2812,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   formsLifeCycleData?: FormsLifeCycleDataResolvers<ContextType>;
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
+  Invitation?: InvitationResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   MultimodalTransporter?: MultimodalTransporterResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
@@ -3174,6 +3217,18 @@ export function createInternationalCompanyInputMock(props: Partial<International
     contact: null,
     mail: null,
     phone: null,
+    ...props,
+  };
+}
+
+export function createInvitationMock(props: Partial<Invitation>): Invitation {
+  return {
+    __typename: "Invitation",
+    id: "",
+    email: "",
+    companySiret: "",
+    hash: "",
+    role: "MEMBER",
     ...props,
   };
 }
