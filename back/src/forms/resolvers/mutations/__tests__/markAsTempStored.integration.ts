@@ -8,14 +8,57 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
 
-jest.mock("axios", () => ({
-  default: {
-    get: jest.fn(() => Promise.resolve({ data: {} }))
+const MARK_AS_TEMP_STORED = `
+  mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
+    markAsTempStored(id: $id, tempStoredInfos: $tempStoredInfos){
+      id
+      status
+    }
   }
-}));
+`;
 
 describe("{ mutation { markAsTempStored } }", () => {
   afterAll(() => resetDatabase());
+
+  test("it fails when form is not SENT", async () => {
+    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: tempStorerCompany.siret,
+        recipientIsTempStorage: true,
+        temporaryStorageDetail: { create: {} }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: form.id,
+        tempStoredInfos: {
+          wasteAcceptationStatus: "ACCEPTED",
+          wasteRefusalReason: "",
+          receivedBy: "John Doe",
+          receivedAt: "2018-12-11T00:00:00.000Z",
+          signedAt: "2018-12-11T00:00:00.000Z",
+          quantityReceived: 2.4,
+          quantityType: "REAL"
+        }
+      }
+    });
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+    );
+  });
 
   test("the temp storer of the BSD can mark it as TEMP_STORED", async () => {
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
@@ -37,23 +80,20 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const mutation = `
-      mutation   {
-        markAsTempStored(id: "${form.id}", tempStoredInfos: {
-          wasteAcceptationStatus: ACCEPTED,
-          wasteRefusalReason: ""
+    await mutate(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: form.id,
+        tempStoredInfos: {
+          wasteAcceptationStatus: "ACCEPTED",
+          wasteRefusalReason: "",
           receivedBy: "John Doe",
           receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
-          quantityReceived: 2.4
-          quantityType: REAL
-        }) {
-          id
+          quantityReceived: 2.4,
+          quantityType: "REAL"
         }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     const formAfterMutation = await prisma.form({ id: form.id });
 
@@ -90,23 +130,20 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const mutation = `
-      mutation   {
-        markAsTempStored(id: "${form.id}", tempStoredInfos: {
-          wasteAcceptationStatus: REFUSED,
-          wasteRefusalReason: "Thats isn't what I was expecting man !"
+    await mutate(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: form.id,
+        tempStoredInfos: {
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Thats isn't what I was expecting man !",
           receivedBy: "John Doe",
           receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
-          quantityReceived: 0
-          quantityType: REAL
-        }) {
-          id
+          quantityReceived: 0,
+          quantityType: "REAL"
         }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     const formAfterMutation = await prisma.form({ id: form.id });
 
@@ -143,28 +180,26 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const mutation = `
-    mutation   {
-      markAsTempStored(id: "${form.id}", tempStoredInfos: {
-        wasteAcceptationStatus: ACCEPTED,
-        wasteRefusalReason: ""
-        receivedBy: "John Doe",
-        receivedAt: "2018-12-11T00:00:00.000Z",
-        signedAt: "2018-12-11T00:00:00.000Z",
-        quantityReceived: 2.4
-        quantityType: REAL
-      }) {
-        id
+    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: form.id,
+        tempStoredInfos: {
+          wasteAcceptationStatus: "ACCEPTED",
+          wasteRefusalReason: "",
+          receivedBy: "John Doe",
+          receivedAt: "2018-12-11T00:00:00.000Z",
+          signedAt: "2018-12-11T00:00:00.000Z",
+          quantityReceived: 2.4,
+          quantityType: "REAL"
+        }
       }
-    }
-  `;
-
-    const { errors } = await mutate(mutation);
+    });
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
-      "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+      "Ce bordereau ne peut pas être marqué comme entreposé provisoirement car le destinataire " +
+        "n'a pas été identifié comme étant une installation d'entreposage provsoire ou de reconditionnement"
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 });

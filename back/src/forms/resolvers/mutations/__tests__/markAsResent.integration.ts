@@ -20,6 +20,36 @@ const MARK_AS_RESENT = `
 describe("Mutation markAsResent", () => {
   afterEach(resetDatabase);
 
+  test("it fails when form is not TEMP_STORED", async () => {
+    const owner = await userFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "DRAFT",
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { errors } = await mutate(MARK_AS_RESENT, {
+      variables: {
+        id: form.id,
+        resentInfos: {
+          signedAt: "2020-01-01T00:00:00.000Z",
+          signedBy: "John Snow"
+        }
+      }
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+    );
+  });
+
   test("the temp storer of the BSD can resend it", async () => {
     const owner = await userFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER");

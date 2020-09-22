@@ -1,96 +1,50 @@
-import { interpret, State } from "xstate";
-import { GraphQLContext } from "../../types";
-import { getError } from "./errors";
-import { formWorkflowMachine } from "./machine";
-import { ForbiddenError } from "apollo-server-express";
 import {
+  Form,
+  FormUpdateInput,
+  Status,
   prisma,
-  Form as PrismaForm,
-  FormUpdateInput
+  User
 } from "../../generated/prisma-client";
-import { Form, FormStatus } from "../../generated/graphql/types";
-import logStatusChange from "./logStatusChange";
+import { Event } from "./types";
+import machine from "./machine";
+import { InvalidTransition } from "../errors";
 
-export default async function transitionForm<T>(
-  form: PrismaForm,
-  { eventType, eventParams }: { eventType: string; eventParams: T },
-  context: GraphQLContext,
-  transformEventToFormProps: (v: T) => FormUpdateInput = v => v
+export default async function transitionForm(
+  user: User,
+  form: Form,
+  event: Event
 ) {
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
-    .temporaryStorageDetail();
+  const currentStatus = form.status;
 
-  const formPropsFromEvent = transformEventToFormProps(eventParams);
+  // Use state machine to calculate new status
+  const nextState = machine.transition(currentStatus, event);
 
-  // to receive simple multimodal form, we need to be sure there is no segment left wo need to be taken over
-  // get segments here for MARK_RECEIVED event because awaiting in xstate is tricky
-  const transportSegments =
-    eventType === "MARK_RECEIVED"
-      ? await prisma.transportSegments({
-          where: {
-            form: { id: form.id }
-          }
-        })
-      : [];
-  const startingState = State.from(form.status, {
-    form: {
-      ...form,
-      ...formPropsFromEvent,
-      temporaryStorageDetail,
-      transportSegments
-    },
-    requestContext: context,
-    isStableState: true
-  });
-
-  if (
-    !formWorkflowMachine
-      .resolveState(startingState)
-      .nextEvents.includes(eventType)
-  ) {
-    throw new ForbiddenError("Transition impossible");
+  // This transition is not possible
+  if (!nextState.changed) {
+    throw new InvalidTransition();
   }
 
-  const formService = interpret(formWorkflowMachine);
+  const nextStatus = nextState.value as Status;
 
-  // Machine transitions are always synchronous
-  // We subscribe to the transitions and wait for a stable or final position before returning a result
-  return new Promise<Form>((resolve, reject) => {
-    formService.start(startingState).onTransition(async state => {
-      if (!state.changed) {
-        return;
-      }
+  const formUpdateInput: FormUpdateInput = {
+    status: nextStatus,
+    ...event.formUpdateInput
+  };
 
-      if (state.matches("error")) {
-        const workflowError = state.meta[Object.keys(state.meta)[0]];
-        const error = await getError(workflowError);
-        reject(error);
-        formService.stop();
-      }
-
-      // `done` means we reached a final state (xstate concept)
-      // `context.isStableState` is a concept introduced to differentiate form state with transient states (validation or side effects)
-      // If we reached one of those, we know the transition is over and we can safely update the form and return
-      if (state.done || state.context.isStableState) {
-        const newStatus = state.value;
-        await logStatusChange(
-          form.id,
-          newStatus,
-          context,
-          eventType,
-          eventParams
-        );
-
-        const updatedForm = await prisma.updateForm({
-          where: { id: form.id },
-          data: { status: newStatus as string, ...formPropsFromEvent }
-        });
-        resolve({ ...updatedForm, status: updatedForm.status as FormStatus });
-        formService.stop();
-      }
-    });
-
-    formService.send({ type: eventType, ...eventParams });
+  // update form
+  const updatedForm = await prisma.updateForm({
+    where: { id: form.id },
+    data: formUpdateInput
   });
+
+  // log status change
+  await prisma.createStatusLog({
+    user: { connect: { id: user.id } },
+    form: { connect: { id: form.id } },
+    status: nextStatus,
+    loggedAt: new Date(),
+    updatedFields: event.formUpdateInput ?? {}
+  });
+
+  return updatedForm;
 }

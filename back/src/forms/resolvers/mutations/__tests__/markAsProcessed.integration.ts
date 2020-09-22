@@ -403,4 +403,40 @@ describe("mutation.markAsProcessed", () => {
       })
     ]);
   });
+
+  it("should mark appendix2 forms as grouped", async () => {
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED"
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
+    });
+
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 1",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    expect(appendix2grouped.status).toEqual("PROCESSED");
+  });
 });

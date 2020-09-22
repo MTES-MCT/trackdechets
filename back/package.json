@@ -64,7 +64,7 @@
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0",
     "world-countries": "^4.0.0",
-    "xstate": "^4.10.0",
+    "xstate": "^4.13.0",
     "yup": "^0.29.3"
   },
   "devDependencies": {
