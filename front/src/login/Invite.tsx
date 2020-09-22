@@ -51,7 +51,7 @@ function SignupConfirmation({ user }: { user: User }) {
         <h2>Confirmation de création de compte</h2>
         <p>
           Votre compte <span className="tw-font-bold">{user.email}</span> a bien
-          été crée et vous êtes désormais membres des établissements suivants:
+          été crée et vous êtes désormais membre des établissements suivants:
         </p>
         <ul>
           {user.companies?.map(company => (

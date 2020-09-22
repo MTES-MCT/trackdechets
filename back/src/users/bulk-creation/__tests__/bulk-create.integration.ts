@@ -171,7 +171,7 @@ describe("bulk create users and companies from csv files", () => {
     const company = await companyFactory({ siret: "51212357100022" });
 
     // John Snow has been invited to company 51212357100022
-    await prisma.createUserAccountHash({
+    const invitation = await prisma.createUserAccountHash({
       email: "john.snow@trackdechets.fr",
       companySiret: company.siret,
       role: "MEMBER",
@@ -193,14 +193,17 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations).toHaveLength(1);
     expect(associations[0].role).toEqual("MEMBER");
 
-    // invitation should be deleted
-    expect(await prisma.userAccountHashes()).toHaveLength(0);
+    // invitation should be marked as joined
+    const updatedInvitation = await prisma.userAccountHash({
+      id: invitation.id
+    });
+    expect(updatedInvitation.joined).toEqual(true);
   }, 10000);
 
   test("role in csv already in pending invitation", async () => {
     // assume John Snow was already invited to Trackdéchets
     const company = await companyFactory({ siret: "85001946400013" });
-    await prisma.createUserAccountHash({
+    const invitation = await prisma.createUserAccountHash({
       email: "john.snow@trackdechets.fr",
       companySiret: company.siret,
       role: "MEMBER",
@@ -219,7 +222,10 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations).toHaveLength(1);
     expect(associations[0].role).toEqual("MEMBER");
 
-    // invitation should be deleted
-    expect(await prisma.userAccountHashes()).toHaveLength(0);
+    // invitation should be marked as joined
+    const updatedInvitation = await prisma.userAccountHash({
+      id: invitation.id
+    });
+    expect(updatedInvitation.joined).toEqual(true);
   }, 10000);
 });

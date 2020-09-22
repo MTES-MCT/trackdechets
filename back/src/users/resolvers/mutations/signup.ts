@@ -4,7 +4,7 @@ import { sendMail } from "../../../common/mails.helper";
 import { User, prisma } from "../../../generated/prisma-client";
 import { userMails } from "../../mails";
 import { hashPassword } from "../../utils";
-import { sanitizeEmail, legacySanitizeEmail } from "../../../utils";
+import { sanitizeEmail } from "../../../utils";
 import { UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
