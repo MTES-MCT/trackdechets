@@ -10,6 +10,7 @@ import {
   MutationResolvers,
   MutationSignupArgs
 } from "../../../generated/graphql/types";
+import { acceptNewUserCompanyInvitations, userExists } from "../../database";
 
 export const signupSchema = yup.object({
   userInfos: yup.object({
@@ -32,11 +33,8 @@ function validateArgs(args: MutationSignupArgs) {
 export async function signupFn({
   userInfos: { name, password, phone, email: unsafeEmail }
 }: MutationSignupArgs) {
-  const userExists = await prisma.$exists.user({
-    email_in: [legacySanitizeEmail(unsafeEmail), sanitizeEmail(unsafeEmail)]
-  });
-
-  if (userExists) {
+  const exists = await userExists(unsafeEmail);
+  if (exists) {
     throw new UserInputError(
       "Impossible de créer cet utilisateur. Cet email a déjà un compte"
     );
@@ -80,37 +78,6 @@ async function createActivationHash(user: User) {
     user: {
       connect: { id: user.id }
     }
-  });
-}
-
-/**
- * If the user has pending invitations, validate them all at once on signup
- *
- * @param user
- */
-export async function acceptNewUserCompanyInvitations(user: User) {
-  const existingHashes = await prisma
-    .userAccountHashes({ where: { email: user.email } })
-    .catch(() => {
-      throw new Error("Technical error.");
-    });
-
-  if (!existingHashes.length) {
-    return Promise.resolve();
-  }
-
-  await Promise.all(
-    existingHashes.map(existingHash =>
-      prisma.createCompanyAssociation({
-        company: { connect: { siret: existingHash.companySiret } },
-        user: { connect: { id: user.id } },
-        role: existingHash.role
-      })
-    )
-  );
-
-  return prisma.deleteManyUserAccountHashes({
-    id_in: existingHashes.map(h => h.id)
   });
 }
 

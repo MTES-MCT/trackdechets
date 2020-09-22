@@ -1,8 +1,13 @@
 import { prisma } from "../../../generated/prisma-client";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { hashPassword } from "../../utils";
-import { getUserAccountHashOrNotFound } from "../../database";
+import {
+  acceptNewUserCompanyInvitations,
+  getUserAccountHashOrNotFound,
+  userExists
+} from "../../database";
 import { UserInputError } from "apollo-server-express";
+import { sanitizeEmail } from "../../../utils";
 
 const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   parent,
@@ -11,33 +16,27 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   const existingHash = await getUserAccountHashOrNotFound({ hash: inviteHash });
 
   if (existingHash.joined) {
+    throw new UserInputError("Cette invitation n'est plus valide");
+  }
+
+  const exists = await userExists(existingHash.email);
+  if (exists) {
     throw new UserInputError(
-      `Le compte de l'utilisateur ${existingHash.email} a déjà été crée`
+      "Impossible de créer cet utilisateur. Cet email a déjà un compte"
     );
   }
 
   const hashedPassword = await hashPassword(password);
   const user = await prisma.createUser({
     name,
-    email: existingHash.email,
+    email: sanitizeEmail(existingHash.email),
     password: hashedPassword,
     phone: "",
-    isActive: true,
-    companyAssociations: {
-      create: {
-        company: { connect: { siret: existingHash.companySiret } },
-        role: existingHash.role
-      }
-    }
+    isActive: true
   });
 
-  // persist
-
-  await prisma
-    .deleteUserAccountHash({ hash: inviteHash })
-    .catch(err =>
-      console.error(`Cannot delete user account hash ${inviteHash}`, err)
-    );
+  // accept all pending invitations at once
+  await acceptNewUserCompanyInvitations(user);
 
   return user;
 };

@@ -164,7 +164,7 @@ describe("Mutation.signup", () => {
 
     const company = await companyFactory();
 
-    await prisma.createUserAccountHash({
+    const invitation = await prisma.createUserAccountHash({
       email: user.email,
       companySiret: company.siret,
       hash: "hash",
@@ -184,12 +184,10 @@ describe("Mutation.signup", () => {
 
     const newUser = await prisma.user({ email: user.email });
 
-    const accountHashesCount = await prisma
-      .userAccountHashesConnection()
-      .aggregate()
-      .count();
-
-    expect(accountHashesCount).toEqual(0);
+    const updatedInvitation = await prisma.userAccountHash({
+      id: invitation.id
+    });
+    expect(updatedInvitation.joined).toEqual(true);
 
     const companyAssociation = await prisma.companyAssociations({
       where: { user: { id: newUser.id }, company: { id: company.id } }

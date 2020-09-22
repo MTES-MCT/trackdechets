@@ -13,7 +13,7 @@ import {
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
-import { getUid } from "../utils";
+import { getUid, legacySanitizeEmail, sanitizeEmail } from "../utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma
@@ -114,7 +114,7 @@ export async function getUserAccountHashOrNotFound(
     where
   });
   if (userAccountHashes.length === 0) {
-    throw new UserInputError(`Cette invitation n'existe pas`);
+    throw new UserInputError("Cette invitation n'existe pas");
   }
   return userAccountHashes[0];
 }
@@ -138,4 +138,41 @@ export async function createAccessToken(user: User) {
     token
   });
   return accessToken;
+}
+
+export function userExists(unsafeEmail: string) {
+  return prisma.$exists.user({
+    email_in: [legacySanitizeEmail(unsafeEmail), sanitizeEmail(unsafeEmail)]
+  });
+}
+
+/**
+ * Validate a user's pending invitations
+ * @param user
+ */
+export async function acceptNewUserCompanyInvitations(user: User) {
+  const existingHashes = await prisma.userAccountHashes({
+    where: { email: user.email }
+  });
+
+  if (!existingHashes.length) {
+    return Promise.resolve();
+  }
+
+  await Promise.all(
+    existingHashes.map(existingHash =>
+      prisma.createCompanyAssociation({
+        company: { connect: { siret: existingHash.companySiret } },
+        user: { connect: { id: user.id } },
+        role: existingHash.role
+      })
+    )
+  );
+
+  return prisma.updateManyUserAccountHashes({
+    where: {
+      id_in: existingHashes.map(h => h.id)
+    },
+    data: { joined: true }
+  });
 }
