@@ -30,6 +30,13 @@ export async function markAsProcessedFn(
   formUpdateInput.processingOperationDescription =
     processedInfo.processingOperationDescription || operation?.description;
 
+  if (
+    formUpdateInput.nextDestinationCompanySiret &&
+    !formUpdateInput.nextDestinationCompanyCountry
+  ) {
+    formUpdateInput.nextDestinationCompanyCountry = "FR";
+  }
+
   return transitionForm(
     form,
     { eventType: "MARK_PROCESSED", eventParams: processedInfo },

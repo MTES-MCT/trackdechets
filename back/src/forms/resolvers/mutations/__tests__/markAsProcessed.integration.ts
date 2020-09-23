@@ -278,6 +278,48 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
+  it("should set country to FR by default", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: "0".repeat(14),
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form({ id: form.id });
+    expect(resultingForm).toMatchObject({
+      status: "AWAITING_GROUP",
+      nextDestinationCompanyCountry: "FR"
+    });
+  });
+
   it("should add a foreign next destination", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
