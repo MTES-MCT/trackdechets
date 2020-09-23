@@ -197,7 +197,7 @@ describe("bulk create users and companies from csv files", () => {
     const updatedInvitation = await prisma.userAccountHash({
       id: invitation.id
     });
-    expect(updatedInvitation.joined).toEqual(true);
+    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
   }, 10000);
 
   test("role in csv already in pending invitation", async () => {
@@ -226,6 +226,6 @@ describe("bulk create users and companies from csv files", () => {
     const updatedInvitation = await prisma.userAccountHash({
       id: invitation.id
     });
-    expect(updatedInvitation.joined).toEqual(true);
+    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
   }, 10000);
 });

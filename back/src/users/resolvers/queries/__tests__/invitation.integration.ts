@@ -13,7 +13,7 @@ const INVITATION = `
       email
       companySiret
       role
-      joined
+      acceptedAt
     }
   }
 `;
@@ -55,13 +55,13 @@ describe("query / invitation", () => {
       companySiret: company.siret,
       hash: "azerty",
       role: "MEMBER",
-      joined: false
+      acceptedAt: null
     });
     const { query } = makeClient();
     const { data } = await query(INVITATION, {
       variables: { hash: userAccountHash.hash }
     });
-    expect(data.invitation.joined).toEqual(true);
+    expect(data.invitation.acceptedAt.length).toBeGreaterThan(0);
     const joined = await prisma.$exists.companyAssociation({
       user: { id: user.id },
       company: { siret: company.siret }
@@ -79,13 +79,13 @@ describe("query / invitation", () => {
         companySiret: company.siret,
         hash: "azerty",
         role: "MEMBER",
-        joined: false
+        acceptedAt: null
       });
       const { query } = makeClient();
       const { data } = await query(INVITATION, {
         variables: { hash: userAccountHash.hash }
       });
-      expect(data.invitation.joined).toEqual(true);
+      expect(data.invitation.acceptedAt.length).toBeGreaterThan(0);
     }
   );
 });
