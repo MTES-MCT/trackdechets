@@ -17,7 +17,7 @@ const INVITATION = gql`
   query Invitation($hash: String!) {
     invitation(hash: $hash) {
       email
-      joined
+      acceptedAt
       companySiret
     }
   }
