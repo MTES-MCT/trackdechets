@@ -76,7 +76,7 @@ function SignupConfirmation({ user }: { user: User }) {
  * This page is shown when user try to join several times with the
  * same invite link
  */
-function AlreadyJoined({ invitation }: { invitation: Invitation }) {
+function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
   const { email, companySiret } = invitation;
   return (
     <div className="container">
@@ -142,9 +142,9 @@ export default function Invite() {
   if (queryData && queryData.invitation) {
     const invitation = queryData.invitation;
 
-    // user has already joined
-    if (invitation.joined) {
-      return <AlreadyJoined invitation={invitation} />;
+    // invitation was already accepted
+    if (invitation.acceptedAt) {
+      return <AlreadyAccepted invitation={invitation} />;
     }
 
     return (

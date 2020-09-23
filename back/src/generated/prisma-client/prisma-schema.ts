@@ -7628,9 +7628,9 @@ type UserAccountHash {
   companySiret: ID!
   role: UserRole!
   hash: String!
-  joined: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
+  acceptedAt: DateTime
 }
 
 type UserAccountHashConnection {
@@ -7645,7 +7645,7 @@ input UserAccountHashCreateInput {
   companySiret: ID!
   role: UserRole!
   hash: String!
-  joined: Boolean
+  acceptedAt: DateTime
 }
 
 type UserAccountHashEdge {
@@ -7664,12 +7664,12 @@ enum UserAccountHashOrderByInput {
   role_DESC
   hash_ASC
   hash_DESC
-  joined_ASC
-  joined_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  acceptedAt_ASC
+  acceptedAt_DESC
 }
 
 type UserAccountHashPreviousValues {
@@ -7678,9 +7678,9 @@ type UserAccountHashPreviousValues {
   companySiret: ID!
   role: UserRole!
   hash: String!
-  joined: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
+  acceptedAt: DateTime
 }
 
 type UserAccountHashSubscriptionPayload {
@@ -7706,7 +7706,7 @@ input UserAccountHashUpdateInput {
   companySiret: ID
   role: UserRole
   hash: String
-  joined: Boolean
+  acceptedAt: DateTime
 }
 
 input UserAccountHashUpdateManyMutationInput {
@@ -7714,7 +7714,7 @@ input UserAccountHashUpdateManyMutationInput {
   companySiret: ID
   role: UserRole
   hash: String
-  joined: Boolean
+  acceptedAt: DateTime
 }
 
 input UserAccountHashWhereInput {
@@ -7778,8 +7778,6 @@ input UserAccountHashWhereInput {
   hash_not_starts_with: String
   hash_ends_with: String
   hash_not_ends_with: String
-  joined: Boolean
-  joined_not: Boolean
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -7796,6 +7794,14 @@ input UserAccountHashWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  acceptedAt: DateTime
+  acceptedAt_not: DateTime
+  acceptedAt_in: [DateTime!]
+  acceptedAt_not_in: [DateTime!]
+  acceptedAt_lt: DateTime
+  acceptedAt_lte: DateTime
+  acceptedAt_gt: DateTime
+  acceptedAt_gte: DateTime
   AND: [UserAccountHashWhereInput!]
   OR: [UserAccountHashWhereInput!]
   NOT: [UserAccountHashWhereInput!]

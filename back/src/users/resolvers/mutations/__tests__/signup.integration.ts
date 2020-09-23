@@ -187,7 +187,7 @@ describe("Mutation.signup", () => {
     const updatedInvitation = await prisma.userAccountHash({
       id: invitation.id
     });
-    expect(updatedInvitation.joined).toEqual(true);
+    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
 
     const companyAssociation = await prisma.companyAssociations({
       where: { user: { id: newUser.id }, company: { id: company.id } }

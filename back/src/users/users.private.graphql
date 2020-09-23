@@ -94,8 +94,8 @@ type Invitation {
   "Rôle de l'utilisateur au sein de l'entreprise"
   role: UserRole!
 
-  "Wether or not the user has already joined with invite"
-  joined: Boolean!
+  "Date when the invitation was accepted and the user joined"
+  acceptedAt: DateTime
 }
 
 input SignupInput {

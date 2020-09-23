@@ -1395,12 +1395,12 @@ export type UserAccountHashOrderByInput =
   | "role_DESC"
   | "hash_ASC"
   | "hash_DESC"
-  | "joined_ASC"
-  | "joined_DESC"
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
-  | "updatedAt_DESC";
+  | "updatedAt_DESC"
+  | "acceptedAt_ASC"
+  | "acceptedAt_DESC";
 
 export type UserActivationHashOrderByInput =
   | "id_ASC"
@@ -4337,8 +4337,6 @@ export interface UserAccountHashWhereInput {
   hash_not_starts_with?: Maybe<String>;
   hash_ends_with?: Maybe<String>;
   hash_not_ends_with?: Maybe<String>;
-  joined?: Maybe<Boolean>;
-  joined_not?: Maybe<Boolean>;
   createdAt?: Maybe<DateTimeInput>;
   createdAt_not?: Maybe<DateTimeInput>;
   createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -4355,6 +4353,14 @@ export interface UserAccountHashWhereInput {
   updatedAt_lte?: Maybe<DateTimeInput>;
   updatedAt_gt?: Maybe<DateTimeInput>;
   updatedAt_gte?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
+  acceptedAt_not?: Maybe<DateTimeInput>;
+  acceptedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_lt?: Maybe<DateTimeInput>;
+  acceptedAt_lte?: Maybe<DateTimeInput>;
+  acceptedAt_gt?: Maybe<DateTimeInput>;
+  acceptedAt_gte?: Maybe<DateTimeInput>;
   AND?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
   OR?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
   NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
@@ -7778,7 +7784,7 @@ export interface UserAccountHashCreateInput {
   companySiret: ID_Input;
   role: UserRole;
   hash: String;
-  joined?: Maybe<Boolean>;
+  acceptedAt?: Maybe<DateTimeInput>;
 }
 
 export interface UserAccountHashUpdateInput {
@@ -7786,7 +7792,7 @@ export interface UserAccountHashUpdateInput {
   companySiret?: Maybe<ID_Input>;
   role?: Maybe<UserRole>;
   hash?: Maybe<String>;
-  joined?: Maybe<Boolean>;
+  acceptedAt?: Maybe<DateTimeInput>;
 }
 
 export interface UserAccountHashUpdateManyMutationInput {
@@ -7794,7 +7800,7 @@ export interface UserAccountHashUpdateManyMutationInput {
   companySiret?: Maybe<ID_Input>;
   role?: Maybe<UserRole>;
   hash?: Maybe<String>;
-  joined?: Maybe<Boolean>;
+  acceptedAt?: Maybe<DateTimeInput>;
 }
 
 export interface UserActivationHashCreateInput {
@@ -10394,9 +10400,9 @@ export interface UserAccountHash {
   companySiret: ID_Output;
   role: UserRole;
   hash: String;
-  joined: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  acceptedAt?: DateTimeOutput;
 }
 
 export interface UserAccountHashPromise
@@ -10407,9 +10413,9 @@ export interface UserAccountHashPromise
   companySiret: () => Promise<ID_Output>;
   role: () => Promise<UserRole>;
   hash: () => Promise<String>;
-  joined: () => Promise<Boolean>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface UserAccountHashSubscription
@@ -10420,9 +10426,9 @@ export interface UserAccountHashSubscription
   companySiret: () => Promise<AsyncIterator<ID_Output>>;
   role: () => Promise<AsyncIterator<UserRole>>;
   hash: () => Promise<AsyncIterator<String>>;
-  joined: () => Promise<AsyncIterator<Boolean>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  acceptedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface UserAccountHashNullablePromise
@@ -10433,9 +10439,9 @@ export interface UserAccountHashNullablePromise
   companySiret: () => Promise<ID_Output>;
   role: () => Promise<UserRole>;
   hash: () => Promise<String>;
-  joined: () => Promise<Boolean>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface UserAccountHashConnection {
@@ -11942,9 +11948,9 @@ export interface UserAccountHashPreviousValues {
   companySiret: ID_Output;
   role: UserRole;
   hash: String;
-  joined: Boolean;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  acceptedAt?: DateTimeOutput;
 }
 
 export interface UserAccountHashPreviousValuesPromise
@@ -11955,9 +11961,9 @@ export interface UserAccountHashPreviousValuesPromise
   companySiret: () => Promise<ID_Output>;
   role: () => Promise<UserRole>;
   hash: () => Promise<String>;
-  joined: () => Promise<Boolean>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface UserAccountHashPreviousValuesSubscription
@@ -11968,9 +11974,9 @@ export interface UserAccountHashPreviousValuesSubscription
   companySiret: () => Promise<AsyncIterator<ID_Output>>;
   role: () => Promise<AsyncIterator<UserRole>>;
   hash: () => Promise<AsyncIterator<String>>;
-  joined: () => Promise<AsyncIterator<Boolean>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  acceptedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface UserActivationHashSubscriptionPayload {

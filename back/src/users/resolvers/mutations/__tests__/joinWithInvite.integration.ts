@@ -4,6 +4,7 @@ import { server } from "../../../../server";
 import { prisma } from "../../../../generated/prisma-client";
 import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
+import makeClient from "../../../../__tests__/testClient";
 
 const JOIN_WITH_INVITE = `
   mutation JoinWithInvite($inviteHash: String!, $name: String!, $password: String!){
@@ -15,9 +16,9 @@ const JOIN_WITH_INVITE = `
 
 describe("joinWithInvite mutation", () => {
   afterEach(resetDatabase);
+  const { mutate } = makeClient();
 
-  it("should raise exception if hash does not exist", async () => {
-    const { mutate } = createTestClient({ apolloServer: server });
+  it("should raise exception if invitation does not exist", async () => {
     const { errors } = await mutate(JOIN_WITH_INVITE, {
       variables: { inviteHash: "invalid", name: "John Snow", password: "pass" }
     });
@@ -25,9 +26,31 @@ describe("joinWithInvite mutation", () => {
     expect(errors[0].message).toEqual("Cette invitation n'existe pas");
   });
 
-  it("should create user, associate it to company and mark invitation as joined", async () => {
+  it("should raise exception if invitation was already accepted", async () => {
     const { mutate } = createTestClient({ apolloServer: server });
 
+    const company = await companyFactory();
+    const invitee = "john.snow@trackdechets.fr";
+
+    const invitation = await prisma.createUserAccountHash({
+      email: invitee,
+      companySiret: company.siret,
+      role: "MEMBER",
+      hash: "hash",
+      acceptedAt: new Date().toISOString()
+    });
+    const { errors } = await mutate(JOIN_WITH_INVITE, {
+      variables: {
+        inviteHash: invitation.hash,
+        name: "John Snow",
+        password: "pass"
+      }
+    });
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual("Cette invitation a déjà été acceptée");
+  });
+
+  it("should create user, associate it to company and mark invitation as joined", async () => {
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
@@ -52,7 +75,7 @@ describe("joinWithInvite mutation", () => {
     const updatedInvitation = await prisma.userAccountHash({
       id: invitation.id
     });
-    expect(updatedInvitation.joined).toEqual(true);
+    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
 
     // check invitee is company member
     const isCompanyMember = await prisma.$exists.companyAssociation({
@@ -63,8 +86,6 @@ describe("joinWithInvite mutation", () => {
   });
 
   it("should accept other pending invitations", async () => {
-    const { mutate } = createTestClient({ apolloServer: server });
-
     const company1 = await companyFactory();
     const company2 = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
@@ -94,7 +115,7 @@ describe("joinWithInvite mutation", () => {
     const updatedInvitation2 = await prisma.userAccountHash({
       id: invitation2.id
     });
-    expect(updatedInvitation2.joined).toEqual(true);
+    expect(updatedInvitation2.acceptedAt.length).toBeGreaterThan(0);
 
     const user = await prisma.user({ email: invitee });
     const companies = await getUserCompanies(user.id);

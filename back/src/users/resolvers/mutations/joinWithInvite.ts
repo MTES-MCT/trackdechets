@@ -15,8 +15,8 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
 ) => {
   const existingHash = await getUserAccountHashOrNotFound({ hash: inviteHash });
 
-  if (existingHash.joined) {
-    throw new UserInputError("Cette invitation n'est plus valide");
+  if (existingHash.acceptedAt) {
+    throw new UserInputError("Cette invitation a déjà été acceptée");
   }
 
   const exists = await userExists(existingHash.email);

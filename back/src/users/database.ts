@@ -173,6 +173,6 @@ export async function acceptNewUserCompanyInvitations(user: User) {
     where: {
       id_in: existingHashes.map(h => h.id)
     },
-    data: { joined: true }
+    data: { acceptedAt: new Date().toISOString() }
   });
 }

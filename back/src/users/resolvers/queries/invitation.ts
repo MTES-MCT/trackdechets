@@ -20,7 +20,7 @@ const invitationResolver: QueryResolvers["invitation"] = async (
   // as a result of not taking into account the possibility
   // of a user being invited to several companies before it joins
   const user = await prisma.user({ email: invitation.email });
-  if (user && !invitation.joined) {
+  if (user && !invitation.acceptedAt) {
     // user has already joined with another link
     // but this invitation was not consumed.
     const joined = await prisma.$exists.companyAssociation({
@@ -37,7 +37,7 @@ const invitationResolver: QueryResolvers["invitation"] = async (
     }
     const updatedInvitation = await prisma.updateUserAccountHash({
       where: { hash },
-      data: { joined: true }
+      data: { acceptedAt: new Date().toISOString() }
     });
     return updatedInvitation;
   }
