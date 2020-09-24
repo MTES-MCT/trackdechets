@@ -34,6 +34,8 @@ export async function markAsProcessedFn(
     formUpdateInput.nextDestinationCompanySiret &&
     !formUpdateInput.nextDestinationCompanyCountry
   ) {
+    // only default to "FR" if there's an actual nextDestination
+    // otherwise keep it empty to avoid filling a field for an object that doesn't exist
     formUpdateInput.nextDestinationCompanyCountry = "FR";
   }
 
