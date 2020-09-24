@@ -1,13 +1,12 @@
-import { createTestClient } from "apollo-server-integration-testing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
-import { server } from "../../../../server";
 import {
   formFactory,
   userWithCompanyFactory,
   companyFactory
 } from "../../../../__tests__/factories";
 import { PROCESSING_OPERATIONS } from "../../../../common/constants";
+import makeClient from "../../../../__tests__/testClient";
 
 jest.mock("axios", () => ({
   default: {
@@ -24,37 +23,11 @@ const MARK_AS_PROCESSED = `
   }
 `;
 
-describe("Integration / Mark as processed mutation", () => {
-  let user;
-  let company;
-  let mutate;
-
-  beforeAll(async () => {
-    const userAndCompany = await userWithCompanyFactory("ADMIN");
-    user = userAndCompany.user;
-    company = userAndCompany.company;
-  });
-
-  beforeEach(() => {
-    // instantiate test client
-    const { mutate: m, setOptions } = createTestClient({
-      apolloServer: server
-    });
-
-    setOptions({
-      request: {
-        user
-      }
-    });
-
-    mutate = m;
-  });
-
-  afterAll(async () => {
-    await resetDatabase();
-  });
+describe("mutation.markAsProcessed", () => {
+  afterAll(() => resetDatabase());
 
   it("should fail if current user is not recipient", async () => {
+    const { user } = await userWithCompanyFactory("ADMIN");
     const recipientCompany = await companyFactory();
 
     const form = await formFactory({
@@ -66,6 +39,7 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
+    const { mutate } = makeClient(user);
     const { errors } = await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
@@ -81,6 +55,7 @@ describe("Integration / Mark as processed mutation", () => {
   });
 
   it("should mark a form as processed", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -90,6 +65,7 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
+    const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
@@ -118,6 +94,7 @@ describe("Integration / Mark as processed mutation", () => {
   });
 
   it("should fill the description with the operation's", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -130,6 +107,7 @@ describe("Integration / Mark as processed mutation", () => {
     const processingOperation = PROCESSING_OPERATIONS.find(
       operation => operation.code === "D 1"
     );
+    const { mutate } = makeClient(user);
     const {
       data: {
         markAsProcessed: { processingOperationDescription }
@@ -150,6 +128,7 @@ describe("Integration / Mark as processed mutation", () => {
   });
 
   it("should not mark a form as processed when operation code is not valid", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -159,6 +138,7 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
+    const { mutate } = makeClient(user);
     const { errors } = await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
@@ -188,6 +168,7 @@ describe("Integration / Mark as processed mutation", () => {
   });
 
   it("should mark a form as AWAITING_GROUP when operation implies so", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -197,6 +178,7 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
+    const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
@@ -224,7 +206,8 @@ describe("Integration / Mark as processed mutation", () => {
     expect(resultingForm.status).toBe("AWAITING_GROUP");
   });
 
-  it("should mark a form as NO_TRACEABILITY when user declares it", async () => {
+  it("should return an error when providing a next destination for a non-grouping waste code", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -234,6 +217,50 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "R 1",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: "97874512984578",
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure"
+      })
+    ]);
+  });
+
+  it("should mark a form as NO_TRACEABILITY when user declares it", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
@@ -251,7 +278,8 @@ describe("Integration / Mark as processed mutation", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should add a foreign next destination", async () => {
+  it("should set country to FR by default", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -261,6 +289,49 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: "0".repeat(14),
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form({ id: form.id });
+    expect(resultingForm).toMatchObject({
+      status: "AWAITING_GROUP",
+      nextDestinationCompanyCountry: "FR"
+    });
+  });
+
+  it("should add a foreign next destination", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
@@ -291,6 +362,7 @@ describe("Integration / Mark as processed mutation", () => {
   });
 
   it("should disallow a missing siret for a french next destination", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -300,6 +372,7 @@ describe("Integration / Mark as processed mutation", () => {
       }
     });
 
+    const { mutate } = makeClient(user);
     const { errors } = await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
