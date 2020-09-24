@@ -8,6 +8,8 @@ import {
 import express from "express";
 import passport from "passport";
 import session from "express-session";
+import rateLimit from "express-rate-limit";
+import RateLimitRedisStore from "rate-limit-redis";
 import redisStore from "connect-redis";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -129,6 +131,19 @@ export const server = new ApolloServer({
 });
 
 export const app = express();
+
+const RATE_LIMIT_WINDOW_SECONDS = 60;
+const MAX_REQUESTS_PER_WINDOW = 1000;
+app.use(
+  rateLimit({
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
+    max: MAX_REQUESTS_PER_WINDOW,
+    store: new RateLimitRedisStore({
+      client: redisClient,
+      expiry: RATE_LIMIT_WINDOW_SECONDS
+    })
+  })
+);
 
 /**
  * parse application/x-www-form-urlencoded
