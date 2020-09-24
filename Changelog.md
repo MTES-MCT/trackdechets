@@ -7,7 +7,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2020.09.1] 28/09/2020
 
-- Ajout d'une limitation de 1000 requêtes possible par une même adresse IP dans une fenêtre de 1 minutes, [PR](https://github.com/MTES-MCT/trackdechets/pull/393)
+- Ajout d'une limitation de 1000 requêtes possible par une même adresse IP dans une fenêtre de 1 minutes, [PR 407](https://github.com/MTES-MCT/trackdechets/pull/407)
 - Changements autour du code ONU : il est requis pour les déchets dangereux mais pas pour les non-dangereux, [PR 393](https://github.com/MTES-MCT/trackdechets/pull/393)
 - Possibilité de renseigner une entreprise à l'étranger en case 12, [PR 377](https://github.com/MTES-MCT/trackdechets/pull/377)
 - Correction d'un bug lors d'invitations successives d'un utilisateur à plusieurs établissements, [PR 406](https://github.com/MTES-MCT/trackdechets/pull/406)
