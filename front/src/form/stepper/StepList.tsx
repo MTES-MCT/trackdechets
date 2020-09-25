@@ -8,7 +8,7 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { RouteComponentProps, withRouter, useLocation } from "react-router";
 import { InlineError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
 import { currentSiretService } from "../../dashboard/CompanySelector";
@@ -36,6 +36,8 @@ export default withRouter(function StepList(
 ) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = props.children.length - 1;
+  const { search } = useLocation();
+  const searchParams = new URLSearchParams(search);
 
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_FORM,
@@ -162,7 +164,11 @@ export default withRouter(function StepList(
                   saveForm({
                     variables: { formInput },
                   })
-                    .then(_ => props.history.push("/dashboard/"))
+                    .then(_ =>
+                      props.history.push(
+                        `/dashboard/${searchParams.get("redirectTo") ?? ""}`
+                      )
+                    )
                     .catch(err => {
                       err.graphQLErrors.map(err =>
                         cogoToast.error(err.message, { hideAfter: 7 })

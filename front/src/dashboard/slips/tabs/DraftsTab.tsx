@@ -32,7 +32,7 @@ export default function DraftsTab() {
         <h4>Il n'y a aucun bordereau en brouillon</h4>
         <p>
           Si vous le souhaitez, vous pouvez{" "}
-          <Link to="/form">
+          <Link to={`/form?redirectTo=${siret}`}>
             <button className="button-outline small primary">
               créer un bordereau
             </button>
