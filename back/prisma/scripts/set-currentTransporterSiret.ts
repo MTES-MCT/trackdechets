@@ -35,7 +35,7 @@ async function setCurrentTransporterSiret() {
 @registerUpdater(
   "Set current transporter siret field",
   `New column currentTransporterSiret filled with transporter company siret on SENT forms`,
-  true
+  false
 )
 export class SetCurrentTransporterSiret implements Updater {
   run() {
