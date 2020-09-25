@@ -104,4 +104,31 @@ describe("inviteUserToCompany", () => {
       )
     );
   });
+
+  it("should sanitize email", async () => {
+    userMock.mockResolvedValueOnce(null);
+    const userAccountHash = {
+      email: "Arya.Stark@trackdechets.fr",
+      hash: "hash",
+      role: "MEMBER"
+    };
+    createUserAccountHashMock.mockResolvedValueOnce(userAccountHash);
+
+    const company = { siret: "85001946400013", name: "Code en Stock" };
+    companyMock.mockResolvedValueOnce(company);
+
+    const adminUser = { name: "John Snow" } as User;
+
+    await inviteUserToCompany(adminUser, {
+      email: "arya.stark@trackdechets.fr",
+      siret: "85001946400013",
+      role: "MEMBER"
+    });
+
+    expect(createUserAccountHashMock).toHaveBeenCalledWith(
+      "arya.stark@trackdechets.fr",
+      "MEMBER",
+      "85001946400013"
+    );
+  });
 });

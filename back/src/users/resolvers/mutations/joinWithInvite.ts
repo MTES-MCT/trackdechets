@@ -7,7 +7,6 @@ import {
   userExists
 } from "../../database";
 import { UserInputError } from "apollo-server-express";
-import { sanitizeEmail } from "../../../utils";
 
 const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   parent,
@@ -29,7 +28,7 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   const hashedPassword = await hashPassword(password);
   const user = await prisma.createUser({
     name,
-    email: sanitizeEmail(existingHash.email),
+    email: existingHash.email,
     password: hashedPassword,
     phone: "",
     isActive: true
