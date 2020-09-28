@@ -5,7 +5,7 @@ import React, { useEffect, useReducer } from "react";
 import { FaSearch } from "react-icons/fa";
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import { Query } from "../../generated/graphql/types";
+import { Query, EcoOrganisme } from "../../generated/graphql/types";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -121,7 +121,7 @@ export default function EcoOrganismes(props) {
                 </button>
               </div>
               <div className={styles.list}>
-                <CompanyResults
+                <CompanyResults<EcoOrganisme>
                   onSelect={eo => dispatch({ type: "select", payload: eo.id })}
                   results={state.ecoOrganismes.filter(eo =>
                     eo.name.toLowerCase().includes(state.searchClue)

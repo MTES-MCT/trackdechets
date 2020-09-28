@@ -408,16 +408,22 @@ export const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
         page: page,
         yOffset
       });
-    }
-    if (typeof content === "string") {
-      drawText({
-        fieldName,
-        content,
-        settings: settings,
-        font: font,
-        page: page,
-        yOffset
-      });
+    } else {
+      content =
+        typeof content === "string"
+          ? content
+          : settings[fieldName]?.content?.(data);
+
+      if (typeof content === "string") {
+        drawText({
+          fieldName,
+          content,
+          settings: settings,
+          font: font,
+          page: page,
+          yOffset
+        });
+      }
     }
   }
 };

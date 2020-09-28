@@ -22,6 +22,8 @@ import { Wizard } from "./Wizard";
 import { SiretContext } from "../Dashboard";
 import cogoToast from "cogo-toast";
 import { FaFilePdf } from "react-icons/fa";
+import CompanyAddress from "./CompanyAddress";
+
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
     $id: ID!
@@ -190,15 +192,15 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       </label>
                     </p>
 
-                    <h3 id="destination-address">Destination du déchet</h3>
-                    <address
-                      aria-labelledby="destination-address"
-                      className="address"
-                    >
-                      {form.stateSummary?.recipient?.name} (
-                      {form.stateSummary?.recipient?.siret})
-                      <br /> {form.stateSummary?.recipient?.address}
-                    </address>
+                    {form.stateSummary?.recipient && (
+                      <>
+                        <h3 id="destination-address">Destination du déchet</h3>
+                        <CompanyAddress
+                          aria-labelledby="destination-address"
+                          company={form.stateSummary.recipient}
+                        />
+                      </>
+                    )}
 
                     <h3>Signature</h3>
 
@@ -280,12 +282,17 @@ export default function TransportSignature({ form, userSiret }: Props) {
                         <br /> {form.stateSummary?.transporter?.address}
                       </address>
 
-                      <h3 id="destination-address">Destination du déchet</h3>
-                      <address aria-labelledby="destination-address">
-                        {form.stateSummary?.recipient?.name} (
-                        {form.stateSummary?.recipient?.siret})
-                        <br /> {form.stateSummary?.recipient?.address}
-                      </address>
+                      {form.stateSummary?.recipient && (
+                        <>
+                          <h3 id="destination-address">
+                            Destination du déchet
+                          </h3>
+                          <CompanyAddress
+                            aria-labelledby="destination-address"
+                            company={form.stateSummary.recipient}
+                          />
+                        </>
+                      )}
 
                       <p>
                         <label>

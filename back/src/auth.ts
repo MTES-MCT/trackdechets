@@ -22,6 +22,7 @@ import {
   legacySanitizeEmail,
   sanitizeEmail
 } from "./utils";
+import { GraphQLContext } from "./types";
 
 const { JWT_SECRET } = process.env;
 
@@ -229,7 +230,7 @@ passport.use(new ClientPasswordStrategy(verifyClient));
  * Custom passport callback that pass to next middleware
  * even if authorization fails (default behavior is to return
  * 401 Not Authorized). Fine grained control of authorization
- * will be handled by graphql-shield
+ * will be handled in resolvers
  */
 async function passportCallback(
   req: express.Request,
@@ -315,3 +316,20 @@ export const passportJwtMiddleware = (
     })
   );
 };
+
+/**
+ * Passport will use all possible strategies to authenticate user on the GraphQL endpoint
+ * Nevertheless we may want to apply only specific strategies on a particular GraphQL query.
+ * For example the mutation used to renew a user password may only be accessible from a user
+ * logged in from Trackdechets UI. This helper function allow to get rid of user info if
+ * it was not authenticated with the proper stratgey
+ */
+export function applyAuthStrategies(
+  context: GraphQLContext,
+  strategies: AuthType[]
+) {
+  if (context.user && !strategies.includes(context.user.auth)) {
+    context.user = null;
+  }
+  return context;
+}

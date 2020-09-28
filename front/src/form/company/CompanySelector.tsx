@@ -1,195 +1,255 @@
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import { FaSearch } from "react-icons/fa";
+import { constantCase } from "constant-case";
 import { InlineError } from "../../common/Error";
-import { toMacroCase } from "../../common/helper";
 import RedErrorMessage from "../../common/RedErrorMessage";
 import CompanyResults from "./CompanyResults";
 import "./CompanySelector.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
-import { Query, QuerySearchCompaniesArgs } from "../../generated/graphql/types";
+import {
+  Query,
+  QuerySearchCompaniesArgs,
+  CompanySearchResult,
+  FormCompany,
+  QueryFavoritesArgs,
+  FavoriteType,
+} from "../../generated/graphql/types";
+import CountrySelector from "./CountrySelector";
 
-function init(selectedCompany) {
-  return {
-    clue: "",
-    department: null,
-    displayDepartment: false,
-    searchLoading: false,
-    searchResults: [],
-    selectedCompany,
-  };
+interface CompanySelectorProps {
+  name:
+    | "nextDestination.company"
+    | "destination.company"
+    | "transporter.company"
+    | "emitter.company"
+    | "recipient.company"
+    | "trader.company"
+    | "temporaryStorageDetail.destination.company";
+  onCompanySelected?: (company: CompanySearchResult) => void;
+  allowForeignCompanies?: boolean;
 }
 
-export default function CompanySelector(props) {
-  const [field] = useField(props);
+export default function CompanySelector({
+  name,
+  onCompanySelected,
+  allowForeignCompanies,
+}: CompanySelectorProps) {
+  const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
-  const [state, dispatch] = useReducer(reducer, field.value, init);
+  const [clue, setClue] = React.useState("");
+  const [department, setDepartement] = React.useState<null | string>(null);
   const [
     searchCompaniesQuery,
-    { loading: searchLoading, data: searchData },
+    { loading: isLoadingSearch, data: searchData },
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES
   );
+  const {
+    loading: isLoadingFavorites,
+    data: favoritesData,
+    error: favoritesError,
+  } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(FAVORITES, {
+    variables: {
+      // Load different favorites depending on the object we are filling
+      type: constantCase(field.name.split(".")[0]) as FavoriteType,
+    },
+  });
+  const selectCompany = useCallback(
+    (company: CompanySearchResult) => {
+      setFieldValue(`${field.name}.siret`, company.siret);
 
-  function reducer(state, action) {
-    switch (action.type) {
-      case "search_input":
-        return { ...state, clue: action.payload };
-      case "department_filter":
-        return { ...state, displayDepartment: action.payload };
-      case "department_input":
-        return { ...state, department: action.payload };
-      case "search_change":
-        return { ...state, ...action.payload };
-      case "company_selected": {
-        if (props.onCompanySelected) {
-          props.onCompanySelected(action.payload);
+      ["name", "address", "contact", "phone", "mail"].forEach(key => {
+        if (!company?.[key]) {
+          return;
         }
-        return { ...state, selectedCompany: action.payload };
-      }
-      case "reset":
-        return init(action.payload);
-      default:
-        throw new Error();
-    }
-  }
-
-  useEffect(() => {
-    dispatch({
-      type: "search_change",
-      payload: {
-        searchResults: searchData?.searchCompanies ?? [],
-        searchLoading,
-      },
-    });
-
-    if (searchData?.searchCompanies?.length === 1) {
-      dispatch({
-        type: "company_selected",
-        payload: searchData.searchCompanies[0],
+        setFieldValue(`${field.name}.${key}`, company[key]);
       });
-    }
-  }, [searchData, searchLoading]);
+
+      if (onCompanySelected) {
+        onCompanySelected(company);
+      }
+    },
+    [field.name, setFieldValue, onCompanySelected]
+  );
+
+  const searchResults: CompanySearchResult[] = useMemo(
+    () =>
+      searchData?.searchCompanies ??
+      favoritesData?.favorites?.map(favorite => ({
+        ...favorite,
+
+        // Convert CompanyFavorite to CompanySearchResult
+        __typename: "CompanySearchResult",
+        etatAdministratif: null,
+        codeCommune: null,
+        naf: null,
+        libelleNaf: null,
+        companyTypes: null,
+        installation: null,
+      })) ??
+      [],
+    [searchData, favoritesData]
+  );
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      if (!state.clue || state.clue.length < 1) {
-        return;
-      }
-      const isNumber = /^[0-9\s]+$/.test(state.clue);
-      if (isNumber && state.clue.length < 14) {
+    if (searchResults.length === 1 && field.value.siret === "") {
+      selectCompany(searchResults[0]);
+    }
+  }, [searchResults, field.value.siret, selectCompany]);
+
+  useEffect(() => {
+    const timeoutID = setTimeout(() => {
+      if (clue.length < 3) {
         return;
       }
 
       searchCompaniesQuery({
-        variables: { clue: state.clue, department: state.department },
+        variables: {
+          clue,
+          department: department,
+        },
       });
     }, 300);
 
     return () => {
-      clearTimeout(handler);
+      clearTimeout(timeoutID);
     };
-  }, [state.clue, state.department, searchCompaniesQuery]);
+  }, [clue, department, searchCompaniesQuery]);
 
-  useEffect(() => {
-    ["siret", "name", "address", "contact", "phone", "mail"].forEach(key => {
-      if (!state.selectedCompany?.[key]) {
-        return;
-      }
-      setFieldValue(`${field.name}.${key}`, state.selectedCompany[key]);
-    });
-  }, [state.selectedCompany, field.name, setFieldValue]);
+  if (isLoadingFavorites) {
+    return <p>Chargement...</p>;
+  }
 
-  // Load different favorites depending on the object we are filling
-  const type = toMacroCase(field.name.split(".")[0]);
-
-  const { loading, error } = useQuery<Pick<Query, "favorites">>(FAVORITES, {
-    variables: { type },
-    onCompleted: data => {
-      if (state.selectedCompany.siret === "") {
-        dispatch({ type: "company_selected", payload: data.favorites[0] });
-      }
-      dispatch({
-        type: "search_change",
-        payload: {
-          searchResults: data.favorites,
-        },
-      });
-    },
-  });
-
-  if (loading) return <p>Chargement...</p>;
-  if (error) return <InlineError apolloError={error} />;
+  if (favoritesError) {
+    return <InlineError apolloError={favoritesError} />;
+  }
 
   return (
     <div className="CompanySelector form__group">
-      <div className="search__group">
-        <input
-          type="text"
-          placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-          className="company-selector__search"
-          onChange={e =>
-            dispatch({ type: "search_input", payload: e.target.value })
-          }
-        />
-        <button
-          className="overlay-button search-icon"
-          aria-label="Recherche"
-          disabled={true}
-        >
-          <FaSearch />
-        </button>
-      </div>
-      <button
-        className="button-outline small primary"
-        type="button"
-        onClick={_ =>
-          dispatch({
-            type: "department_filter",
-            payload: !state.displayDepartment,
-          })
-        }
-      >
-        Affiner la recherche par département?
-      </button>
-      {state.displayDepartment && (
-        <div className="form__group">
-          <label>
-            Département
+      {field.value.siret != null && (
+        <>
+          <div className="search__group">
             <input
               type="text"
-              placeholder="Département ou code postal"
-              onChange={e =>
-                dispatch({
-                  type: "department_input",
-                  payload: e.target.value,
-                })
-              }
+              placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
+              className="company-selector__search"
+              onChange={event => setClue(event.target.value)}
             />
-          </label>
-        </div>
-      )}
+            <button
+              className="overlay-button search-icon"
+              aria-label="Recherche"
+              disabled={true}
+            >
+              <FaSearch />
+            </button>
+          </div>
 
-      {state.searchLoading && <span>Chargement...</span>}
-      <CompanyResults
-        onSelect={company =>
-          dispatch({ type: "company_selected", payload: company })
-        }
-        results={[
-          ...state.searchResults,
-          ...(!state.searchResults.some(
-            c => c.siret === state.selectedCompany.siret
-          )
-            ? [state.selectedCompany]
-            : []),
-        ]}
-        selectedItem={state.selectedCompany}
-      />
+          <button
+            className="button-outline small primary"
+            type="button"
+            onClick={() => setDepartement(department == null ? "" : null)}
+          >
+            Affiner la recherche par département?
+          </button>
+
+          {department != null && (
+            <div className="form__group">
+              <label>
+                Département
+                <input
+                  type="text"
+                  placeholder="Département ou code postal"
+                  onChange={event => setDepartement(event.target.value)}
+                />
+              </label>
+            </div>
+          )}
+
+          {isLoadingSearch && <span>Chargement...</span>}
+
+          <CompanyResults
+            onSelect={company => selectCompany(company)}
+            results={searchResults}
+            selectedItem={{
+              ...field.value,
+
+              // Convert FormCompany to CompanySearchResult
+              __typename: "CompanySearchResult",
+              etatAdministratif: null,
+              codeCommune: null,
+              companyTypes: null,
+              naf: null,
+              libelleNaf: null,
+              installation: null,
+              transporterReceipt: null,
+              traderReceipt: null,
+            }}
+          />
+        </>
+      )}
 
       <RedErrorMessage name={`${field.name}.siret`} />
 
+      {allowForeignCompanies && (
+        <label>
+          <input
+            type="checkbox"
+            onChange={event => {
+              setFieldValue(
+                `${field.name}.siret`,
+                event.target.checked ? null : ""
+              );
+            }}
+            checked={field.value.siret == null}
+          />
+          L'entreprise est à l'étranger
+        </label>
+      )}
+
       <div className="form__group">
+        {field.value.siret == null && (
+          <>
+            <label>
+              Nom de l'entreprise
+              <Field
+                type="text"
+                name={`${field.name}.name`}
+                placeholder="Nom"
+              />
+            </label>
+
+            <RedErrorMessage name={`${field.name}.address`} />
+
+            <label>
+              Adresse de l'entreprise
+              <Field
+                type="text"
+                name={`${field.name}.address`}
+                placeholder="Adresse"
+              />
+            </label>
+
+            <RedErrorMessage name={`${field.name}.address`} />
+
+            <label>
+              Pays de l'entreprise
+              <Field name={`${field.name}.country`}>
+                {({ field, form }) => (
+                  <CountrySelector
+                    {...field}
+                    onChange={code => form.setFieldValue(field.name, code)}
+                    value={field.value}
+                    placeholder="Pays"
+                  />
+                )}
+              </Field>
+            </label>
+
+            <RedErrorMessage name={`${field.name}.country`} />
+          </>
+        )}
         <label>
           Personne à contacter
           <Field

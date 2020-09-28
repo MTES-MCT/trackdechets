@@ -72,7 +72,7 @@ export const PROCESSING_OPERATIONS: ProcessingOperation[] = [
       "Utilisation de déchets résiduels obtenus à partir de l'une des opérations numérotées R1 à R10"
   },
   {
-    type: ProcessingOperationType.Valorisation,
+    type: ProcessingOperationType.Groupement,
     code: "R 12",
     description:
       "Échange de déchets en vue de les soumettre à l'une des opérations numérotées R1 à R11"

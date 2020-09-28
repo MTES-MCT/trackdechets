@@ -10,6 +10,7 @@ import FormsSelector from "./appendix/FormsSelector";
 import AppendixInfo from "./appendix/AppendixInfo";
 import Tooltip from "../common/Tooltip";
 import "./WasteInfo.scss";
+import { isDangerous } from "../generated/constants";
 
 type Values = {
   wasteDetails: { code: string; packagings: string[] };
@@ -133,14 +134,15 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
         <RedErrorMessage name="wasteDetails.quantityType" />
       </div>
-      {values.wasteDetails.code.includes("*") && (
-        <div className="form__group">
-          <label>
-            Mentions au titre des règlements ADR, RID, ADNR, IMDG (optionnel)
-            <Field type="text" name="wasteDetails.onuCode" />
-          </label>
-        </div>
-      )}
+      <div className="form__group">
+        <label>
+          Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
+          {!isDangerous(values.wasteDetails.code) && "(optionnel)"}
+          <Field type="text" name="wasteDetails.onuCode" />
+        </label>
+
+        <RedErrorMessage name="wasteDetails.onuCode" />
+      </div>
     </>
   );
 });

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getInstallation, getRubriques } from "./queries";
+import { getInstallation, getRubriques } from "./database";
 import { searchCompany } from "./sirene";
 
 export const anomalies = {

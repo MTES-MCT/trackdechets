@@ -124,7 +124,12 @@ ID d'un BSD
 <td valign="top">[<a href="#form">Form</a>!]!</td>
 <td>
 
-Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
+Renvoie les BSDs de l'établissement sélectionné.
+Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
+alors les BSD de cette entreprise sont retournés.
+Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
+préciser un SIRET
+Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
 Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
 On peut également demander les bordereaux pour lesquels on est transporteur
 
@@ -507,7 +512,7 @@ Valide le traitement d'un BSD
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -534,7 +539,7 @@ Valide la réception d'un BSD
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -601,7 +606,7 @@ Utiliser la mutation signedByTransporter permettant d'apposer les signatures du 
 
 Scelle un BSD
 Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
-doivent avoir été renseignés grâce à la mutation `saveForm`
+doivent avoir été renseignés au préalable
 
 ```
 emitter: {
@@ -642,6 +647,7 @@ transporter: {
 }
 wasteDetails: {
   code
+  // onuCode est optionnel pour les déchets non-dangereux
   onuCode
   name
   packagings
@@ -656,7 +662,7 @@ wasteDetails: {
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -680,7 +686,7 @@ Utiliser la mutation signedByTransporter permettant d'apposer les signatures col
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a></td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 ID d'un BSD
@@ -2077,6 +2083,18 @@ SIRET de l'établissement
 <td>
 
 Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>country</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
 
 </td>
 </tr>
@@ -3925,6 +3943,89 @@ Annexe 2
 </tbody>
 </table>
 
+### InternationalCompanyInput
+
+Payload d'un établissement pouvant se situer en France
+ou à l'étranger
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Adresse de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>country</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+En l'absence de code, l'entreprise est considérée comme résidant en France.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>contact</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom du contact dans l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>mail</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Email du contact dans l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>phone</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de téléphone de contact dans l'établissement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### NextDestinationInput
 
 <table>
@@ -3938,7 +4039,7 @@ Annexe 2
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>processingOperation</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Traitement prévue (code D/R)
@@ -3947,7 +4048,7 @@ Traitement prévue (code D/R)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td valign="top"><a href="#internationalcompanyinput">InternationalCompanyInput</a>!</td>
 <td>
 
 Établissement de destination ultérieur
@@ -4400,7 +4501,7 @@ Transporteur du déchet reconditionné
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom du signataire du BSD suite  (case 19)
@@ -4409,7 +4510,7 @@ Nom du signataire du BSD suite  (case 19)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedAt</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
 Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui.
@@ -4434,7 +4535,7 @@ Payload de signature d'un BSD
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>sentAt</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
 Date de l'envoi du déchet par l'émetteur (case 9)
@@ -4443,7 +4544,7 @@ Date de l'envoi du déchet par l'émetteur (case 9)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom de la personne responsable de l'envoi du déchet (case 9)
@@ -4730,7 +4831,7 @@ Si oui ou non le BSD a été signé par un transporteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>securityCode</strong></td>
-<td valign="top"><a href="#int">Int</a></td>
+<td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
 Code de sécurité permettant d'authentifier l'émetteur
@@ -4739,7 +4840,7 @@ Code de sécurité permettant d'authentifier l'émetteur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
 Nom de la personne responsable de l'envoi du déchet (case 9)
@@ -5634,6 +5735,9 @@ Les admins peuvent:
 Les membres peuvent:
 * consulter/éditer les bordereaux
 * consulter le reste des informations
+
+Vous pouvez consulter [cette page](https://docs.google.com/spreadsheets/d/12K9Bd2k5l4uqXhS0h5uI00lNEzW7C-1t-NDOyxy8aKk/edit#gid=0)
+pour le détail de chacun des rôles
 
 <table>
 <thead>

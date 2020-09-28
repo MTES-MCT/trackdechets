@@ -3,9 +3,7 @@ import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { WorkflowError } from "./errors";
 import {
   markFormAppendixAwaitingFormsAsGrouped,
-  markFormAppendixGroupedsAsProcessed,
-  validateForm,
-  validateSecurityCode
+  markFormAppendixGroupedsAsProcessed
 } from "./helpers";
 import { FormState } from "./model";
 
@@ -23,22 +21,24 @@ export const formWorkflowMachine = Machine(
         entry: "setStable",
         exit: "setUnStable",
         on: {
-          MARK_SEALED: [{ target: "pendingSealedValidation" }],
-          MARK_SENT: [{ target: "pendingSentValidation" }]
+          MARK_SEALED: [
+            { target: "pendingSealedMarkFormAppendixAwaitingFormsAsGrouped" }
+          ],
+          MARK_SENT: [
+            { target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped" }
+          ]
         }
       },
       [FormState.Sealed]: {
         entry: "setStable",
         exit: "setUnStable",
         on: {
-          MARK_SENT: [{ target: "pendingSentValidation" }],
+          MARK_SENT: [
+            { target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped" }
+          ],
           MARK_SIGNED_BY_TRANSPORTER: [
             {
-              target: "error.missingSignature",
-              cond: "isMissingSignature"
-            },
-            {
-              target: `pendingEmitterSecurityCodeValidation`
+              target: FormState.Sent
             }
           ]
         }
@@ -115,52 +115,6 @@ export const formWorkflowMachine = Machine(
           onError: { target: "error.appendixError" }
         }
       },
-      pendingSealedValidation: {
-        invoke: {
-          id: "validateBeforeSent",
-          src: ctx => validateForm(ctx.form),
-          onDone: {
-            target: "pendingSealedMarkFormAppendixAwaitingFormsAsGrouped"
-          },
-          onError: { target: "error.invalidForm" }
-        }
-      },
-      pendingSentValidation: {
-        invoke: {
-          id: "validateBeforeSent",
-          src: ctx => validateForm(ctx.form),
-          onDone: {
-            target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
-          },
-          onError: { target: "error.invalidForm" }
-        }
-      },
-      pendingEmitterSecurityCodeValidation: {
-        invoke: {
-          src: (ctx, event) =>
-            validateSecurityCode(
-              ctx.form.emitterCompanySiret,
-              event.securityCode
-            ),
-          onDone: {
-            target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped"
-          },
-          onError: { target: "error.invalidSecurityCode" }
-        }
-      },
-      pendingTempStorerSecurityCodeValidation: {
-        invoke: {
-          src: (ctx, event) =>
-            validateSecurityCode(
-              ctx.form.recipientCompanySiret,
-              event.securityCode
-            ),
-          onDone: {
-            target: FormState.Resent
-          },
-          onError: { target: "error.invalidSecurityCode" }
-        }
-      },
       pendingReceivedMarkFormAppendixGroupedsAsProcessed: {
         invoke: {
           id: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
@@ -199,11 +153,7 @@ export const formWorkflowMachine = Machine(
           ],
           MARK_SIGNED_BY_TRANSPORTER: [
             {
-              target: "error.missingSignature",
-              cond: "isMissingSignature"
-            },
-            {
-              target: `pendingTempStorerSecurityCodeValidation`
+              target: FormState.Resent
             }
           ]
         }
@@ -225,10 +175,7 @@ export const formWorkflowMachine = Machine(
       },
       error: {
         states: {
-          invalidForm: { meta: WorkflowError.InvalidForm },
           invalidTransition: { meta: WorkflowError.InvalidTransition },
-          missingSignature: { meta: WorkflowError.MissingSignature },
-          invalidSecurityCode: { meta: WorkflowError.InvalidSecurityCode },
           appendixError: { meta: WorkflowError.AppendixError },
           hasSegmentsToTakeOverError: {
             meta: WorkflowError.HasSegmentsToTakeOverError
@@ -251,8 +198,6 @@ export const formWorkflowMachine = Machine(
       setUnStable: assign({ isStableState: false }) as any
     },
     guards: {
-      isMissingSignature: (_, event: any) =>
-        !event.signedByTransporter || !event.signedByProducer,
       isExemptOfTraceability: ctx => ctx.form.noTraceability,
       awaitsGroup: ctx =>
         PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(

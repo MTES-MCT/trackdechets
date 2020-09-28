@@ -1033,6 +1033,8 @@ export type FormOrderByInput =
   | "nextDestinationCompanySiret_DESC"
   | "nextDestinationCompanyAddress_ASC"
   | "nextDestinationCompanyAddress_DESC"
+  | "nextDestinationCompanyCountry_ASC"
+  | "nextDestinationCompanyCountry_DESC"
   | "nextDestinationCompanyContact_ASC"
   | "nextDestinationCompanyContact_DESC"
   | "nextDestinationCompanyPhone_ASC"
@@ -1396,7 +1398,9 @@ export type UserAccountHashOrderByInput =
   | "createdAt_ASC"
   | "createdAt_DESC"
   | "updatedAt_ASC"
-  | "updatedAt_DESC";
+  | "updatedAt_DESC"
+  | "acceptedAt_ASC"
+  | "acceptedAt_DESC";
 
 export type UserActivationHashOrderByInput =
   | "id_ASC"
@@ -2410,6 +2414,20 @@ export interface FormWhereInput {
   nextDestinationCompanyAddress_not_starts_with?: Maybe<String>;
   nextDestinationCompanyAddress_ends_with?: Maybe<String>;
   nextDestinationCompanyAddress_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
+  nextDestinationCompanyCountry_not?: Maybe<String>;
+  nextDestinationCompanyCountry_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_lt?: Maybe<String>;
+  nextDestinationCompanyCountry_lte?: Maybe<String>;
+  nextDestinationCompanyCountry_gt?: Maybe<String>;
+  nextDestinationCompanyCountry_gte?: Maybe<String>;
+  nextDestinationCompanyCountry_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_not_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_ends_with?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyContact_not?: Maybe<String>;
   nextDestinationCompanyContact_in?: Maybe<String[] | String>;
@@ -4335,6 +4353,14 @@ export interface UserAccountHashWhereInput {
   updatedAt_lte?: Maybe<DateTimeInput>;
   updatedAt_gt?: Maybe<DateTimeInput>;
   updatedAt_gte?: Maybe<DateTimeInput>;
+  acceptedAt?: Maybe<DateTimeInput>;
+  acceptedAt_not?: Maybe<DateTimeInput>;
+  acceptedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  acceptedAt_lt?: Maybe<DateTimeInput>;
+  acceptedAt_lte?: Maybe<DateTimeInput>;
+  acceptedAt_gt?: Maybe<DateTimeInput>;
+  acceptedAt_gte?: Maybe<DateTimeInput>;
   AND?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
   OR?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
   NOT?: Maybe<UserAccountHashWhereInput[] | UserAccountHashWhereInput>;
@@ -5046,6 +5072,7 @@ export interface FormCreateInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -5222,6 +5249,7 @@ export interface FormUpdateInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -5357,6 +5385,7 @@ export interface FormUpdateDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -6074,6 +6103,20 @@ export interface FormScalarWhereInput {
   nextDestinationCompanyAddress_not_starts_with?: Maybe<String>;
   nextDestinationCompanyAddress_ends_with?: Maybe<String>;
   nextDestinationCompanyAddress_not_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
+  nextDestinationCompanyCountry_not?: Maybe<String>;
+  nextDestinationCompanyCountry_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_not_in?: Maybe<String[] | String>;
+  nextDestinationCompanyCountry_lt?: Maybe<String>;
+  nextDestinationCompanyCountry_lte?: Maybe<String>;
+  nextDestinationCompanyCountry_gt?: Maybe<String>;
+  nextDestinationCompanyCountry_gte?: Maybe<String>;
+  nextDestinationCompanyCountry_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_not_contains?: Maybe<String>;
+  nextDestinationCompanyCountry_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_starts_with?: Maybe<String>;
+  nextDestinationCompanyCountry_ends_with?: Maybe<String>;
+  nextDestinationCompanyCountry_not_ends_with?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyContact_not?: Maybe<String>;
   nextDestinationCompanyContact_in?: Maybe<String[] | String>;
@@ -6814,6 +6857,7 @@ export interface FormUpdateManyDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -6897,6 +6941,7 @@ export interface FormUpdateManyMutationInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7187,6 +7232,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7323,6 +7369,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7494,6 +7541,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7611,6 +7659,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   nextDestinationCompanyName?: Maybe<String>;
   nextDestinationCompanySiret?: Maybe<String>;
   nextDestinationCompanyAddress?: Maybe<String>;
+  nextDestinationCompanyCountry?: Maybe<String>;
   nextDestinationCompanyContact?: Maybe<String>;
   nextDestinationCompanyPhone?: Maybe<String>;
   nextDestinationCompanyMail?: Maybe<String>;
@@ -7735,6 +7784,7 @@ export interface UserAccountHashCreateInput {
   companySiret: ID_Input;
   role: UserRole;
   hash: String;
+  acceptedAt?: Maybe<DateTimeInput>;
 }
 
 export interface UserAccountHashUpdateInput {
@@ -7742,6 +7792,7 @@ export interface UserAccountHashUpdateInput {
   companySiret?: Maybe<ID_Input>;
   role?: Maybe<UserRole>;
   hash?: Maybe<String>;
+  acceptedAt?: Maybe<DateTimeInput>;
 }
 
 export interface UserAccountHashUpdateManyMutationInput {
@@ -7749,6 +7800,7 @@ export interface UserAccountHashUpdateManyMutationInput {
   companySiret?: Maybe<ID_Input>;
   role?: Maybe<UserRole>;
   hash?: Maybe<String>;
+  acceptedAt?: Maybe<DateTimeInput>;
 }
 
 export interface UserActivationHashCreateInput {
@@ -8904,6 +8956,7 @@ export interface Form {
   nextDestinationCompanyName?: String;
   nextDestinationCompanySiret?: String;
   nextDestinationCompanyAddress?: String;
+  nextDestinationCompanyCountry?: String;
   nextDestinationCompanyContact?: String;
   nextDestinationCompanyPhone?: String;
   nextDestinationCompanyMail?: String;
@@ -8991,6 +9044,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
+  nextDestinationCompanyCountry: () => Promise<String>;
   nextDestinationCompanyContact: () => Promise<String>;
   nextDestinationCompanyPhone: () => Promise<String>;
   nextDestinationCompanyMail: () => Promise<String>;
@@ -9100,6 +9154,7 @@ export interface FormSubscription
   nextDestinationCompanyName: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanySiret: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyAddress: () => Promise<AsyncIterator<String>>;
+  nextDestinationCompanyCountry: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyContact: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyPhone: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyMail: () => Promise<AsyncIterator<String>>;
@@ -9211,6 +9266,7 @@ export interface FormNullablePromise
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
+  nextDestinationCompanyCountry: () => Promise<String>;
   nextDestinationCompanyContact: () => Promise<String>;
   nextDestinationCompanyPhone: () => Promise<String>;
   nextDestinationCompanyMail: () => Promise<String>;
@@ -10346,6 +10402,7 @@ export interface UserAccountHash {
   hash: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  acceptedAt?: DateTimeOutput;
 }
 
 export interface UserAccountHashPromise
@@ -10358,6 +10415,7 @@ export interface UserAccountHashPromise
   hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface UserAccountHashSubscription
@@ -10370,6 +10428,7 @@ export interface UserAccountHashSubscription
   hash: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  acceptedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface UserAccountHashNullablePromise
@@ -10382,6 +10441,7 @@ export interface UserAccountHashNullablePromise
   hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface UserAccountHashConnection {
@@ -10951,6 +11011,7 @@ export interface FormPreviousValues {
   nextDestinationCompanyName?: String;
   nextDestinationCompanySiret?: String;
   nextDestinationCompanyAddress?: String;
+  nextDestinationCompanyCountry?: String;
   nextDestinationCompanyContact?: String;
   nextDestinationCompanyPhone?: String;
   nextDestinationCompanyMail?: String;
@@ -11039,6 +11100,7 @@ export interface FormPreviousValuesPromise
   nextDestinationCompanyName: () => Promise<String>;
   nextDestinationCompanySiret: () => Promise<String>;
   nextDestinationCompanyAddress: () => Promise<String>;
+  nextDestinationCompanyCountry: () => Promise<String>;
   nextDestinationCompanyContact: () => Promise<String>;
   nextDestinationCompanyPhone: () => Promise<String>;
   nextDestinationCompanyMail: () => Promise<String>;
@@ -11127,6 +11189,7 @@ export interface FormPreviousValuesSubscription
   nextDestinationCompanyName: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanySiret: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyAddress: () => Promise<AsyncIterator<String>>;
+  nextDestinationCompanyCountry: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyContact: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyPhone: () => Promise<AsyncIterator<String>>;
   nextDestinationCompanyMail: () => Promise<AsyncIterator<String>>;
@@ -11887,6 +11950,7 @@ export interface UserAccountHashPreviousValues {
   hash: String;
   createdAt: DateTimeOutput;
   updatedAt: DateTimeOutput;
+  acceptedAt?: DateTimeOutput;
 }
 
 export interface UserAccountHashPreviousValuesPromise
@@ -11899,6 +11963,7 @@ export interface UserAccountHashPreviousValuesPromise
   hash: () => Promise<String>;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  acceptedAt: () => Promise<DateTimeOutput>;
 }
 
 export interface UserAccountHashPreviousValuesSubscription
@@ -11911,6 +11976,7 @@ export interface UserAccountHashPreviousValuesSubscription
   hash: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  acceptedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
 export interface UserActivationHashSubscriptionPayload {

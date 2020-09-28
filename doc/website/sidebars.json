@@ -11,7 +11,9 @@
       "playground",
       "multimodal",
       "sirene",
-      "registre"
+      "registre",
+      "roles",
+      "notifications"
     ],
     "Référence de l'API": ["api-reference", "changelog"]
   }

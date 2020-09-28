@@ -14,14 +14,13 @@ import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
 import { sentry } from "graphql-middleware-sentry";
-import { shield } from "graphql-shield";
 import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
 import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
-import { typeDefs, resolvers, shieldRulesTree } from "./schema";
+import { typeDefs, resolvers } from "./schema";
 import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
@@ -41,13 +40,6 @@ const {
 } = process.env;
 
 const UI_BASE_URL = getUIBaseURL();
-
-const shieldMiddleware = shield(shieldRulesTree, {
-  allowExternalErrors: true,
-
-  // Disable graphql-shield's error catching since it's already handled by ApolloServer.formatError
-  debug: true
-});
 
 /**
  * Custom report error for sentry middleware
@@ -102,7 +94,7 @@ const schema = makeExecutableSchema({
 
 export const schemaWithMiddleware = applyMiddleware(
   schema,
-  ...[shieldMiddleware, ...(SENTRY_DSN ? [sentryMiddleware()] : [])]
+  ...[...(SENTRY_DSN ? [sentryMiddleware()] : [])]
 );
 
 // GraphQL endpoint

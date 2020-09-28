@@ -35,7 +35,11 @@ export default function TemporaryStorage(props) {
   return (
     <>
       <h4>Installation de destination prévue</h4>
-      <CompanySelector name={`${props.name}.destination.company`} />
+      <CompanySelector
+        name={
+          `${props.name}.destination.company` as "temporaryStorageDetail.destination.company"
+        }
+      />
 
       <div className="form__group">
         <label>

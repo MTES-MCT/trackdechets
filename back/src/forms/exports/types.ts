@@ -27,7 +27,7 @@ export type FormFlattened = Partial<Form> & {
 };
 
 export type Column = {
-  field: string;
+  field: keyof FormFlattened;
   label: string;
   format: (v: any) => any;
 };

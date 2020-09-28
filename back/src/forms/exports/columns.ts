@@ -1,5 +1,6 @@
-import { Column, FormFlattened } from "./types";
 import Excel from "exceljs";
+import countries from "world-countries";
+import { Column, FormFlattened } from "./types";
 
 const identity = (v: any) => v ?? "";
 const formatDate = (d: string | null) => (d ? d.slice(0, 10) : "");
@@ -8,6 +9,10 @@ const formatBoolean = (b: boolean | null) => {
     return "";
   }
   return b ? "O" : "N";
+};
+const formatCountry = (code: string): string => {
+  const country = countries.find(country => country.cca2 === code);
+  return country?.translations.fra.common ?? "";
 };
 
 const columns: Column[] = [
@@ -180,6 +185,42 @@ const columns: Column[] = [
     field: "noTraceability",
     label: "Perte de traçabilité",
     format: formatBoolean
+  },
+  // cadre 12 (destination ultérieure)
+  {
+    field: "nextDestinationProcessingOperation",
+    label: "Destination ultérieure opération réalisée D/R",
+    format: identity
+  },
+  {
+    field: "nextDestinationCompanyName",
+    label: "Destination ultérieure nom",
+    format: identity
+  },
+  {
+    field: "nextDestinationCompanyContact",
+    label: "Destination ultérieure contact",
+    format: identity
+  },
+  {
+    field: "nextDestinationCompanyMail",
+    label: "Destination ultérieure email",
+    format: identity
+  },
+  {
+    field: "nextDestinationCompanyPhone",
+    label: "Destination ultérieure téléphone",
+    format: identity
+  },
+  {
+    field: "nextDestinationCompanyAddress",
+    label: "Destination ultérieure adresse",
+    format: identity
+  },
+  {
+    field: "nextDestinationCompanyCountry",
+    label: "Destination ultérieure pays",
+    format: formatCountry
   },
   // cadre 18 (entreposage provisoire)
   {

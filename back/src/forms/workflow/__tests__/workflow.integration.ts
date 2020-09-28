@@ -5,8 +5,11 @@ import path from "path";
 import { app } from "../../../server";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { associateUserToCompany } from "../../../users/mutations/associateUserToCompany";
-import { apiKey } from "../../../users/queries";
+import {
+  associateUserToCompany,
+  createAccessToken
+} from "../../../users/database";
+import { User } from "../../../generated/prisma-client";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative
@@ -77,6 +80,14 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     });
   }
 
+  /**
+   * Helper function to return a user token
+   */
+  async function apiKey(user: User) {
+    const accessToken = await createAccessToken(user);
+    return accessToken.token;
+  }
+
   test("Acheminement direct du producteur à l'installation de traitement", async () => {
     // 1er cas: Acheminement direct du producteur à l'installation de traitement.
     // Exemple de boues organiques traitées par incinération
@@ -113,6 +124,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     );
 
     // Récupère les tokens utilisateurs pour l'authentification à l'API
+
     const producteurToken = await apiKey(producteurUser);
     const traiteurToken = await apiKey(traiteurUser);
     const transporteurToken = await apiKey(transporteurUser);
@@ -170,7 +182,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           wasteDetails: {
             code: "06 05 02*"
-            onuCode: ""
+            onuCode: "2003"
             name: "Boues"
             packagings: [
               BENNE
@@ -373,9 +385,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -423,7 +433,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     // Entreprise de transport entre l'installation de production du déchet
     // et le site d'entreprosage provisoire
     const transporteur1 = await companyFactory({
-      siret: "444444444444444",
+      siret: "44444444444444",
       name: "Transport Qui Roule"
     });
     // Avec un utilisateur membre
@@ -515,7 +525,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           wasteDetails: {
               code: "06 05 02*"
-              onuCode: ""
+              onuCode: "2003"
               name: "Boues"
               packagings: [
                 BENNE
@@ -848,9 +858,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "RESENT",
         updatedFields: {
           sentAt: "2020-08-03T10:00:00",
-          signedByTransporter: true,
           sentBy: "Mr Provisoire",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -871,9 +879,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"
@@ -1009,7 +1015,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           wasteDetails: {
             code: "06 05 02*"
-            onuCode: ""
+            onuCode: "2003"
             name: "Boues"
             packagings: [
               BENNE
@@ -1481,9 +1487,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         status: "SENT",
         updatedFields: {
           sentAt: "2020-04-03T14:48:00",
-          signedByTransporter: true,
           sentBy: "Isabelle Guichard",
-          signedByProducer: true,
           packagings: ["BENNE"],
           quantity: 1,
           onuCode: "xxxx"

@@ -1,10 +1,10 @@
 "Payload de signature d'un BSD"
 input SentFormInput {
   "Date de l'envoi du déchet par l'émetteur (case 9)"
-  sentAt: DateTime
+  sentAt: DateTime!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String
+  sentBy: String!
 }
 
 "Payload de signature d'un BSD par un transporteur"
@@ -16,10 +16,10 @@ input TransporterSignatureFormInput {
   signedByTransporter: Boolean!
 
   "Code de sécurité permettant d'authentifier l'émetteur"
-  securityCode: Int
+  securityCode: Int!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String
+  sentBy: String!
 
   "Si oui on non le BSD a été signé par l'émetteur"
   signedByProducer: Boolean!
@@ -93,10 +93,10 @@ input ProcessedFormInput {
 
 input NextDestinationInput {
   "Traitement prévue (code D/R)"
-  processingOperation: String
+  processingOperation: String!
 
   "Établissement de destination ultérieur"
-  company: CompanyInput
+  company: InternationalCompanyInput!
 }
 
 "Payload de création d'un bordereau"
@@ -239,6 +239,38 @@ input CompanyInput {
 
   "Adresse de l'établissement"
   address: String
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+}
+
+"""
+Payload d'un établissement pouvant se situer en France
+ou à l'étranger
+"""
+input InternationalCompanyInput {
+  "SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger"
+  siret: String
+
+  "Nom de l'établissement"
+  name: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+  En l'absence de code, l'entreprise est considérée comme résidant en France.
+  """
+  country: String
 
   "Nom du contact dans l'établissement"
   contact: String
@@ -410,10 +442,10 @@ input ResentFormInput {
   transporter: TransporterInput
 
   "Nom du signataire du BSD suite  (case 19)"
-  signedBy: String
+  signedBy: String!
 
   "Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui."
-  signedAt: DateTime
+  signedAt: DateTime!
 }
 
 "Payload lié au détails du déchet du BSD suite (case 14 à 19)"

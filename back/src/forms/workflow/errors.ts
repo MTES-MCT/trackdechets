@@ -1,13 +1,5 @@
-import { Form } from "../../generated/prisma-client";
-import { formSchema } from "../validator";
-import {
-  UserInputError,
-  ForbiddenError,
-  ApolloError
-} from "apollo-server-express";
-import { expandFormFromDb } from "../form-converter";
+import { ForbiddenError, ApolloError } from "apollo-server-express";
 export enum WorkflowError {
-  InvalidForm,
   InvalidTransition,
   MissingSignature,
   InvalidSecurityCode,
@@ -15,32 +7,13 @@ export enum WorkflowError {
   HasSegmentsToTakeOverError
 }
 
-export async function getError(error: WorkflowError, form: Form) {
+export async function getError(error: WorkflowError) {
   switch (error) {
-    case WorkflowError.InvalidForm:
-      const errors: string[] = await formSchema
-        .validate(expandFormFromDb(form), { abortEarly: false })
-        .catch(err => err.errors);
-      return new UserInputError(
-        `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${errors.join(
-          "\n"
-        )}`
-      );
-
-    case WorkflowError.InvalidSecurityCode:
-      return new ForbiddenError(
-        "Code de sécurité producteur incorrect. En cas de doute vérifiez sa valeur sur votre espace dans l'onglet 'Mon compte'."
-      );
-
     case WorkflowError.InvalidTransition:
       return new ForbiddenError(
         "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
       );
 
-    case WorkflowError.MissingSignature:
-      return new UserInputError(
-        "Le transporteur et le producteur du déchet doivent tous deux valider l'enlèvement"
-      );
     case WorkflowError.HasSegmentsToTakeOverError:
       return new ForbiddenError(
         "Vous ne pouvez pas passer ce bordereau à l'état souhaité, il n'est pas encore pris en charge par le dernier transporteur"

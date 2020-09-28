@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/back"
+    schedule:
+      interval: "daily"
+    target-branch: "dev"
+  - package-ecosystem: "npm"
+    directory: "/front"
+    schedule:
+      interval: "daily"
+    target-branch: "dev"
+  - package-ecosystem: "pdf"
+    directory: "/back"
+    schedule:
+      interval: "daily"
+    target-branch: "dev"

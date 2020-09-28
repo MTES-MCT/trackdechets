@@ -522,6 +522,13 @@ export type FormCompany = {
   siret: Maybe<Scalars['String']>;
   /** Adresse de l'établissement */
   address: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
+   */
+  country: Maybe<Scalars['String']>;
   /** Nom du contact dans l'établissement */
   contact: Maybe<Scalars['String']>;
   /** Numéro de téléphone de contact dans l'établissement */
@@ -697,6 +704,53 @@ export type Installation = {
   declarations: Maybe<Array<Declaration>>;
 };
 
+/**
+ * Payload d'un établissement pouvant se situer en France
+ * ou à l'étranger
+ */
+export type InternationalCompanyInput = {
+  /** SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger */
+  siret: Maybe<Scalars['String']>;
+  /** Nom de l'établissement */
+  name: Maybe<Scalars['String']>;
+  /** Adresse de l'établissement */
+  address: Maybe<Scalars['String']>;
+  /**
+   * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+   * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+   * 
+   * En l'absence de code, l'entreprise est considérée comme résidant en France.
+   */
+  country: Maybe<Scalars['String']>;
+  /** Nom du contact dans l'établissement */
+  contact: Maybe<Scalars['String']>;
+  /** Email du contact dans l'établissement */
+  mail: Maybe<Scalars['String']>;
+  /** Numéro de téléphone de contact dans l'établissement */
+  phone: Maybe<Scalars['String']>;
+};
+
+/**
+ * Invitation à rejoindre une entreprise
+ * lorsque l'utilisateur invité n'est pas encore inscrit
+ * sur Trackdéchets
+ */
+export type Invitation = {
+  __typename?: 'Invitation';
+  /** Identifiant unique */
+  id: Scalars['ID'];
+  /** Email de l'utilisateur invité */
+  email: Scalars['String'];
+  /** Siret de l'entreprise à laquelle l'utilisateur est invité */
+  companySiret: Scalars['String'];
+  /** Hash unique inclus dans le lien d'invitation envoyé par email */
+  hash: Scalars['String'];
+  /** Rôle de l'utilisateur au sein de l'entreprise */
+  role: UserRole;
+  /** Date when the invitation was accepted and the user joined */
+  acceptedAt: Maybe<Scalars['DateTime']>;
+};
+
 
 export type MultimodalTransporter = {
   __typename?: 'MultimodalTransporter';
@@ -803,7 +857,7 @@ export type Mutation = {
   /**
    * Scelle un BSD
    * Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
-   * doivent avoir été renseignés grâce à la mutation `saveForm`
+   * doivent avoir été renseignés au préalable
    * 
    * ```
    * emitter: {
@@ -844,6 +898,7 @@ export type Mutation = {
    * }
    * wasteDetails: {
    *   code
+   *   // onuCode est optionnel pour les déchets non-dangereux
    *   onuCode
    *   name
    *   packagings
@@ -950,12 +1005,12 @@ export type MutationCreateFormArgs = {
 
 
 export type MutationCreateTraderReceiptArgs = {
-  input: Maybe<CreateTraderReceiptInput>;
+  input: CreateTraderReceiptInput;
 };
 
 
 export type MutationCreateTransporterReceiptArgs = {
-  input: Maybe<CreateTransporterReceiptInput>;
+  input: CreateTransporterReceiptInput;
 };
 
 
@@ -977,12 +1032,12 @@ export type MutationDeleteInvitationArgs = {
 
 
 export type MutationDeleteTraderReceiptArgs = {
-  input: Maybe<DeleteTraderReceiptInput>;
+  input: DeleteTraderReceiptInput;
 };
 
 
 export type MutationDeleteTransporterReceiptArgs = {
-  input: Maybe<DeleteTransporterReceiptInput>;
+  input: DeleteTransporterReceiptInput;
 };
 
 
@@ -1026,13 +1081,13 @@ export type MutationLoginArgs = {
 
 
 export type MutationMarkAsProcessedArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   processedInfo: ProcessedFormInput;
 };
 
 
 export type MutationMarkAsReceivedArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   receivedInfo: ReceivedFormInput;
 };
 
@@ -1050,12 +1105,12 @@ export type MutationMarkAsResentArgs = {
 
 
 export type MutationMarkAsSealedArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
 };
 
 
 export type MutationMarkAsSentArgs = {
-  id: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   sentInfo: SentFormInput;
 };
 
@@ -1141,7 +1196,7 @@ export type MutationUpdateFormArgs = {
 
 
 export type MutationUpdateTraderReceiptArgs = {
-  input: Maybe<UpdateTraderReceiptInput>;
+  input: UpdateTraderReceiptInput;
 };
 
 
@@ -1153,7 +1208,7 @@ export type MutationUpdateTransporterFieldsArgs = {
 
 
 export type MutationUpdateTransporterReceiptArgs = {
-  input: Maybe<UpdateTransporterReceiptInput>;
+  input: UpdateTransporterReceiptInput;
 };
 
 /** Destination ultérieure prévue (case 12) */
@@ -1167,9 +1222,9 @@ export type NextDestination = {
 
 export type NextDestinationInput = {
   /** Traitement prévue (code D/R) */
-  processingOperation: Maybe<Scalars['String']>;
+  processingOperation: Scalars['String'];
   /** Établissement de destination ultérieur */
-  company: Maybe<CompanyInput>;
+  company: InternationalCompanyInput;
 };
 
 /** Payload d'un segment de transport */
@@ -1230,7 +1285,7 @@ export type PrivateCompanyInput = {
   /** Identifiant GEREP de l'établissement */
   gerepId: Maybe<Scalars['String']>;
   /** Profil de l'établissement */
-  companyTypes: Maybe<Array<Maybe<CompanyType>>>;
+  companyTypes: Array<CompanyType>;
   /** Code NAF */
   codeNaf: Maybe<Scalars['String']>;
   /** Nom de l'établissement */
@@ -1304,7 +1359,12 @@ export type Query = {
    */
   formPdf: FileDownload;
   /**
-   * Renvoie les BSDs de l'établissement sélectionné (le premier par défaut)
+   * Renvoie les BSDs de l'établissement sélectionné.
+   * Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
+   * alors les BSD de cette entreprise sont retournés.
+   * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
+   * préciser un SIRET
+   * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
    * Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
    * On peut également demander les bordereaux pour lesquels on est transporteur
    */
@@ -1321,6 +1381,12 @@ export type Query = {
    * Il est valable 10 secondes
    */
   formsRegister: FileDownload;
+  /**
+   * USAGE INTERNE
+   * Recherche une invitation à rejoindre une entreprise
+   * par son hash
+   */
+  invitation: Maybe<Invitation>;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
   /**
@@ -1387,6 +1453,11 @@ export type QueryFormsRegisterArgs = {
   endDate: Maybe<Scalars['DateTime']>;
   wasteCode: Maybe<Scalars['String']>;
   exportFormat: Maybe<FormsRegisterExportFormat>;
+};
+
+
+export type QueryInvitationArgs = {
+  hash: Scalars['String'];
 };
 
 
@@ -1461,9 +1532,9 @@ export type ResentFormInput = {
   /** Transporteur du déchet reconditionné */
   transporter: Maybe<TransporterInput>;
   /** Nom du signataire du BSD suite  (case 19) */
-  signedBy: Maybe<Scalars['String']>;
+  signedBy: Scalars['String'];
   /** Date de signature du BSD suite (case 19). Défaut à la date d'aujourd'hui. */
-  signedAt: Maybe<Scalars['DateTime']>;
+  signedAt: Scalars['DateTime'];
 };
 
 /**
@@ -1502,9 +1573,9 @@ export type Rubrique = {
 /** Payload de signature d'un BSD */
 export type SentFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
-  sentAt: Maybe<Scalars['DateTime']>;
+  sentAt: Scalars['DateTime'];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
-  sentBy: Maybe<Scalars['String']>;
+  sentBy: Scalars['String'];
 };
 
 export type SignupInput = {
@@ -1759,9 +1830,9 @@ export type TransporterSignatureFormInput = {
   /** Si oui ou non le BSD a été signé par un transporteur */
   signedByTransporter: Scalars['Boolean'];
   /** Code de sécurité permettant d'authentifier l'émetteur */
-  securityCode: Maybe<Scalars['Int']>;
+  securityCode: Scalars['Int'];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
-  sentBy: Maybe<Scalars['String']>;
+  sentBy: Scalars['String'];
   /** Si oui on non le BSD a été signé par l'émetteur */
   signedByProducer: Scalars['Boolean'];
   /** Conditionnement */
@@ -1886,6 +1957,9 @@ export type User = {
  * Les membres peuvent:
  * * consulter/éditer les bordereaux
  * * consulter le reste des informations
+ * 
+ * Vous pouvez consulter [cette page](https://docs.google.com/spreadsheets/d/12K9Bd2k5l4uqXhS0h5uI00lNEzW7C-1t-NDOyxy8aKk/edit#gid=0)
+ * pour le détail de chacun des rôles
  */
 export enum UserRole {
   Member = 'MEMBER',
@@ -2297,6 +2371,7 @@ export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany 
     name: null,
     siret: null,
     address: null,
+    country: null,
     contact: null,
     phone: null,
     mail: null,
@@ -2355,6 +2430,32 @@ export function createInstallationMock(props: Partial<Installation>): Installati
   };
 }
 
+export function createInternationalCompanyInputMock(props: Partial<InternationalCompanyInput>): InternationalCompanyInput {
+  return {
+    siret: null,
+    name: null,
+    address: null,
+    country: null,
+    contact: null,
+    mail: null,
+    phone: null,
+    ...props,
+  };
+}
+
+export function createInvitationMock(props: Partial<Invitation>): Invitation {
+  return {
+    __typename: "Invitation",
+    id: "",
+    email: "",
+    companySiret: "",
+    hash: "",
+    role: UserRole.Member,
+    acceptedAt: null,
+    ...props,
+  };
+}
+
 export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
   return {
     __typename: "MultimodalTransporter",
@@ -2380,8 +2481,8 @@ export function createNextDestinationMock(props: Partial<NextDestination>): Next
 
 export function createNextDestinationInputMock(props: Partial<NextDestinationInput>): NextDestinationInput {
   return {
-    processingOperation: null,
-    company: null,
+    processingOperation: "",
+    company: createInternationalCompanyInputMock({}),
     ...props,
   };
 }
@@ -2422,7 +2523,7 @@ export function createPrivateCompanyInputMock(props: Partial<PrivateCompanyInput
   return {
     siret: "",
     gerepId: null,
-    companyTypes: null,
+    companyTypes: [],
     codeNaf: null,
     companyName: null,
     documentKeys: null,
@@ -2491,8 +2592,8 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     destination: null,
     wasteDetails: null,
     transporter: null,
-    signedBy: null,
-    signedAt: null,
+    signedBy: "",
+    signedAt: new Date(),
     ...props,
   };
 }
@@ -2515,8 +2616,8 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: null,
-    sentBy: null,
+    sentAt: new Date(),
+    sentBy: "",
     ...props,
   };
 }
@@ -2723,8 +2824,8 @@ export function createTransporterSignatureFormInputMock(props: Partial<Transport
   return {
     sentAt: new Date(),
     signedByTransporter: false,
-    securityCode: null,
-    sentBy: null,
+    securityCode: 0,
+    sentBy: "",
     signedByProducer: false,
     packagings: [],
     quantity: 0,
