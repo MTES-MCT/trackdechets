@@ -35,6 +35,9 @@ type UserAccountHash {
 
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
+
+  # date when the invitation was accepted and the user joined
+  acceptedAt: DateTime
 }
 
 """

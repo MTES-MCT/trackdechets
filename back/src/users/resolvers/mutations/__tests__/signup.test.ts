@@ -20,7 +20,7 @@ jest.mock("../../../../generated/prisma-client", () => ({
     ),
     userAccountHashes: jest.fn(() => Promise.resolve([])),
     createCompanyAssociation: jest.fn(() => Promise.resolve()),
-    deleteManyUserAccountHashes: jest.fn(() => Promise.resolve())
+    updateManyUserAccountHashes: jest.fn(() => Promise.resolve())
   }
 }));
 
@@ -58,6 +58,6 @@ describe("signup", () => {
     expect(prisma.createCompanyAssociation).toHaveBeenCalledTimes(
       hashes.length
     );
-    expect(prisma.deleteManyUserAccountHashes).toHaveBeenCalledTimes(1);
+    expect(prisma.updateManyUserAccountHashes).toHaveBeenCalledTimes(1);
   });
 });

@@ -730,6 +730,27 @@ export type InternationalCompanyInput = {
   phone: Maybe<Scalars['String']>;
 };
 
+/**
+ * Invitation à rejoindre une entreprise
+ * lorsque l'utilisateur invité n'est pas encore inscrit
+ * sur Trackdéchets
+ */
+export type Invitation = {
+  __typename?: 'Invitation';
+  /** Identifiant unique */
+  id: Scalars['ID'];
+  /** Email de l'utilisateur invité */
+  email: Scalars['String'];
+  /** Siret de l'entreprise à laquelle l'utilisateur est invité */
+  companySiret: Scalars['String'];
+  /** Hash unique inclus dans le lien d'invitation envoyé par email */
+  hash: Scalars['String'];
+  /** Rôle de l'utilisateur au sein de l'entreprise */
+  role: UserRole;
+  /** Date when the invitation was accepted and the user joined */
+  acceptedAt: Maybe<Scalars['DateTime']>;
+};
+
 
 export type MultimodalTransporter = {
   __typename?: 'MultimodalTransporter';
@@ -1360,6 +1381,12 @@ export type Query = {
    * Il est valable 10 secondes
    */
   formsRegister: FileDownload;
+  /**
+   * USAGE INTERNE
+   * Recherche une invitation à rejoindre une entreprise
+   * par son hash
+   */
+  invitation: Maybe<Invitation>;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
   /**
@@ -1426,6 +1453,11 @@ export type QueryFormsRegisterArgs = {
   endDate: Maybe<Scalars['DateTime']>;
   wasteCode: Maybe<Scalars['String']>;
   exportFormat: Maybe<FormsRegisterExportFormat>;
+};
+
+
+export type QueryInvitationArgs = {
+  hash: Scalars['String'];
 };
 
 
@@ -2407,6 +2439,19 @@ export function createInternationalCompanyInputMock(props: Partial<International
     contact: null,
     mail: null,
     phone: null,
+    ...props,
+  };
+}
+
+export function createInvitationMock(props: Partial<Invitation>): Invitation {
+  return {
+    __typename: "Invitation",
+    id: "",
+    email: "",
+    companySiret: "",
+    hash: "",
+    role: UserRole.Member,
+    acceptedAt: null,
     ...props,
   };
 }

@@ -7630,6 +7630,7 @@ type UserAccountHash {
   hash: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  acceptedAt: DateTime
 }
 
 type UserAccountHashConnection {
@@ -7644,6 +7645,7 @@ input UserAccountHashCreateInput {
   companySiret: ID!
   role: UserRole!
   hash: String!
+  acceptedAt: DateTime
 }
 
 type UserAccountHashEdge {
@@ -7666,6 +7668,8 @@ enum UserAccountHashOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  acceptedAt_ASC
+  acceptedAt_DESC
 }
 
 type UserAccountHashPreviousValues {
@@ -7676,6 +7680,7 @@ type UserAccountHashPreviousValues {
   hash: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  acceptedAt: DateTime
 }
 
 type UserAccountHashSubscriptionPayload {
@@ -7701,6 +7706,7 @@ input UserAccountHashUpdateInput {
   companySiret: ID
   role: UserRole
   hash: String
+  acceptedAt: DateTime
 }
 
 input UserAccountHashUpdateManyMutationInput {
@@ -7708,6 +7714,7 @@ input UserAccountHashUpdateManyMutationInput {
   companySiret: ID
   role: UserRole
   hash: String
+  acceptedAt: DateTime
 }
 
 input UserAccountHashWhereInput {
@@ -7787,6 +7794,14 @@ input UserAccountHashWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  acceptedAt: DateTime
+  acceptedAt_not: DateTime
+  acceptedAt_in: [DateTime!]
+  acceptedAt_not_in: [DateTime!]
+  acceptedAt_lt: DateTime
+  acceptedAt_lte: DateTime
+  acceptedAt_gt: DateTime
+  acceptedAt_gte: DateTime
   AND: [UserAccountHashWhereInput!]
   OR: [UserAccountHashWhereInput!]
   NOT: [UserAccountHashWhereInput!]
