@@ -4,7 +4,7 @@ import { updaters, Updater } from "./helper/helper";
 async function loadUpdaters() {
   console.info("⌛ Loading updaters...");
 
-  const loaded = await loadFiles(`${__dirname}/*.ts`);
+  const loaded = await loadFiles(`${__dirname}/*.{ts,js}`);
 
   console.info(`✅ [${loaded.length}] updaters have been loaded.`);
   console.info(`🔢 [${updaters.length}] updaters are active.`);
