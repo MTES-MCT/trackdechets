@@ -1,3 +1,4 @@
+import { resetDatabase } from "../../../../integration-tests/helper";
 import { FormUpdateInput, prisma } from "../../../generated/prisma-client";
 import {
   formFactory,
@@ -8,7 +9,9 @@ import {
 import { expandTemporaryStorageFromDb } from "../../form-converter";
 import { formDiff } from "../diff";
 
-describe(formDiff, () => {
+describe("formDiff", () => {
+  afterAll(resetDatabase);
+
   it("should return an empty object if no change are recorded", async () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
