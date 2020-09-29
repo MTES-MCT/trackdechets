@@ -136,6 +136,7 @@ const RATE_LIMIT_WINDOW_SECONDS = 60;
 const MAX_REQUESTS_PER_WINDOW = 1000;
 app.use(
   rateLimit({
+    message: `Quota de ${MAX_REQUESTS_PER_WINDOW} requêtes par minute excédée pour cette adresse IP, merci de réessayer plus tard.`,
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
     max: MAX_REQUESTS_PER_WINDOW,
     store: new RateLimitRedisStore({
