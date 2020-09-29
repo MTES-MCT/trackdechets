@@ -72,7 +72,7 @@ describe("arrayEquals", () => {
   });
 });
 
-describe.only("objectDiff", () => {
+describe("objectDiff", () => {
   test("shallow diff", () => {
     const o1 = {
       a: "a",
