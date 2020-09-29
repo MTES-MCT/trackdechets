@@ -9,6 +9,12 @@ import { Event } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../errors";
 
+/**
+ * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
+ * Allowed transitions are defined as a state machine using xstate
+ * Data updates are applied along the way and we make sure this transition is
+ * logged in the StatusLogs table
+ */
 export default async function transitionForm(
   user: User,
   form: Form,

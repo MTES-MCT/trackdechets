@@ -2,6 +2,9 @@ import { Machine } from "xstate";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { Event, EventType, FormState } from "./types";
 
+/**
+ * Workflow state machine
+ */
 const machine = Machine<any, Event>(
   {
     id: "form-workflow-machine",

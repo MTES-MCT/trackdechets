@@ -85,7 +85,7 @@ export class DestinationCannotTempStore extends UserInputError {
     super(
       "Ce bordereau ne peut pas être marqué comme entreposé provisoirement " +
         "car le destinataire n'a pas été identifié comme étant une installation d'entreposage " +
-        "provsoire ou de reconditionnement"
+        "provisoire ou de reconditionnement"
     );
   }
 }
