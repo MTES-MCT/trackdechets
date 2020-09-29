@@ -405,6 +405,8 @@ describe("mutation.markAsProcessed", () => {
   });
 
   it("should mark appendix2 forms as grouped", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
@@ -423,6 +425,8 @@ describe("mutation.markAsProcessed", () => {
       where: { id: form.id },
       data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
+
+    const { mutate } = makeClient(user);
 
     await mutate(MARK_AS_PROCESSED, {
       variables: {

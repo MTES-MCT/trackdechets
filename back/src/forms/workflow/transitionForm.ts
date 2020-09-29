@@ -8,6 +8,7 @@ import {
 import { Event } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../errors";
+import { formDiff } from "./diff";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -37,11 +38,28 @@ export default async function transitionForm(
     ...event.formUpdateInput
   };
 
+  // retrieves temp storage before update
+  // for diff calculation
+  const temporaryStorageDetail = await prisma
+    .form({ id: form.id })
+    .temporaryStorageDetail();
+
   // update form
   const updatedForm = await prisma.updateForm({
     where: { id: form.id },
     data: formUpdateInput
   });
+
+  // retrieves updated temp storage
+  const updatedTemporaryStorageDetail = await prisma
+    .form({ id: updatedForm.id })
+    .temporaryStorageDetail();
+
+  // calculates diff between initial form and updated form
+  const updatedFields = formDiff(
+    { ...form, temporaryStorageDetail },
+    { ...updatedForm, temporaryStorageDetail: updatedTemporaryStorageDetail }
+  );
 
   // log status change
   await prisma.createStatusLog({
@@ -49,7 +67,7 @@ export default async function transitionForm(
     form: { connect: { id: form.id } },
     status: nextStatus,
     loggedAt: new Date(),
-    updatedFields: event.formUpdateInput ?? {}
+    updatedFields
   });
 
   return updatedForm;

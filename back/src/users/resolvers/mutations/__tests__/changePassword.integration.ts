@@ -18,7 +18,6 @@ describe("mutation changePassword", () => {
 
   it("should update a user password", async () => {
     const user = await userFactory();
-    console.log(user.password);
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const newPassword = "newPass";
     const { data } = await mutate(CHANGE_PASSWORD, {
