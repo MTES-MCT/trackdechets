@@ -16,8 +16,8 @@ describe("transition form", () => {
     });
     const formUpdateInput: FormUpdateInput = {
       receivedBy: "Bill",
-      receivedAt: "2019-01-17T10:22:00+0100",
-      signedAt: "2019-01-17T10:22:00+0100",
+      receivedAt: "2019-01-17T09:22:00.000Z",
+      signedAt: "2019-01-17T09:22:00.000Z",
       wasteAcceptationStatus: "ACCEPTED",
       quantityReceived: 1
     };
@@ -53,8 +53,8 @@ describe("transition form", () => {
     });
     const formUpdateInput: FormUpdateInput = {
       receivedBy: "Bill",
-      receivedAt: "2019-01-17T10:22:00+0100",
-      signedAt: "2019-01-17T10:22:00+0100",
+      receivedAt: "2019-01-17T09:22:00.000Z",
+      signedAt: "2019-01-17T09:22:00.000Z",
       wasteAcceptationStatus: "ACCEPTED",
       quantityReceived: 1
     };
