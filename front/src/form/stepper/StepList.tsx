@@ -8,7 +8,8 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { RouteComponentProps, withRouter, useLocation } from "react-router";
+import { useLocation, useHistory } from "react-router";
+import queryString from "query-string";
 import { InlineError } from "../../common/Error";
 import { updateApolloCache } from "../../common/helper";
 import { currentSiretService } from "../../dashboard/CompanySelector";
@@ -31,13 +32,12 @@ interface IProps {
   children: ReactElement<IStepContainerProps>[];
   formId?: string;
 }
-export default withRouter(function StepList(
-  props: IProps & RouteComponentProps
-) {
+export default function StepList(props: IProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = props.children.length - 1;
+  const history = useHistory();
   const { search } = useLocation();
-  const searchParams = new URLSearchParams(search);
+  const searchParams = queryString.parse(search);
 
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_FORM,
@@ -165,8 +165,8 @@ export default withRouter(function StepList(
                     variables: { formInput },
                   })
                     .then(_ =>
-                      props.history.push(
-                        `/dashboard/${searchParams.get("redirectTo") ?? ""}`
+                      history.push(
+                        `/dashboard/${searchParams.redirectTo ?? ""}`
                       )
                     )
                     .catch(err => {
@@ -195,7 +195,7 @@ export default withRouter(function StepList(
       </div>
     </div>
   );
-});
+}
 
 /**
  * Construct the form state by merging initialState and the actual form.
