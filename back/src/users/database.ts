@@ -8,7 +8,8 @@ import {
   UserRole,
   UserAccountHashWhereInput,
   CompanyAssociationWhereInput,
-  Company
+  Company,
+  MembershipRequestWhereUniqueInput
 } from "../generated/prisma-client";
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
@@ -175,4 +176,14 @@ export async function acceptNewUserCompanyInvitations(user: User) {
     },
     data: { acceptedAt: new Date().toISOString() }
   });
+}
+
+export async function getMembershipRequestOrNotFoundError(
+  where: MembershipRequestWhereUniqueInput
+) {
+  const invitationRequest = await prisma.membershipRequest(where);
+  if (!invitationRequest) {
+    throw new UserInputError("Cette demande de rattachement n'existe pas");
+  }
+  return invitationRequest;
 }

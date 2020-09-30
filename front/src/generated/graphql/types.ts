@@ -806,8 +806,47 @@ export type Invitation = {
 };
 
 
+/**
+ * Demande de rattachement à un établissement effectué par
+ * un utilisateur.
+ */
+export type MembershipRequest = {
+  __typename?: 'MembershipRequest';
+  id: Scalars['ID'];
+  /** Email de l'utilisateur faisant la demande */
+  email: Scalars['String'];
+  /** SIRET de l'établissement */
+  siret: Scalars['String'];
+  /** Nom de l'établissement */
+  name: Scalars['String'];
+  /** Statut de la demande d'invitation */
+  status: MembershipRequestStatus;
+  /**
+   * Liste des adresses email correspondant aux comptes administrateurs à qui la demande
+   * d'invitation a été envoyée. Les adresses emails sont partiellement masquées de la
+   * façon suivante j********w@trackdechets.fr
+   */
+  sentTo: Array<Scalars['String']>;
+};
+
+/**
+ * Différents statuts possibles pour une demande de rattachement
+ * à un établissement
+ */
+export enum MembershipRequestStatus {
+  Pending = 'PENDING',
+  Accepted = 'ACCEPTED',
+  Refused = 'REFUSED'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
+  /**
+   * USAGE INTERNE
+   * Accepte une demande de rattachement à un établissement
+   * en spécifiant le rôle accordé au nouvel utilisateur
+   */
+  acceptMembershipRequest: CompanyPrivate;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -966,6 +1005,11 @@ export type Mutation = {
   prepareSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
+   * Refuse une demande de rattachement à un un établissement
+   */
+  refuseMembershipRequest: CompanyPrivate;
+  /**
+   * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
    */
   removeUserFromCompany: CompanyPrivate;
@@ -989,6 +1033,13 @@ export type Mutation = {
    * @deprecated Utiliser createForm / updateForm selon le besoin
    */
   saveForm: Maybe<Form>;
+  /**
+   * Envoie une demande de rattachement de l'utilisateur courant
+   * à rejoindre l'établissement dont le siret est précisé en paramètre.
+   * Cette demande est communiquée à l'ensemble des administrateurs de
+   * l'établissement qui ont le choix de l'accepter ou de la refuser.
+   */
+  sendMembershipRequest: Maybe<MembershipRequest>;
   /**
    * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
    * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
@@ -1027,6 +1078,12 @@ export type Mutation = {
    * Édite les informations d'un récépissé transporteur
    */
   updateTransporterReceipt: Maybe<TransporterReceipt>;
+};
+
+
+export type MutationAcceptMembershipRequestArgs = {
+  id: Scalars['ID'];
+  role: UserRole;
 };
 
 
@@ -1180,6 +1237,11 @@ export type MutationPrepareSegmentArgs = {
 };
 
 
+export type MutationRefuseMembershipRequestArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationRemoveUserFromCompanyArgs = {
   userId: Scalars['ID'];
   siret: Scalars['String'];
@@ -1204,6 +1266,11 @@ export type MutationResetPasswordArgs = {
 
 export type MutationSaveFormArgs = {
   formInput: FormInput;
+};
+
+
+export type MutationSendMembershipRequestArgs = {
+  siret: Scalars['String'];
 };
 
 
@@ -1420,6 +1487,15 @@ export type Query = {
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
   /**
+   * Récupère une demande de rattachement effectuée par l'utilisateur courant
+   * à partir de l'identifiant de cette demande ou du SIRET de l'établissement
+   * auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des
+   * paramètres (id ou siret) doit être être passé mais pas les deux. Cette query
+   * permet notamment de suivre l'état d'avancement de la demande d'invitation
+   * (en attente, accepté, refusé)
+   */
+  membershipRequest: Maybe<MembershipRequest>;
+  /**
    * Effectue une recherche floue sur la base SIRENE et enrichit
    * les résultats avec des informations provenant de Trackdéchets
    */
@@ -1495,6 +1571,12 @@ export type QueryFormsRegisterArgs = {
 
 export type QueryInvitationArgs = {
   hash: Scalars['String'];
+};
+
+
+export type QueryMembershipRequestArgs = {
+  id: Maybe<Scalars['ID']>;
+  siret: Maybe<Scalars['String']>;
 };
 
 
@@ -2530,6 +2612,19 @@ export function createInvitationMock(props: Partial<Invitation>): Invitation {
     hash: "",
     role: UserRole.Member,
     acceptedAt: null,
+    ...props,
+  };
+}
+
+export function createMembershipRequestMock(props: Partial<MembershipRequest>): MembershipRequest {
+  return {
+    __typename: "MembershipRequest",
+    id: "",
+    email: "",
+    siret: "",
+    name: "",
+    status: MembershipRequestStatus.Pending,
+    sentTo: [],
     ...props,
   };
 }

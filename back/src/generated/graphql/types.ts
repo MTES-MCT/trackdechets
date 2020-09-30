@@ -800,8 +800,46 @@ export type Invitation = {
 };
 
 
+/**
+ * Demande de rattachement à un établissement effectué par
+ * un utilisateur.
+ */
+export type MembershipRequest = {
+  __typename?: 'MembershipRequest';
+  id: Scalars['ID'];
+  /** Email de l'utilisateur faisant la demande */
+  email: Scalars['String'];
+  /** SIRET de l'établissement */
+  siret: Scalars['String'];
+  /** Nom de l'établissement */
+  name: Scalars['String'];
+  /** Statut de la demande d'invitation */
+  status: MembershipRequestStatus;
+  /**
+   * Liste des adresses email correspondant aux comptes administrateurs à qui la demande
+   * d'invitation a été envoyée. Les adresses emails sont partiellement masquées de la
+   * façon suivante j********w@trackdechets.fr
+   */
+  sentTo: Array<Scalars['String']>;
+};
+
+/**
+ * Différents statuts possibles pour une demande de rattachement
+ * à un établissement
+ */
+export type MembershipRequestStatus = 
+  | 'PENDING'
+  | 'ACCEPTED'
+  | 'REFUSED';
+
 export type Mutation = {
   __typename?: 'Mutation';
+  /**
+   * USAGE INTERNE
+   * Accepte une demande de rattachement à un établissement
+   * en spécifiant le rôle accordé au nouvel utilisateur
+   */
+  acceptMembershipRequest: CompanyPrivate;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -960,6 +998,11 @@ export type Mutation = {
   prepareSegment?: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
+   * Refuse une demande de rattachement à un un établissement
+   */
+  refuseMembershipRequest: CompanyPrivate;
+  /**
+   * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
    */
   removeUserFromCompany: CompanyPrivate;
@@ -983,6 +1026,13 @@ export type Mutation = {
    * @deprecated Utiliser createForm / updateForm selon le besoin
    */
   saveForm?: Maybe<Form>;
+  /**
+   * Envoie une demande de rattachement de l'utilisateur courant
+   * à rejoindre l'établissement dont le siret est précisé en paramètre.
+   * Cette demande est communiquée à l'ensemble des administrateurs de
+   * l'établissement qui ont le choix de l'accepter ou de la refuser.
+   */
+  sendMembershipRequest?: Maybe<MembershipRequest>;
   /**
    * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
    * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
@@ -1021,6 +1071,12 @@ export type Mutation = {
    * Édite les informations d'un récépissé transporteur
    */
   updateTransporterReceipt?: Maybe<TransporterReceipt>;
+};
+
+
+export type MutationAcceptMembershipRequestArgs = {
+  id: Scalars['ID'];
+  role: UserRole;
 };
 
 
@@ -1174,6 +1230,11 @@ export type MutationPrepareSegmentArgs = {
 };
 
 
+export type MutationRefuseMembershipRequestArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationRemoveUserFromCompanyArgs = {
   userId: Scalars['ID'];
   siret: Scalars['String'];
@@ -1198,6 +1259,11 @@ export type MutationResetPasswordArgs = {
 
 export type MutationSaveFormArgs = {
   formInput: FormInput;
+};
+
+
+export type MutationSendMembershipRequestArgs = {
+  siret: Scalars['String'];
 };
 
 
@@ -1412,6 +1478,15 @@ export type Query = {
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
   /**
+   * Récupère une demande de rattachement effectuée par l'utilisateur courant
+   * à partir de l'identifiant de cette demande ou du SIRET de l'établissement
+   * auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des
+   * paramètres (id ou siret) doit être être passé mais pas les deux. Cette query
+   * permet notamment de suivre l'état d'avancement de la demande d'invitation
+   * (en attente, accepté, refusé)
+   */
+  membershipRequest?: Maybe<MembershipRequest>;
+  /**
    * Effectue une recherche floue sur la base SIRENE et enrichit
    * les résultats avec des informations provenant de Trackdéchets
    */
@@ -1487,6 +1562,12 @@ export type QueryFormsRegisterArgs = {
 
 export type QueryInvitationArgs = {
   hash: Scalars['String'];
+};
+
+
+export type QueryMembershipRequestArgs = {
+  id?: Maybe<Scalars['ID']>;
+  siret?: Maybe<Scalars['String']>;
 };
 
 
@@ -2231,6 +2312,8 @@ export type ResolversTypes = {
   CompanyPrivate: ResolverTypeWrapper<CompanyPrivate>;
   CompanyType: CompanyType;
   CompanyMember: ResolverTypeWrapper<CompanyMember>;
+  MembershipRequest: ResolverTypeWrapper<MembershipRequest>;
+  MembershipRequestStatus: MembershipRequestStatus;
   CompanySearchResult: ResolverTypeWrapper<CompanySearchResult>;
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
@@ -2334,6 +2417,8 @@ export type ResolversParentTypes = {
   CompanyPrivate: CompanyPrivate;
   CompanyType: CompanyType;
   CompanyMember: CompanyMember;
+  MembershipRequest: MembershipRequest;
+  MembershipRequestStatus: MembershipRequestStatus;
   CompanySearchResult: CompanySearchResult;
   CompanyStat: CompanyStat;
   Stat: Stat;
@@ -2609,7 +2694,18 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'JSON';
 }
 
+export type MembershipRequestResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['MembershipRequest'] = ResolversParentTypes['MembershipRequest']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  siret?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['MembershipRequestStatus'], ParentType, ContextType>;
+  sentTo?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+};
+
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  acceptMembershipRequest?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationAcceptMembershipRequestArgs, 'id' | 'role'>>;
   changePassword?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'oldPassword' | 'newPassword'>>;
   createCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>;
   createForm?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<MutationCreateFormArgs, 'createFormInput'>>;
@@ -2636,11 +2732,13 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   markAsTempStored?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStoredArgs, 'id' | 'tempStoredInfos'>>;
   markSegmentAsReadyToTakeOver?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationMarkSegmentAsReadyToTakeOverArgs, 'id'>>;
   prepareSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationPrepareSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
+  refuseMembershipRequest?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRefuseMembershipRequestArgs, 'id'>>;
   removeUserFromCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRemoveUserFromCompanyArgs, 'userId' | 'siret'>>;
   renewSecurityCode?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRenewSecurityCodeArgs, 'siret'>>;
   resendInvitation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResendInvitationArgs, 'email' | 'siret'>>;
   resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email'>>;
   saveForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSaveFormArgs, 'formInput'>>;
+  sendMembershipRequest?: Resolver<Maybe<ResolversTypes['MembershipRequest']>, ParentType, ContextType, RequireFields<MutationSendMembershipRequestArgs, 'siret'>>;
   signedByTransporter?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationSignedByTransporterArgs, 'id' | 'signingInfo'>>;
   signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'userInfos'>>;
   takeOverSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationTakeOverSegmentArgs, 'id' | 'takeOverInfo'>>;
@@ -2670,6 +2768,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   formsRegister?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormsRegisterArgs, 'sirets'>>;
   invitation?: Resolver<Maybe<ResolversTypes['Invitation']>, ParentType, ContextType, RequireFields<QueryInvitationArgs, 'hash'>>;
   me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  membershipRequest?: Resolver<Maybe<ResolversTypes['MembershipRequest']>, ParentType, ContextType, RequireFields<QueryMembershipRequestArgs, never>>;
   searchCompanies?: Resolver<Array<ResolversTypes['CompanySearchResult']>, ParentType, ContextType, RequireFields<QuerySearchCompaniesArgs, 'clue'>>;
   stats?: Resolver<Array<ResolversTypes['CompanyStat']>, ParentType, ContextType>;
 };
@@ -2871,6 +2970,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Installation?: InstallationResolvers<ContextType>;
   Invitation?: InvitationResolvers<ContextType>;
   JSON?: GraphQLScalarType;
+  MembershipRequest?: MembershipRequestResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NextDestination?: NextDestinationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
@@ -3317,6 +3417,19 @@ export function createInvitationMock(props: Partial<Invitation>): Invitation {
     hash: "",
     role: "MEMBER",
     acceptedAt: null,
+    ...props,
+  };
+}
+
+export function createMembershipRequestMock(props: Partial<MembershipRequest>): MembershipRequest {
+  return {
+    __typename: "MembershipRequest",
+    id: "",
+    email: "",
+    siret: "",
+    name: "",
+    status: "PENDING",
+    sentTo: [],
     ...props,
   };
 }

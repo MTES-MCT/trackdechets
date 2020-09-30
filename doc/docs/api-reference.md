@@ -446,6 +446,30 @@ Renvoie les informations sur l'utilisateur authentifié
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>membershipRequest</strong></td>
+<td valign="top"><a href="#membershiprequest">MembershipRequest</a></td>
+<td>
+
+Récupère une demande de rattachement effectuée par l'utilisateur courant
+à partir de l'identifiant de cette demande ou du SIRET de l'établissement
+auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des
+paramètres (id ou siret) doit être être passé mais pas les deux. Cette query
+permet notamment de suivre l'état d'avancement de la demande d'invitation
+(en attente, accepté, refusé)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>searchCompanies</strong></td>
 <td valign="top">[<a href="#companysearchresult">CompanySearchResult</a>!]!</td>
 <td>
@@ -896,6 +920,23 @@ Utiliser createForm / updateForm selon le besoin
 Payload du BSD
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>sendMembershipRequest</strong></td>
+<td valign="top"><a href="#membershiprequest">MembershipRequest</a></td>
+<td>
+
+Envoie une demande de rattachement de l'utilisateur courant
+à rejoindre l'établissement dont le siret est précisé en paramètre.
+Cette demande est communiquée à l'ensemble des administrateurs de
+l'établissement qui ont le choix de l'accepter ou de la refuser.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signedByTransporter</strong></td>
@@ -2399,6 +2440,76 @@ Liste des rubriques associées
 <td>
 
 Liste des déclarations GEREP
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### MembershipRequest
+
+Demande de rattachement à un établissement effectué par
+un utilisateur.
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>email</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Email de l'utilisateur faisant la demande
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+SIRET de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom de l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#membershiprequeststatus">MembershipRequestStatus</a>!</td>
+<td>
+
+Statut de la demande d'invitation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>sentTo</strong></td>
+<td valign="top">[<a href="#string">String</a>!]!</td>
+<td>
+
+Liste des adresses email correspondant aux comptes administrateurs à qui la demande
+d'invitation a été envoyée. Les adresses emails sont partiellement masquées de la
+façon suivante j********w@trackdechets.fr
 
 </td>
 </tr>
@@ -5729,6 +5840,32 @@ Type d'une déclaration GEREP
 </tr>
 <tr>
 <td valign="top"><strong>Traiteur</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### MembershipRequestStatus
+
+Différents statuts possibles pour une demande de rattachement
+à un établissement
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>PENDING</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>ACCEPTED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
 <td></td>
 </tr>
 </tbody>

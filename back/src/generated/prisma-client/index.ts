@@ -27,6 +27,7 @@ export interface Exists {
   form: (where?: FormWhereInput) => Promise<boolean>;
   grant: (where?: GrantWhereInput) => Promise<boolean>;
   installation: (where?: InstallationWhereInput) => Promise<boolean>;
+  membershipRequest: (where?: MembershipRequestWhereInput) => Promise<boolean>;
   rubrique: (where?: RubriqueWhereInput) => Promise<boolean>;
   statusLog: (where?: StatusLogWhereInput) => Promise<boolean>;
   temporaryStorageDetail: (
@@ -246,6 +247,27 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => InstallationConnectionPromise;
+  membershipRequest: (
+    where: MembershipRequestWhereUniqueInput
+  ) => MembershipRequestNullablePromise;
+  membershipRequests: (args?: {
+    where?: MembershipRequestWhereInput;
+    orderBy?: MembershipRequestOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<MembershipRequest>;
+  membershipRequestsConnection: (args?: {
+    where?: MembershipRequestWhereInput;
+    orderBy?: MembershipRequestOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => MembershipRequestConnectionPromise;
   rubrique: (where: RubriqueWhereUniqueInput) => RubriqueNullablePromise;
   rubriques: (args?: {
     where?: RubriqueWhereInput;
@@ -599,6 +621,28 @@ export interface Prisma {
   deleteManyInstallations: (
     where?: InstallationWhereInput
   ) => BatchPayloadPromise;
+  createMembershipRequest: (
+    data: MembershipRequestCreateInput
+  ) => MembershipRequestPromise;
+  updateMembershipRequest: (args: {
+    data: MembershipRequestUpdateInput;
+    where: MembershipRequestWhereUniqueInput;
+  }) => MembershipRequestPromise;
+  updateManyMembershipRequests: (args: {
+    data: MembershipRequestUpdateManyMutationInput;
+    where?: MembershipRequestWhereInput;
+  }) => BatchPayloadPromise;
+  upsertMembershipRequest: (args: {
+    where: MembershipRequestWhereUniqueInput;
+    create: MembershipRequestCreateInput;
+    update: MembershipRequestUpdateInput;
+  }) => MembershipRequestPromise;
+  deleteMembershipRequest: (
+    where: MembershipRequestWhereUniqueInput
+  ) => MembershipRequestPromise;
+  deleteManyMembershipRequests: (
+    where?: MembershipRequestWhereInput
+  ) => BatchPayloadPromise;
   createRubrique: (data: RubriqueCreateInput) => RubriquePromise;
   updateRubrique: (args: {
     data: RubriqueUpdateInput;
@@ -813,6 +857,9 @@ export interface Subscription {
   installation: (
     where?: InstallationSubscriptionWhereInput
   ) => InstallationSubscriptionPayloadSubscription;
+  membershipRequest: (
+    where?: MembershipRequestSubscriptionWhereInput
+  ) => MembershipRequestSubscriptionPayloadSubscription;
   rubrique: (
     where?: RubriqueSubscriptionWhereInput
   ) => RubriqueSubscriptionPayloadSubscription;
@@ -1242,6 +1289,20 @@ export type InstallationOrderByInput =
   | "gerepNumeroSiret_DESC"
   | "sireneNumeroSiret_ASC"
   | "sireneNumeroSiret_DESC";
+
+export type MembershipRequestStatus = "PENDING" | "ACCEPTED" | "REFUSED";
+
+export type MembershipRequestOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC"
+  | "status_ASC"
+  | "status_DESC"
+  | "statusUpdatedBy_ASC"
+  | "statusUpdatedBy_DESC";
 
 export type WasteType = "INERTE" | "NOT_DANGEROUS" | "DANGEROUS";
 
@@ -4079,6 +4140,66 @@ export interface InstallationWhereInput {
   AND?: Maybe<InstallationWhereInput[] | InstallationWhereInput>;
   OR?: Maybe<InstallationWhereInput[] | InstallationWhereInput>;
   NOT?: Maybe<InstallationWhereInput[] | InstallationWhereInput>;
+}
+
+export type MembershipRequestWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface MembershipRequestWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  status?: Maybe<MembershipRequestStatus>;
+  status_not?: Maybe<MembershipRequestStatus>;
+  status_in?: Maybe<MembershipRequestStatus[] | MembershipRequestStatus>;
+  status_not_in?: Maybe<MembershipRequestStatus[] | MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  statusUpdatedBy_not?: Maybe<String>;
+  statusUpdatedBy_in?: Maybe<String[] | String>;
+  statusUpdatedBy_not_in?: Maybe<String[] | String>;
+  statusUpdatedBy_lt?: Maybe<String>;
+  statusUpdatedBy_lte?: Maybe<String>;
+  statusUpdatedBy_gt?: Maybe<String>;
+  statusUpdatedBy_gte?: Maybe<String>;
+  statusUpdatedBy_contains?: Maybe<String>;
+  statusUpdatedBy_not_contains?: Maybe<String>;
+  statusUpdatedBy_starts_with?: Maybe<String>;
+  statusUpdatedBy_not_starts_with?: Maybe<String>;
+  statusUpdatedBy_ends_with?: Maybe<String>;
+  statusUpdatedBy_not_ends_with?: Maybe<String>;
+  user?: Maybe<UserWhereInput>;
+  company?: Maybe<CompanyWhereInput>;
+  AND?: Maybe<MembershipRequestWhereInput[] | MembershipRequestWhereInput>;
+  OR?: Maybe<MembershipRequestWhereInput[] | MembershipRequestWhereInput>;
+  NOT?: Maybe<MembershipRequestWhereInput[] | MembershipRequestWhereInput>;
 }
 
 export type RubriqueWhereUniqueInput = AtLeastOne<{
@@ -7171,6 +7292,37 @@ export interface InstallationUpdateManyMutationInput {
   sireneNumeroSiret?: Maybe<String>;
 }
 
+export interface MembershipRequestCreateInput {
+  id?: Maybe<ID_Input>;
+  status?: Maybe<MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  user: UserCreateOneInput;
+  company: CompanyCreateOneInput;
+  sentTo?: Maybe<MembershipRequestCreatesentToInput>;
+}
+
+export interface MembershipRequestCreatesentToInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface MembershipRequestUpdateInput {
+  status?: Maybe<MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  sentTo?: Maybe<MembershipRequestUpdatesentToInput>;
+}
+
+export interface MembershipRequestUpdatesentToInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface MembershipRequestUpdateManyMutationInput {
+  status?: Maybe<MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  sentTo?: Maybe<MembershipRequestUpdatesentToInput>;
+}
+
 export interface RubriqueCreateInput {
   id?: Maybe<ID_Input>;
   codeS3ic?: Maybe<String>;
@@ -8059,6 +8211,26 @@ export interface InstallationSubscriptionWhereInput {
   >;
   NOT?: Maybe<
     InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
+}
+
+export interface MembershipRequestSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<MembershipRequestWhereInput>;
+  AND?: Maybe<
+    | MembershipRequestSubscriptionWhereInput[]
+    | MembershipRequestSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | MembershipRequestSubscriptionWhereInput[]
+    | MembershipRequestSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | MembershipRequestSubscriptionWhereInput[]
+    | MembershipRequestSubscriptionWhereInput
   >;
 }
 
@@ -10020,6 +10192,110 @@ export interface AggregateInstallationSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
+export interface MembershipRequest {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  status: MembershipRequestStatus;
+  statusUpdatedBy?: String;
+  sentTo: String[];
+}
+
+export interface MembershipRequestPromise
+  extends Promise<MembershipRequest>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<MembershipRequestStatus>;
+  statusUpdatedBy: () => Promise<String>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
+  sentTo: () => Promise<String[]>;
+}
+
+export interface MembershipRequestSubscription
+  extends Promise<AsyncIterator<MembershipRequest>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  status: () => Promise<AsyncIterator<MembershipRequestStatus>>;
+  statusUpdatedBy: () => Promise<AsyncIterator<String>>;
+  user: <T = UserSubscription>() => T;
+  company: <T = CompanySubscription>() => T;
+  sentTo: () => Promise<AsyncIterator<String[]>>;
+}
+
+export interface MembershipRequestNullablePromise
+  extends Promise<MembershipRequest | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<MembershipRequestStatus>;
+  statusUpdatedBy: () => Promise<String>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
+  sentTo: () => Promise<String[]>;
+}
+
+export interface MembershipRequestConnection {
+  pageInfo: PageInfo;
+  edges: MembershipRequestEdge[];
+}
+
+export interface MembershipRequestConnectionPromise
+  extends Promise<MembershipRequestConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<MembershipRequestEdge>>() => T;
+  aggregate: <T = AggregateMembershipRequestPromise>() => T;
+}
+
+export interface MembershipRequestConnectionSubscription
+  extends Promise<AsyncIterator<MembershipRequestConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<MembershipRequestEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateMembershipRequestSubscription>() => T;
+}
+
+export interface MembershipRequestEdge {
+  node: MembershipRequest;
+  cursor: String;
+}
+
+export interface MembershipRequestEdgePromise
+  extends Promise<MembershipRequestEdge>,
+    Fragmentable {
+  node: <T = MembershipRequestPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface MembershipRequestEdgeSubscription
+  extends Promise<AsyncIterator<MembershipRequestEdge>>,
+    Fragmentable {
+  node: <T = MembershipRequestSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateMembershipRequest {
+  count: Int;
+}
+
+export interface AggregateMembershipRequestPromise
+  extends Promise<AggregateMembershipRequest>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateMembershipRequestSubscription
+  extends Promise<AsyncIterator<AggregateMembershipRequest>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface Rubrique {
   id: ID_Output;
   codeS3ic?: String;
@@ -11516,6 +11792,62 @@ export interface InstallationPreviousValuesSubscription
   sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
 }
 
+export interface MembershipRequestSubscriptionPayload {
+  mutation: MutationType;
+  node: MembershipRequest;
+  updatedFields: String[];
+  previousValues: MembershipRequestPreviousValues;
+}
+
+export interface MembershipRequestSubscriptionPayloadPromise
+  extends Promise<MembershipRequestSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = MembershipRequestPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = MembershipRequestPreviousValuesPromise>() => T;
+}
+
+export interface MembershipRequestSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<MembershipRequestSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = MembershipRequestSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = MembershipRequestPreviousValuesSubscription>() => T;
+}
+
+export interface MembershipRequestPreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  status: MembershipRequestStatus;
+  statusUpdatedBy?: String;
+  sentTo: String[];
+}
+
+export interface MembershipRequestPreviousValuesPromise
+  extends Promise<MembershipRequestPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<MembershipRequestStatus>;
+  statusUpdatedBy: () => Promise<String>;
+  sentTo: () => Promise<String[]>;
+}
+
+export interface MembershipRequestPreviousValuesSubscription
+  extends Promise<AsyncIterator<MembershipRequestPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  status: () => Promise<AsyncIterator<MembershipRequestStatus>>;
+  statusUpdatedBy: () => Promise<AsyncIterator<String>>;
+  sentTo: () => Promise<AsyncIterator<String[]>>;
+}
+
 export interface RubriqueSubscriptionPayload {
   mutation: MutationType;
   node: Rubrique;
@@ -12266,6 +12598,14 @@ export const models: Model[] = [
   },
   {
     name: "UserAccountHash",
+    embedded: false
+  },
+  {
+    name: "MembershipRequestStatus",
+    embedded: false
+  },
+  {
+    name: "MembershipRequest",
     embedded: false
   },
   {

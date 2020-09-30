@@ -71,6 +71,19 @@ type Mutation {
   Supprime une invitation à un établissement
   """
   deleteInvitation(email: String!, siret: String!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Accepte une demande de rattachement à un établissement
+  en spécifiant le rôle accordé au nouvel utilisateur
+  """
+  acceptMembershipRequest(id: ID!, role: UserRole!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Refuse une demande de rattachement à un un établissement
+  """
+  refuseMembershipRequest(id: ID!): CompanyPrivate!
 }
 
 """
