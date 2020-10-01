@@ -2263,84 +2263,6 @@ Liste des déclarations GEREP
 </tbody>
 </table>
 
-### MultimodalTransporter
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td>
-
-Établissement transporteur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
-<td>
-
-Exemption de récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>receipt</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-N° de récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Département
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td>
-
-Limite de validité du récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>numberPlate</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de plaque d'immatriculation
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>customInfo</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Information libre, destinée aux transporteurs
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### NextDestination
 
 Destination ultérieure prévue (case 12)
@@ -3101,7 +3023,7 @@ Siret du transporteur précédent
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
-<td valign="top"><a href="#multimodaltransporter">MultimodalTransporter</a></td>
+<td valign="top"><a href="#transporter">Transporter</a></td>
 <td>
 
 Transporteur du segment
@@ -4203,76 +4125,6 @@ Traitement prévue (code D/R)
 </tbody>
 </table>
 
-### NextSegmentCompanyInput
-
-Payload d'un segment de transport
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-SIRET de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Nom de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>address</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Adresse de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>contact</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Nom du contact dans l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>mail</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Email du contact dans l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de téléphone de contact dans l'établissement
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### NextSegmentInfoInput
 
 Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
@@ -4288,81 +4140,13 @@ Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
-<td valign="top"><a href="#nextsegmenttransporterinput">NextSegmentTransporterInput</a></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>mode</strong></td>
 <td valign="top"><a href="#transportmode">TransportMode</a>!</td>
 <td></td>
-</tr>
-</tbody>
-</table>
-
-### NextSegmentTransporterInput
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
-<td>
-
-Exemption de récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>receipt</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-N° de récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Département
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td>
-
-Limite de validité du récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>numberPlate</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de plaque d'immatriculation
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#nextsegmentcompanyinput">NextSegmentCompanyInput</a></td>
-<td>
-
-Établissement collecteur - transporteur
-
-</td>
 </tr>
 </tbody>
 </table>

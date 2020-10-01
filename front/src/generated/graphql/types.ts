@@ -790,24 +790,6 @@ export type Invitation = {
 };
 
 
-export type MultimodalTransporter = {
-  __typename?: 'MultimodalTransporter';
-  /** Établissement transporteur */
-  company: Maybe<FormCompany>;
-  /** Exemption de récipissé */
-  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
-  /** N° de récipissé */
-  receipt: Maybe<Scalars['String']>;
-  /** Département */
-  department: Maybe<Scalars['String']>;
-  /** Limite de validité du récipissé */
-  validityLimit: Maybe<Scalars['DateTime']>;
-  /** Numéro de plaque d'immatriculation */
-  numberPlate: Maybe<Scalars['String']>;
-  /** Information libre, destinée aux transporteurs */
-  customInfo: Maybe<Scalars['String']>;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   /**
@@ -1277,41 +1259,10 @@ export type NextDestinationInput = {
   company: InternationalCompanyInput;
 };
 
-/** Payload d'un segment de transport */
-export type NextSegmentCompanyInput = {
-  /** SIRET de l'établissement */
-  siret: Maybe<Scalars['String']>;
-  /** Nom de l'établissement */
-  name: Maybe<Scalars['String']>;
-  /** Adresse de l'établissement */
-  address: Maybe<Scalars['String']>;
-  /** Nom du contact dans l'établissement */
-  contact: Maybe<Scalars['String']>;
-  /** Email du contact dans l'établissement */
-  mail: Maybe<Scalars['String']>;
-  /** Numéro de téléphone de contact dans l'établissement */
-  phone: Maybe<Scalars['String']>;
-};
-
 /** Payload lié à l'ajout de segment de transport multimodal (case 20 à 21) */
 export type NextSegmentInfoInput = {
-  transporter: Maybe<NextSegmentTransporterInput>;
+  transporter: Maybe<TransporterInput>;
   mode: TransportMode;
-};
-
-export type NextSegmentTransporterInput = {
-  /** Exemption de récipissé */
-  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
-  /** N° de récipissé */
-  receipt: Maybe<Scalars['String']>;
-  /** Département */
-  department: Maybe<Scalars['String']>;
-  /** Limite de validité du récipissé */
-  validityLimit: Maybe<Scalars['DateTime']>;
-  /** Numéro de plaque d'immatriculation */
-  numberPlate: Maybe<Scalars['String']>;
-  /** Établissement collecteur - transporteur */
-  company: Maybe<NextSegmentCompanyInput>;
 };
 
 /** Type de packaging du déchet */
@@ -1915,7 +1866,7 @@ export type TransportSegment = {
   /** Siret du transporteur précédent */
   previousTransporterCompanySiret: Maybe<Scalars['String']>;
   /** Transporteur du segment */
-  transporter: Maybe<MultimodalTransporter>;
+  transporter: Maybe<Transporter>;
   /** Mode de transport */
   mode: Maybe<TransportMode>;
   /** Date de prise en charge */
@@ -2532,20 +2483,6 @@ export function createInvitationMock(props: Partial<Invitation>): Invitation {
   };
 }
 
-export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
-  return {
-    __typename: "MultimodalTransporter",
-    company: null,
-    isExemptedOfReceipt: null,
-    receipt: null,
-    department: null,
-    validityLimit: null,
-    numberPlate: null,
-    customInfo: null,
-    ...props,
-  };
-}
-
 export function createNextDestinationMock(props: Partial<NextDestination>): NextDestination {
   return {
     __typename: "NextDestination",
@@ -2563,34 +2500,10 @@ export function createNextDestinationInputMock(props: Partial<NextDestinationInp
   };
 }
 
-export function createNextSegmentCompanyInputMock(props: Partial<NextSegmentCompanyInput>): NextSegmentCompanyInput {
-  return {
-    siret: null,
-    name: null,
-    address: null,
-    contact: null,
-    mail: null,
-    phone: null,
-    ...props,
-  };
-}
-
 export function createNextSegmentInfoInputMock(props: Partial<NextSegmentInfoInput>): NextSegmentInfoInput {
   return {
     transporter: null,
     mode: TransportMode.Road,
-    ...props,
-  };
-}
-
-export function createNextSegmentTransporterInputMock(props: Partial<NextSegmentTransporterInput>): NextSegmentTransporterInput {
-  return {
-    isExemptedOfReceipt: null,
-    receipt: null,
-    department: null,
-    validityLimit: null,
-    numberPlate: null,
-    company: null,
     ...props,
   };
 }

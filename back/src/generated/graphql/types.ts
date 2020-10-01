@@ -784,24 +784,6 @@ export type Invitation = {
 };
 
 
-export type MultimodalTransporter = {
-  __typename?: 'MultimodalTransporter';
-  /** Établissement transporteur */
-  company?: Maybe<FormCompany>;
-  /** Exemption de récipissé */
-  isExemptedOfReceipt?: Maybe<Scalars['Boolean']>;
-  /** N° de récipissé */
-  receipt?: Maybe<Scalars['String']>;
-  /** Département */
-  department?: Maybe<Scalars['String']>;
-  /** Limite de validité du récipissé */
-  validityLimit?: Maybe<Scalars['DateTime']>;
-  /** Numéro de plaque d'immatriculation */
-  numberPlate?: Maybe<Scalars['String']>;
-  /** Information libre, destinée aux transporteurs */
-  customInfo?: Maybe<Scalars['String']>;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   /**
@@ -1271,41 +1253,10 @@ export type NextDestinationInput = {
   company: InternationalCompanyInput;
 };
 
-/** Payload d'un segment de transport */
-export type NextSegmentCompanyInput = {
-  /** SIRET de l'établissement */
-  siret?: Maybe<Scalars['String']>;
-  /** Nom de l'établissement */
-  name?: Maybe<Scalars['String']>;
-  /** Adresse de l'établissement */
-  address?: Maybe<Scalars['String']>;
-  /** Nom du contact dans l'établissement */
-  contact?: Maybe<Scalars['String']>;
-  /** Email du contact dans l'établissement */
-  mail?: Maybe<Scalars['String']>;
-  /** Numéro de téléphone de contact dans l'établissement */
-  phone?: Maybe<Scalars['String']>;
-};
-
 /** Payload lié à l'ajout de segment de transport multimodal (case 20 à 21) */
 export type NextSegmentInfoInput = {
-  transporter?: Maybe<NextSegmentTransporterInput>;
+  transporter?: Maybe<TransporterInput>;
   mode: TransportMode;
-};
-
-export type NextSegmentTransporterInput = {
-  /** Exemption de récipissé */
-  isExemptedOfReceipt?: Maybe<Scalars['Boolean']>;
-  /** N° de récipissé */
-  receipt?: Maybe<Scalars['String']>;
-  /** Département */
-  department?: Maybe<Scalars['String']>;
-  /** Limite de validité du récipissé */
-  validityLimit?: Maybe<Scalars['DateTime']>;
-  /** Numéro de plaque d'immatriculation */
-  numberPlate?: Maybe<Scalars['String']>;
-  /** Établissement collecteur - transporteur */
-  company?: Maybe<NextSegmentCompanyInput>;
 };
 
 /** Type de packaging du déchet */
@@ -1906,7 +1857,7 @@ export type TransportSegment = {
   /** Siret du transporteur précédent */
   previousTransporterCompanySiret?: Maybe<Scalars['String']>;
   /** Transporteur du segment */
-  transporter?: Maybe<MultimodalTransporter>;
+  transporter?: Maybe<Transporter>;
   /** Mode de transport */
   mode?: Maybe<TransportMode>;
   /** Date de prise en charge */
@@ -2213,7 +2164,6 @@ export type ResolversTypes = {
   Destination: ResolverTypeWrapper<Destination>;
   StateSummary: ResolverTypeWrapper<StateSummary>;
   TransportSegment: ResolverTypeWrapper<TransportSegment>;
-  MultimodalTransporter: ResolverTypeWrapper<MultimodalTransporter>;
   TransportMode: TransportMode;
   CompanyPublic: ResolverTypeWrapper<CompanyPublic>;
   Installation: ResolverTypeWrapper<Installation>;
@@ -2263,8 +2213,6 @@ export type ResolversTypes = {
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
   NextSegmentInfoInput: NextSegmentInfoInput;
-  NextSegmentTransporterInput: NextSegmentTransporterInput;
-  NextSegmentCompanyInput: NextSegmentCompanyInput;
   ImportPaperFormInput: ImportPaperFormInput;
   SignatureFormInput: SignatureFormInput;
   ReceivedFormInput: ReceivedFormInput;
@@ -2317,7 +2265,6 @@ export type ResolversParentTypes = {
   Destination: Destination;
   StateSummary: StateSummary;
   TransportSegment: TransportSegment;
-  MultimodalTransporter: MultimodalTransporter;
   TransportMode: TransportMode;
   CompanyPublic: CompanyPublic;
   Installation: Installation;
@@ -2367,8 +2314,6 @@ export type ResolversParentTypes = {
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
   NextSegmentInfoInput: NextSegmentInfoInput;
-  NextSegmentTransporterInput: NextSegmentTransporterInput;
-  NextSegmentCompanyInput: NextSegmentCompanyInput;
   ImportPaperFormInput: ImportPaperFormInput;
   SignatureFormInput: SignatureFormInput;
   ReceivedFormInput: ReceivedFormInput;
@@ -2613,17 +2558,6 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'JSON';
 }
 
-export type MultimodalTransporterResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['MultimodalTransporter'] = ResolversParentTypes['MultimodalTransporter']> = {
-  company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
-  isExemptedOfReceipt?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  receipt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  department?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  validityLimit?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  numberPlate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  customInfo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
-};
-
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   changePassword?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'oldPassword' | 'newPassword'>>;
   createCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>;
@@ -2814,7 +2748,7 @@ export type TransporterReceiptResolvers<ContextType = GraphQLContext, ParentType
 export type TransportSegmentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TransportSegment'] = ResolversParentTypes['TransportSegment']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   previousTransporterCompanySiret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  transporter?: Resolver<Maybe<ResolversTypes['MultimodalTransporter']>, ParentType, ContextType>;
+  transporter?: Resolver<Maybe<ResolversTypes['Transporter']>, ParentType, ContextType>;
   mode?: Resolver<Maybe<ResolversTypes['TransportMode']>, ParentType, ContextType>;
   takenOverAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   takenOverBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -2881,7 +2815,6 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Installation?: InstallationResolvers<ContextType>;
   Invitation?: InvitationResolvers<ContextType>;
   JSON?: GraphQLScalarType;
-  MultimodalTransporter?: MultimodalTransporterResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NextDestination?: NextDestinationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
@@ -3319,20 +3252,6 @@ export function createInvitationMock(props: Partial<Invitation>): Invitation {
   };
 }
 
-export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
-  return {
-    __typename: "MultimodalTransporter",
-    company: null,
-    isExemptedOfReceipt: null,
-    receipt: null,
-    department: null,
-    validityLimit: null,
-    numberPlate: null,
-    customInfo: null,
-    ...props,
-  };
-}
-
 export function createNextDestinationMock(props: Partial<NextDestination>): NextDestination {
   return {
     __typename: "NextDestination",
@@ -3350,34 +3269,10 @@ export function createNextDestinationInputMock(props: Partial<NextDestinationInp
   };
 }
 
-export function createNextSegmentCompanyInputMock(props: Partial<NextSegmentCompanyInput>): NextSegmentCompanyInput {
-  return {
-    siret: null,
-    name: null,
-    address: null,
-    contact: null,
-    mail: null,
-    phone: null,
-    ...props,
-  };
-}
-
 export function createNextSegmentInfoInputMock(props: Partial<NextSegmentInfoInput>): NextSegmentInfoInput {
   return {
     transporter: null,
     mode: "ROAD",
-    ...props,
-  };
-}
-
-export function createNextSegmentTransporterInputMock(props: Partial<NextSegmentTransporterInput>): NextSegmentTransporterInput {
-  return {
-    isExemptedOfReceipt: null,
-    receipt: null,
-    department: null,
-    validityLimit: null,
-    numberPlate: null,
-    company: null,
     ...props,
   };
 }

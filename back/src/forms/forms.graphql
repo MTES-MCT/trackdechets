@@ -983,29 +983,6 @@ enum TransportMode {
   SEA
 }
 
-type MultimodalTransporter {
-  "Établissement transporteur"
-  company: FormCompany
-
-  "Exemption de récipissé"
-  isExemptedOfReceipt: Boolean
-
-  "N° de récipissé"
-  receipt: String
-
-  "Département"
-  department: String
-
-  "Limite de validité du récipissé"
-  validityLimit: DateTime
-
-  "Numéro de plaque d'immatriculation"
-  numberPlate: String
-
-  "Information libre, destinée aux transporteurs"
-  customInfo: String
-}
-
 type TransportSegment {
   id: ID!
 
@@ -1013,7 +990,7 @@ type TransportSegment {
   previousTransporterCompanySiret: String
 
   "Transporteur du segment"
-  transporter: MultimodalTransporter
+  transporter: Transporter
 
   "Mode de transport"
   mode: TransportMode
