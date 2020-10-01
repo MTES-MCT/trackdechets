@@ -17,6 +17,7 @@ import {
 } from "./generated/prisma-client";
 import { compare } from "bcrypt";
 import { sameDayMidnight, daysBetween, sanitizeEmail } from "./utils";
+import { GraphQLContext } from "./types";
 
 const { JWT_SECRET } = process.env;
 
