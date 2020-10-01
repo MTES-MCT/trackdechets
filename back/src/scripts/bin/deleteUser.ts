@@ -3,9 +3,25 @@ import { prisma } from "../../generated/prisma-client";
 import deleteUser from "../prisma/deleteUser";
 
 (async () => {
-  const userID = process.argv[3];
+  const [userID] = process.argv.slice(2);
 
-  const user = userID ? await prisma.user({ id: userID }) : null;
+  if (!userID) {
+    console.log(
+      [
+        `Ce script permet de supprimer 1 compte utilisateur et ses objets liés.`,
+        `Il accepte un seul argument :`,
+        `- userID : id de l'utilisateur à supprimer`,
+        `Avant d'enclencher la suppression, des vérifications sont faites pour s'assurer de ne pas supprimer des informations importantes.`,
+        `Il est par exemple impossible de supprimer un utilisateur qui est seul administrateur d'une entreprise.`,
+        ``,
+        `Exemple :`,
+        `node ./src/scripts/bin/mergeUsersAndDelete.js 1234`
+      ].join("\n")
+    );
+    return;
+  }
+
+  const user = await prisma.user({ id: userID });
 
   if (!user) {
     console.log(
