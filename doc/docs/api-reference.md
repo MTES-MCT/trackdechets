@@ -4705,6 +4705,15 @@ Collecteur - transporteur (case 8)
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Établissement collecteur - transporteur
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
@@ -4750,11 +4759,11 @@ Numéro de plaque d'immatriculation
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
-Établissement collecteur - transporteur
+Information libre, destinée aux transporteurs
 
 </td>
 </tr>

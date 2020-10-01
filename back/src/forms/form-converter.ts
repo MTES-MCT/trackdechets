@@ -190,7 +190,8 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
     transporterReceipt: chain(input.transporter, t => t.receipt),
     transporterDepartment: chain(input.transporter, t => t.department),
     transporterValidityLimit: chain(input.transporter, t => t.validityLimit),
-    transporterNumberPlate: chain(input.transporter, t => t.numberPlate)
+    transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
+    transporterCustomInfo: chain(input.transporter, t => t.customInfo)
   };
 }
 

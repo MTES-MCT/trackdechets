@@ -1806,6 +1806,8 @@ export type Transporter = {
 
 /** Collecteur - transporteur (case 8) */
 export type TransporterInput = {
+  /** Établissement collecteur - transporteur */
+  company: Maybe<CompanyInput>;
   /** Exemption de récipissé */
   isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
   /** N° de récipissé */
@@ -1816,8 +1818,8 @@ export type TransporterInput = {
   validityLimit: Maybe<Scalars['DateTime']>;
   /** Numéro de plaque d'immatriculation */
   numberPlate: Maybe<Scalars['String']>;
-  /** Établissement collecteur - transporteur */
-  company: Maybe<CompanyInput>;
+  /** Information libre, destinée aux transporteurs */
+  customInfo: Maybe<Scalars['String']>;
 };
 
 /** Récépissé transporteur */
@@ -2796,12 +2798,13 @@ export function createTransporterMock(props: Partial<Transporter>): Transporter 
 
 export function createTransporterInputMock(props: Partial<TransporterInput>): TransporterInput {
   return {
+    company: null,
     isExemptedOfReceipt: null,
     receipt: null,
     department: null,
     validityLimit: null,
     numberPlate: null,
-    company: null,
+    customInfo: null,
     ...props,
   };
 }
