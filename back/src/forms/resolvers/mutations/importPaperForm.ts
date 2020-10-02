@@ -11,7 +11,6 @@ import {
   prisma,
   User
 } from "../../../generated/prisma-client";
-import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import {
   getEcoOrganismeOrNotFound,
@@ -25,17 +24,14 @@ import { checkCanImportForm } from "../../permissions";
 import { getReadableId } from "../../readable-id";
 import { processedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
+import { EventType } from "../../workflow/types";
 
 /**
  * Update an existing form with data imported from a paper form
  * Only SEALED form can be updated and marked as processed
  * which is reflected in the state machine
  */
-async function updateForm(
-  form: Form,
-  input: ImportPaperFormInput,
-  context: GraphQLContext
-) {
+async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
   // fail fast on form.status (before state machine validation) to ensure
   // we apply validation on a sealed form
   if (form.status !== "SEALED") {
@@ -85,14 +81,11 @@ async function updateForm(
       : {})
   };
 
-  return transitionForm(
-    form,
-    {
-      eventType: "IMPORT_PAPER_FORM",
-      eventParams: formUpdateInput
-    },
-    context
-  );
+  const updatedForm = await transitionForm(user, form, {
+    type: EventType.ImportPaperForm,
+    formUpdateInput
+  });
+  return expandFormFromDb(updatedForm);
 }
 
 /**
@@ -151,7 +144,7 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
     const { id, ...formInput } = input;
     const form = await getFormOrFormNotFound({ id });
     await checkCanImportForm(user, form);
-    return updateForm(form, formInput, context);
+    return updateForm(user, form, formInput);
   } else {
     // create new form
     return createForm(user, input);

@@ -294,18 +294,23 @@ describe("mutation / importPaperForm", () => {
       const statusLogs = await prisma.statusLogs();
       expect(statusLogs).toHaveLength(1);
       expect(statusLogs[0].status).toEqual("PROCESSED");
-      expect(Object.keys(statusLogs[0].updatedFields)).toEqual([
-        "sentAt",
-        "signedByTransporter",
-        "sentBy",
-        "receivedBy",
-        "receivedAt",
-        "quantityReceived",
-        "processedBy",
-        "processedAt",
-        "processingOperationDone",
-        "processingOperationDescription"
-      ]);
+      expect(statusLogs[0].updatedFields).toEqual({
+        isImportedFromPaper: true,
+        signedByTransporter: true,
+        sentAt: importedData.signingInfo.sentAt,
+        sentBy: importedData.signingInfo.sentBy,
+        wasteAcceptationStatus:
+          importedData.receivedInfo.wasteAcceptationStatus,
+        receivedBy: importedData.receivedInfo.receivedBy,
+        receivedAt: importedData.receivedInfo.receivedAt,
+        quantityReceived: importedData.receivedInfo.quantityReceived,
+        processingOperationDone:
+          importedData.processedInfo.processingOperationDone,
+        processingOperationDescription:
+          importedData.processedInfo.processingOperationDescription,
+        processedBy: importedData.processedInfo.processedBy,
+        processedAt: importedData.processedInfo.processedAt
+      });
     });
 
     it("should update as sealed form and overwrite existing data", async () => {

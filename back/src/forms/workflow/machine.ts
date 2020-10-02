@@ -24,7 +24,7 @@ const machine = Machine<any, Event>(
               target: FormState.Sent
             }
           ],
-          IMPORT_PAPER_FORM: [{ target: FormState.Processed }]
+          [EventType.ImportPaperForm]: [{ target: FormState.Processed }]
         }
       },
       [FormState.Sent]: {

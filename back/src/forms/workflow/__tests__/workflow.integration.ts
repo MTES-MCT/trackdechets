@@ -399,7 +399,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
   }, 30000);
 
   test(
-    "Acheminement direct du producteur à l'installation de traitement avec" +
+    "Acheminement direct du producteur à l'installation de traitement avec " +
       "reprise de traçabilité numérique après une impression papier initiale",
     async () => {
       // 1er cas: Acheminement direct du producteur à l'installation de traitement.
@@ -589,6 +589,48 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       await downloadPdf(form.id, producteurToken, "1-bsd-imported.pdf");
 
       expect(form.status).toEqual("PROCESSED");
+
+      const formsLifeCycleQuery = `
+      query {
+        formsLifeCycle(siret: "${producteur.siret}"){
+          statusLogs {
+            status
+            updatedFields
+          }
+        }
+      }
+    `;
+
+      const formsLifeCycleResponse = await request
+        .post("/")
+        .set("Authorization", `Bearer ${producteurToken}`)
+        .send({ query: formsLifeCycleQuery });
+
+      const statusLogs =
+        formsLifeCycleResponse.body.data.formsLifeCycle.statusLogs;
+
+      expect(statusLogs).toEqual([
+        {
+          status: "PROCESSED",
+          updatedFields: {
+            isImportedFromPaper: true,
+            signedByTransporter: true,
+            sentAt: "2020-04-03T14:48:00.000Z",
+            sentBy: "Isabelle Guichard",
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedBy: "Antoine Derieux",
+            receivedAt: "2020-04-05T11:18:00.000Z",
+            signedAt: "2020-04-05T12:00:00.000Z",
+            quantityReceived: 1,
+            processingOperationDone: "D 10",
+            processingOperationDescription: "Incinération",
+            processedBy: "Alfred Dujardin",
+            processedAt: "2020-04-15T10:22:00"
+          }
+        },
+        { status: "SEALED", updatedFields: {} },
+        { status: "DRAFT", updatedFields: {} }
+      ]);
     },
     30000
   );
