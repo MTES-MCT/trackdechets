@@ -26,6 +26,7 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
       node: {
         id: "xyz12345",
         readableId: "TD-xxx",
+        isImportedFromPaper: false,
         status: "NO_TRACEABILITY",
         createdAt: "2019-10-16T07:45:13.959Z",
         updatedAt: "2019-10-16T07:45:13.959Z",
@@ -36,6 +37,7 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
       previousValues: {
         id: "xyz12345",
         readableId: "TD-xxx",
+        isImportedFromPaper: false,
         status: "RECEIVED",
         createdAt: "2019-10-16T07:45:13.959Z",
         updatedAt: "2019-10-16T07:45:13.959Z"

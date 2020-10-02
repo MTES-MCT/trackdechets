@@ -74,6 +74,7 @@ test("expandFormFromDb", () => {
   const form: Form = {
     id: "ckcejngdp00p00895cxaze1e8",
     readableId: "TD-61feb7d24fd67a5688e761eb1cbcb497",
+    isImportedFromPaper: false,
     customId: null,
     isDeleted: false,
     createdAt: "2020-07-09T08:43:23.434Z",
@@ -163,6 +164,7 @@ test("expandFormFromDb", () => {
   const expected = {
     id: form.id,
     readableId: form.readableId,
+    isImportedFromPaper: false,
     customId: form.customId,
     emitter: {
       type: form.emitterType,

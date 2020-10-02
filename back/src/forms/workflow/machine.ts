@@ -23,7 +23,8 @@ const machine = Machine<any, Event>(
             {
               target: FormState.Sent
             }
-          ]
+          ],
+          [EventType.ImportPaperForm]: [{ target: FormState.Processed }]
         }
       },
       [FormState.Sent]: {

@@ -26,7 +26,8 @@ export enum EventType {
   MarkAsTempStored = "MARK_AS_TEMP_STORED",
   MarkAsResealed = "MARK_AS_RESEALED",
   MarkAsResent = "MARK_AS_RESENT",
-  MarkAsGrouped = "MARK_AS_GROUPED"
+  MarkAsGrouped = "MARK_AS_GROUPED",
+  ImportPaperForm = "IMPORT_PAPER_FORM"
 }
 
 // Xstate event

@@ -190,7 +190,9 @@ const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne p
 
 // 1 - Émetteur du bordereau
 export const emitterSchema: yup.ObjectSchema<Emitter> = yup.object().shape({
-  emitterType: yup.mixed<EmitterType>().required(),
+  emitterType: yup
+    .mixed<EmitterType>()
+    .required(`Émetteur: Le type d'émetteur est obligatoire`),
   emitterCompanyName: yup
     .string()
     .ensure()
@@ -523,7 +525,7 @@ const withoutNextDestination = yup.object().shape({
 });
 
 // 11 - Réalisation de l’opération :
-export const processedInfoSchema = yup.lazy((value: any) => {
+const processedInfoSchemaFn = (value: any) => {
   const base = yup.object().shape({
     processedBy: yup
       .string()
@@ -543,7 +545,9 @@ export const processedInfoSchema = yup.lazy((value: any) => {
   )
     ? base.concat(withNextDestination)
     : base.concat(withoutNextDestination);
-});
+};
+
+export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 
 // *********************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 2 (SUITE)
@@ -715,6 +719,14 @@ export const sealedFormSchema = emitterSchema
   .concat(recipientSchema)
   .concat(wasteDetailsSchema)
   .concat(transporterSchema);
+
+// validation schema for a BSD with a processed status
+export const processedFormSchema = yup.lazy((value: any) =>
+  sealedFormSchema
+    .concat(signingInfoSchema)
+    .concat(receivedInfoSchema)
+    .concat(processedInfoSchemaFn(value))
+);
 
 // validation schema for BSD suite before it can be (re)sealed
 export const resealedFormSchema = tempStoredInfoSchema

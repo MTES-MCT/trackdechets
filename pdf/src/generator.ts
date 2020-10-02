@@ -82,6 +82,11 @@ const buildPdf = async params => {
   );
   const watermarkImage = await mainForm.embedPng(watermarkBytes);
 
+  const paperSignatureBytes = fs.readFileSync(
+    path.join(__dirname, "./medias/paper-signature.png")
+  );
+  const paperSignatureStamp = await mainForm.embedPng(paperSignatureBytes);
+
   // Start by generating the main page of the PDF
   // ----------------------------
   const formData = processMainFormParams({
@@ -134,32 +139,64 @@ const buildPdf = async params => {
   }
 
   if (!!formData.signedByTransporter) {
-    drawImage({
-      locationName: "transporterSignature",
-      image: stampImage,
-      page: firstPage
-    });
+    if (!!formData.isImportedFromPaper) {
+      drawImage({
+        locationName: "transporterSignature",
+        image: paperSignatureStamp,
+        page: firstPage
+      });
+    } else {
+      drawImage({
+        locationName: "transporterSignature",
+        image: stampImage,
+        page: firstPage
+      });
+    }
   }
   if (!!formData.sentAt) {
-    drawImage({
-      locationName: "emitterSignature",
-      image: stampImage,
-      page: firstPage
-    });
+    if (!!formData.isImportedFromPaper) {
+      drawImage({
+        locationName: "emitterSignature",
+        image: paperSignatureStamp,
+        page: firstPage
+      });
+    } else {
+      drawImage({
+        locationName: "emitterSignature",
+        image: stampImage,
+        page: firstPage
+      });
+    }
   }
   if (!!formData.processingOperationDone) {
-    drawImage({
-      locationName: "processingSignature",
-      image: stampImage,
-      page: firstPage
-    });
+    if (!!formData.isImportedFromPaper) {
+      drawImage({
+        locationName: "processingSignature",
+        image: paperSignatureStamp,
+        page: firstPage
+      });
+    } else {
+      drawImage({
+        locationName: "processingSignature",
+        image: stampImage,
+        page: firstPage
+      });
+    }
   }
   if (!!formData.receivedBy) {
-    drawImage({
-      locationName: "receivedSignature",
-      image: stampImage,
-      page: firstPage
-    });
+    if (!!formData.isImportedFromPaper) {
+      drawImage({
+        locationName: "receivedSignature",
+        image: paperSignatureStamp,
+        page: firstPage
+      });
+    } else {
+      drawImage({
+        locationName: "receivedSignature",
+        image: stampImage,
+        page: firstPage
+      });
+    }
   }
 
   if (!!formData.transporterIsExemptedOfReceipt) {

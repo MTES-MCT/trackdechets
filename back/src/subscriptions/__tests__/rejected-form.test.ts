@@ -107,6 +107,7 @@ const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
   node: {
     id: "xyz12345",
     readableId: "TD-xxx",
+    isImportedFromPaper: false,
     status: "REFUSED",
     createdAt: "2019-10-16T07:45:13.959Z",
     updatedAt: "2019-10-16T07:45:13.959Z",
@@ -123,6 +124,7 @@ const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
   previousValues: {
     id: "xyz12345",
     readableId: "TD-xxx",
+    isImportedFromPaper: false,
     status: "SENT",
     createdAt: "2019-10-16T07:45:13.959Z",
     updatedAt: "2019-10-16T07:45:13.959Z"
