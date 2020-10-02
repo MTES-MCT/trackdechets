@@ -1,11 +1,7 @@
 import { prisma, UserRole } from "../../../../generated/prisma-client";
-
 import * as mailsHelper from "../../../../common/mails.helper";
-
 import { prepareRedis, prepareDB } from "../../../__tests__/helpers";
-
 import makeClient from "../../../../__tests__/testClient";
-
 import {
   formFactory,
   userFactory,
@@ -17,6 +13,15 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
+
+const MARK_AS_RECEIVED = `
+  mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!){
+    markAsReceived(id: $id, receivedInfo: $receivedInfo){
+      id
+      status
+    }
+  }
+`;
 
 describe("Test Form reception", () => {
   afterEach(async () => {
@@ -40,22 +45,19 @@ describe("Test Form reception", () => {
     });
 
     const { mutate } = makeClient(recipient);
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Bill",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: ACCEPTED,
-            quantityReceived: 11
-      }
-        ) { status }
-      }
-    `;
 
-    await mutate(mutation);
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 11
+        }
+      }
+    });
 
     const frm = await prisma.form({ id: form.id });
 
@@ -89,22 +91,18 @@ describe("Test Form reception", () => {
 
     const { mutate } = makeClient(recipient);
     // payload contains a negative quantity value, which must not be accepted
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Bill",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: ACCEPTED,
-            quantityReceived: -2
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: -2
+        }
       }
-        ) { status }
-      }
-    `;
-
-    await mutate(mutation);
+    });
 
     const frm = await prisma.form({ id: form.id });
     // form was not accepted, still sent
@@ -128,22 +126,18 @@ describe("Test Form reception", () => {
 
     const { mutate } = makeClient(recipient);
     // payload contains a null quantity value whereas wasteAcceptationStatus is ACCEPTED, which is invalid
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Bill",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: ACCEPTED,
-            quantityReceived: 0
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 0
+        }
       }
-        ) { status }
-      }
-    `;
-
-    await mutate(mutation);
+    });
 
     const frm = await prisma.form({ id: form.id });
     // form was not accepted, still sent
@@ -165,24 +159,20 @@ describe("Test Form reception", () => {
       recipientCompany
     });
     const { mutate } = makeClient(recipient);
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Holden",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: REFUSED,
-            wasteRefusalReason: "Lorem ipsum",
-            quantityReceived: 0
 
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Holden",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Lorem ipsum",
+          quantityReceived: 0
+        }
       }
-        ) { status }
-      }
-    `;
-
-    await mutate(mutation);
+    });
 
     const frm = await prisma.form({ id: form.id });
 
@@ -214,23 +204,19 @@ describe("Test Form reception", () => {
     });
     const { mutate } = makeClient(recipient);
     // trying to refuse waste with a non-zero quantityReceived
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Holden",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: REFUSED,
-            wasteRefusalReason: "Lorem ipsum",
-            quantityReceived: 21
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Holden",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Lorem ipsum",
+          quantityReceived: 21
+        }
       }
-        ) { status }
-      }
-    `;
-
-    await mutate(mutation);
+    });
 
     const frm = await prisma.form({ id: form.id });
 
@@ -259,23 +245,20 @@ describe("Test Form reception", () => {
       recipientCompany
     });
     const { mutate } = makeClient(recipient);
-    const mutation = `
-      mutation {
-        markAsReceived(
-          id: "${form.id}",
-          receivedInfo: {
-            receivedBy: "Carol",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: PARTIALLY_REFUSED,
-            wasteRefusalReason: "Dolor sit amet",
-            quantityReceived: 12.5
-          }
-        ) { status }
-      }
-    `;
 
-    await mutate(mutation);
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Carol",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          wasteRefusalReason: "Dolor sit amet",
+          quantityReceived: 12.5
+        }
+      }
+    });
 
     const frm = await prisma.form({ id: form.id });
     // form was not accepted
@@ -317,24 +300,20 @@ describe("Test Form reception", () => {
       }
     });
     const { mutate } = makeClient(recipient);
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${alreadyReceivedForm.id}",
-            receivedInfo: {
-            receivedBy: "Sandy",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: PARTIALLY_REFUSED,
-            wasteRefusalReason: "Dolor sit amet",
-            quantityReceived: 19
 
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: alreadyReceivedForm.id,
+        receivedInfo: {
+          receivedBy: "Sandy",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          wasteRefusalReason: "Dolor sit amet",
+          quantityReceived: 19
+        }
       }
-        ) { status }
-      }
-    `;
-
-    await mutate(mutation);
+    });
 
     const frm = await prisma.form({ id: alreadyReceivedForm.id });
     // form is not updated by the last mutation
@@ -361,23 +340,20 @@ describe("Test Form reception", () => {
       }
     });
     const { mutate } = makeClient(randomUser);
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Bill",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            signedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: ACCEPTED,
-            quantityReceived: 11
-      }
-        ) { status }
-      }
-    `;
 
     // request performed by randomuser, form state is not updated
-    await mutate(mutation);
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 11
+        }
+      }
+    });
 
     const frm = await prisma.form({ id: form.id });
 
@@ -416,21 +392,18 @@ describe("Test Form reception", () => {
     });
 
     const { mutate } = makeClient(recipient);
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Bill",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: ACCEPTED,
-            quantityReceived: 11
-      }
-        ) { status }
-      }
-    `;
 
-    await mutate(mutation);
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 11
+        }
+      }
+    });
 
     const frm = await prisma.form({ id: form.id });
 
@@ -484,21 +457,18 @@ describe("Test Form reception", () => {
     });
 
     const { mutate } = makeClient(recipient);
-    const mutation = `
-      mutation {
-        markAsReceived(
-            id: "${form.id}",
-            receivedInfo: {
-            receivedBy: "Bill",
-            receivedAt :"2019-01-17T10:22:00+0100",
-            wasteAcceptationStatus: ACCEPTED,
-            quantityReceived: 11
-      }
-        ) { status }
-      }
-    `;
 
-    await mutate(mutation);
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 11
+        }
+      }
+    });
 
     const frm = await prisma.form({ id: form.id });
 
@@ -512,5 +482,36 @@ describe("Test Form reception", () => {
       where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(0);
+  });
+
+  it("should fail if recipient is temp storage", async () => {
+    const { recipient, form } = await prepareDB();
+
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: { recipientIsTempStorage: true }
+    });
+
+    const { mutate } = makeClient(recipient);
+
+    const { errors } = await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 11
+        }
+      }
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Ce bordereau ne peut pas être marqué comme reçu car le destinataire est une installation " +
+        "d'entreposage provisoire ou de reconditionnement. Utiliser la mutation markAsTempStored " +
+        "pour marquer ce bordereau comme entreposé provisoirement"
+    );
   });
 });

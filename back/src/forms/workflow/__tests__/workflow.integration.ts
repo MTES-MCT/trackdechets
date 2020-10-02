@@ -366,29 +366,31 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       {
         status: "PROCESSED",
         updatedFields: {
-          processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00",
           processingOperationDone: "D 10",
-          processingOperationDescription: "Incinération"
+          processingOperationDescription: "Incinération",
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00"
         }
       },
       {
         status: "RECEIVED",
         updatedFields: {
+          wasteAcceptationStatus: "ACCEPTED",
           receivedBy: "Antoine Derieux",
-          receivedAt: "2020-04-05T11:18:00",
-          signedAt: "2020-04-05T12:00:00",
-          quantityReceived: 1
+          receivedAt: "2020-04-05T11:18:00.000Z",
+          signedAt: "2020-04-05T12:00:00.000Z",
+          quantityReceived: 1,
+          currentTransporterSiret: ""
         }
       },
       {
         status: "SENT",
         updatedFields: {
-          sentAt: "2020-04-03T14:48:00",
+          wasteDetails: { onuCode: "xxxx" },
+          signedByTransporter: true,
+          sentAt: "2020-04-03T14:48:00.000Z",
           sentBy: "Isabelle Guichard",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          currentTransporterSiret: "33333333333333"
         }
       },
       { status: "SEALED", updatedFields: {} },
@@ -839,50 +841,92 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       {
         status: "PROCESSED",
         updatedFields: {
-          processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00",
           processingOperationDone: "D 10",
-          processingOperationDescription: "Incinération"
+          processingOperationDescription: "Incinération",
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00"
         }
       },
       {
         status: "RECEIVED",
         updatedFields: {
+          wasteAcceptationStatus: "ACCEPTED",
           receivedBy: "Antoine Derieux",
-          receivedAt: "2020-04-05T11:18:00",
-          signedAt: "2020-04-05T11:18:00",
-          quantityReceived: 1
+          receivedAt: "2020-04-05T11:18:00.000Z",
+          signedAt: "2020-04-05T11:18:00.000Z",
+          quantityReceived: 1,
+          currentTransporterSiret: ""
         }
       },
       {
         status: "RESENT",
         updatedFields: {
-          sentAt: "2020-08-03T10:00:00",
-          sentBy: "Mr Provisoire",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          temporaryStorageDetail: {
+            signedAt: "2020-08-03T10:00:00.000Z",
+            signedBy: "Mr Provisoire",
+            wasteDetails: {
+              onuCode: "xxxx"
+            }
+          }
         }
       },
-      { status: "RESEALED", updatedFields: {} },
+      {
+        status: "RESEALED",
+        updatedFields: {
+          temporaryStorageDetail: {
+            wasteDetails: {
+              code: null,
+              name: null,
+              onuCode: null,
+              packagings: ["BENNE"],
+              otherPackaging: null,
+              numberOfPackages: 1,
+              quantity: 1,
+              quantityType: "ESTIMATED",
+              consistence: null
+            },
+            transporter: {
+              company: {
+                name: "Transport Qui Mousse",
+                siret: "55555555555555",
+                address: "1 rue du Mas, 07430 DAVEZIEUX",
+                contact: "Marc Pneu",
+                phone: "0400000000",
+                mail: "marc.pneu@transportquimousse.fr"
+              },
+              isExemptedOfReceipt: null,
+              receipt: "76498",
+              department: "07",
+              validityLimit: "2020-07-30T00:00:00.000Z",
+              numberPlate: "OG-678-PS",
+              customInfo: null
+            }
+          }
+        }
+      },
       {
         status: "TEMP_STORED",
         updatedFields: {
-          receivedBy: "Mr Provisoire",
-          receivedAt: "2020-05-03T09:00:00",
-          signedAt: "2020-05-03T09:00:00",
-          quantityReceived: 1,
-          quantityType: "REAL"
+          temporaryStorageDetail: {
+            temporaryStorer: {
+              quantityType: "REAL",
+              quantityReceived: 1,
+              wasteAcceptationStatus: "ACCEPTED",
+              wasteRefusalReason: null,
+              receivedAt: "2020-05-03T09:00:00.000Z",
+              receivedBy: "Mr Provisoire"
+            }
+          }
         }
       },
       {
         status: "SENT",
         updatedFields: {
-          sentAt: "2020-04-03T14:48:00",
+          wasteDetails: { onuCode: "xxxx" },
+          signedByTransporter: true,
+          sentAt: "2020-04-03T14:48:00.000Z",
           sentBy: "Isabelle Guichard",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          currentTransporterSiret: "44444444444444"
         }
       },
       { status: "SEALED", updatedFields: {} },
@@ -1468,29 +1512,31 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       {
         status: "PROCESSED",
         updatedFields: {
-          processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00",
           processingOperationDone: "D 10",
-          processingOperationDescription: "Incinération"
+          processingOperationDescription: "Incinération",
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00"
         }
       },
       {
         status: "RECEIVED",
         updatedFields: {
+          wasteAcceptationStatus: "ACCEPTED",
           receivedBy: "Antoine Derieux",
-          receivedAt: "2020-04-07T11:18:00",
-          signedAt: "2020-04-07T12:00:00",
-          quantityReceived: 1
+          receivedAt: "2020-04-07T11:18:00.000Z",
+          signedAt: "2020-04-07T12:00:00.000Z",
+          quantityReceived: 1,
+          currentTransporterSiret: ""
         }
       },
       {
         status: "SENT",
         updatedFields: {
-          sentAt: "2020-04-03T14:48:00",
+          wasteDetails: { onuCode: "xxxx" },
+          signedByTransporter: true,
+          sentAt: "2020-04-03T14:48:00.000Z",
           sentBy: "Isabelle Guichard",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          currentTransporterSiret: "33333333333333"
         }
       },
       { status: "SEALED", updatedFields: {} },

@@ -7,14 +7,48 @@ import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 
-jest.mock("axios", () => ({
-  default: {
-    get: jest.fn(() => Promise.resolve({ data: {} }))
+const MARK_AS_SENT = `
+  mutation MarkAsSent($id: ID!, $sentInfo: SentFormInput!){
+    markAsSent(id: $id, sentInfo: $sentInfo){
+      id
+      status
+    }
   }
-}));
+`;
 
 describe("{ mutation { markAsSent } }", () => {
   afterAll(() => resetDatabase());
+
+  it("should fail when SENT is not a possible next step", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const recipientCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SENT", // cannot transition from SENT to SENT
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
+      }
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+    );
+  });
 
   test("the emitter of the BSD can send it when it's sealed", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
@@ -34,15 +68,12 @@ describe("{ mutation { markAsSent } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const mutation = `
-      mutation   {
-        markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
-          id
-        }
+    await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     form = await prisma.form({ id: form.id });
 
@@ -115,15 +146,12 @@ describe("{ mutation { markAsSent } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const mutation = `
-      mutation   {
-        markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
-          id
-        }
+    await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     form = await prisma.form({ id: form.id });
 
@@ -157,15 +185,12 @@ describe("{ mutation { markAsSent } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const mutation = `
-      mutation   {
-        markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
-          id
-        }
+    await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
       }
-    `;
-
-    await mutate(mutation);
+    });
 
     form = await prisma.form({ id: form.id });
 
@@ -197,15 +222,12 @@ describe("{ mutation { markAsSent } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const mutation = `
-      mutation   {
-        markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
-          id
-        }
+    const { errors } = await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
       }
-    `;
-
-    const { errors } = await mutate(mutation);
+    });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
 
     const resultingForm = await prisma.form({ id: form.id });
@@ -235,15 +257,12 @@ describe("{ mutation { markAsSent } }", () => {
 
       const { mutate } = makeClient(user);
 
-      const mutation = `
-        mutation   {
-          markAsSent(id: "${form.id}", sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe"}) {
-            id
-          }
+      const { errors } = await mutate(MARK_AS_SENT, {
+        variables: {
+          id: form.id,
+          sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
         }
-      `;
-
-      const { errors } = await mutate(mutation);
+      });
 
       expect(errors[0].message).toEqual(
         expect.stringContaining(
@@ -286,15 +305,12 @@ describe("{ mutation { markAsSent } }", () => {
 
       const { mutate } = makeClient(user);
 
-      const mutation = `
-        mutation   {
-          markAsSent(id: "${form.id}", sentInfo: { sentAt: "${dateStr}", sentBy: "John Doe"}) {
-            id
-          }
+      const { errors } = await mutate(MARK_AS_SENT, {
+        variables: {
+          id: form.id,
+          sentInfo: { sentAt: `${dateStr}`, sentBy: "John Doe" }
         }
-      `;
-
-      const { errors } = await mutate(mutation);
+      });
       expect(errors[0].message).toEqual(
         "La date d'envoi n'est pas formatée correctement"
       );
@@ -313,4 +329,42 @@ describe("{ mutation { markAsSent } }", () => {
       expect(statusLogs.length).toEqual(0);
     }
   );
+
+  test("appendix2Forms should be marked as GROUPED", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const recipientCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "AWAITING_GROUP" }
+    });
+
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
+      }
+    });
+
+    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    expect(appendix2grouped.status).toEqual("GROUPED");
+  });
 });
