@@ -10,8 +10,8 @@ updates:
     schedule:
       interval: "daily"
     target-branch: "dev"
-  - package-ecosystem: "pdf"
-    directory: "/back"
+  - package-ecosystem: "npm"
+    directory: "/pdf"
     schedule:
       interval: "daily"
     target-branch: "dev"
