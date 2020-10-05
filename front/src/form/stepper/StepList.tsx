@@ -10,10 +10,12 @@ import React, {
 } from "react";
 import { useLocation, useHistory } from "react-router";
 import queryString from "query-string";
-import { InlineError } from "../../common/Error";
-import { updateApolloCache } from "../../common/helper";
-import { currentSiretService } from "../../dashboard/CompanySelector";
-import { GET_SLIPS } from "../../dashboard/slips/query";
+
+import { RouteComponentProps, withRouter } from "react-router";
+import { InlineError } from "src/common/components/Error";
+import { updateApolloCache } from "src/common/helper";
+import { currentSiretService } from "src/dashboard/CompanySelector";
+import { GET_SLIPS } from "src/dashboard/slips/query";
 import initialState from "../initial-state";
 import {
   Form,
@@ -22,7 +24,7 @@ import {
   Mutation,
   MutationSaveFormArgs,
   FormInput,
-} from "../../generated/graphql/types";
+} from "src/generated/graphql/types";
 import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
@@ -103,6 +105,7 @@ export default function StepList(props: IProps) {
         displaySubmit: currentStep === totalSteps,
         goToPreviousStep: () => setCurrentStep(currentStep - 1),
         goToNextStep: () => setCurrentStep(currentStep + 1),
+        formId: props.formId,
       },
       child
     );

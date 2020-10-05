@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { RadioButton } from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
-import { Form } from "../generated/graphql/types";
+import { Form } from "src/generated/graphql/types";
 import EcoOrganismes from "./eco-organismes/EcoOrganismes";
 import WorkSite from "./work-site/WorkSite";
 
@@ -25,11 +25,12 @@ export default function Emitter() {
 
   return (
     <>
-      <div className="form__group">
+      <div className="form__row">
         <label htmlFor="id_customId">Autre Numéro Libre (optionnel)</label>
         <Field
           id="id_customId"
           type="text"
+          className="td-input"
           placeholder="Utilisez votre propre numéro de BSD si nécessaire."
           name="customId"
         />
@@ -38,13 +39,13 @@ export default function Emitter() {
       <EcoOrganismes name="ecoOrganisme" />
 
       {lockEmitterType && (
-        <div className="form__group notification info">
+        <div className="form__row notification info">
           Lorsqu'un éco-organisme est indiqué comme responsable du déchet, le
           type d'émetteur est verrouillé à <strong>Autre détenteur</strong>.
         </div>
       )}
 
-      <div className="form__group">
+      <div className="form__row">
         <fieldset>
           <legend className="tw-font-semibold"> L'émetteur est</legend>
           <Field
@@ -79,8 +80,8 @@ export default function Emitter() {
         </fieldset>
       </div>
 
-      <h4>Entreprise émettrice</h4>
-      <CompanySelector name="emitter.company" />
+    
+      <CompanySelector name="emitter.company" heading="Entreprise émettrice"/>
 
       <WorkSite />
     </>

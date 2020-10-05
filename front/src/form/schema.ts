@@ -10,8 +10,9 @@ import {
   StringSchema,
 } from "yup";
 import countries from "world-countries";
-import { WasteAcceptationStatusInput as WasteAcceptationStatus } from "../generated/graphql/types";
-import { isDangerous } from "../generated/constants";
+
+import { isDangerous } from "src/generated/constants";
+import { WasteAcceptationStatusInput as WasteAcceptationStatus } from "src/generated/graphql/types";
 
 setLocale({
   mixed: {

@@ -8,7 +8,7 @@ export default connect(function AppendixInfo(props) {
     <div>
       <h4>Annexe 1</h4>
       <p>
-        Vous êtes entrain d'éditer un bordereau pour un collecteur de petites
+        Vous êtes en train de modifier un bordereau pour un collecteur de petites
         quantités de déchets relevant d’une même rubrique. Ce bordereau
         nécessite donc la présence d'une annexe 1.
       </p>
@@ -29,7 +29,7 @@ export default connect(function AppendixInfo(props) {
         ) : (
           <span>
             Le bordereau est créé au format de brouillon, il permet de préparer
-            la tournée et d'éditer l'annexe 1. Il ne peut être finalisé que
+            la tournée et de modifier l'annexe 1. Il ne peut être finalisé que
             lorsque la tournée est terminée, afin de faire le reporting des
             annexes 1. <br /> Lorsque la tournée est terminée, complétez ce
             bordereau brouillon par les éléments manquants (poids total,

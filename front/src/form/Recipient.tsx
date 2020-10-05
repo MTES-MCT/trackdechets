@@ -1,12 +1,14 @@
 import { Field, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import RedErrorMessage from "../common/RedErrorMessage";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
 import initialState from "./initial-state";
-import { Form } from "../generated/graphql/types";
+import { Form } from "src/generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
+import TdSwitch from "../common/components/Switch";
+
 import "./Recipient.scss";
 
 export default function Recipient() {
@@ -22,15 +24,21 @@ export default function Recipient() {
 
   return (
     <>
-      <div className="form__group">
-        <label>
-          <Field type="checkbox" name="recipient.isTempStorage" />
-          Le BSD va passer par une étape d'entreposage provisoire ou
-          reconditionnement
-        </label>
+      <div className="form__row">
+        <TdSwitch
+          checked={!!values.recipient?.isTempStorage}
+          onChange={() =>
+            setFieldValue(
+              "recipient.isTempStorage",
+              !values.recipient?.isTempStorage
+            )
+          }
+          label="Le BSD va passer par une étape d'entreposage provisoire ou
+          reconditionnement"
+        />
       </div>
 
-      <h4 className="required">
+      <h4 className="form__section-heading">
         Installation{" "}
         {values.recipient?.isTempStorage
           ? "d'entreposage ou de reconditionnement"
@@ -53,9 +61,9 @@ export default function Recipient() {
 
       <CompanySelector name="recipient.company" />
 
-      <h4>Informations complémentaires</h4>
+      <h4 className="form__section-heading">Informations complémentaires</h4>
 
-      <div className="form__group">
+      <div className="form__row">
         <Field
           component={ProcessingOperation}
           name="recipient.processingOperation"
@@ -64,26 +72,27 @@ export default function Recipient() {
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
 
-      <div className="form__group">
+      <div className="form__row">
         <label>
           Numéro de CAP (optionnel)
-          <Field type="text" name="recipient.cap" className="recipient-cap" />
+          <Field
+            type="text"
+            name="recipient.cap"
+            className="td-input recipient-cap"
+          />
         </label>
       </div>
 
-      <div className="form__group">
-        <label>
-          <input
-            type="checkbox"
-            defaultChecked={hasTrader}
-            onChange={() => setHasTrader(!hasTrader)}
-          />
-          Je suis passé par un négociant
-        </label>
+      <div className="form__row">
+        <TdSwitch
+          checked={hasTrader}
+          onChange={() => setHasTrader(!hasTrader)}
+          label="Je suis passé par un négociant"
+        />
       </div>
       {hasTrader && (
-        <div className="form__group">
-          <h4>Négociant</h4>
+        <div className="form__row">
+          <h4 className="form__section-heading">Négociant</h4>
           <CompanySelector
             name="trader.company"
             onCompanySelected={trader => {
@@ -108,7 +117,7 @@ export default function Recipient() {
             }}
           />
 
-          <div className="form__group">
+          <div className="form__row">
             <label>
               Numéro de récépissé
               <Field type="text" name="trader.receipt" />

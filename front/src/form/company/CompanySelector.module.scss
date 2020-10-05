@@ -1,0 +1,91 @@
+@import "src/scss/Breakpoints.scss";
+
+.CompanySelector {
+  .company-bookmarks {
+    list-style: none;
+    padding: 0;
+  }
+
+  h6 {
+    margin: 10px 0;
+  }
+
+  .company-bookmarks__item {
+    background-color: #ebeff3;
+    margin: 10px 0;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    .content {
+      flex: 1;
+
+      p,
+      h6 {
+        margin: 0;
+      }
+    }
+
+    .icon {
+      color: #8393a7;
+      font-size: 1.5em;
+    }
+
+    &:hover .icon,
+    &.is-selected .icon {
+      color: #03bd5b;
+    }
+
+    &.is-selected {
+      border: 1px solid #03bd5b;
+      background-color: #daf5e7;
+    }
+  }
+
+  .search-icon {
+    cursor: text;
+  }
+}
+.companySelector {
+  &SearchFields {
+    display: flex;
+    margin-right: 1rem;
+    flex-direction: column;
+    @include desktop {
+      flex-direction: row;
+    }
+  }
+
+  &SearchSiret {
+    width: 480px;
+    display: inline-block;
+  }
+
+  &SearchGeo {
+    width: 300px;
+    display: inline-block;
+  }
+  &SearchPhone {
+    width: 150px;
+    display: block;
+  }
+  &SearchEmail {
+    width: 300px;
+    display: block;
+  }
+  &SearchField {
+    display: flex;
+    align-items: center;
+    margin-right: 50px;
+  }
+  &SearchGroup {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.searchIcon {
+  margin-left: -30px;
+  position: relative;
+}

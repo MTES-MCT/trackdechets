@@ -1,6 +1,6 @@
 import React, { InputHTMLAttributes } from "react";
 import { FieldProps } from "formik";
-
+import styles from "./CustomInputs.module.scss";
 export function InlineRadioButton({
   field: { name, value, onChange, onBlur },
   id,
@@ -9,21 +9,23 @@ export function InlineRadioButton({
 }: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
   const cssId = `id_${name}_${id}`;
   return (
-    <p>
-      <label className="label-inline mr-2" htmlFor={cssId}>
-        <input
-          id={cssId}
-          name={name}
-          type="radio"
-          value={id}
-          checked={id === value}
-          onChange={onChange}
-          onBlur={onBlur}
-          {...props}
-        />
+    <>
+      <label className={styles.labelInline} htmlFor={cssId}>
+      <input
+        id={cssId}
+        name={name}
+        type="radio"
+        value={id}
+        checked={id === value}
+        onChange={onChange}
+        onBlur={onBlur}
+        className="td-radio"
+        {...props}
+      />
+    
         {label}
       </label>
-    </p>
+    </>
   );
 }
 

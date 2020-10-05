@@ -1,8 +1,8 @@
 import { useFormikContext, Field } from "formik";
 import React, { useEffect } from "react";
-import CompanySelector from "../company/CompanySelector";
-import { Form } from "../../generated/graphql/types";
-import { PROCESSING_OPERATIONS } from "../../generated/constants";
+import CompanySelector from "src/form/company/CompanySelector";
+import { Form } from "src/generated/graphql/types";
+import { PROCESSING_OPERATIONS } from "src/generated/constants";
 import initialState from "../initial-state";
 
 export default function TemporaryStorage(props) {
@@ -41,18 +41,19 @@ export default function TemporaryStorage(props) {
         }
       />
 
-      <div className="form__group">
+      <div className="form__row">
         <label>
           Numéro de CAP (le cas échéant)
           <Field type="text" name={`${props.name}.destination.cap`} />
         </label>
       </div>
 
-      <div className="form__group">
-        <label>Opération d'élimination / valoristation prévue (code D/R)</label>
+      <div className="form__row">
+        <label>Opération d'élimination / valorisation prévue (code D/R)</label>
 
         <Field
           component="select"
+          className="td-select"
           name={`${props.name}.destination.processingOperation`}
         >
           <option value="">Choisissez...</option>

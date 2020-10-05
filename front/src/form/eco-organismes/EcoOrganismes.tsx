@@ -2,10 +2,13 @@ import { useQuery } from "@apollo/react-hooks";
 import { useField, useFormikContext } from "formik";
 import gql from "graphql-tag";
 import React, { useEffect, useReducer } from "react";
-import { FaSearch } from "react-icons/fa";
+
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import { Query, EcoOrganisme } from "../../generated/graphql/types";
+import SearchInput from "src/common/components/SearchInput";
+import { Query, EcoOrganisme} from "src/generated/graphql/types";
+import TdSwitch from "src/common/components/Switch";
+import { tdContactEmail } from "src/common/config";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -74,16 +77,12 @@ export default function EcoOrganismes(props) {
 
   return (
     <>
-      <div className="form__group">
-        <label>
-          <input
-            type="checkbox"
-            checked={state.isActive}
-            onChange={() => dispatch({ type: "toggle_activation" })}
-          />
-          Un éco-organisme est le responsable / producteur des déchets de ce
-          bordereau
-        </label>
+      <div className="form__row">
+        <TdSwitch
+          checked={state.isActive}
+          onChange={() => dispatch({ type: "toggle_activation" })}
+          label="Un éco-organisme est le responsable / producteur des déchets de ce bordereau"
+        />
       </div>
 
       {state.isActive && (
@@ -92,34 +91,24 @@ export default function EcoOrganismes(props) {
           {error && <p>Erreur lors du chargement des éco-organismes...</p>}
           {data && (
             <>
-              <div className="form__group notification info">
+              <div className="form__row notification notification--info">
                 Veuillez sélectionner ci-dessous un des éco-organismes
                 enregistrés dans Trackdéchets. Si votre éco-organisme n'apparait
                 pas et que vous pensez que c'est une erreur,{" "}
-                <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
-                  contactez le support.
-                </a>
+                <a href={`mailto:${tdContactEmail}`} className="link">contactez le support.</a>
               </div>
+              <SearchInput
+                id="eco-search"
+                placeholder="Filtrer les éco-organismes par nom..."
+                className={styles.ecoorganismeSearchInput}
+                onChange={e =>
+                  dispatch({
+                    type: "search",
+                    payload: e.target.value.toLowerCase(),
+                  })
+                }
+              />
 
-              <div className="form__group search__group">
-                <input
-                  type="text"
-                  placeholder="Filtrer les éco-organismes par nom..."
-                  onChange={e =>
-                    dispatch({
-                      type: "search",
-                      payload: e.target.value.toLowerCase(),
-                    })
-                  }
-                />
-                <button
-                  className="overlay-button search-icon"
-                  aria-label="Recherche"
-                  disabled={true}
-                >
-                  <FaSearch />
-                </button>
-              </div>
               <div className={styles.list}>
                 <CompanyResults<EcoOrganisme>
                   onSelect={eo => dispatch({ type: "select", payload: eo.id })}

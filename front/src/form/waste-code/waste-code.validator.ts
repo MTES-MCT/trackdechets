@@ -1,4 +1,4 @@
-import { WASTES } from "../../generated/constants";
+import { WASTES } from "src/generated/constants";
 
 export function wasteCodeValidator(wasteCode: string) {
   const wasteCodeWithoutSpaces = wasteCode.replace(/\s+/g, "");

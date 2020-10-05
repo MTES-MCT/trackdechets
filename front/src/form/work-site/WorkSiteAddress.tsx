@@ -1,7 +1,8 @@
 import React, { useEffect, useReducer } from "react";
-import { FaSearch } from "react-icons/fa";
-import styles from "./WorkSiteAddress.module.scss";
 
+
+import SearchInput from "src/common/components/SearchInput";
+import styles from "./WorkSiteAddress.module.scss";
 function init({ adress, city, postalCode }) {
   const selectedAdress = [adress, postalCode, city].filter(Boolean).join(" ");
   return {
@@ -65,29 +66,22 @@ export default function WorkSiteAddress({
   }
 
   return (
-    <div className="form__group">
+    <div className="form__row">
       <label>Adresse de l'entreprise</label>
-      <div className="search__group">
-        <input
-          type="text"
-          placeholder="Recherchez une adresse puis sélectionnez un des choix qui apparait..."
-          value={state.searchInput}
-          onChange={e =>
-            dispatch({ type: "search_input", payload: e.target.value })
-          }
-        />
-        <button
-          className="overlay-button search-icon"
-          aria-label="Recherche"
-          disabled={true}
-        >
-          <FaSearch />
-        </button>
-      </div>
+
+      <SearchInput
+        id="eco-search"
+        placeholder="Recherchez une adresse puis sélectionnez un des choix qui apparait..."
+        className={styles.worksiteSearchInput}
+        onChange={e =>
+          dispatch({ type: "search_input", payload: e.target.value })
+        }
+        value={state.searchInput}
+      />
 
       {state.searchResults.map(feature => (
         <div
-          className={styles.searchResult}
+          className={styles.worksiteSearchResult}
           key={feature.properties.id}
           onClick={_ => selectAddress(feature)}
         >
