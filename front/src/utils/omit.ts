@@ -1,3 +1,11 @@
+export function omitDeepArrayWalk(arr: any[], key: string): any[] {
+  return arr.map(val => {
+    if (Array.isArray(val)) return omitDeepArrayWalk(val, key);
+    else if (typeof val === "object") return omitDeep(val, key);
+    return val;
+  });
+}
+
 export function omitDeep(obj: any, key: string) {
   const keys = Object.keys(obj);
   const newObj: any = {};
@@ -11,12 +19,4 @@ export function omitDeep(obj: any, key: string) {
     }
   });
   return newObj;
-}
-
-export function omitDeepArrayWalk(arr: any[], key: string): any[] {
-  return arr.map(val => {
-    if (Array.isArray(val)) return omitDeepArrayWalk(val, key);
-    else if (typeof val === "object") return omitDeep(val, key);
-    return val;
-  });
 }
