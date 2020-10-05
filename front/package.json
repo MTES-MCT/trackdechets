@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/react-components": "^3.1.5",
+    "@apollo/react-components": "^4.0.0",
     "@apollo/react-hooks": "^3.1.5",
     "@sentry/browser": "^5.12.5",
     "@types/mapbox-gl": "^0.54.5",
