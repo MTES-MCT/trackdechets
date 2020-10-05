@@ -70,7 +70,7 @@ function TransportContent({ formType }) {
     DISPLAY_TYPE_STORAGE_KEY
   );
 
-  const windowSize = useWindowSize();
+   const windowSize = useWindowSize();
 
   useEffect(() => {
     // set display as cards on small screens
@@ -78,7 +78,7 @@ function TransportContent({ formType }) {
     setDisplayAsCards(
       windowSize.width < MEDIA_QUERIES.handHeld ? true : displayAsCards
     );
-  }, [windowSize]);
+  }, [windowSize, displayAsCards, setDisplayAsCards]);
 
   const DisplayComponent = displayAsCards ? TransportCards : TransportTable;
   const refetchQuery = {

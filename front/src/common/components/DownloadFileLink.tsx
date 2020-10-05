@@ -1,14 +1,12 @@
-import React,  { useEffect }  from "react";
+import React, { useEffect } from "react";
 import { useLazyQuery } from "@apollo/react-hooks";
 import { DocumentNode } from "graphql";
- 
-
 
 type Props = {
   query: DocumentNode;
   params: any;
   children?: any;
-  onSuccess?: () => void
+  onSuccess?: () => void;
 };
 
 export default function DownloadFileLink({
@@ -31,8 +29,9 @@ export default function DownloadFileLink({
     if (data[key].downloadLink) {
       window.open(data[key].downloadLink, "_blank");
     }
-    !!onSuccess && onSuccess()
-  }, [data]);
+
+    onSuccess();
+  }, [data, onSuccess]);
 
   return (
     <button
