@@ -2,10 +2,10 @@ import React from "react";
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
 import { Formik, FormikProps, Form, Field } from "formik";
-import RedErrorMessage from "../../../common/RedErrorMessage";
-import { NotificationError } from "../../../common/Error";
-import DateInput from "../../../form/custom-inputs/DateInput";
-import { CompanyPrivate } from "../../../generated/graphql/types";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
+import { NotificationError } from "src/common/components/Error";
+import DateInput from "src/form/custom-inputs/DateInput";
+import { CompanyPrivate } from "src/generated/graphql/types";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "traderReceipt">;

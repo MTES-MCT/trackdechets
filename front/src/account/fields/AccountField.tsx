@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import styles from "./AccountField.module.scss";
-import Tooltip from "../../common/Tooltip";
+import Tooltip from "src/common/components/Tooltip";
 
 type Props = {
   // the name of the field
@@ -55,7 +55,7 @@ export default function AccountField({
         {!editing ? value : form}
       </div>
       {modifier && (
-        <div className={styles.modifier} onClick={toggleEdition}>
+        <div className="btn btn--primary" onClick={toggleEdition}>
           {!editing ? (!!value ? modifier : "Ajouter") : "Annuler"}
         </div>
       )}

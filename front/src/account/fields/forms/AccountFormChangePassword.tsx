@@ -2,14 +2,14 @@ import React from "react";
 import gql from "graphql-tag";
 import { Formik, Form, Field } from "formik";
 import { useMutation } from "@apollo/react-hooks";
-import RedErrorMessage from "../../../common/RedErrorMessage";
-import PasswordMeter from "../../../common/PasswordMeter";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
+import PasswordMeter from "src/common/components/PasswordMeter";
 import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
 import {
   MutationChangePasswordArgs,
   Mutation,
-} from "../../../generated/graphql/types";
+} from "src/generated/graphql/types";
 
 type Props = {
   toggleEdition: () => void;
@@ -76,7 +76,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
     >
       {props => (
         <Form>
-          <div className="form__group">
+          <div className="form__row">
             <label htmlFor="oldPassword">Ancien mot de passe:</label>
             <Field
               id="oldPassword"
@@ -90,7 +90,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
               </RedErrorMessage>
             )}
           </div>
-          <div className="form__group">
+          <div className="form__row">
             <label htmlFor="newPassword">Nouveau mot de passe:</label>
             <Field
               id="newPassword"
@@ -100,7 +100,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
             ></Field>
             <PasswordMeter password={props.values.newPassword} />
           </div>
-          <div className="form__group">
+          <div className="form__row">
             <label htmlFor="newPasswordConfirmation">
               Confirmation du nouveau mot de passe:
             </label>
@@ -119,7 +119,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
           {loading && <div>Envoi en cours...</div>}
 
           <button
-            className="button"
+            className="btn btn--primary"
             type="submit"
             disabled={props.isSubmitting}
           >

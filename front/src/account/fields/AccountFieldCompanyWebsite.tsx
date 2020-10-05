@@ -8,7 +8,7 @@ import {
   CompanyPrivate,
   UserRole,
   MutationUpdateCompanyArgs,
-} from "../../generated/graphql/types";
+} from "src/generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;

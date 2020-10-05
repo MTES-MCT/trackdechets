@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormCompanyTypes from "./forms/AccountFormCompanyTypes";
 import { COMPANY_TYPES } from "../../login/CompanyType";
-import { CompanyPrivate } from "../../generated/graphql/types";
+import { CompanyPrivate } from "src/generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;

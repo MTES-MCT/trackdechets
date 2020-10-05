@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
-import { User, MutationEditProfileArgs } from "../../generated/graphql/types";
+import { User, MutationEditProfileArgs } from "src/generated/graphql/types";
 
 type Me = Pick<User, "phone">;
 

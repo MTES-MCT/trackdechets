@@ -1,7 +1,7 @@
 import React from "react";
 import AccountField from "../AccountField";
 import "@testing-library/jest-dom/extend-expect";
-import { render, fireEvent, getByLabelText } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import styles from "../AccountField.module.scss";
 
 describe("<AccountField />", () => {

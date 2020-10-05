@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import gql from "graphql-tag";
-import RedErrorMessage from "../../../common/RedErrorMessage";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
 import styles from "./AccountCompanyInviteNewUser.module.scss";
 import { useMutation } from "@apollo/react-hooks";
 import AccountCompanyMember from "../../AccountCompanyMember";
@@ -11,7 +11,7 @@ import {
   UserRole,
   Mutation,
   MutationInviteUserToCompanyArgs,
-} from "../../../generated/graphql/types";
+} from "src/generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;
@@ -82,13 +82,14 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
             <Field
               type="email"
               name="email"
+              className="td-input"
               placeholder="Email de la personne à inviter"
             />
-            <Field component="select" name="role">
+            <Field component="select" name="role" className="td-select">
               <option value={UserRole.Member}>Collaborateur</option>
               <option value={UserRole.Admin}>Administrateur</option>
             </Field>
-            <button type="submit" className="button" disabled={isSubmitting}>
+            <button type="submit" className="btn btn--primary" disabled={isSubmitting}>
               Inviter
             </button>
             <RedErrorMessage name="email" />
