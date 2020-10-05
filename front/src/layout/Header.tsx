@@ -107,7 +107,7 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
     },
     {
       caption: "Mon compte",
-      href: "/account/info",
+      href: "/account",
       onClick: () => trackEvent("navbar", "mon-compte"),
 
       navlink: true,
@@ -130,6 +130,7 @@ const MenuLink = ({ entry }) => {
         <NavLink
           className={styles.headerNavLink}
           to={entry.href}
+          exact={false}
           onClick={entry.onClick}
           activeClassName={styles.headerNavLinkActive}
         >
@@ -174,7 +175,7 @@ export default withRouter(function Header({
     strict: false,
   });
 
-  const matchDashboard= matchPath(location.pathname, {
+  const matchDashboard = matchPath(location.pathname, {
     path: "/dashboard/",
     exact: false,
     strict: false,
@@ -186,7 +187,7 @@ export default withRouter(function Header({
   }, [windowSize]);
   const currentSiret = currentSiretService.getSiret();
 
-  const entries = getMenuEntries(
+  const menuEntries = getMenuEntries(
     isAuthenticated,
     REACT_APP_DEVELOPERS_ENDPOINT,
     currentSiret
@@ -235,18 +236,16 @@ export default withRouter(function Header({
             </button>
           </div>
 
-          {!!isMobileDevice && !! matchDashboard &&(
+          {!!isMobileDevice && !!matchDashboard && (
             <MobileSubNav
               currentSiret={currentSiret}
               onClick={() => toggleMenu(true)}
             />
           )}
-          {!!matchAccount && !!isMobileDevice && (
-            <AccountMenuContent   />
-          )}
+          {!!matchAccount && !!isMobileDevice && <AccountMenuContent />}
 
           <ul className={styles.headerNavItems}>
-            {entries.map((e, idx) => (
+            {menuEntries.map((e, idx) => (
               <li className={styles.headerNavItem} key={idx}>
                 <MenuLink entry={e} />
               </li>
