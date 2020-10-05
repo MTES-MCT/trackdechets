@@ -1,7 +1,6 @@
 import React from "react";
 import SideMenu from "../common/components/SideMenu";
 import { NavLink } from "react-router-dom";
-import { match } from "react-router";
 import styles from "./AccountMenu.module.scss";
 import { accountRoutes } from "src/common/routes";
 
