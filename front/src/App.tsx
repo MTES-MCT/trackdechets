@@ -1,9 +1,8 @@
 import React from "react";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { BrowserRouter as Router } from "react-router-dom";
-import "./App.css";
 import client from "./graphql-client";
-import LayoutContainer from "./LayoutContainer";
+import LayoutContainer from "./layout/LayoutContainer";
 import { Settings } from "luxon";
 import setYupLocale from "./common/setYupLocale";
 import BrowserDetect from "./BrowserDetect";
