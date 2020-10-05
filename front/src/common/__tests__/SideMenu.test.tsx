@@ -1,5 +1,5 @@
 import React from "react";
-import SideMenu from "../SideMenu";
+import SideMenu from "../components/SideMenu";
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 
