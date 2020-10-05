@@ -4,15 +4,16 @@ import { filter } from "graphql-anywhere";
 import React from "react";
 import { Redirect, Route, useHistory } from "react-router";
 import { useParams, useRouteMatch } from "react-router-dom";
-import { InlineError } from "../common/Error";
-import Loader from "../common/Loader";
+import { InlineError } from "../common/components/Error";
+import Loader from "../common/components/Loaders";
 import { currentSiretService } from "./CompanySelector";
 import "./Dashboard.scss";
-import DashboardMenu2 from "./DashboardMenu2";
+import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
 import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
-import { Query } from "../generated/graphql/types";
+
+import { Query } from "src/generated/graphql/types";
 import Stats from "./stats/Stats";
 
 export const GET_ME = gql`
@@ -38,8 +39,7 @@ export default function Dashboard() {
   const match = useRouteMatch();
   const { siret } = useParams();
   const history = useHistory();
-  
- 
+
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: () => {
       if (siret) {
@@ -71,7 +71,7 @@ export default function Dashboard() {
     return (
       <SiretContext.Provider value={{ siret }}>
         <div id="dashboard" className="dashboard">
-          <DashboardMenu2
+          <DashboardMenu
             me={data.me}
             match={match}
             handleCompanyChange={siret => history.push(`/dashboard/${siret}`)}
@@ -82,7 +82,7 @@ export default function Dashboard() {
               <Redirect to={`${match.url}/slips`} />
             </Route>
 
-            <Route path={`${match.path}/slips`}>
+            <Route path={`${match.url}/slips`}>
               <SlipsContainer />
             </Route>
 

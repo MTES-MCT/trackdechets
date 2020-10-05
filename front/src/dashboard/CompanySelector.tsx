@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanyPrivate } from "../generated/graphql/types";
+import { CompanyPrivate } from "src/generated/graphql/types";
 
 export const currentSiretService = {
   getSiret: () => window.localStorage.getItem(SIRET_STORAGE_KEY) || "",
@@ -24,7 +24,7 @@ export default function CompanySelector({
   };
 
   return (
-    <select value={siret} onChange={e => handleChange(e.target.value)}>
+    <select className="td-select" value={siret} onChange={e => handleChange(e.target.value)}>
       {companies.map(c => (
         <option key={c.siret} value={c.siret}>
           {c.givenName || c.name} ({c.siret})
