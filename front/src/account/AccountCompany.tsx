@@ -8,7 +8,7 @@ import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyPage from "./AccountCompanyPage";
 import styles from "./AccountCompany.module.scss";
 import { FaUserShield } from "react-icons/fa";
-import { CompanyPrivate, UserRole } from "../generated/graphql/types";
+import { CompanyPrivate, UserRole } from "src/generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;

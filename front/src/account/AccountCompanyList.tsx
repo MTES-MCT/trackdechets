@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
 import { useRouteMatch, Link } from "react-router-dom";
-import { CompanyPrivate } from "../generated/graphql/types";
+import { CompanyPrivate } from "src/generated/graphql/types";
 
 type Props = {
   companies: CompanyPrivate[] | null | undefined;

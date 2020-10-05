@@ -9,14 +9,14 @@ import {
   RouteComponentProps,
   useHistory,
 } from "react-router";
-import Loader from "../common/Loader";
-import { InlineError } from "../common/Error";
+import Loader from "src/common/components/Loaders";
+import { InlineError } from "src/common/components/Error";
 import AccountInfo from "./AccountInfo";
 import AccountIntegrationApi from "./AccountIntegrationApi";
 import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
 import AccountCompanyAdd from "./AccountCompanyAdd";
-import { Query } from "../generated/graphql/types";
+import { Query } from "src/generated/graphql/types";
 
 export const GET_ME = gql`
   {
@@ -38,11 +38,11 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
   if (loading) return <Loader />;
 
   if (error) return <InlineError apolloError={error} />;
-
+  
   if (data) {
     return (
       <div id="account" className="account dashboard">
-        <AccountMenu match={match} />
+        <AccountMenu  />
         <div className="dashboard-content">
           <Route
             path={`${match.path}/info`}

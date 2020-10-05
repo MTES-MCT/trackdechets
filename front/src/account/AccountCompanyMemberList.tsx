@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
 import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
-import { CompanyPrivate } from "../generated/graphql/types";
+import { CompanyPrivate } from "src/generated/graphql/types";
 
 type Props = { company: CompanyPrivate };
 

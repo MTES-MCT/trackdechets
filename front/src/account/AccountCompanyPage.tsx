@@ -4,7 +4,7 @@ import { filter } from "graphql-anywhere";
 import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContactEmail";
 import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
-import { CompanyPrivate } from "../generated/graphql/types";
+import { CompanyPrivate } from "src/generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;

@@ -4,8 +4,8 @@ import { Field, Form, Formik, FormikProps, FormikValues } from "formik";
 import gql from "graphql-tag";
 import { useHistory } from "react-router-dom";
 import { GET_ME } from "../dashboard/Dashboard";
-import { NotificationError } from "../common/Error";
-import RedErrorMessage from "../common/RedErrorMessage";
+import { NotificationError } from "../common/components/Error";
+import RedErrorMessage from "../common/components/RedErrorMessage";
 import CompanyType from "../login/CompanyType";
 import AccountCompanyAddTransporterReceipt from "./accountCompanyAdd/AccountCompanyAddTransporterReceipt";
 import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAddTraderReceipt";
@@ -17,7 +17,7 @@ import {
   MutationCreateCompanyArgs,
   Query,
   CompanyType as _CompanyType,
-} from "../generated/graphql/types";
+} from "src/generated/graphql/types";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
