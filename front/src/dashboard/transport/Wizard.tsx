@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, FormikHelpers } from "formik";
-
+import { NextButton, PreviousButton } from "src/common/components/Buttons";
 import "./Wizard.scss";
 
 type Props = {
@@ -79,7 +79,7 @@ export class Wizard extends React.Component<Props, State> {
     const activePage: any = React.Children.toArray(children)[page];
     const isLastPage = page === React.Children.count(children) - 1;
     return (
-      <React.Fragment>
+      <>
         <ul className="step-header">
           {React.Children.map(children, (child, index) => (
             <li
@@ -104,32 +104,41 @@ export class Wizard extends React.Component<Props, State> {
                 {React.cloneElement(activePage, { values, isSubmitting })}
                 <div className="form__actions mb-2">
                   {page > 0 && (
-                    <button
-                      type="button"
-                      className="button-outline primary no-margin"
-                      onClick={this.previous}
-                    >
-                      Précédent
-                    </button>
+                      <PreviousButton onClick={this.previous}                    />
+                    // <button
+                    //   type="button"
+                    //   className="btn btn--outline-primary"
+                    //   onClick={this.previous}
+                    // >
+                    //   Précédent
+                    // </button>
                   )}
                   <button
                     type="button"
-                    className="button-outline primary "
+                    className="btn btn--outline-primary"
                     onClick={() => this.props.onCancel()}
                   >
                     Annuler
                   </button>
                   {!isLastPage && (
-                    <button className="button no-margin" type="submit">
-                      {!!activePage.props.nextButtonCaption
-                        ? activePage.props.nextButtonCaption
-                        : "Suivant"}
-                    </button>
+                    <NextButton
+                      caption={
+                        !!activePage.props.nextButtonCaption
+                          ? activePage.props.nextButtonCaption
+                          : "Suivant"
+                      }
+                      onClick={() => null}
+                    />
+                    // <button className="btn btn--primary" type="submit">
+                    //   {!!activePage.props.nextButtonCaption
+                    //     ? activePage.props.nextButtonCaption
+                    //     : "Suivant"}
+                    // </button>
                   )}
                   {isLastPage && (
                     <button
                       type="submit"
-                      className="button no-margin"
+                      className="btn btn--primary"
                       disabled={isSubmitting}
                     >
                       {!!activePage.props.submitButtonCaption
@@ -142,7 +151,7 @@ export class Wizard extends React.Component<Props, State> {
             )}
           </Formik>
         </div>
-      </React.Fragment>
+      </>
     );
   }
 }

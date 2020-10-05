@@ -3,19 +3,22 @@ import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import React, { useState } from "react";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import {
   Form,
+  FormRole,
+  FormStatus,
   Mutation,
   MutationMarkSegmentAsReadyToTakeOverArgs,
   TransportSegment,
-} from "../../generated/graphql/types";
+} from "src/generated/graphql/types";
 import { Form as FormikForm, Formik } from "formik";
-import { segmentFragment } from "../../common/fragments";
-import "./TransportSignature.scss";
-import { updateApolloCache } from "../../common/helper";
+import { segmentFragment } from "src/common/fragments";
+import { updateApolloCache } from "src/common/helper";
 import cogoToast from "cogo-toast";
-import { NotificationError } from "../../common/Error";
+import { NotificationError } from "src/common/components/Error";
+// import "./TransportSignature.module.scss";
+import TdModal from "src/common/components/Modal";
 
 export const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
@@ -77,8 +80,13 @@ export default function MarkSegmentAsReadyToTakeOver({
         query: GET_TRANSPORT_SLIPS,
         variables: {
           userSiret,
-          roles: ["TRANSPORTER"],
-          status: ["SEALED", "SENT", "RESEALED", "RESENT"],
+          roles: [FormRole.Transporter],
+          status: [
+            FormStatus.Sealed,
+            FormStatus.Sent,
+            FormStatus.Resealed,
+            FormStatus.Resent,
+          ],
         },
         getNewData: data => ({
           forms: data.forms,
@@ -95,59 +103,57 @@ export default function MarkSegmentAsReadyToTakeOver({
   return (
     <>
       <button
-        className="button button-small"
+        className="btn btn--primary btn--medium-text"
         onClick={() => setIsOpen(true)}
-        title="Marquer comme prêt à transférer"
+        title="Finaliser pour transférer"
       >
-        Marquer comme prêt à transférer le segment N°{segment.segmentNumber}
+        <span>Finaliser pour transférer</span>
       </button>
 
       {isOpen ? (
-        <div
-          className="modal__backdrop"
-          id="modal"
-          style={{
-            display: isOpen ? "flex" : "none",
-          }}
+        <TdModal
+          isOpen={isOpen}
+          ariaLabel="Finaliser un segment"
+          onClose={() => setIsOpen(false)}
+       
         >
-          <div className="modal">
-            <Formik
-              initialValues={{}}
-              onSubmit={(values, { setFieldError, setSubmitting }) => {
-                const variables = {
-                  id: segment.id,
-                };
-                markSegmentAsReadyToTakeOver({ variables }).catch(() => {});
-              }}
-            >
-              {({ values }) => (
-                <FormikForm>
-                  <h2>Finaliser le segment</h2>
-                  <p>
-                    Cette action aura pour effet de finaliser le segment
-                    suivant, c'est à dire que vous ne pourrez plus l'éditer.
-                    Cette action est nécessaire pour transférer le déchet au
-                    transporteur suivant.
-                  </p>
-                  {error && <NotificationError apolloError={error} />}
+          <Formik
+            initialValues={{}}
+            onSubmit={() => {
+              const variables = {
+                id: segment.id,
+              };
+              markSegmentAsReadyToTakeOver({ variables }).catch(() => {});
+            }}
+          >
+            {() => (
+              <FormikForm>
+                <h3 className="h3 tw-mb-4">Préparer un transfert multimodal</h3>
 
-                  <div className="buttons">
-                    <button
-                      type="button"
-                      className="button warning"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Annuler
-                    </button>
-                    <button className="button" type="submit">
-                      Valider
-                    </button>
-                  </div>
-                </FormikForm>
-              )}
-            </Formik>
-          </div>
-        </div>
+                <p>
+                  Cette action aura pour effet de finaliser le segment suivant,
+                  c'est à dire que vous ne pourrez plus le modifier. Cette
+                  action est nécessaire pour transférer le déchet au
+                  transporteur suivant.
+                </p>
+                {error && <NotificationError apolloError={error} />}
+
+                <div className="form__actions">
+                  <button
+                    type="button"
+                    className="btn btn--outline-primary"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Annuler
+                  </button>
+                  <button className="btn btn--primary" type="submit">
+                    Valider
+                  </button>
+                </div>
+              </FormikForm>
+            )}
+          </Formik>
+        </TdModal>
       ) : null}
     </>
   );

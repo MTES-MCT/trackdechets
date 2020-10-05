@@ -19,9 +19,10 @@ import {
   createTemporaryStorageDetailMock,
   createRecipientMock,
   createDestinationMock,
-} from "../../../generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
-import Transport, { GET_TRANSPORT_SLIPS } from "../Transport";
+} from "src/generated/graphql/types";
+import { SiretContext } from "src/dashboard/Dashboard";
+import Transport  from "src/dashboard/transport/Transport";
+import  { GET_TRANSPORT_SLIPS } from "src/dashboard/transport/queries";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({

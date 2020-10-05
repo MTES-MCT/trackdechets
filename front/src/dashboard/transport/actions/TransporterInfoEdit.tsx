@@ -2,11 +2,12 @@ import { useMutation } from "@apollo/react-hooks";
 import { useFormik } from "formik";
 import gql from "graphql-tag";
 import React, { useState } from "react";
-import { FaEdit } from "react-icons/fa";
-import { Form as FormModel } from "../../generated/graphql/types";
-import { NotificationError } from "../../common/Error";
-import { capitalize } from "../../common/helper";
-import "./TransportSignature.scss";
+ 
+import { Form as FormModel } from "src/generated/graphql/types";
+import { NotificationError } from "src/common/components/Error";
+import { capitalize } from "src/common/helper";
+import { PaperWriteIcon } from "src/common/components/Icons";
+ 
 
 export const UPDATE_PLATE = gql`
   mutation updateTransporterFields(
@@ -72,11 +73,13 @@ export default function TransporterInfoEdit({
   return (
     <>
       <button
-        className="link icon"
+        className="link__ icon__ btn--no-style"
         onClick={() => setIsOpen(true)}
         title={`Modifier ${verboseFieldName}`}
       >
-        <FaEdit />
+     
+        <PaperWriteIcon color="#0053b3"/> 
+      
       </button>
       {isOpen && (
         <div

@@ -1,4 +1,4 @@
-import "./TransportSignature.scss";
+import "./TransportSignature.module.scss";
 
 import { Field, Form as FormikForm, Formik } from "formik";
 import gql from "graphql-tag";
@@ -9,13 +9,16 @@ import {
   Mutation,
   MutationTakeOverSegmentArgs,
   TransportSegment,
-} from "../../generated/graphql/types";
+  FormRole,
+  FormStatus,
+} from "src/generated/graphql/types";
 import { useMutation } from "@apollo/react-hooks";
-import { NotificationError } from "../../common/Error";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
-import { updateApolloCache } from "../../common/helper";
-import DateInput from "../../form/custom-inputs/DateInput";
+import { NotificationError } from "src/common/components/Error";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
+import { updateApolloCache } from "src/common/helper";
+import DateInput from "src/form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
+import { BusTransfer } from "src/common/components/Icons";
 
 export const TAKE_OVER_SEGMENT = gql`
   mutation takeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {
@@ -71,8 +74,13 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
         query: GET_TRANSPORT_SLIPS,
         variables: {
           userSiret,
-          roles: ["TRANSPORTER"],
-          status: ["SEALED", "SENT", "RESEALED", "RESENT"],
+          roles: [FormRole.Transporter],
+          status: [
+            FormStatus.Sealed,
+            FormStatus.Sent,
+            FormStatus.Resealed,
+            FormStatus.Resent,
+          ],
         },
         getNewData: data => ({
           forms: data.forms,
@@ -94,11 +102,14 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
   return (
     <>
       <button
-        className="button button-small"
+        className="btn btn--primary btn--medium-text"
         onClick={() => setIsOpen(true)}
         title="Prendre en charge le déchet"
       >
-        Prendre en charge le déchet
+        <BusTransfer />
+        <span>
+          Prendre&nbsp;en&nbsp;charge<br />le&nbsp;déchet
+        </span>
       </button>
       {isOpen ? (
         <div
