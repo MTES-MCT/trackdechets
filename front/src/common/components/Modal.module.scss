@@ -1,0 +1,42 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+
+.tdModalOverlay {
+  z-index: 999;
+  position: fixed;
+}
+.tdModal {
+ 
+  border-radius: $common-radius;
+  box-shadow: 0 1px 2px rgba(201, 211, 223, 0.2);
+  background: #fff;
+  background: var(--white);
+  width: 95vw;
+  min-width: 50vw;
+  z-index: 1000;
+  padding: 0;
+ 
+  @include desktop {
+    width: 50vw;
+  }
+}
+.tdModalPadding {
+  padding: 2rem;
+}
+.tdModalWide {
+  @include desktop {
+    width: 90vw;
+    max-width: 95vw;
+  }
+}
+.tdModalTitle {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+.tdModalCloseMenu {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 1rem 0 0;
+}
