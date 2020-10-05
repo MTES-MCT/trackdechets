@@ -477,7 +477,9 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
         contact: form.traderCompanyContact,
         phone: form.traderCompanyPhone,
         mail: form.traderCompanyMail
-      })
+      }),
+      receipt: form.traderReceipt,
+      validityLimit: form.traderValidityLimit
     }),
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
