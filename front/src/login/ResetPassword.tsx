@@ -1,11 +1,11 @@
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import React, { useState } from "react";
-import { NotificationError } from "../common/Error";
+import { NotificationError } from "../common/components/Error";
 import {
   Mutation,
   MutationResetPasswordArgs,
-} from "../generated/graphql/types";
+} from "src/generated/graphql/types";
 
 const RESET_PASSWORD = gql`
   mutation ResetPassword($email: String!) {
@@ -20,7 +20,7 @@ export default function ResetPassword() {
     MutationResetPasswordArgs
   >(RESET_PASSWORD);
   return (
-    <section className="section section-white">
+    <section className="section section--white">
       <div className="container">
         <form
           onSubmit={e => {
@@ -32,12 +32,12 @@ export default function ResetPassword() {
             setEmail("");
           }}
         >
-          <h1>Réinitialisation de votre mot de passe</h1>
+          <h1 className="h1">Réinitialisation de votre mot de passe</h1>
           <p>
             Afin de réinitialiser votre mot de passe, merci de saisir votre
             email. Un nouveau mot de passe vous sera transmis.
           </p>
-          <div className="form__group">
+          <div className="form__row">
             <label>
               <input
                 type="text"

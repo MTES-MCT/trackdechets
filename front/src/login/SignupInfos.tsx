@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-
+import { tdContactEmail } from "src/common/config";
 interface LocationState {
   signupEmail: string;
 }
@@ -10,7 +10,7 @@ export default function SignupInfo() {
   const signupEmail = location.state?.signupEmail;
   return (
     <div className="container">
-      <section className="section section-white">
+      <section className="section section--white">
         <h2>On y est presque !</h2>
         <p className="lead-text">
           Un mail de confirmation vous a été envoyé à l'adresse {signupEmail}
@@ -36,10 +36,7 @@ export default function SignupInfo() {
 
         <p>
           Des questions, des interrogations ? N'hésitez pas à{" "}
-          <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
-            nous contacter
-          </a>
-          .
+          <a href={`mailto:${tdContactEmail}`} className="link">nous contacter</a>.
         </p>
         <Link to="/login" className="button">
           Se connecter

@@ -1,7 +1,7 @@
 import React from "react";
 import "rc-tree/assets/index.css";
 import { Link } from "react-router-dom";
-import WasteTree from "../search/WasteTree";
+import WasteTree from "src/search/WasteTree";
 
 export default function WasteSelector() {
   return (

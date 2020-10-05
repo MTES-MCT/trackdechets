@@ -57,7 +57,7 @@ export class Wizard extends React.Component<Props, State> {
       ? { className: activePage.props.formClassName }
       : {};
     return (
-      <React.Fragment>
+      <>
         <ul className="step-header">
           {React.Children.map(children, (child, index) => (
             <li
@@ -110,7 +110,7 @@ export class Wizard extends React.Component<Props, State> {
             )}
           </Formik>
         </div>
-      </React.Fragment>
+      </>
     );
   }
 }

@@ -3,13 +3,13 @@ import { Field } from "formik";
 import React, { useState } from "react";
 import { FaEnvelope, FaEye, FaIdCard, FaLock, FaPhone } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
-import { NotificationError } from "../common/Error";
-import PasswordMeter from "../common/PasswordMeter";
-import RedErrorMessage from "../common/RedErrorMessage";
+import { NotificationError } from "src/common/components/Error";
+import PasswordMeter from "src/common/components/PasswordMeter";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
 import { SIGNUP } from "./mutations";
 import "./Signup.scss";
 import { Wizard } from "./Wizard";
-import { Mutation, MutationSignupArgs } from "../generated/graphql/types";
+import { Mutation, MutationSignupArgs } from "src/generated/graphql/types";
 
 export default function Signup() {
   const [passwordType, setPasswordType] = useState("password");
@@ -21,7 +21,7 @@ export default function Signup() {
   const history = useHistory();
 
   return (
-    <section className="section section-white">
+    <section className="section section--white">
       <div className="container">
         <Wizard
           initialValues={{
@@ -47,7 +47,7 @@ export default function Signup() {
           }}
         >
           <Wizard.Page title="Bienvenue">
-            <h1>Bienvenue sur Trackdéchets</h1>
+            <h1 className="h1">Bienvenue sur Trackdéchets</h1>
             <p>
               Trackdéchets est un produit du Ministère de la Transition
               Ecologique et Solidaire.
@@ -94,9 +94,9 @@ export default function Signup() {
               return errors;
             }}
           >
-            <h1>Informations utilisateur</h1>
+            <h1 className="h1">Informations utilisateur</h1>
 
-            <div className="form__group">
+            <div className="form__row">
               <label>Nom et prénom*</label>
               <div className="search__group">
                 <Field type="text" name="name" />
@@ -112,7 +112,7 @@ export default function Signup() {
               <RedErrorMessage name="name" />
             </div>
 
-            <div className="form__group">
+            <div className="form__row">
               <label>Email*</label>
               <div className="search__group">
                 <Field type="email" name="email" />
@@ -128,7 +128,7 @@ export default function Signup() {
               <RedErrorMessage name="email" />
             </div>
 
-            <div className="form__group">
+            <div className="form__row">
               <label>Téléphone</label>
               <div className="search__group">
                 <Field type="text" name="phone" />
@@ -142,7 +142,7 @@ export default function Signup() {
               </div>
             </div>
 
-            <div className="form__group">
+            <div className="form__row">
               <label>Mot de passe*</label>
               <div className="search__group">
                 <Field name="password">
@@ -177,7 +177,7 @@ export default function Signup() {
               <RedErrorMessage name="password" />
             </div>
 
-            <div className="form__group">
+            <div className="form__row">
               <label>
                 <Field name="cgu" type="checkbox" />
                 Je certifie avoir lu les{" "}
