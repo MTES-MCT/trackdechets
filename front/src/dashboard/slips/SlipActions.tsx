@@ -9,7 +9,7 @@ import {
   FaPencilAlt,
 } from "react-icons/fa";
 import { IconContext } from "react-icons";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "./SlipActions.scss";
 import Delete from "./slips-actions/Delete";
 import DownloadPdf from "./slips-actions/DownloadPdf";
@@ -35,11 +35,17 @@ interface SlipActionsProps {
   form: Form;
 }
 export function SlipActions({ form }: SlipActionsProps) {
+  const { siret } = useParams<{ siret: string }>();
+
   return (
     <div className="SlipActions">
       {form.status === "DRAFT" ? (
         <>
-          <Link to={`/form/${form.id}`} className="icon" title="Editer">
+          <Link
+            to={`/form/${form.id}?redirectTo=${siret}`}
+            className="icon"
+            title="Editer"
+          >
             <FaEdit />
           </Link>
           <Delete formId={form.id} />

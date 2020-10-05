@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'une limitation de 1000 requêtes possible par une même adresse IP dans une fenêtre de 1 minute, [PR 407](https://github.com/MTES-MCT/trackdechets/pull/407)
 - Amélioration de la machine à état permettant de calculer les états possibles du BSD [PR 411](https://github.com/MTES-MCT/trackdechets/pull/411)
 - Ajout de la possibilité de pouvoir importer un BSD papier signé, [PR 404](https://github.com/MTES-MCT/trackdechets/pull/404)
+- Préservation de la sélection d'entreprise après la création d'un BSD, [PR 410](https://github.com/MTES-MCT/trackdechets/pull/410)
 
 # [2020.09.1] 28/09/2020
 

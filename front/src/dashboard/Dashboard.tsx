@@ -81,7 +81,7 @@ export default function Dashboard() {
               <Redirect to={`${match.url}/slips`} />
             </Route>
 
-            <Route path={`${match.url}/slips`}>
+            <Route path={`${match.path}/slips`}>
               <SlipsContainer />
             </Route>
 
