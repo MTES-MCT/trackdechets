@@ -1,10 +1,18 @@
+@import "../generated/css/tailwind.generated.css";
+
 @import "./Constants.scss";
 @import "./Breakpoints.scss";
 @import "./Utils.scss";
+@import "./Typography.scss";
+@import "./Layout.scss";
+@import "./Sections.scss";
 @import "./Buttons.scss";
+@import "./Tables.scss";
+@import "./Inputs.scss";
+@import "./Errors.scss";
 @import "./Forms.scss";
+@import "./Modals.scss";
 @import "./Notifications.scss";
-@import "../generated/css/tailwind.generated.css";
 
 @font-face {
   font-family: "marianne";

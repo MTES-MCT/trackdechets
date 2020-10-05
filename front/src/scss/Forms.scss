@@ -7,35 +7,37 @@ button.no-margin:active {
   opacity: 0.6;
   cursor: not-allowed;
 }
-.form__actions {
-  margin-top: 1em;
-  display: flex;
-  justify-content: flex-end;
-  button,
-  button:active {
-    margin-left: 1em;
-    margin-right: 0;
+.form {
+  &__row {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
   }
-}
+  &__row--inline {
+    flex-direction: row;
+    input {
 
-// remove ff red shadows around required checkboxes
-input[type="checkbox"]:invalid {
-  box-shadow: none;
-}
-.field__ {
-  &block {
-    display: block;
+      flex: 0 0 auto;
+    }
   }
-  &weight {
-    width: 6em;
+  &__radio-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
-  &onu-code {
-    width: 6em;
+  &__actions {
+    margin-top: 1em;
+    display: flex;
+    justify-content: flex-end;
+    button,
+    button:active {
+      margin-left: 1em;
+      margin-right: 0;
+    }
   }
-  &security-code {
-    width: 6em;
-  }
-  &full-name {
-    width: 20em;
+  &__section-heading {
+    font-weight: bold;
+    font-size: 1.25rem; //h4
+    margin: 2rem 0 0.75rem 0;
   }
 }

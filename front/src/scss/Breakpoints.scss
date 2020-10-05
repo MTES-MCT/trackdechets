@@ -6,7 +6,7 @@
   }
 }
 @mixin phone {
-  @media only screen and (max-width: $breakpoint-sm) {
+  @media only screen and (min-width: $breakpoint-sm) {
     @content;
   }
 }
@@ -15,13 +15,18 @@
     @content;
   }
 }
-@mixin desktop {
+@mixin desktopx {
   @media only screen and (min-width: $breakpoint-lg) {
     @content;
   }
 }
 @mixin lg-desktop {
   @media only screen and (min-width: $breakpoint-xl) {
+    @content;
+  }
+}
+@mixin desktop {
+  @media only screen and (min-width: $breakpoint-handheld) {
     @content;
   }
 }
