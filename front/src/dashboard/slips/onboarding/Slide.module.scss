@@ -1,19 +1,22 @@
 .slide {
-  .content {
+  &Content {
     display: flex;
   }
 
-  h1 {
+  &Title {
     text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    line-height: 1.125rem;
   }
 
-  .text {
+  &Text {
     text-align: justify;
     align-self: center;
     padding: 0 10px;
   }
 
-  .image {
+  &Image {
     max-width: 50%;
     flex-shrink: 0;
     margin-right: 10px;
