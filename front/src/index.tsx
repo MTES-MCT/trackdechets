@@ -4,7 +4,7 @@ import "react-app-polyfill/stable";
 
 import React from "react";
 import ReactDOM from "react-dom";
-import "template.data.gouv.fr/dist/main.min.css";
+
 import "./scss/index.scss";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
