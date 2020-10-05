@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/react-hooks";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import {
   WaterDamIcon,
@@ -50,10 +50,12 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
   const disableOutsideClick = () => toggleOutsideClick(false);
 
   // callback when a child modal is closed
-  const onClose = () => {
+  const _onClose = () => {
     toggleOutsideClick(true);
     toggleDropdown(false);
   };
+  // Avoid warning and rerendering in granchild useEffect()
+  const onClose = useCallback(() => _onClose(), []);
   return (
     <OutsideClickHandler
       useCapture={false}
