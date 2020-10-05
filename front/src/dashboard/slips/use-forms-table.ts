@@ -1,4 +1,4 @@
-import { Form } from "../../generated/graphql/types";
+import { Form } from "src/generated/graphql/types";
 import { useState, useEffect } from "react";
 
 function getKey(object: any, key: string) {
@@ -7,28 +7,44 @@ function getKey(object: any, key: string) {
 }
 
 function compareBy(key: string) {
-  return function (a: any, b: any) {
+  return function(a: any, b: any) {
     if (getKey(a, key) < getKey(b, key)) return -1;
     if (getKey(a, key) > getKey(b, key)) return 1;
     return 0;
   };
 }
 
+const ASC = "ASC";
+const DSC = "DSC";
+const nextOrder = { ASC: DSC, DSC: ASC };
+
 export function useFormsTable(
   inputForms: Form[]
-): [Form[], (k: string) => void, (k: string, v: string) => void] {
+): [
+  Form[],
+  { key: string; order: string },
+  (k: string) => void,
+  (k: string, v: string) => void
+] {
   const [forms, setForms] = useState(inputForms);
-  const [sortKey, setSortKey] = useState("");
+  const [sortParams, setSortParams] = useState({ key: "", order: DSC }); // handle sort key and order in an object
+
   const [filters, setFilters] = useState<{ key: string; value: string }[]>([]);
 
   useEffect(() => setForms(inputForms), [inputForms]);
 
   function sortBy(key: string) {
     const sortedForms = [...forms];
-    if (sortKey === key) sortedForms.reverse();
-    else sortedForms.sort(compareBy(key));
 
-    setSortKey(key);
+    const order = sortParams.key === key ? nextOrder[sortParams.order] : ASC;
+
+    sortedForms.sort(compareBy(key));
+    if (order === DSC) {
+      sortedForms.reverse();
+    }
+
+    setSortParams({ key: key, order: order });
+
     setForms(sortedForms);
   }
 
@@ -48,5 +64,5 @@ export function useFormsTable(
     setForms(newForms);
   }
 
-  return [forms, sortBy, filter];
+  return [forms, sortParams, sortBy, filter];
 }

@@ -1,88 +1,95 @@
 import React from "react";
 import { DateTime } from "luxon";
-import { SlipActions, DynamicActions } from "./SlipActions";
+import { SlipActions, DynamicActions } from "./slips-actions/SlipActions";
 import { useFormsTable } from "./use-forms-table";
+import SortControl from "./SortableTableHeader";
 import { statusLabels } from "../constants";
-import { FaSort } from "react-icons/fa";
+
 import "./Slips.scss";
-import { Form } from "../../generated/graphql/types";
+import { Form } from "src/generated/graphql/types";
 
 type Props = {
   forms: Form[];
   siret: string;
   hiddenFields?: string[];
   dynamicActions?: boolean;
+  refetch?: () => void
 };
 export default function Slips({
   forms,
   siret,
   hiddenFields = [],
   dynamicActions = false,
+  refetch
 }: Props) {
-  const [sortedForms, sortBy, filter] = useFormsTable(forms);
+  const [sortedForms, sortParams, sortBy, filter] = useFormsTable(forms);
 
   return (
-    <table className="table">
+    <table className="td-table">
       <thead>
-        <tr>
+        <tr className="td-table__head-tr">
           {hiddenFields.indexOf("readableId") === -1 && <th>Numéro</th>}
-          <th className="sortable" onClick={() => sortBy("createdAt")}>
-            Date de création{" "}
-            <small>
-              <FaSort />
-            </small>
-          </th>
-          <th
-            className="sortable"
-            onClick={() => sortBy("emitter.company.name")}
-          >
-            Emetteur{" "}
-            <small>
-              <FaSort />
-            </small>
-          </th>
-          <th
-            className="sortable"
-            onClick={() => sortBy("stateSummary.recipient.name")}
-          >
-            Destinataire{" "}
-            <small>
-              <FaSort />
-            </small>
-          </th>
-          <th className="sortable" onClick={() => sortBy("wasteDetails.code")}>
-            Déchet{" "}
-            <small>
-              <FaSort />
-            </small>
-          </th>
+
+          {hiddenFields.indexOf("sentAt") === -1 && (
+            <SortControl
+              sortFunc={sortBy}
+              fieldName="sentAt"
+              sortParams={sortParams}
+              caption="Date d'enlèvement"
+            />
+          )}
+
+          <SortControl
+            sortFunc={sortBy}
+            fieldName="emitter.company.name"
+            sortParams={sortParams}
+            caption="Emetteur"
+          />
+
+          <SortControl
+            sortFunc={sortBy}
+            fieldName="stateSummary.recipient.name"
+            sortParams={sortParams}
+            caption="Destinataire"
+          />
+
+          <SortControl
+            sortFunc={sortBy}
+            fieldName="wasteDetails.code"
+            sortParams={sortParams}
+            caption="Déchet"
+          />
+
           <th>Quantité</th>
           {hiddenFields.indexOf("status") === -1 && (
-            <th className="sortable" onClick={() => sortBy("status")}>
-              Statut{" "}
-              <small>
-                <FaSort />
-              </small>
-            </th>
+            <SortControl
+              sortFunc={sortBy}
+              fieldName="status"
+              sortParams={sortParams}
+              caption="Statut"
+            />
           )}
           {dynamicActions && <th>Mes actions</th>}
           <th></th>
         </tr>
-        <tr>
+        <tr className=" td-table__head-tr td-table__tr--bordered">
           {hiddenFields.indexOf("readableId") === -1 && (
             <th>
               <input
                 type="text"
                 onChange={e => filter("readableId", e.target.value)}
+                className="td-input"
                 placeholder="Filtrer..."
               />
             </th>
           )}
-          <th />
+
+          {hiddenFields.indexOf("sentAt") === -1 && <th></th>}
           <th>
             <input
               type="text"
               onChange={e => filter("emitter.company.name", e.target.value)}
+              className="td-input"
               placeholder="Filtrer..."
             />
           </th>
@@ -92,6 +99,7 @@ export default function Slips({
               onChange={e =>
                 filter("stateSummary.recipient.name", e.target.value)
               }
+              className="td-input"
               placeholder="Filtrer..."
             />
           </th>
@@ -99,6 +107,7 @@ export default function Slips({
             <input
               type="text"
               onChange={e => filter("wasteDetails.code", e.target.value)}
+              className="td-input"
               placeholder="Filtrer..."
             />
           </th>
@@ -110,21 +119,26 @@ export default function Slips({
       </thead>
       <tbody>
         {sortedForms.map((s: any) => (
-          <tr key={s.id}>
+          <tr key={s.id} className="td-table__tr--bordered">
             {hiddenFields.indexOf("readableId") === -1 && (
               <td>
                 <div className="id">{s.readableId}</div>
               </td>
             )}
-            <td>{DateTime.fromISO(s.createdAt).toLocaleString()}</td>
+            {hiddenFields.indexOf("sentAt") === -1 && (
+              <td>
+                {!!s.sentAt && DateTime.fromISO(s.sentAt).toLocaleString()}
+              </td>
+            )}
+
             <td>{s.emitter.company?.name}</td>
             <td>{s.stateSummary.recipient?.name}</td>
             <td>
               {s.wasteDetails && (
-                <React.Fragment>
+                <>
                   <div>{s.wasteDetails.code}</div>
                   <div>{s.wasteDetails.name}</div>
-                </React.Fragment>
+                </>
               )}
             </td>
             <td>{s.stateSummary.quantity ?? "?"} t</td>
@@ -133,11 +147,11 @@ export default function Slips({
             )}
             {dynamicActions && (
               <td>
-                <DynamicActions siret={siret} form={s} />
+                <DynamicActions siret={siret} form={s} refetch={refetch}/>
               </td>
             )}
             <td>
-              <SlipActions form={s} />
+              <SlipActions form={s} siret={siret} />
             </td>
           </tr>
         ))}
