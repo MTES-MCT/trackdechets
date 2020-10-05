@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import gql from "graphql-tag";
 import { Formik, Form, Field } from "formik";
-import DateInput from "../../form/custom-inputs/DateInput";
+import DateInput from "src/form/custom-inputs/DateInput";
 import styles from "./ExportsForms.module.scss";
 import {
   CompanyPrivate,
   FormsRegisterExportType,
   CompanyType,
-} from "../../generated/graphql/types";
-import WasteTreeModal from "../../search/WasteTreeModal";
-import { wasteCodeValidator } from "../../form/waste-code/waste-code.validator";
-import { WASTES } from "../../generated/constants";
+} from "src/generated/graphql/types";
+import WasteTreeModal from "src/search/WasteTreeModal";
+import { wasteCodeValidator } from "src/form/waste-code/waste-code.validator";
+import { WASTES } from "src/generated/constants";
 import { useLazyQuery } from "@apollo/react-hooks";
-import { NotificationError } from "../../common/Error";
-import RedErrorMessage from "../../common/RedErrorMessage";
+import { NotificationError } from "src/common/components/Error";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
 import { FaHourglassHalf } from "react-icons/fa";
 
 interface IProps {
@@ -201,15 +201,16 @@ export default function ExportsForm({ companies }: IProps) {
         }
 
         return (
-          <Form className="tw-m-0">
+          <Form className={styles.exportForm}>
             <div className="tw-grid tw-justify-center tw-grid-cols-3 tw-gap-6">
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
                 Type de registre
               </label>
               <Field
-                className="tw-col-span-2 tw-max-w-md"
+                className="tw-col-span-2 tw-max-w-md td-select"
                 name="exportType"
                 as="select"
+              
               >
                 <option
                   value={FormsRegisterExportType.Outgoing}
@@ -249,32 +250,32 @@ export default function ExportsForm({ companies }: IProps) {
                 Date de début
               </label>
               <Field
-                className={`tw-col-span-2 ${styles["max-w-xxs"]}`}
+                className={`tw-col-span-2 td-input ${styles["max-w-xxs"]}`}
                 name="startDate"
                 component={DateInput}
-              ></Field>
+              />
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
                 Date de fin
               </label>
 
-              <div className="tw-col-span-2 tw-max-w-md">
+              <div className="tw-col-span-2   tw-max-w-md">
                 <Field
-                  className={`tw-col-span-2 ${styles["max-w-xxs"]}`}
+                  className={`tw-col-span-2 td-input  ${styles["max-w-xxs"]}`}
                   name="endDate"
                   component={DateInput}
-                ></Field>
+                />
 
                 <RedErrorMessage name="endDate"></RedErrorMessage>
               </div>
 
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
+              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold ">
                 Établissement
               </label>
 
               <Field name="companies">
                 {() => (
                   <select
-                    className="tw-col-span-2 max-w-md"
+                    className="tw-col-span-2 tw-max-w-md td-select"
                     onChange={evt => {
                       const value = evt.target.value;
                       if (value === "all") {
@@ -305,11 +306,11 @@ export default function ExportsForm({ companies }: IProps) {
                 <div className="tw-container tw-flex tw-flex-row">
                   <Field
                     name="wasteCode"
-                    className={`${styles["max-w-xxs"]} tw-mr-4`}
-                  ></Field>
+                    className={`${styles["max-w-xxs"]} tw-mr-4 td-input`}
+                  />
                   <button
                     type="button"
-                    className={`button-outline primary small tw-text-xs ${styles["max-w-xxs"]} tw-mr-4`}
+                    className={`btn btn--outline-primary btn--small-text ${styles["max-w-xxs"]} tw-mr-4`}
                     onClick={() => setOpenWasteTreeModal(true)}
                   >
                     Liste des codes déchets
@@ -332,7 +333,7 @@ export default function ExportsForm({ companies }: IProps) {
               <Field
                 as="select"
                 name="exportFormat"
-                className="tw-col-span-2 tw-max-w-md"
+                className="tw-col-span-2 tw-max-w-md td-select"
               >
                 <option value="CSV">.csv</option>
                 <option value="XLSX">.xlsx (Excel)</option>
@@ -345,7 +346,7 @@ export default function ExportsForm({ companies }: IProps) {
             <div className="tw-container tw-flex tw-flex-row-reverse tw-mt-5">
               <button
                 type="submit"
-                className="button tw-justify-end"
+                className="btn btn--primary"
                 disabled={loading}
               >
                 {loading ? (
