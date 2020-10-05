@@ -19,7 +19,8 @@
       "dom",
       "es6",
       "esnext.asynciterable"
-    ]
+    ],
+    "baseUrl": "."
   },
   "include": [
     "src"
