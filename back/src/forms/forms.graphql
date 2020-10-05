@@ -579,7 +579,7 @@ type StateSummary {
 
 "Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant"
 type TemporaryStorageDetail {
-  "Établissement qui sotcke temporairement le déchet (case 13)"
+  "Établissement qui stocke temporairement le déchet (case 13)"
   temporaryStorer: TemporaryStorer
 
   """

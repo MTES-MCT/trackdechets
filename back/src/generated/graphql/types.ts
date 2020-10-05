@@ -1692,7 +1692,7 @@ export type TakeOverInput = {
 /** Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant */
 export type TemporaryStorageDetail = {
   __typename?: 'TemporaryStorageDetail';
-  /** Établissement qui sotcke temporairement le déchet (case 13) */
+  /** Établissement qui stocke temporairement le déchet (case 13) */
   temporaryStorer?: Maybe<TemporaryStorer>;
   /**
    * Installation de destination prévue (case 14) à remplir par le producteur ou
