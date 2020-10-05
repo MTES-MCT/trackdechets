@@ -1,12 +1,12 @@
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useCallback, useMemo } from "react";
-import { FaSearch } from "react-icons/fa";
+import { Search } from "src/common/components/Icons";
 import { constantCase } from "constant-case";
-import { InlineError } from "../../common/Error";
-import RedErrorMessage from "../../common/RedErrorMessage";
+import { InlineError } from "src/common/components/Error";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
 import CompanyResults from "./CompanyResults";
-import "./CompanySelector.scss";
+import styles from "./CompanySelector.module.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
 import {
   Query,
@@ -29,13 +29,16 @@ interface CompanySelectorProps {
     | "temporaryStorageDetail.destination.company";
   onCompanySelected?: (company: CompanySearchResult) => void;
   allowForeignCompanies?: boolean;
+  heading?: string;
 }
 
 export default function CompanySelector({
   name,
   onCompanySelected,
   allowForeignCompanies,
+  heading
 }: CompanySelectorProps) {
+  const [uniqId] = useState(() => uuid());
   const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
   const [clue, setClue] = React.useState("");
@@ -127,45 +130,43 @@ export default function CompanySelector({
   }
 
   return (
-    <div className="CompanySelector form__group">
+    <div className="tw-my-6">
+      {!!heading && (
+        <h4 className="form__section-heading">{heading}</h4>
+      )}
       {field.value.siret != null && (
         <>
           <div className="search__group">
             <input
+              id={`siret-${uniqId}`}
               type="text"
               placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-              className="company-selector__search"
+              className={`td-input ${styles.companySelectorSearchSiret}`}
               onChange={event => setClue(event.target.value)}
             />
-            <button
-              className="overlay-button search-icon"
-              aria-label="Recherche"
-              disabled={true}
-            >
-              <FaSearch />
-            </button>
+            <i className={styles.searchIcon} aria-label="Recherche">
+              <Search color="#8393a7" size={12} />
+            </i>
           </div>
 
-          <button
+          {/* <button
             className="button-outline small primary"
             type="button"
             onClick={() => setDepartement(department == null ? "" : null)}
           >
             Affiner la recherche par département?
-          </button>
+          </button> */}
 
-          {department != null && (
-            <div className="form__group">
-              <label>
-                Département
-                <input
-                  type="text"
-                  placeholder="Département ou code postal"
-                  onChange={event => setDepartement(event.target.value)}
-                />
-              </label>
-            </div>
-          )}
+          <div className={styles.companySelectorSearchGroup}>
+            <label htmlFor={`geo-${uniqId}`}>Département ou code postal</label>
+
+            <input
+              id={`geo-${uniqId}`}
+              type="text"
+              className={`td-input ${styles.companySelectorSearchGeo}`}
+              onChange={event => setDepartement(event.target.value)}
+            />
+          </div>
 
           {isLoadingSearch && <span>Chargement...</span>}
 
@@ -196,6 +197,7 @@ export default function CompanySelector({
         <label>
           <input
             type="checkbox"
+            className="td-checkbox"
             onChange={event => {
               setFieldValue(
                 `${field.name}.siret`,
@@ -208,13 +210,14 @@ export default function CompanySelector({
         </label>
       )}
 
-      <div className="form__group">
+      <div className="form__row">
         {field.value.siret == null && (
           <>
             <label>
               Nom de l'entreprise
               <Field
                 type="text"
+                className="td-input"
                 name={`${field.name}.name`}
                 placeholder="Nom"
               />
@@ -226,6 +229,7 @@ export default function CompanySelector({
               Adresse de l'entreprise
               <Field
                 type="text"
+                className="td-input"
                 name={`${field.name}.address`}
                 placeholder="Adresse"
               />
@@ -256,29 +260,33 @@ export default function CompanySelector({
             type="text"
             name={`${field.name}.contact`}
             placeholder="NOM Prénom"
+            className="td-input"
+
           />
         </label>
 
         <RedErrorMessage name={`${field.name}.contact`} />
-
+      </div>
+      <div className="form__row">
         <label>
           Téléphone ou Fax
           <Field
             type="text"
             name={`${field.name}.phone`}
             placeholder="Numéro"
-            className="company-selector__phone"
+            className={`td-input ${styles.companySelectorSearchPhone}`}
           />
         </label>
 
         <RedErrorMessage name={`${field.name}.phone`} />
-
+      </div>
+      <div className="form__row">
         <label>
           Mail
           <Field
             type="email"
             name={`${field.name}.mail`}
-            className="company-selector__email"
+            className={`td-input ${styles.companySelectorSearchEmail}`}
           />
         </label>
 
