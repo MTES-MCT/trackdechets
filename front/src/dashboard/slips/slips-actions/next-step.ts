@@ -1,4 +1,4 @@
-import { Form, FormStatus } from "../../../generated/graphql/types";
+import { Form, FormStatus } from "src/generated/graphql/types";
 
 export enum SlipTabs {
   DRAFTS,

@@ -1,25 +1,42 @@
 import React, { useState, useContext } from "react";
-import { FaTrash } from "react-icons/fa";
+
+import { COLORS } from "src/common/config";
+import { TrashIcon } from "src/common/components/Icons";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
 import { useMutation } from "@apollo/react-hooks";
-import { updateApolloCache } from "../../../common/helper";
+import { updateApolloCache } from "src/common/helper";
 import {
   Form,
   Mutation,
-  MutationDuplicateFormArgs,
-} from "../../../generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
+  MutationDeleteFormArgs,
+} from "src/generated/graphql/types";
+import { useHistory } from "react-router-dom";
+import { SiretContext } from "src/dashboard/Dashboard";
+import cogoToast from "cogo-toast";
+import TdModal from "src/common/components/Modal";
+import { dashboardBase } from "src/common/routes";
+type Props = {
+  formId: string;
+  small?: boolean;
+  redirectToDashboard?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
+};
 
-type Props = { formId: string };
-
-export default function Delete({ formId }: Props) {
+export default function Delete({
+  formId,
+  small = true,
+  onOpen,
+  onClose,
+  redirectToDashboard,
+}: Props) {
   const { siret } = useContext(SiretContext);
-
+  const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [deleteForm] = useMutation<
     Pick<Mutation, "deleteForm">,
-    MutationDuplicateFormArgs
+    MutationDeleteFormArgs
   >(mutations.DELETE_FORM, {
     variables: { id: formId },
     update: (store, { data }) => {
@@ -35,38 +52,58 @@ export default function Delete({ formId }: Props) {
         }),
       });
     },
+    onCompleted: () => {
+      cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
+      !!redirectToDashboard && history.push(dashboardBase);
+    },
+    onError: () =>
+      cogoToast.error("Le bordereau n'a pas pu être supprimé", {
+        hideAfter: 5,
+      }),
   });
+  const className = small
+    ? "btn--no-style slips-actions__button"
+    : "btn btn--outline-primary";
 
   return (
     <>
       <button
-        className="icon"
+        className={className}
         title="Supprimer définitivement"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setIsOpen(true);
+          onOpen && onOpen();
+        }}
       >
-        <FaTrash />
+        <TrashIcon color={COLORS.blueLight} />
+        <span>Supprimer</span>
       </button>
-      <div
-        className="modal__backdrop"
-        id="modal"
-        style={{ display: isOpen ? "flex" : "none" }}
+      <TdModal
+        isOpen={isOpen}
+        onClose={() => {
+          setIsOpen(false);
+          !!onClose && onClose();
+        }}
+        ariaLabel="Supprimer un bordereau"
       >
-        <div className="modal">
-          <h3>Confirmer la suppression ?</h3>
-          <p>Cette action est irréversible.</p>
-          <div className="form__actions">
-            <button
-              className="button-outline primary"
-              onClick={() => setIsOpen(false)}
-            >
-              Annuler
-            </button>
-            <button className="button no-margin" onClick={() => deleteForm()}>
-              Supprimer
-            </button>
-          </div>
+        <h2 className="td-modal-title">Confirmer la suppression ?</h2>
+        <p>Cette action est irréversible.</p>
+        <div className="td-modal-actions">
+          <button
+            className="btn btn--outline-primary"
+            onClick={() => setIsOpen(false)}
+          >
+            Annuler
+          </button>
+          <button
+            className="btn btn--primary no-margin"
+            onClick={() => deleteForm()}
+          >
+            <TrashIcon />
+            <span> Supprimer</span>
+          </button>
         </div>
-      </div>
+      </TdModal>
     </>
   );
 }

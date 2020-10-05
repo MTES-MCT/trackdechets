@@ -1,16 +1,16 @@
 import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
-import { removeNulls } from "../../../common/helper";
-import RedErrorMessage from "../../../common/RedErrorMessage";
-import CompanySelector from "../../../form/company/CompanySelector";
-import DateInput from "../../../form/custom-inputs/DateInput";
-import NumberInput from "../../../form/custom-inputs/NumberInput";
-import { RadioButton } from "../../../form/custom-inputs/RadioButton";
-import Packagings from "../../../form/packagings/Packagings";
-import { SlipActionProps } from "../SlipActions";
-import { PROCESSING_OPERATIONS } from "../../../generated/constants";
-import { WasteDetails } from "../../../generated/graphql/types";
+import { removeNulls } from "src/common/helper";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
+import CompanySelector from "src/form/company/CompanySelector";
+import DateInput from "src/form/custom-inputs/DateInput";
+import NumberInput from "src/form/custom-inputs/NumberInput";
+import { RadioButton } from "src/form/custom-inputs/RadioButton";
+import Packagings from "src/form/packagings/Packagings";
+import { SlipActionProps } from "./SlipActions";
+import { PROCESSING_OPERATIONS } from "src/generated/constants";
+import { WasteDetails } from "src/generated/graphql/types";
 
 export default function Resealed({
   form,
@@ -76,23 +76,33 @@ export default function Resealed({
       >
         {({ values, setFieldValue }) => (
           <Form>
-            <h5>Installation de destination prévue</h5>
+            <h5 className="form__section-heading">
+              Installation de destination prévue
+            </h5>
 
             <CompanySelector name="destination.company" />
 
-            <div className="form__group">
+            <div className="form__row">
               <label>
                 Numéro de CAP (le cas échéant)
-                <Field type="text" name="destination.cap" />
+                <Field
+                  type="text"
+                  name="destination.cap"
+                  className="td-input"
+                />
               </label>
             </div>
 
-            <div className="form__group">
+            <div className="form__row">
               <label>
-                Opération d'élimination / valoristation prévue (code D/R)
+                Opération d'élimination / valorisation prévue (code D/R)
               </label>
 
-              <Field component="select" name="destination.processingOperation">
+              <Field
+                component="select"
+                name="destination.processingOperation"
+                className="td-select"
+              >
                 <option value="">Choisissez...</option>
                 {PROCESSING_OPERATIONS.map(operation => (
                   <option key={operation.code} value={operation.code}>
@@ -103,13 +113,15 @@ export default function Resealed({
               </Field>
             </div>
 
-            <div className="form__group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={isRefurbished}
-                  onChange={() => onChangeRefurbished(values, setFieldValue)}
-                />
+            <div className="form__row form__row--inline">
+              <input
+                type="checkbox"
+                checked={isRefurbished}
+                id="id_isRefurbished"
+                className="td-checkbox"
+                onChange={() => onChangeRefurbished(values, setFieldValue)}
+              />
+              <label htmlFor="id_isRefurbished">
                 Les déchets ont subi un reconditionnement, je dois saisir les
                 détails
               </label>
@@ -117,10 +129,10 @@ export default function Resealed({
 
             {isRefurbished && (
               <>
-                <h5>Détails du déchet</h5>
+                <h5 className="form__section-heading">Détails du déchet</h5>
 
                 <h4>Conditionnement</h4>
-                <div className="form__group">
+                <div className="form__row">
                   <Field
                     name="wasteDetails.packagings"
                     component={Packagings}
@@ -131,6 +143,7 @@ export default function Resealed({
                       <Field
                         name="wasteDetails.otherPackaging"
                         type="text"
+                        className="td-input"
                         placeholder="Détail de l'autre conditionnement"
                       />
                     </label>
@@ -139,6 +152,7 @@ export default function Resealed({
                   <Field
                     component={NumberInput}
                     name="wasteDetails.numberOfPackages"
+                    className="td-input"
                     label="Nombre de colis"
                     min="1"
                   />
@@ -146,10 +160,11 @@ export default function Resealed({
                 </div>
 
                 <h4>Quantité en tonnes</h4>
-                <div className="form__group">
+                <div className="form__row">
                   <Field
                     component={NumberInput}
                     name="wasteDetails.quantity"
+                    className="td-input"
                     placeholder="En tonnes"
                     min="0"
                     step="0.001"
@@ -175,39 +190,49 @@ export default function Resealed({
 
                   <RedErrorMessage name="wasteDetails.quantityType" />
                 </div>
-                <div className="form__group">
+                <div className="form__row">
                   <label>
                     Mentions au titre des règlements ADR, RID, ADNR, IMDG (le
                     cas échéant)
-                    <Field type="text" name="wasteDetails.onuCode" />
+                    <Field
+                      type="text"
+                      name="wasteDetails.onuCode"
+                      className="td-input"
+                    />
                   </label>
                 </div>
               </>
             )}
 
-            <h5>
+            <h5 className="form__section-heading">
               Collecteur-transporteur après entreposage ou reconditionnement
             </h5>
 
             <CompanySelector name="transporter.company" />
 
-            <div className="form__group">
-              <label>
-                <Field
-                  type="checkbox"
-                  name="transporter.isExemptedOfReceipt"
-                  checked={values.transporter.isExemptedOfReceipt}
-                />
+            <div className="form__row form__row--inline">
+              <Field
+                type="checkbox"
+                name="transporter.isExemptedOfReceipt"
+                id="id_isExemptedOfReceipt"
+                checked={values.transporter.isExemptedOfReceipt}
+                className="td-checkbox"
+              />
+              <label htmlFor="id_isExemptedOfReceipt">
                 Le transporteur déclare être exempté de récépissé conformément
                 aux dispositions de l'article R.541-50 du code de
                 l'environnement.
               </label>
             </div>
             {!values.transporter.isExemptedOfReceipt && (
-              <div className="form__group">
+              <div className="form__row">
                 <label>
                   Numéro de récépissé
-                  <Field type="text" name="transporter.receipt" />
+                  <Field
+                    type="text"
+                    name="transporter.receipt"
+                    className="td-input"
+                  />
                 </label>
 
                 <RedErrorMessage name="transporter.receipt" />
@@ -218,6 +243,7 @@ export default function Resealed({
                     type="text"
                     name="transporter.department"
                     placeholder="Ex: 83"
+                    className="td-input"
                   />
                 </label>
 
@@ -228,6 +254,7 @@ export default function Resealed({
                   <Field
                     component={DateInput}
                     name="transporter.validityLimit"
+                    className="td-input"
                   />
                 </label>
 
@@ -238,6 +265,7 @@ export default function Resealed({
                   <Field
                     type="text"
                     name="transporter.numberPlate"
+                    className="td-input"
                     placeholder="Plaque d'immatriculation du véhicule"
                   />
                 </label>
@@ -246,15 +274,15 @@ export default function Resealed({
               </div>
             )}
 
-            <div className="form__group button__group">
+            <div className="form__actions">
               <button
                 type="button"
-                className="button secondary"
+                className="btn btn--outline-primary"
                 onClick={onCancel}
               >
                 Annuler
               </button>
-              <button type="submit" className="button">
+              <button type="submit" className="btn btn--outline">
                 Je valide
               </button>
             </div>
