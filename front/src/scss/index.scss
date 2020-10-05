@@ -13,6 +13,9 @@
 @import "./Forms.scss";
 @import "./Modals.scss";
 @import "./Notifications.scss";
+@import "./Panels.scss";
+@import "./Dashboard.scss";
+
 
 @font-face {
   font-family: "marianne";
@@ -67,6 +70,6 @@ button.link {
     max-height: 100%;
   }
 }
-a:hover{
-  background: none ;
+a:hover {
+  background: none;
 }
