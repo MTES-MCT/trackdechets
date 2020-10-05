@@ -1,30 +1,32 @@
 import { useQuery } from "@apollo/react-hooks";
+import { NetworkStatus } from "apollo-client";
 import React, { useContext } from "react";
-import { FaClone } from "react-icons/fa";
+
+import { DuplicateFile } from "src/common/components/Icons";
 import { Link } from "react-router-dom";
-import { InlineError } from "../../../common/Error";
-import Loader from "../../../common/Loader";
-import {
-  FormStatus,
-  Query,
-  QueryFormsArgs,
-} from "../../../generated/graphql/types";
+import { InlineError } from "src/common/components/Error";
+import Loader from "src/common/components/Loaders";
+import { FormStatus, Query, QueryFormsArgs } from "src/generated/graphql/types";
 import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
-import LoadMore from "./LoadMore";
+
+import TabContent from "./TabContent";
+import { COLORS } from "src/common/config";
 
 export default function DraftsTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data, fetchMore } = useQuery<
+  const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
   >(GET_SLIPS, {
     variables: { siret, status: [FormStatus.Draft] },
+    notifyOnNetworkStatusChange: true,
   });
 
-  if (loading) return <Loader />;
+  if (networkStatus === NetworkStatus.loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
+
   if (!data?.forms?.length)
     return (
       <div className="empty-tab">
@@ -33,26 +35,33 @@ export default function DraftsTab() {
         <p>
           Si vous le souhaitez, vous pouvez{" "}
           <Link to={`/form?redirectTo=${siret}`}>
-            <button className="button-outline small primary">
-              créer un bordereau
-            </button>
-          </Link>{" "}
+            <button className="btn btn--outline-primary btn--medium-text">
+              Créer un bordereau
+            </button>{" "}
+          </Link>
           ou dupliquer un bordereau déjà existant dans un autre onglet grâce à
-          l'icône <FaClone />
+          l'icône{" "}
+          <span style={{ display: "inline" }}>
+            <DuplicateFile color={COLORS.blueLight} />
+          </span>
         </p>
       </div>
     );
 
   return (
-    <>
+    <TabContent
+      networkStatus={networkStatus}
+      refetch={refetch}
+      forms={data.forms}
+      fetchMore={fetchMore}
+    >
       <Slips
         siret={siret}
         forms={data.forms}
-        hiddenFields={["status", "readableId"]}
+        hiddenFields={["status", "readableId", "sentAt"]}
         dynamicActions={true}
+        refetch={refetch}
       />
-
-      <LoadMore forms={data.forms} fetchMore={fetchMore} />
-    </>
+    </TabContent>
   );
 }

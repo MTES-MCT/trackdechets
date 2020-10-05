@@ -1,20 +1,16 @@
 import { useQuery } from "@apollo/react-hooks";
+import { NetworkStatus } from "apollo-client";
 import React, { useContext } from "react";
-import { InlineError } from "../../../common/Error";
-import Loader from "../../../common/Loader";
-import {
-  FormStatus,
-  Query,
-  QueryFormsArgs,
-} from "../../../generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
+import { InlineError } from "src/common/components/Error";
+import Loader from "src/common/components/Loaders";
+import { FormStatus, Query, QueryFormsArgs } from "src/generated/graphql/types";
+import { SiretContext } from "src/dashboard/Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
-import LoadMore from "./LoadMore";
-
+import TabContent from "./TabContent";
 export default function FollowTab() {
   const { siret } = useContext(SiretContext);
-  const { loading, error, data, fetchMore } = useQuery<
+  const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
   >(GET_SLIPS, {
@@ -31,9 +27,10 @@ export default function FollowTab() {
       ],
       hasNextStep: false,
     },
+    notifyOnNetworkStatusChange: true,
   });
 
-  if (loading) return <Loader />;
+  if (networkStatus === NetworkStatus.loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
   if (!data?.forms?.length)
     return (
@@ -51,9 +48,13 @@ export default function FollowTab() {
     );
 
   return (
-    <>
-      <Slips siret={siret} forms={data.forms} />
-      <LoadMore forms={data.forms} fetchMore={fetchMore} />
-    </>
+    <TabContent
+      networkStatus={networkStatus}
+      refetch={refetch}
+      forms={data.forms}
+      fetchMore={fetchMore}
+    >
+      <Slips siret={siret} forms={data.forms} refetch={refetch} />
+    </TabContent>
   );
 }
