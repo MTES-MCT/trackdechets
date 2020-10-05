@@ -1,90 +1,58 @@
-import { assign, Machine } from "xstate";
+import { Machine } from "xstate";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
-import { WorkflowError } from "./errors";
-import {
-  markFormAppendixAwaitingFormsAsGrouped,
-  markFormAppendixGroupedsAsProcessed
-} from "./helpers";
-import { FormState } from "./model";
+import { Event, EventType, FormState } from "./types";
 
-export const formWorkflowMachine = Machine(
+/**
+ * Workflow state machine
+ */
+const machine = Machine<any, Event>(
   {
     id: "form-workflow-machine",
     initial: FormState.Draft,
-    context: {
-      form: null,
-      requestContext: null,
-      isStableState: true
-    },
     states: {
       [FormState.Draft]: {
-        entry: "setStable",
-        exit: "setUnStable",
         on: {
-          MARK_SEALED: [
-            { target: "pendingSealedMarkFormAppendixAwaitingFormsAsGrouped" }
-          ],
-          MARK_SENT: [
-            { target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped" }
-          ]
+          [EventType.MarkAsSealed]: [{ target: FormState.Sealed }],
+          [EventType.MarkAsSent]: [{ target: FormState.Sent }]
         }
       },
       [FormState.Sealed]: {
-        entry: "setStable",
-        exit: "setUnStable",
         on: {
-          MARK_SENT: [
-            { target: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped" }
-          ],
-          MARK_SIGNED_BY_TRANSPORTER: [
+          [EventType.MarkAsSent]: [{ target: FormState.Sent }],
+          [EventType.SignedByTransporter]: [
             {
               target: FormState.Sent
             }
-          ]
+          ],
+          [EventType.ImportPaperForm]: [{ target: FormState.Processed }]
         }
       },
       [FormState.Sent]: {
-        entry: "setStable",
-        exit: "setUnStable",
         on: {
-          MARK_TEMP_STORED: [
+          [EventType.MarkAsTempStored]: [
             {
               target: FormState.Refused,
               cond: "isFormRefusedByTempStorage"
             },
             {
-              target: FormState.TempStored,
-              cond: "hasTempStorageDestination"
-            },
-            {
-              target: "error.invalidTransition"
+              target: FormState.TempStored
             }
           ],
-          MARK_RECEIVED: [
+          [EventType.MarkAsReceived]: [
             {
-              target: "error.invalidTransition",
-              cond: "hasTempStorageDestination"
+              target: FormState.Refused,
+              cond: "isFormRefused"
             },
             {
-              target: "error.hasSegmentsToTakeOverError",
-              cond: "hasSegmentToTakeOver"
-            },
-            {
-              target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
-              cond: "isFormAccepted"
-            },
-            {
-              target: FormState.Refused
+              target: FormState.Received
             }
           ]
         }
       },
       [FormState.Refused]: { type: "final" },
       [FormState.Received]: {
-        entry: "setStable",
-        exit: "setUnStable",
         on: {
-          MARK_PROCESSED: [
+          [EventType.MarkAsProcessed]: [
             {
               target: FormState.NoTraceability,
               cond: "isExemptOfTraceability"
@@ -99,43 +67,24 @@ export const formWorkflowMachine = Machine(
           ]
         }
       },
-      pendingSealedMarkFormAppendixAwaitingFormsAsGrouped: {
-        invoke: {
-          id: "pendingSealedMarkFormAppendixAwaitingFormsAsGrouped",
-          src: "markFormAppendixAwaitingFormsAsGrouped",
-          onDone: { target: FormState.Sealed },
-          onError: { target: "error.appendixError" }
-        }
-      },
-      pendingSentMarkFormAppendixAwaitingFormsAsGrouped: {
-        invoke: {
-          id: "pendingSentMarkFormAppendixAwaitingFormsAsGrouped",
-          src: "markFormAppendixAwaitingFormsAsGrouped",
-          onDone: { target: FormState.Sent },
-          onError: { target: "error.appendixError" }
-        }
-      },
-      pendingReceivedMarkFormAppendixGroupedsAsProcessed: {
-        invoke: {
-          id: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
-          src: "markFormAppendixGroupedsAsProcessed",
-          onDone: { target: FormState.Received },
-          onError: { target: "error.appendixError" }
-        }
-      },
       [FormState.Processed]: { type: "final" },
       [FormState.NoTraceability]: { type: "final" },
-      [FormState.AwaitingGroup]: { type: "final" },
-      [FormState.TempStored]: {
-        entry: "setStable",
-        exit: "setUnStable",
+      [FormState.AwaitingGroup]: {
         on: {
-          MARK_RESEALED: [
+          [EventType.MarkAsGrouped]: { target: FormState.Grouped }
+        }
+      },
+      [FormState.Grouped]: {
+        on: { [EventType.MarkAsProcessed]: { target: FormState.Processed } }
+      },
+      [FormState.TempStored]: {
+        on: {
+          [EventType.MarkAsResealed]: [
             {
               target: FormState.Resealed
             }
           ],
-          MARK_RESENT: [
+          [EventType.MarkAsResent]: [
             {
               target: FormState.Resent
             }
@@ -143,15 +92,13 @@ export const formWorkflowMachine = Machine(
         }
       },
       [FormState.Resealed]: {
-        entry: "setStable",
-        exit: "setUnStable",
         on: {
-          MARK_RESENT: [
+          [EventType.MarkAsResent]: [
             {
               target: FormState.Resent
             }
           ],
-          MARK_SIGNED_BY_TRANSPORTER: [
+          [EventType.SignedByTransporter]: [
             {
               target: FormState.Resent
             }
@@ -159,65 +106,38 @@ export const formWorkflowMachine = Machine(
         }
       },
       [FormState.Resent]: {
-        entry: "setStable",
-        exit: "setUnStable",
         on: {
-          MARK_RECEIVED: [
+          [EventType.MarkAsReceived]: [
             {
-              target: "pendingReceivedMarkFormAppendixGroupedsAsProcessed",
-              cond: "isFormAccepted"
+              target: FormState.Refused,
+              cond: "isFormRefused"
             },
             {
-              target: FormState.Refused
+              target: FormState.Received
             }
           ]
         }
       },
       error: {
-        states: {
-          invalidTransition: { meta: WorkflowError.InvalidTransition },
-          appendixError: { meta: WorkflowError.AppendixError },
-          hasSegmentsToTakeOverError: {
-            meta: WorkflowError.HasSegmentsToTakeOverError
-          }
-        }
+        states: {}
       }
     }
   },
   {
-    services: {
-      markFormAppendixAwaitingFormsAsGrouped: ctx =>
-        markFormAppendixAwaitingFormsAsGrouped(ctx.form.id),
-      markFormAppendixGroupedsAsProcessed: ctx =>
-        markFormAppendixGroupedsAsProcessed(ctx.form.id, ctx.requestContext)
-    },
-    actions: {
-      // Stable = possible state for a form. Basically any of the FormState.* states
-      setStable: assign({ isStableState: true }) as any,
-      // Unstable = transient state, can be sync or async. Basically any pending* state, which are used for validation & side effects
-      setUnStable: assign({ isStableState: false }) as any
-    },
     guards: {
-      isExemptOfTraceability: ctx => ctx.form.noTraceability,
-      awaitsGroup: ctx =>
+      isExemptOfTraceability: (_, event) =>
+        !!event?.formUpdateInput?.noTraceability,
+      awaitsGroup: (_, event) =>
         PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          ctx.form.processingOperationDone
+          event.formUpdateInput?.processingOperationDone
         ),
-      isFormAccepted: ctx => {
-        return ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
-          ctx.form.wasteAcceptationStatus
-        );
-      },
-      isFormRefusedByTempStorage: (_, event: any) => {
-        return !["ACCEPTED", "PARTIALLY_REFUSED"].includes(
-          event.wasteAcceptationStatus
-        );
-      },
-      hasTempStorageDestination: ctx => ctx.form.recipientIsTempStorage,
-      hasSegmentToTakeOver: ctx => {
-        // if any segment is not yet taken over, return true (form can't be received)
-        return ctx.form.transportSegments.some(f => !f.takenOverAt);
-      }
+      isFormRefused: (_, event) =>
+        event.formUpdateInput?.wasteAcceptationStatus === "REFUSED",
+      isFormRefusedByTempStorage: (_, event) =>
+        event.formUpdateInput?.temporaryStorageDetail?.update
+          ?.tempStorerWasteAcceptationStatus === "REFUSED"
     }
   }
 );
+
+export default machine;

@@ -1,12 +1,16 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
-import { flattenResealedFormInput } from "../../form-converter";
+import {
+  expandFormFromDb,
+  flattenResealedFormInput
+} from "../../form-converter";
 import { checkCanMarkAsResealed } from "../../permissions";
 import transitionForm from "../../workflow/transitionForm";
 import { prisma } from "../../../generated/prisma-client";
 import { UserInputError } from "apollo-server-express";
 import { resealedFormSchema } from "../../validation";
+import { EventType } from "../../workflow/types";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -39,16 +43,18 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     ...updateInput
   });
 
-  return transitionForm(
-    form,
-    { eventType: "MARK_RESEALED", eventParams: resealedInfos },
-    context,
-    () => ({
-      temporaryStorageDetail: {
-        update: updateInput
-      }
-    })
-  );
+  const formUpdateInput = {
+    temporaryStorageDetail: {
+      update: updateInput
+    }
+  };
+
+  const resealedForm = await transitionForm(user, form, {
+    type: EventType.MarkAsResealed,
+    formUpdateInput
+  });
+
+  return expandFormFromDb(resealedForm);
 };
 
 export default markAsResealed;

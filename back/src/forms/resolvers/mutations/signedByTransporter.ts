@@ -9,6 +9,8 @@ import {
   checkSecurityCode
 } from "../../permissions";
 import { signingInfoSchema, wasteDetailsSchema } from "../../validation";
+import { EventType } from "../../workflow/types";
+import { expandFormFromDb } from "../../form-converter";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = async (
   parent,
@@ -71,41 +73,42 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 
     const hasWasteDetailsOverride = !!temporaryStorageDetail.wasteDetailsQuantity;
 
-    return transitionForm(
-      form,
-      { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: infos },
-      context,
-      infos => {
-        return {
-          ...(!hasWasteDetailsOverride && wasteDetails(infos)),
-          temporaryStorageDetail: {
-            update: {
-              signedBy: infos.sentBy,
-              signedAt: infos.sentAt,
-              signedByTransporter: true,
-              ...(hasWasteDetailsOverride && wasteDetails(infos))
-            }
-          }
-        };
+    const formUpdateInput = {
+      ...(!hasWasteDetailsOverride && wasteDetails(infos)),
+      temporaryStorageDetail: {
+        update: {
+          signedBy: infos.sentBy,
+          signedAt: infos.sentAt,
+          signedByTransporter: true,
+          ...(hasWasteDetailsOverride && wasteDetails(infos))
+        }
       }
-    );
+    };
+    const resentForm = await transitionForm(user, form, {
+      type: EventType.SignedByTransporter,
+      formUpdateInput
+    });
+
+    return expandFormFromDb(resentForm);
   }
 
   // check security code is producer's
   await checkSecurityCode(form.emitterCompanySiret, securityCode);
 
-  return transitionForm(
-    form,
-    { eventType: "MARK_SIGNED_BY_TRANSPORTER", eventParams: infos },
-    context,
-    infos => ({
-      signedByTransporter: true,
-      sentAt: infos.sentAt,
-      sentBy: infos.sentBy,
-      ...wasteDetails(infos),
-      currentTransporterSiret: form.transporterCompanySiret
-    })
-  );
+  const formUpdateInput = {
+    signedByTransporter: true,
+    sentAt: infos.sentAt,
+    sentBy: infos.sentBy,
+    ...wasteDetails(infos),
+    currentTransporterSiret: form.transporterCompanySiret
+  };
+
+  const sentForm = await transitionForm(user, form, {
+    type: EventType.SignedByTransporter,
+    formUpdateInput
+  });
+
+  return expandFormFromDb(sentForm);
 };
 
 export default signedByTransporterResolver;

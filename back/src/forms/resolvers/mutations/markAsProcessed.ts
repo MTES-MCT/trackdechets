@@ -1,22 +1,30 @@
-import {
-  MutationResolvers,
-  MutationMarkAsProcessedArgs
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import { GraphQLContext } from "../../../types";
 import transitionForm from "../../workflow/transitionForm";
-import { flattenProcessedFormInput } from "../../form-converter";
-import { Form, FormUpdateInput } from "../../../generated/prisma-client";
+import {
+  expandFormFromDb,
+  flattenProcessedFormInput
+} from "../../form-converter";
+import { FormUpdateInput, prisma } from "../../../generated/prisma-client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanMarkAsProcessed } from "../../permissions";
 import { processedInfoSchema } from "../../validation";
 import { PROCESSING_OPERATIONS } from "../../../common/constants";
+import { EventType } from "../../workflow/types";
 
-export async function markAsProcessedFn(
-  form: Form,
-  { processedInfo }: MutationMarkAsProcessedArgs,
-  context: GraphQLContext
-) {
+const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
+  parent,
+  args,
+  context
+) => {
+  const user = checkIsAuthenticated(context);
+
+  const { id, processedInfo } = args;
+
+  const form = await getFormOrFormNotFound({ id });
+
+  await checkCanMarkAsProcessed(user, form);
+
   const formUpdateInput: FormUpdateInput = flattenProcessedFormInput(
     processedInfo
   );
@@ -39,28 +47,23 @@ export async function markAsProcessedFn(
     formUpdateInput.nextDestinationCompanyCountry = "FR";
   }
 
-  return transitionForm(
-    form,
-    { eventType: "MARK_PROCESSED", eventParams: processedInfo },
-    context,
-    () => formUpdateInput
-  );
-}
+  const processedForm = await transitionForm(user, form, {
+    type: EventType.MarkAsProcessed,
+    formUpdateInput
+  });
 
-const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
-  parent,
-  args,
-  context
-) => {
-  const user = checkIsAuthenticated(context);
+  // mark appendix2Forms as PROCESSED
+  const appendix2Forms = await prisma.form({ id: form.id }).appendix2Forms();
+  if (appendix2Forms.length > 0) {
+    const promises = appendix2Forms.map(appendix => {
+      return transitionForm(user, appendix, {
+        type: EventType.MarkAsProcessed
+      });
+    });
+    await Promise.all(promises);
+  }
 
-  const { id, processedInfo } = args;
-
-  const form = await getFormOrFormNotFound({ id });
-
-  await checkCanMarkAsProcessed(user, form);
-
-  return markAsProcessedFn(form, { id, processedInfo }, context);
+  return expandFormFromDb(processedForm);
 };
 
 export default markAsProcessedResolver;

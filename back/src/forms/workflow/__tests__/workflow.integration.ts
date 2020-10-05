@@ -366,35 +366,274 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       {
         status: "PROCESSED",
         updatedFields: {
-          processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00",
           processingOperationDone: "D 10",
-          processingOperationDescription: "Incinération"
+          processingOperationDescription: "Incinération",
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00"
         }
       },
       {
         status: "RECEIVED",
         updatedFields: {
+          wasteAcceptationStatus: "ACCEPTED",
           receivedBy: "Antoine Derieux",
-          receivedAt: "2020-04-05T11:18:00",
-          signedAt: "2020-04-05T12:00:00",
-          quantityReceived: 1
+          receivedAt: "2020-04-05T11:18:00.000Z",
+          signedAt: "2020-04-05T12:00:00.000Z",
+          quantityReceived: 1,
+          currentTransporterSiret: ""
         }
       },
       {
         status: "SENT",
         updatedFields: {
-          sentAt: "2020-04-03T14:48:00",
+          wasteDetails: { onuCode: "xxxx" },
+          signedByTransporter: true,
+          sentAt: "2020-04-03T14:48:00.000Z",
           sentBy: "Isabelle Guichard",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          currentTransporterSiret: "33333333333333"
         }
       },
       { status: "SEALED", updatedFields: {} },
       { status: "DRAFT", updatedFields: {} }
     ]);
   }, 30000);
+
+  test(
+    "Acheminement direct du producteur à l'installation de traitement avec " +
+      "reprise de traçabilité numérique après une impression papier initiale",
+    async () => {
+      // 1er cas: Acheminement direct du producteur à l'installation de traitement.
+      // Le bordereau est préparé initialement dans Trackdéchets puis imprimé
+      // au moment de l'enlèvement par le transporteur. Le BSD papier accompagne
+      // le déchet jusqu'au traitement final puis les données sont ré-importés
+      // dans Trackdéchets pour assurer la traçabilité numérique
+
+      // Établissement producteur de boues organiques
+      const producteur = await companyFactory({
+        siret: "11111111111111",
+        name: "Boues and Co"
+      });
+      // Avec un utilisateur membre
+      const producteurUser = await userFactory();
+      await associateUserToCompany(
+        producteurUser.id,
+        producteur.siret,
+        "MEMBER"
+      );
+
+      // Installation d'incinération
+      const traiteur = await companyFactory({
+        siret: "22222222222222",
+        name: "Incinérateur du Grand Est"
+      });
+      // Avec un utilisateur membre
+      const traiteurUser = await userFactory();
+      await associateUserToCompany(traiteurUser.id, traiteur.siret, "MEMBER");
+
+      // Entreprise de transport
+      const transporteur = await companyFactory({
+        siret: "33333333333333",
+        name: "Transport Qui Roule"
+      });
+      // Avec un utilisateur membre
+      const transporteurUser = await userFactory();
+      await associateUserToCompany(
+        transporteurUser.id,
+        transporteur.siret,
+        "MEMBER"
+      );
+
+      // Récupère les tokens utilisateurs pour l'authentification à l'API
+      const producteurToken = await apiKey(producteurUser);
+      const traiteurToken = await apiKey(traiteurUser);
+
+      // Le BSD est rempli du cadre 1 à 8 par l’émetteur du bordereau
+
+      // La requête suivante est une chaîne de caractères
+      // Dans la plupart des langages ne supportant pas les littéraux de gabarits
+      // comme Node.js, vous devrez échapper les sauts de lignes et les guillements
+      const saveFormQuery = `
+        mutation {
+          saveForm(formInput: {
+            customId: "TD-20-AAA00256"
+            emitter: {
+              type: PRODUCER
+              company: {
+                siret: "${producteur.siret}"
+                name: "${producteur.name}"
+                address: "1 rue de paradis, 75010 PARIS"
+                contact: "Jean Dupont de la Boue"
+                phone: "01 00 00 00 00"
+                mail: "jean.dupont@boues.fr"
+              },
+              workSite: {
+                address: "5 rue du chantier"
+                postalCode: "07100"
+                city: "Annonay"
+                infos: "Site de stockage de boues"
+              }
+            }
+            recipient: {
+              processingOperation: "D 10"
+              company: {
+                siret: "${traiteur.siret}"
+                name: "${traiteur.name}"
+                address: "1 avenue de Colmar 67100 Strasbourg"
+                contact: "Thomas Largeron"
+                phone: "03 00 00 00 00"
+                mail: "thomas.largeron@incinerateur.fr"
+              }
+            }
+            transporter: {
+              company: {
+                siret: "${transporteur.siret}"
+                name: "${transporteur.name}"
+                address: "1 rue des 6 chemins, 07100 ANNONAY"
+                contact: "Claire Dupuis"
+                mail: "claire.dupuis@transportquiroule.fr"
+                phone: "0400000000"
+              }
+              receipt: "12379"
+              department: "07"
+              validityLimit: "2020-06-30"
+              numberPlate: "AD-007-TS"
+            }
+            wasteDetails: {
+              code: "06 05 02*"
+              onuCode: "2003"
+              name: "Boues"
+              packagings: [
+                BENNE
+              ]
+              numberOfPackages: 1
+              quantity: 1
+              quantityType: ESTIMATED
+              consistence: LIQUID
+            }
+          }){
+            id
+            status
+          }
+        }
+      `;
+
+      const saveFormResponse = await request
+        .post("/")
+        .set("Authorization", `Bearer ${producteurToken}`)
+        .send({ query: saveFormQuery });
+
+      let form = saveFormResponse.body.data.saveForm;
+
+      // Lors de sa création, le BSD se retrouve à l'état de BROUILLON
+      expect(form.status).toEqual("DRAFT");
+
+      // L'émetteur du BSD procède à la finalisation du bordereau. L'ensemble
+      // des champs des cases 1 à 8 sont validés et ne pourront plus être modifiés
+      const markAsSealedQuery = `
+      mutation {
+        markAsSealed(id: "${form.id}") {
+          id
+          status
+        }
+      }`;
+
+      const markAsSealedResponse = await request
+        .post("/")
+        .set("Authorization", `Bearer ${producteurToken}`)
+        .send({ query: markAsSealedQuery });
+
+      form = markAsSealedResponse.body.data.markAsSealed;
+
+      // Le BSD passe à l'état "Finalisé"
+      expect(form.status).toEqual("SEALED");
+
+      // Le BSD est ensuite imprimé au format papier grâce à la query formPdf.
+      // Le BSD papier accompagne le déchet lors de l'enlèvement, de la réception
+      // et du traitement final puis les données sont "ré-injectées" dans Trackdéchets
+      // grâce à la mutation importPaperForm
+
+      const importPaperFormQuery = `
+        mutation {
+          importPaperForm(input: {
+            id: "${form.id}",
+            signingInfo: {
+              sentAt: "2020-04-03T14:48:00",
+              sentBy: "Isabelle Guichard"
+            },
+            receivedInfo: {
+              wasteAcceptationStatus: ACCEPTED
+              receivedBy: "Antoine Derieux"
+              receivedAt: "2020-04-05T11:18:00"
+              signedAt: "2020-04-05T12:00:00"
+              quantityReceived: 1
+            },
+            processedInfo: {
+              processingOperationDone: "D 10",
+              processingOperationDescription: "Incinération",
+              processedBy: "Alfred Dujardin",
+              processedAt: "2020-04-15T10:22:00"
+            }
+          }) {
+            id
+            status
+          }
+        }
+      `;
+
+      const importPaperFormResponse = await request
+        .post("/")
+        .set("Authorization", `Bearer ${traiteurToken}`)
+        .send({ query: importPaperFormQuery });
+
+      form = importPaperFormResponse.body.data.importPaperForm;
+      await downloadPdf(form.id, producteurToken, "1-bsd-imported.pdf");
+
+      expect(form.status).toEqual("PROCESSED");
+
+      const formsLifeCycleQuery = `
+      query {
+        formsLifeCycle(siret: "${producteur.siret}"){
+          statusLogs {
+            status
+            updatedFields
+          }
+        }
+      }
+    `;
+
+      const formsLifeCycleResponse = await request
+        .post("/")
+        .set("Authorization", `Bearer ${producteurToken}`)
+        .send({ query: formsLifeCycleQuery });
+
+      const statusLogs =
+        formsLifeCycleResponse.body.data.formsLifeCycle.statusLogs;
+
+      expect(statusLogs).toEqual([
+        {
+          status: "PROCESSED",
+          updatedFields: {
+            isImportedFromPaper: true,
+            signedByTransporter: true,
+            sentAt: "2020-04-03T14:48:00.000Z",
+            sentBy: "Isabelle Guichard",
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedBy: "Antoine Derieux",
+            receivedAt: "2020-04-05T11:18:00.000Z",
+            signedAt: "2020-04-05T12:00:00.000Z",
+            quantityReceived: 1,
+            processingOperationDone: "D 10",
+            processingOperationDescription: "Incinération",
+            processedBy: "Alfred Dujardin",
+            processedAt: "2020-04-15T10:22:00"
+          }
+        },
+        { status: "SEALED", updatedFields: {} },
+        { status: "DRAFT", updatedFields: {} }
+      ]);
+    },
+    30000
+  );
 
   test("Entreposage provisoire ou reconditionnement", async () => {
     // 2ème cas: Entreposage provisoire ou reconditionnement
@@ -839,50 +1078,92 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       {
         status: "PROCESSED",
         updatedFields: {
-          processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00",
           processingOperationDone: "D 10",
-          processingOperationDescription: "Incinération"
+          processingOperationDescription: "Incinération",
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00"
         }
       },
       {
         status: "RECEIVED",
         updatedFields: {
+          wasteAcceptationStatus: "ACCEPTED",
           receivedBy: "Antoine Derieux",
-          receivedAt: "2020-04-05T11:18:00",
-          signedAt: "2020-04-05T11:18:00",
-          quantityReceived: 1
+          receivedAt: "2020-04-05T11:18:00.000Z",
+          signedAt: "2020-04-05T11:18:00.000Z",
+          quantityReceived: 1,
+          currentTransporterSiret: ""
         }
       },
       {
         status: "RESENT",
         updatedFields: {
-          sentAt: "2020-08-03T10:00:00",
-          sentBy: "Mr Provisoire",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          temporaryStorageDetail: {
+            signedAt: "2020-08-03T10:00:00.000Z",
+            signedBy: "Mr Provisoire",
+            wasteDetails: {
+              onuCode: "xxxx"
+            }
+          }
         }
       },
-      { status: "RESEALED", updatedFields: {} },
+      {
+        status: "RESEALED",
+        updatedFields: {
+          temporaryStorageDetail: {
+            wasteDetails: {
+              code: null,
+              name: null,
+              onuCode: null,
+              packagings: ["BENNE"],
+              otherPackaging: null,
+              numberOfPackages: 1,
+              quantity: 1,
+              quantityType: "ESTIMATED",
+              consistence: null
+            },
+            transporter: {
+              company: {
+                name: "Transport Qui Mousse",
+                siret: "55555555555555",
+                address: "1 rue du Mas, 07430 DAVEZIEUX",
+                contact: "Marc Pneu",
+                phone: "0400000000",
+                mail: "marc.pneu@transportquimousse.fr"
+              },
+              isExemptedOfReceipt: null,
+              receipt: "76498",
+              department: "07",
+              validityLimit: "2020-07-30T00:00:00.000Z",
+              numberPlate: "OG-678-PS",
+              customInfo: null
+            }
+          }
+        }
+      },
       {
         status: "TEMP_STORED",
         updatedFields: {
-          receivedBy: "Mr Provisoire",
-          receivedAt: "2020-05-03T09:00:00",
-          signedAt: "2020-05-03T09:00:00",
-          quantityReceived: 1,
-          quantityType: "REAL"
+          temporaryStorageDetail: {
+            temporaryStorer: {
+              quantityType: "REAL",
+              quantityReceived: 1,
+              wasteAcceptationStatus: "ACCEPTED",
+              wasteRefusalReason: null,
+              receivedAt: "2020-05-03T09:00:00.000Z",
+              receivedBy: "Mr Provisoire"
+            }
+          }
         }
       },
       {
         status: "SENT",
         updatedFields: {
-          sentAt: "2020-04-03T14:48:00",
+          wasteDetails: { onuCode: "xxxx" },
+          signedByTransporter: true,
+          sentAt: "2020-04-03T14:48:00.000Z",
           sentBy: "Isabelle Guichard",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          currentTransporterSiret: "44444444444444"
         }
       },
       { status: "SEALED", updatedFields: {} },
@@ -1468,29 +1749,31 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       {
         status: "PROCESSED",
         updatedFields: {
-          processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00",
           processingOperationDone: "D 10",
-          processingOperationDescription: "Incinération"
+          processingOperationDescription: "Incinération",
+          processedBy: "Alfred Dujardin",
+          processedAt: "2020-04-15T10:22:00"
         }
       },
       {
         status: "RECEIVED",
         updatedFields: {
+          wasteAcceptationStatus: "ACCEPTED",
           receivedBy: "Antoine Derieux",
-          receivedAt: "2020-04-07T11:18:00",
-          signedAt: "2020-04-07T12:00:00",
-          quantityReceived: 1
+          receivedAt: "2020-04-07T11:18:00.000Z",
+          signedAt: "2020-04-07T12:00:00.000Z",
+          quantityReceived: 1,
+          currentTransporterSiret: ""
         }
       },
       {
         status: "SENT",
         updatedFields: {
-          sentAt: "2020-04-03T14:48:00",
+          wasteDetails: { onuCode: "xxxx" },
+          signedByTransporter: true,
+          sentAt: "2020-04-03T14:48:00.000Z",
           sentBy: "Isabelle Guichard",
-          packagings: ["BENNE"],
-          quantity: 1,
-          onuCode: "xxxx"
+          currentTransporterSiret: "33333333333333"
         }
       },
       { status: "SEALED", updatedFields: {} },

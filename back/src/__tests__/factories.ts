@@ -183,7 +183,7 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
-const tempStorageData: TemporaryStorageDetailCreateInput = {
+export const tempStorageData: TemporaryStorageDetailCreateInput = {
   tempStorerQuantityType: "ESTIMATED",
   tempStorerQuantityReceived: 1,
   tempStorerWasteAcceptationStatus: "ACCEPTED",

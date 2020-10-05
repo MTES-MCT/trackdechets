@@ -1353,6 +1353,7 @@ type Form {
   readableId: String!
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean!
   owner: User!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -1451,6 +1452,7 @@ input FormCreateInput {
   readableId: String!
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
   status: String
@@ -1561,6 +1563,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   readableId: String!
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
   status: String
@@ -1650,6 +1653,7 @@ input FormCreateWithoutTransportSegmentsInput {
   readableId: String!
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
   status: String
@@ -1748,6 +1752,8 @@ enum FormOrderByInput {
   customId_DESC
   isDeleted_ASC
   isDeleted_DESC
+  isImportedFromPaper_ASC
+  isImportedFromPaper_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -1915,6 +1921,7 @@ type FormPreviousValues {
   readableId: String!
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   signedByTransporter: Boolean
@@ -2042,6 +2049,8 @@ input FormScalarWhereInput {
   customId_not_ends_with: String
   isDeleted: Boolean
   isDeleted_not: Boolean
+  isImportedFromPaper: Boolean
+  isImportedFromPaper_not: Boolean
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -3015,6 +3024,7 @@ input FormUpdateDataInput {
   readableId: String
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
@@ -3104,6 +3114,7 @@ input FormUpdateInput {
   readableId: String
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
@@ -3193,6 +3204,7 @@ input FormUpdateManyDataInput {
   readableId: String
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   signedByTransporter: Boolean
   status: String
   sentAt: DateTime
@@ -3289,6 +3301,7 @@ input FormUpdateManyMutationInput {
   readableId: String
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   signedByTransporter: Boolean
   status: String
   sentAt: DateTime
@@ -3401,6 +3414,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   readableId: String
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
@@ -3489,6 +3503,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   readableId: String
   customId: String
   isDeleted: Boolean
+  isImportedFromPaper: Boolean
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
@@ -3644,6 +3659,8 @@ input FormWhereInput {
   customId_not_ends_with: String
   isDeleted: Boolean
   isDeleted_not: Boolean
+  isImportedFromPaper: Boolean
+  isImportedFromPaper_not: Boolean
   owner: UserWhereInput
   createdAt: DateTime
   createdAt_not: DateTime

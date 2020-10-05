@@ -301,6 +301,14 @@ type Mutation {
       reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)"
     )
 
+  """
+  Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
+  de traitement. Le BSD signé papier original doit être conservé à l'installation de destination qui doit
+  être en mesure de retrouver le bordereau papier correspondant à un bordereau numérique. Le champ `customId`
+  de l'input peut-être utilisé pour faire le lien.
+  """
+  importPaperForm(input: ImportPaperFormInput!): Form
+
   "Prépare un nouveau segment de transport multimodal"
   prepareSegment(
     id: ID!
@@ -431,6 +439,12 @@ type Form {
   objet un système d'information tierce
   """
   customId: String
+
+  """
+  Permet de savoir si les données du BSD ont été importées depuis un
+  bordereau signé papier via la mutation `importPaperForm`
+  """
+  isImportedFromPaper: Boolean!
 
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: Emitter

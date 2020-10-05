@@ -1,33 +1,13 @@
-import {
-  MutationResolvers,
-  MutationMarkAsResentArgs
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
-import { GraphQLContext } from "../../../types";
-import { flattenResentFormInput } from "../../form-converter";
+import { expandFormFromDb, flattenResentFormInput } from "../../form-converter";
 import transitionForm from "../../workflow/transitionForm";
-import { Form, prisma } from "../../../generated/prisma-client";
+import { prisma } from "../../../generated/prisma-client";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";
 import { resealedFormSchema } from "../../validation";
-
-export async function markAsResentFn(
-  form: Form,
-  { resentInfos }: MutationMarkAsResentArgs,
-  context: GraphQLContext
-) {
-  return transitionForm(
-    form,
-    { eventType: "MARK_RESENT", eventParams: resentInfos },
-    context,
-    infos => ({
-      temporaryStorageDetail: {
-        update: flattenResentFormInput(infos)
-      }
-    })
-  );
-}
+import { EventType } from "../../workflow/types";
 
 const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   parent,
@@ -58,7 +38,16 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
     });
   }
 
-  return markAsResentFn(form, { id, resentInfos }, context);
+  const formUpdateInput = {
+    temporaryStorageDetail: {
+      update: flattenResentFormInput(resentInfos)
+    }
+  };
+  const resentForm = await transitionForm(user, form, {
+    type: EventType.MarkAsResent,
+    formUpdateInput
+  });
+  return expandFormFromDb(resentForm);
 };
 
 export default markAsResentResolver;

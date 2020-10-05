@@ -1,5 +1,11 @@
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 
+export class InvalidTransition extends UserInputError {
+  constructor() {
+    super("Vous ne pouvez pas passer ce bordereau à l'état souhaité.");
+  }
+}
+
 export class InvalidWasteCode extends UserInputError {
   constructor(wasteCode: string) {
     super(
@@ -61,5 +67,33 @@ export class CountryNotFound extends UserInputError {
 export class InvaliSecurityCode extends ForbiddenError {
   constructor() {
     super("Le code de sécurité de l'émetteur du bordereau est invalide.");
+  }
+}
+
+export class TemporaryStorageCannotReceive extends UserInputError {
+  constructor() {
+    super(
+      "Ce bordereau ne peut pas être marqué comme reçu car le destinataire " +
+        "est une installation d'entreposage provisoire ou de reconditionnement. " +
+        "Utiliser la mutation markAsTempStored pour marquer ce bordereau comme entreposé provisoirement"
+    );
+  }
+}
+
+export class DestinationCannotTempStore extends UserInputError {
+  constructor() {
+    super(
+      "Ce bordereau ne peut pas être marqué comme entreposé provisoirement " +
+        "car le destinataire n'a pas été identifié comme étant une installation d'entreposage " +
+        "provisoire ou de reconditionnement"
+    );
+  }
+}
+
+export class HasSegmentToTakeOverError extends UserInputError {
+  constructor() {
+    super(
+      "Vous ne pouvez pas passer ce bordereau à l'état souhaité, il n'est pas encore pris en charge par le dernier transporteur"
+    );
   }
 }

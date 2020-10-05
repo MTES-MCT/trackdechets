@@ -14,6 +14,9 @@ type Form {
   customId: String
   isDeleted: Boolean @default(value: false)
 
+  # flag a form that is imported from a paper form
+  isImportedFromPaper: Boolean! @default(value: false)
+
   owner: User! @relation(link: TABLE)
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
@@ -246,7 +249,7 @@ type TransportSegment {
   segmentNumber: Int
 
   form: Form!
-  
+
   # Frame 20-21...
   transporterCompanySiret: String
   transporterCompanyName: String
@@ -269,5 +272,5 @@ type TransportSegment {
 
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
-  
+
 }

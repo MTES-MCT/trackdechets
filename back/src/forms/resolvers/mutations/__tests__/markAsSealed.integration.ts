@@ -26,6 +26,30 @@ const MARK_AS_SEALED = `
 describe("Mutation.markAsSealed", () => {
   afterAll(() => resetDatabase());
 
+  it("should fail if SEALED is not a possible next state", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+    );
+  });
+
   it.each(["emitter", "recipient", "trader", "transporter"])(
     "%p of the BSD can seal it",
     async role => {
@@ -131,9 +155,7 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("the BSD can not be sealed if data do not validate", async () => {
-    const { user, company: emitterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
+    const { user } = await userWithCompanyFactory("MEMBER");
 
     const recipientCompany = await companyFactory();
 
@@ -141,7 +163,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: emitterCompany.siret,
+        emitterCompanySiret: "", // this field is required and will make the mutation fail
         emitterCompanyContact: "", // this field is required and will make the mutation fail
         recipientCompanySiret: recipientCompany.siret
       }
@@ -156,7 +178,10 @@ describe("Mutation.markAsSealed", () => {
 
     // check error message is relevant and only failing fields are reported
     const errMessage =
-      "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): Émetteur: Le contact dans l'entreprise est obligatoire";
+      "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
+      "Erreur(s): Émetteur: Le siret de l'entreprise est obligatoire\n" +
+      "Émetteur: Le SIRET doit faire 14 caractères numériques\n" +
+      "Émetteur: Le contact dans l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
     form = await prisma.form({ id: form.id });

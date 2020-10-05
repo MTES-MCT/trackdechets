@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "./SlipsHeader.scss";
 import { FaTimesCircle } from "react-icons/fa";
 
 export default function SlipsHeader() {
+  const { siret } = useParams<{ siret: string }>();
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     const warningBannerShown = window.localStorage.getItem("td-warningbanner");
@@ -19,7 +20,7 @@ export default function SlipsHeader() {
         </div>
 
         <div className="buttons">
-          <Link to="/form">
+          <Link to={`/form?redirectTo=${siret}`}>
             <button className="button primary">Créer un bordereau</button>
           </Link>
         </div>

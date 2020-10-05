@@ -56,6 +56,7 @@ Chaque changement d'état s'effectue grâce à une mutation.
 | `markAsProcessed`     | <div><ul><li>`RECEIVED -> PROCESSED`</li><li>`RECEIVED -> NO_TRACEABILITY`</li><li>`RECEIVED -> AWAITING_GROUP`</li></ul></div> | [ProcessedFormInput](api-reference.md#processedforminput)                         | Uniquement le destinataire du BSD                                                                                                                                                       |
 | `markAsTempStored`    | <div><ul><li>`SENT -> TEMP_STORED`</li><li>`SENT -> REFUSED`</li></ul></div>                                                    | [TempStoredFormInput](api-reference.md#tempstoredforminput)                       | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
 | `markAsResealed`      | `TEMP_STORED -> RESEALED`                                                                                                       | [ResealedFormInput](api-reference.md#resealedtoredforminput)                      | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
+| `importPaperForm` | `SEALED -> PROCESSED` | [ImportPaperFormInput](api-reference#importpaperforminput)| Uniquement l'entreprise de destination |
 
 <script src="https://unpkg.com/mermaid@8.1.0/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({startOnLoad:true});</script>
@@ -68,6 +69,7 @@ AO(NO STATE) -->|createForm| A
 A -->|updateForm| A
 A[DRAFT] -->|markAsSealed| B(SEALED)
 B -->|signedByTransporter| C(SENT)
+B -->|importPaperForm| E(PROCESSED)
 C -->|markAsReceived| D(RECEIVED)
 D -->|markAsProcessed| E(PROCESSED)
 D -->|markAsProcessed - avec rupture de traçabalité |G(NO_TRACEABILITY)
@@ -118,3 +120,25 @@ L'URL a une durée de validité de 10 secondes.
 Il est possible d'accéder à un flux des modifications d'états qui ont eu lieu sur un BSD en particulier ou sur l'ensemble des BSD's liés à un établissement. En faisant des appels réguliers sur ce flux, il est possible d'implémenter des systèmes de notifications en quasi temps réel pour vos utilisateurs (par exemple lors du traitement d'un déchets).
 
 Ce flux est accessible via la query `formsLifeCycle`. Pour plus d'informations se référer à la [référence de l'API](api-reference/#query)
+
+
+## Import d'un BSD signé papier
+
+L'installation de traitement a la possibilité d'importer un BSD signé papier dans Trackdéchet après l'étape de traitement final dans
+le cas simple d'un acheminement direct du producteur à l’installation de traitement.
+Cet import se fait via la mutation `importFormPaper`. Deux cas de figures se présentent:
+
+* Le BSD est crée initialement dans Trackdéchet puis imprimé avant l'enlèvement par le transporteur. La signature du collecteur-transporteur en case 8
+ainsi que les informations et signatures en case 9, 10 et 11 sont renseignées sur le bordereau papier. Après la phase de traitement finale, le BSD numérique
+initial est mis à jour pour l'entreprise de destination en renseignant son `id` et les informations manquantes.
+
+:::tip
+Afin d'obtenir d'obtenir l'identifiant d'un bordereau numérique à partir du numéro *TD-xxx* apparaissant sur le bordereau papier, il suffit d'utiliser la query `form` en lui passant
+le paramètre `{ readableId: "TD-XXX"}`
+:::
+
+* Le BSD initial n'a pas été émis via Trackdéchets et dispose d'un numéro qui lui est propre. Après la phase de traitement finale, le bordereau papier
+est importé dans Trackdéchets en reportant l'ensemble des informations y apparaissant. Le numéro du BSD papier doit être renseigné grâce au champ `customId`.
+Ce champ permettra de faire le lien entre le bordereau numérique et le bordereau papier.
+
+Dans les deux cas ci-dessus, l'entreprise de traitement doit conserver l'original papier pendant toute la durée réglementaire.

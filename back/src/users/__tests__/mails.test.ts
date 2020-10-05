@@ -4,6 +4,7 @@ import { Form } from "../../generated/prisma-client";
 const formWithTransporter: Form = {
   id: "abcd123",
   readableId: "TD-2019-XYZ",
+  isImportedFromPaper: false,
   status: "REFUSED",
   createdAt: "2019-01-17T08:44:29+0100",
   updatedAt: "2019-01-17T08:44:29+0100",

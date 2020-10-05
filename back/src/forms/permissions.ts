@@ -257,6 +257,18 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
   return true;
 }
 
+// only recipient of the form can import data from paper
+export async function checkCanImportForm(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const isAuthorized = isFormRecipient(fullUser, form);
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir mettre à jour ce bordereau"
+    );
+  }
+  return true;
+}
+
 export async function checkSecurityCode(siret: string, securityCode: number) {
   const exists = await prisma.$exists.company({
     siret,
