@@ -176,6 +176,7 @@ export default function TransportSignature({ form, userSiret }: Props) {
                           type="number"
                           name="quantity"
                           className="field__weight field__block"
+                          step="0.001"
                         />
                       </label>
                     </p>
