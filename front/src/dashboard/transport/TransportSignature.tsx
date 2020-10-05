@@ -4,19 +4,19 @@ import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React, { useState, useContext } from "react";
 import { FaFileSignature } from "react-icons/fa";
-import DownloadFileLink from "../../common/DownloadFileLink";
-import { NotificationError } from "../../common/Error";
-import { updateApolloCache } from "../../common/helper";
-import RedErrorMessage from "../../common/RedErrorMessage";
+import DownloadFileLink from "src/common/components/DownloadFileLink";
+import { NotificationError } from "src/common/components/Error";
+import { updateApolloCache } from "src/common/helper";
+import RedErrorMessage from "src/common/components/RedErrorMessage";
 import {
   Form,
   Mutation,
   MutationSignedByTransporterArgs,
   FormStatus,
-} from "../../generated/graphql/types";
-import Packagings from "../../form/packagings/Packagings";
-import { FORMS_PDF } from "../slips/slips-actions/DownloadPdf";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "./Transport";
+} from "src/generated/graphql/types";
+import Packagings from "src/form/packagings/Packagings";
+import { FORMS_PDF } from "src/dashboard/slips/slips-actions/DownloadPdf";
+import { GET_TRANSPORT_SLIPS, GET_FORM } from "./queries";
 import "./TransportSignature.scss";
 import { Wizard } from "./Wizard";
 import { SiretContext } from "../Dashboard";

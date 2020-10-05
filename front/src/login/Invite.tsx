@@ -10,8 +10,8 @@ import {
   Query,
   User,
 } from "../generated/graphql/types";
-import Loader from "../common/Loader";
-import { NotificationError } from "../common/Error";
+import Loader from "src/common/components/Loaders";
+import { NotificationError } from "src/common/components/Error";
 
 const INVITATION = gql`
   query Invitation($hash: String!) {

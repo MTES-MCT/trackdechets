@@ -1,6 +1,6 @@
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
-import React, { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { Search } from "src/common/components/Icons";
 import { constantCase } from "constant-case";
 import { InlineError } from "src/common/components/Error";
@@ -17,7 +17,7 @@ import {
   FavoriteType,
 } from "../../generated/graphql/types";
 import CountrySelector from "./CountrySelector";
-
+import { uuid } from "uuidv4";
 interface CompanySelectorProps {
   name:
     | "nextDestination.company"
@@ -36,7 +36,7 @@ export default function CompanySelector({
   name,
   onCompanySelected,
   allowForeignCompanies,
-  heading
+  heading,
 }: CompanySelectorProps) {
   const [uniqId] = useState(() => uuid());
   const [field] = useField<FormCompany>({ name });
@@ -131,9 +131,7 @@ export default function CompanySelector({
 
   return (
     <div className="tw-my-6">
-      {!!heading && (
-        <h4 className="form__section-heading">{heading}</h4>
-      )}
+      {!!heading && <h4 className="form__section-heading">{heading}</h4>}
       {field.value.siret != null && (
         <>
           <div className="search__group">
@@ -261,7 +259,6 @@ export default function CompanySelector({
             name={`${field.name}.contact`}
             placeholder="NOM Prénom"
             className="td-input"
-
           />
         </label>
 

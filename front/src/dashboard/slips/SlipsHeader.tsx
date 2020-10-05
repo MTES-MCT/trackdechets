@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import "./SlipsHeader.scss";
 
 import styles from "./SlipsHeader.module.scss";
 import { FaTimesCircle } from "react-icons/fa";

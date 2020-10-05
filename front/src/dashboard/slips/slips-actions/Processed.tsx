@@ -6,9 +6,9 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
 } from "src/generated/constants";
 import DateInput from "src/form/custom-inputs/DateInput";
-import CompanySelector from "../../../form/company/CompanySelector";
-import { SlipActionProps } from "../SlipActions";
-import { MutationMarkAsProcessedArgs } from "../../../generated/graphql/types";
+import CompanySelector from "src/form/company/CompanySelector";
+import { SlipActionProps } from "./SlipActions";
+import { MutationMarkAsProcessedArgs } from "src/generated/graphql/types";
 
 function Processed(props: SlipActionProps) {
   const {
