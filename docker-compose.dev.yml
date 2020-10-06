@@ -142,20 +142,8 @@ services:
       LETSENCRYPT_HOST: $DEVELOPERS_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
 
-  metabase:
-    image: metabase/metabase:v0.34.2
-    volumes:
-      - metabase:/metabase-data
-    environment:
-      - MB_DB_FILE=/metabase-data/metabase.db
-      - VIRTUAL_HOST=$METABASE_HOST
-      - VIRTUAL_PORT=3000
-      - LETSENCRYPT_HOST=$METABASE_HOST
-      - LETSENCRYPT_EMAIL=$EMAIL_LETS_ENCRYPT
-
 volumes:
   postgres:
-  metabase:
 
 networks:
   default:
