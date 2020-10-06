@@ -91,7 +91,7 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   const statusLogsCx = await prisma
     .statusLogsConnection({
       orderBy: "loggedAt_DESC",
-      first: PAGINATE_BY,
+      [cursorAfter ? "first" : "last"]: PAGINATE_BY,
       after: cursorAfter,
       before: cursorBefore,
       where: {
