@@ -134,36 +134,36 @@ export default function CompanySelector({
       {!!heading && <h4 className="form__section-heading">{heading}</h4>}
       {field.value.siret != null && (
         <>
-          <div className="search__group">
-            <input
-              id={`siret-${uniqId}`}
-              type="text"
-              placeholder="Recherche par numéro de SIRET ou nom de l'entreprise"
-              className={`td-input ${styles.companySelectorSearchSiret}`}
-              onChange={event => setClue(event.target.value)}
-            />
-            <i className={styles.searchIcon} aria-label="Recherche">
-              <Search color="#8393a7" size={12} />
-            </i>
-          </div>
+          <div className={styles.companySelectorSearchFields}>
+            <div className={styles.companySelectorSearchGroup}>
+              <label htmlFor={`siret-${uniqId}`}>
+                Numéro de SIRET ou nom de l'entreprise
+              </label>
+              <div className={styles.companySelectorSearchField}>
+                <input
+                  id={`siret-${uniqId}`}
+                  type="text"
+                  className={`td-input ${styles.companySelectorSearchSiret}`}
+                  onChange={event => setClue(event.target.value)}
+                />
+                <i className={styles.searchIcon} aria-label="Recherche">
+                  <Search color="#8393a7" size={12} />
+                </i>
+              </div>
+            </div>
 
-          {/* <button
-            className="button-outline small primary"
-            type="button"
-            onClick={() => setDepartement(department == null ? "" : null)}
-          >
-            Affiner la recherche par département?
-          </button> */}
+            <div className={styles.companySelectorSearchGroup}>
+              <label htmlFor={`geo-${uniqId}`}>
+                Département ou code postal
+              </label>
 
-          <div className={styles.companySelectorSearchGroup}>
-            <label htmlFor={`geo-${uniqId}`}>Département ou code postal</label>
-
-            <input
-              id={`geo-${uniqId}`}
-              type="text"
-              className={`td-input ${styles.companySelectorSearchGeo}`}
-              onChange={event => setDepartement(event.target.value)}
-            />
+              <input
+                id={`geo-${uniqId}`}
+                type="text"
+                className={`td-input ${styles.companySelectorSearchGeo}`}
+                onChange={event => setDepartement(event.target.value)}
+              />
+            </div>
           </div>
 
           {isLoadingSearch && <span>Chargement...</span>}

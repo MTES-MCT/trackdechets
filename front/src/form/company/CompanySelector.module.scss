@@ -50,21 +50,21 @@
 .companySelector {
   &SearchFields {
     display: flex;
-    margin-right: 1rem;
     flex-direction: column;
     @include desktop {
       flex-direction: row;
+      flex-wrap: wrap; // display fields stacked if there is not enough room
     }
   }
 
   &SearchSiret {
     width: 480px;
-    display: inline-block;
+ 
   }
 
   &SearchGeo {
-    width: 300px;
-    display: inline-block;
+    width: 230px;
+ 
   }
   &SearchPhone {
     width: 150px;
