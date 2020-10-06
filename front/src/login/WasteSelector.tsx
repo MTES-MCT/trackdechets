@@ -12,7 +12,7 @@ export default function WasteSelector() {
       <Link to="/signup/activation" className="button secondary">
         Ignorer
       </Link>
-      <Link to="/signup/activation" className="button">
+      <Link to="/signup/activation" className="btn btn--primary">
         Valider
       </Link>
     </div>

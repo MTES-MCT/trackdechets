@@ -64,7 +64,7 @@ function SignupConfirmation({ user }: { user: User }) {
           Connectez-vous à votre compte pour accéder à votre tableau de bord et
           accéder aux bordereaux de ces établissements.
         </p>
-        <Link to="/login" className="button">
+        <Link to="/login" className="btn btn--primary">
           Se connecter
         </Link>
       </section>
@@ -91,7 +91,7 @@ function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
           Connectez-vous à votre compte pour accéder à votre tableau de bord et
           accéder aux bordereaux de cet établissement.
         </p>
-        <Link to="/login" className="button">
+        <Link to="/login" className="btn btn--primary">
           Se connecter
         </Link>
       </section>
@@ -210,11 +210,11 @@ export default function Invite() {
                 <ErrorMessage
                   name="passwordConfirmation"
                   render={msg => (
-                    <div className="input-error-message">{msg}</div>
+                    <div className="error-message">{msg}</div>
                   )}
                 />
                 <button
-                  className="button"
+                  className="btn btn--primary"
                   type="submit"
                   disabled={isSubmitting}
                 >

@@ -48,7 +48,7 @@ export default function ResetPassword() {
             </label>
           </div>
 
-          <button className="button" type="submit">
+          <button className="btn btn--primary" type="submit">
             Réinitialiser
           </button>
         </form>

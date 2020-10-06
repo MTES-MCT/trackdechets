@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, FormikHelpers } from "formik";
 import "./Wizard.scss";
-
+import { NextButton, PreviousButton } from "src/common/components/Buttons";
 type Props = { initialValues: Object; children: any[]; onSubmit: Function };
 type State = { page: number; values: Object };
 
@@ -82,24 +82,14 @@ export class Wizard extends React.Component<Props, State> {
                 {activePage}
                 <div className="form__actions">
                   {page > 0 && (
-                    <button
-                      type="button"
-                      className="button-outline primary"
-                      onClick={this.previous}
-                    >
-                      Retour
-                    </button>
+                    <PreviousButton onClick={this.previous} caption="Retour" />
                   )}
 
-                  {!isLastPage && (
-                    <button className="button" type="submit">
-                      Continuer
-                    </button>
-                  )}
+                  {!isLastPage && <NextButton caption="Continuer" />}
                   {isLastPage && (
                     <button
                       type="submit"
-                      className="button no-margin"
+                      className="btn btn--primary"
                       disabled={isSubmitting}
                     >
                       S'inscrire

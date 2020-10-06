@@ -68,7 +68,7 @@ export default withRouter(function Login(
               />
             </label>
             {error && errorField === "email" && (
-              <div className="input-error-message">{error}</div>
+              <div className="error-message">{error}</div>
             )}
           </div>
 
@@ -83,12 +83,12 @@ export default withRouter(function Login(
               />
             </label>
             {error && errorField === "password" && (
-              <div className="input-error-message">{error}</div>
+              <div className="error-message">{error}</div>
             )}
           </div>
           {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
           {error && !errorField && (
-            <div className="input-error-message">{error}</div>
+            <div className="error-message">{error}</div>
           )}
           <div className="form__actions">
             <button
