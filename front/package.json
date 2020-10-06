@@ -71,7 +71,7 @@
     "@types/rc-tree": "^1.11.3",
     "@types/react": "^16.9.43",
     "@types/react-dom": "^16.9.8",
-    "@types/react-lazyload": "^2.5.0",
+    "@types/react-lazyload": "^3.0.0",
     "@types/react-router-dom": "^5.1.5",
     "@types/react-select": "^3.0.16",
     "@types/react-tabs": "^2.3.2",
