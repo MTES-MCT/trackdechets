@@ -333,7 +333,7 @@ describe("checkCanMarkAsProcessed", () => {
   });
 });
 
-describe("checkCanMarkAsTempStored", async () => {
+describe("checkCanMarkAsTempStored", () => {
   afterAll(resetDatabase);
 
   const permission = checkCanMarkAsTempStored;
@@ -353,7 +353,7 @@ describe("checkCanMarkAsTempStored", async () => {
   });
 });
 
-describe("checkCanMarkAsResent", async () => {
+describe("checkCanMarkAsResent", () => {
   afterAll(resetDatabase);
 
   const permission = checkCanMarkAsResent;
@@ -373,7 +373,7 @@ describe("checkCanMarkAsResent", async () => {
   });
 });
 
-describe("checkSecurityCode", async () => {
+describe("checkSecurityCode", () => {
   afterAll(resetDatabase);
 
   test("securityCode is valid", async () => {
