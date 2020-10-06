@@ -72,7 +72,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                 title="Établissements"
                 button={
                   <button
-                    className="button"
+                    className="btn btn--primary"
                     onClick={() => history.push(`${match.path}/companies/new`)}
                   >
                     Créer un établissement

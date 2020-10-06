@@ -44,7 +44,7 @@ export default function AccountFormCompanySecurityCode({
     <>
       <div className="notification warning">{cautionMessage}</div>
       <button
-        className="button"
+        className="btn btn--primary"
         type="submit"
         onClick={() => renewSecurityCode({ variables: mutationArgs })}
       >

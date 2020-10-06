@@ -59,7 +59,7 @@ export default function AccountCompanyAddSiret({
           <RedErrorMessage name="siret" />
           <br />
           <button
-            className="button"
+            className="btn btn--primary tw-mt-2"
             type="button"
             onClick={() => {
               const trimedSiret = values.siret.replace(/\s/g, "");

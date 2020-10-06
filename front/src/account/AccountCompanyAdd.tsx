@@ -385,7 +385,7 @@ export default function AccountCompanyAdd() {
                     <Field
                       type="text"
                       name="companyName"
-                      className={styles.textField}
+                      className={`td-input ${styles.textField}`}
                     />
                   </div>
                 </div>
@@ -398,7 +398,7 @@ export default function AccountCompanyAdd() {
                     <Field
                       type="text"
                       name="codeNaf"
-                      className={styles.textField}
+                      className={`td-input ${styles.textField}`}
                     />
                   </div>
                 </div>
@@ -409,7 +409,7 @@ export default function AccountCompanyAdd() {
                     <Field
                       type="text"
                       name="address"
-                      className={styles.textField}
+                      className={`td-input ${styles.textField}`}
                     />
                   </div>
                 </div>
@@ -467,7 +467,7 @@ export default function AccountCompanyAdd() {
                     <Field
                       type="text"
                       name="gerepId"
-                      className={styles.textField}
+                      className={`td-input ${styles.textField}`}
                     />
                     <div className={styles.smaller}>
                       Gestion Electronique du Registre des Emissions Polluantes.{" "}
@@ -485,7 +485,11 @@ export default function AccountCompanyAdd() {
                 <div className={styles.field}>
                   <div className={styles.field__value}>
                     <label>
-                      <Field type="checkbox" name="isAllowed" />
+                      <Field
+                        type="checkbox"
+                        name="isAllowed"
+                        className="td-checkbox"
+                      />
                       Je certifie disposer du pouvoir pour créer un compte au
                       nom de mon entreprise
                     </label>
@@ -496,7 +500,7 @@ export default function AccountCompanyAdd() {
 
                 <div className={styles["submit-form"]}>
                   <button
-                    className="button-outline primary"
+                    className="btn btn--outline-primary"
                     disabled={isSubmitting}
                     onClick={() => {
                       history.goBack();
@@ -506,7 +510,7 @@ export default function AccountCompanyAdd() {
                   </button>
 
                   <button
-                    className="button"
+                    className="btn btn--primary"
                     type="submit"
                     disabled={isSubmitting}
                   >

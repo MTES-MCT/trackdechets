@@ -203,7 +203,7 @@ export default function AccountFormCompanyTransporterReceipt({
               </button>
             )}
             <button
-              className="button"
+              className="btn btn--primary"
               type="submit"
               disabled={props.isSubmitting}
             >
