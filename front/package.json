@@ -29,7 +29,7 @@
     "rc-tree": "^1.14.10",
     "react": "16.12.0",
     "react-app-polyfill": "^1.0.6",
-    "react-dom": "16.12.0",
+    "react-dom": "16.13.0",
     "react-icons": "^3.2.2",
     "react-lazyload": "^2.5.0",
     "react-router-dom": "5.1.2",
