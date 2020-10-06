@@ -104,22 +104,6 @@ input[type="file"] {
   display: inline-flex;
 }
 
-select {
-  appearance: none;
-  background: #fff
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><path d="M1.254 2.518a.904.904 0 0 1 0-1.257.85.85 0 0 1 1.225 0l4.512 4.632 4.511-4.632a.85.85 0 0 1 1.225 0 .904.904 0 0 1 0 1.257L7.621 7.761a.848.848 0 0 1-.63.259.849.849 0 0 1-.631-.259L1.254 2.518z" fill="gray"/></svg>')
-    no-repeat;
-  background: var(--theme-background-white)
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><path d="M1.254 2.518a.904.904 0 0 1 0-1.257.85.85 0 0 1 1.225 0l4.512 4.632 4.511-4.632a.85.85 0 0 1 1.225 0 .904.904 0 0 1 0 1.257L7.621 7.761a.848.848 0 0 1-.63.259.849.849 0 0 1-.631-.259L1.254 2.518z" fill="gray"/></svg>')
-    no-repeat;
-  background-position: top 1em right 0;
-  background-size: 1.7em;
-  padding-right: 2.8em;
-  border-radius: 3px;
-  border-radius: var(--theme-border-radius);
-  width: auto;
-}
-
 @-moz-document url-prefix() {
   select {
     padding-top: 0.438em;
@@ -157,7 +141,9 @@ select:-moz-focusring {
   vertical-align: middle;
   position: relative;
 }
+
 .td-select {
+  appearance: none;
   padding-right: 1.75rem;
   background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTMxIDguNzA3TDE2LjcwNyAyM2EuOTk2Ljk5NiAwIDAgMS0xLjQxNCAwTDEgOC43MDciIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjk5OTk5NDk5OTk5OTk5OTciLz48L3N2Zz4=");
   background-repeat: no-repeat, repeat;

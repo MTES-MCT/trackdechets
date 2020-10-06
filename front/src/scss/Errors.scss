@@ -2,6 +2,9 @@
   border-color: #d63626;
 }
 
-.input-error-message {
+.error-message {
   color: #d63626;
+  &--bold {
+    font-weight: bold;
+  }
 }

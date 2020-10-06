@@ -1,16 +1,16 @@
 .h1 {
   font-size: $h1Size;
-  line-height: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .h2 {
   font-size: $h2Size;
-  line-height: 1.25rem;
+  line-height: 1.5rem;
 }
 
 .h3 {
   font-size: $h3Size;
-  line-height: 1.5rem;
+  line-height: 1.25rem;
 }
 
 .h4 {
@@ -43,4 +43,17 @@ a.link:hover {
 }
 .lead-text {
   font-size: 1.25em;
+}
+.body-text {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+.body-text + .body-text {
+  margin-top: 1rem;
+}
+.bullets {
+  li {
+    list-style: disc inside;
+    margin: 0.5rem 0 0.5rem 1rem;
+  }
 }
