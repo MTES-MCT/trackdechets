@@ -43,7 +43,12 @@ function Processed(props: SlipActionProps) {
       <div className="form__row">
         <label>
           Nom du responsable
-          <Field type="text" name="processedBy" placeholder="NOM Prénom" />
+          <Field
+            type="text"
+            name="processedBy"
+            placeholder="NOM Prénom"
+            className="td-input"
+          />
         </label>
       </div>
       <div className="form__row">
