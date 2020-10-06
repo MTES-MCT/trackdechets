@@ -72,6 +72,22 @@ type Query {
     cursorBefore: ID
 
     """
+    (Optionnel) Retourne les BSD modifiés avant la date
+    Filtre sur la date de dernière modification
+    Au format (YYYY-MM-DD)
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    updatedBefore: String
+
+    """
+    (Optionnel) Retourne les BSD modifiés après la date
+    Filtre sur la date de dernière modification
+    Au format (YYYY-MM-DD)
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    updatedAfter: String
+
+    """
     (Optionnel) Filtre sur les statuts des bordereaux
     Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
     Défaut à vide.

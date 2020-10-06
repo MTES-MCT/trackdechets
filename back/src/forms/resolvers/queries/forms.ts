@@ -63,6 +63,8 @@ export async function getForms(
     ...getPaginationFilter(rest),
     orderBy: "createdAt_DESC",
     where: {
+      updatedAt_gte: rest.updatedAfter,
+      updatedAt_lte: rest.updatedBefore,
       ...(status?.length && { status_in: status }),
       AND: [
         getFormsRightFilter(company.siret, roles),

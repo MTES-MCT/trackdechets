@@ -200,6 +200,30 @@ Défaut à vide, pour retourner les "derniers" bordereaux
 </td>
 </tr>
 <tr>
+<td colspan="2" align="right" valign="top">updatedBefore</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Retourne les BSD modifiés avant la date
+Filtre sur la date de dernière modification
+Au format (YYYY-MM-DD)
+Par défaut vide, aucun filtre n'est appliqué
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">updatedAfter</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Retourne les BSD modifiés après la date
+Filtre sur la date de dernière modification
+Au format (YYYY-MM-DD)
+Par défaut vide, aucun filtre n'est appliqué
+
+</td>
+</tr>
+<tr>
 <td colspan="2" align="right" valign="top">status</td>
 <td valign="top">[<a href="#formstatus">FormStatus</a>!]</td>
 <td>

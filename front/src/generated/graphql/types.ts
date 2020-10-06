@@ -1456,6 +1456,8 @@ export type QueryFormsArgs = {
   formsPerPage: Maybe<Scalars['PaginationAmount']>;
   cursorAfter: Maybe<Scalars['ID']>;
   cursorBefore: Maybe<Scalars['ID']>;
+  updatedBefore: Maybe<Scalars['String']>;
+  updatedAfter: Maybe<Scalars['String']>;
   status: Maybe<Array<FormStatus>>;
   roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
