@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import { ChevronDown, ChevronUp } from "./Icons";
-import OutsideClickHandler from "react-outside-click-handler";
 import { COLORS } from "src/common/config";
 
 export const MenuDropDown = props => {
