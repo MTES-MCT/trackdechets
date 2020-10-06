@@ -11,7 +11,7 @@ import session from "express-session";
 import rateLimit from "express-rate-limit";
 import RateLimitRedisStore from "rate-limit-redis";
 import redisStore from "connect-redis";
-import depthLimit from "graphql-depth-limit"
+import depthLimit from "graphql-depth-limit";
 import bodyParser from "body-parser";
 import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
