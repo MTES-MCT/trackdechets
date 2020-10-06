@@ -53,7 +53,7 @@ export default function Dialog() {
           ></input>
           <div className={styles.flex}>
             <input
-              className="button"
+              className="btn btn--primary"
               type="submit"
               value="Autoriser"
               id="allow"
