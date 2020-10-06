@@ -135,8 +135,8 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
 function getPaginationFilter({
   first,
   skip,
-  cursorAfter,
-  cursorBefore,
+  cursorAfter: after,
+  cursorBefore: before,
   formsPerPage = DEFAULT_PAGINATE_BY
 }: Partial<QueryFormsArgs>) {
   // DEPRECATED. To remove with && skip
@@ -147,16 +147,16 @@ function getPaginationFilter({
     };
   }
 
-  if (cursorBefore) {
+  if (before) {
     return {
-      cursorBefore,
+      before,
       last: formsPerPage
     };
   }
 
   // By default, if no cursorAfter is provided we'll return the first elements
   return {
-    cursorAfter,
+    after,
     first: formsPerPage
   };
 }
