@@ -7,8 +7,7 @@ export const GET_SLIPS = gql`
     $siret: String
     $status: [FormStatus!]
     $hasNextStep: Boolean
-    $first: Int = ${ITEMS_PER_PAGE}
-    $skip: Int
+    $cursorAfter: ID
   ) {
     forms(
       siret: $siret
