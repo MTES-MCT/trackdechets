@@ -117,7 +117,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
         </label>
         <RedErrorMessage name="wasteDetails.quantity" />
 
-        <fieldset className="mt-3">
+        <fieldset className="tw-mt-3">
           <legend>Cette quantité est</legend>
           <Field
             name="wasteDetails.quantityType"
