@@ -149,6 +149,7 @@ SIRET d'un établissement dont je suis membre
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
+DEPRECATED - (Optionnel) PAGINATION
 Nombre de bordereaux retournés.
 Défaut à 50, maximum à 500
 
@@ -159,9 +160,42 @@ Défaut à 50, maximum à 500
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
+DEPRECATED - (Optionnel) PAGINATION
 Nombre d'éléments à ne pas récupérer en début de liste
-Permet de paginer les résultats
 Défaut à 0
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">formsPerPage</td>
+<td valign="top"><a href="#paginationamount">PaginationAmount</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés.
+Défaut à 50, maximum à 500
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorAfter</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Curseur après lequel les bordereaux doivent être retournés
+Défaut à vide, pour retourner les "premiers" bordereaux
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorBefore</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Curseur avant lequel les bordereaux doivent être retournés
+Défaut à vide, pour retourner les "derniers" bordereaux
 
 </td>
 </tr>
@@ -5888,6 +5922,10 @@ The `ID` scalar type represents a unique identifier, often used to refetch an ob
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
 
 ### JSON
+
+### PaginationAmount
+
+### PositiveInt
 
 ### String
 

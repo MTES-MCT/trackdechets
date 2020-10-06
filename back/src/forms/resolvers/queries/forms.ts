@@ -1,16 +1,17 @@
-import {
-  QueryResolvers,
-  QueryFormsArgs,
-  Form
-} from "../../../generated/graphql/types";
-import { checkIsAuthenticated } from "../../../common/permissions";
-import { prisma } from "../../../generated/prisma-client";
-import { expandFormFromDb } from "../../form-converter";
 import { UserInputError } from "apollo-server-express";
-import { NotCompanyMember, MissingSiret } from "../../../common/errors";
+import { MissingSiret, NotCompanyMember } from "../../../common/errors";
+import { checkIsAuthenticated } from "../../../common/permissions";
+import {
+  Form,
+  QueryFormsArgs,
+  QueryResolvers
+} from "../../../generated/graphql/types";
+import { prisma } from "../../../generated/prisma-client";
 import { getUserCompanies } from "../../../users/database";
 import { getFormsRightFilter } from "../../database";
+import { expandFormFromDb } from "../../form-converter";
 
+// DEPRECATED. To remove with && skip
 function validateArgs(args: QueryFormsArgs) {
   if (args.first < 0 || args.first > 500) {
     throw new UserInputError(
@@ -23,20 +24,8 @@ function validateArgs(args: QueryFormsArgs) {
   return args;
 }
 
-const DEFAULT_FIRST = 50;
+const DEFAULT_PAGINATE_BY = 50;
 
-/**
- *
- * if type is TRANSPORTER, return forms:
- * - which status is in "SEALED", "SENT", "RESEALED", "RESENT"
- * - which transporterCompanySiret  or one segment's transporterCompanySiret matches selectedCompany siret
- * - which temporaryStorageDetail transporterCompanySiret matches selectedCompany siret
- *
- * if type is ACTOR (default), return forms:
- * - from any status
- * - which recipientCompanySiret, emitterCompanySiret, ecoOrganisme siret or temporaryStorageDetail destinationCompanySiret
- *  matches selectedCompany siret
- */
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
   const validArgs = validateArgs(args);
@@ -47,9 +36,6 @@ export async function getForms(
   userId: string,
   { siret, status, roles, hasNextStep, ...rest }: QueryFormsArgs
 ): Promise<Form[]> {
-  const first = rest.first ?? DEFAULT_FIRST;
-  const skip = rest.skip ?? 0;
-
   const userCompanies = await getUserCompanies(userId);
 
   let company = null;
@@ -74,8 +60,7 @@ export async function getForms(
   }
 
   const queriedForms = await prisma.forms({
-    first,
-    skip,
+    ...getPaginationFilter(rest),
     orderBy: "createdAt_DESC",
     where: {
       ...(status?.length && { status_in: status }),
@@ -145,6 +130,35 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
   };
 
   return hasNextStep ? filter : { NOT: filter };
+}
+
+function getPaginationFilter({
+  first,
+  skip,
+  cursorAfter,
+  cursorBefore,
+  formsPerPage = DEFAULT_PAGINATE_BY
+}: Partial<QueryFormsArgs>) {
+  // DEPRECATED. To remove with && skip
+  if (first || skip) {
+    return {
+      first: first,
+      skip: skip ?? 0
+    };
+  }
+
+  if (cursorBefore) {
+    return {
+      cursorBefore,
+      last: formsPerPage
+    };
+  }
+
+  // By default, if no cursorAfter is provided we'll return the first elements
+  return {
+    cursorAfter,
+    first: formsPerPage
+  };
 }
 
 export default formsResolver;

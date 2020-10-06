@@ -15,10 +15,12 @@ export type Scalars = {
    * - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
    * - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
    */
-  DateTime: string;
+  DateTime: any;
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
-  URL: string;
+  URL: any;
+  PaginationAmount: any;
   JSON: any;
+  PositiveInt: any;
 };
 
 /** Payload de création d'une annexe 2 */
@@ -1295,6 +1297,8 @@ export enum Packagings {
   Autre = 'AUTRE'
 }
 
+
+
 /** Payload permettant le rattachement d'un établissement à un utilisateur */
 export type PrivateCompanyInput = {
   /** SIRET de l'établissement */
@@ -1449,6 +1453,9 @@ export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
   first: Maybe<Scalars['Int']>;
   skip: Maybe<Scalars['Int']>;
+  formsPerPage: Maybe<Scalars['PaginationAmount']>;
+  cursorAfter: Maybe<Scalars['ID']>;
+  cursorBefore: Maybe<Scalars['ID']>;
   status: Maybe<Array<FormStatus>>;
   roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
@@ -2248,7 +2255,7 @@ export function createCreateFormInputMock(props: Partial<CreateFormInput>): Crea
 export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderReceiptInput>): CreateTraderReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2257,7 +2264,7 @@ export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderRe
 export function createCreateTransporterReceiptInputMock(props: Partial<CreateTransporterReceiptInput>): CreateTransporterReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2561,7 +2568,7 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
     processingOperationDone: "",
     processingOperationDescription: null,
     processedBy: "",
-    processedAt: new Date().toISOString(),
+    processedAt: new Date(),
     nextDestination: null,
     noTraceability: null,
     ...props,
@@ -2573,7 +2580,7 @@ export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): 
     wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date().toISOString(),
+    receivedAt: new Date(),
     signedAt: null,
     quantityReceived: 0,
     ...props,
@@ -2616,7 +2623,7 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     wasteDetails: null,
     transporter: null,
     signedBy: "",
-    signedAt: new Date().toISOString(),
+    signedAt: new Date(),
     ...props,
   };
 }
@@ -2639,7 +2646,7 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     sentBy: "",
     ...props,
   };
@@ -2647,7 +2654,7 @@ export function createSentFormInputMock(props: Partial<SentFormInput>): SentForm
 
 export function createSignatureFormInputMock(props: Partial<SignatureFormInput>): SignatureFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     sentBy: "",
     ...props,
   };
@@ -2730,7 +2737,7 @@ export function createSubscriptionMock(props: Partial<Subscription>): Subscripti
 
 export function createTakeOverInputMock(props: Partial<TakeOverInput>): TakeOverInput {
   return {
-    takenOverAt: new Date().toISOString(),
+    takenOverAt: new Date(),
     takenOverBy: "",
     ...props,
   };
@@ -2774,7 +2781,7 @@ export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput
     wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date().toISOString(),
+    receivedAt: new Date(),
     signedAt: null,
     quantityReceived: 0,
     quantityType: QuantityType.Real,
@@ -2808,7 +2815,7 @@ export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderRe
     __typename: "TraderReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2846,7 +2853,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
     __typename: "TransporterReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2854,7 +2861,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
 
 export function createTransporterSignatureFormInputMock(props: Partial<TransporterSignatureFormInput>): TransporterSignatureFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     signedByTransporter: false,
     securityCode: 0,
     sentBy: "",

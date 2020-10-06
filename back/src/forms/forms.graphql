@@ -10,6 +10,9 @@ scalar DateTime
 
 scalar JSON
 
+scalar PaginationAmount
+scalar PositiveInt
+
 type Query {
   "Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)"
   form(
@@ -34,17 +37,39 @@ type Query {
     siret: String
 
     """
+    DEPRECATED - (Optionnel) PAGINATION
     Nombre de bordereaux retournés.
     Défaut à 50, maximum à 500
     """
     first: Int
 
     """
+    DEPRECATED - (Optionnel) PAGINATION
     Nombre d'éléments à ne pas récupérer en début de liste
-    Permet de paginer les résultats
     Défaut à 0
     """
     skip: Int
+
+    """
+    (Optionnel) PAGINATION
+    Nombre de bordereaux retournés.
+    Défaut à 50, maximum à 500
+    """
+    formsPerPage: PaginationAmount
+
+    """
+    (Optionnel) PAGINATION
+    Curseur après lequel les bordereaux doivent être retournés
+    Défaut à vide, pour retourner les "premiers" bordereaux
+    """
+    cursorAfter: ID
+
+    """
+    (Optionnel) PAGINATION
+    Curseur avant lequel les bordereaux doivent être retournés
+    Défaut à vide, pour retourner les "derniers" bordereaux
+    """
+    cursorBefore: ID
 
     """
     (Optionnel) Filtre sur les statuts des bordereaux
