@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 
 import styles from "./SlipsHeader.module.scss";
 import { FaTimesCircle } from "react-icons/fa";
@@ -24,7 +23,6 @@ const Crumb = () => {
   );
 };
 export default function SlipsHeader() {
-  const { siret } = useParams<{ siret: string }>();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
