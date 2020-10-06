@@ -47,7 +47,7 @@ export function DashboardNav({
 
       {company && (
         <>
-          <p className={styles.dashboardNavChapter}>Mes bordereaux 1</p>
+          <p className={styles.dashboardNavChapter}>Mes bordereaux</p>
           <ul>
             <li className="sidebar__item">
               <NavLink

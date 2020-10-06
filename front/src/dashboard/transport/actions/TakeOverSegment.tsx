@@ -156,7 +156,7 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
                     >
                       Annuler
                     </button>
-                    <button className="button" type="submit">
+                    <button className="btn btn--primary" type="submit">
                       Valider
                     </button>
                   </div>

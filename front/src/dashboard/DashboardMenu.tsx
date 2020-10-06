@@ -38,7 +38,7 @@ export default function DashboardMenu({
 
         {company && (
           <>
-            <p className="sidebar__chapter">Mes bordereaux 2</p>
+            <p className="sidebar__chapter">Mes bordereaux</p>
             <ul>
               <li>
                 <NavLink

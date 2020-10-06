@@ -102,17 +102,8 @@ export class Wizard extends React.Component<Props, State> {
             {({ values, handleSubmit, isSubmitting }) => (
               <form onSubmit={handleSubmit}>
                 {React.cloneElement(activePage, { values, isSubmitting })}
-                <div className="form__actions mb-2">
-                  {page > 0 && (
-                      <PreviousButton onClick={this.previous}                    />
-                    // <button
-                    //   type="button"
-                    //   className="btn btn--outline-primary"
-                    //   onClick={this.previous}
-                    // >
-                    //   Précédent
-                    // </button>
-                  )}
+                <div className="form__actions tw-mb-2">
+                  {page > 0 && <PreviousButton onClick={this.previous} />}
                   <button
                     type="button"
                     className="btn btn--outline-primary"

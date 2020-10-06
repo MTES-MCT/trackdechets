@@ -30,7 +30,7 @@ const textConfig = {
   },
 };
 const FieldError = ({ fieldError }) =>
-  !!fieldError ? <p className="text-red mt-0 mb-0">{fieldError}</p> : null;
+  !!fieldError ? <p className="text-red tw-mt-0 tw-mb-0">{fieldError}</p> : null;
 
 export default function Received(props: SlipActionProps) {
   return (
@@ -68,7 +68,7 @@ export default function Received(props: SlipActionProps) {
               <div className="form__row">
                 <div className="form__row">
                   <fieldset className="form__radio-group">
-                    <h4 className="mr-2">Lot accepté: </h4>
+                    <h4 className="tw-mr-2">Lot accepté: </h4>
                     <Field
                       name="wasteAcceptationStatus"
                       id={WasteAcceptationStatus.Accepted}
