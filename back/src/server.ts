@@ -107,7 +107,7 @@ export const server = new ApolloServer({
   schema: schemaWithMiddleware,
   introspection: true, // used to enable the playground in production
   playground: true, // used to enable the playground in production
-  validationRules: [ depthLimit(10) ],
+  validationRules: [depthLimit(10)],
   context: async ctx => {
     return {
       ...ctx,
