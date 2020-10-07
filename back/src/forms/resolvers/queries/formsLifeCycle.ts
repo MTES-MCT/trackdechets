@@ -1,5 +1,4 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { GraphQLContext } from "../../../types";
 import {
   prisma,
   StatusLogConnection,

@@ -349,4 +349,45 @@ describe("Test formsLifeCycle query", () => {
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(0);
   });
+
+  it("should return statusLog data for which the current user is a trader on", async () => {
+    const {
+      emitter,
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form
+    } = await prepareDB();
+
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    const traderForm = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        traderCompanySiret: recipientCompany.siret
+      }
+    });
+
+    await statusLogFactory({
+      status: "SENT",
+      formId: traderForm.id,
+      userId: emitter.id,
+      updatedFields: { lorem: "ipsum" }
+    });
+    const glQuery = buildFormsLifecycleQuery();
+
+    const { query } = makeClient(recipient);
+
+    const { data } = (await query(glQuery)) as any;
+    const { statusLogs } = data.formsLifeCycle;
+    expect(statusLogs.length).toBe(1);
+    expect(statusLogs[0].status).toBe("SENT");
+    expect(statusLogs[0].updatedFields.lorem).toBe("ipsum");
+    expect(statusLogs[0].form.id).toBe(traderForm.id);
+    expect(statusLogs[0].user.id).toBe(emitter.id);
+  });
 });
