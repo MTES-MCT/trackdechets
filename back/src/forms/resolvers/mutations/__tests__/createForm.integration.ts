@@ -37,6 +37,22 @@ const CREATE_FORM = `
           }
         }
       }
+      transporter {
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+        }
+        isExemptedOfReceipt
+        receipt
+        department
+        validityLimit
+        numberPlate
+        customInfo
+      }
     }
   }
 `;
@@ -333,4 +349,43 @@ describe("Mutation.createForm", () => {
       ]);
     }
   );
+
+  it("should create a form with a transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      transporter: {
+        company: {
+          siret: "12345678901234",
+          name: "Transporter",
+          address: "123 whatever street, Somewhere",
+          contact: "Jane Doe",
+          mail: "janedoe@transporter.com",
+          phone: "06"
+        },
+        isExemptedOfReceipt: false,
+        receipt: "8043",
+        department: "69",
+        validityLimit: "2040-01-01T00:00:00.000Z",
+        numberPlate: "AX-123-69",
+        customInfo: "T-456"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    expect(errors).toEqual(undefined);
+    expect(data.createForm.transporter).toMatchObject(
+      createFormInput.transporter
+    );
+  });
 });

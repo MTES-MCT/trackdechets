@@ -146,6 +146,7 @@ export default function PrepareSegment({ form, userSiret }: Props) {
                     nextSegmentInfo: {
                       transporter: {
                         ...transporter,
+                        customInfo: null,
                         validityLimit: validityLimit || null,
                       },
                       ...rst,

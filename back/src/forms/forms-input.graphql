@@ -334,6 +334,9 @@ input RecipientInput {
 
 "Collecteur - transporteur (case 8)"
 input TransporterInput {
+  "Établissement collecteur - transporteur"
+  company: CompanyInput
+
   "Exemption de récipissé"
   isExemptedOfReceipt: Boolean
 
@@ -349,8 +352,8 @@ input TransporterInput {
   "Numéro de plaque d'immatriculation"
   numberPlate: String
 
-  "Établissement collecteur - transporteur"
-  company: CompanyInput
+  "Information libre, destinée aux transporteurs"
+  customInfo: String
 }
 
 "Payload lié au négociant"
@@ -468,50 +471,9 @@ input ResealedFormInput {
   transporter: TransporterInput
 }
 
-"Payload d'un segment de transport"
-input NextSegmentCompanyInput {
-  "SIRET de l'établissement"
-  siret: String
-
-  "Nom de l'établissement"
-  name: String
-
-  "Adresse de l'établissement"
-  address: String
-
-  "Nom du contact dans l'établissement"
-  contact: String
-
-  "Email du contact dans l'établissement"
-  mail: String
-
-  "Numéro de téléphone de contact dans l'établissement"
-  phone: String
-}
-
-input NextSegmentTransporterInput {
-  "Exemption de récipissé"
-  isExemptedOfReceipt: Boolean
-
-  "N° de récipissé"
-  receipt: String
-
-  "Département"
-  department: String
-
-  "Limite de validité du récipissé"
-  validityLimit: DateTime
-
-  "Numéro de plaque d'immatriculation"
-  numberPlate: String
-
-  "Établissement collecteur - transporteur"
-  company: NextSegmentCompanyInput
-}
-
 "Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)"
 input NextSegmentInfoInput {
-  transporter: NextSegmentTransporterInput
+  transporter: TransporterInput
   mode: TransportMode!
 }
 
