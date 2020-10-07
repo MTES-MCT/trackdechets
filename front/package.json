@@ -27,7 +27,7 @@
     "node-sass": "^4.14.1",
     "query-string": "^6.10.1",
     "rc-tree": "^1.14.10",
-    "react": "16.12.0",
+    "react": "16.13.1",
     "react-app-polyfill": "^1.0.6",
     "react-dom": "16.12.0",
     "react-icons": "^3.2.2",
