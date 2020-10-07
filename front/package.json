@@ -73,7 +73,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-lazyload": "^2.5.0",
     "@types/react-router-dom": "^5.1.5",
-    "@types/react-select": "^3.0.16",
+    "@types/react-select": "^3.0.21",
     "@types/react-tabs": "^2.3.2",
     "@types/yup": "^0.26.37",
     "@types/zxcvbn": "^4.4.0",
