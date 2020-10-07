@@ -355,8 +355,7 @@ describe("Test formsLifeCycle query", () => {
       emitter,
       emitterCompany,
       recipient,
-      recipientCompany,
-      form
+      recipientCompany
     } = await prepareDB();
 
     await prepareRedis({
