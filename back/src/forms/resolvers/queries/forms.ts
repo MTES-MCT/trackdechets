@@ -90,7 +90,7 @@ export async function getForms(
   return queriedForms.map(f => expandFormFromDb(f));
 }
 
-function getRolesFilter(siret: string, roles: FormRole[]) {
+export function getRolesFilter(siret: string, roles: FormRole[]) {
   const filtersByRole = {
     ["RECIPIENT"]: [
       { recipientCompanySiret: siret },
