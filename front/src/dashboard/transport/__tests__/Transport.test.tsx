@@ -21,8 +21,8 @@ import {
   createDestinationMock,
 } from "src/generated/graphql/types";
 import { SiretContext } from "src/dashboard/Dashboard";
-import Transport  from "src/dashboard/transport/Transport";
-import  { GET_TRANSPORT_SLIPS } from "src/dashboard/transport/queries";
+import { TransportContent } from "src/dashboard/transport/Transport";
+import { GET_TRANSPORT_SLIPS } from "src/dashboard/transport/queries";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({
@@ -72,7 +72,7 @@ async function renderWith({ forms }: { forms: Form[] }) {
       ]}
     >
       <SiretContext.Provider value={{ siret: TRANSPORTER.company!.siret! }}>
-        <Transport />
+        <TransportContent formType="TO_TAKE_OVER" />
       </SiretContext.Provider>
     </MockedProvider>
   );
@@ -137,10 +137,14 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")
+        );
 
         await waitForElement(() =>
-          screen.getByText("Signer par le transporteur")
+          screen.getByText(
+            (text, el) => !!/Signer par le producteur/i.test(text)
+          )
         );
       });
 
@@ -223,10 +227,14 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")
+        );
 
         await waitForElement(() =>
-          screen.getByText("Signer par le producteur")
+          screen.getByText(
+            (text, el) => !!/Signer par le producteur/i.test(text)
+          )
         );
       });
 
@@ -312,9 +320,16 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
 
-        await waitForElement(() => screen.getByText("Signer par le détenteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")
+        );
+
+        await waitForElement(() =>
+          screen.getByText(
+            (text, el) => !!/Signer par le détenteur/i.test(text)
+          )
+        );
       });
 
       it("should display the temporary storage as the collect address", () => {

@@ -60,7 +60,7 @@ export default function Transport() {
  * user preferences (stored in local storage)
  * @param param0
  */
-function TransportContent({ formType }) {
+export function TransportContent({ formType }) {
   const { siret } = useContext(SiretContext);
 
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
@@ -70,7 +70,7 @@ function TransportContent({ formType }) {
     DISPLAY_TYPE_STORAGE_KEY
   );
 
-   const windowSize = useWindowSize();
+  const windowSize = useWindowSize();
 
   useEffect(() => {
     // set display as cards on small screens

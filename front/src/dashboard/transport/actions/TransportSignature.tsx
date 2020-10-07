@@ -147,16 +147,16 @@ export default function TransportSignature({ form, userSiret }: Props) {
                   Cet écran est à signer par le <strong>transporteur</strong>
                 </div>
 
-                <p className="form__row">
+                <div className="form__row">
                   <span className={styles.label}>Bordereau</span>
                   <span> {form.readableId}</span>
-                </p>
-                <p className="form__row">
-                  <span id="collect-address" className={styles.label}>
+                </div>
+                <div className="form__row">
+                  <span id="collect-address-trs" className={styles.label}>
                     Lieu de collecte
                   </span>
                   <address
-                    aria-labelledby="collect-address"
+                    aria-labelledby="collect-address-trs"
                     className={styles.address}
                   >
                     {form.stateSummary?.emitter?.name} (
@@ -164,16 +164,16 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     )
                     <br /> {form.stateSummary?.emitter?.address}
                   </address>
-                </p>
-                <p className="form__row">
+                </div>
+                <div className="form__row">
                   <h3 className="h4 tw-font-bold">Déchets à collecter</h3>
-                </p>
-                <p className="form__row">
+                </div>
+                <div className="form__row">
                   <span className={styles.label}>Appellation du déchet :</span>
                   {form.wasteDetails?.name} ({form.wasteDetails?.code})
-                </p>
+                </div>
 
-                <p className="form__row">
+                <div className="form__row">
                   <label htmlFor="id_packagings" className={styles.label}>
                     Conditionnement
                   </label>
@@ -182,9 +182,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     id="id_packagings"
                     component={Packagings}
                   />
-                </p>
+                </div>
 
-                <p className="form__row">
+                <div className="form__row">
                   <label htmlFor="id_quantity" className={styles.label}>
                     Poids en tonnes
                   </label>
@@ -194,9 +194,9 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     id="id_quantity"
                     className={`${styles.fieldWeight} field__block td-input`}
                   />
-                </p>
+                </div>
 
-                <p className="form__row">
+                <div className="form__row">
                   <label htmlFor="id_onuCode" className={styles.label}>
                     Code ADR (ONU)
                   </label>
@@ -210,8 +210,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     Champ à renseigner selon le déchet transporté, sous votre
                     responsabilité
                   </span>
-                </p>
-                <p className="form__row">
+                </div>
+                <div className="form__row">
                   <span id="destination-address" className={styles.label}>
                     Destination du déchet
                   </span>
@@ -223,8 +223,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                     {form.stateSummary?.recipient?.siret})
                     <br /> {form.stateSummary?.recipient?.address}
                   </address>
-                </p>
-                <p className="form__row">
+                </div>
+                <div className="form__row">
                   <label
                     htmlFor="id_signedByTransporter"
                     className="tw-font-bold tw-mt-2 "
@@ -241,7 +241,7 @@ export default function TransportSignature({ form, userSiret }: Props) {
                   </label>
 
                   <RedErrorMessage name="signedByTransporters" />
-                </p>
+                </div>
                 <p>
                   <DownloadFileLink
                     query={FORMS_PDF}
@@ -271,7 +271,7 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       déchet
                     </strong>
                   </div>
-                  <p className="form__row">
+                  <div className="form__row">
                     <span id="collect-address" className={styles.label}>
                       Lieu de collecte
                     </span>
@@ -283,25 +283,25 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       {form.stateSummary?.emitter?.siret})
                       <br /> {form.stateSummary?.emitter?.address}
                     </address>
-                  </p>
+                  </div>
                   <h3>Déchets</h3>
-                  <p className="form__row">
+                  <div className="form__row">
                     <span className={styles.label}>Bordereau numéro:</span>
                     {form.readableId}
-                  </p>
-                  <p className="form__row">
+                  </div>
+                  <div className="form__row">
                     <span className={styles.label}>Appellation du déchet:</span>
                     {form.wasteDetails?.name} ({form.wasteDetails?.code})
-                  </p>
-                  <p className="form__row">
+                  </div>
+                  <div className="form__row">
                     <span className={styles.label}>Conditionnement:</span>
                     {props.packagings.join(", ")}
-                  </p>
-                  <p className="form__row">
+                  </div>
+                  <div className="form__row">
                     <span className={styles.label}>Poids total:</span>
                     {props.quantity} tonnes
-                  </p>
-                  <p className="form__row">
+                  </div>
+                  <div className="form__row">
                     <span id="transporter-address" className={styles.label}>
                       Transporteur
                     </span>
@@ -313,8 +313,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       {form.stateSummary?.transporter?.siret})
                       <br /> {form.stateSummary?.transporter?.address}
                     </address>
-                  </p>
-                  <p className="form__row">
+                  </div>
+                  <div className="form__row">
                     <span id="destination-address" className={styles.label}>
                       Destination du déchet
                     </span>
@@ -326,8 +326,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       {form.stateSummary?.recipient?.siret})
                       <br /> {form.stateSummary?.recipient?.address}
                     </address>
-                  </p>
-                  <p className="form__row">
+                  </div>
+                  <div className="form__row">
                     <label htmlFor="id_signedByProducer">
                       <Field
                         type="checkbox"
@@ -342,10 +342,10 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       transporteur correspondent aux informations vues ci-avant
                       et je valide l'enlèvement.
                     </label>
-                  </p>
+                  </div>
                   <RedErrorMessage name="signedByProducer" />
 
-                  <p className="form__row">
+                  <div className="form__row">
                     <label className={styles.label} htmlFor="id_securityCode">
                       Code de sécurité entreprise
                     </label>
@@ -355,8 +355,8 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       type="number"
                       className={`field__block td-input ${styles.fieldSecurityCode} ${styles.noSpinner}`}
                     />
-                  </p>
-                  <p className="form__row">
+                  </div>
+                  <div className="form__row">
                     <label className={styles.label} htmlFor="id_sentBy">
                       Nom et prénom
                     </label>
@@ -366,7 +366,7 @@ export default function TransportSignature({ form, userSiret }: Props) {
                       name="sentBy"
                       className={`field__block td-input ${styles.fieldFullName}`}
                     />
-                  </p>
+                  </div>
                   {error && <NotificationError apolloError={error} />}
                 </div>
               </>
