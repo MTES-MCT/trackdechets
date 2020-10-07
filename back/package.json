@@ -28,6 +28,7 @@
     "@graphql-toolkit/schema-merging": "^0.10.7",
     "@graphql-tools/load-files": "^6.0.15",
     "@graphql-tools/merge": "^6.0.15",
+    "@profusion/apollo-validation-directives": "^2.0.3",
     "@sentry/integrations": "^5.15.5",
     "@sentry/node": "^5.15.5",
     "apollo-server-express": "^2.13.1",
