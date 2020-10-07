@@ -72,7 +72,7 @@ export default function Slips({
           {dynamicActions && <th>Mes actions</th>}
           <th></th>
         </tr>
-        <tr className=" td-table__head-tr td-table__tr--bordered">
+        <tr className=" td-table__head-tr td-table__tr">
           {hiddenFields.indexOf("readableId") === -1 && (
             <th>
               <input
@@ -119,7 +119,7 @@ export default function Slips({
       </thead>
       <tbody>
         {sortedForms.map((s: any) => (
-          <tr key={s.id} className="td-table__tr--bordered">
+          <tr key={s.id} className="td-table__tr">
             {hiddenFields.indexOf("readableId") === -1 && (
               <td>
                 <div className="id">{s.readableId}</div>

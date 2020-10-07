@@ -25,14 +25,14 @@ export default function Stats() {
 
   return (
     <div className="main">
-      <h2>Statistiques</h2>
+      <h2 className="h2 tw-my-4 tw-ml-2">Statistiques</h2>
       {loading && <Loader />}
       {error && <InlineError apolloError={error} />}
       {!data && <p>Aucune donnée à afficher.</p>}
       {data && (
-        <table className="table">
+        <table className="td-table">
           <thead>
-            <tr>
+            <tr className="td-table__head-tr td-table__tr">
               <th>Code déchet</th>
               <th>Quantité totale entrée</th>
               <th>Quantité totale sortie</th>
@@ -41,7 +41,7 @@ export default function Stats() {
           </thead>
           <tbody>
             {data.stats[0].stats.map(s => (
-              <tr key={s.wasteCode}>
+              <tr key={s.wasteCode} className="td-table__tr">
                 <td>{s.wasteCode}</td>
                 <td>{s.incoming}</td>
                 <td>{s.outgoing}</td>

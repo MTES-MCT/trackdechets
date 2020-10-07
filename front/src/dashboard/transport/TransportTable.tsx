@@ -48,7 +48,7 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
           <th>Action</th>
           <th></th>
         </tr>
-        <tr className="td-table__head-tr td-table__tr--bordered">
+        <tr className="td-table__head-tr td-table__tr">
           <th>
             <input
               type="text"
@@ -90,7 +90,7 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
       </thead>
       <tbody>
         {sortedForms.map(form => (
-          <tr key={form.id} className="td-table__tr--bordered">
+          <tr key={form.id} className="td-table__tr">
             <td>
               <div className={styles.readableId}>
                 <DownloadPdf formId={form.id} />
