@@ -89,7 +89,11 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
               <option value={UserRole.Member}>Collaborateur</option>
               <option value={UserRole.Admin}>Administrateur</option>
             </Field>
-            <button type="submit" className="btn btn--primary" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="btn btn--primary"
+              disabled={isSubmitting}
+            >
               Inviter
             </button>
             <RedErrorMessage name="email" />

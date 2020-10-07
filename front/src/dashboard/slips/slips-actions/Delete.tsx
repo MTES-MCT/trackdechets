@@ -95,10 +95,7 @@ export default function Delete({
           >
             Annuler
           </button>
-          <button
-            className="btn btn--primary no-margin"
-            onClick={() => deleteForm()}
-          >
+          <button className="btn btn--primary" onClick={() => deleteForm()}>
             <TrashIcon />
             <span> Supprimer</span>
           </button>

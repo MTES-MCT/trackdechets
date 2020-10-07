@@ -1,22 +1,3 @@
-.td-modal__backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.5);
-  height: 100%;
-  width: 100%;
-
-  justify-content: center;
-
-  align-items: center;
-  z-index: 10;
-  display: flex;
-
-  /* no js modal */
-  &:target {
-    display: flex;
-  }
-}
 .td-modal {
   position: relative;
   border-radius: $common-radius;
@@ -37,42 +18,12 @@
   & > :first-child {
     margin-top: 0;
   }
-
-  & .button__group {
-    display: flex;
-
-    justify-content: space-between;
-    margin-top: 1.5em;
-    margin-top: var(--space-m);
-  }
-
-  & .button__group .button {
-    margin: 0;
-  }
-
-  & .button__group .button + .button {
-    margin-left: 1em;
-  }
 }
- 
+
 .td-modal-title {
   font-size: 1.75rem;
   margin-bottom: 2rem;
   font-weight: bold;
-  
 }
 
-.td-modal-actions{
-  margin-top: 1em;
-  display: flex;
-  justify-content: flex-end;
-  button,
-  button:active {
-    margin-left: 1em;
-    margin-right: 0;
-  }
-}
-.closeMenu{
-  display: flex;
-  justify-content: flex-end;
-}
+
