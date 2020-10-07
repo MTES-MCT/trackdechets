@@ -6,7 +6,7 @@ import {
   withRouter,
   Redirect,
 } from "react-router-dom";
-import styles from "./Login.module.scss";
+ 
 import { localAuthService } from "./auth.service";
 
 const fieldErrorsProps = (fieldName, errorField) => {
@@ -49,7 +49,7 @@ export default withRouter(function Login(
 
   return (
     <section className="section section--white">
-      <div className={`${styles.loginContainer} container`}>
+      <div className="container-narrow">
         <form
           action={`${REACT_APP_API_ENDPOINT}/login`}
           method="post"

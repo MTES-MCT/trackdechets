@@ -46,7 +46,7 @@ export default function Signup() {
               });
           }}
         >
-          <Wizard.Page title="Bienvenue" formClassName={styles.signupContainer}>
+          <Wizard.Page title="Bienvenue" formClassName="container-narrow">
             <div>
               <h1 className="h1 tw-mb-6">Bienvenue sur Trackdéchets</h1>
 
@@ -76,7 +76,7 @@ export default function Signup() {
           </Wizard.Page>
           <Wizard.Page
             title="Informations utilisateur"
-            formClassName={styles.signupContainer}
+            formClassName="container-narrow"
             validate={(values: any) => {
               let errors: any = {};
 
@@ -100,7 +100,7 @@ export default function Signup() {
             }}
           >
             {" "}
-            <div className={styles.signupContainer}>
+            <div className="container-narrow">
               <h1 className="h1 tw-mb-6">Informations utilisateur</h1>
 
               <div className="form__row">
