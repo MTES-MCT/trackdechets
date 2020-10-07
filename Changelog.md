@@ -28,6 +28,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du champ `customInfo` à `TransporterInput`, ce qui permet de renseigner cette information via les mutations `createForm`, `updateForm`, `markAsResent`, `markAsResealed`, [PR 417](https://github.com/MTES-MCT/trackdechets/pull/417)
 - Suppression du service metabase suite au basculement vers une instance metabase dédiée [PR 453](https://github.com/MTES-MCT/trackdechets/pull/453)
 - Ajout du profil d'entreprise "éco-organisme". Ce type d'entreprise peut renseigner ses agréments et signer un BSD à la place du détenteur lorsqu'il est responsable des déchets. [PR 400](https://github.com/MTES-MCT/trackdechets/pull/400)
+- Dépréciation des arguments `first` et `skip` sur la query `forms`. A la place, pour paginer, utiliser `cursorAfter` ou `cursotBefore` et éventuellement `formsPerPage`
+- Ajout d'arguments sur la query `forms` qui permettent de filtrer par date de dernière modification : `updatedAfter` et `updatedBefore`
 
 # [2020.10.1] 05/10/2020
 
