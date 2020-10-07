@@ -64,7 +64,7 @@ export default function WasteCode(props) {
       <RedErrorMessage name={field.name} />
 
       {wasteCodeDetail && (
-        <div className="notification success">
+        <div className="notification success tw-mt-2">
           Vous avez sélectionné le code déchet{" "}
           <strong>{isDangerous ? "dangereux" : "non dangereux"}</strong>{" "}
           suivant: <em>{wasteCodeDetail.description}</em>
