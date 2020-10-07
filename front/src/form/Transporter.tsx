@@ -81,7 +81,7 @@ export default connect<{}, Values>(function Transporter(props) {
             <Field
               component={DateInput}
               name="transporter.validityLimit"
-              className={`td-input ${styles.transporterDepartment}`}
+              className={`td-input ${styles.transporterValidityLimit}`}
             />
           </label>
 
