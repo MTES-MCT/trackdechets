@@ -2,12 +2,12 @@ import { useMutation } from "@apollo/react-hooks";
 import { useFormik } from "formik";
 import gql from "graphql-tag";
 import React, { useState } from "react";
- 
+
 import { Form as FormModel } from "src/generated/graphql/types";
 import { NotificationError } from "src/common/components/Error";
 import { capitalize } from "src/common/helper";
 import { PaperWriteIcon } from "src/common/components/Icons";
- 
+import TdModal from "src/common/components/Modal";
 
 export const UPDATE_PLATE = gql`
   mutation updateTransporterFields(
@@ -77,49 +77,42 @@ export default function TransporterInfoEdit({
         onClick={() => setIsOpen(true)}
         title={`Modifier ${verboseFieldName}`}
       >
-     
-        <PaperWriteIcon color="#0053b3"/> 
-      
+        <PaperWriteIcon color="#0053b3" />
       </button>
-      {isOpen && (
-        <div
-          className="modal__backdrop"
-          id="modal"
-          style={{
-            display: "flex",
-          }}
-        >
-          <div className="modal">
-            <h2>Modifier</h2>
-            <form onSubmit={formik.handleSubmit}>
-              <label htmlFor={`id_${fieldName}`}>
-                {capitalize(verboseFieldName)}
-              </label>
-              <input
-                id={`id_${fieldName}`}
-                name={fieldName}
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values[fieldName]}
-              />
-              {error && <NotificationError apolloError={error} />}
+      <TdModal
+        isOpen={isOpen}
+        ariaLabel={`Modifier ${verboseFieldName}`}
+        onClose={() => setIsOpen(false)}
+      >
+        <h2 className="h2 tw-mb-4">Modifier</h2>
+        <form onSubmit={formik.handleSubmit}>
+          <label htmlFor={`id_${fieldName}`}>
+            {capitalize(verboseFieldName)}
+          </label>
+          <input
+            id={`id_${fieldName}`}
+            name={fieldName}
+            type="text"
+            className="td-input"
+            onChange={formik.handleChange}
+            value={formik.values[fieldName]}
+          />
+          {!!error && <NotificationError apolloError={error} />}
 
-              <div className="form__actions">
-                <button
-                  className="button-outline primary"
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Annuler
-                </button>
-                <button className="button no-margin" type="submit">
-                  Modifier
-                </button>
-              </div>
-            </form>
+          <div className="form__actions">
+            <button
+              className="btn btn--outline-primary"
+              type="button"
+              onClick={() => setIsOpen(false)}
+            >
+              Annuler
+            </button>
+            <button className="btn btn--primary" type="submit">
+              Modifier
+            </button>
           </div>
-        </div>
-      )}
+        </form>
+      </TdModal>
     </>
   );
 }
