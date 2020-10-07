@@ -184,6 +184,7 @@ Défaut à 50, maximum à 500
 
 (Optionnel) PAGINATION
 Curseur après lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
 Défaut à vide, pour retourner les "premiers" bordereaux
 
 </td>
@@ -195,6 +196,7 @@ Défaut à vide, pour retourner les "premiers" bordereaux
 
 (Optionnel) PAGINATION
 Curseur avant lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
 Défaut à vide, pour retourner les "derniers" bordereaux
 
 </td>

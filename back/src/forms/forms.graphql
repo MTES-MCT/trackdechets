@@ -60,6 +60,7 @@ type Query {
     """
     (Optionnel) PAGINATION
     Curseur après lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
     Défaut à vide, pour retourner les "premiers" bordereaux
     """
     cursorAfter: ID
@@ -67,6 +68,7 @@ type Query {
     """
     (Optionnel) PAGINATION
     Curseur avant lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
     Défaut à vide, pour retourner les "derniers" bordereaux
     """
     cursorBefore: ID
