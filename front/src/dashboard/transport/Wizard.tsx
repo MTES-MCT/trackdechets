@@ -15,12 +15,7 @@ type State = { page: number; values: Object };
 
 // Copied from Formik Doc - multi step wizard example
 export class Wizard extends React.Component<Props, State> {
-  static Page = ({
-    children,
-    values,
-    nextButtonCaption,
-    submitButtonCaption,
-  }: Props & any) => children(values);
+  static Page = ({ children, values }: Props & any) => children(values);
   contentRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: Props) {
@@ -120,11 +115,6 @@ export class Wizard extends React.Component<Props, State> {
                       }
                       onClick={() => null}
                     />
-                    // <button className="btn btn--primary" type="submit">
-                    //   {!!activePage.props.nextButtonCaption
-                    //     ? activePage.props.nextButtonCaption
-                    //     : "Suivant"}
-                    // </button>
                   )}
                   {isLastPage && (
                     <button
