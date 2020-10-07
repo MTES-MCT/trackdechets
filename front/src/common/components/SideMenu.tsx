@@ -1,22 +1,22 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
 
-import useWindowSize from "../hooks/use-window-size";
- 
-import { MEDIA_QUERIES } from "../config";
+import useWindowSize from "src/common/hooks/use-window-size";
 
- 
+import { MEDIA_QUERIES } from "src/common/config";
+
 const SideMenu: FunctionComponent = ({ children }) => {
   const windowSize = useWindowSize();
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
- 
+  const [isHandHeld, setIsHandHeld] = useState(false);
 
   useEffect(() => {
-    setIsMobileDevice(windowSize.width < MEDIA_QUERIES.handHeld);
+    setIsHandHeld(windowSize.width < MEDIA_QUERIES.handHeld);
   }, [windowSize]);
-
+  if (isHandHeld) {
+    return null;
+  }
   return (
     <aside className="sidebar" role="navigation">
-      {!isMobileDevice  && children}
+      {children}
     </aside>
   );
 };
