@@ -75,7 +75,7 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/react-select": "^3.0.16",
     "@types/react-tabs": "^2.3.2",
-    "@types/yup": "^0.26.37",
+    "@types/yup": "^0.29.7",
     "@types/zxcvbn": "^4.4.0",
     "browserslist-useragent-regexp": "^2.0.5",
     "prettier": "^2.0.5",
