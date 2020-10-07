@@ -95,24 +95,6 @@ describe("Mutation.signup", () => {
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
-  it("should throw BAD_USER_INPUT if email already exist with the same casing", async () => {
-    const alreadyExistingUser = await userFactory({
-      email: "JOHNdoe@gmail.COM"
-    });
-
-    const { errors } = await mutate(SIGNUP, {
-      variables: {
-        userInfos: {
-          email: alreadyExistingUser.email,
-          password: "newUserPassword",
-          name: alreadyExistingUser.name,
-          phone: alreadyExistingUser.phone
-        }
-      }
-    });
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-  });
-
   it("should throw BAD_USER_INPUT if email is not valid", async () => {
     const user = {
       email: "bademail",
