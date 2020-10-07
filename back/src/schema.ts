@@ -16,7 +16,11 @@ const typeDefsPath = repositories.map(
 
 const typeDefsArray = loadFilesSync(typeDefsPath);
 
-const typeDefs = mergeTypeDefs(typeDefsArray);
+const typeDefs = mergeTypeDefs([
+  ...typeDefsArray,
+  ...ValidateDirectiveVisitor.getMissingCommonTypeDefs(),
+  ...range.getTypeDefs()
+]);
 
 const resolvers = [
   scalarResolvers,
@@ -25,4 +29,6 @@ const resolvers = [
   usersResolvers
 ];
 
-export { typeDefs, resolvers };
+const schemaDirectives = { range };
+
+export { typeDefs, resolvers, schemaDirectives };

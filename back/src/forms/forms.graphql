@@ -55,7 +55,7 @@ type Query {
     Nombre de bordereaux retournés.
     Défaut à 50, maximum à 500
     """
-    formsPerPage: PaginationAmount
+    formsPerPage: Int @range(min: 1, max: 500)
 
     """
     (Optionnel) PAGINATION

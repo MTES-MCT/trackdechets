@@ -21,8 +21,8 @@ export type Scalars = {
   DateTime: any;
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
   URL: any;
-  PaginationAmount: any;
   JSON: any;
+  PaginationAmount: any;
   PositiveInt: any;
 };
 
@@ -1445,7 +1445,7 @@ export type QueryFormsArgs = {
   siret?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   skip?: Maybe<Scalars['Int']>;
-  formsPerPage?: Maybe<Scalars['PaginationAmount']>;
+  formsPerPage?: Maybe<Scalars['Int']>;
   cursorAfter?: Maybe<Scalars['ID']>;
   cursorBefore?: Maybe<Scalars['ID']>;
   updatedBefore?: Maybe<Scalars['String']>;
@@ -2208,7 +2208,6 @@ export type ResolversTypes = {
   FavoriteType: FavoriteType;
   CompanyFavorite: ResolverTypeWrapper<CompanyFavorite>;
   FileDownload: ResolverTypeWrapper<FileDownload>;
-  PaginationAmount: ResolverTypeWrapper<Scalars['PaginationAmount']>;
   FormRole: FormRole;
   formsLifeCycleData: ResolverTypeWrapper<FormsLifeCycleData>;
   StatusLog: ResolverTypeWrapper<StatusLog>;
@@ -2267,6 +2266,7 @@ export type ResolversTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
+  PaginationAmount: ResolverTypeWrapper<Scalars['PaginationAmount']>;
   PositiveInt: ResolverTypeWrapper<Scalars['PositiveInt']>;
 };
 
@@ -2313,7 +2313,6 @@ export type ResolversParentTypes = {
   FavoriteType: FavoriteType;
   CompanyFavorite: CompanyFavorite;
   FileDownload: FileDownload;
-  PaginationAmount: Scalars['PaginationAmount'];
   FormRole: FormRole;
   formsLifeCycleData: FormsLifeCycleData;
   StatusLog: StatusLog;
@@ -2372,6 +2371,7 @@ export type ResolversParentTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: {};
   FormSubscription: FormSubscription;
+  PaginationAmount: Scalars['PaginationAmount'];
   PositiveInt: Scalars['PositiveInt'];
 };
 

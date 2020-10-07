@@ -168,7 +168,7 @@ Défaut à 0
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">formsPerPage</td>
-<td valign="top"><a href="#paginationamount">PaginationAmount</a></td>
+<td valign="top"><a href="#int">Int</a></td>
 <td>
 
 (Optionnel) PAGINATION

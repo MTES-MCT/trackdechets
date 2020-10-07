@@ -23,7 +23,7 @@ import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
 import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
-import { typeDefs, resolvers } from "./schema";
+import { typeDefs, resolvers, schemaDirectives } from "./schema";
 import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { GraphQLContext } from "./types";
@@ -92,7 +92,8 @@ const sentryMiddleware = () =>
 
 const schema = makeExecutableSchema({
   typeDefs,
-  resolvers
+  resolvers,
+  schemaDirectives
 });
 
 export const schemaWithMiddleware = applyMiddleware(

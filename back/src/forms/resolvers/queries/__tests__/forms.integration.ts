@@ -1,3 +1,4 @@
+import { addDays, format, subDays } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 import {
@@ -302,21 +303,47 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
+    // Get the forms we just created, as ordered by the API
+    const { data: created } = await query(
+      `query {
+          forms {
+            id
+          }
+        }
+      `
+    );
 
-    const { data: firstForms } = await query(FORMS, {
-      variables: {
-        first: 4
-      }
-    });
+    const { data: firstForms } = await query(
+      `query {
+          forms(formsPerPage: 4) {
+            id
+          }
+        }
+      `
+    );
     expect(firstForms.forms.length).toBe(4);
 
-    const { data: skippedForms } = await query(FORMS, {
-      variables: {
-        first: 4,
-        skip: 4
-      }
-    });
-    expect(skippedForms.forms.length).toBe(2);
+    const { data: formsAfter } = await query(
+      `query Forms($cursorAfter: ID) {
+          forms(cursorAfter: $cursorAfter) {
+            id
+          }
+        }
+      `,
+      { variables: { cursorAfter: created.forms[3].id } }
+    );
+    expect(formsAfter.forms.length).toBe(2);
+
+    const { data: formsBefore } = await query(
+      `query Forms($cursorBefore: ID) {
+          forms(cursorBefore: $cursorBefore) {
+            id
+          }
+        }
+      `,
+      { variables: { cursorBefore: created.forms[1].id } }
+    );
+    expect(formsBefore.forms.length).toBe(1);
   });
 
   it("should return 50 forms by default", async () => {
@@ -335,8 +362,81 @@ describe("Query.forms", () => {
 
     const { query } = makeClient(user);
     const { data } = await query(FORMS);
-
     expect(data.forms.length).toBe(50);
+  });
+
+  it("should filter by updatedAt", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    ]);
+
+    const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+    const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
+
+    const { query } = makeClient(user);
+    const { data: updatedAfterYesterday } = await query(
+      `query {
+          forms(updatedAfter: "${yesterday}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedAfterYesterday.forms.length).toBe(2);
+
+    const { data: updatedBeforeYesterday } = await query(
+      `query {
+          forms(updatedBefore: "${yesterday}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedBeforeYesterday.forms.length).toBe(0);
+
+    const { data: updatedAfterTomorrow } = await query(
+      `query {
+          forms(updatedAfter: "${tomorrow}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedAfterTomorrow.forms.length).toBe(0);
+
+    const { data: updatedBeforeTomorrow } = await query(
+      `query {
+          forms(updatedBefore: "${tomorrow}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedBeforeTomorrow.forms.length).toBe(2);
   });
 
   it("should return forms transported by initial transporter", async () => {

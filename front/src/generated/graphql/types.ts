@@ -18,8 +18,8 @@ export type Scalars = {
   DateTime: any;
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
   URL: any;
-  PaginationAmount: any;
   JSON: any;
+  PaginationAmount: any;
   PositiveInt: any;
 };
 
@@ -1453,7 +1453,7 @@ export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
   first: Maybe<Scalars['Int']>;
   skip: Maybe<Scalars['Int']>;
-  formsPerPage: Maybe<Scalars['PaginationAmount']>;
+  formsPerPage: Maybe<Scalars['Int']>;
   cursorAfter: Maybe<Scalars['ID']>;
   cursorBefore: Maybe<Scalars['ID']>;
   updatedBefore: Maybe<Scalars['String']>;
