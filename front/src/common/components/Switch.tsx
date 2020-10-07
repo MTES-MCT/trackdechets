@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Switch from "react-switch";
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 import "./Switch.scss";
 export default function TdSwitch({
   onChange,
@@ -11,7 +11,7 @@ export default function TdSwitch({
   checked: boolean;
   label: string;
 }) {
-  const [uniqId] = useState(() => uuid());
+  const [uniqId] = useState(() => uuidv4());
   return (
     <div className="switch__container">
       <Switch

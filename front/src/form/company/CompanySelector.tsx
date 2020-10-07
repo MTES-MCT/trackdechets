@@ -17,7 +17,7 @@ import {
   FavoriteType,
 } from "../../generated/graphql/types";
 import CountrySelector from "./CountrySelector";
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 interface CompanySelectorProps {
   name:
     | "nextDestination.company"
@@ -38,7 +38,7 @@ export default function CompanySelector({
   allowForeignCompanies,
   heading,
 }: CompanySelectorProps) {
-  const [uniqId] = useState(() => uuid());
+  const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
   const [clue, setClue] = React.useState("");

@@ -11,7 +11,6 @@ import React, {
 import { useLocation, useHistory } from "react-router";
 import queryString from "query-string";
 
-import { RouteComponentProps, withRouter } from "react-router";
 import { InlineError } from "src/common/components/Error";
 import { updateApolloCache } from "src/common/helper";
 import { currentSiretService } from "src/dashboard/CompanySelector";
