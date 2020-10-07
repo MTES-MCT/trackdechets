@@ -175,12 +175,6 @@ export default withRouter(function Header({
     strict: false,
   });
 
-  const matchDashboard = matchPath(location.pathname, {
-    path: "/dashboard/",
-    exact: false,
-    strict: false,
-  });
-
   const menuClass = menuHidden && isMobileDevice ? styles.headerNavHidden : "";
   useEffect(() => {
     setIsMobileDevice(windowSize.width < MEDIA_QUERIES.handHeld);
@@ -191,6 +185,15 @@ export default withRouter(function Header({
     isAuthenticated,
     REACT_APP_DEVELOPERS_ENDPOINT,
     currentSiret
+  );
+
+  const mobileNav = !!matchAccount ? (
+    <AccountMenuContent />
+  ) : (
+    <MobileSubNav
+      currentSiret={currentSiret}
+      onClick={() => toggleMenu(true)}
+    />
   );
 
   return (
@@ -235,14 +238,7 @@ export default withRouter(function Header({
               <Close color="#000" size={16} />
             </button>
           </div>
-
-          {!!isMobileDevice && !!matchDashboard && (
-            <MobileSubNav
-              currentSiret={currentSiret}
-              onClick={() => toggleMenu(true)}
-            />
-          )}
-          {!!matchAccount && !!isMobileDevice && <AccountMenuContent />}
+          {!!isMobileDevice && mobileNav}
 
           <ul className={styles.headerNavItems}>
             {menuEntries.map((e, idx) => (
