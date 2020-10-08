@@ -44,7 +44,7 @@ export default function AccountFielCompanyGivenName({ company }: Props) {
         <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
           name="givenName"
           type="text"
-          value={company.givenName}
+          value={company.givenName || ""}
           placeHolder="Nom usuel"
           mutation={UPDATE_GIVEN_NAME}
           mutationArgs={{ siret: company.siret }}
