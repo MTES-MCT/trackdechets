@@ -1388,10 +1388,18 @@ export type Query = {
    * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
    * préciser un SIRET
    * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-   * On peut filtrer les bordereaux en spécifiant le rôle que l'on y joue via l'argument `role`.
-   * On peut filtrer par date de dernière modification via `updatedBefore` / `updatedAfter`, et par statut du BSD via `status`.
-   * La pagination se fait par curseurs avec les arguments `cursorAfter` / `cursorBefore`.
-   * Par défaut, les 50 premiers BSDs. Cette valeur peut être modifiée avec `formsPerPage`.
+   * 
+   * Vous pouvez filtrer:
+   * - par rôle que joue votre entreprise sur le BSD via `role`
+   * - par date de dernière modification via `updatedBefore` / `updatedAfter`
+   * - par statut du BSD via `status`
+   * - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+   * 
+   * Par défaut:
+   * - tous les BSD accessibles sont retournés
+   * - les BSD sont classés par date de création, de la plus récente à la plus vieille
+   * - les résultats sont paginés par 50. Il est possible de modifier cette valeur via `formsPerPage`
+   * - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
    */
   forms: Array<Form>;
   /**
@@ -1463,6 +1471,7 @@ export type QueryFormsArgs = {
   status: Maybe<Array<FormStatus>>;
   roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
+  siretPresentOnForm: Maybe<Scalars['String']>;
 };
 
 

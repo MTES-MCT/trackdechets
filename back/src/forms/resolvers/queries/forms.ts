@@ -68,7 +68,10 @@ export async function getForms(
       ...(status?.length && { status_in: status }),
       AND: [
         getFormsRightFilter(company.siret, roles),
-        getHasNextStepFilter(company.siret, hasNextStep)
+        getHasNextStepFilter(company.siret, hasNextStep),
+        ...(rest.siretPresentOnForm
+          ? [getFormsRightFilter(rest.siretPresentOnForm, [])]
+          : [])
       ],
       isDeleted: false
     }

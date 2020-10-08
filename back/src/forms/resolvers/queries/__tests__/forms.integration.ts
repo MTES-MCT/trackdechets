@@ -439,6 +439,44 @@ describe("Query.forms", () => {
     expect(updatedBeforeTomorrow.forms.length).toBe(2);
   });
 
+  it("should filter by siretPresentOnForm", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const otherCompany = await companyFactory();
+
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        emitterCompanyName: otherCompany.name,
+        emitterCompanySiret: otherCompany.siret
+      }
+    ]);
+    
+    const { query } = makeClient(user);
+    const { data } = await query(
+      `query {
+          forms(siretPresentOnForm: "${otherCompany.siret}") {
+            id
+            emitter {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].emitter.company.siret).toBe(otherCompany.siret);
+  });
+});
+
+describe("Integration / Forms query for transporters", () => {
+  afterEach(() => resetDatabase());
+
   it("should return forms transported by initial transporter", async () => {
     const owner = await userFactory();
     const { user, company: transporter } = await userWithCompanyFactory(

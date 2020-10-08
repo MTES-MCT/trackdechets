@@ -130,10 +130,18 @@ alors les BSD de cette entreprise sont retournés.
 Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
 préciser un SIRET
 Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-On peut filtrer les bordereaux en spécifiant le rôle que l'on y joue via l'argument `role`.
-On peut filtrer par date de dernière modification via `updatedBefore` / `updatedAfter`, et par statut du BSD via `status`.
-La pagination se fait par curseurs avec les arguments `cursorAfter` / `cursorBefore`.
-Par défaut, les 50 premiers BSDs. Cette valeur peut être modifiée avec `formsPerPage`.
+
+Vous pouvez filtrer:
+- par rôle que joue votre entreprise sur le BSD via `role`
+- par date de dernière modification via `updatedBefore` / `updatedAfter`
+- par statut du BSD via `status`
+- les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+
+Par défaut:
+- tous les BSD accessibles sont retournés
+- les BSD sont classés par date de création, de la plus récente à la plus vieille
+- les résultats sont paginés par 50. Il est possible de modifier cette valeur via `formsPerPage`
+- pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
 
 </td>
 </tr>
@@ -260,10 +268,22 @@ Défaut à vide.
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 
-(Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+(Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de votre part
 Si `true`, seul les bordereaux attendant une action sont renvoyés
 Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
 Si vide, tous les bordereaux sont renvoyés
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siretPresentOnForm</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Siret d'une autre entreprise présente sur le bordereau
+Vous n'avez pas besoin d'être membre de cette entreprise.
+Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
 Défaut à vide.
 
 </td>
