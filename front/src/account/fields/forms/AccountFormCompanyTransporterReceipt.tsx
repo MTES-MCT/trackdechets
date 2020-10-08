@@ -162,21 +162,21 @@ export default function AccountFormCompanyTransporterReceipt({
                 <tr>
                   <td>Numéro de récépissé</td>
                   <td>
-                    <Field type="text" name="receiptNumber" />
+                    <Field type="text" name="receiptNumber" className="td-input" />
                     <RedErrorMessage name="receiptNumber" />
                   </td>
                 </tr>
                 <tr>
                   <td>Limite de validité</td>
                   <td>
-                    <Field name="validityLimit" component={DateInput} />
+                    <Field name="validityLimit" component={DateInput} className="td-input" />
                     <RedErrorMessage name="validityLimit" />
                   </td>
                 </tr>
                 <tr>
                   <td>Département</td>
                   <td>
-                    <Field type="text" name="department" placeholder="75" />
+                    <Field type="text" name="department" placeholder="75" className="td-input" />
                     <RedErrorMessage name="department" />
                   </td>
                 </tr>
