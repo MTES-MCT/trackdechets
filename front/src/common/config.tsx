@@ -1,6 +1,5 @@
 export const MEDIA_QUERIES = {
-  mobile: 480,
-  handHeld: 900,
+  handHeld: "900px",
 };
 
 export const COLORS = {

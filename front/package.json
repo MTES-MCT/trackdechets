@@ -42,6 +42,7 @@
     "react-switch": "5.0.1",
     "react-tabs": "3.1.1",
     "tailwindcss": "^1.4.6",
+    "use-media": "^1.4.0",
     "uuid": "^8.3.1",
     "world-countries": "^4.0.0",
     "yup": "^0.26.10",

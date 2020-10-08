@@ -19,7 +19,7 @@ import {
 import { SiretContext } from "../Dashboard";
 import { GET_TRANSPORT_SLIPS } from "./queries";
 import useLocalStorage from "src/common/hooks/useLocalStorage";
-import useWindowSize from "src/common/hooks/use-window-size";
+import useMedia from 'use-media';
 
 import { COLORS } from "src/common/config";
 
@@ -70,15 +70,15 @@ export function TransportContent({ formType }) {
     DISPLAY_TYPE_STORAGE_KEY
   );
 
-  const windowSize = useWindowSize();
+  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld2});
 
   useEffect(() => {
     // set display as cards on small screens
 
     setDisplayAsCards(
-      windowSize.width < MEDIA_QUERIES.handHeld ? true : displayAsCards
+      isMobile ? true : displayAsCards
     );
-  }, [windowSize, displayAsCards, setDisplayAsCards]);
+  }, [isMobile, displayAsCards, setDisplayAsCards]);
 
   const DisplayComponent = displayAsCards ? TransportCards : TransportTable;
   const refetchQuery = {
