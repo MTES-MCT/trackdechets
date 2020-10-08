@@ -130,8 +130,10 @@ alors les BSD de cette entreprise sont retournés.
 Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
 préciser un SIRET
 Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
-On peut également demander les bordereaux pour lesquels on est transporteur
+On peut filtrer les bordereaux en spécifiant le rôle que l'on y joue via l'argument `role`.
+On peut filtrer par date de dernière modification via `updatedBefore` / `updatedAfter`, et par statut du BSD via `status`.
+La pagination se fait par curseurs avec les arguments `cursorAfter` / `cursorBefore`.
+Par défaut, les 50 premiers BSDs. Cette valeur peut être modifiée avec `formsPerPage`.
 
 </td>
 </tr>
@@ -173,7 +175,7 @@ Défaut à 0
 
 (Optionnel) PAGINATION
 Nombre de bordereaux retournés.
-Défaut à 50, maximum à 500
+Défaut à 50, maximum à 500, minimum à 1
 
 </td>
 </tr>
@@ -186,6 +188,7 @@ Défaut à 50, maximum à 500
 Curseur après lequel les bordereaux doivent être retournés
 Attend un identifiant (propriété `id`) de BSD
 Défaut à vide, pour retourner les "premiers" bordereaux
+Le BSD précisé dans le curseur ne fait pas partie du résultat
 
 </td>
 </tr>
@@ -198,6 +201,7 @@ Défaut à vide, pour retourner les "premiers" bordereaux
 Curseur avant lequel les bordereaux doivent être retournés
 Attend un identifiant (propriété `id`) de BSD
 Défaut à vide, pour retourner les "derniers" bordereaux
+Le BSD précisé dans le curseur ne fait pas partie du résultat
 
 </td>
 </tr>
