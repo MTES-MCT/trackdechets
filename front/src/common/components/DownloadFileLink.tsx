@@ -30,7 +30,7 @@ export default function DownloadFileLink({
       window.open(data[key].downloadLink, "_blank");
     }
 
-    onSuccess();
+    !!onSuccess && onSuccess();
   }, [data, onSuccess]);
 
   return (
