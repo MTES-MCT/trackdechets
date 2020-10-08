@@ -43,6 +43,9 @@
     align-items: center;
     width: 100%;
     color: var(--dark-blue);
+    &:hover{
+      opacity: 0.7;
+    }
   }
 }
 
