@@ -1,6 +1,7 @@
 import { CompanyType, CompanyPrivate } from "src/generated/graphql/types";
 
 export const dashboardBase = "/dashboard";
+export const formCreateRoute = "/form";
 
 export default function getDashboardRoutes({
   siret,

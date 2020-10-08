@@ -8,6 +8,7 @@ import { SiretContext } from "src/dashboard/Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 import TabContent from "./TabContent";
+import EmptyTab from "./EmptyTab";
 import { statusesWithDynamicActions } from "../../constants";
 
 export default function ActTab() {
@@ -28,7 +29,7 @@ export default function ActTab() {
   if (error) return <InlineError apolloError={error} />;
   if (!data?.forms?.length)
     return (
-      <div className="empty-tab">
+      <EmptyTab>
         <img src="/illu/illu_sent.svg" alt="" />
         <h4>Il n'y a aucun bordereau à signer</h4>
         <p>
@@ -37,7 +38,7 @@ export default function ActTab() {
           effectuer dans le cadre de leur cycle de vie (envoi, réception ou
           traitement...)
         </p>
-      </div>
+      </EmptyTab>
     );
 
   return (

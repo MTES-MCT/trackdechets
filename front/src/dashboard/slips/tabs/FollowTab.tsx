@@ -8,6 +8,7 @@ import { SiretContext } from "src/dashboard/Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 import TabContent from "./TabContent";
+import EmptyTab from "./EmptyTab";
 export default function FollowTab() {
   const { siret } = useContext(SiretContext);
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
@@ -34,7 +35,7 @@ export default function FollowTab() {
   if (error) return <InlineError apolloError={error} />;
   if (!data?.forms?.length)
     return (
-      <div className="empty-tab">
+      <EmptyTab>
         <img src="/illu/illu_transfer.svg" alt="" />
         <h4>Il n'y a aucun bordereau à suivre</h4>
         <p>
@@ -44,7 +45,7 @@ export default function FollowTab() {
           <strong>STATUT</strong> vous renseignera sur l'état précis du
           bordereau.
         </p>
-      </div>
+      </EmptyTab>
     );
 
   return (

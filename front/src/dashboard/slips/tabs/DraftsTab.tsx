@@ -13,7 +13,7 @@ import Slips from "../Slips";
 
 import TabContent from "./TabContent";
 import { COLORS } from "src/common/config";
-
+import EmptyTab from "./EmptyTab";
 export default function DraftsTab() {
   const { siret } = useContext(SiretContext);
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
@@ -29,7 +29,7 @@ export default function DraftsTab() {
 
   if (!data?.forms?.length)
     return (
-      <div className="empty-tab">
+      <EmptyTab>
         <img src="/illu/illu_empty.svg" alt="" />
         <h4>Il n'y a aucun bordereau en brouillon</h4>
         <p>
@@ -45,7 +45,7 @@ export default function DraftsTab() {
             <DuplicateFile color={COLORS.blueLight} />
           </span>
         </p>
-      </div>
+      </EmptyTab>
     );
 
   return (
