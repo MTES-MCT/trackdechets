@@ -70,14 +70,14 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                 <AccountContentWrapper
                   title="Établissements"
                   button={
-                    <button
+                    <a
                       className="btn btn--primary"
                       onClick={() =>
                         history.push(`${match.path}/companies/new`)
                       }
                     >
                       Créer un établissement
-                    </button>
+                    </a>
                   }
                 >
                   <AccountCompanyList
