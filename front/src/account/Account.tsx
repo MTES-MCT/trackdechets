@@ -9,6 +9,7 @@ import {
   RouteComponentProps,
   useHistory,
   Redirect,
+  Switch,
 } from "react-router";
 import Loader from "src/common/components/Loaders";
 import { InlineError } from "src/common/components/Error";
@@ -39,60 +40,62 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
   if (loading) return <Loader />;
 
   if (error) return <InlineError apolloError={error} />;
- 
+
   if (data) {
     return (
       <div id="account" className="account dashboard">
         <AccountMenu />
         <div className="dashboard-content">
-          <Route exact path={match.url}>
+          <Switch>
+            <Route
+              path={`${match.path}/info`}
+              render={() => (
+                <AccountContentWrapper title="Informations générales">
+                  <AccountInfo me={filter(AccountInfo.fragments.me, data.me)} />
+                </AccountContentWrapper>
+              )}
+            />
+            <Route
+              path={`${match.path}/api`}
+              render={() => (
+                <AccountContentWrapper title="Intégration API">
+                  <AccountIntegrationApi />
+                </AccountContentWrapper>
+              )}
+            />
+            <Route
+              exact
+              path={`${match.path}/companies`}
+              render={() => (
+                <AccountContentWrapper
+                  title="Établissements"
+                  button={
+                    <button
+                      className="btn btn--primary"
+                      onClick={() =>
+                        history.push(`${match.path}/companies/new`)
+                      }
+                    >
+                      Créer un établissement
+                    </button>
+                  }
+                >
+                  <AccountCompanyList
+                    companies={filter(
+                      AccountCompanyList.fragments.company,
+                      data.me.companies
+                    )}
+                  />
+                </AccountContentWrapper>
+              )}
+            />
+            <Route path={`${match.path}/companies/new`}>
+              <AccountContentWrapper title="Créer un établissement">
+                <AccountCompanyAdd />
+              </AccountContentWrapper>
+            </Route>
             <Redirect to={`${match.path}/info`} />
-          </Route>
-          <Route
-            path={`${match.path}/info`}
-            render={() => (
-              <AccountContentWrapper title="Informations générales">
-                <AccountInfo me={filter(AccountInfo.fragments.me, data.me)} />
-              </AccountContentWrapper>
-            )}
-          />
-          <Route
-            path={`${match.path}/api`}
-            render={() => (
-              <AccountContentWrapper title="Intégration API">
-                <AccountIntegrationApi />
-              </AccountContentWrapper>
-            )}
-          />
-          <Route
-            exact
-            path={`${match.path}/companies`}
-            render={() => (
-              <AccountContentWrapper
-                title="Établissements"
-                button={
-                  <button
-                    className="btn btn--primary"
-                    onClick={() => history.push(`${match.path}/companies/new`)}
-                  >
-                    Créer un établissement
-                  </button>
-                }
-              >
-                <AccountCompanyList
-                  companies={filter(
-                    AccountCompanyList.fragments.company,
-                    data.me.companies
-                  )}
-                />
-              </AccountContentWrapper>
-            )}
-          />
-          <Route path={`${match.path}/companies/new`}>
-            <AccountContentWrapper title="Créer un établissement">
-              <AccountCompanyAdd />
-            </AccountContentWrapper>
-          </Route>
+          </Switch>
         </div>
       </div>
     );
