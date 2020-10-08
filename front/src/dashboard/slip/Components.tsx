@@ -1,7 +1,7 @@
 import React from "react";
-import { isoDate } from "src/common/datetime";
+import { isoDate } from "common/datetime";
 import { formatPackagings } from "./utils";
-import { Packagings, } from "src/generated/graphql/types";
+import { Packagings, } from "generated/graphql/types";
 import styles from  "./Slip.module.scss";
 
 export const DetailRow = ({ value, label }) => {

@@ -1,8 +1,8 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import { WASTES } from "src/generated/constants";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
-import WasteTreeModal from "src/search/WasteTreeModal";
+import { WASTES } from "generated/constants";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import WasteTreeModal from "search/WasteTreeModal";
 import formatWasteCodeEffect from "./format-waste-code.effect";
 import styles from "./WasteCode.module.scss";
 

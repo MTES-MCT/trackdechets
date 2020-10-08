@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import gql from "graphql-tag";
 import { Formik, Form, Field } from "formik";
-import DateInput from "src/form/custom-inputs/DateInput";
+import DateInput from "form/custom-inputs/DateInput";
 import styles from "./ExportsForms.module.scss";
 import {
   CompanyPrivate,
   FormsRegisterExportType,
   CompanyType,
-} from "src/generated/graphql/types";
-import WasteTreeModal from "src/search/WasteTreeModal";
-import { wasteCodeValidator } from "src/form/waste-code/waste-code.validator";
-import { WASTES } from "src/generated/constants";
+} from "generated/graphql/types";
+import WasteTreeModal from "search/WasteTreeModal";
+import { wasteCodeValidator } from "form/waste-code/waste-code.validator";
+import { WASTES } from "generated/constants";
 import { useLazyQuery } from "@apollo/react-hooks";
-import { NotificationError } from "src/common/components/Error";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import { NotificationError } from "common/components/Error";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import { FaHourglassHalf } from "react-icons/fa";
 
 interface IProps {

@@ -3,30 +3,30 @@ import { Field } from "formik";
 import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React, { useState, useContext } from "react";
-import DownloadFileLink from "src/common/components/DownloadFileLink";
-import { NotificationError } from "src/common/components/Error";
-import { updateApolloCache } from "src/common/helper";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import DownloadFileLink from "common/components/DownloadFileLink";
+import { NotificationError } from "common/components/Error";
+import { updateApolloCache } from "common/helper";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import {
   Form,
   Mutation,
   MutationSignedByTransporterArgs,
   FormStatus,
   FormRole,
-} from "src/generated/graphql/types";
-import Packagings from "src/form/packagings/Packagings";
-import { FORMS_PDF } from "src/dashboard/slips/slips-actions/DownloadPdf";
+} from "generated/graphql/types";
+import Packagings from "form/packagings/Packagings";
+import { FORMS_PDF } from "dashboard/slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import styles from "./TransportSignature.module.scss";
 import { Wizard } from "../Wizard";
-import { SiretContext } from "src/dashboard/Dashboard";
+import { SiretContext } from "dashboard/Dashboard";
 import cogoToast from "cogo-toast";
-import TdModal from "src/common/components/Modal";
-import { COLORS } from "src/common/config";
+import TdModal from "common/components/Modal";
+import { COLORS } from "common/config";
 import {
   ShipmentSignSmartphoneIcon,
   PdfIcon,
-} from "src/common/components/Icons";
+} from "common/components/Icons";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(

@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer } from "react";
 
 
-import SearchInput from "src/common/components/SearchInput";
+import SearchInput from "common/components/SearchInput";
 import styles from "./WorkSiteAddress.module.scss";
 function init({ adress, city, postalCode }) {
   const selectedAdress = [adress, postalCode, city].filter(Boolean).join(" ");

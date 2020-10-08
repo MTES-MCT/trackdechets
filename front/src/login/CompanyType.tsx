@@ -1,6 +1,6 @@
 import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
-import Tooltip from "src/common/components/Tooltip";
+import Tooltip from "common/components/Tooltip";
 
 export const COMPANY_TYPES = [
   { value: "PRODUCER", label: "Producteur de déchets" },

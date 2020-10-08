@@ -2,7 +2,7 @@ import React, { FunctionComponent  } from "react";
 
 import useMedia from 'use-media';
 
-import { MEDIA_QUERIES } from "src/common/config";
+import { MEDIA_QUERIES } from "common/config";
 
 const SideMenu: FunctionComponent = ({ children }) => {
  

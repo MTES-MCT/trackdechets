@@ -2,17 +2,17 @@ import { useQuery } from "@apollo/react-hooks";
 import { NetworkStatus } from "apollo-client";
 import React, { useContext } from "react";
 
-import { DuplicateFile } from "src/common/components/Icons";
+import { DuplicateFile } from "common/components/Icons";
 import { Link } from "react-router-dom";
-import { InlineError } from "src/common/components/Error";
-import Loader from "src/common/components/Loaders";
-import { FormStatus, Query, QueryFormsArgs } from "src/generated/graphql/types";
+import { InlineError } from "common/components/Error";
+import Loader from "common/components/Loaders";
+import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
 import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 
 import TabContent from "./TabContent";
-import { COLORS } from "src/common/config";
+import { COLORS } from "common/config";
 import EmptyTab from "./EmptyTab";
 export default function DraftsTab() {
   const { siret } = useContext(SiretContext);

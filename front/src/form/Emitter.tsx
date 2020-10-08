@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import CompanySelector from "./company/CompanySelector";
 import { RadioButton } from "./custom-inputs/RadioButton";
 import "./Emitter.scss";
-import { Form } from "src/generated/graphql/types";
+import { Form } from "generated/graphql/types";
 import EcoOrganismes from "./eco-organismes/EcoOrganismes";
 import WorkSite from "./work-site/WorkSite";
 

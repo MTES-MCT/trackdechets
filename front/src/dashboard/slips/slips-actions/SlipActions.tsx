@@ -7,8 +7,8 @@ import {
   PaperWriteIcon,
   DeliveryTruckClockIcon,
   WarehouseStorageIcon,
-} from "src/common/components/Icons";
-import { Form } from "src/generated/graphql/types";
+} from "common/components/Icons";
+import { Form } from "generated/graphql/types";
 import "./SlipActions.scss";
 import Delete from "./Delete";
 import DownloadPdf from "./DownloadPdf";
@@ -23,11 +23,11 @@ import Sent from "./Sent";
 import Resealed from "./Resealed";
 import Resent from "./Resent";
 import mutations from "./slip-actions.mutations";
-import { NotificationError } from "src/common/components/Error";
-import { ChevronDown, ChevronUp } from "src/common/components/Icons";
+import { NotificationError } from "common/components/Error";
+import { ChevronDown, ChevronUp } from "common/components/Icons";
 import OutsideClickHandler from "react-outside-click-handler";
-import { COLORS } from "src/common/config";
-import TdModal from "src/common/components/Modal";
+import { COLORS } from "common/config";
+import TdModal from "common/components/Modal";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;

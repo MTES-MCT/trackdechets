@@ -3,13 +3,13 @@ import { Field } from "formik";
 import React, { useState } from "react";
 import { FaEnvelope, FaEye, FaIdCard, FaLock, FaPhone } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
-import { NotificationError } from "src/common/components/Error";
-import PasswordMeter from "src/common/components/PasswordMeter";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import { NotificationError } from "common/components/Error";
+import PasswordMeter from "common/components/PasswordMeter";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import { SIGNUP } from "./mutations";
 import styles from "./Signup.module.scss";
 import { Wizard } from "./Wizard";
-import { Mutation, MutationSignupArgs } from "src/generated/graphql/types";
+import { Mutation, MutationSignupArgs } from "generated/graphql/types";
 
 export default function Signup() {
   const [passwordType, setPasswordType] = useState("password");

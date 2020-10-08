@@ -2,7 +2,7 @@ import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
 import AccountFormCompanyTraderReceipt from "./forms/AccountFormCompanyTraderReceipt";
-import { CompanyPrivate } from "src/generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 import { DateTime } from "luxon";
 
 type Props = {

@@ -20,9 +20,10 @@
       "es6",
       "esnext.asynciterable"
     ],
-    "baseUrl": "."
+    "baseUrl": "./src",
+ 
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

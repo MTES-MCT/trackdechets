@@ -1,9 +1,9 @@
 import React from "react";
 
-import { PdfIcon } from "src/common/components/Icons";
-import DownloadFileLink from "src/common/components/DownloadFileLink";
+import { PdfIcon } from "common/components/Icons";
+import DownloadFileLink from "common/components/DownloadFileLink";
 import gql from "graphql-tag";
-import {COLORS} from "src/common/config"
+import {COLORS} from "common/config"
 type Props = { formId: string; small?: boolean; onSuccess?: () => void; };
 
 export const FORMS_PDF = gql`

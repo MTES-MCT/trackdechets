@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { formCreateRoute } from "src/common/routes";
+import { formCreateRoute } from "common/routes";
 import styles from "../SlipsHeaderActions.module.scss";
 export default function EmptyTab(props) {
   return (

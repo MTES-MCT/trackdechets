@@ -13,7 +13,7 @@ import Exports from "./exports/Exports";
 import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
 
-import { Query } from "src/generated/graphql/types";
+import { Query } from "generated/graphql/types";
 import Stats from "./stats/Stats";
 
 export const GET_ME = gql`

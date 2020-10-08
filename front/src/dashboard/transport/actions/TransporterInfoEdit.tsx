@@ -3,11 +3,11 @@ import { useFormik } from "formik";
 import gql from "graphql-tag";
 import React, { useState } from "react";
 
-import { Form as FormModel } from "src/generated/graphql/types";
-import { NotificationError } from "src/common/components/Error";
-import { capitalize } from "src/common/helper";
-import { PaperWriteIcon } from "src/common/components/Icons";
-import TdModal from "src/common/components/Modal";
+import { Form as FormModel } from "generated/graphql/types";
+import { NotificationError } from "common/components/Error";
+import { capitalize } from "common/helper";
+import { PaperWriteIcon } from "common/components/Icons";
+import TdModal from "common/components/Modal";
 
 export const UPDATE_PLATE = gql`
   mutation updateTransporterFields(

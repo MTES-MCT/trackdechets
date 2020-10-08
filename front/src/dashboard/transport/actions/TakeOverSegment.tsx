@@ -11,14 +11,14 @@ import {
   TransportSegment,
   FormRole,
   FormStatus,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 import { useMutation } from "@apollo/react-hooks";
-import { NotificationError } from "src/common/components/Error";
+import { NotificationError } from "common/components/Error";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
-import { updateApolloCache } from "src/common/helper";
-import DateInput from "src/form/custom-inputs/DateInput";
+import { updateApolloCache } from "common/helper";
+import DateInput from "form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
-import { BusTransfer } from "src/common/components/Icons";
+import { BusTransfer } from "common/components/Icons";
 
 export const TAKE_OVER_SEGMENT = gql`
   mutation takeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {

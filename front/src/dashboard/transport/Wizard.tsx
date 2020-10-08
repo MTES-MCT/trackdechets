@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, FormikHelpers } from "formik";
-import { NextButton, PreviousButton } from "src/common/components/Buttons";
+import { NextButton, PreviousButton } from "common/components/Buttons";
 import "./Wizard.scss";
 
 type Props = {

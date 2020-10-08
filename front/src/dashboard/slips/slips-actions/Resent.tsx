@@ -1,16 +1,16 @@
 import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
-import { removeNulls } from "src/common/helper";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
-import CompanySelector from "src/form/company/CompanySelector";
-import DateInput from "src/form/custom-inputs/DateInput";
-import NumberInput from "src/form/custom-inputs/NumberInput";
-import { RadioButton } from "src/form/custom-inputs/RadioButton";
-import Packagings from "src/form/packagings/Packagings";
+import { removeNulls } from "common/helper";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import CompanySelector from "form/company/CompanySelector";
+import DateInput from "form/custom-inputs/DateInput";
+import NumberInput from "form/custom-inputs/NumberInput";
+import { RadioButton } from "form/custom-inputs/RadioButton";
+import Packagings from "form/packagings/Packagings";
 import { SlipActionProps } from "./SlipActions";
-import { PROCESSING_OPERATIONS } from "src/generated/constants";
-import { WasteDetails } from "src/generated/graphql/types";
+import { PROCESSING_OPERATIONS } from "generated/constants";
+import { WasteDetails } from "generated/graphql/types";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   // We need a deep merge as sub-objects may be partially filled

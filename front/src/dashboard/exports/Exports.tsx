@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import React from "react";
-import { CompanyPrivate } from "src/generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 import ExportsForm from "./ExportsForm";
 import { filter } from "graphql-anywhere";
 

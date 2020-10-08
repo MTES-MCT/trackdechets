@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { NextButton, PreviousButton } from "src/common/components/Buttons";
+import { NextButton, PreviousButton } from "common/components/Buttons";
 import "./Step.scss";
 
 interface IStepProps {

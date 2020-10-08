@@ -1,25 +1,25 @@
 import React, { lazy, Suspense, useEffect } from "react";
 import { Route, withRouter, Switch, Redirect } from "react-router";
 import { useAuth } from "./use-auth";
-import PrivateRoute from "src/login/PrivateRoute";
-import { trackPageView } from "src/tracker";
-import Loader from "src/common/components/Loaders";
+import PrivateRoute from "login/PrivateRoute";
+import { trackPageView } from "tracker";
+import Loader from "common/components/Loaders";
 import Layout from "./Layout";
 
-const dashBoardPreload = import("src/dashboard/Dashboard");
+const dashBoardPreload = import("dashboard/Dashboard");
 const Dashboard = lazy(() => dashBoardPreload);
-const Account = lazy(() => import("src/account/Account"));
-const FormContainer = lazy(() => import("src/form/FormContainer"));
-const SignupInfo = lazy(() => import("src/login/SignupInfos"));
-const WasteSelector = lazy(() => import("src/login/WasteSelector"));
+const Account = lazy(() => import("account/Account"));
+const FormContainer = lazy(() => import("form/FormContainer"));
+const SignupInfo = lazy(() => import("login/SignupInfos"));
+const WasteSelector = lazy(() => import("login/WasteSelector"));
 
-const Invite = lazy(() => import("src/login/Invite"));
-const ResetPassword = lazy(() => import("src/login/ResetPassword"));
-const Login = lazy(() => import("src/login/Login"));
-const Signup = lazy(() => import("src/login/Signup"));
-const Dialog = lazy(() => import("src/oauth2/Dialog"));
-const Company = lazy(() => import("src/company/Company"));
-const WasteTree = lazy(() => import("src/search/WasteTree"));
+const Invite = lazy(() => import("login/Invite"));
+const ResetPassword = lazy(() => import("login/ResetPassword"));
+const Login = lazy(() => import("login/Login"));
+const Signup = lazy(() => import("login/Signup"));
+const Dialog = lazy(() => import("oauth2/Dialog"));
+const Company = lazy(() => import("company/Company"));
+const WasteTree = lazy(() => import("search/WasteTree"));
 
 export default withRouter(function LayoutContainer({ history }) {
   useEffect(() => {

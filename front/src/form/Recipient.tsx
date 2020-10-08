@@ -1,10 +1,10 @@
 import { Field, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
 import initialState from "./initial-state";
-import { Form } from "src/generated/graphql/types";
+import { Form } from "generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
 import TdSwitch from "../common/components/Switch";

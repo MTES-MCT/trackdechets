@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { ChevronDown, ChevronUp } from "./Icons";
-import { COLORS } from "src/common/config";
+import { COLORS } from "common/config";
 
 export const MenuDropDown = props => {
   const [dropdownOpened, toggleDropdown] = useState(false);

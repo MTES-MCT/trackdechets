@@ -1,19 +1,19 @@
 import { useMutation } from "@apollo/react-hooks";
 import cogoToast from "cogo-toast";
 import React, { useContext } from "react";
-import { DuplicateFile } from "src/common/components/Icons";
-import { updateApolloCache } from "src/common/helper";
+import { DuplicateFile } from "common/components/Icons";
+import { updateApolloCache } from "common/helper";
 import { useHistory } from "react-router-dom";
 import {
   Form,
   Mutation,
   MutationDuplicateFormArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import mutations from "./slip-actions.mutations";
-import { COLORS } from "src/common/config";
-import { dashboardBase } from "src/common/routes";
+import { COLORS } from "common/config";
+import { dashboardBase } from "common/routes";
 type Props = {
   formId: string;
   small?: boolean;

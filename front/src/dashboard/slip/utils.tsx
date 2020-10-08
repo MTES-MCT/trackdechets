@@ -1,4 +1,4 @@
-import { Consistence, Packagings,   WasteAcceptationStatusInput as WasteAcceptationStatus, QuantityType} from "src/generated/graphql/types";
+import { Consistence, Packagings,   WasteAcceptationStatusInput as WasteAcceptationStatus, QuantityType} from "generated/graphql/types";
 export const getVerboseConsistence = (
   consistence: Consistence | null | undefined | ""
 ): string => {

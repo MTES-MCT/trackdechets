@@ -7,19 +7,19 @@ import {
   RouteComponentProps,
 } from "react-router-dom";
 
-import { trackEvent } from "src/tracker";
+import { trackEvent } from "tracker";
 
-import { localAuthService } from "src/login/auth.service";
-import { ProfileIcon, LeftArrowIcon, Close } from "src/common/components/Icons";
-import { AccountMenuContent } from "src/account/AccountMenu";
+import { localAuthService } from "login/auth.service";
+import { ProfileIcon, LeftArrowIcon, Close } from "common/components/Icons";
+import { AccountMenuContent } from "account/AccountMenu";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
-import Loader from "src/common/components/Loaders";
-import { InlineError } from "src/common/components/Error";
-import { Query } from "src/generated/graphql/types";
-import { DashboardNav } from "src/dashboard/DashboardNavigation";
+import Loader from "common/components/Loaders";
+import { InlineError } from "common/components/Error";
+import { Query } from "generated/graphql/types";
+import { DashboardNav } from "dashboard/DashboardNavigation";
 
-import { MEDIA_QUERIES } from "src/common/config";
+import { MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import useMedia from "use-media";
 

@@ -11,14 +11,14 @@ import {
   Redirect,
   Switch,
 } from "react-router";
-import Loader from "src/common/components/Loaders";
-import { InlineError } from "src/common/components/Error";
+import Loader from "common/components/Loaders";
+import { InlineError } from "common/components/Error";
 import AccountInfo from "./AccountInfo";
 import AccountIntegrationApi from "./AccountIntegrationApi";
 import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
 import AccountCompanyAdd from "./AccountCompanyAdd";
-import { Query } from "src/generated/graphql/types";
+import { Query } from "generated/graphql/types";
 
 export const GET_ME = gql`
   {
@@ -72,9 +72,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                   button={
                     <a
                       className="btn btn--primary"
-                      onClick={() =>
-                        history.push(`${match.path}/companies/new`)
-                      }
+                      href={`${match.path}/companies/new`}
                     >
                       Créer un établissement
                     </a>

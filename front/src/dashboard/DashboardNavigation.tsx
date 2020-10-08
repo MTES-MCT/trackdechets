@@ -1,11 +1,11 @@
 import React from "react";
 import { NavLink, useHistory } from "react-router-dom";
 
-import Loader from "src/common/components/Loaders";
-import { InlineError } from "src/common/components/Error";
-import DashboardCompanySelector from "src/dashboard/DashboardCompanySelector";
-import getDashboardRoutes from "src/common/routes";
-import { CompanyType } from "src/generated/graphql/types";
+import Loader from "common/components/Loaders";
+import { InlineError } from "common/components/Error";
+import DashboardCompanySelector from "dashboard/DashboardCompanySelector";
+import getDashboardRoutes from "common/routes";
+import { CompanyType } from "generated/graphql/types";
 import styles from "./DashboardNavigation.module.scss";
 
 export function DashboardNav({

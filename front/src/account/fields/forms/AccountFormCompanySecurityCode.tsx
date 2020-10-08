@@ -4,7 +4,7 @@ import { useMutation } from "@apollo/react-hooks";
 import {
   Mutation,
   MutationRenewSecurityCodeArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   toggleEdition: () => void;

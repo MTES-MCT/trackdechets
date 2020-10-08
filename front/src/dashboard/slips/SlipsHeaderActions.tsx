@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { RefreshIcon } from "src/common/components/Icons";
+import { RefreshIcon } from "common/components/Icons";
 import styles from "./SlipsHeaderActions.module.scss";
-import { formCreateRoute } from "src/common/routes";
+import { formCreateRoute } from "common/routes";
 export default function SlipsHeaderActions({
   refetch,
 }: {

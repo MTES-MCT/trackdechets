@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { match, NavLink } from "react-router-dom";
-import SideMenu from "src/common/components/SideMenu";
-import { CompanyType, User } from "src/generated/graphql/types";
+import SideMenu from "common/components/SideMenu";
+import { CompanyType, User } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import { SiretContext } from "./Dashboard";
 import "./DashboardMenu.scss";

@@ -1,7 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import AccountCompanySecurityCodeField from "./fields/AccountFieldCompanySecurityCode";
-import { CompanyPrivate } from "src/generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 
 type Props = { company: CompanyPrivate };
 

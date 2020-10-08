@@ -1,10 +1,10 @@
 import { useLazyQuery, useQuery } from "@apollo/react-hooks";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useCallback, useMemo, useState } from "react";
-import { Search } from "src/common/components/Icons";
+import { Search } from "common/components/Icons";
 import { constantCase } from "constant-case";
-import { InlineError } from "src/common/components/Error";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import { InlineError } from "common/components/Error";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanyResults from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
@@ -15,7 +15,7 @@ import {
   FormCompany,
   QueryFavoritesArgs,
   FavoriteType,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 import CountrySelector from "./CountrySelector";
 import { v4 as uuidv4 } from "uuid";
 interface CompanySelectorProps {

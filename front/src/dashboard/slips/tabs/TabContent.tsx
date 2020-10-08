@@ -1,6 +1,6 @@
 import React from "react";
 
-import { RefreshLoader } from "src/common/components/Loaders";
+import { RefreshLoader } from "common/components/Loaders";
 
 import LoadMore from "./LoadMore";
 import SlipsHeaderActions from "../SlipsHeaderActions";

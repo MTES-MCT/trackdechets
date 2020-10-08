@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanyPrivate } from "src/generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 
 export const currentSiretService = {
   getSiret: () => window.localStorage.getItem(SIRET_STORAGE_KEY) || "",

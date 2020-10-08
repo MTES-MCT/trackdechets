@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/react-hooks/lib/useQuery";
 import gql from "graphql-tag";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { InlineError } from "src/common/components/Error";
+import { InlineError } from "common/components/Error";
 import "./Company.scss";
 import CompanyActivity from "./CompanyActivity";
 import CompanyContact from "./CompanyContact";
@@ -10,7 +10,7 @@ import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyHeader from "./CompanyHeader";
 import CompanyMap from "./CompanyMap";
 import CompanyRegistration from "./CompanyRegistration";
-import { Query, QueryCompanyInfosArgs } from "src/generated/graphql/types";
+import { Query, QueryCompanyInfosArgs } from "generated/graphql/types";
 
 const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {

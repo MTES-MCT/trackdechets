@@ -6,7 +6,7 @@ import SortControl from "./SortableTableHeader";
 import { statusLabels } from "../constants";
 
 import "./Slips.scss";
-import { Form } from "src/generated/graphql/types";
+import { Form } from "generated/graphql/types";
 
 type Props = {
   forms: Form[];

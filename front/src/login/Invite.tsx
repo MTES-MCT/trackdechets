@@ -10,8 +10,8 @@ import {
   Query,
   User,
 } from "../generated/graphql/types";
-import Loader from "src/common/components/Loaders";
-import { NotificationError } from "src/common/components/Error";
+import Loader from "common/components/Loaders";
+import { NotificationError } from "common/components/Error";
 
 
 const INVITATION = gql`

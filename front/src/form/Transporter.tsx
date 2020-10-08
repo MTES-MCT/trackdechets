@@ -1,9 +1,9 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
 import { Field, connect } from "formik";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import DateInput from "./custom-inputs/DateInput";
-import TdSwitch from "src/common/components/Switch";
+import TdSwitch from "common/components/Switch";
 
 import styles from  "./Transporter.module.scss";
 type Values = {

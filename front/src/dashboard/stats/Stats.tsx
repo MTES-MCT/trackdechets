@@ -1,9 +1,9 @@
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import React from "react";
-import { InlineError } from "src/common/components/Error";
-import Loader from "src/common/components/Loaders";
-import { Query } from "src/generated/graphql/types";
+import { InlineError } from "common/components/Error";
+import Loader from "common/components/Loaders";
+import { Query } from "generated/graphql/types";
 
 const GET_STATS = gql`
   query GetStats {

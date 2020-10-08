@@ -17,7 +17,7 @@ import {
   MutationCreateCompanyArgs,
   Query,
   CompanyType as _CompanyType,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {

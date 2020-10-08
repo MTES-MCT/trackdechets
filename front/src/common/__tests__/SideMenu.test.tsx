@@ -1,8 +1,8 @@
 import React from "react";
-import SideMenu from "src/common/components/SideMenu";
+import SideMenu from "common/components/SideMenu";
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
-import { mockMatchMediaWidth } from "src/common/__mocks__/matchmedia.mock";
+import { mockMatchMediaWidth } from "common/__mocks__/matchmedia.mock";
 
 describe("<SideMenu />", () => {
   it("should render content normally if resolution is > 1000", () => {

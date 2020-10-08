@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import WasteTree from "./WasteTree";
 import styles from "./WasteTreeModal.module.scss";
-import TdModal from "src/common/components/Modal";
+import TdModal from "common/components/Modal";
 type Props = {
   open: boolean;
   onClose?: () => void;

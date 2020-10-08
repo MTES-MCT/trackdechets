@@ -1,19 +1,19 @@
 import React from "react";
-import SortControl from "src/dashboard/slips/SortableTableHeader";
+import SortControl from "dashboard/slips/SortableTableHeader";
 
 import MarkSegmentAsReadyToTakeOver from "./actions/MarkSegmentAsReadyToTakeOver";
 import PrepareSegment from "./actions/PrepareSegment";
 import TakeOverSegment from "./actions/TakeOverSegment";
 import EditSegment from "./actions/EditSegment";
 
-import DownloadPdf from "src/dashboard/slips/slips-actions/DownloadPdf";
-import { useFormsTable } from "src/dashboard/slips/use-forms-table";
+import DownloadPdf from "dashboard/slips/slips-actions/DownloadPdf";
+import { useFormsTable } from "dashboard/slips/use-forms-table";
 
 import TransporterInfoEdit from "./actions/TransporterInfoEdit";
 import TransportSignature from "./actions/TransportSignature";
 import styles from "./TransportTable.module.scss";
 import { Segments } from "./Segments";
-import Quicklook from "src/dashboard/slips/slips-actions/Quicklook";
+import Quicklook from "dashboard/slips/slips-actions/Quicklook";
 export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
   const [sortedForms, sortParams, sortBy, filter] = useFormsTable(forms);
 

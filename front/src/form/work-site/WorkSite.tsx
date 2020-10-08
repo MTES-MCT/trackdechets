@@ -1,8 +1,8 @@
 import { Field, useFormikContext } from "formik";
 import React, { useState, useEffect } from "react";
-import { Form } from "src/generated/graphql/types";
+import { Form } from "generated/graphql/types";
 import WorkSiteAddress from "./WorkSiteAddress";
-import TdSwitch from "src/common/components/Switch";
+import TdSwitch from "common/components/Switch";
 const FIELDS = ["name", "address", "city", "postalCode", "infos"];
 
 export default function WorkSite() {

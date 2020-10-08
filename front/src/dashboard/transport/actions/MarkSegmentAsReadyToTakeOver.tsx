@@ -11,14 +11,14 @@ import {
   Mutation,
   MutationMarkSegmentAsReadyToTakeOverArgs,
   TransportSegment,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 import { Form as FormikForm, Formik } from "formik";
-import { segmentFragment } from "src/common/fragments";
-import { updateApolloCache } from "src/common/helper";
+import { segmentFragment } from "common/fragments";
+import { updateApolloCache } from "common/helper";
 import cogoToast from "cogo-toast";
-import { NotificationError } from "src/common/components/Error";
+import { NotificationError } from "common/components/Error";
 // import "./TransportSignature.module.scss";
-import TdModal from "src/common/components/Modal";
+import TdModal from "common/components/Modal";
 
 export const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {

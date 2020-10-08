@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 
-import { ViewIcon } from "src/common/components/Icons";
+import { ViewIcon } from "common/components/Icons";
 
 import { useQuery } from "@apollo/react-hooks";
-import SlipDetailContent from "src/dashboard/slip/SlipDetailContent";
+import SlipDetailContent from "dashboard/slip/SlipDetailContent";
 
-import { ModalLoader } from "src/common/components/Loaders";
-import TdModal from "src/common/components/Modal";
+import { ModalLoader } from "common/components/Loaders";
+import TdModal from "common/components/Modal";
 
-import { Query, QueryFormArgs } from "src/generated/graphql/types";
-import { InlineError } from "src/common/components/Error";
-import { GET_DETAIL_FORM } from "src/common/queries";
+import { Query, QueryFormArgs } from "generated/graphql/types";
+import { InlineError } from "common/components/Error";
+import { GET_DETAIL_FORM } from "common/queries";
 
  
-import { COLORS } from "src/common/config";
+import { COLORS } from "common/config";
 const QuicklookModal = ({ formId, onClose }) => {
  
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(

@@ -11,7 +11,7 @@ import {
   Mutation,
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;

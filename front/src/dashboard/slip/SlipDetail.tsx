@@ -1,11 +1,11 @@
 import React from "react";
 import SlipDetailContent from "./SlipDetailContent";
-import Loader from "src/common/components/Loaders";
+import Loader from "common/components/Loaders";
 import { useQuery } from "@apollo/react-hooks";
-import { Query, QueryFormArgs } from "src/generated/graphql/types";
+import { Query, QueryFormArgs } from "generated/graphql/types";
 import { useParams } from "react-router";
-import { GET_DETAIL_FORM } from "src/common/queries";
-import { InlineError } from "src/common/components/Error";
+import { GET_DETAIL_FORM } from "common/queries";
+import { InlineError } from "common/components/Error";
 
 export default function SlipDetail() {
   const { id: formId } = useParams<{ id: string }>();

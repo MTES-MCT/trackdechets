@@ -1,7 +1,7 @@
 import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer, useState } from "react";
-import useDebounce from "src/common/hooks/use-debounce";
-import { Form } from "src/generated/graphql/types";
+import useDebounce from "common/hooks/use-debounce";
+import { Form } from "generated/graphql/types";
 import formatWasteCodeEffect from "../waste-code/format-waste-code.effect";
 import FormsTable from "./FormsTable";
 

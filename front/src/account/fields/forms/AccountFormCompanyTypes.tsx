@@ -3,14 +3,14 @@ import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
 import { Formik, Field, Form, FormikProps } from "formik";
 import CompanyTypes from "../../../login/CompanyType";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
-import { InlineError } from "src/common/components/Error";
+import { InlineError } from "common/components/Error";
 import {
   CompanyType,
   Mutation,
   MutationUpdateCompanyArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   name: string;

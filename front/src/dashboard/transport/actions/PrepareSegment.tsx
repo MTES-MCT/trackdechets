@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/react-hooks";
-import { NotificationError } from "src/common/components/Error";
-import { BusTransfer } from "src/common/components/Icons";
+import { NotificationError } from "common/components/Error";
+import { BusTransfer } from "common/components/Icons";
 import { DateTime } from "luxon";
 import gql from "graphql-tag";
 
@@ -8,12 +8,12 @@ import React, { useState } from "react";
 
 import { Field, Form as FormikForm, Formik } from "formik";
 
-import CompanySelector from "src/form/company/CompanySelector";
-import { segmentFragment } from "src/common/fragments";
+import CompanySelector from "form/company/CompanySelector";
+import { segmentFragment } from "common/fragments";
 import { transportModeLabels } from "../../constants";
 import cogoToast from "cogo-toast";
 
-import DateInput from "src/form/custom-inputs/DateInput";
+import DateInput from "form/custom-inputs/DateInput";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import {
   Form,
@@ -23,9 +23,9 @@ import {
   TransportSegment,
   FormRole,
   FormStatus,
-} from "src/generated/graphql/types";
-import { updateApolloCache } from "src/common/helper";
-import TdModal from "src/common/components/Modal";
+} from "generated/graphql/types";
+import { updateApolloCache } from "common/helper";
+import TdModal from "common/components/Modal";
 import styles from "./Segments.module.scss";
 
 const PREPARE_SEGMENT = gql`

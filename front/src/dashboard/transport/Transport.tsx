@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/react-hooks";
-import Loader, { RefreshLoader } from "src/common/components/Loaders";
+import Loader, { RefreshLoader } from "common/components/Loaders";
 import React, { useContext, useEffect } from "react";
-import { MEDIA_QUERIES } from "src/common/config";
+import { MEDIA_QUERIES } from "common/config";
 import { NetworkStatus } from "apollo-client";
 import {
   Form,
@@ -9,19 +9,19 @@ import {
   FormStatus,
   Query,
   QueryFormsArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 import {
   RefreshIcon,
   Layout2Icon,
   LayoutModule1Icon,
-} from "src/common/components/Icons";
+} from "common/components/Icons";
 
 import { SiretContext } from "../Dashboard";
 import { GET_TRANSPORT_SLIPS } from "./queries";
-import useLocalStorage from "src/common/hooks/useLocalStorage";
+import useLocalStorage from "common/hooks/useLocalStorage";
 import useMedia from 'use-media';
 
-import { COLORS } from "src/common/config";
+import { COLORS } from "common/config";
 
 import { TransportTable } from "./TransportTable";
 import { TransportCards } from "./TransportCards";

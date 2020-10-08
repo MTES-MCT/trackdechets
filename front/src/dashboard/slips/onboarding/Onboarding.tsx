@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Slide from "./Slide";
 import styles from "./Onboarding.module.scss";
 import Slider from "./Slider";
-import TdModal from "src/common/components/Modal";
+import TdModal from "common/components/Modal";
 export default function OnBoarding() {
   const [isOpen, setIsOpen] = useState(false);
 

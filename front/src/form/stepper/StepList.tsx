@@ -11,10 +11,10 @@ import React, {
 import { useLocation, useHistory } from "react-router";
 import queryString from "query-string";
 
-import { InlineError } from "src/common/components/Error";
-import { updateApolloCache } from "src/common/helper";
-import { currentSiretService } from "src/dashboard/DashboardCompanySelector";
-import { GET_SLIPS } from "src/dashboard/slips/query";
+import { InlineError } from "common/components/Error";
+import { updateApolloCache } from "common/helper";
+import { currentSiretService } from "dashboard/DashboardCompanySelector";
+import { GET_SLIPS } from "dashboard/slips/query";
 import initialState from "../initial-state";
 import {
   Form,
@@ -23,7 +23,7 @@ import {
   Mutation,
   MutationSaveFormArgs,
   FormInput,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";

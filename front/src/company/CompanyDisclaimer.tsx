@@ -1,5 +1,5 @@
 import React from "react";
-import {tdContactEmail} from "src/common/config"
+import {tdContactEmail} from "common/config"
 export default function CompanyDisclaimer() {
   return (
     <div className="columns">

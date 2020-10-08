@@ -5,7 +5,7 @@ import { NotificationError } from "../common/components/Error";
 import {
   Mutation,
   MutationResetPasswordArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 const RESET_PASSWORD = gql`
   mutation ResetPassword($email: String!) {

@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import styles from "./AccountField.module.scss";
-import ToolTip from "src/common/components/Tooltip";
+import ToolTip from "common/components/Tooltip";
 
 type Props = {
   name: string;

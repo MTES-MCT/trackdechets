@@ -5,12 +5,12 @@ import gql from "graphql-tag";
 import React, { useState } from "react";
 
 import { Field, Form as FormikForm, Formik } from "formik";
-import { segmentFragment } from "src/common/fragments";
-import { PaperWriteIcon } from "src/common/components/Icons";
+import { segmentFragment } from "common/fragments";
+import { PaperWriteIcon } from "common/components/Icons";
 
 import { transportModeLabels } from "../../constants";
-import CompanySelector from "src/form/company/CompanySelector";
-import DateInput from "src/form/custom-inputs/DateInput";
+import CompanySelector from "form/company/CompanySelector";
+import DateInput from "form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import {
@@ -20,10 +20,10 @@ import {
   TransportSegment,
   FormRole,
   FormStatus,
-} from "src/generated/graphql/types";
-import { NotificationError } from "src/common/components/Error";
-import { updateApolloCache } from "src/common/helper";
-import TdModal from "src/common/components/Modal";
+} from "generated/graphql/types";
+import { NotificationError } from "common/components/Error";
+import { updateApolloCache } from "common/helper";
+import TdModal from "common/components/Modal";
 import styles from "./Segments.module.scss";
 
 /**Remove company data if segment is readytoTakeOver */

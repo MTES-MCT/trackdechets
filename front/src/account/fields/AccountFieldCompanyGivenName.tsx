@@ -5,7 +5,7 @@ import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import {
   CompanyPrivate,
   MutationUpdateCompanyArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;

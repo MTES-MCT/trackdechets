@@ -5,7 +5,7 @@ import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
 import AccountFieldName from "./fields/AccountFieldName";
 import AccountFieldPhone from "./fields/AccountFieldPhone";
 import AccountFieldPassword from "./fields/AccountFieldPassword";
-import { User } from "src/generated/graphql/types";
+import { User } from "generated/graphql/types";
 
 type Props = {
   me: User;

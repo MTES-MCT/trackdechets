@@ -1,21 +1,21 @@
 import React, { useState, useContext } from "react";
 
-import { COLORS } from "src/common/config";
-import { TrashIcon } from "src/common/components/Icons";
+import { COLORS } from "common/config";
+import { TrashIcon } from "common/components/Icons";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
 import { useMutation } from "@apollo/react-hooks";
-import { updateApolloCache } from "src/common/helper";
+import { updateApolloCache } from "common/helper";
 import {
   Form,
   Mutation,
   MutationDeleteFormArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 import { useHistory } from "react-router-dom";
-import { SiretContext } from "src/dashboard/Dashboard";
+import { SiretContext } from "dashboard/Dashboard";
 import cogoToast from "cogo-toast";
-import TdModal from "src/common/components/Modal";
-import { dashboardBase } from "src/common/routes";
+import TdModal from "common/components/Modal";
+import { dashboardBase } from "common/routes";
 type Props = {
   formId: string;
   small?: boolean;

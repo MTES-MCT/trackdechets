@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import gql from "graphql-tag";
-import RedErrorMessage from "src/common/components/RedErrorMessage";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountCompanyInviteNewUser.module.scss";
 import { useMutation } from "@apollo/react-hooks";
 import AccountCompanyMember from "../../AccountCompanyMember";
@@ -11,7 +11,7 @@ import {
   UserRole,
   Mutation,
   MutationInviteUserToCompanyArgs,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;

@@ -1,5 +1,5 @@
 import React from "react";
-import { Installation } from "src/generated/graphql/types";
+import { Installation } from "generated/graphql/types";
 
 type Props = { installation: Installation };
 

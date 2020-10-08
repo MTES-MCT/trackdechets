@@ -1,5 +1,5 @@
 import React from "react";
-import { Form } from "src/generated/graphql/types";
+import { Form } from "generated/graphql/types";
 import { ITEMS_PER_PAGE } from "../../constants";
 
 type Props = {

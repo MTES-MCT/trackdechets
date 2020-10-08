@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import { DateTime } from "luxon";
-import DateInput from "src/form/custom-inputs/DateInput";
+import DateInput from "form/custom-inputs/DateInput";
 import { SlipActionProps } from "./SlipActions";
 
 export default function Sent(props: SlipActionProps) {

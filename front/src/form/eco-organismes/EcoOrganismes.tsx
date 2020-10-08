@@ -5,10 +5,10 @@ import React, { useEffect, useReducer } from "react";
 
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import SearchInput from "src/common/components/SearchInput";
-import { Query, EcoOrganisme} from "src/generated/graphql/types";
-import TdSwitch from "src/common/components/Switch";
-import { tdContactEmail } from "src/common/config";
+import SearchInput from "common/components/SearchInput";
+import { Query, EcoOrganisme} from "generated/graphql/types";
+import TdSwitch from "common/components/Switch";
+import { tdContactEmail } from "common/config";
 
 const GET_ECO_ORGANISMES = gql`
   {

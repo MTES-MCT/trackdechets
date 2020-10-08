@@ -1,4 +1,4 @@
-import { CompanyType, CompanyPrivate } from "src/generated/graphql/types";
+import { CompanyType, CompanyPrivate } from "generated/graphql/types";
 
 export const dashboardBase = "/dashboard";
 export const formCreateRoute = "/form";

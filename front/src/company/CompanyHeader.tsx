@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanyPublic } from "src/generated/graphql/types";
+import { CompanyPublic } from "generated/graphql/types";
 
 type Props = Pick<CompanyPublic, "name" | "siret" | "naf" | "libelleNaf">;
 

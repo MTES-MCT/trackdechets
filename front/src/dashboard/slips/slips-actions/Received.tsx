@@ -1,17 +1,17 @@
 import React from "react";
 import { Formik, Field, Form } from "formik";
 import { DateTime } from "luxon";
-import NumberInput from "src/form/custom-inputs/NumberInput";
-import DateInput from "src/form/custom-inputs/DateInput";
+import NumberInput from "form/custom-inputs/NumberInput";
+import DateInput from "form/custom-inputs/DateInput";
 import { SlipActionProps } from "./SlipActions";
 import {
   InlineRadioButton,
   RadioButton,
-} from "src/form/custom-inputs/RadioButton";
+} from "form/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   FormStatus,
-} from "src/generated/graphql/types";
+} from "generated/graphql/types";
 
 const textConfig = {
   [WasteAcceptationStatus.Accepted]: {

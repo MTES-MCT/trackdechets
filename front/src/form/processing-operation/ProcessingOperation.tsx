@@ -1,6 +1,6 @@
 import { FieldProps } from "formik";
 import React from "react";
-import { PROCESSING_OPERATIONS } from "src/generated/constants";
+import { PROCESSING_OPERATIONS } from "generated/constants";
 import "./ProcessingOperation.scss";
 
 export default function ProcessingOperation({

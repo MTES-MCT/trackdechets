@@ -19,11 +19,11 @@ import {
   createTemporaryStorageDetailMock,
   createRecipientMock,
   createDestinationMock,
-} from "src/generated/graphql/types";
-import { SiretContext } from "src/dashboard/Dashboard";
-import { TransportContent } from "src/dashboard/transport/Transport";
-import { GET_TRANSPORT_SLIPS } from "src/dashboard/transport/queries";
-import { mockMatchMediaWidth } from "src/common/__mocks__/matchmedia.mock";
+} from "generated/graphql/types";
+import { SiretContext } from "dashboard/Dashboard";
+import { TransportContent } from "dashboard/transport/Transport";
+import { GET_TRANSPORT_SLIPS } from "dashboard/transport/queries";
+import { mockMatchMediaWidth } from "common/__mocks__/matchmedia.mock";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({

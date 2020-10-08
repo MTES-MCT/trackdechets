@@ -1,9 +1,9 @@
 import React from "react";
 
-import { PaperWriteIcon } from "src/common/components/Icons";
+import { PaperWriteIcon } from "common/components/Icons";
 
 import { Link } from "react-router-dom";
-import { COLORS } from "src/common/config";
+import { COLORS } from "common/config";
 type Props = { formId: string; small?: boolean };
 
 export default function Edit({ formId, small = true }: Props) {

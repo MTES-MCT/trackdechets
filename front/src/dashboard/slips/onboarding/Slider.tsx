@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
 import styles from "./Slider.module.scss";
-import { NextButton, PreviousButton } from "src/common/components/Buttons";
+import { NextButton, PreviousButton } from "common/components/Buttons";
 export default function Slider({ children, onClose }: any) {
   const [page, setPage] = useState(0);
 

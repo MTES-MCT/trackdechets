@@ -1,10 +1,10 @@
 import { useQuery } from "@apollo/react-hooks";
 import { NetworkStatus } from "apollo-client";
 import React, { useContext } from "react";
-import { InlineError } from "src/common/components/Error";
-import Loader from "src/common/components/Loaders";
-import { Query, QueryFormsArgs } from "src/generated/graphql/types";
-import { SiretContext } from "src/dashboard/Dashboard";
+import { InlineError } from "common/components/Error";
+import Loader from "common/components/Loaders";
+import { Query, QueryFormsArgs } from "generated/graphql/types";
+import { SiretContext } from "dashboard/Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 import TabContent from "./TabContent";

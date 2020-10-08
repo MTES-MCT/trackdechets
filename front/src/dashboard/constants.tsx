@@ -1,4 +1,4 @@
-import { FormStatus } from "src/generated/graphql/types";
+import { FormStatus } from "generated/graphql/types";
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente d'envoi",

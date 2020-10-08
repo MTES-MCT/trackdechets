@@ -3,7 +3,7 @@ import {
     TriangleUpIconAndDown,
     TriangleDownIcon,
     TriangleUpIcon,
-  } from "src/common/components/Icons";
+  } from "common/components/Icons";
 
 export default function SortControl ({ sortFunc, fieldName, sortParams, caption }) {
     const getIcon = sortParams => {

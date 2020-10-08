@@ -1,6 +1,6 @@
 import React from "react";
 import Tree, { TreeNode } from "rc-tree";
-import { WASTES_TREE, WasteNode } from "src/generated/constants/WASTES";
+import { WASTES_TREE, WasteNode } from "generated/constants/WASTES";
 import "rc-tree/assets/index.css";
 
 const loop = (data: WasteNode[]) => {

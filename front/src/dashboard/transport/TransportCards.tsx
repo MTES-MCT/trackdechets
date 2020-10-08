@@ -4,7 +4,7 @@ import MarkSegmentAsReadyToTakeOver from "./actions/MarkSegmentAsReadyToTakeOver
 import PrepareSegment from "./actions/PrepareSegment";
 import TakeOverSegment from "./actions/TakeOverSegment";
 import EditSegment from "./actions/EditSegment";
-import Quicklook from "src/dashboard/slips/slips-actions/Quicklook";
+import Quicklook from "dashboard/slips/slips-actions/Quicklook";
 
 import TransporterInfoEdit from "./actions/TransporterInfoEdit";
 import TransportSignature from "./actions/TransportSignature";

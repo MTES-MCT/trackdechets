@@ -1,13 +1,13 @@
 import React, { useContext } from "react";
 
-import { statusLabels } from "src/dashboard/constants";
-import DownloadPdf from "src/dashboard/slips/slips-actions/DownloadPdf";
-import Duplicate from "src/dashboard/slips/slips-actions/Duplicate";
+import { statusLabels } from "dashboard/constants";
+import DownloadPdf from "dashboard/slips/slips-actions/DownloadPdf";
+import Duplicate from "dashboard/slips/slips-actions/Duplicate";
 
-import Delete from "src/dashboard/slips/slips-actions/Delete";
-import Edit from "src/dashboard/slips/slips-actions/Edit";
+import Delete from "dashboard/slips/slips-actions/Delete";
+import Edit from "dashboard/slips/slips-actions/Edit";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import { TransportSegment, Form } from "src/generated/graphql/types";
+import { TransportSegment, Form } from "generated/graphql/types";
 import { statusesWithDynamicActions } from "../constants";
 import {
   WarehouseDeliveryIcon,
@@ -15,7 +15,7 @@ import {
   WaterDamIcon,
   RenewableEnergyEarthIcon,
   WarehousePackageIcon,
-} from "src/common/components/Icons";
+} from "common/components/Icons";
 
 import {
   getVerboseConsistence,
