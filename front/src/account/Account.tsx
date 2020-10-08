@@ -39,14 +39,14 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
   if (loading) return <Loader />;
 
   if (error) return <InlineError apolloError={error} />;
-
+ 
   if (data) {
     return (
       <div id="account" className="account dashboard">
         <AccountMenu />
         <div className="dashboard-content">
           <Route exact path={match.url}>
-            <Redirect to={`${match.url}/info`} />
+            <Redirect to={`${match.path}/info`} />
           </Route>
           <Route
             path={`${match.path}/info`}
