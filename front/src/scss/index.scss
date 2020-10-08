@@ -15,20 +15,11 @@
 @import "./Panels.scss";
 @import "./Dashboard.scss";
 
-
-@font-face {
-  font-family: "marianne";
-  src: url("/fonts/marianne/marianne-light-webfont.woff2") format("woff2"),
-    url("/fonts/marianne/marianne-light-webfont.woff") format("woff");
-  font-weight: 100 300;
-  font-style: normal;
-}
-
 @font-face {
   font-family: "marianne";
   src: url("/fonts/marianne/marianne-medium-webfont.woff2") format("woff2"),
     url("/fonts/marianne/marianne-medium-webfont.woff") format("woff");
-  font-weight: 400 600;
+  font-weight: normal;
   font-style: normal;
 }
 
@@ -36,7 +27,7 @@
   font-family: "marianne";
   src: url("/fonts/marianne/marianne-bold-webfont.woff2") format("woff2"),
     url("/fonts/marianne/marianne-bold-webfont.woff") format("woff");
-  font-weight: 700 900;
+  font-weight: bold;
   font-style: normal;
 }
 html,
