@@ -180,6 +180,7 @@ export default function Signup() {
                   <a
                     href="https://trackdechets.beta.gouv.fr/cgu"
                     target="_blank"
+                    className="link"
                     rel="noopener noreferrer"
                   >
                     conditions générales d'utilisation
