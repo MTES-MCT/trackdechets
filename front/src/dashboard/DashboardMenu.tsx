@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { match, NavLink } from "react-router-dom";
 import SideMenu from "src/common/components/SideMenu";
 import { CompanyType, User } from "src/generated/graphql/types";
-import CompanySelector from "./CompanySelector";
+import DashboardCompanySelector from "./DashboardCompanySelector";
 import { SiretContext } from "./Dashboard";
 import "./DashboardMenu.scss";
 
@@ -26,7 +26,7 @@ export default function DashboardMenu({
       <>
         {companies.length > 1 ? (
           <div className="company-select">
-            <CompanySelector
+            <DashboardCompanySelector
               siret={siret}
               companies={companies}
               handleCompanyChange={handleCompanyChange}

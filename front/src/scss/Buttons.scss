@@ -3,7 +3,6 @@
   appearance: none;
   border: none;
   display: inline-flex;
-
   width: auto;
   align-items: center;
   padding: 0.5rem 1.5rem;
@@ -35,6 +34,23 @@
     &-secondary {
       border: 1px solid $grey-dark;
       color: $grey-dark;
+    }
+  }
+  &--sqr{
+    background-color: #18009f;
+    color: #fff;
+    border-radius: 0;
+    &:hover {
+      background-color: #18009f;
+    }
+  }
+  &--sqr-outline{
+    background-color: #fff;
+    color: #18009f;
+    border: 1px solid #18009f;
+    border-radius: 0;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
     }
   }
   &--no-style {

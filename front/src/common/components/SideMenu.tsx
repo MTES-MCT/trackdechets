@@ -6,7 +6,7 @@ import { MEDIA_QUERIES } from "src/common/config";
 
 const SideMenu: FunctionComponent = ({ children }) => {
  
-  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld2});
+  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld});
  
   if (isMobile) {
     return null;

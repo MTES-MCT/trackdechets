@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   NavLink,
   Link,
@@ -6,17 +6,11 @@ import {
   matchPath,
   RouteComponentProps,
 } from "react-router-dom";
-import useWindowSize from "src/common/hooks/use-window-size";
+
 import { trackEvent } from "src/tracker";
 
 import { localAuthService } from "src/login/auth.service";
-import { currentSiretService } from "src/dashboard/CompanySelector";
-import {
-  LogoutIcon,
-  LoginIcon,
-  LeftArrowIcon,
-  Close,
-} from "src/common/components/Icons";
+import { ProfileIcon, LeftArrowIcon, Close } from "src/common/components/Icons";
 import { AccountMenuContent } from "src/account/AccountMenu";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
@@ -27,6 +21,7 @@ import { DashboardNav } from "src/dashboard/DashboardNavigation";
 
 import { MEDIA_QUERIES } from "src/common/config";
 import styles from "./Header.module.scss";
+import useMedia from "use-media";
 
 export const GET_ME = gql`
   {
@@ -53,7 +48,6 @@ function MobileSubNav({ currentSiret, onClick }) {
 
   if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
-
   return (
     <DashboardNav
       currentSiret={currentSiret}
@@ -89,14 +83,7 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
       navlink: false,
     },
   ];
-  const notConnected = [
-    {
-      caption: "S'inscrire",
-      href: "/signup",
 
-      navlink: true,
-    },
-  ];
   const connected = [
     {
       caption: "Mon espace",
@@ -113,10 +100,10 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
       navlink: true,
     },
   ];
-  return [...common, ...(isAuthenticated ? connected : notConnected)];
+  return [...common, ...(isAuthenticated ? connected : [])];
 };
 
-const MenuLink = ({ entry }) => {
+const MenuLink = ({ entry, mobileCallback }) => {
   const content = (
     <>
       <LeftArrowIcon color="#0053b3" size={16} />
@@ -131,7 +118,10 @@ const MenuLink = ({ entry }) => {
           className={styles.headerNavLink}
           to={entry.href}
           exact={false}
-          onClick={entry.onClick}
+          onClick={() => {
+            entry.onClick();
+            mobileCallback && mobileCallback();
+          }}
           activeClassName={styles.headerNavLinkActive}
         >
           {content}
@@ -166,35 +156,43 @@ export default withRouter(function Header({
 }: RouteComponentProps & HeaderProps) {
   const { REACT_APP_API_ENDPOINT, REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
   const [menuHidden, toggleMenu] = useState(true);
-  const windowSize = useWindowSize();
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
 
+  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+  const closeMobileMenu = () => isMobile && toggleMenu(true);
   const matchAccount = matchPath(location.pathname, {
     path: "/account/",
     exact: false,
     strict: false,
   });
+  const matchDashboard = matchPath(location.pathname, {
+    path: "/dashboard/:siret",
+    exact: false,
+    strict: false,
+  });
 
-  const menuClass = menuHidden && isMobileDevice ? styles.headerNavHidden : "";
-  useEffect(() => {
-    setIsMobileDevice(windowSize.width < MEDIA_QUERIES.handHeld);
-  }, [windowSize]);
-  const currentSiret = currentSiretService.getSiret();
+  const menuClass = menuHidden && isMobile ? styles.headerNavHidden : "";
 
+  // Catching siret from url when not available from props (just after login)
+  const currentSiret = matchDashboard?.params["siret"];
   const menuEntries = getMenuEntries(
     isAuthenticated,
     REACT_APP_DEVELOPERS_ENDPOINT,
     currentSiret
   );
 
-  const mobileNav = !!matchAccount ? (
-    <AccountMenuContent />
-  ) : (
-    <MobileSubNav
-      currentSiret={currentSiret}
-      onClick={() => toggleMenu(true)}
-    />
-  );
+  const mobileNav = () => {
+    if (!isAuthenticated || !isMobile) {
+      return null;
+    }
+    return !!matchAccount ? (
+      <AccountMenuContent mobileCallback={() => closeMobileMenu()} />
+    ) : (
+      <MobileSubNav
+        currentSiret={currentSiret}
+        onClick={() => closeMobileMenu()}
+      />
+    );
+  };
 
   return (
     <nav id="header" className={styles.header}>
@@ -232,23 +230,26 @@ export default withRouter(function Header({
           <div className={styles.headerClose}>
             <button
               className="btn btn--no-style"
-              onClick={() => toggleMenu(true)}
+              onClick={() => closeMobileMenu()}
             >
               <span className="tw-mr-2">Fermer</span>
               <Close color="#000" size={16} />
             </button>
           </div>
-          {!!isMobileDevice && mobileNav}
+
+          {mobileNav()}
 
           <ul className={styles.headerNavItems}>
             {menuEntries.map((e, idx) => (
               <li className={styles.headerNavItem} key={idx}>
-                <MenuLink entry={e} />
+                <MenuLink entry={e} mobileCallback={() => closeMobileMenu()} />
               </li>
             ))}
 
             {isAuthenticated ? (
-              <li className={styles.headerNavItem}>
+              <li
+                className={`${styles.headerNavItem} ${styles.headerNavItemNoBorder}`}
+              >
                 <form
                   className={styles.headerConnexion}
                   name="logout"
@@ -256,30 +257,51 @@ export default withRouter(function Header({
                   method="post"
                 >
                   <button
-                    className="btn btn--primary"
+                    className={`${styles.headerConnexion} btn btn--sqr`}
                     onClick={() => {
                       localAuthService.locallySignOut();
                       document.forms["logout"].submit();
+                      closeMobileMenu();
                       return false;
                     }}
                   >
                     <span>Se déconnecter</span>
-                    <LogoutIcon />
+                    <ProfileIcon color="#ffffff" />
                   </button>
                 </form>
               </li>
             ) : (
-              <li className={styles.headerNavItem}>
-                <NavLink
-                  to="/login"
-                  className={`${styles.headerConnexion} btn btn--primary`}
-                  onClick={() => trackEvent("navbar", "login")}
+              <>
+                <li
+                  className={`${styles.headerNavItem} ${styles.headerNavItemNoBorder}`}
                 >
-                  <span>Se connecter</span>
-
-                  <LoginIcon />
-                </NavLink>
-              </li>
+                  <NavLink
+                    to="/signup"
+                    className={`${styles.headerSignup} btn btn--sqr-outline`}
+                    onClick={() => {
+                      trackEvent("navbar", "login");
+                      closeMobileMenu();
+                    }}
+                  >
+                    <span>Créer un compte</span>
+                  </NavLink>
+                </li>
+                <li
+                  className={`${styles.headerNavItem} ${styles.headerNavItemNoBorder}`}
+                >
+                  <NavLink
+                    to="/login"
+                    className={`${styles.headerConnexion} btn btn--sqr`}
+                    onClick={() => {
+                      trackEvent("navbar", "login");
+                      closeMobileMenu();
+                    }}
+                  >
+                    <span>Se connecter</span>
+                    <ProfileIcon color="#ffffff" />
+                  </NavLink>
+                </li>
+              </>
             )}
           </ul>
         </div>

@@ -4,7 +4,11 @@ import { NavLink } from "react-router-dom";
 import styles from "./AccountMenu.module.scss";
 import { accountRoutes } from "src/common/routes";
 
-export const AccountMenuContent = () => (
+export const AccountMenuContent = ({
+  mobileCallback,
+}: {
+  mobileCallback?: () => void;
+}) => (
   <>
     <h5 className={styles.title}>Mon Compte</h5>
     <ul>
@@ -13,6 +17,7 @@ export const AccountMenuContent = () => (
           to={accountRoutes.accountInfo}
           className="sidebar__link  "
           activeClassName="sidebar__link--active"
+          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Informations générales
         </NavLink>
@@ -22,6 +27,7 @@ export const AccountMenuContent = () => (
           to={accountRoutes.accountCompanies}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
+          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Établissements
         </NavLink>
@@ -31,6 +37,7 @@ export const AccountMenuContent = () => (
           to={accountRoutes.accountApi}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
+          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Intégration API
         </NavLink>

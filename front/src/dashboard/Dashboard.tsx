@@ -6,7 +6,7 @@ import { Redirect, Route, useHistory } from "react-router";
 import { useParams, useRouteMatch } from "react-router-dom";
 import { InlineError } from "../common/components/Error";
 import Loader from "../common/components/Loaders";
-import { currentSiretService } from "./CompanySelector";
+import { currentSiretService } from "./DashboardCompanySelector";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
@@ -67,7 +67,7 @@ export default function Dashboard() {
     if (!companies.find(company => company.siret === siret)) {
       return <Redirect to={`/dashboard/${companies[0].siret}`} />;
     }
-
+    console.log("dashboard", siret)
     return (
       <SiretContext.Provider value={{ siret }}>
         <div id="dashboard" className="dashboard">

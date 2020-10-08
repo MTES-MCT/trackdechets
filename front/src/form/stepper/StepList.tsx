@@ -13,7 +13,7 @@ import queryString from "query-string";
 
 import { InlineError } from "src/common/components/Error";
 import { updateApolloCache } from "src/common/helper";
-import { currentSiretService } from "src/dashboard/CompanySelector";
+import { currentSiretService } from "src/dashboard/DashboardCompanySelector";
 import { GET_SLIPS } from "src/dashboard/slips/query";
 import initialState from "../initial-state";
 import {

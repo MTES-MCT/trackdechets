@@ -133,15 +133,13 @@
   margin-right: 0.75rem;
   margin-left: 1rem;
   align-items: center;
-  &:not(:last-child) {
-    border-bottom: 1px solid $grey-light;
-    @include desktop {
-      border: none;
-    }
+  border-bottom: 1px solid $grey-light;
+  &NoBorder {
+    border-bottom: none;
   }
   @include desktop {
     flex-direction: column;
-
+    border: none;
     justify-content: center;
   }
 }
@@ -191,22 +189,26 @@
   display: block;
 }
 
-.headerConnexion {
+.headerConnexion,
+.headerSignup {
   display: flex;
-  margin: 2rem auto;
+  margin: 1rem auto 0.5rem;
   @include desktop {
     margin: 0;
   }
   & span {
-    color: #fff;
     white-space: nowrap;
-
     font-weight: bold;
-    font-size: 16px;
+    font-size: 1rem;
     text-transform: Capitalize;
   }
 }
 
+.headerConnexion {
+  & span {
+    color: #fff;
+  }
+}
 a:hover {
   border-radius: none !important;
 }

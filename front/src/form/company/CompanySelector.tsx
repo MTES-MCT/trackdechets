@@ -15,7 +15,7 @@ import {
   FormCompany,
   QueryFavoritesArgs,
   FavoriteType,
-} from "../../generated/graphql/types";
+} from "src/generated/graphql/types";
 import CountrySelector from "./CountrySelector";
 import { v4 as uuidv4 } from "uuid";
 interface CompanySelectorProps {

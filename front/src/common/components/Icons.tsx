@@ -95,51 +95,7 @@ export const ViewIcon = ({
     </g>
   </svg>
 );
-export const LoginIcon = ({
-  color = WHITE,
-  size = DEFAULT_DIMENSION,
-}: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-    fillRule="evenodd"
-    clipRule="evenodd"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    width={`${size}px`}
-    height={`${size}px`}
-  >
-    <path
-      d="M1.414 16.5c1.801 4.236 5.98 7 10.583 7 6.309 0 11.5-5.191 11.5-11.5S18.306.5 11.997.5a11.519 11.519 0 0 0-10.583 7"
-      fill="none"
-      stroke={color}
-    />
-    <path d="M12.5 16l4-4-4-4M16.5 12H.5" fill="none" stroke={color} />
-  </svg>
-);
-export const LogoutIcon = ({
-  color = WHITE,
-  size = DEFAULT_DIMENSION,
-}: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-    fillRule="evenodd"
-    clipRule="evenodd"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    width={`${size}px`}
-    height={`${size}px`}
-  >
-    <path
-      d="M14.782 8.59a7.463 7.463 0 0 0-6.844-4.528C3.858 4.062.5 7.42.5 11.5s3.358 7.438 7.438 7.438a7.487 7.487 0 0 0 6.844-4.527"
-      fill="none"
-      stroke={color}
-      strokeWidth=".6445998000000001"
-    />
-    <path d="M19.497 8l4 4-4 4m4-4h-16" fill="none" stroke={color} />
-  </svg>
-);
+
 export const PdfIcon = ({
   color = WHITE,
   size = DEFAULT_DIMENSION,
@@ -660,5 +616,27 @@ export const DeliveryTruckClockIcon = ({
         strokeWidth="1.9999949999999997"
       />
     </g>
+  </svg>
+);
+
+export const ProfileIcon = ({
+  color = WHITE,
+  size = DEFAULT_DIMENSION,
+}: IconProps) => (
+  <svg
+    viewBox="0 0 32 32"
+    xmlns="http://www.w3.org/2000/svg"
+    fillRule="evenodd"
+    clipRule="evenodd"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="0"
+    width={`${size}px`}
+    height={`${size}px`}
+  >
+    <path
+      d="M16.191 31.666c-.063 0-.127.003-.192.003-8.594 0-15.667-7.074-15.667-15.667C.332 7.406 7.405.335 15.999.335h.192c8.521.103 15.475 7.143 15.475 15.667 0 8.52-6.954 15.56-15.475 15.664zm-7.813-5.865a12.488 12.488 0 0 0 7.813 2.73 12.482 12.482 0 0 0 8.093-2.963 10.932 10.932 0 0 0-7.844-3.301A10.949 10.949 0 0 0 8.378 25.8zM6.19 23.55a14.07 14.07 0 0 1 10.25-4.418 14.062 14.062 0 0 1 9.969 4.126 12.53 12.53 0 0 0 2.314-7.256c0-6.876-5.656-12.533-12.532-12.533C9.318 3.47 3.66 9.126 3.66 16.002c0 2.723.888 5.376 2.53 7.55v-.002zm10.001-5.983c-3.438 0-6.267-2.83-6.267-6.268 0-3.438 2.83-6.267 6.267-6.267 3.438 0 6.268 2.83 6.268 6.267 0 3.438-2.83 6.268-6.268 6.268zm0-3.135a3.148 3.148 0 0 0 3.133-3.133 3.148 3.148 0 0 0-3.133-3.132 3.148 3.148 0 0 0-3.132 3.132 3.148 3.148 0 0 0 3.132 3.133z"
+      fill="#fff"
+    />
   </svg>
 );

@@ -14,7 +14,8 @@ interface IProps {
 }
 
 export const SIRET_STORAGE_KEY = "td-selectedSiret";
-export default function CompanySelector({
+
+export default function DashboardCompanySelector({
   siret,
   companies,
   handleCompanyChange,
@@ -24,7 +25,11 @@ export default function CompanySelector({
   };
 
   return (
-    <select className="td-select" value={siret} onChange={e => handleChange(e.target.value)}>
+    <select
+      className="td-select"
+      value={siret}
+      onChange={e => handleChange(e.target.value)}
+    >
       {companies.map(c => (
         <option key={c.siret} value={c.siret}>
           {c.givenName || c.name} ({c.siret})

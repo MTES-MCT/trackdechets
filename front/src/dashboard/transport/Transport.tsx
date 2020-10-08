@@ -70,7 +70,7 @@ export function TransportContent({ formType }) {
     DISPLAY_TYPE_STORAGE_KEY
   );
 
-  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld2});
+  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld});
 
   useEffect(() => {
     // set display as cards on small screens

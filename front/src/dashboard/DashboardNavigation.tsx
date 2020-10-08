@@ -3,7 +3,7 @@ import { NavLink, useHistory } from "react-router-dom";
 
 import Loader from "src/common/components/Loaders";
 import { InlineError } from "src/common/components/Error";
-import CompanySelector from "src/dashboard/CompanySelector";
+import DashboardCompanySelector from "src/dashboard/DashboardCompanySelector";
 import getDashboardRoutes from "src/common/routes";
 import { CompanyType } from "src/generated/graphql/types";
 import styles from "./DashboardNavigation.module.scss";
@@ -35,10 +35,10 @@ export function DashboardNav({
     <>
       {companies.length > 1 ? (
         <div className={styles.companySelect}>
-          <CompanySelector
+          <DashboardCompanySelector
             siret={currentSiret}
             companies={companies}
-            handleCompanyChange={handleCompanyChange}
+            handleCompanyChange={siret => history.push(`/dashboard/${siret}`)}
           />
         </div>
       ) : (
