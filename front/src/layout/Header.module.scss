@@ -188,7 +188,11 @@
   width: 3rem;
   display: block;
 }
-
+.headerNavItem:hover .headerNavActive {
+  @include desktop {
+    border-color: $black;
+  }
+}
 .headerConnexion,
 .headerSignup {
   display: flex;
