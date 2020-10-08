@@ -23,6 +23,7 @@ import {
 import { SiretContext } from "src/dashboard/Dashboard";
 import { TransportContent } from "src/dashboard/transport/Transport";
 import { GET_TRANSPORT_SLIPS } from "src/dashboard/transport/queries";
+import { mockMatchMediaWidth } from "src/common/__mocks__/matchmedia.mock";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({
@@ -83,6 +84,7 @@ async function renderWith({ forms }: { forms: Form[] }) {
 describe("<Transport />", () => {
   describe("when leaving the producer for the final collector", () => {
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -174,6 +176,7 @@ describe("<Transport />", () => {
     });
 
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -264,6 +267,7 @@ describe("<Transport />", () => {
     });
 
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
