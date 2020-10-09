@@ -29,7 +29,7 @@ describe("<AccountField />", () => {
     expect(getByLabelText("Nom utilisateur")).toBeInTheDocument();
 
     // it should container tooltip trigger
-    expect(getByRole("icon")).toBeInTheDocument();
+    expect(getByRole("button")).toBeInTheDocument();
 
     // it should contain field value
     expect(getByText("John Snow")).toBeInTheDocument();
