@@ -78,7 +78,7 @@
     "@types/yup": "^0.26.37",
     "@types/zxcvbn": "^4.4.0",
     "browserslist-useragent-regexp": "^2.0.5",
-    "prettier": "^2.0.5",
+    "prettier": "^2.1.2",
     "typescript": "^3.7.5"
   }
 }
