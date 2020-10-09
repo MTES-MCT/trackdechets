@@ -6,7 +6,7 @@ import { render, fireEvent } from "@testing-library/react";
 describe("<Tooltip />", () => {
   it("renders nothing when props are empty", () => {
     const { container } = render(<Tooltip />);
-    expect(container.querySelector("span")).toBeNull();
+    expect(container.querySelector("button")).toBeNull();
   });
 
   it("shows help message when button is hovered", async () => {
@@ -15,7 +15,7 @@ describe("<Tooltip />", () => {
       <Tooltip msg={helpMsg} />
     );
 
-    expect(container.querySelector("span")).toHaveClass("tooltip__container");
+    expect(container.querySelector("button")).toHaveClass("tdTooltip");
 
     expect(queryByText(helpMsg)).not.toBeInTheDocument();
     const button = getByRole("button");
@@ -29,8 +29,7 @@ describe("<Tooltip />", () => {
     fireEvent.mouseOver(button);
     const displayed = getByText(helpMsg);
     expect(displayed).toBeInTheDocument();
-    expect(displayed).toHaveClass("tooltip__content");
-
+ 
     // Mouseleave button -> hide text
     fireEvent.mouseLeave(button);
     expect(queryByText(helpMsg)).not.toBeInTheDocument();

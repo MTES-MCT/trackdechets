@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { IconContext } from "react-icons";
-import { FaQuestion } from "react-icons/fa";
-import "./Tooltip.scss";
+import React from "react";
+import { Question } from "common/components/Icons";
+import { COLORS } from "common/config";
+import Tooltip from "@reach/tooltip";
+import "@reach/tooltip/styles.css";
+import style from "./Tooltip.module.scss";
 
 type Props = {
   msg?: string;
@@ -11,24 +13,25 @@ type Props = {
  * Icon displaying help text when hovered
  * @param msg string
  */
-const Tooltip = ({ msg }: Props) => {
-  const [display, setDisplay] = useState(false);
-  return !!msg ? (
-    <span className="tooltip__container">
-      <span
-        role="button"
-        className="tooltip__trigger"
-        onMouseOver={() => setDisplay(true)}
-        onMouseLeave={() => setDisplay(false)}
-      >
-        <IconContext.Provider value={{ className: "tooltip__icon" }}>
-          <FaQuestion role="icon" />
-        </IconContext.Provider>
-      </span>
 
-      {display && <p className="tooltip__content"> {msg} </p>}
-    </span>
+const TdTooltip = ({ msg }: Props) => {
+  return !!msg ? (
+    <Tooltip
+      label={msg}
+      aria-label={msg}
+      style={{
+        background: "hsla(0, 0%, 0%, 0.75)",
+        color: "white",
+        border: "none",
+        borderRadius: "3px",
+        padding: "0.5em 1em",
+      }}
+    >
+      <button className={style.tdTooltip}>
+        <Question color={COLORS.blue} size={20} />
+      </button>
+    </Tooltip>
   ) : null;
 };
 
-export default Tooltip;
+export default TdTooltip;

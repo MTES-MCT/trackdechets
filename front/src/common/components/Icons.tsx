@@ -640,3 +640,42 @@ export const ProfileIcon = ({
     />
   </svg>
 );
+
+export const Question = ({
+  color = WHITE,
+  size = DEFAULT_DIMENSION,
+}: IconProps) => (
+  <svg
+    viewBox="0 0 32 32"
+    xmlns="http://www.w3.org/2000/svg"
+    fillRule="evenodd"
+    clipRule="evenodd"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="0"
+    width={`${size}px`}
+    height={`${size}px`}
+  >
+    <circle
+      cx="18"
+      cy="16"
+      r="13"
+      transform="translate(-6.154 -3.692) scale(1.23077)"
+      fill={color}
+    />
+    <path
+      d="M11 11.09c0-2.792 2.298-5.088 5.091-5.088s5.091 2.297 5.091 5.09a5.1 5.1 0 0 1-3.394 4.8 2.552 2.552 0 0 0-1.697 2.4V20"
+      fill="none"
+      stroke="#fff"
+      strokeWidth="2.5455"
+    />
+
+    <path
+      d="M16 25c-.275 0-.5.225-.5.5s.225.5.5.5.5-.225.5-.5-.225-.5-.5-.5"
+      fill="#fff"
+      fillRule="nonzero"
+      stroke="#fff"
+      strokeWidth="1.9999949999999997"
+    />
+  </svg>
+);
