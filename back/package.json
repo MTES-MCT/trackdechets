@@ -81,7 +81,7 @@
     "@types/express-serve-static-core": "^4.17.8",
     "@types/express-session": "^1.15.16",
     "@types/ioredis": "^4.0.21",
-    "@types/jest": "^25.2.3",
+    "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^8.3.9",
     "@types/node": "^14.0.23",
     "@types/oauth2orize": "^1.8.8",
