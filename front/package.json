@@ -58,7 +58,7 @@
     "extends": "react-app"
   },
   "devDependencies": {
-    "@apollo/react-testing": "^3.1.4",
+    "@apollo/react-testing": "^4.0.0",
     "@testing-library/dom": "^6.6.0",
     "@testing-library/jest-dom": "^4.1.2",
     "@testing-library/react": "^9.3.3",
