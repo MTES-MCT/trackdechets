@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from "react";
 import Slide from "./Slide";
-import "./Onboarding.scss";
+import styles from "./Onboarding.module.scss";
 import Slider from "./Slider";
-
+import TdModal from "common/components/Modal";
 export default function OnBoarding() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const slideShowShown = window.localStorage.getItem("td-slideshow");
 
-    if (!slideShowShown) {
-      setIsOpen(true);
-      window.localStorage.setItem("td-slideshow", "DONE");
-    }
+      if (!slideShowShown) {
+        setIsOpen(true);
+        window.localStorage.setItem("td-slideshow", "DONE");
+      }
   }, []);
 
   return (
-    <div
-      className="modal__backdrop"
-      id="modal"
-      style={{ display: isOpen ? "flex" : "none" }}
-      onClick={() => setIsOpen(false)}
+    <TdModal
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      ariaLabel="Éditez et transmettez simplement vos BSD"
+      wide={true}
     >
-      <div className="modal onboarding" onClick={e => e.stopPropagation()}>
+      <div className={styles.Onboarding} onClick={e => e.stopPropagation()}>
         <Slider onClose={() => setIsOpen(false)}>
           <Slide
             image="/onboarding/slide1.png"
@@ -112,6 +112,6 @@ export default function OnBoarding() {
           </Slide>
         </Slider>
       </div>
-    </div>
+    </TdModal>
   );
 }

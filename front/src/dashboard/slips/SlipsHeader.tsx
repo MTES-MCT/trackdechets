@@ -1,11 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import "./SlipsHeader.scss";
-import { FaTimesCircle } from "react-icons/fa";
 
+import styles from "./SlipsHeader.module.scss";
+import { FaTimesCircle } from "react-icons/fa";
+import { useRouteMatch } from "react-router-dom";
+
+const Crumb = () => {
+  const draft = useRouteMatch("/dashboard/:siret/slips/drafts");
+  const act = useRouteMatch("/dashboard/:siret/slips/act");
+  const follow = useRouteMatch("/dashboard/:siret/slips/follow");
+  const history = useRouteMatch("/dashboard/:siret/slips/history");
+  const detail = useRouteMatch("/dashboard/:siret/slips/view/:id");
+
+  return (
+    <span>
+      {"> "}
+      {draft && "Brouillons"}
+      {act && "Pour Action"}
+      {follow && "Suivi"}
+      {history && "Archives"}
+      {detail && "Aperçu"}
+    </span>
+  );
+};
 export default function SlipsHeader() {
-  const { siret } = useParams<{ siret: string }>();
   const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
     const warningBannerShown = window.localStorage.getItem("td-warningbanner");
     if (!warningBannerShown) {
@@ -13,16 +32,12 @@ export default function SlipsHeader() {
     }
   }, []);
   return (
-    <div className="SlipsHeader">
-      <div className="header-content">
+    <div className={styles.slipsHeader}>
+      <div>
         <div className="title">
-          <h2>Mes bordereaux</h2>
-        </div>
-
-        <div className="buttons">
-          <Link to={`/form?redirectTo=${siret}`}>
-            <button className="button primary">Créer un bordereau</button>
-          </Link>
+          <h2 className="h3 tw-mb-4">
+            Mes Bordereaux <Crumb />
+          </h2>
         </div>
       </div>
       {isOpen && (

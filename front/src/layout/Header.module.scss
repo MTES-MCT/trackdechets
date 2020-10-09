@@ -1,0 +1,218 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+
+.header {
+  background-color: #fff;
+  width: 100%;
+  border-bottom: 1px solid rgba(203, 213, 224, 1);
+  display: flex;
+  justify-content: space-between;
+}
+.headerToggle {
+  padding-right: 1rem;
+  background-color: $blue-dark;
+  height: 100px;
+  display: flex;
+  padding: 0 0.75rem;
+  align-items: center;
+  button {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 0.5rem;
+    appearance: none;
+    align-items: center;
+    color: $grey-light;
+    width: 36px;
+    border-style: none;
+    background-color: transparent;
+    svg {
+      fill: currentColor;
+    }
+  }
+  &Text {
+    font-size: 12px;
+  }
+
+  @include desktop {
+    display: none;
+  }
+}
+
+.headerContent {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  @include desktop {
+    justify-content: flex-start;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+.headerBranding {
+  padding-left: 1rem;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+.headerNav {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background-color: #fff;
+  margin-left: auto;
+
+  z-index: 20;
+
+  top: 0;
+
+  width: 85vw;
+  min-height: 100vh;
+  padding-right: 0.5rem;
+  position: fixed;
+  left: 0;
+  background-color: #fff;
+  border-right: 1px solid $grey-light;
+
+  box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.1);
+  &Hidden {
+    display: none;
+  }
+  @include desktop {
+    z-index: 0;
+    width: auto;
+    justify-content: flex-end;
+    margin-top: 0;
+    position: static;
+    border-left: none;
+    box-shadow: none;
+    height: 100px;
+    min-height: 100px;
+  }
+}
+.headerClose {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  color: $blue;
+  button {
+    padding: 2rem;
+  }
+  span {
+    font-size: 1.5rem;
+  }
+
+  @include desktop {
+    display: none;
+  }
+}
+.headerNavItems {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 100px;
+  margin-top: auto;
+
+  @include desktop {
+    height: 100px;
+    position: relative;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    width: 100%;
+    flex-direction: row;
+
+    box-shadow: none;
+    padding-bottom: 0;
+    border: none;
+  }
+}
+.headerNavItem {
+  display: flex;
+  flex-direction: row;
+  margin-right: 0.75rem;
+  margin-left: 1rem;
+  align-items: center;
+  border-bottom: 1px solid $grey-light;
+  &NoBorder {
+    border-bottom: none;
+  }
+  @include desktop {
+    flex-direction: column;
+    border: none;
+    justify-content: center;
+  }
+}
+
+.headerNavLink {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: $blue;
+  padding: 1rem 0 1rem 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  span {
+    margin-left: 1rem;
+  }
+
+  @include desktop {
+    padding: 0;
+    color: $black;
+    font-weight: bold;
+
+    svg {
+      display: none;
+    }
+
+    span {
+      margin: 0;
+    }
+  }
+}
+
+.headerNavLinkActive {
+  font-weight: bold;
+  svg {
+    transform: rotate(180deg);
+  }
+}
+.headerNavLinkActive + .headerNavActive {
+  @include desktop {
+    border-color: $black;
+  }
+}
+.headerNavActive {
+  margin-top: 3px;
+  border-bottom: 4px solid transparent;
+  width: 3rem;
+  display: block;
+}
+.headerNavItem:hover .headerNavActive {
+  @include desktop {
+    border-color: $black;
+  }
+}
+.headerConnexion,
+.headerSignup {
+  display: flex;
+  margin: 1rem auto 0.5rem;
+  @include desktop {
+    margin: 0;
+  }
+  & span {
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: Capitalize;
+  }
+}
+
+.headerConnexion {
+  & span {
+    color: #fff;
+  }
+}
+a:hover {
+  border-radius: none !important;
+}

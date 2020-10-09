@@ -3,10 +3,10 @@ import { useLazyQuery } from "@apollo/react-hooks";
 import { Field, FormikProps } from "formik";
 import { FaHourglassHalf } from "react-icons/fa";
 import cogoToast from "cogo-toast";
-import { COMPANY_INFOS } from "../../form/company/query";
-import RedErrorMessage from "../../common/RedErrorMessage";
-import AutoFormattingSiret from "../../common/AutoFormattingSiret";
-import { NotificationError } from "../../common/Error";
+import { COMPANY_INFOS } from "form/company/query";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import AutoFormattingSiret from "common/components/AutoFormattingSiret";
+import { NotificationError } from "common/components/Error";
 import styles from "../AccountCompanyAdd.module.scss";
 
 type IProps = Pick<FormikProps<any>, "values"> & {
@@ -59,7 +59,7 @@ export default function AccountCompanyAddSiret({
           <RedErrorMessage name="siret" />
           <br />
           <button
-            className="button"
+            className="btn btn--primary tw-mt-2"
             type="button"
             onClick={() => {
               const trimedSiret = values.siret.replace(/\s/g, "");

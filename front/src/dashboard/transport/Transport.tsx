@@ -1,214 +1,112 @@
 import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-import React, { useContext, useState } from "react";
-import { FaSort, FaSync } from "react-icons/fa";
+import Loader, { RefreshLoader } from "common/components/Loaders";
+import React, { useContext, useEffect } from "react";
+import { MEDIA_QUERIES } from "common/config";
+import { NetworkStatus } from "apollo-client";
 import {
   Form,
   FormRole,
   FormStatus,
   Query,
   QueryFormsArgs,
-} from "../../generated/graphql/types";
-import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
-import PrepareSegment from "./PrepareSegment";
-import TakeOverSegment from "./TakeOverSegment";
-import EditSegment from "./EditSegment";
+} from "generated/graphql/types";
+import {
+  RefreshIcon,
+  Layout2Icon,
+  LayoutModule1Icon,
+} from "common/components/Icons";
+
 import { SiretContext } from "../Dashboard";
-import DownloadPdf from "../slips/slips-actions/DownloadPdf";
-import { useFormsTable } from "../slips/use-forms-table";
-import useLocalStorage from "./hooks";
-import "./Transport.scss";
-import TransporterInfoEdit from "./TransporterInfoEdit";
-import TransportSignature from "./TransportSignature";
-import { Segments } from "./Segments";
-import { transporterFormFragment } from "../../common/fragments";
+import { GET_TRANSPORT_SLIPS } from "./queries";
+import useLocalStorage from "common/hooks/useLocalStorage";
+import useMedia from 'use-media';
 
-export const GET_TRANSPORT_SLIPS = gql`
-  query GetSlips($siret: String, $status: [FormStatus!], $roles: [FormRole!]) {
-    forms(siret: $siret, status: $status, roles: $roles) {
-      ...TransporterForm
-    }
-  }
-  ${transporterFormFragment}
-`;
+import { COLORS } from "common/config";
 
-export const GET_FORM = gql`
-  query form($id: ID!) {
-    form(id: $id) {
-      ...TransporterForm
-    }
-  }
-  ${transporterFormFragment}
-`;
+import { TransportTable } from "./TransportTable";
+import { TransportCards } from "./TransportCards";
+import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 
-const Table = ({ forms, userSiret }) => {
-  const [sortedForms, sortBy, filter] = useFormsTable(forms);
-  const refetchQuery = {
-    query: GET_TRANSPORT_SLIPS,
-    variables: {
-      siret: userSiret,
-      roles: ["TRANSPORTER"],
-      status: ["SEALED", "SENT", "RESEALED", "RESENT"],
-    },
-  };
+import styles from "./Transport.module.scss";
 
-  return (
-    <table className="table transport-table">
-      <thead>
-        <tr>
-          <th className="sortable" onClick={() => sortBy("readableId")}>
-            Numéro{" "}
-            <small>
-              <FaSort />
-            </small>
-          </th>
-          <th
-            className="sortable"
-            onClick={() => sortBy("emitter.company.name")}
-          >
-            Emetteur{" "}
-            <small>
-              <FaSort />
-            </small>
-          </th>
-          <th
-            className="sortable hide-on-mobile"
-            onClick={() => sortBy("stateSummary.recipient.name")}
-          >
-            Destinataire{" "}
-            <small>
-              <FaSort />
-            </small>
-          </th>
-
-          <th>Déchet</th>
-          <th className="hide-on-mobile">Quantité estimée</th>
-          <th colSpan={2}>Champ libre</th>
-          <th colSpan={2}>Plaque d'immatriculation</th>
-          <th>Multimodal</th>
-          <th>Action</th>
-        </tr>
-        <tr>
-          <th>
-            <input
-              type="text"
-              onChange={e => filter("readableId", e.target.value)}
-              placeholder="Filtrer..."
-            />
-          </th>
-          <th>
-            <input
-              type="text"
-              onChange={e => filter("emitter.company.name", e.target.value)}
-              placeholder="Filtrer..."
-            />
-          </th>
-          <th className="hide-on-mobile">
-            <input
-              type="text"
-              onChange={e =>
-                filter("stateSummary.recipient.name", e.target.value)
-              }
-              placeholder="Filtrer..."
-            />
-          </th>
-          <th>
-            <input
-              type="text"
-              onChange={e => filter("wasteDetails.name", e.target.value)}
-              placeholder="Filtrer..."
-            />
-          </th>
-          <th className="hide-on-mobile"></th>
-
-          <th colSpan={6}></th>
-        </tr>
-      </thead>
-      <tbody>
-        {sortedForms.map(form => (
-          <tr key={form.id}>
-            <td>
-              <div className="readable-id">
-                {form.readableId}
-                <DownloadPdf formId={form.id} />
-              </div>
-            </td>
-            <td>{form.stateSummary?.emitter?.name}</td>
-            <td className="hide-on-mobile">
-              {form.stateSummary?.recipient?.name}
-            </td>
-            <td>
-              <div>{form.wasteDetails?.name}</div>
-            </td>
-            <td className="hide-on-mobile">
-              {form.stateSummary?.quantity} tonnes
-            </td>
-            <td>{form.stateSummary?.transporterCustomInfo}</td>
-            <td style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <TransporterInfoEdit
-                form={form}
-                fieldName="customInfo"
-                verboseFieldName={"champ libre"}
-                refetchQuery={refetchQuery}
-              />
-            </td>
-            <td>{form.stateSummary?.transporterNumberPlate}</td>
-            <td style={{ paddingLeft: 0 }}>
-              <TransporterInfoEdit
-                form={form}
-                fieldName="numberPlate"
-                verboseFieldName={"plaque d'immatriculation"}
-                refetchQuery={refetchQuery}
-              />
-            </td>
-            <td>
-              <Segments form={form} userSiret={userSiret} />
-            </td>
-            <td>
-              <TransportSignature form={form} userSiret={userSiret} />
-
-              <PrepareSegment form={form} userSiret={userSiret} />
-              <MarkSegmentAsReadyToTakeOver form={form} userSiret={userSiret} />
-              <EditSegment form={form} userSiret={userSiret} />
-              <TakeOverSegment form={form} userSiret={userSiret} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
-const TRANSPORTER_FILTER_STORAGE_KEY = "TRANSPORTER_FILTER_STORAGE_KEY";
+const TRANSPORTER_FILTER_STORAGE_KEY = "td-transporter-filter";
+const DISPLAY_TYPE_STORAGE_KEY = "td-display-type";
 
 export default function Transport() {
+  const { url, path } = useRouteMatch();
+
+  return (
+    <div>
+      <Switch>
+        <Route
+          exact
+          path={url}
+          render={() => <Redirect to={`./to-collect`} />}
+        />
+        <Route
+          path={`${path}/to-collect`}
+          render={() => <TransportContent formType="TO_TAKE_OVER" />}
+        />
+        <Route
+          path={`${path}/collected`}
+          render={() => <TransportContent formType="TAKEN_OVER" />}
+        />
+      </Switch>
+    </div>
+  );
+}
+/**
+ * Render Transporter forms either as table or cards according to
+ * user preferences (stored in local storage)
+ * @param param0
+ */
+export function TransportContent({ formType }) {
   const { siret } = useContext(SiretContext);
-  // const [filterStatus, setFilterStatus] = useState(["SEALED", "RESEALED"]);
-  const [filterFormType, setFilterFormType] = useState({
-    formType: "TO_TAKE_OVER",
-  });
+
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY
   );
-  const { loading, error, data, refetch } = useQuery<
-    Pick<Query, "forms">,
-    Partial<QueryFormsArgs>
-  >(GET_TRANSPORT_SLIPS, {
+  const [displayAsCards, setDisplayAsCards] = useLocalStorage(
+    DISPLAY_TYPE_STORAGE_KEY
+  );
+
+  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld});
+
+  useEffect(() => {
+    // set display as cards on small screens
+
+    setDisplayAsCards(
+      isMobile ? true : displayAsCards
+    );
+  }, [isMobile, displayAsCards, setDisplayAsCards]);
+
+  const DisplayComponent = displayAsCards ? TransportCards : TransportTable;
+  const refetchQuery = {
+    query: GET_TRANSPORT_SLIPS,
     variables: {
-      siret,
+      siret: siret,
+      roles: [FormRole.Transporter],
       status: [
         FormStatus.Sealed,
         FormStatus.Sent,
         FormStatus.Resealed,
         FormStatus.Resent,
       ],
-      roles: [FormRole.Transporter],
     },
+  };
+
+  const { error, data, refetch, networkStatus } = useQuery<
+    Pick<Query, "forms">,
+    Partial<QueryFormsArgs>
+  >(refetchQuery.query, {
+    variables: refetchQuery.variables,
+    notifyOnNetworkStatusChange: true,
   });
 
-  if (loading) return <div>loading</div>;
+  if (networkStatus === NetworkStatus.loading) return <Loader />;
   if (error) return <div>error</div>;
 
-  const filterAgainstPersistenFilter = (field, filterParam) => {
+  const filterAgainstPersistentFilter = (field, filterParam) => {
     field = !field ? "" : field;
     return field.toLowerCase().indexOf(filterParam.toLowerCase()) > -1;
   };
@@ -217,7 +115,7 @@ export default function Transport() {
     const statuses = {
       TO_TAKE_OVER: ["SEALED", "RESEALED"],
       TAKEN_OVER: ["SENT", "RESENT"],
-    }[filterFormType.formType];
+    }[formType];
 
     const segmentsToTakeOver =
       form.transportSegments?.filter(
@@ -236,10 +134,10 @@ export default function Transport() {
     return (
       (statuses.includes(form.status) &&
         form.transporter?.company?.siret === siret) ||
-      (filterFormType.formType === "TO_TAKE_OVER" &&
+      (formType === "TO_TAKE_OVER" &&
         form.status === "SENT" &&
         !!segmentsToTakeOver.length) ||
-      (filterFormType.formType === "TAKEN_OVER" &&
+      (formType === "TAKEN_OVER" &&
         form.status === "SENT" &&
         !!hasTakenOverASegment.length)
     );
@@ -251,7 +149,7 @@ export default function Transport() {
         .filter(
           f =>
             filtering(f) &&
-            filterAgainstPersistenFilter(
+            filterAgainstPersistentFilter(
               f.stateSummary?.transporterCustomInfo,
               persistentFilter
             )
@@ -266,68 +164,70 @@ export default function Transport() {
     : [];
   return (
     <div>
-      <div className="header-content">
-        <h2>Déchets à transporter</h2>
+      <div className={styles.headerContent}>
+        <h2 className={`${styles.headerTitle} h2 tw-mb-4`}>
+          Transport {"> "}
+          {formType === "TAKEN_OVER"
+            ? "Chargés, en attente de réception ou de transfert"
+            : "À collecter"}
+        </h2>
       </div>
-
-      <div className="transport-menu">
+      <div className={styles.chooseLayout}>
         <button
-          onClick={() => setFilterFormType({ formType: "TO_TAKE_OVER" })}
-          className={`link ${
-            filterFormType.formType === "TO_TAKE_OVER" ? "active" : ""
+          className={`btn btn--small btn--left ${
+            !displayAsCards ? "btn--primary" : "btn--outline-primary"
           }`}
+          onClick={() => setDisplayAsCards(false)}
         >
-          Déchets à collecter
+          <Layout2Icon
+            color={displayAsCards ? COLORS.blueLight : COLORS.white}
+            size={16}
+          />{" "}
+          <span>Tableau</span>
         </button>
         <button
-          onClick={() => setFilterFormType({ formType: "TAKEN_OVER" })}
-          className={`link ${
-            filterFormType.formType === "TAKEN_OVER" ? "active" : ""
+          className={`btn btn--small btn--right ${
+            displayAsCards ? "btn--primary" : "btn--outline-primary"
           }`}
+          onClick={() => setDisplayAsCards(true)}
         >
-          Déchets chargés, en attente de réception ou de transfert
+          <LayoutModule1Icon
+            color={!displayAsCards ? COLORS.blueLight : COLORS.white}
+            size={16}
+          />{" "}
+          <span>Cartes</span>
         </button>
+      </div>
+      <div className={styles.transportMenu}>
+        <div className="transporter-permanent-filter  ">
+          <input
+            type="text"
+            className="td-input"
+            placeholder="Filtrer…"
+            value={persistentFilter}
+            onChange={e => setPersistentFilter(e.target.value)}
+          />
+          {persistentFilter && (
+            <button
+              className="btn btn--outline-danger"
+              onClick={e => setPersistentFilter("")}
+            >
+              Afficher tous les bordereaux
+            </button>
+          )}
+        </div>
         <button
-          className="button button-primary transport-refresh"
-          onClick={() =>
-            refetch({
-              siret,
-              status: [
-                FormStatus.Sealed,
-                FormStatus.Sent,
-                FormStatus.Resealed,
-                FormStatus.Resent,
-              ],
-              roles: [FormRole.Transporter],
-            })
-          }
+          className="btn btn--primary tw-ml-auto tw-mr-1"
+          onClick={() => refetch()}
         >
-          <FaSync /> Rafraîchir
+          <span>Rafraîchir</span> <RefreshIcon />
         </button>
       </div>
-
-      <div className="transporter-permanent-filter form__group">
-        <input
-          type="text"
-          placeholder="Filtre champ libre…"
-          value={persistentFilter}
-          onChange={e => setPersistentFilter(e.target.value)}
-        />
-
-        {persistentFilter && (
-          <button
-            className="button-outline warning"
-            onClick={e => setPersistentFilter("")}
-          >
-            Afficher tous les bordereaux
-          </button>
-        )}
-      </div>
-
-      <Table
+      <RefreshLoader networkStatus={networkStatus} />
+      <DisplayComponent
         forms={filteredForms}
         userSiret={siret}
-        // displayActions={filterFormType.formType.includes("TO_TAKE_OVER")}
+        refetchQuery={refetchQuery}
       />
     </div>
   );

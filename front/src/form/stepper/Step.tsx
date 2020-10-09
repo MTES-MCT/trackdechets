@@ -1,4 +1,6 @@
 import React, { ReactNode } from "react";
+import { Link } from "react-router-dom";
+import { NextButton, PreviousButton } from "common/components/Buttons";
 import "./Step.scss";
 
 interface IStepProps {
@@ -9,6 +11,7 @@ interface IStepProps {
   children?: ReactNode;
   goToNextStep: Function;
   goToPreviousStep: Function;
+  formId?: string;
 }
 
 export interface IStepContainerProps {
@@ -26,54 +29,55 @@ export function StepContainer(props: IStepContainerProps) {
 
 export function Step(props: IStepProps) {
   if (props.isActive === false) return null;
-
+  const submitCaption = props.formId ? "Enregistrer" : "Créer";
+  const cancelLink = props.formId ? "/slips/drafts" : "x";
   return (
-    <React.Fragment>
+    <>
       {props.children}
       <div className="step-buttons form__actions">
         <Previous
           isActive={props.displayPrevious}
           goToPreviousStep={() => props.goToPreviousStep()}
         />
+
+        <Cancel link={cancelLink} />
+
         <Next
           isActive={props.displayNext}
           goToNextStep={() => props.goToNextStep()}
         />
-        <Submit isActive={props.displaySubmit} />
+        <Submit isActive={props.displaySubmit} caption={submitCaption} />
       </div>
-    </React.Fragment>
+    </>
   );
 }
 
 function Next(props: { isActive: boolean; goToNextStep: Function }) {
   if (props.isActive === false) return null;
 
-  return (
-    <button className="button no-margin" onClick={() => props.goToNextStep()}>
-      Suivant
-    </button>
-  );
+  return <NextButton onClick={props.goToNextStep} />;
 }
 
 function Previous(props: { isActive: boolean; goToPreviousStep: Function }) {
   if (props.isActive === false) return null;
 
+  return <PreviousButton onClick={props.goToPreviousStep} />;
+}
+
+function Submit(props: { isActive: boolean; caption: string }) {
+  if (props.isActive === false) return null;
+
   return (
-    <button
-      className="button-outline primary"
-      onClick={() => props.goToPreviousStep()}
-    >
-      Précédent
+    <button className="btn btn--primary" type="submit">
+      {props.caption ? props.caption : "Enregistrer"}
     </button>
   );
 }
 
-function Submit(props: { isActive: boolean }) {
-  if (props.isActive === false) return null;
-
+function Cancel(props: { link: string }) {
   return (
-    <button className="button no-margin" type="submit">
-      Enregistrer
-    </button>
+    <Link to={props.link}>
+      <button className="btn btn--outline-primary">Annuler</button>
+    </Link>
   );
 }

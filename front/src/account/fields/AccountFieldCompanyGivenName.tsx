@@ -5,7 +5,7 @@ import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import {
   CompanyPrivate,
   MutationUpdateCompanyArgs,
-} from "../../generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;
@@ -44,7 +44,7 @@ export default function AccountFielCompanyGivenName({ company }: Props) {
         <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
           name="givenName"
           type="text"
-          value={company.givenName}
+          value={company.givenName || ""}
           placeHolder="Nom usuel"
           mutation={UPDATE_GIVEN_NAME}
           mutationArgs={{ siret: company.siret }}

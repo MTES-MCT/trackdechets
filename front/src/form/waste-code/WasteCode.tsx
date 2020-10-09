@@ -1,10 +1,10 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import { WASTES } from "../../generated/constants";
-import RedErrorMessage from "../../common/RedErrorMessage";
-import WasteTreeModal from "../../search/WasteTreeModal";
+import { WASTES } from "generated/constants";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import WasteTreeModal from "search/WasteTreeModal";
 import formatWasteCodeEffect from "./format-waste-code.effect";
-import "./WasteCode.scss";
+import styles from "./WasteCode.module.scss";
 
 export default function WasteCode(props) {
   const [field, meta] = useField(props);
@@ -22,8 +22,8 @@ export default function WasteCode(props) {
 
   const [openModal, setOpenModal] = useState(false);
   return (
-    <div className="waste-code">
-      <div className="text-quote">
+    <div>
+      <div className={styles.textQuote}>
         <ul>
           <li>
             Vous hésitez sur le type de code déchet à choisir ? Sélectionnez un
@@ -40,23 +40,23 @@ export default function WasteCode(props) {
 
       <label>
         Code déchet
-        <div className="waste-code__widgets">
+        <div className={styles.wasteCodeWidgets}>
           <input
             type="text"
             name={field.name}
             value={wasteCode}
-            className={`waste-code__input ${
-              meta.touched && meta.error && "input-error"
-            }`}
+            className={`td-input ${styles.wasteCodeInput} ${meta.touched &&
+              meta.error &&
+              styles.inputError}`}
             onBlur={field.onBlur}
             onChange={e => setWasteCode(e.target.value)}
           />
           <button
             type="button"
-            className="button-outline small primary"
+            className="btn btn--outline-primary"
             onClick={() => setOpenModal(true)}
           >
-            liste des codes déchets
+            Liste des codes déchets
           </button>
         </div>
       </label>
@@ -64,7 +64,7 @@ export default function WasteCode(props) {
       <RedErrorMessage name={field.name} />
 
       {wasteCodeDetail && (
-        <div className="notification success">
+        <div className="notification success tw-mt-2">
           Vous avez sélectionné le code déchet{" "}
           <strong>{isDangerous ? "dangereux" : "non dangereux"}</strong>{" "}
           suivant: <em>{wasteCodeDetail.description}</em>

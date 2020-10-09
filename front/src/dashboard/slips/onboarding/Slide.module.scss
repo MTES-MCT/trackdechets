@@ -1,0 +1,29 @@
+.slide {
+  &Content {
+    display: flex;
+  }
+
+  &Title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    line-height: 1.125rem;
+  }
+
+  &Text {
+    text-align: justify;
+    align-self: center;
+    padding: 0 10px;
+  }
+
+  &Image {
+    max-width: 50%;
+    flex-shrink: 0;
+    margin-right: 10px;
+    align-self: center;
+
+    img {
+      max-width: 100%;
+    }
+  }
+}

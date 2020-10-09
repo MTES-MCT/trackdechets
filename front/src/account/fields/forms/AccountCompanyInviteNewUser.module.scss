@@ -1,13 +1,24 @@
+@import "src/scss/Breakpoints";
 .invite__form {
   form {
     max-width: none;
     width: 100%;
-    margin: 1em 0;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    @include tablet {
+      flex-direction: row;
+    }
   }
 
   form input,
   select {
-    max-width: 30em;
-    margin-right: 2em;
+    max-width: 30rem;
+    margin-bottom: 1rem;
+    @include tablet {
+      margin-right: 2rem;
+      margin-bottom: 0;
+      max-width: 100%;
+    }
   }
 }

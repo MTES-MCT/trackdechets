@@ -19,9 +19,11 @@ import {
   createTemporaryStorageDetailMock,
   createRecipientMock,
   createDestinationMock,
-} from "../../../generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
-import Transport, { GET_TRANSPORT_SLIPS } from "../Transport";
+} from "generated/graphql/types";
+import { SiretContext } from "dashboard/Dashboard";
+import { TransportContent } from "dashboard/transport/Transport";
+import { GET_TRANSPORT_SLIPS } from "dashboard/transport/queries";
+import { mockMatchMediaWidth } from "common/__mocks__/matchmedia.mock";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({
@@ -71,7 +73,7 @@ async function renderWith({ forms }: { forms: Form[] }) {
       ]}
     >
       <SiretContext.Provider value={{ siret: TRANSPORTER.company!.siret! }}>
-        <Transport />
+        <TransportContent formType="TO_TAKE_OVER" />
       </SiretContext.Provider>
     </MockedProvider>
   );
@@ -82,6 +84,7 @@ async function renderWith({ forms }: { forms: Form[] }) {
 describe("<Transport />", () => {
   describe("when leaving the producer for the final collector", () => {
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -136,10 +139,14 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")
+        );
 
         await waitForElement(() =>
-          screen.getByText("Signer par le transporteur")
+          screen.getByText(
+            (text, el) => !!/Signer par le producteur/i.test(text)
+          )
         );
       });
 
@@ -169,6 +176,7 @@ describe("<Transport />", () => {
     });
 
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -222,10 +230,14 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")
+        );
 
         await waitForElement(() =>
-          screen.getByText("Signer par le producteur")
+          screen.getByText(
+            (text, el) => !!/Signer par le producteur/i.test(text)
+          )
         );
       });
 
@@ -255,6 +267,7 @@ describe("<Transport />", () => {
     });
 
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -311,9 +324,16 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
 
-        await waitForElement(() => screen.getByText("Signer par le détenteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")
+        );
+
+        await waitForElement(() =>
+          screen.getByText(
+            (text, el) => !!/Signer par le détenteur/i.test(text)
+          )
+        );
       });
 
       it("should display the temporary storage as the collect address", () => {

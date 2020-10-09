@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { fullFormFragment } from "../../common/fragments";
+import { fullFormFragment } from "common/fragments";
 import { ITEMS_PER_PAGE } from "../constants";
 
 export const GET_SLIPS = gql`

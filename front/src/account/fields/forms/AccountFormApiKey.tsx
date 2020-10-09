@@ -14,12 +14,12 @@ export default function AccountFormApiKey({ apiKey }: Props) {
   };
 
   return (
-    <div className="form__group">
+    <div className="form__row">
       <div className={styles.input__group}>
         <input
           id="apiKey"
           type="text"
-          className={styles.input}
+          className={`td-input ${styles.input}`}
           value={apiKey}
           readOnly
         />

@@ -1,0 +1,59 @@
+.h1 {
+  font-size: $h1Size;
+  line-height: 1.75rem;
+}
+
+.h2 {
+  font-size: $h2Size;
+  line-height: 1.5rem;
+}
+
+.h3 {
+  font-size: $h3Size;
+  line-height: 1.25rem;
+}
+
+.h4 {
+  font-size: $h4Size;
+}
+
+.h5 {
+  font-size: $h5Size;
+}
+
+.h6 {
+  font-size: $h6Size;
+}
+
+a.link,
+a.link:focus,
+a.link:visited,
+a.link:active {
+  text-decoration: underline;
+  color: #0053b3;
+  color: var(--theme-primary);
+}
+
+a.link:hover {
+  color: #003b80;
+  color: var(--dark-blue);
+  background-color: #ebeff3;
+  background-color: var(--lighter-grey);
+  text-decoration: none;
+}
+.lead-text {
+  font-size: 1.25em;
+}
+.body-text {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+.body-text + .body-text {
+  margin-top: 1rem;
+}
+.bullets {
+  li {
+    list-style: disc inside;
+    margin: 0.5rem 0 0.5rem 1rem;
+  }
+}

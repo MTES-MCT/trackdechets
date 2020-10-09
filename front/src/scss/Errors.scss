@@ -1,0 +1,10 @@
+.input-error {
+  border-color: #d63626;
+}
+
+.error-message {
+  color: #d63626;
+  &--bold {
+    font-weight: bold;
+  }
+}

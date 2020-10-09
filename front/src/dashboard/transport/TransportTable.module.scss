@@ -1,0 +1,29 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+
+.transportTable {
+  overflow-y: auto;
+}
+.readableId {
+  display: flex;
+}
+
+.hideOnMobile {
+  @media all and (max-width: 768px) {
+    display: none;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    visibility: collapse;
+  }
+}
+
+.quicklook {
+  border: 1px solid $blue;
+  border-radius: $common-radius;
+  font-size: $fs-small;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 3rem;
+}

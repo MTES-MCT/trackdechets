@@ -1,6 +1,6 @@
 import React from "react";
 import { transportModeLabels } from "../constants";
-import "./Transport.scss";
+import styles from  "./Transport.module.scss";
 const verboseTakenOver = ({ segment, userSiret }) => {
   if (!!segment.takenOverAt) {
     return segment.transporter.company.siret === userSiret
@@ -34,7 +34,7 @@ export const Segments = ({ form, userSiret }) => {
             !!segment.id ? (
               <tr key={segment.id}>
                 <td>
-                  <span className="segment-pill">{segment.segmentNumber}</span>
+                  <span className={styles.segmentPill}>{segment.segmentNumber}</span>
                 </td>
                 <td>{segment.mode && transportModeLabels[segment.mode]}</td>
                 <td> {segment.transporter.company.name}</td>

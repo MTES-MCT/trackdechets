@@ -1,0 +1,115 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+.detail {
+  &Title {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    display: flex;
+  }
+  &Status {
+    color: $grey-darker;
+    margin-right: 1rem;
+  }
+  &Content {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    @include desktop {
+      flex-direction: row;
+    }
+  }
+  &Block {
+    margin-top: 1rem;
+    margin-right: 1rem;
+    flex: 1 1;
+
+    @include desktop {
+      max-width: 400px;
+    }
+  }
+
+  &Summary {
+    padding: 1rem;
+  }
+  &Row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+    @include desktop {
+      flex-direction: row;
+    }
+    dt {
+      color: $grey-dark;
+      font-weight: bold;
+      padding-right: 1rem;
+      overflow-wrap: anywhere;
+      word-break: keep-all;
+      @include desktop {
+        width: 50%;
+        text-align: right;
+      }
+    }
+  }
+  &QRCodeIcon {
+    display: flex;
+    justify-content: center;
+    @include desktop {
+      justify-content: flex-end;
+      order: 99;
+    }
+  }
+  &Actions {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid $grey;
+    padding: 1rem;
+
+    @include phone {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+    > * {
+      // space buttons and divs
+      margin-left: 1rem;
+      margin-bottom: 1rem;
+      @include phone {
+        margin-bottom: 0;
+      }
+    }
+  }
+  &Tabs {
+    background-color: #fff;
+    display: flex;
+  }
+  &Tab {
+    border-top: 1px solid $grey;
+    border-left: 1px solid $grey;
+    border-right: 1px solid $grey;
+    border-bottom: 3px solid transparent;
+    height: 64px;
+    width: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+
+    &Selected {
+      border-bottom: 3px solid $blue;
+    }
+  }
+  &TabCaption {
+    color: $blue;
+    font-size: 0.75rem;
+  }
+  &TabPanels {
+    border-top: 2px solid $blue;
+    padding: 1rem;
+  }
+  &TabPanel {
+    display: flex;
+  }
+}

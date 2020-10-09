@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-import {
-  FaArrowAltCircleRight,
-  FaArrowAltCircleLeft,
-  FaAngleRight,
-  FaAngleLeft,
-} from "react-icons/fa";
-import "./Slider.scss";
-
+import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
+import styles from "./Slider.module.scss";
+import { NextButton, PreviousButton } from "common/components/Buttons";
 export default function Slider({ children, onClose }: any) {
   const [page, setPage] = useState(0);
 
@@ -14,51 +9,45 @@ export default function Slider({ children, onClose }: any) {
   const activePage = React.Children.toArray(children)[page];
 
   return (
-    <div className="slider-container">
-      <div className="slider">
+    <div className={styles.sliderContainer}>
+      <div className={styles.slider}>
         <div
-          className={`navigation ${page === 0 && "hidden"}`}
+          className={`${styles.sliderNavigation} ${page === 0 &&
+            styles.sliderNavigationHidden}`}
           onClick={() => setPage(Math.max(page - 1, 0))}
         >
           <FaArrowAltCircleLeft />
         </div>
         <div className="content">{activePage}</div>
         <div
-          className={`navigation ${page === numberOfPages && "hidden"}`}
+          className={`${styles.sliderNavigation} ${page === numberOfPages &&
+            styles.sliderNavigationHidden}`}
           onClick={() => setPage(Math.min(page + 1, numberOfPages))}
         >
           <FaArrowAltCircleRight />
         </div>
       </div>
 
-      <div className="slider-buttons">
+      <div className={styles.sliderButtons}>
         {page !== 0 && (
-          <button
-            className="button-outline secondary"
-            onClick={() => setPage(Math.max(page - 1, 0))}
-          >
-            <FaAngleLeft /> Précédent
-          </button>
+          <PreviousButton onClick={() => setPage(Math.max(page - 1, 0))} />
         )}
         {page === numberOfPages ? (
-          <button className="button" onClick={() => onClose()}>
+          <button className="btn btn--primary" onClick={() => onClose()}>
             Terminer
           </button>
         ) : (
           <button
-            className="button-outline secondary"
+            className="btn btn--outline-secondary"
             onClick={() => onClose()}
           >
             Passer
           </button>
         )}
         {page < numberOfPages && (
-          <button
-            className="button"
+          <NextButton
             onClick={() => setPage(Math.min(page + 1, numberOfPages))}
-          >
-            Suivant <FaAngleRight />
-          </button>
+          />
         )}
       </div>
     </div>

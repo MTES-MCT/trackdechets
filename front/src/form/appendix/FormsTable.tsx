@@ -3,12 +3,12 @@ import { useFormikContext } from "formik";
 import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React from "react";
-import { InlineError } from "../../common/Error";
+import { InlineError } from "common/components/Error";
 import {
   Form,
   Query,
   QueryAppendixFormsArgs,
-} from "../../generated/graphql/types";
+} from "generated/graphql/types";
 
 const GET_APPENDIX_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {

@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { match, NavLink } from "react-router-dom";
-import SideMenu from "../common/SideMenu";
-import { CompanyType, User } from "../generated/graphql/types";
-import CompanySelector from "./CompanySelector";
+import SideMenu from "common/components/SideMenu";
+import { CompanyType, User } from "generated/graphql/types";
+import DashboardCompanySelector from "./DashboardCompanySelector";
 import { SiretContext } from "./Dashboard";
 import "./DashboardMenu.scss";
 
@@ -26,7 +26,7 @@ export default function DashboardMenu({
       <>
         {companies.length > 1 ? (
           <div className="company-select">
-            <CompanySelector
+            <DashboardCompanySelector
               siret={siret}
               companies={companies}
               handleCompanyChange={handleCompanyChange}
@@ -37,30 +37,95 @@ export default function DashboardMenu({
         )}
 
         {company && (
-          <ul>
-            <li>
-              <NavLink to={`${match.url}/slips`} activeClassName="active">
-                Mes bordereaux
-              </NavLink>
-            </li>
-            {company.companyTypes.includes(CompanyType.Transporter) && (
+          <>
+            <p className="sidebar__chapter">Mes bordereaux</p>
+            <ul>
               <li>
-                <NavLink to={`${match.url}/transport`} activeClassName="active">
-                  Transport
+                <NavLink
+                  to={`${match.url}/slips/drafts`}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  Brouillon
                 </NavLink>
               </li>
+
+              <li>
+                <NavLink
+                  to={`${match.url}/slips/act`}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  Pour action
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to={`${match.url}/slips/follow`}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  Suivi
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={`${match.url}/slips/history`}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  Archives
+                </NavLink>
+              </li>
+            </ul>
+
+            {company.companyTypes.includes(CompanyType.Transporter) && (
+              <>
+                <p className="sidebar__chapter ">Transport</p>
+                <ul>
+                  <li>
+                    <NavLink
+                      to={`${match.url}/transport/to-collect`}
+                      className="sidebar__link sidebar__link--indented"
+                      activeClassName="sidebar__link--active"
+                    >
+                      À collecter
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to={`${match.url}/transport/collected`}
+                      className="sidebar__link sidebar__link--indented"
+                      activeClassName="sidebar__link--active"
+                    >
+                      Collecté
+                    </NavLink>
+                  </li>
+                </ul>
+              </>
             )}
-            <li>
-              <NavLink to={`${match.url}/exports`} activeClassName="active">
-                Registre
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to={`${match.url}/stats`} activeClassName="active">
-                Statistiques
-              </NavLink>
-            </li>
-          </ul>
+            <ul>
+              <li>
+                <NavLink
+                  to={`${match.url}/exports`}
+                  className="sidebar__link sidebar__link--chapter"
+                  activeClassName="sidebar__link--active"
+                >
+                  Registre
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={`${match.url}/stats`}
+                  className="sidebar__link sidebar__link--chapter"
+                  activeClassName="sidebar__link--active"
+                >
+                  Statistiques
+                </NavLink>
+              </li>
+            </ul>
+          </>
         )}
       </>
     </SideMenu>

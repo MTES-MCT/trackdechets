@@ -1,6 +1,6 @@
 import React from "react";
 import "./CompanyContact.scss";
-import { CompanyPublic } from "../generated/graphql/types";
+import { CompanyPublic } from "generated/graphql/types";
 
 type Props = {
   company: Pick<

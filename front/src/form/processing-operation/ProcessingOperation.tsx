@@ -1,6 +1,6 @@
 import { FieldProps } from "formik";
 import React from "react";
-import { PROCESSING_OPERATIONS } from "../../generated/constants";
+import { PROCESSING_OPERATIONS } from "generated/constants";
 import "./ProcessingOperation.scss";
 
 export default function ProcessingOperation({
@@ -27,7 +27,7 @@ export default function ProcessingOperation({
       </div>
 
       <label>Opération d’élimination / valorisation prévue (code D/R)</label>
-      <select id="select" name={name} value={value} onChange={onChange}>
+      <select id="select" name={name} value={value} onChange={onChange} className="td-select">
         <option value="">Choisissez...</option>
         {PROCESSING_OPERATIONS.map(operation => (
           <option key={operation.code} value={operation.code}>

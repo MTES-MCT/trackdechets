@@ -1,13 +1,13 @@
 import React from "react";
 import Onboarding from "./onboarding/Onboarding";
 import SlipsHeader from "./SlipsHeader";
-import SlipsTabs from "./SlipsTabs";
+import SlipsContent from "./SlipsContent";
 
 export default function SlipsContainer() {
   return (
     <>
       <SlipsHeader />
-      <SlipsTabs />
+      <SlipsContent />
       <Onboarding />
     </>
   );

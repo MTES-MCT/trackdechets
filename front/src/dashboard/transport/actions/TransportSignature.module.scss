@@ -1,0 +1,59 @@
+@import "src/scss/Breakpoints.scss";
+
+ 
+  form {
+    max-width: initial;
+  }
+
+  .step-header {
+    position: initial;
+  }
+
+  @include xs-phone {
+    .step-header {
+      display: none;
+    }
+  }
+ 
+
+// hide number input spinner
+ .noSpinner::-webkit-outer-spin-button,
+ .noSpinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.noSpinner[type="number"] {
+  -moz-appearance: textfield;
+}
+ 
+.address {
+  font-style: normal;
+}
+.pdf {
+  display: flex;
+}
+.row {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+.label {
+  font-weight: bold;
+
+  margin-bottom: 0.25 rem;
+}
+.field {
+ 
+  &Weight {
+    width: 6em;
+  }
+
+  &SecurityCode {
+    width: 6em;
+  }
+  &FullName {
+    width: 20em;
+  }
+}

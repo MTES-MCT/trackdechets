@@ -9,12 +9,12 @@ exports[`<CompanyType /> CompanyType renders correctly 1`] = `
       style="display: inline-block;"
     >
       <input
+        class="td-checkbox"
         name="companyTypes"
         type="checkbox"
         value="PRODUCER"
       />
       Producteur de déchets
-      <br />
     </label>
   </div>
   <div>
@@ -22,222 +22,300 @@ exports[`<CompanyType /> CompanyType renders correctly 1`] = `
       style="display: inline-block;"
     >
       <input
+        class="td-checkbox"
         name="companyTypes"
         type="checkbox"
         value="COLLECTOR"
       />
       Installation de Transit, regroupement ou tri de déchets
-      <br />
-    </label>
-    <span
-      class="tooltip__container"
-    >
-      <span
-        class="tooltip__trigger"
-        role="button"
+      <button
+        class="tdTooltip"
+        data-reach-tooltip-trigger=""
       >
         <svg
-          class="tooltip__icon"
-          fill="currentColor"
-          height="1em"
-          role="icon"
-          stroke="currentColor"
+          clip-rule="evenodd"
+          fill-rule="evenodd"
+          height="20px"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           stroke-width="0"
-          viewBox="0 0 384 512"
-          width="1em"
+          viewBox="0 0 32 32"
+          width="20px"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <circle
+            cx="18"
+            cy="16"
+            fill="#0053b3"
+            r="13"
+            transform="translate(-6.154 -3.692) scale(1.23077)"
+          />
           <path
-            d="M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z"
+            d="M11 11.09c0-2.792 2.298-5.088 5.091-5.088s5.091 2.297 5.091 5.09a5.1 5.1 0 0 1-3.394 4.8 2.552 2.552 0 0 0-1.697 2.4V20"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2.5455"
+          />
+          <path
+            d="M16 25c-.275 0-.5.225-.5.5s.225.5.5.5.5-.225.5-.5-.225-.5-.5-.5"
+            fill="#fff"
+            fill-rule="nonzero"
+            stroke="#fff"
+            stroke-width="1.9999949999999997"
           />
         </svg>
-      </span>
-    </span>
+      </button>
+    </label>
   </div>
   <div>
     <label
       style="display: inline-block;"
     >
       <input
+        class="td-checkbox"
         name="companyTypes"
         type="checkbox"
         value="WASTE_CENTER"
       />
       Installation de collecte de déchets apportés par le producteur initial
-      <br />
-    </label>
-    <span
-      class="tooltip__container"
-    >
-      <span
-        class="tooltip__trigger"
-        role="button"
+      <button
+        class="tdTooltip"
+        data-reach-tooltip-trigger=""
       >
         <svg
-          class="tooltip__icon"
-          fill="currentColor"
-          height="1em"
-          role="icon"
-          stroke="currentColor"
+          clip-rule="evenodd"
+          fill-rule="evenodd"
+          height="20px"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           stroke-width="0"
-          viewBox="0 0 384 512"
-          width="1em"
+          viewBox="0 0 32 32"
+          width="20px"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <circle
+            cx="18"
+            cy="16"
+            fill="#0053b3"
+            r="13"
+            transform="translate(-6.154 -3.692) scale(1.23077)"
+          />
           <path
-            d="M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z"
+            d="M11 11.09c0-2.792 2.298-5.088 5.091-5.088s5.091 2.297 5.091 5.09a5.1 5.1 0 0 1-3.394 4.8 2.552 2.552 0 0 0-1.697 2.4V20"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2.5455"
+          />
+          <path
+            d="M16 25c-.275 0-.5.225-.5.5s.225.5.5.5.5-.225.5-.5-.225-.5-.5-.5"
+            fill="#fff"
+            fill-rule="nonzero"
+            stroke="#fff"
+            stroke-width="1.9999949999999997"
           />
         </svg>
-      </span>
-    </span>
+      </button>
+    </label>
   </div>
   <div>
     <label
       style="display: inline-block;"
     >
       <input
+        class="td-checkbox"
         name="companyTypes"
         type="checkbox"
         value="WASTE_VEHICLES"
       />
       Installation d'entreposage, dépollution, démontage, découpage de VHU
-      <br />
-    </label>
-    <span
-      class="tooltip__container"
-    >
-      <span
-        class="tooltip__trigger"
-        role="button"
+      <button
+        class="tdTooltip"
+        data-reach-tooltip-trigger=""
       >
         <svg
-          class="tooltip__icon"
-          fill="currentColor"
-          height="1em"
-          role="icon"
-          stroke="currentColor"
+          clip-rule="evenodd"
+          fill-rule="evenodd"
+          height="20px"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           stroke-width="0"
-          viewBox="0 0 384 512"
-          width="1em"
+          viewBox="0 0 32 32"
+          width="20px"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <circle
+            cx="18"
+            cy="16"
+            fill="#0053b3"
+            r="13"
+            transform="translate(-6.154 -3.692) scale(1.23077)"
+          />
           <path
-            d="M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z"
+            d="M11 11.09c0-2.792 2.298-5.088 5.091-5.088s5.091 2.297 5.091 5.09a5.1 5.1 0 0 1-3.394 4.8 2.552 2.552 0 0 0-1.697 2.4V20"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2.5455"
+          />
+          <path
+            d="M16 25c-.275 0-.5.225-.5.5s.225.5.5.5.5-.225.5-.5-.225-.5-.5-.5"
+            fill="#fff"
+            fill-rule="nonzero"
+            stroke="#fff"
+            stroke-width="1.9999949999999997"
           />
         </svg>
-      </span>
-    </span>
+      </button>
+    </label>
   </div>
   <div>
     <label
       style="display: inline-block;"
     >
       <input
+        class="td-checkbox"
         name="companyTypes"
         type="checkbox"
         value="WASTEPROCESSOR"
       />
       Installation de traitement
-      <br />
-    </label>
-    <span
-      class="tooltip__container"
-    >
-      <span
-        class="tooltip__trigger"
-        role="button"
+      <button
+        class="tdTooltip"
+        data-reach-tooltip-trigger=""
       >
         <svg
-          class="tooltip__icon"
-          fill="currentColor"
-          height="1em"
-          role="icon"
-          stroke="currentColor"
+          clip-rule="evenodd"
+          fill-rule="evenodd"
+          height="20px"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           stroke-width="0"
-          viewBox="0 0 384 512"
-          width="1em"
+          viewBox="0 0 32 32"
+          width="20px"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <circle
+            cx="18"
+            cy="16"
+            fill="#0053b3"
+            r="13"
+            transform="translate(-6.154 -3.692) scale(1.23077)"
+          />
           <path
-            d="M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z"
+            d="M11 11.09c0-2.792 2.298-5.088 5.091-5.088s5.091 2.297 5.091 5.09a5.1 5.1 0 0 1-3.394 4.8 2.552 2.552 0 0 0-1.697 2.4V20"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2.5455"
+          />
+          <path
+            d="M16 25c-.275 0-.5.225-.5.5s.225.5.5.5.5-.225.5-.5-.225-.5-.5-.5"
+            fill="#fff"
+            fill-rule="nonzero"
+            stroke="#fff"
+            stroke-width="1.9999949999999997"
           />
         </svg>
-      </span>
-    </span>
+      </button>
+    </label>
   </div>
   <div>
     <label
       style="display: inline-block;"
     >
       <input
+        class="td-checkbox"
         name="companyTypes"
         type="checkbox"
         value="TRANSPORTER"
       />
       Transporteur
-      <br />
-    </label>
-    <span
-      class="tooltip__container"
-    >
-      <span
-        class="tooltip__trigger"
-        role="button"
+      <button
+        class="tdTooltip"
+        data-reach-tooltip-trigger=""
       >
         <svg
-          class="tooltip__icon"
-          fill="currentColor"
-          height="1em"
-          role="icon"
-          stroke="currentColor"
+          clip-rule="evenodd"
+          fill-rule="evenodd"
+          height="20px"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           stroke-width="0"
-          viewBox="0 0 384 512"
-          width="1em"
+          viewBox="0 0 32 32"
+          width="20px"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <circle
+            cx="18"
+            cy="16"
+            fill="#0053b3"
+            r="13"
+            transform="translate(-6.154 -3.692) scale(1.23077)"
+          />
           <path
-            d="M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z"
+            d="M11 11.09c0-2.792 2.298-5.088 5.091-5.088s5.091 2.297 5.091 5.09a5.1 5.1 0 0 1-3.394 4.8 2.552 2.552 0 0 0-1.697 2.4V20"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2.5455"
+          />
+          <path
+            d="M16 25c-.275 0-.5.225-.5.5s.225.5.5.5.5-.225.5-.5-.225-.5-.5-.5"
+            fill="#fff"
+            fill-rule="nonzero"
+            stroke="#fff"
+            stroke-width="1.9999949999999997"
           />
         </svg>
-      </span>
-    </span>
+      </button>
+    </label>
   </div>
   <div>
     <label
       style="display: inline-block;"
     >
       <input
+        class="td-checkbox"
         name="companyTypes"
         type="checkbox"
         value="TRADER"
       />
       Négociant
-      <br />
-    </label>
-    <span
-      class="tooltip__container"
-    >
-      <span
-        class="tooltip__trigger"
-        role="button"
+      <button
+        class="tdTooltip"
+        data-reach-tooltip-trigger=""
       >
         <svg
-          class="tooltip__icon"
-          fill="currentColor"
-          height="1em"
-          role="icon"
-          stroke="currentColor"
+          clip-rule="evenodd"
+          fill-rule="evenodd"
+          height="20px"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           stroke-width="0"
-          viewBox="0 0 384 512"
-          width="1em"
+          viewBox="0 0 32 32"
+          width="20px"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <circle
+            cx="18"
+            cy="16"
+            fill="#0053b3"
+            r="13"
+            transform="translate(-6.154 -3.692) scale(1.23077)"
+          />
           <path
-            d="M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z"
+            d="M11 11.09c0-2.792 2.298-5.088 5.091-5.088s5.091 2.297 5.091 5.09a5.1 5.1 0 0 1-3.394 4.8 2.552 2.552 0 0 0-1.697 2.4V20"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2.5455"
+          />
+          <path
+            d="M16 25c-.275 0-.5.225-.5.5s.225.5.5.5.5-.225.5-.5-.225-.5-.5-.5"
+            fill="#fff"
+            fill-rule="nonzero"
+            stroke="#fff"
+            stroke-width="1.9999949999999997"
           />
         </svg>
-      </span>
-    </span>
+      </button>
+    </label>
   </div>
 </fieldset>
 `;

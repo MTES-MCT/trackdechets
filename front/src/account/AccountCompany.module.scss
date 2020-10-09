@@ -14,9 +14,8 @@
       color: var(--darker-grey);
       svg {
         margin-left: 1em;
-        width: 20px;
-        height: auto;
         vertical-align: sub;
+        display: inline;
       }
     }
   }

@@ -1,6 +1,6 @@
 import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
-import Tooltip from "../common/Tooltip";
+import Tooltip from "common/components/Tooltip";
 
 export const COMPANY_TYPES = [
   { value: "PRODUCER", label: "Producteur de déchets" },
@@ -62,6 +62,7 @@ export default function CompanyType({
                   type="checkbox"
                   name={name}
                   value={p.value}
+                  className="td-checkbox"
                   checked={value.indexOf(p.value) > -1}
                   onChange={e => {
                     if (e.target.checked) arrayHelpers.push(p.value);
@@ -72,9 +73,10 @@ export default function CompanyType({
                   }}
                 />
                 {p.label}
-                <br />
+                <Tooltip msg={p.helpText} />
+           
               </label>
-              <Tooltip msg={p.helpText} />
+            
             </div>
           ))}
         </fieldset>

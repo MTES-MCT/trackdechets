@@ -2795,7 +2795,7 @@ Données du BSD suite sur la partie entreposage provisoire ou reconditionnement,
 <td valign="top"><a href="#temporarystorer">TemporaryStorer</a></td>
 <td>
 
-Établissement qui sotcke temporairement le déchet (case 13)
+Établissement qui stocke temporairement le déchet (case 13)
 
 </td>
 </tr>

@@ -1,0 +1,28 @@
+.td-table {
+  background: var(--theme-background-white);
+  border: 1px solid #c9d3df;
+  border: 1px solid var(--theme-border-lighter);
+  border-left: 0;
+  border-right: 0;
+  border-radius: 2px;
+  position: relative;
+  width: 100%;
+  border-collapse: collapse;
+  &__tr {
+    border-bottom: 1px solid var(--theme-border-lighter);
+  }
+  &__head-tr {
+    background: #eaeaea;
+    font-size: 0.875em;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  & td,
+  th {
+    padding: 1em 0.2em;
+    text-align: left;
+    @include lg-desktop {
+      padding: 1em 1em;
+    }
+  }
+}

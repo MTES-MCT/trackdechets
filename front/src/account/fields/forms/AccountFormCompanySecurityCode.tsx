@@ -4,7 +4,7 @@ import { useMutation } from "@apollo/react-hooks";
 import {
   Mutation,
   MutationRenewSecurityCodeArgs,
-} from "../../../generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   toggleEdition: () => void;
@@ -44,7 +44,7 @@ export default function AccountFormCompanySecurityCode({
     <>
       <div className="notification warning">{cautionMessage}</div>
       <button
-        className="button"
+        className="btn btn--primary"
         type="submit"
         onClick={() => renewSecurityCode({ variables: mutationArgs })}
       >

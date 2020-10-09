@@ -11,7 +11,7 @@ import {
   CompanyPrivate,
   UserRole,
   CompanyType,
-} from "../generated/graphql/types";
+} from "generated/graphql/types";
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 

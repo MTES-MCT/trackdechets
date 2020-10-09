@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
 import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
-import { CompanyPrivate } from "../generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 
 type Props = { company: CompanyPrivate };
 
@@ -32,7 +32,7 @@ export default function AccountCompanyMemberList({ company }: Props) {
         )}
       />
       {company && company.users && company.users.length > 0 && (
-        <table className="table">
+        <table className="td-table">
           <tbody>
             {company.users.map(user => (
               <AccountCompanyMember

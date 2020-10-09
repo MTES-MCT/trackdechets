@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import ToolTip from "../../common/Tooltip";
+import ToolTip from "common/components/Tooltip";
 import AccountFormApiKey from "./forms/AccountFormApiKey";
 import styles from "./AccountField.module.scss";
 
