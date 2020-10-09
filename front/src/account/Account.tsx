@@ -7,7 +7,6 @@ import {
   Route,
   withRouter,
   RouteComponentProps,
-  useHistory,
   Redirect,
   Switch,
 } from "react-router";
@@ -34,7 +33,6 @@ export const GET_ME = gql`
 `;
 
 export default withRouter(function Account({ match }: RouteComponentProps) {
-  const history = useHistory();
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   if (loading) return <Loader />;

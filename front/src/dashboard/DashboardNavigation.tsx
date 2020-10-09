@@ -29,8 +29,6 @@ export function DashboardNav({
   const company = companies.find(c => c.siret === currentSiret);
   const routes = getDashboardRoutes({ siret: currentSiret, company: company });
 
-  const handleCompanyChange = () => history.push(routes.dashboard);
-
   return (
     <>
       {companies.length > 1 ? (
