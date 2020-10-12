@@ -101,6 +101,7 @@ type Form {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -161,6 +162,7 @@ type TemporaryStorageDetail {
 
   # Frame 15, 16, 17
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -208,6 +210,7 @@ enum Consistence {
   SOLID
   LIQUID
   GASEOUS
+  DOUGHY
 }
 
 enum Status {

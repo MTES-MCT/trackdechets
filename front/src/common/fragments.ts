@@ -34,9 +34,11 @@ export const wasteDetailsFragment = gql`
     code
     name
     onuCode
-    packagings
-    otherPackaging
-    numberOfPackages
+    packagingInfos {
+      type
+      other
+      quantity
+    }
     quantity
     quantityType
     consistence
@@ -114,9 +116,11 @@ export const temporaryStorageDetailFragment = gql`
     }
     wasteDetails {
       onuCode
-      packagings
-      otherPackaging
-      numberOfPackages
+      packagingInfos {
+        type
+        other
+        quantity
+      }
       quantity
       quantityType
     }
@@ -134,7 +138,11 @@ export const staticFieldsFragment = gql`
     createdAt
     status
     stateSummary {
-      packagings
+      packagingInfos {
+        type
+        other
+        quantity
+      }
       onuCode
       quantity
       transporterNumberPlate

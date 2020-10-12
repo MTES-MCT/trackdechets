@@ -51,7 +51,8 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   });
 
   const wasteDetails = infos => ({
-    wasteDetailsPackagings: infos.packagings ?? form.wasteDetailsPackagings,
+    wasteDetailsPackagingInfos:
+      infos.packagingInfos ?? form.wasteDetailsPackagingInfos,
     wasteDetailsQuantity: infos.quantity ?? form.wasteDetailsQuantity,
     wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
   });

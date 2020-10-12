@@ -1,7 +1,7 @@
 import { StateSummaryResolvers } from "../../generated/graphql/types";
 
 const stateSummaryResolvers: StateSummaryResolvers = {
-  packagings: parent => parent.packagings || []
+  packagingInfos: parent => parent.packagingInfos || []
 };
 
 export default stateSummaryResolvers;

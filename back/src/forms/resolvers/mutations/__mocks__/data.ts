@@ -4,10 +4,7 @@ import {
   QuantityType,
   Form as PrismaForm
 } from "../../../../generated/prisma-client";
-import {
-  Packagings,
-  Form as GraphQLForm
-} from "../../../../generated/graphql/types";
+import { Form as GraphQLForm } from "../../../../generated/graphql/types";
 
 export function getNewValidPrismaForm(): PrismaForm {
   return {
@@ -50,9 +47,10 @@ export function getNewValidPrismaForm(): PrismaForm {
     transporterCompanyMail: "t@t.fr",
     wasteDetailsCode: "01 03 04*",
     wasteDetailsOnuCode: "AAA",
-    wasteDetailsPackagings: ["CITERNE", "GRV"],
-    wasteDetailsOtherPackaging: "",
-    wasteDetailsNumberOfPackages: 2,
+    wasteDetailsPackagingInfos: [
+      { type: "FUT", quantity: 1 },
+      { type: "GRV", quantity: 1 }
+    ],
     wasteDetailsQuantity: 1.5,
     wasteDetailsQuantityType: "REAL",
     wasteDetailsConsistence: "SOLID"
@@ -113,9 +111,10 @@ export function getNewValidForm(): GraphQLForm {
     wasteDetails: {
       code: "01 03 04*",
       onuCode: "AAA",
-      packagings: ["CITERNE", "GRV"] as Packagings[],
-      otherPackaging: "",
-      numberOfPackages: 2,
+      packagingInfos: [
+        { type: "FUT", quantity: 1 },
+        { type: "GRV", quantity: 1 }
+      ],
       quantity: 1.5,
       quantityType: "REAL" as QuantityType
     }
@@ -186,9 +185,7 @@ const EMPTY_FORM = {
     code: "",
     name: "",
     onuCode: "",
-    packagings: [],
-    otherPackaging: "",
-    numberOfPackages: null,
+    packagingInfos: [],
     quantity: null,
     quantityType: "ESTIMATED",
     consistence: "SOLID"

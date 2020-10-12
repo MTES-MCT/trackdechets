@@ -999,6 +999,7 @@ enum Consistence {
   SOLID
   LIQUID
   GASEOUS
+  DOUGHY
 }
 
 scalar DateTime
@@ -1437,6 +1438,7 @@ type Form {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1536,6 +1538,7 @@ input FormCreateInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1649,6 +1652,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1741,6 +1745,7 @@ input FormCreateWithoutTransportSegmentsInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1907,6 +1912,8 @@ enum FormOrderByInput {
   wasteDetailsName_DESC
   wasteDetailsOnuCode_ASC
   wasteDetailsOnuCode_DESC
+  wasteDetailsPackagingInfos_ASC
+  wasteDetailsPackagingInfos_DESC
   wasteDetailsPackagings_ASC
   wasteDetailsPackagings_DESC
   wasteDetailsOtherPackaging_ASC
@@ -2016,6 +2023,7 @@ type FormPreviousValues {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3148,6 +3156,7 @@ input FormUpdateDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3240,6 +3249,7 @@ input FormUpdateInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3331,6 +3341,7 @@ input FormUpdateManyDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3430,6 +3441,7 @@ input FormUpdateManyMutationInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3546,6 +3558,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3637,6 +3650,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6056,6 +6070,7 @@ type TemporaryStorageDetail {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6103,6 +6118,7 @@ input TemporaryStorageDetailCreateInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6148,6 +6164,7 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6211,6 +6228,8 @@ enum TemporaryStorageDetailOrderByInput {
   destinationProcessingOperation_DESC
   wasteDetailsOnuCode_ASC
   wasteDetailsOnuCode_DESC
+  wasteDetailsPackagingInfos_ASC
+  wasteDetailsPackagingInfos_DESC
   wasteDetailsPackagings_ASC
   wasteDetailsPackagings_DESC
   wasteDetailsOtherPackaging_ASC
@@ -6270,6 +6289,7 @@ type TemporaryStorageDetailPreviousValues {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6328,6 +6348,7 @@ input TemporaryStorageDetailUpdateInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6367,6 +6388,7 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6415,6 +6437,7 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int

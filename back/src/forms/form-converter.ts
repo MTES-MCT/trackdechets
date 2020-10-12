@@ -36,7 +36,8 @@ import {
   TraderInput,
   NextDestinationInput,
   ImportPaperFormInput,
-  EcoOrganismeInput
+  EcoOrganismeInput,
+  PackagingInfo
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -149,15 +150,7 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
   return {
     wasteDetailsCode: chain(input.wasteDetails, w => w.code),
     wasteDetailsOnuCode: chain(input.wasteDetails, w => w.onuCode),
-    wasteDetailsPackagings: chain(input.wasteDetails, w => w.packagings),
-    wasteDetailsOtherPackaging: chain(
-      input.wasteDetails,
-      w => w.otherPackaging
-    ),
-    wasteDetailsNumberOfPackages: chain(
-      input.wasteDetails,
-      w => w.numberOfPackages
-    ),
+    wasteDetailsPackagingInfos: getProcessedPackagingInfos(input.wasteDetails),
     wasteDetailsQuantity: chain(input.wasteDetails, w => w.quantity),
     wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType),
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
@@ -474,9 +467,9 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
       onuCode: form.wasteDetailsOnuCode,
-      packagings: form.wasteDetailsPackagings,
-      otherPackaging: form.wasteDetailsOtherPackaging,
-      numberOfPackages: form.wasteDetailsNumberOfPackages,
+      packagingInfos: form.wasteDetailsPackagingInfos,
+      // DEPRECATED - To remove with old packaging fields
+      ...getDeprecatedPackagingApiFields(form.wasteDetailsPackagingInfos),
       quantity: form.wasteDetailsQuantity,
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence
@@ -566,9 +559,11 @@ export function expandTemporaryStorageFromDb(
       code: null,
       name: null,
       onuCode: temporaryStorageDetail.wasteDetailsOnuCode,
-      packagings: temporaryStorageDetail.wasteDetailsPackagings,
-      otherPackaging: temporaryStorageDetail.wasteDetailsOtherPackaging,
-      numberOfPackages: temporaryStorageDetail.wasteDetailsNumberOfPackages,
+      packagingInfos: temporaryStorageDetail.wasteDetailsPackagingInfos,
+      // DEPRECATED - To remove with old packaging fields
+      ...getDeprecatedPackagingApiFields(
+        temporaryStorageDetail.wasteDetailsPackagingInfos
+      ),
       quantity: temporaryStorageDetail.wasteDetailsQuantity,
       quantityType: temporaryStorageDetail.wasteDetailsQuantityType,
       consistence: null
@@ -667,4 +662,57 @@ export function cleanUpNonDuplicatableSegmentField(
   } = segment;
 
   return rest;
+}
+
+/**
+ * `packagings`, `otherPackaging` and `numberOfPackages` are DEPRECATED
+ * For retro compatibility, calculate their values by reading `packagingInfos`
+ * @param packagingInfos
+ */
+function getDeprecatedPackagingApiFields(packagingInfos: PackagingInfo[]) {
+  return {
+    packagings: chain(packagingInfos, pi => pi.map(pi => pi.type)),
+    otherPackaging: chain(
+      packagingInfos,
+      pi => pi.find(pi => pi.type === "AUTRE")?.other
+    ),
+    numberOfPackages: chain(packagingInfos, pi =>
+      pi.reduce((prev, cur) => prev + cur.quantity, 0)
+    )
+  };
+}
+
+/**
+ * `packagings`, `otherPackaging` and `numberOfPackages` are DEPRECATED
+ * But they can still be passed as input instead of `packagingInfos`
+ * So we calculate the `packagingInfos` to store in DB based on their values
+ * @param wasteDetails
+ */
+function getProcessedPackagingInfos(wasteDetails: WasteDetailsInput) {
+  if (!wasteDetails) {
+    return wasteDetails; // To differentiate between null and undefined
+  }
+
+  // If we do have a `packagingInfos` just use that and ignore other properties
+  if (wasteDetails.packagingInfos) {
+    return wasteDetails.packagingInfos ?? [];
+  }
+
+  const packagings = wasteDetails.packagings ?? [];
+  const numberOfPackages = wasteDetails.numberOfPackages ?? 1;
+  const maxPackagesPerPackaging = Math.ceil(
+    numberOfPackages / packagings.length
+  );
+
+  return packagings.map((type, idx) => ({
+    type,
+    other: type === "AUTRE" ? wasteDetails.otherPackaging : null,
+    quantity: Math.max(
+      0,
+      Math.min(
+        maxPackagesPerPackaging,
+        numberOfPackages - maxPackagesPerPackaging * idx
+      )
+    )
+  }));
 }

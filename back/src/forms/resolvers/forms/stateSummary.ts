@@ -119,9 +119,9 @@ export async function getStateSummary(form: Form) {
     .temporaryStorageDetail();
   return {
     quantity: getQuantity(form, temporaryStorageDetail),
-    packagings:
-      temporaryStorageDetail?.wasteDetailsPackagings ??
-      form.wasteDetails?.packagings ??
+    packagingInfos:
+      temporaryStorageDetail?.wasteDetailsPackagingInfos ??
+      form.wasteDetails?.packagingInfos ??
       [],
     onuCode:
       temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails?.onuCode,

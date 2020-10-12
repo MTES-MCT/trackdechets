@@ -37,17 +37,15 @@ export default function Resealed({
 
       const keys: Array<keyof WasteDetails> = [
         "onuCode",
-        "packagings",
-        "otherPackaging",
-        "numberOfPackages",
+        "packagingInfos",
         "quantity",
         "quantityType",
       ];
       keys.forEach(key => {
         switch (key) {
-          case "packagings": {
+          case "packagingInfos": {
             if (
-              wasteDetails[key].length > 0 &&
+              wasteDetails[key]?.length &&
               values.wasteDetails[key].length === 0
             ) {
               setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
@@ -116,32 +114,11 @@ export default function Resealed({
                 <h5 className="form__section-heading">Détails du déchet</h5>
 
                 <h4>Conditionnement</h4>
-                <div className="form__row">
-                  <Field
-                    name="wasteDetails.packagings"
-                    component={Packagings}
-                  />
 
-                  {values.wasteDetails.packagings.indexOf("AUTRE") > -1 && (
-                    <label>
-                      <Field
-                        name="wasteDetails.otherPackaging"
-                        type="text"
-                        className="td-input"
-                        placeholder="Détail de l'autre conditionnement"
-                      />
-                    </label>
-                  )}
-
-                  <Field
-                    component={NumberInput}
-                    name="wasteDetails.numberOfPackages"
-                    className="td-input"
-                    label="Nombre de colis"
-                    min="1"
-                  />
-                  <RedErrorMessage name="wasteDetails.numberOfPackages" />
-                </div>
+                <Field
+                  name="wasteDetails.packagingInfos"
+                  component={Packagings}
+                />
 
                 <h4>Quantité en tonnes</h4>
                 <div className="form__row">

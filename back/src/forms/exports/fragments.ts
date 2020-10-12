@@ -14,7 +14,7 @@ export function formFragment(exportType: FormsRegisterExportType) {
 }
 
 const outgoingWasteFragment = `
-  fragment OutgoingWasteFrom on Form {
+  fragment OutgoingWasteFragment on Form {
     readableId
     customId
     emitterWorkSiteName
@@ -73,7 +73,7 @@ const outgoingWasteFragment = `
 `;
 
 const incomingWasteFragment = `
-  fragment OutgoingWasteFrom on Form {
+  fragment IncomingWasteFragment on Form {
     readableId
     customId
     emitterCompanySiret
@@ -113,7 +113,7 @@ const incomingWasteFragment = `
   }
 `;
 const transportedWasteFragment = `
-  fragment OutgoingWasteFrom on Form {
+  fragment TransportedWasteFragment on Form {
     readableId
     customId
     emitterCompanySiret
@@ -180,7 +180,7 @@ const transportedWasteFragment = `
   }
 `;
 const tradedWasteFragment = `
-  fragment OutgoingWasteFrom on Form {
+  fragment TradedWasteFragment on Form {
     readableId
     customId
     emitterCompanySiret
@@ -246,7 +246,7 @@ const tradedWasteFragment = `
 `;
 
 const allWasteFragment = `
-  fragment OutgoingWasteFrom on Form {
+  fragment AllWasteFragment on Form {
     readableId
     customId
     emitterCompanySiret

@@ -2552,6 +2552,50 @@ Traitement prévue (code D/R)
 </tbody>
 </table>
 
+### PackagingInfo
+
+Informations sur le conditionnement
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#packagings">Packagings</a>!</td>
+<td>
+
+Type de conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Nombre de colis associés à ce conditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### Recipient
 
 Installation de destination ou d'entreprosage
@@ -2782,8 +2826,8 @@ Quantité la plus à jour
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>packagings</strong></td>
-<td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfo">PackagingInfo</a>!]</td>
 <td>
 
 Packaging le plus à jour
@@ -3565,30 +3609,57 @@ Code ONU
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>packagings</strong></td>
-<td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfo">PackagingInfo</a>!]</td>
 <td>
 
-Conditionnement
+Conditionnements
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>otherPackaging</strong></td>
+<td colspan="2" valign="top"><strong>packagings</strong> ⚠️</td>
+<td valign="top">[<a href="#packagings">Packagings</a>!]</td>
+<td>
+
+Conditionnement
+
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser `packagingInfos`
+
+</blockquote>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>otherPackaging</strong> ⚠️</td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
 Autre packaging (préciser)
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser `packagingInfos`
+
+</blockquote>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>numberOfPackages</strong></td>
+<td colspan="2" valign="top"><strong>numberOfPackages</strong> ⚠️</td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
 Nombre de colis
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser `packagingInfos`
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -4410,6 +4481,49 @@ Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
 </tbody>
 </table>
 
+### PackagingInfoInput
+
+Payload lié à un élément de conditionnement
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#packagings">Packagings</a>!</td>
+<td>
+
+Type de conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Nombre de colis associés à ce conditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### ProcessedFormInput
 
 Payload de traitement d'un BSD
@@ -5097,11 +5211,20 @@ Si oui on non le BSD a été signé par l'émetteur
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>packagings</strong></td>
-<td valign="top">[<a href="#packagings">Packagings</a>]!</td>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfoinput">PackagingInfoInput</a>!]</td>
 <td>
 
-Conditionnement
+Conditionnements
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#packagings">Packagings</a>]</td>
+<td>
+
+DEPRECATED - Conditionnement
 
 </td>
 </tr>
@@ -5281,11 +5404,20 @@ Code ONU
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfoinput">PackagingInfoInput</a>]</td>
+<td>
+
+Conditionnements
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>packagings</strong></td>
 <td valign="top">[<a href="#packagings">Packagings</a>]</td>
 <td>
 
-Conditionnement
+DEPRECATED - Conditionnement
 
 </td>
 </tr>
@@ -5294,7 +5426,7 @@ Conditionnement
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Autre packaging (préciser)
+DEPRECATED - Autre packaging (préciser)
 
 </td>
 </tr>
@@ -5303,7 +5435,7 @@ Autre packaging (préciser)
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-Nombre de colis
+DEPRECATED - Nombre de colis
 
 </td>
 </tr>
@@ -5488,6 +5620,14 @@ Liquide
 <td>
 
 Gazeux
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>DOUGHY</strong></td>
+<td>
+
+Pâteux
 
 </td>
 </tr>

@@ -50,56 +50,32 @@ export default connect<{}, Values>(function WasteInfo(props) {
       )}
 
       <h4 className="form__section-heading">Conditionnement</h4>
-      <div className="form__row">
-        <Field name="wasteDetails.packagings" component={Packagings} />
 
-        {values.wasteDetails.packagings.indexOf("AUTRE") > -1 && (
-          <label>
-            <Field
-              name="wasteDetails.otherPackaging"
-              type="text"
-              className="td-input tw-mt-2 "
-              placeholder="Détail de l'autre conditionnement"
-            />
-          </label>
-        )}
-      </div>
-      <div className="form__row">
-        <label className="mt-2" htmlFor="idNumberOfPackages">
-          Nombre de colis
-          <Field
-            id="idNumberOfPackages"
-            component={NumberInput}
-            className="td-input waste-details__number-of-packages"
-            name="wasteDetails.numberOfPackages"
-            min="1"
-          />{" "}
-        </label>
-
-        <RedErrorMessage name="wasteDetails.numberOfPackages" />
-      </div>
+      <Field name="wasteDetails.packagingInfos" component={Packagings} />
 
       <div className="form__row">
         <fieldset>
           <legend>Consistance</legend>
-          <Field
-            name="wasteDetails.consistence"
-            id="SOLID"
-            label="Solide"
-            component={RadioButton}
-          />
-          <Field
-            name="wasteDetails.consistence"
-            id="LIQUID"
-            label="Liquide"
-            component={RadioButton}
-          />
-          <Field
-            name="wasteDetails.consistence"
-            id="GASEOUS"
-            label="Gazeux"
-            component={RadioButton}
-          />
+          <div className="tw-flex">
+            <Field
+              name="wasteDetails.consistence"
+              id="SOLID"
+              label="Solide"
+              component={RadioButton}
+            />
+            <Field
+              name="wasteDetails.consistence"
+              id="LIQUID"
+              label="Liquide"
+              component={RadioButton}
+            />
+            <Field
+              name="wasteDetails.consistence"
+              id="GASEOUS"
+              label="Gazeux"
+              component={RadioButton}
+            />
+          </div>
         </fieldset>
 
         <RedErrorMessage name="wasteDetails.consistence" />
@@ -108,7 +84,6 @@ export default connect<{}, Values>(function WasteInfo(props) {
       <h4 className="form__section-heading">Quantité en tonnes</h4>
       <div className="form__row">
         <label>
-          Quantité
           <Field
             component={NumberInput}
             name="wasteDetails.quantity"
@@ -117,6 +92,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
             min="0"
             step="0.001"
           />
+          <span className="tw-ml-2">Tonnes</span>
         </label>
         <RedErrorMessage name="wasteDetails.quantity" />
 

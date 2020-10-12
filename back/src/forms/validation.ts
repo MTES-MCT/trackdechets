@@ -1,23 +1,24 @@
-import * as yup from "yup";
-import validDatetime from "../common/yup/validDatetime";
-import configureYup from "../common/yup/configureYup";
-import {
-  Form,
-  EmitterType,
-  QuantityType,
-  Consistence,
-  WasteAcceptationStatus,
-  TemporaryStorageDetail,
-  prisma
-} from "../generated/prisma-client";
-import {
-  WASTES_CODES,
-  PROCESSING_OPERATIONS_CODES,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-  isDangerous
-} from "../common/constants";
 import { UserInputError } from "apollo-server-express";
 import countries from "world-countries";
+import * as yup from "yup";
+import {
+  isDangerous,
+  PROCESSING_OPERATIONS_CODES,
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  WASTES_CODES
+} from "../common/constants";
+import configureYup from "../common/yup/configureYup";
+import validDatetime from "../common/yup/validDatetime";
+import { PackagingInfo, Packagings } from "../generated/graphql/types";
+import {
+  Consistence,
+  EmitterType,
+  Form,
+  prisma,
+  QuantityType,
+  TemporaryStorageDetail,
+  WasteAcceptationStatus
+} from "../generated/prisma-client";
 
 // set yup default error messages
 configureYup();
@@ -61,6 +62,7 @@ type WasteDetails = Pick<
   | "wasteDetailsCode"
   | "wasteDetailsName"
   | "wasteDetailsOnuCode"
+  | "wasteDetailsPackagingInfos"
   | "wasteDetailsPackagings"
   | "wasteDetailsOtherPackaging"
   | "wasteDetailsNumberOfPackages"
@@ -280,6 +282,41 @@ export const recipientSchema: yup.ObjectSchema<Recipient> = yup.object().shape({
     .required(`Destinataire: ${MISSING_COMPANY_EMAIL}`)
 });
 
+const packagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
+  type: yup
+    .mixed<Packagings>()
+    .required("Le type de conditionnement doit être précisé."),
+  other: yup
+    .string()
+    .when("type", (type, schema) =>
+      type === "AUTRE"
+        ? schema.required(
+            "La description doit être précisée pour le conditionnement 'AUTRE'."
+          )
+        : schema
+            .nullable()
+            .max(
+              0,
+              "${path} ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
+            )
+    ),
+  quantity: yup
+    .number()
+    .required(
+      "Le nombre de colis associé au conditionnement doit être précisé."
+    )
+    .integer()
+    .min(1, "Le nombre de colis doit être supérieur à 0.")
+    .when("type", (type, schema) =>
+      ["CITERNE", "BENNE"].includes(type)
+        ? schema.max(
+            1,
+            "Le nombre de benne ou de citerne ne peut être supérieur à 1."
+          )
+        : schema
+    )
+});
+
 // 3 - Dénomination du déchet
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
@@ -303,12 +340,31 @@ export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
           ),
       otherwise: () => yup.string().nullable()
     }),
-    wasteDetailsPackagings: yup.array().ensure().required(),
-    wasteDetailsNumberOfPackages: yup
-      .number()
-      .integer()
-      .min(1, "Le nombre de colis doit être supérieur à 0")
-      .nullable(true),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .required()
+      .of(packagingInfo)
+      .test(
+        "is-valid-packaging-infos",
+        "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
+        (infos: PackagingInfo[]) => {
+          const hasCiterne = infos?.find(i => i.type === "CITERNE");
+          const hasBenne = infos?.find(i => i.type === "BENNE");
+
+          if (hasCiterne && hasBenne) {
+            return false;
+          }
+
+          const hasOtherPackaging = infos?.find(
+            i => !["CITERNE", "BENNE"].includes(i.type)
+          );
+          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+            return false;
+          }
+
+          return true;
+        }
+      ),
     wasteDetailsQuantity: yup
       .number()
       .required("La quantité du déchet en tonnes est obligatoire")
