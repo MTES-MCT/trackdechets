@@ -6,7 +6,7 @@ import {
 } from "../../../generated/prisma-client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getRolesFilter } from "./forms";
+import { getFormsRightFilter } from "../../database";
 
 const PAGINATE_BY = 100;
 
@@ -86,7 +86,7 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   const selectedCompany =
     userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
 
-  const formsFilter = getRolesFilter(selectedCompany.siret, []);
+  const formsFilter = getFormsRightFilter(selectedCompany.siret);
 
   const statusLogsCx = await prisma
     .statusLogsConnection({

@@ -8,7 +8,9 @@ import {
 import {
   statusLogFactory,
   formFactory,
-  companyFactory
+  companyFactory,
+  userWithCompanyFactory,
+  userFactory
 } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma, UserRole } from "../../../../generated/prisma-client";
@@ -17,37 +19,31 @@ import { prisma, UserRole } from "../../../../generated/prisma-client";
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
-const buildFormsLifecycleQuery = (
-  paramKey?: string,
-  paramValue?: any
-): string => {
-  const param = paramKey ? `(${paramKey}: "${paramValue}")` : "";
-
-  return `query{
-    formsLifeCycle ${param}{
-      statusLogs {
+const FORMS_LIFECYCLE = `query FormsLifeCycle($loggedAfter: String, $loggedBefore: String, $formId: ID, $siret: String){
+  formsLifeCycle(loggedAfter: $loggedAfter, loggedBefore: $loggedBefore, formId: $formId, siret: $siret){
+    statusLogs {
+      id
+      status
+      updatedFields
+      loggedAt
+      form {
         id
-        status
-        updatedFields
-        loggedAt
-        form {
-          id
-          readableId
-        }
-        user {
-          id
-          email
-        }
+        readableId
       }
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-      count
+      user {
+        id
+        email
+      }
     }
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+    count
   }
+}
 `;
-};
+
 describe("Test formsLifeCycle query", () => {
   afterEach(async () => {
     await resetDatabase();
@@ -72,11 +68,10 @@ describe("Test formsLifeCycle query", () => {
       userId: emitter.id,
       updatedFields: { lorem: "ipsum" }
     });
-    const glQuery = buildFormsLifecycleQuery();
 
     const { query } = makeClient(recipient);
 
-    const { data } = (await query(glQuery)) as any;
+    const { data } = (await query(FORMS_LIFECYCLE)) as any;
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("SENT");
@@ -107,11 +102,10 @@ describe("Test formsLifeCycle query", () => {
       updatedFields: { lorem: "ipsum" },
       opt: { loggedAt: null }
     });
-    const glQuery = buildFormsLifecycleQuery();
 
     const { query } = makeClient(recipient);
 
-    const { data } = (await query(glQuery)) as any;
+    const { data } = (await query(FORMS_LIFECYCLE)) as any;
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(0);
   });
@@ -150,12 +144,12 @@ describe("Test formsLifeCycle query", () => {
       updatedFields: { consectetur: "adipiscing" }
     });
 
-    // query forms statuses created after today
-    const glQuery = buildFormsLifecycleQuery("loggedAfter", todayStr);
-
     const { query } = makeClient(recipient);
 
-    const { data } = (await query(glQuery)) as any;
+    // query forms statuses created after today
+    const { data } = (await query(FORMS_LIFECYCLE, {
+      variables: { loggedAfter: todayStr }
+    })) as any;
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("RECEIVED");
@@ -195,12 +189,12 @@ describe("Test formsLifeCycle query", () => {
       updatedFields: { consectetur: "adipiscing" }
     });
 
-    // query forms statuses created after today
-    const glQuery = buildFormsLifecycleQuery("loggedBefore", todayStr);
-
     const { query } = makeClient(recipient);
 
-    const { data } = (await query(glQuery)) as any;
+    // query forms statuses created after today
+    const { data } = (await query(FORMS_LIFECYCLE, {
+      variables: { loggedBefore: todayStr }
+    })) as any;
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("SENT");
@@ -242,12 +236,13 @@ describe("Test formsLifeCycle query", () => {
       userId: emitter.id,
       updatedFields: { foo: "bar" }
     });
-    // query forms statuses created for a given form
-    const glQuery = buildFormsLifecycleQuery("formId", form.id);
 
     const { query } = makeClient(recipient);
 
-    const { data } = (await query(glQuery)) as any;
+    // query forms statuses created for a given form
+    const { data } = (await query(FORMS_LIFECYCLE, {
+      variables: { formId: form.id }
+    })) as any;
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("RECEIVED");
@@ -300,13 +295,12 @@ describe("Test formsLifeCycle query", () => {
       updatedFields: { foo: "bar" }
     });
 
-    // Now we filter results by siret, so status log from otherCompany should not appear
-
-    const glQuery = buildFormsLifecycleQuery("siret", recipientCompany.siret);
-
     const { query } = makeClient(recipient);
 
-    const { data } = (await query(glQuery)) as any;
+    // Now we filter results by siret, so status log from otherCompany should not appear
+    const { data } = (await query(FORMS_LIFECYCLE, {
+      variables: { siret: recipientCompany.siret }
+    })) as any;
 
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(1);
@@ -341,52 +335,41 @@ describe("Test formsLifeCycle query", () => {
         isDeleted: true
       }
     });
-    const glQuery = buildFormsLifecycleQuery();
 
     const { query } = makeClient(recipient);
 
-    const { data } = (await query(glQuery)) as any;
+    const { data } = (await query(FORMS_LIFECYCLE)) as any;
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(0);
   });
 
   it("should return statusLog data for which the current user is a trader on", async () => {
     const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany
-    } = await prepareDB();
+      user: trader,
+      company: tradingCompany
+    } = await userWithCompanyFactory("MEMBER");
+    const owner = await userFactory();
 
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
-
-    const traderForm = await formFactory({
-      ownerId: emitter.id,
-      opt: {
-        emitterCompanySiret: emitterCompany.siret,
-        traderCompanySiret: recipientCompany.siret
-      }
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: { traderCompanySiret: tradingCompany.siret }
     });
 
     await statusLogFactory({
       status: "SENT",
-      formId: traderForm.id,
-      userId: emitter.id,
+      formId: form.id,
+      userId: owner.id,
       updatedFields: { lorem: "ipsum" }
     });
-    const glQuery = buildFormsLifecycleQuery();
 
-    const { query } = makeClient(recipient);
+    const { query } = makeClient(trader);
 
-    const { data } = (await query(glQuery)) as any;
+    const { data } = await query<{ data }>(FORMS_LIFECYCLE);
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("SENT");
     expect(statusLogs[0].updatedFields.lorem).toBe("ipsum");
-    expect(statusLogs[0].form.id).toBe(traderForm.id);
-    expect(statusLogs[0].user.id).toBe(emitter.id);
+    expect(statusLogs[0].form.id).toBe(form.id);
+    expect(statusLogs[0].user.id).toBe(owner.id);
   });
 });

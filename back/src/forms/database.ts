@@ -6,11 +6,13 @@ import {
   Form,
   prisma,
   FormWhereUniqueInput,
-  EcoOrganismeWhereUniqueInput
+  EcoOrganismeWhereUniqueInput,
+  FormWhereInput
 } from "../generated/prisma-client";
 import { FullForm } from "./types";
 import { FormNotFound, EcoOrganismeNotFound } from "./errors";
 import { UserInputError } from "apollo-server-express";
+import { FormRole } from "../generated/graphql/types";
 
 /**
  * Returns a prisma Form with all linked objects
@@ -65,4 +67,50 @@ export async function getEcoOrganismeOrNotFound({
     throw new EcoOrganismeNotFound(id.toString());
   }
   return eo;
+}
+
+/**
+ * Get a filter to retrieve forms the passed siret has rights on
+ * Optional parameter roles allows to filter on specific roles
+ * For example getFormsRightFilter(company, [TRANSPORTER]) will return a filter
+ * only for the forms in which the company appears as a transporter
+ * @param siret the siret to filter on
+ * @param roles optional [FormRole] to refine filter
+ */
+export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
+  const filtersByRole: { [key in FormRole]: Partial<FormWhereInput>[] } = {
+    ["RECIPIENT"]: [
+      { recipientCompanySiret: siret },
+      {
+        temporaryStorageDetail: {
+          destinationCompanySiret: siret
+        }
+      }
+    ],
+    ["EMITTER"]: [{ emitterCompanySiret: siret }],
+    ["TRANSPORTER"]: [
+      { transporterCompanySiret: siret },
+      {
+        transportSegments_some: {
+          transporterCompanySiret: siret
+        }
+      },
+      {
+        temporaryStorageDetail: {
+          transporterCompanySiret: siret
+        }
+      }
+    ],
+    ["TRADER"]: [{ traderCompanySiret: siret }],
+    ["ECO_ORGANISME"]: [{ ecoOrganisme: { siret: siret } }]
+  };
+
+  return {
+    OR: Object.keys(filtersByRole)
+      .filter((role: FormRole) =>
+        roles?.length > 0 ? roles.includes(role) : true
+      )
+      .map(role => filtersByRole[role])
+      .flat()
+  };
 }
