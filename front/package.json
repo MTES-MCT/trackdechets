@@ -20,7 +20,7 @@
     "constant-case": "^3.0.3",
     "deepmerge": "^2.2.1",
     "env-cmd": "^10.0.1",
-    "formik": "2.1.5",
+    "formik": "2.2.0",
     "graphql": "^14.0.2",
     "graphql-anywhere": "^4.2.7",
     "graphql-tag": "^2.10.4",
