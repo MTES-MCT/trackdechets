@@ -23,7 +23,7 @@
     "formik": "2.1.5",
     "graphql": "^14.0.2",
     "graphql-anywhere": "^4.2.7",
-    "graphql-tag": "^2.10.4",
+    "graphql-tag": "^2.11.0",
     "jwt-decode": "^2.2.0",
     "luxon": "^1.8.3",
     "mapbox-gl": "^1.11.1",
