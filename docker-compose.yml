@@ -124,20 +124,8 @@ services:
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/airflow
       AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$ETL_DB
       AIRFLOW_CONN_POSTGRES_PRISMA: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/prisma
-  metabase:
-    image: metabase/metabase:v0.34.2
-    volumes:
-      - metabase:/metabase-data
-    environment:
-      - MB_DB_FILE=/metabase-data/metabase.db
-      - VIRTUAL_HOST=$METABASE_HOST
-      - VIRTUAL_PORT=3000
-      - LETSENCRYPT_HOST=$METABASE_HOST
-      - LETSENCRYPT_EMAIL=$EMAIL_LETS_ENCRYPT
-
 volumes:
   postgres:
-  metabase:
 
 networks:
   default:

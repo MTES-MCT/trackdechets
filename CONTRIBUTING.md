@@ -55,7 +55,6 @@ Afin de pouvoir accéder aux différents services via des URLs du type `http://t
    127.0.0.1 api.trackdechets.local
    127.0.0.1 trackdechets.local
    127.0.0.1 etl.trackdechets.local
-   127.0.0.1 metabase.trackdechets.local
    127.0.0.1 doc.trackdechets.local
    127.0.0.1 developers.trackdechets.local
    ```
@@ -88,7 +87,7 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 
    Le démarrage du service `td-mail` est déconseillé en développement pour éviter des envois de courriels intempestifs mais vous pouvez l'activer pour le bon fonctionnement de certaines fonctionnalités (ex: validation de l'inscription, invitation à rejoindre un établissement, etc)
 
-   Vous pouvez également démarrer les services `td-doc`, `td-etl` et `metabase` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
+   Vous pouvez également démarrer les services `td-doc`, `td-etl` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
 
 4. Synchroniser la base de données avec le schéma prisma.
 
