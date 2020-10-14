@@ -28,7 +28,7 @@
     "@types/supertest": "^2.0.10",
     "copyfiles": "^2.3.0",
     "jest": "^26.4.0",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.5",
     "prettier": "^2.0.5",
     "supertest": "^4.0.2",
     "ts-jest": "^26.2.0",
