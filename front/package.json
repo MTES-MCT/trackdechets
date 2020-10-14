@@ -19,7 +19,7 @@
     "cogo-toast": "^4.1.3",
     "constant-case": "^3.0.3",
     "deepmerge": "^2.2.1",
-    "env-cmd": "^10.0.1",
+    "env-cmd": "^10.1.0",
     "formik": "2.1.5",
     "graphql": "^14.0.2",
     "graphql-anywhere": "^4.2.7",
