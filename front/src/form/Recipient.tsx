@@ -51,6 +51,7 @@ export default function Recipient() {
           recevoir le déchet, vous pouvez consulter{" "}
           <a
             href="https://www.georisques.gouv.fr/risques/installations/donnees#/"
+            className="link"
             target="_blank"
             rel="noopener noreferrer"
           >
