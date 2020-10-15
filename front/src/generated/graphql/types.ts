@@ -1394,7 +1394,8 @@ export type Query = {
    * Par défaut:
    * - tous les BSD accessibles sont retournés
    * - les BSD sont classés par date de création, de la plus récente à la plus vieille
-   * - les résultats sont paginés par 50. Il est possible de modifier cette valeur via `formsPerPage`
+   * - les résultats sont paginés par 50. Il est possible de modifier cette valeur
+   * via `first` ou `last` en fonction du curseur utilisé
    * - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
    */
   forms: Array<Form>;
@@ -1457,10 +1458,11 @@ export type QueryFormPdfArgs = {
 
 export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
-  first: Maybe<Scalars['Int']>;
   skip: Maybe<Scalars['Int']>;
   cursorAfter: Maybe<Scalars['ID']>;
+  first: Maybe<Scalars['Int']>;
   cursorBefore: Maybe<Scalars['ID']>;
+  last: Maybe<Scalars['Int']>;
   updatedBefore: Maybe<Scalars['String']>;
   updatedAfter: Maybe<Scalars['String']>;
   status: Maybe<Array<FormStatus>>;

@@ -140,7 +140,7 @@ Vous pouvez filtrer:
 Par défaut:
 - tous les BSD accessibles sont retournés
 - les BSD sont classés par date de création, de la plus récente à la plus vieille
-- les résultats sont paginés par 50. Il est possible de modifier cette valeur via `formsPerPage`
+- les résultats sont paginés par 50. Il est possible de modifier cette valeur via `first` ou `last` en fonction du curseur utilisé
 - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
 
 </td>
@@ -151,17 +151,6 @@ Par défaut:
 <td>
 
 SIRET d'un établissement dont je suis membre
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">first</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td>
-
-(Optionnel) PAGINATION
-Nombre de bordereaux retournés.
-Défaut à 50, maximum à 500
 
 </td>
 </tr>
@@ -190,6 +179,18 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 </td>
 </tr>
 <tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés après le `cursorAfter`
+Défaut à 50, maximum à 500
+Ignoré si utilisé avec `cursorBefore`
+
+</td>
+</tr>
+<tr>
 <td colspan="2" align="right" valign="top">cursorBefore</td>
 <td valign="top"><a href="#id">ID</a></td>
 <td>
@@ -199,6 +200,18 @@ Curseur avant lequel les bordereaux doivent être retournés
 Attend un identifiant (propriété `id`) de BSD
 Défaut à vide, pour retourner les "derniers" bordereaux
 Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">last</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés avant le `cursorBefore`
+Défaut à 50, maximum à 500
+Ignoré si utilisé avec `cursorAfter`
 
 </td>
 </tr>

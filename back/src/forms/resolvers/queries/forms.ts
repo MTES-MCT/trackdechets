@@ -12,11 +12,11 @@ import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 
 function validateArgs(args: QueryFormsArgs) {
-  if (args.first < 0 || args.first > 500) {
+  if (args.first < 1 || args.first > 500) {
     throw new UserInputError(
       "Le paramètre `first` doit être compris entre 1 et 500"
-      );
-    }
+    );
+  }
   // DEPRECATED. To remove with skip
   if (args.skip < 0) {
     throw new UserInputError("Le paramètre `skip` doit être positif");
@@ -140,9 +140,10 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
 
 function getPaginationFilter({
   first = DEFAULT_PAGINATE_BY,
+  last = DEFAULT_PAGINATE_BY,
   skip,
   cursorAfter: after,
-  cursorBefore: before,
+  cursorBefore: before
 }: Partial<QueryFormsArgs>) {
   // DEPRECATED. To remove with skip
   if (skip) {
@@ -155,7 +156,7 @@ function getPaginationFilter({
   if (before) {
     return {
       before,
-      last: first
+      last
     };
   }
 
