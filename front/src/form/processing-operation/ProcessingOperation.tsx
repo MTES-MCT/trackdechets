@@ -19,6 +19,7 @@ export default function ProcessingOperation({
           <a
             href="https://www.legifrance.gouv.fr/affichTexteArticle.do;jsessionid=DF38C3AD1F5E2888AF25D80D0A703E13.tpdila11v_3?idArticle=LEGIARTI000026902174&cidTexte=LEGITEXT000026918330&dateTexte=20160111"
             target="_blank"
+            className="link"
             rel="noopener noreferrer"
           >
             le site legifrance.
