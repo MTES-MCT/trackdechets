@@ -9,7 +9,8 @@ import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
 import TdSwitch from "../common/components/Switch";
 
-import "./Recipient.scss";
+import styles from "./Recipient.module.scss";
+import classNames from "classnames";
 
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -45,7 +46,7 @@ export default function Recipient() {
           : "de destination"}
       </h4>
 
-      <div className="text-quote recipient">
+      <div className={styles.recipientTextQuote}>
         <p>
           Pour vous assurer que l'entreprise de destination est autorisée à
           recevoir le déchet, vous pouvez consulter{" "}
@@ -79,7 +80,7 @@ export default function Recipient() {
           <Field
             type="text"
             name="recipient.cap"
-            className="td-input recipient-cap"
+            className={classNames("td-input", styles.recipientCap)}
           />
         </label>
       </div>
@@ -121,25 +122,35 @@ export default function Recipient() {
           <div className="form__row">
             <label>
               Numéro de récépissé
-              <Field type="text" name="trader.receipt" />
+              <Field type="text" name="trader.receipt" className="td-input" />
             </label>
 
             <RedErrorMessage name="trader.receipt" />
-
+          </div>
+          <div className="form__row">
             <label>
               Département
               <Field
                 type="text"
                 name="trader.department"
                 placeholder="Ex: 83"
+                className={classNames("td-input", styles.recipientDepartment)}
               />
             </label>
 
             <RedErrorMessage name="trader.department" />
-
+          </div>
+          <div className="form__row">
             <label>
               Limite de validité
-              <Field component={DateInput} name="trader.validityLimit" />
+              <Field
+                component={DateInput}
+                name="trader.validityLimit"
+                className={classNames(
+                  "td-input",
+                  styles.recipientValidityLimit
+                )}
+              />
             </label>
 
             <RedErrorMessage name="trader.validityLimit" />
