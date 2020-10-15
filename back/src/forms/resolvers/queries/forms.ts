@@ -1,6 +1,5 @@
 import {
   QueryResolvers,
-  FormRole,
   QueryFormsArgs,
   Form
 } from "../../../generated/graphql/types";
@@ -10,6 +9,7 @@ import { expandFormFromDb } from "../../form-converter";
 import { UserInputError } from "apollo-server-express";
 import { NotCompanyMember, MissingSiret } from "../../../common/errors";
 import { getUserCompanies } from "../../../users/database";
+import { getFormsRightFilter } from "../../database";
 
 function validateArgs(args: QueryFormsArgs) {
   if (args.first < 0 || args.first > 500) {
@@ -80,7 +80,7 @@ export async function getForms(
     where: {
       ...(status?.length && { status_in: status }),
       AND: [
-        getRolesFilter(company.siret, roles ?? []),
+        getFormsRightFilter(company.siret, roles),
         getHasNextStepFilter(company.siret, hasNextStep)
       ],
       isDeleted: false
@@ -88,42 +88,6 @@ export async function getForms(
   });
 
   return queriedForms.map(f => expandFormFromDb(f));
-}
-
-function getRolesFilter(siret: string, roles: FormRole[]) {
-  const filtersByRole = {
-    ["RECIPIENT"]: [
-      { recipientCompanySiret: siret },
-      {
-        temporaryStorageDetail: {
-          destinationCompanySiret: siret
-        }
-      }
-    ],
-    ["EMITTER"]: [{ emitterCompanySiret: siret }],
-    ["TRANSPORTER"]: [
-      { transporterCompanySiret: siret },
-      {
-        transportSegments_some: {
-          transporterCompanySiret: siret
-        }
-      },
-      {
-        temporaryStorageDetail: {
-          transporterCompanySiret: siret
-        }
-      }
-    ],
-    ["TRADER"]: [{ traderCompanySiret: siret }],
-    ["ECO_ORGANISME"]: [{ ecoOrganisme: { siret: siret } }]
-  };
-
-  return {
-    OR: (Object.keys(filtersByRole) as Array<keyof typeof filtersByRole>)
-      .filter(role => (roles.length > 0 ? roles.includes(role) : true))
-      .map(role => filtersByRole[role])
-      .flat()
-  };
 }
 
 function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
