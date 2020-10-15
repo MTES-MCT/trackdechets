@@ -6,11 +6,9 @@ export default function Sealed(props: SlipActionProps) {
   function onSubmit() {
     props
       .onSubmit({})
-      .then(res =>
-        console.log(
-          cogoToast.success(
-            `Le numéro #${props.form.readableId} a été affecté au bordereau`
-          )
+      .then(() =>
+        cogoToast.success(
+          `Le numéro #${props.form.readableId} a été affecté au bordereau`
         )
       );
   }
