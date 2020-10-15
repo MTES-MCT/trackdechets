@@ -315,7 +315,7 @@ describe("Query.forms", () => {
 
     const { data: firstForms } = await query(
       `query {
-          forms(formsPerPage: 4) {
+          forms(first: 4) {
             id
           }
         }
@@ -348,7 +348,6 @@ describe("Query.forms", () => {
 
   it("should return 50 forms by default", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
-
     await Promise.all(
       Array.from({ length: 60 }).map(() =>
         formFactory({
@@ -363,6 +362,94 @@ describe("Query.forms", () => {
     const { query } = makeClient(user);
     const { data } = await query(FORMS);
     expect(data.forms.length).toBe(50);
+  });
+
+  it("should not accepted a first argument lower than 1 or greater than 500", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    // The user has many forms, and a different role in each
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { errors: zeroErrors } = await query(
+      `query Forms($first: Int) {
+          forms(first: $first) {
+            id
+          }
+        }
+      `,
+      { variables: { first: 0 } }
+    );
+    expect(zeroErrors.length).toBe(1);
+
+    const { errors: negativeErrors } = await query(
+      `query Forms($first: Int) {
+          forms(first: $first) {
+            id
+          }
+        }
+      `,
+      { variables: { first: -1 } }
+    );
+    expect(negativeErrors.length).toBe(1);
+
+    const { errors: tooBigErrors } = await query(
+      `query Forms($first: Int) {
+          forms(first: $first) {
+            id
+          }
+        }
+      `,
+      { variables: { first: 501 } }
+    );
+    expect(tooBigErrors.length).toBe(1);
+  });
+
+  it("should filter by siret", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const otherCompany = await companyFactory();
+
+    await prisma.createCompanyAssociation({
+      company: { connect: { id: otherCompany.id } },
+      user: { connect: { id: user.id } },
+      role: "ADMIN"
+    });
+
+    // 1 form on each company
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: otherCompany.name,
+        recipientCompanySiret: otherCompany.siret
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { data } = await query(
+      `query {
+          forms(siret: "${otherCompany.siret}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
   });
 
   it("should filter by updatedAt", async () => {
@@ -455,7 +542,7 @@ describe("Query.forms", () => {
         emitterCompanySiret: otherCompany.siret
       }
     ]);
-    
+
     const { query } = makeClient(user);
     const { data } = await query(
       `query {

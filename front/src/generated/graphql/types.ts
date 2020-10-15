@@ -19,8 +19,6 @@ export type Scalars = {
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
   URL: any;
   JSON: any;
-  PaginationAmount: any;
-  PositiveInt: any;
 };
 
 /** Payload de création d'une annexe 2 */
@@ -1297,8 +1295,6 @@ export enum Packagings {
   Autre = 'AUTRE'
 }
 
-
-
 /** Payload permettant le rattachement d'un établissement à un utilisateur */
 export type PrivateCompanyInput = {
   /** SIRET de l'établissement */
@@ -1463,7 +1459,6 @@ export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
   first: Maybe<Scalars['Int']>;
   skip: Maybe<Scalars['Int']>;
-  formsPerPage: Maybe<Scalars['Int']>;
   cursorAfter: Maybe<Scalars['ID']>;
   cursorBefore: Maybe<Scalars['ID']>;
   updatedBefore: Maybe<Scalars['String']>;
@@ -1472,6 +1467,7 @@ export type QueryFormsArgs = {
   roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
   siretPresentOnForm: Maybe<Scalars['String']>;
+  wasteCode: Maybe<Scalars['String']>;
 };
 
 

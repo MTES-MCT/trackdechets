@@ -11,13 +11,13 @@ import { getUserCompanies } from "../../../users/database";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 
-// DEPRECATED. To remove with && skip
 function validateArgs(args: QueryFormsArgs) {
   if (args.first < 0 || args.first > 500) {
     throw new UserInputError(
       "Le paramètre `first` doit être compris entre 1 et 500"
-    );
-  }
+      );
+    }
+  // DEPRECATED. To remove with skip
   if (args.skip < 0) {
     throw new UserInputError("Le paramètre `skip` doit être positif");
   }
@@ -65,6 +65,7 @@ export async function getForms(
     where: {
       updatedAt_gte: rest.updatedAfter,
       updatedAt_lte: rest.updatedBefore,
+      wasteDetailsCode: rest.wasteCode,
       ...(status?.length && { status_in: status }),
       AND: [
         getFormsRightFilter(company.siret, roles),
@@ -138,31 +139,30 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
 }
 
 function getPaginationFilter({
-  first,
+  first = DEFAULT_PAGINATE_BY,
   skip,
   cursorAfter: after,
   cursorBefore: before,
-  formsPerPage = DEFAULT_PAGINATE_BY
 }: Partial<QueryFormsArgs>) {
-  // DEPRECATED. To remove with && skip
-  if (first || skip) {
+  // DEPRECATED. To remove with skip
+  if (skip) {
     return {
-      first: first,
-      skip: skip ?? 0
+      first,
+      skip
     };
   }
 
   if (before) {
     return {
       before,
-      last: formsPerPage
+      last: first
     };
   }
 
   // By default, if no cursorAfter is provided we'll return the first elements
   return {
     after,
-    first: formsPerPage
+    first
   };
 }
 

@@ -159,7 +159,7 @@ SIRET d'un établissement dont je suis membre
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-DEPRECATED - (Optionnel) PAGINATION
+(Optionnel) PAGINATION
 Nombre de bordereaux retournés.
 Défaut à 50, maximum à 500
 
@@ -173,17 +173,6 @@ Défaut à 50, maximum à 500
 DEPRECATED - (Optionnel) PAGINATION
 Nombre d'éléments à ne pas récupérer en début de liste
 Défaut à 0
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">formsPerPage</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td>
-
-(Optionnel) PAGINATION
-Nombre de bordereaux retournés.
-Défaut à 50, maximum à 500, minimum à 1
 
 </td>
 </tr>
@@ -285,6 +274,15 @@ Défaut à vide.
 Vous n'avez pas besoin d'être membre de cette entreprise.
 Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
 Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">wasteCode</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Code déchet pour affiner la recherche
 
 </td>
 </tr>
@@ -5972,10 +5970,6 @@ The `ID` scalar type represents a unique identifier, often used to refetch an ob
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
 
 ### JSON
-
-### PaginationAmount
-
-### PositiveInt
 
 ### String
 

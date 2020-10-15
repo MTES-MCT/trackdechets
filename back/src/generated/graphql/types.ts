@@ -22,8 +22,6 @@ export type Scalars = {
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
   URL: any;
   JSON: any;
-  PaginationAmount: any;
-  PositiveInt: any;
 };
 
 /** Payload de création d'une annexe 2 */
@@ -1290,8 +1288,6 @@ export type Packagings =
   /** Autre */
   | 'AUTRE';
 
-
-
 /** Payload permettant le rattachement d'un établissement à un utilisateur */
 export type PrivateCompanyInput = {
   /** SIRET de l'établissement */
@@ -1455,7 +1451,6 @@ export type QueryFormsArgs = {
   siret?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   skip?: Maybe<Scalars['Int']>;
-  formsPerPage?: Maybe<Scalars['Int']>;
   cursorAfter?: Maybe<Scalars['ID']>;
   cursorBefore?: Maybe<Scalars['ID']>;
   updatedBefore?: Maybe<Scalars['String']>;
@@ -1464,6 +1459,7 @@ export type QueryFormsArgs = {
   roles?: Maybe<Array<FormRole>>;
   hasNextStep?: Maybe<Scalars['Boolean']>;
   siretPresentOnForm?: Maybe<Scalars['String']>;
+  wasteCode?: Maybe<Scalars['String']>;
 };
 
 
@@ -2277,8 +2273,6 @@ export type ResolversTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
-  PaginationAmount: ResolverTypeWrapper<Scalars['PaginationAmount']>;
-  PositiveInt: ResolverTypeWrapper<Scalars['PositiveInt']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -2382,8 +2376,6 @@ export type ResolversParentTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   Subscription: {};
   FormSubscription: FormSubscription;
-  PaginationAmount: Scalars['PaginationAmount'];
-  PositiveInt: Scalars['PositiveInt'];
 };
 
 export type AuthPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuthPayload'] = ResolversParentTypes['AuthPayload']> = {
@@ -2663,14 +2655,6 @@ export type NextDestinationResolvers<ContextType = GraphQLContext, ParentType ex
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
-export interface PaginationAmountScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PaginationAmount'], any> {
-  name: 'PaginationAmount';
-}
-
-export interface PositiveIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PositiveInt'], any> {
-  name: 'PositiveInt';
-}
-
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   apiKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   appendixForms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryAppendixFormsArgs, 'siret'>>;
@@ -2887,8 +2871,6 @@ export type Resolvers<ContextType = GraphQLContext> = {
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   NextDestination?: NextDestinationResolvers<ContextType>;
-  PaginationAmount?: GraphQLScalarType;
-  PositiveInt?: GraphQLScalarType;
   Query?: QueryResolvers<ContextType>;
   Recipient?: RecipientResolvers<ContextType>;
   Rubrique?: RubriqueResolvers<ContextType>;

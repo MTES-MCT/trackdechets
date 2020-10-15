@@ -10,9 +10,6 @@ scalar DateTime
 
 scalar JSON
 
-scalar PaginationAmount
-scalar PositiveInt
-
 type Query {
   "Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)"
   form(
@@ -47,7 +44,7 @@ type Query {
     siret: String
 
     """
-    DEPRECATED - (Optionnel) PAGINATION
+    (Optionnel) PAGINATION
     Nombre de bordereaux retournés.
     Défaut à 50, maximum à 500
     """
@@ -59,13 +56,6 @@ type Query {
     Défaut à 0
     """
     skip: Int
-
-    """
-    (Optionnel) PAGINATION
-    Nombre de bordereaux retournés.
-    Défaut à 50, maximum à 500, minimum à 1
-    """
-    formsPerPage: Int @range(min: 1, max: 500)
 
     """
     (Optionnel) PAGINATION
@@ -135,6 +125,9 @@ type Query {
     Défaut à vide.
     """
     siretPresentOnForm: String
+
+    "(Optionnel) Code déchet pour affiner la recherche"
+    wasteCode: String
   ): [Form!]!
 
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"
