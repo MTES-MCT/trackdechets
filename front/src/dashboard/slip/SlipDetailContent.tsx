@@ -229,11 +229,9 @@ export default function SlipDetailContent({
             />
             <div className={styles.detailRow}>
               <dt>Code déchet</dt>
-              <dd>
-                {form.wasteDetails?.code} {form.wasteDetails?.name}
-              </dd>
+              <dd>{form.wasteDetails?.code}</dd>
             </div>
-
+            <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
             <div className={styles.detailRow}>
               <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
             </div>
