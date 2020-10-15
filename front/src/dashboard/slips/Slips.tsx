@@ -4,9 +4,9 @@ import { SlipActions, DynamicActions } from "./slips-actions/SlipActions";
 import { useFormsTable } from "./use-forms-table";
 import SortControl from "./SortableTableHeader";
 import { statusLabels } from "../constants";
-
-import "./Slips.scss";
+import Shorten from "common/components/Shorten";
 import { Form } from "generated/graphql/types";
+import "./Slips.scss";
 
 type Props = {
   forms: Form[];
@@ -23,7 +23,6 @@ export default function Slips({
   refetch,
 }: Props) {
   const [sortedForms, sortParams, sortBy, filter] = useFormsTable(forms);
-
   return (
     <div className="td-table-wrapper">
       <table className="td-table">
@@ -132,8 +131,12 @@ export default function Slips({
                 </td>
               )}
 
-              <td>{s.emitter.company?.name}</td>
-              <td>{s.stateSummary.recipient?.name}</td>
+              <td>
+                <Shorten content={s.emitter.company?.name} />
+              </td>
+              <td>
+                <Shorten content={s.stateSummary.recipient?.name} />
+              </td>
               <td>
                 {s.wasteDetails && (
                   <>
