@@ -1455,7 +1455,7 @@ export type QueryFormsArgs = {
   first?: Maybe<Scalars['Int']>;
   cursorBefore?: Maybe<Scalars['ID']>;
   last?: Maybe<Scalars['Int']>;
-  updatedBefore?: Maybe<Scalars['String']>;
+  sentAfter?: Maybe<Scalars['String']>;
   updatedAfter?: Maybe<Scalars['String']>;
   status?: Maybe<Array<FormStatus>>;
   roles?: Maybe<Array<FormRole>>;

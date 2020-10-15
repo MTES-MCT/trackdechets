@@ -64,7 +64,7 @@ export async function getForms(
     orderBy: "createdAt_DESC",
     where: {
       updatedAt_gte: rest.updatedAfter,
-      updatedAt_lte: rest.updatedBefore,
+      sentAt_gte: rest.sentAfter,
       wasteDetailsCode: rest.wasteCode,
       ...(status?.length && { status_in: status }),
       AND: [

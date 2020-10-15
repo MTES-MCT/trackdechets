@@ -85,12 +85,12 @@ type Query {
     last: Int
 
     """
-    (Optionnel) Retourne les BSD modifiés avant la date
-    Filtre sur la date de dernière modification
+    (Optionnel) Retourne les BSD envoyés après la date
+    Filtre sur la date d'envoi (date de la case 9 du bordereau)
     Au format (YYYY-MM-DD)
     Par défaut vide, aucun filtre n'est appliqué
     """
-    updatedBefore: String
+    sentAfter: String
 
     """
     (Optionnel) Retourne les BSD modifiés après la date
@@ -135,7 +135,11 @@ type Query {
     """
     siretPresentOnForm: String
 
-    "(Optionnel) Code déchet pour affiner la recherche"
+    """
+    (Optionnel) Code déchet pour affiner la recherche
+    Ex: 01 03 04* (Veillez à bien respecter les espaces).
+    Défaut à vide.
+    """
     wasteCode: String
   ): [Form!]!
 

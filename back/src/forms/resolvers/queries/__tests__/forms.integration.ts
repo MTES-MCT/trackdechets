@@ -483,20 +483,6 @@ describe("Query.forms", () => {
 
     expect(updatedAfterYesterday.forms.length).toBe(2);
 
-    const { data: updatedBeforeYesterday } = await query(
-      `query {
-          forms(updatedBefore: "${yesterday}") {
-            id
-            recipient {
-              company { siret }
-            }
-          }
-        }
-      `
-    );
-
-    expect(updatedBeforeYesterday.forms.length).toBe(0);
-
     const { data: updatedAfterTomorrow } = await query(
       `query {
           forms(updatedAfter: "${tomorrow}") {
@@ -510,20 +496,37 @@ describe("Query.forms", () => {
     );
 
     expect(updatedAfterTomorrow.forms.length).toBe(0);
+  });
 
-    const { data: updatedBeforeTomorrow } = await query(
-      `query {
-          forms(updatedBefore: "${tomorrow}") {
+  it("should filter by waste code", async () => {
+    await createForms(user.id, [
+      {
+        wasteDetailsCode: "01 03 04*",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        wasteDetailsCode: "01 03 05*",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    ]);
+
+    const { data } = await query(
+      `query Forms($wasteCode: String) {
+          forms(wasteCode: $wasteCode) {
             id
-            recipient {
-              company { siret }
+            wasteDetails {
+              code
             }
           }
         }
-      `
+      `,
+      { variables: { wasteCode: "01 03 04*" } }
     );
 
-    expect(updatedBeforeTomorrow.forms.length).toBe(2);
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].wasteDetails.code).toBe("01 03 04*");
   });
 
   it("should filter by siretPresentOnForm", async () => {

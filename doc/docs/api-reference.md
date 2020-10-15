@@ -216,12 +216,12 @@ Ignoré si utilisé avec `cursorAfter`
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">updatedBefore</td>
+<td colspan="2" align="right" valign="top">sentAfter</td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-(Optionnel) Retourne les BSD modifiés avant la date
-Filtre sur la date de dernière modification
+(Optionnel) Retourne les BSD envoyés après la date
+Filtre sur la date d'envoi (date de la case 9 du bordereau)
 Au format (YYYY-MM-DD)
 Par défaut vide, aucun filtre n'est appliqué
 
@@ -296,6 +296,8 @@ Défaut à vide.
 <td>
 
 (Optionnel) Code déchet pour affiner la recherche
+Ex: 01 03 04* (Veillez à bien respecter les espaces).
+Défaut à vide.
 
 </td>
 </tr>
