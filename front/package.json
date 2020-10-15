@@ -43,7 +43,7 @@
     "react-select": "^3.1.0",
     "react-switch": "5.0.1",
     "react-tabs": "3.1.1",
-    "tailwindcss": "^1.4.6",
+    "tailwindcss": "^1.9.2",
     "use-media": "^1.4.0",
     "uuid": "^8.3.1",
     "world-countries": "^4.0.0",
