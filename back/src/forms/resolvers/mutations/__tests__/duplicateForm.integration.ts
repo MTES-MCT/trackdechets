@@ -6,6 +6,8 @@ import makeClient from "../../../../__tests__/testClient";
 import { prisma, Form } from "../../../../generated/prisma-client";
 import { cleanUpNotDuplicatableFieldsInForm } from "../../../form-converter";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -26,7 +28,9 @@ describe("Mutation.duplicateForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(DUPLICATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "duplicateForm">>
+    >(DUPLICATE_FORM, {
       variables: {
         id: form.id
       }

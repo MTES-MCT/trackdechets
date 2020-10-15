@@ -3,6 +3,8 @@ import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 import { AuthType } from "../../../../auth";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 describe("{ mutation { createTraderReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -28,7 +30,9 @@ describe("{ mutation { createTraderReceipt } }", () => {
         }`;
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createTraderReceipt">>
+    >(mutation);
 
     expect(await prisma.traderReceiptsConnection().aggregate().count()).toEqual(
       1

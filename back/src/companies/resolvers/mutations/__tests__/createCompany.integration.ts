@@ -5,6 +5,8 @@ import { prisma } from "../../../../generated/prisma-client";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { AuthType } from "../../../../auth";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -38,7 +40,9 @@ describe("Create company endpoint", () => {
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createCompany">>
+    >(mutation);
 
     const expected = {
       siret,
@@ -94,7 +98,9 @@ describe("Create company endpoint", () => {
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createCompany">>
+    >(mutation);
 
     expect(data.createCompany.transporterReceipt).toEqual(transporterReceipt);
   });
@@ -134,7 +140,9 @@ describe("Create company endpoint", () => {
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createCompany">>
+    >(mutation);
 
     // check the traderReceipt was created in db
     expect(data.createCompany.traderReceipt).toEqual(traderReceipt);
@@ -189,7 +197,9 @@ describe("Create company endpoint", () => {
       `;
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { errors, data } = await mutate(mutation);
+    const { errors, data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createCompany">>
+    >(mutation);
 
     expect(data).toBeNull();
     expect(errors[0].extensions.code).toBe(ErrorCode.BAD_USER_INPUT);

@@ -1,3 +1,4 @@
+import { ExecutionResult } from "graphql";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 import {
@@ -95,7 +96,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
       }
     }
   `;
-    const { errors } = await mutate(mutation);
+    const { errors } = await mutate<ExecutionResult>(mutation);
     expect(errors[0].message).toEqual(
       "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé"
     );
@@ -126,7 +127,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
       }
     }
   `;
-    const { errors } = await mutate(mutation);
+    const { errors } = await mutate<ExecutionResult>(mutation);
 
     expect(errors[0].message).toEqual(
       "Vous n'êtes pas transporteur de ce bordereau."

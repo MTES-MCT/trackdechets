@@ -7,6 +7,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
 
 const MARK_AS_TEMP_STORED = `
   mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
@@ -40,7 +41,7 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_TEMP_STORED, {
       variables: {
         id: form.id,
         tempStoredInfos: {
@@ -180,7 +181,7 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_TEMP_STORED, {
       variables: {
         id: form.id,
         tempStoredInfos: {

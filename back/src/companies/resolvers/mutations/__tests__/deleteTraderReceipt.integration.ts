@@ -3,6 +3,8 @@ import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 describe("{ mutation { deleteTraderReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -36,7 +38,9 @@ describe("{ mutation { deleteTraderReceipt } }", () => {
       }
     `;
 
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "deleteTraderReceipt">>
+    >(mutation);
     expect(data.deleteTraderReceipt.id).toEqual(receiptId);
 
     expect(await prisma.traderReceiptsConnection().aggregate().count()).toEqual(

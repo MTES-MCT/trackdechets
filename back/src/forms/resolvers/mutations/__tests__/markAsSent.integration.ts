@@ -6,6 +6,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
+import { ExecutionResult } from "graphql";
 
 const MARK_AS_SENT = `
   mutation MarkAsSent($id: ID!, $sentInfo: SentFormInput!){
@@ -37,7 +38,7 @@ describe("{ mutation { markAsSent } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_SENT, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_SENT, {
       variables: {
         id: form.id,
         sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
@@ -222,7 +223,7 @@ describe("{ mutation { markAsSent } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_SENT, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_SENT, {
       variables: {
         id: form.id,
         sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
@@ -257,7 +258,7 @@ describe("{ mutation { markAsSent } }", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(MARK_AS_SENT, {
+      const { errors } = await mutate<ExecutionResult>(MARK_AS_SENT, {
         variables: {
           id: form.id,
           sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
@@ -305,7 +306,7 @@ describe("{ mutation { markAsSent } }", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(MARK_AS_SENT, {
+      const { errors } = await mutate<ExecutionResult>(MARK_AS_SENT, {
         variables: {
           id: form.id,
           sentInfo: { sentAt: `${dateStr}`, sentBy: "John Doe" }

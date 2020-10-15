@@ -4,6 +4,8 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 import { compare } from "bcrypt";
 import { AuthType } from "../../../../auth";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CHANGE_PASSWORD = `
   mutation ChangePassword($oldPassword: String!, $newPassword: String!){
@@ -20,7 +22,9 @@ describe("mutation changePassword", () => {
     const user = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const newPassword = "newPass";
-    const { data } = await mutate(CHANGE_PASSWORD, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "changePassword">>
+    >(CHANGE_PASSWORD, {
       variables: { oldPassword: "pass", newPassword }
     });
     expect(data.changePassword.id).toEqual(user.id);

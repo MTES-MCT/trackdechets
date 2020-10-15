@@ -6,6 +6,9 @@ import { prisma } from "../../../../generated/prisma-client";
 import { userMails } from "../../../mails";
 import { userFactory, companyFactory } from "../../../../__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
+import { Mutation } from "../../../../generated/graphql/types";
+import { ApolloError } from "apollo-server-express";
+import { ExecutionResult } from "graphql";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -38,16 +41,19 @@ describe("Mutation.signup", () => {
       phone: "06 00 00 00 00"
     };
 
-    const { data } = await mutate(SIGNUP, {
-      variables: {
-        userInfos: {
-          email: user.email,
-          password: "newUserPassword",
-          name: user.name,
-          phone: user.phone
+    const { data } = await mutate<ExecutionResult<Pick<Mutation, "signup">>>(
+      SIGNUP,
+      {
+        variables: {
+          userInfos: {
+            email: user.email,
+            password: "newUserPassword",
+            name: user.name,
+            phone: user.phone
+          }
         }
       }
-    });
+    );
     expect(data.signup).toEqual(user);
 
     const newUser = await prisma.user({ email: user.email });
@@ -66,7 +72,7 @@ describe("Mutation.signup", () => {
   it("should throw BAD_USER_INPUT if email already exist", async () => {
     const alreadyExistingUser = await userFactory();
 
-    const { errors } = await mutate(SIGNUP, {
+    const { errors } = await mutate<{ errors: ApolloError[] }>(SIGNUP, {
       variables: {
         userInfos: {
           email: alreadyExistingUser.email,
@@ -82,7 +88,7 @@ describe("Mutation.signup", () => {
   it("should throw BAD_USER_INPUT if email already exist regarldess of the email casing", async () => {
     const alreadyExistingUser = await userFactory();
 
-    const { errors } = await mutate(SIGNUP, {
+    const { errors } = await mutate<ExecutionResult>(SIGNUP, {
       variables: {
         userInfos: {
           email: alreadyExistingUser.email.toUpperCase(),
@@ -103,7 +109,7 @@ describe("Mutation.signup", () => {
       password: "newUserPassword"
     };
 
-    const { errors } = await mutate(SIGNUP, {
+    const { errors } = await mutate<ExecutionResult>(SIGNUP, {
       variables: {
         userInfos: {
           email: user.email,
@@ -123,7 +129,7 @@ describe("Mutation.signup", () => {
       phone: "06 00 00 00 00",
       password: "pass"
     };
-    const { errors } = await mutate(SIGNUP, {
+    const { errors } = await mutate<ExecutionResult>(SIGNUP, {
       variables: {
         userInfos: {
           email: user.email,

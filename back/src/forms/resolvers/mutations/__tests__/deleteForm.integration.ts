@@ -7,6 +7,8 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import { prisma } from "../../../../generated/prisma-client";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const DELETE_FORM = `
 mutation DeleteForm($id: ID!) {
@@ -27,7 +29,7 @@ describe("Mutation.deleteForm", () => {
       opt: { status: "DRAFT" }
     });
 
-    const { errors } = await mutate(DELETE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(DELETE_FORM, {
       variables: { id: form.id }
     });
 
@@ -51,7 +53,7 @@ describe("Mutation.deleteForm", () => {
       opt: { status: "DRAFT" }
     });
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(DELETE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(DELETE_FORM, {
       variables: { id: form.id }
     });
 
@@ -75,7 +77,7 @@ describe("Mutation.deleteForm", () => {
       opt: { status: "SEALED" }
     });
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(DELETE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(DELETE_FORM, {
       variables: { id: form.id }
     });
 
@@ -103,7 +105,9 @@ describe("Mutation.deleteForm", () => {
       });
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate(DELETE_FORM, {
+      const { data } = await mutate<
+        ExecutionResult<Pick<Mutation, "deleteForm">>
+      >(DELETE_FORM, {
         variables: { id: form.id }
       });
 

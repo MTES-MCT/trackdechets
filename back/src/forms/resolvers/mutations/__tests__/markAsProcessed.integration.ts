@@ -7,6 +7,8 @@ import {
 } from "../../../../__tests__/factories";
 import { PROCESSING_OPERATIONS } from "../../../../common/constants";
 import makeClient from "../../../../__tests__/testClient";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 jest.mock("axios", () => ({
   default: {
@@ -40,7 +42,7 @@ describe("mutation.markAsProcessed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_PROCESSED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
         processedInfo: {
@@ -112,16 +114,19 @@ describe("mutation.markAsProcessed", () => {
       data: {
         markAsProcessed: { processingOperationDescription }
       }
-    } = await mutate(MARK_AS_PROCESSED, {
-      variables: {
-        id: form.id,
-        processedInfo: {
-          processingOperationDone: processingOperation.code,
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+    } = await mutate<ExecutionResult<Pick<Mutation, "markAsProcessed">>>(
+      MARK_AS_PROCESSED,
+      {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDone: processingOperation.code,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
         }
       }
-    });
+    );
     expect(processingOperationDescription).toBe(
       processingOperation.description
     );
@@ -139,7 +144,7 @@ describe("mutation.markAsProcessed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_PROCESSED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
         processedInfo: {
@@ -218,7 +223,7 @@ describe("mutation.markAsProcessed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_PROCESSED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
         processedInfo: {
@@ -373,7 +378,7 @@ describe("mutation.markAsProcessed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_PROCESSED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
         processedInfo: {

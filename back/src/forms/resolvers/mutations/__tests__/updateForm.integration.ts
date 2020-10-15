@@ -8,6 +8,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -56,7 +58,7 @@ describe("Mutation.updateForm", () => {
     });
 
     const { mutate } = makeClient();
-    const { errors } = await mutate(UPDATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(UPDATE_FORM, {
       variables: {
         updateFormInput: {
           id: form.id
@@ -85,7 +87,7 @@ describe("Mutation.updateForm", () => {
     const currentUser = await userFactory();
 
     const { mutate } = makeClient(currentUser);
-    const { errors } = await mutate(UPDATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(UPDATE_FORM, {
       variables: {
         updateFormInput: {
           id: form.id,
@@ -125,7 +127,9 @@ describe("Mutation.updateForm", () => {
           code: "01 01 01"
         }
       };
-      const { data } = await mutate(UPDATE_FORM, {
+      const { data } = await mutate<
+        ExecutionResult<Pick<Mutation, "updateForm">>
+      >(UPDATE_FORM, {
         variables: { updateFormInput }
       });
 
@@ -160,7 +164,9 @@ describe("Mutation.updateForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -178,7 +184,7 @@ describe("Mutation.updateForm", () => {
       id: "does_not_exist"
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(UPDATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -210,7 +216,7 @@ describe("Mutation.updateForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(UPDATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -248,7 +254,9 @@ describe("Mutation.updateForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput: {
           id: form.id,
@@ -279,7 +287,9 @@ describe("Mutation.updateForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput: {
           id: form.id,
@@ -307,7 +317,9 @@ describe("Mutation.updateForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: { updateFormInput }
     });
     expect(data.updateForm.wasteDetails).toMatchObject(
@@ -336,7 +348,9 @@ describe("Mutation.updateForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -371,7 +385,9 @@ describe("Mutation.updateForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -401,7 +417,9 @@ describe("Mutation.updateForm", () => {
       temporaryStorageDetail: null
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -429,7 +447,9 @@ describe("Mutation.updateForm", () => {
         }
       }
     };
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -461,7 +481,9 @@ describe("Mutation.updateForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -488,7 +510,9 @@ describe("Mutation.updateForm", () => {
       recipient: null
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(UPDATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateForm">>
+    >(UPDATE_FORM, {
       variables: {
         updateFormInput
       }
@@ -515,7 +539,7 @@ describe("Mutation.updateForm", () => {
       });
 
       const { mutate } = makeClient(user);
-      const { errors } = await mutate(UPDATE_FORM, {
+      const { errors } = await mutate<ExecutionResult>(UPDATE_FORM, {
         variables: {
           updateFormInput: {
             id: form.id,

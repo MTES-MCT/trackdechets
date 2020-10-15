@@ -7,6 +7,8 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 jest.mock("axios", () => ({
   default: {
@@ -77,7 +79,7 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+    const { errors } = await mutate<ExecutionResult>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -120,7 +122,9 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+    const { data, errors } = await mutate<
+      ExecutionResult<Pick<Mutation, "signedByTransporter">>
+    >(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -156,7 +160,7 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+    const { errors } = await mutate<ExecutionResult>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -197,7 +201,7 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+    const { errors } = await mutate<ExecutionResult>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -238,7 +242,7 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+    const { errors } = await mutate<ExecutionResult>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {

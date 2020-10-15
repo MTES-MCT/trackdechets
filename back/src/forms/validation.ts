@@ -98,23 +98,6 @@ type ReceivedInfo = Pick<
 
 type SigningInfo = Pick<Form, "sentAt" | "sentBy" | "signedByTransporter">;
 
-type ProcessedInfo = Pick<
-  Form,
-  | "processedBy"
-  | "processedAt"
-  | "processingOperationDone"
-  | "processingOperationDescription"
-  | "noTraceability"
-  | "nextDestinationProcessingOperation"
-  | "nextDestinationCompanyName"
-  | "nextDestinationCompanySiret"
-  | "nextDestinationCompanyAddress"
-  | "nextDestinationCompanyCountry"
-  | "nextDestinationCompanyContact"
-  | "nextDestinationCompanyPhone"
-  | "nextDestinationCompanyMail"
->;
-
 type TempStorageInfo = Pick<
   TemporaryStorageDetail,
   | "tempStorerQuantityType"

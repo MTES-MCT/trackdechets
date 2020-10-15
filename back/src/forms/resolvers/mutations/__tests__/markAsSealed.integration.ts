@@ -7,6 +7,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 jest.mock("axios", () => ({
   default: {
@@ -38,7 +40,7 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_SEALED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_SEALED, {
       variables: {
         id: form.id
       }
@@ -143,7 +145,7 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_SEALED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_SEALED, {
       variables: {
         id: form.id
       }
@@ -170,7 +172,7 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_SEALED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_SEALED, {
       variables: {
         id: form.id
       }
@@ -214,7 +216,7 @@ describe("Mutation.markAsSealed", () => {
       });
 
       const { mutate } = makeClient(user);
-      const { errors } = await mutate(MARK_AS_SEALED, {
+      const { errors } = await mutate<ExecutionResult>(MARK_AS_SEALED, {
         variables: {
           id: form.id
         }
@@ -259,7 +261,7 @@ describe("Mutation.markAsSealed", () => {
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_SEALED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_SEALED, {
       variables: {
         id: form.id
       }
@@ -291,7 +293,9 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(MARK_AS_SEALED, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "markAsSealed">>
+    >(MARK_AS_SEALED, {
       variables: {
         id: form.id
       }

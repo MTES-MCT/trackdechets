@@ -1,4 +1,7 @@
-import { ImportPaperFormInput } from "../../../../generated/graphql/types";
+import {
+  ImportPaperFormInput,
+  Mutation
+} from "../../../../generated/graphql/types";
 import makeClient from "../../../../__tests__/testClient";
 import {
   getReadableId,
@@ -11,6 +14,7 @@ import {
   prisma
 } from "../../../../generated/prisma-client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { ExecutionResult } from "graphql";
 
 const IMPORT_PAPER_FORM = `
   mutation ImportPaperForm($input: ImportPaperFormInput!){
@@ -90,7 +94,7 @@ describe("mutation / importPaperForm", () => {
 
     it("should fail if not authenticated", async () => {
       const { mutate } = makeClient();
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+      const { errors } = await mutate<ExecutionResult>(IMPORT_PAPER_FORM, {
         variables: { input: getImportPaperFormInput() }
       });
       expect(errors).toHaveLength(1);
@@ -105,7 +109,9 @@ describe("mutation / importPaperForm", () => {
       const input = getImportPaperFormInput();
       input.recipient.company.siret = company.siret;
 
-      const { data } = await mutate(IMPORT_PAPER_FORM, {
+      const { data } = await mutate<
+        ExecutionResult<Pick<Mutation, "importPaperForm">>
+      >(IMPORT_PAPER_FORM, {
         variables: { input }
       });
 
@@ -120,7 +126,7 @@ describe("mutation / importPaperForm", () => {
 
       const input = getImportPaperFormInput();
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+      const { errors } = await mutate<ExecutionResult>(IMPORT_PAPER_FORM, {
         variables: { input }
       });
 
@@ -140,7 +146,7 @@ describe("mutation / importPaperForm", () => {
       // invalidate input
       input.emitter.type = null;
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+      const { errors } = await mutate<ExecutionResult>(IMPORT_PAPER_FORM, {
         variables: { input }
       });
 
@@ -164,7 +170,9 @@ describe("mutation / importPaperForm", () => {
       input.recipient.company.siret = company.siret;
       input.ecoOrganisme = { id: ecoOrganisme.id };
 
-      const { data } = await mutate(IMPORT_PAPER_FORM, {
+      const { data } = await mutate<
+        ExecutionResult<Pick<Mutation, "importPaperForm">>
+      >(IMPORT_PAPER_FORM, {
         variables: { input }
       });
 
@@ -373,7 +381,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+      const { errors } = await mutate<ExecutionResult>(IMPORT_PAPER_FORM, {
         variables: {
           input: {
             id: form.id, // update mode
@@ -406,7 +414,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+      const { errors } = await mutate<ExecutionResult>(IMPORT_PAPER_FORM, {
         variables: {
           input: {
             id: form.id, // update mode
@@ -440,7 +448,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+      const { errors } = await mutate<ExecutionResult>(IMPORT_PAPER_FORM, {
         variables: {
           input: {
             id: form.id, // update mode
@@ -479,7 +487,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
+      const { errors } = await mutate<ExecutionResult>(IMPORT_PAPER_FORM, {
         variables: {
           input: {
             id: form.id, // update mode

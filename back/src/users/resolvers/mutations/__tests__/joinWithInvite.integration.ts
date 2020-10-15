@@ -5,6 +5,8 @@ import { prisma } from "../../../../generated/prisma-client";
 import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const JOIN_WITH_INVITE = `
   mutation JoinWithInvite($inviteHash: String!, $name: String!, $password: String!){
@@ -19,7 +21,7 @@ describe("joinWithInvite mutation", () => {
   const { mutate } = makeClient();
 
   it("should raise exception if invitation does not exist", async () => {
-    const { errors } = await mutate(JOIN_WITH_INVITE, {
+    const { errors } = await mutate<ExecutionResult>(JOIN_WITH_INVITE, {
       variables: { inviteHash: "invalid", name: "John Snow", password: "pass" }
     });
     expect(errors).toHaveLength(1);
@@ -39,7 +41,7 @@ describe("joinWithInvite mutation", () => {
       hash: "hash",
       acceptedAt: new Date().toISOString()
     });
-    const { errors } = await mutate(JOIN_WITH_INVITE, {
+    const { errors } = await mutate<ExecutionResult>(JOIN_WITH_INVITE, {
       variables: {
         inviteHash: invitation.hash,
         name: "John Snow",
@@ -61,7 +63,9 @@ describe("joinWithInvite mutation", () => {
       hash: "hash"
     });
 
-    const { data } = await mutate(JOIN_WITH_INVITE, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "joinWithInvite">>
+    >(JOIN_WITH_INVITE, {
       variables: {
         inviteHash: invitation.hash,
         name: "John Snow",

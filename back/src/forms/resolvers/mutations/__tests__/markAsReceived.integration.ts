@@ -9,6 +9,7 @@ import {
   transportSegmentFactory
 } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { ExecutionResult } from "graphql";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -494,7 +495,7 @@ describe("Test Form reception", () => {
 
     const { mutate } = makeClient(recipient);
 
-    const { errors } = await mutate(MARK_AS_RECEIVED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_RECEIVED, {
       variables: {
         id: form.id,
         receivedInfo: {

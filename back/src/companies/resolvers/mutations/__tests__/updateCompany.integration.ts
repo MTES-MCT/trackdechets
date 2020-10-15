@@ -3,6 +3,8 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { prisma } from "../../../../generated/prisma-client";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_COMPANY = `
   mutation UpdateCompany(
@@ -42,7 +44,9 @@ describe("mutation updateCompany", () => {
     const contactPhone = "1111111111";
     const givenName = "newGivenName";
     const website = "newWebsite@trackechets.fr";
-    const { data } = await mutate(UPDATE_COMPANY, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "updateCompany">>
+    >(UPDATE_COMPANY, {
       variables: {
         siret: company.siret,
         gerepId,

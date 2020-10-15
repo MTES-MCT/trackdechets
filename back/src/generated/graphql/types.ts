@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { GraphQLContext } from '../../types';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -2071,11 +2071,16 @@ export type WorkSiteInput = {
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
 
-export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
+export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
   fragment: string;
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
 
+export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
+  selectionSet: string;
+  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
+};
+export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>;
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
   | StitchingResolver<TResult, TParent, TContext, TArgs>;
@@ -2125,7 +2130,7 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type isTypeOfResolverFn<T = {}> = (obj: T, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
@@ -2246,20 +2251,15 @@ export type ResolversParentTypes = {
   ID: Scalars['ID'];
   Boolean: Scalars['Boolean'];
   Emitter: Emitter;
-  EmitterType: EmitterType;
   WorkSite: WorkSite;
   FormCompany: FormCompany;
   Recipient: Recipient;
   Transporter: Transporter;
   DateTime: Scalars['DateTime'];
   WasteDetails: WasteDetails;
-  Packagings: Packagings;
   Int: Scalars['Int'];
   Float: Scalars['Float'];
-  QuantityType: QuantityType;
-  Consistence: Consistence;
   Trader: Trader;
-  FormStatus: FormStatus;
   NextDestination: NextDestination;
   EcoOrganisme: EcoOrganisme;
   TemporaryStorageDetail: TemporaryStorageDetail;
@@ -2267,31 +2267,22 @@ export type ResolversParentTypes = {
   Destination: Destination;
   StateSummary: StateSummary;
   TransportSegment: TransportSegment;
-  TransportMode: TransportMode;
   CompanyPublic: CompanyPublic;
   Installation: Installation;
   Rubrique: Rubrique;
-  WasteType: WasteType;
   Declaration: Declaration;
-  GerepType: GerepType;
   TransporterReceipt: TransporterReceipt;
   TraderReceipt: TraderReceipt;
-  FavoriteType: FavoriteType;
   CompanyFavorite: CompanyFavorite;
   FileDownload: FileDownload;
-  FormRole: FormRole;
   formsLifeCycleData: FormsLifeCycleData;
   StatusLog: StatusLog;
   JSON: Scalars['JSON'];
   StatusLogForm: StatusLogForm;
   StatusLogUser: StatusLogUser;
-  FormsRegisterExportType: FormsRegisterExportType;
-  FormsRegisterExportFormat: FormsRegisterExportFormat;
   Invitation: Invitation;
-  UserRole: UserRole;
   User: User;
   CompanyPrivate: CompanyPrivate;
-  CompanyType: CompanyType;
   CompanyMember: CompanyMember;
   CompanySearchResult: CompanySearchResult;
   CompanyStat: CompanyStat;
@@ -2319,7 +2310,6 @@ export type ResolversParentTypes = {
   ImportPaperFormInput: ImportPaperFormInput;
   SignatureFormInput: SignatureFormInput;
   ReceivedFormInput: ReceivedFormInput;
-  WasteAcceptationStatusInput: WasteAcceptationStatusInput;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
   InternationalCompanyInput: InternationalCompanyInput;
@@ -2342,7 +2332,7 @@ export type ResolversParentTypes = {
 export type AuthPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuthPayload'] = ResolversParentTypes['AuthPayload']> = {
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CompanyFavoriteResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyFavorite'] = ResolversParentTypes['CompanyFavorite']> = {
@@ -2354,7 +2344,7 @@ export type CompanyFavoriteResolvers<ContextType = GraphQLContext, ParentType ex
   mail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CompanyMemberResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyMember'] = ResolversParentTypes['CompanyMember']> = {
@@ -2365,7 +2355,7 @@ export type CompanyMemberResolvers<ContextType = GraphQLContext, ParentType exte
   isActive?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   isPendingInvitation?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   isMe?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CompanyPrivateResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyPrivate'] = ResolversParentTypes['CompanyPrivate']> = {
@@ -2387,7 +2377,7 @@ export type CompanyPrivateResolvers<ContextType = GraphQLContext, ParentType ext
   installation?: Resolver<Maybe<ResolversTypes['Installation']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CompanyPublicResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyPublic'] = ResolversParentTypes['CompanyPublic']> = {
@@ -2404,7 +2394,7 @@ export type CompanyPublicResolvers<ContextType = GraphQLContext, ParentType exte
   isRegistered?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CompanySearchResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanySearchResult'] = ResolversParentTypes['CompanySearchResult']> = {
@@ -2419,13 +2409,13 @@ export type CompanySearchResultResolvers<ContextType = GraphQLContext, ParentTyp
   installation?: Resolver<Maybe<ResolversTypes['Installation']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CompanyStatResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyStat'] = ResolversParentTypes['CompanyStat']> = {
   company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
   stats?: Resolver<Array<ResolversTypes['Stat']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
@@ -2437,7 +2427,7 @@ export type DeclarationResolvers<ContextType = GraphQLContext, ParentType extend
   codeDechet?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   libDechet?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   gerepType?: Resolver<Maybe<ResolversTypes['GerepType']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type DestinationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Destination'] = ResolversParentTypes['Destination']> = {
@@ -2445,7 +2435,7 @@ export type DestinationResolvers<ContextType = GraphQLContext, ParentType extend
   processingOperation?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
   isFilledByEmitter?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type EcoOrganismeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EcoOrganisme'] = ResolversParentTypes['EcoOrganisme']> = {
@@ -2453,7 +2443,7 @@ export type EcoOrganismeResolvers<ContextType = GraphQLContext, ParentType exten
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   siret?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type EmitterResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Emitter'] = ResolversParentTypes['Emitter']> = {
@@ -2461,13 +2451,13 @@ export type EmitterResolvers<ContextType = GraphQLContext, ParentType extends Re
   workSite?: Resolver<Maybe<ResolversTypes['WorkSite']>, ParentType, ContextType>;
   pickupSite?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type FileDownloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['FileDownload'] = ResolversParentTypes['FileDownload']> = {
   token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   downloadLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type FormResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Form'] = ResolversParentTypes['Form']> = {
@@ -2506,7 +2496,7 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   transportSegments?: Resolver<Maybe<Array<ResolversTypes['TransportSegment']>>, ParentType, ContextType>;
   currentTransporterSiret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   nextTransporterSiret?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type FormCompanyResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['FormCompany'] = ResolversParentTypes['FormCompany']> = {
@@ -2517,7 +2507,7 @@ export type FormCompanyResolvers<ContextType = GraphQLContext, ParentType extend
   contact?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type FormsLifeCycleDataResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['formsLifeCycleData'] = ResolversParentTypes['formsLifeCycleData']> = {
@@ -2527,7 +2517,7 @@ export type FormsLifeCycleDataResolvers<ContextType = GraphQLContext, ParentType
   startCursor?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   endCursor?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type FormSubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['FormSubscription'] = ResolversParentTypes['FormSubscription']> = {
@@ -2535,7 +2525,7 @@ export type FormSubscriptionResolvers<ContextType = GraphQLContext, ParentType e
   node?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType>;
   updatedFields?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   previousValues?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type InstallationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Installation'] = ResolversParentTypes['Installation']> = {
@@ -2543,7 +2533,7 @@ export type InstallationResolvers<ContextType = GraphQLContext, ParentType exten
   urlFiche?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   rubriques?: Resolver<Maybe<Array<ResolversTypes['Rubrique']>>, ParentType, ContextType>;
   declarations?: Resolver<Maybe<Array<ResolversTypes['Declaration']>>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type InvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Invitation'] = ResolversParentTypes['Invitation']> = {
@@ -2553,7 +2543,7 @@ export type InvitationResolvers<ContextType = GraphQLContext, ParentType extends
   hash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
   acceptedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
@@ -2605,7 +2595,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 export type NextDestinationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['NextDestination'] = ResolversParentTypes['NextDestination']> = {
   processingOperation?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -2630,7 +2620,7 @@ export type RecipientResolvers<ContextType = GraphQLContext, ParentType extends 
   processingOperation?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   company?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
   isTempStorage?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type RubriqueResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Rubrique'] = ResolversParentTypes['Rubrique']> = {
@@ -2643,14 +2633,14 @@ export type RubriqueResolvers<ContextType = GraphQLContext, ParentType extends R
   volume?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   unite?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   wasteType?: Resolver<Maybe<ResolversTypes['WasteType']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type StatResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Stat'] = ResolversParentTypes['Stat']> = {
   wasteCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   incoming?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   outgoing?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type StateSummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StateSummary'] = ResolversParentTypes['StateSummary']> = {
@@ -2663,7 +2653,7 @@ export type StateSummaryResolvers<ContextType = GraphQLContext, ParentType exten
   recipient?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
   emitter?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
   lastActionOn?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type StatusLogResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StatusLog'] = ResolversParentTypes['StatusLog']> = {
@@ -2673,19 +2663,19 @@ export type StatusLogResolvers<ContextType = GraphQLContext, ParentType extends 
   updatedFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   form?: Resolver<Maybe<ResolversTypes['StatusLogForm']>, ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['StatusLogUser']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type StatusLogFormResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StatusLogForm'] = ResolversParentTypes['StatusLogForm']> = {
   id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   readableId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type StatusLogUserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StatusLogUser'] = ResolversParentTypes['StatusLogUser']> = {
   id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
@@ -2699,7 +2689,7 @@ export type TemporaryStorageDetailResolvers<ContextType = GraphQLContext, Parent
   transporter?: Resolver<Maybe<ResolversTypes['Transporter']>, ParentType, ContextType>;
   signedBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   signedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TemporaryStorerResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TemporaryStorer'] = ResolversParentTypes['TemporaryStorer']> = {
@@ -2709,7 +2699,7 @@ export type TemporaryStorerResolvers<ContextType = GraphQLContext, ParentType ex
   wasteRefusalReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   receivedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   receivedBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TraderResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Trader'] = ResolversParentTypes['Trader']> = {
@@ -2717,7 +2707,7 @@ export type TraderResolvers<ContextType = GraphQLContext, ParentType extends Res
   receipt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   department?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   validityLimit?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TraderReceiptResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TraderReceipt'] = ResolversParentTypes['TraderReceipt']> = {
@@ -2725,7 +2715,7 @@ export type TraderReceiptResolvers<ContextType = GraphQLContext, ParentType exte
   receiptNumber?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   validityLimit?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   department?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TransporterResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Transporter'] = ResolversParentTypes['Transporter']> = {
@@ -2736,7 +2726,7 @@ export type TransporterResolvers<ContextType = GraphQLContext, ParentType extend
   validityLimit?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   numberPlate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   customInfo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TransporterReceiptResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TransporterReceipt'] = ResolversParentTypes['TransporterReceipt']> = {
@@ -2744,7 +2734,7 @@ export type TransporterReceiptResolvers<ContextType = GraphQLContext, ParentType
   receiptNumber?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   validityLimit?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   department?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TransportSegmentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TransportSegment'] = ResolversParentTypes['TransportSegment']> = {
@@ -2756,13 +2746,13 @@ export type TransportSegmentResolvers<ContextType = GraphQLContext, ParentType e
   takenOverBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   readyToTakeOver?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   segmentNumber?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UploadLinkResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UploadLink'] = ResolversParentTypes['UploadLink']> = {
   signedUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   key?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -2771,7 +2761,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   companies?: Resolver<Maybe<Array<ResolversTypes['CompanyPrivate']>>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type WasteDetailsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['WasteDetails'] = ResolversParentTypes['WasteDetails']> = {
@@ -2784,7 +2774,7 @@ export type WasteDetailsResolvers<ContextType = GraphQLContext, ParentType exten
   quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   quantityType?: Resolver<Maybe<ResolversTypes['QuantityType']>, ParentType, ContextType>;
   consistence?: Resolver<Maybe<ResolversTypes['Consistence']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type WorkSiteResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['WorkSite'] = ResolversParentTypes['WorkSite']> = {
@@ -2793,7 +2783,7 @@ export type WorkSiteResolvers<ContextType = GraphQLContext, ParentType extends R
   city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   postalCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   infos?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = GraphQLContext> = {

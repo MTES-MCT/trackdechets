@@ -7,6 +7,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -62,7 +64,7 @@ describe("Mutation.createForm", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(CREATE_FORM, {
       variables: { createFormInput: {} }
     });
 
@@ -80,7 +82,7 @@ describe("Mutation.createForm", () => {
     const user = await userFactory();
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(CREATE_FORM, {
       variables: {
         createFormInput: {
           emitter: {
@@ -109,7 +111,9 @@ describe("Mutation.createForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate(CREATE_FORM, {
+      const { data } = await mutate<
+        ExecutionResult<Pick<Mutation, "createForm">>
+      >(CREATE_FORM, {
         variables: {
           createFormInput: {
             [role]: {
@@ -133,7 +137,9 @@ describe("Mutation.createForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createForm">>
+    >(CREATE_FORM, {
       variables: {
         createFormInput: {
           ecoOrganisme: { id: eo.id }
@@ -158,7 +164,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(CREATE_FORM, {
       variables: {
         createFormInput
       }
@@ -193,7 +199,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<ExecutionResult>(CREATE_FORM, {
       variables: { createFormInput }
     });
 
@@ -226,7 +232,9 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createForm">>
+    >(CREATE_FORM, {
       variables: { createFormInput }
     });
 
@@ -239,7 +247,9 @@ describe("Mutation.createForm", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createForm">>
+    >(CREATE_FORM, {
       variables: {
         createFormInput: {
           emitter: {
@@ -260,7 +270,7 @@ describe("Mutation.createForm", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<ExecutionResult>(CREATE_FORM, {
       variables: {
         createFormInput: {
           emitter: {
@@ -300,7 +310,9 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createForm">>
+    >(CREATE_FORM, {
       variables: {
         createFormInput
       }
@@ -323,7 +335,7 @@ describe("Mutation.createForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const { mutate } = makeClient(user);
-      const { errors } = await mutate(CREATE_FORM, {
+      const { errors } = await mutate<ExecutionResult>(CREATE_FORM, {
         variables: {
           createFormInput: {
             emitter: {
@@ -377,7 +389,9 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate(CREATE_FORM, {
+    const { data, errors } = await mutate<
+      ExecutionResult<Pick<Mutation, "createForm">>
+    >(CREATE_FORM, {
       variables: {
         createFormInput
       }

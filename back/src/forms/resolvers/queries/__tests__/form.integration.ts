@@ -10,6 +10,8 @@ import {
   FormCreateInput,
   Form as PrismaForm
 } from "../../../../generated/prisma-client";
+import { ExecutionResult } from "graphql";
+import { Query } from "../../../../generated/graphql/types";
 
 const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {
@@ -41,11 +43,14 @@ describe("Query.form", () => {
       });
 
       const { query } = makeClient(user);
-      const { data } = await query(GET_FORM_QUERY, {
-        variables: {
-          id: form.id
+      const { data } = await query<ExecutionResult<Pick<Query, "form">>>(
+        GET_FORM_QUERY,
+        {
+          variables: {
+            id: form.id
+          }
         }
-      });
+      );
 
       expect(data.form.id).toBe(form.id);
     }
@@ -61,11 +66,14 @@ describe("Query.form", () => {
     });
 
     const { query } = makeClient(user);
-    const { data } = await query(GET_FORM_QUERY, {
-      variables: {
-        id: form.id
+    const { data } = await query<ExecutionResult<Pick<Query, "form">>>(
+      GET_FORM_QUERY,
+      {
+        variables: {
+          id: form.id
+        }
       }
-    });
+    );
 
     expect(data.form.id).toBe(form.id);
   });
@@ -75,7 +83,7 @@ describe("Query.form", () => {
     const form = await createForm({});
 
     const { query } = makeClient(user);
-    const { errors } = await query(GET_FORM_QUERY, {
+    const { errors } = await query<ExecutionResult>(GET_FORM_QUERY, {
       variables: {
         id: form.id
       }
@@ -93,11 +101,14 @@ describe("Query.form", () => {
     });
 
     const { query } = makeClient(user);
-    const { data } = await query(GET_FORM_QUERY, {
-      variables: {
-        readableId: form.readableId
+    const { data } = await query<ExecutionResult<Pick<Query, "form">>>(
+      GET_FORM_QUERY,
+      {
+        variables: {
+          readableId: form.readableId
+        }
       }
-    });
+    );
 
     expect(data.form.id).toBe(form.id);
   });

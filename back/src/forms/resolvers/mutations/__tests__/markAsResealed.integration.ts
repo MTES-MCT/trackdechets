@@ -7,6 +7,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
 
 const MARK_AS_RESEALED = `
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!){
@@ -67,7 +68,7 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const { errors } = await mutate(MARK_AS_RESEALED, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_RESEALED, {
       variables: {
         id: form.id,
         resealedInfos: {}

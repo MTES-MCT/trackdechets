@@ -1,5 +1,7 @@
 import { createTestClient } from "apollo-server-integration-testing";
+import { ExecutionResult } from "graphql";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Query } from "../../../../generated/graphql/types";
 import { prisma } from "../../../../generated/prisma-client";
 import { server } from "../../../../server";
 import {
@@ -421,7 +423,7 @@ describe("Integration / Forms query for transporters", () => {
     // the transporter makes the query
 
     const { query } = makeClient(transporter);
-    const { data } = await query(
+    const { data } = await query<ExecutionResult<Pick<Query, "forms">>>(
       `query {
           forms(siret: "${transporterSiret}", roles: [TRANSPORTER]) {
             id
@@ -460,7 +462,7 @@ describe("Integration / Forms query for transporters", () => {
     // the transporter makes the query
 
     const { query } = makeClient(transporter);
-    const { data } = await query(
+    const { data } = await query<ExecutionResult<Pick<Query, "forms">>>(
       `query {
           forms(siret: "${transporterSiret}", roles: [TRANSPORTER]) {
             id

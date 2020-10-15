@@ -3,6 +3,8 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_UPLOAD_LINK = `
   mutation CreateUploadLink($fileName: String!, $fileType: String!){
@@ -20,7 +22,7 @@ describe("createUploadLink", () => {
   it("should throw UserInputException if file format is not supported", async () => {
     const user = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { errors } = await mutate(CREATE_UPLOAD_LINK, {
+    const { errors } = await mutate<ExecutionResult>(CREATE_UPLOAD_LINK, {
       variables: { fileName: "awesome video", fileType: "video/mpeg" }
     });
     expect(errors).toHaveLength(1);
@@ -31,7 +33,9 @@ describe("createUploadLink", () => {
   it("should return a signed url", async () => {
     const user = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_UPLOAD_LINK, {
+    const { data } = await mutate<
+      ExecutionResult<Pick<Mutation, "createUploadLink">>
+    >(CREATE_UPLOAD_LINK, {
       variables: { fileName: "awesome pdf", fileType: "application/pdf" }
     });
     expect(getPutSignedUrlSpy).toHaveBeenCalledTimes(1);

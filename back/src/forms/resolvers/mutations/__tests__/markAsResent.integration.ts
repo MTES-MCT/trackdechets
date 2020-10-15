@@ -7,6 +7,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
 
 const MARK_AS_RESENT = `
   mutation MarkAsResent($id: ID!, $resentInfos: ResentFormInput!){
@@ -34,7 +35,7 @@ describe("Mutation markAsResent", () => {
       }
     });
 
-    const { errors } = await mutate(MARK_AS_RESENT, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_RESENT, {
       variables: {
         id: form.id,
         resentInfos: {
@@ -100,7 +101,7 @@ describe("Mutation markAsResent", () => {
       }
     });
 
-    const { errors } = await mutate(MARK_AS_RESENT, {
+    const { errors } = await mutate<ExecutionResult>(MARK_AS_RESENT, {
       variables: {
         id: form.id,
         resentInfos: {

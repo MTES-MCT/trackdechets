@@ -8,6 +8,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
 
 describe("mutation deleteInvitation", () => {
   afterEach(resetDatabase);
@@ -55,7 +56,7 @@ describe("mutation deleteInvitation", () => {
           }
         }
       `;
-    const { errors } = await mutate(mutation);
+    const { errors } = await mutate<ExecutionResult>(mutation);
     expect(errors).toHaveLength(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     expect(errors[0].message).toEqual("Cette invitation n'existe pas");

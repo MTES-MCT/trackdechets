@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { CompanyRow } from "./types";
 import { getCompanyThrottled } from "./sirene";
-import { prisma } from "../../generated/prisma-client";
+import { CompanyType, prisma } from "../../generated/prisma-client";
 
 const COMPANY_TYPES = [
   "PRODUCER",
@@ -54,12 +54,16 @@ export const companyValidationSchema = yup.object().shape({
     .ensure()
     .compact()
     .required()
-    .test("is-companyType", "${value} is not a valid company type", value => {
-      const isCompanyType = value.reduce((acc: boolean, curr: string) => {
-        return acc && COMPANY_TYPES.includes(curr);
-      }, true);
-      return isCompanyType;
-    }),
+    .test(
+      "is-companyType",
+      "${value} is not a valid company type",
+      (value: CompanyType[]) => {
+        const isCompanyType = value.reduce<boolean>((acc, curr) => {
+          return acc && COMPANY_TYPES.includes(curr);
+        }, true);
+        return isCompanyType;
+      }
+    ),
   givenName: yup.string().notRequired(),
   contactEmail: yup.string().notRequired().email(),
   contactPhone: yup

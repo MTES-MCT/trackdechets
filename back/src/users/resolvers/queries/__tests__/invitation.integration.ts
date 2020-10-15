@@ -1,4 +1,6 @@
+import { ExecutionResult } from "graphql";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Query } from "../../../../generated/graphql/types";
 import { prisma } from "../../../../generated/prisma-client";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -24,9 +26,12 @@ describe("query / invitation", () => {
       hash: "azerty",
       role: "MEMBER"
     });
-    const { data } = await query(INVITATION, {
-      variables: { hash: userAccountHash.hash }
-    });
+    const { data } = await query<ExecutionResult<Pick<Query, "invitation">>>(
+      INVITATION,
+      {
+        variables: { hash: userAccountHash.hash }
+      }
+    );
     expect(data.invitation.email).toEqual(userAccountHash.email);
     expect(data.invitation.companySiret).toEqual(userAccountHash.companySiret);
     expect(data.invitation.role).toEqual(userAccountHash.role);
@@ -35,7 +40,7 @@ describe("query / invitation", () => {
 
   it("should return error if invitation does not exist", async () => {
     const { query } = makeClient();
-    const { errors } = await query(INVITATION, {
+    const { errors } = await query<ExecutionResult>(INVITATION, {
       variables: { hash: "does_not_exist" }
     });
     expect(errors).toHaveLength(1);

@@ -1,6 +1,8 @@
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "../../../../generated/prisma-client";
+import { ExecutionResult } from "graphql";
+import { Mutation } from "../../../../generated/graphql/types";
 
 describe("{ mutation { login } }", () => {
   it("should return a token", async () => {
@@ -14,7 +16,9 @@ describe("{ mutation { login } }", () => {
         }
       }
     `;
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<ExecutionResult<Pick<Mutation, "login">>>(
+      mutation
+    );
     expect(data.login.token).toHaveLength(40);
     // should have created an accessToken in db
     const accessToken = await prisma.accessToken({

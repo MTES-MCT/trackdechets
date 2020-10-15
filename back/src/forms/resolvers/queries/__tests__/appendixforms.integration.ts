@@ -6,6 +6,8 @@ import {
 } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
+import { ExecutionResult } from "graphql";
+import { Query } from "../../../../generated/graphql/types";
 
 const buildQuery = siret =>
   `query { appendixForms (siret: "${siret}") { id } } `;
@@ -60,7 +62,9 @@ describe("Test appendixForms", () => {
     const { query } = makeClient(recipient);
     const {
       data: { appendixForms }
-    } = await query(buildQuery(recipientCompany.siret));
+    } = await query<ExecutionResult<Pick<Query, "appendixForms">>>(
+      buildQuery(recipientCompany.siret)
+    );
 
     expect(appendixForms.length).toBe(1);
     expect(appendixForms[0].id).toBe(form.id);
@@ -89,7 +93,9 @@ describe("Test appendixForms", () => {
     // the queried siret is not recipientCompanySiret, result should be null
 
     const { query } = makeClient(recipient);
-    const { data, errors } = await query(buildQuery(emitterCompany.siret));
+    const { data, errors } = await query<
+      ExecutionResult<Pick<Query, "appendixForms">>
+    >(buildQuery(emitterCompany.siret));
     expect(errors).toHaveLength(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
     expect(data).toBe(null);
