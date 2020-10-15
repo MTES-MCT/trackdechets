@@ -117,6 +117,23 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
     </OutsideClickHandler>
   );
 };
+
+const ActionButton = ({ onClick, icon, title }) => (
+  <div className="dynamic-action">
+    <button
+      className="btn btn--primary btn--slim btn--auto-height"
+      onClick={onClick}
+      title={title}
+    >
+      <span className="dynamic-action__content">
+        {icon({ size: 24 })}
+        <span className="dynamic-action__text">{title}</span>
+      </span>
+    </button>
+    <span className="dynamic-action__caption">{title}</span>
+  </div>
+);
+
 interface DynamicActionsProps extends SlipActionsProps {
   siret: string;
   refetch?: () => void;
@@ -133,7 +150,9 @@ export function DynamicActions({ form, siret, refetch }: DynamicActionsProps) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [mark, { error }] = useMutation(dynamicMutation, {
-    onCompleted: () => !!refetch && refetch(),
+    onCompleted: () => {
+      !!refetch && refetch();
+    },
   });
 
   useEffect(() => {
@@ -148,19 +167,11 @@ export function DynamicActions({ form, siret, refetch }: DynamicActionsProps) {
 
   return (
     <div className="SlipActions">
-      <button
-        className="btn btn--primary"
-        onClick={() => setIsOpen(true)}
+      <ActionButton
         title={buttons[nextStep].title}
-      >
-        <span className="dynamic-action">
-          {buttons[nextStep].icon({ size: 24 })}
-
-          <span className="dynamic-action__text">
-            {buttons[nextStep].title}
-          </span>
-        </span>
-      </button>
+        icon={buttons[nextStep].icon}
+        onClick={() => setIsOpen(true)}
+      />
 
       <TdModal
         isOpen={isOpen}
@@ -171,9 +182,7 @@ export function DynamicActions({ form, siret, refetch }: DynamicActionsProps) {
         {ButtonComponent && (
           <ButtonComponent
             onCancel={() => setIsOpen(false)}
-            onSubmit={vars => {
-              mark({ variables: { id: form.id, ...vars } });
-            }}
+            onSubmit={vars => mark({ variables: { id: form.id, ...vars } })}
             form={form}
           />
         )}

@@ -130,8 +130,8 @@
 .headerNavItem {
   display: flex;
   flex-direction: row;
-  margin-right: 0.75rem;
-  margin-left: 1rem;
+  margin-right: 0.5rem;
+  margin-left: 0.25rem;
   align-items: center;
   border-bottom: 1px solid $grey-light;
   &NoBorder {
@@ -141,6 +141,10 @@
     flex-direction: column;
     border: none;
     justify-content: center;
+  }
+  @include lg-desktop {
+    margin-right: 0.75rem;
+    margin-left: 1rem;
   }
 }
 
@@ -197,8 +201,16 @@
 .headerSignup {
   display: flex;
   margin: 1rem auto 0.5rem;
+
   @include desktop {
     margin: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  @include lg-desktop {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
   & span {
     white-space: nowrap;

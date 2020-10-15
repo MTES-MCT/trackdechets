@@ -51,7 +51,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
 
   if (!forms.length) {
     return (
-      <div className="notification error">
+      <div className="notification notification--error">
         Vous n'avez actuellement aucun bordereau qui peut être inclus dans ce
         regroupement.{" "}
         {wasteCode && (
