@@ -3,11 +3,12 @@
 .dashboard-content {
   flex: 1;
   padding-bottom: 80px; //prevent crispr icon to overlap slips list
-  width: calc(100vw - 210px);
-  max-width: calc(100vw - 210px);
+ 
   overflow-x: scroll;
-
+  width: 100%;
+  max-width: 100%;
   @include lg-desktop {
-    width: 100%;
+    width: calc(100vw - 210px);
+    max-width: calc(100vw - 210px);
   }
 }
