@@ -4,10 +4,15 @@ import { SlipActionProps } from "./SlipActions";
 
 export default function Sealed(props: SlipActionProps) {
   function onSubmit() {
-    cogoToast.success(
-      `Le numéro #${props.form.readableId} a été affecté au bordereau`
-    );
-    props.onSubmit({});
+    props
+      .onSubmit({})
+      .then(res =>
+        console.log(
+          cogoToast.success(
+            `Le numéro #${props.form.readableId} a été affecté au bordereau`
+          )
+        )
+      );
   }
 
   return (
