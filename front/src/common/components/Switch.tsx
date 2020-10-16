@@ -1,22 +1,19 @@
 import React, { useState } from "react";
-import Switch from "react-switch";
+import ReactSwitch, { ReactSwitchProps } from "react-switch";
 import { v4 as uuidv4 } from "uuid";
 import "./Switch.scss";
-export default function TdSwitch({
-  onChange,
-  checked,
-  label,
-}: {
-  onChange: () => void;
-  checked: boolean;
+
+interface SwitchProps extends ReactSwitchProps {
   label: string;
-}) {
+}
+
+export default function Switch({ label, ...props }: SwitchProps) {
   const [uniqId] = useState(() => uuidv4());
+
   return (
     <div className="switch__container">
-      <Switch
-        onChange={() => onChange()}
-        checked={checked}
+      <ReactSwitch
+        {...props}
         uncheckedIcon={false}
         checkedIcon={false}
         boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"

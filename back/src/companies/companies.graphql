@@ -1,3 +1,8 @@
+"""
+Chaîne de caractère au format URL, débutant par un protocole http(s).
+"""
+scalar URL
+
 type Query {
   """
   Renvoie des informations publiques sur un établissement
@@ -48,6 +53,9 @@ enum CompanyType {
 
   "Négociant"
   TRADER
+
+  "Éco-organisme"
+  ECO_ORGANISME
 }
 
 "Information sur un établissement accessible par un utilisateur membre"
@@ -115,6 +123,11 @@ type CompanyPrivate {
   Récépissé négociant (le cas échéant, pour les profils transporteur)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]!
 }
 
 "Information sur un établissement accessible publiquement"
@@ -166,6 +179,11 @@ type CompanyPublic {
   Récépissé négociant associé à cet établissement (le cas échant)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]!
 }
 
 "Information sur un établissement accessible publiquement en recherche"

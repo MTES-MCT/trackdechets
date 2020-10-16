@@ -463,6 +463,7 @@ type Company {
   contactPhone: String
   website: String
   documentKeys: [String!]!
+  ecoOrganismeAgreements: [String!]!
   transporterReceipt: TransporterReceipt
   traderReceipt: TraderReceipt
 }
@@ -648,6 +649,10 @@ input CompanyCreatedocumentKeysInput {
   set: [String!]
 }
 
+input CompanyCreateecoOrganismeAgreementsInput {
+  set: [String!]
+}
+
 input CompanyCreateInput {
   id: ID
   siret: String!
@@ -661,6 +666,7 @@ input CompanyCreateInput {
   contactPhone: String
   website: String
   documentKeys: CompanyCreatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyCreateecoOrganismeAgreementsInput
   transporterReceipt: TransporterReceiptCreateOneInput
   traderReceipt: TraderReceiptCreateOneInput
 }
@@ -717,6 +723,7 @@ type CompanyPreviousValues {
   contactPhone: String
   website: String
   documentKeys: [String!]!
+  ecoOrganismeAgreements: [String!]!
 }
 
 type CompanySubscriptionPayload {
@@ -745,6 +752,7 @@ enum CompanyType {
   WASTE_VEHICLES
   WASTE_CENTER
   TRADER
+  ECO_ORGANISME
 }
 
 input CompanyUpdatecompanyTypesInput {
@@ -763,11 +771,16 @@ input CompanyUpdateDataInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyUpdateecoOrganismeAgreementsInput
   transporterReceipt: TransporterReceiptUpdateOneInput
   traderReceipt: TraderReceiptUpdateOneInput
 }
 
 input CompanyUpdatedocumentKeysInput {
+  set: [String!]
+}
+
+input CompanyUpdateecoOrganismeAgreementsInput {
   set: [String!]
 }
 
@@ -783,6 +796,7 @@ input CompanyUpdateInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyUpdateecoOrganismeAgreementsInput
   transporterReceipt: TransporterReceiptUpdateOneInput
   traderReceipt: TraderReceiptUpdateOneInput
 }
@@ -799,6 +813,7 @@ input CompanyUpdateManyMutationInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyUpdateecoOrganismeAgreementsInput
 }
 
 input CompanyUpdateOneRequiredInput {
@@ -1434,6 +1449,8 @@ type Form {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganisme
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
   temporaryStorageDetail: TemporaryStorageDetail
   transportSegments(where: TransportSegmentWhereInput, orderBy: TransportSegmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TransportSegment!]
@@ -1531,6 +1548,8 @@ input FormCreateInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
   temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
   transportSegments: TransportSegmentCreateManyWithoutFormInput
@@ -1642,6 +1661,8 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
   transportSegments: TransportSegmentCreateManyWithoutFormInput
   currentTransporterSiret: String
@@ -1732,6 +1753,8 @@ input FormCreateWithoutTransportSegmentsInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
   temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
   currentTransporterSiret: String
@@ -1910,6 +1933,10 @@ enum FormOrderByInput {
   traderDepartment_DESC
   traderValidityLimit_ASC
   traderValidityLimit_DESC
+  ecoOrganismeName_ASC
+  ecoOrganismeName_DESC
+  ecoOrganismeSiret_ASC
+  ecoOrganismeSiret_DESC
   currentTransporterSiret_ASC
   currentTransporterSiret_DESC
   nextTransporterSiret_ASC
@@ -2000,6 +2027,8 @@ type FormPreviousValues {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   currentTransporterSiret: String
   nextTransporterSiret: String
 }
@@ -2969,6 +2998,34 @@ input FormScalarWhereInput {
   traderValidityLimit_lte: DateTime
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeName_not: String
+  ecoOrganismeName_in: [String!]
+  ecoOrganismeName_not_in: [String!]
+  ecoOrganismeName_lt: String
+  ecoOrganismeName_lte: String
+  ecoOrganismeName_gt: String
+  ecoOrganismeName_gte: String
+  ecoOrganismeName_contains: String
+  ecoOrganismeName_not_contains: String
+  ecoOrganismeName_starts_with: String
+  ecoOrganismeName_not_starts_with: String
+  ecoOrganismeName_ends_with: String
+  ecoOrganismeName_not_ends_with: String
+  ecoOrganismeSiret: String
+  ecoOrganismeSiret_not: String
+  ecoOrganismeSiret_in: [String!]
+  ecoOrganismeSiret_not_in: [String!]
+  ecoOrganismeSiret_lt: String
+  ecoOrganismeSiret_lte: String
+  ecoOrganismeSiret_gt: String
+  ecoOrganismeSiret_gte: String
+  ecoOrganismeSiret_contains: String
+  ecoOrganismeSiret_not_contains: String
+  ecoOrganismeSiret_starts_with: String
+  ecoOrganismeSiret_not_starts_with: String
+  ecoOrganismeSiret_ends_with: String
+  ecoOrganismeSiret_not_ends_with: String
   currentTransporterSiret: String
   currentTransporterSiret_not: String
   currentTransporterSiret_in: [String!]
@@ -3103,6 +3160,8 @@ input FormUpdateDataInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
   transportSegments: TransportSegmentUpdateManyWithoutFormInput
@@ -3193,6 +3252,8 @@ input FormUpdateInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
   transportSegments: TransportSegmentUpdateManyWithoutFormInput
@@ -3281,6 +3342,8 @@ input FormUpdateManyDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   currentTransporterSiret: String
   nextTransporterSiret: String
 }
@@ -3378,6 +3441,8 @@ input FormUpdateManyMutationInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   currentTransporterSiret: String
   nextTransporterSiret: String
 }
@@ -3493,6 +3558,8 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   transportSegments: TransportSegmentUpdateManyWithoutFormInput
   currentTransporterSiret: String
@@ -3582,6 +3649,8 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
   currentTransporterSiret: String
@@ -4581,6 +4650,34 @@ input FormWhereInput {
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
   ecoOrganisme: EcoOrganismeWhereInput
+  ecoOrganismeName: String
+  ecoOrganismeName_not: String
+  ecoOrganismeName_in: [String!]
+  ecoOrganismeName_not_in: [String!]
+  ecoOrganismeName_lt: String
+  ecoOrganismeName_lte: String
+  ecoOrganismeName_gt: String
+  ecoOrganismeName_gte: String
+  ecoOrganismeName_contains: String
+  ecoOrganismeName_not_contains: String
+  ecoOrganismeName_starts_with: String
+  ecoOrganismeName_not_starts_with: String
+  ecoOrganismeName_ends_with: String
+  ecoOrganismeName_not_ends_with: String
+  ecoOrganismeSiret: String
+  ecoOrganismeSiret_not: String
+  ecoOrganismeSiret_in: [String!]
+  ecoOrganismeSiret_not_in: [String!]
+  ecoOrganismeSiret_lt: String
+  ecoOrganismeSiret_lte: String
+  ecoOrganismeSiret_gt: String
+  ecoOrganismeSiret_gte: String
+  ecoOrganismeSiret_contains: String
+  ecoOrganismeSiret_not_contains: String
+  ecoOrganismeSiret_starts_with: String
+  ecoOrganismeSiret_not_starts_with: String
+  ecoOrganismeSiret_ends_with: String
+  ecoOrganismeSiret_not_ends_with: String
   appendix2Forms_every: FormWhereInput
   appendix2Forms_some: FormWhereInput
   appendix2Forms_none: FormWhereInput

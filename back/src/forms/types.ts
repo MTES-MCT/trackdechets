@@ -1,7 +1,6 @@
 import {
   Form,
   User,
-  EcoOrganisme,
   TemporaryStorageDetail,
   TransportSegment
 } from "../generated/prisma-client";
@@ -9,8 +8,8 @@ import {
 /**
  * A Prisma Form with linked objects
  */
-export type FullForm = Form & { owner: User } & {
-  ecoOrganisme: EcoOrganisme;
-} & {
+export interface FullForm extends Form {
+  owner: User;
   temporaryStorage: TemporaryStorageDetail;
-} & { transportSegments: TransportSegment[] };
+  transportSegments: TransportSegment[];
+}

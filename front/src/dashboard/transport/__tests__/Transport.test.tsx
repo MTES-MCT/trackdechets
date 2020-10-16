@@ -140,13 +140,11 @@ describe("<Transport />", () => {
           )
         );
         fireEvent.click(
-          screen.getByText("Signer par le transporteur").closest("button")
+          screen.getByText("Signer par le transporteur").closest("button")!
         );
 
         await waitForElement(() =>
-          screen.getByText(
-            (text, el) => !!/Signer par le producteur/i.test(text)
-          )
+          screen.getByText((text, el) => /Signer par le producteur/i.test(text))
         );
       });
 
@@ -231,13 +229,11 @@ describe("<Transport />", () => {
           )
         );
         fireEvent.click(
-          screen.getByText("Signer par le transporteur").closest("button")
+          screen.getByText("Signer par le transporteur").closest("button")!
         );
 
         await waitForElement(() =>
-          screen.getByText(
-            (text, el) => !!/Signer par le producteur/i.test(text)
-          )
+          screen.getByText((text, el) => /Signer par le producteur/i.test(text))
         );
       });
 
@@ -326,13 +322,11 @@ describe("<Transport />", () => {
         );
 
         fireEvent.click(
-          screen.getByText("Signer par le transporteur").closest("button")
+          screen.getByText("Signer par le transporteur").closest("button")!
         );
 
         await waitForElement(() =>
-          screen.getByText(
-            (text, el) => !!/Signer par le détenteur/i.test(text)
-          )
+          screen.getByText((text, el) => /Signer par le détenteur/i.test(text))
         );
       });
 

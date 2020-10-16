@@ -1,12 +1,7 @@
-import {
-  Form,
-  TemporaryStorageDetail,
-  EcoOrganisme
-} from "../../generated/prisma-client";
+import { Form, TemporaryStorageDetail } from "../../generated/prisma-client";
 
 export type FormExpanded = Partial<Form> & {
   temporaryStorageDetail?: Partial<TemporaryStorageDetail>;
-  ecoOrganisme?: Partial<EcoOrganisme>;
 };
 
 export type FormFlattened = Partial<Form> & {
@@ -23,7 +18,7 @@ export type FormFlattened = Partial<Form> & {
   temporaryStorageTransporterReceipt?: string;
   temporaryStorageTransporterValidityLimit?: string;
   temporaryStorageTransporterNumberPlate?: string;
-  ecoOrganismeName: string;
+  ecoOrganismeName?: string;
 };
 
 export type Column = {

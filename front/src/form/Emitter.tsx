@@ -11,11 +11,11 @@ export default function Emitter() {
   const { values, setFieldValue } = useFormikContext<Form>();
 
   const [lockEmitterType, setLockEmitterType] = useState(
-    values.ecoOrganisme?.id != null
+    values.ecoOrganisme?.siret != null
   );
 
   useEffect(() => {
-    if (values.ecoOrganisme?.id) {
+    if (values.ecoOrganisme?.siret) {
       setLockEmitterType(true);
       setFieldValue("emitter.type", "OTHER");
       return;

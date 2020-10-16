@@ -28,12 +28,6 @@ export class MissingTempStorageFlag extends UserInputError {
   }
 }
 
-export class EcoOrganismeNotFound extends UserInputError {
-  constructor(id: string) {
-    super(`L'éco-organisme avec l'identifiant "${id}" n'existe pas.`);
-  }
-}
-
 export class NotFormContributor extends ForbiddenError {
   constructor() {
     super(

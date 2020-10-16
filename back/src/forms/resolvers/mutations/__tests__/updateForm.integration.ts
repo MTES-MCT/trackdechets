@@ -37,7 +37,7 @@ const UPDATE_FORM = `
         }
       }
       ecoOrganisme {
-        id
+        siret
       }
     }
   }
@@ -136,20 +136,21 @@ describe("Mutation.updateForm", () => {
   );
 
   it("should allow an eco-organisme to update a form", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const eo = await prisma.createEcoOrganisme({
-      address: "an address",
-      name: "a name",
-      siret: company.siret
+    const { user, company: eo } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    await prisma.createEcoOrganisme({
+      address: "",
+      name: eo.name,
+      siret: eo.siret
     });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        ecoOrganisme: {
-          connect: {
-            id: eo.id
-          }
-        }
+        ecoOrganismeName: eo.name,
+        ecoOrganismeSiret: eo.siret
       }
     });
 
@@ -206,7 +207,8 @@ describe("Mutation.updateForm", () => {
     const updateFormInput = {
       id: form.id,
       ecoOrganisme: {
-        id: "does_not_exist"
+        name: "",
+        siret: "does_not_exist"
       }
     };
     const { mutate } = makeClient(user);
@@ -218,7 +220,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'éco-organisme avec l'identifiant "${updateFormInput.ecoOrganisme.id}" n'existe pas.`,
+        message: `L'éco-organisme avec le siret "${updateFormInput.ecoOrganisme.siret}" n'est pas reconnu.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -228,23 +230,33 @@ describe("Mutation.updateForm", () => {
 
   it("should update the eco-organisme", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const originalEO = await companyFactory({
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    await prisma.createEcoOrganisme({
+      address: "",
+      name: originalEO.name,
+      siret: originalEO.siret
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        ecoOrganisme: {
-          create: {
-            siret: "0".repeat(14),
-            address: "Original EO Address",
-            name: "Original EO Name"
-          }
-        }
+        ecoOrganismeName: originalEO.name,
+        ecoOrganismeSiret: originalEO.siret
       }
     });
-    const newEO = await prisma.createEcoOrganisme({
-      address: "New EO Address",
-      name: "New EO Name",
-      siret: "1".repeat(14)
+    const newEO = await companyFactory({
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    await prisma.createEcoOrganisme({
+      address: "",
+      name: newEO.name,
+      siret: newEO.siret
     });
 
     const { mutate } = makeClient(user);
@@ -253,28 +265,34 @@ describe("Mutation.updateForm", () => {
         updateFormInput: {
           id: form.id,
           ecoOrganisme: {
-            id: newEO.id
+            name: newEO.name,
+            siret: newEO.siret
           }
         }
       }
     });
 
-    expect(data.updateForm.ecoOrganisme.id).toBe(newEO.id);
+    expect(data.updateForm.ecoOrganisme.siret).toBe(newEO.siret);
   });
 
   it("should remove the eco-organisme", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const eo = await companyFactory({
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    await prisma.createEcoOrganisme({
+      address: "",
+      name: eo.name,
+      siret: eo.siret
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        ecoOrganisme: {
-          create: {
-            siret: "0".repeat(14),
-            address: "Original EO Address",
-            name: "Original EO Name"
-          }
-        }
+        ecoOrganismeName: eo.name,
+        ecoOrganismeSiret: eo.siret
       }
     });
 

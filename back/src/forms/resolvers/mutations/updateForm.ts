@@ -13,10 +13,7 @@ import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanReadUpdateDeleteForm } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import {
-  getFormOrFormNotFound,
-  getEcoOrganismeOrNotFound
-} from "../../database";
+import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema } from "../../validation";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -39,7 +36,6 @@ const updateFormResolver = async (
   const {
     id,
     appendix2Forms,
-    ecoOrganisme,
     temporaryStorageDetail,
     ...formContent
   } = updateFormInput;
@@ -58,22 +54,6 @@ const updateFormResolver = async (
 
   // Validate form input
   await draftFormSchema.validate(formUpdateInput);
-
-  // Link to registered eco organisme by id
-  if (ecoOrganisme) {
-    const validEcoOrganisme = await getEcoOrganismeOrNotFound(ecoOrganisme);
-    formUpdateInput.ecoOrganisme = { connect: { id: validEcoOrganisme.id } };
-  }
-
-  if (ecoOrganisme === null) {
-    const existingEcoOrganisme = await prisma.forms({
-      where: { id, ecoOrganisme: { id_not: null } }
-    });
-    if (existingEcoOrganisme && existingEcoOrganisme.length > 0) {
-      // Disconnect linked eco organisme object
-      formUpdateInput.ecoOrganisme = { disconnect: true };
-    }
-  }
 
   const isOrWillBeTempStorage =
     (existingForm.recipientIsTempStorage &&

@@ -65,7 +65,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     // BSD has already been sent, it must be a signature for frame 18
 
     // check security code is temp storer's
-    await checkSecurityCode(form.recipientCompanySiret, securityCode);
+    await checkSecurityCode([form.recipientCompanySiret], securityCode);
 
     const temporaryStorageDetail = await prisma
       .form({ id })
@@ -92,8 +92,11 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     return expandFormFromDb(resentForm);
   }
 
-  // check security code is producer's
-  await checkSecurityCode(form.emitterCompanySiret, securityCode);
+  // check security code is producer's or eco-organisme's (if there's one)
+  await checkSecurityCode(
+    [form.emitterCompanySiret, form.ecoOrganismeSiret].filter(Boolean),
+    signingInfo.securityCode
+  );
 
   const formUpdateInput = {
     signedByTransporter: true,

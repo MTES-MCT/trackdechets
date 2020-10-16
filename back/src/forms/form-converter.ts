@@ -21,6 +21,7 @@ import {
   FormStatus,
   WorkSite,
   FormCompany,
+  FormEcoOrganisme,
   NextDestination,
   FormInput,
   TemporaryStorageDetailInput,
@@ -34,7 +35,8 @@ import {
   RecipientInput,
   TraderInput,
   NextDestinationInput,
-  ImportPaperFormInput
+  ImportPaperFormInput,
+  EcoOrganismeInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -42,7 +44,7 @@ export function flattenObjectForDb(
   previousKeys = [],
   dbObject = {}
 ): Partial<PrismaForm> {
-  const relations = ["ecoOrganisme", "temporaryStorageDetail"];
+  const relations = ["temporaryStorageDetail"];
 
   Object.keys(input || {}).forEach(key => {
     if (relations.includes(key)) {
@@ -284,6 +286,13 @@ function flattenTraderInput(input: { trader?: TraderInput }) {
   };
 }
 
+function flattenEcoOrganismeInput(input: { ecoOrganisme?: EcoOrganismeInput }) {
+  return {
+    ecoOrganismeName: chain(input.ecoOrganisme, e => e.name),
+    ecoOrganismeSiret: chain(input.ecoOrganisme, e => e.siret)
+  };
+}
+
 function flattenNextDestinationInput(input: {
   nextDestination?: NextDestinationInput;
 }) {
@@ -325,6 +334,7 @@ export function flattenFormInput(
     | "transporter"
     | "wasteDetails"
     | "trader"
+    | "ecoOrganisme"
   >
 ): FormCreateInput | FormUpdateInput {
   return safeInput({
@@ -333,7 +343,8 @@ export function flattenFormInput(
     ...flattenRecipientInput(formInput),
     ...flattenTransporterInput(formInput),
     ...flattenWasteDetailsInput(formInput),
-    ...flattenTraderInput(formInput)
+    ...flattenTraderInput(formInput),
+    ...flattenEcoOrganismeInput(formInput)
   });
 }
 
@@ -363,6 +374,7 @@ export function flattenImportPaperFormInput(
     id,
     customId,
     ...flattenEmitterInput(rest),
+    ...flattenEcoOrganismeInput(rest),
     ...flattenRecipientInput(rest),
     ...flattenTransporterInput(rest),
     ...flattenWasteDetailsInput(rest),
@@ -480,6 +492,10 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       }),
       receipt: form.traderReceipt,
       validityLimit: form.traderValidityLimit
+    }),
+    ecoOrganisme: nullIfNoValues<FormEcoOrganisme>({
+      name: form.ecoOrganismeName,
+      siret: form.ecoOrganismeSiret
     }),
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,

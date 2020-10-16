@@ -11,14 +11,12 @@ import {
 } from "../../../generated/prisma-client";
 import {
   MutationCreateFormArgs,
-  ResolversParentTypes,
-  EcoOrganisme
+  ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { MissingTempStorageFlag, NotFormContributor } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
 import { GraphQLContext } from "../../../types";
-import { getEcoOrganismeOrNotFound } from "../../database";
 import { draftFormSchema } from "../../validation";
 
 const createFormResolver = async (
@@ -30,22 +28,16 @@ const createFormResolver = async (
 
   const {
     appendix2Forms,
-    ecoOrganisme,
     temporaryStorageDetail,
     ...formContent
   } = createFormInput;
 
-  let validEcoOrganisme: EcoOrganisme = null;
-
-  if (ecoOrganisme) {
-    validEcoOrganisme = await getEcoOrganismeOrNotFound(ecoOrganisme);
-  }
   const formInputSirets = [
     formContent.emitter?.company?.siret,
     formContent.recipient?.company?.siret,
     formContent.trader?.company?.siret,
     formContent.transporter?.company?.siret,
-    ...(validEcoOrganisme ? [validEcoOrganisme.siret] : [])
+    formContent.ecoOrganisme?.siret
   ];
 
   const userCompanies = await getUserCompanies(user.id);
@@ -63,13 +55,6 @@ const createFormResolver = async (
   };
 
   await draftFormSchema.validate(formCreateInput);
-
-  if (ecoOrganisme) {
-    // Connect with eco-organisme
-    formCreateInput.ecoOrganisme = {
-      connect: ecoOrganisme
-    };
-  }
 
   if (temporaryStorageDetail) {
     if (formContent.recipient?.isTempStorage !== true) {

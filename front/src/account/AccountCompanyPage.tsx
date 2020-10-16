@@ -4,7 +4,8 @@ import { filter } from "graphql-anywhere";
 import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContactEmail";
 import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
-import { CompanyPrivate } from "generated/graphql/types";
+import AccountFieldCompanyAgreements from "./fields/AccountFieldCompanyAgreements";
+import { CompanyPrivate, CompanyType } from "../generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;
@@ -14,13 +15,16 @@ AccountCompanyPage.fragments = {
   company: gql`
     fragment AccountCompanyPageFragment on CompanyPrivate {
       siret
+      companyTypes
       ...AccountFieldCompanyContactEmailFragment
       ...AccountFieldCompanyContactPhoneFragment
       ...AccountFieldCompanyWebsiteFragment
+      ...AccountFieldCompanyAgreementsFragment
     }
     ${AccountFieldCompanyContactEmail.fragments.company}
     ${AccountFieldCompanyContactPhone.fragments.company}
     ${AccountFieldCompanyWebsite.fragments.company}
+    ${AccountFieldCompanyAgreements.fragments.company}
   `,
 };
 
@@ -54,6 +58,9 @@ export default function AccountCompanyPage({ company }: Props) {
       <AccountFieldCompanyWebsite
         company={filter(AccountFieldCompanyWebsite.fragments.company, company)}
       />
+      {company.companyTypes.includes(CompanyType.EcoOrganisme) && (
+        <AccountFieldCompanyAgreements company={company} />
+      )}
     </>
   );
 }

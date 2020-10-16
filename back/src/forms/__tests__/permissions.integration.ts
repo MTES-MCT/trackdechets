@@ -87,7 +87,10 @@ async function checkEcoOrganismePermission(
   });
   const form = await formFactory({
     ownerId: owner.id,
-    opt: { ecoOrganisme: { connect: { id: ecoOrganisme.id } } }
+    opt: {
+      ecoOrganismeSiret: ecoOrganisme.siret,
+      ecoOrganismeName: ecoOrganisme.name
+    }
   });
   return permission(user, form);
 }
@@ -378,13 +381,30 @@ describe("checkSecurityCode", () => {
 
   test("securityCode is valid", async () => {
     const company = await companyFactory();
-    const check = await checkSecurityCode(company.siret, company.securityCode);
+    const check = await checkSecurityCode(
+      [company.siret],
+      company.securityCode
+    );
+    expect(check).toEqual(true);
+  });
+
+  test("securityCode is valid for one of the companies", async () => {
+    const firstCompany = await companyFactory({
+      securityCode: 1234
+    });
+    const secondCompany = await companyFactory({
+      securityCode: 4567
+    });
+    const check = await checkSecurityCode(
+      [firstCompany.siret, secondCompany.siret],
+      secondCompany.securityCode
+    );
     expect(check).toEqual(true);
   });
 
   test("securityCode is invalid", async () => {
     const company = await companyFactory();
-    const checkFn = () => checkSecurityCode(company.siret, 1258478956);
+    const checkFn = () => checkSecurityCode([company.siret], 1258478956);
     expect(checkFn).rejects.toThrow(
       "Le code de sécurité de l'émetteur du bordereau est invalide."
     );

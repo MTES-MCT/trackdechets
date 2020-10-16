@@ -98,7 +98,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
               {form.wasteDetails?.code} - {form.wasteDetails?.name}
             </td>
             <td>{form.emitter?.company?.name}</td>
-            <td>{DateTime.fromISO(form.receivedAt).toLocaleString()}</td>
+            <td>{DateTime.fromISO(form.receivedAt!).toLocaleString()}</td>
             <td>{form.quantityReceived} tonnes</td>
             <td>{form.processingOperationDone}</td>
           </tr>

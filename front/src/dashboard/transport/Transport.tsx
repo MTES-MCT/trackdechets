@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/react-hooks";
 import Loader, { RefreshLoader } from "common/components/Loaders";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { MEDIA_QUERIES } from "common/config";
 import { NetworkStatus } from "apollo-client";
 import {
@@ -19,7 +19,7 @@ import {
 import { SiretContext } from "../Dashboard";
 import { GET_TRANSPORT_SLIPS } from "./queries";
 import useLocalStorage from "common/hooks/useLocalStorage";
-import useMedia from 'use-media';
+import useMedia from "use-media";
 
 import { COLORS } from "common/config";
 
@@ -69,18 +69,10 @@ export function TransportContent({ formType }) {
   const [displayAsCards, setDisplayAsCards] = useLocalStorage(
     DISPLAY_TYPE_STORAGE_KEY
   );
+  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
 
-  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld});
-
-  useEffect(() => {
-    // set display as cards on small screens
-
-    setDisplayAsCards(
-      isMobile ? true : displayAsCards
-    );
-  }, [isMobile, displayAsCards, setDisplayAsCards]);
-
-  const DisplayComponent = displayAsCards ? TransportCards : TransportTable;
+  const DisplayComponent =
+    isMobile || displayAsCards ? TransportCards : TransportTable;
   const refetchQuery = {
     query: GET_TRANSPORT_SLIPS,
     variables: {

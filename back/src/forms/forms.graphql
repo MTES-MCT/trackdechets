@@ -276,11 +276,11 @@ type Mutation {
   Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
   ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
   Cette mutation doit être appelée avec le token du collecteur-transporteur.
-  L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-  disponible sur le tableau de bord Trackdéchets
-  Mon Compte > Établissements > Sécurité.
-  D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-  émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+  L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
+  grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
+  D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
+  renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+  Dans le cas où un éco-organisme est responsable du déchet, le code de celui-ci peut être utilisé pour signer.
   """
   signedByTransporter(
     "ID d'un BSD"
@@ -525,7 +525,7 @@ type Form {
   "Annexe 2"
   appendix2Forms: [Form!]
 
-  ecoOrganisme: EcoOrganisme
+  ecoOrganisme: FormEcoOrganisme
 
   "BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement"
   temporaryStorageDetail: TemporaryStorageDetail
@@ -651,6 +651,12 @@ type FormCompany {
 
   "Email du contact dans l'établissement"
   mail: String
+}
+
+"Information sur l'éco-organisme responsable du BSD"
+type FormEcoOrganisme {
+  name: String!
+  siret: String!
 }
 
 "Types d'émetteur de déchet (choix multiple de la case 1)"

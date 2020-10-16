@@ -9,6 +9,7 @@ import RedErrorMessage from "../common/components/RedErrorMessage";
 import CompanyType from "../login/CompanyType";
 import AccountCompanyAddTransporterReceipt from "./accountCompanyAdd/AccountCompanyAddTransporterReceipt";
 import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAddTraderReceipt";
+import AccountCompanyAddEcoOrganisme from "./accountCompanyAdd/AccountCompanyAddEcoOrganisme";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
 import { FaHourglassHalf } from "react-icons/fa";
@@ -71,6 +72,7 @@ interface Values extends FormikValues {
   traderReceiptNumber: string;
   traderReceiptValidity: string;
   traderReceiptDepartment: string;
+  ecoOrganismeAgreements: string[];
 }
 
 /**
@@ -166,12 +168,16 @@ export default function AccountCompanyAdd() {
     setToggleForm(!!companyInfos);
   }
 
-  function isTransporter(companyTypes) {
+  function isTransporter(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Transporter);
   }
 
-  function isTrader(companyTypes) {
+  function isTrader(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Trader);
+  }
+
+  function isEcoOrganisme(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.EcoOrganisme);
   }
 
   /**
@@ -189,6 +195,7 @@ export default function AccountCompanyAdd() {
       traderReceiptNumber,
       traderReceiptValidity,
       traderReceiptDepartment,
+      ecoOrganismeAgreements,
       ...companyInput
     } = values;
 
@@ -277,6 +284,9 @@ export default function AccountCompanyAdd() {
           documentKeys,
           transporterReceiptId,
           traderReceiptId,
+
+          // Filter out empty agreements
+          ecoOrganismeAgreements: ecoOrganismeAgreements.filter(Boolean),
         },
       },
     });
@@ -302,6 +312,7 @@ export default function AccountCompanyAdd() {
           traderReceiptNumber: "",
           traderReceiptValidity: "",
           traderReceiptDepartment: "",
+          ecoOrganismeAgreements: [],
         }}
         validate={values => {
           // whether or not one of the transporter receipt field is set
@@ -360,6 +371,10 @@ export default function AccountCompanyAdd() {
               isTrader_ &&
               !values.traderReceiptDepartment && {
                 traderReceiptDepartment: "Champ obligatoire",
+              }),
+            ...(isEcoOrganisme(values.companyTypes) &&
+              values.ecoOrganismeAgreements.length < 1 && {
+                ecoOrganismeAgreements: "Champ obligatoire",
               }),
           };
         }}
@@ -457,6 +472,10 @@ export default function AccountCompanyAdd() {
 
                 {isTrader(values.companyTypes) && (
                   <AccountCompanyAddTraderReceipt />
+                )}
+
+                {isEcoOrganisme(values.companyTypes) && (
+                  <AccountCompanyAddEcoOrganisme />
                 )}
 
                 <div className={styles.field}>

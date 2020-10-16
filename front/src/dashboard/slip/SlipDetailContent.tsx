@@ -187,10 +187,6 @@ const EcoOrganisme = ({ ecoOrganisme }) => (
       <dt>Siret</dt>
       <dd>{ecoOrganisme?.siret}</dd>
     </div>
-    <div className={styles.detailRow}>
-      <dt>Adresse</dt>
-      <dd>{ecoOrganisme?.address}</dd>
-    </div>
   </div>
 );
 export default function SlipDetailContent({
@@ -198,7 +194,7 @@ export default function SlipDetailContent({
   children = null,
   refetch,
 }: SlipDetailContentProps) {
-  const { siret } = useContext<{ siret: string } >(SiretContext);
+  const { siret } = useContext<{ siret: string }>(SiretContext);
 
   const isMultiModal: boolean = !!form?.transportSegments?.length;
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;
@@ -262,7 +258,7 @@ export default function SlipDetailContent({
             </div>
           </div>
 
-          {!!form.ecoOrganisme?.name && (
+          {form.ecoOrganisme && (
             <EcoOrganisme ecoOrganisme={form.ecoOrganisme} />
           )}
         </div>
@@ -491,7 +487,7 @@ export default function SlipDetailContent({
         <Duplicate formId={form.id} small={false} redirectToDashboard={true} />
         {form.status === "DRAFT" ? (
           <>
-            <Delete formId={form.id} small={false} redirectToDashboard={true}/>
+            <Delete formId={form.id} small={false} redirectToDashboard={true} />
             <Edit formId={form.id} small={false} />
           </>
         ) : (

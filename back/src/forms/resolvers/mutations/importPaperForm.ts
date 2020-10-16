@@ -12,10 +12,7 @@ import {
   User
 } from "../../../generated/prisma-client";
 import { getUserCompanies } from "../../../users/database";
-import {
-  getEcoOrganismeOrNotFound,
-  getFormOrFormNotFound
-} from "../../database";
+import { getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenImportPaperFormInput
@@ -67,18 +64,7 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
   const formUpdateInput: FormUpdateInput = {
     ...flattenedFormInput,
     isImportedFromPaper: true,
-    signedByTransporter: true,
-    ...(input.ecoOrganisme
-      ? {
-          ecoOrganisme: {
-            connect: {
-              id: await getEcoOrganismeOrNotFound(input.ecoOrganisme).then(
-                e => e.id
-              )
-            }
-          }
-        }
-      : {})
+    signedByTransporter: true
   };
 
   const updatedForm = await transitionForm(user, form, {
@@ -112,17 +98,6 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     ...flattenedFormInput,
     readableId: await getReadableId(),
     owner: { connect: { id: user.id } },
-    ...(input.ecoOrganisme
-      ? {
-          ecoOrganisme: {
-            connect: {
-              id: await getEcoOrganismeOrNotFound(input.ecoOrganisme).then(
-                e => e.id
-              )
-            }
-          }
-        }
-      : {}),
     status: "PROCESSED",
     isImportedFromPaper: true,
     signedByTransporter: true

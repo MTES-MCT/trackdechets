@@ -18,7 +18,9 @@ export type Scalars = {
    * - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
    * - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
    */
-  DateTime: any;
+  DateTime: string;
+  /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
+  URL: string;
   JSON: any;
 };
 
@@ -153,6 +155,8 @@ export type CompanyPrivate = {
   transporterReceipt?: Maybe<TransporterReceipt>;
   /** Récépissé négociant (le cas échéant, pour les profils transporteur) */
   traderReceipt?: Maybe<TraderReceipt>;
+  /** Liste des agréments de l'éco-organisme */
+  ecoOrganismeAgreements: Array<Scalars['URL']>;
 };
 
 /** Information sur un établissement accessible publiquement */
@@ -187,6 +191,8 @@ export type CompanyPublic = {
   transporterReceipt?: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
   traderReceipt?: Maybe<TraderReceipt>;
+  /** Liste des agréments de l'éco-organisme */
+  ecoOrganismeAgreements: Array<Scalars['URL']>;
 };
 
 /** Information sur un établissement accessible publiquement en recherche */
@@ -243,7 +249,9 @@ export type CompanyType =
   /** Installation de collecte de déchets apportés par le producteur initial */
   | 'WASTE_CENTER'
   /** Négociant */
-  | 'TRADER';
+  | 'TRADER'
+  /** Éco-organisme */
+  | 'ECO_ORGANISME';
 
 /** Consistance du déchet */
 export type Consistence = 
@@ -364,7 +372,8 @@ export type EcoOrganisme = {
 
 /** Payload de liason d'un BSD à un eco-organisme */
 export type EcoOrganismeInput = {
-  id: Scalars['ID'];
+  name: Scalars['String'];
+  siret: Scalars['String'];
 };
 
 /** Émetteur du BSD (case 1) */
@@ -507,7 +516,7 @@ export type Form = {
   nextDestination?: Maybe<NextDestination>;
   /** Annexe 2 */
   appendix2Forms?: Maybe<Array<Form>>;
-  ecoOrganisme?: Maybe<EcoOrganisme>;
+  ecoOrganisme?: Maybe<FormEcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
@@ -539,6 +548,13 @@ export type FormCompany = {
   phone?: Maybe<Scalars['String']>;
   /** Email du contact dans l'établissement */
   mail?: Maybe<Scalars['String']>;
+};
+
+/** Information sur l'éco-organisme responsable du BSD */
+export type FormEcoOrganisme = {
+  __typename?: 'FormEcoOrganisme';
+  name: Scalars['String'];
+  siret: Scalars['String'];
 };
 
 /** Payload de création d'un BSD */
@@ -971,13 +987,12 @@ export type Mutation = {
    * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
    * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
    * Cette mutation doit être appelée avec le token du collecteur-transporteur.
-   * L'établissement émetteur (resp. d'entreposage provisoire ou de
-   * reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-   * disponible sur le tableau de bord Trackdéchets
-   * Mon Compte > Établissements > Sécurité.
+   * L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
+   * grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
    * D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-   * émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le
-   * code de sécurité sur le terminal du collecteur-transporteur.
+   * émetteur (resp. d'entreposage provisoire ou de reconditionnement)
+   * renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+   * Dans le cas où un éco-organisme est responsable du déchet, le code de celui-ci peut être utilisé pour signer.
    */
   signedByTransporter?: Maybe<Form>;
   /**
@@ -1213,6 +1228,7 @@ export type MutationUpdateCompanyArgs = {
   givenName?: Maybe<Scalars['String']>;
   transporterReceiptId?: Maybe<Scalars['String']>;
   traderReceiptId?: Maybe<Scalars['String']>;
+  ecoOrganismeAgreements?: Maybe<Array<Scalars['URL']>>;
 };
 
 
@@ -1293,6 +1309,8 @@ export type PrivateCompanyInput = {
   transporterReceiptId?: Maybe<Scalars['String']>;
   /** Récipissé négociant (le cas échéant, pour les profils négociant) */
   traderReceiptId?: Maybe<Scalars['String']>;
+  /** Liste des agréments de l'éco-organisme */
+  ecoOrganismeAgreements?: Maybe<Array<Scalars['URL']>>;
 };
 
 /** Payload de traitement d'un BSD */
@@ -1930,6 +1948,7 @@ export type UploadLink = {
   key?: Maybe<Scalars['String']>;
 };
 
+
 /** Représente un utilisateur sur la plateforme Trackdéchets */
 export type User = {
   __typename?: 'User';
@@ -2160,7 +2179,7 @@ export type ResolversTypes = {
   Trader: ResolverTypeWrapper<Trader>;
   FormStatus: FormStatus;
   NextDestination: ResolverTypeWrapper<NextDestination>;
-  EcoOrganisme: ResolverTypeWrapper<EcoOrganisme>;
+  FormEcoOrganisme: ResolverTypeWrapper<FormEcoOrganisme>;
   TemporaryStorageDetail: ResolverTypeWrapper<TemporaryStorageDetail>;
   TemporaryStorer: ResolverTypeWrapper<TemporaryStorer>;
   Destination: ResolverTypeWrapper<Destination>;
@@ -2175,6 +2194,8 @@ export type ResolversTypes = {
   GerepType: GerepType;
   TransporterReceipt: ResolverTypeWrapper<TransporterReceipt>;
   TraderReceipt: ResolverTypeWrapper<TraderReceipt>;
+  URL: ResolverTypeWrapper<Scalars['URL']>;
+  EcoOrganisme: ResolverTypeWrapper<EcoOrganisme>;
   FavoriteType: FavoriteType;
   CompanyFavorite: ResolverTypeWrapper<CompanyFavorite>;
   FileDownload: ResolverTypeWrapper<FileDownload>;
@@ -2261,7 +2282,7 @@ export type ResolversParentTypes = {
   Trader: Trader;
   FormStatus: FormStatus;
   NextDestination: NextDestination;
-  EcoOrganisme: EcoOrganisme;
+  FormEcoOrganisme: FormEcoOrganisme;
   TemporaryStorageDetail: TemporaryStorageDetail;
   TemporaryStorer: TemporaryStorer;
   Destination: Destination;
@@ -2276,6 +2297,8 @@ export type ResolversParentTypes = {
   GerepType: GerepType;
   TransporterReceipt: TransporterReceipt;
   TraderReceipt: TraderReceipt;
+  URL: Scalars['URL'];
+  EcoOrganisme: EcoOrganisme;
   FavoriteType: FavoriteType;
   CompanyFavorite: CompanyFavorite;
   FileDownload: FileDownload;
@@ -2387,6 +2410,7 @@ export type CompanyPrivateResolvers<ContextType = GraphQLContext, ParentType ext
   installation?: Resolver<Maybe<ResolversTypes['Installation']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
+  ecoOrganismeAgreements?: Resolver<Array<ResolversTypes['URL']>, ParentType, ContextType>;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
@@ -2404,6 +2428,7 @@ export type CompanyPublicResolvers<ContextType = GraphQLContext, ParentType exte
   isRegistered?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   transporterReceipt?: Resolver<Maybe<ResolversTypes['TransporterReceipt']>, ParentType, ContextType>;
   traderReceipt?: Resolver<Maybe<ResolversTypes['TraderReceipt']>, ParentType, ContextType>;
+  ecoOrganismeAgreements?: Resolver<Array<ResolversTypes['URL']>, ParentType, ContextType>;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
@@ -2500,7 +2525,7 @@ export type FormResolvers<ContextType = GraphQLContext, ParentType extends Resol
   noTraceability?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   nextDestination?: Resolver<Maybe<ResolversTypes['NextDestination']>, ParentType, ContextType>;
   appendix2Forms?: Resolver<Maybe<Array<ResolversTypes['Form']>>, ParentType, ContextType>;
-  ecoOrganisme?: Resolver<Maybe<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>;
+  ecoOrganisme?: Resolver<Maybe<ResolversTypes['FormEcoOrganisme']>, ParentType, ContextType>;
   temporaryStorageDetail?: Resolver<Maybe<ResolversTypes['TemporaryStorageDetail']>, ParentType, ContextType>;
   stateSummary?: Resolver<Maybe<ResolversTypes['StateSummary']>, ParentType, ContextType>;
   transportSegments?: Resolver<Maybe<Array<ResolversTypes['TransportSegment']>>, ParentType, ContextType>;
@@ -2517,6 +2542,12 @@ export type FormCompanyResolvers<ContextType = GraphQLContext, ParentType extend
   contact?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+};
+
+export type FormEcoOrganismeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['FormEcoOrganisme'] = ResolversParentTypes['FormEcoOrganisme']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  siret?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
@@ -2765,6 +2796,10 @@ export type UploadLinkResolvers<ContextType = GraphQLContext, ParentType extends
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
+export interface UrlScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['URL'], any> {
+  name: 'URL';
+}
+
 export type UserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -2812,6 +2847,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   FileDownload?: FileDownloadResolvers<ContextType>;
   Form?: FormResolvers<ContextType>;
   FormCompany?: FormCompanyResolvers<ContextType>;
+  FormEcoOrganisme?: FormEcoOrganismeResolvers<ContextType>;
   formsLifeCycleData?: FormsLifeCycleDataResolvers<ContextType>;
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
@@ -2836,6 +2872,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   TransporterReceipt?: TransporterReceiptResolvers<ContextType>;
   TransportSegment?: TransportSegmentResolvers<ContextType>;
   UploadLink?: UploadLinkResolvers<ContextType>;
+  URL?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
   WasteDetails?: WasteDetailsResolvers<ContextType>;
   WorkSite?: WorkSiteResolvers<ContextType>;
@@ -2927,6 +2964,7 @@ export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): Compan
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,
+    ecoOrganismeAgreements: [],
     ...props,
   };
 }
@@ -2947,6 +2985,7 @@ export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyP
     isRegistered: null,
     transporterReceipt: null,
     traderReceipt: null,
+    ecoOrganismeAgreements: [],
     ...props,
   };
 }
@@ -2996,7 +3035,7 @@ export function createCreateFormInputMock(props: Partial<CreateFormInput>): Crea
 export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderReceiptInput>): CreateTraderReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3005,7 +3044,7 @@ export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderRe
 export function createCreateTransporterReceiptInputMock(props: Partial<CreateTransporterReceiptInput>): CreateTransporterReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3069,7 +3108,8 @@ export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganis
 
 export function createEcoOrganismeInputMock(props: Partial<EcoOrganismeInput>): EcoOrganismeInput {
   return {
-    id: "",
+    name: "",
+    siret: "",
     ...props,
   };
 }
@@ -3156,6 +3196,15 @@ export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany 
     contact: null,
     phone: null,
     mail: null,
+    ...props,
+  };
+}
+
+export function createFormEcoOrganismeMock(props: Partial<FormEcoOrganisme>): FormEcoOrganisme {
+  return {
+    __typename: "FormEcoOrganisme",
+    name: "",
+    siret: "",
     ...props,
   };
 }
@@ -3289,6 +3338,7 @@ export function createPrivateCompanyInputMock(props: Partial<PrivateCompanyInput
     documentKeys: null,
     transporterReceiptId: null,
     traderReceiptId: null,
+    ecoOrganismeAgreements: null,
     ...props,
   };
 }
@@ -3298,7 +3348,7 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
     processingOperationDone: "",
     processingOperationDescription: null,
     processedBy: "",
-    processedAt: new Date(),
+    processedAt: new Date().toISOString(),
     nextDestination: null,
     noTraceability: null,
     ...props,
@@ -3310,7 +3360,7 @@ export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): 
     wasteAcceptationStatus: "ACCEPTED",
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date(),
+    receivedAt: new Date().toISOString(),
     signedAt: null,
     quantityReceived: 0,
     ...props,
@@ -3353,7 +3403,7 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     wasteDetails: null,
     transporter: null,
     signedBy: "",
-    signedAt: new Date(),
+    signedAt: new Date().toISOString(),
     ...props,
   };
 }
@@ -3376,7 +3426,7 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     sentBy: "",
     ...props,
   };
@@ -3384,7 +3434,7 @@ export function createSentFormInputMock(props: Partial<SentFormInput>): SentForm
 
 export function createSignatureFormInputMock(props: Partial<SignatureFormInput>): SignatureFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     sentBy: "",
     ...props,
   };
@@ -3467,7 +3517,7 @@ export function createSubscriptionMock(props: Partial<Subscription>): Subscripti
 
 export function createTakeOverInputMock(props: Partial<TakeOverInput>): TakeOverInput {
   return {
-    takenOverAt: new Date(),
+    takenOverAt: new Date().toISOString(),
     takenOverBy: "",
     ...props,
   };
@@ -3511,7 +3561,7 @@ export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput
     wasteAcceptationStatus: "ACCEPTED",
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date(),
+    receivedAt: new Date().toISOString(),
     signedAt: null,
     quantityReceived: 0,
     quantityType: "REAL",
@@ -3545,7 +3595,7 @@ export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderRe
     __typename: "TraderReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3583,7 +3633,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
     __typename: "TransporterReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3591,7 +3641,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
 
 export function createTransporterSignatureFormInputMock(props: Partial<TransporterSignatureFormInput>): TransporterSignatureFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     signedByTransporter: false,
     securityCode: 0,
     sentBy: "",

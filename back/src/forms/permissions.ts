@@ -2,7 +2,6 @@ import {
   Form,
   Company,
   User,
-  EcoOrganisme,
   TemporaryStorageDetail,
   TransportSegment,
   prisma
@@ -52,13 +51,13 @@ function isFormTrader(user: { companies: Company[] }, form: Form) {
 
 function isFormEcoOrganisme(
   user: { companies: Company[] },
-  form: { ecoOrganisme: EcoOrganisme }
+  form: Pick<Form, "ecoOrganismeSiret">
 ) {
-  if (!form.ecoOrganisme) {
+  if (!form.ecoOrganismeSiret) {
     return false;
   }
   const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.ecoOrganisme.siret);
+  return sirets.includes(form.ecoOrganismeSiret);
 }
 
 function isFormDestinationAfterTempStorage(
@@ -269,10 +268,15 @@ export async function checkCanImportForm(user: User, form: Form) {
   return true;
 }
 
-export async function checkSecurityCode(siret: string, securityCode: number) {
+export async function checkSecurityCode(
+  sirets: string[],
+  securityCode: number
+) {
   const exists = await prisma.$exists.company({
-    siret,
-    securityCode
+    OR: sirets.map(siret => ({
+      siret,
+      securityCode
+    }))
   });
   if (!exists) {
     throw new InvaliSecurityCode();

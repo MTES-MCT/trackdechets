@@ -38,6 +38,7 @@ const COMPANY_INFOS = gql`
           unite
         }
       }
+      ecoOrganismeAgreements
     }
   }
 `;

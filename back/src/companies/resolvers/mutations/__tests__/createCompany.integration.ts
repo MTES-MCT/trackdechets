@@ -10,131 +10,113 @@ import { AuthType } from "../../../../auth";
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
-describe("Create company endpoint", () => {
-  afterEach(async () => {
-    await resetDatabase();
-  });
+const CREATE_COMPANY = `
+  mutation CreateCompany($companyInput: PrivateCompanyInput!) {
+    createCompany(companyInput: $companyInput) {
+      siret
+      gerepId
+      name
+      companyTypes
+      ecoOrganismeAgreements
+      transporterReceipt {
+        id
+        receiptNumber
+        validityLimit
+        department
+      }
+      traderReceipt {
+        id
+        receiptNumber
+        validityLimit
+        department
+      }
+    }
+  }
+`;
 
-  test("should create company and userAssociation", async () => {
+describe("Mutation.createCompany", () => {
+  afterEach(() => resetDatabase());
+
+  it("should create company and userAssociation", async () => {
     const user = await userFactory();
 
-    const siret = "12345678912345";
-    const gerepId = "1234";
-    const name = "Acme";
-    const companyTypes = ["PRODUCER"];
-
-    const mutation = `
-    mutation {
-      createCompany(
-        companyInput: {
-          siret: "${siret}"
-          gerepId: "${gerepId}"
-          companyName: "${name}"
-          companyTypes: [${companyTypes}]
-        }
-      ) { siret, gerepId, name, companyTypes }
-    }
-  `;
-
-    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-
-    const { data } = await mutate(mutation);
-
-    const expected = {
-      siret,
-      gerepId,
-      name,
-      companyTypes
+    const companyInput = {
+      siret: "12345678912345",
+      gerepId: "1234",
+      companyName: "Acme",
+      companyTypes: ["PRODUCER"]
     };
-    expect(data.createCompany).toEqual(expected);
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
 
-    const newCompanyExists = await prisma.$exists.company({ siret });
+    expect(data.createCompany).toMatchObject({
+      siret: companyInput.siret,
+      gerepId: companyInput.gerepId,
+      name: companyInput.companyName,
+      companyTypes: companyInput.companyTypes
+    });
+
+    const newCompanyExists = await prisma.$exists.company({
+      siret: companyInput.siret
+    });
     expect(newCompanyExists).toBe(true);
 
     const newCompanyAssociationExists = await prisma.$exists.companyAssociation(
-      { company: { siret }, user: { id: user.id } }
+      { company: { siret: companyInput.siret }, user: { id: user.id } }
     );
     expect(newCompanyAssociationExists).toBe(true);
   });
 
-  test("should link to a transporterReceipt", async () => {
+  it("should link to a transporterReceipt", async () => {
     const user = await userFactory();
 
-    const siret = "12345678912345";
-    const name = "Acme";
-    const companyTypes = ["TRANSPORTER"];
-    const transporterReceipt = {
+    const transporterReceipt = await prisma.createTransporterReceipt({
       receiptNumber: "1234",
       validityLimit: "2023-03-31T00:00:00.000Z",
       department: "07"
+    });
+    const companyInput = {
+      siret: "12345678912345",
+      companyName: "Acme",
+      companyTypes: ["TRANSPORTER"],
+      transporterReceiptId: transporterReceipt.id
     };
 
-    const receiptId = await prisma
-      .createTransporterReceipt(transporterReceipt)
-      .id();
-
-    const mutation = `
-      mutation {
-        createCompany(
-          companyInput: {
-            siret: "${siret}"
-            companyName: "${name}"
-            companyTypes: [${companyTypes}]
-            transporterReceiptId: "${receiptId}"
-          }
-        ) {
-            siret
-            transporterReceipt {
-              receiptNumber
-              validityLimit
-              department
-            }
-          }
-      }`;
-
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-
-    const { data } = await mutate(mutation);
+    const { data } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
 
     expect(data.createCompany.transporterReceipt).toEqual(transporterReceipt);
   });
 
-  test("should link to a traderReceipt", async () => {
+  it("should link to a traderReceipt", async () => {
     const user = await userFactory();
 
-    const siret = "12345678912345";
-    const name = "Acme";
-    const companyTypes = ["TRADER"];
-    const traderReceipt = {
+    const traderReceipt = await prisma.createTraderReceipt({
       receiptNumber: "1234",
       validityLimit: "2023-03-31T00:00:00.000Z",
       department: "07"
+    });
+    const companyInput = {
+      siret: "12345678912345",
+      companyName: "Acme",
+      companyTypes: ["TRADER"],
+      traderReceiptId: traderReceipt.id
     };
 
-    const receiptId = await prisma.createTraderReceipt(traderReceipt).id();
-
-    const mutation = `
-      mutation {
-        createCompany(
-          companyInput: {
-            siret: "${siret}"
-            companyName: "${name}"
-            companyTypes: [${companyTypes}]
-            traderReceiptId: "${receiptId}"
-          }
-        ) {
-            siret
-            traderReceipt {
-              receiptNumber
-              validityLimit
-              department
-            }
-          }
-      }`;
-
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-
-    const { data } = await mutate(mutation);
+    const { data } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
 
     // check the traderReceipt was created in db
     expect(data.createCompany.traderReceipt).toEqual(traderReceipt);
@@ -143,77 +125,59 @@ describe("Create company endpoint", () => {
   it("should create document keys", async () => {
     const user = await userFactory();
 
-    const siret = "12345678912345";
-    const name = "Acme";
-    const companyTypes = ["PRODUCER"];
-
-    const mutation = `
-      mutation {
-        createCompany(
-          companyInput: {
-            siret: "${siret}"
-            companyName: "${name}"
-            companyTypes: [${companyTypes}]
-            documentKeys: ["key1", "key2"]
-          }
-        ) {
-            siret
-          }
-      }`;
-
+    const companyInput = {
+      siret: "12345678912345",
+      companyName: "Acme",
+      companyTypes: ["PRODUCER"],
+      documentKeys: ["key1", "key2"]
+    };
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
 
-    await mutate(mutation);
-
-    const company = await prisma.company({ siret });
+    const company = await prisma.company({ siret: companyInput.siret });
     expect(company.documentKeys).toEqual(["key1", "key2"]);
   });
 
-  test("should throw error if the company already exist", async () => {
+  it("should throw error if the company already exist", async () => {
     const user = await userFactory();
-
     const company = await companyFactory();
 
     // try re-creating the same company
-    const mutation = `
-    mutation {
-      createCompany(
-        companyInput: {
-          siret: "${company.siret}"
-          gerepId: "${company.gerepId}"
-          companyName: "${company.name}"
-          companyTypes: [${company.companyTypes}]
-        }
-        ) { siret, gerepId, name, companyTypes }
-      }
-      `;
+    const companyInput = {
+      siret: company.siret,
+      gerepId: company.gerepId,
+      companyName: company.name,
+      companyTypes: company.companyTypes
+    };
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-
-    const { errors, data } = await mutate(mutation);
+    const { errors, data } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
 
     expect(data).toBeNull();
     expect(errors[0].extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
   });
 
-  test("should alert when a user creates too many companies", async () => {
+  it("should alert when a user creates too many companies", async () => {
     const user = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const companyTypes = ["PRODUCER"];
-
-    async function createCompany(siret) {
-      const mutation = `
-        mutation {
-          createCompany(
-            companyInput: {
-              siret: "${siret}"
-              gerepId: "1234",
-              companyTypes: [${companyTypes}]
-            }
-          ) { id }
+    async function createCompany(siret: string) {
+      await mutate(CREATE_COMPANY, {
+        variables: {
+          companyInput: {
+            siret,
+            gerepId: "1234",
+            companyTypes: ["PRODUCER"]
+          }
         }
-      `;
-      await mutate(mutation);
+      });
     }
 
     // 1 company
@@ -239,5 +203,103 @@ describe("Create company endpoint", () => {
     // 6 companies => should warn
     await createCompany("67891234567890");
     expect(sendMailSpy).toBeCalled();
+  });
+
+  it("should return an error when creating an unknown eco-organisme", async () => {
+    const user = await userFactory();
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput: {
+          siret: "0".repeat(14),
+          companyTypes: ["ECO_ORGANISME"]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : emmanuel.flahaut@developpement-durable.gouv.fr"
+      })
+    ]);
+  });
+
+  it("should return an error when creating an eco-organisme without its agreement", async () => {
+    const user = await userFactory();
+
+    const companyInput = {
+      siret: "0".repeat(14),
+      companyTypes: ["ECO_ORGANISME"]
+    };
+    await prisma.createEcoOrganisme({
+      address: "",
+      name: "Eco-Organisme",
+      siret: companyInput.siret
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "L'URL de l'agrément de l'éco-organisme est requis."
+      })
+    ]);
+  });
+
+  it("should allow creating a known eco-organisme with its agreement", async () => {
+    const user = await userFactory();
+
+    const companyInput = {
+      siret: "0".repeat(14),
+      companyTypes: ["ECO_ORGANISME"],
+      ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
+    };
+    await prisma.createEcoOrganisme({
+      address: "",
+      name: "Eco-Organisme",
+      siret: companyInput.siret
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(data.createCompany.ecoOrganismeAgreements).toEqual(
+      companyInput.ecoOrganismeAgreements
+    );
+  });
+
+  it("should return an error when creating a producer company with eco-organisme agreements", async () => {
+    const user = await userFactory();
+
+    const companyInput = {
+      siret: "0".repeat(14),
+      companyTypes: ["PRODUCER"],
+      ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
+    };
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de lier des agréments d'éco-organisme : l'entreprise n'est pas un éco-organisme."
+      })
+    ]);
   });
 });
