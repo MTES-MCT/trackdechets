@@ -19,6 +19,8 @@ import { updateApolloCache } from "common/helper";
 import DateInput from "form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
 import { BusTransfer } from "common/components/Icons";
+import ActionButton from "common/components/ActionButton";
+import TdModal from "common/components/Modal";
 
 export const TAKE_OVER_SEGMENT = gql`
   mutation takeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {
@@ -50,9 +52,14 @@ const getSegmentToTakeOver = ({ form, userSiret }) => {
 type Props = {
   form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
   userSiret: string;
+  inCard?: boolean;
 };
 
-export default function TakeOverSegment({ form, userSiret }: Props) {
+export default function TakeOverSegment({
+  form,
+  userSiret,
+  inCard = false,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const refetchQuery = {
     query: GET_FORM,
@@ -101,70 +108,87 @@ export default function TakeOverSegment({ form, userSiret }: Props) {
 
   return (
     <>
-      <button
-        className="btn btn--primary btn--medium-text"
-        onClick={() => setIsOpen(true)}
-        title="Prendre en charge le déchet"
-      >
-        <BusTransfer />
-        <span>
-          Prendre&nbsp;en&nbsp;charge<br />le&nbsp;déchet
-        </span>
-      </button>
-      {isOpen ? (
-        <div
-          className="modal__backdrop"
-          id="modal"
-          style={{
-            display: isOpen ? "flex" : "none",
-          }}
+      {inCard ? (
+        <button
+          className="btn btn--primary btn--medium-text"
+          onClick={() => setIsOpen(true)}
+          title="Prendre en charge le déchet"
         >
-          <div className="modal">
-            <Formik
-              initialValues={initialValues}
-              onSubmit={values => {
-                const variables = {
-                  takeOverInfo: { ...values },
-                  id: segment.id,
-                };
+          <BusTransfer />
+          <span>
+            Prendre&nbsp;en&nbsp;charge
+            <br />
+            le&nbsp;déchet
+          </span>
+        </button>
+      ) : (
+        <ActionButton
+          title="Prendre en charge le déchet"
+          icon={BusTransfer}
+          onClick={() => setIsOpen(true)}
+          iconSize={32}
+        />
+      )}
 
-                takeOverSegment({ variables }).catch(() => {});
-              }}
-            >
-              {({ values }) => (
-                <FormikForm>
-                  <h2>Prendre en charge le déchet</h2>
+      {isOpen ? (
+        <TdModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          ariaLabel="Prendre en charge"
+        >
+          <h2 className="td-modal-title">Prendre en charge le déchet</h2>
+          <Formik
+            initialValues={initialValues}
+            onSubmit={values => {
+              const variables = {
+                takeOverInfo: { ...values },
+                id: segment.id,
+              };
+
+              takeOverSegment({ variables }).catch(() => {});
+            }}
+          >
+            {({ values }) => (
+              <FormikForm>
+                <div className="form__row">
                   <label>
                     Nom du responsable
                     <Field
                       type="text"
                       name="takenOverBy"
                       placeholder="NOM Prénom"
+                      className="td-input"
                     />
                   </label>
+                </div>
+                <div className="form__row">
                   <label>
                     Date de prise en charge
-                    <Field component={DateInput} name="takenOverAt" />
+                    <Field
+                      component={DateInput}
+                      name="takenOverAt"
+                      className="td-input"
+                    />
                   </label>
-                  {error && <NotificationError apolloError={error} />}
+                </div>
+                {error && <NotificationError apolloError={error} />}
 
-                  <div className="buttons">
-                    <button
-                      type="button"
-                      className="button warning"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Annuler
-                    </button>
-                    <button className="btn btn--primary" type="submit">
-                      Valider
-                    </button>
-                  </div>
-                </FormikForm>
-              )}
-            </Formik>
-          </div>
-        </div>
+                <div className="form__actions">
+                  <button
+                    type="button"
+                    className="button warning"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Annuler
+                  </button>
+                  <button className="btn btn--primary" type="submit">
+                    Valider
+                  </button>
+                </div>
+              </FormikForm>
+            )}
+          </Formik>
+        </TdModal>
       ) : null}
     </>
   );

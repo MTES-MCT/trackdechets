@@ -36,7 +36,7 @@
   display: flex;
   margin-top: 0.5rem;
   justify-content: flex-end;
-  & > button:not(:last-child) {
+  & > *:not(:last-child) {
     margin-right: 0.5rem;
   }
 }

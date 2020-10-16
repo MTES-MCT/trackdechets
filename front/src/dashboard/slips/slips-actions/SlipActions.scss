@@ -1,47 +1,4 @@
 @import "scss/Constants.scss";
-@import "scss/Breakpoints.scss";
-.dynamic-action {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  &__content {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    svg {
-      width: 24px;
-      flex-shrink: 0;
-    }
-    @include lg-desktop {
-      flex-direction: row;
-    }
-  }
-  &__text {
-    display: none;
-    word-break: normal;
-
- 
-    @include desktop {
-      display: inline-block;
-      margin-left: 6px;
-      font-size: 0.5rem;
-      font-weight: bold;
-      line-height: 1rem;
-    }
-    @include lg-desktop {
-      font-size: 0.75rem;
-    }
-  }
-  &__caption {
-    margin-top: 0.25rem;
-    font-size: 0.5rem;
-    display: inline-block;
-    text-align: center;
-    @include desktop {
-      display: none;
-    }
-  }
-}
 
 .slips-actions {
   position: relative;

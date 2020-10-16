@@ -25,6 +25,7 @@ import { NotificationError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
 import TdModal from "common/components/Modal";
 import styles from "./Segments.module.scss";
+import ActionButton from "common/components/ActionButton";
 
 /**Remove company data if segment is readytoTakeOver */
 const removeCompanyData = values => {
@@ -106,9 +107,14 @@ const getSegmentToEdit = ({ form, userSiret }) => {
 type Props = {
   form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
   userSiret: string;
+  inCard?: boolean;
 };
 
-export default function EditSegment({ form, userSiret }: Props) {
+export default function EditSegment({
+  form,
+  userSiret,
+  inCard = false,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const refetchQuery = {
@@ -158,17 +164,26 @@ export default function EditSegment({ form, userSiret }: Props) {
 
   return (
     <>
-      <button
-        className="btn btn--primary btn--medium-text"
-        onClick={() => setIsOpen(true)}
-        title="Modifier le segment"
-      >
-        <PaperWriteIcon />
-        <span>
-          Modifier <br />
-          le&nbsp;segment&nbsp;N°{segment.segmentNumber}
-        </span>
-      </button>
+      {inCard ? (
+        <button
+          className="btn btn--primary btn--medium-text"
+          onClick={() => setIsOpen(true)}
+          title="Modifier le segment"
+        >
+          <PaperWriteIcon />
+          <span>
+            Modifier <br />
+            le&nbsp;segment&nbsp;N°{segment.segmentNumber}
+          </span>
+        </button>
+      ) : (
+        <ActionButton
+          title="Modifier le segment"
+          icon={PaperWriteIcon}
+          onClick={() => setIsOpen(true)}
+          iconSize={32}
+        />
+      )}
 
       {isOpen ? (
         <TdModal

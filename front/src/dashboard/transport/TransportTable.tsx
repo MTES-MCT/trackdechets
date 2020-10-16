@@ -134,7 +134,8 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
             <td>
               <Segments form={form} userSiret={userSiret} />
             </td>
-            <td className="">
+            <td  >
+              <div className={styles.transportActions}>
               <TransportSignature form={form} userSiret={userSiret} />
 
               <EditSegment form={form} userSiret={userSiret} />
@@ -143,6 +144,7 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
               <MarkSegmentAsReadyToTakeOver form={form} userSiret={userSiret} />
 
               <TakeOverSegment form={form} userSiret={userSiret} />
+              </div>
             </td>
             <td>
               <Quicklook

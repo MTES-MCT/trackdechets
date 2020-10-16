@@ -23,7 +23,10 @@ import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
 import { COLORS } from "common/config";
 import { ShipmentSignSmartphoneIcon, PdfIcon } from "common/components/Icons";
+
 import { useParams } from "react-router-dom";
+
+import ActionButton from "common/components/ActionButton";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -42,10 +45,15 @@ export const SIGNED_BY_TRANSPORTER = gql`
   }
 `;
 
-type Props = { form: Form; userSiret: string };
+type Props = { form: Form; userSiret: string; inCard?: boolean };
 
-export default function TransportSignature({ form, userSiret }: Props) {
+export default function TransportSignature({
+  form,
+  userSiret,
+  inCard = false,
+}: Props) {
   const { siret } = useParams<{ siret: string }>();
+
   const [isOpen, setIsOpen] = useState(false);
   const refetchQuery = {
     query: GET_FORM,
@@ -102,16 +110,25 @@ export default function TransportSignature({ form, userSiret }: Props) {
 
   return (
     <>
-      <button
-        className="btn btn--primary"
-        onClick={() => setIsOpen(true)}
-        title="Signer ce bordereau"
-      >
-        <ShipmentSignSmartphoneIcon size={32} />
-        <span className="tw-text-sm tw-ml-2">
-          Signer <br /> l'enlèvement
-        </span>
-      </button>
+      {inCard ? (
+        <button
+          className="btn btn--primary"
+          onClick={() => setIsOpen(true)}
+          title="Signer ce bordereau"
+        >
+          <ShipmentSignSmartphoneIcon size={32} />
+          <span className="tw-text-sm tw-ml-2">
+            Signer <br /> l'enlèvement
+          </span>
+        </button>
+      ) : (
+        <ActionButton
+          title="Signer ce bordereau"
+          icon={ShipmentSignSmartphoneIcon}
+          onClick={() => setIsOpen(true)}
+          iconSize={32}
+        />
+      )}
       <TdModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

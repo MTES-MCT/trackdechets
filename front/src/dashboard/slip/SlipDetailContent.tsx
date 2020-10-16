@@ -235,6 +235,9 @@ export default function SlipDetailContent({
             <div className={styles.detailRow}>
               <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
             </div>
+            <div className={styles.detailRow}>
+              <dt>Quantité</dt> <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
+            </div>
             <DetailRow
               value={getVerboseQuantityType(form.wasteDetails?.quantityType)}
               label="Quantité"
@@ -332,10 +335,10 @@ export default function SlipDetailContent({
               />
               {!!form.emitter?.workSite?.address && (
                 <div className={styles.detailRow}>
-                  <dt>Adresse Chantier</dt>{" "}
+                  <dt>Adresse Chantier</dt>
                   <dd>
-                    {form.emitter?.workSite?.address}
-                    {form.emitter?.workSite?.postalCode}
+                    {form.emitter?.workSite?.address}{" "}
+                    {form.emitter?.workSite?.postalCode}{" "}
                     {form.emitter?.workSite?.city}
                   </dd>
                 </div>
@@ -343,7 +346,7 @@ export default function SlipDetailContent({
             </div>
             <div className={styles.detailBlock}>
               <DateRow value={form.sentAt} label="Envoyé le" />
-              <DateRow value={form.sentBy} label="Envoyé par" />
+              <DetailRow value={form.sentBy} label="Envoyé par" />
             </div>
           </TabPanel>
           {/* Trader tab panel */}

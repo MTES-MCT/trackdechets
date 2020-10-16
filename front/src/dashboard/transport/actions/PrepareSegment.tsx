@@ -26,6 +26,8 @@ import {
 } from "generated/graphql/types";
 import { updateApolloCache } from "common/helper";
 import TdModal from "common/components/Modal";
+import ActionButton from "common/components/ActionButton";
+
 import styles from "./Segments.module.scss";
 
 const PREPARE_SEGMENT = gql`
@@ -44,8 +46,13 @@ const PREPARE_SEGMENT = gql`
 type Props = {
   form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
   userSiret: String;
+  inCard?: boolean;
 };
-export default function PrepareSegment({ form, userSiret }: Props) {
+export default function PrepareSegment({
+  form,
+  userSiret,
+  inCard = false,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const segments: TransportSegment[] = form.transportSegments || [];
@@ -131,16 +138,27 @@ export default function PrepareSegment({ form, userSiret }: Props) {
 
   return (
     <>
-      <button
-        className="btn btn--primary button-small"
-        onClick={() => setIsOpen(true)}
-      >
-        <BusTransfer />
-        <span>
-          Préparer <br />
-          le&nbsp;transfert
-        </span>
-      </button>
+      {inCard ? (
+        <button
+          className="btn btn--primary"
+          onClick={() => setIsOpen(true)}
+          title="Signer ce bordereau"
+        >
+          <BusTransfer size={32} />
+          <span className="tw-text-sm tw-ml-2">
+            Préparer <br />
+            le&nbsp;transfert
+          </span>
+        </button>
+      ) : (
+        <ActionButton
+          title="Préparer le transfert"
+          icon={BusTransfer}
+          onClick={() => setIsOpen(true)}
+          iconSize={32}
+        />
+      )}
+
       {isOpen ? (
         <TdModal
           isOpen={isOpen}

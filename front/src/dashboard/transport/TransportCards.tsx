@@ -9,6 +9,7 @@ import Quicklook from "dashboard/slips/slips-actions/Quicklook";
 import TransporterInfoEdit from "./actions/TransporterInfoEdit";
 import TransportSignature from "./actions/TransportSignature";
 import { useFormsTable } from "../slips/use-forms-table";
+import { Segments } from "./Segments";
 
 import styles from "./TransportCards.module.scss";
 export const TransportCards = ({ forms, userSiret, refetchQuery }) => {
@@ -64,7 +65,9 @@ export const TransportCards = ({ forms, userSiret, refetchQuery }) => {
           {!!form?.transportSegments?.length && (
             <div className={styles.detailRow}>
               <dt>Segment</dt>
-              <dd>{form?.transportSegments?.length}</dd>
+              <dd>
+                <Segments form={form} userSiret={userSiret} inCard={true} />
+              </dd>
             </div>
           )}
 
@@ -76,12 +79,16 @@ export const TransportCards = ({ forms, userSiret, refetchQuery }) => {
             <TransportSignature
               form={form}
               userSiret={userSiret}
-             
+              inCard={true}
             />
-            <PrepareSegment form={form} userSiret={userSiret} />
-            <MarkSegmentAsReadyToTakeOver form={form} userSiret={userSiret} />
-            <EditSegment form={form} userSiret={userSiret} />
-            <TakeOverSegment form={form} userSiret={userSiret} />
+            <PrepareSegment form={form} userSiret={userSiret} inCard={true} />
+            <MarkSegmentAsReadyToTakeOver
+              form={form}
+              userSiret={userSiret}
+              inCard={true}
+            />
+            <EditSegment form={form} userSiret={userSiret} inCard={true} />
+            <TakeOverSegment form={form} userSiret={userSiret} inCard={true} />
           </div>
         </li>
       ))}

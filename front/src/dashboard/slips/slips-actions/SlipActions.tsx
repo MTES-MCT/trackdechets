@@ -28,6 +28,7 @@ import { ChevronDown, ChevronUp } from "common/components/Icons";
 import OutsideClickHandler from "react-outside-click-handler";
 import { COLORS } from "common/config";
 import TdModal from "common/components/Modal";
+import ActionButton from "common/components/ActionButton";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -117,22 +118,6 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
     </OutsideClickHandler>
   );
 };
-
-const ActionButton = ({ onClick, icon, title }) => (
-  <div className="dynamic-action">
-    <button
-      className="btn btn--primary btn--slim btn--auto-height"
-      onClick={onClick}
-      title={title}
-    >
-      <span className="dynamic-action__content">
-        {icon({ size: 24 })}
-        <span className="dynamic-action__text">{title}</span>
-      </span>
-    </button>
-    <span className="dynamic-action__caption">{title}</span>
-  </div>
-);
 
 interface DynamicActionsProps extends SlipActionsProps {
   siret: string;
