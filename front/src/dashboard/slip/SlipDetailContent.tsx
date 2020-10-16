@@ -34,30 +34,17 @@ type Props = {
 };
 const TransportSegmentDetail = ({ segment }: Props) => {
   return (
-    <div className={styles.detailBlock}>
-      <div className={styles.detailRow}>
-        <dt>
-          Transporteur
-          {!!segment.segmentNumber && `N° ${segment.segmentNumber + 1}`}
-        </dt>
-        <dd>{segment?.transporter?.company?.name}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Siret</dt> <dd>{segment?.transporter?.company?.siret}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Adresse</dt> <dd>{segment?.transporter?.company?.address}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Tél</dt> <dd>{segment?.transporter?.company?.phone}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Mél</dt> <dd>{segment?.transporter?.company?.mail}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Contact</dt> <dd>{segment?.transporter?.company?.contact}</dd>
-      </div>
-
+    <div className={styles.detailGrid}>
+      <dt>
+        Transporteur
+        {!!segment.segmentNumber && `N° ${segment.segmentNumber + 1}`}
+      </dt>
+      <dd>{segment?.transporter?.company?.name}</dd>
+      <dt>Siret</dt> <dd>{segment?.transporter?.company?.siret}</dd>
+      <dt>Adresse</dt> <dd>{segment?.transporter?.company?.address}</dd>
+      <dt>Tél</dt> <dd>{segment?.transporter?.company?.phone}</dd>
+      <dt>Mél</dt> <dd>{segment?.transporter?.company?.mail}</dd>
+      <dt>Contact</dt> <dd>{segment?.transporter?.company?.contact}</dd>
       <DateRow value={segment?.takenOverAt} label="Pris en charge le" />
       <DetailRow value={segment?.takenOverBy} label="Pris en charge par" />
     </div>
@@ -144,49 +131,38 @@ const TempStorage = ({ temporaryStorageDetail }) => (
 );
 const Trader = ({ trader }) => (
   <>
-    <div className={styles.detailBlock}>
-      <div className={styles.detailRow}>
-        <dt>Négociant</dt>
-        <dd>{trader.company?.name}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Siret</dt>
-        <dd>{trader.company?.siret}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Adresse</dt>
-        <dd>{trader.company?.address}</dd>
-      </div>
+    <div className={styles.detailGrid}>
+      <dt>Négociant</dt>
+      <dd>{trader.company?.name}</dd>
 
-      <div className={styles.detailRow}>
-        <dt>Tél</dt>
-        <dd>{trader.company?.phone}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Mél</dt>
-        <dd>{trader.company?.mail}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Contact</dt>
-        <dd>{trader.company?.contact}</dd>
-      </div>
+      <dt>Siret</dt>
+      <dd>{trader.company?.siret}</dd>
+
+      <dt>Adresse</dt>
+      <dd>{trader.company?.address}</dd>
+
+      <dt>Tél</dt>
+      <dd>{trader.company?.phone}</dd>
+
+      <dt>Mél</dt>
+      <dd>{trader.company?.mail}</dd>
+
+      <dt>Contact</dt>
     </div>
-    <div className={styles.detailBlock}>
-      <DetailRow value={trader.receipt} label="Récipissé" />
+    <div className={styles.detailGrid}>
+      <DetailRow value={trader.receipt} label="Récépissé" />
       <DateRow value={trader.validityLimit} label="Date de validité" />
     </div>
   </>
 );
 const EcoOrganisme = ({ ecoOrganisme }) => (
-  <div className={styles.detailBlock}>
-    <div className={styles.detailRow}>
-      <dt>EcoOrganisme</dt>
-      <dd>{ecoOrganisme?.name}</dd>
-    </div>
-    <div className={styles.detailRow}>
-      <dt>Siret</dt>
-      <dd>{ecoOrganisme?.siret}</dd>
-    </div>
+  <div className={styles.detailGrid}>
+    <dt>EcoOrganisme</dt>
+    <dd>{ecoOrganisme?.name}</dd>
+
+    <dt>Siret</dt>
+    <dd>{ecoOrganisme?.siret}</dd>
+
   </div>
 );
 export default function SlipDetailContent({
@@ -222,22 +198,19 @@ export default function SlipDetailContent({
               <QRCodeIcon value={form.readableId} size={96} />
             )}
           </div>
-          <div className={styles.detailBlock}>
+          <div className={styles.detailGrid}>
+            <dt>Code déchet</dt>
+            <dd>{form.wasteDetails?.code}</dd>
             <DateRow
               value={form.stateSummary?.lastActionOn}
               label="Mis à jour"
             />
-            <div className={styles.detailRow}>
-              <dt>Code déchet</dt>
-              <dd>{form.wasteDetails?.code}</dd>
-            </div>
+            <dt>Code déchet</dt>
+            <dd>{form.wasteDetails?.code}</dd>
             <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
-            <div className={styles.detailRow}>
-              <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
-            </div>
-            <div className={styles.detailRow}>
-              <dt>Quantité</dt> <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
-            </div>
+            <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
+            <dt>Quantité</dt>{" "}
+            <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
             <DetailRow
               value={getVerboseQuantityType(form.wasteDetails?.quantityType)}
               label="Quantité"
@@ -246,17 +219,13 @@ export default function SlipDetailContent({
               packagings={form.wasteDetails?.packagings}
               numberOfPackages={form.wasteDetails?.numberOfPackages}
             />
-
-            <div className={styles.detailRow}>
-              <dt>Consistance</dt>{" "}
-              <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
-            </div>
+            <dt>Consistance</dt>{" "}
+            <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
           </div>
-          <div className={styles.detailBlock}>
-            <div className={styles.detailRow}>
-              <dt>Code onu</dt>
-              <dd>{form?.wasteDetails?.onuCode}</dd>
-            </div>
+
+          <div className={styles.detailGrid}>
+            <dt>Code onu</dt>
+            <dd>{form?.wasteDetails?.onuCode}</dd>
           </div>
 
           {form.ecoOrganisme && (
@@ -309,42 +278,29 @@ export default function SlipDetailContent({
         <div className={styles.detailTabPanels}>
           {/* Emitter tab panel */}
           <TabPanel className={styles.detailTabPanel}>
-            <div className={styles.detailBlock}>
-              <div className={styles.detailRow}>
-                <dt>Émetteur</dt> <dd>{form.emitter?.company?.name}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Siret</dt> <dd>{form.emitter?.company?.siret}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Adresse</dt> <dd>{form.emitter?.company?.address}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Tél</dt> <dd>{form.emitter?.company?.phone}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Mél</dt> <dd>{form.emitter?.company?.mail}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Contact</dt> <dd>{form.emitter?.company?.contact}</dd>
-              </div>
-
+            <div className={styles.detailGrid}>
+              <dt>Émetteur</dt> <dd>{form.emitter?.company?.name}</dd>
+              <dt>Siret</dt> <dd>{form.emitter?.company?.siret}</dd>
+              <dt>Adresse</dt> <dd>{form.emitter?.company?.address}</dd>
+              <dt>Tél</dt> <dd>{form.emitter?.company?.phone}</dd>
+              <dt>Mél</dt> <dd>{form.emitter?.company?.mail}</dd>
+              <dt>Contact</dt> <dd>{form.emitter?.company?.contact}</dd>
               <DetailRow
                 value={form.emitter?.workSite?.name}
                 label="Chantier"
               />
               {!!form.emitter?.workSite?.address && (
-                <div className={styles.detailRow}>
+                <>
                   <dt>Adresse Chantier</dt>
                   <dd>
                     {form.emitter?.workSite?.address}{" "}
                     {form.emitter?.workSite?.postalCode}{" "}
                     {form.emitter?.workSite?.city}
                   </dd>
-                </div>
+                </>
               )}
             </div>
-            <div className={styles.detailBlock}>
+            <div className={styles.detailGrid}>
               <DateRow value={form.sentAt} label="Envoyé le" />
               <DetailRow value={form.sentBy} label="Envoyé par" />
             </div>
@@ -357,28 +313,16 @@ export default function SlipDetailContent({
           )}
           {/* Transporter tab panel */}
           <TabPanel className={styles.detailTabPanel}>
-            <div className={`${styles.detailBlock} `}>
-              <div className={styles.detailRow}>
-                <dt>Transporteur {isMultiModal && <span>N°1</span>}</dt>{" "}
-                <dd>{form.transporter?.company?.name}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Siret</dt> <dd>{form.transporter?.company?.siret}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Adresse</dt> <dd>{form.transporter?.company?.address}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Tél</dt> <dd>{form.transporter?.company?.phone}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Mél</dt> <dd>{form.transporter?.company?.mail}</dd>
-              </div>
-              <div className={styles.detailRow}>
-                <dt>Contact</dt> <dd>{form.transporter?.company?.contact}</dd>
-              </div>
+            <div className={`${styles.detailGrid} `}>
+              <dt>Transporteur {isMultiModal && <span>N°1</span>}</dt>{" "}
+              <dd>{form.transporter?.company?.name}</dd>
+              <dt>Siret</dt> <dd>{form.transporter?.company?.siret}</dd>
+              <dt>Adresse</dt> <dd>{form.transporter?.company?.address}</dd>
+              <dt>Tél</dt> <dd>{form.transporter?.company?.phone}</dd>
+              <dt>Mél</dt> <dd>{form.transporter?.company?.mail}</dd>
+              <dt>Contact</dt> <dd>{form.transporter?.company?.contact}</dd>
             </div>
-            <div className={styles.detailBlock}>
+            <div className={styles.detailGrid}>
               <YesNoRow
                 value={form?.transporter?.isExemptedOfReceipt}
                 label="Exemption de récépissé"
@@ -422,33 +366,33 @@ export default function SlipDetailContent({
 
           {/* Recipient tab panel */}
           <TabPanel className={styles.detailTabPanel}>
-            <div className={styles.detailBlock}>
-              <div className={styles.detailRow}>
+            <div className={styles.detailGrid}>
+  
                 <dt>Destinataire</dt> <dd>{form.recipient?.company?.name}</dd>
-              </div>
-              <div className={styles.detailRow}>
+ 
+  
                 <dt>Siret</dt> <dd>{form.recipient?.company?.siret}</dd>
-              </div>
-              <div className={styles.detailRow}>
+     
+ 
                 <dt>Adresse</dt> <dd>{form.recipient?.company?.address}</dd>
-              </div>
-              <div className={styles.detailRow}>
+   
+ 
                 <dt>Tél</dt> <dd>{form.recipient?.company?.phone}</dd>
-              </div>
-              <div className={styles.detailRow}>
+   
+ 
                 <dt>Mél</dt> <dd>{form.recipient?.company?.mail}</dd>
-              </div>
-              <div className={styles.detailRow}>
+ 
+      
                 <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
-              </div>
-              <div className={styles.detailRow}>
+ 
+         
                 <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
-              </div>
+      
             </div>
-            <div className={styles.detailBlock}>
-              <div className={styles.detailRow}>
+            <div className={styles.detailGrid}>
+ 
                 <dt>Numéro de CAP</dt> <dd>{form.recipient?.cap}</dd>
-              </div>
+  
               <DetailRow
                 value={form.recipient?.processingOperation}
                 label="Opération de traitement effectué"

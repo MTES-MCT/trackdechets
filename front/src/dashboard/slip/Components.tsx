@@ -1,8 +1,8 @@
 import React from "react";
 import { isoDate } from "common/datetime";
 import { formatPackagings } from "./utils";
-import { Packagings, } from "generated/graphql/types";
-import styles from  "./Slip.module.scss";
+import { Packagings } from "generated/graphql/types";
+import styles from "./Slip.module.scss";
 
 export const DetailRow = ({ value, label }) => {
   if (!value) {
@@ -10,10 +10,10 @@ export const DetailRow = ({ value, label }) => {
   }
 
   return (
-    <div className={styles.detailRow}>
+    <>
       <dt>{label}</dt>
       <dd>{value}</dd>
-    </div>
+    </>
   );
 };
 
@@ -23,10 +23,10 @@ export const YesNoRow = ({ value, label }) => {
   }
 
   return (
-    <div className={styles.detailRow}>
+    <>
       <dt>{label}</dt>
       <dd>{value ? "Oui" : "Non"}</dd>
-    </div>
+    </>
   );
 };
 export const DateRow = ({ value, label }) => {
@@ -34,10 +34,10 @@ export const DateRow = ({ value, label }) => {
     return null;
   }
   return (
-    <div className={styles.detailRow}>
+    <>
       <dt>{label}</dt>
       <dd>{isoDate(value)}</dd>
-    </div>
+    </>
   );
 };
 export const PackagingRow = ({
@@ -45,9 +45,9 @@ export const PackagingRow = ({
   numberOfPackages,
 }: {
   packagings?: Packagings[];
-  numberOfPackages: number|null|undefined;
+  numberOfPackages: number | null | undefined;
 }) => (
-  <div className={styles.detailRow}>
+  < >
     <dt>Conditionnement</dt>
     <dd>
       {!!packagings && formatPackagings(packagings)}
@@ -55,5 +55,5 @@ export const PackagingRow = ({
         <span className="tw-ml-2">({numberOfPackages})</span>
       )}
     </dd>
-  </div>
+  </>
 );
