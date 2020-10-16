@@ -24,6 +24,7 @@ import {
 } from "./utils";
 import QRCodeIcon from "react-qr-code";
 import { DynamicActions } from "../slips/slips-actions/SlipActions";
+
 import styles from "./Slip.module.scss";
 
 import { DateRow, DetailRow, YesNoRow, PackagingRow } from "./Components";
@@ -162,7 +163,6 @@ const EcoOrganisme = ({ ecoOrganisme }) => (
 
     <dt>Siret</dt>
     <dd>{ecoOrganisme?.siret}</dd>
-
   </div>
 );
 export default function SlipDetailContent({
@@ -193,28 +193,21 @@ export default function SlipDetailContent({
         </h4>
 
         <div className={styles.detailContent}>
-          <div className={`${styles.detailBlock} ${styles.detailQRCodeIcon}`}>
+          <div className={`${styles.detailQRCodeIcon}`}>
             {form.status !== "DRAFT" && (
               <QRCodeIcon value={form.readableId} size={96} />
             )}
           </div>
           <div className={styles.detailGrid}>
-            <dt>Code déchet</dt>
-            <dd>{form.wasteDetails?.code}</dd>
             <DateRow
               value={form.stateSummary?.lastActionOn}
-              label="Mis à jour"
+              label="Dernière action sur le BSD"
             />
             <dt>Code déchet</dt>
             <dd>{form.wasteDetails?.code}</dd>
             <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
-            <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
-            <dt>Quantité</dt>{" "}
+            <dt>Quantité</dt>
             <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
-            <DetailRow
-              value={getVerboseQuantityType(form.wasteDetails?.quantityType)}
-              label="Quantité"
-            />
             <PackagingRow
               packagings={form.wasteDetails?.packagings}
               numberOfPackages={form.wasteDetails?.numberOfPackages}
@@ -301,8 +294,14 @@ export default function SlipDetailContent({
               )}
             </div>
             <div className={styles.detailGrid}>
+              <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
+              <DetailRow
+                value={getVerboseQuantityType(form.wasteDetails?.quantityType)}
+                label="Quantité"
+              />
               <DateRow value={form.sentAt} label="Envoyé le" />
               <DetailRow value={form.sentBy} label="Envoyé par" />
+              <YesNoRow value={!!form.sentAt} label="Signature producteur" />
             </div>
           </TabPanel>
           {/* Trader tab panel */}
@@ -367,62 +366,54 @@ export default function SlipDetailContent({
           {/* Recipient tab panel */}
           <TabPanel className={styles.detailTabPanel}>
             <div className={styles.detailGrid}>
-  
-                <dt>Destinataire</dt> <dd>{form.recipient?.company?.name}</dd>
- 
-  
-                <dt>Siret</dt> <dd>{form.recipient?.company?.siret}</dd>
-     
- 
-                <dt>Adresse</dt> <dd>{form.recipient?.company?.address}</dd>
-   
- 
-                <dt>Tél</dt> <dd>{form.recipient?.company?.phone}</dd>
-   
- 
-                <dt>Mél</dt> <dd>{form.recipient?.company?.mail}</dd>
- 
-      
-                <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
- 
-         
-                <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
-      
+              <dt>Destinataire</dt> <dd>{form.recipient?.company?.name}</dd>
+              <dt>Siret</dt> <dd>{form.recipient?.company?.siret}</dd>
+              <dt>Adresse</dt> <dd>{form.recipient?.company?.address}</dd>
+              <dt>Tél</dt> <dd>{form.recipient?.company?.phone}</dd>
+              <dt>Mél</dt> <dd>{form.recipient?.company?.mail}</dd>
+              <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
             </div>
             <div className={styles.detailGrid}>
- 
-                <dt>Numéro de CAP</dt> <dd>{form.recipient?.cap}</dd>
-  
-              <DetailRow
-                value={form.recipient?.processingOperation}
-                label="Opération de traitement effectué"
-              />
-
+              <dt>Numéro de CAP</dt> <dd>{form.recipient?.cap}</dd>
               <DateRow value={form.receivedAt} label="Reçu le" />
               <DetailRow value={form.receivedBy} label="Reçu par" />
               <DetailRow
-                value={form.wasteAcceptationStatus}
+                value={getVerboseAcceptationStatus(
+                  form?.wasteAcceptationStatus
+                )}
                 label="Lot accepté"
+              />
+              <DetailRow
+                value={
+                  form?.quantityReceived && `${form?.quantityReceived} tonnes`
+                }
+                label="Quantité reçue"
               />
               <DetailRow
                 value={form.wasteRefusalReason}
                 label="Motif de refus"
               />
+            </div>
+            <div className={styles.detailGrid}>
+              <DetailRow
+                value={form.recipient?.processingOperation}
+                label="Opération de traitement prévue"
+              />
               <DetailRow
                 value={form.processingOperationDone}
-                label="Code D/R"
+                label="Traitement réalisé (code D/R)"
               />
               <DetailRow
                 value={form.processingOperationDescription}
-                label="Opération de traitement"
-              />
-              <DetailRow
-                value={form.processedBy}
-                label="Traitement effectué par"
+                label="Description de l'opération"
               />
               <DateRow
                 value={form.processedAt}
                 label="Traitement effectué le"
+              />
+              <DetailRow
+                value={form.processedBy}
+                label="Traitement effectué par"
               />
             </div>
           </TabPanel>

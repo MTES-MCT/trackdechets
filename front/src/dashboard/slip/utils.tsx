@@ -1,4 +1,5 @@
 import { Consistence, Packagings,   WasteAcceptationStatusInput as WasteAcceptationStatus, QuantityType} from "generated/graphql/types";
+import Maybe from "graphql/tsutils/Maybe";
 export const getVerboseConsistence = (
   consistence: Consistence | null | undefined | ""
 ): string => {
@@ -25,7 +26,7 @@ export const formatPackagings = (packagings: Packagings[]): string => {
 
 
 export const getVerboseAcceptationStatus= (
-  acceptationStatus: WasteAcceptationStatus | null | undefined | ""
+  acceptationStatus:  WasteAcceptationStatus | null | undefined | string 
 ): string => {
   if (!acceptationStatus) {
     return "";

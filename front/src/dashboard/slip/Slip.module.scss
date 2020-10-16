@@ -30,12 +30,10 @@
   }
 
   &Grid {
-    @include tablet {
-      max-width: 50%;
-    }
+  
     display: inline-grid;
-    grid-template-columns: 2fr 3fr;
-
+    grid-template-columns: auto auto;
+    grid-auto-rows:  1.5rem;
     grid-gap: 1rem;
     margin-right: 1rem;
 
@@ -54,8 +52,13 @@
   &QRCodeIcon {
     display: flex;
     justify-content: center;
+    margin-bottom: 30px;
+
     @include desktop {
-      justify-content: flex-end;
+      
+      margin-left: auto;
+      width: 30%;
+    
       order: 99;
     }
   }
