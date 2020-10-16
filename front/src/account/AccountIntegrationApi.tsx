@@ -11,6 +11,7 @@ export default function AccountIntegrationApi() {
         <a
           href="https://doc.trackdechets.fr"
           target="_blank"
+          className="link"
           rel="noopener noreferrer"
         >
           la documentation
