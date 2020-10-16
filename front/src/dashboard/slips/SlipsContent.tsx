@@ -1,6 +1,13 @@
 import React from "react";
-import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
+import {
+  Redirect,
+  Route,
+  Switch,
+  generatePath,
+  useParams,
+} from "react-router-dom";
 
+import { routes } from "common/routes";
 import "./SlipsContent.scss";
 import ActTab from "./tabs/ActTab";
 import DraftsTab from "./tabs/DraftsTab";
@@ -9,22 +16,33 @@ import HistoryTab from "./tabs/HistoryTab";
 import SlipDetail from "../slip/SlipDetail";
 
 export default function SlipsContent() {
-  const { url, path } = useRouteMatch();
+  const { siret } = useParams<{ siret: string }>();
 
   return (
     <div>
       <Switch>
-        <Route
-          exact
-          path={url}
-          render={() => <Redirect to={`./slips/drafts`} />}
-        />
-
-        <Route path={`${path}/view/:id`} render={() => <SlipDetail />} />
-        <Route path={`${path}/drafts`} render={() => <DraftsTab />} />
-        <Route path={`${path}/act`} render={() => <ActTab />} />
-        <Route path={`${path}/follow`} render={() => <FollowTab />} />
-        <Route path={`${path}/history`} render={() => <HistoryTab />} />
+        <Route path={routes.dashboard.slips.view}>
+          <SlipDetail />
+        </Route>
+        <Route path={routes.dashboard.slips.drafts}>
+          <DraftsTab />
+        </Route>
+        <Route path={routes.dashboard.slips.act}>
+          <ActTab />
+        </Route>
+        <Route path={routes.dashboard.slips.follow}>
+          <FollowTab />
+        </Route>
+        <Route path={routes.dashboard.slips.history}>
+          <HistoryTab />
+        </Route>
+        <Route>
+          <Redirect
+            to={generatePath(routes.dashboard.slips.drafts, {
+              siret,
+            })}
+          />
+        </Route>
       </Switch>
     </div>
   );

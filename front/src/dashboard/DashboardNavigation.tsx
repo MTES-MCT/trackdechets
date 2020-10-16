@@ -1,10 +1,10 @@
 import React from "react";
-import { NavLink, useHistory } from "react-router-dom";
+import { generatePath, NavLink, useHistory } from "react-router-dom";
 
 import Loader from "common/components/Loaders";
 import { InlineError } from "common/components/Error";
 import DashboardCompanySelector from "dashboard/DashboardCompanySelector";
-import getDashboardRoutes from "common/routes";
+import { routes } from "common/routes";
 import { CompanyType } from "generated/graphql/types";
 import styles from "./DashboardNavigation.module.scss";
 
@@ -25,9 +25,9 @@ export function DashboardNav({
 
   if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
+
   const companies = data?.me.companies || [];
   const company = companies.find(c => c.siret === currentSiret);
-  const routes = getDashboardRoutes({ siret: currentSiret, company: company });
 
   return (
     <>
@@ -49,7 +49,9 @@ export function DashboardNav({
           <ul>
             <li className="sidebar__item">
               <NavLink
-                to={routes.draft}
+                to={generatePath(routes.dashboard.slips.drafts, {
+                  siret: currentSiret,
+                })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
                 activeClassName="sidebar__link--active"
                 onClick={() => onClick()}
@@ -60,7 +62,9 @@ export function DashboardNav({
 
             <li>
               <NavLink
-                to={routes.forAction}
+                to={generatePath(routes.dashboard.slips.act, {
+                  siret: currentSiret,
+                })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
                 activeClassName="sidebar__link--active"
                 onClick={() => onClick()}
@@ -71,7 +75,9 @@ export function DashboardNav({
 
             <li>
               <NavLink
-                to={routes.followUp}
+                to={generatePath(routes.dashboard.slips.follow, {
+                  siret: currentSiret,
+                })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
                 activeClassName="sidebar__link--active"
                 onClick={() => onClick()}
@@ -81,7 +87,9 @@ export function DashboardNav({
             </li>
             <li>
               <NavLink
-                to={routes.archive}
+                to={generatePath(routes.dashboard.slips.history, {
+                  siret: currentSiret,
+                })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
                 activeClassName="sidebar__link--active"
                 onClick={() => onClick()}
@@ -120,7 +128,9 @@ export function DashboardNav({
           <ul>
             <li>
               <NavLink
-                to={routes.exports}
+                to={generatePath(routes.dashboard.exports, {
+                  siret: currentSiret,
+                })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavMain}`}
                 activeClassName={styles.dashboardNavActive}
                 onClick={() => onClick()}
@@ -130,7 +140,9 @@ export function DashboardNav({
             </li>
             <li>
               <NavLink
-                to={routes.stats}
+                to={generatePath(routes.dashboard.stats, {
+                  siret: currentSiret,
+                })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavMain}`}
                 activeClassName={styles.dashboardNavActive}
                 onClick={() => onClick()}

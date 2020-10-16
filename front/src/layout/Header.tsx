@@ -5,6 +5,7 @@ import {
   withRouter,
   matchPath,
   RouteComponentProps,
+  generatePath,
 } from "react-router-dom";
 
 import { trackEvent } from "tracker";
@@ -19,6 +20,7 @@ import { InlineError } from "common/components/Error";
 import { Query } from "generated/graphql/types";
 import { DashboardNav } from "dashboard/DashboardNavigation";
 
+import { routes } from "common/routes";
 import { MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import useMedia from "use-media";
@@ -87,14 +89,18 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
   const connected = [
     {
       caption: "Mon espace",
-      href: `/dashboard/${currentSiret}`,
+      href: currentSiret
+        ? generatePath(routes.dashboard.slips.drafts, {
+            siret: currentSiret,
+          })
+        : generatePath("/"),
       onClick: () => trackEvent("navbar", "mon-espace"),
 
       navlink: true,
     },
     {
       caption: "Mon compte",
-      href: "/account",
+      href: generatePath(routes.account.info),
       onClick: () => trackEvent("navbar", "mon-compte"),
 
       navlink: true,

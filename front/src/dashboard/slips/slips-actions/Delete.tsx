@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 
 import { COLORS } from "common/config";
 import { TrashIcon } from "common/components/Icons";
@@ -11,11 +11,11 @@ import {
   Mutation,
   MutationDeleteFormArgs,
 } from "generated/graphql/types";
-import { useHistory } from "react-router-dom";
-import { SiretContext } from "dashboard/Dashboard";
+import { generatePath, useHistory, useParams } from "react-router-dom";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
-import { dashboardBase } from "common/routes";
+import { routes } from "common/routes";
+
 type Props = {
   formId: string;
   small?: boolean;
@@ -31,7 +31,7 @@ export default function Delete({
   onClose,
   redirectToDashboard,
 }: Props) {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [deleteForm] = useMutation<
@@ -54,7 +54,14 @@ export default function Delete({
     },
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
-      !!redirectToDashboard && history.push(dashboardBase);
+
+      if (redirectToDashboard) {
+        history.push(
+          generatePath(routes.dashboard.slips.drafts, {
+            siret,
+          })
+        );
+      }
     },
     onError: () =>
       cogoToast.error("Le bordereau n'a pas pu être supprimé", {

@@ -5,6 +5,7 @@ import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
 import Loader from "common/components/Loaders";
 import Layout from "./Layout";
+import { routes } from "common/routes";
 
 const dashBoardPreload = import("dashboard/Dashboard");
 const Dashboard = lazy(() => dashBoardPreload);
@@ -53,35 +54,35 @@ export default withRouter(function LayoutContainer({ history }) {
         <Route>
           <Layout isAuthenticated={isAuthenticated}>
             <Switch>
-              <Route exact path="/login">
+              <Route exact path={routes.login}>
                 <Login />
               </Route>
 
-              <Route exact path="/invite">
+              <Route exact path={routes.invite}>
                 <Invite />
               </Route>
 
-              <Route exact path="/signup">
+              <Route exact path={routes.signup.index}>
                 <Signup />
               </Route>
 
-              <Route exact path="/signup/details">
+              <Route exact path={routes.signup.details}>
                 <WasteSelector />
               </Route>
 
-              <Route exact path="/signup/activation">
+              <Route exact path={routes.signup.activation}>
                 <SignupInfo />
               </Route>
 
-              <Route exact path="/reset-password">
+              <Route exact path={routes.resetPassword}>
                 <ResetPassword />
               </Route>
 
-              <Route exact path="/company/:siret">
+              <Route exact path={routes.company}>
                 <Company />
               </Route>
 
-              <Route exact path="/wasteTree">
+              <Route exact path={routes.wasteTree}>
                 <WasteTree />
               </Route>
 
@@ -90,13 +91,16 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path="/dashboard/:siret?"
+                path={routes.dashboard.index}
                 isAuthenticated={isAuthenticated}
               >
                 <Dashboard />
               </PrivateRoute>
 
-              <PrivateRoute path="/account" isAuthenticated={isAuthenticated}>
+              <PrivateRoute
+                path={routes.account.index}
+                isAuthenticated={isAuthenticated}
+              >
                 <Account />
               </PrivateRoute>
 
