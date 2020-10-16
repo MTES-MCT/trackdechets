@@ -69,7 +69,6 @@ const emitterFragment = gql`
   }
   ${companyFragment}
   ${workSiteFragment}
-  
 `;
 
 const recipientFragment = gql`
@@ -260,8 +259,10 @@ export const detailFormFragment = gql`
     signedAt
     processedBy
     processedAt
-    ecoOrganisme{ siret name address}
-   
+    ecoOrganisme {
+      siret
+      name
+    }
   }
   ${transporterFormFragment}
 `;
