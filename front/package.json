@@ -86,7 +86,7 @@
     "@types/yup": "^0.26.37",
     "@types/zxcvbn": "^4.4.0",
     "@typescript-eslint/parser": "^3.0.2",
-    "browserslist-useragent-regexp": "^2.0.5",
+    "browserslist-useragent-regexp": "^2.1.1",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-no-only-tests": "^2.4.0",
