@@ -1,16 +1,17 @@
 import { useQuery } from "@apollo/react-hooks";
 import { NetworkStatus } from "apollo-client";
-import React, { useContext } from "react";
+import React from "react";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
 import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
-import { SiretContext } from "dashboard/Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 import TabContent from "./TabContent";
 import EmptyTab from "./EmptyTab";
+import { useParams } from "react-router-dom";
+
 export default function FollowTab() {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>

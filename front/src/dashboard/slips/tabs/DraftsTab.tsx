@@ -1,13 +1,12 @@
 import { useQuery } from "@apollo/react-hooks";
 import { NetworkStatus } from "apollo-client";
-import React, { useContext } from "react";
+import React from "react";
 
 import { DuplicateFile } from "common/components/Icons";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
 import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 
@@ -17,7 +16,7 @@ import EmptyTab from "./EmptyTab";
 import { routes } from "common/routes";
 
 export default function DraftsTab() {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>

@@ -9,7 +9,7 @@ import {
   Switch,
   useHistory,
 } from "react-router";
-import { useParams, useRouteMatch } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { routes } from "common/routes";
 import { InlineError } from "../common/components/Error";
 import Loader from "../common/components/Loaders";
@@ -38,12 +38,7 @@ export const GET_ME = gql`
   }
 `;
 
-export const SiretContext = React.createContext({
-  siret: "",
-});
-
 export default function Dashboard() {
-  const match = useRouteMatch();
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
@@ -79,45 +74,42 @@ export default function Dashboard() {
     }
 
     return (
-      <SiretContext.Provider value={{ siret }}>
-        <div id="dashboard" className="dashboard">
-          <DashboardMenu
-            me={data.me}
-            match={match}
-            handleCompanyChange={siret =>
-              history.push(
-                generatePath(routes.dashboard.slips.drafts, {
-                  siret,
-                })
-              )
-            }
-          />
+      <div id="dashboard" className="dashboard">
+        <DashboardMenu
+          me={data.me}
+          handleCompanyChange={siret =>
+            history.push(
+              generatePath(routes.dashboard.slips.drafts, {
+                siret,
+              })
+            )
+          }
+        />
 
-          <div className="dashboard-content">
-            <Switch>
-              <Route path={routes.dashboard.slips.index}>
-                <SlipsContainer />
-              </Route>
-              <Route path={routes.dashboard.transport.index}>
-                <Transport />
-              </Route>
-              <Route path={routes.dashboard.exports}>
-                <Exports
-                  companies={filter(Exports.fragments.company, companies)}
-                />
-              </Route>
-              <Route path={routes.dashboard.stats}>
-                <Stats />
-              </Route>
-              <Redirect
-                to={generatePath(routes.dashboard.slips.drafts, {
-                  siret,
-                })}
+        <div className="dashboard-content">
+          <Switch>
+            <Route path={routes.dashboard.slips.index}>
+              <SlipsContainer />
+            </Route>
+            <Route path={routes.dashboard.transport.index}>
+              <Transport />
+            </Route>
+            <Route path={routes.dashboard.exports}>
+              <Exports
+                companies={filter(Exports.fragments.company, companies)}
               />
-            </Switch>
-          </div>
+            </Route>
+            <Route path={routes.dashboard.stats}>
+              <Stats />
+            </Route>
+            <Redirect
+              to={generatePath(routes.dashboard.slips.drafts, {
+                siret,
+              })}
+            />
+          </Switch>
         </div>
-      </SiretContext.Provider>
+      </div>
     );
   }
 

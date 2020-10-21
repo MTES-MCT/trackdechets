@@ -7,6 +7,7 @@ import {
   waitForElement,
   fireEvent,
 } from "@testing-library/react";
+import { generatePath, MemoryRouter } from "react-router-dom";
 import {
   Form,
   FormRole,
@@ -20,10 +21,10 @@ import {
   createRecipientMock,
   createDestinationMock,
 } from "generated/graphql/types";
-import { SiretContext } from "dashboard/Dashboard";
 import { TransportContent } from "dashboard/transport/Transport";
 import { GET_TRANSPORT_SLIPS } from "dashboard/transport/queries";
 import { mockMatchMediaWidth } from "common/__mocks__/matchmedia.mock";
+import { routes } from "common/routes";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({
@@ -72,9 +73,15 @@ async function renderWith({ forms }: { forms: Form[] }) {
         },
       ]}
     >
-      <SiretContext.Provider value={{ siret: TRANSPORTER.company!.siret! }}>
+      <MemoryRouter
+        initialEntries={[
+          generatePath(routes.dashboard.transport.toCollect, {
+            siret: TRANSPORTER.company!.siret!,
+          }),
+        ]}
+      >
         <TransportContent formType="TO_TAKE_OVER" />
-      </SiretContext.Provider>
+      </MemoryRouter>
     </MockedProvider>
   );
 

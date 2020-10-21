@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/react-hooks";
 import Loader, { RefreshLoader } from "common/components/Loaders";
-import React, { useContext } from "react";
+import React from "react";
 import { MEDIA_QUERIES } from "common/config";
 import { NetworkStatus } from "apollo-client";
 import {
@@ -17,7 +17,6 @@ import {
 } from "common/components/Icons";
 import { routes } from "common/routes";
 
-import { SiretContext } from "../Dashboard";
 import { GET_TRANSPORT_SLIPS } from "./queries";
 import useLocalStorage from "common/hooks/useLocalStorage";
 import useMedia from "use-media";
@@ -69,7 +68,7 @@ export default function Transport() {
  * @param param0
  */
 export function TransportContent({ formType }) {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
 
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import { statusLabels } from "dashboard/constants";
 import DownloadPdf from "dashboard/slips/slips-actions/DownloadPdf";
@@ -24,10 +24,10 @@ import {
 } from "./utils";
 import QRCodeIcon from "react-qr-code";
 import { DynamicActions } from "../slips/slips-actions/SlipActions";
-import { SiretContext } from "../Dashboard";
 import styles from "./Slip.module.scss";
 
 import { DateRow, DetailRow, YesNoRow, PackagingRow } from "./Components";
+import { useParams } from "react-router-dom";
 
 type Props = {
   segment: TransportSegment;
@@ -194,7 +194,7 @@ export default function SlipDetailContent({
   children = null,
   refetch,
 }: SlipDetailContentProps) {
-  const { siret } = useContext<{ siret: string }>(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
 
   const isMultiModal: boolean = !!form?.transportSegments?.length;
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;

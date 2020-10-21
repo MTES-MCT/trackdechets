@@ -1,23 +1,18 @@
-import React, { useContext } from "react";
-import { match, NavLink } from "react-router-dom";
+import React from "react";
+import { generatePath, NavLink, useParams } from "react-router-dom";
 import SideMenu from "common/components/SideMenu";
 import { CompanyType, User } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
-import { SiretContext } from "./Dashboard";
 import "./DashboardMenu.scss";
+import { routes } from "common/routes";
 
 interface IProps {
   me: User;
-  match: match<{}>;
   handleCompanyChange: (siret: string) => void;
 }
 
-export default function DashboardMenu({
-  me,
-  match,
-  handleCompanyChange,
-}: IProps) {
-  const { siret } = useContext(SiretContext);
+export default function DashboardMenu({ me, handleCompanyChange }: IProps) {
+  const { siret } = useParams<{ siret: string }>();
   const companies = me.companies || [];
   const company = companies.find(c => c.siret === siret);
 
@@ -42,7 +37,7 @@ export default function DashboardMenu({
             <ul>
               <li>
                 <NavLink
-                  to={`${match.url}/slips/drafts`}
+                  to={generatePath(routes.dashboard.slips.drafts, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
@@ -52,7 +47,7 @@ export default function DashboardMenu({
 
               <li>
                 <NavLink
-                  to={`${match.url}/slips/act`}
+                  to={generatePath(routes.dashboard.slips.act, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
@@ -62,7 +57,7 @@ export default function DashboardMenu({
 
               <li>
                 <NavLink
-                  to={`${match.url}/slips/follow`}
+                  to={generatePath(routes.dashboard.slips.follow, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
@@ -71,7 +66,7 @@ export default function DashboardMenu({
               </li>
               <li>
                 <NavLink
-                  to={`${match.url}/slips/history`}
+                  to={generatePath(routes.dashboard.slips.history, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
@@ -86,7 +81,9 @@ export default function DashboardMenu({
                 <ul>
                   <li>
                     <NavLink
-                      to={`${match.url}/transport/to-collect`}
+                      to={generatePath(routes.dashboard.transport.toCollect, {
+                        siret,
+                      })}
                       className="sidebar__link sidebar__link--indented"
                       activeClassName="sidebar__link--active"
                     >
@@ -95,7 +92,9 @@ export default function DashboardMenu({
                   </li>
                   <li>
                     <NavLink
-                      to={`${match.url}/transport/collected`}
+                      to={generatePath(routes.dashboard.transport.collected, {
+                        siret,
+                      })}
                       className="sidebar__link sidebar__link--indented"
                       activeClassName="sidebar__link--active"
                     >
@@ -108,7 +107,7 @@ export default function DashboardMenu({
             <ul>
               <li>
                 <NavLink
-                  to={`${match.url}/exports`}
+                  to={generatePath(routes.dashboard.exports, { siret })}
                   className="sidebar__link sidebar__link--chapter"
                   activeClassName="sidebar__link--active"
                 >
@@ -117,7 +116,7 @@ export default function DashboardMenu({
               </li>
               <li>
                 <NavLink
-                  to={`${match.url}/stats`}
+                  to={generatePath(routes.dashboard.stats, { siret })}
                   className="sidebar__link sidebar__link--chapter"
                   activeClassName="sidebar__link--active"
                 >
