@@ -1,12 +1,6 @@
 import React from "react";
 import { CompanyPrivate } from "generated/graphql/types";
 
-export const currentSiretService = {
-  getSiret: () => window.localStorage.getItem(SIRET_STORAGE_KEY) || "",
-  setSiret: (value: string) =>
-    window.localStorage.setItem(SIRET_STORAGE_KEY, value),
-};
-
 interface IProps {
   siret: string;
   companies: CompanyPrivate[];

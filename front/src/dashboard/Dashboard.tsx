@@ -13,7 +13,6 @@ import { useParams } from "react-router-dom";
 import { routes } from "common/routes";
 import { InlineError } from "../common/components/Error";
 import Loader from "../common/components/Loaders";
-import { currentSiretService } from "./DashboardCompanySelector";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
@@ -42,14 +41,7 @@ export default function Dashboard() {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
-  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
-    onCompleted: () => {
-      if (siret) {
-        currentSiretService.setSiret(siret);
-        return;
-      }
-    },
-  });
+  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;

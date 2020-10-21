@@ -8,12 +8,11 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { useLocation, useHistory } from "react-router";
+import { useLocation, useHistory, useParams } from "react-router";
 import queryString from "query-string";
 
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
-import { currentSiretService } from "dashboard/DashboardCompanySelector";
 import { GET_SLIPS } from "dashboard/slips/query";
 import initialState from "../initial-state";
 import {
@@ -34,6 +33,7 @@ interface IProps {
   formId?: string;
 }
 export default function StepList(props: IProps) {
+  const { siret } = useParams<{ siret: string }>();
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = props.children.length - 1;
   const history = useHistory();
@@ -67,7 +67,7 @@ export default function StepList(props: IProps) {
       const saveForm = data.saveForm;
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
-        variables: { siret: currentSiretService.getSiret(), status: ["DRAFT"] },
+        variables: { siret, status: ["DRAFT"] },
         getNewData: data => ({
           forms: [...data.forms.filter(f => f.id !== saveForm.id), saveForm],
         }),
