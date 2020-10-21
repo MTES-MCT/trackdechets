@@ -20,16 +20,14 @@ export const routes = {
       follow: "/dashboard/:siret/slips/follow",
       history: "/dashboard/:siret/slips/history",
       view: "/dashboard/:siret/slips/view/:id",
+      create: "/dashboard/:siret/slips/create",
+      edit: "/dashboard/:siret/slips/edit/:id",
     },
     transport: {
       index: "/dashboard/:siret/transport",
       toCollect: "/dashboard/:siret/transport/to-collect",
       collected: "/dashboard/:siret/transport/collected",
     },
-  },
-  form: {
-    create: "/form",
-    edit: "/form/:id",
   },
   account: {
     index: "/account",

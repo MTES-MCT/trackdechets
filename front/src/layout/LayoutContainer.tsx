@@ -107,7 +107,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </Route>
 
               <PrivateRoute
-                path={routes.form.edit}
+                path={routes.dashboard.slips.edit}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -115,11 +115,34 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.form.create}
+                path={routes.dashboard.slips.create}
                 isAuthenticated={isAuthenticated}
                 exact
               >
                 <FormContainer />
+              </PrivateRoute>
+
+              {/*
+                This is a legacy URL we need to keep for some time
+                in order to redirect users from the old URL to the new one
+              */}
+              <PrivateRoute path="/form/:id?" isAuthenticated={isAuthenticated}>
+                {({ match }) => (
+                  <Redirect
+                    to={
+                      data && data.me.companies.length > 0
+                        ? match?.params?.id
+                          ? generatePath(routes.dashboard.slips.edit, {
+                              siret: data.me.companies[0].siret,
+                              id: match.params.id,
+                            })
+                          : generatePath(routes.dashboard.slips.create, {
+                              siret: data.me.companies[0].siret,
+                            })
+                        : routes.account.companies
+                    }
+                  />
+                )}
               </PrivateRoute>
 
               <PrivateRoute

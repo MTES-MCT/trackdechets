@@ -3,7 +3,7 @@ import { NetworkStatus } from "apollo-client";
 import React from "react";
 
 import { DuplicateFile } from "common/components/Icons";
-import { Link, useParams } from "react-router-dom";
+import { generatePath, Link, useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
 import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
@@ -35,7 +35,7 @@ export default function DraftsTab() {
         <h4>Il n'y a aucun bordereau en brouillon</h4>
         <p>
           Si vous le souhaitez, vous pouvez{" "}
-          <Link to={routes.form.create}>
+          <Link to={generatePath(routes.dashboard.slips.create, { siret })}>
             <button className="btn btn--outline-primary btn--medium-text">
               Créer un bordereau
             </button>{" "}
