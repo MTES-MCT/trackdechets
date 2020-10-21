@@ -70,7 +70,7 @@
     "@testing-library/jest-dom": "^4.1.2",
     "@testing-library/react": "^9.3.3",
     "@types/graphql": "^14.0.7",
-    "@types/jest": "^24.9.1",
+    "@types/jest": "^26.0.15",
     "@types/jwt-decode": "^2.2.1",
     "@types/luxon": "^1.4.2",
     "@types/node": "^10.17.27",
