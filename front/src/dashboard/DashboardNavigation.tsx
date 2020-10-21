@@ -36,7 +36,11 @@ export function DashboardNav({
           <DashboardCompanySelector
             siret={currentSiret}
             companies={companies}
-            handleCompanyChange={siret => history.push(`/dashboard/${siret}`)}
+            handleCompanyChange={siret =>
+              history.push(
+                generatePath(routes.dashboard.slips.drafts, { siret })
+              )
+            }
           />
         </div>
       ) : (

@@ -6,8 +6,9 @@ import {
   withRouter,
   Redirect,
 } from "react-router-dom";
- 
+
 import { localAuthService } from "./auth.service";
+import { routes } from "common/routes";
 
 const fieldErrorsProps = (fieldName, errorField) => {
   if (errorField === fieldName) {
@@ -41,7 +42,7 @@ export default withRouter(function Login(
       ...(!!returnTo ? { returnTo } : {}),
     };
 
-    return <Redirect to={{ pathname: "/login", state }} />;
+    return <Redirect to={{ pathname: routes.login, state }} />;
   }
 
   const { returnTo, error, errorField, username } =
@@ -87,9 +88,7 @@ export default withRouter(function Login(
             )}
           </div>
           {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-          {error && !errorField && (
-            <div className="error-message">{error}</div>
-          )}
+          {error && !errorField && <div className="error-message">{error}</div>}
           <div className="form__actions">
             <button
               className="btn btn--primary"
@@ -104,13 +103,13 @@ export default withRouter(function Login(
           </div>
           <p className="tw-my-5">
             Vous n'avez pas encore de compte ?{" "}
-            <Link to="/signup" className="link">
+            <Link to={routes.signup.index} className="link">
               Inscrivez vous maintenant
             </Link>
           </p>
           <p className="tw-my-5">
             Vous avez perdu votre mot de passe ?{" "}
-            <Link to="/reset-password" className="link">
+            <Link to={routes.resetPassword} className="link">
               Réinitialisez le
             </Link>
           </p>

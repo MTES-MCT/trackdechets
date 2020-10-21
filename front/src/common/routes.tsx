@@ -29,6 +29,7 @@ export const routes = {
   },
   form: {
     create: "/form",
+    edit: "/form/:id",
   },
   account: {
     index: "/account",

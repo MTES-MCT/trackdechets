@@ -93,14 +93,14 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
         ? generatePath(routes.dashboard.slips.drafts, {
             siret: currentSiret,
           })
-        : generatePath("/"),
+        : "/dashboard",
       onClick: () => trackEvent("navbar", "mon-espace"),
 
       navlink: true,
     },
     {
       caption: "Mon compte",
-      href: generatePath(routes.account.info),
+      href: routes.account.info,
       onClick: () => trackEvent("navbar", "mon-compte"),
 
       navlink: true,
@@ -166,12 +166,12 @@ export default withRouter(function Header({
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
   const closeMobileMenu = () => isMobile && toggleMenu(true);
   const matchAccount = matchPath(location.pathname, {
-    path: "/account/",
+    path: routes.account.index,
     exact: false,
     strict: false,
   });
   const matchDashboard = matchPath(location.pathname, {
-    path: "/dashboard/:siret",
+    path: routes.dashboard.index,
     exact: false,
     strict: false,
   });
@@ -282,7 +282,7 @@ export default withRouter(function Header({
                   className={`${styles.headerNavItem} ${styles.headerNavItemNoBorder}`}
                 >
                   <NavLink
-                    to="/signup"
+                    to={routes.signup.index}
                     className={`${styles.headerSignup} btn btn--sqr-outline`}
                     onClick={() => {
                       trackEvent("navbar", "login");
@@ -296,7 +296,7 @@ export default withRouter(function Header({
                   className={`${styles.headerNavItem} ${styles.headerNavItemNoBorder}`}
                 >
                   <NavLink
-                    to="/login"
+                    to={routes.login}
                     className={`${styles.headerConnexion} btn btn--sqr`}
                     onClick={() => {
                       trackEvent("navbar", "login");

@@ -14,6 +14,8 @@ import Slips from "../Slips";
 import TabContent from "./TabContent";
 import { COLORS } from "common/config";
 import EmptyTab from "./EmptyTab";
+import { routes } from "common/routes";
+
 export default function DraftsTab() {
   const { siret } = useContext(SiretContext);
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
@@ -34,7 +36,7 @@ export default function DraftsTab() {
         <h4>Il n'y a aucun bordereau en brouillon</h4>
         <p>
           Si vous le souhaitez, vous pouvez{" "}
-          <Link to={`/form?redirectTo=${siret}`}>
+          <Link to={routes.form.create}>
             <button className="btn btn--outline-primary btn--medium-text">
               Créer un bordereau
             </button>{" "}

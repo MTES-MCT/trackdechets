@@ -91,7 +91,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.index}
+                path="/dashboard/:siret?"
                 isAuthenticated={isAuthenticated}
               >
                 <Dashboard />
@@ -104,7 +104,7 @@ export default withRouter(function LayoutContainer({ history }) {
                 <Account />
               </PrivateRoute>
 
-              <Redirect to={isAuthenticated ? "/dashboard" : "/login"} />
+              <Redirect to={isAuthenticated ? "/dashboard" : routes.login} />
             </Switch>
           </Layout>
         </Route>

@@ -2,6 +2,8 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { tdContactEmail } from "common/config";
 import styles from "./SignupInfo.module.scss";
+import { routes } from "common/routes";
+
 interface LocationState {
   signupEmail: string;
 }
@@ -37,14 +39,16 @@ export default function SignupInfo() {
 
         <p className="body-text">
           Des questions, des interrogations ? N'hésitez pas à{" "}
-          <a href={`mailto:${tdContactEmail}`} className="link">nous contacter</a>.
+          <a href={`mailto:${tdContactEmail}`} className="link">
+            nous contacter
+          </a>
+          .
         </p>
         <p className="form__actions">
-        <Link to="/login" className="btn btn--primary">
-          Se connecter
-        </Link>
+          <Link to={routes.login} className="btn btn--primary">
+            Se connecter
+          </Link>
         </p>
-    
       </section>
     </div>
   );

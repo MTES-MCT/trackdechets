@@ -64,7 +64,7 @@ export default function Dashboard() {
 
     // if user doesn't belong to any company, redirect them to their account's companies
     if (!companies || companies.length === 0) {
-      return <Redirect to="/account/companies" />;
+      return <Redirect to={routes.account.companies} />;
     }
 
     // redirect to the user's first company if the siret is missing or invalid
