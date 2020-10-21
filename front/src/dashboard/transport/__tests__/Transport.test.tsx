@@ -7,7 +7,7 @@ import {
   waitForElement,
   fireEvent,
 } from "@testing-library/react";
-import { generatePath, MemoryRouter } from "react-router-dom";
+import { generatePath, MemoryRouter, Route } from "react-router-dom";
 import {
   Form,
   FormRole,
@@ -80,7 +80,9 @@ async function renderWith({ forms }: { forms: Form[] }) {
           }),
         ]}
       >
-        <TransportContent formType="TO_TAKE_OVER" />
+        <Route path={routes.dashboard.transport.toCollect}>
+          <TransportContent formType="TO_TAKE_OVER" />
+        </Route>
       </MemoryRouter>
     </MockedProvider>
   );
