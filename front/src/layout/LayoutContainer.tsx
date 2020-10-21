@@ -1,14 +1,20 @@
 import React, { lazy, Suspense, useEffect } from "react";
-import { Route, withRouter, Switch, Redirect } from "react-router";
-import { useAuth } from "./use-auth";
+import {
+  Route,
+  withRouter,
+  Switch,
+  Redirect,
+  generatePath,
+} from "react-router";
 import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
 import Loader from "common/components/Loaders";
 import Layout from "./Layout";
 import { routes } from "common/routes";
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-const dashBoardPreload = import("dashboard/Dashboard");
-const Dashboard = lazy(() => dashBoardPreload);
+const Dashboard = lazy(() => import("dashboard/Dashboard"));
 const Account = lazy(() => import("account/Account"));
 const FormContainer = lazy(() => import("form/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
@@ -22,6 +28,17 @@ const Dialog = lazy(() => import("oauth2/Dialog"));
 const Company = lazy(() => import("company/Company"));
 const WasteTree = lazy(() => import("search/WasteTree"));
 
+const GET_ME = gql`
+  query GetMe {
+    me {
+      id
+      companies {
+        siret
+      }
+    }
+  }
+`;
+
 export default withRouter(function LayoutContainer({ history }) {
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") {
@@ -34,7 +51,10 @@ export default withRouter(function LayoutContainer({ history }) {
     return () => unlisten();
   });
 
-  const { loading, isAuthenticated } = useAuth();
+  const { data, loading } = useQuery<{
+    me: { id: string; companies: Array<{ siret: string }> };
+  }>(GET_ME);
+  const isAuthenticated = !loading && data != null;
 
   if (loading) {
     return <Loader />;
@@ -103,7 +123,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path="/dashboard/:siret?"
+                path={routes.dashboard.index}
                 isAuthenticated={isAuthenticated}
               >
                 <Dashboard />
@@ -116,7 +136,17 @@ export default withRouter(function LayoutContainer({ history }) {
                 <Account />
               </PrivateRoute>
 
-              <Redirect to={isAuthenticated ? "/dashboard" : routes.login} />
+              <Redirect
+                to={
+                  data
+                    ? data.me.companies.length > 0
+                      ? generatePath(routes.dashboard.index, {
+                          siret: data.me.companies[0].siret,
+                        })
+                      : routes.account.companies
+                    : routes.login
+                }
+              />
             </Switch>
           </Layout>
         </Route>

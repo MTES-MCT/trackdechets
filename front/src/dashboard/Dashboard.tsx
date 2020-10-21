@@ -44,7 +44,7 @@ export const SiretContext = React.createContext({
 
 export default function Dashboard() {
   const match = useRouteMatch();
-  const { siret } = useParams<{ siret?: string }>();
+  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
@@ -60,20 +60,20 @@ export default function Dashboard() {
   if (error) return <InlineError apolloError={error} />;
 
   if (data) {
-    const companies = data.me.companies;
+    const companies = data.me.companies!;
 
-    // if user doesn't belong to any company, redirect them to their account's companies
-    if (!companies || companies.length === 0) {
-      return <Redirect to={routes.account.companies} />;
-    }
-
-    // redirect to the user's first company if the siret is missing or invalid
-    if (!siret || !companies.find(company => company.siret === siret)) {
+    // if the user is not part of the company whose siret is in the url
+    // redirect them to their first company or account if they're not part of any company
+    if (!companies.find(company => company.siret === siret)) {
       return (
         <Redirect
-          to={generatePath(routes.dashboard.slips.drafts, {
-            siret: companies[0].siret,
-          })}
+          to={
+            companies.length > 0
+              ? generatePath(routes.dashboard.slips.drafts, {
+                  siret: companies[0].siret,
+                })
+              : routes.account.companies
+          }
         />
       );
     }
