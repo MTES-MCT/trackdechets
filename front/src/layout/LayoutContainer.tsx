@@ -86,7 +86,19 @@ export default withRouter(function LayoutContainer({ history }) {
                 <WasteTree />
               </Route>
 
-              <PrivateRoute path="/form/:id?" isAuthenticated={isAuthenticated}>
+              <PrivateRoute
+                path={routes.form.edit}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <FormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.form.create}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
                 <FormContainer />
               </PrivateRoute>
 
