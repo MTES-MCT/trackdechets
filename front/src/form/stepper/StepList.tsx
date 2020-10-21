@@ -8,8 +8,7 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { useLocation, useHistory, useParams, generatePath } from "react-router";
-import queryString from "query-string";
+import { useHistory, useParams, generatePath } from "react-router";
 
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
@@ -38,8 +37,6 @@ export default function StepList(props: IProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = props.children.length - 1;
   const history = useHistory();
-  const { search } = useLocation();
-  const searchParams = queryString.parse(search);
 
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_FORM,
