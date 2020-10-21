@@ -8,7 +8,7 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { useLocation, useHistory, useParams } from "react-router";
+import { useLocation, useHistory, useParams, generatePath } from "react-router";
 import queryString from "query-string";
 
 import { InlineError } from "common/components/Error";
@@ -27,6 +27,7 @@ import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
 import "./StepList.scss";
+import { routes } from "common/routes";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
@@ -168,7 +169,7 @@ export default function StepList(props: IProps) {
                   })
                     .then(_ =>
                       history.push(
-                        `/dashboard/${searchParams.redirectTo ?? ""}`
+                        generatePath(routes.dashboard.slips.drafts, { siret })
                       )
                     )
                     .catch(err => {
