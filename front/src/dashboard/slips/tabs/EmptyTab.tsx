@@ -16,7 +16,7 @@ export default function EmptyTab(props: Props) {
           to={generatePath(routes.dashboard.slips.create, { siret })}
           className="btn btn--primary"
         >
-          Créer un bordereau…
+          Créer un bordereau
         </Link>
       </div>
 
