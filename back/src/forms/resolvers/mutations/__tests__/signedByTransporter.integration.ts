@@ -296,6 +296,7 @@ describe("Mutation.signedByTransporter", () => {
           sentAt: "2018-12-11T00:00:00.000Z",
           signedByTransporter: true,
           securityCode: ecoOrganisme.securityCode,
+          signatureAuthor: "ECO_ORGANISME",
           sentBy: "Roger Lapince",
           signedByProducer: true,
           packagings: form.wasteDetailsPackagings,
