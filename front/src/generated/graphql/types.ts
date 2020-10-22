@@ -15,9 +15,9 @@ export type Scalars = {
    * - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
    * - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
    */
-  DateTime: string;
+  DateTime: any;
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
-  URL: string;
+  URL: any;
   JSON: any;
 };
 
@@ -1384,8 +1384,19 @@ export type Query = {
    * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
    * préciser un SIRET
    * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-   * Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
-   * On peut également demander les bordereaux pour lesquels on est transporteur
+   * 
+   * Vous pouvez filtrer:
+   * - par rôle que joue votre entreprise sur le BSD via `role`
+   * - par date de dernière modification via `updatedBefore` / `updatedAfter`
+   * - par statut du BSD via `status`
+   * - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+   * 
+   * Par défaut:
+   * - tous les BSD accessibles sont retournés
+   * - les BSD sont classés par date de création, de la plus récente à la plus vieille
+   * - les résultats sont paginés par 50. Il est possible de modifier cette valeur
+   * via `first` ou `last` en fonction du curseur utilisé
+   * - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
    */
   forms: Array<Form>;
   /**
@@ -1447,11 +1458,18 @@ export type QueryFormPdfArgs = {
 
 export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
-  first: Maybe<Scalars['Int']>;
   skip: Maybe<Scalars['Int']>;
+  cursorAfter: Maybe<Scalars['ID']>;
+  first: Maybe<Scalars['Int']>;
+  cursorBefore: Maybe<Scalars['ID']>;
+  last: Maybe<Scalars['Int']>;
+  sentAfter: Maybe<Scalars['String']>;
+  updatedAfter: Maybe<Scalars['String']>;
   status: Maybe<Array<FormStatus>>;
   roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
+  siretPresentOnForm: Maybe<Scalars['String']>;
+  wasteCode: Maybe<Scalars['String']>;
 };
 
 
@@ -2248,7 +2266,7 @@ export function createCreateFormInputMock(props: Partial<CreateFormInput>): Crea
 export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderReceiptInput>): CreateTraderReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2257,7 +2275,7 @@ export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderRe
 export function createCreateTransporterReceiptInputMock(props: Partial<CreateTransporterReceiptInput>): CreateTransporterReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2561,7 +2579,7 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
     processingOperationDone: "",
     processingOperationDescription: null,
     processedBy: "",
-    processedAt: new Date().toISOString(),
+    processedAt: new Date(),
     nextDestination: null,
     noTraceability: null,
     ...props,
@@ -2573,7 +2591,7 @@ export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): 
     wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date().toISOString(),
+    receivedAt: new Date(),
     signedAt: null,
     quantityReceived: 0,
     ...props,
@@ -2616,7 +2634,7 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     wasteDetails: null,
     transporter: null,
     signedBy: "",
-    signedAt: new Date().toISOString(),
+    signedAt: new Date(),
     ...props,
   };
 }
@@ -2639,7 +2657,7 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     sentBy: "",
     ...props,
   };
@@ -2647,7 +2665,7 @@ export function createSentFormInputMock(props: Partial<SentFormInput>): SentForm
 
 export function createSignatureFormInputMock(props: Partial<SignatureFormInput>): SignatureFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     sentBy: "",
     ...props,
   };
@@ -2730,7 +2748,7 @@ export function createSubscriptionMock(props: Partial<Subscription>): Subscripti
 
 export function createTakeOverInputMock(props: Partial<TakeOverInput>): TakeOverInput {
   return {
-    takenOverAt: new Date().toISOString(),
+    takenOverAt: new Date(),
     takenOverBy: "",
     ...props,
   };
@@ -2774,7 +2792,7 @@ export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput
     wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date().toISOString(),
+    receivedAt: new Date(),
     signedAt: null,
     quantityReceived: 0,
     quantityType: QuantityType.Real,
@@ -2808,7 +2826,7 @@ export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderRe
     __typename: "TraderReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2846,7 +2864,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
     __typename: "TransporterReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props,
   };
@@ -2854,7 +2872,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
 
 export function createTransporterSignatureFormInputMock(props: Partial<TransporterSignatureFormInput>): TransporterSignatureFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     signedByTransporter: false,
     securityCode: 0,
     sentBy: "",

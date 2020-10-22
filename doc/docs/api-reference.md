@@ -130,8 +130,18 @@ alors les BSD de cette entreprise sont retournés.
 Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
 préciser un SIRET
 Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
-On peut également demander les bordereaux pour lesquels on est transporteur
+
+Vous pouvez filtrer:
+- par rôle que joue votre entreprise sur le BSD via `role`
+- par date de dernière modification via `updatedBefore` / `updatedAfter`
+- par statut du BSD via `status`
+- les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+
+Par défaut:
+- tous les BSD accessibles sont retournés
+- les BSD sont classés par date de création, de la plus récente à la plus vieille
+- les résultats sont paginés par 50. Il est possible de modifier cette valeur via `first` ou `last` en fonction du curseur utilisé
+- pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
 
 </td>
 </tr>
@@ -145,23 +155,87 @@ SIRET d'un établissement dont je suis membre
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">first</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td>
-
-Nombre de bordereaux retournés.
-Défaut à 50, maximum à 500
-
-</td>
-</tr>
-<tr>
 <td colspan="2" align="right" valign="top">skip</td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
+DEPRECATED - (Optionnel) PAGINATION
 Nombre d'éléments à ne pas récupérer en début de liste
-Permet de paginer les résultats
 Défaut à 0
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorAfter</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Curseur après lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les "premiers" bordereaux
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés après le `cursorAfter`
+Défaut à 50, maximum à 500
+Ignoré si utilisé avec `cursorBefore`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorBefore</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Curseur avant lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les "derniers" bordereaux
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">last</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés avant le `cursorBefore`
+Défaut à 50, maximum à 500
+Ignoré si utilisé avec `cursorAfter`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">sentAfter</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Retourne les BSD envoyés après la date
+Filtre sur la date d'envoi (date de la case 9 du bordereau)
+Au format (YYYY-MM-DD)
+Par défaut vide, aucun filtre n'est appliqué
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">updatedAfter</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Retourne les BSD modifiés après la date
+Filtre sur la date de dernière modification
+Au format (YYYY-MM-DD)
+Par défaut vide, aucun filtre n'est appliqué
 
 </td>
 </tr>
@@ -196,10 +270,33 @@ Défaut à vide.
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 
-(Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+(Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de votre part
 Si `true`, seul les bordereaux attendant une action sont renvoyés
 Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
 Si vide, tous les bordereaux sont renvoyés
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siretPresentOnForm</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Siret d'une autre entreprise présente sur le bordereau
+Vous n'avez pas besoin d'être membre de cette entreprise.
+Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">wasteCode</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Code déchet pour affiner la recherche
+Ex: 01 03 04* (Veillez à bien respecter les espaces).
 Défaut à vide.
 
 </td>

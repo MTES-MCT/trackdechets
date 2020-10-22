@@ -10,7 +10,7 @@ type Props = {
 export default function LoadMore({ forms, fetchMore }: Props) {
   if (forms.length < ITEMS_PER_PAGE) {
     return null;
-    
+
   }
 
   return (
@@ -20,7 +20,7 @@ export default function LoadMore({ forms, fetchMore }: Props) {
         onClick={() =>
           fetchMore({
             variables: {
-              skip: forms.length,
+              cursorAfter: forms[forms.length - 1].id,
             },
             updateQuery: (prev, { fetchMoreResult }) => {
               if (!fetchMoreResult) return prev;

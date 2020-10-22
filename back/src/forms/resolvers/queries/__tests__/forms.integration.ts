@@ -1,3 +1,4 @@
+import { addDays, format, subDays } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
 import {
@@ -302,26 +303,51 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
+    // Get the forms we just created, as ordered by the API
+    const { data: created } = await query(
+      `query {
+          forms {
+            id
+          }
+        }
+      `
+    );
 
-    const { data: firstForms } = await query(FORMS, {
-      variables: {
-        first: 4
-      }
-    });
+    const { data: firstForms } = await query(
+      `query {
+          forms(first: 4) {
+            id
+          }
+        }
+      `
+    );
     expect(firstForms.forms.length).toBe(4);
 
-    const { data: skippedForms } = await query(FORMS, {
-      variables: {
-        first: 4,
-        skip: 4
-      }
-    });
-    expect(skippedForms.forms.length).toBe(2);
+    const { data: formsAfter } = await query(
+      `query Forms($cursorAfter: ID) {
+          forms(cursorAfter: $cursorAfter) {
+            id
+          }
+        }
+      `,
+      { variables: { cursorAfter: created.forms[3].id } }
+    );
+    expect(formsAfter.forms.length).toBe(2);
+
+    const { data: formsBefore } = await query(
+      `query Forms($cursorBefore: ID) {
+          forms(cursorBefore: $cursorBefore) {
+            id
+          }
+        }
+      `,
+      { variables: { cursorBefore: created.forms[1].id } }
+    );
+    expect(formsBefore.forms.length).toBe(1);
   });
 
   it("should return 50 forms by default", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
-
     await Promise.all(
       Array.from({ length: 60 }).map(() =>
         formFactory({
@@ -335,9 +361,213 @@ describe("Query.forms", () => {
 
     const { query } = makeClient(user);
     const { data } = await query(FORMS);
-
     expect(data.forms.length).toBe(50);
   });
+
+  it("should not accepted a first argument lower than 1 or greater than 500", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    // The user has many forms, and a different role in each
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { errors: zeroErrors } = await query(
+      `query Forms($first: Int) {
+          forms(first: $first) {
+            id
+          }
+        }
+      `,
+      { variables: { first: 0 } }
+    );
+    expect(zeroErrors.length).toBe(1);
+
+    const { errors: negativeErrors } = await query(
+      `query Forms($first: Int) {
+          forms(first: $first) {
+            id
+          }
+        }
+      `,
+      { variables: { first: -1 } }
+    );
+    expect(negativeErrors.length).toBe(1);
+
+    const { errors: tooBigErrors } = await query(
+      `query Forms($first: Int) {
+          forms(first: $first) {
+            id
+          }
+        }
+      `,
+      { variables: { first: 501 } }
+    );
+    expect(tooBigErrors.length).toBe(1);
+  });
+
+  it("should filter by siret", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const otherCompany = await companyFactory();
+
+    await prisma.createCompanyAssociation({
+      company: { connect: { id: otherCompany.id } },
+      user: { connect: { id: user.id } },
+      role: "ADMIN"
+    });
+
+    // 1 form on each company
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: otherCompany.name,
+        recipientCompanySiret: otherCompany.siret
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { data } = await query(
+      `query {
+          forms(siret: "${otherCompany.siret}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
+  });
+
+  it("should filter by updatedAt", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    ]);
+
+    const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+    const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
+
+    const { query } = makeClient(user);
+    const { data: updatedAfterYesterday } = await query(
+      `query {
+          forms(updatedAfter: "${yesterday}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedAfterYesterday.forms.length).toBe(2);
+
+    const { data: updatedAfterTomorrow } = await query(
+      `query {
+          forms(updatedAfter: "${tomorrow}") {
+            id
+            recipient {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(updatedAfterTomorrow.forms.length).toBe(0);
+  });
+
+  it("should filter by waste code", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    await createForms(user.id, [
+      {
+        wasteDetailsCode: "01 03 04*",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        wasteDetailsCode: "01 03 05*",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { data } = await query(
+      `query Forms($wasteCode: String) {
+          forms(wasteCode: $wasteCode) {
+            id
+            wasteDetails {
+              code
+            }
+          }
+        }
+      `,
+      { variables: { wasteCode: "01 03 04*" } }
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].wasteDetails.code).toBe("01 03 04*");
+  });
+
+  it("should filter by siretPresentOnForm", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const otherCompany = await companyFactory();
+
+    await createForms(user.id, [
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        emitterCompanyName: otherCompany.name,
+        emitterCompanySiret: otherCompany.siret
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { data } = await query(
+      `query {
+          forms(siretPresentOnForm: "${otherCompany.siret}") {
+            id
+            emitter {
+              company { siret }
+            }
+          }
+        }
+      `
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].emitter.company.siret).toBe(otherCompany.siret);
+  });
+});
+
+describe("Integration / Forms query for transporters", () => {
+  afterEach(() => resetDatabase());
 
   it("should return forms transported by initial transporter", async () => {
     const owner = await userFactory();
