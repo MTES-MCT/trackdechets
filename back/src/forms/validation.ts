@@ -115,7 +115,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyMail"
 >;
 
-type TempStorageInfo = Pick<
+export type TempStorageInfo = Pick<
   TemporaryStorageDetail,
   | "tempStorerQuantityType"
   | "tempStorerQuantityReceived"
