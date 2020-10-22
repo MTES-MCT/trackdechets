@@ -70,11 +70,15 @@ export default function AccountFormAgreements({
                       className={styles.input__group}
                       style={{ alignItems: "normal", marginBottom: "10px" }}
                     >
-                      <Field name={`${name}.${index}`} type="url" />
+                      <Field
+                        name={`${name}.${index}`}
+                        type="url"
+                        className="td-input"
+                      />
 
                       <button
                         type="button"
-                        className="button-outline small warning"
+                        className="btn btn--outline-danger"
                         onClick={() => remove(index)}
                         aria-label="Supprimer"
                       >
@@ -85,7 +89,7 @@ export default function AccountFormAgreements({
                 </div>
                 {error && <InlineError apolloError={error} />}
                 <button
-                  className="button-outline primary"
+                  className="btn btn--primary"
                   type="button"
                   disabled={loading}
                   onClick={() => push("")}
@@ -93,7 +97,11 @@ export default function AccountFormAgreements({
                   Ajouter un agrément
                 </button>
                 &nbsp;
-                <button className="button" type="submit" disabled={loading}>
+                <button
+                  className="btn btn--primary"
+                  type="submit"
+                  disabled={loading}
+                >
                   {loading ? "Chargement..." : "Valider"}
                 </button>
               </>

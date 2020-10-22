@@ -1,6 +1,7 @@
 import React from "react";
 import { FaTrash } from "react-icons/fa";
 import { Field, FieldArray, useField } from "formik";
+import className from "classnames";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "../AccountCompanyAdd.module.scss";
 
@@ -27,11 +28,14 @@ export default function AccountCompanyAddEcoOrganisme() {
                           <Field
                             type="url"
                             name={`ecoOrganismeAgreements.${index}`}
-                            className={styles.inputGroupInput}
+                            className={className([
+                              "td-input",
+                              styles.inputGroupInput,
+                            ])}
                           />
                           <button
                             type="button"
-                            className="button-outline small warning"
+                            className="btn btn--outline-danger"
                             onClick={() => remove(index)}
                             aria-label="Supprimer"
                           >
@@ -41,7 +45,7 @@ export default function AccountCompanyAddEcoOrganisme() {
                       ))}
                       <button
                         type="button"
-                        className="button-outline primary"
+                        className="btn btn--primary"
                         onClick={() => push("")}
                       >
                         Ajouter un agrément
