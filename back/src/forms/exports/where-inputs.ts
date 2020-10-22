@@ -45,11 +45,8 @@ export function formsWhereInput(
  */
 function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
-    AND: [
-      { emitterCompanySiret_in: sirets },
-      { ecoOrganismeSiret_in: sirets },
-      { status_not_in: ["DRAFT", "SEALED"] }
-    ]
+    OR: [{ emitterCompanySiret_in: sirets }, { ecoOrganismeSiret_in: sirets }],
+    AND: [{ status_not_in: ["DRAFT", "SEALED"] }]
   };
 }
 
