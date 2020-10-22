@@ -1697,6 +1697,14 @@ export type SentFormInput = {
   sentBy: Scalars['String'];
 };
 
+/** Dénomination de l'auteur de la signature */
+export enum SignatureAuthor {
+  /** L'auteur de la signature est l'émetteur du déchet */
+  Emitter = 'EMITTER',
+  /** L'auteur de la signature est l'éco-organisme figurant sur le BSD */
+  EcoOrganisme = 'ECO_ORGANISME'
+}
+
 /** Payload simplifié de signature d'un BSD par un transporteur */
 export type SignatureFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
@@ -1960,6 +1968,8 @@ export type TransporterSignatureFormInput = {
   signedByTransporter: Scalars['Boolean'];
   /** Code de sécurité permettant d'authentifier l'émetteur */
   securityCode: Scalars['Int'];
+  /** Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur */
+  signatureAuthor: Maybe<SignatureAuthor>;
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars['String'];
   /** Si oui on non le BSD a été signé par l'émetteur */
@@ -2970,6 +2980,7 @@ export function createTransporterSignatureFormInputMock(props: Partial<Transport
     sentAt: new Date().toISOString(),
     signedByTransporter: false,
     securityCode: 0,
+    signatureAuthor: null,
     sentBy: "",
     signedByProducer: false,
     packagings: [],

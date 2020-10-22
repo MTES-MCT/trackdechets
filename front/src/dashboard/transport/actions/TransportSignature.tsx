@@ -13,6 +13,7 @@ import {
   MutationSignedByTransporterArgs,
   FormStatus,
   FormRole,
+  SignatureAuthor,
 } from "generated/graphql/types";
 import Packagings from "form/packagings/Packagings";
 import { FORMS_PDF } from "dashboard/slips/slips-actions/DownloadPdf";
@@ -109,9 +110,6 @@ export default function TransportSignature({
       });
     },
   });
-  const [signatureAuthor, setSignatureAuthor] = useState<
-    "EMITTER" | "ECO_ORGANISME"
-  >("EMITTER");
 
   const isPendingTransportFromEmitter =
     form.status === "SEALED" && form.transporter?.company?.siret === userSiret;
@@ -163,6 +161,7 @@ export default function TransportSignature({
             securityCode: "",
             signedByTransporter: false,
             signedByProducer: true,
+            signatureAuthor: SignatureAuthor.Emitter,
             packagings: form.stateSummary?.packagings,
             quantity: form.stateSummary?.quantity ?? "",
             onuCode: form.stateSummary?.onuCode ?? "",
@@ -362,11 +361,10 @@ export default function TransportSignature({
 
                   <div className="form__row">
                     <label>
-                      <input
+                      <Field
                         type="radio"
                         name="signatureAuthor"
-                        onChange={() => setSignatureAuthor("EMITTER")}
-                        checked={signatureAuthor === "EMITTER"}
+                        value={SignatureAuthor.Emitter}
                         className="td-radio"
                       />
                       En tant que{" "}
@@ -378,7 +376,7 @@ export default function TransportSignature({
                       et je valide l'enlèvement.
                     </label>
                   </div>
-                  {signatureAuthor === "EMITTER" && (
+                  {values.signatureAuthor === SignatureAuthor.Emitter && (
                     <>
                       <div className="form__row">
                         <label
@@ -412,11 +410,10 @@ export default function TransportSignature({
                     <>
                       <div className="form__row">
                         <label>
-                          <input
+                          <Field
                             type="radio"
                             name="signatureAuthor"
-                            onChange={() => setSignatureAuthor("ECO_ORGANISME")}
-                            checked={signatureAuthor === "ECO_ORGANISME"}
+                            value={SignatureAuthor.EcoOrganisme}
                             className="td-radio"
                           />
                           En tant que <strong>éco-organisme</strong> responsable
@@ -425,7 +422,8 @@ export default function TransportSignature({
                           ci-avant et je valide l'enlèvement.
                         </label>
                       </div>
-                      {signatureAuthor === "ECO_ORGANISME" && (
+                      {values.signatureAuthor ===
+                        SignatureAuthor.EcoOrganisme && (
                         <>
                           <div className="form__row">
                             <label

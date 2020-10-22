@@ -5069,6 +5069,15 @@ Code de sécurité permettant d'authentifier l'émetteur
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>signatureAuthor</strong></td>
+<td valign="top"><a href="#signatureauthor">SignatureAuthor</a></td>
+<td>
+
+Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td>
@@ -5947,6 +5956,35 @@ Quntité réelle
 <td>
 
 Quantité estimée
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### SignatureAuthor
+
+Dénomination de l'auteur de la signature
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>EMITTER</strong></td>
+<td>
+
+L'auteur de la signature est l'émetteur du déchet
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>ECO_ORGANISME</strong></td>
+<td>
+
+L'auteur de la signature est l'éco-organisme figurant sur le BSD
 
 </td>
 </tr>

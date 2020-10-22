@@ -268,16 +268,8 @@ export async function checkCanImportForm(user: User, form: Form) {
   return true;
 }
 
-export async function checkSecurityCode(
-  sirets: string[],
-  securityCode: number
-) {
-  const exists = await prisma.$exists.company({
-    OR: sirets.map(siret => ({
-      siret,
-      securityCode
-    }))
-  });
+export async function checkSecurityCode(siret: string, securityCode: number) {
+  const exists = await prisma.$exists.company({ siret, securityCode });
   if (!exists) {
     throw new InvaliSecurityCode();
   }
