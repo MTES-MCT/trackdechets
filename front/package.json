@@ -7,7 +7,7 @@
     "@apollo/react-hooks": "^3.1.5",
     "@reach/dialog": "^0.11.2",
     "@reach/tooltip": "^0.11.2",
-    "@sentry/browser": "^5.12.5",
+    "@sentry/browser": "^5.27.0",
     "@types/mapbox-gl": "^0.54.5",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
