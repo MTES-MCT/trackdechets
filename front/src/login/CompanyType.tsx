@@ -50,7 +50,7 @@ export const COMPANY_TYPES = [
     value: CompanyType.EcoOrganisme,
     label: "Éco-organisme",
     helpText:
-      "Éco-organisme agréé par l'état pour la collecte des déchets sous sa responsabilité",
+      "Société prenant en charge la gestion des déchets, dans le cadre de la REP (Responsabilité élargie du producteur)",
   },
 ];
 
