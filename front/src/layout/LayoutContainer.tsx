@@ -10,7 +10,7 @@ import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
 import Loader from "common/components/Loaders";
 import Layout from "./Layout";
-import { routes } from "common/routes";
+import routes from "common/routes";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 

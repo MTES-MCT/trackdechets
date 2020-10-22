@@ -13,7 +13,7 @@ import Slips from "../Slips";
 import TabContent from "./TabContent";
 import { COLORS } from "common/config";
 import EmptyTab from "./EmptyTab";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 export default function DraftsTab() {
   const { siret } = useParams<{ siret: string }>();

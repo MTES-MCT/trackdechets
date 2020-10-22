@@ -14,7 +14,7 @@ import {
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 type Props = {
   formId: string;

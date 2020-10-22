@@ -2,7 +2,7 @@ import React from "react";
 import SideMenu from "../common/components/SideMenu";
 import { NavLink } from "react-router-dom";
 import styles from "./AccountMenu.module.scss";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 export const AccountMenuContent = ({
   mobileCallback,

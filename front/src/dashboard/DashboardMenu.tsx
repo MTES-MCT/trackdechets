@@ -4,7 +4,7 @@ import SideMenu from "common/components/SideMenu";
 import { CompanyType, User } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import "./DashboardMenu.scss";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 interface IProps {
   me: User;

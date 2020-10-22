@@ -10,7 +10,7 @@ import {
   useHistory,
 } from "react-router";
 import { useParams } from "react-router-dom";
-import { routes } from "common/routes";
+import routes from "common/routes";
 import { InlineError } from "../common/components/Error";
 import Loader from "../common/components/Loaders";
 import "./Dashboard.scss";

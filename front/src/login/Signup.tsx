@@ -10,7 +10,7 @@ import { SIGNUP } from "./mutations";
 import styles from "./Signup.module.scss";
 import { Wizard } from "./Wizard";
 import { Mutation, MutationSignupArgs } from "generated/graphql/types";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 export default function Signup() {
   const [passwordType, setPasswordType] = useState("password");

@@ -3,7 +3,7 @@ import { FaCheck, FaRegCircle } from "react-icons/fa";
 import styles from "./CompanyResult.module.scss";
 import { CompanySearchResult } from "../../generated/graphql/types";
 import { generatePath } from "react-router-dom";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 interface CompanyResultsProps<T> {
   results: T[];

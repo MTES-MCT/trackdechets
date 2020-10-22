@@ -15,7 +15,7 @@ import {
   Layout2Icon,
   LayoutModule1Icon,
 } from "common/components/Icons";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 import { GET_TRANSPORT_SLIPS } from "./queries";
 import useLocalStorage from "common/hooks/useLocalStorage";

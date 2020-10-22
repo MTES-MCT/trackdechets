@@ -1,4 +1,4 @@
-import { routes } from "common/routes";
+import routes from "common/routes";
 import React from "react";
 import { Route, Redirect, RouteProps, useLocation } from "react-router";
 

@@ -24,7 +24,7 @@ import {
 import { TransportContent } from "dashboard/transport/Transport";
 import { GET_TRANSPORT_SLIPS } from "dashboard/transport/queries";
 import { mockMatchMediaWidth } from "common/__mocks__/matchmedia.mock";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({

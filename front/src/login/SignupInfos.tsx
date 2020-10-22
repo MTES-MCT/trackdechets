@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { tdContactEmail } from "common/config";
 import styles from "./SignupInfo.module.scss";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 interface LocationState {
   signupEmail: string;

@@ -12,7 +12,7 @@ import {
 import { GET_SLIPS } from "../query";
 import mutations from "./slip-actions.mutations";
 import { COLORS } from "common/config";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 type Props = {
   formId: string;

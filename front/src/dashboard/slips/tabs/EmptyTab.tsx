@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useParams, generatePath } from "react-router-dom";
-import { routes } from "common/routes";
+import routes from "common/routes";
 import styles from "../SlipsHeaderActions.module.scss";
 
 interface Props {

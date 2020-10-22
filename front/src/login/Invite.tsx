@@ -12,7 +12,7 @@ import {
 } from "../generated/graphql/types";
 import Loader from "common/components/Loaders";
 import { NotificationError } from "common/components/Error";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 const INVITATION = gql`
   query Invitation($hash: String!) {

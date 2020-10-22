@@ -4,7 +4,7 @@ import { generatePath, NavLink, useHistory } from "react-router-dom";
 import Loader from "common/components/Loaders";
 import { InlineError } from "common/components/Error";
 import DashboardCompanySelector from "dashboard/DashboardCompanySelector";
-import { routes } from "common/routes";
+import routes from "common/routes";
 import { CompanyType } from "generated/graphql/types";
 import styles from "./DashboardNavigation.module.scss";
 

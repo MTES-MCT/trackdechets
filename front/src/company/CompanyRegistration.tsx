@@ -1,6 +1,6 @@
 import React from "react";
 import { CompanyPublic } from "generated/graphql/types";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 type Props = Pick<CompanyPublic, "isRegistered">;
 

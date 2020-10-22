@@ -4,7 +4,7 @@ import { PaperWriteIcon } from "common/components/Icons";
 
 import { generatePath, Link, useParams } from "react-router-dom";
 import { COLORS } from "common/config";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 type Props = { formId: string; small?: boolean };
 

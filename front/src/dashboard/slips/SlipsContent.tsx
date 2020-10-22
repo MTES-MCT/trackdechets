@@ -7,7 +7,7 @@ import {
   useParams,
 } from "react-router-dom";
 
-import { routes } from "common/routes";
+import routes from "common/routes";
 import "./SlipsContent.scss";
 import ActTab from "./tabs/ActTab";
 import DraftsTab from "./tabs/DraftsTab";

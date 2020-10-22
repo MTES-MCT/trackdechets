@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 
 import { localAuthService } from "./auth.service";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 const fieldErrorsProps = (fieldName, errorField) => {
   if (errorField === fieldName) {

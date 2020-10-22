@@ -26,7 +26,7 @@ import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
 import "./StepList.scss";
-import { routes } from "common/routes";
+import routes from "common/routes";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];

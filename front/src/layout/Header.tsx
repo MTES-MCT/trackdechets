@@ -20,7 +20,7 @@ import { InlineError } from "common/components/Error";
 import { Query } from "generated/graphql/types";
 import { DashboardNav } from "dashboard/DashboardNavigation";
 
-import { routes } from "common/routes";
+import routes from "common/routes";
 import { MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import useMedia from "use-media";
