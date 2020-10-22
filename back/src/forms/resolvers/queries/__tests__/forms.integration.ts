@@ -499,6 +499,7 @@ describe("Query.forms", () => {
   });
 
   it("should filter by waste code", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     await createForms(user.id, [
       {
         wasteDetailsCode: "01 03 04*",
@@ -512,6 +513,7 @@ describe("Query.forms", () => {
       }
     ]);
 
+    const { query } = makeClient(user);
     const { data } = await query(
       `query Forms($wasteCode: String) {
           forms(wasteCode: $wasteCode) {
