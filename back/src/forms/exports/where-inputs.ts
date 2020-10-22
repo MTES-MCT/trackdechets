@@ -47,6 +47,7 @@ function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
     AND: [
       { emitterCompanySiret_in: sirets },
+      { ecoOrganismeSiret_in: sirets },
       { status_not_in: ["DRAFT", "SEALED"] }
     ]
   };
@@ -171,6 +172,7 @@ function allWasteWhereInput(sirets: string[]): FormWhereInput {
       {
         OR: [
           { emitterCompanySiret_in: sirets },
+          { ecoOrganismeSiret_in: sirets },
           { recipientCompanySiret_in: sirets },
           { traderCompanySiret_in: sirets },
           {
