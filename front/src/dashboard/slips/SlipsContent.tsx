@@ -36,13 +36,11 @@ export default function SlipsContent() {
         <Route path={routes.dashboard.slips.history}>
           <HistoryTab />
         </Route>
-        <Route>
-          <Redirect
-            to={generatePath(routes.dashboard.slips.drafts, {
-              siret,
-            })}
-          />
-        </Route>
+        <Redirect
+          to={generatePath(routes.dashboard.slips.drafts, {
+            siret,
+          })}
+        />
       </Switch>
     </div>
   );

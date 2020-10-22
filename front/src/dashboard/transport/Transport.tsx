@@ -50,13 +50,11 @@ export default function Transport() {
         <Route path={routes.dashboard.transport.collected}>
           <TransportContent formType="TAKEN_OVER" />
         </Route>
-        <Route>
-          <Redirect
-            to={generatePath(routes.dashboard.transport.toCollect, {
-              siret,
-            })}
-          />
-        </Route>
+        <Redirect
+          to={generatePath(routes.dashboard.transport.toCollect, {
+            siret,
+          })}
+        />
       </Switch>
     </div>
   );

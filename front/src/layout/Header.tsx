@@ -90,10 +90,10 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
     {
       caption: "Mon espace",
       href: currentSiret
-        ? generatePath(routes.dashboard.slips.drafts, {
+        ? generatePath(routes.dashboard.index, {
             siret: currentSiret,
           })
-        : "/dashboard",
+        : "/",
       onClick: () => trackEvent("navbar", "mon-espace"),
 
       navlink: true,
@@ -123,7 +123,7 @@ const MenuLink = ({ entry, mobileCallback }) => {
         <NavLink
           className={styles.headerNavLink}
           to={entry.href}
-          exact={false}
+          exact={entry.href === "/"}
           onClick={() => {
             entry.onClick();
             mobileCallback && mobileCallback();
