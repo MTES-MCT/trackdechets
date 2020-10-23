@@ -47,7 +47,7 @@ export default function Dashboard() {
   if (error) return <InlineError apolloError={error} />;
 
   if (data) {
-    const companies = data.me.companies!;
+    const companies = data.me.companies;
 
     // if the user is not part of the company whose siret is in the url
     // redirect them to their first company or account if they're not part of any company
