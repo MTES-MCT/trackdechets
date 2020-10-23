@@ -10,11 +10,13 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 
-// Sentry setup
-const { REACT_APP_SENTRY_DSN } = process.env;
-if (!!REACT_APP_SENTRY_DSN) {
-  Sentry.init({ dsn: REACT_APP_SENTRY_DSN });
-  Sentry.configureScope(scope => scope.setTag("service", "frontend")); // tell apart logs from our different services
+const { REACT_APP_SENTRY_DSN, REACT_APP_SENTRY_ENVIRONMENT } = process.env;
+
+if (REACT_APP_SENTRY_DSN && REACT_APP_SENTRY_ENVIRONMENT) {
+  Sentry.init({
+    dsn: REACT_APP_SENTRY_DSN,
+    environment: REACT_APP_SENTRY_ENVIRONMENT,
+  });
 }
 
 const rootElement = document.getElementById("root");
