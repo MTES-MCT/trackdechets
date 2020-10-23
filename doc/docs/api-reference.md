@@ -950,7 +950,8 @@ L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionneme
 grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
 D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
 renseigne le code de sécurité sur le terminal du collecteur-transporteur.
-Dans le cas où un éco-organisme est responsable du déchet, le code de celui-ci peut être utilisé pour signer.
+Dans le cas où un éco-organisme figure sur le BSD, il est également possible de signer avec son code plutôt que celui de l'émetteur.
+Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est l'auteur de la signature (signingInfo.signatureAuthor doit valoir ECO_ORGANISME).
 
 </td>
 </tr>
