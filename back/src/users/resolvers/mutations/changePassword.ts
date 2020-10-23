@@ -25,11 +25,16 @@ export async function changePasswordFn(
   }
 
   const hashedPassword = await hashPassword(newPassword);
-
-  return prisma.updateUser({
+  const updatedUser = await prisma.updateUser({
     where: { id: userId },
     data: { password: hashedPassword }
   });
+
+  return {
+    ...updatedUser,
+    // companies are resolved through a separate resolver (User.companies)
+    companies: []
+  };
 }
 
 const changePasswordResolver: MutationResolvers["changePassword"] = (

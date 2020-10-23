@@ -3304,7 +3304,7 @@ Numéro de téléphone de l'utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companies</strong></td>
-<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>!]</td>
+<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>!]!</td>
 <td>
 
 Liste des établissements dont l'utilisateur est membre

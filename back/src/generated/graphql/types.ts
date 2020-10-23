@@ -1961,7 +1961,7 @@ export type User = {
   /** Numéro de téléphone de l'utilisateur */
   phone?: Maybe<Scalars['String']>;
   /** Liste des établissements dont l'utilisateur est membre */
-  companies?: Maybe<Array<CompanyPrivate>>;
+  companies: Array<CompanyPrivate>;
 };
 
 /**
@@ -2805,7 +2805,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  companies?: Resolver<Maybe<Array<ResolversTypes['CompanyPrivate']>>, ParentType, ContextType>;
+  companies?: Resolver<Array<ResolversTypes['CompanyPrivate']>, ParentType, ContextType>;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
@@ -3720,7 +3720,7 @@ export function createUserMock(props: Partial<User>): User {
     email: "",
     name: null,
     phone: null,
-    companies: null,
+    companies: [],
     ...props,
   };
 }

@@ -53,7 +53,11 @@ export async function signupFn({
   await acceptNewUserCompanyInvitations(user);
   await sendMail(userMails.onSignup(user, userActivationHash.hash));
 
-  return user;
+  return {
+    ...user,
+    // companies are resolved through a separate resolver (User.companies)
+    companies: []
+  };
 }
 
 const signupResolver: MutationResolvers["signup"] = async (parent, args) => {

@@ -1970,7 +1970,7 @@ export type User = {
   /** Numéro de téléphone de l'utilisateur */
   phone: Maybe<Scalars['String']>;
   /** Liste des établissements dont l'utilisateur est membre */
-  companies: Maybe<Array<CompanyPrivate>>;
+  companies: Array<CompanyPrivate>;
 };
 
 /**
@@ -2933,7 +2933,7 @@ export function createUserMock(props: Partial<User>): User {
     email: "",
     name: null,
     phone: null,
-    companies: null,
+    companies: [],
     ...props,
   };
 }
