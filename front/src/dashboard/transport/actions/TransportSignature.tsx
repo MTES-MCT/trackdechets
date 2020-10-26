@@ -47,6 +47,26 @@ export const SIGNED_BY_TRANSPORTER = gql`
 
 type Props = { form: Form; userSiret: string; inCard?: boolean };
 
+/**
+ *
+ * Displays collect address:
+ * - worksite address if it is filled and status is SEALED
+ * - emitter company (initial or temp storage) address if status is RESEALED or worksite address is not filled
+ */
+const CollectAddress = ({ form }: { form: Form }) =>
+  !!form.emitter?.workSite?.name && form.status === "SEALED" ? (
+    <>
+      {form.emitter?.workSite?.name} ({form.stateSummary?.emitter?.siret})
+      <br /> {form.emitter?.workSite?.address}{" "}
+      {form.emitter?.workSite?.postalCode} {form.emitter?.workSite?.city}
+    </>
+  ) : (
+    <>
+      {form.stateSummary?.emitter?.name} ({form.stateSummary?.emitter?.siret})
+      <br /> {form.stateSummary?.emitter?.address}
+    </>
+  );
+
 export default function TransportSignature({
   form,
   userSiret,
@@ -176,10 +196,7 @@ export default function TransportSignature({
                     aria-labelledby="collect-address-trs"
                     className={styles.address}
                   >
-                    {form.stateSummary?.emitter?.name} (
-                    {form.stateSummary?.emitter?.siret}
-                    )
-                    <br /> {form.stateSummary?.emitter?.address}
+                    <CollectAddress form={form} />
                   </address>
                 </div>
                 <div className="form__row">
@@ -296,9 +313,7 @@ export default function TransportSignature({
                       aria-labelledby="collect-address"
                       className={styles.address}
                     >
-                      {form.stateSummary?.emitter?.name} (
-                      {form.stateSummary?.emitter?.siret})
-                      <br /> {form.stateSummary?.emitter?.address}
+                      <CollectAddress form={form} />
                     </address>
                   </div>
                   <h3>Déchets</h3>
