@@ -1,5 +1,10 @@
-import { Consistence, Packagings,   WasteAcceptationStatusInput as WasteAcceptationStatus, QuantityType} from "generated/graphql/types";
-import Maybe from "graphql/tsutils/Maybe";
+import {
+  Consistence,
+  Packagings,
+  WasteAcceptationStatusInput as WasteAcceptationStatus,
+  QuantityType,
+} from "generated/graphql/types";
+
 export const getVerboseConsistence = (
   consistence: Consistence | null | undefined | ""
 ): string => {
@@ -24,24 +29,27 @@ export const formatPackagings = (packagings: Packagings[]): string => {
   return packagings.map(p => getVerbosePackaging(p)).join(" ");
 };
 
-
-export const getVerboseAcceptationStatus= (
-  acceptationStatus:  WasteAcceptationStatus | null | undefined | string 
+export const getVerboseAcceptationStatus = (
+  acceptationStatus: WasteAcceptationStatus | null | undefined | string
 ): string => {
   if (!acceptationStatus) {
     return "";
   }
-  const verbose = { "ACCEPTED": "Accepté", "REFUSED": "Refusé","PARTIALLY REFUSED": "Accepté partiellement" };
+  const verbose = {
+    ACCEPTED: "Accepté",
+    REFUSED: "Refusé",
+    "PARTIALLY REFUSED": "Accepté partiellement",
+  };
 
   return verbose[acceptationStatus];
 };
 
-export const getVerboseQuantityType= (
+export const getVerboseQuantityType = (
   quantityType: QuantityType | null | undefined | ""
 ): string => {
   if (!quantityType) {
     return "";
   }
- 
-  return   (quantityType === "REAL")? "Réelle" : "Estimée"
+
+  return quantityType === "REAL" ? "Réelle" : "Estimée";
 };

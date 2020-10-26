@@ -2,7 +2,6 @@ import React from "react";
 import { isoDate } from "common/datetime";
 import { formatPackagings } from "./utils";
 import { Packagings } from "generated/graphql/types";
-import styles from "./Slip.module.scss";
 
 export const DetailRow = ({ value, label }) => {
   if (!value) {
@@ -47,7 +46,7 @@ export const PackagingRow = ({
   packagings?: Packagings[];
   numberOfPackages: number | null | undefined;
 }) => (
-  < >
+  <>
     <dt>Conditionnement</dt>
     <dd>
       {!!packagings && formatPackagings(packagings)}
