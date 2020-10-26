@@ -646,6 +646,8 @@ export function cleanUpNotDuplicatableFieldsInForm(form: Form): Partial<Form> {
     quantityReceived,
     processingOperationDone,
     currentTransporterSiret,
+    signedByTransporter,
+    transporterCustomInfo,
     ...rest
   } = form;
 
