@@ -6,6 +6,7 @@
   overflow: visible;
   padding: 2x;
   min-width: 63px; // computed dropdown menu width
+  max-width: 70px;
 
   &__content {
     padding-top: 0.25rem;
