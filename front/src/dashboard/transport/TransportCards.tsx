@@ -14,7 +14,6 @@ import { Segments } from "./Segments";
 import styles from "./TransportCards.module.scss";
 export const TransportCards = ({ forms, userSiret, refetchQuery }) => {
   const [sortedForms] = useFormsTable(forms);
-
   return (
     <ul className={styles.transportCards}>
       {sortedForms.map(form => (
@@ -33,9 +32,7 @@ export const TransportCards = ({ forms, userSiret, refetchQuery }) => {
           </div>
           <div className={styles.detailRow}>
             <dt>Déchet</dt>
-            <dd>
-              {form.wasteDetails?.code} {form.wasteDetails?.name}
-            </dd>
+            <dd>{form.wasteDetails?.name}</dd>
           </div>
           <div className={styles.detailRow}>
             <dt>Quantité</dt>
