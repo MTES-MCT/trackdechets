@@ -491,6 +491,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
         mail: form.traderCompanyMail
       }),
       receipt: form.traderReceipt,
+      department: form.traderDepartment,
       validityLimit: form.traderValidityLimit
     }),
     ecoOrganisme: nullIfNoValues<FormEcoOrganisme>({

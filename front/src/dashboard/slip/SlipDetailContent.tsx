@@ -152,6 +152,7 @@ const Trader = ({ trader }) => (
     </div>
     <div className={styles.detailGrid}>
       <DetailRow value={trader.receipt} label="Récépissé" />
+      <DetailRow value={trader.department} label="Départment" />
       <DateRow value={trader.validityLimit} label="Date de validité" />
     </div>
   </>
