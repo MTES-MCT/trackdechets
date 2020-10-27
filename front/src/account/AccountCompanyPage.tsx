@@ -6,6 +6,8 @@ import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContact
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
 import AccountFieldCompanyAgreements from "./fields/AccountFieldCompanyAgreements";
 import { CompanyPrivate, CompanyType } from "../generated/graphql/types";
+import { generatePath } from "react-router-dom";
+import routes from "common/routes";
 
 type Props = {
   company: CompanyPrivate;
@@ -32,7 +34,7 @@ export default function AccountCompanyPage({ company }: Props) {
   const companyPage =
     `${process.env.REACT_APP_URL_SCHEME}://` +
     `${process.env.REACT_APP_HOSTNAME}` +
-    `/company/${company.siret}`;
+    generatePath(routes.company, { siret: company.siret });
 
   return (
     <>

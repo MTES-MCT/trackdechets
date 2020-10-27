@@ -8,12 +8,10 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { useLocation, useHistory } from "react-router";
-import queryString from "query-string";
+import { useHistory, useParams, generatePath } from "react-router";
 
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
-import { currentSiretService } from "dashboard/DashboardCompanySelector";
 import { GET_SLIPS } from "dashboard/slips/query";
 import initialState from "../initial-state";
 import {
@@ -28,17 +26,17 @@ import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
 import "./StepList.scss";
+import routes from "common/routes";
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
   formId?: string;
 }
 export default function StepList(props: IProps) {
+  const { siret } = useParams<{ siret: string }>();
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = props.children.length - 1;
   const history = useHistory();
-  const { search } = useLocation();
-  const searchParams = queryString.parse(search);
 
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_FORM,
@@ -67,7 +65,7 @@ export default function StepList(props: IProps) {
       const saveForm = data.saveForm;
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
-        variables: { siret: currentSiretService.getSiret(), status: ["DRAFT"] },
+        variables: { siret, status: ["DRAFT"] },
         getNewData: data => ({
           forms: [...data.forms.filter(f => f.id !== saveForm.id), saveForm],
         }),
@@ -168,7 +166,7 @@ export default function StepList(props: IProps) {
                   })
                     .then(_ =>
                       history.push(
-                        `/dashboard/${searchParams.redirectTo ?? ""}`
+                        generatePath(routes.dashboard.slips.drafts, { siret })
                       )
                     )
                     .catch(err => {

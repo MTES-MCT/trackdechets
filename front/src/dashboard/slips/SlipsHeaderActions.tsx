@@ -1,17 +1,22 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { generatePath, Link, useParams } from "react-router-dom";
 import { RefreshIcon } from "common/components/Icons";
 import styles from "./SlipsHeaderActions.module.scss";
-import { formCreateRoute } from "common/routes";
+import routes from "common/routes";
+
 export default function SlipsHeaderActions({
   refetch,
 }: {
   refetch: () => void;
 }) {
+  const { siret } = useParams<{ siret: string }>();
   return (
     <div className={styles.slipHeaderActions}>
-      <Link to={formCreateRoute} className="btn btn--primary">
-        Créer un bordereau…
+      <Link
+        to={generatePath(routes.dashboard.slips.create, { siret })}
+        className="btn btn--primary"
+      >
+        Créer un bordereau
       </Link>
       <button
         className={`btn btn--primary ${styles.refreshButton}`}

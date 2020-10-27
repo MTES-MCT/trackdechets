@@ -12,7 +12,7 @@ import {
 } from "../generated/graphql/types";
 import Loader from "common/components/Loaders";
 import { NotificationError } from "common/components/Error";
-
+import routes from "common/routes";
 
 const INVITATION = gql`
   query Invitation($hash: String!) {
@@ -66,7 +66,7 @@ function SignupConfirmation({ user }: { user: User }) {
           accéder aux bordereaux de ces établissements.
         </p>
         <div className="form__actions">
-          <Link to="/login" className="btn btn--primary">
+          <Link to={routes.login} className="btn btn--primary">
             Se connecter
           </Link>
         </div>
@@ -84,8 +84,8 @@ function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
   return (
     <div className="container-narrow">
       <section className="section section-white">
-      <h2 className="h2 tw-my-4">Cette invitation n'est plus valide</h2>
-      <p className="body-text">
+        <h2 className="h2 tw-my-4">Cette invitation n'est plus valide</h2>
+        <p className="body-text">
           Votre compte <span className="tw-font-bold">{email}</span> a déjà été
           crée et le rattachement à l'établissement dont le SIRET est{" "}
           <span className="tw-font-bold">{companySiret}</span> est effectif.
@@ -95,9 +95,9 @@ function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
           accéder aux bordereaux de cet établissement.
         </p>
         <div className="form__actions">
-        <Link to="/login" className="btn btn--primary">
-          Se connecter
-        </Link>
+          <Link to={routes.login} className="btn btn--primary">
+            Se connecter
+          </Link>
         </div>
       </section>
     </div>

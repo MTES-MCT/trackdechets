@@ -32,9 +32,9 @@ describe("POST /login", () => {
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
 
-    // should redirect to /dashboard/
+    // should redirect to /
     expect(login.status).toBe(302);
-    expect(login.header.location).toBe(`http://${UI_HOST}/dashboard/`);
+    expect(login.header.location).toBe(`http://${UI_HOST}/`);
 
     const cookieValue = sessionCookie.match(cookieRegExp)[1];
 

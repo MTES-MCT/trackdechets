@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/react-hooks";
 import Loader, { RefreshLoader } from "common/components/Loaders";
-import React, { useContext } from "react";
+import React from "react";
 import { MEDIA_QUERIES } from "common/config";
 import { NetworkStatus } from "apollo-client";
 import {
@@ -15,8 +15,8 @@ import {
   Layout2Icon,
   LayoutModule1Icon,
 } from "common/components/Icons";
+import routes from "common/routes";
 
-import { SiretContext } from "../Dashboard";
 import { GET_TRANSPORT_SLIPS } from "./queries";
 import useLocalStorage from "common/hooks/useLocalStorage";
 import useMedia from "use-media";
@@ -25,7 +25,13 @@ import { COLORS } from "common/config";
 
 import { TransportTable } from "./TransportTable";
 import { TransportCards } from "./TransportCards";
-import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
+import {
+  generatePath,
+  Redirect,
+  Route,
+  Switch,
+  useParams,
+} from "react-router-dom";
 
 import styles from "./Transport.module.scss";
 
@@ -33,35 +39,34 @@ const TRANSPORTER_FILTER_STORAGE_KEY = "td-transporter-filter";
 const DISPLAY_TYPE_STORAGE_KEY = "td-display-type";
 
 export default function Transport() {
-  const { url, path } = useRouteMatch();
+  const { siret } = useParams<{ siret: string }>();
 
   return (
     <div>
       <Switch>
-        <Route
-          exact
-          path={url}
-          render={() => <Redirect to={`./to-collect`} />}
-        />
-        <Route
-          path={`${path}/to-collect`}
-          render={() => <TransportContent formType="TO_TAKE_OVER" />}
-        />
-        <Route
-          path={`${path}/collected`}
-          render={() => <TransportContent formType="TAKEN_OVER" />}
+        <Route path={routes.dashboard.transport.toCollect}>
+          <TransportContent formType="TO_TAKE_OVER" />
+        </Route>
+        <Route path={routes.dashboard.transport.collected}>
+          <TransportContent formType="TAKEN_OVER" />
+        </Route>
+        <Redirect
+          to={generatePath(routes.dashboard.transport.toCollect, {
+            siret,
+          })}
         />
       </Switch>
     </div>
   );
 }
+
 /**
  * Render Transporter forms either as table or cards according to
  * user preferences (stored in local storage)
  * @param param0
  */
 export function TransportContent({ formType }) {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
 
   const [persistentFilter, setPersistentFilter] = useLocalStorage(
     TRANSPORTER_FILTER_STORAGE_KEY

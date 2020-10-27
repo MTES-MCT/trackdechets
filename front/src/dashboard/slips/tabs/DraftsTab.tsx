@@ -1,21 +1,22 @@
 import { useQuery } from "@apollo/react-hooks";
 import { NetworkStatus } from "apollo-client";
-import React, { useContext } from "react";
+import React from "react";
 
 import { DuplicateFile } from "common/components/Icons";
-import { Link } from "react-router-dom";
+import { generatePath, Link, useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
 import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import Slips from "../Slips";
 
 import TabContent from "./TabContent";
 import { COLORS } from "common/config";
 import EmptyTab from "./EmptyTab";
+import routes from "common/routes";
+
 export default function DraftsTab() {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
@@ -34,7 +35,7 @@ export default function DraftsTab() {
         <h4>Il n'y a aucun bordereau en brouillon</h4>
         <p>
           Si vous le souhaitez, vous pouvez{" "}
-          <Link to={`/form?redirectTo=${siret}`}>
+          <Link to={generatePath(routes.dashboard.slips.create, { siret })}>
             <button className="btn btn--outline-primary btn--medium-text">
               Créer un bordereau
             </button>{" "}

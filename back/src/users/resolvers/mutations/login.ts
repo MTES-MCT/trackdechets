@@ -37,7 +37,11 @@ const loginResolver: MutationResolvers["login"] = async (
 
   return {
     token: accesToken.token,
-    user
+    user: {
+      ...user,
+      // companies are resolved through a separate resolver (User.companies)
+      companies: []
+    }
   };
 };
 

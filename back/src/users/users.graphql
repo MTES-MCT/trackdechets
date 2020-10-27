@@ -42,7 +42,7 @@ type User {
   phone: String
 
   "Liste des établissements dont l'utilisateur est membre"
-  companies: [CompanyPrivate!]
+  companies: [CompanyPrivate!]!
 }
 
 """

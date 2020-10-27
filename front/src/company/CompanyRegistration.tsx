@@ -1,5 +1,6 @@
 import React from "react";
 import { CompanyPublic } from "generated/graphql/types";
+import routes from "common/routes";
 
 type Props = Pick<CompanyPublic, "isRegistered">;
 
@@ -20,7 +21,7 @@ export default function CompanyRegistration(props: Props) {
             <br />
             <span style={{ fontStyle: "italic" }}>
               Il s'agit de votre entreprise ? Mettez à jour vos informations en{" "}
-              <a href="/signup">vous inscrivant</a>
+              <a href={routes.signup.index}>vous inscrivant</a>
             </span>
           </>
         )}

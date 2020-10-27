@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { Field } from "formik";
 import gql from "graphql-tag";
 import { DateTime } from "luxon";
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import DownloadFileLink from "common/components/DownloadFileLink";
 import { NotificationError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
@@ -19,11 +19,11 @@ import { FORMS_PDF } from "dashboard/slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import styles from "./TransportSignature.module.scss";
 import { Wizard } from "../Wizard";
-import { SiretContext } from "dashboard/Dashboard";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
 import { COLORS } from "common/config";
 import { ShipmentSignSmartphoneIcon, PdfIcon } from "common/components/Icons";
+import { useParams } from "react-router-dom";
 
 export const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -45,7 +45,7 @@ export const SIGNED_BY_TRANSPORTER = gql`
 type Props = { form: Form; userSiret: string };
 
 export default function TransportSignature({ form, userSiret }: Props) {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
   const [isOpen, setIsOpen] = useState(false);
   const refetchQuery = {
     query: GET_FORM,

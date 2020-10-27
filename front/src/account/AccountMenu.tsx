@@ -2,7 +2,7 @@ import React from "react";
 import SideMenu from "../common/components/SideMenu";
 import { NavLink } from "react-router-dom";
 import styles from "./AccountMenu.module.scss";
-import { accountRoutes } from "common/routes";
+import routes from "common/routes";
 
 export const AccountMenuContent = ({
   mobileCallback,
@@ -14,7 +14,7 @@ export const AccountMenuContent = ({
     <ul>
       <li className="tw-mb-1">
         <NavLink
-          to={accountRoutes.accountInfo}
+          to={routes.account.info}
           className="sidebar__link  "
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
@@ -24,7 +24,7 @@ export const AccountMenuContent = ({
       </li>
       <li className="tw-mb-1">
         <NavLink
-          to={accountRoutes.accountCompanies}
+          to={routes.account.companies}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
@@ -34,7 +34,7 @@ export const AccountMenuContent = ({
       </li>
       <li>
         <NavLink
-          to={accountRoutes.accountApi}
+          to={routes.account.api}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}

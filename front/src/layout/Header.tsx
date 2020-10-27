@@ -5,6 +5,7 @@ import {
   withRouter,
   matchPath,
   RouteComponentProps,
+  generatePath,
 } from "react-router-dom";
 
 import { trackEvent } from "tracker";
@@ -19,6 +20,7 @@ import { InlineError } from "common/components/Error";
 import { Query } from "generated/graphql/types";
 import { DashboardNav } from "dashboard/DashboardNavigation";
 
+import routes from "common/routes";
 import { MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import useMedia from "use-media";
@@ -87,14 +89,18 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
   const connected = [
     {
       caption: "Mon espace",
-      href: `/dashboard/${currentSiret}`,
+      href: currentSiret
+        ? generatePath(routes.dashboard.index, {
+            siret: currentSiret,
+          })
+        : "/",
       onClick: () => trackEvent("navbar", "mon-espace"),
 
       navlink: true,
     },
     {
       caption: "Mon compte",
-      href: "/account",
+      href: routes.account.info,
       onClick: () => trackEvent("navbar", "mon-compte"),
 
       navlink: true,
@@ -117,7 +123,7 @@ const MenuLink = ({ entry, mobileCallback }) => {
         <NavLink
           className={styles.headerNavLink}
           to={entry.href}
-          exact={false}
+          exact={entry.href === "/"}
           onClick={() => {
             entry.onClick();
             mobileCallback && mobileCallback();
@@ -160,12 +166,12 @@ export default withRouter(function Header({
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
   const closeMobileMenu = () => isMobile && toggleMenu(true);
   const matchAccount = matchPath(location.pathname, {
-    path: "/account/",
+    path: routes.account.index,
     exact: false,
     strict: false,
   });
   const matchDashboard = matchPath(location.pathname, {
-    path: "/dashboard/:siret",
+    path: routes.dashboard.index,
     exact: false,
     strict: false,
   });
@@ -276,7 +282,7 @@ export default withRouter(function Header({
                   className={`${styles.headerNavItem} ${styles.headerNavItemNoBorder}`}
                 >
                   <NavLink
-                    to="/signup"
+                    to={routes.signup.index}
                     className={`${styles.headerSignup} btn btn--sqr-outline`}
                     onClick={() => {
                       trackEvent("navbar", "login");
@@ -290,7 +296,7 @@ export default withRouter(function Header({
                   className={`${styles.headerNavItem} ${styles.headerNavItemNoBorder}`}
                 >
                   <NavLink
-                    to="/login"
+                    to={routes.login}
                     className={`${styles.headerConnexion} btn btn--sqr`}
                     onClick={() => {
                       trackEvent("navbar", "login");

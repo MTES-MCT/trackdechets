@@ -1,19 +1,19 @@
 import { useMutation } from "@apollo/react-hooks";
 import cogoToast from "cogo-toast";
-import React, { useContext } from "react";
+import React from "react";
 import { DuplicateFile } from "common/components/Icons";
 import { updateApolloCache } from "common/helper";
-import { useHistory } from "react-router-dom";
+import { generatePath, useHistory, useParams } from "react-router-dom";
 import {
   Form,
   Mutation,
   MutationDuplicateFormArgs,
 } from "generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
 import { GET_SLIPS } from "../query";
 import mutations from "./slip-actions.mutations";
 import { COLORS } from "common/config";
-import { dashboardBase } from "common/routes";
+import routes from "common/routes";
+
 type Props = {
   formId: string;
   small?: boolean;
@@ -27,7 +27,7 @@ export default function Duplicate({
   redirectToDashboard,
   small = true,
 }: Props) {
-  const { siret } = useContext(SiretContext);
+  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
   const [duplicate] = useMutation<
     Pick<Mutation, "duplicateForm">,
@@ -48,8 +48,18 @@ export default function Duplicate({
       });
     },
     onCompleted: () => {
-      !!onClose && onClose();
-      !!redirectToDashboard && history.push(dashboardBase);
+      if (onClose) {
+        onClose();
+      }
+
+      if (redirectToDashboard) {
+        history.push(
+          generatePath(routes.dashboard.slips.drafts, {
+            siret,
+          })
+        );
+      }
+
       cogoToast.success(
         `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`
       );

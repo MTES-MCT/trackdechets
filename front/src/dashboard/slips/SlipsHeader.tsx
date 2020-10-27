@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 
+import routes from "common/routes";
 import styles from "./SlipsHeader.module.scss";
 import { FaTimesCircle } from "react-icons/fa";
 import { useRouteMatch } from "react-router-dom";
 
 const Crumb = () => {
-  const draft = useRouteMatch("/dashboard/:siret/slips/drafts");
-  const act = useRouteMatch("/dashboard/:siret/slips/act");
-  const follow = useRouteMatch("/dashboard/:siret/slips/follow");
-  const history = useRouteMatch("/dashboard/:siret/slips/history");
-  const detail = useRouteMatch("/dashboard/:siret/slips/view/:id");
+  const draft = useRouteMatch(routes.dashboard.slips.drafts);
+  const act = useRouteMatch(routes.dashboard.slips.act);
+  const follow = useRouteMatch(routes.dashboard.slips.follow);
+  const history = useRouteMatch(routes.dashboard.slips.history);
+  const detail = useRouteMatch(routes.dashboard.slips.view);
 
   return (
     <span>

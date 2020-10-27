@@ -37,7 +37,11 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   // accept all pending invitations at once
   await acceptNewUserCompanyInvitations(user);
 
-  return user;
+  return {
+    ...user,
+    // companies are resolved through a separate resolver (User.companies)
+    companies: []
+  };
 };
 
 export default joinWithInviteResolver;

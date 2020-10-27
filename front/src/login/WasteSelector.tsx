@@ -2,6 +2,7 @@ import React from "react";
 import "rc-tree/assets/index.css";
 import { Link } from "react-router-dom";
 import WasteTree from "search/WasteTree";
+import routes from "common/routes";
 
 export default function WasteSelector() {
   return (
@@ -9,10 +10,10 @@ export default function WasteSelector() {
       <h2>Sélection des codes déchets autorisés</h2>
       <WasteTree checkable={true} />
 
-      <Link to="/signup/activation" className="button secondary">
+      <Link to={routes.signup.activation} className="button secondary">
         Ignorer
       </Link>
-      <Link to="/signup/activation" className="btn btn--primary">
+      <Link to={routes.signup.activation} className="btn btn--primary">
         Valider
       </Link>
     </div>

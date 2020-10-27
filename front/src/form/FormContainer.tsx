@@ -8,7 +8,7 @@ import WasteInfo from "./WasteInfo";
 import { useParams } from "react-router";
 
 export default function FormContainer() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id?: string }>();
   return (
     <main className="main">
       <div className="container">

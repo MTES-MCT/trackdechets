@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import { Field, Form, Formik, FormikProps, FormikValues } from "formik";
 import gql from "graphql-tag";
-import { useHistory } from "react-router-dom";
+import { generatePath, useHistory } from "react-router-dom";
+import routes from "common/routes";
 import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../common/components/Error";
 import RedErrorMessage from "../common/components/RedErrorMessage";
@@ -291,7 +292,11 @@ export default function AccountCompanyAdd() {
       },
     });
 
-    history.push("/dashboard");
+    history.push(
+      generatePath(routes.dashboard.slips.drafts, {
+        siret: companyInput.siret,
+      })
+    );
   }
 
   return (
