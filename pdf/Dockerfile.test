@@ -2,7 +2,7 @@ FROM node:10.14-alpine as build-deps
 
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 COPY . ./
 
 CMD ["npm", "test", "--", "--forceExit"]

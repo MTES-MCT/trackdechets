@@ -1,7 +1,7 @@
 FROM node:14.3
 WORKDIR /usr/src/app
 COPY package.json package.json
-RUN npm install --silent
+RUN npm ci
 COPY . .
 EXPOSE 80
 CMD [ "npm", "test", "--", "--forceExit" ]
