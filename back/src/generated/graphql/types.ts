@@ -18,9 +18,9 @@ export type Scalars = {
    * - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
    * - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
    */
-  DateTime: any;
+  DateTime: string;
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
-  URL: any;
+  URL: string;
   JSON: any;
 };
 
@@ -3053,7 +3053,7 @@ export function createCreateFormInputMock(props: Partial<CreateFormInput>): Crea
 export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderReceiptInput>): CreateTraderReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3062,7 +3062,7 @@ export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderRe
 export function createCreateTransporterReceiptInputMock(props: Partial<CreateTransporterReceiptInput>): CreateTransporterReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3366,7 +3366,7 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
     processingOperationDone: "",
     processingOperationDescription: null,
     processedBy: "",
-    processedAt: new Date(),
+    processedAt: new Date().toISOString(),
     nextDestination: null,
     noTraceability: null,
     ...props,
@@ -3378,7 +3378,7 @@ export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): 
     wasteAcceptationStatus: "ACCEPTED",
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date(),
+    receivedAt: new Date().toISOString(),
     signedAt: null,
     quantityReceived: 0,
     ...props,
@@ -3421,7 +3421,7 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     wasteDetails: null,
     transporter: null,
     signedBy: "",
-    signedAt: new Date(),
+    signedAt: new Date().toISOString(),
     ...props,
   };
 }
@@ -3444,7 +3444,7 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     sentBy: "",
     ...props,
   };
@@ -3452,7 +3452,7 @@ export function createSentFormInputMock(props: Partial<SentFormInput>): SentForm
 
 export function createSignatureFormInputMock(props: Partial<SignatureFormInput>): SignatureFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     sentBy: "",
     ...props,
   };
@@ -3535,7 +3535,7 @@ export function createSubscriptionMock(props: Partial<Subscription>): Subscripti
 
 export function createTakeOverInputMock(props: Partial<TakeOverInput>): TakeOverInput {
   return {
-    takenOverAt: new Date(),
+    takenOverAt: new Date().toISOString(),
     takenOverBy: "",
     ...props,
   };
@@ -3579,7 +3579,7 @@ export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput
     wasteAcceptationStatus: "ACCEPTED",
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date(),
+    receivedAt: new Date().toISOString(),
     signedAt: null,
     quantityReceived: 0,
     quantityType: "REAL",
@@ -3613,7 +3613,7 @@ export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderRe
     __typename: "TraderReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3651,7 +3651,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
     __typename: "TransporterReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -3659,7 +3659,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
 
 export function createTransporterSignatureFormInputMock(props: Partial<TransporterSignatureFormInput>): TransporterSignatureFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     signedByTransporter: false,
     securityCode: 0,
     sentBy: "",
