@@ -132,10 +132,10 @@ export default function Slips({
               )}
 
               <td>
-                <Shorten content={s?.emitter?.company?.name ?? ""} />
+                <Shorten content={s?.emitter?.company?.name || ""} />
               </td>
               <td>
-                <Shorten content={s?.stateSummary?.recipient?.name ?? ""} />
+                <Shorten content={s?.stateSummary?.recipient?.name || ""} />
               </td>
               <td>
                 {s.wasteDetails && (
