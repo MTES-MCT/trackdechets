@@ -118,7 +118,7 @@ export default function Slips({
           </tr>
         </thead>
         <tbody>
-          {sortedForms.map((s: any) => (
+          {sortedForms.map((s: Form) => (
             <tr key={s.id} className="td-table__tr">
               {hiddenFields.indexOf("readableId") === -1 && (
                 <td>
@@ -132,10 +132,10 @@ export default function Slips({
               )}
 
               <td>
-                <Shorten content={s.emitter.company?.name} />
+                <Shorten content={s?.emitter?.company?.name ?? ""} />
               </td>
               <td>
-                <Shorten content={s.stateSummary.recipient?.name} />
+                <Shorten content={s?.stateSummary?.recipient?.name ?? ""} />
               </td>
               <td>
                 {s.wasteDetails && (
@@ -145,7 +145,7 @@ export default function Slips({
                   </>
                 )}
               </td>
-              <td>{s.stateSummary.quantity ?? "?"} t</td>
+              <td>{s?.stateSummary?.quantity ?? "?"} t</td>
               {hiddenFields.indexOf("status") === -1 && (
                 <td>{statusLabels[s.status]}</td>
               )}
