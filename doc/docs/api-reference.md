@@ -454,7 +454,7 @@ Récupère une demande de rattachement effectuée par l'utilisateur courant
 à partir de l'identifiant de cette demande ou du SIRET de l'établissement
 auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des
 paramètres (id ou siret) doit être être passé mais pas les deux. Cette query
-permet notamment de suivre l'état d'avancement de la demande d'invitation
+permet notamment de suivre l'état d'avancement de la demande de rattachement
 (en attente, accepté, refusé)
 
 </td>
@@ -2498,7 +2498,7 @@ Nom de l'établissement
 <td valign="top"><a href="#membershiprequeststatus">MembershipRequestStatus</a>!</td>
 <td>
 
-Statut de la demande d'invitation
+Statut de la demande de rattachement
 
 </td>
 </tr>
@@ -2508,7 +2508,7 @@ Statut de la demande d'invitation
 <td>
 
 Liste des adresses email correspondant aux comptes administrateurs à qui la demande
-d'invitation a été envoyée. Les adresses emails sont partiellement masquées de la
+de rattachement a été envoyée. Les adresses emails sont partiellement masquées de la
 façon suivante j********w@trackdechets.fr
 
 </td>

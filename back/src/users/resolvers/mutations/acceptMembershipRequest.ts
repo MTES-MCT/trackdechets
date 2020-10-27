@@ -8,8 +8,8 @@ import {
   getMembershipRequestOrNotFoundError
 } from "../../database";
 import {
-  InvitationRequestAlreadyAccepted,
-  InvitationRequestAlreadyRefused
+  MembershipRequestAlreadyAccepted,
+  MembershipRequestAlreadyRefused
 } from "../../errors";
 import { userMails } from "../../mails";
 import { checkIsCompanyAdmin } from "../../permissions";
@@ -23,7 +23,7 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
 
   const user = checkIsAuthenticated(context);
 
-  // throw error if invitation does not exist
+  // throw error if membership request does not exist
   const membershipRequest = await getMembershipRequestOrNotFoundError({ id });
 
   const company = await prisma
@@ -33,21 +33,21 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
   // check authenticated user is admin of the company
   await checkIsCompanyAdmin(user, company);
 
-  // throw error if invitation was already accepted
+  // throw error if membership request was already accepted
   if (membershipRequest.status === "ACCEPTED") {
-    throw new InvitationRequestAlreadyAccepted();
+    throw new MembershipRequestAlreadyAccepted();
   }
 
-  // throw error if invitation was already refused
+  // throw error if membership request was already refused
   if (membershipRequest.status === "REFUSED") {
-    throw new InvitationRequestAlreadyRefused();
+    throw new MembershipRequestAlreadyRefused();
   }
 
   const requester = await prisma
     .membershipRequest({ id: membershipRequest.id })
     .user();
 
-  // associate invitation requester to company with the role decided by the admin
+  // associate membership requester to company with the role decided by the admin
   await associateUserToCompany(requester.id, company.siret, role);
 
   await prisma.updateMembershipRequest({

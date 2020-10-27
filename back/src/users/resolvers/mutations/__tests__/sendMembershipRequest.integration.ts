@@ -26,7 +26,7 @@ const SEND_MEMBERSHIP_REQUEST = `
   }
 `;
 
-describe("mutation send invitation request", () => {
+describe("mutation sendMembershipRequest", () => {
   afterAll(resetDatabase);
 
   afterEach(sendMailSpy.mockClear);

@@ -245,7 +245,7 @@ export const userMails = {
   }),
   membershipRequest: (
     recipients,
-    invitationRequestLink: string,
+    membershipRequestLink: string,
     user: User,
     company: Company
   ) => ({
@@ -258,7 +258,7 @@ export const userMails = {
     dont vous êtes administrateur.
 
     Pour valider ou refuser sa demande, cliquer sur
-    <a href="${invitationRequestLink}">ce lien</a>
+    <a href="${membershipRequestLink}">ce lien</a>
     `
   }),
   membershipRequestAccepted: (user: User, company: Company) => ({

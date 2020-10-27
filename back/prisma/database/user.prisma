@@ -57,10 +57,10 @@ type MembershipRequest {
   # Email of the admin who has accepted or refused the request
   statusUpdatedBy: String
 
-  user: User! @relation(link: INLINE, name: "InvitationRequest_user_User")
+  user: User! @relation(link: INLINE, name: "MembershipRequest_user_User")
   company: Company! @relation(link: INLINE)
 
-  # List of emails the invitation was sent to
+  # List of emails the request was sent to
   sentTo: [String!]! @scalarList(strategy: RELATION)
 }
 

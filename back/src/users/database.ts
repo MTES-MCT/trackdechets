@@ -181,9 +181,9 @@ export async function acceptNewUserCompanyInvitations(user: User) {
 export async function getMembershipRequestOrNotFoundError(
   where: MembershipRequestWhereUniqueInput
 ) {
-  const invitationRequest = await prisma.membershipRequest(where);
-  if (!invitationRequest) {
+  const membershipRequest = await prisma.membershipRequest(where);
+  if (!membershipRequest) {
     throw new UserInputError("Cette demande de rattachement n'existe pas");
   }
-  return invitationRequest;
+  return membershipRequest;
 }

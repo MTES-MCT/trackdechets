@@ -5,8 +5,8 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { getMembershipRequestOrNotFoundError } from "../../database";
 import {
-  InvitationRequestAlreadyAccepted,
-  InvitationRequestAlreadyRefused
+  MembershipRequestAlreadyAccepted,
+  MembershipRequestAlreadyRefused
 } from "../../errors";
 import { userMails } from "../../mails";
 import { checkIsCompanyAdmin } from "../../permissions";
@@ -20,7 +20,7 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
 
   const user = checkIsAuthenticated(context);
 
-  // throw error if invitation does not exist
+  // throw error if membership request does not exist
   const membershipRequest = await getMembershipRequestOrNotFoundError({ id });
 
   const company = await prisma
@@ -30,14 +30,14 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
   // check authenticated user is admin of the company
   await checkIsCompanyAdmin(user, company);
 
-  // throw error if invitation was already accepted
+  // throw error if membership request was already accepted
   if (membershipRequest.status === "ACCEPTED") {
-    throw new InvitationRequestAlreadyAccepted();
+    throw new MembershipRequestAlreadyAccepted();
   }
 
-  // throw error if invitation was already refused
+  // throw error if membership request was already refused
   if (membershipRequest.status === "REFUSED") {
-    throw new InvitationRequestAlreadyRefused();
+    throw new MembershipRequestAlreadyRefused();
   }
 
   await prisma.updateMembershipRequest({

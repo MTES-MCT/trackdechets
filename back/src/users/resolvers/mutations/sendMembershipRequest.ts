@@ -27,7 +27,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
     throw new UserInputError("Vous êtes déjà membre de cet établissement");
   }
 
-  // check there is no existing invitation requests for this
+  // check there is no existing membership request for this
   // user and company
   const alreadyRequested = await prisma.$exists.membershipRequest({
     user: { id: user.id },
@@ -42,29 +42,29 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
   const admins = await getCompanyAdminUsers(siret);
   const emails = admins.map(a => a.email);
 
-  const invitationRequest = await prisma.createMembershipRequest({
+  const membershipRequest = await prisma.createMembershipRequest({
     user: { connect: { id: user.id } },
     company: { connect: { id: company.id } },
     sentTo: { set: emails }
   });
 
-  // send invitation request to all admins of the company
+  // send membership request to all admins of the company
   const recipients = admins.map(a => ({ email: a.email, name: a.name }));
-  const invitationRequestLink = `${UI_URL_SCHEME}://${UI_HOST}/membership-request/${invitationRequest.id}`;
+  const membershipRequestLink = `${UI_URL_SCHEME}://${UI_HOST}/membership-request/${membershipRequest.id}`;
   await sendMail(
     userMails.membershipRequest(
       recipients,
-      invitationRequestLink,
+      membershipRequestLink,
       user,
       company
     )
   );
 
-  // send invitation request confirmation to requester
+  // send membership request confirmation to requester
   await sendMail(userMails.membershipRequestConfirmation(user, company));
 
   return {
-    ...invitationRequest,
+    ...membershipRequest,
     email: user.email,
     siret: company.siret,
     name: company.name
