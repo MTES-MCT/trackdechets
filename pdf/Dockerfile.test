@@ -1,4 +1,4 @@
-FROM node:10.14-alpine as build-deps
+FROM node:14.3
 
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
