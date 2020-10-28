@@ -59,7 +59,7 @@ Les différentes instances sont hébérgées chez OVH et Scaleway. Le détail es
 
 Deux pages de monitoring sont accessibles:
 - [Statuts API GraphQL](https://status.trackdechets.beta.gouv.fr)
-- [Statuts td-mail](https://status.trackdechets.beta.gouv.fr)
+- [Statuts service d'envoi d'email](https://updown.io/jgo1)
 
 ## Compatibilité navigateur
 
