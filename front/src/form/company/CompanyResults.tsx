@@ -42,6 +42,7 @@ export default function CompanyResults<
                   href={generatePath(routes.company, { siret: item.siret! })}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="link"
                 >
                   Information sur l'entreprise
                 </a>

@@ -254,11 +254,14 @@ export const detailFormFragment = gql`
     processedAt
     receivedAt
     receivedBy
+    quantityReceived
     wasteAcceptationStatus
     wasteRefusalReason
     signedAt
     processedBy
     processedAt
+    processingOperationDescription
+    processingOperationDone
     ecoOrganisme {
       siret
       name

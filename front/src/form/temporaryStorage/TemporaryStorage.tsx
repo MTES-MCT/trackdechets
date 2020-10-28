@@ -4,6 +4,8 @@ import CompanySelector from "form/company/CompanySelector";
 import { Form } from "generated/graphql/types";
 import { PROCESSING_OPERATIONS } from "generated/constants";
 import initialState from "../initial-state";
+import styles from "./TemporaryStorage.module.scss";
+import classNames from "classnames";
 
 export default function TemporaryStorage(props) {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -34,7 +36,9 @@ export default function TemporaryStorage(props) {
 
   return (
     <>
-      <h4>Installation de destination prévue</h4>
+      <h4 className="form__section-heading">
+        Installation de destination prévue
+      </h4>
       <CompanySelector
         name={
           `${props.name}.destination.company` as "temporaryStorageDetail.destination.company"
@@ -44,7 +48,11 @@ export default function TemporaryStorage(props) {
       <div className="form__row">
         <label>
           Numéro de CAP (le cas échéant)
-          <Field type="text" name={`${props.name}.destination.cap`} />
+          <Field
+            type="text"
+            name={`${props.name}.destination.cap`}
+            className={classNames("td-input", styles.tempStorageCap)}
+          />
         </label>
       </div>
 

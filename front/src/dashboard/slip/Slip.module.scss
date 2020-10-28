@@ -29,33 +29,36 @@
     }
   }
 
+  &Grid {
+  
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    grid-auto-rows:  1.5rem;
+    grid-gap: 1rem;
+    margin-right: 1rem;
+
+    dt {
+      text-align: right;
+      color: $grey-dark;
+      font-weight: bold;
+
+      overflow-wrap: anywhere;
+    }
+  }
   &Summary {
     padding: 1rem;
   }
-  &Row {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0.5rem;
-    @include desktop {
-      flex-direction: row;
-    }
-    dt {
-      color: $grey-dark;
-      font-weight: bold;
-      padding-right: 1rem;
-      overflow-wrap: anywhere;
-      word-break: keep-all;
-      @include desktop {
-        width: 50%;
-        text-align: right;
-      }
-    }
-  }
+
   &QRCodeIcon {
     display: flex;
     justify-content: center;
+    margin-bottom: 30px;
+
     @include desktop {
-      justify-content: flex-end;
+      
+      margin-left: auto;
+      width: 30%;
+    
       order: 99;
     }
   }
@@ -108,8 +111,13 @@
   &TabPanels {
     border-top: 2px solid $blue;
     padding: 1rem;
+    display: flex;
   }
   &TabPanel {
     display: flex;
+    flex-direction: column;
+    @include desktop {
+      flex-direction: row;
+    }
   }
 }

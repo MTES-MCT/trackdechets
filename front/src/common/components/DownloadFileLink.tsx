@@ -36,6 +36,7 @@ export default function DownloadFileLink({
   return (
     <button
       className="btn--no-style"
+      type="button"
       {...props}
       onClick={() => downloadFile({ variables: params })}
     >

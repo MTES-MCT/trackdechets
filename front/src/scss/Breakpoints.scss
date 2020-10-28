@@ -15,18 +15,14 @@
     @content;
   }
 }
-@mixin desktopx {
-  @media only screen and (min-width: $breakpoint-lg) {
-    @content;
-  }
-}
-@mixin lg-desktop {
-  @media only screen and (min-width: $breakpoint-xl) {
-    @content;
-  }
-}
 @mixin desktop {
   @media only screen and (min-width: $breakpoint-handheld) {
     @content;
   }
+  }
+  @mixin lg-desktop {
+    @media only screen and (min-width: $breakpoint-xl) {
+      @content;
+    }
+ 
 }

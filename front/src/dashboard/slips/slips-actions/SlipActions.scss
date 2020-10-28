@@ -1,15 +1,4 @@
-@import "../../../scss/Constants.scss";
-.dynamic-action {
-  display: flex;
-  align-items: center;
-
-  &__text {
-    margin-left: 6px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    line-height: 1rem;
-  }
-}
+@import "scss/Constants.scss";
 
 .slips-actions {
   position: relative;
@@ -17,7 +6,7 @@
   overflow: visible;
   padding: 2x;
   min-width: 63px; // computed dropdown menu width
- 
+  max-width: 70px;
 
   &__content {
     padding-top: 0.25rem;
@@ -43,12 +32,11 @@
     align-items: center;
     width: 100%;
     color: var(--dark-blue);
-    &:hover{
+    &:hover {
       opacity: 0.7;
     }
   }
 }
-
 
 .slips-actions-trigger {
   border: 1px solid var(--dark-blue);
@@ -63,4 +51,3 @@
     font-size: 0.75rem;
   }
 }
-

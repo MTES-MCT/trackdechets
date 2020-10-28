@@ -1,0 +1,7 @@
+@import "src/scss/Breakpoints";
+@include phone {
+  .tempStorageCap {
+    width: 200px;
+    display: block;
+  }
+}

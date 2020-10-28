@@ -63,16 +63,19 @@ export default connect<{}, Values>(function WasteInfo(props) {
             />
           </label>
         )}
-
-        <label className="mt-2">
+      </div>
+      <div className="form__row">
+        <label className="mt-2" htmlFor="idNumberOfPackages">
           Nombre de colis
           <Field
+            id="idNumberOfPackages"
             component={NumberInput}
             className="td-input waste-details__number-of-packages"
             name="wasteDetails.numberOfPackages"
             min="1"
-          />
+          />{" "}
         </label>
+
         <RedErrorMessage name="wasteDetails.numberOfPackages" />
       </div>
 

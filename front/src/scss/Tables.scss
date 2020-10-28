@@ -6,6 +6,7 @@
   border-right: 0;
   border-radius: 2px;
   position: relative;
+  table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
   &__tr {
@@ -21,8 +22,14 @@
   th {
     padding: 1em 0.2em;
     text-align: left;
+    overflow-wrap: anywhere;
+
     @include lg-desktop {
       padding: 1em 1em;
     }
   }
+}
+.shortenable {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

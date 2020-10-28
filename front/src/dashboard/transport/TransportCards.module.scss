@@ -36,8 +36,13 @@
   display: flex;
   margin-top: 0.5rem;
   justify-content: flex-end;
-  & > button:not(:last-child) {
-    margin-right: 0.5rem;
+
+  flex-wrap: wrap;
+  & > * {
+    margin-bottom: 0.25rem;
+  }
+  & > *:not(:first-child) {
+    margin-left: 0.25rem;
   }
 }
 

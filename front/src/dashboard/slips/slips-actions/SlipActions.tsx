@@ -28,6 +28,7 @@ import { ChevronDown, ChevronUp } from "common/components/Icons";
 import OutsideClickHandler from "react-outside-click-handler";
 import { COLORS } from "common/config";
 import TdModal from "common/components/Modal";
+import ActionButton from "common/components/ActionButton";
 
 export type SlipActionProps = {
   onSubmit: (vars: any) => any;
@@ -117,6 +118,7 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
     </OutsideClickHandler>
   );
 };
+
 interface DynamicActionsProps extends SlipActionsProps {
   siret: string;
   refetch?: () => void;
@@ -133,7 +135,9 @@ export function DynamicActions({ form, siret, refetch }: DynamicActionsProps) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [mark, { error }] = useMutation(dynamicMutation, {
-    onCompleted: () => !!refetch && refetch(),
+    onCompleted: () => {
+      !!refetch && refetch();
+    },
   });
 
   useEffect(() => {
@@ -148,19 +152,11 @@ export function DynamicActions({ form, siret, refetch }: DynamicActionsProps) {
 
   return (
     <div className="SlipActions">
-      <button
-        className="btn btn--primary"
-        onClick={() => setIsOpen(true)}
+      <ActionButton
         title={buttons[nextStep].title}
-      >
-        <span className="dynamic-action">
-          {buttons[nextStep].icon({ size: 24 })}
-
-          <span className="dynamic-action__text">
-            {buttons[nextStep].title}
-          </span>
-        </span>
-      </button>
+        icon={buttons[nextStep].icon}
+        onClick={() => setIsOpen(true)}
+      />
 
       <TdModal
         isOpen={isOpen}
@@ -171,9 +167,7 @@ export function DynamicActions({ form, siret, refetch }: DynamicActionsProps) {
         {ButtonComponent && (
           <ButtonComponent
             onCancel={() => setIsOpen(false)}
-            onSubmit={vars => {
-              mark({ variables: { id: form.id, ...vars } });
-            }}
+            onSubmit={vars => mark({ variables: { id: form.id, ...vars } })}
             form={form}
           />
         )}

@@ -17,8 +17,10 @@ import { segmentFragment } from "common/fragments";
 import { updateApolloCache } from "common/helper";
 import cogoToast from "cogo-toast";
 import { NotificationError } from "common/components/Error";
-// import "./TransportSignature.module.scss";
+
 import TdModal from "common/components/Modal";
+import ActionButton from "common/components/ActionButton";
+import { PaperWriteIcon } from "common/components/Icons";
 
 export const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
@@ -52,11 +54,13 @@ const getSegmentToMarkSegmentAsReadyToTakeOver = ({ form, userSiret }) => {
 type Props = {
   form: Omit<Form, "emitter" | "recipient" | "wasteDetails">;
   userSiret: string;
+  inCard?: boolean;
 };
 
 export default function MarkSegmentAsReadyToTakeOver({
   form,
   userSiret,
+  inCard = false,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const refetchQuery = {
@@ -102,20 +106,29 @@ export default function MarkSegmentAsReadyToTakeOver({
   }
   return (
     <>
-      <button
-        className="btn btn--primary btn--medium-text"
-        onClick={() => setIsOpen(true)}
-        title="Finaliser pour transférer"
-      >
-        <span>Finaliser pour transférer</span>
-      </button>
+      {inCard ? (
+        <button
+          className="btn btn--primary btn--medium-text"
+          onClick={() => setIsOpen(true)}
+          title="Finaliser pour transférer"
+        >
+          <span>Finaliser pour transférer</span>
+        </button>
+      ) : (
+
+        <ActionButton
+          title="Finaliser pour transférer"
+          icon={PaperWriteIcon}
+          onClick={() => setIsOpen(true)}
+          iconSize={32}
+        />
+      )}
 
       {isOpen ? (
         <TdModal
           isOpen={isOpen}
           ariaLabel="Finaliser un segment"
           onClose={() => setIsOpen(false)}
-       
         >
           <Formik
             initialValues={{}}

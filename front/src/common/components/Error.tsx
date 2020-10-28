@@ -51,7 +51,7 @@ export function NotificationError({ apolloError, className }: Props) {
       {({ error, idx }) => (
         <div
           key={`${idx}-${error.message}`}
-          className={`notification error ${styles.lineBreak} ${
+          className={`notification notification--error tw-mt-2 ${styles.lineBreak} ${
             className ?? ""
           }`}
         >

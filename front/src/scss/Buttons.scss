@@ -81,5 +81,13 @@
     border-bottom-left-radius: 0;
     border-left: none;
   }
+  &--slim {
+    padding: 0.5rem;
+  }
+  &--auto-height {
+    height: auto;
+  }
 }
-
+.break-word{
+  overflow-wrap: break-word;
+}

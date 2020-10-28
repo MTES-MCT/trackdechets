@@ -27,3 +27,10 @@
   align-items: center;
   width: 3rem;
 }
+.transportActions {
+  display: flex;
+  flex-direction: column;
+  > * {
+    margin-bottom: 0.25rem;
+  }
+}
