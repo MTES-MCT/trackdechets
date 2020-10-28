@@ -31,7 +31,7 @@
     "query-string": "^6.10.1",
     "rc-tree": "^1.14.10",
     "react": "16.13.1",
-    "react-app-polyfill": "^1.0.6",
+    "react-app-polyfill": "^2.0.0",
     "react-dom": "16.13.1",
     "react-icons": "^3.2.2",
     "react-lazyload": "^2.5.0",
