@@ -1042,7 +1042,11 @@ export type Mutation = {
    * D'un point de vue pratique, cela implique qu'un responsable de l'établissement
    * émetteur (resp. d'entreposage provisoire ou de reconditionnement)
    * renseigne le code de sécurité sur le terminal du collecteur-transporteur.
-   * Dans le cas où un éco-organisme est responsable du déchet, le code de celui-ci peut être utilisé pour signer.
+   * Dans le cas où un éco-organisme figure sur le BSD, il est également possible
+   * de signer avec son code plutôt que celui de l'émetteur.
+   * Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est
+   * l'auteur de la signature (signingInfo.signatureAuthor doit valoir
+   * ECO_ORGANISME).
    */
   signedByTransporter?: Maybe<Form>;
   /**
@@ -1688,6 +1692,13 @@ export type SentFormInput = {
   sentBy: Scalars['String'];
 };
 
+/** Dénomination de l'auteur de la signature */
+export type SignatureAuthor = 
+  /** L'auteur de la signature est l'émetteur du déchet */
+  | 'EMITTER'
+  /** L'auteur de la signature est l'éco-organisme figurant sur le BSD */
+  | 'ECO_ORGANISME';
+
 /** Payload simplifié de signature d'un BSD par un transporteur */
 export type SignatureFormInput = {
   /** Date de l'envoi du déchet par l'émetteur (case 9) */
@@ -1951,6 +1962,8 @@ export type TransporterSignatureFormInput = {
   signedByTransporter: Scalars['Boolean'];
   /** Code de sécurité permettant d'authentifier l'émetteur */
   securityCode: Scalars['Int'];
+  /** Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur */
+  signatureAuthor?: Maybe<SignatureAuthor>;
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars['String'];
   /** Si oui on non le BSD a été signé par l'émetteur */
@@ -2351,6 +2364,7 @@ export type ResolversTypes = {
   TempStoredFormInput: TempStoredFormInput;
   FormInput: FormInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
+  SignatureAuthor: SignatureAuthor;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
   UpdateFormInput: UpdateFormInput;
@@ -2456,6 +2470,7 @@ export type ResolversParentTypes = {
   TempStoredFormInput: TempStoredFormInput;
   FormInput: FormInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
+  SignatureAuthor: SignatureAuthor;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
   UpdateFormInput: UpdateFormInput;
@@ -3775,6 +3790,7 @@ export function createTransporterSignatureFormInputMock(props: Partial<Transport
     sentAt: new Date().toISOString(),
     signedByTransporter: false,
     securityCode: 0,
+    signatureAuthor: null,
     sentBy: "",
     signedByProducer: false,
     packagings: [],

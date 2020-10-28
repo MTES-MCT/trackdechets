@@ -950,7 +950,8 @@ L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionneme
 grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
 D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
 renseigne le code de sécurité sur le terminal du collecteur-transporteur.
-Dans le cas où un éco-organisme est responsable du déchet, le code de celui-ci peut être utilisé pour signer.
+Dans le cas où un éco-organisme figure sur le BSD, il est également possible de signer avec son code plutôt que celui de l'émetteur.
+Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est l'auteur de la signature (signingInfo.signatureAuthor doit valoir ECO_ORGANISME).
 
 </td>
 </tr>
@@ -5069,6 +5070,15 @@ Code de sécurité permettant d'authentifier l'émetteur
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>signatureAuthor</strong></td>
+<td valign="top"><a href="#signatureauthor">SignatureAuthor</a></td>
+<td>
+
+Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>sentBy</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td>
@@ -5947,6 +5957,35 @@ Quntité réelle
 <td>
 
 Quantité estimée
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### SignatureAuthor
+
+Dénomination de l'auteur de la signature
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>EMITTER</strong></td>
+<td>
+
+L'auteur de la signature est l'émetteur du déchet
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>ECO_ORGANISME</strong></td>
+<td>
+
+L'auteur de la signature est l'éco-organisme figurant sur le BSD
 
 </td>
 </tr>

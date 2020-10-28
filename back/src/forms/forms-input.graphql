@@ -7,6 +7,14 @@ input SentFormInput {
   sentBy: String!
 }
 
+"Dénomination de l'auteur de la signature"
+enum SignatureAuthor {
+  "L'auteur de la signature est l'émetteur du déchet"
+  EMITTER
+  "L'auteur de la signature est l'éco-organisme figurant sur le BSD"
+  ECO_ORGANISME
+}
+
 "Payload de signature d'un BSD par un transporteur"
 input TransporterSignatureFormInput {
   "Date de l'envoi du déchet par l'émetteur (case 9)"
@@ -17,6 +25,9 @@ input TransporterSignatureFormInput {
 
   "Code de sécurité permettant d'authentifier l'émetteur"
   securityCode: Int!
+
+  "Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur"
+  signatureAuthor: SignatureAuthor
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
   sentBy: String!

@@ -54,10 +54,12 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
   };
 
   const company = {
+    isRegistered,
+    ecoOrganismeAgreements: [],
+
     ...companyIcpeInfo,
     ...sireneCompanyInfo,
-    ...trackdechetsCompanyInfo,
-    ...{ isRegistered }
+    ...trackdechetsCompanyInfo
   };
 
   return company;
