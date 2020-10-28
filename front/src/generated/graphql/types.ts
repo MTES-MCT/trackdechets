@@ -1659,7 +1659,7 @@ export type ResentFormInput = {
 /**
  * Rubrique ICPE d'un établissement avec les autorisations associées
  * Pour plus de détails, se référer à la
- * [nomenclature des ICPE](https://www.georisques.gouv.fr/dossiers/installations/nomenclature-ic)
+ * [nomenclature des ICPE](https://www.georisques.gouv.fr/articles-risques/les-installations-classees-pour-la-protection-de-lenvironnement#nomenclature-des-installations-classees)
  */
 export type Rubrique = {
   __typename?: 'Rubrique';
