@@ -16,15 +16,20 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ siret });
 
-  const hashes = await prisma.userAccountHashes({
+  const invitations = await prisma.userAccountHashes({
     where: { email, companySiret: siret }
   });
 
-  if (hashes.length === 0) {
+  if (invitations.length === 0) {
     throw new UserInputError("Invitation non trouvée");
   }
   await sendMail(
-    userMails.inviteUserToJoin(email, user.name, company.name, hashes[0])
+    userMails.inviteUserToJoin(
+      email,
+      user.name,
+      company.name,
+      invitations[0].hash
+    )
   );
   return true;
 };
