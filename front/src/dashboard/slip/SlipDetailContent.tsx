@@ -347,6 +347,7 @@ export default function SlipDetailContent({
                 value={form.signedByTransporter}
                 label="Signé par le transporteur"
               />
+              <DateRow value={form.sentAt} label="Date de prise en charge" />
             </div>
           </TabPanel>
           {/* Multimodal transporters tab panels */}
