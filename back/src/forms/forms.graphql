@@ -350,6 +350,14 @@ type Mutation {
       reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)"
     )
 
+  "Valide l'arrivée d'un BSD"
+  markAsArrived(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées à l'arrivée"
+    arrivedInfo: ArrivedFormInput!
+  ): Form
+
   "Valide la réception d'un BSD"
   markAsReceived(
     "ID d'un BSD"
