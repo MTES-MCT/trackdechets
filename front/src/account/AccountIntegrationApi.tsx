@@ -9,7 +9,7 @@ export default function AccountIntegrationApi() {
         informatique tierce (ERP, SaaS déchets, etc). Pour en savoir plus, nous
         vous invitons à consulter{" "}
         <a
-          href="https://doc.trackdechets.fr"
+          href="https://developers.trackdechets.beta.gouv.fr/"
           target="_blank"
           className="link"
           rel="noopener noreferrer"
