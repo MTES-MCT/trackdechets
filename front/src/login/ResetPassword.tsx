@@ -2,10 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import React, { useState } from "react";
 import { NotificationError } from "../common/components/Error";
-import {
-  Mutation,
-  MutationResetPasswordArgs,
-} from "generated/graphql/types";
+import { Mutation, MutationResetPasswordArgs } from "generated/graphql/types";
 
 const RESET_PASSWORD = gql`
   mutation ResetPassword($email: String!) {
@@ -33,27 +30,29 @@ export default function ResetPassword() {
           }}
         >
           <h1 className="h1">Réinitialisation de votre mot de passe</h1>
-          <p>
+          <p className="tw-my-2">
             Afin de réinitialiser votre mot de passe, merci de saisir votre
             email. Un nouveau mot de passe vous sera transmis.
           </p>
-          <div className="form__row">
+          <div className="form__row tw-my-2">
             <label>
               <input
                 type="text"
                 placeholder="Saisissez votre email"
+                className="td-input"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
             </label>
           </div>
-
-          <button className="btn btn--primary" type="submit">
-            Réinitialiser
-          </button>
+          <div className="form__actions">
+            <button className="btn btn--primary" type="submit">
+              Réinitialiser
+            </button>
+          </div>
         </form>
         {showSuccess && (
-          <div className="notification success">
+          <div className="notification success tw-mt-2">
             Un email avec votre nouveau mot de passe vient de vous être envoyé.
           </div>
         )}
