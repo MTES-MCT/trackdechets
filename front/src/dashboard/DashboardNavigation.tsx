@@ -108,7 +108,9 @@ export function DashboardNav({
               <ul>
                 <li>
                   <NavLink
-                    to={routes["transportToCollect"]}
+                    to={generatePath(routes.dashboard.transport.toCollect, {
+                      siret: currentSiret,
+                    })}
                     className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
                     activeClassName="sidebar__link--active"
                     onClick={() => onClick()}
@@ -118,7 +120,9 @@ export function DashboardNav({
                 </li>
                 <li>
                   <NavLink
-                    to={routes["transportCollected"]}
+                    to={generatePath(routes.dashboard.transport.collected, {
+                      siret: currentSiret,
+                    })}
                     className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
                     activeClassName="sidebar__link--active"
                     onClick={() => onClick()}
