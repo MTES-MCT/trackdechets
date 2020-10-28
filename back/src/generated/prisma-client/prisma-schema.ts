@@ -192,6 +192,10 @@ type AggregateInstallation {
   count: Int!
 }
 
+type AggregateMembershipRequest {
+  count: Int!
+}
+
 type AggregateRubrique {
   count: Int!
 }
@@ -5216,6 +5220,165 @@ scalar Json
 
 scalar Long
 
+type MembershipRequest {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  status: MembershipRequestStatus!
+  statusUpdatedBy: String
+  user: User!
+  company: Company!
+  sentTo: [String!]!
+}
+
+type MembershipRequestConnection {
+  pageInfo: PageInfo!
+  edges: [MembershipRequestEdge]!
+  aggregate: AggregateMembershipRequest!
+}
+
+input MembershipRequestCreateInput {
+  id: ID
+  status: MembershipRequestStatus
+  statusUpdatedBy: String
+  user: UserCreateOneInput!
+  company: CompanyCreateOneInput!
+  sentTo: MembershipRequestCreatesentToInput
+}
+
+input MembershipRequestCreatesentToInput {
+  set: [String!]
+}
+
+type MembershipRequestEdge {
+  node: MembershipRequest!
+  cursor: String!
+}
+
+enum MembershipRequestOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  status_ASC
+  status_DESC
+  statusUpdatedBy_ASC
+  statusUpdatedBy_DESC
+}
+
+type MembershipRequestPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  status: MembershipRequestStatus!
+  statusUpdatedBy: String
+  sentTo: [String!]!
+}
+
+enum MembershipRequestStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
+type MembershipRequestSubscriptionPayload {
+  mutation: MutationType!
+  node: MembershipRequest
+  updatedFields: [String!]
+  previousValues: MembershipRequestPreviousValues
+}
+
+input MembershipRequestSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: MembershipRequestWhereInput
+  AND: [MembershipRequestSubscriptionWhereInput!]
+  OR: [MembershipRequestSubscriptionWhereInput!]
+  NOT: [MembershipRequestSubscriptionWhereInput!]
+}
+
+input MembershipRequestUpdateInput {
+  status: MembershipRequestStatus
+  statusUpdatedBy: String
+  user: UserUpdateOneRequiredInput
+  company: CompanyUpdateOneRequiredInput
+  sentTo: MembershipRequestUpdatesentToInput
+}
+
+input MembershipRequestUpdateManyMutationInput {
+  status: MembershipRequestStatus
+  statusUpdatedBy: String
+  sentTo: MembershipRequestUpdatesentToInput
+}
+
+input MembershipRequestUpdatesentToInput {
+  set: [String!]
+}
+
+input MembershipRequestWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  status: MembershipRequestStatus
+  status_not: MembershipRequestStatus
+  status_in: [MembershipRequestStatus!]
+  status_not_in: [MembershipRequestStatus!]
+  statusUpdatedBy: String
+  statusUpdatedBy_not: String
+  statusUpdatedBy_in: [String!]
+  statusUpdatedBy_not_in: [String!]
+  statusUpdatedBy_lt: String
+  statusUpdatedBy_lte: String
+  statusUpdatedBy_gt: String
+  statusUpdatedBy_gte: String
+  statusUpdatedBy_contains: String
+  statusUpdatedBy_not_contains: String
+  statusUpdatedBy_starts_with: String
+  statusUpdatedBy_not_starts_with: String
+  statusUpdatedBy_ends_with: String
+  statusUpdatedBy_not_ends_with: String
+  user: UserWhereInput
+  company: CompanyWhereInput
+  AND: [MembershipRequestWhereInput!]
+  OR: [MembershipRequestWhereInput!]
+  NOT: [MembershipRequestWhereInput!]
+}
+
+input MembershipRequestWhereUniqueInput {
+  id: ID
+}
+
 type Mutation {
   createAccessToken(data: AccessTokenCreateInput!): AccessToken!
   updateAccessToken(data: AccessTokenUpdateInput!, where: AccessTokenWhereUniqueInput!): AccessToken
@@ -5271,6 +5434,12 @@ type Mutation {
   upsertInstallation(where: InstallationWhereUniqueInput!, create: InstallationCreateInput!, update: InstallationUpdateInput!): Installation!
   deleteInstallation(where: InstallationWhereUniqueInput!): Installation
   deleteManyInstallations(where: InstallationWhereInput): BatchPayload!
+  createMembershipRequest(data: MembershipRequestCreateInput!): MembershipRequest!
+  updateMembershipRequest(data: MembershipRequestUpdateInput!, where: MembershipRequestWhereUniqueInput!): MembershipRequest
+  updateManyMembershipRequests(data: MembershipRequestUpdateManyMutationInput!, where: MembershipRequestWhereInput): BatchPayload!
+  upsertMembershipRequest(where: MembershipRequestWhereUniqueInput!, create: MembershipRequestCreateInput!, update: MembershipRequestUpdateInput!): MembershipRequest!
+  deleteMembershipRequest(where: MembershipRequestWhereUniqueInput!): MembershipRequest
+  deleteManyMembershipRequests(where: MembershipRequestWhereInput): BatchPayload!
   createRubrique(data: RubriqueCreateInput!): Rubrique!
   updateRubrique(data: RubriqueUpdateInput!, where: RubriqueWhereUniqueInput!): Rubrique
   updateManyRubriques(data: RubriqueUpdateManyMutationInput!, where: RubriqueWhereInput): BatchPayload!
@@ -5377,6 +5546,9 @@ type Query {
   installation(where: InstallationWhereUniqueInput!): Installation
   installations(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Installation]!
   installationsConnection(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InstallationConnection!
+  membershipRequest(where: MembershipRequestWhereUniqueInput!): MembershipRequest
+  membershipRequests(where: MembershipRequestWhereInput, orderBy: MembershipRequestOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [MembershipRequest]!
+  membershipRequestsConnection(where: MembershipRequestWhereInput, orderBy: MembershipRequestOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MembershipRequestConnection!
   rubrique(where: RubriqueWhereUniqueInput!): Rubrique
   rubriques(where: RubriqueWhereInput, orderBy: RubriqueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Rubrique]!
   rubriquesConnection(where: RubriqueWhereInput, orderBy: RubriqueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RubriqueConnection!
@@ -5852,6 +6024,7 @@ type Subscription {
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
   grant(where: GrantSubscriptionWhereInput): GrantSubscriptionPayload
   installation(where: InstallationSubscriptionWhereInput): InstallationSubscriptionPayload
+  membershipRequest(where: MembershipRequestSubscriptionWhereInput): MembershipRequestSubscriptionPayload
   rubrique(where: RubriqueSubscriptionWhereInput): RubriqueSubscriptionPayload
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
   temporaryStorageDetail(where: TemporaryStorageDetailSubscriptionWhereInput): TemporaryStorageDetailSubscriptionPayload

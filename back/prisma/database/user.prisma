@@ -40,6 +40,30 @@ type UserAccountHash {
   acceptedAt: DateTime
 }
 
+enum MembershipRequestStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
+type MembershipRequest {
+  id: ID! @id
+
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+
+  status: MembershipRequestStatus! @default(value: PENDING)
+
+  # Email of the admin who has accepted or refused the request
+  statusUpdatedBy: String
+
+  user: User! @relation(link: INLINE, name: "MembershipRequest_user_User")
+  company: Company! @relation(link: INLINE)
+
+  # List of emails the request was sent to
+  sentTo: [String!]! @scalarList(strategy: RELATION)
+}
+
 """
 OAuth2 - Access token to a user resource
 https://tools.ietf.org/html/rfc6749#section-5

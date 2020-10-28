@@ -9,6 +9,9 @@ import deleteInvitation from "./mutations/deleteInvitation";
 import resendInvitation from "./mutations/resendInvitation";
 import joinWithInvite from "./mutations/joinWithInvite";
 import removeUserFromCompany from "./mutations/removeUserFromCompany";
+import sendMembershipRequest from "./mutations/sendMembershipRequest";
+import acceptMembershipRequest from "./mutations/acceptMembershipRequest";
+import refuseMembershipRequest from "./mutations/refuseMembershipRequest";
 
 const Mutation: MutationResolvers = {
   signup,
@@ -20,7 +23,10 @@ const Mutation: MutationResolvers = {
   deleteInvitation,
   resendInvitation,
   joinWithInvite,
-  removeUserFromCompany
+  removeUserFromCompany,
+  sendMembershipRequest,
+  acceptMembershipRequest,
+  refuseMembershipRequest
 };
 
 export default Mutation;

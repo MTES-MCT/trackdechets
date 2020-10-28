@@ -1,6 +1,7 @@
 export default {
   login: "/login",
   invite: "/invite",
+  membershipRequest: "/membership-request/:id",
   signup: {
     index: "/signup",
     details: "/signup/details",

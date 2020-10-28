@@ -16,6 +16,9 @@ import gql from "graphql-tag";
 
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
 const Account = lazy(() => import("account/Account"));
+const AccountMembershipRequest = lazy(() =>
+  import("account/AccountMembershipRequest")
+);
 const FormContainer = lazy(() => import("form/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
@@ -158,7 +161,12 @@ export default withRouter(function LayoutContainer({ history }) {
               >
                 <Account />
               </PrivateRoute>
-
+              <PrivateRoute
+                path={routes.membershipRequest}
+                isAuthenticated={isAuthenticated}
+              >
+                <AccountMembershipRequest />
+              </PrivateRoute>
               <Redirect
                 to={
                   data

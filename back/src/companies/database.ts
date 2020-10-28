@@ -8,7 +8,8 @@ import {
   User,
   UserRole,
   TraderReceiptWhereUniqueInput,
-  TransporterReceiptWhereUniqueInput
+  TransporterReceiptWhereUniqueInput,
+  Company
 } from "../generated/prisma-client";
 import {
   CompanyNotFound,
@@ -100,6 +101,18 @@ export async function getUserRole(userId: string, siret: string) {
     return associations[0].role;
   }
   return null;
+}
+
+/**
+ * Returns true if user belongs to company with either
+ * MEMBER or ADMIN role, false otherwise
+ * @param user
+ */
+export function isCompanyMember(user: User, company: Company) {
+  return prisma.$exists.companyAssociation({
+    user: { id: user.id },
+    company: { id: company.id }
+  });
 }
 
 /**
