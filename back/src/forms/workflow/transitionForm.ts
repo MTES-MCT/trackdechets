@@ -1,7 +1,6 @@
 import {
   Form,
   FormUpdateInput,
-  TemporaryStorageDetail,
   Status,
   prisma,
   User
@@ -21,7 +20,7 @@ export default async function transitionForm(
   user: User,
   form: Form,
   event: Event
-): Promise<Form & { temporaryStorageDetail: TemporaryStorageDetail }> {
+) {
   const currentStatus = form.status;
 
   // Use state machine to calculate new status
@@ -71,8 +70,5 @@ export default async function transitionForm(
     updatedFields
   });
 
-  return {
-    ...updatedForm,
-    temporaryStorageDetail: updatedTemporaryStorageDetail
-  };
+  return updatedForm;
 }

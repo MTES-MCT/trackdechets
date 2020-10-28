@@ -5,10 +5,7 @@ import { getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsTempStored } from "../../permissions";
 import { tempStoredInfoSchema, TempStorageInfo } from "../../validation";
 import { EventType } from "../../workflow/types";
-import {
-  expandFormFromDb,
-  expandTemporaryStorageFromDb
-} from "../../form-converter";
+import { expandFormFromDb } from "../../form-converter";
 import { DestinationCannotTempStore } from "../../errors";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
@@ -49,12 +46,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     formUpdateInput
   });
 
-  return {
-    ...expandFormFromDb(tempStoredForm),
-    temporaryStorageDetail: expandTemporaryStorageFromDb(
-      tempStoredForm.temporaryStorageDetail
-    )
-  };
+  return expandFormFromDb(tempStoredForm);
 };
 
 export default markAsTempStoredResolver;
