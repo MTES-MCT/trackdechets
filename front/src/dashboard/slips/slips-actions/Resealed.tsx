@@ -1,7 +1,6 @@
-import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
-import { removeNulls } from "common/helper";
+import { mergeDefaults } from "common/helper";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/company/CompanySelector";
 import DateInput from "form/custom-inputs/DateInput";
@@ -17,11 +16,9 @@ export default function Resealed({
   onSubmit,
   onCancel,
 }: SlipActionProps) {
-  // We need a deep merge as sub-objects may be partially filled
-  // But without the null values as they break form elements (uncontrolled)
-  const initialValues = merge(
+  const initialValues = mergeDefaults(
     emptyState,
-    removeNulls(form.temporaryStorageDetail)
+    form.temporaryStorageDetail || {}
   );
   const [isRefurbished, setIsRefurbished] = useState(
     !!form.temporaryStorageDetail?.wasteDetails?.quantity
@@ -282,7 +279,7 @@ export default function Resealed({
               >
                 Annuler
               </button>
-              <button type="submit" className="btn btn--outline">
+              <button type="submit" className="btn btn--primary">
                 Je valide
               </button>
             </div>
