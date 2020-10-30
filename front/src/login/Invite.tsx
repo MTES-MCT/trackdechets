@@ -1,6 +1,7 @@
-import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import React, { useState } from "react";
+import { Formik, Form, Field, ErrorMessage, yupToFormErrors } from "formik";
 import gql from "graphql-tag";
+import * as yup from "yup";
 import { useLocation, Link } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import {
@@ -13,6 +14,10 @@ import {
 import Loader from "common/components/Loaders";
 import { NotificationError } from "common/components/Error";
 import routes from "common/routes";
+import { FaEye, FaLock } from "react-icons/fa";
+import PasswordMeter from "common/components/PasswordMeter";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import styles from "./Invite.module.scss";
 
 const INVITATION = gql`
   query Invitation($hash: String!) {
@@ -112,6 +117,8 @@ export default function Invite() {
   const location = useLocation();
   const hash = decodeURIComponent(location.search.replace("?hash=", ""));
 
+  const [passwordType, setPasswordType] = useState("password");
+
   // INVITATION QUERY
   const { loading, error: queryError, data: queryData } = useQuery<
     Pick<Query, "invitation">
@@ -158,16 +165,15 @@ export default function Invite() {
           email: invitation?.email ?? "",
           name: "",
           password: "",
-          passwordConfirmation: "",
         }}
-        validate={values => {
-          if (values.password !== values.passwordConfirmation) {
-            return {
-              passwordConfirmation:
-                "Les deux mots de passe ne sont pas identiques.",
-            };
-          }
-        }}
+        validationSchema={yup.object().shape({
+          email: yup.string().email().required("L'email est un champ requis"),
+          name: yup.string().required("Le nom est un champ requis"),
+          password: yup
+            .string()
+            .required("Le mot de passe est un champ requis")
+            .min(8, "Le mot de passe doit faire au moins 8 caractères"),
+        })}
         onSubmit={(values, { setSubmitting }) => {
           const { name, password } = values;
           joinWithInvite({
@@ -193,34 +199,52 @@ export default function Invite() {
                     readOnly
                     className="td-input"
                   />
+                  <RedErrorMessage name="email" />
                 </div>
                 <div className="form__row">
                   <label>
                     Nom et prénom
                     <Field type="text" name="name" className="td-input" />
+                    <RedErrorMessage name="name" />
                   </label>
                 </div>
 
                 <div className="form__row">
-                  <label>
-                    Mot de passe
-                    <Field
-                      type="password"
-                      name="password"
-                      className="td-input"
-                    />
-                  </label>
-                </div>
+                  <label>Mot de passe</label>
 
-                <div className="form__row">
-                  <label>
-                    Vérification du mot de passe
-                    <Field
-                      type="password"
-                      name="passwordConfirmation"
-                      className="td-input"
-                    />
-                  </label>
+                  <Field name="password">
+                    {({ field }) => {
+                      return (
+                        <>
+                          <div className="field-with-icon-wrapper">
+                            <input
+                              type={passwordType}
+                              {...field}
+                              className="td-input"
+                            />
+                            <i>
+                              <FaLock />
+                            </i>
+                          </div>
+                          <span
+                            className={styles.showPassword}
+                            onClick={() =>
+                              setPasswordType(
+                                passwordType === "password"
+                                  ? "text"
+                                  : "password"
+                              )
+                            }
+                          >
+                            <FaEye /> <span>Afficher le mot de passe</span>
+                          </span>
+                          <PasswordMeter password={field.value} />
+                        </>
+                      );
+                    }}
+                  </Field>
+
+                  <RedErrorMessage name="password" />
                 </div>
 
                 <ErrorMessage

@@ -20,7 +20,11 @@ describe("joinWithInvite mutation", () => {
 
   it("should raise exception if invitation does not exist", async () => {
     const { errors } = await mutate(JOIN_WITH_INVITE, {
-      variables: { inviteHash: "invalid", name: "John Snow", password: "pass" }
+      variables: {
+        inviteHash: "invalid",
+        name: "John Snow",
+        password: "password"
+      }
     });
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual("Cette invitation n'existe pas");
@@ -43,7 +47,7 @@ describe("joinWithInvite mutation", () => {
       variables: {
         inviteHash: invitation.hash,
         name: "John Snow",
-        password: "pass"
+        password: "password"
       }
     });
     expect(errors).toHaveLength(1);
@@ -65,7 +69,7 @@ describe("joinWithInvite mutation", () => {
       variables: {
         inviteHash: invitation.hash,
         name: "John Snow",
-        password: "pass"
+        password: "password"
       }
     });
 
@@ -108,7 +112,7 @@ describe("joinWithInvite mutation", () => {
       variables: {
         name: "John Snow",
         inviteHash: invitation1.hash,
-        password: "pass"
+        password: "password"
       }
     });
 
@@ -125,5 +129,39 @@ describe("joinWithInvite mutation", () => {
       company1.siret,
       company2.siret
     ]);
+  });
+
+  it("should return an error if name is empty or password less than 8 characters", async () => {
+    const { mutate } = createTestClient({ apolloServer: server });
+
+    const company = await companyFactory();
+    const invitee = "john.snow@trackdechets.fr";
+
+    const invitation = await prisma.createUserAccountHash({
+      email: invitee,
+      companySiret: company.siret,
+      role: "MEMBER",
+      hash: "hash"
+    });
+    const { errors: errs1 } = await mutate(JOIN_WITH_INVITE, {
+      variables: {
+        inviteHash: invitation.hash,
+        name: "John Snow",
+        password: "pass"
+      }
+    });
+    expect(errs1).toHaveLength(1);
+    expect(errs1[0].message).toEqual(
+      "Le mot de passe doit faire au moins 8 caractères"
+    );
+    const { errors: errs2 } = await mutate(JOIN_WITH_INVITE, {
+      variables: {
+        inviteHash: invitation.hash,
+        name: "",
+        password: "password"
+      }
+    });
+    expect(errs2).toHaveLength(1);
+    expect(errs2[0].message).toEqual("Le nom est un champ requis");
   });
 });
