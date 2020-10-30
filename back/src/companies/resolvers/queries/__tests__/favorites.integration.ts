@@ -15,15 +15,30 @@ const FAVORITES = `query Favorites($type: FavoriteType!){
 describe("query favorites", () => {
   afterAll(resetDatabase);
 
-  it("should return most common companies used in forms", async () => {
-    const { user } = await userWithCompanyFactory("MEMBER");
-    const form = await formFactory({ ownerId: user.id });
+  it("should return the recent EMITTER", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["COLLECTOR"]
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id
+    });
+
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query(FAVORITES, {
       variables: { type: "EMITTER" }
     });
-    expect(data.favorites.map(c => c.siret)).toEqual([
-      form.emitterCompanySiret
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: form.emitterCompanySiret
+      })
     ]);
   });
+
+  it.todo("should return the user's company if it matches the favorite type");
+  it.todo("should return the user's company even if there are other results");
+  it.todo("should return the user's company based on an existing BSD");
+  it.todo("should not return the same company twice");
 });

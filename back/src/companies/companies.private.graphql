@@ -100,6 +100,17 @@ type Mutation {
   ): UploadLink!
 }
 
+"Type d'établissement favoris"
+enum FavoriteType {
+  EMITTER
+  TRANSPORTER
+  RECIPIENT
+  TRADER
+  NEXT_DESTINATION
+  TEMPORARY_STORAGE_DETAIL
+  DESTINATION
+}
+
 """
 Information sur établissement accessible dans la liste des favoris
 La liste des favoris est constituée à partir de l'historique des
