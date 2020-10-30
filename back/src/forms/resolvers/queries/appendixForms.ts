@@ -2,8 +2,7 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandFormFromDb } from "../../form-converter";
-import { NotCompanyMember } from "../../../common/errors";
-import { getUserCompanies } from "../../../users/database";
+import { checkIsCompanyMember } from "../../../users/permissions";
 
 const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   _,
@@ -11,14 +10,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-
-  const userCompanies = await getUserCompanies(user.id);
-
-  // check user is member or admin of the provided siret
-  userCompanies.some(uc => uc.siret === siret);
-  if (!userCompanies.some(uc => uc.siret === siret)) {
-    throw new NotCompanyMember(siret);
-  }
+  await checkIsCompanyMember(user, { siret });
 
   const queriedForms = await prisma.forms({
     where: {

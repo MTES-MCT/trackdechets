@@ -1,13 +1,15 @@
 import { UserInputError } from "apollo-server-express";
-import { MissingSiret, NotCompanyMember } from "../../../common/errors";
+import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import {
   Form,
   QueryFormsArgs,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
+import { Company, prisma } from "../../../generated/prisma-client";
 import { getUserCompanies } from "../../../users/database";
+import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 
@@ -36,27 +38,27 @@ export async function getForms(
   userId: string,
   { siret, status, roles, hasNextStep, ...rest }: QueryFormsArgs
 ): Promise<Form[]> {
-  const userCompanies = await getUserCompanies(userId);
-
-  let company = null;
+  let company: Company | null = null;
 
   if (siret) {
     // a siret is specified, check user has permission on this company
-    company = userCompanies.find(uc => uc.siret === siret);
-    if (!company) {
-      throw new NotCompanyMember(siret);
-    }
+    company = await getCompanyOrCompanyNotFound({ siret });
+    await checkIsCompanyMember({ id: userId }, { siret });
   } else {
+    const userCompanies = await getUserCompanies(userId);
+
     if (userCompanies.length === 0) {
       // the user is not member of any companies, return empty array
       return [];
-    } else if (userCompanies.length > 1) {
+    }
+
+    if (userCompanies.length > 1) {
       // the user is member of 2 companies or more, a siret is required
       throw new MissingSiret();
-    } else {
-      // the user is member of only one company, use it as default
-      company = userCompanies[0];
     }
+
+    // the user is member of only one company, use it as default
+    company = userCompanies[0];
   }
 
   const queriedForms = await prisma.forms({

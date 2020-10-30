@@ -6,9 +6,8 @@ import { prisma } from "../../../generated/prisma-client";
 import { formsWhereInput } from "../../exports/where-inputs";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getUserCompanies } from "../../../users/database";
-import { NotCompanyMember } from "../../../common/errors";
 import validDatetime from "../../../common/yup/validDatetime";
+import { checkIsCompanyMember } from "../../../users/permissions";
 
 const TYPE = "forms_register";
 
@@ -32,14 +31,10 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
 
   validationSchema.validateSync(args);
 
-  // check user is member of every provided sirets
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
-  args.sirets.forEach(siret => {
-    if (!userSirets.includes(siret)) {
-      throw new NotCompanyMember(siret);
-    }
-  });
+  for (const siret of args.sirets) {
+    // check user is member of every provided sirets
+    await checkIsCompanyMember({ id: user.id }, { siret: siret });
+  }
 
   const whereInput = formsWhereInput(
     args.exportType,
