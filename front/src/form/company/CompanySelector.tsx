@@ -11,13 +11,14 @@ import { FAVORITES, SEARCH_COMPANIES } from "./query";
 import {
   Query,
   QuerySearchCompaniesArgs,
-  CompanySearchResult,
   FormCompany,
   QueryFavoritesArgs,
   FavoriteType,
+  CompanyFavorite,
 } from "generated/graphql/types";
 import CountrySelector from "./CountrySelector";
 import { v4 as uuidv4 } from "uuid";
+
 interface CompanySelectorProps {
   name:
     | "nextDestination.company"
@@ -27,7 +28,7 @@ interface CompanySelectorProps {
     | "recipient.company"
     | "trader.company"
     | "temporaryStorageDetail.destination.company";
-  onCompanySelected?: (company: CompanySearchResult) => void;
+  onCompanySelected?: (company: CompanyFavorite) => void;
   allowForeignCompanies?: boolean;
   heading?: string;
 }
@@ -60,15 +61,21 @@ export default function CompanySelector({
     },
   });
   const selectCompany = useCallback(
-    (company: CompanySearchResult) => {
+    (company: CompanyFavorite) => {
       setFieldValue(`${field.name}.siret`, company.siret);
 
-      ["name", "address", "contact", "phone", "mail"].forEach(key => {
-        if (!company?.[key]) {
-          return;
-        }
-        setFieldValue(`${field.name}.${key}`, company[key]);
-      });
+      const fields = {
+        name: company.name,
+        address: company.address,
+        contact: company.contact,
+        phone: company.phone,
+        mail: company.mail,
+      };
+      Object.keys(fields)
+        .filter(key => fields[key])
+        .forEach(key => {
+          setFieldValue(`${field.name}.${key}`, fields[key]);
+        });
 
       if (onCompanySelected) {
         onCompanySelected(company);
@@ -77,21 +84,24 @@ export default function CompanySelector({
     [field.name, setFieldValue, onCompanySelected]
   );
 
-  const searchResults: CompanySearchResult[] = useMemo(
+  const searchResults: CompanyFavorite[] = useMemo(
     () =>
-      searchData?.searchCompanies ??
-      favoritesData?.favorites?.map(favorite => ({
-        ...favorite,
+      searchData?.searchCompanies.map(
+        ({ siret, name, address, transporterReceipt, traderReceipt }) => ({
+          // convert CompanySearchResult to CompanyFavorite
+          siret,
+          name,
+          address,
+          transporterReceipt,
+          traderReceipt,
 
-        // Convert CompanyFavorite to CompanySearchResult
-        __typename: "CompanySearchResult",
-        etatAdministratif: null,
-        codeCommune: null,
-        naf: null,
-        libelleNaf: null,
-        companyTypes: null,
-        installation: null,
-      })) ??
+          __typename: "CompanyFavorite",
+          contact: "",
+          phone: "",
+          mail: "",
+        })
+      ) ??
+      favoritesData?.favorites ??
       [],
     [searchData, favoritesData]
   );
@@ -174,14 +184,8 @@ export default function CompanySelector({
             selectedItem={{
               ...field.value,
 
-              // Convert FormCompany to CompanySearchResult
-              __typename: "CompanySearchResult",
-              etatAdministratif: null,
-              codeCommune: null,
-              companyTypes: null,
-              naf: null,
-              libelleNaf: null,
-              installation: null,
+              // Convert FormCompany to CompanyFavorite
+              __typename: "CompanyFavorite",
               transporterReceipt: null,
               traderReceipt: null,
             }}
