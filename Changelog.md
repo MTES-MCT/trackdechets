@@ -34,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug empêchant l'affichage du dashboard lorsqu'un BSD n'avait pas d'émetteur [PR 644](https://github.com/MTES-MCT/trackdechets/pull/644)
 - Correction d'un bug affichant une invitation en attente même quand celle-ci a déjà été acceptée [PR 671](https://github.com/MTES-MCT/trackdechets/pull/671)
 - Correction du lien présent dans l'email d'invitation suite à l'action "Renvoyer l'invitation" [PR 648](https://github.com/MTES-MCT/trackdechets/pull/648)
+- Champs requis dans le formulaire d'inscription suite à un lien d'invitation [PR 670](https://github.com/MTES-MCT/trackdechets/pull/670)
 
 # [2020.10.1] 05/10/2020
 
