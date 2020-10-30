@@ -28,21 +28,33 @@
       max-width: 400px;
     }
   }
-
+  &Columns {
+    display: flex;
+    flex-direction: column;
+    @include desktop {
+      flex-direction: row;
+    }
+    > div {
+      width: 100%; // equal width child grid divs
+    }
+  }
   &Grid {
-  
     display: inline-grid;
-    grid-template-columns: auto auto;
-    grid-auto-rows:  1.5rem;
+    grid-template-columns: auto minmax(auto, 0.75fr);
+    grid-auto-rows: minmax(1.5rem, max-content);
     grid-gap: 1rem;
-    margin-right: 1rem;
 
+    &:not(:last-child) {
+      margin-right: 1rem;
+    }
     dt {
       text-align: right;
       color: $grey-dark;
       font-weight: bold;
-
-      overflow-wrap: anywhere;
+      overflow-wrap: break-word;
+    }
+    dd {
+      overflow-wrap: break-word;
     }
   }
   &Summary {
@@ -55,10 +67,9 @@
     margin-bottom: 30px;
 
     @include desktop {
-      
       margin-left: auto;
       width: 30%;
-    
+
       order: 99;
     }
   }

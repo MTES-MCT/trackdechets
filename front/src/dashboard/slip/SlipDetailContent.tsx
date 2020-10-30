@@ -132,29 +132,30 @@ const TempStorage = ({ temporaryStorageDetail }) => (
 );
 const Trader = ({ trader }) => (
   <>
-    <div className={styles.detailGrid}>
-      <dt>Négociant</dt>
-      <dd>{trader.company?.name}</dd>
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Négociant</dt>
+        <dd>{trader.company?.name}</dd>
 
-      <dt>Siret</dt>
-      <dd>{trader.company?.siret}</dd>
+        <dt>Siret</dt>
+        <dd>{trader.company?.siret}</dd>
 
-      <dt>Adresse</dt>
-      <dd>{trader.company?.address}</dd>
+        <dt>Adresse</dt>
+        <dd>{trader.company?.address}</dd>
 
-      <dt>Tél</dt>
-      <dd>{trader.company?.phone}</dd>
+        <dt>Tél</dt>
+        <dd>{trader.company?.phone}</dd>
 
-      <dt>Mél</dt>
-      <dd>{trader.company?.mail}</dd>
+        <dt>Mél</dt>
+        <dd>{trader.company?.mail}</dd>
 
-      <dt>Contact</dt>
-      <dd>{trader.company?.contact}</dd>
-    </div>
-    <div className={styles.detailGrid}>
-      <DetailRow value={trader.receipt} label="Récépissé" />
-      <DetailRow value={trader.department} label="Départment" />
-      <DateRow value={trader.validityLimit} label="Date de validité" />
+        <dt>Contact</dt>
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={trader.receipt} label="Récépissé" />
+        <DetailRow value={trader.department} label="Départment" />
+        <DateRow value={trader.validityLimit} label="Date de validité" />
+      </div>
     </div>
   </>
 );
@@ -273,37 +274,41 @@ export default function SlipDetailContent({
         <div className={styles.detailTabPanels}>
           {/* Emitter tab panel */}
           <TabPanel className={styles.detailTabPanel}>
-            <div className={styles.detailGrid}>
-              <dt>Émetteur</dt> <dd>{form.emitter?.company?.name}</dd>
-              <dt>Siret</dt> <dd>{form.emitter?.company?.siret}</dd>
-              <dt>Adresse</dt> <dd>{form.emitter?.company?.address}</dd>
-              <dt>Tél</dt> <dd>{form.emitter?.company?.phone}</dd>
-              <dt>Mél</dt> <dd>{form.emitter?.company?.mail}</dd>
-              <dt>Contact</dt> <dd>{form.emitter?.company?.contact}</dd>
-              <DetailRow
-                value={form.emitter?.workSite?.name}
-                label="Chantier"
-              />
-              {!!form.emitter?.workSite?.address && (
-                <>
-                  <dt>Adresse Chantier</dt>
-                  <dd>
-                    {form.emitter?.workSite?.address}{" "}
-                    {form.emitter?.workSite?.postalCode}{" "}
-                    {form.emitter?.workSite?.city}
-                  </dd>
-                </>
-              )}
-            </div>
-            <div className={styles.detailGrid}>
-              <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
-              <DetailRow
-                value={getVerboseQuantityType(form.wasteDetails?.quantityType)}
-                label="Quantité"
-              />
-              <DateRow value={form.sentAt} label="Envoyé le" />
-              <DetailRow value={form.sentBy} label="Envoyé par" />
-              <YesNoRow value={!!form.sentAt} label="Signature producteur" />
+            <div className={styles.detailColumns}>
+              <div className={styles.detailGrid}>
+                <dt>Émetteur</dt> <dd>{form.emitter?.company?.name}</dd>
+                <dt>Siret</dt> <dd>{form.emitter?.company?.siret}</dd>
+                <dt>Adresse</dt> <dd>{form.emitter?.company?.address}</dd>
+                <dt>Tél</dt> <dd>{form.emitter?.company?.phone}</dd>
+                <dt>Mél</dt> <dd>{form.emitter?.company?.mail}</dd>
+                <dt>Contact</dt> <dd>{form.emitter?.company?.contact}</dd>
+                <DetailRow
+                  value={form.emitter?.workSite?.name}
+                  label="Chantier"
+                />
+                {!!form.emitter?.workSite?.address && (
+                  <>
+                    <dt>Adresse Chantier</dt>
+                    <dd>
+                      {form.emitter?.workSite?.address}{" "}
+                      {form.emitter?.workSite?.postalCode}{" "}
+                      {form.emitter?.workSite?.city}
+                    </dd>
+                  </>
+                )}
+              </div>
+              <div className={styles.detailGrid}>
+                <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
+                <DetailRow
+                  value={getVerboseQuantityType(
+                    form.wasteDetails?.quantityType
+                  )}
+                  label="Quantité"
+                />
+                <DateRow value={form.sentAt} label="Envoyé le" />
+                <DetailRow value={form.sentBy} label="Envoyé par" />
+                <YesNoRow value={!!form.sentAt} label="Signature producteur" />
+              </div>
             </div>
           </TabPanel>
           {/* Trader tab panel */}
@@ -368,56 +373,58 @@ export default function SlipDetailContent({
 
           {/* Recipient tab panel */}
           <TabPanel className={styles.detailTabPanel}>
-            <div className={styles.detailGrid}>
-              <dt>Destinataire</dt> <dd>{form.recipient?.company?.name}</dd>
-              <dt>Siret</dt> <dd>{form.recipient?.company?.siret}</dd>
-              <dt>Adresse</dt> <dd>{form.recipient?.company?.address}</dd>
-              <dt>Tél</dt> <dd>{form.recipient?.company?.phone}</dd>
-              <dt>Mél</dt> <dd>{form.recipient?.company?.mail}</dd>
-              <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
-            </div>
-            <div className={styles.detailGrid}>
-              <dt>Numéro de CAP</dt> <dd>{form.recipient?.cap}</dd>
-              <DateRow value={form.receivedAt} label="Reçu le" />
-              <DetailRow value={form.receivedBy} label="Reçu par" />
-              <DetailRow
-                value={getVerboseAcceptationStatus(
-                  form?.wasteAcceptationStatus
-                )}
-                label="Lot accepté"
-              />
-              <DetailRow
-                value={
-                  form?.quantityReceived && `${form?.quantityReceived} tonnes`
-                }
-                label="Quantité reçue"
-              />
-              <DetailRow
-                value={form.wasteRefusalReason}
-                label="Motif de refus"
-              />
-            </div>
-            <div className={styles.detailGrid}>
-              <DetailRow
-                value={form.recipient?.processingOperation}
-                label="Opération de traitement prévue"
-              />
-              <DetailRow
-                value={form.processingOperationDone}
-                label="Traitement réalisé (code D/R)"
-              />
-              <DetailRow
-                value={form.processingOperationDescription}
-                label="Description de l'opération"
-              />
-              <DateRow
-                value={form.processedAt}
-                label="Traitement effectué le"
-              />
-              <DetailRow
-                value={form.processedBy}
-                label="Traitement effectué par"
-              />
+            <div className={styles.detailColumns}>
+              <div className={styles.detailGrid}>
+                <dt>Destinataire</dt> <dd>{form.recipient?.company?.name}</dd>
+                <dt>Siret</dt> <dd>{form.recipient?.company?.siret}</dd>
+                <dt>Adresse</dt> <dd>{form.recipient?.company?.address}</dd>
+                <dt>Tél</dt> <dd>{form.recipient?.company?.phone}</dd>
+                <dt>Mél</dt> <dd>{form.recipient?.company?.mail}</dd>
+                <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
+              </div>
+              <div className={styles.detailGrid}>
+                <dt>Numéro de CAP</dt> <dd>{form.recipient?.cap}</dd>
+                <DateRow value={form.receivedAt} label="Reçu le" />
+                <DetailRow value={form.receivedBy} label="Reçu par" />
+                <DetailRow
+                  value={getVerboseAcceptationStatus(
+                    form?.wasteAcceptationStatus
+                  )}
+                  label="Lot accepté"
+                />
+                <DetailRow
+                  value={
+                    form?.quantityReceived && `${form?.quantityReceived} tonnes`
+                  }
+                  label="Quantité reçue"
+                />
+                <DetailRow
+                  value={form.wasteRefusalReason}
+                  label="Motif de refus"
+                />
+              </div>
+              <div className={styles.detailGrid}>
+                <DetailRow
+                  value={form.recipient?.processingOperation}
+                  label="Opération de traitement prévue"
+                />
+                <DetailRow
+                  value={form.processingOperationDone}
+                  label="Traitement réalisé (code D/R)"
+                />
+                <DetailRow
+                  value={form.processingOperationDescription}
+                  label="Description de l'opération"
+                />
+                <DateRow
+                  value={form.processedAt}
+                  label="Traitement effectué le"
+                />
+                <DetailRow
+                  value={form.processedBy}
+                  label="Traitement effectué par"
+                />
+              </div>
             </div>
           </TabPanel>
         </div>
