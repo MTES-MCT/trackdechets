@@ -95,7 +95,7 @@
     "@types/passport-oauth2-client-password": "^0.1.2",
     "@types/rate-limit-redis": "^1.7.1",
     "@types/supertest": "^2.0.10",
-    "@types/yup": "0.29.4",
+    "@types/yup": "0.29.9",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
     "apollo-server-integration-testing": "^2.3.0",
