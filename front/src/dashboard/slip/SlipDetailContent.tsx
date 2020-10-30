@@ -149,6 +149,7 @@ const Trader = ({ trader }) => (
       <dd>{trader.company?.mail}</dd>
 
       <dt>Contact</dt>
+      <dd>{trader.company?.contact}</dd>
     </div>
     <div className={styles.detailGrid}>
       <DetailRow value={trader.receipt} label="Récépissé" />
