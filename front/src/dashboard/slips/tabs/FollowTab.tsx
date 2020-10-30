@@ -26,6 +26,7 @@ export default function FollowTab() {
         FormStatus.Resealed,
         FormStatus.Resent,
         FormStatus.AwaitingGroup,
+        FormStatus.Grouped,
       ],
       hasNextStep: false,
     },
