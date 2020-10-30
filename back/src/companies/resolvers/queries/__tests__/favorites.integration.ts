@@ -6,8 +6,8 @@ import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
-const FAVORITES = `query Favorites($type: FavoriteType!){
-  favorites(type: $type){
+const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
+  favorites(siret: $siret, type: $type) {
     siret
   }
 }`;
@@ -16,7 +16,7 @@ describe("query favorites", () => {
   afterAll(resetDatabase);
 
   it("should return the recent EMITTER", async () => {
-    const { user } = await userWithCompanyFactory("MEMBER", {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["COLLECTOR"]
       }
@@ -27,7 +27,10 @@ describe("query favorites", () => {
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query(FAVORITES, {
-      variables: { type: "EMITTER" }
+      variables: {
+        siret: company.siret,
+        type: "EMITTER"
+      }
     });
 
     expect(data.favorites).toEqual([

@@ -5,9 +5,10 @@ import {
 } from "../../../generated/graphql/types";
 import { Company, CompanyType, prisma } from "../../../generated/prisma-client";
 import { searchCompany } from "../../sirene";
-import { getUserCompanies } from "../../../users/database";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { getCompanyOrCompanyNotFound } from "../../database";
+import { checkIsCompanyMember } from "../../../users/permissions";
 
 function matchesFavoriteType(
   company: Company,
@@ -43,27 +44,20 @@ function matchesFavoriteType(
 
 const favoritesResolver: QueryResolvers["favorites"] = async (
   parent,
-  { type },
+  { siret, type },
   context
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
+  const company = await getCompanyOrCompanyNotFound({ siret });
+  await checkIsCompanyMember({ id: user.id }, { siret: company.siret });
 
   const lowerType = type.toLowerCase();
-  const userId = user.id;
-  const companies = await getUserCompanies(userId);
 
-  if (!companies.length) {
-    throw new Error(
-      `Vous n'appartenez à aucune entreprise, vous n'avez pas de favori.`
-    );
-  }
-
-  const company = companies[0];
   const forms = await prisma.forms({
     where: {
       OR: [
-        { owner: { id: userId } },
+        { owner: { id: user.id } },
         { recipientCompanySiret: company.siret },
         { emitterCompanySiret: company.siret }
       ],

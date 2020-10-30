@@ -18,6 +18,7 @@ import {
 } from "generated/graphql/types";
 import CountrySelector from "./CountrySelector";
 import { v4 as uuidv4 } from "uuid";
+import { useParams } from "react-router-dom";
 
 interface CompanySelectorProps {
   name:
@@ -39,6 +40,7 @@ export default function CompanySelector({
   allowForeignCompanies,
   heading,
 }: CompanySelectorProps) {
+  const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
@@ -56,6 +58,7 @@ export default function CompanySelector({
     error: favoritesError,
   } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(FAVORITES, {
     variables: {
+      siret,
       // Load different favorites depending on the object we are filling
       type: constantCase(field.name.split(".")[0]) as FavoriteType,
     },

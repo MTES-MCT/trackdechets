@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export const FAVORITES = gql`
-  query Favorites($type: FavoriteType!) {
-    favorites(type: $type) {
+  query Favorites($siret: String!, $type: FavoriteType!) {
+    favorites(siret: $siret, type: $type) {
       siret
       name
       address
