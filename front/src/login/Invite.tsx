@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Formik, Form, Field, ErrorMessage, yupToFormErrors } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import gql from "graphql-tag";
 import * as yup from "yup";
 import { useLocation, Link } from "react-router-dom";
@@ -14,7 +14,7 @@ import {
 import Loader from "common/components/Loaders";
 import { NotificationError } from "common/components/Error";
 import routes from "common/routes";
-import { FaEye, FaLock } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaIdCard, FaLock } from "react-icons/fa";
 import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./Invite.module.scss";
@@ -191,22 +191,33 @@ export default function Invite() {
                   votre inscription, veuillez compléter le formulaire
                   ci-dessous.
                 </p>
+
                 <div className="form__row">
                   <label>Email</label>
-                  <Field
-                    type="email"
-                    name="email"
-                    readOnly
-                    className="td-input"
-                  />
+                  <div className="field-with-icon-wrapper">
+                    <Field
+                      type="email"
+                      name="email"
+                      className="td-input"
+                      readOnly
+                    />
+                    <i>
+                      <FaEnvelope />
+                    </i>
+                  </div>
                   <RedErrorMessage name="email" />
                 </div>
+
                 <div className="form__row">
-                  <label>
-                    Nom et prénom
+                  <label>Nom et prénom</label>
+                  <div className="field-with-icon-wrapper">
                     <Field type="text" name="name" className="td-input" />
-                    <RedErrorMessage name="name" />
-                  </label>
+                    <i>
+                      <FaIdCard />
+                    </i>
+                  </div>
+
+                  <RedErrorMessage name="name" />
                 </div>
 
                 <div className="form__row">
