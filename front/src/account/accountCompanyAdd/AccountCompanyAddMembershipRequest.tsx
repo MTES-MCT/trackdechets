@@ -35,7 +35,10 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
 
   return (
     <div>
-      <h4 className="h4">Cet établissement possède déjà un administrateur</h4>
+      <h4 className="h4">
+        Cet établissement existe déjà dans Trackdéchets, vous pouvez demander à
+        l'administrateur de rejoindre l'établissement
+      </h4>
       <button
         type="button"
         className="btn btn--primary tw-mt-5"
