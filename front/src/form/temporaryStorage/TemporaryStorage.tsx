@@ -2,10 +2,10 @@ import { useFormikContext, Field } from "formik";
 import React, { useEffect } from "react";
 import CompanySelector from "form/company/CompanySelector";
 import { Form } from "generated/graphql/types";
-import { PROCESSING_OPERATIONS } from "generated/constants";
 import initialState from "../initial-state";
 import styles from "./TemporaryStorage.module.scss";
 import classNames from "classnames";
+import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 
 export default function TemporaryStorage(props) {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -57,21 +57,10 @@ export default function TemporaryStorage(props) {
       </div>
 
       <div className="form__row">
-        <label>Opération d'élimination / valorisation prévue (code D/R)</label>
-
         <Field
-          component="select"
-          className="td-select"
+          component={ProcessingOperationSelect}
           name={`${props.name}.destination.processingOperation`}
-        >
-          <option value="">Choisissez...</option>
-          {PROCESSING_OPERATIONS.map(operation => (
-            <option key={operation.code} value={operation.code}>
-              {operation.code} - {operation.description.substr(0, 50)}
-              {operation.description.length > 50 ? "..." : ""}
-            </option>
-          ))}
-        </Field>
+        />
       </div>
     </>
   );
