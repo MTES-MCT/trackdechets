@@ -21,6 +21,19 @@ export type Scalars = {
   JSON: any;
 };
 
+export type AcceptedFormInput = {
+  /** Statut d'acceptation du déchet (case 10) */
+  wasteAcceptationStatus: WasteAcceptationStatusInput;
+  /** Raison du refus (case 10) */
+  wasteRefusalReason: Maybe<Scalars['String']>;
+  /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
+  signedAt: Scalars['DateTime'];
+  /** Nom de la personne en charge de l'acceptation' du déchet (case 10) */
+  signedBy: Scalars['String'];
+  /** Quantité réelle présentée (case 10) */
+  quantityReceived: Scalars['Float'];
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -673,6 +686,8 @@ export enum FormStatus {
   Sent = 'SENT',
   /** BSD reçu par l'établissement de destination */
   Received = 'RECEIVED',
+  /** BSD accepté par l'établissement de destination */
+  Accepted = 'ACCEPTED',
   /** BSD dont les déchets ont été traités */
   Processed = 'PROCESSED',
   /** BSD en attente de regroupement */
@@ -927,6 +942,8 @@ export type Mutation = {
    * d'un utilisateur.
    */
   login: AuthPayload;
+  /** Valide l'acceptation du BSD */
+  markAsAccepted: Maybe<Form>;
   /** Valide le traitement d'un BSD */
   markAsProcessed: Maybe<Form>;
   /** Valide la réception d'un BSD */
@@ -1187,6 +1204,12 @@ export type MutationJoinWithInviteArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationMarkAsAcceptedArgs = {
+  id: Scalars['ID'];
+  acceptedInfo: AcceptedFormInput;
 };
 
 
@@ -1618,18 +1641,18 @@ export type QuerySearchCompaniesArgs = {
 
 /** Payload de réception d'un BSD */
 export type ReceivedFormInput = {
-  /** Statut d'acceptation du déchet (case 10) */
-  wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 10) */
-  wasteRefusalReason: Maybe<Scalars['String']>;
   /** Nom de la personne en charge de la réception du déchet (case 10) */
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 10) */
   receivedAt: Scalars['DateTime'];
+  /** Statut d'acceptation du déchet (case 10) */
+  wasteAcceptationStatus: Maybe<WasteAcceptationStatusInput>;
+  /** Raison du refus (case 10) */
+  wasteRefusalReason: Maybe<Scalars['String']>;
   /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
   signedAt: Maybe<Scalars['DateTime']>;
   /** Quantité réelle présentée (case 10) */
-  quantityReceived: Scalars['Float'];
+  quantityReceived: Maybe<Scalars['Float']>;
 };
 
 /**
@@ -2263,6 +2286,17 @@ export type WorkSiteInput = {
 };
 
 
+export function createAcceptedFormInputMock(props: Partial<AcceptedFormInput>): AcceptedFormInput {
+  return {
+    wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
+    wasteRefusalReason: null,
+    signedAt: new Date().toISOString(),
+    signedBy: "",
+    quantityReceived: 0,
+    ...props,
+  };
+}
+
 export function createAppendixFormInputMock(props: Partial<AppendixFormInput>): AppendixFormInput {
   return {
     id: null,
@@ -2767,12 +2801,12 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
 
 export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): ReceivedFormInput {
   return {
-    wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
-    wasteRefusalReason: null,
     receivedBy: "",
     receivedAt: new Date().toISOString(),
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
     signedAt: null,
-    quantityReceived: 0,
+    quantityReceived: null,
     ...props,
   };
 }

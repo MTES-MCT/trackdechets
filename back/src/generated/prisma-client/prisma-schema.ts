@@ -1575,6 +1575,7 @@ type Form {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1675,6 +1676,7 @@ input FormCreateInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1789,6 +1791,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1882,6 +1885,7 @@ input FormCreateWithoutTransportSegmentsInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -1998,6 +2002,8 @@ enum FormOrderByInput {
   receivedAt_DESC
   signedAt_ASC
   signedAt_DESC
+  signedBy_ASC
+  signedBy_DESC
   quantityReceived_ASC
   quantityReceived_DESC
   processedBy_ASC
@@ -2162,6 +2168,7 @@ type FormPreviousValues {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -2387,6 +2394,20 @@ input FormScalarWhereInput {
   signedAt_lte: DateTime
   signedAt_gt: DateTime
   signedAt_gte: DateTime
+  signedBy: String
+  signedBy_not: String
+  signedBy_in: [String!]
+  signedBy_not_in: [String!]
+  signedBy_lt: String
+  signedBy_lte: String
+  signedBy_gt: String
+  signedBy_gte: String
+  signedBy_contains: String
+  signedBy_not_contains: String
+  signedBy_starts_with: String
+  signedBy_not_starts_with: String
+  signedBy_ends_with: String
+  signedBy_not_ends_with: String
   quantityReceived: Float
   quantityReceived_not: Float
   quantityReceived_in: [Float!]
@@ -3298,6 +3319,7 @@ input FormUpdateDataInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3391,6 +3413,7 @@ input FormUpdateInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3483,6 +3506,7 @@ input FormUpdateManyDataInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3584,6 +3608,7 @@ input FormUpdateManyMutationInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3702,6 +3727,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -3794,6 +3820,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
   processedBy: String
   processedAt: String
@@ -4048,6 +4075,20 @@ input FormWhereInput {
   signedAt_lte: DateTime
   signedAt_gt: DateTime
   signedAt_gte: DateTime
+  signedBy: String
+  signedBy_not: String
+  signedBy_in: [String!]
+  signedBy_not_in: [String!]
+  signedBy_lt: String
+  signedBy_lte: String
+  signedBy_gt: String
+  signedBy_gte: String
+  signedBy_contains: String
+  signedBy_not_contains: String
+  signedBy_starts_with: String
+  signedBy_not_starts_with: String
+  signedBy_ends_with: String
+  signedBy_not_ends_with: String
   quantityReceived: Float
   quantityReceived_not: Float
   quantityReceived_in: [Float!]
@@ -6106,6 +6147,7 @@ enum Status {
   SEALED
   SENT
   RECEIVED
+  ACCEPTED
   PROCESSED
   AWAITING_GROUP
   GROUPED

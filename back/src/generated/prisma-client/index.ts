@@ -1126,6 +1126,8 @@ export type FormOrderByInput =
   | "receivedAt_DESC"
   | "signedAt_ASC"
   | "signedAt_DESC"
+  | "signedBy_ASC"
+  | "signedBy_DESC"
   | "quantityReceived_ASC"
   | "quantityReceived_DESC"
   | "processedBy_ASC"
@@ -1406,6 +1408,7 @@ export type Status =
   | "SEALED"
   | "SENT"
   | "RECEIVED"
+  | "ACCEPTED"
   | "PROCESSED"
   | "AWAITING_GROUP"
   | "GROUPED"
@@ -2544,6 +2547,20 @@ export interface FormWhereInput {
   signedAt_lte?: Maybe<DateTimeInput>;
   signedAt_gt?: Maybe<DateTimeInput>;
   signedAt_gte?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
+  signedBy_not?: Maybe<String>;
+  signedBy_in?: Maybe<String[] | String>;
+  signedBy_not_in?: Maybe<String[] | String>;
+  signedBy_lt?: Maybe<String>;
+  signedBy_lte?: Maybe<String>;
+  signedBy_gt?: Maybe<String>;
+  signedBy_gte?: Maybe<String>;
+  signedBy_contains?: Maybe<String>;
+  signedBy_not_contains?: Maybe<String>;
+  signedBy_starts_with?: Maybe<String>;
+  signedBy_not_starts_with?: Maybe<String>;
+  signedBy_ends_with?: Maybe<String>;
+  signedBy_not_ends_with?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   quantityReceived_not?: Maybe<Float>;
   quantityReceived_in?: Maybe<Float[] | Float>;
@@ -5448,6 +5465,7 @@ export interface FormCreateInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5625,6 +5643,7 @@ export interface FormUpdateInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5745,6 +5764,7 @@ export interface FormUpdateDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -6357,6 +6377,20 @@ export interface FormScalarWhereInput {
   signedAt_lte?: Maybe<DateTimeInput>;
   signedAt_gt?: Maybe<DateTimeInput>;
   signedAt_gte?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
+  signedBy_not?: Maybe<String>;
+  signedBy_in?: Maybe<String[] | String>;
+  signedBy_not_in?: Maybe<String[] | String>;
+  signedBy_lt?: Maybe<String>;
+  signedBy_lte?: Maybe<String>;
+  signedBy_gt?: Maybe<String>;
+  signedBy_gte?: Maybe<String>;
+  signedBy_contains?: Maybe<String>;
+  signedBy_not_contains?: Maybe<String>;
+  signedBy_starts_with?: Maybe<String>;
+  signedBy_not_starts_with?: Maybe<String>;
+  signedBy_ends_with?: Maybe<String>;
+  signedBy_not_ends_with?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   quantityReceived_not?: Maybe<Float>;
   quantityReceived_in?: Maybe<Float[] | Float>;
@@ -7254,6 +7288,7 @@ export interface FormUpdateManyDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7343,6 +7378,7 @@ export interface FormUpdateManyMutationInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7674,6 +7710,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7816,6 +7853,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7993,6 +8031,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -8115,6 +8154,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -9562,6 +9602,7 @@ export interface Form {
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
   signedAt?: DateTimeOutput;
+  signedBy?: String;
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
@@ -9655,6 +9696,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   signedAt: () => Promise<DateTimeOutput>;
+  signedBy: () => Promise<String>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -9769,6 +9811,7 @@ export interface FormSubscription
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signedBy: () => Promise<AsyncIterator<String>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
@@ -9885,6 +9928,7 @@ export interface FormNullablePromise
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   signedAt: () => Promise<DateTimeOutput>;
+  signedBy: () => Promise<String>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -11808,6 +11852,7 @@ export interface FormPreviousValues {
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
   signedAt?: DateTimeOutput;
+  signedBy?: String;
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
@@ -11902,6 +11947,7 @@ export interface FormPreviousValuesPromise
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   signedAt: () => Promise<DateTimeOutput>;
+  signedBy: () => Promise<String>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -11996,6 +12042,7 @@ export interface FormPreviousValuesSubscription
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signedBy: () => Promise<AsyncIterator<String>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;

@@ -99,6 +99,16 @@ type ReceivedInfo = Pick<
   | "quantityReceived"
 >;
 
+type AcceptedInfo = Pick<
+  Form,
+  | "isAccepted"
+  | "wasteAcceptationStatus"
+  | "wasteRefusalReason"
+  | "signedAt"
+  | "signedBy"
+  | "quantityReceived"
+>;
+
 type SigningInfo = Pick<Form, "sentAt" | "sentBy" | "signedByTransporter">;
 
 type ProcessedInfo = Pick<
@@ -456,7 +466,6 @@ export const signingInfoSchema: yup.ObjectSchema<SigningInfo> = yup
 export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
   .object()
   .shape({
-    wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
     receivedBy: yup
       .string()
       .ensure()
@@ -468,6 +477,56 @@ export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
     signedAt: validDatetime({
       verboseFieldName: "date d'acceptation"
     }),
+    quantityReceived: yup
+      .number()
+      // if waste is refused, quantityReceived must be 0
+      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+        ["REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.test(
+              "is-zero",
+              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
+              v => v === 0
+            )
+          : schema
+      )
+      // if waste is partially or totally accepted, we check it is a positive value
+      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.test(
+              "is-strictly-positive",
+              "Vous devez saisir une quantité reçue supérieure à 0.",
+              v => v > 0
+            )
+          : schema
+      ),
+    wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
+    wasteRefusalReason: yup
+      .string()
+      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.ensure().required("Vous devez saisir un motif de refus")
+          : schema
+              .notRequired()
+              .nullable()
+              .test(
+                "is-empty",
+                "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+                v => !v
+              )
+      )
+  });
+
+// 10 - Expédition acceptée (ou refusée) à l’installation de destination
+export const acceptedInfoSchema: yup.ObjectSchema<AcceptedInfo> = yup
+  .object()
+  .shape({
+    signedAt: validDatetime({
+      verboseFieldName: "date d'acceptation"
+    }),
+    signedBy: yup
+      .string()
+      .ensure()
+      .required("Vous devez saisir un responsable de la réception."),
     quantityReceived: yup
       .number()
       .required()
@@ -491,6 +550,7 @@ export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
             )
           : schema
       ),
+    wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
     wasteRefusalReason: yup
       .string()
       .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>

@@ -24,6 +24,19 @@ export type Scalars = {
   JSON: any;
 };
 
+export type AcceptedFormInput = {
+  /** Statut d'acceptation du déchet (case 10) */
+  wasteAcceptationStatus: WasteAcceptationStatusInput;
+  /** Raison du refus (case 10) */
+  wasteRefusalReason?: Maybe<Scalars['String']>;
+  /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
+  signedAt: Scalars['DateTime'];
+  /** Nom de la personne en charge de l'acceptation' du déchet (case 10) */
+  signedBy: Scalars['String'];
+  /** Quantité réelle présentée (case 10) */
+  quantityReceived: Scalars['Float'];
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -669,6 +682,8 @@ export type FormStatus =
   | 'SENT'
   /** BSD reçu par l'établissement de destination */
   | 'RECEIVED'
+  /** BSD accepté par l'établissement de destination */
+  | 'ACCEPTED'
   /** BSD dont les déchets ont été traités */
   | 'PROCESSED'
   /** BSD en attente de regroupement */
@@ -920,6 +935,8 @@ export type Mutation = {
    * d'un utilisateur.
    */
   login: AuthPayload;
+  /** Valide l'acceptation du BSD */
+  markAsAccepted?: Maybe<Form>;
   /** Valide le traitement d'un BSD */
   markAsProcessed?: Maybe<Form>;
   /** Valide la réception d'un BSD */
@@ -1180,6 +1197,12 @@ export type MutationJoinWithInviteArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationMarkAsAcceptedArgs = {
+  id: Scalars['ID'];
+  acceptedInfo: AcceptedFormInput;
 };
 
 
@@ -1609,18 +1632,18 @@ export type QuerySearchCompaniesArgs = {
 
 /** Payload de réception d'un BSD */
 export type ReceivedFormInput = {
-  /** Statut d'acceptation du déchet (case 10) */
-  wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 10) */
-  wasteRefusalReason?: Maybe<Scalars['String']>;
   /** Nom de la personne en charge de la réception du déchet (case 10) */
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 10) */
   receivedAt: Scalars['DateTime'];
+  /** Statut d'acceptation du déchet (case 10) */
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatusInput>;
+  /** Raison du refus (case 10) */
+  wasteRefusalReason?: Maybe<Scalars['String']>;
   /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
   signedAt?: Maybe<Scalars['DateTime']>;
   /** Quantité réelle présentée (case 10) */
-  quantityReceived: Scalars['Float'];
+  quantityReceived?: Maybe<Scalars['Float']>;
 };
 
 /**
@@ -2411,6 +2434,7 @@ export type ResolversTypes = {
   NextDestinationInput: NextDestinationInput;
   InternationalCompanyInput: InternationalCompanyInput;
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
+  AcceptedFormInput: AcceptedFormInput;
   ResealedFormInput: ResealedFormInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
@@ -2519,6 +2543,7 @@ export type ResolversParentTypes = {
   NextDestinationInput: NextDestinationInput;
   InternationalCompanyInput: InternationalCompanyInput;
   AuthPayload: AuthPayload;
+  AcceptedFormInput: AcceptedFormInput;
   ResealedFormInput: ResealedFormInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
@@ -2793,6 +2818,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>;
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  markAsAccepted?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsAcceptedArgs, 'id' | 'acceptedInfo'>>;
   markAsProcessed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsProcessedArgs, 'id' | 'processedInfo'>>;
   markAsReceived?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsReceivedArgs, 'id' | 'receivedInfo'>>;
   markAsResealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsResealedArgs, 'id' | 'resealedInfos'>>;
@@ -3083,6 +3109,17 @@ export type Resolvers<ContextType = GraphQLContext> = {
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
 export type IResolvers<ContextType = GraphQLContext> = Resolvers<ContextType>;
+
+export function createAcceptedFormInputMock(props: Partial<AcceptedFormInput>): AcceptedFormInput {
+  return {
+    wasteAcceptationStatus: "ACCEPTED",
+    wasteRefusalReason: null,
+    signedAt: new Date().toISOString(),
+    signedBy: "",
+    quantityReceived: 0,
+    ...props,
+  };
+}
 
 export function createAppendixFormInputMock(props: Partial<AppendixFormInput>): AppendixFormInput {
   return {
@@ -3588,12 +3625,12 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
 
 export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): ReceivedFormInput {
   return {
-    wasteAcceptationStatus: "ACCEPTED",
-    wasteRefusalReason: null,
     receivedBy: "",
     receivedAt: new Date().toISOString(),
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
     signedAt: null,
-    quantityReceived: 0,
+    quantityReceived: null,
     ...props,
   };
 }

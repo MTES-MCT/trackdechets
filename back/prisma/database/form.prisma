@@ -34,6 +34,7 @@ type Form {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
 
   processedBy: String
@@ -222,6 +223,7 @@ enum Status {
   SEALED
   SENT
   RECEIVED
+  ACCEPTED
   PROCESSED
   AWAITING_GROUP
   GROUPED
