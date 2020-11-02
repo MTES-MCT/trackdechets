@@ -17,6 +17,7 @@ const initialTransporter = {
 };
 
 export default {
+  customId: "",
   emitter: {
     type: "PRODUCER",
     workSite: {
