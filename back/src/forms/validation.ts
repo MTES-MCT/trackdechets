@@ -301,24 +301,24 @@ export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
           .required(
             `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
           ),
-      otherwise: () => yup.string().nullable(),
-      wasteDetailsPackagings: yup.array().ensure().required(),
-      wasteDetailsNumberOfPackages: yup
-        .number()
-        .integer()
-        .min(1, "Le nombre de colis doit être supérieur à 0")
-        .nullable(true),
-      wasteDetailsQuantity: yup
-        .number()
-        .required("La quantité du déchet en tonnes est obligatoire")
-        .min(0, "La quantité doit être supérieure à 0"),
-      wasteDetailsQuantityType: yup
-        .mixed<QuantityType>()
-        .required("Le type de quantité (réelle ou estimée) doit être précisé"),
-      wasteDetailsConsistence: yup
-        .mixed<Consistence>()
-        .required("La consistance du déchet doit être précisée")
-    })
+      otherwise: () => yup.string().nullable()
+    }),
+    wasteDetailsPackagings: yup.array().ensure().required(),
+    wasteDetailsNumberOfPackages: yup
+      .number()
+      .integer()
+      .min(1, "Le nombre de colis doit être supérieur à 0")
+      .nullable(true),
+    wasteDetailsQuantity: yup
+      .number()
+      .required("La quantité du déchet en tonnes est obligatoire")
+      .min(0, "La quantité doit être supérieure à 0"),
+    wasteDetailsQuantityType: yup
+      .mixed<QuantityType>()
+      .required("Le type de quantité (réelle ou estimée) doit être précisé"),
+    wasteDetailsConsistence: yup
+      .mixed<Consistence>()
+      .required("La consistance du déchet doit être précisée")
   });
 
 // 8 - Collecteur-transporteur

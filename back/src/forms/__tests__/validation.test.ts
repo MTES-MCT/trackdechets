@@ -154,6 +154,16 @@ describe("sealedFormSchema", () => {
       .isValid(testForm);
     expect(isValid).toEqual(false);
   });
+
+  test("when there is no waste details quantity", async () => {
+    const testForm = {
+      ...form,
+      wasteDetailsQuantity: null
+    };
+
+    const isValid = await sealedFormSchema.isValid(testForm);
+    expect(isValid).toEqual(false);
+  });
 });
 
 describe("receivedInfosSchema", () => {
