@@ -29,6 +29,3 @@ services:
     build:
       context: ./doc-redirect
 
-  td-etl:
-    build:
-      context: ./etl
