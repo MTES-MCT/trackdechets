@@ -63,28 +63,38 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           });
         }}
       >
-        <Form className={styles.companyAddForm}>
-          <div className={styles.field}>
-            <label className={`text-right ${styles.bold}`}>SIRET</label>
-            <div className={styles.field__value}>
-              <Field name="siret" component={AutoFormattingSiret} />
-              {isRegistered && (
-                <p className="error-message">
-                  Cet établissement existe déjà dans Trackdéchets
-                </p>
-              )}
-              <RedErrorMessage name="siret" />
-              <br />
-              <button
-                disabled={loading}
-                className="btn btn--primary tw-mt-2"
-                type="submit"
-              >
-                {loading ? <FaHourglassHalf /> : "Valider"}
-              </button>
+        {({ setFieldValue }) => (
+          <Form className={styles.companyAddForm}>
+            <div className={styles.field}>
+              <label className={`text-right ${styles.bold}`}>SIRET</label>
+              <div className={styles.field__value}>
+                <Field
+                  name="siret"
+                  component={AutoFormattingSiret}
+                  onChange={e => {
+                    setIsRegistered(false);
+                    setFieldValue("siret", e.target.value);
+                  }}
+                />
+                {isRegistered && (
+                  <p className="error-message">
+                    Cet établissement existe déjà dans Trackdéchets
+                  </p>
+                )}
+                <RedErrorMessage name="siret" />
+                <div>
+                  <button
+                    disabled={loading}
+                    className="btn btn--primary tw-mt-2"
+                    type="submit"
+                  >
+                    {loading ? <FaHourglassHalf /> : "Valider"}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </Form>
+          </Form>
+        )}
       </Formik>
     </>
   );
