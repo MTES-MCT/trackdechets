@@ -60,72 +60,101 @@ type SlipDetailContentProps = {
 
 const TempStorage = ({ temporaryStorageDetail }) => (
   <>
-    <div className={styles.detailBlock}>
-      <DetailRow
-        value={temporaryStorageDetail?.wasteDetails?.code}
-        label="Code déchet"
-      />
-      <DetailRow
-        value={temporaryStorageDetail?.wasteDetails?.name}
-        label="Description déchet"
-      />
-      <DetailRow
-        value={temporaryStorageDetail?.wasteDetails?.onuCode}
-        label="Code Onu"
-      />
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <DetailRow
+          value={temporaryStorageDetail?.wasteDetails?.code}
+          label="Code déchet"
+        />
+        <DetailRow
+          value={temporaryStorageDetail?.wasteDetails?.name}
+          label="Description déchet"
+        />
+        <DetailRow
+          value={temporaryStorageDetail?.wasteDetails?.onuCode}
+          label="Code Onu"
+        />
 
-      <PackagingRow
-        packagings={temporaryStorageDetail?.wasteDetails?.packagings}
-        numberOfPackages={
-          temporaryStorageDetail?.wasteDetails?.numberOfPackages
-        }
-      />
-      <DetailRow
-        value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
-        label="Quantité reçue"
-      />
-      <DetailRow
-        value={getVerboseQuantityType(
-          temporaryStorageDetail?.temporaryStorer?.quantityType
-        )}
-        label="Quantité"
-      />
-      <DateRow
-        value={temporaryStorageDetail?.temporaryStorer?.receivedAt}
-        label="Reçu le"
-      />
-      <DetailRow
-        value={temporaryStorageDetail?.temporaryStorer?.receivedBy}
-        label="Reçu par"
-      />
-      <DetailRow
-        value={getVerboseAcceptationStatus(
-          temporaryStorageDetail?.temporaryStorer?.wasteAcceptationStatus
-        )}
-        label="Accepté"
-      />
+        <PackagingRow
+          packagings={temporaryStorageDetail?.wasteDetails?.packagings}
+          numberOfPackages={
+            temporaryStorageDetail?.wasteDetails?.numberOfPackages
+          }
+        />
+        <DetailRow
+          value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
+          label="Quantité reçue"
+        />
+        <DetailRow
+          value={getVerboseQuantityType(
+            temporaryStorageDetail?.temporaryStorer?.quantityType
+          )}
+          label="Quantité"
+        />
+        <DateRow
+          value={temporaryStorageDetail?.temporaryStorer?.receivedAt}
+          label="Reçu le"
+        />
+        <DetailRow
+          value={temporaryStorageDetail?.temporaryStorer?.receivedBy}
+          label="Reçu par"
+        />
+        <DetailRow
+          value={getVerboseAcceptationStatus(
+            temporaryStorageDetail?.temporaryStorer?.wasteAcceptationStatus
+          )}
+          label="Accepté"
+        />
+      </div>
     </div>
-
-    <div className={styles.detailBlock}>
-      <div className={styles.detailRow}>
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
         <dt>Destination suivante</dt>
         <dd>{temporaryStorageDetail?.destination?.company?.name}</dd>
-      </div>
-      <div className={styles.detailRow}>
+
         <dt>Siret</dt>
         <dd>{temporaryStorageDetail?.destination?.company?.siret}</dd>
-      </div>
-      <div className={styles.detailRow}>
+
         <dt>Adresse</dt>
         <dd>{temporaryStorageDetail?.destination?.company?.address}</dd>
+ 
+     <DetailRow
+          value={temporaryStorageDetail?.destination?.cap}
+          label="Numéro de CAP"
+        />  
+ 
+ 
+     
+        <DetailRow
+            value={temporaryStorageDetail?.destination?.processingOperation}
+            label="Opération de traitement prévue"
+          />
       </div>
-      <div className={styles.detailRow}>
-        <dt>Numéro de CAP</dt>
-        <dd>{temporaryStorageDetail?.destination?.cap}</dd>
-      </div>
-      <div className={styles.detailRow}>
-        <dt>Opération de traitement prévue</dt>
-        <dd>{temporaryStorageDetail?.destination?.processingOperation}</dd>
+      <div className={styles.detailColumns}>
+        <div className={styles.detailGrid}>
+          <DetailRow
+            value={temporaryStorageDetail?.transporter?.company?.name}
+            label="Transporteur"
+          />
+
+          <DetailRow
+            value={temporaryStorageDetail?.transporter?.company?.siret}
+            label="Siret"
+          />
+
+          <DetailRow
+            value={temporaryStorageDetail?.transporter?.company?.address}
+            label="Adresse"
+          />
+          <DetailRow
+            value={temporaryStorageDetail?.transporter?.receipt}
+            label="Récépissé"
+          />
+          <DateRow
+            value={temporaryStorageDetail?.transporter?.validityLimit}
+            label="Date de validité"
+          />
+        </div>
       </div>
     </div>
   </>
