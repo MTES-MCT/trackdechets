@@ -27,7 +27,7 @@
     "jwt-decode": "^2.2.0",
     "luxon": "^1.8.3",
     "mapbox-gl": "^1.11.1",
-    "node-sass": "^4.14.1",
+    "node-sass": "^5.0.0",
     "query-string": "^6.10.1",
     "rc-tree": "^1.14.10",
     "react": "16.13.1",
