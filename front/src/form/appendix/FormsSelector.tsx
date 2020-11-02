@@ -79,23 +79,24 @@ export default function FormsSelector({ name }) {
 
   return (
     <>
-      <h4>Annexe 2</h4>
-      <p>
+      <h4 className="form__section-heading">Annexe 2</h4>
+      <p className="tw-my-2">
         Vous êtes en train de créer un bordereau de regroupement. Veuillez
         sélectionner ci-dessous les bordereaux à regrouper.
       </p>
-      <p>
+      <p className="tw-my-2">
         Tous les bordereaux présentés ci-dessous correspondent à des bordereaux
         pour lesquels vous avez effectué une opération de traitement de type D
         13, D 14, D 15 ou R 13.
       </p>
 
-      <p>
+      <p className="tw-my-2">
         Pour affiner votre sélection, vous avez la possibilité de filtrer par
         code déchet.
         <input
           type="text"
           placeholder="Filtre optionnel..."
+          className="td-input"
           value={wasteCodeFilter}
           onChange={e => setWasteCodeFilter(e.target.value)}
         />

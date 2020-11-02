@@ -6,13 +6,13 @@ export default connect(function AppendixInfo(props) {
 
   return (
     <div>
-      <h4>Annexe 1</h4>
-      <p>
-        Vous êtes en train de modifier un bordereau pour un collecteur de petites
-        quantités de déchets relevant d’une même rubrique. Ce bordereau
+      <h4 className="form__section-heading">Annexe 1</h4>
+      <p className="tw-my-2">
+        Vous êtes en train de modifier un bordereau pour un collecteur de
+        petites quantités de déchets relevant d’une même rubrique. Ce bordereau
         nécessite donc la présence d'une annexe 1.
       </p>
-      <p>
+      <p className="tw-my-2">
         Cette annexe n'est pas à compléter sur Trackdéchets mais vous avez la
         possibilité ci-dessous d'en imprimer une. Complétez la et{" "}
         <strong>
