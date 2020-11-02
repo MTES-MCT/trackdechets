@@ -1,0 +1,8 @@
+.processingOperationSelect {
+  &Select {
+    width: 100%;
+  }
+  &Option {
+    text-overflow: ellipsis;
+  }
+}
