@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, FormikHelpers } from "formik";
 import { NextButton, PreviousButton } from "common/components/Buttons";
-import "./Wizard.scss";
+import "./WizardStepList.scss";
 
 type Props = {
   initialValues: Object;

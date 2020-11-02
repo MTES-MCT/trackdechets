@@ -19,7 +19,7 @@ import Packagings from "form/packagings/Packagings";
 import { FORMS_PDF } from "dashboard/slips/slips-actions/DownloadPdf";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import styles from "./TransportSignature.module.scss";
-import { Wizard } from "../Wizard";
+import { Wizard } from "common/components/Wizard";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
 import { COLORS } from "common/config";
