@@ -27,7 +27,7 @@ const TdTooltip = ({ msg }: Props) => {
         padding: "0.5em 1em",
       }}
     >
-      <button className={style.tdTooltip}>
+      <button className={style.tdTooltip} type="button">
         <Question color={COLORS.blue} size={20} />
       </button>
     </Tooltip>
