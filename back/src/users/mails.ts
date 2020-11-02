@@ -257,8 +257,8 @@ export const userMails = {
     L'utilisateur ${user.email} a demandé à rejoindre l'établissement ${company.name} (${company.siret})
     dont vous êtes administrateur.
 
-    Pour valider ou refuser sa demande, cliquer sur
-    <a href="${membershipRequestLink}">ce lien</a>
+    Pour valider ou refuser sa demande, cliquez sur
+    <a href="${membershipRequestLink}">ce lien</a>.
     `
   }),
   membershipRequestAccepted: (user: User, company: Company) => ({
