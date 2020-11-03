@@ -1,7 +1,6 @@
-import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
-import { removeNulls } from "common/helper";
+import { mergeDefaults } from "common/helper";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/company/CompanySelector";
 import DateInput from "form/custom-inputs/DateInput";
@@ -13,11 +12,9 @@ import { PROCESSING_OPERATIONS } from "generated/constants";
 import { WasteDetails } from "generated/graphql/types";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
-  // We need a deep merge as sub-objects may be partially filled
-  // But without the null values as they break form elements (uncontrolled)
-  const initialValues = merge(
+  const initialValues = mergeDefaults(
     emptyState,
-    removeNulls(form.temporaryStorageDetail)
+    form.temporaryStorageDetail || {}
   );
 
   const [isRefurbished, setIsRefurbished] = useState(
