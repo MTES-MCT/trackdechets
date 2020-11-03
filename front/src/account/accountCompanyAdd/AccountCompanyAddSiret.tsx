@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLazyQuery } from "@apollo/react-hooks";
 import { Field, Form, Formik } from "formik";
 import { FaHourglassHalf } from "react-icons/fa";
@@ -23,6 +23,8 @@ type IProps = {
  * - it is not closed
  */
 export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
+  const [isRegistered, setIsRegistered] = useState(false);
+
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyInfos">
   >(COMPANY_INFOS, {
@@ -34,6 +36,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
             "Cet établissement est fermé, impossible de le créer"
           );
         } else {
+          setIsRegistered(companyInfos?.isRegistered ?? false);
           onCompanyInfos(companyInfos);
         }
       }
@@ -60,23 +63,38 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           });
         }}
       >
-        <Form className={styles.companyAddForm}>
-          <div className={styles.field}>
-            <label className={`text-right ${styles.bold}`}>SIRET</label>
-            <div className={styles.field__value}>
-              <Field name="siret" component={AutoFormattingSiret} />
-              <RedErrorMessage name="siret" />
-              <br />
-              <button
-                disabled={loading}
-                className="btn btn--primary tw-mt-2"
-                type="submit"
-              >
-                {loading ? <FaHourglassHalf /> : "Valider"}
-              </button>
+        {({ setFieldValue }) => (
+          <Form className={styles.companyAddForm}>
+            <div className={styles.field}>
+              <label className={`text-right ${styles.bold}`}>SIRET</label>
+              <div className={styles.field__value}>
+                <Field
+                  name="siret"
+                  component={AutoFormattingSiret}
+                  onChange={e => {
+                    setIsRegistered(false);
+                    setFieldValue("siret", e.target.value);
+                  }}
+                />
+                {isRegistered && (
+                  <p className="error-message">
+                    Cet établissement existe déjà dans Trackdéchets
+                  </p>
+                )}
+                <RedErrorMessage name="siret" />
+                <div>
+                  <button
+                    disabled={loading}
+                    className="btn btn--primary tw-mt-2"
+                    type="submit"
+                  >
+                    {loading ? <FaHourglassHalf /> : "Valider"}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </Form>
+          </Form>
+        )}
       </Formik>
     </>
   );

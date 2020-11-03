@@ -23,19 +23,20 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
 
   if (data) {
     return (
-      <div>
-        <h4 className="h4">Demande de rattachement envoyée</h4>
-        <div>
-          Vous recevrez un email de confirmation lorsque votre demande sera
-          validée
-        </div>
+      <div className="notification notification--success">
+        <p>
+          Demande de rattachement envoyée. Vous recevrez un email de
+          confirmation lorsque votre demande sera validée
+        </p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h4 className="h4">Cet établissement possède déjà un administrateur</h4>
+    <div className="notification">
+      <p>
+        Vous pouvez demander à l'administrateur de rejoindre l'établissement
+      </p>
       <button
         type="button"
         className="btn btn--primary tw-mt-5"
