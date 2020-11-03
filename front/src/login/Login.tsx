@@ -6,8 +6,9 @@ import {
   withRouter,
   Redirect,
 } from "react-router-dom";
-import styles from "./Login.module.scss";
+
 import { localAuthService } from "./auth.service";
+import routes from "common/routes";
 
 const fieldErrorsProps = (fieldName, errorField) => {
   if (errorField === fieldName) {
@@ -41,56 +42,56 @@ export default withRouter(function Login(
       ...(!!returnTo ? { returnTo } : {}),
     };
 
-    return <Redirect to={{ pathname: "/login", state }} />;
+    return <Redirect to={{ pathname: routes.login, state }} />;
   }
 
   const { returnTo, error, errorField, username } =
     routeProps.location.state || {};
 
   return (
-    <section className="section section-white">
-      <div className="container">
+    <section className="section section--white">
+      <div className="container-narrow">
         <form
           action={`${REACT_APP_API_ENDPOINT}/login`}
           method="post"
           name="login"
         >
-          <h1>Connexion</h1>
-          <div className="form__group">
+          <h1 className="h1 tw-mb-6">Connexion</h1>
+          <div className="form__row">
             <label>
               Email
               <input
                 type="email"
                 name="email"
                 defaultValue={username}
+                className="td-input"
                 {...fieldErrorsProps("email", errorField)}
               />
             </label>
             {error && errorField === "email" && (
-              <div className={styles["form-error-message"]}>{error}</div>
+              <div className="error-message">{error}</div>
             )}
           </div>
 
-          <div className="form__group">
+          <div className="form__row">
             <label>
               Mot de passe
               <input
                 type="password"
                 name="password"
+                className="td-input"
                 {...fieldErrorsProps("password", errorField)}
               />
             </label>
             {error && errorField === "password" && (
-              <div className={styles["form-error-message"]}>{error}</div>
+              <div className="error-message">{error}</div>
             )}
           </div>
           {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-          {error && !errorField && (
-            <div className={styles["form-error-message"]}>{error}</div>
-          )}
+          {error && !errorField && <div className="error-message">{error}</div>}
           <div className="form__actions">
             <button
-              className="button"
+              className="btn btn--primary"
               type="submit"
               onClick={() => {
                 localAuthService.locallySignOut();
@@ -100,13 +101,17 @@ export default withRouter(function Login(
               Se connecter
             </button>
           </div>
-          <p>
+          <p className="tw-my-5">
             Vous n'avez pas encore de compte ?{" "}
-            <Link to="/signup">Inscrivez vous maintenant</Link>
+            <Link to={routes.signup.index} className="link">
+              Inscrivez vous maintenant
+            </Link>
           </p>
-          <p>
+          <p className="tw-my-5">
             Vous avez perdu votre mot de passe ?{" "}
-            <Link to="/reset-password">Réinitialisez le</Link>
+            <Link to={routes.resetPassword} className="link">
+              Réinitialisez le
+            </Link>
           </p>
         </form>
       </div>

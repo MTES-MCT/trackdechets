@@ -1,0 +1,21 @@
+.slider {
+  display: flex;
+
+  &Navigation {
+    align-self: center;
+    padding: 15px;
+    font-size: xx-large;
+    cursor: pointer;
+  }
+
+  &NavigationHidden {
+    visibility: hidden;
+  }
+}
+
+.sliderButtons {
+  text-align: center;
+  button{
+    margin-right: 1rem;
+  }
+}

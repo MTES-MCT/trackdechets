@@ -8,12 +8,11 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { useLocation, useHistory } from "react-router";
-import queryString from "query-string";
-import { InlineError } from "../../common/Error";
-import { updateApolloCache } from "../../common/helper";
-import { currentSiretService } from "../../dashboard/CompanySelector";
-import { GET_SLIPS } from "../../dashboard/slips/query";
+import { useHistory, useParams, generatePath } from "react-router";
+
+import { InlineError } from "common/components/Error";
+import { updateApolloCache } from "common/helper";
+import { GET_SLIPS } from "dashboard/slips/query";
 import initialState from "../initial-state";
 import {
   Form,
@@ -22,22 +21,24 @@ import {
   Mutation,
   MutationSaveFormArgs,
   FormInput,
-} from "../../generated/graphql/types";
+} from "generated/graphql/types";
 import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
+import routes from "common/routes";
+import "common/components/WizardStepList.scss";
 import "./StepList.scss";
+
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
   formId?: string;
 }
 export default function StepList(props: IProps) {
+  const { siret } = useParams<{ siret: string }>();
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = props.children.length - 1;
   const history = useHistory();
-  const { search } = useLocation();
-  const searchParams = queryString.parse(search);
 
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_FORM,
@@ -66,7 +67,7 @@ export default function StepList(props: IProps) {
       const saveForm = data.saveForm;
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
-        variables: { siret: currentSiretService.getSiret(), status: ["DRAFT"] },
+        variables: { siret, status: ["DRAFT"] },
         getNewData: data => ({
           forms: [...data.forms.filter(f => f.id !== saveForm.id), saveForm],
         }),
@@ -103,6 +104,7 @@ export default function StepList(props: IProps) {
         displaySubmit: currentStep === totalSteps,
         goToPreviousStep: () => setCurrentStep(currentStep - 1),
         goToNextStep: () => setCurrentStep(currentStep + 1),
+        formId: props.formId,
       },
       child
     );
@@ -153,7 +155,7 @@ export default function StepList(props: IProps) {
                       ? { temporaryStorageDetail }
                       : { temporaryStorageDetail: null }),
                     // discard ecoOrganisme if not selected
-                    ...(ecoOrganisme?.id
+                    ...(ecoOrganisme?.siret
                       ? { ecoOrganisme }
                       : { ecoOrganisme: null }),
                   };
@@ -166,7 +168,7 @@ export default function StepList(props: IProps) {
                   })
                     .then(_ =>
                       history.push(
-                        `/dashboard/${searchParams.redirectTo ?? ""}`
+                        generatePath(routes.dashboard.slips.drafts, { siret })
                       )
                     )
                     .catch(err => {

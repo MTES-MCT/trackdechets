@@ -8,7 +8,8 @@ import {
   User,
   UserRole,
   TraderReceiptWhereUniqueInput,
-  TransporterReceiptWhereUniqueInput
+  TransporterReceiptWhereUniqueInput,
+  Company
 } from "../generated/prisma-client";
 import {
   CompanyNotFound,
@@ -103,6 +104,18 @@ export async function getUserRole(userId: string, siret: string) {
 }
 
 /**
+ * Returns true if user belongs to company with either
+ * MEMBER or ADMIN role, false otherwise
+ * @param user
+ */
+export function isCompanyMember(user: User, company: Company) {
+  return prisma.$exists.companyAssociation({
+    user: { id: user.id },
+    company: { id: company.id }
+  });
+}
+
+/**
  * Concat active company users and invited company users
  * @param siret
  */
@@ -158,7 +171,7 @@ export async function getCompanyInvitedUsers(
   siret: string
 ): Promise<CompanyMember[]> {
   const hashes = await prisma.userAccountHashes({
-    where: { companySiret: siret }
+    where: { companySiret: siret, acceptedAt: null }
   });
   return hashes.map(h => {
     return {

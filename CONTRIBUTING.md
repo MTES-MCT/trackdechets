@@ -13,6 +13,7 @@
   - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
   - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
   - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
+  - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
 
 ## Mise en route
 
@@ -55,7 +56,6 @@ Afin de pouvoir accéder aux différents services via des URLs du type `http://t
    127.0.0.1 api.trackdechets.local
    127.0.0.1 trackdechets.local
    127.0.0.1 etl.trackdechets.local
-   127.0.0.1 metabase.trackdechets.local
    127.0.0.1 doc.trackdechets.local
    127.0.0.1 developers.trackdechets.local
    ```
@@ -88,7 +88,7 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 
    Le démarrage du service `td-mail` est déconseillé en développement pour éviter des envois de courriels intempestifs mais vous pouvez l'activer pour le bon fonctionnement de certaines fonctionnalités (ex: validation de l'inscription, invitation à rejoindre un établissement, etc)
 
-   Vous pouvez également démarrer les services `td-doc`, `td-etl` et `metabase` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
+   Vous pouvez également démarrer les services `td-doc`, `td-etl` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
 
 4. Synchroniser la base de données avec le schéma prisma.
 
@@ -215,7 +215,7 @@ La procédure qui suit aura pour effet de remplacer vos données en local par le
    ```
 4. Accéder au container Postgres
    ```
-   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   docker exec -it $(docker ps -aqf "name=trackdechets_postgres_1") bash
    ```
 5. Restaurer le backup
    ```
@@ -228,3 +228,14 @@ La procédure qui suit aura pour effet de remplacer vos données en local par le
 
 Il est possible de créer de nouveaux tampons à partir du fichier [stamp.drawio.png](./pdf/src/medias/stamp.drawio.png).
 C'est un fichier PNG valide que l'on peut éditer directement dans Visual Code avec l'extension [Draw.io VS Code Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio)
+
+### Nourrir la base de donnée avec des données par défaut
+
+Il peut être assez fastidieux de devoir recréer des comptes de tests régulièrement en local.
+Pour palier à ce problème, il est possible de nourrir la base de donnée Prisma avec des données par défaut.
+
+1. Créer le fichier `back/prisma/seed.dev.ts` en suivant la [documentation](https://v1.prisma.io/docs/1.34/prisma-cli-and-configuration/cli-command-reference/prisma-seed-xcv8/).
+2. Démarrer les containers.
+3. Accéder au container `td-api`.
+4. Exécuter la commande `npx prisma seed`.
+   Éventuellement lancer la commande avec le flag `--reset` pour remettre à zéro : `npx prisma seed --reset`.

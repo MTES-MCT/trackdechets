@@ -109,9 +109,8 @@ describe("Mutation.markAsSealed", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
         traderCompanySiret: traderCompany.siret,
-        ecoOrganisme: {
-          connect: { id: eo.id }
-        }
+        ecoOrganismeSiret: eo.siret,
+        ecoOrganismeName: eo.name
       }
     });
 
@@ -125,6 +124,45 @@ describe("Mutation.markAsSealed", () => {
     form = await prisma.form({ id: form.id });
 
     expect(form.status).toEqual("SEALED");
+  });
+
+  it("should fail if bsd has an eco-organisme and the wrong emitterType", async () => {
+    const emitterCompany = await companyFactory();
+    const recipientCompany = await companyFactory();
+    const { user, company: eo } = await userWithCompanyFactory("MEMBER");
+    await prisma.createEcoOrganisme({
+      name: eo.name,
+      siret: eo.siret,
+      address: "An address"
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterType: "PRODUCER",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        ecoOrganismeSiret: eo.siret,
+        ecoOrganismeName: eo.name
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: [
+          "Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.",
+          `Erreur(s): Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
+        ].join("\n")
+      })
+    ]);
   });
 
   it("should fail if user is not authorized", async () => {

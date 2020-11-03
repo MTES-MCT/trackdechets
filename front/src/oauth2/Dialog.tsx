@@ -1,9 +1,9 @@
 import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import "whatwg-fetch";
-import Loader from "../common/Loader";
+import Loader from "../common/components/Loaders";
 import styles from "./Dialog.module.scss";
-import { useOAuth2, AuthorizePayload } from "../use-oauth2";
+import { useOAuth2, AuthorizePayload } from "./use-oauth2";
 
 export default function Dialog() {
   const { REACT_APP_API_ENDPOINT } = process.env;
@@ -53,7 +53,7 @@ export default function Dialog() {
           ></input>
           <div className={styles.flex}>
             <input
-              className="button"
+              className="btn btn--primary"
               type="submit"
               value="Autoriser"
               id="allow"

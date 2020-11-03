@@ -17,6 +17,7 @@ const initialTransporter = {
 };
 
 export default {
+  customId: "",
   emitter: {
     type: "PRODUCER",
     workSite: {
@@ -53,7 +54,10 @@ export default {
     consistence: "SOLID",
   },
   appendix2Forms: [],
-  ecoOrganisme: {},
+  ecoOrganisme: {
+    siret: null,
+    name: null,
+  },
   temporaryStorageDetail: {
     destination: {
       company: initialCompany,

@@ -192,6 +192,10 @@ type AggregateInstallation {
   count: Int!
 }
 
+type AggregateMembershipRequest {
+  count: Int!
+}
+
 type AggregateRubrique {
   count: Int!
 }
@@ -463,6 +467,7 @@ type Company {
   contactPhone: String
   website: String
   documentKeys: [String!]!
+  ecoOrganismeAgreements: [String!]!
   transporterReceipt: TransporterReceipt
   traderReceipt: TraderReceipt
 }
@@ -648,6 +653,10 @@ input CompanyCreatedocumentKeysInput {
   set: [String!]
 }
 
+input CompanyCreateecoOrganismeAgreementsInput {
+  set: [String!]
+}
+
 input CompanyCreateInput {
   id: ID
   siret: String!
@@ -661,6 +670,7 @@ input CompanyCreateInput {
   contactPhone: String
   website: String
   documentKeys: CompanyCreatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyCreateecoOrganismeAgreementsInput
   transporterReceipt: TransporterReceiptCreateOneInput
   traderReceipt: TraderReceiptCreateOneInput
 }
@@ -717,6 +727,7 @@ type CompanyPreviousValues {
   contactPhone: String
   website: String
   documentKeys: [String!]!
+  ecoOrganismeAgreements: [String!]!
 }
 
 type CompanySubscriptionPayload {
@@ -745,6 +756,7 @@ enum CompanyType {
   WASTE_VEHICLES
   WASTE_CENTER
   TRADER
+  ECO_ORGANISME
 }
 
 input CompanyUpdatecompanyTypesInput {
@@ -763,11 +775,16 @@ input CompanyUpdateDataInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyUpdateecoOrganismeAgreementsInput
   transporterReceipt: TransporterReceiptUpdateOneInput
   traderReceipt: TraderReceiptUpdateOneInput
 }
 
 input CompanyUpdatedocumentKeysInput {
+  set: [String!]
+}
+
+input CompanyUpdateecoOrganismeAgreementsInput {
   set: [String!]
 }
 
@@ -783,6 +800,7 @@ input CompanyUpdateInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyUpdateecoOrganismeAgreementsInput
   transporterReceipt: TransporterReceiptUpdateOneInput
   traderReceipt: TraderReceiptUpdateOneInput
 }
@@ -799,6 +817,7 @@ input CompanyUpdateManyMutationInput {
   contactPhone: String
   website: String
   documentKeys: CompanyUpdatedocumentKeysInput
+  ecoOrganismeAgreements: CompanyUpdateecoOrganismeAgreementsInput
 }
 
 input CompanyUpdateOneRequiredInput {
@@ -1434,6 +1453,8 @@ type Form {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganisme
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
   temporaryStorageDetail: TemporaryStorageDetail
   transportSegments(where: TransportSegmentWhereInput, orderBy: TransportSegmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TransportSegment!]
@@ -1531,6 +1552,8 @@ input FormCreateInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
   temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
   transportSegments: TransportSegmentCreateManyWithoutFormInput
@@ -1642,6 +1665,8 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
   transportSegments: TransportSegmentCreateManyWithoutFormInput
   currentTransporterSiret: String
@@ -1732,6 +1757,8 @@ input FormCreateWithoutTransportSegmentsInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeCreateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
   temporaryStorageDetail: TemporaryStorageDetailCreateOneWithoutFormInput
   currentTransporterSiret: String
@@ -1910,6 +1937,10 @@ enum FormOrderByInput {
   traderDepartment_DESC
   traderValidityLimit_ASC
   traderValidityLimit_DESC
+  ecoOrganismeName_ASC
+  ecoOrganismeName_DESC
+  ecoOrganismeSiret_ASC
+  ecoOrganismeSiret_DESC
   currentTransporterSiret_ASC
   currentTransporterSiret_DESC
   nextTransporterSiret_ASC
@@ -2000,6 +2031,8 @@ type FormPreviousValues {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   currentTransporterSiret: String
   nextTransporterSiret: String
 }
@@ -2969,6 +3002,34 @@ input FormScalarWhereInput {
   traderValidityLimit_lte: DateTime
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeName_not: String
+  ecoOrganismeName_in: [String!]
+  ecoOrganismeName_not_in: [String!]
+  ecoOrganismeName_lt: String
+  ecoOrganismeName_lte: String
+  ecoOrganismeName_gt: String
+  ecoOrganismeName_gte: String
+  ecoOrganismeName_contains: String
+  ecoOrganismeName_not_contains: String
+  ecoOrganismeName_starts_with: String
+  ecoOrganismeName_not_starts_with: String
+  ecoOrganismeName_ends_with: String
+  ecoOrganismeName_not_ends_with: String
+  ecoOrganismeSiret: String
+  ecoOrganismeSiret_not: String
+  ecoOrganismeSiret_in: [String!]
+  ecoOrganismeSiret_not_in: [String!]
+  ecoOrganismeSiret_lt: String
+  ecoOrganismeSiret_lte: String
+  ecoOrganismeSiret_gt: String
+  ecoOrganismeSiret_gte: String
+  ecoOrganismeSiret_contains: String
+  ecoOrganismeSiret_not_contains: String
+  ecoOrganismeSiret_starts_with: String
+  ecoOrganismeSiret_not_starts_with: String
+  ecoOrganismeSiret_ends_with: String
+  ecoOrganismeSiret_not_ends_with: String
   currentTransporterSiret: String
   currentTransporterSiret_not: String
   currentTransporterSiret_in: [String!]
@@ -3103,6 +3164,8 @@ input FormUpdateDataInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
   transportSegments: TransportSegmentUpdateManyWithoutFormInput
@@ -3193,6 +3256,8 @@ input FormUpdateInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
   transportSegments: TransportSegmentUpdateManyWithoutFormInput
@@ -3281,6 +3346,8 @@ input FormUpdateManyDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   currentTransporterSiret: String
   nextTransporterSiret: String
 }
@@ -3378,6 +3445,8 @@ input FormUpdateManyMutationInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   currentTransporterSiret: String
   nextTransporterSiret: String
 }
@@ -3493,6 +3562,8 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   transportSegments: TransportSegmentUpdateManyWithoutFormInput
   currentTransporterSiret: String
@@ -3582,6 +3653,8 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   traderDepartment: String
   traderValidityLimit: DateTime
   ecoOrganisme: EcoOrganismeUpdateOneInput
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
   temporaryStorageDetail: TemporaryStorageDetailUpdateOneWithoutFormInput
   currentTransporterSiret: String
@@ -4581,6 +4654,34 @@ input FormWhereInput {
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
   ecoOrganisme: EcoOrganismeWhereInput
+  ecoOrganismeName: String
+  ecoOrganismeName_not: String
+  ecoOrganismeName_in: [String!]
+  ecoOrganismeName_not_in: [String!]
+  ecoOrganismeName_lt: String
+  ecoOrganismeName_lte: String
+  ecoOrganismeName_gt: String
+  ecoOrganismeName_gte: String
+  ecoOrganismeName_contains: String
+  ecoOrganismeName_not_contains: String
+  ecoOrganismeName_starts_with: String
+  ecoOrganismeName_not_starts_with: String
+  ecoOrganismeName_ends_with: String
+  ecoOrganismeName_not_ends_with: String
+  ecoOrganismeSiret: String
+  ecoOrganismeSiret_not: String
+  ecoOrganismeSiret_in: [String!]
+  ecoOrganismeSiret_not_in: [String!]
+  ecoOrganismeSiret_lt: String
+  ecoOrganismeSiret_lte: String
+  ecoOrganismeSiret_gt: String
+  ecoOrganismeSiret_gte: String
+  ecoOrganismeSiret_contains: String
+  ecoOrganismeSiret_not_contains: String
+  ecoOrganismeSiret_starts_with: String
+  ecoOrganismeSiret_not_starts_with: String
+  ecoOrganismeSiret_ends_with: String
+  ecoOrganismeSiret_not_ends_with: String
   appendix2Forms_every: FormWhereInput
   appendix2Forms_some: FormWhereInput
   appendix2Forms_none: FormWhereInput
@@ -5119,6 +5220,165 @@ scalar Json
 
 scalar Long
 
+type MembershipRequest {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  status: MembershipRequestStatus!
+  statusUpdatedBy: String
+  user: User!
+  company: Company!
+  sentTo: [String!]!
+}
+
+type MembershipRequestConnection {
+  pageInfo: PageInfo!
+  edges: [MembershipRequestEdge]!
+  aggregate: AggregateMembershipRequest!
+}
+
+input MembershipRequestCreateInput {
+  id: ID
+  status: MembershipRequestStatus
+  statusUpdatedBy: String
+  user: UserCreateOneInput!
+  company: CompanyCreateOneInput!
+  sentTo: MembershipRequestCreatesentToInput
+}
+
+input MembershipRequestCreatesentToInput {
+  set: [String!]
+}
+
+type MembershipRequestEdge {
+  node: MembershipRequest!
+  cursor: String!
+}
+
+enum MembershipRequestOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  status_ASC
+  status_DESC
+  statusUpdatedBy_ASC
+  statusUpdatedBy_DESC
+}
+
+type MembershipRequestPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  status: MembershipRequestStatus!
+  statusUpdatedBy: String
+  sentTo: [String!]!
+}
+
+enum MembershipRequestStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
+type MembershipRequestSubscriptionPayload {
+  mutation: MutationType!
+  node: MembershipRequest
+  updatedFields: [String!]
+  previousValues: MembershipRequestPreviousValues
+}
+
+input MembershipRequestSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: MembershipRequestWhereInput
+  AND: [MembershipRequestSubscriptionWhereInput!]
+  OR: [MembershipRequestSubscriptionWhereInput!]
+  NOT: [MembershipRequestSubscriptionWhereInput!]
+}
+
+input MembershipRequestUpdateInput {
+  status: MembershipRequestStatus
+  statusUpdatedBy: String
+  user: UserUpdateOneRequiredInput
+  company: CompanyUpdateOneRequiredInput
+  sentTo: MembershipRequestUpdatesentToInput
+}
+
+input MembershipRequestUpdateManyMutationInput {
+  status: MembershipRequestStatus
+  statusUpdatedBy: String
+  sentTo: MembershipRequestUpdatesentToInput
+}
+
+input MembershipRequestUpdatesentToInput {
+  set: [String!]
+}
+
+input MembershipRequestWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  status: MembershipRequestStatus
+  status_not: MembershipRequestStatus
+  status_in: [MembershipRequestStatus!]
+  status_not_in: [MembershipRequestStatus!]
+  statusUpdatedBy: String
+  statusUpdatedBy_not: String
+  statusUpdatedBy_in: [String!]
+  statusUpdatedBy_not_in: [String!]
+  statusUpdatedBy_lt: String
+  statusUpdatedBy_lte: String
+  statusUpdatedBy_gt: String
+  statusUpdatedBy_gte: String
+  statusUpdatedBy_contains: String
+  statusUpdatedBy_not_contains: String
+  statusUpdatedBy_starts_with: String
+  statusUpdatedBy_not_starts_with: String
+  statusUpdatedBy_ends_with: String
+  statusUpdatedBy_not_ends_with: String
+  user: UserWhereInput
+  company: CompanyWhereInput
+  AND: [MembershipRequestWhereInput!]
+  OR: [MembershipRequestWhereInput!]
+  NOT: [MembershipRequestWhereInput!]
+}
+
+input MembershipRequestWhereUniqueInput {
+  id: ID
+}
+
 type Mutation {
   createAccessToken(data: AccessTokenCreateInput!): AccessToken!
   updateAccessToken(data: AccessTokenUpdateInput!, where: AccessTokenWhereUniqueInput!): AccessToken
@@ -5174,6 +5434,12 @@ type Mutation {
   upsertInstallation(where: InstallationWhereUniqueInput!, create: InstallationCreateInput!, update: InstallationUpdateInput!): Installation!
   deleteInstallation(where: InstallationWhereUniqueInput!): Installation
   deleteManyInstallations(where: InstallationWhereInput): BatchPayload!
+  createMembershipRequest(data: MembershipRequestCreateInput!): MembershipRequest!
+  updateMembershipRequest(data: MembershipRequestUpdateInput!, where: MembershipRequestWhereUniqueInput!): MembershipRequest
+  updateManyMembershipRequests(data: MembershipRequestUpdateManyMutationInput!, where: MembershipRequestWhereInput): BatchPayload!
+  upsertMembershipRequest(where: MembershipRequestWhereUniqueInput!, create: MembershipRequestCreateInput!, update: MembershipRequestUpdateInput!): MembershipRequest!
+  deleteMembershipRequest(where: MembershipRequestWhereUniqueInput!): MembershipRequest
+  deleteManyMembershipRequests(where: MembershipRequestWhereInput): BatchPayload!
   createRubrique(data: RubriqueCreateInput!): Rubrique!
   updateRubrique(data: RubriqueUpdateInput!, where: RubriqueWhereUniqueInput!): Rubrique
   updateManyRubriques(data: RubriqueUpdateManyMutationInput!, where: RubriqueWhereInput): BatchPayload!
@@ -5280,6 +5546,9 @@ type Query {
   installation(where: InstallationWhereUniqueInput!): Installation
   installations(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Installation]!
   installationsConnection(where: InstallationWhereInput, orderBy: InstallationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InstallationConnection!
+  membershipRequest(where: MembershipRequestWhereUniqueInput!): MembershipRequest
+  membershipRequests(where: MembershipRequestWhereInput, orderBy: MembershipRequestOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [MembershipRequest]!
+  membershipRequestsConnection(where: MembershipRequestWhereInput, orderBy: MembershipRequestOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MembershipRequestConnection!
   rubrique(where: RubriqueWhereUniqueInput!): Rubrique
   rubriques(where: RubriqueWhereInput, orderBy: RubriqueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Rubrique]!
   rubriquesConnection(where: RubriqueWhereInput, orderBy: RubriqueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RubriqueConnection!
@@ -5755,6 +6024,7 @@ type Subscription {
   form(where: FormSubscriptionWhereInput): FormSubscriptionPayload
   grant(where: GrantSubscriptionWhereInput): GrantSubscriptionPayload
   installation(where: InstallationSubscriptionWhereInput): InstallationSubscriptionPayload
+  membershipRequest(where: MembershipRequestSubscriptionWhereInput): MembershipRequestSubscriptionPayload
   rubrique(where: RubriqueSubscriptionWhereInput): RubriqueSubscriptionPayload
   statusLog(where: StatusLogSubscriptionWhereInput): StatusLogSubscriptionPayload
   temporaryStorageDetail(where: TemporaryStorageDetailSubscriptionWhereInput): TemporaryStorageDetailSubscriptionPayload

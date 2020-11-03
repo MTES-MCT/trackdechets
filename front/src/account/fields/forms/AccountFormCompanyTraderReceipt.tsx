@@ -2,10 +2,10 @@ import React from "react";
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
 import { Formik, FormikProps, Form, Field } from "formik";
-import RedErrorMessage from "../../../common/RedErrorMessage";
-import { NotificationError } from "../../../common/Error";
-import DateInput from "../../../form/custom-inputs/DateInput";
-import { CompanyPrivate } from "../../../generated/graphql/types";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import { NotificationError } from "common/components/Error";
+import DateInput from "form/custom-inputs/DateInput";
+import { CompanyPrivate } from "generated/graphql/types";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "traderReceipt">;
@@ -203,7 +203,7 @@ export default function AccountFormCompanyTransporterReceipt({
               </button>
             )}
             <button
-              className="button"
+              className="btn btn--primary"
               type="submit"
               disabled={props.isSubmitting}
             >

@@ -1,0 +1,59 @@
+.nav-tabs {
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+
+  & .nav-tab {
+    text-decoration: none;
+    display: inline-block;
+    border-bottom: 5px solid transparent;
+    bottom: -1px;
+    position: relative;
+    list-style: none;
+    padding: 6px 20px;
+    cursor: pointer;
+    color: #4c555f;
+
+    &.active {
+      background: #fff;
+      border-color: #0053b3;
+      color: #0053b3;
+    }
+
+    &:focus {
+      outline: none;
+
+      &:after {
+        content: "";
+        position: absolute;
+        height: 5px;
+        left: -4px;
+        right: -4px;
+        bottom: -5px;
+      }
+    }
+  }
+
+  &__tab-panel {
+    display: none;
+
+    &--selected {
+      display: block;
+      overflow-y: auto;
+    }
+  }
+}
+
+.empty-tab {
+  text-align: center;
+  h4,
+  p {
+    margin: 10px 100px;
+  }
+  img {
+    height: 500px;
+    margin: 0 auto;
+  }
+  svg {
+    display: inline;
+  }
+}

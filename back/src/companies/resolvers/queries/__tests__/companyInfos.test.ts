@@ -60,6 +60,7 @@ describe("companyInfos", () => {
       contactPhone: "06 67 78 xx xx",
       website: "http://benoitguigal.fr",
       isRegistered: true,
+      ecoOrganismeAgreements: [],
       installation: {
         codeS3ic: "0055.14316"
       }

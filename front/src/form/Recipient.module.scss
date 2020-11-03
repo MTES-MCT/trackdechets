@@ -1,0 +1,20 @@
+@import "src/scss/Breakpoints";
+@include phone {
+  .recipient {
+    &Department {
+      width: 100px;
+      display: block;
+    }
+    &ValidityLimit {
+      width: 160px;
+      display: block;
+    }
+    &Cap {
+      width: 200px;
+      display: block;
+    }
+    &TextQuote {
+      margin: 10px 0;
+    }
+  }
+}

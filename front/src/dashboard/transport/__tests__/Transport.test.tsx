@@ -7,6 +7,7 @@ import {
   waitForElement,
   fireEvent,
 } from "@testing-library/react";
+import { generatePath, MemoryRouter, Route } from "react-router-dom";
 import {
   Form,
   FormRole,
@@ -19,9 +20,11 @@ import {
   createTemporaryStorageDetailMock,
   createRecipientMock,
   createDestinationMock,
-} from "../../../generated/graphql/types";
-import { SiretContext } from "../../Dashboard";
-import Transport, { GET_TRANSPORT_SLIPS } from "../Transport";
+} from "generated/graphql/types";
+import { TransportContent } from "dashboard/transport/Transport";
+import { GET_TRANSPORT_SLIPS } from "dashboard/transport/queries";
+import { mockMatchMediaWidth } from "common/__mocks__/matchmedia.mock";
+import routes from "common/routes";
 
 const PRODUCER = createEmitterMock({
   company: createFormCompanyMock({
@@ -70,9 +73,17 @@ async function renderWith({ forms }: { forms: Form[] }) {
         },
       ]}
     >
-      <SiretContext.Provider value={{ siret: TRANSPORTER.company!.siret! }}>
-        <Transport />
-      </SiretContext.Provider>
+      <MemoryRouter
+        initialEntries={[
+          generatePath(routes.dashboard.transport.toCollect, {
+            siret: TRANSPORTER.company!.siret!,
+          }),
+        ]}
+      >
+        <Route path={routes.dashboard.transport.toCollect}>
+          <TransportContent formType="TO_TAKE_OVER" />
+        </Route>
+      </MemoryRouter>
     </MockedProvider>
   );
 
@@ -82,6 +93,7 @@ async function renderWith({ forms }: { forms: Form[] }) {
 describe("<Transport />", () => {
   describe("when leaving the producer for the final collector", () => {
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -136,10 +148,12 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")!
+        );
 
         await waitForElement(() =>
-          screen.getByText("Signer par le transporteur")
+          screen.getByText((text, el) => /Signer par le producteur/i.test(text))
         );
       });
 
@@ -169,6 +183,7 @@ describe("<Transport />", () => {
     });
 
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -222,10 +237,12 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")!
+        );
 
         await waitForElement(() =>
-          screen.getByText("Signer par le producteur")
+          screen.getByText((text, el) => /Signer par le producteur/i.test(text))
         );
       });
 
@@ -255,6 +272,7 @@ describe("<Transport />", () => {
     });
 
     beforeEach(async () => {
+      mockMatchMediaWidth(1000);
       await renderWith({
         forms: [
           createFormMock({
@@ -311,9 +329,14 @@ describe("<Transport />", () => {
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
           )
         );
-        fireEvent.click(screen.getByText("Signer par le transporteur"));
 
-        await waitForElement(() => screen.getByText("Signer par le détenteur"));
+        fireEvent.click(
+          screen.getByText("Signer par le transporteur").closest("button")!
+        );
+
+        await waitForElement(() =>
+          screen.getByText((text, el) => /Signer par le détenteur/i.test(text))
+        );
       });
 
       it("should display the temporary storage as the collect address", () => {

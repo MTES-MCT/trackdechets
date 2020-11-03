@@ -52,8 +52,14 @@ Les différentes instances sont hébérgées chez OVH et Scaleway. Le détail es
 - [Graylog](https://www.graylog.org/) pour l'indexation des logs
 - [Metabase](https://www.metabase.com/) pour l'analyse et la visualisation des données Trackdéchets
 - [Matomo](https://fr.matomo.org/) pour l'analyse du traffic web
-- [Cachet](http://cachethq.io/) pour la page de statuts et les alertes
+- [Updown](https://updown.io/) pour la page de statuts et les alertes
 - [graphql-codegen](https://graphql-code-generator.com/) pour générer la référence de l'API et le typage Typescript à partir des fichiers de définition GraphQL.
+
+## Monitoring
+
+Deux pages de monitoring sont accessibles:
+- [Statuts API GraphQL](https://status.trackdechets.beta.gouv.fr)
+- [Statuts service d'envoi d'email](https://updown.io/jgo1)
 
 ## Compatibilité navigateur
 

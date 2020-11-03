@@ -340,7 +340,7 @@ describe("{ mutation { markAsSent } }", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "SEALED",
+        status: "DRAFT",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret
       }
@@ -348,6 +348,46 @@ describe("{ mutation { markAsSent } }", () => {
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: { status: "AWAITING_GROUP" }
+    });
+
+    await prisma.updateForm({
+      where: { id: form.id },
+      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
+      }
+    });
+
+    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    expect(appendix2grouped.status).toEqual("GROUPED");
+  });
+
+  test("appendix2Forms already GROUPED should be untouched", async () => {
+    // appendix2 forms could have been grouped in markAsSealed
+
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const recipientCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "GROUPED" }
     });
 
     await prisma.updateForm({

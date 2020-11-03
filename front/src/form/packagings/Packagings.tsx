@@ -27,6 +27,7 @@ export default function Packagings({
                 name={name}
                 value={p.value}
                 checked={value.indexOf(p.value) > -1}
+                className="td-checkbox"
                 onChange={e => {
                   if (e.target.checked) arrayHelpers.push(p.value);
                   else {

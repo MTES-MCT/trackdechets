@@ -7,3 +7,13 @@
   color: #53657d;
   margin-bottom: 0;
 }
+
+.url-ellipsis {
+  max-width: 300px;
+  overflow: hidden;
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: middle;
+  margin-right: 10px;
+  text-overflow: ellipsis;
+}

@@ -2,17 +2,24 @@ import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
 import React from "react";
-import { Redirect, Route, useHistory } from "react-router";
-import { useParams, useRouteMatch } from "react-router-dom";
-import { InlineError } from "../common/Error";
-import Loader from "../common/Loader";
-import { currentSiretService } from "./CompanySelector";
+import {
+  generatePath,
+  Redirect,
+  Route,
+  Switch,
+  useHistory,
+} from "react-router";
+import { useParams } from "react-router-dom";
+import routes from "common/routes";
+import { InlineError } from "../common/components/Error";
+import Loader from "../common/components/Loaders";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
 import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
-import { Query } from "../generated/graphql/types";
+
+import { Query } from "generated/graphql/types";
 import Stats from "./stats/Stats";
 
 export const GET_ME = gql`
@@ -30,23 +37,11 @@ export const GET_ME = gql`
   }
 `;
 
-export const SiretContext = React.createContext({
-  siret: "",
-});
-
 export default function Dashboard() {
-  const match = useRouteMatch();
-  const { siret } = useParams();
+  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
-  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
-    onCompleted: () => {
-      if (siret) {
-        currentSiretService.setSiret(siret);
-        return;
-      }
-    },
-  });
+  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
@@ -54,52 +49,59 @@ export default function Dashboard() {
   if (data) {
     const companies = data.me.companies;
 
-    // As long as you don't belong to a company, you can't access the dashnoard
-    if (!companies || companies.length === 0) {
-      return <Redirect to="/account/companies" />;
-    }
-
-    if (!siret) {
-      return <Redirect to={`${match.url}/${companies[0].siret}`} />;
-    }
-
+    // if the user is not part of the company whose siret is in the url
+    // redirect them to their first company or account if they're not part of any company
     if (!companies.find(company => company.siret === siret)) {
-      return <Redirect to={`/dashboard/${companies[0].siret}`} />;
+      return (
+        <Redirect
+          to={
+            companies.length > 0
+              ? generatePath(routes.dashboard.slips.drafts, {
+                  siret: companies[0].siret,
+                })
+              : routes.account.companies
+          }
+        />
+      );
     }
 
     return (
-      <SiretContext.Provider value={{ siret }}>
-        <div id="dashboard" className="dashboard">
-          <DashboardMenu
-            me={data.me}
-            match={match}
-            handleCompanyChange={siret => history.push(`/dashboard/${siret}`)}
-          />
+      <div id="dashboard" className="dashboard">
+        <DashboardMenu
+          me={data.me}
+          handleCompanyChange={siret =>
+            history.push(
+              generatePath(routes.dashboard.slips.drafts, {
+                siret,
+              })
+            )
+          }
+        />
 
-          <div className="dashboard-content">
-            <Route exact path={match.url}>
-              <Redirect to={`${match.url}/slips`} />
-            </Route>
-
-            <Route path={`${match.path}/slips`}>
+        <div className="dashboard-content">
+          <Switch>
+            <Route path={routes.dashboard.slips.index}>
               <SlipsContainer />
             </Route>
-
-            <Route path={`${match.url}/transport`}>
+            <Route path={routes.dashboard.transport.index}>
               <Transport />
             </Route>
-
-            <Route path={`${match.url}/exports`}>
+            <Route path={routes.dashboard.exports}>
               <Exports
                 companies={filter(Exports.fragments.company, companies)}
               />
             </Route>
-            <Route path={`${match.path}/stats`}>
+            <Route path={routes.dashboard.stats}>
               <Stats />
             </Route>
-          </div>
+            <Redirect
+              to={generatePath(routes.dashboard.slips.drafts, {
+                siret,
+              })}
+            />
+          </Switch>
         </div>
-      </SiretContext.Provider>
+      </div>
     );
   }
 

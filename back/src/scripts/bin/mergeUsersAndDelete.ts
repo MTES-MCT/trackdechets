@@ -4,11 +4,25 @@ import mergeUsers from "../prisma/mergeUsers";
 import deleteUser from "../prisma/deleteUser";
 
 (async () => {
-  const userID = process.argv[3];
-  const heirUserID = process.argv[4];
+  const [userID, heirUserID] = process.argv.slice(2);
 
-  const user = userID ? await prisma.user({ id: userID }) : null;
-  const heir = heirUserID ? await prisma.user({ id: heirUserID }) : null;
+  if (!userID || !heirUserID) {
+    console.log(
+      [
+        `Ce script permet de fusionner 2 comptes utilisateurs et d'en supprimer un.`,
+        `Il accepte deux arguments :`,
+        `- userID : id de l'utilisateur à supprimer, il cède tous ses objets liés à l'héritier`,
+        `- heirUserID : id de l'utilisateur héritier, il obtient tous les objets liés`,
+        ``,
+        `Exemple :`,
+        `node ./src/scripts/bin/mergeUsersAndDelete.js 1234 5678`
+      ].join("\n")
+    );
+    return;
+  }
+
+  const user = await prisma.user({ id: userID });
+  const heir = await prisma.user({ id: heirUserID });
 
   if (!user) {
     console.log(

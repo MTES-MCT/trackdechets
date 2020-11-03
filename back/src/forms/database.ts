@@ -6,11 +6,12 @@ import {
   Form,
   prisma,
   FormWhereUniqueInput,
-  EcoOrganismeWhereUniqueInput
+  FormWhereInput
 } from "../generated/prisma-client";
 import { FullForm } from "./types";
-import { FormNotFound, EcoOrganismeNotFound } from "./errors";
+import { FormNotFound } from "./errors";
 import { UserInputError } from "apollo-server-express";
+import { FormRole } from "../generated/graphql/types";
 
 /**
  * Returns a prisma Form with all linked objects
@@ -19,7 +20,6 @@ import { UserInputError } from "apollo-server-express";
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
   const owner = await prisma.form({ id: form.id }).owner();
-  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
   const temporaryStorage = await prisma
     .form({ id: form.id })
     .temporaryStorageDetail();
@@ -29,7 +29,6 @@ export async function getFullForm(form: Form): Promise<FullForm> {
   return {
     ...form,
     owner,
-    ecoOrganisme,
     temporaryStorage,
     transportSegments
   };
@@ -53,16 +52,47 @@ export async function getFormOrFormNotFound({
 }
 
 /**
- * Retrieves an eco-organisme by id or throw a EcoOrganismeNotFound error
+ * Get a filter to retrieve forms the passed siret has rights on
+ * Optional parameter roles allows to filter on specific roles
+ * For example getFormsRightFilter(company, [TRANSPORTER]) will return a filter
+ * only for the forms in which the company appears as a transporter
+ * @param siret the siret to filter on
+ * @param roles optional [FormRole] to refine filter
  */
-export async function getEcoOrganismeOrNotFound({
-  id
-}: EcoOrganismeWhereUniqueInput) {
-  const eo = await prisma.ecoOrganisme({
-    id
-  });
-  if (!eo) {
-    throw new EcoOrganismeNotFound(id.toString());
-  }
-  return eo;
+export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
+  const filtersByRole: { [key in FormRole]: Partial<FormWhereInput>[] } = {
+    ["RECIPIENT"]: [
+      { recipientCompanySiret: siret },
+      {
+        temporaryStorageDetail: {
+          destinationCompanySiret: siret
+        }
+      }
+    ],
+    ["EMITTER"]: [{ emitterCompanySiret: siret }],
+    ["TRANSPORTER"]: [
+      { transporterCompanySiret: siret },
+      {
+        transportSegments_some: {
+          transporterCompanySiret: siret
+        }
+      },
+      {
+        temporaryStorageDetail: {
+          transporterCompanySiret: siret
+        }
+      }
+    ],
+    ["TRADER"]: [{ traderCompanySiret: siret }],
+    ["ECO_ORGANISME"]: [{ ecoOrganismeSiret: siret }]
+  };
+
+  return {
+    OR: Object.keys(filtersByRole)
+      .filter((role: FormRole) =>
+        roles?.length > 0 ? roles.includes(role) : true
+      )
+      .map(role => filtersByRole[role])
+      .flat()
+  };
 }

@@ -3,14 +3,14 @@ import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
 import { Formik, Field, Form, FormikProps } from "formik";
 import CompanyTypes from "../../../login/CompanyType";
-import RedErrorMessage from "../../../common/RedErrorMessage";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
-import { InlineError } from "../../../common/Error";
+import { InlineError } from "common/components/Error";
 import {
   CompanyType,
   Mutation,
   MutationUpdateCompanyArgs,
-} from "../../../generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   name: string;
@@ -64,7 +64,7 @@ export default function AccountFormCompanyTypes({
     >
       {(props: FormikProps<V>) => (
         <Form>
-          <div className="form__group">
+          <div className="form__row">
             <Field
               className={styles.input}
               name={name}
@@ -79,7 +79,7 @@ export default function AccountFormCompanyTypes({
           {error && <InlineError apolloError={error} />}
 
           <button
-            className="button"
+            className="btn btn--primary"
             type="submit"
             disabled={props.isSubmitting}
           >

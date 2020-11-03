@@ -1,0 +1,134 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+.detail {
+  &Title {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    display: flex;
+  }
+  &Status {
+    color: $grey-darker;
+    margin-right: 1rem;
+  }
+  &Content {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    @include desktop {
+      flex-direction: row;
+    }
+  }
+  &Block {
+    margin-top: 1rem;
+    margin-right: 1rem;
+    flex: 1 1;
+
+    @include desktop {
+      max-width: 400px;
+    }
+  }
+  &Columns {
+    display: flex;
+    flex-direction: column;
+    @include desktop {
+      flex-direction: row;
+    }
+    > div {
+      width: 100%; // equal width child grid divs
+    }
+  }
+  &Grid {
+    display: inline-grid;
+    grid-template-columns: auto minmax(auto, 0.75fr);
+    grid-auto-rows: minmax(1.5rem, max-content);
+    grid-gap: 1rem;
+
+    &:not(:last-child) {
+      margin-right: 1rem;
+    }
+    dt {
+      text-align: right;
+      color: $grey-dark;
+      font-weight: bold;
+      overflow-wrap: break-word;
+    }
+    dd {
+      overflow-wrap: break-word;
+    }
+  }
+  &Summary {
+    padding: 1rem;
+  }
+
+  &QRCodeIcon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+
+    @include desktop {
+      margin-left: auto;
+      width: 30%;
+
+      order: 99;
+    }
+  }
+  &Actions {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid $grey;
+    padding: 1rem;
+
+    @include phone {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+    > * {
+      // space buttons and divs
+      margin-left: 1rem;
+      margin-bottom: 1rem;
+      @include phone {
+        margin-bottom: 0;
+      }
+    }
+  }
+  &Tabs {
+    background-color: #fff;
+    display: flex;
+  }
+  &Tab {
+    border-top: 1px solid $grey;
+    border-left: 1px solid $grey;
+    border-right: 1px solid $grey;
+    border-bottom: 3px solid transparent;
+    height: 64px;
+    width: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+
+    &Selected {
+      border-bottom: 3px solid $blue;
+    }
+  }
+  &TabCaption {
+    color: $blue;
+    font-size: 0.75rem;
+  }
+  &TabPanels {
+    border-top: 2px solid $blue;
+    padding: 1rem;
+    display: flex;
+  }
+  &TabPanel {
+    display: flex;
+    flex-direction: column;
+    @include desktop {
+      flex-direction: row;
+    }
+  }
+}

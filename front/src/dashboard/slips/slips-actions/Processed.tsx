@@ -4,11 +4,11 @@ import { DateTime } from "luxon";
 import {
   PROCESSING_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-} from "../../../generated/constants";
-import DateInput from "../../../form/custom-inputs/DateInput";
-import CompanySelector from "../../../form/company/CompanySelector";
-import { SlipActionProps } from "../SlipActions";
-import { MutationMarkAsProcessedArgs } from "../../../generated/graphql/types";
+} from "generated/constants";
+import DateInput from "form/custom-inputs/DateInput";
+import CompanySelector from "form/company/CompanySelector";
+import { SlipActionProps } from "./SlipActions";
+import { MutationMarkAsProcessedArgs } from "generated/graphql/types";
 
 function Processed(props: SlipActionProps) {
   const {
@@ -40,21 +40,34 @@ function Processed(props: SlipActionProps) {
 
   return (
     <Form>
-      <div className="form__group">
+      <div className="form__row">
         <label>
           Nom du responsable
-          <Field type="text" name="processedBy" placeholder="NOM Prénom" />
+          <Field
+            type="text"
+            name="processedBy"
+            placeholder="NOM Prénom"
+            className="td-input"
+          />
         </label>
       </div>
-      <div className="form__group">
+      <div className="form__row">
         <label>
           Date de traitement
-          <Field component={DateInput} name="processedAt" />
+          <Field
+            component={DateInput}
+            name="processedAt"
+            className="td-input"
+          />
         </label>
       </div>
-      <div className="form__group">
+      <div className="form__row">
         <label>Opération d’élimination / valorisation effectuée</label>
-        <Field component="select" name="processingOperationDone">
+        <Field
+          component="select"
+          name="processingOperationDone"
+          className="td-select"
+        >
           <option value="">Choisissez...</option>
           {PROCESSING_OPERATIONS.map(operation => (
             <option key={operation.code} value={operation.code}>
@@ -68,32 +81,44 @@ function Processed(props: SlipActionProps) {
           {props.form.recipient?.processingOperation}
         </div>
       </div>
-      <div className="form__group">
+      <div className="form__row">
         <label>
           Description de l'Opération
-          <Field component="textarea" name="processingOperationDescription" />
+          <Field
+            component="textarea"
+            name="processingOperationDescription"
+            className="td-textarea"
+          />
         </label>
       </div>
-      <div className="form__group">
-        <label>
-          <Field type="checkbox" name="noTraceability" />
+      <div className="form__row form__row--inline">
+        <Field
+          type="checkbox"
+          name="noTraceability"
+          id="id_noTraceability"
+          className="td-checkbox"
+        />
+
+        <label htmlFor="id_noTraceability">
+          {" "}
           Rupture de traçabilité autorisée par arrêté préfectoral pour ce déchet
           - la responsabilité du producteur du déchet est transférée
         </label>
       </div>
       {nextDestination && (
-        <div className="form__group">
+        <div className="form__row">
           <h4>Destination ultérieure prévue</h4>
           <CompanySelector
             name="nextDestination.company"
             allowForeignCompanies
           />
 
-          <div className="form__group">
+          <div className="form__row">
             <label>Opération d’élimination / valorisation (code D/R)</label>
             <Field
               component="select"
               name="nextDestination.processingOperation"
+              className="td-select"
             >
               <option value="">Choisissez...</option>
               {PROCESSING_OPERATIONS.map(operation => (
@@ -106,15 +131,15 @@ function Processed(props: SlipActionProps) {
           </div>
         </div>
       )}
-      <div className="form__group button__group">
+      <div className="form__actions">
         <button
           type="button"
-          className="button secondary"
+          className="btn btn--outline-primary"
           onClick={props.onCancel}
         >
           Annuler
         </button>
-        <button type="submit" className="button">
+        <button type="submit" className="btn btn--primary">
           Je valide
         </button>
       </div>

@@ -1,5 +1,6 @@
 import { mergeTypeDefs } from "@graphql-tools/merge";
 import { loadFilesSync } from "@graphql-tools/load-files";
+import scalarResolvers from "./scalars";
 import companiesResolvers from "./companies/resolvers";
 import usersResolvers from "./users/resolvers";
 import formsResolvers from "./forms/resolvers";
@@ -17,6 +18,11 @@ const typeDefsArray = loadFilesSync(typeDefsPath);
 
 const typeDefs = mergeTypeDefs(typeDefsArray);
 
-const resolvers = [companiesResolvers, formsResolvers, usersResolvers];
+const resolvers = [
+  scalarResolvers,
+  companiesResolvers,
+  formsResolvers,
+  usersResolvers
+];
 
 export { typeDefs, resolvers };

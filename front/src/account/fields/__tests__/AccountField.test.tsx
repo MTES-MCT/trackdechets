@@ -1,7 +1,7 @@
 import React from "react";
 import AccountField from "../AccountField";
 import "@testing-library/jest-dom/extend-expect";
-import { render, fireEvent, getByLabelText } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import styles from "../AccountField.module.scss";
 
 describe("<AccountField />", () => {
@@ -29,7 +29,7 @@ describe("<AccountField />", () => {
     expect(getByLabelText("Nom utilisateur")).toBeInTheDocument();
 
     // it should container tooltip trigger
-    expect(getByRole("icon")).toBeInTheDocument();
+    expect(getByRole("button")).toBeInTheDocument();
 
     // it should contain field value
     expect(getByText("John Snow")).toBeInTheDocument();

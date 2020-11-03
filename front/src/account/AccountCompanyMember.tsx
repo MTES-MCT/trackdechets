@@ -11,7 +11,7 @@ import {
   Mutation,
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs,
-} from "../generated/graphql/types";
+} from "generated/graphql/types";
 
 type Props = {
   company: CompanyPrivate;
@@ -115,7 +115,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
         {!user.isMe && !user.isPendingInvitation && (
           <td className={styles["right-column"]}>
             <button
-              className="button"
+              className="btn btn--primary"
               onClick={() => {
                 removeUserFromCompany({
                   variables: { siret: company.siret, userId: user.id },
@@ -130,7 +130,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
           <>
             <td className={styles["right-column"]}>
               <button
-                className="button small"
+                className="btn btn--primary"
                 onClick={() => {
                   deleteInvitation({
                     variables: { email: user.email, siret: company.siret },
@@ -142,7 +142,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
             </td>
             <td className={styles["right-column"]}>
               <button
-                className="button small"
+                className="btn btn--primary"
                 onClick={() => {
                   resendInvitation({
                     variables: { email: user.email, siret: company.siret },

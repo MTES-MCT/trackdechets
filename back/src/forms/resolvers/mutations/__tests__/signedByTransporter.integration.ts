@@ -263,6 +263,54 @@ describe("Mutation.signedByTransporter", () => {
     ]);
   });
 
+  it("should succeed when providing the eco-organisme's security code", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const emitter = await companyFactory();
+    const ecoOrganisme = await companyFactory({
+      securityCode: 6789,
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitter.name,
+        emitterCompanySiret: emitter.siret,
+        transporterCompanyName: transporter.name,
+        transporterCompanySiret: transporter.siret,
+        ecoOrganismeName: ecoOrganisme.name,
+        ecoOrganismeSiret: ecoOrganisme.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: ecoOrganisme.securityCode,
+          signatureAuthor: "ECO_ORGANISME",
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagings,
+          quantity: form.wasteDetailsQuantity
+        }
+      }
+    });
+
+    expect(data.signedByTransporter).toMatchObject({
+      id: form.id,
+      status: "SENT"
+    });
+  });
+
   it("should mark a form with temporary storage as signed (frame 18)", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const receivingCompany = await companyFactory();

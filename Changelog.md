@@ -5,6 +5,41 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2020.10.1] 03/11/2020
+
+**Breaking changes**
+
+- Le champ `Form.ecoOrganisme` n'est plus du type `EcoOrganisme` mais du nouveau type `FormEcoOrganisme`.
+  Concrètement, le nouveau type ne contient plus les champs `id` et `address`.
+  Vous n'êtes pas affecté si vous ne requêtiez pas ces champs ou l'objet `ecoOrganisme`.
+- Le type `EcoOrganismeInput` a évolué suite aux changements du champ `Form.ecoOrganisme` :
+  ```diff
+    input EcoOrganismeInput {
+  -   id: ID!
+  +   name: String!
+  +   siret: String!
+    }
+  ```
+  Vous n'êtes pas affecté si vous ne renseigniez pas l'éco-organisme via les mutations `createForm` ou `updateForm`.
+
+**Changes**
+
+- Refonte de l'interface utilisateur. [PR 469](https://github.com/MTES-MCT/trackdechets/pull/469)
+- Ajout du champ `customInfo` à `TransporterInput`, ce qui permet de renseigner cette information via les mutations `createForm`, `updateForm`, `markAsResent`, `markAsResealed`, [PR 417](https://github.com/MTES-MCT/trackdechets/pull/417)
+- Suppression du service metabase suite au basculement vers une instance metabase dédiée [PR 453](https://github.com/MTES-MCT/trackdechets/pull/453)
+- Ajout du profil d'entreprise "éco-organisme". Ce type d'entreprise peut renseigner ses agréments et signer un BSD à la place du détenteur lorsqu'il est responsable des déchets. [PR 400](https://github.com/MTES-MCT/trackdechets/pull/400)
+- Dépréciation des arguments `first` et `skip` sur la query `forms`. A la place, pour paginer utiliser `cursorAfter` et `first` ou `cursorBefore` et `last`. Côté filtres, ajout des arguments `updatedAfter` et `sentAfter` sur la query `forms` pour filtrer par date, `wasteCode` pour filtrer par code déchet, et de `siretPresentOnForm` pour sélectionner des bordereaux ou le SIRET passé apparait [PR 455](https://github.com/MTES-MCT/trackdechets/pull/455)
+- Ajout d'un mécanisme de demande de rattachement à un établissement [PR 418](https://github.com/MTES-MCT/trackdechets/pull/418)
+- Mise à jour des liens Géorisques cassés [PR 645](https://github.com/MTES-MCT/trackdechets/pull/645)
+- Correction d'un bug empêchant l'affichage du dashboard lorsqu'un BSD n'avait pas d'émetteur [PR 644](https://github.com/MTES-MCT/trackdechets/pull/644)
+- Correction d'un bug affichant une invitation en attente même quand celle-ci a déjà été acceptée [PR 671](https://github.com/MTES-MCT/trackdechets/pull/671)
+- Correction du lien présent dans l'email d'invitation suite à l'action "Renvoyer l'invitation" [PR 648](https://github.com/MTES-MCT/trackdechets/pull/648)
+- Champs requis dans le formulaire d'inscription suite à un lien d'invitation [PR 670](https://github.com/MTES-MCT/trackdechets/pull/670)
+- Affichage des bordereaux au statut `GROUPED` dans l'onglet "Suivi" du dashboard et corrections de la mutation `markAsSent` sur un BSD de regroupement [PR 672](https://github.com/MTES-MCT/trackdechets/pull/672)
+- Correction d'un bug permettant de sceller des bordereaux avec des informations sur le détail du déchet (cadre 3,4,5,6) erronnées ce qui causait des erreurs de validation ultérieures [PR 681](https://github.com/MTES-MCT/trackdechets/pull/681)
+- Correction d'un bug empêchant la complétion du BSD suite depuis l'interface [PR 662](https://github.com/MTES-MCT/trackdechets/pull/662)
+- Correction d'un bug lors de l'appel à la mutation `markAsTempStored` sans passer le paramètre optionnel `signedAt` [PR 602](https://github.com/MTES-MCT/trackdechets/pull/602)
+
 # [2020.10.1] 05/10/2020
 
 - Ajout d'une limitation de 1000 requêtes possible par une même adresse IP dans une fenêtre de 1 minute, [PR 407](https://github.com/MTES-MCT/trackdechets/pull/407)

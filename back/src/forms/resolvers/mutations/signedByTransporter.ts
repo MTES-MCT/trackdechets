@@ -29,6 +29,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     signedByProducer,
     signedByTransporter,
     securityCode,
+    signatureAuthor,
     ...infos
   } = signingInfo;
 
@@ -92,8 +93,17 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     return expandFormFromDb(resentForm);
   }
 
-  // check security code is producer's
-  await checkSecurityCode(form.emitterCompanySiret, securityCode);
+  // check security code is producer's or eco-organisme's (if there's one)
+  if (args.signingInfo.signatureAuthor === "ECO_ORGANISME") {
+    if (form.ecoOrganismeSiret == null) {
+      throw new UserInputError(
+        "Impossible de signer au nom de l'éco-organisme : le BSD n'en mentionne aucun."
+      );
+    }
+    await checkSecurityCode(form.ecoOrganismeSiret, signingInfo.securityCode);
+  } else {
+    await checkSecurityCode(form.emitterCompanySiret, signingInfo.securityCode);
+  }
 
   const formUpdateInput = {
     signedByTransporter: true,

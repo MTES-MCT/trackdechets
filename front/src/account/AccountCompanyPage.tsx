@@ -4,7 +4,10 @@ import { filter } from "graphql-anywhere";
 import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContactEmail";
 import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
-import { CompanyPrivate } from "../generated/graphql/types";
+import AccountFieldCompanyAgreements from "./fields/AccountFieldCompanyAgreements";
+import { CompanyPrivate, CompanyType } from "../generated/graphql/types";
+import { generatePath } from "react-router-dom";
+import routes from "common/routes";
 
 type Props = {
   company: CompanyPrivate;
@@ -14,13 +17,16 @@ AccountCompanyPage.fragments = {
   company: gql`
     fragment AccountCompanyPageFragment on CompanyPrivate {
       siret
+      companyTypes
       ...AccountFieldCompanyContactEmailFragment
       ...AccountFieldCompanyContactPhoneFragment
       ...AccountFieldCompanyWebsiteFragment
+      ...AccountFieldCompanyAgreementsFragment
     }
     ${AccountFieldCompanyContactEmail.fragments.company}
     ${AccountFieldCompanyContactPhone.fragments.company}
     ${AccountFieldCompanyWebsite.fragments.company}
+    ${AccountFieldCompanyAgreements.fragments.company}
   `,
 };
 
@@ -28,7 +34,7 @@ export default function AccountCompanyPage({ company }: Props) {
   const companyPage =
     `${process.env.REACT_APP_URL_SCHEME}://` +
     `${process.env.REACT_APP_HOSTNAME}` +
-    `/company/${company.siret}`;
+    generatePath(routes.company, { siret: company.siret });
 
   return (
     <>
@@ -54,6 +60,9 @@ export default function AccountCompanyPage({ company }: Props) {
       <AccountFieldCompanyWebsite
         company={filter(AccountFieldCompanyWebsite.fragments.company, company)}
       />
+      {company.companyTypes.includes(CompanyType.EcoOrganisme) && (
+        <AccountFieldCompanyAgreements company={company} />
+      )}
     </>
   );
 }

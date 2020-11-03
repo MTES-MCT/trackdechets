@@ -2,6 +2,8 @@ import React from "react";
 import { FaCheck, FaRegCircle } from "react-icons/fa";
 import styles from "./CompanyResult.module.scss";
 import { CompanySearchResult } from "../../generated/graphql/types";
+import { generatePath } from "react-router-dom";
+import routes from "common/routes";
 
 interface CompanyResultsProps<T> {
   results: T[];
@@ -37,9 +39,10 @@ export default function CompanyResults<
               </p>
               <p>
                 <a
-                  href={`/company/${item.siret}`}
+                  href={generatePath(routes.company, { siret: item.siret! })}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="link"
                 >
                   Information sur l'entreprise
                 </a>

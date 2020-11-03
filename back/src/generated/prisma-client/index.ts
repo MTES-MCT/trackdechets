@@ -27,6 +27,7 @@ export interface Exists {
   form: (where?: FormWhereInput) => Promise<boolean>;
   grant: (where?: GrantWhereInput) => Promise<boolean>;
   installation: (where?: InstallationWhereInput) => Promise<boolean>;
+  membershipRequest: (where?: MembershipRequestWhereInput) => Promise<boolean>;
   rubrique: (where?: RubriqueWhereInput) => Promise<boolean>;
   statusLog: (where?: StatusLogWhereInput) => Promise<boolean>;
   temporaryStorageDetail: (
@@ -246,6 +247,27 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => InstallationConnectionPromise;
+  membershipRequest: (
+    where: MembershipRequestWhereUniqueInput
+  ) => MembershipRequestNullablePromise;
+  membershipRequests: (args?: {
+    where?: MembershipRequestWhereInput;
+    orderBy?: MembershipRequestOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<MembershipRequest>;
+  membershipRequestsConnection: (args?: {
+    where?: MembershipRequestWhereInput;
+    orderBy?: MembershipRequestOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => MembershipRequestConnectionPromise;
   rubrique: (where: RubriqueWhereUniqueInput) => RubriqueNullablePromise;
   rubriques: (args?: {
     where?: RubriqueWhereInput;
@@ -599,6 +621,28 @@ export interface Prisma {
   deleteManyInstallations: (
     where?: InstallationWhereInput
   ) => BatchPayloadPromise;
+  createMembershipRequest: (
+    data: MembershipRequestCreateInput
+  ) => MembershipRequestPromise;
+  updateMembershipRequest: (args: {
+    data: MembershipRequestUpdateInput;
+    where: MembershipRequestWhereUniqueInput;
+  }) => MembershipRequestPromise;
+  updateManyMembershipRequests: (args: {
+    data: MembershipRequestUpdateManyMutationInput;
+    where?: MembershipRequestWhereInput;
+  }) => BatchPayloadPromise;
+  upsertMembershipRequest: (args: {
+    where: MembershipRequestWhereUniqueInput;
+    create: MembershipRequestCreateInput;
+    update: MembershipRequestUpdateInput;
+  }) => MembershipRequestPromise;
+  deleteMembershipRequest: (
+    where: MembershipRequestWhereUniqueInput
+  ) => MembershipRequestPromise;
+  deleteManyMembershipRequests: (
+    where?: MembershipRequestWhereInput
+  ) => BatchPayloadPromise;
   createRubrique: (data: RubriqueCreateInput) => RubriquePromise;
   updateRubrique: (args: {
     data: RubriqueUpdateInput;
@@ -813,6 +857,9 @@ export interface Subscription {
   installation: (
     where?: InstallationSubscriptionWhereInput
   ) => InstallationSubscriptionPayloadSubscription;
+  membershipRequest: (
+    where?: MembershipRequestSubscriptionWhereInput
+  ) => MembershipRequestSubscriptionPayloadSubscription;
   rubrique: (
     where?: RubriqueSubscriptionWhereInput
   ) => RubriqueSubscriptionPayloadSubscription;
@@ -865,7 +912,8 @@ export type CompanyType =
   | "TRANSPORTER"
   | "WASTE_VEHICLES"
   | "WASTE_CENTER"
-  | "TRADER";
+  | "TRADER"
+  | "ECO_ORGANISME";
 
 export type UserOrderByInput =
   | "id_ASC"
@@ -1147,6 +1195,10 @@ export type FormOrderByInput =
   | "traderDepartment_DESC"
   | "traderValidityLimit_ASC"
   | "traderValidityLimit_DESC"
+  | "ecoOrganismeName_ASC"
+  | "ecoOrganismeName_DESC"
+  | "ecoOrganismeSiret_ASC"
+  | "ecoOrganismeSiret_DESC"
   | "currentTransporterSiret_ASC"
   | "currentTransporterSiret_DESC"
   | "nextTransporterSiret_ASC"
@@ -1237,6 +1289,20 @@ export type InstallationOrderByInput =
   | "gerepNumeroSiret_DESC"
   | "sireneNumeroSiret_ASC"
   | "sireneNumeroSiret_DESC";
+
+export type MembershipRequestStatus = "PENDING" | "ACCEPTED" | "REFUSED";
+
+export type MembershipRequestOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC"
+  | "status_ASC"
+  | "status_DESC"
+  | "statusUpdatedBy_ASC"
+  | "statusUpdatedBy_DESC";
 
 export type WasteType = "INERTE" | "NOT_DANGEROUS" | "DANGEROUS";
 
@@ -3111,6 +3177,34 @@ export interface FormWhereInput {
   traderValidityLimit_gt?: Maybe<DateTimeInput>;
   traderValidityLimit_gte?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeWhereInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeName_not?: Maybe<String>;
+  ecoOrganismeName_in?: Maybe<String[] | String>;
+  ecoOrganismeName_not_in?: Maybe<String[] | String>;
+  ecoOrganismeName_lt?: Maybe<String>;
+  ecoOrganismeName_lte?: Maybe<String>;
+  ecoOrganismeName_gt?: Maybe<String>;
+  ecoOrganismeName_gte?: Maybe<String>;
+  ecoOrganismeName_contains?: Maybe<String>;
+  ecoOrganismeName_not_contains?: Maybe<String>;
+  ecoOrganismeName_starts_with?: Maybe<String>;
+  ecoOrganismeName_not_starts_with?: Maybe<String>;
+  ecoOrganismeName_ends_with?: Maybe<String>;
+  ecoOrganismeName_not_ends_with?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
+  ecoOrganismeSiret_not?: Maybe<String>;
+  ecoOrganismeSiret_in?: Maybe<String[] | String>;
+  ecoOrganismeSiret_not_in?: Maybe<String[] | String>;
+  ecoOrganismeSiret_lt?: Maybe<String>;
+  ecoOrganismeSiret_lte?: Maybe<String>;
+  ecoOrganismeSiret_gt?: Maybe<String>;
+  ecoOrganismeSiret_gte?: Maybe<String>;
+  ecoOrganismeSiret_contains?: Maybe<String>;
+  ecoOrganismeSiret_not_contains?: Maybe<String>;
+  ecoOrganismeSiret_starts_with?: Maybe<String>;
+  ecoOrganismeSiret_not_starts_with?: Maybe<String>;
+  ecoOrganismeSiret_ends_with?: Maybe<String>;
+  ecoOrganismeSiret_not_ends_with?: Maybe<String>;
   appendix2Forms_every?: Maybe<FormWhereInput>;
   appendix2Forms_some?: Maybe<FormWhereInput>;
   appendix2Forms_none?: Maybe<FormWhereInput>;
@@ -4048,6 +4142,66 @@ export interface InstallationWhereInput {
   NOT?: Maybe<InstallationWhereInput[] | InstallationWhereInput>;
 }
 
+export type MembershipRequestWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface MembershipRequestWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  status?: Maybe<MembershipRequestStatus>;
+  status_not?: Maybe<MembershipRequestStatus>;
+  status_in?: Maybe<MembershipRequestStatus[] | MembershipRequestStatus>;
+  status_not_in?: Maybe<MembershipRequestStatus[] | MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  statusUpdatedBy_not?: Maybe<String>;
+  statusUpdatedBy_in?: Maybe<String[] | String>;
+  statusUpdatedBy_not_in?: Maybe<String[] | String>;
+  statusUpdatedBy_lt?: Maybe<String>;
+  statusUpdatedBy_lte?: Maybe<String>;
+  statusUpdatedBy_gt?: Maybe<String>;
+  statusUpdatedBy_gte?: Maybe<String>;
+  statusUpdatedBy_contains?: Maybe<String>;
+  statusUpdatedBy_not_contains?: Maybe<String>;
+  statusUpdatedBy_starts_with?: Maybe<String>;
+  statusUpdatedBy_not_starts_with?: Maybe<String>;
+  statusUpdatedBy_ends_with?: Maybe<String>;
+  statusUpdatedBy_not_ends_with?: Maybe<String>;
+  user?: Maybe<UserWhereInput>;
+  company?: Maybe<CompanyWhereInput>;
+  AND?: Maybe<MembershipRequestWhereInput[] | MembershipRequestWhereInput>;
+  OR?: Maybe<MembershipRequestWhereInput[] | MembershipRequestWhereInput>;
+  NOT?: Maybe<MembershipRequestWhereInput[] | MembershipRequestWhereInput>;
+}
+
 export type RubriqueWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
@@ -4484,6 +4638,7 @@ export interface CompanyCreateInput {
   contactPhone?: Maybe<String>;
   website?: Maybe<String>;
   documentKeys?: Maybe<CompanyCreatedocumentKeysInput>;
+  ecoOrganismeAgreements?: Maybe<CompanyCreateecoOrganismeAgreementsInput>;
   transporterReceipt?: Maybe<TransporterReceiptCreateOneInput>;
   traderReceipt?: Maybe<TraderReceiptCreateOneInput>;
 }
@@ -4493,6 +4648,10 @@ export interface CompanyCreatecompanyTypesInput {
 }
 
 export interface CompanyCreatedocumentKeysInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface CompanyCreateecoOrganismeAgreementsInput {
   set?: Maybe<String[] | String>;
 }
 
@@ -4630,6 +4789,7 @@ export interface CompanyUpdateDataInput {
   contactPhone?: Maybe<String>;
   website?: Maybe<String>;
   documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+  ecoOrganismeAgreements?: Maybe<CompanyUpdateecoOrganismeAgreementsInput>;
   transporterReceipt?: Maybe<TransporterReceiptUpdateOneInput>;
   traderReceipt?: Maybe<TraderReceiptUpdateOneInput>;
 }
@@ -4639,6 +4799,10 @@ export interface CompanyUpdatecompanyTypesInput {
 }
 
 export interface CompanyUpdatedocumentKeysInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface CompanyUpdateecoOrganismeAgreementsInput {
   set?: Maybe<String[] | String>;
 }
 
@@ -4934,6 +5098,7 @@ export interface CompanyUpdateInput {
   contactPhone?: Maybe<String>;
   website?: Maybe<String>;
   documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+  ecoOrganismeAgreements?: Maybe<CompanyUpdateecoOrganismeAgreementsInput>;
   transporterReceipt?: Maybe<TransporterReceiptUpdateOneInput>;
   traderReceipt?: Maybe<TraderReceiptUpdateOneInput>;
 }
@@ -4950,6 +5115,7 @@ export interface CompanyUpdateManyMutationInput {
   contactPhone?: Maybe<String>;
   website?: Maybe<String>;
   documentKeys?: Maybe<CompanyUpdatedocumentKeysInput>;
+  ecoOrganismeAgreements?: Maybe<CompanyUpdateecoOrganismeAgreementsInput>;
 }
 
 export interface CompanyAssociationCreateInput {
@@ -5134,6 +5300,8 @@ export interface FormCreateInput {
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailCreateOneWithoutFormInput
@@ -5312,6 +5480,8 @@ export interface FormUpdateInput {
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailUpdateOneWithoutFormInput
@@ -5449,6 +5619,8 @@ export interface FormUpdateDataInput {
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailUpdateOneWithoutFormInput
@@ -6804,6 +6976,34 @@ export interface FormScalarWhereInput {
   traderValidityLimit_lte?: Maybe<DateTimeInput>;
   traderValidityLimit_gt?: Maybe<DateTimeInput>;
   traderValidityLimit_gte?: Maybe<DateTimeInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeName_not?: Maybe<String>;
+  ecoOrganismeName_in?: Maybe<String[] | String>;
+  ecoOrganismeName_not_in?: Maybe<String[] | String>;
+  ecoOrganismeName_lt?: Maybe<String>;
+  ecoOrganismeName_lte?: Maybe<String>;
+  ecoOrganismeName_gt?: Maybe<String>;
+  ecoOrganismeName_gte?: Maybe<String>;
+  ecoOrganismeName_contains?: Maybe<String>;
+  ecoOrganismeName_not_contains?: Maybe<String>;
+  ecoOrganismeName_starts_with?: Maybe<String>;
+  ecoOrganismeName_not_starts_with?: Maybe<String>;
+  ecoOrganismeName_ends_with?: Maybe<String>;
+  ecoOrganismeName_not_ends_with?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
+  ecoOrganismeSiret_not?: Maybe<String>;
+  ecoOrganismeSiret_in?: Maybe<String[] | String>;
+  ecoOrganismeSiret_not_in?: Maybe<String[] | String>;
+  ecoOrganismeSiret_lt?: Maybe<String>;
+  ecoOrganismeSiret_lte?: Maybe<String>;
+  ecoOrganismeSiret_gt?: Maybe<String>;
+  ecoOrganismeSiret_gte?: Maybe<String>;
+  ecoOrganismeSiret_contains?: Maybe<String>;
+  ecoOrganismeSiret_not_contains?: Maybe<String>;
+  ecoOrganismeSiret_starts_with?: Maybe<String>;
+  ecoOrganismeSiret_not_starts_with?: Maybe<String>;
+  ecoOrganismeSiret_ends_with?: Maybe<String>;
+  ecoOrganismeSiret_not_ends_with?: Maybe<String>;
   currentTransporterSiret?: Maybe<String>;
   currentTransporterSiret_not?: Maybe<String>;
   currentTransporterSiret_in?: Maybe<String[] | String>;
@@ -6923,6 +7123,8 @@ export interface FormUpdateManyDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   currentTransporterSiret?: Maybe<String>;
   nextTransporterSiret?: Maybe<String>;
 }
@@ -7008,6 +7210,8 @@ export interface FormUpdateManyMutationInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   currentTransporterSiret?: Maybe<String>;
   nextTransporterSiret?: Maybe<String>;
 }
@@ -7086,6 +7290,37 @@ export interface InstallationUpdateManyMutationInput {
   irepNumeroSiret?: Maybe<String>;
   gerepNumeroSiret?: Maybe<String>;
   sireneNumeroSiret?: Maybe<String>;
+}
+
+export interface MembershipRequestCreateInput {
+  id?: Maybe<ID_Input>;
+  status?: Maybe<MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  user: UserCreateOneInput;
+  company: CompanyCreateOneInput;
+  sentTo?: Maybe<MembershipRequestCreatesentToInput>;
+}
+
+export interface MembershipRequestCreatesentToInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface MembershipRequestUpdateInput {
+  status?: Maybe<MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  user?: Maybe<UserUpdateOneRequiredInput>;
+  company?: Maybe<CompanyUpdateOneRequiredInput>;
+  sentTo?: Maybe<MembershipRequestUpdatesentToInput>;
+}
+
+export interface MembershipRequestUpdatesentToInput {
+  set?: Maybe<String[] | String>;
+}
+
+export interface MembershipRequestUpdateManyMutationInput {
+  status?: Maybe<MembershipRequestStatus>;
+  statusUpdatedBy?: Maybe<String>;
+  sentTo?: Maybe<MembershipRequestUpdatesentToInput>;
 }
 
 export interface RubriqueCreateInput {
@@ -7301,6 +7536,8 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
   transportSegments?: Maybe<TransportSegmentCreateManyWithoutFormInput>;
   currentTransporterSiret?: Maybe<String>;
@@ -7439,6 +7676,8 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
   transportSegments?: Maybe<TransportSegmentUpdateManyWithoutFormInput>;
   currentTransporterSiret?: Maybe<String>;
@@ -7612,6 +7851,8 @@ export interface FormCreateWithoutTransportSegmentsInput {
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailCreateOneWithoutFormInput
@@ -7731,6 +7972,8 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
   ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
+  ecoOrganismeName?: Maybe<String>;
+  ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
   temporaryStorageDetail?: Maybe<
     TemporaryStorageDetailUpdateOneWithoutFormInput
@@ -7968,6 +8211,26 @@ export interface InstallationSubscriptionWhereInput {
   >;
   NOT?: Maybe<
     InstallationSubscriptionWhereInput[] | InstallationSubscriptionWhereInput
+  >;
+}
+
+export interface MembershipRequestSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<MembershipRequestWhereInput>;
+  AND?: Maybe<
+    | MembershipRequestSubscriptionWhereInput[]
+    | MembershipRequestSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | MembershipRequestSubscriptionWhereInput[]
+    | MembershipRequestSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | MembershipRequestSubscriptionWhereInput[]
+    | MembershipRequestSubscriptionWhereInput
   >;
 }
 
@@ -8305,6 +8568,7 @@ export interface Company {
   contactPhone?: String;
   website?: String;
   documentKeys: String[];
+  ecoOrganismeAgreements: String[];
 }
 
 export interface CompanyPromise extends Promise<Company>, Fragmentable {
@@ -8322,6 +8586,7 @@ export interface CompanyPromise extends Promise<Company>, Fragmentable {
   contactPhone: () => Promise<String>;
   website: () => Promise<String>;
   documentKeys: () => Promise<String[]>;
+  ecoOrganismeAgreements: () => Promise<String[]>;
   transporterReceipt: <T = TransporterReceiptPromise>() => T;
   traderReceipt: <T = TraderReceiptPromise>() => T;
 }
@@ -8343,6 +8608,7 @@ export interface CompanySubscription
   contactPhone: () => Promise<AsyncIterator<String>>;
   website: () => Promise<AsyncIterator<String>>;
   documentKeys: () => Promise<AsyncIterator<String[]>>;
+  ecoOrganismeAgreements: () => Promise<AsyncIterator<String[]>>;
   transporterReceipt: <T = TransporterReceiptSubscription>() => T;
   traderReceipt: <T = TraderReceiptSubscription>() => T;
 }
@@ -8364,6 +8630,7 @@ export interface CompanyNullablePromise
   contactPhone: () => Promise<String>;
   website: () => Promise<String>;
   documentKeys: () => Promise<String[]>;
+  ecoOrganismeAgreements: () => Promise<String[]>;
   transporterReceipt: <T = TransporterReceiptPromise>() => T;
   traderReceipt: <T = TraderReceiptPromise>() => T;
 }
@@ -9028,6 +9295,8 @@ export interface Form {
   traderReceipt?: String;
   traderDepartment?: String;
   traderValidityLimit?: DateTimeOutput;
+  ecoOrganismeName?: String;
+  ecoOrganismeSiret?: String;
   currentTransporterSiret?: String;
   nextTransporterSiret?: String;
 }
@@ -9118,6 +9387,8 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
   ecoOrganisme: <T = EcoOrganismePromise>() => T;
+  ecoOrganismeName: () => Promise<String>;
+  ecoOrganismeSiret: () => Promise<String>;
   appendix2Forms: <T = FragmentableArray<Form>>(args?: {
     where?: FormWhereInput;
     orderBy?: FormOrderByInput;
@@ -9229,6 +9500,8 @@ export interface FormSubscription
   traderDepartment: () => Promise<AsyncIterator<String>>;
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
   ecoOrganisme: <T = EcoOrganismeSubscription>() => T;
+  ecoOrganismeName: () => Promise<AsyncIterator<String>>;
+  ecoOrganismeSiret: () => Promise<AsyncIterator<String>>;
   appendix2Forms: <T = Promise<AsyncIterator<FormSubscription>>>(args?: {
     where?: FormWhereInput;
     orderBy?: FormOrderByInput;
@@ -9342,6 +9615,8 @@ export interface FormNullablePromise
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
   ecoOrganisme: <T = EcoOrganismePromise>() => T;
+  ecoOrganismeName: () => Promise<String>;
+  ecoOrganismeSiret: () => Promise<String>;
   appendix2Forms: <T = FragmentableArray<Form>>(args?: {
     where?: FormWhereInput;
     orderBy?: FormOrderByInput;
@@ -9913,6 +10188,110 @@ export interface AggregateInstallationPromise
 
 export interface AggregateInstallationSubscription
   extends Promise<AsyncIterator<AggregateInstallation>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface MembershipRequest {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  status: MembershipRequestStatus;
+  statusUpdatedBy?: String;
+  sentTo: String[];
+}
+
+export interface MembershipRequestPromise
+  extends Promise<MembershipRequest>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<MembershipRequestStatus>;
+  statusUpdatedBy: () => Promise<String>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
+  sentTo: () => Promise<String[]>;
+}
+
+export interface MembershipRequestSubscription
+  extends Promise<AsyncIterator<MembershipRequest>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  status: () => Promise<AsyncIterator<MembershipRequestStatus>>;
+  statusUpdatedBy: () => Promise<AsyncIterator<String>>;
+  user: <T = UserSubscription>() => T;
+  company: <T = CompanySubscription>() => T;
+  sentTo: () => Promise<AsyncIterator<String[]>>;
+}
+
+export interface MembershipRequestNullablePromise
+  extends Promise<MembershipRequest | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<MembershipRequestStatus>;
+  statusUpdatedBy: () => Promise<String>;
+  user: <T = UserPromise>() => T;
+  company: <T = CompanyPromise>() => T;
+  sentTo: () => Promise<String[]>;
+}
+
+export interface MembershipRequestConnection {
+  pageInfo: PageInfo;
+  edges: MembershipRequestEdge[];
+}
+
+export interface MembershipRequestConnectionPromise
+  extends Promise<MembershipRequestConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<MembershipRequestEdge>>() => T;
+  aggregate: <T = AggregateMembershipRequestPromise>() => T;
+}
+
+export interface MembershipRequestConnectionSubscription
+  extends Promise<AsyncIterator<MembershipRequestConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<MembershipRequestEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateMembershipRequestSubscription>() => T;
+}
+
+export interface MembershipRequestEdge {
+  node: MembershipRequest;
+  cursor: String;
+}
+
+export interface MembershipRequestEdgePromise
+  extends Promise<MembershipRequestEdge>,
+    Fragmentable {
+  node: <T = MembershipRequestPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface MembershipRequestEdgeSubscription
+  extends Promise<AsyncIterator<MembershipRequestEdge>>,
+    Fragmentable {
+  node: <T = MembershipRequestSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateMembershipRequest {
+  count: Int;
+}
+
+export interface AggregateMembershipRequestPromise
+  extends Promise<AggregateMembershipRequest>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateMembershipRequestSubscription
+  extends Promise<AsyncIterator<AggregateMembershipRequest>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -10785,6 +11164,7 @@ export interface CompanyPreviousValues {
   contactPhone?: String;
   website?: String;
   documentKeys: String[];
+  ecoOrganismeAgreements: String[];
 }
 
 export interface CompanyPreviousValuesPromise
@@ -10804,6 +11184,7 @@ export interface CompanyPreviousValuesPromise
   contactPhone: () => Promise<String>;
   website: () => Promise<String>;
   documentKeys: () => Promise<String[]>;
+  ecoOrganismeAgreements: () => Promise<String[]>;
 }
 
 export interface CompanyPreviousValuesSubscription
@@ -10823,6 +11204,7 @@ export interface CompanyPreviousValuesSubscription
   contactPhone: () => Promise<AsyncIterator<String>>;
   website: () => Promise<AsyncIterator<String>>;
   documentKeys: () => Promise<AsyncIterator<String[]>>;
+  ecoOrganismeAgreements: () => Promise<AsyncIterator<String[]>>;
 }
 
 export interface CompanyAssociationSubscriptionPayload {
@@ -11087,6 +11469,8 @@ export interface FormPreviousValues {
   traderReceipt?: String;
   traderDepartment?: String;
   traderValidityLimit?: DateTimeOutput;
+  ecoOrganismeName?: String;
+  ecoOrganismeSiret?: String;
   currentTransporterSiret?: String;
   nextTransporterSiret?: String;
 }
@@ -11177,6 +11561,8 @@ export interface FormPreviousValuesPromise
   traderReceipt: () => Promise<String>;
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
+  ecoOrganismeName: () => Promise<String>;
+  ecoOrganismeSiret: () => Promise<String>;
   currentTransporterSiret: () => Promise<String>;
   nextTransporterSiret: () => Promise<String>;
 }
@@ -11267,6 +11653,8 @@ export interface FormPreviousValuesSubscription
   traderReceipt: () => Promise<AsyncIterator<String>>;
   traderDepartment: () => Promise<AsyncIterator<String>>;
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
+  ecoOrganismeName: () => Promise<AsyncIterator<String>>;
+  ecoOrganismeSiret: () => Promise<AsyncIterator<String>>;
   currentTransporterSiret: () => Promise<AsyncIterator<String>>;
   nextTransporterSiret: () => Promise<AsyncIterator<String>>;
 }
@@ -11402,6 +11790,62 @@ export interface InstallationPreviousValuesSubscription
   irepNumeroSiret: () => Promise<AsyncIterator<String>>;
   gerepNumeroSiret: () => Promise<AsyncIterator<String>>;
   sireneNumeroSiret: () => Promise<AsyncIterator<String>>;
+}
+
+export interface MembershipRequestSubscriptionPayload {
+  mutation: MutationType;
+  node: MembershipRequest;
+  updatedFields: String[];
+  previousValues: MembershipRequestPreviousValues;
+}
+
+export interface MembershipRequestSubscriptionPayloadPromise
+  extends Promise<MembershipRequestSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = MembershipRequestPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = MembershipRequestPreviousValuesPromise>() => T;
+}
+
+export interface MembershipRequestSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<MembershipRequestSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = MembershipRequestSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = MembershipRequestPreviousValuesSubscription>() => T;
+}
+
+export interface MembershipRequestPreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+  status: MembershipRequestStatus;
+  statusUpdatedBy?: String;
+  sentTo: String[];
+}
+
+export interface MembershipRequestPreviousValuesPromise
+  extends Promise<MembershipRequestPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  status: () => Promise<MembershipRequestStatus>;
+  statusUpdatedBy: () => Promise<String>;
+  sentTo: () => Promise<String[]>;
+}
+
+export interface MembershipRequestPreviousValuesSubscription
+  extends Promise<AsyncIterator<MembershipRequestPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  status: () => Promise<AsyncIterator<MembershipRequestStatus>>;
+  statusUpdatedBy: () => Promise<AsyncIterator<String>>;
+  sentTo: () => Promise<AsyncIterator<String[]>>;
 }
 
 export interface RubriqueSubscriptionPayload {
@@ -12154,6 +12598,14 @@ export const models: Model[] = [
   },
   {
     name: "UserAccountHash",
+    embedded: false
+  },
+  {
+    name: "MembershipRequestStatus",
+    embedded: false
+  },
+  {
+    name: "MembershipRequest",
     embedded: false
   },
   {

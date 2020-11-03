@@ -1,17 +1,17 @@
 import React from "react";
 import { Formik, Field, Form } from "formik";
 import { DateTime } from "luxon";
-import NumberInput from "../../../form/custom-inputs/NumberInput";
-import DateInput from "../../../form/custom-inputs/DateInput";
-import { SlipActionProps } from "../SlipActions";
+import NumberInput from "form/custom-inputs/NumberInput";
+import DateInput from "form/custom-inputs/DateInput";
+import { SlipActionProps } from "./SlipActions";
 import {
   InlineRadioButton,
   RadioButton,
-} from "../../../form/custom-inputs/RadioButton";
+} from "form/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   FormStatus,
-} from "../../../generated/graphql/types";
+} from "generated/graphql/types";
 
 const textConfig = {
   [WasteAcceptationStatus.Accepted]: {
@@ -30,7 +30,7 @@ const textConfig = {
   },
 };
 const FieldError = ({ fieldError }) =>
-  !!fieldError ? <p className="text-red mt-0 mb-0">{fieldError}</p> : null;
+  !!fieldError ? <p className="text-red tw-mt-0 tw-mb-0">{fieldError}</p> : null;
 
 export default function Received(props: SlipActionProps) {
   return (
@@ -54,16 +54,21 @@ export default function Received(props: SlipActionProps) {
 
           return (
             <Form>
-              <label>
-                Date d'arrivée
-                <Field component={DateInput} name="receivedAt" />
-                <FieldError fieldError={errors.receivedAt} />
-              </label>
-
-              <div className="form__group">
-                <fieldset>
-                  <div style={{ display: "flex" }}>
-                    <h4 className="mr-2">Lot accepté: </h4>
+              <p className="form__row">
+                <label>
+                  Date d'arrivée
+                  <Field
+                    component={DateInput}
+                    name="receivedAt"
+                    className="td-input"
+                  />
+                  <FieldError fieldError={errors.receivedAt} />
+                </label>
+              </p>
+              <div className="form__row">
+                <div className="form__row">
+                  <fieldset className="form__radio-group">
+                    <h4 className="tw-mr-2">Lot accepté: </h4>
                     <Field
                       name="wasteAcceptationStatus"
                       id={WasteAcceptationStatus.Accepted}
@@ -97,31 +102,32 @@ export default function Received(props: SlipActionProps) {
                       label="Partiellement"
                       component={InlineRadioButton}
                     />
-                  </div>
-                </fieldset>
+                  </fieldset>
+                </div>
               </div>
-
-              <label>
-                Poids à l'arrivée
-                <Field
-                  component={NumberInput}
-                  name="quantityReceived"
-                  placeholder="En tonnes"
-                  disabled={
-                    values.wasteAcceptationStatus ===
-                    WasteAcceptationStatus.Refused
-                  }
-                />
-                <FieldError fieldError={errors.quantityReceived} />
-                <span>
-                  Poids indicatif émis: {props.form.stateSummary?.quantity}{" "}
-                  tonnes
-                </span>
-              </label>
-
+              <p className="form__row">
+                <label>
+                  Poids à l'arrivée
+                  <Field
+                    component={NumberInput}
+                    name="quantityReceived"
+                    placeholder="En tonnes"
+                    className="td-input"
+                    disabled={
+                      values.wasteAcceptationStatus ===
+                      WasteAcceptationStatus.Refused
+                    }
+                  />
+                  <FieldError fieldError={errors.quantityReceived} />
+                  <span>
+                    Poids indicatif émis: {props.form.stateSummary?.quantity}{" "}
+                    tonnes
+                  </span>
+                </label>
+              </p>
               {props.form.recipient?.isTempStorage &&
                 props.form.status === FormStatus.Sent && (
-                  <fieldset>
+                  <fieldset className="form__row">
                     <legend>Cette quantité est</legend>
                     <Field
                       name="quantityType"
@@ -142,33 +148,48 @@ export default function Received(props: SlipActionProps) {
                 WasteAcceptationStatus.Refused.toString(),
                 WasteAcceptationStatus.PartiallyRefused.toString(),
               ].includes(values.wasteAcceptationStatus) && (
-                <label>
-                  {textConfig[values.wasteAcceptationStatus].refusalReasonText}
-                  <Field name="wasteRefusalReason" />
-                  <FieldError fieldError={errors.wasteRefusalReason} />
-                </label>
+                <p className="form__row">
+                  <label>
+                    {
+                      textConfig[values.wasteAcceptationStatus]
+                        .refusalReasonText
+                    }
+                    <Field name="wasteRefusalReason" className="td-input" />
+                    <FieldError fieldError={errors.wasteRefusalReason} />
+                  </label>
+                </p>
               )}
-
-              <label>
-                Nom du responsable
-                <Field type="text" name="receivedBy" placeholder="NOM Prénom" />
-                <FieldError fieldError={errors.receivedBy} />
-              </label>
-
-              <label>
-                Date d'acceptation
-                <Field component={DateInput} name="signedAt" />
-                <FieldError fieldError={errors.signedAt} />
-              </label>
-
+              <p className="form__row">
+                <label>
+                  Nom du responsable
+                  <Field
+                    type="text"
+                    name="receivedBy"
+                    placeholder="NOM Prénom"
+                    className="td-input"
+                  />
+                  <FieldError fieldError={errors.receivedBy} />
+                </label>
+              </p>
+              <p className="form__row">
+                <label>
+                  Date d'acceptation
+                  <Field
+                    component={DateInput}
+                    name="signedAt"
+                    className="td-input"
+                  />
+                  <FieldError fieldError={errors.signedAt} />
+                </label>
+              </p>
               <p>
                 {values.wasteAcceptationStatus &&
                   textConfig[values.wasteAcceptationStatus].validationText}
               </p>
-              <div className="form__group button__group">
+              <div className="form__actions">
                 <button
                   type="button"
-                  className="button secondary"
+                  className="btn btn--outline-primary"
                   onClick={() => {
                     handleReset();
                     props.onCancel();
@@ -181,12 +202,12 @@ export default function Received(props: SlipActionProps) {
                   type="submit"
                   className={
                     hasErrors || !isTouched
-                      ? "button button--disabled"
-                      : "button"
+                      ? "btn btn--primary"
+                      : "btn btn--primary"
                   }
                   disabled={hasErrors || !isTouched}
                 >
-                  Je valide
+                  Je valide la réception
                 </button>
               </div>
             </Form>

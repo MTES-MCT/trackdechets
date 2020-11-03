@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { transportModeLabels } from "../constants";
-import "./Transport.scss";
+import styles from "./Transport.module.scss";
+import TdModal from "common/components/Modal";
+import { OutlineButton } from "common/components/ActionButton";
+
 const verboseTakenOver = ({ segment, userSiret }) => {
   if (!!segment.takenOverAt) {
     return segment.transporter.company.siret === userSiret
@@ -10,7 +13,9 @@ const verboseTakenOver = ({ segment, userSiret }) => {
   return segment.readyToTakeOver ? "Prêt à transférer" : "Brouillon";
 };
 
-export const Segments = ({ form, userSiret }) => {
+export const Segments = ({ form, userSiret, inCard = false }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const transportSegments = form.transportSegments || [];
   if (!transportSegments.length) {
     return null;
@@ -18,33 +23,56 @@ export const Segments = ({ form, userSiret }) => {
 
   return (
     <div>
-      <strong>Segments</strong>
-      {/*  sticking to table because of incomplete IE grid layout support */}
-      <table>
-        <thead>
-          <tr>
-            <th>N°</th>
-            <th>Mode</th>
-            <th>Transporteur</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          {form.transportSegments.map(segment =>
-            !!segment.id ? (
-              <tr key={segment.id}>
-                <td>
-                  <span className="segment-pill">{segment.segmentNumber}</span>
-                </td>
-                <td>{segment.mode && transportModeLabels[segment.mode]}</td>
-                <td> {segment.transporter.company.name}</td>
+      {inCard ? (
+        <button
+          className="btn btn--outline-primary btn--small"
+          onClick={() => setIsOpen(true)}
+          title="Multimodal"
+        >
+          <span>{transportSegments.length} Segment(s)</span>
+        </button>
+      ) : (
+        <OutlineButton
+          title={`Multimodal (${transportSegments.length})`}
+          onClick={() => setIsOpen(true)}
+        />
+      )}
+      <TdModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        ariaLabel="Signature transporteur"
+      >
+        <h2 className="td-modal-title">Segments</h2>
 
-                <td>{verboseTakenOver({ segment, userSiret })}</td>
-              </tr>
-            ) : null
-          )}
-        </tbody>
-      </table>
+        {/*  sticking to table because of incomplete IE grid layout support */}
+        <table className="td-table">
+          <thead>
+            <tr className="td-table__head-tr">
+              <th>N°</th>
+              <th>Mode</th>
+              <th>Transporteur</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            {form.transportSegments.map(segment =>
+              !!segment.id ? (
+                <tr key={segment.id}>
+                  <td>
+                    <span className={styles.segmentPill}>
+                      {segment.segmentNumber}
+                    </span>
+                  </td>
+                  <td>{segment.mode && transportModeLabels[segment.mode]}</td>
+                  <td> {segment.transporter.company.name}</td>
+
+                  <td>{verboseTakenOver({ segment, userSiret })}</td>
+                </tr>
+              ) : null
+            )}
+          </tbody>
+        </table>
+      </TdModal>
     </div>
   );
 };

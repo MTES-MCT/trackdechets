@@ -1,11 +1,13 @@
 import { useQuery } from "@apollo/react-hooks";
 import { useField, useFormikContext } from "formik";
 import gql from "graphql-tag";
-import React, { useEffect, useReducer } from "react";
-import { FaSearch } from "react-icons/fa";
+import React, { useState } from "react";
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import { Query, EcoOrganisme } from "../../generated/graphql/types";
+import SearchInput from "common/components/SearchInput";
+import { Query, EcoOrganisme, Form } from "../../generated/graphql/types";
+import TdSwitch from "common/components/Switch";
+import { tdContactEmail } from "common/config";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -18,117 +20,65 @@ const GET_ECO_ORGANISMES = gql`
   }
 `;
 
-function init(
-  selectedOrganismeId: string | null,
-  isActive = !!selectedOrganismeId,
-  ecoOrganismes = []
-) {
-  return {
-    isActive,
-    ecoOrganismes,
-    searchClue: "",
-    selectedOrganismeId,
-  };
+interface EcoOrganismesProps {
+  name: string;
 }
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "toggle_activation":
-      return init(null, !state.isActive, state.ecoOrganismes);
-    case "select":
-      return {
-        ...state,
-        selectedOrganismeId: action.payload,
-      };
-    case "fetch":
-      return { ...state, ecoOrganismes: action.payload };
-    case "search":
-      return {
-        ...state,
-        searchClue: action.payload.toLowerCase(),
-      };
-  }
-}
-
-export default function EcoOrganismes(props) {
-  const [field] = useField(props);
+export default function EcoOrganismes(props: EcoOrganismesProps) {
+  const [field] = useField<Form["ecoOrganisme"]>(props);
   const { setFieldValue } = useFormikContext();
-  const [state, dispatch] = useReducer(reducer, field.value?.id, init);
-
+  const [isChecked, setIsChecked] = useState(Boolean(field.value?.siret));
+  const [clue, setClue] = useState("");
   const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
     GET_ECO_ORGANISMES
   );
 
-  useEffect(() => {
-    if (data?.ecoOrganismes) {
-      dispatch({ type: "fetch", payload: data.ecoOrganismes });
-    }
-  }, [data]);
-
-  useEffect(() => {
-    setFieldValue(
-      field.name,
-      state.selectedOrganismeId ? { id: state.selectedOrganismeId } : null
-    );
-  }, [state.selectedOrganismeId, field.name, setFieldValue]);
-
   return (
     <>
-      <div className="form__group">
-        <label>
-          <input
-            type="checkbox"
-            checked={state.isActive}
-            onChange={() => dispatch({ type: "toggle_activation" })}
-          />
-          Un éco-organisme est le responsable / producteur des déchets de ce
-          bordereau
-        </label>
+      <div className="form__row">
+        <TdSwitch
+          checked={isChecked}
+          onChange={checked => setIsChecked(checked)}
+          label="Un éco-organisme est le responsable / producteur des déchets de ce bordereau"
+        />
       </div>
 
-      {state.isActive && (
+      {isChecked && (
         <>
           {loading && <p>Chargement...</p>}
           {error && <p>Erreur lors du chargement des éco-organismes...</p>}
           {data && (
             <>
-              <div className="form__group notification info">
+              <div className="form__row notification notification--info">
                 Veuillez sélectionner ci-dessous un des éco-organismes
                 enregistrés dans Trackdéchets. Si votre éco-organisme n'apparait
                 pas et que vous pensez que c'est une erreur,{" "}
-                <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">
+                <a href={`mailto:${tdContactEmail}`} className="link">
                   contactez le support.
                 </a>
               </div>
-
-              <div className="form__group search__group">
-                <input
-                  type="text"
-                  placeholder="Filtrer les éco-organismes par nom..."
-                  onChange={e =>
-                    dispatch({
-                      type: "search",
-                      payload: e.target.value.toLowerCase(),
-                    })
-                  }
-                />
-                <button
-                  className="overlay-button search-icon"
-                  aria-label="Recherche"
-                  disabled={true}
-                >
-                  <FaSearch />
-                </button>
-              </div>
+              <SearchInput
+                id="eco-search"
+                placeholder="Filtrer les éco-organismes par nom..."
+                className={styles.ecoorganismeSearchInput}
+                onChange={event => setClue(event.target.value)}
+              />
               <div className={styles.list}>
                 <CompanyResults<EcoOrganisme>
-                  onSelect={eo => dispatch({ type: "select", payload: eo.id })}
-                  results={state.ecoOrganismes.filter(eo =>
-                    eo.name.toLowerCase().includes(state.searchClue)
+                  onSelect={eo =>
+                    setFieldValue(field.name, {
+                      name: eo.name,
+                      siret: eo.siret,
+                    })
+                  }
+                  results={data.ecoOrganismes.filter(eo =>
+                    eo.name.toLowerCase().includes(clue.toLowerCase())
                   )}
-                  selectedItem={state.ecoOrganismes.find(
-                    eo => eo.id === state.selectedOrganismeId
-                  )}
+                  selectedItem={
+                    data.ecoOrganismes.find(
+                      eo => eo.siret === field.value?.siret
+                    ) || null
+                  }
                 />
               </div>
             </>

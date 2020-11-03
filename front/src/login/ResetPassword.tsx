@@ -1,11 +1,8 @@
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import React, { useState } from "react";
-import { NotificationError } from "../common/Error";
-import {
-  Mutation,
-  MutationResetPasswordArgs,
-} from "../generated/graphql/types";
+import { NotificationError } from "../common/components/Error";
+import { Mutation, MutationResetPasswordArgs } from "generated/graphql/types";
 
 const RESET_PASSWORD = gql`
   mutation ResetPassword($email: String!) {
@@ -20,7 +17,7 @@ export default function ResetPassword() {
     MutationResetPasswordArgs
   >(RESET_PASSWORD);
   return (
-    <section className="section section-white">
+    <section className="section section--white">
       <div className="container">
         <form
           onSubmit={e => {
@@ -32,28 +29,30 @@ export default function ResetPassword() {
             setEmail("");
           }}
         >
-          <h1>Réinitialisation de votre mot de passe</h1>
-          <p>
+          <h1 className="h1">Réinitialisation de votre mot de passe</h1>
+          <p className="tw-my-2">
             Afin de réinitialiser votre mot de passe, merci de saisir votre
             email. Un nouveau mot de passe vous sera transmis.
           </p>
-          <div className="form__group">
+          <div className="form__row tw-my-2">
             <label>
               <input
                 type="text"
                 placeholder="Saisissez votre email"
+                className="td-input"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
             </label>
           </div>
-
-          <button className="button" type="submit">
-            Réinitialiser
-          </button>
+          <div className="form__actions">
+            <button className="btn btn--primary" type="submit">
+              Réinitialiser
+            </button>
+          </div>
         </form>
         {showSuccess && (
-          <div className="notification success">
+          <div className="notification success tw-mt-2">
             Un email avec votre nouveau mot de passe vient de vous être envoyé.
           </div>
         )}

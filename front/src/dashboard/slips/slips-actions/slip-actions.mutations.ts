@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 import {
   fullFormFragment,
   statusChangeFragment,
-} from "../../../common/fragments";
+} from "common/fragments";
 
 const MARK_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {

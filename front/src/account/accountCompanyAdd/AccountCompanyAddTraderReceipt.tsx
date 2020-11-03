@@ -1,6 +1,6 @@
 import React from "react";
 import { Field } from "formik";
-import RedErrorMessage from "../../common/RedErrorMessage";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "../AccountCompanyAdd.module.scss";
 import DateInput from "../../form/custom-inputs/DateInput";
 

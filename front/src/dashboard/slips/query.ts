@@ -1,21 +1,18 @@
 import gql from "graphql-tag";
-import { fullFormFragment } from "../../common/fragments";
-import { ITEMS_PER_PAGE } from "../constants";
+import { fullFormFragment } from "common/fragments";
 
 export const GET_SLIPS = gql`
   query GetSlips(
     $siret: String
     $status: [FormStatus!]
     $hasNextStep: Boolean
-    $first: Int = ${ITEMS_PER_PAGE}
-    $skip: Int
+    $cursorAfter: ID
   ) {
     forms(
       siret: $siret
       status: $status
       hasNextStep: $hasNextStep
-      first: $first
-      skip: $skip
+      cursorAfter: $cursorAfter
     ) {
       ...FullForm
     }

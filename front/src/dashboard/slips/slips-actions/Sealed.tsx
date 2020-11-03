@@ -1,13 +1,16 @@
 import cogoToast from "cogo-toast";
 import React from "react";
-import { SlipActionProps } from "../SlipActions";
+import { SlipActionProps } from "./SlipActions";
 
 export default function Sealed(props: SlipActionProps) {
   function onSubmit() {
-    cogoToast.success(
-      `Le numéro #${props.form.readableId} a été affecté au bordereau`
-    );
-    props.onSubmit({});
+    props
+      .onSubmit({})
+      .then(() =>
+        cogoToast.success(
+          `Le numéro #${props.form.readableId} a été affecté au bordereau`
+        )
+      );
   }
 
   return (
@@ -18,15 +21,16 @@ export default function Sealed(props: SlipActionProps) {
         bordereau PDF et permet au bordereau d'entrer dans le circuit de
         validation.
       </p>
-      <div className="form__actions">
+
+      <div className="td-modal-actions">
         <button
           type="button"
-          className="button-outline primary"
+          className="btn btn--outline-primary"
           onClick={props.onCancel}
         >
           Annuler
         </button>
-        <button type="submit" className="button no-margin" onClick={onSubmit}>
+        <button type="submit" className="btn btn--primary" onClick={onSubmit}>
           Je valide
         </button>
       </div>

@@ -19,9 +19,7 @@ const outgoingWasteFragment = `
     customId
     emitterWorkSiteName
     emitterWorkSiteAddress
-    ecoOrganisme {
-      name
-    }
+    ecoOrganismeName
     recipientCompanySiret
     recipientCompanyName
     recipientCompanyAddress
@@ -84,9 +82,7 @@ const incomingWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
-    ecoOrganisme {
-      name
-    }
+    ecoOrganismeName
     recipientProcessingOperation
     recipientIsTempStorage
     quantityReceived
@@ -126,9 +122,7 @@ const transportedWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
-    ecoOrganisme {
-      name
-    }
+    ecoOrganismeName
     recipientCompanySiret
     recipientCompanyName
     recipientCompanyAddress
@@ -195,9 +189,7 @@ const tradedWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
-    ecoOrganisme {
-      name
-    }
+    ecoOrganismeName
     recipientCompanySiret
     recipientCompanyName
     recipientCompanyAddress
@@ -263,9 +255,7 @@ const allWasteFragment = `
     emitterCompanyAddress
     emitterWorkSiteName
     emitterWorkSiteAddress
-    ecoOrganisme {
-      name
-    }
+    ecoOrganismeName
     recipientCompanySiret
     recipientCompanyName
     recipientCompanyAddress

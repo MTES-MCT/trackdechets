@@ -27,7 +27,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   const user = checkIsAuthenticated(context);
 
   const {
-    siret,
     codeNaf,
     gerepId,
     companyName: name,
@@ -36,12 +35,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     traderReceiptId,
     documentKeys
   } = companyInput;
-
-  const trimedSiret = siret.replace(/\s+/g, "");
+  const ecoOrganismeAgreements = companyInput.ecoOrganismeAgreements || [];
+  const siret = companyInput.siret.replace(/\s+/g, "");
 
   const existingCompany = await prisma.$exists
     .company({
-      siret: trimedSiret
+      siret
     })
     .catch(() => {
       throw new Error(
@@ -55,13 +54,37 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     );
   }
 
+  if (companyTypes.includes("ECO_ORGANISME")) {
+    const ecoOrganismeExists = await prisma.$exists.ecoOrganisme({
+      siret
+    });
+    if (!ecoOrganismeExists) {
+      throw new UserInputError(
+        "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : emmanuel.flahaut@developpement-durable.gouv.fr"
+      );
+    }
+
+    if (ecoOrganismeAgreements.length < 1) {
+      throw new UserInputError(
+        "L'URL de l'agrément de l'éco-organisme est requis."
+      );
+    }
+  } else if (ecoOrganismeAgreements.length > 0) {
+    throw new UserInputError(
+      "Impossible de lier des agréments d'éco-organisme : l'entreprise n'est pas un éco-organisme."
+    );
+  }
+
   const companyCreateInput: CompanyCreateInput = {
-    siret: trimedSiret,
+    siret,
     codeNaf,
     gerepId,
     name,
     companyTypes: { set: companyTypes },
-    securityCode: randomNumber(4)
+    securityCode: randomNumber(4),
+    ecoOrganismeAgreements: {
+      set: ecoOrganismeAgreements
+    }
   };
 
   if (!!transporterReceiptId) {

@@ -1,0 +1,26 @@
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@include xs-phone {
+  .container {
+    width: 85%;
+    padding: 0;
+  }
+}
+
+@include phone {
+  .container {
+    width: 80%;
+  }
+}
+.container-narrow {
+  position: relative;
+  max-width: 35rem;
+  margin: 0 auto;
+  padding: 0 20px;
+}

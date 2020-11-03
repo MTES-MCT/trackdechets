@@ -156,7 +156,9 @@ test("expandFormFromDb", () => {
     traderDepartment: null,
     traderCompanySiret: null,
     traderReceipt: null,
-    traderCompanyPhone: null
+    traderCompanyPhone: null,
+    ecoOrganismeName: null,
+    ecoOrganismeSiret: null
   };
 
   const expanded = expandFormFromDb(form);
@@ -226,6 +228,7 @@ test("expandFormFromDb", () => {
       consistence: form.wasteDetailsConsistence
     },
     trader: null,
+    ecoOrganisme: null,
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
     status: form.status,

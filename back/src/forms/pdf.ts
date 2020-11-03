@@ -30,7 +30,6 @@ const buildPdf = async (form, responseType: ResponseType) => {
   const transportSegments = await prisma
     .form({ id: form.id })
     .transportSegments();
-  const ecoOrganisme = await prisma.form({ id: form.id }).ecoOrganisme();
   const temporaryStorageDetail = await prisma
     .form({ id: form.id })
     .temporaryStorageDetail();
@@ -39,7 +38,6 @@ const buildPdf = async (form, responseType: ResponseType) => {
     {
       ...form,
       appendix2Forms,
-      ecoOrganisme,
       temporaryStorageDetail,
       transportSegments
     },

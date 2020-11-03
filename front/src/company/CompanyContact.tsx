@@ -1,11 +1,16 @@
 import React from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import "./CompanyContact.scss";
-import { CompanyPublic } from "../generated/graphql/types";
+import { CompanyPublic } from "generated/graphql/types";
 
 type Props = {
   company: Pick<
     CompanyPublic,
-    "address" | "contactEmail" | "contactPhone" | "website"
+    | "address"
+    | "contactEmail"
+    | "contactPhone"
+    | "website"
+    | "ecoOrganismeAgreements"
   >;
 };
 
@@ -41,6 +46,25 @@ export default function CompanyContact({ company }: Props) {
           )}
         </span>
       </div>
+      {company.ecoOrganismeAgreements.length > 0 && (
+        <>
+          <p style={{ fontSize: "1.2em", fontWeight: "bold" }}>
+            Agrément(s) éco-organisme
+          </p>
+          <div className="company__item">
+            <ul>
+              {company.ecoOrganismeAgreements.map((agreement, index) => (
+                <li key={index}>
+                  <a href={agreement} target="_blank" rel="noopener noreferrer">
+                    <span className="url-ellipsis">{agreement}</span>
+                    <FaExternalLinkAlt />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
     </div>
   );
 }

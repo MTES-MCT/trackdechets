@@ -3,12 +3,8 @@ import { useFormikContext } from "formik";
 import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React from "react";
-import { InlineError } from "../../common/Error";
-import {
-  Form,
-  Query,
-  QueryAppendixFormsArgs,
-} from "../../generated/graphql/types";
+import { InlineError } from "common/components/Error";
+import { Form, Query, QueryAppendixFormsArgs } from "generated/graphql/types";
 
 const GET_APPENDIX_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {
@@ -51,7 +47,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
 
   if (!forms.length) {
     return (
-      <div className="notification error">
+      <div className="notification notification--error">
         Vous n'avez actuellement aucun bordereau qui peut être inclus dans ce
         regroupement.{" "}
         {wasteCode && (
@@ -65,12 +61,13 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
     );
   }
   return (
-    <table className="table">
+    <table className="td-table">
       <thead>
-        <tr>
+        <tr className="td-table__head-tr">
           <th>
             <input
               type="checkbox"
+              className="td-checkbox"
               checked={selectedItems.length === forms.length}
               onChange={e => onToggle(e.target.checked ? forms : [])}
             />
@@ -85,10 +82,16 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
       </thead>
       <tbody>
         {forms.map(form => (
-          <tr key={form.readableId} onClick={() => onToggle(form)}>
+          <tr
+            key={form.readableId}
+            onClick={() => onToggle(form)}
+            className="td-table__tr"
+          >
             <td>
               <input
                 type="checkbox"
+                className="td-checkbox"
+
                 checked={selectedItems.indexOf(form.readableId) > -1}
                 onChange={() => true}
               />
@@ -98,7 +101,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
               {form.wasteDetails?.code} - {form.wasteDetails?.name}
             </td>
             <td>{form.emitter?.company?.name}</td>
-            <td>{DateTime.fromISO(form.receivedAt).toLocaleString()}</td>
+            <td>{DateTime.fromISO(form.receivedAt!).toLocaleString()}</td>
             <td>{form.quantityReceived} tonnes</td>
             <td>{form.processingOperationDone}</td>
           </tr>

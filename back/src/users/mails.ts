@@ -1,6 +1,7 @@
 import { escape } from "querystring";
-import { Form } from "../generated/prisma-client";
+import { Company, Form, User } from "../generated/prisma-client";
 import { cleanupSpecialChars, toFrFormat } from "../common/mails.helper";
+import { getUIBaseURL } from "../utils";
 
 const {
   UI_HOST,
@@ -76,7 +77,7 @@ export const userMails = {
     <br><br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre Trackdéchets.
     <br>
-    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://${UI_HOST}/invite?hash=${escape(
+    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="${getUIBaseURL()}/invite?hash=${escape(
       hash
     )}">sur ce lien</a> et renseignez les informations demandées.
     <br>
@@ -231,5 +232,58 @@ export const userMails = {
     Aussi, je vous informe que le BSD est désormais disponible sur votre compte Trackdéchets, dans l'onglet "archives" et le restera durant 5 ans. Il n'est donc pas utile de l'imprimer.
     <br><br>
     Quelles conséquences pour vous? La responsabilité du déchet (au sens de l'article L541-2 du code de l'Env.) est transférée à la société ${form.recipientCompanyName}, votre registre est renseigné.`
+  }),
+  membershipRequestConfirmation: (user: User, company: Company) => ({
+    to: [{ email: user.email, name: user.name }],
+    subject: "Votre demande de rattachement a été transmise à l'administrateur",
+    title: "Votre demande de rattachement a été transmise à l'administrateur",
+    body: `Bonjour,
+    <br/><br/>
+    Votre demande de rattachement à l’entreprise ${company.name} (${company.siret}) a été transmise à l'administrateur de l’établissement.
+
+    Si votre demande est acceptée, vous serez informé(e) par email.
+    `
+  }),
+  membershipRequest: (
+    recipients,
+    membershipRequestLink: string,
+    user: User,
+    company: Company
+  ) => ({
+    to: recipients,
+    subject: "Un utilisateur souhaite rejoindre votre établissement",
+    title: "Un utilisateur souhaite rejoindre votre établissement",
+    body: `Bonjour
+    <br/><br/>
+    L'utilisateur ${user.email} a demandé à rejoindre l'établissement ${company.name} (${company.siret})
+    dont vous êtes administrateur.
+
+    Pour valider ou refuser sa demande, cliquez sur
+    <a href="${membershipRequestLink}">ce lien</a>.
+    `
+  }),
+  membershipRequestAccepted: (user: User, company: Company) => ({
+    to: [{ email: user.email, name: user.name }],
+    subject: `Vous êtes à présent membre de l’établissement ${company.name} (${company.siret}) 🔔`,
+    title: `Vous êtes à présent membre de l’établissement ${company.name} (${company.siret}) 🔔`,
+    body: `Bonjour,
+    <br/><br/>
+    Votre demande de rattachement à l’entreprise ${company.name} (${company.siret}) a été acceptée par l'administrateur de l’établissement.
+
+    Vous pourrez à présent effectuer des actions pour le compte de l’entreprise
+    (créer / signer / suivre des BSD, accéder au registre, consulter les fiches entreprise, consulter le code de sécurité).
+    `
+  }),
+  membershipRequestRefused: (user: User, company: Company) => ({
+    to: [{ email: user.email, name: user.name }],
+    subject:
+      "Votre demande de rattachement a été refusée par l'administrateur de l’établissement",
+    title:
+      "Votre demande de rattachement a été refusée par l'administrateur de l’établissement",
+    body: `Bonjour,
+    <br/><br/>
+    Votre demande de rattachement à l’entreprise ${company.name} (${company.siret}) a été refusée par l'administrateur de l’établissement.
+    Vous ne pouvez donc pas effectuer d’action pour le compte de cette entreprise.
+    `
   })
 };

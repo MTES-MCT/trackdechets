@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import { prisma } from "../../../generated/prisma-client";
 import {
   MutationUpdateCompanyArgs,
@@ -18,22 +19,24 @@ export async function updateCompanyFn({
   website,
   givenName,
   transporterReceiptId,
-  traderReceiptId
+  traderReceiptId,
+  ecoOrganismeAgreements
 }: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
   const data = {
-    ...(companyTypes !== undefined
-      ? { companyTypes: { set: companyTypes } }
-      : {}),
-    ...(gerepId !== undefined ? { gerepId } : {}),
-    ...(contactEmail !== undefined ? { contactEmail } : {}),
-    ...(contactPhone !== undefined ? { contactPhone } : {}),
-    ...(website !== undefined ? { website } : {}),
-    ...(givenName !== undefined ? { givenName } : {}),
+    ...(companyTypes != null ? { companyTypes: { set: companyTypes } } : {}),
+    ...(gerepId != null ? { gerepId } : {}),
+    ...(contactEmail != null ? { contactEmail } : {}),
+    ...(contactPhone != null ? { contactPhone } : {}),
+    ...(website != null ? { website } : {}),
+    ...(givenName != null ? { givenName } : {}),
     ...(transporterReceiptId
       ? { transporterReceipt: { connect: { id: transporterReceiptId } } }
       : {}),
     ...(traderReceiptId
       ? { traderReceipt: { connect: { id: traderReceiptId } } }
+      : {}),
+    ...(ecoOrganismeAgreements != null
+      ? { ecoOrganismeAgreements: { set: ecoOrganismeAgreements } }
       : {})
   };
 
@@ -52,6 +55,24 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ siret: args.siret });
   await checkIsCompanyAdmin(user, company);
+
+  const companyTypes = args.companyTypes || company.companyTypes;
+  const { ecoOrganismeAgreements } = args;
+  if (companyTypes.includes("ECO_ORGANISME")) {
+    if (
+      Array.isArray(ecoOrganismeAgreements) &&
+      ecoOrganismeAgreements.length < 1
+    ) {
+      throw new UserInputError(
+        "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : elle doit en posséder au moins 1."
+      );
+    }
+  } else if (ecoOrganismeAgreements?.length > 0) {
+    throw new UserInputError(
+      "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : il ne s'agit pas d'un éco-organisme."
+    );
+  }
+
   return updateCompanyFn(args);
 };
 

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import gql from "graphql-tag";
+import * as yup from "yup";
 import { useLocation, Link } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import {
@@ -10,8 +11,13 @@ import {
   Query,
   User,
 } from "../generated/graphql/types";
-import Loader from "../common/Loader";
-import { NotificationError } from "../common/Error";
+import Loader from "common/components/Loaders";
+import { NotificationError } from "common/components/Error";
+import routes from "common/routes";
+import { FaEnvelope, FaEye, FaIdCard, FaLock } from "react-icons/fa";
+import PasswordMeter from "common/components/PasswordMeter";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import styles from "./Invite.module.scss";
 
 const INVITATION = gql`
   query Invitation($hash: String!) {
@@ -46,27 +52,29 @@ const JOIN_WITH_INVITE = gql`
  */
 function SignupConfirmation({ user }: { user: User }) {
   return (
-    <div className="container">
+    <div className="container-narrow">
       <section className="section section-white">
-        <h2>Confirmation de création de compte</h2>
-        <p>
+        <h2 className="h2 tw-my-4">Confirmation de création de compte</h2>
+        <p className="body-text">
           Votre compte <span className="tw-font-bold">{user.email}</span> a bien
           été crée et vous êtes désormais membre des établissements suivants:
         </p>
-        <ul>
+        <ul className="bullets">
           {user.companies?.map(company => (
             <li key={company.siret}>
               {company.name} - ({company.siret})
             </li>
           ))}
         </ul>
-        <p>
+        <p className="body-text">
           Connectez-vous à votre compte pour accéder à votre tableau de bord et
           accéder aux bordereaux de ces établissements.
         </p>
-        <Link to="/login" className="button">
-          Se connecter
-        </Link>
+        <div className="form__actions">
+          <Link to={routes.login} className="btn btn--primary">
+            Se connecter
+          </Link>
+        </div>
       </section>
     </div>
   );
@@ -79,21 +87,23 @@ function SignupConfirmation({ user }: { user: User }) {
 function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
   const { email, companySiret } = invitation;
   return (
-    <div className="container">
+    <div className="container-narrow">
       <section className="section section-white">
-        <h2>Cette invitation n'est plus valide</h2>
-        <p>
+        <h2 className="h2 tw-my-4">Cette invitation n'est plus valide</h2>
+        <p className="body-text">
           Votre compte <span className="tw-font-bold">{email}</span> a déjà été
           crée et le rattachement à l'établissement dont le SIRET est{" "}
           <span className="tw-font-bold">{companySiret}</span> est effectif.
         </p>
-        <p>
+        <p className="body-text">
           Connectez-vous à votre compte pour accéder à votre tableau de bord et
           accéder aux bordereaux de cet établissement.
         </p>
-        <Link to="/login" className="button">
-          Se connecter
-        </Link>
+        <div className="form__actions">
+          <Link to={routes.login} className="btn btn--primary">
+            Se connecter
+          </Link>
+        </div>
       </section>
     </div>
   );
@@ -106,6 +116,8 @@ export default function Invite() {
   // Extract invitation hash from URL
   const location = useLocation();
   const hash = decodeURIComponent(location.search.replace("?hash=", ""));
+
+  const [passwordType, setPasswordType] = useState("password");
 
   // INVITATION QUERY
   const { loading, error: queryError, data: queryData } = useQuery<
@@ -153,16 +165,15 @@ export default function Invite() {
           email: invitation?.email ?? "",
           name: "",
           password: "",
-          passwordConfirmation: "",
         }}
-        validate={values => {
-          if (values.password !== values.passwordConfirmation) {
-            return {
-              passwordConfirmation:
-                "Les deux mots de passe ne sont pas identiques.",
-            };
-          }
-        }}
+        validationSchema={yup.object().shape({
+          email: yup.string().email().required("L'email est un champ requis"),
+          name: yup.string().required("Le nom est un champ requis"),
+          password: yup
+            .string()
+            .required("Le mot de passe est un champ requis")
+            .min(8, "Le mot de passe doit faire au moins 8 caractères"),
+        })}
         onSubmit={(values, { setSubmitting }) => {
           const { name, password } = values;
           joinWithInvite({
@@ -172,54 +183,94 @@ export default function Invite() {
       >
         {({ isSubmitting }) => (
           <section className="section section-white">
-            <div className="container">
+            <div className="container-narrow">
               <Form>
-                <h1>Validez votre inscription</h1>
-                <p>
+                <h1 className="h1 tw-my-4">Validez votre inscription</h1>
+                <p className="body-text">
                   Vous avez été invité à rejoindre Trackdéchets. Pour valider
                   votre inscription, veuillez compléter le formulaire
                   ci-dessous.
                 </p>
-                <div className="form__group">
-                  <label>
-                    Email
-                    <Field type="email" name="email" readOnly />
-                  </label>
-                </div>
-                <div className="form__group">
-                  <label>
-                    Nom et prénom*
-                    <Field type="text" name="name" />
-                  </label>
+
+                <div className="form__row">
+                  <label>Email</label>
+                  <div className="field-with-icon-wrapper">
+                    <Field
+                      type="email"
+                      name="email"
+                      className="td-input"
+                      readOnly
+                    />
+                    <i>
+                      <FaEnvelope />
+                    </i>
+                  </div>
+                  <RedErrorMessage name="email" />
                 </div>
 
-                <div className="form__group">
-                  <label>
-                    Mot de passe*
-                    <Field type="password" name="password" />
-                  </label>
+                <div className="form__row">
+                  <label>Nom et prénom</label>
+                  <div className="field-with-icon-wrapper">
+                    <Field type="text" name="name" className="td-input" />
+                    <i>
+                      <FaIdCard />
+                    </i>
+                  </div>
+
+                  <RedErrorMessage name="name" />
                 </div>
 
-                <div className="form__group">
-                  <label>
-                    Vérification du mot de passe*
-                    <Field type="password" name="passwordConfirmation" />
-                  </label>
+                <div className="form__row">
+                  <label>Mot de passe</label>
+
+                  <Field name="password">
+                    {({ field }) => {
+                      return (
+                        <>
+                          <div className="field-with-icon-wrapper">
+                            <input
+                              type={passwordType}
+                              {...field}
+                              className="td-input"
+                            />
+                            <i>
+                              <FaLock />
+                            </i>
+                          </div>
+                          <span
+                            className={styles.showPassword}
+                            onClick={() =>
+                              setPasswordType(
+                                passwordType === "password"
+                                  ? "text"
+                                  : "password"
+                              )
+                            }
+                          >
+                            <FaEye /> <span>Afficher le mot de passe</span>
+                          </span>
+                          <PasswordMeter password={field.value} />
+                        </>
+                      );
+                    }}
+                  </Field>
+
+                  <RedErrorMessage name="password" />
                 </div>
 
                 <ErrorMessage
                   name="passwordConfirmation"
-                  render={msg => (
-                    <div className="input-error-message">{msg}</div>
-                  )}
+                  render={msg => <div className="error-message">{msg}</div>}
                 />
-                <button
-                  className="button"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  Valider l'inscription
-                </button>
+                <div className="form__actions">
+                  <button
+                    className="btn btn--primary"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    Valider l'inscription
+                  </button>
+                </div>
               </Form>
             </div>
           </section>

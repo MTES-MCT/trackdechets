@@ -130,8 +130,18 @@ alors les BSD de cette entreprise sont retournés.
 Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
 préciser un SIRET
 Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
-On peut également demander les bordereaux pour lesquels on est transporteur
+
+Vous pouvez filtrer:
+- par rôle que joue votre entreprise sur le BSD via `role`
+- par date de dernière modification via `updatedBefore` / `updatedAfter`
+- par statut du BSD via `status`
+- les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+
+Par défaut:
+- tous les BSD accessibles sont retournés
+- les BSD sont classés par date de création, de la plus récente à la plus vieille
+- les résultats sont paginés par 50. Il est possible de modifier cette valeur via `first` ou `last` en fonction du curseur utilisé
+- pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
 
 </td>
 </tr>
@@ -145,23 +155,87 @@ SIRET d'un établissement dont je suis membre
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">first</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td>
-
-Nombre de bordereaux retournés.
-Défaut à 50, maximum à 500
-
-</td>
-</tr>
-<tr>
 <td colspan="2" align="right" valign="top">skip</td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
+DEPRECATED - (Optionnel) PAGINATION
 Nombre d'éléments à ne pas récupérer en début de liste
-Permet de paginer les résultats
 Défaut à 0
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorAfter</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Curseur après lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les "premiers" bordereaux
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés après le `cursorAfter`
+Défaut à 50, maximum à 500
+Ignoré si utilisé avec `cursorBefore`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorBefore</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Curseur avant lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les "derniers" bordereaux
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">last</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés avant le `cursorBefore`
+Défaut à 50, maximum à 500
+Ignoré si utilisé avec `cursorAfter`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">sentAfter</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Retourne les BSD envoyés après la date
+Filtre sur la date d'envoi (date de la case 9 du bordereau)
+Au format (YYYY-MM-DD)
+Par défaut vide, aucun filtre n'est appliqué
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">updatedAfter</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Retourne les BSD modifiés après la date
+Filtre sur la date de dernière modification
+Au format (YYYY-MM-DD)
+Par défaut vide, aucun filtre n'est appliqué
 
 </td>
 </tr>
@@ -196,10 +270,33 @@ Défaut à vide.
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 
-(Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+(Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de votre part
 Si `true`, seul les bordereaux attendant une action sont renvoyés
 Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
 Si vide, tous les bordereaux sont renvoyés
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siretPresentOnForm</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Siret d'une autre entreprise présente sur le bordereau
+Vous n'avez pas besoin d'être membre de cette entreprise.
+Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">wasteCode</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Code déchet pour affiner la recherche
+Ex: 01 03 04* (Veillez à bien respecter les espaces).
 Défaut à vide.
 
 </td>
@@ -347,6 +444,30 @@ Défaut: csv
 Renvoie les informations sur l'utilisateur authentifié
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>membershipRequest</strong></td>
+<td valign="top"><a href="#membershiprequest">MembershipRequest</a></td>
+<td>
+
+Récupère une demande de rattachement effectuée par l'utilisateur courant
+à partir de l'identifiant de cette demande ou du SIRET de l'établissement
+auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des
+paramètres (id ou siret) doit être être passé mais pas les deux. Cette query
+permet notamment de suivre l'état d'avancement de la demande de rattachement
+(en attente, accepté, refusé)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>searchCompanies</strong></td>
@@ -801,6 +922,23 @@ Payload du BSD
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>sendMembershipRequest</strong></td>
+<td valign="top"><a href="#membershiprequest">MembershipRequest</a></td>
+<td>
+
+Envoie une demande de rattachement de l'utilisateur courant
+à rejoindre l'établissement dont le siret est précisé en paramètre.
+Cette demande est communiquée à l'ensemble des administrateurs de
+l'établissement qui ont le choix de l'accepter ou de la refuser.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>signedByTransporter</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -808,11 +946,12 @@ Payload du BSD
 Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
 ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
 Cette mutation doit être appelée avec le token du collecteur-transporteur.
-L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-disponible sur le tableau de bord Trackdéchets
-Mon Compte > Établissements > Sécurité.
-D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
+grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
+D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
+renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+Dans le cas où un éco-organisme figure sur le BSD, il est également possible de signer avec son code plutôt que celui de l'émetteur.
+Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est l'auteur de la signature (signingInfo.signatureAuthor doit valoir ECO_ORGANISME).
 
 </td>
 </tr>
@@ -1207,6 +1346,15 @@ Récépissé négociant (le cas échéant, pour les profils transporteur)
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganismeAgreements</strong></td>
+<td valign="top">[<a href="#url">URL</a>!]!</td>
+<td>
+
+Liste des agréments de l'éco-organisme
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -1339,6 +1487,15 @@ Récépissé transporteur associé à cet établissement (le cas échéant)
 <td>
 
 Récépissé négociant associé à cet établissement (le cas échant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ecoOrganismeAgreements</strong></td>
+<td valign="top">[<a href="#url">URL</a>!]!</td>
+<td>
+
+Liste des agréments de l'éco-organisme
 
 </td>
 </tr>
@@ -2033,7 +2190,7 @@ Annexe 2
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>ecoOrganisme</strong></td>
-<td valign="top"><a href="#ecoorganisme">EcoOrganisme</a></td>
+<td valign="top"><a href="#formecoorganisme">FormEcoOrganisme</a></td>
 <td></td>
 </tr>
 <tr>
@@ -2155,6 +2312,33 @@ Email du contact dans l'établissement
 </tbody>
 </table>
 
+### FormEcoOrganisme
+
+Information sur l'éco-organisme responsable du BSD
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### FormSubscription
 
 DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
@@ -2263,7 +2447,10 @@ Liste des déclarations GEREP
 </tbody>
 </table>
 
-### MultimodalTransporter
+### MembershipRequest
+
+Demande de rattachement à un établissement effectué par
+un utilisateur.
 
 <table>
 <thead>
@@ -2276,65 +2463,54 @@ Liste des déclarations GEREP
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>email</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-Établissement transporteur
+Email de l'utilisateur faisant la demande
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-Exemption de récipissé
+SIRET de l'établissement
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>receipt</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-N° de récipissé
+Nom de l'établissement
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#membershiprequeststatus">MembershipRequestStatus</a>!</td>
 <td>
 
-Département
+Statut de la demande de rattachement
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
+<td colspan="2" valign="top"><strong>sentTo</strong></td>
+<td valign="top">[<a href="#string">String</a>!]!</td>
 <td>
 
-Limite de validité du récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>numberPlate</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de plaque d'immatriculation
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>customInfo</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Information libre, destinée aux transporteurs
+Liste des adresses email correspondant aux comptes administrateurs à qui la demande
+de rattachement a été envoyée. Les adresses emails sont partiellement masquées de la
+façon suivante j********w@trackdechets.fr
 
 </td>
 </tr>
@@ -2434,7 +2610,7 @@ Indique si c'est un établissement d'entreposage temporaire ou de reocnditionnem
 
 Rubrique ICPE d'un établissement avec les autorisations associées
 Pour plus de détails, se référer à la
-[nomenclature des ICPE](https://www.georisques.gouv.fr/dossiers/installations/nomenclature-ic)
+[nomenclature des ICPE](https://www.georisques.gouv.fr/articles-risques/les-installations-classees-pour-la-protection-de-lenvironnement#nomenclature-des-installations-classees)
 
 <table>
 <thead>
@@ -2873,7 +3049,7 @@ Données du BSD suite sur la partie entreposage provisoire ou reconditionnement,
 <td valign="top"><a href="#temporarystorer">TemporaryStorer</a></td>
 <td>
 
-Établissement qui sotcke temporairement le déchet (case 13)
+Établissement qui stocke temporairement le déchet (case 13)
 
 </td>
 </tr>
@@ -3101,7 +3277,7 @@ Siret du transporteur précédent
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
-<td valign="top"><a href="#multimodaltransporter">MultimodalTransporter</a></td>
+<td valign="top"><a href="#transporter">Transporter</a></td>
 <td>
 
 Transporteur du segment
@@ -3337,7 +3513,7 @@ Numéro de téléphone de l'utilisateur
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companies</strong></td>
-<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>!]</td>
+<td valign="top">[<a href="#companyprivate">CompanyPrivate</a>!]!</td>
 <td>
 
 Liste des établissements dont l'utilisateur est membre
@@ -3812,8 +3988,13 @@ Payload de liason d'un BSD à un eco-organisme
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
 </tbody>
@@ -4203,76 +4384,6 @@ Traitement prévue (code D/R)
 </tbody>
 </table>
 
-### NextSegmentCompanyInput
-
-Payload d'un segment de transport
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-SIRET de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Nom de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>address</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Adresse de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>contact</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Nom du contact dans l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>mail</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Email du contact dans l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de téléphone de contact dans l'établissement
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### NextSegmentInfoInput
 
 Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
@@ -4288,81 +4399,13 @@ Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
-<td valign="top"><a href="#nextsegmenttransporterinput">NextSegmentTransporterInput</a></td>
+<td valign="top"><a href="#transporterinput">TransporterInput</a></td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>mode</strong></td>
 <td valign="top"><a href="#transportmode">TransportMode</a>!</td>
 <td></td>
-</tr>
-</tbody>
-</table>
-
-### NextSegmentTransporterInput
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
-<td>
-
-Exemption de récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>receipt</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-N° de récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Département
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td>
-
-Limite de validité du récipissé
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>numberPlate</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de plaque d'immatriculation
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#nextsegmentcompanyinput">NextSegmentCompanyInput</a></td>
-<td>
-
-Établissement collecteur - transporteur
-
-</td>
 </tr>
 </tbody>
 </table>
@@ -4921,6 +4964,15 @@ Collecteur - transporteur (case 8)
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Établissement collecteur - transporteur
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>isExemptedOfReceipt</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
@@ -4966,11 +5018,11 @@ Numéro de plaque d'immatriculation
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
 <td>
 
-Établissement collecteur - transporteur
+Information libre, destinée aux transporteurs
 
 </td>
 </tr>
@@ -5014,6 +5066,15 @@ Si oui ou non le BSD a été signé par un transporteur
 <td>
 
 Code de sécurité permettant d'authentifier l'émetteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signatureAuthor</strong></td>
+<td valign="top"><a href="#signatureauthor">SignatureAuthor</a></td>
+<td>
+
+Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur
 
 </td>
 </tr>
@@ -5382,6 +5443,14 @@ Installation de collecte de déchets apportés par le producteur initial
 <td>
 
 Négociant
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>ECO_ORGANISME</strong></td>
+<td>
+
+Éco-organisme
 
 </td>
 </tr>
@@ -5786,6 +5855,32 @@ Type d'une déclaration GEREP
 </tbody>
 </table>
 
+### MembershipRequestStatus
+
+Différents statuts possibles pour une demande de rattachement
+à un établissement
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>PENDING</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>ACCEPTED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### Packagings
 
 Type de packaging du déchet
@@ -5862,6 +5957,35 @@ Quntité réelle
 <td>
 
 Quantité estimée
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### SignatureAuthor
+
+Dénomination de l'auteur de la signature
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>EMITTER</strong></td>
+<td>
+
+L'auteur de la signature est l'émetteur du déchet
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>ECO_ORGANISME</strong></td>
+<td>
+
+L'auteur de la signature est l'éco-organisme figurant sur le BSD
 
 </td>
 </tr>
@@ -6041,3 +6165,7 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 ### String
 
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+### URL
+
+Chaîne de caractère au format URL, débutant par un protocole http(s).

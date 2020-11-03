@@ -1,7 +1,7 @@
 import React from "react";
 import gql from "graphql-tag";
 import AccountField from "./AccountField";
-import { CompanyPrivate } from "../../generated/graphql/types";
+import { CompanyPrivate } from "generated/graphql/types";
 import AccountFormCompanyTransporterReceipt from "./forms/AccountFormCompanyTransporterReceipt";
 import { DateTime } from "luxon";
 

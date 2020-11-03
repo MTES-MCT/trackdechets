@@ -1,0 +1,63 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+
+.transportCards {
+  margin: 1rem;
+  display: grid;
+  @include desktop {
+    grid-template-columns: repeat(2, 48%);
+    grid-column-gap: 2rem;
+    grid-row-gap: 0.5rem;
+  }
+}
+.transportCard {
+  padding: 1rem;
+  display: block;
+  border: 1px solid $grey;
+  margin-bottom: 1rem;
+  border-radius: $common-radius;
+  box-shadow: 0 1px 2px rgba(201, 211, 223, 0.5);
+}
+.detailRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+
+  dt {
+    min-width: 120px;
+    text-align: right;
+    margin-right: 1rem;
+  }
+  dd {
+    margin-right: 0.5rem;
+  }
+}
+.cardActions {
+  display: flex;
+  margin-top: 0.5rem;
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+  & > * {
+    margin-bottom: 0.25rem;
+  }
+  & > *:not(:first-child) {
+    margin-left: 0.25rem;
+  }
+}
+
+.cardActionsButton {
+  border: 1px solid var(--dark-blue);
+  border-radius: $common-radius;
+  color: var(--dark-blue);
+
+  display: inline-flex;
+  flex-direction: row;
+
+  align-items: center;
+
+  span {
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+  }
+}

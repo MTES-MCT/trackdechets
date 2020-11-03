@@ -1,0 +1,93 @@
+@import "./Constants.scss";
+.btn {
+  appearance: none;
+  border: none;
+  display: inline-flex;
+  width: auto;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  border-radius: $common-radius;
+  justify-content: center;
+  font-size: $fs-normal;
+  line-height: 1rem;
+  height: 2.5rem;
+  cursor: pointer;
+  &--primary {
+    background-color: $blue;
+    color: $white;
+
+    &:hover {
+      background-color: $blue-light;
+    }
+  }
+  &--outline {
+    background-color: $white;
+
+    &-danger {
+      color: $red;
+      border: 1px solid $red;
+    }
+    &-primary {
+      border: 1px solid $blue;
+      color: $blue;
+    }
+    &-secondary {
+      border: 1px solid $grey-dark;
+      color: $grey-dark;
+    }
+  }
+  &--sqr{
+    background-color: #18009f;
+    color: #fff;
+    border-radius: 0;
+    &:hover {
+      background-color: #18009f;
+    }
+  }
+  &--sqr-outline{
+    background-color: #fff;
+    color: #18009f;
+    border: 1px solid #18009f;
+    border-radius: 0;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+  &--no-style {
+    border: none;
+    background: none;
+    padding: none;
+  }
+  &--small {
+    font-size: $fs-small;
+    height: 1.5rem;
+  }
+  &--small-text {
+    font-size: $fs-small;
+ 
+  }
+  &--medium-text {
+    font-size: $fs-medium;
+  }
+  * + * {
+    margin-left: 0.5rem; // space child elements, eg. icon and span
+  }
+  &--left {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  &--right {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+  }
+  &--slim {
+    padding: 0.5rem;
+  }
+  &--auto-height {
+    height: auto;
+  }
+}
+.break-word{
+  overflow-wrap: break-word;
+}

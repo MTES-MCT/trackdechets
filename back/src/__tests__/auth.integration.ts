@@ -32,9 +32,9 @@ describe("POST /login", () => {
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
 
-    // should redirect to /dashboard/
+    // should redirect to /
     expect(login.status).toBe(302);
-    expect(login.header.location).toBe(`http://${UI_HOST}/dashboard/`);
+    expect(login.header.location).toBe(`http://${UI_HOST}/`);
 
     const cookieValue = sessionCookie.match(cookieRegExp)[1];
 
@@ -55,19 +55,6 @@ describe("POST /login", () => {
     const login = await request
       .post("/login")
       .send(`email=${user.email.toUpperCase()}`)
-      .send(`password=pass`);
-
-    expect(login.header["set-cookie"]).toHaveLength(1);
-  });
-
-  it("should authenticate user with their legacy account if any", async () => {
-    const user = await userFactory({
-      email: "USER_WITH_LEGACY_EMAIL@DOMAIN.COM"
-    });
-
-    const login = await request
-      .post("/login")
-      .send(`email=${user.email}`)
       .send(`password=pass`);
 
     expect(login.header["set-cookie"]).toHaveLength(1);

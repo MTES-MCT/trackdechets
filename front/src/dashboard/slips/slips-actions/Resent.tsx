@@ -1,23 +1,20 @@
-import merge from "deepmerge";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
-import { removeNulls } from "../../../common/helper";
-import RedErrorMessage from "../../../common/RedErrorMessage";
-import CompanySelector from "../../../form/company/CompanySelector";
-import DateInput from "../../../form/custom-inputs/DateInput";
-import NumberInput from "../../../form/custom-inputs/NumberInput";
-import { RadioButton } from "../../../form/custom-inputs/RadioButton";
-import Packagings from "../../../form/packagings/Packagings";
-import { SlipActionProps } from "../SlipActions";
-import { PROCESSING_OPERATIONS } from "../../../generated/constants";
-import { WasteDetails } from "../../../generated/graphql/types";
+import { mergeDefaults } from "common/helper";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import CompanySelector from "form/company/CompanySelector";
+import DateInput from "form/custom-inputs/DateInput";
+import NumberInput from "form/custom-inputs/NumberInput";
+import { RadioButton } from "form/custom-inputs/RadioButton";
+import Packagings from "form/packagings/Packagings";
+import { SlipActionProps } from "./SlipActions";
+import { WasteDetails } from "generated/graphql/types";
+import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
-  // We need a deep merge as sub-objects may be partially filled
-  // But without the null values as they break form elements (uncontrolled)
-  const initialValues = merge(
+  const initialValues = mergeDefaults(
     emptyState,
-    removeNulls(form.temporaryStorageDetail)
+    form.temporaryStorageDetail || {}
   );
 
   const [isRefurbished, setIsRefurbished] = useState(
@@ -73,39 +70,39 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
       >
         {({ values, setFieldValue }) => (
           <Form>
-            <h5>Installation de destination prévue</h5>
+            <h5 className="form__section-heading">
+              Installation de destination prévue
+            </h5>
 
             <CompanySelector name="destination.company" />
 
-            <div className="form__group">
+            <div className="form__row">
               <label>
                 Numéro de CAP (le cas échéant)
-                <Field type="text" name="destination.cap" />
-              </label>
-            </div>
-
-            <div className="form__group">
-              <label>
-                Opération d'élimination / valoristation prévue (code D/R)
-              </label>
-
-              <Field component="select" name="destination.processingOperation">
-                <option value="">Choisissez...</option>
-                {PROCESSING_OPERATIONS.map(operation => (
-                  <option key={operation.code} value={operation.code}>
-                    {operation.code} - {operation.description.substr(0, 50)}
-                    {operation.description.length > 50 ? "..." : ""}
-                  </option>
-                ))}
-              </Field>
-            </div>
-            <div className="form__group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={isRefurbished}
-                  onChange={() => onChangeRefurbished(values, setFieldValue)}
+                <Field
+                  type="text"
+                  name="destination.cap"
+                  className="td-input"
                 />
+              </label>
+            </div>
+
+            <div className="form__row">
+         
+              <Field
+                component={ProcessingOperationSelect}
+                name="destination.processingOperation"
+              />
+            </div>
+            <div className="form__row form__row--inlined">
+              <input
+                type="checkbox"
+                checked={isRefurbished}
+                id="id_isRefurbished"
+                className="td-checkbox"
+                onChange={() => onChangeRefurbished(values, setFieldValue)}
+              />
+              <label htmlFor="id_isRefurbished">
                 Les déchets ont subi un reconditionnement, je dois saisir les
                 détails
               </label>
@@ -113,10 +110,10 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
 
             {isRefurbished && (
               <>
-                <h5>Détails du déchet</h5>
+                <h5 className="form__section-heading">Détails du déchet</h5>
 
                 <h4>Conditionnement</h4>
-                <div className="form__group">
+                <div className="form__row">
                   <Field
                     name="wasteDetails.packagings"
                     component={Packagings}
@@ -127,6 +124,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                       <Field
                         name="wasteDetails.otherPackaging"
                         type="text"
+                        className="td-input"
                         placeholder="Détail de l'autre conditionnement"
                       />
                     </label>
@@ -136,16 +134,18 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                     component={NumberInput}
                     name="wasteDetails.numberOfPackages"
                     label="Nombre de colis"
+                    className="td-input"
                     min="1"
                   />
                   <RedErrorMessage name="wasteDetails.numberOfPackages" />
                 </div>
 
                 <h4>Quantité en tonnes</h4>
-                <div className="form__group">
+                <div className="form__row">
                   <Field
                     component={NumberInput}
                     name="wasteDetails.quantity"
+                    className="td-input"
                     placeholder="En tonnes"
                     min="0"
                     step="0.001"
@@ -159,6 +159,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                       name="wasteDetails.quantityType"
                       id="REAL"
                       label="Réelle"
+                      className="td-input"
                       component={RadioButton}
                     />
                     <Field
@@ -171,39 +172,48 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
 
                   <RedErrorMessage name="wasteDetails.quantityType" />
                 </div>
-                <div className="form__group">
+                <div className="form__row">
                   <label>
                     Mentions au titre des règlements ADR, RID, ADNR, IMDG (le
                     cas échéant)
-                    <Field type="text" name="wasteDetails.onuCode" />
+                    <Field
+                      type="text"
+                      name="wasteDetails.onuCode"
+                      className="td-input"
+                    />
                   </label>
                 </div>
               </>
             )}
 
-            <h5>
+            <h5 className="form__section-heading">
               Collecteur-transporteur après entreposage ou reconditionnement
             </h5>
 
             <CompanySelector name="transporter.company" />
 
-            <div className="form__group">
-              <label>
-                <Field
-                  type="checkbox"
-                  name="transporter.isExemptedOfReceipt"
-                  checked={values.transporter.isExemptedOfReceipt}
-                />
+            <div className="form__row form__row--inlined">
+              <Field
+                type="checkbox"
+                name="transporter.isExemptedOfReceipt"
+                id="id_isExemptedOfReceipt"
+                checked={values.transporter.isExemptedOfReceipt}
+              />
+              <label htmlFor="id_isExemptedOfReceipt">
                 Le transporteur déclare être exempté de récépissé conformément
                 aux dispositions de l'article R.541-50 du code de
                 l'environnement.
               </label>
             </div>
             {!values.transporter.isExemptedOfReceipt && (
-              <div className="form__group">
+              <div className="form__row">
                 <label>
                   Numéro de récépissé
-                  <Field type="text" name="transporter.receipt" />
+                  <Field
+                    type="text"
+                    name="transporter.receipt"
+                    className="td-input"
+                  />
                 </label>
 
                 <RedErrorMessage name="transporter.receipt" />
@@ -214,6 +224,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                     type="text"
                     name="transporter.department"
                     placeholder="Ex: 83"
+                    className="td-input"
                   />
                 </label>
 
@@ -224,6 +235,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                   <Field
                     component={DateInput}
                     name="transporter.validityLimit"
+                    className="td-input"
                   />
                 </label>
 
@@ -235,6 +247,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                     type="text"
                     name="transporter.numberPlate"
                     placeholder="Plaque d'immatriculation du véhicule"
+                    className="td-input"
                   />
                 </label>
 
@@ -242,31 +255,40 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
               </div>
             )}
 
-            <h5>
+            <h5 className="form__section-heading">
               Déclaration de l’exploitant du site d’entreposage ou de
               reconditionnement
             </h5>
             <label>
               Nom du responsable
-              <Field type="text" name="signedBy" placeholder="NOM Prénom" />
+              <Field
+                type="text"
+                name="signedBy"
+                placeholder="NOM Prénom"
+                className="td-input"
+              />
             </label>
             <label>
               Date d'envoi
-              <Field component={DateInput} name="signedAt" />
+              <Field
+                component={DateInput}
+                name="signedAt"
+                className="td-input"
+              />
             </label>
             <p>
               En validant, je certifie que les renseignements portés ci-dessus
               sont exacts et établis de bonne foi
             </p>
-            <div className="form__group button__group">
+            <div className="form__actions">
               <button
                 type="button"
-                className="button secondary"
+                className="btn btn--outline--primary"
                 onClick={onCancel}
               >
                 Annuler
               </button>
-              <button type="submit" className="button">
+              <button type="submit" className="btn btn--primary">
                 Je valide
               </button>
             </div>

@@ -1,0 +1,29 @@
+.td-modal {
+  position: relative;
+  border-radius: $common-radius;
+  border-radius: var(--theme-border-radius);
+
+  box-shadow: 0 1px 2px rgba(201, 211, 223, 0.2);
+
+  box-shadow: var(--theme-box-shadow);
+  background: #fff;
+  background: var(--white);
+  padding: 1.5em;
+  padding: var(--space-m);
+  max-width: 32em;
+  z-index: 1000;
+  &--no-padding {
+    padding: 0;
+  }
+  & > :first-child {
+    margin-top: 0;
+  }
+}
+
+.td-modal-title {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+

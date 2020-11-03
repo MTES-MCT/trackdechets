@@ -1,8 +1,8 @@
 import { Field, useFormikContext } from "formik";
 import React, { useState, useEffect } from "react";
-import { Form } from "../../generated/graphql/types";
+import { Form } from "generated/graphql/types";
 import WorkSiteAddress from "./WorkSiteAddress";
-
+import TdSwitch from "common/components/Switch";
 const FIELDS = ["name", "address", "city", "postalCode", "infos"];
 
 export default function WorkSite() {
@@ -28,31 +28,30 @@ export default function WorkSite() {
   }
 
   return (
-    <div className="form__group">
-      <label>
-        <input
-          type="checkbox"
-          defaultChecked={showWorkSite}
-          onChange={() => setShowWorkSite(!showWorkSite)}
-        />
-        Je souhaite ajouter une adresse de chantier ou de collecte
-      </label>
+    <div className="form__row">
+      <TdSwitch
+        checked={showWorkSite}
+        onChange={() => setShowWorkSite(!showWorkSite)}
+        label="Je souhaite ajouter une adresse de chantier ou de collecte"
+      />
+ 
       {showWorkSite && (
         <>
-          <h4>Adresse chantier</h4>
+          <h4 className="form__section-heading">Adresse chantier</h4>
 
-          <div className="form__group">
+          <div className="form__row">
             <label>
               Nom de l'entreprise
               <Field
                 type="text"
                 name="emitter.workSite.name"
                 placeholder="Intitulé"
+                className="td-input"
               />
             </label>
           </div>
 
-          <div className="form__group">
+          <div className="form__row">
             <WorkSiteAddress
               adress={values.emitter?.workSite?.address}
               city={values.emitter?.workSite?.city}
@@ -61,12 +60,12 @@ export default function WorkSite() {
             />
           </div>
 
-          <div className="form__group">
+          <div className="form__row">
             <label>
               Autre informations
               <Field
                 component="textarea"
-                className="textarea-pickup-site"
+                className="textarea-pickup-site td-textarea"
                 placeholder="Champ libre pour préciser..."
                 name="emitter.workSite.infos"
               />

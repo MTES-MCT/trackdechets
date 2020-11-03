@@ -302,18 +302,12 @@ export const getWasteRefusalreason = params =>
       }
     : {};
 
-/**
- * Flatten ecoOrganisme object and keep only relevant properties for the PDF
- *
- * @param params
- * @returns object
- */
-const getFlatEcoOrganisme = params => {
-  return params.ecoOrganisme && params.ecoOrganisme.name
-    ? {
-        ecoOrganismeName: `Eco-organisme responsable:\n${params.ecoOrganisme.name}`
-      }
-    : {};
+const getEcoOrganismeName = (params: { ecoOrganismeName?: string }) => {
+  return {
+    ecoOrganismeName: params.ecoOrganismeName
+      ? `Eco-organisme responsable:\n${params.ecoOrganismeName}`
+      : undefined
+  };
 };
 
 const processTransporterData = (data: MainFormParams) => ({
@@ -350,7 +344,7 @@ export function processMainFormParams(params: MainFormParams) {
     getWasteDetailsType,
     renameAndFormatMainFormFields,
     getAcceptationStatus,
-    getFlatEcoOrganisme,
+    getEcoOrganismeName,
     getTemporaryStorageExistance,
     getTempStorerWasteDetailsType,
     processTransporterData

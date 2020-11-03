@@ -121,7 +121,9 @@ type Form {
   traderValidityLimit: DateTime
 
   # Eco-organisme
-  ecoOrganisme: EcoOrganisme
+  ecoOrganisme: EcoOrganisme # DEPRECATED
+  ecoOrganismeName: String
+  ecoOrganismeSiret: String
 
   appendix2Forms: [Form]
   temporaryStorageDetail: TemporaryStorageDetail @relation(link: INLINE)

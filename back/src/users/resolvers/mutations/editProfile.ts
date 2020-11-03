@@ -13,7 +13,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
  * @param userId
  * @param payload
  */
-export function editProfileFn(
+export async function editProfileFn(
   userId: string,
   payload: MutationEditProfileArgs
 ) {
@@ -24,11 +24,16 @@ export function editProfileFn(
     ...(phone !== undefined ? { phone } : {}),
     ...(email !== undefined ? { email } : {})
   };
-
-  return prisma.updateUser({
+  const updatedUser = await prisma.updateUser({
     where: { id: userId },
     data
   });
+
+  return {
+    ...updatedUser,
+    // companies are resolved through a separate resolver (User.companies)
+    companies: []
+  };
 }
 
 const editProfileResolver: MutationResolvers["editProfile"] = (

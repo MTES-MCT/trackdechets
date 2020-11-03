@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import { useMutation } from "@apollo/react-hooks";
-import RedErrorMessage from "../../../common/RedErrorMessage";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
 import * as Yup from "yup";
 
@@ -49,20 +49,20 @@ export default function AccountFormSimpleInput<Variables>({
     >
       {props => (
         <Form>
-          <div className="form__group">
+          <div className="form__row">
             <Field
-              className={styles.input}
+              className={`td-input ${styles.input}`}
               type={type}
               name={name}
               placeholder={placeHolder}
-            ></Field>
+            />
           </div>
           {loading && <div>Envoi en cours...</div>}
 
           <RedErrorMessage name={name}>{props.errors[name]}</RedErrorMessage>
 
           <button
-            className="button"
+            className="btn btn--primary tw-mt-4"
             type="submit"
             disabled={props.isSubmitting}
           >

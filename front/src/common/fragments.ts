@@ -97,6 +97,14 @@ const traderFragment = gql`
 
 export const temporaryStorageDetailFragment = gql`
   fragment TemporaryStorageDetailFragment on TemporaryStorageDetail {
+    temporaryStorer {
+      quantityType
+      quantityReceived
+      wasteAcceptationStatus
+      wasteRefusalReason
+      receivedAt
+      receivedBy
+    }
     destination {
       company {
         ...CompanyFragment
@@ -120,7 +128,7 @@ export const temporaryStorageDetailFragment = gql`
   ${transporterFragment}
 `;
 
-const staticFieldsFragment = gql`
+export const staticFieldsFragment = gql`
   fragment StaticFieldsFragment on Form {
     readableId
     createdAt
@@ -150,6 +158,7 @@ const mutableFieldsFragment = gql`
   fragment MutableFieldsFragment on Form {
     id
     customId
+    sentAt
     emitter {
       ...EmitterFragment
     }
@@ -169,7 +178,8 @@ const mutableFieldsFragment = gql`
       readableId
     }
     ecoOrganisme {
-      id
+      name
+      siret
     }
     temporaryStorageDetail {
       ...TemporaryStorageDetailFragment
@@ -194,7 +204,7 @@ export const fullFormFragment = gql`
 `;
 
 export const transporterFormFragment = gql`
-  fragment TransporterForm on Form {
+  fragment TransporterFormFragment on Form {
     ...MutableFieldsFragment
     ...StaticFieldsFragment
     currentTransporterSiret
@@ -233,4 +243,29 @@ export const segmentFragment = gql`
   fragment Segment on TransportSegment {
     id
   }
+`;
+
+export const detailFormFragment = gql`
+  fragment DetailFormFragment on Form {
+    ...TransporterFormFragment
+    sentAt
+    sentBy
+    signedByTransporter
+    processedAt
+    receivedAt
+    receivedBy
+    quantityReceived
+    wasteAcceptationStatus
+    wasteRefusalReason
+    signedAt
+    processedBy
+    processedAt
+    processingOperationDescription
+    processingOperationDone
+    ecoOrganisme {
+      siret
+      name
+    }
+  }
+  ${transporterFormFragment}
 `;

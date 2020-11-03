@@ -14,14 +14,17 @@
     "isolatedModules": true,
     "noEmit": true,
     "noImplicitAny": false,
+    "strictNullChecks": true,
     "jsx": "preserve",
     "lib": [
       "dom",
       "es6",
       "esnext.asynciterable"
-    ]
+    ],
+    "baseUrl": "./src",
+ 
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

@@ -5,13 +5,12 @@ import { FormExpanded, FormFlattened } from "./types";
  */
 export function flattenForm(formExpanded: FormExpanded): FormFlattened {
   const {
-    ecoOrganisme,
     recipientIsTempStorage,
     temporaryStorageDetail,
     ...rest
   } = formExpanded;
 
-  const form: FormFlattened = { ...rest, ecoOrganismeName: ecoOrganisme?.name };
+  const form: FormFlattened = { ...rest };
 
   if (recipientIsTempStorage === true) {
     // recipient is a temp storer

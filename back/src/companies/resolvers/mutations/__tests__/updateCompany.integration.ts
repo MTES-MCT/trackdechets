@@ -14,7 +14,8 @@ const UPDATE_COMPANY = `
     $companyTypes: [CompanyType],
     $givenName: String,
     $transporterReceiptId: String,
-    $traderReceiptId: String
+    $traderReceiptId: String,
+    $ecoOrganismeAgreements: [URL!]
     ){
       updateCompany(
         siret: $siret,
@@ -25,7 +26,8 @@ const UPDATE_COMPANY = `
         website: $website,
         givenName: $givenName,
         transporterReceiptId: $transporterReceiptId,
-        traderReceiptId: $traderReceiptId
+        traderReceiptId: $traderReceiptId,
+        ecoOrganismeAgreements: $ecoOrganismeAgreements
       ){
         id
       }
@@ -33,31 +35,74 @@ const UPDATE_COMPANY = `
 `;
 
 describe("mutation updateCompany", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
+
   it("should update a company information", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
+
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const gerepId = "newGerepId";
-    const contactEmail = "newContact@trackdechets.fr";
-    const contactPhone = "1111111111";
-    const givenName = "newGivenName";
-    const website = "newWebsite@trackechets.fr";
+
+    const variables = {
+      siret: company.siret,
+      gerepId: "newGerepId",
+      contactEmail: "newContact@trackdechets.fr",
+      contactPhone: "1111111111",
+      givenName: "newGivenName",
+      website: "newWebsite@trackechets.fr"
+    };
     const { data } = await mutate(UPDATE_COMPANY, {
-      variables: {
-        siret: company.siret,
-        gerepId,
-        contactEmail,
-        contactPhone,
-        givenName,
-        website
-      }
+      variables
     });
     expect(data.updateCompany.id).toEqual(company.id);
+
     const updatedCompany = await prisma.company({ id: company.id });
-    expect(updatedCompany.gerepId).toEqual(gerepId);
-    expect(updatedCompany.contactEmail).toEqual(contactEmail);
-    expect(updatedCompany.contactPhone).toEqual(contactPhone);
-    expect(updatedCompany.givenName).toEqual(givenName);
-    expect(updatedCompany.website).toEqual(website);
+    expect(updatedCompany).toMatchObject(variables);
+  });
+
+  it("should return an error when trying to add eco-organisme agreements without the relevant type", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const { errors } = await mutate(UPDATE_COMPANY, {
+      variables: {
+        siret: company.siret,
+        ecoOrganismeAgreements: ["https://legifrance.com/1"]
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : il ne s'agit pas d'un éco-organisme."
+      })
+    ]);
+  });
+
+  it("should return an error when trying to remove all eco-organisme agreements", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      },
+      ecoOrganismeAgreements: {
+        set: ["https://legifrance.com/1"]
+      }
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const { errors } = await mutate(UPDATE_COMPANY, {
+      variables: {
+        siret: company.siret,
+        ecoOrganismeAgreements: []
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : elle doit en posséder au moins 1."
+      })
+    ]);
   });
 });

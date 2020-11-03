@@ -1,3 +1,8 @@
+"""
+Chaîne de caractère au format URL, débutant par un protocole http(s).
+"""
+scalar URL
+
 type Query {
   """
   Renvoie des informations publiques sur un établissement
@@ -48,6 +53,9 @@ enum CompanyType {
 
   "Négociant"
   TRADER
+
+  "Éco-organisme"
+  ECO_ORGANISME
 }
 
 "Information sur un établissement accessible par un utilisateur membre"
@@ -115,6 +123,11 @@ type CompanyPrivate {
   Récépissé négociant (le cas échéant, pour les profils transporteur)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]!
 }
 
 "Information sur un établissement accessible publiquement"
@@ -166,6 +179,11 @@ type CompanyPublic {
   Récépissé négociant associé à cet établissement (le cas échant)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]!
 }
 
 "Information sur un établissement accessible publiquement en recherche"
@@ -313,7 +331,7 @@ enum FavoriteType {
 """
 Rubrique ICPE d'un établissement avec les autorisations associées
 Pour plus de détails, se référer à la
-[nomenclature des ICPE](https://www.georisques.gouv.fr/dossiers/installations/nomenclature-ic)
+[nomenclature des ICPE](https://www.georisques.gouv.fr/articles-risques/les-installations-classees-pour-la-protection-de-lenvironnement#nomenclature-des-installations-classees)
 """
 type Rubrique {
   """

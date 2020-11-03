@@ -15,7 +15,9 @@ export type Scalars = {
    * - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
    * - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
    */
-  DateTime: any;
+  DateTime: string;
+  /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
+  URL: string;
   JSON: any;
 };
 
@@ -150,6 +152,8 @@ export type CompanyPrivate = {
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant (le cas échéant, pour les profils transporteur) */
   traderReceipt: Maybe<TraderReceipt>;
+  /** Liste des agréments de l'éco-organisme */
+  ecoOrganismeAgreements: Array<Scalars['URL']>;
 };
 
 /** Information sur un établissement accessible publiquement */
@@ -184,6 +188,8 @@ export type CompanyPublic = {
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
   traderReceipt: Maybe<TraderReceipt>;
+  /** Liste des agréments de l'éco-organisme */
+  ecoOrganismeAgreements: Array<Scalars['URL']>;
 };
 
 /** Information sur un établissement accessible publiquement en recherche */
@@ -240,7 +246,9 @@ export enum CompanyType {
   /** Installation de collecte de déchets apportés par le producteur initial */
   WasteCenter = 'WASTE_CENTER',
   /** Négociant */
-  Trader = 'TRADER'
+  Trader = 'TRADER',
+  /** Éco-organisme */
+  EcoOrganisme = 'ECO_ORGANISME'
 }
 
 /** Consistance du déchet */
@@ -363,7 +371,8 @@ export type EcoOrganisme = {
 
 /** Payload de liason d'un BSD à un eco-organisme */
 export type EcoOrganismeInput = {
-  id: Scalars['ID'];
+  name: Scalars['String'];
+  siret: Scalars['String'];
 };
 
 /** Émetteur du BSD (case 1) */
@@ -508,7 +517,7 @@ export type Form = {
   nextDestination: Maybe<NextDestination>;
   /** Annexe 2 */
   appendix2Forms: Maybe<Array<Form>>;
-  ecoOrganisme: Maybe<EcoOrganisme>;
+  ecoOrganisme: Maybe<FormEcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail: Maybe<TemporaryStorageDetail>;
   /** Résumé des valeurs clés du bordereau à l'instant T */
@@ -540,6 +549,13 @@ export type FormCompany = {
   phone: Maybe<Scalars['String']>;
   /** Email du contact dans l'établissement */
   mail: Maybe<Scalars['String']>;
+};
+
+/** Information sur l'éco-organisme responsable du BSD */
+export type FormEcoOrganisme = {
+  __typename?: 'FormEcoOrganisme';
+  name: Scalars['String'];
+  siret: Scalars['String'];
 };
 
 /** Payload de création d'un BSD */
@@ -790,26 +806,47 @@ export type Invitation = {
 };
 
 
-export type MultimodalTransporter = {
-  __typename?: 'MultimodalTransporter';
-  /** Établissement transporteur */
-  company: Maybe<FormCompany>;
-  /** Exemption de récipissé */
-  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
-  /** N° de récipissé */
-  receipt: Maybe<Scalars['String']>;
-  /** Département */
-  department: Maybe<Scalars['String']>;
-  /** Limite de validité du récipissé */
-  validityLimit: Maybe<Scalars['DateTime']>;
-  /** Numéro de plaque d'immatriculation */
-  numberPlate: Maybe<Scalars['String']>;
-  /** Information libre, destinée aux transporteurs */
-  customInfo: Maybe<Scalars['String']>;
+/**
+ * Demande de rattachement à un établissement effectué par
+ * un utilisateur.
+ */
+export type MembershipRequest = {
+  __typename?: 'MembershipRequest';
+  id: Scalars['ID'];
+  /** Email de l'utilisateur faisant la demande */
+  email: Scalars['String'];
+  /** SIRET de l'établissement */
+  siret: Scalars['String'];
+  /** Nom de l'établissement */
+  name: Scalars['String'];
+  /** Statut de la demande de rattachement */
+  status: MembershipRequestStatus;
+  /**
+   * Liste des adresses email correspondant aux comptes administrateurs à qui la demande
+   * de rattachement a été envoyée. Les adresses emails sont partiellement masquées de la
+   * façon suivante j********w@trackdechets.fr
+   */
+  sentTo: Array<Scalars['String']>;
 };
+
+/**
+ * Différents statuts possibles pour une demande de rattachement
+ * à un établissement
+ */
+export enum MembershipRequestStatus {
+  Pending = 'PENDING',
+  Accepted = 'ACCEPTED',
+  Refused = 'REFUSED'
+}
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /**
+   * USAGE INTERNE
+   * Accepte une demande de rattachement à un établissement
+   * en spécifiant le rôle accordé au nouvel utilisateur
+   */
+  acceptMembershipRequest: CompanyPrivate;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -968,6 +1005,11 @@ export type Mutation = {
   prepareSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
+   * Refuse une demande de rattachement à un un établissement
+   */
+  refuseMembershipRequest: CompanyPrivate;
+  /**
+   * USAGE INTERNE
    * Supprime les droits d'un utilisateurs sur un établissement
    */
   removeUserFromCompany: CompanyPrivate;
@@ -992,16 +1034,26 @@ export type Mutation = {
    */
   saveForm: Maybe<Form>;
   /**
+   * Envoie une demande de rattachement de l'utilisateur courant
+   * à rejoindre l'établissement dont le siret est précisé en paramètre.
+   * Cette demande est communiquée à l'ensemble des administrateurs de
+   * l'établissement qui ont le choix de l'accepter ou de la refuser.
+   */
+  sendMembershipRequest: Maybe<MembershipRequest>;
+  /**
    * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
    * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
    * Cette mutation doit être appelée avec le token du collecteur-transporteur.
-   * L'établissement émetteur (resp. d'entreposage provisoire ou de
-   * reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-   * disponible sur le tableau de bord Trackdéchets
-   * Mon Compte > Établissements > Sécurité.
+   * L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
+   * grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
    * D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-   * émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le
-   * code de sécurité sur le terminal du collecteur-transporteur.
+   * émetteur (resp. d'entreposage provisoire ou de reconditionnement)
+   * renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+   * Dans le cas où un éco-organisme figure sur le BSD, il est également possible
+   * de signer avec son code plutôt que celui de l'émetteur.
+   * Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est
+   * l'auteur de la signature (signingInfo.signatureAuthor doit valoir
+   * ECO_ORGANISME).
    */
   signedByTransporter: Maybe<Form>;
   /**
@@ -1030,6 +1082,12 @@ export type Mutation = {
    * Édite les informations d'un récépissé transporteur
    */
   updateTransporterReceipt: Maybe<TransporterReceipt>;
+};
+
+
+export type MutationAcceptMembershipRequestArgs = {
+  id: Scalars['ID'];
+  role: UserRole;
 };
 
 
@@ -1183,6 +1241,11 @@ export type MutationPrepareSegmentArgs = {
 };
 
 
+export type MutationRefuseMembershipRequestArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationRemoveUserFromCompanyArgs = {
   userId: Scalars['ID'];
   siret: Scalars['String'];
@@ -1207,6 +1270,11 @@ export type MutationResetPasswordArgs = {
 
 export type MutationSaveFormArgs = {
   formInput: FormInput;
+};
+
+
+export type MutationSendMembershipRequestArgs = {
+  siret: Scalars['String'];
 };
 
 
@@ -1237,6 +1305,7 @@ export type MutationUpdateCompanyArgs = {
   givenName: Maybe<Scalars['String']>;
   transporterReceiptId: Maybe<Scalars['String']>;
   traderReceiptId: Maybe<Scalars['String']>;
+  ecoOrganismeAgreements: Maybe<Array<Scalars['URL']>>;
 };
 
 
@@ -1277,41 +1346,10 @@ export type NextDestinationInput = {
   company: InternationalCompanyInput;
 };
 
-/** Payload d'un segment de transport */
-export type NextSegmentCompanyInput = {
-  /** SIRET de l'établissement */
-  siret: Maybe<Scalars['String']>;
-  /** Nom de l'établissement */
-  name: Maybe<Scalars['String']>;
-  /** Adresse de l'établissement */
-  address: Maybe<Scalars['String']>;
-  /** Nom du contact dans l'établissement */
-  contact: Maybe<Scalars['String']>;
-  /** Email du contact dans l'établissement */
-  mail: Maybe<Scalars['String']>;
-  /** Numéro de téléphone de contact dans l'établissement */
-  phone: Maybe<Scalars['String']>;
-};
-
 /** Payload lié à l'ajout de segment de transport multimodal (case 20 à 21) */
 export type NextSegmentInfoInput = {
-  transporter: Maybe<NextSegmentTransporterInput>;
+  transporter: Maybe<TransporterInput>;
   mode: TransportMode;
-};
-
-export type NextSegmentTransporterInput = {
-  /** Exemption de récipissé */
-  isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
-  /** N° de récipissé */
-  receipt: Maybe<Scalars['String']>;
-  /** Département */
-  department: Maybe<Scalars['String']>;
-  /** Limite de validité du récipissé */
-  validityLimit: Maybe<Scalars['DateTime']>;
-  /** Numéro de plaque d'immatriculation */
-  numberPlate: Maybe<Scalars['String']>;
-  /** Établissement collecteur - transporteur */
-  company: Maybe<NextSegmentCompanyInput>;
 };
 
 /** Type de packaging du déchet */
@@ -1349,6 +1387,8 @@ export type PrivateCompanyInput = {
   transporterReceiptId: Maybe<Scalars['String']>;
   /** Récipissé négociant (le cas échéant, pour les profils négociant) */
   traderReceiptId: Maybe<Scalars['String']>;
+  /** Liste des agréments de l'éco-organisme */
+  ecoOrganismeAgreements: Maybe<Array<Scalars['URL']>>;
 };
 
 /** Payload de traitement d'un BSD */
@@ -1415,8 +1455,19 @@ export type Query = {
    * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
    * préciser un SIRET
    * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-   * Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
-   * On peut également demander les bordereaux pour lesquels on est transporteur
+   * 
+   * Vous pouvez filtrer:
+   * - par rôle que joue votre entreprise sur le BSD via `role`
+   * - par date de dernière modification via `updatedBefore` / `updatedAfter`
+   * - par statut du BSD via `status`
+   * - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+   * 
+   * Par défaut:
+   * - tous les BSD accessibles sont retournés
+   * - les BSD sont classés par date de création, de la plus récente à la plus vieille
+   * - les résultats sont paginés par 50. Il est possible de modifier cette valeur
+   * via `first` ou `last` en fonction du curseur utilisé
+   * - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
    */
   forms: Array<Form>;
   /**
@@ -1439,6 +1490,15 @@ export type Query = {
   invitation: Maybe<Invitation>;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
+  /**
+   * Récupère une demande de rattachement effectuée par l'utilisateur courant
+   * à partir de l'identifiant de cette demande ou du SIRET de l'établissement
+   * auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des
+   * paramètres (id ou siret) doit être être passé mais pas les deux. Cette query
+   * permet notamment de suivre l'état d'avancement de la demande de rattachement
+   * (en attente, accepté, refusé)
+   */
+  membershipRequest: Maybe<MembershipRequest>;
   /**
    * Effectue une recherche floue sur la base SIRENE et enrichit
    * les résultats avec des informations provenant de Trackdéchets
@@ -1478,11 +1538,18 @@ export type QueryFormPdfArgs = {
 
 export type QueryFormsArgs = {
   siret: Maybe<Scalars['String']>;
-  first: Maybe<Scalars['Int']>;
   skip: Maybe<Scalars['Int']>;
+  cursorAfter: Maybe<Scalars['ID']>;
+  first: Maybe<Scalars['Int']>;
+  cursorBefore: Maybe<Scalars['ID']>;
+  last: Maybe<Scalars['Int']>;
+  sentAfter: Maybe<Scalars['String']>;
+  updatedAfter: Maybe<Scalars['String']>;
   status: Maybe<Array<FormStatus>>;
   roles: Maybe<Array<FormRole>>;
   hasNextStep: Maybe<Scalars['Boolean']>;
+  siretPresentOnForm: Maybe<Scalars['String']>;
+  wasteCode: Maybe<Scalars['String']>;
 };
 
 
@@ -1508,6 +1575,12 @@ export type QueryFormsRegisterArgs = {
 
 export type QueryInvitationArgs = {
   hash: Scalars['String'];
+};
+
+
+export type QueryMembershipRequestArgs = {
+  id: Maybe<Scalars['ID']>;
+  siret: Maybe<Scalars['String']>;
 };
 
 
@@ -1590,7 +1663,7 @@ export type ResentFormInput = {
 /**
  * Rubrique ICPE d'un établissement avec les autorisations associées
  * Pour plus de détails, se référer à la
- * [nomenclature des ICPE](https://www.georisques.gouv.fr/dossiers/installations/nomenclature-ic)
+ * [nomenclature des ICPE](https://www.georisques.gouv.fr/articles-risques/les-installations-classees-pour-la-protection-de-lenvironnement#nomenclature-des-installations-classees)
  */
 export type Rubrique = {
   __typename?: 'Rubrique';
@@ -1627,6 +1700,14 @@ export type SentFormInput = {
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars['String'];
 };
+
+/** Dénomination de l'auteur de la signature */
+export enum SignatureAuthor {
+  /** L'auteur de la signature est l'émetteur du déchet */
+  Emitter = 'EMITTER',
+  /** L'auteur de la signature est l'éco-organisme figurant sur le BSD */
+  EcoOrganisme = 'ECO_ORGANISME'
+}
 
 /** Payload simplifié de signature d'un BSD par un transporteur */
 export type SignatureFormInput = {
@@ -1749,7 +1830,7 @@ export type TakeOverInput = {
 /** Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant */
 export type TemporaryStorageDetail = {
   __typename?: 'TemporaryStorageDetail';
-  /** Établissement qui sotcke temporairement le déchet (case 13) */
+  /** Établissement qui stocke temporairement le déchet (case 13) */
   temporaryStorer: Maybe<TemporaryStorer>;
   /**
    * Installation de destination prévue (case 14) à remplir par le producteur ou
@@ -1855,6 +1936,8 @@ export type Transporter = {
 
 /** Collecteur - transporteur (case 8) */
 export type TransporterInput = {
+  /** Établissement collecteur - transporteur */
+  company: Maybe<CompanyInput>;
   /** Exemption de récipissé */
   isExemptedOfReceipt: Maybe<Scalars['Boolean']>;
   /** N° de récipissé */
@@ -1865,8 +1948,8 @@ export type TransporterInput = {
   validityLimit: Maybe<Scalars['DateTime']>;
   /** Numéro de plaque d'immatriculation */
   numberPlate: Maybe<Scalars['String']>;
-  /** Établissement collecteur - transporteur */
-  company: Maybe<CompanyInput>;
+  /** Information libre, destinée aux transporteurs */
+  customInfo: Maybe<Scalars['String']>;
 };
 
 /** Récépissé transporteur */
@@ -1889,6 +1972,8 @@ export type TransporterSignatureFormInput = {
   signedByTransporter: Scalars['Boolean'];
   /** Code de sécurité permettant d'authentifier l'émetteur */
   securityCode: Scalars['Int'];
+  /** Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur */
+  signatureAuthor: Maybe<SignatureAuthor>;
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars['String'];
   /** Si oui on non le BSD a été signé par l'émetteur */
@@ -1915,7 +2000,7 @@ export type TransportSegment = {
   /** Siret du transporteur précédent */
   previousTransporterCompanySiret: Maybe<Scalars['String']>;
   /** Transporteur du segment */
-  transporter: Maybe<MultimodalTransporter>;
+  transporter: Maybe<Transporter>;
   /** Mode de transport */
   mode: Maybe<TransportMode>;
   /** Date de prise en charge */
@@ -1986,6 +2071,7 @@ export type UploadLink = {
   key: Maybe<Scalars['String']>;
 };
 
+
 /** Représente un utilisateur sur la plateforme Trackdéchets */
 export type User = {
   __typename?: 'User';
@@ -1998,7 +2084,7 @@ export type User = {
   /** Numéro de téléphone de l'utilisateur */
   phone: Maybe<Scalars['String']>;
   /** Liste des établissements dont l'utilisateur est membre */
-  companies: Maybe<Array<CompanyPrivate>>;
+  companies: Array<CompanyPrivate>;
 };
 
 /**
@@ -2205,6 +2291,7 @@ export function createCompanyPrivateMock(props: Partial<CompanyPrivate>): Compan
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,
+    ecoOrganismeAgreements: [],
     ...props,
   };
 }
@@ -2225,6 +2312,7 @@ export function createCompanyPublicMock(props: Partial<CompanyPublic>): CompanyP
     isRegistered: null,
     transporterReceipt: null,
     traderReceipt: null,
+    ecoOrganismeAgreements: [],
     ...props,
   };
 }
@@ -2274,7 +2362,7 @@ export function createCreateFormInputMock(props: Partial<CreateFormInput>): Crea
 export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderReceiptInput>): CreateTraderReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -2283,7 +2371,7 @@ export function createCreateTraderReceiptInputMock(props: Partial<CreateTraderRe
 export function createCreateTransporterReceiptInputMock(props: Partial<CreateTransporterReceiptInput>): CreateTransporterReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -2347,7 +2435,8 @@ export function createEcoOrganismeMock(props: Partial<EcoOrganisme>): EcoOrganis
 
 export function createEcoOrganismeInputMock(props: Partial<EcoOrganismeInput>): EcoOrganismeInput {
   return {
-    id: "",
+    name: "",
+    siret: "",
     ...props,
   };
 }
@@ -2434,6 +2523,15 @@ export function createFormCompanyMock(props: Partial<FormCompany>): FormCompany 
     contact: null,
     phone: null,
     mail: null,
+    ...props,
+  };
+}
+
+export function createFormEcoOrganismeMock(props: Partial<FormEcoOrganisme>): FormEcoOrganisme {
+  return {
+    __typename: "FormEcoOrganisme",
+    name: "",
+    siret: "",
     ...props,
   };
 }
@@ -2532,16 +2630,15 @@ export function createInvitationMock(props: Partial<Invitation>): Invitation {
   };
 }
 
-export function createMultimodalTransporterMock(props: Partial<MultimodalTransporter>): MultimodalTransporter {
+export function createMembershipRequestMock(props: Partial<MembershipRequest>): MembershipRequest {
   return {
-    __typename: "MultimodalTransporter",
-    company: null,
-    isExemptedOfReceipt: null,
-    receipt: null,
-    department: null,
-    validityLimit: null,
-    numberPlate: null,
-    customInfo: null,
+    __typename: "MembershipRequest",
+    id: "",
+    email: "",
+    siret: "",
+    name: "",
+    status: MembershipRequestStatus.Pending,
+    sentTo: [],
     ...props,
   };
 }
@@ -2563,34 +2660,10 @@ export function createNextDestinationInputMock(props: Partial<NextDestinationInp
   };
 }
 
-export function createNextSegmentCompanyInputMock(props: Partial<NextSegmentCompanyInput>): NextSegmentCompanyInput {
-  return {
-    siret: null,
-    name: null,
-    address: null,
-    contact: null,
-    mail: null,
-    phone: null,
-    ...props,
-  };
-}
-
 export function createNextSegmentInfoInputMock(props: Partial<NextSegmentInfoInput>): NextSegmentInfoInput {
   return {
     transporter: null,
     mode: TransportMode.Road,
-    ...props,
-  };
-}
-
-export function createNextSegmentTransporterInputMock(props: Partial<NextSegmentTransporterInput>): NextSegmentTransporterInput {
-  return {
-    isExemptedOfReceipt: null,
-    receipt: null,
-    department: null,
-    validityLimit: null,
-    numberPlate: null,
-    company: null,
     ...props,
   };
 }
@@ -2605,6 +2678,7 @@ export function createPrivateCompanyInputMock(props: Partial<PrivateCompanyInput
     documentKeys: null,
     transporterReceiptId: null,
     traderReceiptId: null,
+    ecoOrganismeAgreements: null,
     ...props,
   };
 }
@@ -2614,7 +2688,7 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
     processingOperationDone: "",
     processingOperationDescription: null,
     processedBy: "",
-    processedAt: new Date(),
+    processedAt: new Date().toISOString(),
     nextDestination: null,
     noTraceability: null,
     ...props,
@@ -2626,7 +2700,7 @@ export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): 
     wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date(),
+    receivedAt: new Date().toISOString(),
     signedAt: null,
     quantityReceived: 0,
     ...props,
@@ -2669,7 +2743,7 @@ export function createResentFormInputMock(props: Partial<ResentFormInput>): Rese
     wasteDetails: null,
     transporter: null,
     signedBy: "",
-    signedAt: new Date(),
+    signedAt: new Date().toISOString(),
     ...props,
   };
 }
@@ -2692,7 +2766,7 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
 
 export function createSentFormInputMock(props: Partial<SentFormInput>): SentFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     sentBy: "",
     ...props,
   };
@@ -2700,7 +2774,7 @@ export function createSentFormInputMock(props: Partial<SentFormInput>): SentForm
 
 export function createSignatureFormInputMock(props: Partial<SignatureFormInput>): SignatureFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     sentBy: "",
     ...props,
   };
@@ -2783,7 +2857,7 @@ export function createSubscriptionMock(props: Partial<Subscription>): Subscripti
 
 export function createTakeOverInputMock(props: Partial<TakeOverInput>): TakeOverInput {
   return {
-    takenOverAt: new Date(),
+    takenOverAt: new Date().toISOString(),
     takenOverBy: "",
     ...props,
   };
@@ -2827,7 +2901,7 @@ export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput
     wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date(),
+    receivedAt: new Date().toISOString(),
     signedAt: null,
     quantityReceived: 0,
     quantityType: QuantityType.Real,
@@ -2861,7 +2935,7 @@ export function createTraderReceiptMock(props: Partial<TraderReceipt>): TraderRe
     __typename: "TraderReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -2883,12 +2957,13 @@ export function createTransporterMock(props: Partial<Transporter>): Transporter 
 
 export function createTransporterInputMock(props: Partial<TransporterInput>): TransporterInput {
   return {
+    company: null,
     isExemptedOfReceipt: null,
     receipt: null,
     department: null,
     validityLimit: null,
     numberPlate: null,
-    company: null,
+    customInfo: null,
     ...props,
   };
 }
@@ -2898,7 +2973,7 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
     __typename: "TransporterReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date(),
+    validityLimit: new Date().toISOString(),
     department: "",
     ...props,
   };
@@ -2906,9 +2981,10 @@ export function createTransporterReceiptMock(props: Partial<TransporterReceipt>)
 
 export function createTransporterSignatureFormInputMock(props: Partial<TransporterSignatureFormInput>): TransporterSignatureFormInput {
   return {
-    sentAt: new Date(),
+    sentAt: new Date().toISOString(),
     signedByTransporter: false,
     securityCode: 0,
+    signatureAuthor: null,
     sentBy: "",
     signedByProducer: false,
     packagings: [],
@@ -2985,7 +3061,7 @@ export function createUserMock(props: Partial<User>): User {
     email: "",
     name: null,
     phone: null,
-    companies: null,
+    companies: [],
     ...props,
   };
 }

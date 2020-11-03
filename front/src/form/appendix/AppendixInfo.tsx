@@ -6,13 +6,13 @@ export default connect(function AppendixInfo(props) {
 
   return (
     <div>
-      <h4>Annexe 1</h4>
-      <p>
-        Vous êtes entrain d'éditer un bordereau pour un collecteur de petites
-        quantités de déchets relevant d’une même rubrique. Ce bordereau
+      <h4 className="form__section-heading">Annexe 1</h4>
+      <p className="tw-my-2">
+        Vous êtes en train de modifier un bordereau pour un collecteur de
+        petites quantités de déchets relevant d’une même rubrique. Ce bordereau
         nécessite donc la présence d'une annexe 1.
       </p>
-      <p>
+      <p className="tw-my-2">
         Cette annexe n'est pas à compléter sur Trackdéchets mais vous avez la
         possibilité ci-dessous d'en imprimer une. Complétez la et{" "}
         <strong>
@@ -29,7 +29,7 @@ export default connect(function AppendixInfo(props) {
         ) : (
           <span>
             Le bordereau est créé au format de brouillon, il permet de préparer
-            la tournée et d'éditer l'annexe 1. Il ne peut être finalisé que
+            la tournée et de modifier l'annexe 1. Il ne peut être finalisé que
             lorsque la tournée est terminée, afin de faire le reporting des
             annexes 1. <br /> Lorsque la tournée est terminée, complétez ce
             bordereau brouillon par les éléments manquants (poids total,
@@ -42,7 +42,7 @@ export default connect(function AppendixInfo(props) {
       </div>
       <p>
         <a
-          className="button"
+          className="btn btn--primary"
           href="/notice_12571-1.pdf"
           target="_blank"
           rel="noopener noreferrer"

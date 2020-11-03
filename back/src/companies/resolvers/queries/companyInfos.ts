@@ -32,12 +32,13 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
       contactEmail
       contactPhone
       website
+      ecoOrganismeAgreements
     }
   `;
 
   type CompanyFragment = Pick<
     Company,
-    "contactEmail" | "contactPhone" | "website"
+    "contactEmail" | "contactPhone" | "website" | "ecoOrganismeAgreements"
   >;
 
   // retrieves trackdechets public CompanyInfo
@@ -53,10 +54,12 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
   };
 
   const company = {
+    isRegistered,
+    ecoOrganismeAgreements: [],
+
     ...companyIcpeInfo,
     ...sireneCompanyInfo,
-    ...trackdechetsCompanyInfo,
-    ...{ isRegistered }
+    ...trackdechetsCompanyInfo
   };
 
   return company;

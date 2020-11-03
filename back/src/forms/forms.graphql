@@ -26,25 +26,79 @@ type Query {
   Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
   préciser un SIRET
   Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-  Par défaut, renvoie les BSDs dont on est producteur ou destinataire.
-  On peut également demander les bordereaux pour lesquels on est transporteur
+
+  Vous pouvez filtrer:
+  - par rôle que joue votre entreprise sur le BSD via `role`
+  - par date de dernière modification via `updatedBefore` / `updatedAfter`
+  - par statut du BSD via `status`
+  - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+
+  Par défaut:
+  - tous les BSD accessibles sont retournés
+  - les BSD sont classés par date de création, de la plus récente à la plus vieille
+  - les résultats sont paginés par 50. Il est possible de modifier cette valeur via `first` ou `last` en fonction du curseur utilisé
+  - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
   """
   forms(
     "SIRET d'un établissement dont je suis membre"
     siret: String
 
     """
-    Nombre de bordereaux retournés.
+    DEPRECATED - (Optionnel) PAGINATION
+    Nombre d'éléments à ne pas récupérer en début de liste
+    Défaut à 0
+    """
+    skip: Int
+
+    """
+    (Optionnel) PAGINATION
+    Curseur après lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les "premiers" bordereaux
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    cursorAfter: ID
+
+    """
+    (Optionnel) PAGINATION
+    Nombre de bordereaux retournés après le `cursorAfter`
     Défaut à 50, maximum à 500
+    Ignoré si utilisé avec `cursorBefore`
     """
     first: Int
 
     """
-    Nombre d'éléments à ne pas récupérer en début de liste
-    Permet de paginer les résultats
-    Défaut à 0
+    (Optionnel) PAGINATION
+    Curseur avant lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les "derniers" bordereaux
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
     """
-    skip: Int
+    cursorBefore: ID
+
+    """
+    (Optionnel) PAGINATION
+    Nombre de bordereaux retournés avant le `cursorBefore`
+    Défaut à 50, maximum à 500
+    Ignoré si utilisé avec `cursorAfter`
+    """
+    last: Int
+
+    """
+    (Optionnel) Retourne les BSD envoyés après la date
+    Filtre sur la date d'envoi (date de la case 9 du bordereau)
+    Au format (YYYY-MM-DD)
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    sentAfter: String
+
+    """
+    (Optionnel) Retourne les BSD modifiés après la date
+    Filtre sur la date de dernière modification
+    Au format (YYYY-MM-DD)
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    updatedAfter: String
 
     """
     (Optionnel) Filtre sur les statuts des bordereaux
@@ -65,13 +119,28 @@ type Query {
     roles: [FormRole!]
 
     """
-    (Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de notre part
+    (Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de votre part
     Si `true`, seul les bordereaux attendant une action sont renvoyés
     Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
     Si vide, tous les bordereaux sont renvoyés
     Défaut à vide.
     """
     hasNextStep: Boolean
+
+    """
+    (Optionnel) Siret d'une autre entreprise présente sur le bordereau
+    Vous n'avez pas besoin d'être membre de cette entreprise.
+    Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
+    Défaut à vide.
+    """
+    siretPresentOnForm: String
+
+    """
+    (Optionnel) Code déchet pour affiner la recherche
+    Ex: 01 03 04* (Veillez à bien respecter les espaces).
+    Défaut à vide.
+    """
+    wasteCode: String
   ): [Form!]!
 
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"
@@ -276,11 +345,12 @@ type Mutation {
   Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
   ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
   Cette mutation doit être appelée avec le token du collecteur-transporteur.
-  L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui grâce à son code de sécurité
-  disponible sur le tableau de bord Trackdéchets
-  Mon Compte > Établissements > Sécurité.
-  D'un point de vue pratique, cela implique qu'un responsable de l'établissement
-  émetteur (resp. d'entreposage provisoire ou de reconditionnement) renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+  L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
+  grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
+  D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
+  renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+  Dans le cas où un éco-organisme figure sur le BSD, il est également possible de signer avec son code plutôt que celui de l'émetteur.
+  Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est l'auteur de la signature (signingInfo.signatureAuthor doit valoir ECO_ORGANISME).
   """
   signedByTransporter(
     "ID d'un BSD"
@@ -525,7 +595,7 @@ type Form {
   "Annexe 2"
   appendix2Forms: [Form!]
 
-  ecoOrganisme: EcoOrganisme
+  ecoOrganisme: FormEcoOrganisme
 
   "BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement"
   temporaryStorageDetail: TemporaryStorageDetail
@@ -579,7 +649,7 @@ type StateSummary {
 
 "Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant"
 type TemporaryStorageDetail {
-  "Établissement qui sotcke temporairement le déchet (case 13)"
+  "Établissement qui stocke temporairement le déchet (case 13)"
   temporaryStorer: TemporaryStorer
 
   """
@@ -651,6 +721,12 @@ type FormCompany {
 
   "Email du contact dans l'établissement"
   mail: String
+}
+
+"Information sur l'éco-organisme responsable du BSD"
+type FormEcoOrganisme {
+  name: String!
+  siret: String!
 }
 
 "Types d'émetteur de déchet (choix multiple de la case 1)"
@@ -983,29 +1059,6 @@ enum TransportMode {
   SEA
 }
 
-type MultimodalTransporter {
-  "Établissement transporteur"
-  company: FormCompany
-
-  "Exemption de récipissé"
-  isExemptedOfReceipt: Boolean
-
-  "N° de récipissé"
-  receipt: String
-
-  "Département"
-  department: String
-
-  "Limite de validité du récipissé"
-  validityLimit: DateTime
-
-  "Numéro de plaque d'immatriculation"
-  numberPlate: String
-
-  "Information libre, destinée aux transporteurs"
-  customInfo: String
-}
-
 type TransportSegment {
   id: ID!
 
@@ -1013,7 +1066,7 @@ type TransportSegment {
   previousTransporterCompanySiret: String
 
   "Transporteur du segment"
-  transporter: MultimodalTransporter
+  transporter: Transporter
 
   "Mode de transport"
   mode: TransportMode

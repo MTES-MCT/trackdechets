@@ -1,5 +1,5 @@
 import React from "react";
-import { Form } from "../../../generated/graphql/types";
+import { Form } from "generated/graphql/types";
 import { ITEMS_PER_PAGE } from "../../constants";
 
 type Props = {
@@ -10,22 +10,23 @@ type Props = {
 export default function LoadMore({ forms, fetchMore }: Props) {
   if (forms.length < ITEMS_PER_PAGE) {
     return null;
+
   }
 
   return (
     <div style={{ textAlign: "center" }}>
       <button
-        className="center button small"
+        className="center btn btn--primary small"
         onClick={() =>
           fetchMore({
             variables: {
-              skip: forms.length,
+              cursorAfter: forms[forms.length - 1].id,
             },
             updateQuery: (prev, { fetchMoreResult }) => {
               if (!fetchMoreResult) return prev;
               return {
                 ...prev,
-                feed: [...prev.forms, ...fetchMoreResult.forms],
+                forms: [...prev.forms, ...fetchMoreResult.forms],
               };
             },
           })

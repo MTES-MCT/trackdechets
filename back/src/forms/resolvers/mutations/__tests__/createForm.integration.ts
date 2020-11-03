@@ -27,7 +27,7 @@ const CREATE_FORM = `
         }
       }
       ecoOrganisme {
-        id
+        siret
       }
       temporaryStorageDetail {
         destination {
@@ -36,6 +36,22 @@ const CREATE_FORM = `
             name
           }
         }
+      }
+      transporter {
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+        }
+        isExemptedOfReceipt
+        receipt
+        department
+        validityLimit
+        numberPlate
+        customInfo
       }
     }
   }
@@ -108,24 +124,30 @@ describe("Mutation.createForm", () => {
   );
 
   it("should allow an eco-organisme to create a form", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-
-    const eo = await prisma.createEcoOrganisme({
-      address: "an address",
-      name: "a name",
-      siret: company.siret
+    const { user, company: eo } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    await prisma.createEcoOrganisme({
+      address: "",
+      siret: eo.siret,
+      name: eo.name
     });
 
     const { mutate } = makeClient(user);
     const { data } = await mutate(CREATE_FORM, {
       variables: {
         createFormInput: {
-          ecoOrganisme: { id: eo.id }
+          ecoOrganisme: {
+            name: eo.name,
+            siret: eo.siret
+          }
         }
       }
     });
 
-    expect(data.createForm.ecoOrganisme.id).toBe(eo.id);
+    expect(data.createForm.ecoOrganisme.siret).toBe(eo.siret);
   });
 
   it("should return an error when trying to create a form with a non-existing eco-organisme", async () => {
@@ -138,7 +160,8 @@ describe("Mutation.createForm", () => {
         }
       },
       ecoOrganisme: {
-        id: "does_not_exist"
+        name: "",
+        siret: "does_not_exist"
       }
     };
     const { mutate } = makeClient(user);
@@ -150,7 +173,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'éco-organisme avec l'identifiant "${createFormInput.ecoOrganisme.id}" n'existe pas.`,
+        message: `L'éco-organisme avec le siret "${createFormInput.ecoOrganisme.siret}" n'est pas reconnu.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -333,4 +356,43 @@ describe("Mutation.createForm", () => {
       ]);
     }
   );
+
+  it("should create a form with a transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      transporter: {
+        company: {
+          siret: "12345678901234",
+          name: "Transporter",
+          address: "123 whatever street, Somewhere",
+          contact: "Jane Doe",
+          mail: "janedoe@transporter.com",
+          phone: "06"
+        },
+        isExemptedOfReceipt: false,
+        receipt: "8043",
+        department: "69",
+        validityLimit: "2040-01-01T00:00:00.000Z",
+        numberPlate: "AX-123-69",
+        customInfo: "T-456"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    expect(errors).toEqual(undefined);
+    expect(data.createForm.transporter).toMatchObject(
+      createFormInput.transporter
+    );
+  });
 });

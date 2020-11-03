@@ -87,7 +87,10 @@ async function checkEcoOrganismePermission(
   });
   const form = await formFactory({
     ownerId: owner.id,
-    opt: { ecoOrganisme: { connect: { id: ecoOrganisme.id } } }
+    opt: {
+      ecoOrganismeSiret: ecoOrganisme.siret,
+      ecoOrganismeName: ecoOrganisme.name
+    }
   });
   return permission(user, form);
 }
@@ -333,7 +336,7 @@ describe("checkCanMarkAsProcessed", () => {
   });
 });
 
-describe("checkCanMarkAsTempStored", async () => {
+describe("checkCanMarkAsTempStored", () => {
   afterAll(resetDatabase);
 
   const permission = checkCanMarkAsTempStored;
@@ -353,7 +356,7 @@ describe("checkCanMarkAsTempStored", async () => {
   });
 });
 
-describe("checkCanMarkAsResent", async () => {
+describe("checkCanMarkAsResent", () => {
   afterAll(resetDatabase);
 
   const permission = checkCanMarkAsResent;
@@ -373,7 +376,7 @@ describe("checkCanMarkAsResent", async () => {
   });
 });
 
-describe("checkSecurityCode", async () => {
+describe("checkSecurityCode", () => {
   afterAll(resetDatabase);
 
   test("securityCode is valid", async () => {
