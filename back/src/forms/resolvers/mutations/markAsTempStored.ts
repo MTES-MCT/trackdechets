@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import transitionForm from "../../workflow/transitionForm";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsTempStored } from "../../permissions";
-import { tempStoredInfoSchema } from "../../validation";
+import { tempStoredInfoSchema, TempStorageInfo } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
 import { DestinationCannotTempStore } from "../../errors";
@@ -23,14 +23,14 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     throw new DestinationCannotTempStore();
   }
 
-  const tempStorageUpdateInput = {
+  const tempStorageUpdateInput: TempStorageInfo = {
     tempStorerQuantityType: tempStoredInfos.quantityType,
     tempStorerQuantityReceived: tempStoredInfos.quantityReceived,
     tempStorerWasteAcceptationStatus: tempStoredInfos.wasteAcceptationStatus,
     tempStorerWasteRefusalReason: tempStoredInfos.wasteRefusalReason,
     tempStorerReceivedAt: tempStoredInfos.receivedAt,
     tempStorerReceivedBy: tempStoredInfos.receivedBy,
-    tempStorerSignedAt: tempStoredInfos.signedAt ?? new Date()
+    tempStorerSignedAt: tempStoredInfos.signedAt ?? new Date().toISOString()
   };
 
   await tempStoredInfoSchema.validate(tempStorageUpdateInput);
