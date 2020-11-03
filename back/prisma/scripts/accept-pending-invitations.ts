@@ -4,7 +4,7 @@ import acceptPendingInvitations from "../../src/scripts/prisma/acceptPendingInvi
 @registerUpdater(
   "Accept pending invitations",
   "Accept all pending invitations for users who have already joined by invitation link",
-  true
+  false
 )
 export class AcceptPendingInvitations implements Updater {
   run() {
