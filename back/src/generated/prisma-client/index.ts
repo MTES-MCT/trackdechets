@@ -1408,12 +1408,14 @@ export type Status =
   | "SEALED"
   | "SENT"
   | "RECEIVED"
+  | "ACCEPTED"
   | "PROCESSED"
   | "AWAITING_GROUP"
   | "GROUPED"
   | "NO_TRACEABILITY"
   | "REFUSED"
   | "TEMP_STORED"
+  | "TEMP_STORER_ACCEPTED"
   | "RESEALED"
   | "RESENT";
 

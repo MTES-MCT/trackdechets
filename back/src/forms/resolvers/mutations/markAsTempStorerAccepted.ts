@@ -6,7 +6,6 @@ import { checkCanMarkAsTempStorerAccepted } from "../../permissions";
 import { tempStorerAcceptedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
-import { DestinationCannotTempStore } from "../../errors";
 
 const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccepted"] = async (
   _,

@@ -1,11 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
 import { getFormOrFormNotFound } from "../../database";
-import {
-  HasSegmentToTakeOverError,
-  TemporaryStorageCannotReceive
-} from "../../errors";
 import { expandFormFromDb } from "../../form-converter";
 import { checkCanMarkAsAccepted } from "../../permissions";
 import { acceptedInfoSchema } from "../../validation";

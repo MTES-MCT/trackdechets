@@ -125,7 +125,15 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
               transporterCompanySiret_in: sirets
             }
           },
-          { status_not_in: ["DRAFT", "SEALED", "SENT", "TEMP_STORED", "TEMP_STORER_ACCEPTED"] }
+          {
+            status_not_in: [
+              "DRAFT",
+              "SEALED",
+              "SENT",
+              "TEMP_STORED",
+              "TEMP_STORER_ACCEPTED"
+            ]
+          }
         ]
       },
       // multi-modal

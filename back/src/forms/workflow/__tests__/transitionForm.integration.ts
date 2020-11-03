@@ -28,7 +28,7 @@ describe("transition form", () => {
 
     const updatedForm = await prisma.form({ id: form.id });
 
-    const nextStatus = "RECEIVED";
+    const nextStatus = "ACCEPTED";
 
     expect(updatedForm.status).toEqual(nextStatus);
 

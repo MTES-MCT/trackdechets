@@ -60,7 +60,7 @@ describe("{ mutation { markAsTempStored } }", () => {
     );
   });
 
-  test("the temp storer of the BSD can mark it as TEMP_STORED", async () => {
+  test("the temp storer of the BSD can mark it as TEMP_STORER_ACCEPTED", async () => {
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
@@ -97,7 +97,7 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const formAfterMutation = await prisma.form({ id: form.id });
 
-    expect(formAfterMutation.status).toEqual("TEMP_STORED");
+    expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLogs({
