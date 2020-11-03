@@ -13,6 +13,7 @@ export enum FormState {
   AwaitingGroup = "AWAITING_GROUP",
   Grouped = "GROUPED",
   TempStored = "TEMP_STORED",
+  TempStorerAccepted = "TEMP_STORER_ACCEPTED",
   Resealed = "RESEALED",
   Resent = "RESENT"
 }
@@ -26,6 +27,7 @@ export enum EventType {
   MarkAsAccepted = "MARK_AS_ACCEPTED",
   MarkAsProcessed = "MARK_AS_PROCESSED",
   MarkAsTempStored = "MARK_AS_TEMP_STORED",
+  MarkAsTempStorerAccepted = "MARK_AS_TEMP_STORER_ACCEPTED",
   MarkAsResealed = "MARK_AS_RESEALED",
   MarkAsResent = "MARK_AS_RESENT",
   MarkAsGrouped = "MARK_AS_GROUPED",

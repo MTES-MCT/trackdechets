@@ -1408,7 +1408,6 @@ export type Status =
   | "SEALED"
   | "SENT"
   | "RECEIVED"
-  | "ACCEPTED"
   | "PROCESSED"
   | "AWAITING_GROUP"
   | "GROUPED"
@@ -1447,6 +1446,8 @@ export type TemporaryStorageDetailOrderByInput =
   | "tempStorerReceivedBy_DESC"
   | "tempStorerSignedAt_ASC"
   | "tempStorerSignedAt_DESC"
+  | "tempStorerSignedBy_ASC"
+  | "tempStorerSignedBy_DESC"
   | "destinationIsFilledByEmitter_ASC"
   | "destinationIsFilledByEmitter_DESC"
   | "destinationCompanyName_ASC"
@@ -3525,6 +3526,20 @@ export interface TemporaryStorageDetailWhereInput {
   tempStorerSignedAt_lte?: Maybe<DateTimeInput>;
   tempStorerSignedAt_gt?: Maybe<DateTimeInput>;
   tempStorerSignedAt_gte?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
+  tempStorerSignedBy_not?: Maybe<String>;
+  tempStorerSignedBy_in?: Maybe<String[] | String>;
+  tempStorerSignedBy_not_in?: Maybe<String[] | String>;
+  tempStorerSignedBy_lt?: Maybe<String>;
+  tempStorerSignedBy_lte?: Maybe<String>;
+  tempStorerSignedBy_gt?: Maybe<String>;
+  tempStorerSignedBy_gte?: Maybe<String>;
+  tempStorerSignedBy_contains?: Maybe<String>;
+  tempStorerSignedBy_not_contains?: Maybe<String>;
+  tempStorerSignedBy_starts_with?: Maybe<String>;
+  tempStorerSignedBy_not_starts_with?: Maybe<String>;
+  tempStorerSignedBy_ends_with?: Maybe<String>;
+  tempStorerSignedBy_not_ends_with?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationIsFilledByEmitter_not?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
@@ -5564,6 +5579,7 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -5861,6 +5877,7 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -7656,6 +7673,7 @@ export interface TemporaryStorageDetailCreateInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -7796,6 +7814,7 @@ export interface TemporaryStorageDetailUpdateInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -7943,6 +7962,7 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -10031,6 +10051,7 @@ export interface TemporaryStorageDetail {
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerReceivedBy?: String;
   tempStorerSignedAt?: DateTimeOutput;
+  tempStorerSignedBy?: String;
   destinationIsFilledByEmitter?: Boolean;
   destinationCompanyName?: String;
   destinationCompanySiret?: String;
@@ -10075,6 +10096,7 @@ export interface TemporaryStorageDetailPromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  tempStorerSignedBy: () => Promise<String>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
   destinationCompanySiret: () => Promise<String>;
@@ -10121,6 +10143,7 @@ export interface TemporaryStorageDetailSubscription
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  tempStorerSignedBy: () => Promise<AsyncIterator<String>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
   destinationCompanyName: () => Promise<AsyncIterator<String>>;
   destinationCompanySiret: () => Promise<AsyncIterator<String>>;
@@ -10165,6 +10188,7 @@ export interface TemporaryStorageDetailNullablePromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  tempStorerSignedBy: () => Promise<String>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
   destinationCompanySiret: () => Promise<String>;
@@ -12467,6 +12491,7 @@ export interface TemporaryStorageDetailPreviousValues {
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerReceivedBy?: String;
   tempStorerSignedAt?: DateTimeOutput;
+  tempStorerSignedBy?: String;
   destinationIsFilledByEmitter?: Boolean;
   destinationCompanyName?: String;
   destinationCompanySiret?: String;
@@ -12510,6 +12535,7 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  tempStorerSignedBy: () => Promise<String>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
   destinationCompanySiret: () => Promise<String>;
@@ -12555,6 +12581,7 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  tempStorerSignedBy: () => Promise<AsyncIterator<String>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
   destinationCompanyName: () => Promise<AsyncIterator<String>>;
   destinationCompanySiret: () => Promise<AsyncIterator<String>>;

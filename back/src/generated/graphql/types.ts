@@ -696,6 +696,8 @@ export type FormStatus =
   | 'REFUSED'
   /** Déchet arrivé sur le site d'entreposage ou reconditionnement */
   | 'TEMP_STORED'
+  /** Déchet accepté par le site d'entreposage ou reconditionnement */
+  | 'TEMP_STORER_ACCEPTED'
   /** Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site d'entreposage ou reconditionnement */
   | 'RESEALED'
   /** Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement */
@@ -1011,6 +1013,8 @@ export type Mutation = {
   markAsSent?: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored?: Maybe<Form>;
+  /** Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement */
+  markAsTempStorerAccepted?: Maybe<Form>;
   /** Marque un segment de transport comme prêt à être emporté */
   markSegmentAsReadyToTakeOver?: Maybe<TransportSegment>;
   /** Prépare un nouveau segment de transport multimodal */
@@ -1244,6 +1248,12 @@ export type MutationMarkAsSentArgs = {
 export type MutationMarkAsTempStoredArgs = {
   id: Scalars['ID'];
   tempStoredInfos: TempStoredFormInput;
+};
+
+
+export type MutationMarkAsTempStorerAcceptedArgs = {
+  id: Scalars['ID'];
+  tempStorerAcceptedInfo: TempStorerAcceptedFormInput;
 };
 
 
@@ -1923,6 +1933,21 @@ export type TempStoredFormInput = {
   quantityType: QuantityType;
 };
 
+export type TempStorerAcceptedFormInput = {
+  /** Date à laquelle le déchet a été accepté ou refusé (case 13). */
+  signedAt: Scalars['DateTime'];
+  /** Nom de la personne en charge de l'acceptation du déchet (case 13) */
+  signedBy: Scalars['String'];
+  /** Statut d'acceptation du déchet (case 13) */
+  wasteAcceptationStatus: WasteAcceptationStatusInput;
+  /** Raison du refus (case 13) */
+  wasteRefusalReason?: Maybe<Scalars['String']>;
+  /** Quantité réelle présentée (case 13) */
+  quantityReceived: Scalars['Float'];
+  /** Réelle ou estimée */
+  quantityType: QuantityType;
+};
+
 /** Négociant (case 7) */
 export type Trader = {
   __typename?: 'Trader';
@@ -2439,6 +2464,7 @@ export type ResolversTypes = {
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
+  TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
@@ -2548,6 +2574,7 @@ export type ResolversParentTypes = {
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
+  TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
@@ -2826,6 +2853,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   markAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSealedArgs, 'id'>>;
   markAsSent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSentArgs, 'id' | 'sentInfo'>>;
   markAsTempStored?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStoredArgs, 'id' | 'tempStoredInfos'>>;
+  markAsTempStorerAccepted?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStorerAcceptedArgs, 'id' | 'tempStorerAcceptedInfo'>>;
   markSegmentAsReadyToTakeOver?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationMarkSegmentAsReadyToTakeOverArgs, 'id'>>;
   prepareSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationPrepareSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
   refuseMembershipRequest?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRefuseMembershipRequestArgs, 'id'>>;
@@ -3832,6 +3860,18 @@ export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput
     receivedBy: "",
     receivedAt: new Date().toISOString(),
     signedAt: null,
+    quantityReceived: 0,
+    quantityType: "REAL",
+    ...props,
+  };
+}
+
+export function createTempStorerAcceptedFormInputMock(props: Partial<TempStorerAcceptedFormInput>): TempStorerAcceptedFormInput {
+  return {
+    signedAt: new Date().toISOString(),
+    signedBy: "",
+    wasteAcceptationStatus: "ACCEPTED",
+    wasteRefusalReason: null,
     quantityReceived: 0,
     quantityType: "REAL",
     ...props,

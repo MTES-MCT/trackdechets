@@ -468,6 +468,26 @@ input WasteDetailsInput {
   pop: Boolean
 }
 
+input TempStorerAcceptedFormInput {
+  "Date à laquelle le déchet a été accepté ou refusé (case 13)."
+  signedAt: DateTime!
+
+  "Nom de la personne en charge de l'acceptation du déchet (case 13)"
+  signedBy: String!
+
+  "Statut d'acceptation du déchet (case 13)"
+  wasteAcceptationStatus: WasteAcceptationStatusInput!
+
+  "Raison du refus (case 13)"
+  wasteRefusalReason: String
+
+  "Quantité réelle présentée (case 13)"
+  quantityReceived: Float!
+
+  "Réelle ou estimée"
+  quantityType: QuantityType!
+}
+
 input TempStoredFormInput {
   "Statut d'acceptation du déchet (case 13)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!

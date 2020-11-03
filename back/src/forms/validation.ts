@@ -681,10 +681,6 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 export const tempStoredInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
   .object()
   .shape({
-    tempStorerQuantityType: yup.mixed<QuantityType>().required(),
-    tempStorerWasteAcceptationStatus: yup
-      .mixed<WasteAcceptationStatus>()
-      .required(),
     tempStorerReceivedBy: yup
       .string()
       .ensure()
@@ -693,6 +689,66 @@ export const tempStoredInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
       verboseFieldName: "date de réception",
       required: true
     }),
+    tempStorerSignedAt: validDatetime({
+      verboseFieldName: "date d'acceptation"
+    }),
+    tempStorerQuantityType: yup.mixed<QuantityType>(),
+    tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
+    tempStorerQuantityReceived: yup
+      .number()
+      // if waste is refused, quantityReceived must be 0
+      .when(
+        "tempStorerWasteAcceptationStatus",
+        (wasteAcceptationStatus, schema) =>
+          ["REFUSED"].includes(wasteAcceptationStatus)
+            ? schema.test(
+                "is-zero",
+                "Vous devez saisir une quantité reçue égale à 0.",
+                v => v === 0
+              )
+            : schema
+      )
+      // if waste is partially or totally accepted, we check it is a positive value
+      .when(
+        "tempStorerWasteAcceptationStatus",
+        (wasteAcceptationStatus, schema) =>
+          ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+            ? schema.test(
+                "is-strictly-positive",
+                "Vous devez saisir une quantité reçue supérieure à 0.",
+                v => v > 0
+              )
+            : schema
+      ),
+    tempStorerWasteRefusalReason: yup
+      .string()
+      .when(
+        "tempStorerWasteAcceptationStatus",
+        (wasteAcceptationStatus, schema) =>
+          ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+            ? schema.required("Vous devez renseigner la raison du refus")
+            : schema
+                .notRequired()
+                .nullable()
+                .test(
+                  "is-empty",
+                  "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+                  v => !v
+                )
+      )
+  });
+
+export const tempStorerAcceptedInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
+  .object()
+  .shape({
+    tempStorerQuantityType: yup.mixed<QuantityType>().required(),
+    tempStorerWasteAcceptationStatus: yup
+      .mixed<WasteAcceptationStatus>()
+      .required(),
+    tempStorerSignedBy: yup
+      .string()
+      .ensure()
+      .required("Vous devez saisir un responsable de l'acceptation."),
     tempStorerSignedAt: validDatetime({
       verboseFieldName: "date d'acceptation"
     }),

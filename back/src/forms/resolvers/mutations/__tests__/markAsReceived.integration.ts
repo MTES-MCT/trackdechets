@@ -51,7 +51,7 @@ describe("Test Form reception", () => {
         id: form.id,
         receivedInfo: {
           receivedBy: "Bill",
-          receivedAt: "2019-01-17T10:22:00+0100",
+          receivedAt: "2019-01-17T10:22:00+0100"
         }
       }
     });

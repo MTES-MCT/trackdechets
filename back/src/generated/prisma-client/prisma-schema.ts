@@ -6147,7 +6147,6 @@ enum Status {
   SEALED
   SENT
   RECEIVED
-  ACCEPTED
   PROCESSED
   AWAITING_GROUP
   GROUPED
@@ -6319,6 +6318,7 @@ type TemporaryStorageDetail {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
   destinationCompanySiret: String
@@ -6367,6 +6367,7 @@ input TemporaryStorageDetailCreateInput {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
   destinationCompanySiret: String
@@ -6413,6 +6414,7 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
   destinationCompanySiret: String
@@ -6467,6 +6469,8 @@ enum TemporaryStorageDetailOrderByInput {
   tempStorerReceivedBy_DESC
   tempStorerSignedAt_ASC
   tempStorerSignedAt_DESC
+  tempStorerSignedBy_ASC
+  tempStorerSignedBy_DESC
   destinationIsFilledByEmitter_ASC
   destinationIsFilledByEmitter_DESC
   destinationCompanyName_ASC
@@ -6538,6 +6542,7 @@ type TemporaryStorageDetailPreviousValues {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
   destinationCompanySiret: String
@@ -6597,6 +6602,7 @@ input TemporaryStorageDetailUpdateInput {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
   destinationCompanySiret: String
@@ -6637,6 +6643,7 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
   destinationCompanySiret: String
@@ -6686,6 +6693,7 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
   destinationIsFilledByEmitter: Boolean
   destinationCompanyName: String
   destinationCompanySiret: String
@@ -6799,6 +6807,20 @@ input TemporaryStorageDetailWhereInput {
   tempStorerSignedAt_lte: DateTime
   tempStorerSignedAt_gt: DateTime
   tempStorerSignedAt_gte: DateTime
+  tempStorerSignedBy: String
+  tempStorerSignedBy_not: String
+  tempStorerSignedBy_in: [String!]
+  tempStorerSignedBy_not_in: [String!]
+  tempStorerSignedBy_lt: String
+  tempStorerSignedBy_lte: String
+  tempStorerSignedBy_gt: String
+  tempStorerSignedBy_gte: String
+  tempStorerSignedBy_contains: String
+  tempStorerSignedBy_not_contains: String
+  tempStorerSignedBy_starts_with: String
+  tempStorerSignedBy_not_starts_with: String
+  tempStorerSignedBy_ends_with: String
+  tempStorerSignedBy_not_ends_with: String
   destinationIsFilledByEmitter: Boolean
   destinationIsFilledByEmitter_not: Boolean
   destinationCompanyName: String

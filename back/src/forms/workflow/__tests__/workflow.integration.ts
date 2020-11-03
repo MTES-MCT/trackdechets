@@ -303,7 +303,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .send({ query: markAsReceivedQuery });
 
     form = markAsReceivedResponse.body.data.markAsReceived;
-    expect(form.status).toEqual("RECEIVED");
+    expect(form.status).toEqual("ACCEPTED");
 
     // Télécharge le pdf
     await downloadPdf(form.id, producteurToken, "1-bsd-received.pdf");
@@ -901,7 +901,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
 
     form = markAsTempStoredResponse.body.data.markAsTempStored;
 
-    expect(form.status).toEqual("TEMP_STORED");
+    expect(form.status).toEqual("TEMP_STORER_ACCEPTED");
 
     // Télécharge le pdf
     await downloadPdf(form.id, producteurToken, "2-bsd-temp-stored.pdf");
@@ -1013,7 +1013,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .send({ query: markAsReceivedQuery });
 
     form = markAsReceivedResponse.body.data.markAsReceived;
-    expect(form.status).toEqual("RECEIVED");
+    expect(form.status).toEqual("ACCEPTED");
 
     // Télécharge le pdf
     await downloadPdf(form.id, producteurToken, "2-bsd-received.pdf");
@@ -1138,7 +1138,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         }
       },
       {
-        status: "TEMP_STORED",
+        status: "TEMP_STORER_ACCEPTED",
         updatedFields: {
           temporaryStorageDetail: {
             temporaryStorer: {
@@ -1682,7 +1682,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .send({ query: markAsReceivedQuery });
 
     form = markAsReceivedResponse.body.data.markAsReceived;
-    expect(form.status).toEqual("RECEIVED");
+    expect(form.status).toEqual("ACCEPTED");
 
     // Télécharge le pdf
     await downloadPdf(form.id, producteurToken, "5-bsd-received.pdf");

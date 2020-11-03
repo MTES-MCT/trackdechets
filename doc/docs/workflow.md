@@ -75,7 +75,10 @@ B -->|updateForm| B
 A[DRAFT] -->|markAsSealed| B(SEALED)
 B -->|signedByTransporter| C(SENT)
 B -->|importPaperForm| E(PROCESSED)
-C -->|markAsReceived| D(RECEIVED)
+C -->|markAsReceived| D(ACCEPTED)
+C -->|markAsReceived - sans signature| M(RECEIVED)
+M -->|markAsAccepted| D
+M -->|markAsReceived - avec refus| I
 D -->|markAsProcessed| E(PROCESSED)
 D -->|markAsProcessed - avec rupture de traçabalité |G(NO_TRACEABILITY)
 D -->|markAsProcessed - avec opération de regroupement | F(AWAITING_GROUP)
@@ -84,8 +87,11 @@ C -->|markAsTempStored - avec refus| I
 F.->|createForm - appendix2Forms |A
 F-->|Lors de la création d'un nouveau BSD avec annexe 2|H[GROUPED]
 H-->|Lorsque markAsProcessed est appelé sur le BSD avec annexe 2|E
-C -->|markAsTempStored|J(TEMP_STORED)
-J -->|markAsResealed| K(RESEALED)
+C -->|markAsTempStored - |J(TEMP_STORED)
+C -->|markAsTempStored|N
+J -->|markAsTempStorerAccepted - avec refus|I
+J -->|markAsTempStorerAccepted|N(TEMP_STORER_ACCEPTED)
+N -->|markAsResealed| K(RESEALED)
 K -->|signedByTransporter| L(RESENT)
 L --> D
 </div>

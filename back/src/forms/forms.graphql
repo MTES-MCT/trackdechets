@@ -395,6 +395,9 @@ type Mutation {
   "Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement"
   markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form
 
+  "Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement"
+  markAsTempStorerAccepted(id: ID!, tempStorerAcceptedInfo: TempStorerAcceptedFormInput!): Form
+
   "Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement"
   markAsResealed(id: ID!, resealedInfos: ResealedFormInput!): Form
 
@@ -504,6 +507,9 @@ enum FormStatus {
 
   "Déchet arrivé sur le site d'entreposage ou reconditionnement"
   TEMP_STORED
+
+  "Déchet accepté par le site d'entreposage ou reconditionnement"
+  TEMP_STORER_ACCEPTED
 
   "Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site d'entreposage ou reconditionnement"
   RESEALED

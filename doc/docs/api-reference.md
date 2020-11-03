@@ -908,6 +908,25 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>markAsTempStorerAccepted</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">tempStorerAcceptedInfo</td>
+<td valign="top"><a href="#tempstoreracceptedforminput">TempStorerAcceptedFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>markSegmentAsReadyToTakeOver</strong></td>
 <td valign="top"><a href="#transportsegment">TransportSegment</a></td>
 <td>
@@ -5124,6 +5143,74 @@ Réelle ou estimée
 </tbody>
 </table>
 
+### TempStorerAcceptedFormInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date à laquelle le déchet a été accepté ou refusé (case 13).
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedBy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom de la personne en charge de l'acceptation du déchet (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
+<td>
+
+Statut d'acceptation du déchet (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Raison du refus (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityReceived</strong></td>
+<td valign="top"><a href="#float">Float</a>!</td>
+<td>
+
+Quantité réelle présentée (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a>!</td>
+<td>
+
+Réelle ou estimée
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### TemporaryStorageDetailInput
 
 <table>
@@ -5967,6 +6054,14 @@ Déchet refusé
 <td>
 
 Déchet arrivé sur le site d'entreposage ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TEMP_STORER_ACCEPTED</strong></td>
+<td>
+
+Déchet accepté par le site d'entreposage ou reconditionnement
 
 </td>
 </tr>

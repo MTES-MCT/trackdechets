@@ -266,6 +266,19 @@ export async function checkCanMarkAsTempStored(user: User, form: Form) {
   return true;
 }
 
+export async function checkCanMarkAsTempStorerAccepted(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+
+  const isAuthorized = isFormRecipient(fullUser, fullForm);
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
+    );
+  }
+  return true;
+}
+
 export async function checkCanMarkAsResealed(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);

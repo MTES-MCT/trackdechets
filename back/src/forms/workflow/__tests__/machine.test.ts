@@ -28,6 +28,15 @@ describe("Workflow machine", () => {
     });
     expect(nextState.value).toEqual(FormState.Received);
   });
+  test("SENT -> ACCEPTED", () => {
+    const nextState = machine.transition(FormState.Sent, {
+      type: EventType.MarkAsReceived,
+      formUpdateInput: {
+        wasteAcceptationStatus: "ACCEPTED"
+      }
+    });
+    expect(nextState.value).toEqual(FormState.Accepted);
+  });
   test("SENT -> REFUSED", () => {
     const nextState = machine.transition(FormState.Sent, {
       type: EventType.MarkAsReceived,
@@ -43,6 +52,17 @@ describe("Workflow machine", () => {
     });
     expect(nextState.value).toEqual(FormState.TempStored);
   });
+  test("SENT -> TEMP_STORER_ACCEPTED", () => {
+    const nextState = machine.transition(FormState.Sent, {
+      type: EventType.MarkAsTempStored,
+      formUpdateInput: {
+        temporaryStorageDetail: {
+          update: { tempStorerWasteAcceptationStatus: "ACCEPTED" }
+        }
+      }
+    });
+    expect(nextState.value).toEqual(FormState.TempStorerAccepted);
+  });
   test("SENT -> REFUSED (temp storage)", () => {
     const nextState = machine.transition(FormState.Sent, {
       type: EventType.MarkAsTempStored,
@@ -54,28 +74,45 @@ describe("Workflow machine", () => {
     });
     expect(nextState.value).toEqual(FormState.Refused);
   });
-  test("RECEIVED -> PROCESSED", () => {
+  test("TEMP_STORED -> REFUSED (temp storage)", () => {
+    const nextState = machine.transition(FormState.TempStored, {
+      type: EventType.MarkAsTempStorerAccepted,
+      formUpdateInput: {
+        temporaryStorageDetail: {
+          update: { tempStorerWasteAcceptationStatus: "REFUSED" }
+        }
+      }
+    });
+    expect(nextState.value).toEqual(FormState.Refused);
+  });
+  test("RECEIVED -> ACCEPTED", () => {
     const nextState = machine.transition(FormState.Received, {
+      type: EventType.MarkAsAccepted
+    });
+    expect(nextState.value).toEqual(FormState.Accepted);
+  });
+  test("ACCEPTED -> PROCESSED", () => {
+    const nextState = machine.transition(FormState.Accepted, {
       type: EventType.MarkAsProcessed
     });
     expect(nextState.value).toEqual(FormState.Processed);
   });
-  test("RECEIVED -> AWAITING_GROUP", () => {
-    const nextState = machine.transition(FormState.Received, {
+  test("ACCEPTED -> AWAITING_GROUP", () => {
+    const nextState = machine.transition(FormState.Accepted, {
       type: EventType.MarkAsProcessed,
       formUpdateInput: { processingOperationDone: "R 12" }
     });
     expect(nextState.value).toEqual(FormState.AwaitingGroup);
   });
-  test("RECEIVED -> NO_TRACEABILITY", () => {
-    const nextState = machine.transition(FormState.Received, {
+  test("ACCEPTED -> NO_TRACEABILITY", () => {
+    const nextState = machine.transition(FormState.Accepted, {
       type: EventType.MarkAsProcessed,
       formUpdateInput: { noTraceability: true }
     });
     expect(nextState.value).toEqual(FormState.NoTraceability);
   });
-  test("TEMP_STORED -> RESEALED", () => {
-    const nextState = machine.transition(FormState.TempStored, {
+  test("TEMP_STORER_ACCEPTED -> RESEALED", () => {
+    const nextState = machine.transition(FormState.TempStorerAccepted, {
       type: EventType.MarkAsResealed
     });
     expect(nextState.value).toEqual(FormState.Resealed);
@@ -86,8 +123,8 @@ describe("Workflow machine", () => {
     });
     expect(nextState.value).toEqual(FormState.Resent);
   });
-  test("TEMP_STORED -> RESENT", () => {
-    const nextState = machine.transition(FormState.TempStored, {
+  test("TEMP_STORER_ACCEPTED -> RESENT", () => {
+    const nextState = machine.transition(FormState.TempStorerAccepted, {
       type: EventType.MarkAsResent
     });
     expect(nextState.value).toEqual(FormState.Resent);
