@@ -6,7 +6,7 @@ export const statusLabels: { [key: string]: string } = {
   RECEIVED: "Reçu, en attente de traitement",
   PROCESSED: "Traité",
   AWAITING_GROUP: "Traité, en attente de regroupement",
-  GROUPED: "Traité, annexé à un bordereau de regroupement",
+  GROUPED: "Annexé à un bordereau de regroupement",
   NO_TRACEABILITY: "Regroupé, avec autorisation de perte de traçabilité",
   REFUSED: "Refusé",
   TEMP_STORED: "Entreposé temporairement ou en reconditionnement",
@@ -22,7 +22,6 @@ export const transportModeLabels: { [key: string]: string } = {
   RAIL: "Voie ferrée",
   RIVER: "Voie fluviale",
 };
-
 
 export const statusesWithDynamicActions = [
   FormStatus.Sealed,

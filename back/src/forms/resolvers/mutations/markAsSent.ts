@@ -41,7 +41,10 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   });
 
   // mark appendix2Forms as GROUPED
-  const appendix2Forms = await prisma.form({ id: form.id }).appendix2Forms();
+  const appendix2Forms = await prisma
+    .form({ id: form.id })
+    .appendix2Forms({ where: { status: "AWAITING_GROUP" } });
+
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {
       return transitionForm(user, appendix, {
