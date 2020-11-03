@@ -4,6 +4,7 @@ export const statusLabels: { [key: string]: string } = {
   SEALED: "En attente de collecte par le transporteur",
   SENT: "En attente de réception",
   RECEIVED: "Reçu, en attente de traitement",
+  ACCEPTED: "Accepté, en attente de traitement",
   PROCESSED: "Traité",
   AWAITING_GROUP: "Traité, en attente de regroupement",
   GROUPED: "Annexé à un bordereau de regroupement",
@@ -27,6 +28,8 @@ export const transportModeLabels: { [key: string]: string } = {
 export const statusesWithDynamicActions = [
   FormStatus.Sent,
   FormStatus.Received,
+  FormStatus.Accepted,
   FormStatus.TempStored,
+  FormStatus.TempStorerAccepted,
   FormStatus.Resent,
 ];

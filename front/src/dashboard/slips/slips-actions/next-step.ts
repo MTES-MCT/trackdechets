@@ -68,12 +68,14 @@ export function getNextStep(form: Form, currentSiret: string) {
 
   if (currentUserIsDestination) {
     if (form.status === FormStatus.Resent) return FormStatus.Received;
-    if (form.status === FormStatus.Received) return FormStatus.Processed;
+    if (form.status === FormStatus.Received) return FormStatus.Accepted;
+    if (form.status === FormStatus.Accepted) return FormStatus.Processed;
   }
 
   if (currentUserIsTempStorer) {
     if (form.status === FormStatus.Sent) return FormStatus.TempStored;
-    if (form.status === FormStatus.TempStored) return FormStatus.Resealed;
+    if (form.status === FormStatus.TempStored) return FormStatus.TempStorerAccepted;
+    if (form.status === FormStatus.TempStorerAccepted) return FormStatus.Resealed;
     return null;
   }
 
@@ -83,7 +85,8 @@ export function getNextStep(form: Form, currentSiret: string) {
       form.temporaryStorageDetail?.temporaryStorer == null
     )
       return FormStatus.Received;
-    if (form.status === FormStatus.Received) return FormStatus.Processed;
+    if (form.status === FormStatus.Received) return FormStatus.Accepted;
+    if (form.status === FormStatus.Accepted) return FormStatus.Processed;
   }
 
   return null;

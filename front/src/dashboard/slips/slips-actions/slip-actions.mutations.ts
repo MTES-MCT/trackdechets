@@ -17,6 +17,16 @@ const MARK_RECEIVED = gql`
   }
   ${statusChangeFragment}
 `;
+
+const MARK_ACCEPTED = gql`
+  mutation MarkAsAccepted($id: ID!, $info: AcceptedFormInput!) {
+    markAsAccepted(id: $id, acceptedInfo: $info) {
+      ...StatusChange
+    }
+  }
+  ${statusChangeFragment}
+`;
+
 const MARK_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $info: ProcessedFormInput!) {
     markAsProcessed(id: $id, processedInfo: $info) {
@@ -29,6 +39,15 @@ const MARK_PROCESSED = gql`
 const MARK_TEMP_STORED = gql`
   mutation MarkAsTempStored($id: ID!, $info: TempStoredFormInput!) {
     markAsTempStored(id: $id, tempStoredInfos: $info) {
+      ...StatusChange
+    }
+  }
+  ${statusChangeFragment}
+`;
+
+const MARK_TEMP_STORER_ACCEPTED = gql`
+  mutation MarkAsTempStorerAccepted($id: ID!, $info: TempStorerAcceptedFormInput!) {
+    markAsTempStorerAccepted(id: $id, tempStorerAcceptedInfo: $info) {
       ...StatusChange
     }
   }
@@ -65,8 +84,10 @@ const DELETE_FORM = gql`
 export default {
   SEALED: MARK_SEALED,
   RECEIVED: MARK_RECEIVED,
+  ACCEPTED: MARK_ACCEPTED,
   PROCESSED: MARK_PROCESSED,
   TEMP_STORED: MARK_TEMP_STORED,
+  TEMP_STORER_ACCEPTED: MARK_TEMP_STORER_ACCEPTED,
   RESEALED: MARK_RESEALED,
   DUPLICATE_FORM,
   DELETE_FORM,

@@ -19,6 +19,7 @@ import Quicklook from "./Quicklook";
 import { getNextStep } from "./next-step";
 import Processed from "./Processed";
 import Received from "./Received";
+import Accepted from "./Accepted";
 import Sealed from "./Sealed";
 import Resealed from "./Resealed";
 import mutations from "./slip-actions.mutations";
@@ -188,6 +189,11 @@ const buttons = {
     icon: WaterDamIcon,
     component: Received,
   },
+  ACCEPTED: {
+    title: "Valider l'acceptation",
+    icon: WaterDamIcon,
+    component: Accepted,
+  },
   PROCESSED: {
     title: "Valider le traitement",
     icon: CogApprovedIcon,
@@ -197,6 +203,11 @@ const buttons = {
     title: "Valider l'entreposage provisoire",
     icon: WarehouseStorageIcon,
     component: Received,
+  },
+  TEMP_STORER_ACCEPTED: {
+    title: "Valider l'acceptation de l'entreposage provisoire",
+    icon: WarehouseStorageIcon,
+    component: Accepted,
   },
   RESEALED: {
     title: "Compléter le BSD suite",

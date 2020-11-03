@@ -4,40 +4,25 @@ import { DateTime } from "luxon";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { SlipActionProps } from "./SlipActions";
-import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
+import {
+  InlineRadioButton,
+  RadioButton,
+} from "form/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   FormStatus,
 } from "generated/graphql/types";
+import { textConfig } from "./Received";
 
-export const textConfig = {
-  [WasteAcceptationStatus.Accepted]: {
-    validationText:
-      "En validant, je confirme la réception des déchets indiqués dans ce bordereau.",
-  },
-  [WasteAcceptationStatus.Refused]: {
-    validationText:
-      "En refusant ce déchet, je le retourne à son producteur. Un mail automatique Trackdéchets, informera le producteur de ce refus, accompagné du BSD en pdf. L'inspection des ICPE et ma société en recevront une copie",
-    refusalReasonText: "Motif du refus",
-  },
-  [WasteAcceptationStatus.PartiallyRefused]: {
-    validationText:
-      "En validant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. Un mail automatique Trackdéchets, informera le producteur de ce refus partiel, accompagné du BSD en pdf. L'inspection des ICPE et ma société en recevront une copie",
-    refusalReasonText: "Motif du refus partiel",
-  },
-};
 const FieldError = ({ fieldError }) =>
-  !!fieldError ? (
-    <p className="text-red tw-mt-0 tw-mb-0">{fieldError}</p>
-  ) : null;
+  !!fieldError ? <p className="text-red tw-mt-0 tw-mb-0">{fieldError}</p> : null;
 
-export default function Received(props: SlipActionProps) {
+export default function Accepted(props: SlipActionProps) {
   return (
     <div>
       <Formik
         initialValues={{
-          receivedBy: "",
-          receivedAt: DateTime.local().toISODate(),
+          signedBy: "",
           signedAt: DateTime.local().toISODate(),
           quantityReceived: "",
           wasteAcceptationStatus: "",
@@ -53,17 +38,6 @@ export default function Received(props: SlipActionProps) {
 
           return (
             <Form>
-              <p className="form__row">
-                <label>
-                  Date d'arrivée
-                  <Field
-                    component={DateInput}
-                    name="receivedAt"
-                    className="td-input"
-                  />
-                  <FieldError fieldError={errors.receivedAt} />
-                </label>
-              </p>
               <div className="form__row">
                 <div className="form__row">
                   <fieldset className="form__radio-group">
@@ -163,11 +137,11 @@ export default function Received(props: SlipActionProps) {
                   Nom du responsable
                   <Field
                     type="text"
-                    name="receivedBy"
+                    name="signedBy"
                     placeholder="NOM Prénom"
                     className="td-input"
                   />
-                  <FieldError fieldError={errors.receivedBy} />
+                  <FieldError fieldError={errors.signedBy} />
                 </label>
               </p>
               <p className="form__row">
