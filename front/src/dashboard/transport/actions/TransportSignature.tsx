@@ -24,6 +24,7 @@ import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
 import { COLORS } from "common/config";
 import { ShipmentSignSmartphoneIcon, PdfIcon } from "common/components/Icons";
+import NumberInput from "form/custom-inputs/NumberInput";
 
 import { useParams } from "react-router-dom";
 
@@ -203,7 +204,7 @@ export default function TransportSignature({
                 </div>
                 <div className="form__row">
                   <span className={styles.label}>Appellation du déchet :</span>
-                  {form.wasteDetails?.name} ({form.wasteDetails?.code})
+                  {form.wasteDetails?.name}
                 </div>
 
                 <div className="form__row">
@@ -222,10 +223,12 @@ export default function TransportSignature({
                     Poids en tonnes
                   </label>
                   <Field
-                    type="number"
+                    component={NumberInput}
                     name="quantity"
                     id="id_quantity"
                     className={`${styles.fieldWeight} field__block td-input`}
+                    min="0"
+                    step="0.001"
                   />
                 </div>
 
@@ -273,7 +276,7 @@ export default function TransportSignature({
                     informations ci avant.
                   </label>
 
-                  <RedErrorMessage name="signedByTransporters" />
+                  <RedErrorMessage name="signedByTransporter" />
                 </div>
                 <p>
                   <DownloadFileLink
@@ -322,7 +325,7 @@ export default function TransportSignature({
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Appellation du déchet:</span>
-                    {form.wasteDetails?.name} ({form.wasteDetails?.code})
+                    {form.wasteDetails?.name}
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Conditionnement:</span>
@@ -390,6 +393,7 @@ export default function TransportSignature({
                           id="id_securityCode"
                           type="number"
                           className={`field__block td-input ${styles.fieldSecurityCode} ${styles.noSpinner}`}
+                          required
                         />
                       </div>
                       <div className="form__row">
