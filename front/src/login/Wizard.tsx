@@ -1,7 +1,8 @@
 import React from "react";
 import { Formik, Form, FormikHelpers } from "formik";
-import "./Wizard.scss";
 import { NextButton, PreviousButton } from "common/components/Buttons";
+import "common/components/WizardStepList.scss";
+
 type Props = { initialValues: Object; children: any[]; onSubmit: Function };
 type State = { page: number; values: Object };
 

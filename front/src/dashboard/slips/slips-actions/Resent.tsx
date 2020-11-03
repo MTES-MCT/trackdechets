@@ -8,8 +8,8 @@ import NumberInput from "form/custom-inputs/NumberInput";
 import { RadioButton } from "form/custom-inputs/RadioButton";
 import Packagings from "form/packagings/Packagings";
 import { SlipActionProps } from "./SlipActions";
-import { PROCESSING_OPERATIONS } from "generated/constants";
 import { WasteDetails } from "generated/graphql/types";
+import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 
 export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
   const initialValues = mergeDefaults(
@@ -88,23 +88,11 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
             </div>
 
             <div className="form__row">
-              <label>
-                Opération d'élimination / valorisation prévue (code D/R)
-              </label>
-
+         
               <Field
-                component="select"
+                component={ProcessingOperationSelect}
                 name="destination.processingOperation"
-                className="td-select"
-              >
-                <option value="">Choisissez...</option>
-                {PROCESSING_OPERATIONS.map(operation => (
-                  <option key={operation.code} value={operation.code}>
-                    {operation.code} - {operation.description.substr(0, 50)}
-                    {operation.description.length > 50 ? "..." : ""}
-                  </option>
-                ))}
-              </Field>
+              />
             </div>
             <div className="form__row form__row--inlined">
               <input

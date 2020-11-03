@@ -24,6 +24,7 @@ export default function Signup() {
   return (
     <section className="section section--white">
       <div className="container">
+
         <Wizard
           initialValues={{
             email: "",

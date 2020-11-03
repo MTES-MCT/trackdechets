@@ -100,6 +100,10 @@ input[type="checkbox"]:invalid {
   box-shadow: none;
 }
 
+// prevent date input icon to hide date value on webkit
+input[type="date"]::-webkit-calendar-picker-indicator {
+  margin: 0;
+}
 input[type="file"] {
   display: inline-flex;
 }

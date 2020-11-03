@@ -13,6 +13,7 @@ import TransporterInfoEdit from "./actions/TransporterInfoEdit";
 import TransportSignature from "./actions/TransportSignature";
 import styles from "./TransportTable.module.scss";
 import { Segments } from "./Segments";
+import Shorten from "common/components/Shorten";
 import Quicklook from "dashboard/slips/slips-actions/Quicklook";
 export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
   const [sortedForms, sortParams, sortBy, filter] = useFormsTable(forms);
@@ -97,9 +98,11 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
                 {form.readableId}
               </div>
             </td>
-            <td>{form.stateSummary?.emitter?.name}</td>
+            <td>
+              <Shorten content={form.stateSummary?.emitter?.name || ""} />
+            </td>
             <td className={styles.hideOnMobile}>
-              {form.stateSummary?.recipient?.name}
+              <Shorten content={form.stateSummary?.recipient?.name || ""} />
             </td>
             <td>
               <div>{form.wasteDetails?.name}</div>
@@ -134,16 +137,19 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
             <td>
               <Segments form={form} userSiret={userSiret} />
             </td>
-            <td  >
+            <td>
               <div className={styles.transportActions}>
-              <TransportSignature form={form} userSiret={userSiret} />
+                <TransportSignature form={form} userSiret={userSiret} />
 
-              <EditSegment form={form} userSiret={userSiret} />
+                <EditSegment form={form} userSiret={userSiret} />
 
-              <PrepareSegment form={form} userSiret={userSiret} />
-              <MarkSegmentAsReadyToTakeOver form={form} userSiret={userSiret} />
+                <PrepareSegment form={form} userSiret={userSiret} />
+                <MarkSegmentAsReadyToTakeOver
+                  form={form}
+                  userSiret={userSiret}
+                />
 
-              <TakeOverSegment form={form} userSiret={userSiret} />
+                <TakeOverSegment form={form} userSiret={userSiret} />
               </div>
             </td>
             <td>

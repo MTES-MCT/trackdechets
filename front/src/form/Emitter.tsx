@@ -80,8 +80,7 @@ export default function Emitter() {
         </fieldset>
       </div>
 
-    
-      <CompanySelector name="emitter.company" heading="Entreprise émettrice"/>
+      <CompanySelector name="emitter.company" heading="Entreprise émettrice" />
 
       <WorkSite />
     </>

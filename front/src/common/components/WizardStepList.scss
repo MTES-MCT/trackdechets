@@ -1,3 +1,4 @@
+// common styles for wizards and steplist
 .step-header {
   display: flex;
   justify-content: space-between;
@@ -37,8 +38,8 @@
 .step-header li:before {
   content: "";
   display: block;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   background-color: #ebeff3;
   border-radius: 50%;
   border: 2px solid #ffffff;
