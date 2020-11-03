@@ -171,7 +171,7 @@ export async function getCompanyInvitedUsers(
   siret: string
 ): Promise<CompanyMember[]> {
   const hashes = await prisma.userAccountHashes({
-    where: { companySiret: siret }
+    where: { companySiret: siret, acceptedAt: null }
   });
   return hashes.map(h => {
     return {
