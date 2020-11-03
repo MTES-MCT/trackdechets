@@ -1,6 +1,7 @@
 import { escape } from "querystring";
 import { Company, Form, User } from "../generated/prisma-client";
 import { cleanupSpecialChars, toFrFormat } from "../common/mails.helper";
+import { getUIBaseURL } from "../utils";
 
 const {
   UI_HOST,
@@ -76,7 +77,7 @@ export const userMails = {
     <br><br>
     La personne en charge de la société <strong>${companyName}</strong> vous a invité à rejoindre Trackdéchets.
     <br>
-    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="https://${UI_HOST}/invite?hash=${escape(
+    Pour finaliser la création de votre compte et commencer à utiliser la plateforme, cliquez <a href="${getUIBaseURL()}/invite?hash=${escape(
       hash
     )}">sur ce lien</a> et renseignez les informations demandées.
     <br>
