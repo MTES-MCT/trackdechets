@@ -123,7 +123,7 @@ describe("<Transport />", () => {
 
     describe("when the transporter signs", () => {
       beforeEach(() => {
-        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+        fireEvent.click(screen.getByTitle("Signer l'enlèvement"));
       });
 
       it("should display the producer as the collect address", () => {
@@ -134,14 +134,14 @@ describe("<Transport />", () => {
 
       it("should display the final collector as the destination", () => {
         expect(
-          screen.getByLabelText("Destination du déchet")
+          screen.getByLabelText("Destination du déchet :")
         ).toHaveTextContent(COLLECTOR.company!.name!);
       });
     });
 
     describe("when the producer signs", () => {
       beforeEach(async () => {
-        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+        fireEvent.click(screen.getByTitle("Signer l'enlèvement"));
 
         fireEvent.click(
           screen.getByLabelText(
@@ -164,14 +164,14 @@ describe("<Transport />", () => {
       });
 
       it("should display the transporter", () => {
-        expect(screen.getByLabelText("Transporteur")).toHaveTextContent(
+        expect(screen.getByLabelText("Transporteur :")).toHaveTextContent(
           TRANSPORTER.company!.name!
         );
       });
 
       it("should display the final collector as the destination", () => {
         expect(
-          screen.getByLabelText("Destination du déchet")
+          screen.getByLabelText("Destination du déchet :")
         ).toHaveTextContent(COLLECTOR.company!.name!);
       });
     });
@@ -213,7 +213,7 @@ describe("<Transport />", () => {
 
     describe("when the transporter signs", () => {
       beforeEach(() => {
-        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+        fireEvent.click(screen.getByTitle("Signer l'enlèvement"));
       });
 
       it("should display the producer as the collect address", () => {
@@ -224,14 +224,14 @@ describe("<Transport />", () => {
 
       it("should display the temporary storage as the destination", () => {
         expect(
-          screen.getByLabelText("Destination du déchet")
+          screen.getByLabelText("Destination du déchet :")
         ).toHaveTextContent(TEMPORARY_STORAGE_RECIPIENT.company!.name!);
       });
     });
 
     describe("when the producer signs", () => {
       beforeEach(async () => {
-        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+        fireEvent.click(screen.getByTitle("Signer l'enlèvement"));
         fireEvent.click(
           screen.getByLabelText(
             "J'ai vérifié que les déchets à transporter correspondent aux informations ci avant."
@@ -253,14 +253,14 @@ describe("<Transport />", () => {
       });
 
       it("should display the transporter", () => {
-        expect(screen.getByLabelText("Transporteur")).toHaveTextContent(
+        expect(screen.getByLabelText("Transporteur :")).toHaveTextContent(
           TRANSPORTER.company!.name!
         );
       });
 
       it("should display the temporary storage as the destination", () => {
         expect(
-          screen.getByLabelText("Destination du déchet")
+          screen.getByLabelText("Destination du déchet :")
         ).toHaveTextContent(TEMPORARY_STORAGE_RECIPIENT.company!.name!);
       });
     });
@@ -299,12 +299,12 @@ describe("<Transport />", () => {
         ],
       });
 
-      fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+      fireEvent.click(screen.getByTitle("Signer l'enlèvement"));
     });
 
     describe("when the transporter signs", () => {
       beforeEach(() => {
-        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+        fireEvent.click(screen.getByTitle("Signer l'enlèvement"));
       });
 
       it("should display the temporary storage as the collect address", () => {
@@ -315,14 +315,14 @@ describe("<Transport />", () => {
 
       it("should display the final collector as the destination", () => {
         expect(
-          screen.getByLabelText("Destination du déchet")
+          screen.getByLabelText("Destination du déchet :")
         ).toHaveTextContent(COLLECTOR.company!.name!);
       });
     });
 
     describe("when the temporary storage signs", () => {
       beforeEach(async () => {
-        fireEvent.click(screen.getByTitle("Signer ce bordereau"));
+        fireEvent.click(screen.getByTitle("Signer l'enlèvement"));
 
         fireEvent.click(
           screen.getByLabelText(
@@ -346,14 +346,14 @@ describe("<Transport />", () => {
       });
 
       it("should display the transporter", () => {
-        expect(screen.getByLabelText("Transporteur")).toHaveTextContent(
+        expect(screen.getByLabelText("Transporteur :")).toHaveTextContent(
           TRANSPORTER.company!.name!
         );
       });
 
       it("should display final collector as the destination", () => {
         expect(
-          screen.getByLabelText("Destination du déchet")
+          screen.getByLabelText("Destination du déchet :")
         ).toHaveTextContent(COLLECTOR.company!.name!);
       });
     });

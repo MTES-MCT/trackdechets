@@ -12,6 +12,7 @@ import React, {
 } from "react";
 import { useHistory, useParams, generatePath } from "react-router-dom";
 
+import { Breadcrumb, BreadcrumbItem } from "common/components";
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
 import { GET_SLIPS } from "dashboard/slips/query";
@@ -28,7 +29,6 @@ import { formSchema } from "../schema";
 import { GET_FORM, SAVE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
 import routes from "common/routes";
-import "common/components/WizardStepList.scss";
 import "./StepList.scss";
 
 interface IProps {
@@ -116,22 +116,22 @@ export default function StepList(props: IProps) {
 
   return (
     <div>
-      <ul className="step-header">
+      <Breadcrumb>
         {Children.map(props.children, (child, index) => (
-          <li
-            className={
+          <BreadcrumbItem
+            variant={
               index === currentStep
-                ? "is-active"
+                ? "active"
                 : currentStep > index
-                ? "is-complete"
-                : ""
+                ? "complete"
+                : "normal"
             }
             onClick={() => setCurrentStep(index)}
           >
             <span>{child.props.title}</span>
-          </li>
+          </BreadcrumbItem>
         ))}
-      </ul>
+      </Breadcrumb>
       <div className="step-content">
         <Formik<FormInput>
           innerRef={formikForm}

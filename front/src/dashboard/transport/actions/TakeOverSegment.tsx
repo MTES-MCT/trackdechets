@@ -1,5 +1,3 @@
-import "./TransportSignature.module.scss";
-
 import { Field, Form as FormikForm, Formik } from "formik";
 import { DateTime } from "luxon";
 import React, { useState } from "react";

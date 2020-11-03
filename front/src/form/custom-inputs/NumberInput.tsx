@@ -1,22 +1,31 @@
 import React, { InputHTMLAttributes } from "react";
 import { FieldProps } from "formik";
+import classNames from "classnames";
+import styles from "./NumberInput.module.scss";
+
+type NumberInputProps = FieldProps & { label: string } & InputHTMLAttributes<
+    HTMLInputElement
+  > & {
+    noSpin?: boolean;
+  };
 
 export default function NumberInput({
-  field: { name, value, onChange, onBlur },
+  field,
   label,
+  noSpin,
   ...props
-}: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
+}: NumberInputProps) {
   return (
     <label>
       {label}
       <input
-        name={name}
-        type="number"
-        value={!value && value !== 0 ? "" : value}
-        onChange={onChange}
-        onBlur={onBlur}
         min="0"
+        {...field}
         {...props}
+        type="number"
+        className={classNames(props.className, {
+          [styles.NumberInputNoSpin]: noSpin,
+        })}
       />
     </label>
   );
