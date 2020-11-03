@@ -1,0 +1,9 @@
+.showPassword {
+  color: #006be6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  > span {
+    margin-left: 0.25rem;
+  }
+}
