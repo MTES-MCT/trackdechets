@@ -43,6 +43,18 @@ function isObject(value: any): boolean {
   return Object.prototype.toString.call(value) === "[object Object]";
 }
 
+/**
+ * Merge options into defaults without extending that object.
+ *
+ * @example
+ * mergeDefaults({ foo: "" }, { foo: "foo", bar: "bar" })
+ * // returns { foo: "foo" }
+ *
+ * @param {Object} defaults The shape of the final object, with all default values.
+ * @param {Object} options Values that should overwrite defaults'.
+ *
+ * @returns {Object} Object with the exact shape as defaults, with values from options where provided.
+ */
 export function mergeDefaults<T>(defaults: T, options: Record<string, any>): T {
   return Object.keys(defaults).reduce((acc, key) => {
     if (options[key] == null) {
