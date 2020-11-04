@@ -52,23 +52,30 @@ async function getCompanies(
   siret: string,
   type: FavoriteType
 ): Promise<CompanyFavorite[]> {
+  const defaultFilters = {
+    where: {
+      OR: [
+        { owner: { id: userID } },
+        { recipientCompanySiret: siret },
+        { emitterCompanySiret: siret }
+      ],
+      isDeleted: false
+    },
+    orderBy: "updatedAt_DESC" as const,
+    first: 50
+  };
+
   switch (type) {
     case "TEMPORARY_STORAGE_DETAIL": {
       const forms = await prisma.forms({
+        ...defaultFilters,
         where: {
-          OR: [
-            { owner: { id: userID } },
-            { recipientCompanySiret: siret },
-            { emitterCompanySiret: siret }
-          ],
+          ...defaultFilters.where,
           AND: {
             recipientIsTempStorage: true,
             recipientCompanySiret_not: null
-          },
-          isDeleted: false
-        },
-        orderBy: "updatedAt_DESC",
-        first: 50
+          }
+        }
       });
       return forms.map(form => ({
         name: form.recipientCompanyName,
@@ -81,20 +88,14 @@ async function getCompanies(
     }
     case "DESTINATION": {
       const forms = await prisma.forms({
+        ...defaultFilters,
         where: {
-          OR: [
-            { owner: { id: userID } },
-            { recipientCompanySiret: siret },
-            { emitterCompanySiret: siret }
-          ],
+          ...defaultFilters.where,
           AND: {
             recipientIsTempStorage: true,
             recipientCompanySiret_not: null
-          },
-          isDeleted: false
-        },
-        orderBy: "updatedAt_DESC",
-        first: 50
+          }
+        }
       }).$fragment<
         Array<{ temporaryStorageDetail: TemporaryStorageDetail }>
       >(`fragment TemporaryStorageDetail on Form {
@@ -123,19 +124,13 @@ async function getCompanies(
     case "NEXT_DESTINATION": {
       const lowerType = type.toLowerCase();
       const forms = await prisma.forms({
+        ...defaultFilters,
         where: {
-          OR: [
-            { owner: { id: userID } },
-            { recipientCompanySiret: siret },
-            { emitterCompanySiret: siret }
-          ],
+          ...defaultFilters.where,
           AND: {
             [`${lowerType}CompanySiret_not`]: null
-          },
-          isDeleted: false
-        },
-        orderBy: "updatedAt_DESC",
-        first: 50
+          }
+        }
       });
 
       return forms.map(form => ({
