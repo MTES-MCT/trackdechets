@@ -11,6 +11,7 @@ import signedByTransporter from "./mutations/signedByTransporter";
 import markAsReceived from "./mutations/markAsReceived";
 import markAsAccepted from "./mutations/markAsAccepted";
 import markAsTempStored from "./mutations/markAsTempStored";
+import markAsTempStorerAccepted from "./mutations/markAsTempStorerAccepted";
 import markAsProcessed from "./mutations/markAsProcessed";
 import markAsResealed from "./mutations/markAsResealed";
 import markAsResent from "./mutations/markAsResent";
@@ -33,6 +34,7 @@ const Mutation: MutationResolvers = {
   markAsReceived,
   markAsAccepted,
   markAsTempStored,
+  markAsTempStorerAccepted,
   markAsResealed,
   markAsResent,
   markAsProcessed,

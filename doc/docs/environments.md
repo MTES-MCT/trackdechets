@@ -18,4 +18,5 @@ Enfin, il y a également un environnement de "recette" permettant aux équipes T
 Accéder à l'environnement de recette:
 
 * [https://api.trackdechets.fr](https://api.trackdechets.fr) (API)
-* [https://trackdechets.fr](https://trackdechets.fr) (interface graphique)
+* [https://recette.trackdechets.fr](https://tecette.trackdechets.fr) (interface graphique
+)

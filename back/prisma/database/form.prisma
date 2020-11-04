@@ -149,6 +149,7 @@ type TemporaryStorageDetail {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
 
   # Frame 14
   destinationIsFilledByEmitter: Boolean @default(value: true)
@@ -232,6 +233,7 @@ enum Status {
 
   # Temporary storage status
   TEMP_STORED
+  TEMP_STORER_ACCEPTED
   RESEALED
   RESENT
 }

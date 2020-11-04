@@ -1081,7 +1081,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
         }
       },
       {
-        status: "RECEIVED",
+        status: "ACCEPTED",
         updatedFields: {
           wasteAcceptationStatus: "ACCEPTED",
           receivedBy: "Antoine Derieux",

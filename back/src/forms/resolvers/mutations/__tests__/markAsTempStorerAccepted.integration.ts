@@ -42,7 +42,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     const { errors } = await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
       variables: {
         id: form.id,
-        tempStoredInfos: {
+        tempStorerAcceptedInfo: {
           wasteAcceptationStatus: "ACCEPTED",
           wasteRefusalReason: "",
           signedAt: "2018-12-11T00:00:00.000Z",
@@ -83,7 +83,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
       variables: {
         id: form.id,
-        tempStoredInfos: {
+        tempStorerAcceptedInfo: {
           wasteAcceptationStatus: "ACCEPTED",
           wasteRefusalReason: "",
           signedAt: "2018-12-11T00:00:00.000Z",
@@ -119,7 +119,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "TEMP_STORERD",
+        status: "TEMP_STORED",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
@@ -134,7 +134,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
       variables: {
         id: form.id,
-        tempStoredInfos: {
+        tempStorerAcceptedInfo: {
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Thats isn't what I was expecting man !",
           signedBy: "John Doe",
