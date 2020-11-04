@@ -95,9 +95,9 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
     // their company is not included in the results yet
     favorites.find(favorite => favorite.siret === company.siret) == null
   ) {
-    // prepend the results with their own company
+    // append their own company to the results
     const companySearchResult = await searchCompany(company.siret);
-    favorites.unshift({
+    favorites.push({
       name: company.name,
       siret: company.siret,
       address: companySearchResult.address,

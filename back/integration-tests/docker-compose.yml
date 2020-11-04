@@ -39,7 +39,6 @@ services:
     env_file:
       - .integration-tests-env
     environment:
-      NODE_ENV: dev
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       PRISMA_ENDPOINT: $PRISMA_ENDPOINT
