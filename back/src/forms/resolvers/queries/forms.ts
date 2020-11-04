@@ -61,7 +61,7 @@ export async function getForms(
 
   const queriedForms = await prisma.forms({
     ...getPaginationFilter(rest),
-    orderBy: "createdAt_DESC",
+    // orderBy: "createdAt_DESC",
     where: {
       updatedAt_gte: rest.updatedAfter,
       sentAt_gte: rest.sentAfter,
