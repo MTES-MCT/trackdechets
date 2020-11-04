@@ -3,7 +3,12 @@ import {
   FavoriteType,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import { Company, CompanyType, prisma } from "../../../generated/prisma-client";
+import {
+  Company,
+  CompanyType,
+  prisma,
+  TemporaryStorageDetail
+} from "../../../generated/prisma-client";
 import { searchCompany } from "../../sirene";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -42,6 +47,111 @@ function matchesFavoriteType(
   );
 }
 
+async function getCompanies(
+  userID: string,
+  siret: string,
+  type: FavoriteType
+): Promise<CompanyFavorite[]> {
+  switch (type) {
+    case "TEMPORARY_STORAGE_DETAIL": {
+      const forms = await prisma.forms({
+        where: {
+          OR: [
+            { owner: { id: userID } },
+            { recipientCompanySiret: siret },
+            { emitterCompanySiret: siret }
+          ],
+          AND: {
+            recipientIsTempStorage: true,
+            recipientCompanySiret_not: null
+          },
+          isDeleted: false
+        },
+        orderBy: "updatedAt_DESC",
+        first: 50
+      });
+      return forms.map(form => ({
+        name: form.recipientCompanyName,
+        siret: form.recipientCompanySiret,
+        address: form.recipientCompanyAddress,
+        contact: form.recipientCompanyAddress,
+        phone: form.recipientCompanyPhone,
+        mail: form.recipientCompanyMail
+      }));
+    }
+    case "DESTINATION": {
+      const forms = await prisma.forms({
+        where: {
+          OR: [
+            { owner: { id: userID } },
+            { recipientCompanySiret: siret },
+            { emitterCompanySiret: siret }
+          ],
+          AND: {
+            recipientIsTempStorage: true,
+            recipientCompanySiret_not: null
+          },
+          isDeleted: false
+        },
+        orderBy: "updatedAt_DESC",
+        first: 50
+      }).$fragment<
+        Array<{ temporaryStorageDetail: TemporaryStorageDetail }>
+      >(`fragment TemporaryStorageDetail on Form {
+        temporaryStorageDetail {
+          destinationCompanyName
+          destinationCompanySiret
+          destinationCompanyAddress
+          destinationCompanyContact
+          destinationCompanyPhone
+          destinationCompanyMail
+        }
+      }`);
+      return forms.map(form => ({
+        name: form.temporaryStorageDetail.destinationCompanyName,
+        siret: form.temporaryStorageDetail.destinationCompanySiret,
+        address: form.temporaryStorageDetail.destinationCompanyAddress,
+        contact: form.temporaryStorageDetail.destinationCompanyContact,
+        phone: form.temporaryStorageDetail.destinationCompanyPhone,
+        mail: form.temporaryStorageDetail.destinationCompanyMail
+      }));
+    }
+    case "EMITTER":
+    case "TRANSPORTER":
+    case "RECIPIENT":
+    case "TRADER":
+    case "NEXT_DESTINATION": {
+      const lowerType = type.toLowerCase();
+      const forms = await prisma.forms({
+        where: {
+          OR: [
+            { owner: { id: userID } },
+            { recipientCompanySiret: siret },
+            { emitterCompanySiret: siret }
+          ],
+          AND: {
+            [`${lowerType}CompanySiret_not`]: null
+          },
+          isDeleted: false
+        },
+        orderBy: "updatedAt_DESC",
+        first: 50
+      });
+
+      return forms.map(form => ({
+        name: form[`${lowerType}CompanyName`],
+        siret: form[`${lowerType}CompanySiret`],
+        address: form[`${lowerType}CompanyAddress`],
+        contact: form[`${lowerType}CompanyContact`],
+        phone: form[`${lowerType}CompanyPhone`],
+        mail: form[`${lowerType}CompanyMail`]
+      }));
+    }
+    default:
+      return [];
+  }
+}
+
 const favoritesResolver: QueryResolvers["favorites"] = async (
   parent,
   { siret, type },
@@ -52,35 +162,9 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   const company = await getCompanyOrCompanyNotFound({ siret });
   await checkIsCompanyMember({ id: user.id }, { siret: company.siret });
 
-  const lowerType = type.toLowerCase();
-
-  const forms = await prisma.forms({
-    where: {
-      OR: [
-        { owner: { id: user.id } },
-        { recipientCompanySiret: company.siret },
-        { emitterCompanySiret: company.siret }
-      ],
-      AND: {
-        [`${lowerType}CompanySiret_not`]: null
-      },
-      isDeleted: false
-    },
-    orderBy: "updatedAt_DESC",
-
-    // Take more than needed as duplicates are filtered out
-    first: 50
-  });
-
-  const favorites: CompanyFavorite[] = forms
-    .map(form => ({
-      name: form[`${lowerType}CompanyName`],
-      siret: form[`${lowerType}CompanySiret`],
-      address: form[`${lowerType}CompanyAddress`],
-      contact: form[`${lowerType}CompanyContact`],
-      phone: form[`${lowerType}CompanyPhone`],
-      mail: form[`${lowerType}CompanyMail`]
-    }))
+  const favorites: CompanyFavorite[] = (
+    await getCompanies(user.id, company.siret, type)
+  )
     // Remove duplicates (by company siret)
     .reduce<CompanyFavorite[]>((prev, cur) => {
       if (prev.find(el => el.siret === cur.siret) == null) {

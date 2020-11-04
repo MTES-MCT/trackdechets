@@ -5,6 +5,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { prisma } from "../../../../generated/prisma-client";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
@@ -181,6 +182,75 @@ describe("query favorites", () => {
     expect(data.favorites).toEqual([
       expect.objectContaining({
         siret: firstForm.emitterCompanySiret
+      })
+    ]);
+  });
+
+  it("should suggest a temporary storer", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        recipientCompanySiret: "0".repeat(14),
+        recipientIsTempStorage: true,
+        temporaryStorageDetail: {
+          create: {}
+        }
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TEMPORARY_STORAGE_DETAIL"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: form.recipientCompanySiret
+      })
+    ]);
+  });
+
+  it("should suggest a temporary storage detail destination", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        recipientCompanySiret: "0".repeat(14),
+        recipientIsTempStorage: true,
+        temporaryStorageDetail: {
+          create: {
+            destinationCompanySiret: "1".repeat(14)
+          }
+        }
+      }
+    });
+    const temporaryStorageDetail = await prisma
+      .form({ id: form.id })
+      .temporaryStorageDetail();
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "DESTINATION"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: temporaryStorageDetail.destinationCompanySiret
       })
     ]);
   });

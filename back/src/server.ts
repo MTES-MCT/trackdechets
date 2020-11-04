@@ -123,7 +123,7 @@ export const server = new ApolloServer({
     }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
-      NODE_ENV !== "dev"
+      NODE_ENV === "production"
     ) {
       // Do not leak error for internal server error in production
       return new ApolloError("Erreur serveur", ErrorCode.INTERNAL_SERVER_ERROR);
