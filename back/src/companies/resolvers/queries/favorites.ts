@@ -1,3 +1,4 @@
+import { camelCase } from "camel-case";
 import {
   CompanyFavorite,
   FavoriteType,
@@ -122,7 +123,7 @@ async function getCompanies(
     case "RECIPIENT":
     case "TRADER":
     case "NEXT_DESTINATION": {
-      const lowerType = type.toLowerCase();
+      const lowerType = camelCase(type);
       const forms = await prisma.forms({
         ...defaultFilters,
         where: {

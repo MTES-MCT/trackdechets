@@ -254,4 +254,32 @@ describe("query favorites", () => {
       })
     ]);
   });
+
+  it("should suggest a next destination", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationCompanySiret: "0".repeat(14)
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "NEXT_DESTINATION"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: form.nextDestinationCompanySiret
+      })
+    ]);
+  });
 });

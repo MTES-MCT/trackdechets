@@ -35,6 +35,7 @@
     "axios": "^0.19.2",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "camel-case": "^4.1.1",
     "connect-redis": "^4.0.4",
     "cors": "^2.8.5",
     "csv-parser": "^2.3.3",
