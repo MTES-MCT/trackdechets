@@ -48,30 +48,51 @@ function matchesFavoriteType(
   );
 }
 
-async function getCompanies(
+/**
+ * Return a list of companies the user (and their company) have been working with recently.
+ * The list is filtered according to a given "FavoriteType": a field of the form.
+ *
+ * @param {string} userID ID of the user for whom to retrieve the recent partners
+ * @param {string} siret SIRET of the company for which to retrieve the recent partners
+ * @param {FavoriteType} type the type of partners to search for
+ *
+ * @returns {Promise} resolves to a list of recent partners matching the provided parameters
+ */
+async function getRecentPartners(
   userID: string,
   siret: string,
   type: FavoriteType
 ): Promise<CompanyFavorite[]> {
-  const defaultFilters = {
-    where: {
-      OR: [
-        { owner: { id: userID } },
-        { recipientCompanySiret: siret },
-        { emitterCompanySiret: siret }
-      ],
-      isDeleted: false
-    },
+  const defaultArgs = {
     orderBy: "updatedAt_DESC" as const,
     first: 50
+  };
+  const defaultWhere = {
+    OR: [
+      { owner: { id: userID } },
+      { emitterCompanySiret: siret },
+      { ecoOrganismeSiret: siret },
+      { recipientCompanySiret: siret },
+      { traderCompanySiret: siret },
+      {
+        temporaryStorageDetail: { destinationCompanySiret: siret }
+      },
+      { transporterCompanySiret: siret },
+      {
+        transportSegments_some: {
+          transporterCompanySiret: siret
+        }
+      }
+    ],
+    isDeleted: false
   };
 
   switch (type) {
     case "TEMPORARY_STORAGE_DETAIL": {
       const forms = await prisma.forms({
-        ...defaultFilters,
+        ...defaultArgs,
         where: {
-          ...defaultFilters.where,
+          ...defaultWhere,
           AND: {
             recipientIsTempStorage: true,
             recipientCompanySiret_not: null
@@ -89,12 +110,11 @@ async function getCompanies(
     }
     case "DESTINATION": {
       const forms = await prisma.forms({
-        ...defaultFilters,
+        ...defaultArgs,
         where: {
-          ...defaultFilters.where,
-          AND: {
-            recipientIsTempStorage: true,
-            recipientCompanySiret_not: null
+          ...defaultWhere,
+          temporaryStorageDetail: {
+            destinationCompanySiret_not: null
           }
         }
       }).$fragment<
@@ -125,12 +145,10 @@ async function getCompanies(
     case "NEXT_DESTINATION": {
       const lowerType = camelCase(type);
       const forms = await prisma.forms({
-        ...defaultFilters,
+        ...defaultArgs,
         where: {
-          ...defaultFilters.where,
-          AND: {
-            [`${lowerType}CompanySiret_not`]: null
-          }
+          ...defaultWhere,
+          [`${lowerType}CompanySiret_not`]: null
         }
       });
 
@@ -159,7 +177,7 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   await checkIsCompanyMember({ id: user.id }, { siret: company.siret });
 
   const favorites: CompanyFavorite[] = (
-    await getCompanies(user.id, company.siret, type)
+    await getRecentPartners(user.id, company.siret, type)
   )
     // Remove duplicates (by company siret)
     .reduce<CompanyFavorite[]>((prev, cur) => {
