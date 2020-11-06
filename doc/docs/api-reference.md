@@ -160,8 +160,7 @@ SIRET d'un établissement dont je suis membre
 <td>
 
 DEPRECATED - (Optionnel) PAGINATION
-Nombre d'éléments à ne pas récupérer en début de liste
-dans le mode de pagination par "offset"
+Nombre d'éléments à ne pas récupérer en début de liste dans le mode de pagination par "offset"
 Utiliser en conjonction avec `first` pour paginer "en avant" (des plus récents aux plus anciens)
 Utiliser en conjonction avec `last` pour paginer "en arrière" (des plus anciens aux plus récents)
 Défaut à 0
@@ -315,7 +314,7 @@ Défaut à vide.
 
 Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
 La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
-Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont retournés
+Seuls les changements de statut disposant d'un champ `loggedAt` non nul sont retournés
 
 </td>
 </tr>
@@ -354,7 +353,7 @@ Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont re
 (Optionnel) PAGINATION
 Permet de paginer les changements de statut "en avant"
 (des changements de statut les plus récents aux changements de statut les plus anciens)
-Curseur après lequel les changements de statuts doivent être retournés
+Curseur après lequel les changements de statut doivent être retournés
 Attend un identifiant (propriété `id`) d'un changement de statut
 Défaut à vide, pour retourner les changements de statut les plus récents
 Le changement de statut précisé dans le curseur ne fait pas partie du résultat
@@ -369,7 +368,7 @@ Le changement de statut précisé dans le curseur ne fait pas partie du résulta
 (Optionnel) PAGINATION
 Permet de paginer les changements de statut "en arrière"
 (des changements de statut les plus anciens aux changements de statut les plus récents)
-Curseur avant lequel les changements de statuts doivent être retournés
+Curseur avant lequel les changements de statut doivent être retournés
 Attend un identifiant (propriété `id`) d'un changement de statut
 Défaut à vide, pour retourner les changements de statut les plus anciens
 Le changement de statut précisé dans le curseur ne fait pas partie du résultat
