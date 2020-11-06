@@ -1,51 +1,27 @@
-import { UserInputError } from "apollo-server-express";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
+import { Company, prisma } from "../../../generated/prisma-client";
 import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import {
-  Form,
-  QueryFormsArgs,
-  QueryResolvers
-} from "../../../generated/graphql/types";
-import { Company, prisma } from "../../../generated/prisma-client";
+import { QueryResolvers } from "../../../generated/graphql/types";
 import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
-
-function validateArgs(args: QueryFormsArgs) {
-  if (args.first < 1 || args.first > 500) {
-    throw new UserInputError(
-      "Le paramètre `first` doit être compris entre 1 et 500"
-    );
-  }
-  // DEPRECATED. To remove with skip
-  if (args.skip < 0) {
-    throw new UserInputError("Le paramètre `skip` doit être positif");
-  }
-  return args;
-}
-
-const DEFAULT_PAGINATE_BY = 50;
+import { getConnectionsArgs } from "../../pagination";
 
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
-  const validArgs = validateArgs(args);
-  return getForms(user.id, validArgs);
-};
 
-export async function getForms(
-  userId: string,
-  { siret, status, roles, hasNextStep, ...rest }: QueryFormsArgs
-): Promise<Form[]> {
+  const { siret, status, roles, hasNextStep, ...rest } = args;
+
   let company: Company | null = null;
 
   if (siret) {
     // a siret is specified, check user has permission on this company
     company = await getCompanyOrCompanyNotFound({ siret });
-    await checkIsCompanyMember({ id: userId }, { siret });
+    await checkIsCompanyMember({ id: user.id }, { siret });
   } else {
-    const userCompanies = await getUserCompanies(userId);
+    const userCompanies = await getUserCompanies(user.id);
 
     if (userCompanies.length === 0) {
       // the user is not member of any companies, return empty array
@@ -61,8 +37,16 @@ export async function getForms(
     company = userCompanies[0];
   }
 
+  // validate pagination arguments (skip, first, last, cursorAfter, cursorBefore)
+  // and convert them to prisma connections args: (skip, first, last, after, before)
+  const connectionsArgs = getConnectionsArgs({
+    ...rest,
+    defaultPaginateBy: 50,
+    maxPaginateBy: 500
+  });
+
   const queriedForms = await prisma.forms({
-    ...getPaginationFilter(rest),
+    ...connectionsArgs,
     orderBy: "createdAt_DESC",
     where: {
       updatedAt_gte: rest.updatedAfter,
@@ -81,7 +65,7 @@ export async function getForms(
   });
 
   return queriedForms.map(f => expandFormFromDb(f));
-}
+};
 
 function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
   if (hasNextStep == null) {
@@ -138,35 +122,6 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
   };
 
   return hasNextStep ? filter : { NOT: filter };
-}
-
-function getPaginationFilter({
-  first = DEFAULT_PAGINATE_BY,
-  last = DEFAULT_PAGINATE_BY,
-  skip,
-  cursorAfter: after,
-  cursorBefore: before
-}: Partial<QueryFormsArgs>) {
-  // DEPRECATED. To remove with skip
-  if (skip) {
-    return {
-      first,
-      skip
-    };
-  }
-
-  if (before) {
-    return {
-      before,
-      last
-    };
-  }
-
-  // By default, if no cursorAfter is provided we'll return the first elements
-  return {
-    after,
-    first
-  };
 }
 
 export default formsResolver;

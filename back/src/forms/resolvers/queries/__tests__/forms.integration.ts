@@ -1,6 +1,10 @@
 import { addDays, format, subDays } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import {
+  Form,
+  FormCreateInput,
+  prisma
+} from "../../../../generated/prisma-client";
 import {
   companyFactory,
   formFactory,
@@ -10,7 +14,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-function createForms(userId: string, params: any[]) {
+function createForms(userId: string, params: Partial<FormCreateInput>[]) {
   return Promise.all(
     params.map(p => {
       return formFactory({
@@ -21,36 +25,76 @@ function createForms(userId: string, params: any[]) {
   );
 }
 
+function createNForms(
+  userId: string,
+  param: Partial<FormCreateInput>,
+  n: number
+) {
+  return createForms(userId, Array(n).fill(param));
+}
+
+// Created n forms sequentially in order to have a
+// strict ordering on the field `createdAt`
+async function createNSortedForms(
+  userId: string,
+  opt: Partial<FormCreateInput>,
+  n: number
+) {
+  const forms: Form[] = [];
+  for (const _ of Array(n)) {
+    const form = await formFactory({ ownerId: userId, opt });
+    forms.push(form);
+  }
+  return forms;
+}
+
 const FORMS = `
-  query Forms($siret: String, $status: [FormStatus!], $roles: [FormRole!], $first: Int, $skip: Int) {
-    forms(siret: $siret, status: $status, roles: $roles, first: $first, skip: $skip) {
-      id
-      recipient {
-        company {
-          siret
-        }
+  query Forms(
+    $siret: String,
+    $status: [FormStatus!],
+    $roles: [FormRole!],
+    $skip: Int,
+    $first: Int,
+    $last: Int,
+    $cursorBefore: ID,
+    $cursorAfter: ID) {
+      forms(
+        siret: $siret
+        status: $status
+        roles: $roles
+        skip: $skip
+        first: $first
+        last: $last
+        cursorBefore: $cursorBefore
+        cursorAfter: $cursorAfter
+        ) {
+          id
+          recipient {
+            company {
+              siret
+            }
+          }
+          emitter {
+            company {
+              siret
+            }
+          }
+          ecoOrganisme {
+            siret
+          }
+          wasteDetails {
+            packagingInfos {
+              type
+              quantity
+            }
+          }
+          stateSummary {
+            packagingInfos {
+              type
+              quantity
+            }
+          }
       }
-      emitter {
-        company {
-          siret
-        }
-      }
-      ecoOrganisme {
-        siret
-      }
-      wasteDetails {
-        packagingInfos {
-          type
-          quantity
-        }
-      }
-      stateSummary {
-        packagingInfos {
-          type
-          quantity
-        }
-      }
-    }
   }
 `;
 
@@ -327,92 +371,126 @@ describe("Query.forms", () => {
     expect(roleAndStatusFiltered.forms.length).toBe(1);
   });
 
-  it("should display paginated results", async () => {
+  it("should paginate forward with `first` and `skip` (descending order)", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
+    const opts = {
+      recipientCompanyName: company.name,
+      recipientCompanySiret: company.siret
+    };
+    const forms = await createNSortedForms(user.id, opts, 5);
+    const f4 = forms[3];
+    const { query } = makeClient(user);
+    const { data } = await query(FORMS, { variables: { first: 1, skip: 1 } });
+    const formIds = data.forms.map(f => f.id);
+    expect(formIds).toEqual([f4.id]);
+  });
 
-    // The user has many forms, and a different role in each
-    await createForms(user.id, [
-      {
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      },
-      {
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      },
-      {
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      },
-      {
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      },
-      {
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      },
-      {
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      }
-    ]);
+  it("should paginate forward with `first` and `cursorAfter` (descending order)", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const opts = {
+      recipientCompanyName: company.name,
+      recipientCompanySiret: company.siret
+    };
+    const forms = await createNSortedForms(user.id, opts, 5);
+    const f1 = forms[0];
+    const f2 = forms[1];
+    const f3 = forms[2];
+    const f4 = forms[3];
+    const f5 = forms[4];
 
     const { query } = makeClient(user);
-    // Get the forms we just created, as ordered by the API
-    const { data: created } = await query(
-      `query {
-          forms {
-            id
-          }
-        }
-      `
-    );
+    const { data: data1 } = await query(FORMS, {
+      variables: { first: 2 }
+    });
+    const page1 = data1.forms.map(f => f.id);
+    expect(page1).toEqual([f5.id, f4.id]);
+    const { data: data2 } = await query(FORMS, {
+      variables: {
+        first: 2,
+        cursorAfter: f4.id
+      }
+    });
+    const page2 = data2.forms.map(f => f.id);
+    expect(page2).toEqual([f3.id, f2.id]);
+    const { data: data3 } = await query(FORMS, {
+      variables: {
+        first: 2,
+        cursorAfter: f2.id
+      }
+    });
+    const page3 = data3.forms.map(f => f.id);
+    expect(page3).toEqual([f1.id]);
+    const { data: data4 } = await query(FORMS, {
+      variables: { first: 2, cursorAfter: f1.id }
+    });
+    const page4 = data4.forms.map(f => f.id);
+    expect(page4).toEqual([]);
+  });
 
-    const { data: firstForms } = await query(
-      `query {
-          forms(first: 4) {
-            id
-          }
-        }
-      `
-    );
-    expect(firstForms.forms.length).toBe(4);
+  it("should paginate backward with `last` and `skip` (descending order)", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const opts = {
+      recipientCompanyName: company.name,
+      recipientCompanySiret: company.siret
+    };
+    const forms = await createNSortedForms(user.id, opts, 5);
+    const f2 = forms[1];
+    const { query } = makeClient(user);
+    const { data } = await query(FORMS, { variables: { last: 1, skip: 1 } });
+    const formIds = data.forms.map(f => f.id);
+    expect(formIds).toEqual([f2.id]);
+  });
 
-    const { data: formsAfter } = await query(
-      `query Forms($cursorAfter: ID) {
-          forms(cursorAfter: $cursorAfter) {
-            id
-          }
-        }
-      `,
-      { variables: { cursorAfter: created.forms[3].id } }
-    );
-    expect(formsAfter.forms.length).toBe(2);
+  it("should paginate backward with `last` and `cursorBefore` (descending order)", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const opts = {
+      recipientCompanyName: company.name,
+      recipientCompanySiret: company.siret
+    };
+    const forms = await createNSortedForms(user.id, opts, 5);
+    const f1 = forms[0];
+    const f2 = forms[1];
+    const f3 = forms[2];
+    const f4 = forms[3];
+    const f5 = forms[4];
 
-    const { data: formsBefore } = await query(
-      `query Forms($cursorBefore: ID) {
-          forms(cursorBefore: $cursorBefore) {
-            id
-          }
-        }
-      `,
-      { variables: { cursorBefore: created.forms[1].id } }
-    );
-    expect(formsBefore.forms.length).toBe(1);
+    const { query } = makeClient(user);
+    const { data: data1 } = await query(FORMS, {
+      variables: { last: 2 }
+    });
+    const page1 = data1.forms.map(f => f.id);
+    expect(page1).toEqual([f2.id, f1.id]);
+    const { data: data2 } = await query(FORMS, {
+      variables: {
+        last: 2,
+        cursorBefore: f2.id
+      }
+    });
+    const page2 = data2.forms.map(f => f.id);
+    expect(page2).toEqual([f4.id, f3.id]);
+    const { data: data3 } = await query(FORMS, {
+      variables: {
+        last: 2,
+        cursorBefore: f4.id
+      }
+    });
+    const page3 = data3.forms.map(f => f.id);
+    expect(page3).toEqual([f5.id]);
+    const { data: data4 } = await query(FORMS, {
+      variables: { last: 2, cursorBefore: f5.id }
+    });
+    const page4 = data4.forms.map(f => f.id);
+    expect(page4).toEqual([]);
   });
 
   it("should return 50 forms by default", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
-    await Promise.all(
-      Array.from({ length: 60 }).map(() =>
-        formFactory({
-          ownerId: user.id,
-          opt: {
-            emitterCompanySiret: company.siret
-          }
-        })
-      )
+    await createNForms(
+      user.id,
+      {
+        emitterCompanySiret: company.siret
+      },
+      60
     );
 
     const { query } = makeClient(user);
