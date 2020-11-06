@@ -8,6 +8,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # Unreleased
 
 - Migration du service td-etl dans un projet Github à part [PR 683](https://github.com/MTES-MCT/trackdechets/pull/683)
+- Correction de la mutation `duplicateForm` pour dupliquer l'entreposage provisoire, [PR 700](https://github.com/
 
 # [2020.10.1] 03/11/2020
 
