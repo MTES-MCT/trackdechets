@@ -122,7 +122,6 @@ type Form {
   traderValidityLimit: DateTime
 
   # Eco-organisme
-  ecoOrganisme: EcoOrganisme # DEPRECATED
   ecoOrganismeName: String
   ecoOrganismeSiret: String
 
