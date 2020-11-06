@@ -161,6 +161,9 @@ SIRET d'un établissement dont je suis membre
 
 DEPRECATED - (Optionnel) PAGINATION
 Nombre d'éléments à ne pas récupérer en début de liste
+dans le mode de pagination par "offset"
+Utiliser en conjonction avec `first` pour paginer "en avant" (des plus récents aux plus anciens)
+Utiliser en conjonction avec `last` pour paginer "en arrière" (des plus anciens aux plus récents)
 Défaut à 0
 
 </td>
@@ -171,9 +174,11 @@ Défaut à 0
 <td>
 
 (Optionnel) PAGINATION
+Permet en conjonction avec `first` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
 Curseur après lequel les bordereaux doivent être retournés
 Attend un identifiant (propriété `id`) de BSD
-Défaut à vide, pour retourner les "premiers" bordereaux
+Défaut à vide, pour retourner les bordereaux les plus récents
 Le BSD précisé dans le curseur ne fait pas partie du résultat
 
 </td>
@@ -184,9 +189,10 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 <td>
 
 (Optionnel) PAGINATION
+Permet en conjonction avec `cursorAfter` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
 Nombre de bordereaux retournés après le `cursorAfter`
 Défaut à 50, maximum à 500
-Ignoré si utilisé avec `cursorBefore`
 
 </td>
 </tr>
@@ -196,9 +202,11 @@ Ignoré si utilisé avec `cursorBefore`
 <td>
 
 (Optionnel) PAGINATION
+Permet en conjonction avec `last` de paginer "en arrière"
+(des bordereaux les plus anciens aux bordereaux les plus récents)
 Curseur avant lequel les bordereaux doivent être retournés
 Attend un identifiant (propriété `id`) de BSD
-Défaut à vide, pour retourner les "derniers" bordereaux
+Défaut à vide, pour retourner les bordereaux les plus anciens
 Le BSD précisé dans le curseur ne fait pas partie du résultat
 
 </td>
@@ -211,7 +219,6 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 (Optionnel) PAGINATION
 Nombre de bordereaux retournés avant le `cursorBefore`
 Défaut à 50, maximum à 500
-Ignoré si utilisé avec `cursorAfter`
 
 </td>
 </tr>
@@ -344,7 +351,13 @@ Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont re
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-(Optionnel) PAGINATION - Curseur après lequel les changements de statut doivent être retournés
+(Optionnel) PAGINATION
+Permet de paginer les changements de statut "en avant"
+(des changements de statut les plus récents aux changements de statut les plus anciens)
+Curseur après lequel les changements de statuts doivent être retournés
+Attend un identifiant (propriété `id`) d'un changement de statut
+Défaut à vide, pour retourner les changements de statut les plus récents
+Le changement de statut précisé dans le curseur ne fait pas partie du résultat
 
 </td>
 </tr>
@@ -353,7 +366,13 @@ Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont re
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-(Optionnel) PAGINATION - Curseur avant lequel les changements de statut doivent être retournés
+(Optionnel) PAGINATION
+Permet de paginer les changements de statut "en arrière"
+(des changements de statut les plus anciens aux changements de statut les plus récents)
+Curseur avant lequel les changements de statuts doivent être retournés
+Attend un identifiant (propriété `id`) d'un changement de statut
+Défaut à vide, pour retourner les changements de statut les plus anciens
+Le changement de statut précisé dans le curseur ne fait pas partie du résultat
 
 </td>
 </tr>

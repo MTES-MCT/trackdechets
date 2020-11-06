@@ -46,32 +46,40 @@ type Query {
     """
     DEPRECATED - (Optionnel) PAGINATION
     Nombre d'éléments à ne pas récupérer en début de liste
+    dans le mode de pagination par "offset"
+    Utiliser en conjonction avec `first` pour paginer "en avant" (des plus récents aux plus anciens)
+    Utiliser en conjonction avec `last` pour paginer "en arrière" (des plus anciens aux plus récents)
     Défaut à 0
     """
     skip: Int
 
     """
     (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
     Curseur après lequel les bordereaux doivent être retournés
     Attend un identifiant (propriété `id`) de BSD
-    Défaut à vide, pour retourner les "premiers" bordereaux
+    Défaut à vide, pour retourner les bordereaux les plus récents
     Le BSD précisé dans le curseur ne fait pas partie du résultat
     """
     cursorAfter: ID
 
     """
     (Optionnel) PAGINATION
+    Permet en conjonction avec `cursorAfter` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
     Nombre de bordereaux retournés après le `cursorAfter`
     Défaut à 50, maximum à 500
-    Ignoré si utilisé avec `cursorBefore`
     """
     first: Int
 
     """
     (Optionnel) PAGINATION
+    Permet en conjonction avec `last` de paginer "en arrière"
+    (des bordereaux les plus anciens aux bordereaux les plus récents)
     Curseur avant lequel les bordereaux doivent être retournés
     Attend un identifiant (propriété `id`) de BSD
-    Défaut à vide, pour retourner les "derniers" bordereaux
+    Défaut à vide, pour retourner les bordereaux les plus anciens
     Le BSD précisé dans le curseur ne fait pas partie du résultat
     """
     cursorBefore: ID
@@ -80,7 +88,6 @@ type Query {
     (Optionnel) PAGINATION
     Nombre de bordereaux retournés avant le `cursorBefore`
     Défaut à 50, maximum à 500
-    Ignoré si utilisé avec `cursorAfter`
     """
     last: Int
 
@@ -215,9 +222,25 @@ type Query {
     loggedBefore: String
     "(Optionnel) Date formatée avant laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel"
     loggedAfter: String
-    "(Optionnel) PAGINATION - Curseur après lequel les changements de statut doivent être retournés"
+    """
+    (Optionnel) PAGINATION
+    Permet de paginer les changements de statut "en avant"
+    (des changements de statut les plus récents aux changements de statut les plus anciens)
+    Curseur après lequel les changements de statuts doivent être retournés
+    Attend un identifiant (propriété `id`) d'un changement de statut
+    Défaut à vide, pour retourner les changements de statut les plus récents
+    Le changement de statut précisé dans le curseur ne fait pas partie du résultat
+    """
     cursorAfter: String
-    "(Optionnel) PAGINATION - Curseur avant lequel les changements de statut doivent être retournés"
+    """
+    (Optionnel) PAGINATION
+    Permet de paginer les changements de statut "en arrière"
+    (des changements de statut les plus anciens aux changements de statut les plus récents)
+    Curseur avant lequel les changements de statuts doivent être retournés
+    Attend un identifiant (propriété `id`) d'un changement de statut
+    Défaut à vide, pour retourner les changements de statut les plus anciens
+    Le changement de statut précisé dans le curseur ne fait pas partie du résultat
+    """
     cursorBefore: String
     "(Optionnel) ID d'un BSD en particulier"
     formId: ID
