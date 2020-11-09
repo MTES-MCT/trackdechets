@@ -55,14 +55,14 @@ export const PackagingRow = ({
   );
 
   return (
-    <div className={styles.detailRow}>
+    <>
       <dt>Conditionnement</dt>
       <dd>
         {formatedPackagings}
         {numberOfPackages && (
-          <span className="tw-ml-2">{numberOfPackages}</span>
+          <span className="tw-ml-2">({numberOfPackages})</span>
         )}
       </dd>
-    </div>
+    </>
   );
 };

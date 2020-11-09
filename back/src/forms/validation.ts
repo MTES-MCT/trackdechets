@@ -342,7 +342,7 @@ export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
     }),
     wasteDetailsPackagingInfos: yup
       .array()
-      .required()
+      .required("Le détail du conditionnement est obligatoire")
       .of(packagingInfo)
       .test(
         "is-valid-packaging-infos",

@@ -170,8 +170,8 @@ export const formSchema = object().shape({
       /(REAL|ESTIMATED)/,
       "Le type de quantité (réelle ou estimée) doit être précisé"
     ),
-    consistence: string().matches(
-      /(SOLID|LIQUID|GASEOUS|DOUGHY)/,
+    consistence: string().oneOf(
+      Object.values(Packagings),
       "La consistance du déchet doit être précisée"
     ),
   }),

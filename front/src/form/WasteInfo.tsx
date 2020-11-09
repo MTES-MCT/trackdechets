@@ -75,6 +75,12 @@ export default connect<{}, Values>(function WasteInfo(props) {
               label="Gazeux"
               component={RadioButton}
             />
+            <Field
+              name="wasteDetails.consistence"
+              id="DOUGHY"
+              label="Pâteux"
+              component={RadioButton}
+            />
           </div>
         </fieldset>
 

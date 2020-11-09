@@ -1765,8 +1765,13 @@ export type StateSummary = {
   __typename?: 'StateSummary';
   /** Quantité la plus à jour */
   quantity?: Maybe<Scalars['Float']>;
+  /**
+   * DEPRECATED Packaging le plus à jour
+   * @deprecated Utiliser packagingInfos
+   */
+  packagings: Array<Packagings>;
   /** Packaging le plus à jour */
-  packagingInfos?: Maybe<Array<PackagingInfo>>;
+  packagingInfos: Array<PackagingInfo>;
   /** Code ONU le plus à jour */
   onuCode?: Maybe<Scalars['String']>;
   /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
@@ -2192,7 +2197,7 @@ export type WasteDetailsInput = {
   /** Code ONU */
   onuCode?: Maybe<Scalars['String']>;
   /** Conditionnements */
-  packagingInfos?: Maybe<Array<Maybe<PackagingInfoInput>>>;
+  packagingInfos?: Maybe<Array<PackagingInfoInput>>;
   /** DEPRECATED - Conditionnement */
   packagings?: Maybe<Array<Maybe<Packagings>>>;
   /** DEPRECATED - Autre packaging (préciser) */
@@ -2867,7 +2872,8 @@ export type StatResolvers<ContextType = GraphQLContext, ParentType extends Resol
 
 export type StateSummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StateSummary'] = ResolversParentTypes['StateSummary']> = {
   quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  packagingInfos?: Resolver<Maybe<Array<ResolversTypes['PackagingInfo']>>, ParentType, ContextType>;
+  packagings?: Resolver<Array<ResolversTypes['Packagings']>, ParentType, ContextType>;
+  packagingInfos?: Resolver<Array<ResolversTypes['PackagingInfo']>, ParentType, ContextType>;
   onuCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   transporter?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
   transporterNumberPlate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -3680,7 +3686,8 @@ export function createStateSummaryMock(props: Partial<StateSummary>): StateSumma
   return {
     __typename: "StateSummary",
     quantity: null,
-    packagingInfos: null,
+    packagings: [],
+    packagingInfos: [],
     onuCode: null,
     transporter: null,
     transporterNumberPlate: null,

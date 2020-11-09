@@ -37,7 +37,8 @@ import {
   NextDestinationInput,
   ImportPaperFormInput,
   EcoOrganismeInput,
-  PackagingInfo
+  PackagingInfo,
+  TransporterSignatureFormInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -406,6 +407,15 @@ export function flattenResentFormInput(
   });
 }
 
+export function flattenSignedByTransporterInput(
+  transporterSignatureFormInput: TransporterSignatureFormInput
+) {
+  return safeInput({
+    ...transporterSignatureFormInput,
+    packagingInfos: getProcessedPackagingInfos(transporterSignatureFormInput)
+  });
+}
+
 /**
  * Expand form data from db
  */
@@ -688,7 +698,7 @@ function getDeprecatedPackagingApiFields(packagingInfos: PackagingInfo[]) {
  * So we calculate the `packagingInfos` to store in DB based on their values
  * @param wasteDetails
  */
-function getProcessedPackagingInfos(wasteDetails: WasteDetailsInput) {
+function getProcessedPackagingInfos(wasteDetails: Partial<WasteDetailsInput>) {
   if (!wasteDetails) {
     return wasteDetails; // To differentiate between null and undefined
   }

@@ -117,12 +117,16 @@ export async function getStateSummary(form: Form) {
   const temporaryStorageDetail = await prisma
     .form({ id: form.id })
     .temporaryStorageDetail();
+
+  const packagingInfos =
+    temporaryStorageDetail?.wasteDetailsPackagingInfos ??
+    form.wasteDetails?.packagingInfos ??
+    [];
+
   return {
     quantity: getQuantity(form, temporaryStorageDetail),
-    packagingInfos:
-      temporaryStorageDetail?.wasteDetailsPackagingInfos ??
-      form.wasteDetails?.packagingInfos ??
-      [],
+    packagingInfos,
+    packagings: packagingInfos.map(pi => pi.type),
     onuCode:
       temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails?.onuCode,
     transporterNumberPlate:

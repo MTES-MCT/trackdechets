@@ -1775,8 +1775,13 @@ export type StateSummary = {
   __typename?: 'StateSummary';
   /** Quantité la plus à jour */
   quantity: Maybe<Scalars['Float']>;
+  /**
+   * DEPRECATED Packaging le plus à jour
+   * @deprecated Utiliser packagingInfos
+   */
+  packagings: Array<Packagings>;
   /** Packaging le plus à jour */
-  packagingInfos: Maybe<Array<PackagingInfo>>;
+  packagingInfos: Array<PackagingInfo>;
   /** Code ONU le plus à jour */
   onuCode: Maybe<Scalars['String']>;
   /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
@@ -2205,7 +2210,7 @@ export type WasteDetailsInput = {
   /** Code ONU */
   onuCode: Maybe<Scalars['String']>;
   /** Conditionnements */
-  packagingInfos: Maybe<Array<Maybe<PackagingInfoInput>>>;
+  packagingInfos: Maybe<Array<PackagingInfoInput>>;
   /** DEPRECATED - Conditionnement */
   packagings: Maybe<Array<Maybe<Packagings>>>;
   /** DEPRECATED - Autre packaging (préciser) */
@@ -2861,7 +2866,8 @@ export function createStateSummaryMock(props: Partial<StateSummary>): StateSumma
   return {
     __typename: "StateSummary",
     quantity: null,
-    packagingInfos: null,
+    packagings: [],
+    packagingInfos: [],
     onuCode: null,
     transporter: null,
     transporterNumberPlate: null,

@@ -622,8 +622,11 @@ type StateSummary {
   "Quantité la plus à jour"
   quantity: Float
 
+  "DEPRECATED Packaging le plus à jour"
+  packagings: [Packagings!]! @deprecated(reason: "Utiliser packagingInfos")
+
   "Packaging le plus à jour"
-  packagingInfos: [PackagingInfo!]
+  packagingInfos: [PackagingInfo!]!
 
   "Code ONU le plus à jour"
   onuCode: String

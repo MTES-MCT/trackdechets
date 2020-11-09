@@ -2826,8 +2826,23 @@ Quantité la plus à jour
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>packagings</strong> ⚠️</td>
+<td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
+<td>
+
+DEPRECATED Packaging le plus à jour
+
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser packagingInfos
+
+</blockquote>
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>packagingInfos</strong></td>
-<td valign="top">[<a href="#packaginginfo">PackagingInfo</a>!]</td>
+<td valign="top">[<a href="#packaginginfo">PackagingInfo</a>!]!</td>
 <td>
 
 Packaging le plus à jour
@@ -5405,7 +5420,7 @@ Code ONU
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>packagingInfos</strong></td>
-<td valign="top">[<a href="#packaginginfoinput">PackagingInfoInput</a>]</td>
+<td valign="top">[<a href="#packaginginfoinput">PackagingInfoInput</a>!]</td>
 <td>
 
 Conditionnements

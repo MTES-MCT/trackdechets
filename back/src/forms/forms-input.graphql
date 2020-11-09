@@ -427,7 +427,7 @@ input WasteDetailsInput {
   onuCode: String
 
   "Conditionnements"
-  packagingInfos: [PackagingInfoInput]
+  packagingInfos: [PackagingInfoInput!]
 
   "DEPRECATED - Conditionnement"
   packagings: [Packagings]

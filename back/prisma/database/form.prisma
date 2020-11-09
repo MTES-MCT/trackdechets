@@ -162,9 +162,13 @@ type TemporaryStorageDetail {
 
   # Frame 15, 16, 17
   wasteDetailsOnuCode: String
+  # Expects [{type, other, quantity}]
   wasteDetailsPackagingInfos: Json
+  # DEPRECATED
   wasteDetailsPackagings: Json
+  # DEPRECATED
   wasteDetailsOtherPackaging: String
+  # DEPRECATED
   wasteDetailsNumberOfPackages: Int
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType

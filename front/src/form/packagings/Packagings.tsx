@@ -114,8 +114,14 @@ export default function Packagings({
       />
       {value.length > 0 && (
         <div className="tw-mt-4">
-          Total : {value?.length} conditionnement(s) et{" "}
-          {value.reduce((prev, cur) => prev + cur.quantity, 0)} colis.
+          Total :{" "}
+          {value
+            ?.map(v => {
+              const packaging = PACKAGINGS.find(p => p.value === v.type);
+              return `${v.quantity} ${packaging?.label}`;
+            })
+            .join(", ")}
+          .
         </div>
       )}
     </div>
