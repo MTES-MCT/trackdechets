@@ -2,7 +2,6 @@ import {
   Form,
   FormUpdateInput,
   Status,
-  AuthType,
   prisma
 } from "../../generated/prisma-client";
 import { Event } from "./types";
