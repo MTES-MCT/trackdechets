@@ -19,7 +19,6 @@ import { getNextStep } from "./next-step";
 import Processed from "./Processed";
 import Received from "./Received";
 import Sealed from "./Sealed";
-import Sent from "./Sent";
 import Resealed from "./Resealed";
 import Resent from "./Resent";
 import mutations from "./slip-actions.mutations";
@@ -184,11 +183,6 @@ const buttons = {
     title: "Finaliser le bordereau",
     icon: PaperWriteIcon,
     component: Sealed,
-  },
-  SENT: {
-    title: "Valider l'enlèvement",
-    icon: DeliveryTruckClockIcon,
-    component: Sent,
   },
   RECEIVED: {
     title: "Valider la réception",

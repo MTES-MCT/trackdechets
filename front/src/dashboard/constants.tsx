@@ -24,7 +24,6 @@ export const transportModeLabels: { [key: string]: string } = {
 };
 
 export const statusesWithDynamicActions = [
-  FormStatus.Sealed,
   FormStatus.Sent,
   FormStatus.Received,
   FormStatus.TempStored,

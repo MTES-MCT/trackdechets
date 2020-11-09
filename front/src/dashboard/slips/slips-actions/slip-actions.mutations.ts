@@ -1,20 +1,9 @@
 import gql from "graphql-tag";
-import {
-  fullFormFragment,
-  statusChangeFragment,
-} from "common/fragments";
+import { fullFormFragment, statusChangeFragment } from "common/fragments";
 
 const MARK_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {
     markAsSealed(id: $id) {
-      ...StatusChange
-    }
-  }
-  ${statusChangeFragment}
-`;
-const MARK_SENT = gql`
-  mutation MarkAsSent($id: ID!, $info: SentFormInput!) {
-    markAsSent(id: $id, sentInfo: $info) {
       ...StatusChange
     }
   }
@@ -83,7 +72,6 @@ const DELETE_FORM = gql`
 
 export default {
   SEALED: MARK_SEALED,
-  SENT: MARK_SENT,
   RECEIVED: MARK_RECEIVED,
   PROCESSED: MARK_PROCESSED,
   TEMP_STORED: MARK_TEMP_STORED,
