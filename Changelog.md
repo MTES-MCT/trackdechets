@@ -29,6 +29,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Migration du service td-etl dans un projet Github à part [PR 683](https://github.com/MTES-MCT/trackdechets/pull/683)
+- Suppression des actions permettant de valider un enlèvement sans signature transporteur dans l'interface Trackdéchets [PR 704](https://github.com/MTES-MCT/trackdechets/pull/704)
 
 
 # [2020.10.1] 03/11/2020
