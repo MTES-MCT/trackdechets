@@ -8,7 +8,6 @@ import { Event } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../errors";
 import { formDiff } from "./diff";
-import { toPrismaAuthType } from "../../auth";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -66,7 +65,7 @@ export default async function transitionForm(
     user: { connect: { id: user.id } },
     form: { connect: { id: form.id } },
     status: nextStatus,
-    authType: toPrismaAuthType(user.auth),
+    authType: user.auth,
     loggedAt: new Date(),
     updatedFields
   });
