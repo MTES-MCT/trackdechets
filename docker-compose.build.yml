@@ -1,10 +1,6 @@
 version: "3.7"
 services:
 
-  postgres:
-    build:
-      context: ./postgres
-
   td-api:
     build:
       context: ./back
