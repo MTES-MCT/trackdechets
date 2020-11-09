@@ -17,6 +17,3 @@ services:
   td-doc:
     image: betagouv/trackdechets-doc:sandbox
 
-  td-etl:
-    image: betagouv/trackdechets-etl:sandbox
-
