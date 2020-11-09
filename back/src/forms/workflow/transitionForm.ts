@@ -2,13 +2,14 @@ import {
   Form,
   FormUpdateInput,
   Status,
-  prisma,
-  User
+  AuthType,
+  prisma
 } from "../../generated/prisma-client";
 import { Event } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../errors";
 import { formDiff } from "./diff";
+import { toPrismaAuthType } from "../../auth";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -17,7 +18,7 @@ import { formDiff } from "./diff";
  * logged in the StatusLogs table
  */
 export default async function transitionForm(
-  user: User,
+  user: Express.User,
   form: Form,
   event: Event
 ) {
@@ -66,6 +67,7 @@ export default async function transitionForm(
     user: { connect: { id: user.id } },
     form: { connect: { id: form.id } },
     status: nextStatus,
+    authType: toPrismaAuthType(user.auth),
     loggedAt: new Date(),
     updatedFields
   });

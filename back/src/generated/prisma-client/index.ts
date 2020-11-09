@@ -1334,6 +1334,8 @@ export type RubriqueOrderByInput =
   | "wasteType_ASC"
   | "wasteType_DESC";
 
+export type AuthType = "SESSION" | "BEARER" | "JWT";
+
 export type Status =
   | "DRAFT"
   | "SEALED"
@@ -1351,6 +1353,8 @@ export type Status =
 export type StatusLogOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "authType_ASC"
+  | "authType_DESC"
   | "status_ASC"
   | "status_DESC"
   | "loggedAt_ASC"
@@ -4393,6 +4397,10 @@ export interface StatusLogWhereInput {
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
   user?: Maybe<UserWhereInput>;
+  authType?: Maybe<AuthType>;
+  authType_not?: Maybe<AuthType>;
+  authType_in?: Maybe<AuthType[] | AuthType>;
+  authType_not_in?: Maybe<AuthType[] | AuthType>;
   form?: Maybe<FormWhereInput>;
   status?: Maybe<Status>;
   status_not?: Maybe<Status>;
@@ -7351,6 +7359,7 @@ export interface RubriqueUpdateManyMutationInput {
 export interface StatusLogCreateInput {
   id?: Maybe<ID_Input>;
   user: UserCreateOneInput;
+  authType?: Maybe<AuthType>;
   form: FormCreateOneInput;
   status: Status;
   loggedAt?: Maybe<DateTimeInput>;
@@ -7364,6 +7373,7 @@ export interface FormCreateOneInput {
 
 export interface StatusLogUpdateInput {
   user?: Maybe<UserUpdateOneRequiredInput>;
+  authType?: Maybe<AuthType>;
   form?: Maybe<FormUpdateOneRequiredInput>;
   status?: Maybe<Status>;
   loggedAt?: Maybe<DateTimeInput>;
@@ -7383,6 +7393,7 @@ export interface FormUpsertNestedInput {
 }
 
 export interface StatusLogUpdateManyMutationInput {
+  authType?: Maybe<AuthType>;
   status?: Maybe<Status>;
   loggedAt?: Maybe<DateTimeInput>;
   updatedFields?: Maybe<Json>;
@@ -10408,6 +10419,7 @@ export interface AggregateRubriqueSubscription
 
 export interface StatusLog {
   id: ID_Output;
+  authType?: AuthType;
   status: Status;
   loggedAt?: DateTimeOutput;
   updatedFields?: Json;
@@ -10416,6 +10428,7 @@ export interface StatusLog {
 export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
   id: () => Promise<ID_Output>;
   user: <T = UserPromise>() => T;
+  authType: () => Promise<AuthType>;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
   loggedAt: () => Promise<DateTimeOutput>;
@@ -10427,6 +10440,7 @@ export interface StatusLogSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   user: <T = UserSubscription>() => T;
+  authType: () => Promise<AsyncIterator<AuthType>>;
   form: <T = FormSubscription>() => T;
   status: () => Promise<AsyncIterator<Status>>;
   loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -10438,6 +10452,7 @@ export interface StatusLogNullablePromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   user: <T = UserPromise>() => T;
+  authType: () => Promise<AuthType>;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
   loggedAt: () => Promise<DateTimeOutput>;
@@ -11942,6 +11957,7 @@ export interface StatusLogSubscriptionPayloadSubscription
 
 export interface StatusLogPreviousValues {
   id: ID_Output;
+  authType?: AuthType;
   status: Status;
   loggedAt?: DateTimeOutput;
   updatedFields?: Json;
@@ -11951,6 +11967,7 @@ export interface StatusLogPreviousValuesPromise
   extends Promise<StatusLogPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  authType: () => Promise<AuthType>;
   status: () => Promise<Status>;
   loggedAt: () => Promise<DateTimeOutput>;
   updatedFields: () => Promise<Json>;
@@ -11960,6 +11977,7 @@ export interface StatusLogPreviousValuesSubscription
   extends Promise<AsyncIterator<StatusLogPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  authType: () => Promise<AsyncIterator<AuthType>>;
   status: () => Promise<AsyncIterator<Status>>;
   loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedFields: () => Promise<AsyncIterator<Json>>;
@@ -12566,6 +12584,10 @@ export const models: Model[] = [
   },
   {
     name: "Status",
+    embedded: false
+  },
+  {
+    name: "AuthType",
     embedded: false
   },
   {

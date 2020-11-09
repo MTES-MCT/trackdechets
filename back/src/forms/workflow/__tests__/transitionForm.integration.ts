@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { AuthType } from "../../../auth";
 import { FormUpdateInput, prisma } from "../../../generated/prisma-client";
 import { formFactory, userFactory } from "../../../__tests__/factories";
 import transitionForm from "../transitionForm";
@@ -23,7 +24,7 @@ describe("transition form", () => {
     };
 
     const event = { type: EventType.MarkAsReceived, formUpdateInput };
-    await transitionForm(user, form, event);
+    await transitionForm({ ...user, auth: AuthType.Bearer }, form, event);
 
     const updatedForm = await prisma.form({ id: form.id });
 
@@ -38,6 +39,7 @@ describe("transition form", () => {
     const statusLogForm = await prisma.statusLog({ id: statusLog.id }).form();
 
     expect(statusLog.status).toEqual(nextStatus);
+    expect(statusLog.authType).toEqual("BEARER");
     expect(statusLog.loggedAt.length).toBeGreaterThan(0);
     expect(statusLog.updatedFields).toEqual(formUpdateInput);
     expect(statusLogUser.id).toEqual(user.id);

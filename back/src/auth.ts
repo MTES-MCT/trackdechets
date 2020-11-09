@@ -13,7 +13,8 @@ import {
   User,
   AccessToken,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  User as PrismaUser
+  User as PrismaUser,
+  AuthType as PrismaAuthType
 } from "./generated/prisma-client";
 import { compare } from "bcrypt";
 import { sameDayMidnight, daysBetween, sanitizeEmail } from "./utils";
@@ -35,6 +36,18 @@ export enum AuthType {
   Session = "session",
   JWT = "jwt",
   Bearer = "bearer"
+}
+
+// Convert express AuthType to Prisma AuthType
+export function toPrismaAuthType(authType: AuthType): PrismaAuthType {
+  const SESSION: PrismaAuthType = "SESSION";
+  const BEARER: PrismaAuthType = "BEARER";
+  const JWT: PrismaAuthType = "JWT";
+  return {
+    [AuthType.Session]: SESSION,
+    [AuthType.Bearer]: BEARER,
+    [AuthType.JWT]: JWT
+  }[authType];
 }
 
 // verbose error message and related errored field

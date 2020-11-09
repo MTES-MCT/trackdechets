@@ -448,6 +448,12 @@ input ApplicationWhereUniqueInput {
   id: ID
 }
 
+enum AuthType {
+  SESSION
+  BEARER
+  JWT
+}
+
 type BatchPayload {
   count: Long!
 }
@@ -5880,6 +5886,7 @@ enum Status {
 type StatusLog {
   id: ID!
   user: User!
+  authType: AuthType
   form: Form!
   status: Status!
   loggedAt: DateTime
@@ -5895,6 +5902,7 @@ type StatusLogConnection {
 input StatusLogCreateInput {
   id: ID
   user: UserCreateOneInput!
+  authType: AuthType
   form: FormCreateOneInput!
   status: Status!
   loggedAt: DateTime
@@ -5909,6 +5917,8 @@ type StatusLogEdge {
 enum StatusLogOrderByInput {
   id_ASC
   id_DESC
+  authType_ASC
+  authType_DESC
   status_ASC
   status_DESC
   loggedAt_ASC
@@ -5919,6 +5929,7 @@ enum StatusLogOrderByInput {
 
 type StatusLogPreviousValues {
   id: ID!
+  authType: AuthType
   status: Status!
   loggedAt: DateTime
   updatedFields: Json
@@ -5944,6 +5955,7 @@ input StatusLogSubscriptionWhereInput {
 
 input StatusLogUpdateInput {
   user: UserUpdateOneRequiredInput
+  authType: AuthType
   form: FormUpdateOneRequiredInput
   status: Status
   loggedAt: DateTime
@@ -5951,6 +5963,7 @@ input StatusLogUpdateInput {
 }
 
 input StatusLogUpdateManyMutationInput {
+  authType: AuthType
   status: Status
   loggedAt: DateTime
   updatedFields: Json
@@ -5972,6 +5985,10 @@ input StatusLogWhereInput {
   id_ends_with: ID
   id_not_ends_with: ID
   user: UserWhereInput
+  authType: AuthType
+  authType_not: AuthType
+  authType_in: [AuthType!]
+  authType_not_in: [AuthType!]
   form: FormWhereInput
   status: Status
   status_not: Status
