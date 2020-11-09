@@ -233,12 +233,6 @@ enum Status {
   RESENT
 }
 
-enum AuthType {
-  SESSION
-  BEARER
-  JWT
-}
-
 type StatusLog {
   id: ID! @id
   user: User!

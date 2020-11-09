@@ -12587,10 +12587,6 @@ export const models: Model[] = [
     embedded: false
   },
   {
-    name: "AuthType",
-    embedded: false
-  },
-  {
     name: "StatusLog",
     embedded: false
   },
@@ -12624,6 +12620,10 @@ export const models: Model[] = [
   },
   {
     name: "MembershipRequest",
+    embedded: false
+  },
+  {
+    name: "AuthType",
     embedded: false
   },
   {
