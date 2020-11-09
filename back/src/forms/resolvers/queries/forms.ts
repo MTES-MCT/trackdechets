@@ -92,8 +92,6 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
     OR: [
       // DRAFT
       { status: "DRAFT" },
-      // isEmitter && SEALED
-      { AND: [{ emitterCompanySiret: siret }, { status: "SEALED" }] },
       // isTemporaryStorer && (RESENT || RECEIVED)
       {
         AND: [
