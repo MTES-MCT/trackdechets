@@ -20,7 +20,6 @@ import Processed from "./Processed";
 import Received from "./Received";
 import Sealed from "./Sealed";
 import Resealed from "./Resealed";
-import Resent from "./Resent";
 import mutations from "./slip-actions.mutations";
 import { NotificationError } from "common/components/Error";
 import { ChevronDown, ChevronUp } from "common/components/Icons";
@@ -203,10 +202,5 @@ const buttons = {
     title: "Compléter le BSD suite",
     icon: PaperWriteIcon,
     component: Resealed,
-  },
-  RESENT: {
-    title: "Valider l'enlèvement",
-    icon: DeliveryTruckClockIcon,
-    component: Resent,
   },
 };

@@ -104,17 +104,13 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
         ]
       },
       // isRecipient && isTempStorage == isTempStorer
-      // => isTempStorer && (SENT || TEMP_STORED || RESEALED)
+      // => isTempStorer && (SENT || TEMP_STORED)
       {
         AND: [
           { recipientCompanySiret: siret },
           { recipientIsTempStorage: true },
           {
-            OR: [
-              { status: "SENT" },
-              { status: "TEMP_STORED" },
-              { status: "RESEALED" }
-            ]
+            OR: [{ status: "SENT" }, { status: "TEMP_STORED" }]
           }
         ]
       },

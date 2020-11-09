@@ -44,15 +44,6 @@ const MARK_RESEALED = gql`
   ${statusChangeFragment}
 `;
 
-const MARK_RESENT = gql`
-  mutation MarkAsResent($id: ID!, $info: ResentFormInput!) {
-    markAsResent(id: $id, resentInfos: $info) {
-      ...StatusChange
-    }
-  }
-  ${statusChangeFragment}
-`;
-
 const DUPLICATE_FORM = gql`
   mutation DuplicateForm($id: ID!) {
     duplicateForm(id: $id) {
@@ -76,7 +67,6 @@ export default {
   PROCESSED: MARK_PROCESSED,
   TEMP_STORED: MARK_TEMP_STORED,
   RESEALED: MARK_RESEALED,
-  RESENT: MARK_RESENT,
   DUPLICATE_FORM,
   DELETE_FORM,
 };
