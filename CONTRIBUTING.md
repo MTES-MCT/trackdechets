@@ -113,8 +113,6 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
   - `back/src/generated/graphql/types.ts` pour le back
   - `front/src/generated/graphql/types.ts` pour le front
 
-[Linux/MacOS uniquement] Avant de pousser votre premier commit, il est recommandé d'installer un hook Github permettant de faire tourner eslint et prettier sur le code source back et front. `~/.githooks/install-hooks.sh` se chargera de l'installation. Si vous avez besoin de forcer un push sans vérifier les conventions de style, il est toujours possible de faire git push --no-verify.
-
 ## Tests unitaires
 
 La commande pour faire tourner tous les tests unitaires est la suivante :
