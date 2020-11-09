@@ -55,6 +55,7 @@
     "graylog2": "^0.2.1",
     "ioredis": "^4.17.3",
     "minimist": "^1.2.5",
+    "node-mailjet" : "^3.3.1",
     "oauth2orize": "^1.11.0",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
