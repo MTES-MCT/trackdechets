@@ -53,7 +53,16 @@ const mailjetBackend = {
       });
   },
   addContact: function(contact: Contact) {
-    this.log(contact);
+    const request = mj
+      .post("contact", { version: "v3" })
+      .request({ Name: contact.name, Email: contact.email });
+    request
+      .then(result => {
+        console.log(result.body);
+      })
+      .catch(err => {
+        console.log(err.statusCode);
+      });
   }
 };
 
