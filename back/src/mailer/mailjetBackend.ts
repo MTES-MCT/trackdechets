@@ -16,8 +16,8 @@ const mailjetBackend = {
 
     let payload = {
       From: {
-        Email: process.env.MJ_SENDER_EMAIL_ADDRESS,
-        Name: process.env.MJ_SENDER_NAME
+        Email: process.env.SENDER_EMAIL_ADDRESS,
+        Name: process.env.SENDER_NAME
       },
       To: mail.to,
       TemplateId: mail.templateId,
