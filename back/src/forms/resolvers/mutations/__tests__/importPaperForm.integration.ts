@@ -308,7 +308,7 @@ describe("mutation / importPaperForm", () => {
       expect(updatedForm.quantityReceived).toEqual(
         importedData.receivedInfo.quantityReceived
       );
-      expect(updatedForm.processedAt).toEqual(
+      expect(updatedForm.processedAtDateTime).toEqual(
         importedData.processedInfo.processedAt
       );
       expect(updatedForm.processedBy).toEqual(
