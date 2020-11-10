@@ -1,6 +1,8 @@
-const { UI_HOST, MJ_SECURITY_CODE_RENEWAL_TEMPLATE_ID } = process.env;
-
+const { UI_HOST } = process.env;
+import { templateIds } from "../common/mails.helper";
 const baseUrl = `https://${UI_HOST}`;
+
+const templateId = templateIds.SECURITY_CODE_RENEWAL_TEMPLATE_ID;
 
 export const companyMails = {
   securityCodeRenewal: (
@@ -11,7 +13,7 @@ export const companyMails = {
     subject: "Renouvellement du code de sécurité sur Trackdéchets",
     title: "_",
     body: "_",
-    templateId: parseInt(MJ_SECURITY_CODE_RENEWAL_TEMPLATE_ID, 10),
+    templateId: parseInt(templateId, 10),
     baseUrl,
     vars: {
       company

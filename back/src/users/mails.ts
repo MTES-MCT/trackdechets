@@ -2,13 +2,14 @@ import { escape } from "querystring";
 import { Company, Form, User } from "../generated/prisma-client";
 import { cleanupSpecialChars, toFrFormat } from "../common/mails.helper";
 import { getUIBaseURL } from "../utils";
+import { templateIds } from "../common/mails.helper";
+
+const { UI_HOST, VIRTUAL_HOST } = process.env;
 
 const {
-  UI_HOST,
-  VIRTUAL_HOST,
-  MJ_FIRST_ONBOARDING_TEMPLATE_ID,
-  MJ_SECOND_ONBOARDING_TEMPLATE_ID
-} = process.env;
+  FIRST_ONBOARDING_TEMPLATE_ID,
+  SECOND_ONBOARDING_TEMPLATE_ID
+} = templateIds;
 
 const baseUrl = `https://${UI_HOST}`;
 
@@ -205,7 +206,7 @@ export const userMails = {
     subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     body: "_",
-    templateId: parseInt(MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10),
+    templateId: parseInt(FIRST_ONBOARDING_TEMPLATE_ID, 10),
     baseUrl
   }),
   onboardingSecondStep: (toEmail, toName) => ({
@@ -213,7 +214,7 @@ export const userMails = {
     subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     body: "_",
-    templateId: parseInt(MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10),
+    templateId: parseInt(SECOND_ONBOARDING_TEMPLATE_ID, 10),
     baseUrl
   }),
   formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({
