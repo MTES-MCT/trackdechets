@@ -39,44 +39,6 @@ import {
   EcoOrganismeInput
 } from "../generated/graphql/types";
 
-export function flattenObjectForDb(
-  input,
-  previousKeys = [],
-  dbObject = {}
-): Partial<PrismaForm> {
-  const relations = ["temporaryStorageDetail"];
-
-  Object.keys(input || {}).forEach(key => {
-    if (relations.includes(key)) {
-      dbObject[key] = {};
-      return input[key]
-        ? flattenObjectForDb(input[key], [], dbObject[key])
-        : {};
-    }
-
-    if (
-      input[key] &&
-      !Array.isArray(input[key]) &&
-      typeof input[key] === "object"
-    ) {
-      return flattenObjectForDb(input[key], [...previousKeys, key], dbObject);
-    }
-
-    const objectKey = [...previousKeys, key]
-      .map((k, i) => {
-        if (i !== 0) {
-          return k.charAt(0).toUpperCase() + k.slice(1);
-        }
-        return k;
-      })
-      .join("");
-
-    dbObject[objectKey] = input[key];
-  });
-
-  return dbObject;
-}
-
 /**
  * Return null if all object values are null
  * obj otherwise
@@ -351,9 +313,10 @@ export function flattenFormInput(
 export function flattenProcessedFormInput(
   processedFormInput: ProcessedFormInput
 ): FormUpdateInput {
-  const { nextDestination, ...rest } = processedFormInput;
+  const { nextDestination, processedAt, ...rest } = processedFormInput;
   return safeInput({
     ...rest,
+    processedAtDateTime: processedAt,
     ...flattenNextDestinationInput(processedFormInput)
   });
 }
@@ -513,7 +476,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
     processedBy: form.processedBy,
-    processedAt: form.processedAt,
+    processedAt: form.processedAtDateTime,
     noTraceability: form.noTraceability,
     nextDestination: nullIfNoValues<NextDestination>({
       processingOperation: form.nextDestinationProcessingOperation,

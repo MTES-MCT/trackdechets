@@ -1069,6 +1069,8 @@ export type FormOrderByInput =
   | "processedBy_DESC"
   | "processedAt_ASC"
   | "processedAt_DESC"
+  | "processedAtDateTime_ASC"
+  | "processedAtDateTime_DESC"
   | "processingOperationDone_ASC"
   | "processingOperationDone_DESC"
   | "processingOperationDescription_ASC"
@@ -2398,6 +2400,14 @@ export interface FormWhereInput {
   processedAt_not_starts_with?: Maybe<String>;
   processedAt_ends_with?: Maybe<String>;
   processedAt_not_ends_with?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
+  processedAtDateTime_not?: Maybe<DateTimeInput>;
+  processedAtDateTime_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  processedAtDateTime_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  processedAtDateTime_lt?: Maybe<DateTimeInput>;
+  processedAtDateTime_lte?: Maybe<DateTimeInput>;
+  processedAtDateTime_gt?: Maybe<DateTimeInput>;
+  processedAtDateTime_gte?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDone_not?: Maybe<String>;
   processingOperationDone_in?: Maybe<String[] | String>;
@@ -5236,6 +5246,7 @@ export interface FormCreateInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -5416,6 +5427,7 @@ export interface FormUpdateInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -5555,6 +5567,7 @@ export interface FormUpdateDataInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -6198,6 +6211,14 @@ export interface FormScalarWhereInput {
   processedAt_not_starts_with?: Maybe<String>;
   processedAt_ends_with?: Maybe<String>;
   processedAt_not_ends_with?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
+  processedAtDateTime_not?: Maybe<DateTimeInput>;
+  processedAtDateTime_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  processedAtDateTime_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  processedAtDateTime_lt?: Maybe<DateTimeInput>;
+  processedAtDateTime_lte?: Maybe<DateTimeInput>;
+  processedAtDateTime_gt?: Maybe<DateTimeInput>;
+  processedAtDateTime_gte?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDone_not?: Maybe<String>;
   processingOperationDone_in?: Maybe<String[] | String>;
@@ -7060,6 +7081,7 @@ export interface FormUpdateManyDataInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -7147,6 +7169,7 @@ export interface FormUpdateManyMutationInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -7472,6 +7495,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -7612,6 +7636,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -7787,6 +7812,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -7908,6 +7934,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
+  processedAtDateTime?: Maybe<DateTimeInput>;
   processingOperationDone?: Maybe<String>;
   processingOperationDescription?: Maybe<String>;
   noTraceability?: Maybe<Boolean>;
@@ -9232,6 +9259,7 @@ export interface Form {
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
+  processedAtDateTime?: DateTimeOutput;
   processingOperationDone?: String;
   processingOperationDescription?: String;
   noTraceability?: Boolean;
@@ -9323,6 +9351,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
+  processedAtDateTime: () => Promise<DateTimeOutput>;
   processingOperationDone: () => Promise<String>;
   processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
@@ -9436,6 +9465,7 @@ export interface FormSubscription
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
+  processedAtDateTime: () => Promise<AsyncIterator<DateTimeOutput>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;
   processingOperationDescription: () => Promise<AsyncIterator<String>>;
   noTraceability: () => Promise<AsyncIterator<Boolean>>;
@@ -9551,6 +9581,7 @@ export interface FormNullablePromise
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
+  processedAtDateTime: () => Promise<DateTimeOutput>;
   processingOperationDone: () => Promise<String>;
   processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
@@ -11406,6 +11437,7 @@ export interface FormPreviousValues {
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
+  processedAtDateTime?: DateTimeOutput;
   processingOperationDone?: String;
   processingOperationDescription?: String;
   noTraceability?: Boolean;
@@ -11498,6 +11530,7 @@ export interface FormPreviousValuesPromise
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
+  processedAtDateTime: () => Promise<DateTimeOutput>;
   processingOperationDone: () => Promise<String>;
   processingOperationDescription: () => Promise<String>;
   noTraceability: () => Promise<Boolean>;
@@ -11590,6 +11623,7 @@ export interface FormPreviousValuesSubscription
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
+  processedAtDateTime: () => Promise<AsyncIterator<DateTimeOutput>>;
   processingOperationDone: () => Promise<AsyncIterator<String>>;
   processingOperationDescription: () => Promise<AsyncIterator<String>>;
   noTraceability: () => Promise<AsyncIterator<Boolean>>;
