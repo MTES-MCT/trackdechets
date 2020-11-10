@@ -37,8 +37,8 @@ var mailjetClient = mailjet.NewMailjetClient(
 	mustGetenv("MJ_APIKEY_PRIVATE"),
 )
 
-var senderAddress = mustGetenv("MJ_SENDER_EMAIL_ADDRESS")
-var senderName = mustGetenv("MJ_SENDER_NAME")
+var senderAddress = mustGetenv("SENDER_EMAIL_ADDRESS")
+var senderName = mustGetenv("SENDER_NAME")
 
 func mustGetenv(k string) string {
 	v := os.Getenv(k)
