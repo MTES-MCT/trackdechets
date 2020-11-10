@@ -1365,6 +1365,7 @@ type Form {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -1464,6 +1465,7 @@ input FormCreateInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -1577,6 +1579,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -1669,6 +1672,7 @@ input FormCreateWithoutTransportSegmentsInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -1787,6 +1791,8 @@ enum FormOrderByInput {
   processedBy_DESC
   processedAt_ASC
   processedAt_DESC
+  processedAtDateTime_ASC
+  processedAtDateTime_DESC
   processingOperationDone_ASC
   processingOperationDone_DESC
   processingOperationDescription_ASC
@@ -1946,6 +1952,7 @@ type FormPreviousValues {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -2203,6 +2210,14 @@ input FormScalarWhereInput {
   processedAt_not_starts_with: String
   processedAt_ends_with: String
   processedAt_not_ends_with: String
+  processedAtDateTime: DateTime
+  processedAtDateTime_not: DateTime
+  processedAtDateTime_in: [DateTime!]
+  processedAtDateTime_not_in: [DateTime!]
+  processedAtDateTime_lt: DateTime
+  processedAtDateTime_lte: DateTime
+  processedAtDateTime_gt: DateTime
+  processedAtDateTime_gte: DateTime
   processingOperationDone: String
   processingOperationDone_not: String
   processingOperationDone_in: [String!]
@@ -3079,6 +3094,7 @@ input FormUpdateDataInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -3171,6 +3187,7 @@ input FormUpdateInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -3262,6 +3279,7 @@ input FormUpdateManyDataInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -3362,6 +3380,7 @@ input FormUpdateManyMutationInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -3479,6 +3498,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -3570,6 +3590,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   quantityReceived: Float
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
@@ -3856,6 +3877,14 @@ input FormWhereInput {
   processedAt_not_starts_with: String
   processedAt_ends_with: String
   processedAt_not_ends_with: String
+  processedAtDateTime: DateTime
+  processedAtDateTime_not: DateTime
+  processedAtDateTime_in: [DateTime!]
+  processedAtDateTime_not_in: [DateTime!]
+  processedAtDateTime_lt: DateTime
+  processedAtDateTime_lte: DateTime
+  processedAtDateTime_gt: DateTime
+  processedAtDateTime_gte: DateTime
   processingOperationDone: String
   processingOperationDone_not: String
   processingOperationDone_in: [String!]

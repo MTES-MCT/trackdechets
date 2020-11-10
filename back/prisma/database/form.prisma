@@ -38,6 +38,7 @@ type Form {
 
   processedBy: String
   processedAt: String
+  processedAtDateTime: DateTime
   processingOperationDone: String
   processingOperationDescription: String
   noTraceability: Boolean
