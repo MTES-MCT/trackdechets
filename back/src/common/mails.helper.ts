@@ -1,5 +1,28 @@
-import axios from "axios";
-const { MJ_MAIN_TEMPLATE_ID } = process.env;
+ 
+const { EMAIL_BACKEND } = process.env;
+import sendMailx, { addContact as addContactx } from "../mailer/mailing";
+
+const getPrefix = () => {
+  if (EMAIL_BACKEND === "mailjet") {
+    return "MJ";
+  }
+  if (EMAIL_BACKEND === "sendinblue") {
+    return "SIB";
+  }
+  return "";
+};
+
+const PREFIX = getPrefix();
+
+export const templateIds = {
+  MAIN_TEMPLATE_ID: process.env[`${PREFIX}_MAIN_TEMPLATE_ID`] || "1000", // console fake tpl ids
+  FIRST_ONBOARDING_TEMPLATE_ID:
+    process.env[`${PREFIX}_FIRST_ONBOARDING_TEMPLATE_ID`] || "2000",
+  SECOND_ONBOARDING_TEMPLATE_ID:
+    process.env[`${PREFIX}_SECOND_ONBOARDING_TEMPLATE_ID`] || "3000",
+  SECURITY_CODE_RENEWAL_TEMPLATE_ID:
+    process.env[`${PREFIX}_SECURITY_CODE_RENEWAL_TEMPLATE_ID`] || "4000"
+};
 
 type Attachment = {
   name: string;
@@ -22,21 +45,13 @@ type Mail = {
 
 export function sendMail(mail: Mail) {
   if (!mail.templateId) {
-    mail.templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
+    mail.templateId = parseInt(templateIds.MAIN_TEMPLATE_ID, 10);
   }
-  return axios
-    .post("http://td-mail/send", mail)
-    .catch(err =>
-      console.error("Error while pushing mail to mail service", err)
-    );
+  return sendMailx(mail);
 }
 
 export function addContact({ email, name }: { email: string; name: string }) {
-  return axios
-    .post("http://td-mail/contact", { email, name })
-    .catch(err =>
-      console.error("Error while pushing new contact to mail service", err)
-    );
+  return addContactx({ email, name });
 }
 
 const unwantedChars = /\*|\//g;
