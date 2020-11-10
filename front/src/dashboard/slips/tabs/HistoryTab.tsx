@@ -1,5 +1,4 @@
-import { useQuery } from "@apollo/client";
-import { NetworkStatus } from "apollo-client";
+import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";

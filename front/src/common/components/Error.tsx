@@ -1,4 +1,4 @@
-import { ApolloError } from "apollo-client";
+import { ApolloError } from "@apollo/client";
 import React, { FunctionComponent } from "react";
 import styles from "./Error.module.scss";
 
@@ -51,9 +51,9 @@ export function NotificationError({ apolloError, className }: Props) {
       {({ error, idx }) => (
         <div
           key={`${idx}-${error.message}`}
-          className={`notification notification--error tw-mt-2 ${styles.lineBreak} ${
-            className ?? ""
-          }`}
+          className={`notification notification--error tw-mt-2 ${
+            styles.lineBreak
+          } ${className ?? ""}`}
         >
           {error.message}
         </div>

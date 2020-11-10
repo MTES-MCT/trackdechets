@@ -1,5 +1,4 @@
-import { useQuery } from "@apollo/client";
-import { NetworkStatus } from "apollo-client";
+import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
 
 import { DuplicateFile } from "common/components/Icons";
