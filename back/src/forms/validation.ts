@@ -535,7 +535,7 @@ const processedInfoSchemaFn = (value: any) => {
       .string()
       .ensure()
       .required("Vous devez saisir un responsable de traitement."),
-    processedAt: validDatetime({
+    processedAtDateTime: validDatetime({
       verboseFieldName: "date de traitement",
       required: true
     }),

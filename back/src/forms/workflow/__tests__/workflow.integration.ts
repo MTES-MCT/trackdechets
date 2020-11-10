@@ -369,7 +369,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           processingOperationDone: "D 10",
           processingOperationDescription: "Incinération",
           processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00"
+          processedAt: "2020-04-15T10:22:00.000Z"
         }
       },
       {
@@ -625,7 +625,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             processingOperationDone: "D 10",
             processingOperationDescription: "Incinération",
             processedBy: "Alfred Dujardin",
-            processedAt: "2020-04-15T10:22:00"
+            processedAt: "2020-04-15T10:22:00.000Z"
           }
         },
         { status: "SEALED", updatedFields: {} },
@@ -1033,7 +1033,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             processingOperationDone: "D 10",
             processingOperationDescription: "Incinération",
             processedBy: "Alfred Dujardin",
-            processedAt: "2020-04-15T10:22:00"
+            processedAt: "2020-04-15T10:22:00.000Z"
           }
         ){
           id
@@ -1081,7 +1081,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           processingOperationDone: "D 10",
           processingOperationDescription: "Incinération",
           processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00"
+          processedAt: "2020-04-15T10:22:00.000Z"
         }
       },
       {
@@ -1752,7 +1752,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           processingOperationDone: "D 10",
           processingOperationDescription: "Incinération",
           processedBy: "Alfred Dujardin",
-          processedAt: "2020-04-15T10:22:00"
+          processedAt: "2020-04-15T10:22:00.000Z"
         }
       },
       {
