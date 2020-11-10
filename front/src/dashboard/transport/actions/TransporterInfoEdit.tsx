@@ -1,6 +1,5 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { useFormik } from "formik";
-import gql from "graphql-tag";
 import React, { useState } from "react";
 
 import { Form as FormModel } from "generated/graphql/types";

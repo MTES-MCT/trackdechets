@@ -1,5 +1,5 @@
 import React from "react";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFormCompanyTraderReceipt from "./forms/AccountFormCompanyTraderReceipt";
 import { CompanyPrivate } from "generated/graphql/types";

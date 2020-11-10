@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import React from "react";
 import { CompanyPrivate } from "generated/graphql/types";
 import ExportsForm from "./ExportsForm";

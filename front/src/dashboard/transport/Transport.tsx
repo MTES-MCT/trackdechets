@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/client";
 import Loader, { RefreshLoader } from "common/components/Loaders";
 import React from "react";
 import { MEDIA_QUERIES } from "common/config";

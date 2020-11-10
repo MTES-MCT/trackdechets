@@ -1,5 +1,4 @@
-import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { useMutation, gql } from "@apollo/client";
 import React, { useState } from "react";
 import { NotificationError } from "../common/components/Error";
 import { Mutation, MutationResetPasswordArgs } from "generated/graphql/types";

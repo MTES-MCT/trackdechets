@@ -1,6 +1,5 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, gql } from "@apollo/client";
 import { useFormikContext } from "formik";
-import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React from "react";
 import { InlineError } from "common/components/Error";
@@ -91,7 +90,6 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
               <input
                 type="checkbox"
                 className="td-checkbox"
-
                 checked={selectedItems.indexOf(form.readableId) > -1}
                 onChange={() => true}
               />

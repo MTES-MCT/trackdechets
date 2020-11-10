@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import gql from "graphql-tag";
 import { Formik, Form, Field } from "formik";
 import DateInput from "form/custom-inputs/DateInput";
 import styles from "./ExportsForms.module.scss";
@@ -11,7 +10,7 @@ import {
 import WasteTreeModal from "search/WasteTreeModal";
 import { wasteCodeValidator } from "form/waste-code/waste-code.validator";
 import { WASTES } from "generated/constants";
-import { useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { FaHourglassHalf } from "react-icons/fa";
@@ -210,7 +209,6 @@ export default function ExportsForm({ companies }: IProps) {
                 className="tw-col-span-2 tw-max-w-md td-select"
                 name="exportType"
                 as="select"
-              
               >
                 <option
                   value={FormsRegisterExportType.Outgoing}

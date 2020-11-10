@@ -1,6 +1,5 @@
 import React from "react";
-import gql from "graphql-tag";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { NotificationError } from "common/components/Error";
@@ -162,21 +161,34 @@ export default function AccountFormCompanyTransporterReceipt({
                 <tr>
                   <td>Numéro de récépissé</td>
                   <td>
-                    <Field type="text" name="receiptNumber" className="td-input" />
+                    <Field
+                      type="text"
+                      name="receiptNumber"
+                      className="td-input"
+                    />
                     <RedErrorMessage name="receiptNumber" />
                   </td>
                 </tr>
                 <tr>
                   <td>Limite de validité</td>
                   <td>
-                    <Field name="validityLimit" component={DateInput} className="td-input" />
+                    <Field
+                      name="validityLimit"
+                      component={DateInput}
+                      className="td-input"
+                    />
                     <RedErrorMessage name="validityLimit" />
                   </td>
                 </tr>
                 <tr>
                   <td>Département</td>
                   <td>
-                    <Field type="text" name="department" placeholder="75" className="td-input" />
+                    <Field
+                      type="text"
+                      name="department"
+                      placeholder="75"
+                      className="td-input"
+                    />
                     <RedErrorMessage name="department" />
                   </td>
                 </tr>

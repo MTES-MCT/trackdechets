@@ -1,6 +1,5 @@
 import { DocumentNode } from "graphql";
-import { DataProxy } from "apollo-cache";
-import { ApolloError } from "apollo-client";
+import { ApolloError, DataProxy } from "@apollo/client";
 
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
@@ -25,7 +24,7 @@ export function updateApolloCache<T>(
 
     const newData = getNewData(existingData);
 
-    store.writeQuery({
+    store.writeQuery<T>({
       query,
       variables,
       data: { ...existingData, ...newData },

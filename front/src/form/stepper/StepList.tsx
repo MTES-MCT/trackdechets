@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Formik, setNestedObjectValues } from "formik";
 import React, {
@@ -28,7 +28,6 @@ import { IStepContainerProps, Step } from "./Step";
 import routes from "common/routes";
 import "common/components/WizardStepList.scss";
 import "./StepList.scss";
-
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];

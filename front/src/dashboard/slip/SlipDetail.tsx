@@ -1,7 +1,7 @@
 import React from "react";
 import SlipDetailContent from "./SlipDetailContent";
 import Loader from "common/components/Loaders";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/client";
 import { Query, QueryFormArgs } from "generated/graphql/types";
 import { useParams } from "react-router";
 import { GET_DETAIL_FORM } from "common/queries";

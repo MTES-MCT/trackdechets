@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 import { Field } from "formik";
 import React, { useState } from "react";
 import { FaEnvelope, FaEye, FaIdCard, FaLock, FaPhone } from "react-icons/fa";
@@ -24,7 +24,6 @@ export default function Signup() {
   return (
     <section className="section section--white">
       <div className="container">
-
         <Wizard
           initialValues={{
             email: "",

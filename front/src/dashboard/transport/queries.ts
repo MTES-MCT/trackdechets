@@ -1,5 +1,6 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { transporterFormFragment } from "common/fragments";
+
 export const GET_TRANSPORT_SLIPS = gql`
   query GetSlips($siret: String, $status: [FormStatus!], $roles: [FormRole!]) {
     forms(siret: $siret, status: $status, roles: $roles) {
@@ -17,5 +18,3 @@ export const GET_FORM = gql`
   }
   ${transporterFormFragment}
 `;
-
-

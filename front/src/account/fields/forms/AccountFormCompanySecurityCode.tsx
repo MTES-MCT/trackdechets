@@ -1,6 +1,5 @@
 import React from "react";
-import gql from "graphql-tag";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import {
   Mutation,
   MutationRenewSecurityCodeArgs,

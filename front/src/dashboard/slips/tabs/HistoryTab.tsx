@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/client";
 import { NetworkStatus } from "apollo-client";
 import React from "react";
 import { InlineError } from "common/components/Error";

@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
 import * as Yup from "yup";

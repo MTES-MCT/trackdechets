@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { fullFormFragment } from "common/fragments";
 
 export const GET_SLIPS = gql`

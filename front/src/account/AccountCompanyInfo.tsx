@@ -1,5 +1,5 @@
 import React from "react";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountFieldCompanyTypes from "./fields/AccountFieldCompanyTypes";
 import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
@@ -7,11 +7,7 @@ import AccountFieldCompanyGerepId from "./fields/AccountFieldCompanyGerepId";
 import AccountFieldCompanyGivenName, {
   tooltip as givenNameTooltip,
 } from "./fields/AccountFieldCompanyGivenName";
-import {
-  CompanyPrivate,
-  UserRole,
-  CompanyType,
-} from "generated/graphql/types";
+import { CompanyPrivate, UserRole, CompanyType } from "generated/graphql/types";
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 

@@ -1,6 +1,4 @@
-import { useMutation } from "@apollo/react-hooks";
-
-import gql from "graphql-tag";
+import { useMutation, gql } from "@apollo/client";
 
 import React, { useState } from "react";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
@@ -115,7 +113,6 @@ export default function MarkSegmentAsReadyToTakeOver({
           <span>Finaliser pour transférer</span>
         </button>
       ) : (
-
         <ActionButton
           title="Finaliser pour transférer"
           icon={PaperWriteIcon}
