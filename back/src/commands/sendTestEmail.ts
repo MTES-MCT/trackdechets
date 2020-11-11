@@ -1,5 +1,9 @@
-import sendMail from "../mailer/mailing";
+import { sendMail } from "../mailer/mailing";
 
+/**
+ * Send a test email to a given address from command line
+ * node path/commands/sentestEmail foo@bar.baz
+ */
 const sendtestEmail = () => {
   const recipient = process.argv[2];
   sendMail({
