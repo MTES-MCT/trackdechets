@@ -1,8 +1,5 @@
- 
-const { EMAIL_BACKEND } = process.env;
-import sendMailx, { addContact as addContactx } from "../mailer/mailing";
-
 const getPrefix = () => {
+  const { EMAIL_BACKEND } = process.env;
   if (EMAIL_BACKEND === "mailjet") {
     return "MJ";
   }
@@ -12,7 +9,7 @@ const getPrefix = () => {
   return "";
 };
 
-const PREFIX = getPrefix();
+export const PREFIX = getPrefix();
 
 export const templateIds = {
   MAIN_TEMPLATE_ID: process.env[`${PREFIX}_MAIN_TEMPLATE_ID`] || "1000", // console fake tpl ids
@@ -23,36 +20,6 @@ export const templateIds = {
   SECURITY_CODE_RENEWAL_TEMPLATE_ID:
     process.env[`${PREFIX}_SECURITY_CODE_RENEWAL_TEMPLATE_ID`] || "4000"
 };
-
-type Attachment = {
-  name: string;
-  file: string;
-};
-type Recipient = {
-  name: string;
-  email: string;
-};
-type Mail = {
-  to: Recipient[];
-  cc?: Recipient[];
-  subject: string;
-  title: string;
-  body: string;
-  templateId?: number;
-  attachment?: Attachment;
-  vars?: { [id: string]: any };
-};
-
-export function sendMail(mail: Mail) {
-  if (!mail.templateId) {
-    mail.templateId = parseInt(templateIds.MAIN_TEMPLATE_ID, 10);
-  }
-  return sendMailx(mail);
-}
-
-export function addContact({ email, name }: { email: string; name: string }) {
-  return addContactx({ email, name });
-}
 
 const unwantedChars = /\*|\//g;
 /**
