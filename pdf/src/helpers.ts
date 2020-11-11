@@ -231,22 +231,38 @@ const renameAndFormatMainFormFields = params => ({
 
 /**
  * Return an object according to wasteDetailsPackagings array
- * {wasteDetailsPackagings : ["citerne", "fut"]} ->
+ * {wasteDetailsPackagingInfos : [{type: "citerne", quantity: 2}, {type: "fut", quantity: 1}]} ->
  *    {wasteDetailsPackagingsCiterne: true, wasteDetailsPackagingFut: true}
  * @param {object} params -  the full request payload
  * @returns {object}
  */
 const getWasteDetailsPackagings = params => {
-  if (!params.wasteDetailsPackagings) {
+  if (!params.wasteDetailsPackagingInfos) {
     return {};
   }
-  return params.wasteDetailsPackagings.reduce(function (acc, elem) {
-    let key = `wasteDetailsPackagings${capitalize(elem)}`;
+  return params.wasteDetailsPackagingInfos.reduce(function (acc, elem) {
+    let key = `wasteDetailsPackagings${capitalize(elem.type)}`;
     return {
       ...acc,
       [key]: true
     };
   }, {});
+};
+
+/**
+ * Return the number of packages as the total sum of wasteDetailsPackagingInfos packages
+ * @param params -  the full request payload
+ */
+const getWasteDetailsNumberOfPackages = params => {
+  if (!params.wasteDetailsPackagingInfos) {
+    return 0;
+  }
+  return {
+    wasteDetailsNumberOfPackages: params.wasteDetailsPackagingInfos.reduce(
+      (acc, elem) => acc + elem.quantity,
+      0
+    )
+  };
 };
 
 /**
@@ -341,6 +357,7 @@ export function processMainFormParams(params: MainFormParams) {
     getEmitterType,
     getWasteDetailsConsistence,
     getWasteDetailsPackagings,
+    getWasteDetailsNumberOfPackages,
     getWasteDetailsType,
     renameAndFormatMainFormFields,
     getAcceptationStatus,

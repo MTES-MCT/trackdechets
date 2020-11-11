@@ -76,10 +76,7 @@ const TempStorage = ({ temporaryStorageDetail }) => (
         />
 
         <PackagingRow
-          packagings={temporaryStorageDetail?.wasteDetails?.packagings}
-          numberOfPackages={
-            temporaryStorageDetail?.wasteDetails?.numberOfPackages
-          }
+          packagingInfos={temporaryStorageDetail?.wasteDetails?.packagingInfos}
         />
         <DetailRow
           value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
@@ -117,18 +114,16 @@ const TempStorage = ({ temporaryStorageDetail }) => (
 
         <dt>Adresse</dt>
         <dd>{temporaryStorageDetail?.destination?.company?.address}</dd>
- 
-     <DetailRow
+
+        <DetailRow
           value={temporaryStorageDetail?.destination?.cap}
           label="Numéro de CAP"
-        />  
- 
- 
-     
+        />
+
         <DetailRow
-            value={temporaryStorageDetail?.destination?.processingOperation}
-            label="Opération de traitement prévue"
-          />
+          value={temporaryStorageDetail?.destination?.processingOperation}
+          label="Opération de traitement prévue"
+        />
       </div>
       <div className={styles.detailColumns}>
         <div className={styles.detailGrid}>
@@ -240,10 +235,7 @@ export default function SlipDetailContent({
             <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
             <dt>Quantité</dt>
             <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
-            <PackagingRow
-              packagings={form.wasteDetails?.packagings}
-              numberOfPackages={form.wasteDetails?.numberOfPackages}
-            />
+            <PackagingRow packagingInfos={form.wasteDetails?.packagingInfos} />
             <dt>Consistance</dt>{" "}
             <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
           </div>

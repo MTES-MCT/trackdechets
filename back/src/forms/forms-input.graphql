@@ -35,8 +35,11 @@ input TransporterSignatureFormInput {
   "Si oui on non le BSD a été signé par l'émetteur"
   signedByProducer: Boolean!
 
-  "Conditionnement"
-  packagings: [Packagings]!
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
+
+  "DEPRECATED - Conditionnement"
+  packagings: [Packagings]
 
   "Quantité en tonnes"
   quantity: Float!
@@ -383,6 +386,18 @@ input TraderInput {
   company: CompanyInput
 }
 
+"Payload lié à un élément de conditionnement"
+input PackagingInfoInput {
+  "Type de conditionnement"
+  type: Packagings!
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+}
+
 "Payload lié au détails du déchet (case 3, 4, 5, 6)"
 input WasteDetailsInput {
   """
@@ -411,13 +426,16 @@ input WasteDetailsInput {
   "Code ONU"
   onuCode: String
 
-  "Conditionnement"
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
+
+  "DEPRECATED - Conditionnement"
   packagings: [Packagings]
 
-  "Autre packaging (préciser)"
+  "DEPRECATED - Autre packaging (préciser)"
   otherPackaging: String
 
-  "Nombre de colis"
+  "DEPRECATED - Nombre de colis"
   numberOfPackages: Int
 
   "Quantité en tonnes"

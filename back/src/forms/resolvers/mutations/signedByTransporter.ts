@@ -10,7 +10,10 @@ import {
 } from "../../permissions";
 import { signingInfoSchema, wasteDetailsSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
-import { expandFormFromDb } from "../../form-converter";
+import {
+  expandFormFromDb,
+  flattenSignedByTransporterInput
+} from "../../form-converter";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = async (
   parent,
@@ -31,7 +34,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     securityCode,
     signatureAuthor,
     ...infos
-  } = signingInfo;
+  } = flattenSignedByTransporterInput(signingInfo);
 
   if (signedByTransporter === false) {
     throw new UserInputError(
@@ -51,7 +54,8 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   });
 
   const wasteDetails = infos => ({
-    wasteDetailsPackagings: infos.packagings ?? form.wasteDetailsPackagings,
+    wasteDetailsPackagingInfos:
+      infos.packagingInfos ?? form.wasteDetailsPackagingInfos,
     wasteDetailsQuantity: infos.quantity ?? form.wasteDetailsQuantity,
     wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
   });

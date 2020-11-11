@@ -1024,7 +1024,7 @@ export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
 
 export type QuantityType = "REAL" | "ESTIMATED";
 
-export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
+export type Consistence = "SOLID" | "LIQUID" | "GASEOUS" | "DOUGHY";
 
 export type TransportMode = "ROAD" | "RAIL" | "AIR" | "RIVER" | "SEA";
 
@@ -1165,6 +1165,8 @@ export type FormOrderByInput =
   | "wasteDetailsName_DESC"
   | "wasteDetailsOnuCode_ASC"
   | "wasteDetailsOnuCode_DESC"
+  | "wasteDetailsPackagingInfos_ASC"
+  | "wasteDetailsPackagingInfos_DESC"
   | "wasteDetailsPackagings_ASC"
   | "wasteDetailsPackagings_DESC"
   | "wasteDetailsOtherPackaging_ASC"
@@ -1393,6 +1395,8 @@ export type TemporaryStorageDetailOrderByInput =
   | "destinationProcessingOperation_DESC"
   | "wasteDetailsOnuCode_ASC"
   | "wasteDetailsOnuCode_DESC"
+  | "wasteDetailsPackagingInfos_ASC"
+  | "wasteDetailsPackagingInfos_DESC"
   | "wasteDetailsPackagings_ASC"
   | "wasteDetailsPackagings_DESC"
   | "wasteDetailsOtherPackaging_ASC"
@@ -5284,6 +5288,7 @@ export interface FormCreateInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5345,6 +5350,7 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5464,6 +5470,7 @@ export interface FormUpdateInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5603,6 +5610,7 @@ export interface FormUpdateDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5657,6 +5665,7 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7108,6 +7117,7 @@ export interface FormUpdateManyDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7195,6 +7205,7 @@ export interface FormUpdateManyMutationInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7426,6 +7437,7 @@ export interface TemporaryStorageDetailCreateInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7520,6 +7532,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7563,6 +7576,7 @@ export interface TemporaryStorageDetailUpdateInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7660,6 +7674,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7707,6 +7722,7 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7835,6 +7851,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7956,6 +7973,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -9280,6 +9298,7 @@ export interface Form {
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -9371,6 +9390,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -9484,6 +9504,7 @@ export interface FormSubscription
   wasteDetailsCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsName: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
@@ -9599,6 +9620,7 @@ export interface FormNullablePromise
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -9659,6 +9681,7 @@ export interface TemporaryStorageDetail {
   destinationCap?: String;
   destinationProcessingOperation?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -9702,6 +9725,7 @@ export interface TemporaryStorageDetailPromise
   destinationCap: () => Promise<String>;
   destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -9747,6 +9771,7 @@ export interface TemporaryStorageDetailSubscription
   destinationCap: () => Promise<AsyncIterator<String>>;
   destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
@@ -9790,6 +9815,7 @@ export interface TemporaryStorageDetailNullablePromise
   destinationCap: () => Promise<String>;
   destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -11454,6 +11480,7 @@ export interface FormPreviousValues {
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -11546,6 +11573,7 @@ export interface FormPreviousValuesPromise
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -11638,6 +11666,7 @@ export interface FormPreviousValuesSubscription
   wasteDetailsCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsName: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
@@ -12016,6 +12045,7 @@ export interface TemporaryStorageDetailPreviousValues {
   destinationCap?: String;
   destinationProcessingOperation?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -12058,6 +12088,7 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   destinationCap: () => Promise<String>;
   destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -12102,6 +12133,7 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   destinationCap: () => Promise<AsyncIterator<String>>;
   destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;

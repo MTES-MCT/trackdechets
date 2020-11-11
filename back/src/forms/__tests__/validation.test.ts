@@ -42,9 +42,10 @@ const form: Partial<Form> = {
   transporterCompanyMail: "t@t.fr",
   wasteDetailsCode: "01 03 04*",
   wasteDetailsOnuCode: "AAA",
-  wasteDetailsPackagings: ["CITERNE", "GRV"],
-  wasteDetailsOtherPackaging: "",
-  wasteDetailsNumberOfPackages: 2,
+  wasteDetailsPackagingInfos: [
+    { type: "FUT", other: null, quantity: 1 },
+    { type: "GRV", other: null, quantity: 1 }
+  ],
   wasteDetailsQuantity: 1.5,
   wasteDetailsQuantityType: "REAL",
   wasteDetailsConsistence: "SOLID"
@@ -139,20 +140,46 @@ describe("sealedFormSchema", () => {
       const isValid = await sealedFormSchema.isValid(testForm);
       expect(isValid).toEqual(false);
     });
-  });
 
-  test("when there is an eco-organisme but emitter type is not OTHER", async () => {
-    const testForm = {
-      ...form,
-      emitterType: "PRODUCER",
-      ecoOrganismeSiret: "12592018234951",
-      ecoOrganismeName: "Some eco-organisme"
-    };
+    test("when there is an eco-organisme but emitter type is not OTHER", async () => {
+      const testForm = {
+        ...form,
+        emitterType: "PRODUCER",
+        ecoOrganismeSiret: "12592018234951",
+        ecoOrganismeName: "Some eco-organisme"
+      };
 
-    const isValid = await sealedFormSchema
-      .concat(ecoOrganismeSchema)
-      .isValid(testForm);
-    expect(isValid).toEqual(false);
+      const isValid = await sealedFormSchema
+        .concat(ecoOrganismeSchema)
+        .isValid(testForm);
+      expect(isValid).toEqual(false);
+    });
+
+    test("when there is 1 citerne and another packaging", async () => {
+      const testForm = {
+        ...form,
+        wasteDetailsPackagingInfos: [
+          { type: "CITERNE", other: null, quantity: 1 },
+          { type: "GRV", other: null, quantity: 1 }
+        ]
+      };
+
+      const isValid = await sealedFormSchema.isValid(testForm);
+      expect(isValid).toEqual(false);
+    });
+
+    test("when there is 1 benne and another packaging", async () => {
+      const testForm = {
+        ...form,
+        wasteDetailsPackagingInfos: [
+          { type: "BENNE", other: null, quantity: 1 },
+          { type: "GRV", other: null, quantity: 1 }
+        ]
+      };
+
+      const isValid = await sealedFormSchema.isValid(testForm);
+      expect(isValid).toEqual(false);
+    });
   });
 
   test("when there is no waste details quantity", async () => {

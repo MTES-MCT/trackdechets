@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { isoDate } from "common/datetime";
 import { formatPackagings } from "./utils";
-import { Packagings } from "generated/graphql/types";
+import { PackagingInfo } from "generated/graphql/types";
 
 export const DetailRow = ({ value, label }) => {
   if (!value) {
@@ -40,19 +40,28 @@ export const DateRow = ({ value, label }) => {
   );
 };
 export const PackagingRow = ({
-  packagings,
-  numberOfPackages,
+  packagingInfos,
 }: {
-  packagings?: Packagings[];
-  numberOfPackages: number | null | undefined;
-}) => (
-  <>
-    <dt>Conditionnement</dt>
-    <dd>
-      {!!packagings && formatPackagings(packagings)}
-      {numberOfPackages && (
-        <span className="tw-ml-2">({numberOfPackages})</span>
-      )}
-    </dd>
-  </>
-);
+  packagingInfos?: PackagingInfo[] | null;
+}) => {
+  const numberOfPackages = useMemo(
+    () => packagingInfos?.reduce((prev, cur) => cur.quantity + prev, 0),
+    [packagingInfos]
+  );
+  const formatedPackagings = useMemo(
+    () => formatPackagings(packagingInfos?.map(p => p.type)),
+    [packagingInfos]
+  );
+
+  return (
+    <>
+      <dt>Conditionnement</dt>
+      <dd>
+        {formatedPackagings}
+        {numberOfPackages && (
+          <span className="tw-ml-2">({numberOfPackages})</span>
+        )}
+      </dd>
+    </>
+  );
+};

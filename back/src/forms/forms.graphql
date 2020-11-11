@@ -622,8 +622,11 @@ type StateSummary {
   "Quantité la plus à jour"
   quantity: Float
 
+  "DEPRECATED Packaging le plus à jour"
+  packagings: [Packagings!]! @deprecated(reason: "Utiliser packagingInfos")
+
   "Packaging le plus à jour"
-  packagings: [Packagings!]!
+  packagingInfos: [PackagingInfo!]!
 
   "Code ONU le plus à jour"
   onuCode: String
@@ -857,6 +860,21 @@ enum Consistence {
 
   "Gazeux"
   GASEOUS
+
+  "Pâteux"
+  DOUGHY
+}
+
+"Informations sur le conditionnement"
+type PackagingInfo {
+  "Type de conditionnement"
+  type: Packagings!
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
 }
 
 "Détails du déchet (case 3, 4, 5, 6)"
@@ -870,14 +888,17 @@ type WasteDetails {
   "Code ONU"
   onuCode: String
 
+  "Conditionnements"
+  packagingInfos: [PackagingInfo!]
+
   "Conditionnement"
-  packagings: [Packagings!]!
+  packagings: [Packagings!] @deprecated(reason: "Utiliser `packagingInfos`")
 
   "Autre packaging (préciser)"
-  otherPackaging: String
+  otherPackaging: String @deprecated(reason: "Utiliser `packagingInfos`")
 
   "Nombre de colis"
-  numberOfPackages: Int
+  numberOfPackages: Int @deprecated(reason: "Utiliser `packagingInfos`")
 
   "Quantité en tonnes"
   quantity: Float

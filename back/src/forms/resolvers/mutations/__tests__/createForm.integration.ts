@@ -53,6 +53,13 @@ const CREATE_FORM = `
         numberPlate
         customInfo
       }
+      wasteDetails {
+        packagingInfos {
+          type
+          other
+          quantity
+        }
+      }
     }
   }
 `;
@@ -393,6 +400,35 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual(undefined);
     expect(data.createForm.transporter).toMatchObject(
       createFormInput.transporter
+    );
+  });
+
+  it("should create a form from deprecated packagings fields", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        packagings: ["FUT", "AUTRE"],
+        otherPackaging: "Contenant",
+        numberOfPackages: 2
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    const expectedPackagingInfos = [
+      { type: "FUT", other: null, quantity: 1 },
+      { type: "AUTRE", other: "Contenant", quantity: 1 }
+    ];
+    expect(data.createForm.wasteDetails.packagingInfos).toMatchObject(
+      expectedPackagingInfos
     );
   });
 });

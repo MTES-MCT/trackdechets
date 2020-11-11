@@ -1,7 +1,7 @@
 import { WasteDetailsResolvers } from "../../generated/graphql/types";
 
 const wasteDetailsResolvers: WasteDetailsResolvers = {
-  packagings: parent => parent.packagings || []
+  packagingInfos: parent => parent.packagingInfos || []
 };
 
 export default wasteDetailsResolvers;

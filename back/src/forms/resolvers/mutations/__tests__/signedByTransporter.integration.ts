@@ -24,6 +24,42 @@ const SIGNED_BY_TRANSPORTER = `mutation SignedByTransporter($id: ID!, $signingIn
 describe("Mutation.signedByTransporter", () => {
   afterAll(() => resetDatabase());
 
+  it("should mark a form as signed with deprecated packagings field", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const emitterCompany = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanyName: company.name,
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: emitterCompany.securityCode,
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagings: form.wasteDetailsPackagingInfos.map(p => p.type),
+          quantity: form.wasteDetailsQuantity,
+          onuCode: "Code ONU"
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form({ id: form.id });
+    expect(resultingForm.status).toBe("SENT");
+  });
+
   it("should mark a form as signed", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const emitterCompany = await companyFactory();
@@ -49,7 +85,7 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: emitterCompany.securityCode,
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity,
           onuCode: "Code ONU"
         }
@@ -86,7 +122,7 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: emitter.securityCode,
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity,
           onuCode: ""
         }
@@ -129,7 +165,7 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: emitter.securityCode,
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity,
           onuCode: ""
         }
@@ -165,7 +201,7 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: 4567,
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity
         }
       }
@@ -206,7 +242,7 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: 1234,
           sentBy: "Roger Lapince",
           signedByProducer: false,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity
         }
       }
@@ -247,7 +283,7 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: 1234,
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity
         }
       }
@@ -299,7 +335,7 @@ describe("Mutation.signedByTransporter", () => {
           signatureAuthor: "ECO_ORGANISME",
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity
         }
       }
@@ -357,7 +393,7 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: receivingCompany.securityCode,
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: form.wasteDetailsPackagings,
+          packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity,
           onuCode: "Code ONU"
         }

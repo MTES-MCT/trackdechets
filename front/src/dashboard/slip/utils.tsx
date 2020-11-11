@@ -24,7 +24,9 @@ export const getVerbosePackaging = (
   return packaging[0] + packaging.slice(1).toLowerCase();
 };
 
-export const formatPackagings = (packagings: Packagings[]): string => {
+export const formatPackagings = (
+  packagings: Packagings[] | undefined
+): string => {
   if (!packagings) return "";
   return packagings.map(p => getVerbosePackaging(p)).join(" ");
 };

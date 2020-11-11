@@ -39,10 +39,16 @@ const FORMS = `
         siret
       }
       wasteDetails {
-        packagings
+        packagingInfos {
+          type
+          quantity
+        }
       }
       stateSummary {
-        packagings
+        packagingInfos {
+          type
+          quantity
+        }
       }
     }
   }
@@ -146,21 +152,21 @@ describe("Query.forms", () => {
     expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
   });
 
-  it("should convert packagings to an empty array if null", async () => {
+  it("should convert packagingInfos to an empty array if null", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     await createForms(user.id, [
       {
         recipientCompanySiret: company.siret,
-        wasteDetailsPackagings: ["CITERNE"]
+        wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
       },
       {
         recipientCompanySiret: company.siret,
-        wasteDetailsPackagings: []
+        wasteDetailsPackagingInfos: []
       },
       {
         recipientCompanySiret: company.siret,
-        wasteDetailsPackagings: null
+        wasteDetailsPackagingInfos: null
       }
     ]);
 
@@ -172,17 +178,67 @@ describe("Query.forms", () => {
 
     expect(data.forms).toEqual([
       expect.objectContaining({
-        wasteDetails: { packagings: [] },
-        stateSummary: { packagings: [] }
+        wasteDetails: { packagingInfos: [] },
+        stateSummary: { packagingInfos: [] }
       }),
       expect.objectContaining({
-        wasteDetails: { packagings: [] },
-        stateSummary: { packagings: [] }
+        wasteDetails: { packagingInfos: [] },
+        stateSummary: { packagingInfos: [] }
       }),
       expect.objectContaining({
-        wasteDetails: { packagings: ["CITERNE"] },
-        stateSummary: { packagings: ["CITERNE"] }
+        wasteDetails: { packagingInfos: [{ type: "CITERNE", quantity: 1 }] },
+        stateSummary: { packagingInfos: [{ type: "CITERNE", quantity: 1 }] }
       })
+    ]);
+  });
+
+  it("should return deprecated packagings fields, consistent with packagingInfos", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    await createForms(user.id, [
+      {
+        recipientCompanySiret: company.siret,
+        wasteDetailsPackagingInfos: [
+          { type: "FUT", quantity: 2 },
+          { type: "AUTRE", other: "Contenant", quantity: 3 }
+        ]
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { data, errors } = await query(
+      `query {
+          forms {
+            wasteDetails {
+              packagingInfos {
+                type
+                other
+                quantity
+              }
+              packagings
+              otherPackaging
+              numberOfPackages
+            }
+          }
+        }
+      `
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data.forms.length).toBe(1);
+
+    expect(data.forms).toEqual([
+      {
+        wasteDetails: {
+          packagingInfos: [
+            { type: "FUT", other: null, quantity: 2 },
+            { type: "AUTRE", other: "Contenant", quantity: 3 }
+          ],
+          packagings: ["FUT", "AUTRE"],
+          otherPackaging: "Contenant",
+          numberOfPackages: 5
+        }
+      }
     ]);
   });
 

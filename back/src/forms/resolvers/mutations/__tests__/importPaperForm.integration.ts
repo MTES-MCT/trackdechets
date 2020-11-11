@@ -65,7 +65,7 @@ describe("mutation / importPaperForm", () => {
           code: "01 03 04*",
           quantity: 1.0,
           quantityType: "ESTIMATED",
-          packagings: ["BENNE"],
+          packagingInfos: [{ type: "BENNE", quantity: 1 }],
           onuCode: "ONU",
           consistence: "SOLID"
         },
@@ -237,9 +237,9 @@ describe("mutation / importPaperForm", () => {
       wasteDetailsCode: "01 03 04*",
       wasteDetailsQuantity: 1.0,
       wasteDetailsQuantityType: "ESTIMATED",
-      wasteDetailsPackagings: ["BENNE"],
-      wasteDetailsOnuCode: "ONU",
-      wasteDetailsConsistence: "SOLID"
+      wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
+      wasteDetailsConsistence: "SOLID",
+      wasteDetailsOnuCode: "ONU"
     };
 
     const importedData = {

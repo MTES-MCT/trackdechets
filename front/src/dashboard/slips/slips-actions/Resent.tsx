@@ -34,9 +34,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
 
       const keys: Array<keyof WasteDetails> = [
         "onuCode",
-        "packagings",
-        "otherPackaging",
-        "numberOfPackages",
+        "packagingInfos",
         "quantity",
         "quantityType",
       ];
@@ -44,7 +42,7 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
         switch (key) {
           case "packagings": {
             if (
-              wasteDetails[key].length > 0 &&
+              wasteDetails[key]?.length &&
               values.wasteDetails[key].length === 0
             ) {
               setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
@@ -113,32 +111,10 @@ export default function Resent({ form, onSubmit, onCancel }: SlipActionProps) {
                 <h5 className="form__section-heading">Détails du déchet</h5>
 
                 <h4>Conditionnement</h4>
-                <div className="form__row">
-                  <Field
-                    name="wasteDetails.packagings"
-                    component={Packagings}
-                  />
-
-                  {values.wasteDetails.packagings.indexOf("AUTRE") > -1 && (
-                    <label>
-                      <Field
-                        name="wasteDetails.otherPackaging"
-                        type="text"
-                        className="td-input"
-                        placeholder="Détail de l'autre conditionnement"
-                      />
-                    </label>
-                  )}
-
-                  <Field
-                    component={NumberInput}
-                    name="wasteDetails.numberOfPackages"
-                    label="Nombre de colis"
-                    className="td-input"
-                    min="1"
-                  />
-                  <RedErrorMessage name="wasteDetails.numberOfPackages" />
-                </div>
+                <Field
+                  name="wasteDetails.packagingInfos"
+                  component={Packagings}
+                />
 
                 <h4>Quantité en tonnes</h4>
                 <div className="form__row">
