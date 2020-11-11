@@ -47,10 +47,10 @@ describe("sendOnboardingFirstStepMails", () => {
     await sendOnboardingFirstStepMails();
 
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
+    expect(mockedAxiosPost).toHaveBeenCalledWith("http://mailservice/smtp/email", {
       body: "_",
       subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
-      templateId: parseInt(process.env.MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10), // hardcoded mailjet template ID, should match .env MJ_FIRST_ONBOARDING_TEMPLATE_ID
+      templateId: 2000, // hardcoded console FIRST_ONBOARDING_TEMPLATE_ID template ID 
       title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
       toEmail: "user@example.com",
       toName: "Rick Hunter",
@@ -70,10 +70,10 @@ describe("sendOnboardingSecondStepMails", () => {
     await sendOnboardingSecondStepMails();
 
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-    expect(mockedAxiosPost).toHaveBeenCalledWith("http://td-mail/send", {
+    expect(mockedAxiosPost).toHaveBeenCalledWith("http://mailservice/smtp/email", {
       body: "_",
       subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
-      templateId: parseInt(process.env.MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10), // hardcoded mailjet template ID, should match .env MJ_SECOND_ONBOARDING_TEMPLATE_ID
+      templateId: 3000, // hardcoded console SECOND_ONBOARDING_TEMPLATE_ID 
       title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
       toEmail: "user@example.com",
       toName: "Rick Hunter",

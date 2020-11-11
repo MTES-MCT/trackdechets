@@ -1,5 +1,5 @@
 const { UI_HOST } = process.env;
-import { templateIds } from "../common/mails.helper";
+import { templateIds } from "../mailer/helpers";
 const baseUrl = `https://${UI_HOST}`;
 
 const templateId = templateIds.SECURITY_CODE_RENEWAL_TEMPLATE_ID;

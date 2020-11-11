@@ -152,7 +152,6 @@ const insee2: CompanySearchResult = {
 jest.mock("../../forms/pdf/generator", () => ({
   buildPdfBase64: jest.fn(() => "base64xyz")
 }));
-
 // Mock a utils function that hits th db
 jest.mock("../../companies/database", () => ({
   getCompanyAdminUsers: jest.fn(siret => mockedCompanyAdmins[siret])
@@ -172,7 +171,7 @@ const mockedAxiosGet = jest.spyOn(axios, "get");
 // spies on axios post to capture calls to td-mail
 const mockedAxiosPost = jest.spyOn(axios, "post");
 
-const { MJ_MAIN_TEMPLATE_ID } = process.env;
+const { SIB_MAIN_TEMPLATE_ID } = process.env;
 /**
  * Test mailWhenFormIsDeclined function
  * We check:
@@ -227,7 +226,7 @@ describe("mailWhenFormIsDeclined", () => {
     const args = mockedAxiosPost.mock.calls;
     // right service was called
 
-    expect(args[0][0]).toEqual("http://td-mail/send");
+    expect(args[0][0]).toEqual("http://mailservice/smtp/email");
 
     const payload1 = args[0][1];
 
@@ -245,9 +244,9 @@ describe("mailWhenFormIsDeclined", () => {
     );
 
     // check form readable id is in mail body
-    expect(payload1.body).toContain("TD-19-AAA03488");
+    expect(payload1.params.body).toContain("TD-19-AAA03488");
 
-    const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
+    const templateId = parseInt(SIB_MAIN_TEMPLATE_ID, 10);
     expect(payload1.templateId).toEqual(templateId);
   });
 
@@ -282,11 +281,12 @@ describe("mailWhenFormIsDeclined", () => {
     const args = mockedAxiosPost.mock.calls;
 
     // right service was called
-    expect(args[0][0]).toEqual("http://td-mail/send");
+    expect(args[0][0]).toEqual("http://mailservice/smtp/email");
 
     const payload1 = args[0][1];
 
     // pdf from was attached
+
     expect(payload1.attachment.file).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
@@ -300,9 +300,9 @@ describe("mailWhenFormIsDeclined", () => {
     );
 
     // check form readable id is in mail body
-    expect(payload1.body).toContain("TD-19-AAA03488");
+    expect(payload1.params.body).toContain("TD-19-AAA03488");
 
-    const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
+    const templateId = parseInt(SIB_MAIN_TEMPLATE_ID, 10);
     expect(payload1.templateId).toEqual(templateId);
   });
 });
