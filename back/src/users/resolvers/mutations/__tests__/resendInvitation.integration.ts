@@ -6,7 +6,7 @@ import {
 import { createUserAccountHash } from "../../../database";
 import { AuthType } from "../../../../auth";
 import makeClient from "../../../../__tests__/testClient";
-import * as mailsHelper from "../../../../common/mails.helper";
+import * as mailsHelper from "../../../../mailer/mailing";
 import { userMails } from "../../../mails";
 
 // No mails

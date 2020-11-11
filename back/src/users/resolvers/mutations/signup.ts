@@ -1,6 +1,6 @@
 import { hash } from "bcrypt";
 import * as yup from "yup";
-import { sendMail } from "../../../common/mails.helper";
+import { sendMail } from "../../../mailer/mailing";
 import { User, prisma } from "../../../generated/prisma-client";
 import { userMails } from "../../mails";
 import { hashPassword } from "../../utils";

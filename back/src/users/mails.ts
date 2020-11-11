@@ -1,8 +1,12 @@
 import { escape } from "querystring";
 import { Company, Form, User } from "../generated/prisma-client";
-import { cleanupSpecialChars, toFrFormat } from "../common/mails.helper";
+import {
+  cleanupSpecialChars,
+  toFrFormat,
+  templateIds
+} from "../mailer/helpers";
 import { getUIBaseURL } from "../utils";
-import { templateIds } from "../common/mails.helper";
+import {} from "../mailer/mailing";
 
 const { UI_HOST, VIRTUAL_HOST } = process.env;
 

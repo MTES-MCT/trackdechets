@@ -1,5 +1,5 @@
 import { userMails } from "../users/mails";
-import { sendMail } from "../common/mails.helper";
+import { sendMail } from "../mailer/mailing";
 import { prisma } from "../generated/prisma-client";
 
 /**

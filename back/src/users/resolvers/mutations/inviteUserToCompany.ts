@@ -1,5 +1,5 @@
 import { prisma, User } from "../../../generated/prisma-client";
-import { sendMail } from "../../../common/mails.helper";
+import { sendMail } from "../../../mailer/mailing";
 import { userMails } from "../../mails";
 import {
   MutationInviteUserToCompanyArgs,

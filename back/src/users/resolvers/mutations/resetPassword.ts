@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { generatePassword, hashPassword } from "../../utils";
-import { sendMail } from "../../../common/mails.helper";
+import { sendMail } from "../../../mailer/mailing";
 import { userMails } from "../../mails";
 
 const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
