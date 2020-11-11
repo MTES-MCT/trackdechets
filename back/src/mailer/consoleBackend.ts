@@ -8,7 +8,6 @@ const consoleBackend = {
   log: function(payload: Mail | Contact) {
     console.log(yellow, "-".repeat(30), "Email", "-".repeat(30), reset);
     console.log(`Backend: ${this.backendName}`);
-
     console.log(payload);
     console.log("\n");
   },

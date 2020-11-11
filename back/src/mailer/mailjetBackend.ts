@@ -1,11 +1,16 @@
 import { Mail, Contact } from "./types";
 import mailjet from "node-mailjet";
 
-const mj = mailjet.connect(
-  process.env.MJ_APIKEY_PUBLIC,
-  process.env.MJ_APIKEY_PRIVATE
-);
-const MJ_MAIN_TEMPLATE_ID = process.env.MJ_MAIN_TEMPLATE_ID;
+const {
+  MJ_APIKEY_PUBLIC,
+  MJ_APIKEY_PRIVATE,
+  SENDER_EMAIL_ADDRESS,
+  SENDER_NAME,
+  MJ_MAIN_TEMPLATE_ID
+} = process.env;
+
+const mj = mailjet.connect(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE);
+
 const mailjetBackend = {
   backendName: "Mailjet",
 
@@ -16,10 +21,11 @@ const mailjetBackend = {
 
     let payload = {
       From: {
-        Email: process.env.SENDER_EMAIL_ADDRESS,
-        Name: process.env.SENDER_NAME
+        Email: SENDER_EMAIL_ADDRESS,
+        Name: SENDER_NAME
       },
       To: mail.to,
+      Cc: mail.cc,
       TemplateId: mail.templateId,
       TemplateLanguage: true,
       Variables: {
@@ -45,11 +51,17 @@ const mailjetBackend = {
       .post("send", { version: "v3.1" })
       .request({ Messages: [payload] });
     request
-      .then(result => {
-        console.log(result.body);
+      .then(() => {
+        const allRecipients = [...mail.to, ...(!!mail.cc? mail.cc: [])]
+        for (let recipient of allRecipients) {
+          console.log(
+            `Mail sent via MJ to ${recipient.email} - Subject: ${mail.subject}`
+          );
+          
+        }
       })
       .catch(err => {
-        console.log(err.statusCode);
+        console.log(err);
       });
   },
   addContact: function(contact: Contact) {
@@ -57,11 +69,11 @@ const mailjetBackend = {
       .post("contact", { version: "v3" })
       .request({ Name: contact.name, Email: contact.email });
     request
-      .then(result => {
-        console.log(result.body);
+      .then(() => {
+        console.log(`Contact created on MJ: ${contact.email}`);
       })
       .catch(err => {
-        console.log(err.statusCode);
+        console.log(err);
       });
   }
 };

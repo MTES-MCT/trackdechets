@@ -1,45 +1,64 @@
 import { Mail, Contact } from "./types";
 import axios from "axios";
 const SIB_BASE_URL = "https://api.sendinblue.com/v3";
-const SIB_SMTP_URL = `${SIB_BASE_URL}/smtp/email`;
-const SIB_CONTACT_URL = `${SIB_BASE_URL}/contacts`;
-const SIB_API_KEY = process.env.SIB_APIKEY;
-const SIB_MAIN_TEMPLATE_ID = 2;
+
+const {
+  SIB_APIKEY,
+  DISABLE_EMAILING,
+  SENDER_EMAIL_ADDRESS,
+  SENDER_NAME,
+  SIB_MAIN_TEMPLATE_ID
+} = process.env;
+
+const baseUrl = !!DISABLE_EMAILING ? "http://mailservice" : SIB_BASE_URL; // use a fake url for tests
+const SIB_SMTP_URL = `${baseUrl}/smtp/email`;
+const SIB_CONTACT_URL = `${baseUrl}/contacts`;
 
 const headers = {
-  "api-key": SIB_API_KEY,
+  "api-key": SIB_APIKEY,
   "Content-Type": "application/json"
 };
 const sendInBlueBackend = {
   backendName: "SendInBlue",
 
   sendMail: function(mail: Mail) {
+    if (!mail.templateId) {
+      mail.templateId = parseInt(SIB_MAIN_TEMPLATE_ID, 10);
+    }
     const params = { title: mail.title, body: mail.body };
 
-    const req = axios.post(
-      SIB_SMTP_URL,
-      {
-        subject: mail.subject,
-        to: mail.to,
-        sender: {
-          email: process.env.SENDER_EMAIL_ADDRESS,
-          name: process.env.SENDER_NAME
-        },
-        templateId: SIB_MAIN_TEMPLATE_ID,
-        params: params
+    let payload = {
+      subject: mail.subject,
+      to: mail.to,
+      sender: {
+        email: SENDER_EMAIL_ADDRESS,
+        name: SENDER_NAME
       },
-      {
-        headers
-      }
-    );
+      cc: mail.cc,
+      templateId: mail.templateId,
+      params: params
+    };
+    if (!!mail.attachment) {
+      payload["attachment"] = [
+        {
+          name: mail.attachment.name,
+          content: mail.attachment.file
+        }
+      ];
+    }
+
+    const req = axios.post(SIB_SMTP_URL, payload, { headers: headers });
     req
-      .then(function(response) {
-        // handle success
-        console.log(response);
+      .then(() => {
+        const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
+        for (let recipient of allRecipients) {
+          console.log(
+            `Mail sent via SIB to ${recipient.email} - Subject: ${mail.subject}`
+          );
+        }
       })
-      .catch(function(error) {
-        // handle error
-        console.log(error);
+      .catch(err => {
+        console.log(err);
       });
   },
   addContact: function(contact: Contact) {
@@ -47,20 +66,18 @@ const sendInBlueBackend = {
       SIB_CONTACT_URL,
       {
         email: contact.email,
-        NOM: contact.name
+        NOM: contact.name // NOM is a custom SIB contact field
       },
       {
         headers
       }
     );
     req
-      .then(function(response) {
-        // handle success
-        console.log(response);
+      .then(() => {
+        console.log(`Contact created on SIB: ${contact.email}`);
       })
-      .catch(function(error) {
-        // handle error
-        console.log(error);
+      .catch(err => {
+        console.log(err);
       });
   }
 };
