@@ -72,6 +72,10 @@ export default function Packagings({
                                     [
                                       PackagingsEnum.Citerne,
                                       PackagingsEnum.Benne,
+                                      ...(packaging.value !==
+                                      PackagingsEnum.Autre
+                                        ? [packaging.value]
+                                        : []),
                                     ].includes(p.type)
                                   ))
                               }
