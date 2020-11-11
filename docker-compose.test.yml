@@ -7,7 +7,13 @@ services:
       dockerfile: Dockerfile.test
     environment:
       JWT_SECRET: "xxx"
-
+      EMAIL_BACKEND: "sendinblue"
+      DISABLE_EMAILING: "true"
+      SIB_MAIN_TEMPLATE_ID: "9"
+      SIB_FIRST_ONBOARDING_TEMPLATE_ID: "8"
+      SIB_SECOND_ONBOARDING_TEMPLATE_ID: "7"
+      SIB_SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
+ 
   td-ui:
     restart: "no"
     build:

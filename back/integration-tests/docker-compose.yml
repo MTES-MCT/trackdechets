@@ -44,5 +44,6 @@ services:
       LETSENCRYPT_HOST: $API_HOST
       PRISMA_ENDPOINT: $PRISMA_ENDPOINT
       PRISMA_SECRET: $PRISMA_SECRET
-      EMAIL_BACKEND: console
+      EMAIL_BACKEND: "sendinblue"
+      DISABLE_EMAILING: "true"
  
