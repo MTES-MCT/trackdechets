@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { isoDate } from "common/datetime";
 import { formatPackagings } from "./utils";
 import { PackagingInfo } from "generated/graphql/types";
-import styles from "./Slip.module.scss";
 
 export const DetailRow = ({ value, label }) => {
   if (!value) {

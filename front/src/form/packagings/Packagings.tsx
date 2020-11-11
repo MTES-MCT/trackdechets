@@ -3,7 +3,7 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps } from "formik";
 import { Packagings as PackagingsEnum } from "generated/graphql/types";
-import React, { InputHTMLAttributes } from "react";
+import React, { InputHTMLAttributes, useMemo } from "react";
 import "./Packagings.scss";
 
 const PACKAGINGS = [
@@ -20,6 +20,16 @@ export default function Packagings({
   id,
   ...props
 }: FieldProps & InputHTMLAttributes<HTMLInputElement>) {
+  const isAddButtonDisabled = useMemo(() => {
+    if (value?.length === 0) {
+      return false;
+    }
+
+    return value.some(p =>
+      [PackagingsEnum.Citerne, PackagingsEnum.Benne].includes(p.type)
+    );
+  }, [value]);
+
   if (!value) {
     return null;
   }
@@ -52,6 +62,19 @@ export default function Packagings({
                             <option
                               key={packaging.value}
                               value={packaging.value}
+                              disabled={
+                                value?.length > 1 &&
+                                ([
+                                  PackagingsEnum.Citerne,
+                                  PackagingsEnum.Benne,
+                                ].includes(packaging.value) ||
+                                  value.some(p =>
+                                    [
+                                      PackagingsEnum.Citerne,
+                                      PackagingsEnum.Benne,
+                                    ].includes(p.type)
+                                  ))
+                              }
                             >
                               {packaging.label}
                             </option>
@@ -99,6 +122,7 @@ export default function Packagings({
             <button
               type="button"
               className="btn btn--outline-primary"
+              disabled={isAddButtonDisabled}
               onClick={() =>
                 arrayHelpers.push({
                   type: PackagingsEnum.Autre,
