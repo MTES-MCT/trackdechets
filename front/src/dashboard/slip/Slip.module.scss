@@ -60,7 +60,16 @@
   &Summary {
     padding: 1rem;
   }
-
+  &QRCode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    span {
+      font-size: 0.75rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+  }
   &QRCodeIcon {
     display: flex;
     justify-content: center;
