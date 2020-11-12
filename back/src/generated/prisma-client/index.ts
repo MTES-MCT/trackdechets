@@ -3180,7 +3180,6 @@ export interface FormWhereInput {
   traderValidityLimit_lte?: Maybe<DateTimeInput>;
   traderValidityLimit_gt?: Maybe<DateTimeInput>;
   traderValidityLimit_gte?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeWhereInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeName_not?: Maybe<String>;
   ecoOrganismeName_in?: Maybe<String[] | String>;
@@ -5304,7 +5303,6 @@ export interface FormCreateInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
@@ -5314,11 +5312,6 @@ export interface FormCreateInput {
   transportSegments?: Maybe<TransportSegmentCreateManyWithoutFormInput>;
   currentTransporterSiret?: Maybe<String>;
   nextTransporterSiret?: Maybe<String>;
-}
-
-export interface EcoOrganismeCreateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
 }
 
 export interface FormCreateManyInput {
@@ -5486,7 +5479,6 @@ export interface FormUpdateInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -5496,26 +5488,6 @@ export interface FormUpdateInput {
   transportSegments?: Maybe<TransportSegmentUpdateManyWithoutFormInput>;
   currentTransporterSiret?: Maybe<String>;
   nextTransporterSiret?: Maybe<String>;
-}
-
-export interface EcoOrganismeUpdateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  update?: Maybe<EcoOrganismeUpdateDataInput>;
-  upsert?: Maybe<EcoOrganismeUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
-}
-
-export interface EcoOrganismeUpdateDataInput {
-  siret?: Maybe<String>;
-  name?: Maybe<String>;
-  address?: Maybe<String>;
-}
-
-export interface EcoOrganismeUpsertNestedInput {
-  update: EcoOrganismeUpdateDataInput;
-  create: EcoOrganismeCreateInput;
 }
 
 export interface FormUpdateManyInput {
@@ -5626,7 +5598,6 @@ export interface FormUpdateDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -7548,7 +7519,6 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
@@ -7690,7 +7660,6 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -7867,7 +7836,6 @@ export interface FormCreateWithoutTransportSegmentsInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
@@ -7989,7 +7957,6 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -9406,7 +9373,6 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   traderReceipt: () => Promise<String>;
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
-  ecoOrganisme: <T = EcoOrganismePromise>() => T;
   ecoOrganismeName: () => Promise<String>;
   ecoOrganismeSiret: () => Promise<String>;
   appendix2Forms: <T = FragmentableArray<Form>>(args?: {
@@ -9520,7 +9486,6 @@ export interface FormSubscription
   traderReceipt: () => Promise<AsyncIterator<String>>;
   traderDepartment: () => Promise<AsyncIterator<String>>;
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-  ecoOrganisme: <T = EcoOrganismeSubscription>() => T;
   ecoOrganismeName: () => Promise<AsyncIterator<String>>;
   ecoOrganismeSiret: () => Promise<AsyncIterator<String>>;
   appendix2Forms: <T = Promise<AsyncIterator<FormSubscription>>>(args?: {
@@ -9636,7 +9601,6 @@ export interface FormNullablePromise
   traderReceipt: () => Promise<String>;
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
-  ecoOrganisme: <T = EcoOrganismePromise>() => T;
   ecoOrganismeName: () => Promise<String>;
   ecoOrganismeSiret: () => Promise<String>;
   appendix2Forms: <T = FragmentableArray<Form>>(args?: {

@@ -1216,11 +1216,6 @@ input EcoOrganismeCreateInput {
   address: String!
 }
 
-input EcoOrganismeCreateOneInput {
-  create: EcoOrganismeCreateInput
-  connect: EcoOrganismeWhereUniqueInput
-}
-
 type EcoOrganismeEdge {
   node: EcoOrganisme!
   cursor: String!
@@ -1262,12 +1257,6 @@ input EcoOrganismeSubscriptionWhereInput {
   NOT: [EcoOrganismeSubscriptionWhereInput!]
 }
 
-input EcoOrganismeUpdateDataInput {
-  siret: String
-  name: String
-  address: String
-}
-
 input EcoOrganismeUpdateInput {
   siret: String
   name: String
@@ -1278,20 +1267,6 @@ input EcoOrganismeUpdateManyMutationInput {
   siret: String
   name: String
   address: String
-}
-
-input EcoOrganismeUpdateOneInput {
-  create: EcoOrganismeCreateInput
-  update: EcoOrganismeUpdateDataInput
-  upsert: EcoOrganismeUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-  connect: EcoOrganismeWhereUniqueInput
-}
-
-input EcoOrganismeUpsertNestedInput {
-  update: EcoOrganismeUpdateDataInput!
-  create: EcoOrganismeCreateInput!
 }
 
 input EcoOrganismeWhereInput {
@@ -1454,7 +1429,6 @@ type Form {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganisme
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
@@ -1554,7 +1528,6 @@ input FormCreateInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeCreateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
@@ -1668,7 +1641,6 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeCreateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
@@ -1761,7 +1733,6 @@ input FormCreateWithoutTransportSegmentsInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeCreateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
@@ -3172,7 +3143,6 @@ input FormUpdateDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -3265,7 +3235,6 @@ input FormUpdateInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -3574,7 +3543,6 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -3666,7 +3634,6 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -4667,7 +4634,6 @@ input FormWhereInput {
   traderValidityLimit_lte: DateTime
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
-  ecoOrganisme: EcoOrganismeWhereInput
   ecoOrganismeName: String
   ecoOrganismeName_not: String
   ecoOrganismeName_in: [String!]
