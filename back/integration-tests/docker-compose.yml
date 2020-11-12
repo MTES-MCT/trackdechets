@@ -46,4 +46,6 @@ services:
       PRISMA_SECRET: $PRISMA_SECRET
       EMAIL_BACKEND: "sendinblue"
       DISABLE_EMAILING: "true"
- 
+      EMAIL_BACKEND: "sendinblue"
+      DISABLE_EMAILING: "true"
+      SIB_MAIN_TEMPLATE_ID: "9"
