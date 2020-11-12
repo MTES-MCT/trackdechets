@@ -19,10 +19,19 @@ describe("Mutation.duplicateForm", () => {
   afterEach(() => resetDatabase());
 
   it.each([
-    ["", {}],
+    [
+      "",
+      {
+        transporterNumberPlate: "AB-1234-56",
+        transporterCustomInfo: "T001"
+      }
+    ],
     [
       "with an eco-organisme",
-      { ecoOrganismeName: "COREPILE", ecoOrganismeSiret: "12345678912345" }
+      {
+        ecoOrganismeName: "COREPILE",
+        ecoOrganismeSiret: "12345678912345"
+      }
     ]
   ])("should duplicate a form %s", async (_, opt) => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -90,7 +99,10 @@ describe("Mutation.duplicateForm", () => {
       nextTransporterSiret
     } = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret, ...opt }
+      opt: {
+        emitterCompanySiret: company.siret,
+        ...opt
+      }
     });
 
     const { mutate } = makeClient(user);
