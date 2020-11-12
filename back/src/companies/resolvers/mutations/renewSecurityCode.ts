@@ -5,7 +5,7 @@ import {
   getCompanyActiveUsers,
   getCompanyOrCompanyNotFound
 } from "../../database";
-import { sendMail } from "../../../mailer/mailing"; 
+import { sendMail } from "../../../mailer/mailing";
 import { UserInputError } from "apollo-server-express";
 import {
   CompanyPrivate,

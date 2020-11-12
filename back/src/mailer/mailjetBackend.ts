@@ -14,12 +14,12 @@ const mj = mailjet.connect(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE);
 const mailjetBackend = {
   backendName: "Mailjet",
 
-  sendMail: function(mail: Mail) {
+  sendMail: function (mail: Mail) {
     if (!mail.templateId) {
       mail.templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
     }
 
-    let payload = {
+    const payload = {
       From: {
         Email: SENDER_EMAIL_ADDRESS,
         Name: SENDER_NAME
@@ -52,19 +52,18 @@ const mailjetBackend = {
       .request({ Messages: [payload] });
     request
       .then(() => {
-        const allRecipients = [...mail.to, ...(!!mail.cc? mail.cc: [])]
-        for (let recipient of allRecipients) {
+        const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
+        for (const recipient of allRecipients) {
           console.log(
             `Mail sent via MJ to ${recipient.email} - Subject: ${mail.subject}`
           );
-          
         }
       })
       .catch(err => {
         console.log(err);
       });
   },
-  addContact: function(contact: Contact) {
+  addContact: function (contact: Contact) {
     const request = mj
       .post("contact", { version: "v3" })
       .request({ Name: contact.name, Email: contact.email });

@@ -52,7 +52,7 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
     const postArgs = mockedAxiosPost.mock.calls[0];
- 
+
     expect(postArgs[0]).toEqual("http://mailservice/smtp/email"); // fake url for tests
 
     const payload = postArgs[1];

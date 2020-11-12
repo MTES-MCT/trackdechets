@@ -80,7 +80,7 @@ describe("mutation inviteUserToCompany", () => {
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
     const postArgs = mockedAxiosPost.mock.calls[0];
-  
+
     // to right endpoint
     expect(postArgs[0]).toEqual("http://mailservice/smtp/email");
 

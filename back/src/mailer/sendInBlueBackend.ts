@@ -21,13 +21,13 @@ const headers = {
 const sendInBlueBackend = {
   backendName: "SendInBlue",
 
-  sendMail: function(mail: Mail) {
+  sendMail: function (mail: Mail) {
     if (!mail.templateId) {
       mail.templateId = parseInt(SIB_MAIN_TEMPLATE_ID, 10);
     }
     const params = { title: mail.title, body: mail.body };
 
-    let payload = {
+    const payload = {
       subject: mail.subject,
       to: mail.to,
       sender: {
@@ -51,7 +51,7 @@ const sendInBlueBackend = {
     req
       .then(() => {
         const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
-        for (let recipient of allRecipients) {
+        for (const recipient of allRecipients) {
           console.log(
             `Mail sent via SIB to ${recipient.email} - Subject: ${mail.subject}`
           );
@@ -61,7 +61,7 @@ const sendInBlueBackend = {
         console.log(err);
       });
   },
-  addContact: function(contact: Contact) {
+  addContact: function (contact: Contact) {
     const req = axios.post(
       SIB_CONTACT_URL,
       {
