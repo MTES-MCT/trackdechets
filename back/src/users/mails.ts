@@ -35,7 +35,7 @@ export const userMails = {
     <br>
     Pour rappel, Trackdéchets est un site en béta conçu par la Fabrique Numérique du Ministère de l'Ecologie et des Territoires.
     <br>
-    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.`
+    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:hello@trackdechets.beta.gouv.fr">hello@trackdechets.beta.gouv.fr</a>.`
   }),
   contentAwaitsGuest: (
     toEmail,
@@ -71,7 +71,7 @@ export const userMails = {
     <br>
     Si vous disposez de votre propre solution, vous continuez comme avant et la mise en place des connections (via API) permettra de transmettre des BSD dématérialisés à vos clients et prestataires. Pour en <a href="https://doc.trackdechets.fr/">savoir plus</a>.
     <br><br>
-    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.
+    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:hello@trackdechets.beta.gouv.fr">hello@trackdechets.beta.gouv.fr</a>.
   `
   }),
   inviteUserToJoin: (toEmail, companyAdmin, companyName, hash) => ({
@@ -112,7 +112,7 @@ export const userMails = {
     Vous avez demandé à réinitialiser votre mot de passe sur Trackdéchets.<br>
     Vous pouvez désormais vous connecter avec votre nouveau mot de passe qui vient d'être généré: <strong>${password}</strong>.<br>
     Vous aurez la possibilité de modifier ce mot de passe sur la plateforme.<bt><br>
-    Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">par mail.</a>
+    Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:hello@trackdechets.beta.gouv.fr">par mail.</a>
     `
   }),
   formNotAccepted: (recipients, ccs, form: Form, attachment) => ({
