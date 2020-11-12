@@ -5694,47 +5694,6 @@ Personne ayant transformé ou réalisé un traitement dont la provenance des dé
 </tbody>
 </table>
 
-### FavoriteType
-
-Type d'établissement favoris
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>EMITTER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>RECIPIENT</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TRADER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>NEXT_DESTINATION</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TEMPORARY_STORAGE_DETAIL</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>DESTINATION</strong></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
 ### FormRole
 
 <table>

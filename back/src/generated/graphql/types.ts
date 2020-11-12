@@ -1535,6 +1535,7 @@ export type QueryCompanyInfosArgs = {
 
 
 export type QueryFavoritesArgs = {
+  siret: Scalars['String'];
   type: FavoriteType;
 };
 
@@ -2829,7 +2830,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   appendixForms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryAppendixFormsArgs, 'siret'>>;
   companyInfos?: Resolver<ResolversTypes['CompanyPublic'], ParentType, ContextType, RequireFields<QueryCompanyInfosArgs, 'siret'>>;
   ecoOrganismes?: Resolver<Array<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>;
-  favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'type'>>;
+  favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'siret' | 'type'>>;
   form?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormArgs, never>>;
   formPdf?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>;
   forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, never>>;

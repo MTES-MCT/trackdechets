@@ -1544,6 +1544,7 @@ export type QueryCompanyInfosArgs = {
 
 
 export type QueryFavoritesArgs = {
+  siret: Scalars['String'];
   type: FavoriteType;
 };
 

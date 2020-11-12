@@ -317,17 +317,6 @@ type CompanyMember {
   isMe: Boolean
 }
 
-"Type d'établissement favoris"
-enum FavoriteType {
-  EMITTER
-  TRANSPORTER
-  RECIPIENT
-  TRADER
-  NEXT_DESTINATION
-  TEMPORARY_STORAGE_DETAIL
-  DESTINATION
-}
-
 """
 Rubrique ICPE d'un établissement avec les autorisations associées
 Pour plus de détails, se référer à la
