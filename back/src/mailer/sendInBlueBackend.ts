@@ -1,5 +1,7 @@
 import { Mail, Contact } from "./types";
 import axios from "axios";
+import * as Sentry from "@sentry/node";
+
 const SIB_BASE_URL = "https://api.sendinblue.com/v3";
 
 const {
@@ -7,8 +9,17 @@ const {
   DISABLE_EMAILING,
   SENDER_EMAIL_ADDRESS,
   SENDER_NAME,
-  SIB_MAIN_TEMPLATE_ID
+  SIB_MAIN_TEMPLATE_ID,
+  SENTRY_DSN,
+  NODE_ENV
 } = process.env;
+
+if (!!SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    environment: NODE_ENV
+  });
+}
 
 const baseUrl = !!DISABLE_EMAILING ? "http://mailservice" : SIB_BASE_URL; // use a fake url for tests
 const SIB_SMTP_URL = `${baseUrl}/smtp/email`;
@@ -58,7 +69,16 @@ const sendInBlueBackend = {
         }
       })
       .catch(err => {
-        console.log(err);
+        if (!!SENTRY_DSN) {
+          Sentry.captureException(err, {
+            tags: {
+              Mailer: "SendInBlue",
+              Recipients: mail.to.map(el => el.email).join(" ")
+            }
+          });
+        } else {
+          console.log(err);
+        }
       });
   },
   addContact: function (contact: Contact) {
