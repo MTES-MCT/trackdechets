@@ -72,6 +72,7 @@ services:
       OVH_LOGS_TOKEN: $OVH_LOGS_TOKEN
       OVH_LOGS_HOST: $OVH_LOGS_HOST
       OVH_LOGS_PORT: $OVH_LOGS_PORT
+      PDF_WATERMARK: $PDF_WATERMARK
       X-OVH-TOKEN: $OVH_LOGS_TOKEN
       facility: docker-td-api
     logging: *gelf-logging
@@ -82,14 +83,6 @@ services:
       VIRTUAL_HOST: $UI_HOST
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-  td-pdf:
-    image: betagouv/trackdechets-pdf:master
-    restart: always
-    environment:
-      SENTRY_DSN: $SENTRY_DSN
-      X-OVH-TOKEN: $OVH_LOGS_TOKEN
-      facility: docker-td-pdf
-    logging: *gelf-logging
   td-mail:
     image: betagouv/trackdechets-mail:master
     restart: always

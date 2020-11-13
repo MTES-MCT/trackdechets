@@ -1,6 +1,6 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFileDownloadToken } from "../../../common/file-download";
-import { downloadPdf } from "../../pdf";
+import downloadPdf from "../../pdf/downloadPdf";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanReadUpdateDeleteForm } from "../../permissions";

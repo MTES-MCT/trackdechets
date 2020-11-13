@@ -8,12 +8,6 @@ services:
     environment:
       JWT_SECRET: "xxx"
 
-  td-pdf:
-    restart: "no"
-    build:
-      context: ./pdf
-      dockerfile: Dockerfile.test
-
   td-ui:
     restart: "no"
     build:

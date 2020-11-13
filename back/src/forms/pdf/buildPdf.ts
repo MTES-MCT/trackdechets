@@ -18,6 +18,11 @@ import {
   appendixYOffsets,
   transportSegmentSettings
 } from "./settings";
+import { Form } from "../../generated/prisma-client";
+import {
+  TemporaryStorageDetail,
+  TransportSegment
+} from "../../generated/graphql/types";
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
 const multimodalYOffset = 85;
@@ -27,7 +32,13 @@ const multimodalYOffset = 85;
  * @param params - payload
  * @return Buffer
  */
-const buildPdf = async params => {
+const buildPdf = async (
+  params: Form & {
+    appendix2Forms: Form[];
+    temporaryStorageDetail: TemporaryStorageDetail;
+    transportSegments: TransportSegment[];
+  }
+) => {
   const {
     appendix2Forms,
     temporaryStorageDetail,
@@ -236,7 +247,8 @@ const buildPdf = async params => {
           tempStorerCompanyAddress: params.recipientCompanyAddress,
           tempStorerCompanyName: params.recipientCompanyName,
           wasteAcceptationStatus:
-            params.temporaryStorageDetail.tempStorerWasteAcceptationStatus,
+            params.temporaryStorageDetail?.temporaryStorer
+              ?.wasteAcceptationStatus,
           sentAt: params.temporaryStorageDetail.signedAt,
           currentPageNumber: 2,
           totalPagesNumber: 2,
@@ -254,7 +266,7 @@ const buildPdf = async params => {
     }
 
     if (!!transportSegments) {
-      for (let segment of transportSegments.slice(0, 2)) {
+      for (const segment of transportSegments.slice(0, 2)) {
         fillFields({
           data: processSegment(segment),
           page: tempStoragePage,
@@ -333,22 +345,22 @@ const buildPdf = async params => {
       sheetCounter <= transportSegmentsPageCount;
       sheetCounter++
     ) {
-      let multimodalPages = await PDFDocument.load(
+      const multimodalPages = await PDFDocument.load(
         existingTemporaryStorageBytes
       );
       multimodalPages.registerFontkit(fontkit);
-      let multimodalFont = await multimodalPages.embedFont(arialBytes);
+      const multimodalFont = await multimodalPages.embedFont(arialBytes);
       const multimodalWatermarkImage = await multimodalPages.embedPng(
         watermarkBytes
       );
       const multimodalStampImage = await multimodalPages.embedPng(stampBytes);
 
-      let currentMultimodalPage = multimodalPages.getPages()[0];
+      const currentMultimodalPage = multimodalPages.getPages()[0];
 
-      let remaining =
+      const remaining =
         transportSegmentsFormsCount -
         sheetCounter * transportSegmentsFormsByPage; // how many sub forms left
-      let lastPageFormsCount = Math.min(
+      const lastPageFormsCount = Math.min(
         remaining,
         transportSegmentsFormsByPage
       ); // if we have less than 2 forms on the last page
@@ -360,7 +372,7 @@ const buildPdf = async params => {
       ) {
         subFormCounter =
           pageSubFormCounter + sheetCounter * transportSegmentsFormsByPage;
-        let segment = remainingSegments[subFormCounter];
+        const segment = remainingSegments[subFormCounter];
         const yOffset = multimodalYOffset * pageSubFormCounter;
 
         fillFields({
@@ -419,11 +431,11 @@ const buildPdf = async params => {
     sheetCounter++
   ) {
     // create a pdf doc for each appendix, we'll merge it after filling
-    let appendixPages = await PDFDocument.load(existingAppendixBytes);
+    const appendixPages = await PDFDocument.load(existingAppendixBytes);
     appendixPages.registerFontkit(fontkit);
-    let appendixArialFont = await appendixPages.embedFont(arialBytes);
-    let currentAppendixPage = appendixPages.getPages()[0];
-    let appendixWatermarkImage = await appendixPages.embedPng(watermarkBytes);
+    const appendixArialFont = await appendixPages.embedFont(arialBytes);
+    const currentAppendixPage = appendixPages.getPages()[0];
+    const appendixWatermarkImage = await appendixPages.embedPng(watermarkBytes);
 
     // fill appendix header
     fillFields({
@@ -433,8 +445,8 @@ const buildPdf = async params => {
       font: appendixArialFont
     });
 
-    let remaining = appendix2FormsCount - sheetCounter * formsByAppendix; // how many sub forms left
-    let lastPageFormsCount = Math.min(remaining, formsByAppendix); // if we have less than 5 forms on the last page
+    const remaining = appendix2FormsCount - sheetCounter * formsByAppendix; // how many sub forms left
+    const lastPageFormsCount = Math.min(remaining, formsByAppendix); // if we have less than 5 forms on the last page
     for (
       let pageSubFormCounter = 0;
       pageSubFormCounter <= lastPageFormsCount - 1;
@@ -450,7 +462,7 @@ const buildPdf = async params => {
         numbering: `${subFormCounter + 1}`
       };
       // to avoid using coordinates for each one of the 5 subForms, we add a vertical offset
-      let yOffset = appendixYOffsets[pageSubFormCounter];
+      const yOffset = appendixYOffsets[pageSubFormCounter];
 
       // fill sub form data
       fillFields({
@@ -476,7 +488,7 @@ const buildPdf = async params => {
     }
 
     // copy each page and merge in global pdf
-    let copiedAppendixPages = await mainForm.copyPages(appendixPages, [0]);
+    const copiedAppendixPages = await mainForm.copyPages(appendixPages, [0]);
     mainForm.addPage(copiedAppendixPages[0]);
   }
 

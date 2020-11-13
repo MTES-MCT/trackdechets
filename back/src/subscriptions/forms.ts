@@ -9,7 +9,7 @@ import {
   createNotCompatibleRubriqueAlertCard,
   alertTypes
 } from "../common/trello";
-import { pdfEmailAttachment } from "../forms/pdf";
+import pdfEmailAttachment from "../forms/pdf/pdfEmailAttachment";
 import Dreals from "./dreals";
 import axios from "axios";
 import { trim } from "../common/strings";

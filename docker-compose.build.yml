@@ -9,10 +9,6 @@ services:
     build:
       context: ./front
 
-  td-pdf:
-    build:
-      context: ./pdf
-
   td-mail:
     build:
       context: ./mail
