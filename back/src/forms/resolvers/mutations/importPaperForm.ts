@@ -31,7 +31,7 @@ import { EventType } from "../../workflow/types";
 async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
   // fail fast on form.status (before state machine validation) to ensure
   // we apply validation on a sealed form
-  if (form.status !== "SEALED") {
+  if (form.statusEnum !== "SEALED") {
     throw new UserInputError(
       `Seul un BSD à l'état "scellé" (SEALED) peut être mis à jour à partir d'un BSD papier`
     );
@@ -98,7 +98,7 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     ...flattenedFormInput,
     readableId: await getReadableId(),
     owner: { connect: { id: user.id } },
-    status: "PROCESSED",
+    statusEnum: "PROCESSED",
     isImportedFromPaper: true,
     signedByTransporter: true
   };

@@ -76,7 +76,7 @@ const takeOverInfoSchema = Yup.object<any>().shape({
 
 type FormSiretsAndSegments = {
   recipientCompanySiret: string;
-  status: string;
+  statusEnum: string;
   emitterCompanySiret: string;
   transporterCompanySiret: string;
   traderCompanySiret: string;
@@ -94,7 +94,7 @@ type FormSiretsAndSegments = {
 const formFragment = `
 fragment FormWithSegments on Form {
   id
-  status
+  statusEnum
   readableId
   wasteDetailsCode
   wasteDetailsName
@@ -208,11 +208,11 @@ export async function prepareSegment(
 
   // segments can be created by transporters if form is SENT and they're currently in charge of the form
   const userIsForbiddenToPrepareSentForm =
-    userIsCurrentTransporter && form.status !== "SENT";
+    userIsCurrentTransporter && form.statusEnum !== "SENT";
 
   // segments can be created by form owners when form is draft
   const userIsForbiddenToPrepareDraftForm =
-    userIsOwner && form.status !== "DRAFT";
+    userIsOwner && form.statusEnum !== "DRAFT";
 
   // as user can be transporter and form owner, we dont want to forbid at first failing condition
   if (userIsForbiddenToPrepareSentForm && userIsForbiddenToPrepareDraftForm) {
@@ -317,7 +317,7 @@ export async function markSegmentAsReadyToTakeOver(
   }
   const form = await getForm(currentSegment.form.id);
 
-  if (form.status !== "SENT") {
+  if (form.statusEnum !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
@@ -367,7 +367,7 @@ export async function takeOverSegment(
   }
 
   const form = await getForm(currentSegment.form.id);
-  if (form.status !== "SENT") {
+  if (form.statusEnum !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
@@ -452,11 +452,11 @@ export async function editSegment(
 
   // segments can be edited by form transporter when form is sent
   const transporterIsForbiddenToEditSentForm =
-    userIsCurrentTransporter && form.status !== "SENT";
+    userIsCurrentTransporter && form.statusEnum !== "SENT";
 
   // segments can be edited by form owners when form is draft
   const ownerIsForbiddenToEditDraftForm =
-    userIsOwner && form.status !== "DRAFT";
+    userIsOwner && form.statusEnum !== "DRAFT";
 
   // current transporter can edit until segment is readyToTakeOver
   const currentTransporterIsForbiddenToEditReadyToTakeOverSegment =

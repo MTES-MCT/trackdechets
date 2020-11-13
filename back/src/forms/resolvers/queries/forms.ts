@@ -68,7 +68,7 @@ export async function getForms(
       updatedAt_gte: rest.updatedAfter,
       sentAt_gte: rest.sentAfter,
       wasteDetailsCode: rest.wasteCode,
-      ...(status?.length && { status_in: status }),
+      ...(status?.length && { statusEnum_in: status }),
       AND: [
         getFormsRightFilter(company.siret, roles),
         getHasNextStepFilter(company.siret, hasNextStep),
@@ -91,9 +91,9 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
   const filter = {
     OR: [
       // DRAFT
-      { status: "DRAFT" },
+      { statusEnum: "DRAFT" },
       // isEmitter && SEALED
-      { AND: [{ emitterCompanySiret: siret }, { status: "SEALED" }] },
+      { AND: [{ emitterCompanySiret: siret }, { statusEnum: "SEALED" }] },
       // isTemporaryStorer && (RESENT || RECEIVED)
       {
         AND: [
@@ -102,7 +102,7 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
               destinationCompanySiret: siret
             }
           },
-          { OR: [{ status: "RESENT" }, { status: "RECEIVED" }] }
+          { OR: [{ statusEnum: "RESENT" }, { statusEnum: "RECEIVED" }] }
         ]
       },
       // isRecipient && isTempStorage == isTempStorer
@@ -113,9 +113,9 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           { recipientIsTempStorage: true },
           {
             OR: [
-              { status: "SENT" },
-              { status: "TEMP_STORED" },
-              { status: "RESEALED" }
+              { statusEnum: "SENT" },
+              { statusEnum: "TEMP_STORED" },
+              { statusEnum: "RESEALED" }
             ]
           }
         ]
@@ -127,9 +127,9 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           {
             OR: [
               {
-                AND: [{ status: "SENT" }, { recipientIsTempStorage: false }]
+                AND: [{ statusEnum: "SENT" }, { recipientIsTempStorage: false }]
               },
-              { status: "RECEIVED" }
+              { statusEnum: "RECEIVED" }
             ]
           }
         ]

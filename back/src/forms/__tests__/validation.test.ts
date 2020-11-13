@@ -10,7 +10,7 @@ import { ReceivedFormInput } from "../../generated/graphql/types";
 const form: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
   readableId: "TD-xxx",
-  status: "DRAFT",
+  statusEnum: "DRAFT",
   emitterType: "PRODUCER",
   emitterWorkSiteName: "",
   emitterWorkSiteAddress: "",

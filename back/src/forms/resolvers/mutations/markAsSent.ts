@@ -21,7 +21,7 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
 
   await checkCanMarkAsSent(user, form);
 
-  if (form.status === "DRAFT") {
+  if (form.statusEnum === "DRAFT") {
     // check it can be sealed
     await checkCanBeSealed(form);
   }
@@ -43,7 +43,7 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   // mark appendix2Forms as GROUPED
   const appendix2Forms = await prisma
     .form({ id: form.id })
-    .appendix2Forms({ where: { status: "AWAITING_GROUP" } });
+    .appendix2Forms({ where: { statusEnum: "AWAITING_GROUP" } });
 
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {

@@ -154,7 +154,7 @@ const formdata = {
   traderCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "signe",
-  status: "SENT" as Status,
+  statusEnum: "SENT" as const,
   wasteRefusalReason: "",
   recipientCompanySiret: "56847895684123",
   transporterCompanyMail: "transporter@td.io",
@@ -246,7 +246,8 @@ export const formFactory = async ({
   ownerId: string;
   opt?: Partial<FormCreateInput>;
 }) => {
-  const formParams = { ...formdata, ...opt };
+  const { status, ...rest } = opt;
+  const formParams = { ...formdata, ...rest, statusEnum: status as Status };
   return prisma.createForm({
     readableId: getReadableId(),
     ...formParams,

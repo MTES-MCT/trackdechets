@@ -21,7 +21,7 @@ export default async function transitionForm(
   form: Form,
   event: Event
 ) {
-  const currentStatus = form.status;
+  const currentStatus = form.statusEnum;
 
   // Use state machine to calculate new status
   const nextState = machine.transition(currentStatus, event);
@@ -34,7 +34,7 @@ export default async function transitionForm(
   const nextStatus = nextState.value as Status;
 
   const formUpdateInput: FormUpdateInput = {
-    status: nextStatus,
+    statusEnum: nextStatus,
     ...event.formUpdateInput
   };
 

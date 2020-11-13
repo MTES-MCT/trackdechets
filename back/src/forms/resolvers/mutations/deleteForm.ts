@@ -15,7 +15,7 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  if (form.status !== "DRAFT") {
+  if (form.statusEnum !== "DRAFT") {
     const errMessage =
       "Seuls les BSD à l'état de brouillon peuvent être supprimés";
     throw new UserInputError(errMessage);

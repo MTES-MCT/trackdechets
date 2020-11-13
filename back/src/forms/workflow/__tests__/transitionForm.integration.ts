@@ -29,7 +29,7 @@ describe("transition form", () => {
 
     const nextStatus = "RECEIVED";
 
-    expect(updatedForm.status).toEqual(nextStatus);
+    expect(updatedForm.statusEnum).toEqual(nextStatus);
 
     const statusLogs = await prisma.statusLogs();
     expect(statusLogs).toHaveLength(1);

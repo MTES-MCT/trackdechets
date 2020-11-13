@@ -22,7 +22,7 @@ class PdfDraftError extends Error {
  * @return {Axios Promise}
  */
 const buildPdf = async (form, responseType: ResponseType) => {
-  if (form.status === "DRAFT") {
+  if (form.statusEnum === "DRAFT") {
     throw new PdfDraftError("Impossible de générer un PDF pour un brouillon.");
   }
 

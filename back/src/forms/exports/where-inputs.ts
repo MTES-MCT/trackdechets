@@ -61,7 +61,7 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
         AND: [
           { recipientIsTempStorage: false },
           { recipientCompanySiret_in: sirets },
-          { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+          { statusEnum_not_in: ["DRAFT", "SEALED", "SENT"] }
         ]
       },
       {
@@ -72,7 +72,7 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
               {
                 AND: [
                   { recipientCompanySiret_in: sirets },
-                  { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+                  { statusEnum_not_in: ["DRAFT", "SEALED", "SENT"] }
                 ]
               },
               {
@@ -83,7 +83,7 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
                     }
                   },
                   {
-                    status_not_in: [
+                    statusEnum_not_in: [
                       "DRAFT",
                       "SEALED",
                       "SENT",
@@ -149,7 +149,7 @@ function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
     AND: [
       {
-        status_not_in: ["DRAFT", "SEALED"]
+        statusEnum_not_in: ["DRAFT", "SEALED"]
       },
       { traderCompanySiret_in: sirets }
     ]

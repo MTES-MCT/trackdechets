@@ -15,7 +15,7 @@ const updateTransporterFieldsResolver: MutationResolvers["updateTransporterField
 
   const form = await getFormOrFormNotFound({ id });
 
-  if (form.status !== "SEALED") {
+  if (form.statusEnum !== "SEALED") {
     throw new ForbiddenError(
       "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé"
     );
