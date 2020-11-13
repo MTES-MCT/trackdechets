@@ -464,7 +464,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     }),
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
-    status: form.status as FormStatus,
+    status: form.statusEnum,
     signedByTransporter: form.signedByTransporter,
     sentAt: form.sentAt,
     sentBy: form.sentBy,

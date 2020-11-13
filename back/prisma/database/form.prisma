@@ -25,6 +25,7 @@ type Form {
   signedByTransporter: Boolean
 
   status: String! @default(value: "DRAFT")
+  statusEnum: Status! @default(value: DRAFT)
   sentAt: DateTime
   sentBy: String
 

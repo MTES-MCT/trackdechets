@@ -1015,6 +1015,20 @@ export type EcoOrganismeOrderByInput =
   | "address_ASC"
   | "address_DESC";
 
+export type Status =
+  | "DRAFT"
+  | "SEALED"
+  | "SENT"
+  | "RECEIVED"
+  | "PROCESSED"
+  | "AWAITING_GROUP"
+  | "GROUPED"
+  | "NO_TRACEABILITY"
+  | "REFUSED"
+  | "TEMP_STORED"
+  | "RESEALED"
+  | "RESENT";
+
 export type WasteAcceptationStatus =
   | "ACCEPTED"
   | "REFUSED"
@@ -1047,6 +1061,8 @@ export type FormOrderByInput =
   | "signedByTransporter_DESC"
   | "status_ASC"
   | "status_DESC"
+  | "statusEnum_ASC"
+  | "statusEnum_DESC"
   | "sentAt_ASC"
   | "sentAt_DESC"
   | "sentBy_ASC"
@@ -1335,20 +1351,6 @@ export type RubriqueOrderByInput =
   | "category_DESC"
   | "wasteType_ASC"
   | "wasteType_DESC";
-
-export type Status =
-  | "DRAFT"
-  | "SEALED"
-  | "SENT"
-  | "RECEIVED"
-  | "PROCESSED"
-  | "AWAITING_GROUP"
-  | "GROUPED"
-  | "NO_TRACEABILITY"
-  | "REFUSED"
-  | "TEMP_STORED"
-  | "RESEALED"
-  | "RESENT";
 
 export type StatusLogOrderByInput =
   | "id_ASC"
@@ -2292,6 +2294,10 @@ export interface FormWhereInput {
   status_not_starts_with?: Maybe<String>;
   status_ends_with?: Maybe<String>;
   status_not_ends_with?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
+  statusEnum_not?: Maybe<Status>;
+  statusEnum_in?: Maybe<Status[] | Status>;
+  statusEnum_not_in?: Maybe<Status[] | Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentAt_not?: Maybe<DateTimeInput>;
   sentAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -5238,6 +5244,7 @@ export interface FormCreateInput {
   owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -5415,6 +5422,7 @@ export interface FormUpdateInput {
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -5535,6 +5543,7 @@ export interface FormUpdateDataInput {
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -6079,6 +6088,10 @@ export interface FormScalarWhereInput {
   status_not_starts_with?: Maybe<String>;
   status_ends_with?: Maybe<String>;
   status_not_ends_with?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
+  statusEnum_not?: Maybe<Status>;
+  statusEnum_in?: Maybe<Status[] | Status>;
+  statusEnum_not_in?: Maybe<Status[] | Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentAt_not?: Maybe<DateTimeInput>;
   sentAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
@@ -7050,6 +7063,7 @@ export interface FormUpdateManyDataInput {
   isImportedFromPaper?: Maybe<Boolean>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -7139,6 +7153,7 @@ export interface FormUpdateManyMutationInput {
   isImportedFromPaper?: Maybe<Boolean>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -7467,6 +7482,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -7609,6 +7625,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -7786,6 +7803,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   owner: UserCreateOneInput;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -7908,6 +7926,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   owner?: Maybe<UserUpdateOneRequiredInput>;
   signedByTransporter?: Maybe<Boolean>;
   status?: Maybe<String>;
+  statusEnum?: Maybe<Status>;
   sentAt?: Maybe<DateTimeInput>;
   sentBy?: Maybe<String>;
   isAccepted?: Maybe<Boolean>;
@@ -9233,6 +9252,7 @@ export interface Form {
   updatedAt: DateTimeOutput;
   signedByTransporter?: Boolean;
   status: String;
+  statusEnum: Status;
   sentAt?: DateTimeOutput;
   sentBy?: String;
   isAccepted?: Boolean;
@@ -9326,6 +9346,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   updatedAt: () => Promise<DateTimeOutput>;
   signedByTransporter: () => Promise<Boolean>;
   status: () => Promise<String>;
+  statusEnum: () => Promise<Status>;
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
   isAccepted: () => Promise<Boolean>;
@@ -9440,6 +9461,7 @@ export interface FormSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
   status: () => Promise<AsyncIterator<String>>;
+  statusEnum: () => Promise<AsyncIterator<Status>>;
   sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   sentBy: () => Promise<AsyncIterator<String>>;
   isAccepted: () => Promise<AsyncIterator<Boolean>>;
@@ -9556,6 +9578,7 @@ export interface FormNullablePromise
   updatedAt: () => Promise<DateTimeOutput>;
   signedByTransporter: () => Promise<Boolean>;
   status: () => Promise<String>;
+  statusEnum: () => Promise<Status>;
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
   isAccepted: () => Promise<Boolean>;
@@ -11416,6 +11439,7 @@ export interface FormPreviousValues {
   updatedAt: DateTimeOutput;
   signedByTransporter?: Boolean;
   status: String;
+  statusEnum: Status;
   sentAt?: DateTimeOutput;
   sentBy?: String;
   isAccepted?: Boolean;
@@ -11510,6 +11534,7 @@ export interface FormPreviousValuesPromise
   updatedAt: () => Promise<DateTimeOutput>;
   signedByTransporter: () => Promise<Boolean>;
   status: () => Promise<String>;
+  statusEnum: () => Promise<Status>;
   sentAt: () => Promise<DateTimeOutput>;
   sentBy: () => Promise<String>;
   isAccepted: () => Promise<Boolean>;
@@ -11604,6 +11629,7 @@ export interface FormPreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   signedByTransporter: () => Promise<AsyncIterator<Boolean>>;
   status: () => Promise<AsyncIterator<String>>;
+  statusEnum: () => Promise<AsyncIterator<Status>>;
   sentAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   sentBy: () => Promise<AsyncIterator<String>>;
   isAccepted: () => Promise<AsyncIterator<Boolean>>;

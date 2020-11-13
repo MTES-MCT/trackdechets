@@ -1354,6 +1354,7 @@ type Form {
   updatedAt: DateTime!
   signedByTransporter: Boolean
   status: String!
+  statusEnum: Status!
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1454,6 +1455,7 @@ input FormCreateInput {
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1568,6 +1570,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1661,6 +1664,7 @@ input FormCreateWithoutTransportSegmentsInput {
   owner: UserCreateOneInput!
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -1769,6 +1773,8 @@ enum FormOrderByInput {
   signedByTransporter_DESC
   status_ASC
   status_DESC
+  statusEnum_ASC
+  statusEnum_DESC
   sentAt_ASC
   sentAt_DESC
   sentBy_ASC
@@ -1941,6 +1947,7 @@ type FormPreviousValues {
   updatedAt: DateTime!
   signedByTransporter: Boolean
   status: String!
+  statusEnum: Status!
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -2102,6 +2109,10 @@ input FormScalarWhereInput {
   status_not_starts_with: String
   status_ends_with: String
   status_not_ends_with: String
+  statusEnum: Status
+  statusEnum_not: Status
+  statusEnum_in: [Status!]
+  statusEnum_not_in: [Status!]
   sentAt: DateTime
   sentAt_not: DateTime
   sentAt_in: [DateTime!]
@@ -3083,6 +3094,7 @@ input FormUpdateDataInput {
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3176,6 +3188,7 @@ input FormUpdateInput {
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3268,6 +3281,7 @@ input FormUpdateManyDataInput {
   isImportedFromPaper: Boolean
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3369,6 +3383,7 @@ input FormUpdateManyMutationInput {
   isImportedFromPaper: Boolean
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3487,6 +3502,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3579,6 +3595,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   owner: UserUpdateOneRequiredInput
   signedByTransporter: Boolean
   status: String
+  statusEnum: Status
   sentAt: DateTime
   sentBy: String
   isAccepted: Boolean
@@ -3769,6 +3786,10 @@ input FormWhereInput {
   status_not_starts_with: String
   status_ends_with: String
   status_not_ends_with: String
+  statusEnum: Status
+  statusEnum_not: Status
+  statusEnum_in: [Status!]
+  statusEnum_not_in: [Status!]
   sentAt: DateTime
   sentAt_not: DateTime
   sentAt_in: [DateTime!]
