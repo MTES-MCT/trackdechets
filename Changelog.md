@@ -7,10 +7,26 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # Unreleased
 
-- Migration du service td-etl dans un projet Github à part [PR 683](https://github.com/MTES-MCT/trackdechets/pull/683)
+#### :rocket: Nouvelles fonctionnalités
+
 - Ajout d'un nouveau champ `packagingInfos` qui viendra remplacer `packagings`, `numberOfPackages` et `otherPackaging`. Ces champs sont encore supportés pour quelques temps mais marqué comme dépréciés. Nous vous invitons à migrer aussi vite que possible. [PR 600](https://github.com/MTES-MCT/trackdechets/pull/600)
-- Correction de la mutation `duplicateForm` pour dupliquer l'entreposage provisoire, [PR 700](https://github.com/
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+- Correction de la mutation `duplicateForm` pour dupliquer l'entreposage provisoire, [PR 700](https://github.com/)
+
+#### :nail_care: Améliorations
+
 - Amélioration des suggestions d'entreprise lors de la création d'un BSD depuis l'interface, [PR 673](https://github.com/MTES-MCT/trackdechets/pull/673)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Migration du service td-etl dans un projet Github à part [PR 683](https://github.com/MTES-MCT/trackdechets/pull/683)
+
 
 # [2020.10.1] 03/11/2020
 
