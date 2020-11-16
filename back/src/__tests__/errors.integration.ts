@@ -160,7 +160,7 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { mutate } = createTestClient(server);
-    // invalid variables `toto` instead of `input`
+    // invalid variable `toto` instead of `input`
     const variables = { toto: "toto" };
     const { errors } = await mutate({
       mutation: BAR,

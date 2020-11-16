@@ -128,7 +128,7 @@ export const server = new ApolloServer({
       // Workaround for graphQL validation error displayed as internal server error
       // when graphQL variables are of of invalid type
       // See: https://github.com/apollographql/apollo-server/issues/3498
-      if (err.message.startsWith(`Variable "`)) {
+      if (err.message && err.message.startsWith(`Variable "`)) {
         err.extensions.code = "GRAPHQL_VALIDATION_FAILED";
         return err;
       }
