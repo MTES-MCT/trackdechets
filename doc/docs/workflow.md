@@ -30,7 +30,9 @@ Chaque BSD est associé à un identifiant opaque unique. Cet identifiant corresp
 
 Vous pouvez également ajouter un identifiant qui vous est propre pour faire le lien avec votre SI. Il vous faut pour cela utiliser le champ `customId`.
 
-NB: un QRCode généré dans l'interface utilisateur encode le champ `readableId`.
+:::tip
+Un QRCode généré dans l'interface utilisateur encode le champ `readableId`.
+:::
 
 ## États du BSD
 
