@@ -411,7 +411,7 @@ export function processSegment(segment) {
  */
 
 export const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
-  for (let [fieldName, content] of Object.entries(data)) {
+  for (const [fieldName, content] of Object.entries(data)) {
     if (content === true) {
       checkBox({
         fieldName,
@@ -421,15 +421,15 @@ export const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
         yOffset
       });
     } else {
-      content =
+      const cont =
         typeof content === "string"
           ? content
           : settings[fieldName]?.content?.(data);
 
-      if (typeof content === "string") {
+      if (typeof cont === "string") {
         drawText({
           fieldName,
-          content,
+          content: cont,
           settings: settings,
           font: font,
           page: page,

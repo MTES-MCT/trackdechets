@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { prisma } from "../../generated/prisma-client";
-import buildPdf from "./buildPdf";
+import { buildPdf } from "./generator";
 
 /**
  * Render a form pdf as an HTTP response
@@ -17,21 +17,8 @@ export default async function downloadPdf(res: Response, { id }) {
     date.getMonth() + 1
   }-${date.getFullYear()}`;
 
-  const appendix2Forms = await prisma.form({ id: form.id }).appendix2Forms();
-  const transportSegments = await prisma
-    .form({ id: form.id })
-    .transportSegments();
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
-    .temporaryStorageDetail();
-
   try {
-    const buffer = await buildPdf({
-      ...form,
-      appendix2Forms,
-      transportSegments,
-      temporaryStorageDetail
-    });
+    const buffer = await buildPdf(form);
 
     res.status(200);
     res.type("pdf");

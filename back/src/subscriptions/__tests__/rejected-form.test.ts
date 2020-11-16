@@ -148,10 +148,11 @@ const insee2: CompanySearchResult = {
   codeCommune: "77001"
 };
 
-// Mock pdf service
-jest.mock("../../forms/pdf", () => ({
-  pdfEmailAttachment: jest.fn(() => "base64xyz")
+// Mock pdf generator
+jest.mock("../../forms/pdf/generator", () => ({
+  buildPdfBase64: jest.fn(() => "base64xyz")
 }));
+
 // Mock a utils function that hits th db
 jest.mock("../../companies/database", () => ({
   getCompanyAdminUsers: jest.fn(siret => mockedCompanyAdmins[siret])
@@ -231,7 +232,7 @@ describe("mailWhenFormIsDeclined", () => {
     const payload1 = args[0][1];
 
     // pdf from was attached
-    expect(payload1.attachment).toEqual("base64xyz");
+    expect(payload1.attachment.file).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
@@ -286,7 +287,7 @@ describe("mailWhenFormIsDeclined", () => {
     const payload1 = args[0][1];
 
     // pdf from was attached
-    expect(payload1.attachment).toEqual("base64xyz");
+    expect(payload1.attachment.file).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
