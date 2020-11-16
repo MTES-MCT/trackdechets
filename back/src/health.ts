@@ -5,11 +5,7 @@ import { resolve } from "url";
 export const healthRouter = express.Router();
 
 const TIMEOUT = 5000;
-const services = [
-  { name: "td-pdf", port: 3201, check: pingCheck },
-  { name: "td-mail", port: 80, check: pingCheck },
-  { name: "td-etl", port: 80, check: etlCheck }
-];
+const services = [{ name: "td-mail", port: 80, check: pingCheck }];
 
 type HealthCheck = {
   name: string;
@@ -40,17 +36,6 @@ async function pingCheck() {
     this.port,
     "/ping",
     data => typeof data === "string" && data.toLowerCase() === "pong"
-  );
-}
-
-async function etlCheck() {
-  return httpCheck(
-    this.name,
-    this.port,
-    "/health",
-    data =>
-      data.metadatabase.status === "healthy" &&
-      data.scheduler.status === "healthy"
   );
 }
 

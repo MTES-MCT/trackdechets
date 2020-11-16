@@ -127,7 +127,7 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
 
 1. Démarrer les différents services
    ```
-   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-pdf td-api td-ui
+   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-api td-ui
    ```
 2. Faire tourner les tests back
    ```bash
