@@ -1,7 +1,7 @@
-import { Mail, Contact } from "./types";
+import { Mail, Contact } from "../types";
 import axios from "axios";
 import * as Sentry from "@sentry/node";
-
+import { templateIds } from "../helpers";
 const SIB_BASE_URL = "https://api.sendinblue.com/v3";
 
 const {
@@ -9,7 +9,6 @@ const {
   DISABLE_EMAILING,
   SENDER_EMAIL_ADDRESS,
   SENDER_NAME,
-  SIB_MAIN_TEMPLATE_ID,
   SENTRY_DSN,
   NODE_ENV
 } = process.env;
@@ -34,7 +33,7 @@ const sendInBlueBackend = {
 
   sendMail: function (mail: Mail) {
     if (!mail.templateId) {
-      mail.templateId = parseInt(SIB_MAIN_TEMPLATE_ID, 10);
+      mail.templateId = templateIds.MAIN;
     }
     const params = { title: mail.title, body: mail.body };
 
@@ -58,7 +57,10 @@ const sendInBlueBackend = {
       ];
     }
 
-    const req = axios.post(SIB_SMTP_URL, payload, { headers: headers });
+    const req = axios.post(SIB_SMTP_URL, payload, {
+      headers: headers,
+      timeout: 5000
+    });
     req
       .then(() => {
         const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];

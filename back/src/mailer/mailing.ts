@@ -1,7 +1,7 @@
 import { Mail, Contact } from "./types";
-import consoleBackend from "./consoleBackend";
-import mailjetBackend from "./mailjetBackend";
-import sendInBlueBackend from "./sendInBlueBackend";
+import consoleBackend from "./backends/consoleBackend";
+import mailjetBackend from "./backends/mailjetBackend";
+import sendInBlueBackend from "./backends/sendInBlueBackend";
 import { templateIds } from "./helpers";
 
 const backends = {
@@ -17,7 +17,7 @@ if (!backend) {
 
 export function sendMail(mail: Mail) {
   if (!mail.templateId) {
-    mail.templateId = parseInt(templateIds.MAIN_TEMPLATE_ID, 10);
+    mail.templateId = templateIds.MAIN;
   }
   return backend.sendMail(mail);
 }

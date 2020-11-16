@@ -1,13 +1,13 @@
-import { Mail, Contact } from "./types";
+import { Mail, Contact } from "../types";
 import * as Sentry from "@sentry/node";
 import mailjet from "node-mailjet";
-
+import { templateIds } from "../helpers";
 const {
   MJ_APIKEY_PUBLIC,
   MJ_APIKEY_PRIVATE,
   SENDER_EMAIL_ADDRESS,
   SENDER_NAME,
-  MJ_MAIN_TEMPLATE_ID,
+
   SENTRY_DSN,
   NODE_ENV
 } = process.env;
@@ -18,7 +18,6 @@ if (!!SENTRY_DSN) {
     environment: NODE_ENV
   });
 }
-
 const mj = mailjet.connect(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE);
 
 const mailjetBackend = {
@@ -26,7 +25,7 @@ const mailjetBackend = {
 
   sendMail: function (mail: Mail) {
     if (!mail.templateId) {
-      mail.templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
+      mail.templateId = templateIds.MAIN;
     }
 
     const payload = {
@@ -56,7 +55,6 @@ const mailjetBackend = {
         }
       ];
     }
-
     const request = mj
       .post("send", { version: "v3.1" })
       .request({ Messages: [payload] });
@@ -69,6 +67,7 @@ const mailjetBackend = {
           );
         }
       })
+
       .catch(err => {
         if (!!SENTRY_DSN) {
           Sentry.captureException(err, {

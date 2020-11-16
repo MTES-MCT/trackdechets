@@ -10,11 +10,6 @@ import {} from "../mailer/mailing";
 
 const { UI_HOST, VIRTUAL_HOST } = process.env;
 
-const {
-  FIRST_ONBOARDING_TEMPLATE_ID,
-  SECOND_ONBOARDING_TEMPLATE_ID
-} = templateIds;
-
 const baseUrl = `https://${UI_HOST}`;
 
 export const quantityPartiallyRefused = (quantitySent, quantityAccepted) =>
@@ -210,7 +205,7 @@ export const userMails = {
     subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     body: "_",
-    templateId: parseInt(FIRST_ONBOARDING_TEMPLATE_ID, 10),
+    templateId: templateIds.FIRST_ONBOARDING,
     baseUrl
   }),
   onboardingSecondStep: (toEmail, toName) => ({
@@ -218,7 +213,7 @@ export const userMails = {
     subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     body: "_",
-    templateId: parseInt(SECOND_ONBOARDING_TEMPLATE_ID, 10),
+    templateId: templateIds.SECOND_ONBOARDING,
     baseUrl
   }),
   formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({

@@ -47,6 +47,16 @@ services:
       EMAIL_BACKEND: "sendinblue"
       DISABLE_EMAILING: "true"
       EMAIL_BACKEND: "sendinblue"
+<<<<<<< HEAD
       DISABLE_EMAILING: "true"
       SIB_MAIN_TEMPLATE_ID: "9"
  
+=======
+      MAIN_TEMPLATE_ID: "9"
+ 
+  td-pdf:
+    image: td-pdf
+    build:
+      context: ../../pdf
+      dockerfile: Dockerfile.dev
+>>>>>>> wip

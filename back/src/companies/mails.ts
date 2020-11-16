@@ -2,7 +2,7 @@ const { UI_HOST } = process.env;
 import { templateIds } from "../mailer/helpers";
 const baseUrl = `https://${UI_HOST}`;
 
-const templateId = templateIds.SECURITY_CODE_RENEWAL_TEMPLATE_ID;
+const templateId = templateIds.SECURITY_CODE_RENEWAL;
 
 export const companyMails = {
   securityCodeRenewal: (
@@ -13,7 +13,7 @@ export const companyMails = {
     subject: "Renouvellement du code de sécurité sur Trackdéchets",
     title: "_",
     body: "_",
-    templateId: parseInt(templateId, 10),
+    templateId,
     baseUrl,
     vars: {
       company

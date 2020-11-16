@@ -1,4 +1,4 @@
-import { Mail, Contact } from "./types";
+import { Mail, Contact } from "../types";
 
 const yellow = "\x1b[33m";
 const reset = "\x1b[0m";

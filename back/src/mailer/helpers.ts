@@ -1,26 +1,28 @@
-const getPrefix = () => {
-  const { EMAIL_BACKEND } = process.env;
-  if (EMAIL_BACKEND === "mailjet") {
-    return "MJ";
-  }
-  if (EMAIL_BACKEND === "sendinblue") {
-    return "SIB";
-  }
-  return "";
+const enum TemplateNames {
+  MAIN = "MAIN",
+  FIRST_ONBOARDING = "FIRST_ONBOARDING",
+  SECOND_ONBOARDING = "SECOND_ONBOARDING",
+  SECURITY_CODE_RENEWAL = "SECURITY_CODE_RENEWAL"
+}
+type templateInterface = {
+  [key in TemplateNames]: number;
 };
 
-export const PREFIX = getPrefix();
-
-export const templateIds = {
-  MAIN_TEMPLATE_ID: process.env[`${PREFIX}_MAIN_TEMPLATE_ID`] || "1000", // console fake tpl ids
-  FIRST_ONBOARDING_TEMPLATE_ID:
-    process.env[`${PREFIX}_FIRST_ONBOARDING_TEMPLATE_ID`] || "2000",
-  SECOND_ONBOARDING_TEMPLATE_ID:
-    process.env[`${PREFIX}_SECOND_ONBOARDING_TEMPLATE_ID`] || "3000",
-  SECURITY_CODE_RENEWAL_TEMPLATE_ID:
-    process.env[`${PREFIX}_SECURITY_CODE_RENEWAL_TEMPLATE_ID`] || "4000"
+export const templateIds: templateInterface = {
+  [TemplateNames.MAIN]: parseInt(process.env.MAIN_TEMPLATE_ID, 10),
+  [TemplateNames.FIRST_ONBOARDING]: parseInt(
+    process.env.FIRST_ONBOARDING_TEMPLATE_ID,
+    10
+  ),
+  [TemplateNames.SECOND_ONBOARDING]: parseInt(
+    process.env.SECOND_ONBOARDING_TEMPLATE_ID,
+    10
+  ),
+  [TemplateNames.SECURITY_CODE_RENEWAL]: parseInt(
+    process.env.SECURITY_CODE_RENEWAL_TEMPLATE_ID,
+    10
+  )
 };
-
 const unwantedChars = /\*|\//g;
 /**
  * Remove * and / special chars appearing on some individual companies
