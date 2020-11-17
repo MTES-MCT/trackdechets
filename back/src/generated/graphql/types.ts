@@ -33,7 +33,7 @@ export type Scalars = {
    */
   DateTime: string;
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
-  URL: string;
+  URL: URL;
   JSON: any;
 };
 

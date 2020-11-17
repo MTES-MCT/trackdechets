@@ -48,6 +48,7 @@ services:
       - .env
     environment:
       NODE_ENV: dev
+      DATABASE_URL: $DATABASE_URL
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
