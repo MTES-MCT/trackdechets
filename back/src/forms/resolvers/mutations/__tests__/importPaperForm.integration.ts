@@ -1,16 +1,13 @@
+import { Form, FormCreateInput } from "@prisma/client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import { ImportPaperFormInput } from "../../../../generated/graphql/types";
-import makeClient from "../../../../__tests__/testClient";
 import {
   getReadableId,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import {
-  Form,
-  FormCreateInput,
-  prisma
-} from "../../../../generated/prisma-client";
-import { resetDatabase } from "../../../../../integration-tests/helper";
+import makeClient from "../../../../__tests__/testClient";
 
 const IMPORT_PAPER_FORM = `
   mutation ImportPaperForm($input: ImportPaperFormInput!){
@@ -153,10 +150,12 @@ describe("mutation / importPaperForm", () => {
 
     it("should import a form with an ecoOrganisme", async () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
-      const ecoOrganisme = await prisma.createEcoOrganisme({
-        name: "EO",
-        siret: "67281782716256",
-        address: "Somewhere"
+      const ecoOrganisme = await prisma.ecoOrganisme.create({
+        data: {
+          name: "EO",
+          siret: "67281782716256",
+          address: "Somewhere"
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -175,7 +174,9 @@ describe("mutation / importPaperForm", () => {
 
       expect(data.importPaperForm.status).toEqual("PROCESSED");
 
-      const updatedForm = await prisma.form({ id: data.importPaperForm.id });
+      const updatedForm = await prisma.form.findOne({
+        where: { id: data.importPaperForm.id }
+      });
 
       expect(updatedForm).toMatchObject({
         ecoOrganismeName: ecoOrganisme.name,
@@ -278,7 +279,7 @@ describe("mutation / importPaperForm", () => {
       };
 
       // create a form with a sealed status
-      const form = await prisma.createForm(formCreateInput);
+      const form = await prisma.form.create({ data: formCreateInput });
 
       const { mutate } = makeClient(user);
 
@@ -290,7 +291,7 @@ describe("mutation / importPaperForm", () => {
           }
         }
       });
-      const updatedForm = await prisma.form({ id: form.id });
+      const updatedForm = await prisma.form.findOne({ where: { id: form.id } });
 
       expect(updatedForm.status).toEqual("PROCESSED");
       expect(updatedForm.isImportedFromPaper).toEqual(true);
@@ -323,7 +324,7 @@ describe("mutation / importPaperForm", () => {
       );
 
       // check statusLog was created
-      const statusLogs = await prisma.statusLogs();
+      const statusLogs = await prisma.statusLog.findMany();
       expect(statusLogs).toHaveLength(1);
       expect(statusLogs[0].status).toEqual("PROCESSED");
       expect(statusLogs[0].updatedFields).toEqual({
@@ -361,7 +362,7 @@ describe("mutation / importPaperForm", () => {
       };
 
       // create a form with a sealed status
-      const form = await prisma.createForm(formCreateInput);
+      const form = await prisma.form.create({ data: formCreateInput });
 
       const { mutate } = makeClient(user);
 
@@ -380,7 +381,7 @@ describe("mutation / importPaperForm", () => {
           }
         }
       });
-      const updatedForm = await prisma.form({ id: form.id });
+      const updatedForm = await prisma.form.findOne({ where: { id: form.id } });
       expect(updatedForm.status).toEqual("PROCESSED");
       expect(updatedForm.emitterCompanyName).toEqual(emitterCompanyName);
     });
@@ -401,7 +402,7 @@ describe("mutation / importPaperForm", () => {
       };
 
       // create a form with a sealed status
-      const form = await prisma.createForm(formCreateInput);
+      const form = await prisma.form.create({ data: formCreateInput });
 
       const { mutate } = makeClient(user);
 
@@ -434,7 +435,7 @@ describe("mutation / importPaperForm", () => {
       };
 
       // create a form with a sealed status
-      const form = await prisma.createForm(formCreateInput);
+      const form = await prisma.form.create({ data: formCreateInput });
 
       const { mutate } = makeClient(user);
 
@@ -468,7 +469,7 @@ describe("mutation / importPaperForm", () => {
       };
 
       // create a form with a sealed status
-      const form = await prisma.createForm(formCreateInput);
+      const form = await prisma.form.create({ data: formCreateInput });
 
       const { mutate } = makeClient(user);
 
@@ -507,7 +508,7 @@ describe("mutation / importPaperForm", () => {
       };
 
       // create a form with a sealed status
-      const form = await prisma.createForm(formCreateInput);
+      const form = await prisma.form.create({ data: formCreateInput });
 
       const { mutate } = makeClient(user);
 

@@ -5,7 +5,7 @@ import {
   safeInput,
   chain
 } from "../form-converter";
-import { Form } from "../../generated/prisma-client";
+import { Form } from "@prisma/client";
 import { FormInput, WasteDetailsInput } from "../../generated/graphql/types";
 
 test("nullIfNoValues", () => {

@@ -1,14 +1,14 @@
-import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompany";
+import { User } from "@prisma/client";
 import { userMails } from "../../../mails";
-import { User } from "../../../../generated/prisma-client";
+import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompany";
 
 const userMock = jest.fn();
 const companyMock = jest.fn();
 
-jest.mock("../../../../generated/prisma-client", () => ({
+jest.mock("src/prisma", () => ({
   prisma: {
-    user: jest.fn((...args) => userMock(...args)),
-    company: jest.fn((...args) => companyMock(...args))
+    user: { findOne: jest.fn((...args) => userMock(...args)) },
+    company: { findOne: jest.fn((...args) => companyMock(...args)) }
   }
 }));
 

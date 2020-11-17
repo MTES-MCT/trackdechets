@@ -17,11 +17,13 @@ const ASSOCIATIONS = [
   }
 ];
 
-jest.mock("../../generated/prisma-client", () => ({
+jest.mock("src/prisma", () => ({
   prisma: {
-    companyAssociations: jest.fn(() => ({
-      $fragment: jest.fn(() => Promise.resolve(ASSOCIATIONS))
-    }))
+    companyAssociation: {
+      findMany: jest.fn(() => ({
+        $fragment: jest.fn(() => Promise.resolve(ASSOCIATIONS))
+      }))
+    }
   }
 }));
 

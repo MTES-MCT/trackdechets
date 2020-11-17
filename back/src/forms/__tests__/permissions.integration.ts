@@ -1,26 +1,27 @@
+import { Form, User } from "@prisma/client";
+import prisma from "src/prisma";
+import { resetDatabase } from "../../../integration-tests/helper";
+import { ErrorCode } from "../../common/errors";
+import {
+  companyFactory,
+  formFactory,
+  formWithTempStorageFactory,
+  userFactory,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
 import {
   checkCanRead,
   checkCanDuplicate,
   checkCanUpdate,
   checkCanDelete,
-  checkCanMarkAsSealed,
-  checkCanSignedByTransporter,
-  checkCanMarkAsReceived,
   checkCanMarkAsProcessed,
-  checkCanMarkAsTempStored,
+  checkCanMarkAsReceived,
   checkCanMarkAsResent,
+  checkCanMarkAsSealed,
+  checkCanMarkAsTempStored,
+  checkCanSignedByTransporter,
   checkSecurityCode
 } from "../permissions";
-import {
-  userFactory,
-  formFactory,
-  userWithCompanyFactory,
-  formWithTempStorageFactory,
-  companyFactory
-} from "../../__tests__/factories";
-import { prisma, User, Form } from "../../generated/prisma-client";
-import { ErrorCode } from "../../common/errors";
-import { resetDatabase } from "../../../integration-tests/helper";
 
 async function checkEmitterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
@@ -80,10 +81,12 @@ async function checkEcoOrganismePermission(
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
-  const ecoOrganisme = await prisma.createEcoOrganisme({
-    siret: company.siret,
-    name: "EO",
-    address: ""
+  const ecoOrganisme = await prisma.ecoOrganisme.create({
+    data: {
+      siret: company.siret,
+      name: "EO",
+      address: ""
+    }
   });
   const form = await formFactory({
     ownerId: owner.id,
@@ -108,10 +111,10 @@ async function checkTransporterAfterTempStoragePermission(
       status: formStatus
     }
   });
-  const tempStorageDetail = await prisma
-    .form({ id: form.id })
+  const tempStorageDetail = await prisma.form
+    .findOne({ where: { id: form.id } })
     .temporaryStorageDetail();
-  await prisma.updateTemporaryStorageDetail({
+  await prisma.temporaryStorageDetail.update({
     data: { transporterCompanySiret: company.siret },
     where: { id: tempStorageDetail.id }
   });
@@ -130,10 +133,10 @@ async function checkDestinationAfterTempStoragePermission(
       status: formStatus
     }
   });
-  const tempStorageDetail = await prisma
-    .form({ id: form.id })
+  const tempStorageDetail = await prisma.form
+    .findOne({ where: { id: form.id } })
     .temporaryStorageDetail();
-  await prisma.updateTemporaryStorageDetail({
+  await prisma.temporaryStorageDetail.update({
     data: { destinationCompanySiret: company.siret },
     where: { id: tempStorageDetail.id }
   });
@@ -152,9 +155,11 @@ async function checkMultiModalTransporterPermission(
       status: formStatus
     }
   });
-  await prisma.createTransportSegment({
-    form: { connect: { id: form.id } },
-    transporterCompanySiret: company.siret
+  await prisma.transportSegment.create({
+    data: {
+      form: { connect: { id: form.id } },
+      transporterCompanySiret: company.siret
+    }
   });
   return permission(user, form);
 }

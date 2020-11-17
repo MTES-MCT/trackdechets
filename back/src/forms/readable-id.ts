@@ -1,12 +1,12 @@
-import { prisma } from "../generated/prisma-client";
+import prisma from "src/prisma";
 
 export async function getReadableId() {
   const beginningOfYear = new Date(new Date().getFullYear(), 0, 1);
   const shortYear = beginningOfYear.getFullYear().toString().slice(-2);
 
-  const mostRecentForms = await prisma.forms({
-    orderBy: "readableId_DESC",
-    first: 10
+  const mostRecentForms = await prisma.form.findMany({
+    orderBy: { readableId: "desc" },
+    take: 10
   });
 
   const latestFormReadableId = mostRecentForms[0]?.readableId;

@@ -1,8 +1,9 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { receiptSchema } from "../../validation";
+import { stringifyDates } from "src/companies/database";
 
 /**
  * Create a transporter receipt
@@ -17,7 +18,10 @@ const createTransporterReceiptResolver: MutationResolvers["createTransporterRece
   checkIsAuthenticated(context);
   const { input } = args;
   await receiptSchema.validate(input);
-  return prisma.createTransporterReceipt(input);
+  const transporterReceipt = await prisma.transporterReceipt.create({
+    data: input
+  });
+  return stringifyDates(transporterReceipt);
 };
 
 export default createTransporterReceiptResolver;

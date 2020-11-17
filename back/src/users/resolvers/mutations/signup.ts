@@ -1,16 +1,17 @@
+import { User } from "@prisma/client";
+import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
+import prisma from "src/prisma";
 import * as yup from "yup";
 import { sendMail } from "../../../mailer/mailing";
-import { User, prisma } from "../../../generated/prisma-client";
-import { userMails } from "../../mails";
-import { hashPassword } from "../../utils";
-import { sanitizeEmail } from "../../../utils";
-import { UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   MutationSignupArgs
 } from "../../../generated/graphql/types";
+import { sanitizeEmail } from "../../../utils";
 import { acceptNewUserCompanyInvitations, userExists } from "../../database";
+import { userMails } from "../../mails";
+import { hashPassword } from "../../utils";
 
 export const signupSchema = yup.object({
   userInfos: yup.object({
@@ -42,11 +43,13 @@ export async function signupFn({
 
   const hashedPassword = await hashPassword(password);
 
-  const user = await prisma.createUser({
-    name,
-    email: sanitizeEmail(unsafeEmail),
-    password: hashedPassword,
-    phone
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email: sanitizeEmail(unsafeEmail),
+      password: hashedPassword,
+      phone
+    }
   });
 
   const userActivationHash = await createActivationHash(user);
@@ -77,10 +80,12 @@ async function createActivationHash(user: User) {
     new Date().valueOf().toString() + Math.random().toString(),
     10
   );
-  return prisma.createUserActivationHash({
-    hash: activationHash,
-    user: {
-      connect: { id: user.id }
+  return prisma.userActivationHash.create({
+    data: {
+      hash: activationHash,
+      user: {
+        connect: { id: user.id }
+      }
     }
   });
 }

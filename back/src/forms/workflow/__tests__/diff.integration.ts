@@ -1,10 +1,11 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { FormUpdateInput, prisma } from "../../../generated/prisma-client";
+import { FormUpdateInput } from "@prisma/client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
   formFactory,
   formWithTempStorageFactory,
-  userFactory,
-  tempStorageData
+  tempStorageData,
+  userFactory
 } from "../../../__tests__/factories";
 import { expandTemporaryStorageFromDb } from "../../form-converter";
 import { formDiff } from "../diff";
@@ -26,7 +27,7 @@ describe("formDiff", () => {
       emitterCompanyName: "Updated name", // nested field
       sentBy: "Mr Sender" // shallow field
     };
-    const updatedForm = await prisma.updateForm({
+    const updatedForm = await prisma.form.update({
       where: { id: form.id },
       data: formUpdateInput
     });
@@ -40,8 +41,8 @@ describe("formDiff", () => {
   it("should calculate diff on temporary storage detail", async () => {
     const user = await userFactory();
     const form = await formWithTempStorageFactory({ ownerId: user.id });
-    const temporaryStorageDetail = await prisma
-      .form({ id: form.id })
+    const temporaryStorageDetail = await prisma.form
+      .findOne({ where: { id: form.id } })
       .temporaryStorageDetail();
     const formUpdateInput: FormUpdateInput = {
       temporaryStorageDetail: {
@@ -50,12 +51,12 @@ describe("formDiff", () => {
         }
       }
     };
-    const updatedForm = await prisma.updateForm({
+    const updatedForm = await prisma.form.update({
       where: { id: form.id },
       data: formUpdateInput
     });
-    const updatedTemporaryStorageDetail = await prisma
-      .form({ id: form.id })
+    const updatedTemporaryStorageDetail = await prisma.form
+      .findOne({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     const diff = formDiff(
@@ -78,20 +79,20 @@ describe("formDiff", () => {
   it("should calculate diff on temporary storage detail if no initial temp storage", async () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
-    const temporaryStorageDetail = await prisma
-      .form({ id: form.id })
+    const temporaryStorageDetail = await prisma.form
+      .findOne({ where: { id: form.id } })
       .temporaryStorageDetail();
     const formUpdateInput: FormUpdateInput = {
       temporaryStorageDetail: {
         create: tempStorageData
       }
     };
-    const updatedForm = await prisma.updateForm({
+    const updatedForm = await prisma.form.update({
       where: { id: form.id },
       data: formUpdateInput
     });
-    const updatedTemporaryStorageDetail = await prisma
-      .form({ id: form.id })
+    const updatedTemporaryStorageDetail = await prisma.form
+      .findOne({ where: { id: form.id } })
       .temporaryStorageDetail();
     const diff = formDiff(
       { ...form, temporaryStorageDetail },

@@ -20,7 +20,7 @@ import { applyMiddleware } from "graphql-middleware";
 import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
 import { oauth2Router } from "./routers/oauth2-router";
-import { prisma } from "./generated/prisma-client";
+import prisma from "src/prisma";
 import { userActivationHandler } from "./users/activation";
 import { typeDefs, resolvers } from "./schema";
 import { getUIBaseURL } from "./utils";

@@ -1,9 +1,5 @@
-import {
-  Form,
-  FormUpdateInput,
-  Status,
-  prisma
-} from "../../generated/prisma-client";
+import { Form, FormUpdateInput, Status } from "@prisma/client";
+import prisma from "src/prisma";
 import { Event } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../errors";
@@ -39,19 +35,19 @@ export default async function transitionForm(
 
   // retrieves temp storage before update
   // for diff calculation
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
+  const temporaryStorageDetail = await prisma.form
+    .findOne({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   // update form
-  const updatedForm = await prisma.updateForm({
+  const updatedForm = await prisma.form.update({
     where: { id: form.id },
     data: formUpdateInput
   });
 
   // retrieves updated temp storage
-  const updatedTemporaryStorageDetail = await prisma
-    .form({ id: updatedForm.id })
+  const updatedTemporaryStorageDetail = await prisma.form
+    .findOne({ where: { id: updatedForm.id } })
     .temporaryStorageDetail();
 
   // calculates diff between initial form and updated form
@@ -61,13 +57,15 @@ export default async function transitionForm(
   );
 
   // log status change
-  await prisma.createStatusLog({
-    user: { connect: { id: user.id } },
-    form: { connect: { id: form.id } },
-    status: nextStatus,
-    authType: user.auth,
-    loggedAt: new Date(),
-    updatedFields
+  await prisma.statusLog.create({
+    data: {
+      user: { connect: { id: user.id } },
+      form: { connect: { id: form.id } },
+      status: nextStatus,
+      authType: user.auth,
+      loggedAt: new Date(),
+      updatedFields
+    }
   });
 
   return updatedForm;

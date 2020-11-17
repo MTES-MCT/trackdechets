@@ -17,6 +17,12 @@ export const isValidDatetime = str => {
   if (!str) {
     return true;
   }
+
+  // TODO-PRISMA
+  if (str instanceof Date) {
+    return !isNaN(str.getTime());
+  }
+
   for (const fmt of allowedFormats) {
     // to know if a given string is correctly formatted date, we use date-fns parse
     // if format is correct, getDate() will return a nice Date object,
@@ -39,7 +45,8 @@ export const isValidDatetime = str => {
  * @param required - is this field required ?
  */
 export default function validDatetime({ verboseFieldName, required = false }) {
-  let validator = yup.string();
+  // TODO-PRISMA
+  let validator = yup.date();
   if (!!required) {
     validator = validator.required(`Vous devez saisir une ${verboseFieldName}`);
   } else {

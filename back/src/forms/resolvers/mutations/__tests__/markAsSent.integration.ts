@@ -1,11 +1,11 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
-  userWithCompanyFactory,
+  companyFactory,
   formFactory,
-  companyFactory
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
 
 const MARK_AS_SENT = `
   mutation MarkAsSent($id: ID!, $sentInfo: SentFormInput!){
@@ -75,12 +75,12 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
@@ -117,12 +117,12 @@ describe("{ mutation { markAsSent } }", () => {
 
     await mutate(mutation);
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
@@ -153,7 +153,7 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
@@ -161,7 +161,7 @@ describe("{ mutation { markAsSent } }", () => {
     expect(form.currentTransporterSiret).toEqual(form.transporterCompanySiret);
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
@@ -192,7 +192,7 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
@@ -200,7 +200,7 @@ describe("{ mutation { markAsSent } }", () => {
     expect(form.currentTransporterSiret).toEqual(form.transporterCompanySiret);
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: { form: { id: form.id }, user: { id: user.id }, status: "SENT" }
     });
     expect(statusLogs.length).toEqual(1);
@@ -230,7 +230,7 @@ describe("{ mutation { markAsSent } }", () => {
     });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
 
-    const resultingForm = await prisma.form({ id: form.id });
+    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
     expect(resultingForm.status).toEqual("SEALED");
 
     expect(resultingForm.currentTransporterSiret).toBeNull();
@@ -269,12 +269,12 @@ describe("{ mutation { markAsSent } }", () => {
           "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
-      form = await prisma.form({ id: form.id });
+      form = await prisma.form.findOne({ where: { id: form.id } });
 
       expect(form.status).toEqual("DRAFT");
 
       // check no SEALED statusLog is created
-      const statusLogs = await prisma.statusLogs({
+      const statusLogs = await prisma.statusLog.findMany({
         where: {
           form: { id: form.id },
           user: { id: user.id },
@@ -308,18 +308,18 @@ describe("{ mutation { markAsSent } }", () => {
       const { errors } = await mutate(MARK_AS_SENT, {
         variables: {
           id: form.id,
-          sentInfo: { sentAt: `${dateStr}`, sentBy: "John Doe" }
+          sentInfo: { sentAt: new Date(dateStr), sentBy: "John Doe" }
         }
       });
       expect(errors[0].message).toEqual(
         "La date d'envoi n'est pas formatée correctement"
       );
-      form = await prisma.form({ id: form.id });
+      form = await prisma.form.findOne({ where: { id: form.id } });
 
       expect(form.status).toEqual("SEALED");
 
       // check no SEALED statusLog is created
-      const statusLogs = await prisma.statusLogs({
+      const statusLogs = await prisma.statusLog.findMany({
         where: {
           form: { id: form.id },
           user: { id: user.id },
@@ -350,7 +350,7 @@ describe("{ mutation { markAsSent } }", () => {
       opt: { status: "AWAITING_GROUP" }
     });
 
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
@@ -364,7 +364,9 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    const appendix2grouped = await prisma.form.findOne({
+      where: { id: appendix2.id }
+    });
     expect(appendix2grouped.status).toEqual("GROUPED");
   });
 
@@ -390,7 +392,7 @@ describe("{ mutation { markAsSent } }", () => {
       opt: { status: "GROUPED" }
     });
 
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
@@ -404,7 +406,9 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    const appendix2grouped = await prisma.form.findOne({
+      where: { id: appendix2.id }
+    });
     expect(appendix2grouped.status).toEqual("GROUPED");
   });
 });

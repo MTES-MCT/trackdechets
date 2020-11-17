@@ -1,10 +1,10 @@
-import { resetDatabase } from "../../integration-tests/helper";
-import supertest from "supertest";
-import { app, sess } from "../server";
-import { prisma } from "../generated/prisma-client";
-import { getLoginError } from "../auth";
-import queryString from "querystring";
 import { sign } from "jsonwebtoken";
+import queryString from "querystring";
+import supertest from "supertest";
+import { resetDatabase } from "../../integration-tests/helper";
+import { getLoginError } from "../auth";
+import prisma from "../prisma";
+import { app, sess } from "../server";
 import { getUid } from "../utils";
 import { userFactory } from "./factories";
 
@@ -216,11 +216,13 @@ describe("Authentification with token", () => {
 
     // should create a new access token to make it revokable
     // next time this token is used, it will use passport bearer strategy
-    const accessToken = await prisma.accessToken({ token });
+    const accessToken = await prisma.accessToken.findOne({ where: { token } });
     expect(accessToken).toBeDefined();
     expect(accessToken.token).toEqual(token);
     expect(accessToken.lastUsed).not.toBeNull();
-    const accessTokenUser = await prisma.accessToken({ token }).user();
+    const accessTokenUser = await prisma.accessToken
+      .findOne({ where: { token } })
+      .user();
     expect(accessTokenUser.id).toEqual(user.id);
   });
 
@@ -228,9 +230,11 @@ describe("Authentification with token", () => {
     const user = await userFactory();
 
     const token = getUid(10);
-    await prisma.createAccessToken({
-      token,
-      user: { connect: { id: user.id } }
+    await prisma.accessToken.create({
+      data: {
+        token,
+        user: { connect: { id: user.id } }
+      }
     });
 
     const res = await request
@@ -243,7 +247,7 @@ describe("Authentification with token", () => {
     });
 
     // should update lastUsed field
-    const accessToken = await prisma.accessToken({ token });
+    const accessToken = await prisma.accessToken.findOne({ where: { token } });
     expect(accessToken.lastUsed).not.toBeNull();
   });
 });

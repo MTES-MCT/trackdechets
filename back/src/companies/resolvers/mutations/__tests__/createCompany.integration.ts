@@ -1,10 +1,10 @@
-import { userFactory, companyFactory } from "../../../../__tests__/factories";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import * as mailsHelper from "../../../../mailer/mailing";
-import { prisma } from "../../../../generated/prisma-client";
-import makeClient from "../../../../__tests__/testClient";
-import { ErrorCode } from "../../../../common/errors";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import { AuthType } from "../../../../auth";
+import { ErrorCode } from "../../../../common/errors";
+import * as mailsHelper from "../../../../mailer/mailing";
+import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -60,13 +60,18 @@ describe("Mutation.createCompany", () => {
       companyTypes: companyInput.companyTypes
     });
 
-    const newCompanyExists = await prisma.$exists.company({
-      siret: companyInput.siret
-    });
+    const newCompanyExists =
+      (await prisma.company.findFirst({
+        where: {
+          siret: companyInput.siret
+        }
+      })) != null;
     expect(newCompanyExists).toBe(true);
 
-    const newCompanyAssociationExists = await prisma.$exists.companyAssociation(
-      { company: { siret: companyInput.siret }, user: { id: user.id } }
+    const newCompanyAssociationExists = await prisma.companyAssociation.findFirst(
+      {
+        where: { company: { siret: companyInput.siret }, user: { id: user.id } }
+      }
     );
     expect(newCompanyAssociationExists).toBe(true);
   });
@@ -74,10 +79,12 @@ describe("Mutation.createCompany", () => {
   it("should link to a transporterReceipt", async () => {
     const user = await userFactory();
 
-    const transporterReceipt = await prisma.createTransporterReceipt({
-      receiptNumber: "1234",
-      validityLimit: "2023-03-31T00:00:00.000Z",
-      department: "07"
+    const transporterReceipt = await prisma.transporterReceipt.create({
+      data: {
+        receiptNumber: "1234",
+        validityLimit: "2023-03-31T00:00:00.000Z",
+        department: "07"
+      }
     });
     const companyInput = {
       siret: "12345678912345",
@@ -99,10 +106,12 @@ describe("Mutation.createCompany", () => {
   it("should link to a traderReceipt", async () => {
     const user = await userFactory();
 
-    const traderReceipt = await prisma.createTraderReceipt({
-      receiptNumber: "1234",
-      validityLimit: "2023-03-31T00:00:00.000Z",
-      department: "07"
+    const traderReceipt = await prisma.traderReceipt.create({
+      data: {
+        receiptNumber: "1234",
+        validityLimit: "2023-03-31T00:00:00.000Z",
+        department: "07"
+      }
     });
     const companyInput = {
       siret: "12345678912345",
@@ -138,7 +147,9 @@ describe("Mutation.createCompany", () => {
       }
     });
 
-    const company = await prisma.company({ siret: companyInput.siret });
+    const company = await prisma.company.findOne({
+      where: { siret: companyInput.siret }
+    });
     expect(company.documentKeys).toEqual(["key1", "key2"]);
   });
 
@@ -233,10 +244,12 @@ describe("Mutation.createCompany", () => {
       siret: "0".repeat(14),
       companyTypes: ["ECO_ORGANISME"]
     };
-    await prisma.createEcoOrganisme({
-      address: "",
-      name: "Eco-Organisme",
-      siret: companyInput.siret
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: "Eco-Organisme",
+        siret: companyInput.siret
+      }
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
@@ -261,10 +274,12 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["ECO_ORGANISME"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
-    await prisma.createEcoOrganisme({
-      address: "",
-      name: "Eco-Organisme",
-      siret: companyInput.siret
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: "Eco-Organisme",
+        siret: companyInput.siret
+      }
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });

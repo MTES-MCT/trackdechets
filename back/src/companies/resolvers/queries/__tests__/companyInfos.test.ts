@@ -8,11 +8,9 @@ jest.mock("../../../sirene", () => ({
 }));
 
 const companyMock = jest.fn();
-jest.mock("../../../../generated/prisma-client", () => ({
+jest.mock("src/prisma", () => ({
   prisma: {
-    company: jest.fn(() => ({
-      $fragment: companyMock
-    }))
+    company: companyMock
   }
 }));
 

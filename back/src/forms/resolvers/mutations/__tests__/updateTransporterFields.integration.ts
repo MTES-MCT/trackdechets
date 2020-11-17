@@ -1,5 +1,5 @@
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
   formFactory,
   userWithCompanyFactory
@@ -39,7 +39,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
   `;
     await mutate(mutation);
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.transporterNumberPlate).toEqual("ZBLOP 83");
   });
@@ -68,7 +68,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
   `;
     await mutate(mutation);
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.transporterCustomInfo).toEqual("tournée 493");
   });
@@ -100,7 +100,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
       "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé"
     );
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.transporterCustomInfo).toEqual(null);
   });
@@ -132,7 +132,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
       "Vous n'êtes pas transporteur de ce bordereau."
     );
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.transporterCustomInfo).toEqual(null);
   });

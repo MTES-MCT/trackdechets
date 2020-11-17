@@ -1,15 +1,11 @@
-import { sendMail } from "../../../mailer/mailing";
-import { randomNumber } from "../../../utils";
+import { Company, CompanyCreateInput, User } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import {
-  User,
-  Company,
-  CompanyCreateInput,
-  prisma
-} from "../../../generated/prisma-client";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { MutationResolvers } from "../../../generated/graphql/types";
+import { randomNumber } from "../../../utils";
 
 /**
  * Create a new company and associate it to a user
@@ -38,9 +34,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   const ecoOrganismeAgreements = companyInput.ecoOrganismeAgreements || [];
   const siret = companyInput.siret.replace(/\s+/g, "");
 
-  const existingCompany = await prisma.$exists
-    .company({
-      siret
+  const existingCompany = await prisma.company
+    .findOne({
+      where: {
+        siret
+      }
     })
     .catch(() => {
       throw new Error(
@@ -55,8 +53,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   if (companyTypes.includes("ECO_ORGANISME")) {
-    const ecoOrganismeExists = await prisma.$exists.ecoOrganisme({
-      siret
+    const ecoOrganismeExists = await prisma.ecoOrganisme.findOne({
+      where: { siret }
     });
     if (!ecoOrganismeExists) {
       throw new UserInputError(
@@ -105,12 +103,14 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     };
   }
 
-  const companyAssociationPromise = prisma.createCompanyAssociation({
-    user: { connect: { id: user.id } },
-    company: {
-      create: companyCreateInput
-    },
-    role: "ADMIN"
+  const companyAssociationPromise = prisma.companyAssociation.create({
+    data: {
+      user: { connect: { id: user.id } },
+      company: {
+        create: companyCreateInput
+      },
+      role: "ADMIN"
+    }
   });
 
   const company = await companyAssociationPromise.company();
@@ -126,10 +126,9 @@ export async function warnIfUserCreatesTooManyCompanies(
   user: User,
   company: Company
 ) {
-  const userCompaniesNumber = await prisma
-    .companyAssociationsConnection({ where: { user: { id: user.id } } })
-    .aggregate()
-    .count();
+  const userCompaniesNumber = await prisma.companyAssociation.count({
+    where: { user: { id: user.id } }
+  });
 
   if (userCompaniesNumber > NB_OF_COMPANIES_BEFORE_ALERT) {
     return sendMail({

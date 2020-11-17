@@ -4,10 +4,12 @@ import { companyMails } from "../../../mails";
 
 const companyMock = jest.fn();
 const updateCompanyMock = jest.fn();
-jest.mock("../../../../generated/prisma-client", () => ({
+jest.mock("src/prisma", () => ({
   prisma: {
-    company: jest.fn((...args) => companyMock(...args)),
-    updateCompany: jest.fn((...args) => updateCompanyMock(...args))
+    company: {
+      findOne: jest.fn((...args) => companyMock(...args)),
+      update: jest.fn((...args) => updateCompanyMock(...args))
+    }
   }
 }));
 const randomNumberMock = jest.fn();

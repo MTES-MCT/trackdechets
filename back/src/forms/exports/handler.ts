@@ -4,7 +4,7 @@ import { format } from "@fast-csv/format";
 import { QueryFormsRegisterArgs } from "../../generated/graphql/types";
 import { formsReader, formsTransformer } from "./streams";
 import { formsWhereInput } from "./where-inputs";
-import { formFragment } from "./fragments";
+import { formFieldsSelection } from "./fragments";
 import { getExportsFileName } from "./filename";
 import { getXlsxHeaders } from "./columns";
 
@@ -26,9 +26,9 @@ export async function downloadFormsRegister(
     args.wasteCode
   );
 
-  const fragment = formFragment(args.exportType);
+  const fieldsSelection = formFieldsSelection(args.exportType);
 
-  const reader = formsReader({ whereInput, fragment });
+  const reader = formsReader({ whereInput, fieldsSelection });
 
   const filename = getExportsFileName(
     args.exportType,

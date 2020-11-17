@@ -2,7 +2,8 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyAdminUsers } from "../../../companies/database";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { MembershipRequest, prisma } from "../../../generated/prisma-client";
+import { MembershipRequest } from "@prisma/client";
+import prisma from "src/prisma";
 import { getMembershipRequestOrNotFoundError } from "../../database";
 
 const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
@@ -26,7 +27,7 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
 
   if (siret) {
     // search a matching invitation for authenticated user and siret
-    const requests = await prisma.membershipRequests({
+    const requests = await prisma.membershipRequest.findMany({
       where: { user: { id: user.id }, company: { siret } }
     });
     if (requests.length === 0) {
@@ -36,12 +37,12 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
     }
   }
 
-  const { email } = await prisma
-    .membershipRequest({ id: invitationRequest.id })
+  const { email } = await prisma.membershipRequest
+    .findOne({ where: { id: invitationRequest.id } })
     .user();
 
-  const company = await prisma
-    .membershipRequest({ id: invitationRequest.id })
+  const company = await prisma.membershipRequest
+    .findOne({ where: { id: invitationRequest.id } })
     .company();
 
   // check user is requester or company admin

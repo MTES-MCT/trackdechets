@@ -1,5 +1,5 @@
 import { UserInputError } from "apollo-server-express";
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 import {
   MutationUpdateCompanyArgs,
   CompanyPrivate,
@@ -40,7 +40,7 @@ export async function updateCompanyFn({
       : {})
   };
 
-  return prisma.updateCompany({
+  return prisma.company.update({
     where: { siret },
     data
   });

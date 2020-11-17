@@ -1,6 +1,6 @@
 import { UserInputError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { userMails } from "../../mails";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -16,7 +16,7 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ siret });
 
-  const invitations = await prisma.userAccountHashes({
+  const invitations = await prisma.userAccountHash.findMany({
     where: { email, companySiret: siret }
   });
 

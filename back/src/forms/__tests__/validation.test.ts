@@ -1,4 +1,4 @@
-import { Form } from "../../generated/prisma-client";
+import { Form } from "@prisma/client";
 import {
   sealedFormSchema,
   ecoOrganismeSchema,

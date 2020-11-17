@@ -1,7 +1,7 @@
+import prisma from "src/prisma";
 import * as yup from "yup";
-import { CompanyRow } from "./types";
 import { getCompanyThrottled } from "./sirene";
-import { prisma } from "../../generated/prisma-client";
+import { CompanyRow } from "./types";
 
 const COMPANY_TYPES = [
   "PRODUCER",
@@ -39,7 +39,9 @@ export const companyValidationSchema = yup.object().shape({
       "company-already-created",
       "A company with SIRET ${value} was already created",
       async value => {
-        const exists = await prisma.$exists.company({ siret: value });
+        const exists = await prisma.company.findFirst({
+          where: { siret: value }
+        });
         // always return true, but emit warning if the company was
         // already created
         if (exists) {
@@ -100,7 +102,9 @@ export const roleValidationSchema = (companies: CompanyRow[]) =>
         "user-alreay-exists",
         "A user with this email already exist",
         async value => {
-          const exists = await prisma.$exists.user({ email: value });
+          const exists = await prisma.user.findFirst({
+            where: { email: value }
+          });
           // always return true, but emit a warning if this email
           // is already used
           if (exists) {

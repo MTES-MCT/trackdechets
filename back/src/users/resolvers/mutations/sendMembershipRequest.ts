@@ -1,4 +1,5 @@
 import { UserInputError } from "apollo-server-express";
+import prisma from "src/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -7,7 +8,6 @@ import {
   isCompanyMember
 } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
 import { userMails } from "../../mails";
 
 const { UI_HOST, UI_URL_SCHEME } = process.env;
@@ -29,9 +29,11 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
 
   // check there is no existing membership request for this
   // user and company
-  const alreadyRequested = await prisma.$exists.membershipRequest({
-    user: { id: user.id },
-    company: { id: company.id }
+  const alreadyRequested = await prisma.membershipRequest.findFirst({
+    where: {
+      user: { id: user.id },
+      company: { id: company.id }
+    }
   });
   if (alreadyRequested) {
     throw new UserInputError(
@@ -42,10 +44,12 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
   const admins = await getCompanyAdminUsers(siret);
   const emails = admins.map(a => a.email);
 
-  const membershipRequest = await prisma.createMembershipRequest({
-    user: { connect: { id: user.id } },
-    company: { connect: { id: company.id } },
-    sentTo: { set: emails }
+  const membershipRequest = await prisma.membershipRequest.create({
+    data: {
+      user: { connect: { id: user.id } },
+      company: { connect: { id: company.id } },
+      sentTo: emails
+    }
   });
 
   // send membership request to all admins of the company

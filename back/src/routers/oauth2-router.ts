@@ -1,4 +1,4 @@
-import { prisma } from "../generated/prisma-client";
+import prisma from "src/prisma";
 import express, { Request, Response } from "express";
 import passport from "passport";
 import { oauth2server } from "../oauth2";
@@ -18,7 +18,9 @@ oauth2Router.get(
   "/oauth2/authorize",
   ensureLoggedIn,
   oauth2server.authorization(async (clientId, redirectUri, done) => {
-    const client = await prisma.application({ id: clientId });
+    const client = await prisma.application.findOne({
+      where: { id: clientId }
+    });
     if (!client) {
       const err = new AuthorizationError(
         "Invalid client id",

@@ -1,4 +1,4 @@
-import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
+import prisma from "src/prisma";
 import { sendMail } from "../mailer/mailing";
 import { userMails } from "../users/mails";
 import { getCompanyAdminUsers } from "../companies/database";
@@ -15,9 +15,7 @@ import { trim } from "../common/strings";
 import { searchCompany } from "../companies/sirene";
 import { buildPdfBase64 } from "../forms/pdf/generator";
 
-export async function formsSubscriptionCallback(
-  payload: FormSubscriptionPayload
-) {
+export async function formsSubscriptionCallback(payload: any) {
   await Promise.all([
     mailToInexistantRecipient(payload).catch(err =>
       console.error("Error on inexistant recipient subscription", err)
@@ -37,7 +35,7 @@ export async function formsSubscriptionCallback(
   ]);
 }
 
-async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
+async function mailToInexistantRecipient(payload: any) {
   if (
     (payload.updatedFields && payload.updatedFields.includes("isDeleted")) ||
     !payload.node
@@ -61,7 +59,9 @@ async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
     return;
   }
 
-  const companyExists = await prisma.$exists.company({ siret: recipientSiret });
+  const companyExists = await prisma.company.findFirst({
+    where: { siret: recipientSiret }
+  });
   if (companyExists) {
     return;
   }
@@ -77,7 +77,7 @@ async function mailToInexistantRecipient(payload: FormSubscriptionPayload) {
   );
 }
 
-async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
+async function mailToInexistantEmitter(payload: any) {
   if (
     (payload.updatedFields && payload.updatedFields.includes("isDeleted")) ||
     !payload.node
@@ -96,7 +96,9 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
     return;
   }
 
-  const companyExists = await prisma.$exists.company({ siret: emitterSiret });
+  const companyExists = await prisma.company.findFirst({
+    where: { siret: emitterSiret }
+  });
   if (companyExists) {
     return;
   }
@@ -118,7 +120,7 @@ async function mailToInexistantEmitter(payload: FormSubscriptionPayload) {
  * Dreal notification can be toggled with NOTIFY_DREAL_WHEN_FORM_DECLINED setting
  * @param payload
  */
-export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
+export async function mailWhenFormIsDeclined(payload: any) {
   if (
     !payload.updatedFields ||
     !payload.updatedFields.includes("wasteAcceptationStatus") ||
@@ -129,7 +131,7 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   ) {
     return;
   }
-  const form = await prisma.form({ id: payload.node.id });
+  const form = await prisma.form.findOne({ where: { id: payload.node.id } });
   // build pdf as a base64 string
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -192,7 +194,7 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   return sendMail(mail);
 }
 
-async function verifiyPresta(payload: FormSubscriptionPayload) {
+async function verifiyPresta(payload: any) {
   if (payload.mutation === "CREATED") {
     const bsd = payload.node;
     const siret = bsd.recipientCompanySiret;
@@ -228,9 +230,7 @@ async function verifiyPresta(payload: FormSubscriptionPayload) {
   }
 }
 
-async function mailWhenFormTraceabilityIsBroken(
-  payload: FormSubscriptionPayload
-) {
+async function mailWhenFormTraceabilityIsBroken(payload: any) {
   if (
     !payload.updatedFields ||
     !payload.updatedFields.includes("noTraceability") ||
@@ -240,7 +240,7 @@ async function mailWhenFormTraceabilityIsBroken(
     return;
   }
 
-  const form = await prisma.form({ id: payload.node.id });
+  const form = await prisma.form.findOne({ where: { id: payload.node.id } });
   return sendMail(
     userMails.formTraceabilityBreak(
       form.emitterCompanyMail,

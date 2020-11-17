@@ -1,4 +1,4 @@
-import { FormUpdateInput } from "../../generated/prisma-client";
+import { FormUpdateInput } from "@prisma/client";
 
 // Xstate possible states
 export enum FormState {

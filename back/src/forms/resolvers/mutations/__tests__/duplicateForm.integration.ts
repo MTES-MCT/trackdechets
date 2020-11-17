@@ -1,11 +1,13 @@
+import { Form } from "@prisma/client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
   formFactory,
   formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import { resetDatabase } from "../../../../../integration-tests/helper";
+import { cleanUpNotDuplicatableFieldsInForm } from "../../../form-converter";
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -302,7 +304,8 @@ describe("Mutation.duplicateForm", () => {
       }
     });
 
-    const statusLogs = await prisma.statusLogs({
+    // check relevant statusLog is created
+    const statusLogs = await prisma.statusLog.findMany({
       where: {
         form: { id: data.duplicateForm.id },
         user: { id: user.id },

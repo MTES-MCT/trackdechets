@@ -1,6 +1,6 @@
-import { userMails } from "../users/mails";
+import prisma from "src/prisma";
 import { sendMail } from "../mailer/mailing";
-import { prisma } from "../generated/prisma-client";
+import { userMails } from "../users/mails";
 
 /**
  * Compute a past date relative to now
@@ -28,7 +28,7 @@ export const sendOnboardingEmails = async (daysAgo: number, emailFunction) => {
   const inscriptionDateGt = xDaysAgo(now, daysAgo);
   const inscriptionDateLt = xDaysAgo(now, daysAgo - 1);
   // retrieve users whose account was created yesterday
-  const recipients = await prisma.users({
+  const recipients = await prisma.user.findMany({
     where: {
       AND: [
         { createdAt_gt: inscriptionDateGt },

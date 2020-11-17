@@ -1,6 +1,6 @@
-import { resetDatabase } from "../../../../../integration-tests/helper";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import { ErrorCode } from "../../../../common/errors";
-import { prisma } from "../../../../generated/prisma-client";
 import {
   companyFactory,
   userFactory,
@@ -67,9 +67,11 @@ describe("query membershipRequest", () => {
   it("should return an invitation request by id", async () => {
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");
     const requester = await userFactory();
-    const membershipRequest = await prisma.createMembershipRequest({
-      user: { connect: { id: requester.id } },
-      company: { connect: { id: company.id } }
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } }
+      }
     });
     const { query } = makeClient(admin);
     const { data } = await query(MEMBERSHIP_REQUEST, {
@@ -87,9 +89,11 @@ describe("query membershipRequest", () => {
   it("should return a membership request by siret", async () => {
     const { user: _admin, company } = await userWithCompanyFactory("ADMIN");
     const requester = await userFactory();
-    const membershipRequest = await prisma.createMembershipRequest({
-      user: { connect: { id: requester.id } },
-      company: { connect: { id: company.id } }
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } }
+      }
     });
     const { query } = makeClient(requester);
     const { data } = await query(MEMBERSHIP_REQUEST, {

@@ -1,5 +1,5 @@
 import { userMails } from "../mails";
-import { Form } from "../../generated/prisma-client";
+import { Form } from "@prisma/client";
 
 const formWithTransporter: Form = {
   id: "abcd123",

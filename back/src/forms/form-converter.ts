@@ -3,10 +3,11 @@ import {
   TemporaryStorageDetail as PrismaTemporaryStorageDetail,
   TransportSegment as PrismaTransportSegment,
   FormCreateInput,
-  FormUpdateInput,
   TemporaryStorageDetailCreateInput,
-  TemporaryStorageDetailUpdateInput
-} from "../generated/prisma-client";
+  TemporaryStorageDetailUpdateInput,
+  Form,
+  TransportSegment
+} from "@prisma/client";
 import {
   Form as GraphQLForm,
   TemporaryStorageDetail as GraphQLTemporaryStorageDetail,
@@ -117,7 +118,7 @@ export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput;
-}): TemporaryStorageDetailUpdateInput {
+}): TemporaryStorageDetailCreateInput {
   return {
     destinationCompanyName: chain(input.destination, d =>
       chain(d.company, c => c.name)
@@ -331,7 +332,7 @@ export function flattenFormInput(
     | "trader"
     | "ecoOrganisme"
   >
-): FormCreateInput | FormUpdateInput {
+): Partial<FormCreateInput> {
   return safeInput({
     customId: formInput.customId,
     ...flattenEmitterInput(formInput),
@@ -345,7 +346,7 @@ export function flattenFormInput(
 
 export function flattenProcessedFormInput(
   processedFormInput: ProcessedFormInput
-): FormUpdateInput {
+): Partial<FormCreateInput> {
   const { nextDestination, ...rest } = processedFormInput;
   return safeInput({
     ...rest,
@@ -355,7 +356,7 @@ export function flattenProcessedFormInput(
 
 export function flattenImportPaperFormInput(
   input: ImportPaperFormInput
-): FormCreateInput | FormUpdateInput {
+): Partial<FormCreateInput> {
   const {
     id,
     customId,
@@ -382,7 +383,7 @@ export function flattenImportPaperFormInput(
 
 export function flattenTemporaryStorageDetailInput(
   tempStorageInput: TemporaryStorageDetailInput
-): TemporaryStorageDetailCreateInput | TemporaryStorageDetailUpdateInput {
+): TemporaryStorageDetailCreateInput {
   return safeInput(flattenDestinationInput(tempStorageInput));
 }
 
@@ -470,7 +471,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
       receipt: form.transporterReceipt,
       department: form.transporterDepartment,
-      validityLimit: form.transporterValidityLimit,
+      validityLimit: form.transporterValidityLimit?.toISOString(),
       numberPlate: form.transporterNumberPlate,
       customInfo: form.transporterCustomInfo
     }),
@@ -478,9 +479,11 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
       onuCode: form.wasteDetailsOnuCode,
-      packagingInfos: form.wasteDetailsPackagingInfos,
+      packagingInfos: form.wasteDetailsPackagingInfos as PackagingInfo[],
       // DEPRECATED - To remove with old packaging fields
-      ...getDeprecatedPackagingApiFields(form.wasteDetailsPackagingInfos),
+      ...getDeprecatedPackagingApiFields(
+        form.wasteDetailsPackagingInfos as PackagingInfo[]
+      ),
       quantity: form.wasteDetailsQuantity,
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence,
@@ -497,23 +500,23 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       }),
       receipt: form.traderReceipt,
       department: form.traderDepartment,
-      validityLimit: form.traderValidityLimit
+      validityLimit: form.traderValidityLimit?.toISOString()
     }),
     ecoOrganisme: nullIfNoValues<FormEcoOrganisme>({
       name: form.ecoOrganismeName,
       siret: form.ecoOrganismeSiret
     }),
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    createdAt: form.createdAt?.toISOString(),
+    updatedAt: form.updatedAt?.toISOString(),
     status: form.status as FormStatus,
     signedByTransporter: form.signedByTransporter,
-    sentAt: form.sentAt,
+    sentAt: form.sentAt?.toISOString(),
     sentBy: form.sentBy,
     wasteAcceptationStatus: form.wasteAcceptationStatus,
     wasteRefusalReason: form.wasteRefusalReason,
     receivedBy: form.receivedBy,
-    receivedAt: form.receivedAt,
-    signedAt: form.signedAt,
+    receivedAt: form.receivedAt?.toISOString(),
+    signedAt: form.signedAt?.toISOString(),
     quantityReceived: form.quantityReceived,
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
@@ -550,7 +553,7 @@ export function expandTemporaryStorageFromDb(
       wasteAcceptationStatus:
         temporaryStorageDetail.tempStorerWasteAcceptationStatus,
       wasteRefusalReason: temporaryStorageDetail.tempStorerWasteRefusalReason,
-      receivedAt: temporaryStorageDetail.tempStorerReceivedAt,
+      receivedAt: temporaryStorageDetail.tempStorerReceivedAt?.toISOString(),
       receivedBy: temporaryStorageDetail.tempStorerReceivedBy
     }),
     destination: nullIfNoValues({
@@ -571,10 +574,10 @@ export function expandTemporaryStorageFromDb(
       code: null,
       name: null,
       onuCode: temporaryStorageDetail.wasteDetailsOnuCode,
-      packagingInfos: temporaryStorageDetail.wasteDetailsPackagingInfos,
+      packagingInfos: temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
-        temporaryStorageDetail.wasteDetailsPackagingInfos
+        temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[]
       ),
       quantity: temporaryStorageDetail.wasteDetailsQuantity,
       quantityType: temporaryStorageDetail.wasteDetailsQuantityType,
@@ -593,12 +596,12 @@ export function expandTemporaryStorageFromDb(
         temporaryStorageDetail.transporterIsExemptedOfReceipt,
       receipt: temporaryStorageDetail.transporterReceipt,
       department: temporaryStorageDetail.transporterDepartment,
-      validityLimit: temporaryStorageDetail.transporterValidityLimit,
+      validityLimit: temporaryStorageDetail.transporterValidityLimit?.toISOString(),
       numberPlate: temporaryStorageDetail.transporterNumberPlate,
       customInfo: null
     }),
     signedBy: temporaryStorageDetail.signedBy,
-    signedAt: temporaryStorageDetail.signedAt
+    signedAt: temporaryStorageDetail.signedAt?.toISOString()
   };
 }
 
@@ -620,12 +623,12 @@ export function expandTransportSegmentFromDb(
       isExemptedOfReceipt: segment.transporterIsExemptedOfReceipt,
       receipt: segment.transporterReceipt,
       department: segment.transporterDepartment,
-      validityLimit: segment.transporterValidityLimit,
+      validityLimit: segment.transporterValidityLimit?.toISOString(),
       numberPlate: segment.transporterNumberPlate,
       customInfo: null
     }),
     mode: segment.mode,
-    takenOverAt: segment.takenOverAt,
+    takenOverAt: segment.takenOverAt?.toISOString(),
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,
     segmentNumber: segment.segmentNumber

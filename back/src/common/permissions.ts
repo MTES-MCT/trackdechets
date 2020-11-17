@@ -1,6 +1,6 @@
 import { GraphQLContext } from "../types";
 import { NotLoggedIn } from "./errors";
-import { User } from "../generated/prisma-client";
+import { User } from "@prisma/client";
 
 export function checkIsAuthenticated(context: GraphQLContext): User {
   if (!context.user) {

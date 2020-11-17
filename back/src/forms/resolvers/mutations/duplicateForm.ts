@@ -1,10 +1,8 @@
-import {
-  Form,
-  prisma,
-  Status,
+import { Status, Form,
   TemporaryStorageDetail,
-  User
-} from "../../../generated/prisma-client";
+  User } from "@prisma/client";
+import prisma from "src/prisma";
+
 import { expandFormFromDb } from "../../form-converter";
 import { getReadableId } from "../../readable-id";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -128,12 +126,14 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   }
 
   // create statuslog when form is created
-  await prisma.createStatusLog({
-    form: { connect: { id: newForm.id } },
-    user: { connect: { id: user.id } },
-    status: newForm.status as Status,
-    updatedFields: {},
-    loggedAt: new Date()
+  await prisma.statusLog.create({
+    data: {
+      form: { connect: { id: newForm.id } },
+      user: { connect: { id: user.id } },
+      status: newForm.status as Status,
+      updatedFields: {},
+      loggedAt: new Date()
+    }
   });
 
   return expandFormFromDb(newForm);

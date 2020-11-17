@@ -1,10 +1,10 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyAdmin } from "../../permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { getUserAccountHashOrNotFound } from "../../database";
+import { checkIsCompanyAdmin } from "../../permissions";
 
 const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
   parent,
@@ -19,8 +19,8 @@ const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
     email,
     companySiret: siret
   });
-  await prisma.deleteUserAccountHash({ id: hash.id });
-  return prisma.company({ siret });
+  await prisma.userAccountHash.delete({ where: { id: hash.id } });
+  return prisma.company.findOne({ where: { siret } });
 };
 
 export default deleteInvitationResolver;

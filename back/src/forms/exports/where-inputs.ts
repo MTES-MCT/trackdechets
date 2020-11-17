@@ -1,4 +1,4 @@
-import { FormWhereInput } from "../../generated/prisma-client";
+import { FormWhereInput } from "@prisma/client";
 import { FormsRegisterExportType } from "../../generated/graphql/types";
 
 /**
@@ -16,11 +16,11 @@ export function formsWhereInput(
   const whereInputs: FormWhereInput[] = [];
 
   if (startDate) {
-    whereInputs.push({ sentAt_gte: startDate });
+    whereInputs.push({ sentAt: { gte: startDate } });
   }
 
   if (endDate) {
-    whereInputs.push({ sentAt_lte: endDate });
+    whereInputs.push({ sentAt: { lte: endDate } });
   }
 
   if (wasteCode) {
@@ -45,8 +45,11 @@ export function formsWhereInput(
  */
 function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
-    OR: [{ emitterCompanySiret_in: sirets }, { ecoOrganismeSiret_in: sirets }],
-    AND: [{ status_not_in: ["DRAFT", "SEALED"] }]
+    OR: [
+      { emitterCompanySiret: { in: sirets } },
+      { ecoOrganismeSiret: { in: sirets } }
+    ],
+    AND: [{ status: { notIn: ["DRAFT", "SEALED"] } }]
   };
 }
 
@@ -60,8 +63,8 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
       {
         AND: [
           { recipientIsTempStorage: false },
-          { recipientCompanySiret_in: sirets },
-          { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+          { recipientCompanySiret: { in: sirets } },
+          { status: { notIn: ["DRAFT", "SEALED", "SENT"] } }
         ]
       },
       {
@@ -71,26 +74,28 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
             OR: [
               {
                 AND: [
-                  { recipientCompanySiret_in: sirets },
-                  { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+                  { recipientCompanySiret: { in: sirets } },
+                  { status: { notIn: ["DRAFT", "SEALED", "SENT"] } }
                 ]
               },
               {
                 AND: [
                   {
                     temporaryStorageDetail: {
-                      destinationCompanySiret_in: sirets
+                      destinationCompanySiret: { in: sirets }
                     }
                   },
                   {
-                    status_not_in: [
-                      "DRAFT",
-                      "SEALED",
-                      "SENT",
-                      "TEMP_STORED",
-                      "TEMP_STORER_ACCEPTED",
-                      "RESENT"
-                    ]
+                    status: {
+                      notIn: [
+                        "DRAFT",
+                        "SEALED",
+                        "SENT",
+                        "TEMP_STORED",
+                        "TEMP_STORER_ACCEPTED",
+                        "RESENT"
+                      ]
+                    }
                   }
                 ]
               }
@@ -112,8 +117,8 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
       {
         AND: [
           { recipientIsTempStorage: false },
-          { transporterCompanySiret_in: sirets },
-          { status_not_in: ["DRAFT", "SEALED"] }
+          { transporterCompanySiret: { in: sirets } },
+          { status: { notIn: ["DRAFT", "SEALED"] } }
         ]
       },
       // temporary storage
@@ -122,17 +127,19 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
           { recipientIsTempStorage: true },
           {
             temporaryStorageDetail: {
-              transporterCompanySiret_in: sirets
+              transporterCompanySiret: { in: sirets }
             }
           },
           {
-            status_not_in: [
-              "DRAFT",
-              "SEALED",
-              "SENT",
-              "TEMP_STORED",
-              "TEMP_STORER_ACCEPTED"
-            ]
+            status: {
+              notIn: [
+                "DRAFT",
+                "SEALED",
+                "SENT",
+                "TEMP_STORED",
+                "TEMP_STORER_ACCEPTED"
+              ]
+            }
           }
         ]
       },
@@ -141,10 +148,10 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
         AND: [
           {
             transportSegments_some: {
-              transporterCompanySiret_in: sirets
+              transporterCompanySiret: { in: sirets }
             }
           },
-          { status_not_in: ["DRAFT", "SEALED"] }
+          { status: { notIn: ["DRAFT", "SEALED"] } }
         ]
       }
     ]
@@ -158,9 +165,9 @@ function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
     AND: [
       {
-        status_not_in: ["DRAFT", "SEALED"]
+        status: { notIn: ["DRAFT", "SEALED"] }
       },
-      { traderCompanySiret_in: sirets }
+      { traderCompanySiret: { in: sirets } }
     ]
   };
 }
@@ -173,26 +180,26 @@ function allWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
     AND: [
       {
-        status_not_in: ["DRAFT", "SEALED"]
+        status: { notIn: ["DRAFT", "SEALED"] }
       },
       {
         OR: [
-          { emitterCompanySiret_in: sirets },
-          { ecoOrganismeSiret_in: sirets },
-          { recipientCompanySiret_in: sirets },
-          { traderCompanySiret_in: sirets },
+          { emitterCompanySiret: { in: sirets } },
+          { ecoOrganismeSiret: { in: sirets } },
+          { recipientCompanySiret: { in: sirets } },
+          { traderCompanySiret: { in: sirets } },
           {
-            temporaryStorageDetail: { destinationCompanySiret_in: sirets }
+            temporaryStorageDetail: { destinationCompanySiret: { in: sirets } }
           },
-          { traderCompanySiret_in: sirets },
-          { traderCompanySiret_in: sirets },
-          { transporterCompanySiret_in: sirets },
+          { traderCompanySiret: { in: sirets } },
+          { traderCompanySiret: { in: sirets } },
+          { transporterCompanySiret: { in: sirets } },
           {
-            temporaryStorageDetail: { transporterCompanySiret_in: sirets }
+            temporaryStorageDetail: { transporterCompanySiret: { in: sirets } }
           },
           {
             transportSegments_some: {
-              transporterCompanySiret_in: sirets
+              transporterCompanySiret: { in: sirets }
             }
           }
         ]

@@ -1,8 +1,8 @@
+import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
 import { getMembershipRequestOrNotFoundError } from "../../database";
 import {
   MembershipRequestAlreadyAccepted,
@@ -23,8 +23,8 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
   // throw error if membership request does not exist
   const membershipRequest = await getMembershipRequestOrNotFoundError({ id });
 
-  const company = await prisma
-    .membershipRequest({ id: membershipRequest.id })
+  const company = await prisma.membershipRequest
+    .findOne({ where: { id: membershipRequest.id } })
     .company();
 
   // check authenticated user is admin of the company
@@ -40,7 +40,7 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
     throw new MembershipRequestAlreadyRefused();
   }
 
-  await prisma.updateMembershipRequest({
+  await prisma.membershipRequest.update({
     where: { id },
     data: {
       status: "REFUSED",
@@ -49,10 +49,12 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
   });
 
   // notify requester of refusal
-  const requester = await prisma.membershipRequest({ id }).user();
+  const requester = await prisma.membershipRequest
+    .findOne({ where: { id } })
+    .user();
   await sendMail(userMails.membershipRequestRefused(requester, company));
 
-  return prisma.company({ id: company.id });
+  return prisma.company.findOne({ where: { id: company.id } });
 };
 
 export default refuseMembershipRequestResolver;

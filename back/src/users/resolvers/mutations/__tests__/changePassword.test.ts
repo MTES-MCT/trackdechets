@@ -5,10 +5,12 @@ import { hashPassword } from "../../../utils";
 const userMock = jest.fn();
 const updateUserMock = jest.fn();
 
-jest.mock("../../../../generated/prisma-client", () => ({
+jest.mock("src/prisma", () => ({
   prisma: {
-    user: jest.fn((...args) => userMock(...args)),
-    updateUser: jest.fn((...args) => updateUserMock(...args))
+    user: {
+      findOne: jest.fn((...args) => userMock(...args)),
+      update: jest.fn((...args) => updateUserMock(...args))
+    }
   }
 }));
 

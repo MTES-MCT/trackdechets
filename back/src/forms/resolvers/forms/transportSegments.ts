@@ -1,17 +1,16 @@
+import prisma from "src/prisma";
 import { FormResolvers } from "../../../generated/graphql/types";
 import { expandTransportSegmentFromDb } from "../../form-converter";
-import { prisma } from "../../../generated/prisma-client";
 
-const transportSegmentResolver: FormResolvers["transportSegments"] = form => {
-  return prisma
-    .form({ id: form.id })
-    .transportSegments({ orderBy: "segmentNumber_ASC" })
-    .then(segments =>
-      segments.map(el => ({
-        ...el,
-        ...expandTransportSegmentFromDb(el)
-      }))
-    );
+const transportSegmentResolver: FormResolvers["transportSegments"] = async form => {
+  const segments = await prisma.form
+    .findOne({ where: { id: form.id } })
+    .transportSegments({ orderBy: { segmentNumber: "asc" } });
+  return segments.map(el => ({
+    // TODO-PRISMA
+    //...el,
+    ...expandTransportSegmentFromDb(el)
+  }));
 };
 
 export default transportSegmentResolver;

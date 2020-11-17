@@ -167,7 +167,7 @@ const machine = Machine<any, Event>(
         !!event?.formUpdateInput?.noTraceability,
       awaitsGroup: (_, event) =>
         PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          event.formUpdateInput?.processingOperationDone
+          event.formUpdateInput?.processingOperationDone as string
         ),
       isFormRefused: (_, event) =>
         event.formUpdateInput?.wasteAcceptationStatus === "REFUSED",

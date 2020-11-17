@@ -1,9 +1,14 @@
-import { Form, Company, User, prisma } from "../generated/prisma-client";
+import {
+  Company,
+  Form,
+  User
+} from "@prisma/client";
+import { ForbiddenError } from "apollo-server-express";
+import prisma from "src/prisma";
 import { FormSirets } from "./types";
-import { NotFormContributor, InvaliSecurityCode } from "./errors";
 import { getFullUser } from "../users/database";
 import { getFullForm } from "./database";
-import { ForbiddenError } from "apollo-server-express";
+import { InvaliSecurityCode, NotFormContributor } from "./errors";
 
 function isFormEmitter(user: { companies: Company[] }, form: FormSirets) {
   if (!form.emitterCompanySiret) {
@@ -318,7 +323,9 @@ export async function checkCanImportForm(user: User, form: Form) {
 }
 
 export async function checkSecurityCode(siret: string, securityCode: number) {
-  const exists = await prisma.$exists.company({ siret, securityCode });
+  const exists = await prisma.company.findFirst({
+    where: { siret, securityCode }
+  });
   if (!exists) {
     throw new InvaliSecurityCode();
   }

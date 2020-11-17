@@ -1,5 +1,5 @@
 #!/usr/bin/env ts-node
-import { prisma } from "../../generated/prisma-client";
+import prisma from "src/prisma";
 import mergeUsers from "../prisma/mergeUsers";
 import deleteUser from "../prisma/deleteUser";
 
@@ -21,8 +21,8 @@ import deleteUser from "../prisma/deleteUser";
     return;
   }
 
-  const user = await prisma.user({ id: userID });
-  const heir = await prisma.user({ id: heirUserID });
+  const user = await prisma.user.findOne({ where: { id: userID } });
+  const heir = await prisma.user.findOne({ where: { id: heirUserID } });
 
   if (!user) {
     console.log(

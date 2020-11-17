@@ -4,14 +4,9 @@ import {
   createSiretUnknownAlertCard
 } from "../common/trello";
 import { anomalies, verifyPrestataire } from "../companies/verif";
-import {
-  CompanySubscriptionPayload,
-  CompanyType
-} from "../generated/prisma-client";
+import { CompanyType } from "@prisma/client";
 
-export async function companiesSubscriptionCallback(
-  payload: CompanySubscriptionPayload
-) {
+export async function companiesSubscriptionCallback(payload: any) {
   await Promise.all([
     verifyPresta(payload).catch(err => {
       console.error("Error on company verification form subscription", err);
@@ -19,7 +14,7 @@ export async function companiesSubscriptionCallback(
   ]);
 }
 
-async function verifyPresta(payload: CompanySubscriptionPayload) {
+async function verifyPresta(payload: any) {
   if (payload.mutation === "CREATED") {
     const company = payload.node;
 

@@ -1,8 +1,9 @@
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { Company, prisma } from "../../../generated/prisma-client";
 import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
+import { Company } from "@prisma/client";
+import prisma from "src/prisma";
 import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
@@ -45,14 +46,15 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     maxPaginateBy: 500
   });
 
-  const queriedForms = await prisma.forms({
+  const queriedForms = await prisma.form.findMany({
+    // TODO-PRISMA
     ...connectionsArgs,
-    orderBy: "createdAt_DESC",
+    orderBy: { createdAt: "desc" },
     where: {
-      updatedAt_gte: rest.updatedAfter,
-      sentAt_gte: rest.sentAfter,
+      updatedAt: { gte: rest.updatedAfter },
+      sentAt: { gte: rest.sentAfter },
       wasteDetailsCode: rest.wasteCode,
-      ...(status?.length && { status_in: status }),
+      ...(status?.length && { status: { in: status } }),
       AND: [
         getFormsRightFilter(company.siret, roles),
         getHasNextStepFilter(company.siret, hasNextStep),

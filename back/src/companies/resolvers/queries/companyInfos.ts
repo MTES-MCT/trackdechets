@@ -1,11 +1,11 @@
-import { prisma, Company } from "../../../generated/prisma-client";
-import { getInstallation } from "../../database";
-import { searchCompany } from "../../sirene";
 import { UserInputError } from "apollo-server-express";
+import prisma from "src/prisma";
 import {
   CompanyPublic,
   QueryResolvers
 } from "../../../generated/graphql/types";
+import { getInstallation } from "../../database";
+import { searchCompany } from "../../sirene";
 /**
  * This function is used to return public company
  * information for a specific siret. It merge info
@@ -27,25 +27,17 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
     });
   }
 
-  const companyFragment = `
-    fragment PublicInfo on Company {
-      contactEmail
-      contactPhone
-      website
-      ecoOrganismeAgreements
-    }
-  `;
-
-  type CompanyFragment = Pick<
-    Company,
-    "contactEmail" | "contactPhone" | "website" | "ecoOrganismeAgreements"
-  >;
-
   // retrieves trackdechets public CompanyInfo
   // it might be null if the company is not registered in TD
-  const trackdechetsCompanyInfo = await prisma
-    .company({ siret })
-    .$fragment<CompanyFragment>(companyFragment);
+  const trackdechetsCompanyInfo = await prisma.company.findOne({
+    where: { siret },
+    select: {
+      contactEmail: true,
+      contactPhone: true,
+      website: true,
+      ecoOrganismeAgreements: true
+    }
+  });
 
   const isRegistered = !!trackdechetsCompanyInfo;
 

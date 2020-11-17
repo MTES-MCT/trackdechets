@@ -1,14 +1,14 @@
-import { User, Company } from "../../../../generated/prisma-client";
+import { User, Company } from "@prisma/client";
 import { warnIfUserCreatesTooManyCompanies } from "../createCompany";
 
 const countMock = jest.fn();
 const mailMock = jest.fn();
 
-jest.mock("../../../../generated/prisma-client", () => ({
+jest.mock("src/prisma", () => ({
   prisma: {
-    companyAssociationsConnection: () => ({
-      aggregate: () => ({ count: countMock })
-    })
+    companyAssociation: {
+      count: countMock
+    }
   }
 }));
 

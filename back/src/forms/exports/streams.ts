@@ -1,5 +1,6 @@
 import { Readable, Transform, ReadableOptions } from "stream";
-import { prisma, Form, FormWhereInput } from "../../generated/prisma-client";
+import { Form, FormWhereInput } from "@prisma/client";
+import prisma from "src/prisma";
 import { flattenForm } from "./transformers";
 import { formatRow } from "./columns";
 
@@ -17,7 +18,7 @@ class FormReader extends Readable {
 
 interface FormReaderArgs {
   whereInput?: FormWhereInput;
-  fragment?: string;
+  fieldsSelection?: Record<string, unknown>;
   chunk?: number;
 }
 
@@ -26,24 +27,20 @@ interface FormReaderArgs {
  */
 export function formsReader({
   whereInput,
-  fragment,
+  fieldsSelection,
   chunk = 100
 }: FormReaderArgs): Readable {
   const stream = new FormReader({
     objectMode: true,
     read(this) {
       const args = {
-        first: chunk,
+        take: chunk,
         skip: this.skip,
-        ...(whereInput ? { where: whereInput } : {})
+        ...(whereInput ? { where: whereInput } : {}),
+        ...(fieldsSelection ? { select: fieldsSelection } : {})
       };
 
-      const fragmentable = prisma.forms(args);
-
-      const formsPromise = fragment
-        ? fragmentable.$fragment<Form[]>(fragment)
-        : fragmentable;
-      formsPromise.then(forms => {
+      prisma.form.findMany(args).then(forms => {
         if (!forms || forms.length === 0) {
           // end of stream
           this.push(null);

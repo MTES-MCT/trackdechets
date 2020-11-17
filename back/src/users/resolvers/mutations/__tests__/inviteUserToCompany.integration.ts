@@ -5,7 +5,7 @@ import {
   userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "src/prisma";
 import { AuthType } from "../../../../auth";
 
 const INVITE_USER_TO_COMPANY = `
@@ -39,14 +39,16 @@ describe("mutation inviteUserToCompany", () => {
       { email: admin.email },
       { email: user.email }
     ]);
-    const companyAssociations = await prisma
-      .user({ id: user.id })
+    const companyAssociations = await prisma.user
+      .findOne({ where: { id: user.id } })
       .companyAssociations();
     expect(companyAssociations).toHaveLength(1);
     expect(companyAssociations[0].role).toEqual("MEMBER");
-    const userCompany = await prisma
-      .companyAssociation({
-        id: companyAssociations[0].id
+    const userCompany = await prisma.companyAssociation
+      .findOne({
+        where: {
+          id: companyAssociations[0].id
+        }
       })
       .company();
     expect(userCompany.siret).toEqual(company.siret);
@@ -69,7 +71,7 @@ describe("mutation inviteUserToCompany", () => {
     });
 
     // Check userAccountHash has been successfully created
-    const hashes = await prisma.userAccountHashes({
+    const hashes = await prisma.userAccountHash.findMany({
       where: { email: invitedUserEmail, companySiret: company.siret }
     });
     expect(hashes.length).toEqual(1);

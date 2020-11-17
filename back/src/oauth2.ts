@@ -1,5 +1,6 @@
+import { Grant } from "@prisma/client";
 import oauth2orize, { TokenError } from "oauth2orize";
-import { prisma, Grant, User, Application } from "./generated/prisma-client/";
+import prisma from "src/prisma";
 import { getUid } from "./utils";
 
 // Create OAuth 2.0 server
@@ -16,7 +17,7 @@ export const oauth2server = oauth2orize.createServer();
 oauth2server.serializeClient((client, done) => done(null, client.id));
 
 oauth2server.deserializeClient(async (id, done) => {
-  const client = await prisma.application({ id });
+  const client = await prisma.application.findOne({ where: { id } });
   return done(null, client);
 });
 
@@ -35,12 +36,14 @@ oauth2server.deserializeClient(async (id, done) => {
 // values, and will be exchanged for an access token.
 oauth2server.grant(
   oauth2orize.grant.code(async (client, redirectUri, user, _ares, done) => {
-    const grant = await prisma.createGrant({
-      user: { connect: { id: user.id } },
-      code: getUid(16),
-      application: { connect: { id: client.id } },
-      expires: 10 * 60, // recommended by https://tools.ietf.org/html/rfc6749#section-4.1.2
-      redirectUri
+    const grant = await prisma.grant.create({
+      data: {
+        user: { connect: { id: user.id } },
+        code: getUid(16),
+        application: { connect: { id: client.id } },
+        expires: 10 * 60, // recommended by https://tools.ietf.org/html/rfc6749#section-4.1.2
+        redirectUri
+      }
     });
     done(null, grant.code);
   })
@@ -61,22 +64,10 @@ export const tokenErrorMessages = {
 // custom parameters by adding these to the `done()` call
 oauth2server.exchange(
   oauth2orize.exchange.code(async (client, code, redirectUri, done) => {
-    const fragment = `fragment GrantWithUserAndApplication on Grant {
-      createdAt
-      code
-      expires
-      redirectUri
-      user { id, name, email }
-      application { id }
-    }`;
-
-    type GrantWithUserAndApplication = Grant & { user: User } & {
-      application: Application;
-    };
-
-    const grant = await prisma
-      .grant({ code })
-      .$fragment<GrantWithUserAndApplication>(fragment);
+    const grant = await prisma.grant.findFirst({
+      where: { code },
+      include: { user: true, application: true }
+    });
     if (!grant) {
       const err = new TokenError(
         tokenErrorMessages.invalid_code,
@@ -108,14 +99,16 @@ oauth2server.exchange(
 
     const token = getUid(40);
 
-    const accessToken = await prisma.createAccessToken({
-      user: {
-        connect: { id: grant.user.id }
-      },
-      application: {
-        connect: { id: grant.application.id }
-      },
-      token
+    const accessToken = await prisma.accessToken.create({
+      data: {
+        user: {
+          connect: { id: grant.user.id }
+        },
+        application: {
+          connect: { id: grant.application.id }
+        },
+        token
+      }
     });
 
     // Add custom params

@@ -1,4 +1,4 @@
-import { Form, TemporaryStorageDetail } from "../../generated/prisma-client";
+import { Form, TemporaryStorageDetail } from "@prisma/client";
 
 export type FormExpanded = Partial<Form> & {
   temporaryStorageDetail?: Partial<TemporaryStorageDetail>;

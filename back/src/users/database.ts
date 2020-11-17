@@ -2,27 +2,30 @@
  * PRISMA HELPER FUNCTIONS
  */
 
+import prisma from "src/prisma";
 import {
-  prisma,
   User,
   UserRole,
   UserAccountHashWhereInput,
   CompanyAssociationWhereInput,
   Company,
-  MembershipRequestWhereUniqueInput
-} from "../generated/prisma-client";
+  MembershipRequestWhereUniqueInput,
+  UserAccountHash
+} from "@prisma/client";
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail } from "../utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
-  const companyAssociations = await prisma
-    .user({ id: userId })
+  const companyAssociations = await prisma.user
+    .findOne({ where: { id: userId } })
     .companyAssociations();
   return Promise.all(
     companyAssociations.map(association => {
-      return prisma.companyAssociation({ id: association.id }).company();
+      return prisma.companyAssociation
+        .findOne({ where: { id: association.id } })
+        .company();
     })
   );
 }
@@ -52,7 +55,7 @@ export async function createUserAccountHash(
   siret: string
 ) {
   // check for existing records
-  const existingHashes = await prisma.userAccountHashes({
+  const existingHashes = await prisma.userAccountHash.findMany({
     where: { email, companySiret: siret }
   });
 
@@ -67,11 +70,13 @@ export async function createUserAccountHash(
     10
   );
 
-  return prisma.createUserAccountHash({
-    hash: userAccoutHash,
-    email,
-    role,
-    companySiret: siret
+  return prisma.userAccountHash.create({
+    data: {
+      hash: userAccoutHash,
+      email,
+      role,
+      companySiret: siret
+    }
   });
 }
 
@@ -84,7 +89,7 @@ export async function createUserAccountHash(
  */
 export async function associateUserToCompany(userId, siret, role) {
   // check for current associations
-  const associations = await prisma.companyAssociations({
+  const associations = await prisma.companyAssociation.findMany({
     where: {
       user: {
         id: userId
@@ -101,29 +106,33 @@ export async function associateUserToCompany(userId, siret, role) {
     );
   }
 
-  return prisma.createCompanyAssociation({
-    user: { connect: { id: userId } },
-    role,
-    company: { connect: { siret } }
+  return prisma.companyAssociation.create({
+    data: {
+      user: { connect: { id: userId } },
+      role,
+      company: { connect: { siret } }
+    }
   });
 }
 
 export async function getUserAccountHashOrNotFound(
   where: UserAccountHashWhereInput
 ) {
-  const userAccountHashes = await prisma.userAccountHashes({
+  const userAccountHashes = await prisma.userAccountHash.findMany({
     where
   });
   if (userAccountHashes.length === 0) {
     throw new UserInputError("Cette invitation n'existe pas");
   }
-  return userAccountHashes[0];
+  return stringifyDates(userAccountHashes[0]);
 }
 
 export async function getCompanyAssociationOrNotFound(
   where: CompanyAssociationWhereInput
 ) {
-  const companyAssociations = await prisma.companyAssociations({ where });
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where
+  });
   if (companyAssociations.length === 0) {
     throw new UserInputError(`L'utilisateur n'est pas membre de l'entreprise`);
   }
@@ -132,19 +141,24 @@ export async function getCompanyAssociationOrNotFound(
 
 export async function createAccessToken(user: User) {
   const token = getUid(40);
-  const accessToken = await prisma.createAccessToken({
-    user: {
-      connect: { id: user.id }
-    },
-    token
+  const accessToken = await prisma.accessToken.create({
+    data: {
+      user: {
+        connect: { id: user.id }
+      },
+      token
+    }
   });
   return accessToken;
 }
 
-export function userExists(unsafeEmail: string) {
-  return prisma.$exists.user({
-    email: sanitizeEmail(unsafeEmail)
+export async function userExists(unsafeEmail: string) {
+  const count = await prisma.user.count({
+    where: {
+      email: sanitizeEmail(unsafeEmail)
+    }
   });
+  return count >= 1;
 }
 
 /**
@@ -152,7 +166,7 @@ export function userExists(unsafeEmail: string) {
  * @param user
  */
 export async function acceptNewUserCompanyInvitations(user: User) {
-  const existingHashes = await prisma.userAccountHashes({
+  const existingHashes = await prisma.userAccountHash.findMany({
     where: { email: user.email }
   });
 
@@ -162,17 +176,19 @@ export async function acceptNewUserCompanyInvitations(user: User) {
 
   await Promise.all(
     existingHashes.map(existingHash =>
-      prisma.createCompanyAssociation({
-        company: { connect: { siret: existingHash.companySiret } },
-        user: { connect: { id: user.id } },
-        role: existingHash.role
+      prisma.companyAssociation.create({
+        data: {
+          company: { connect: { siret: existingHash.companySiret } },
+          user: { connect: { id: user.id } },
+          role: existingHash.role
+        }
       })
     )
   );
 
-  return prisma.updateManyUserAccountHashes({
+  return prisma.userAccountHash.updateMany({
     where: {
-      id_in: existingHashes.map(h => h.id)
+      id: { in: existingHashes.map(h => h.id) }
     },
     data: { acceptedAt: new Date().toISOString() }
   });
@@ -181,9 +197,16 @@ export async function acceptNewUserCompanyInvitations(user: User) {
 export async function getMembershipRequestOrNotFoundError(
   where: MembershipRequestWhereUniqueInput
 ) {
-  const membershipRequest = await prisma.membershipRequest(where);
+  const membershipRequest = await prisma.membershipRequest.findOne({ where });
   if (!membershipRequest) {
     throw new UserInputError("Cette demande de rattachement n'existe pas");
   }
   return membershipRequest;
+}
+
+export function stringifyDates(obj: UserAccountHash) {
+  return {
+    ...obj,
+    ...(obj.acceptedAt && { acceptedAt: obj.acceptedAt.toISOString() })
+  };
 }

@@ -1,16 +1,16 @@
 import { addDays, format, subDays } from "date-fns";
-import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Form,
   FormCreateInput,
-  prisma
-} from "../../../../generated/prisma-client";
+} from "@prisma/client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
   companyFactory,
   formFactory,
-  userWithCompanyFactory,
   transportSegmentFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -167,10 +167,12 @@ describe("Query.forms", () => {
   it("should filter by siret", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const otherCompany = await companyFactory();
-    await prisma.createCompanyAssociation({
-      company: { connect: { id: otherCompany.id } },
-      user: { connect: { id: user.id } },
-      role: "ADMIN"
+    await prisma.companyAssociation.create({
+      data: {
+        company: { connect: { id: otherCompany.id } },
+        user: { connect: { id: user.id } },
+        role: "ADMIN"
+      }
     });
 
     // 1 form on each company
@@ -551,10 +553,12 @@ describe("Query.forms", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const otherCompany = await companyFactory();
 
-    await prisma.createCompanyAssociation({
-      company: { connect: { id: otherCompany.id } },
-      user: { connect: { id: user.id } },
-      role: "ADMIN"
+    await prisma.companyAssociation.create({
+      data: {
+        company: { connect: { id: otherCompany.id } },
+        user: { connect: { id: user.id } },
+        role: "ADMIN"
+      }
     });
 
     // 1 form on each company

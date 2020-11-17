@@ -3,7 +3,7 @@ import { FormsRegisterExportType } from "../../generated/graphql/types";
 /**
  * Returns Form fragment for each export
  */
-export function formFragment(exportType: FormsRegisterExportType) {
+export function formFieldsSelection(exportType: FormsRegisterExportType) {
   return {
     OUTGOING: outgoingWasteFragment,
     INCOMING: incomingWasteFragment,
@@ -13,305 +13,293 @@ export function formFragment(exportType: FormsRegisterExportType) {
   }[exportType];
 }
 
-const outgoingWasteFragment = `
-  fragment OutgoingWasteFragment on Form {
-    readableId
-    customId
-    emitterWorkSiteName
-    emitterWorkSiteAddress
-    ecoOrganismeName
-    recipientCompanySiret
-    recipientCompanyName
-    recipientCompanyAddress
-    recipientCompanyMail
-    recipientCompanyPhone
-    recipientCompanyContact
-    recipientProcessingOperation
-    recipientIsTempStorage
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-      destinationCompanyPhone
-      destinationCompanyContact
-      destinationProcessingOperation
-      transporterCompanySiret
-      transporterCompanyName
-      transporterCompanyAddress
-      transporterIsExemptedOfReceipt
-      transporterReceipt
-      transporterValidityLimit
-      transporterNumberPlate
+const outgoingWasteFragment = {
+  readableId: true,
+  customId: true,
+  emitterWorkSiteName: true,
+  emitterWorkSiteAddress: true,
+  ecoOrganismeName: true,
+  recipientCompanySiret: true,
+  recipientCompanyName: true,
+  recipientCompanyAddress: true,
+  recipientCompanyMail: true,
+  recipientCompanyPhone: true,
+  recipientCompanyContact: true,
+  recipientProcessingOperation: true,
+  recipientIsTempStorage: true,
+  temporaryStorageDetail: {
+    select: {
+      destinationCompanySiret: true,
+      destinationCompanyName: true,
+      destinationCompanyAddress: true,
+      destinationCompanyMail: true,
+      destinationCompanyPhone: true,
+      destinationCompanyContact: true,
+      destinationProcessingOperation: true,
+      transporterCompanySiret: true,
+      transporterCompanyName: true,
+      transporterCompanyAddress: true,
+      transporterIsExemptedOfReceipt: true,
+      transporterReceipt: true,
+      transporterValidityLimit: true,
+      transporterNumberPlate: true
     }
-    quantityReceived
-    processingOperationDone
-    wasteDetailsCode
-    wasteDetailsQuantity
-    wasteDetailsPop
-    traderCompanyName
-    traderCompanySiret
-    traderReceipt
-    traderValidityLimit
-    traderCompanyContact
-    traderCompanyAddress
-    transporterCompanySiret
-    transporterCompanyName
-    transporterCompanyAddress
-    transporterIsExemptedOfReceipt
-    transporterReceipt
-    transporterValidityLimit
-    transporterNumberPlate
-    sentAt
-    nextDestinationProcessingOperation
-    nextDestinationCompanyName
-    nextDestinationCompanyContact
-    nextDestinationCompanyMail
-    nextDestinationCompanyPhone
-    nextDestinationCompanyAddress
-    nextDestinationCompanyCountry
-  }
-`;
+  },
+  quantityReceived: true,
+  processingOperationDone: true,
+  wasteDetailsCode: true,
+  wasteDetailsQuantity: true,
+  wasteDetailsPop: true,
+  traderCompanyName: true,
+  traderCompanySiret: true,
+  traderReceipt: true,
+  traderValidityLimit: true,
+  traderCompanyContact: true,
+  traderCompanyAddress: true,
+  transporterCompanySiret: true,
+  transporterCompanyName: true,
+  transporterCompanyAddress: true,
+  transporterIsExemptedOfReceipt: true,
+  transporterReceipt: true,
+  transporterValidityLimit: true,
+  transporterNumberPlate: true,
+  sentAt: true,
+  nextDestinationProcessingOperation: true,
+  nextDestinationCompanyName: true,
+  nextDestinationCompanyContact: true,
+  nextDestinationCompanyMail: true,
+  nextDestinationCompanyPhone: true,
+  nextDestinationCompanyAddress: true,
+  nextDestinationCompanyCountry: true
+};
 
-const incomingWasteFragment = `
-  fragment IncomingWasteFragment on Form {
-    readableId
-    customId
-    emitterCompanySiret
-    emitterCompanyName
-    emitterCompanyContact
-    emitterCompanyAddress
-    emitterWorkSiteName
-    emitterWorkSiteAddress
-    ecoOrganismeName
-    recipientProcessingOperation
-    recipientIsTempStorage
-    quantityReceived
-    wasteDetailsCode
-    wasteDetailsPop
-    traderCompanyName
-    traderCompanySiret
-    traderReceipt
-    traderValidityLimit
-    traderCompanyContact
-    traderCompanyAddress
-    transporterCompanySiret
-    transporterCompanyName
-    transporterCompanyAddress
-    transporterIsExemptedOfReceipt
-    transporterReceipt
-    transporterValidityLimit
-    transporterNumberPlate
-    processingOperationDone
-    receivedAt
-    isAccepted
-    nextDestinationProcessingOperation
-    nextDestinationCompanyName
-    nextDestinationCompanyContact
-    nextDestinationCompanyMail
-    nextDestinationCompanyPhone
-    nextDestinationCompanyAddress
-    nextDestinationCompanyCountry
-  }
-`;
-const transportedWasteFragment = `
-  fragment TransportedWasteFragment on Form {
-    readableId
-    customId
-    emitterCompanySiret
-    emitterCompanyName
-    emitterCompanyContact
-    emitterCompanyAddress
-    emitterWorkSiteName
-    emitterWorkSiteAddress
-    ecoOrganismeName
-    recipientCompanySiret
-    recipientCompanyName
-    recipientCompanyAddress
-    recipientCompanyMail
-    recipientCompanyPhone
-    recipientCompanyContact
-    recipientProcessingOperation
-    recipientIsTempStorage
-    quantityReceived
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-      destinationCompanyPhone
-      destinationCompanyContact
-      destinationProcessingOperation
-      transporterCompanySiret
-      transporterCompanyName
-      transporterCompanyAddress
-      transporterIsExemptedOfReceipt
-      transporterReceipt
-      transporterValidityLimit
-      transporterNumberPlate
-    }
-    traderCompanyName
-    traderCompanySiret
-    traderReceipt
-    traderValidityLimit
-    traderCompanyContact
-    traderCompanyAddress
-    traderCompanyName
-    traderCompanySiret
-    traderReceipt
-    traderValidityLimit
-    traderCompanyContact
-    traderCompanyAddress
-    recipientCompanySiret
-    recipientCompanyName
-    recipientCompanyAddress
-    recipientCompanyMail
-    recipientProcessingOperation
-    wasteDetailsCode
-    wasteDetailsPop
-    transporterNumberPlate
-    sentAt
-    receivedAt
-    isAccepted
-    nextDestinationProcessingOperation
-    nextDestinationCompanyName
-    nextDestinationCompanyContact
-    nextDestinationCompanyMail
-    nextDestinationCompanyPhone
-    nextDestinationCompanyAddress
-    nextDestinationCompanyCountry
-  }
-`;
-const tradedWasteFragment = `
-  fragment TradedWasteFragment on Form {
-    readableId
-    customId
-    emitterCompanySiret
-    emitterCompanyName
-    emitterCompanyContact
-    emitterCompanyAddress
-    emitterWorkSiteName
-    emitterWorkSiteAddress
-    ecoOrganismeName
-    recipientCompanySiret
-    recipientCompanyName
-    recipientCompanyAddress
-    recipientCompanyMail
-    recipientCompanyPhone
-    recipientCompanyContact
-    recipientProcessingOperation
-    recipientIsTempStorage
-    quantityReceived
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-      destinationCompanyPhone
-      destinationCompanyContact
-      destinationProcessingOperation
-      transporterCompanySiret
-      transporterCompanyName
-      transporterCompanyAddress
-      transporterIsExemptedOfReceipt
-      transporterReceipt
-      transporterValidityLimit
-      transporterNumberPlate
-    }
-    wasteDetailsCode
-    wasteDetailsQuantity
-    wasteDetailsPop
-    traderCompanyName
-    traderCompanySiret
-    traderReceipt
-    traderValidityLimit
-    traderCompanyContact
-    traderCompanyAddress
-    transporterCompanySiret
-    transporterCompanyName
-    transporterCompanyAddress
-    transporterIsExemptedOfReceipt
-    transporterReceipt
-    transporterValidityLimit
-    transporterNumberPlate
-    sentAt
-    receivedAt
-    isAccepted
-    processingOperationDone
-    noTraceability
-    nextDestinationProcessingOperation
-    nextDestinationCompanyName
-    nextDestinationCompanyContact
-    nextDestinationCompanyMail
-    nextDestinationCompanyPhone
-    nextDestinationCompanyAddress
-    nextDestinationCompanyCountry
-  }
-`;
+const incomingWasteFragment = {
+  readableId: true,
+  customId: true,
+  emitterCompanySiret: true,
+  emitterCompanyName: true,
+  emitterCompanyContact: true,
+  emitterCompanyAddress: true,
+  emitterWorkSiteName: true,
+  emitterWorkSiteAddress: true,
+  ecoOrganismeName: true,
+  recipientProcessingOperation: true,
+  recipientIsTempStorage: true,
+  quantityReceived: true,
+  wasteDetailsCode: true,
+  wasteDetailsPop: true,
+  traderCompanyName: true,
+  traderCompanySiret: true,
+  traderReceipt: true,
+  traderValidityLimit: true,
+  traderCompanyContact: true,
+  traderCompanyAddress: true,
+  transporterCompanySiret: true,
+  transporterCompanyName: true,
+  transporterCompanyAddress: true,
+  transporterIsExemptedOfReceipt: true,
+  transporterReceipt: true,
+  transporterValidityLimit: true,
+  transporterNumberPlate: true,
+  processingOperationDone: true,
+  receivedAt: true,
+  isAccepted: true,
+  nextDestinationProcessingOperation: true,
+  nextDestinationCompanyName: true,
+  nextDestinationCompanyContact: true,
+  nextDestinationCompanyMail: true,
+  nextDestinationCompanyPhone: true,
+  nextDestinationCompanyAddress: true,
+  nextDestinationCompanyCountry: true
+};
 
-const allWasteFragment = `
-  fragment AllWasteFragment on Form {
-    readableId
-    customId
-    emitterCompanySiret
-    emitterCompanyName
-    emitterCompanyContact
-    emitterCompanyAddress
-    emitterWorkSiteName
-    emitterWorkSiteAddress
-    ecoOrganismeName
-    recipientCompanySiret
-    recipientCompanyName
-    recipientCompanyAddress
-    recipientCompanyMail
-    recipientCompanyPhone
-    recipientCompanyContact
-    recipientProcessingOperation
-    recipientIsTempStorage
-    quantityReceived
-    temporaryStorageDetail {
-      destinationCompanySiret
-      destinationCompanyName
-      destinationCompanyAddress
-      destinationCompanyMail
-      destinationCompanyPhone
-      destinationCompanyContact
-      destinationProcessingOperation
-      transporterCompanySiret
-      transporterCompanyName
-      transporterCompanyAddress
-      transporterIsExemptedOfReceipt
-      transporterReceipt
-      transporterValidityLimit
-      transporterNumberPlate
+const transportedWasteFragment = {
+  readableId: true,
+  customId: true,
+  emitterCompanySiret: true,
+  emitterCompanyName: true,
+  emitterCompanyContact: true,
+  emitterCompanyAddress: true,
+  emitterWorkSiteName: true,
+  emitterWorkSiteAddress: true,
+  ecoOrganismeName: true,
+  recipientCompanySiret: true,
+  recipientCompanyName: true,
+  recipientCompanyAddress: true,
+  recipientCompanyMail: true,
+  recipientCompanyPhone: true,
+  recipientCompanyContact: true,
+  recipientProcessingOperation: true,
+  recipientIsTempStorage: true,
+  quantityReceived: true,
+  temporaryStorageDetail: {
+    select: {
+      destinationCompanySiret: true,
+      destinationCompanyName: true,
+      destinationCompanyAddress: true,
+      destinationCompanyMail: true,
+      destinationCompanyPhone: true,
+      destinationCompanyContact: true,
+      destinationProcessingOperation: true,
+      transporterCompanySiret: true,
+      transporterCompanyName: true,
+      transporterCompanyAddress: true,
+      transporterIsExemptedOfReceipt: true,
+      transporterReceipt: true,
+      transporterValidityLimit: true,
+      transporterNumberPlate: true
     }
-    wasteDetailsCode
-    wasteDetailsQuantity
-    wasteDetailsPop
-    traderCompanyName
-    traderCompanySiret
-    traderReceipt
-    traderValidityLimit
-    traderCompanyContact
-    traderCompanyAddress
-    transporterCompanySiret
-    transporterCompanyName
-    transporterCompanyAddress
-    transporterIsExemptedOfReceipt
-    transporterReceipt
-    transporterValidityLimit
-    transporterNumberPlate
-    sentAt
-    receivedAt
-    isAccepted
-    processingOperationDone
-    noTraceability
-    nextDestinationProcessingOperation
-    nextDestinationCompanyName
-    nextDestinationCompanyContact
-    nextDestinationCompanyMail
-    nextDestinationCompanyPhone
-    nextDestinationCompanyAddress
-    nextDestinationCompanyCountry
-  }
-`;
+  },
+  traderCompanyName: true,
+  traderCompanySiret: true,
+  traderReceipt: true,
+  traderValidityLimit: true,
+  traderCompanyContact: true,
+  traderCompanyAddress: true,
+  wasteDetailsCode: true,
+  wasteDetailsPop: true,
+  transporterNumberPlate: true,
+  sentAt: true,
+  receivedAt: true,
+  isAccepted: true,
+  nextDestinationProcessingOperation: true,
+  nextDestinationCompanyName: true,
+  nextDestinationCompanyContact: true,
+  nextDestinationCompanyMail: true,
+  nextDestinationCompanyPhone: true,
+  nextDestinationCompanyAddress: true,
+  nextDestinationCompanyCountry: true
+};
+const tradedWasteFragment = {
+  readableId: true,
+  customId: true,
+  emitterCompanySiret: true,
+  emitterCompanyName: true,
+  emitterCompanyContact: true,
+  emitterCompanyAddress: true,
+  emitterWorkSiteName: true,
+  emitterWorkSiteAddress: true,
+  ecoOrganismeName: true,
+  recipientCompanySiret: true,
+  recipientCompanyName: true,
+  recipientCompanyAddress: true,
+  recipientCompanyMail: true,
+  recipientCompanyPhone: true,
+  recipientCompanyContact: true,
+  recipientProcessingOperation: true,
+  recipientIsTempStorage: true,
+  quantityReceived: true,
+  temporaryStorageDetail: {
+    select: {
+      destinationCompanySiret: true,
+      destinationCompanyName: true,
+      destinationCompanyAddress: true,
+      destinationCompanyMail: true,
+      destinationCompanyPhone: true,
+      destinationCompanyContact: true,
+      destinationProcessingOperation: true,
+      transporterCompanySiret: true,
+      transporterCompanyName: true,
+      transporterCompanyAddress: true,
+      transporterIsExemptedOfReceipt: true,
+      transporterReceipt: true,
+      transporterValidityLimit: true,
+      transporterNumberPlate: true
+    }
+  },
+  wasteDetailsCode: true,
+  wasteDetailsQuantity: true,
+  wasteDetailsPop: true,
+  traderCompanyName: true,
+  traderCompanySiret: true,
+  traderReceipt: true,
+  traderValidityLimit: true,
+  traderCompanyContact: true,
+  traderCompanyAddress: true,
+  transporterCompanySiret: true,
+  transporterCompanyName: true,
+  transporterCompanyAddress: true,
+  transporterIsExemptedOfReceipt: true,
+  transporterReceipt: true,
+  transporterValidityLimit: true,
+  transporterNumberPlate: true,
+  sentAt: true,
+  receivedAt: true,
+  isAccepted: true,
+  processingOperationDone: true,
+  noTraceability: true,
+  nextDestinationProcessingOperation: true,
+  nextDestinationCompanyName: true,
+  nextDestinationCompanyContact: true,
+  nextDestinationCompanyMail: true,
+  nextDestinationCompanyPhone: true,
+  nextDestinationCompanyAddress: true,
+  nextDestinationCompanyCountry: true
+};
+
+const allWasteFragment = {
+  readableId: true,
+  customId: true,
+  emitterCompanySiret: true,
+  emitterCompanyName: true,
+  emitterCompanyContact: true,
+  emitterCompanyAddress: true,
+  emitterWorkSiteName: true,
+  emitterWorkSiteAddress: true,
+  ecoOrganismeName: true,
+  recipientCompanySiret: true,
+  recipientCompanyName: true,
+  recipientCompanyAddress: true,
+  recipientCompanyMail: true,
+  recipientCompanyPhone: true,
+  recipientCompanyContact: true,
+  recipientProcessingOperation: true,
+  recipientIsTempStorage: true,
+  quantityReceived: true,
+  temporaryStorageDetail: {
+    select: {
+      destinationCompanySiret: true,
+      destinationCompanyName: true,
+      destinationCompanyAddress: true,
+      destinationCompanyMail: true,
+      destinationCompanyPhone: true,
+      destinationCompanyContact: true,
+      destinationProcessingOperation: true,
+      transporterCompanySiret: true,
+      transporterCompanyName: true,
+      transporterCompanyAddress: true,
+      transporterIsExemptedOfReceipt: true,
+      transporterReceipt: true,
+      transporterValidityLimit: true,
+      transporterNumberPlate: true
+    }
+  },
+  wasteDetailsCode: true,
+  wasteDetailsQuantity: true,
+  wasteDetailsPop: true,
+  traderCompanyName: true,
+  traderCompanySiret: true,
+  traderReceipt: true,
+  traderValidityLimit: true,
+  traderCompanyContact: true,
+  traderCompanyAddress: true,
+  transporterCompanySiret: true,
+  transporterCompanyName: true,
+  transporterCompanyAddress: true,
+  transporterIsExemptedOfReceipt: true,
+  transporterReceipt: true,
+  transporterValidityLimit: true,
+  transporterNumberPlate: true,
+  sentAt: true,
+  receivedAt: true,
+  isAccepted: true,
+  processingOperationDone: true,
+  noTraceability: true,
+  nextDestinationProcessingOperation: true,
+  nextDestinationCompanyName: true,
+  nextDestinationCompanyContact: true,
+  nextDestinationCompanyMail: true,
+  nextDestinationCompanyPhone: true,
+  nextDestinationCompanyAddress: true,
+  nextDestinationCompanyCountry: true
+};

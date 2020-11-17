@@ -2,7 +2,7 @@ import {
   userWithCompanyFactory,
   userFactory
 } from "../../../../__tests__/factories";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "src/prisma";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -17,19 +17,24 @@ describe("mutation removeUserFromCompany", () => {
   afterEach(resetDatabase);
 
   function isMemberFn(userId: string, siret: string) {
-    return prisma.$exists.companyAssociation({
-      user: { id: userId },
-      company: { siret }
+    const elem = prisma.companyAssociation.findFirst({
+      where: {
+        user: { id: userId },
+        company: { siret }
+      }
     });
+    return elem != null;
   }
 
   it("should remove a user from a company", async () => {
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");
     const user = await userFactory();
-    await prisma.createCompanyAssociation({
-      user: { connect: { id: user.id } },
-      company: { connect: { id: company.id } },
-      role: "MEMBER"
+    await prisma.companyAssociation.create({
+      data: {
+        user: { connect: { id: user.id } },
+        company: { connect: { id: company.id } },
+        role: "MEMBER"
+      }
     });
     let isMember = await isMemberFn(user.id, company.siret);
     expect(isMember).toEqual(true);

@@ -1,8 +1,8 @@
+import prisma from "src/prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
 
 const ecoOrganismeResolver: QueryResolvers["ecoOrganismes"] = () => {
-  return prisma.ecoOrganismes();
+  return prisma.ecoOrganisme.findMany();
 };
 
 export default ecoOrganismeResolver;

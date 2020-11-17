@@ -1,8 +1,8 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
-import { AuthType } from "../../../../auth";
 
 describe("{ mutation { updateTraderReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -14,10 +14,10 @@ describe("{ mutation { updateTraderReceipt } }", () => {
       department: "07"
     };
 
-    const receiptId = await prisma.createTraderReceipt(receipt).id();
+    const createdReceipt = await prisma.traderReceipt.create({ data: receipt });
     const { user, company } = await userWithCompanyFactory("ADMIN");
-    await prisma.updateCompany({
-      data: { traderReceipt: { connect: { id: receiptId } } },
+    await prisma.company.update({
+      data: { traderReceipt: { connect: { id: createdReceipt.id } } },
       where: { id: company.id }
     });
 
@@ -31,7 +31,7 @@ describe("{ mutation { updateTraderReceipt } }", () => {
       mutation {
         updateTraderReceipt(
           input: {
-            id: "${receiptId}"
+            id: "${createdReceipt.id}"
             receiptNumber: "${update.receiptNumber}"
             validityLimit: "${update.validityLimit}"
             department: "${update.department}"
@@ -46,8 +46,8 @@ describe("{ mutation { updateTraderReceipt } }", () => {
     expect(data.updateTraderReceipt).toEqual(update);
 
     // check record was modified in db
-    const { id, ...updated } = await prisma.traderReceipt({
-      id: receiptId
+    const { id, ...updated } = await prisma.traderReceipt.findOne({
+      where: { id: createdReceipt.id }
     });
     expect(updated).toEqual(update);
   });

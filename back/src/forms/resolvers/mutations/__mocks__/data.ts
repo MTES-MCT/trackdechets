@@ -1,9 +1,5 @@
 import { GraphQLContext } from "../../../../types";
-import {
-  EmitterType,
-  QuantityType,
-  Form as PrismaForm
-} from "../../../../generated/prisma-client";
+import { EmitterType, QuantityType, Form as PrismaForm } from "@prisma/client";
 import { Form as GraphQLForm } from "../../../../generated/graphql/types";
 
 export function getNewValidPrismaForm(): PrismaForm {

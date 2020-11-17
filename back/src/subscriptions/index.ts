@@ -1,4 +1,3 @@
-import { prisma } from "../generated/prisma-client";
 import { companiesSubscriptionCallback } from "./companies";
 import { formsSubscriptionCallback } from "./forms";
 
@@ -9,11 +8,11 @@ type Subscription = {
 
 const subscriptions: Subscription[] = [
   {
-    iterable: () => prisma.$subscribe.form(),
+    iterable: () => null, //TODO-PRISMA prisma.$subscribe.form(),
     callback: formsSubscriptionCallback
   },
   {
-    iterable: () => prisma.$subscribe.company(),
+    iterable: () => null, //TODO-PRISMA prisma.$subscribe.company(),
     callback: companiesSubscriptionCallback
   }
 ];
@@ -21,23 +20,22 @@ const subscriptions: Subscription[] = [
 const activeSubscriptions: AsyncIterator<any>[] = [];
 
 export function initSubscriptions() {
-  subscriptions.map(async sub => {
-    try {
-      const asyncIterator = await sub.iterable();
-      activeSubscriptions.push(asyncIterator);
-
-      while (true) {
-        const payload = await asyncIterator.next();
-        if (payload.done) {
-          break;
-        }
-
-        sub.callback(payload.value);
-      }
-    } catch (err) {
-      console.error("Error while setting up or triggering subscription", err);
-    }
-  });
+  // TODO-PRISMA
+  // subscriptions.map(async sub => {
+  //   try {
+  //     const asyncIterator = await sub.iterable();
+  //     activeSubscriptions.push(asyncIterator);
+  //     while (true) {
+  //       const payload = await asyncIterator.next();
+  //       if (payload.done) {
+  //         break;
+  //       }
+  //       sub.callback(payload.value);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error while setting up or triggering subscription", err);
+  //   }
+  // });
 }
 
 export function closeSubscriptions() {

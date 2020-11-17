@@ -8,9 +8,9 @@ import {
   Company,
   CompanyType,
   FormWhereInput,
-  prisma,
   TemporaryStorageDetail
-} from "../../../generated/prisma-client";
+} from "@prisma/client";
+import prisma from "src/prisma"
 import { searchCompany } from "../../sirene";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -94,7 +94,7 @@ async function getRecentPartners(
 
   switch (type) {
     case "TEMPORARY_STORAGE_DETAIL": {
-      const forms = await prisma.forms({
+      const forms = await prisma.form.findMany({
         ...defaultArgs,
         where: {
           ...defaultWhere,
@@ -117,7 +117,7 @@ async function getRecentPartners(
       }));
     }
     case "DESTINATION": {
-      const forms = await prisma.forms({
+      const forms = await prisma.form.findMany({
         ...defaultArgs,
         where: {
           ...defaultWhere,
@@ -157,7 +157,7 @@ async function getRecentPartners(
     case "TRADER":
     case "NEXT_DESTINATION": {
       const lowerType = camelCase(type);
-      const forms = await prisma.forms({
+      const forms = await prisma.form.findMany({
         ...defaultArgs,
         where: {
           ...defaultWhere,

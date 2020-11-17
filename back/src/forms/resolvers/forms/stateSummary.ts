@@ -1,8 +1,10 @@
-import { FormResolvers, Form } from "../../../generated/graphql/types";
+import { TemporaryStorageDetail } from "@prisma/client";
+import prisma from "src/prisma";
 import {
-  prisma,
-  TemporaryStorageDetail
-} from "../../../generated/prisma-client";
+  Form,
+  FormResolvers,
+  PackagingInfo
+} from "../../../generated/graphql/types";
 
 function getTransporter(
   form: Form,
@@ -79,9 +81,9 @@ function getLastActionOn(
     case "TEMP_STORED":
     case "TEMP_STORER_ACCEPTED":
     case "RESEALED":
-      return temporaryStorageDetail.tempStorerReceivedAt;
+      return temporaryStorageDetail.tempStorerReceivedAt.toString();
     case "RESENT":
-      return temporaryStorageDetail.signedAt;
+      return temporaryStorageDetail.signedAt.toString();
     default:
       return form.createdAt;
   }
@@ -116,12 +118,12 @@ function getQuantity(
 }
 
 export async function getStateSummary(form: Form) {
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
+  const temporaryStorageDetail = await prisma.form
+    .findOne({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   const packagingInfos =
-    temporaryStorageDetail?.wasteDetailsPackagingInfos ??
+    (temporaryStorageDetail?.wasteDetailsPackagingInfos as PackagingInfo[]) ??
     form.wasteDetails?.packagingInfos ??
     [];
 

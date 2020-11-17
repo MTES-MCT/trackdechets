@@ -1,21 +1,18 @@
-import {
-  flattenFormInput,
-  flattenTemporaryStorageDetailInput,
-  expandFormFromDb
-} from "../../form-converter";
-import { getReadableId } from "../../readable-id";
-import {
-  FormCreateInput,
-  Status,
-  prisma
-} from "../../../generated/prisma-client";
+import { FormCreateInput, Status } from "@prisma/client";
+import prisma from "src/prisma";
+import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
-import { MissingTempStorageFlag } from "../../errors";
-import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
+import { MissingTempStorageFlag } from "../../errors";
+import {
+  expandFormFromDb,
+  flattenFormInput,
+  flattenTemporaryStorageDetailInput
+} from "../../form-converter";
+import { getReadableId } from "../../readable-id";
 import { draftFormSchema } from "../../validation";
 import { checkIsFormContributor } from "../../permissions";
 import { FormSirets } from "../../types";
@@ -83,15 +80,17 @@ const createFormResolver = async (
     }
   }
 
-  const newForm = await prisma.createForm(formCreateInput);
+  const newForm = await prisma.form.create({ data: formCreateInput });
 
   // create statuslog when and only when form is created
-  await prisma.createStatusLog({
-    form: { connect: { id: newForm.id } },
-    user: { connect: { id: context.user!.id } },
-    status: newForm.status as Status,
-    updatedFields: {},
-    loggedAt: new Date()
+  await prisma.statusLog.create({
+    data: {
+      form: { connect: { id: newForm.id } },
+      user: { connect: { id: context.user!.id } },
+      status: newForm.status as Status,
+      updatedFields: {},
+      loggedAt: new Date()
+    }
   });
 
   return expandFormFromDb(newForm);

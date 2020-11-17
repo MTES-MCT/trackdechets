@@ -1,19 +1,19 @@
-import { prisma } from "../../../generated/prisma-client";
-import { randomNumber } from "../../../utils";
-import { companyMails } from "../../mails";
-import {
-  getCompanyActiveUsers,
-  getCompanyOrCompanyNotFound
-} from "../../database";
-import { sendMail } from "../../../mailer/mailing";
 import { UserInputError } from "apollo-server-express";
+import prisma from "src/prisma";
+import { applyAuthStrategies, AuthType } from "../../../auth";
+import { sendMail } from "../../../mailer/mailing";
+import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   CompanyPrivate,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { applyAuthStrategies, AuthType } from "../../../auth";
-import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkIsCompanyAdmin } from "../../../users/permissions";
+import { randomNumber } from "../../../utils";
+import {
+  getCompanyActiveUsers,
+  getCompanyOrCompanyNotFound
+} from "../../database";
+import { companyMails } from "../../mails";
 
 /**
  * This function is used to renew the security code
@@ -30,7 +30,7 @@ export async function renewSecurityCodeFn(
     });
   }
 
-  const company = await prisma.company({ siret });
+  const company = await prisma.company.findOne({ where: { siret } });
 
   if (!company) {
     throw new UserInputError(
@@ -49,7 +49,7 @@ export async function renewSecurityCodeFn(
     newSecurityCode = randomNumber(4);
   }
 
-  const updatedCompany = await prisma.updateCompany({
+  const updatedCompany = await prisma.company.update({
     where: { siret },
     data: {
       securityCode: newSecurityCode

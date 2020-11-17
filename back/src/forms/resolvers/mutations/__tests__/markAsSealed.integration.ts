@@ -1,12 +1,12 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
-  userWithCompanyFactory,
-  formFactory,
   companyFactory,
-  userFactory
+  formFactory,
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
@@ -70,12 +70,12 @@ describe("Mutation.markAsSealed", () => {
         }
       });
 
-      form = await prisma.form({ id: form.id });
+      form = await prisma.form.findOne({ where: { id: form.id } });
 
       expect(form.status).toEqual("SEALED");
 
       // check relevant statusLog is created
-      const statusLogs = await prisma.statusLogs({
+      const statusLogs = await prisma.statusLog.findMany({
         where: {
           form: { id: form.id },
           user: { id: user.id },
@@ -95,10 +95,12 @@ describe("Mutation.markAsSealed", () => {
       "MEMBER"
     );
 
-    const eo = await prisma.createEcoOrganisme({
-      name: "An EO",
-      siret: ecoOrganismeCompany.siret,
-      address: "An address"
+    const eo = await prisma.ecoOrganisme.create({
+      data: {
+        name: "An EO",
+        siret: ecoOrganismeCompany.siret,
+        address: "An address"
+      }
     });
 
     let form = await formFactory({
@@ -121,7 +123,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
 
     expect(form.status).toEqual("SEALED");
   });
@@ -130,10 +132,12 @@ describe("Mutation.markAsSealed", () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await companyFactory();
     const { user, company: eo } = await userWithCompanyFactory("MEMBER");
-    await prisma.createEcoOrganisme({
-      name: eo.name,
-      siret: eo.siret,
-      address: "An address"
+    await prisma.ecoOrganisme.create({
+      data: {
+        name: eo.name,
+        siret: eo.siret,
+        address: "An address"
+      }
     });
 
     const form = await formFactory({
@@ -188,7 +192,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
 
-    const resultingForm = await prisma.form({ id: form.id });
+    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
     expect(resultingForm.status).toEqual("DRAFT");
   });
 
@@ -220,11 +224,11 @@ describe("Mutation.markAsSealed", () => {
       "Émetteur: Le contact dans l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
-    form = await prisma.form({ id: form.id });
+    form = await prisma.form.findOne({ where: { id: form.id } });
     expect(form.status).toEqual("DRAFT");
 
     // no statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: { form: { id: form.id }, user: { id: user.id } }
     });
     expect(statusLogs.length).toEqual(0);
@@ -261,12 +265,12 @@ describe("Mutation.markAsSealed", () => {
           "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
-      form = await prisma.form({ id: form.id });
+      form = await prisma.form.findOne({ where: { id: form.id } });
 
       expect(form.status).toEqual("DRAFT");
 
       // check no SEALED statusLog is created
-      const statusLogs = await prisma.statusLogs({
+      const statusLogs = await prisma.statusLog.findMany({
         where: {
           form: { id: form.id },
           user: { id: user.id },
@@ -346,7 +350,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: { status: "DRAFT", emitterCompanySiret: company.siret }
     });
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
@@ -357,7 +361,9 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    const appendix2grouped = await prisma.form({ id: appendix2.id });
+    const appendix2grouped = await prisma.form.findOne({
+      where: { id: appendix2.id }
+    });
     expect(appendix2grouped.status).toEqual("GROUPED");
   });
 });

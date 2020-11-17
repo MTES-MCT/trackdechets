@@ -1,12 +1,12 @@
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { ErrorCode } from "../../../../common/errors";
 import {
+  companyFactory,
   formFactory,
-  userWithCompanyFactory,
-  companyFactory
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { ErrorCode } from "../../../../common/errors";
 
 jest.mock("axios", () => ({
   default: {
@@ -56,7 +56,7 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form({ id: form.id });
+    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
     expect(resultingForm.status).toBe("SENT");
   });
 
@@ -92,7 +92,7 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form({ id: form.id });
+    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
     expect(resultingForm.status).toBe("SENT");
   });
 
@@ -401,7 +401,7 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form({ id: form.id });
+    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
     expect(resultingForm.status).toBe("RESENT");
   });
 });

@@ -1,12 +1,12 @@
-import { prisma } from "../../../generated/prisma-client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
-  userFactory,
-  userWithCompanyFactory,
-  userWithAccessTokenFactory,
   formFactory,
-  statusLogFactory
+  statusLogFactory,
+  userFactory,
+  userWithAccessTokenFactory,
+  userWithCompanyFactory
 } from "../../../__tests__/factories";
-import { resetDatabase } from "../../../../integration-tests/helper";
 import mergeUsers from "../mergeUsers";
 
 describe("mergeUsers", () => {
@@ -24,16 +24,10 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedForm = await prisma
-      .form({ id: form.id })
-      .$fragment<{ id: string; owner: { id: string } }>(
-        `fragment UpdatedForm on Form {
-          id
-          owner {
-            id
-          }
-        }`
-      );
+    const updatedForm = await prisma.form.findOne({
+      where: { id: form.id },
+      include: { owner: { select: { id: true } } }
+    });
     expect(updatedForm.owner.id).toBe(heir.id);
   });
 
@@ -49,16 +43,10 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedStatusLog = await prisma
-      .statusLog({ id: statusLog.id })
-      .$fragment<{ id: string; user: { id: string } }>(
-        `fragment UpdatedStatusLog on StatusLog {
-          id
-          user {
-            id
-          }
-        }`
-      );
+    const updatedStatusLog = await prisma.statusLog.findOne({
+      where: { id: statusLog.id },
+      include: { user: { select: { id: true } } }
+    });
     expect(updatedStatusLog.user.id).toBe(heir.id);
   });
 
@@ -68,7 +56,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const [heirCompanyAssociation] = await prisma.companyAssociations({
+    const [heirCompanyAssociation] = await prisma.companyAssociation.findMany({
       where: { user: { id: heir.id }, company: { id: company.id } }
     });
     expect(heirCompanyAssociation).not.toBe(null);
@@ -77,23 +65,25 @@ describe("mergeUsers", () => {
   it("should upgrade heir role in company", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const heir = await userFactory();
-    await prisma.createCompanyAssociation({
-      role: "MEMBER",
-      user: {
-        connect: {
-          id: heir.id
-        }
-      },
-      company: {
-        connect: {
-          id: company.id
+    await prisma.companyAssociation.create({
+      data: {
+        role: "MEMBER",
+        user: {
+          connect: {
+            id: heir.id
+          }
+        },
+        company: {
+          connect: {
+            id: company.id
+          }
         }
       }
     });
 
     await mergeUsers(user, heir);
 
-    const [heirCompanyAssociation] = await prisma.companyAssociations({
+    const [heirCompanyAssociation] = await prisma.companyAssociation.findMany({
       where: { user: { id: heir.id }, company: { id: company.id } }
     });
     expect(heirCompanyAssociation.role).toBe("ADMIN");
@@ -105,50 +95,38 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedAccessToken = await prisma
-      .accessToken({
-        id: accessToken.id
-      })
-      .$fragment<{ id: string; user: { id: string } }>(
-        `fragment UpdatedAccessToken on AccessToken {
-          id
-          user {
-            id
-          }
-        }`
-      );
+    const updatedAccessToken = await prisma.accessToken.findOne({
+      where: { id: accessToken.id },
+      include: { user: { select: { id: true } } }
+    });
     expect(updatedAccessToken.user.id).toBe(heir.id);
   });
 
   it("should transfer applications to heir", async () => {
     const user = await userFactory();
     const heir = await userFactory();
-    const application = await prisma.createApplication({
-      name: "",
-      clientSecret: "",
-      admins: {
-        connect: [
-          {
-            id: user.id
-          }
-        ]
+    const application = await prisma.application.create({
+      data: {
+        name: "",
+        clientSecret: "",
+        admins: {
+          connect: [
+            {
+              id: user.id
+            }
+          ]
+        }
       }
     });
 
     await mergeUsers(user, heir);
 
-    const updatedApplication = await prisma
-      .application({
+    const updatedApplication = await prisma.application.findOne({
+      where: {
         id: application.id
-      })
-      .$fragment<{ id: string; admins: Array<{ id: string }> }>(
-        `fragment UpdatedApplication on Application {
-          id
-          admins {
-            id
-          }
-        }`
-      );
+      },
+      include: { admins: { select: { id: true } } }
+    });
     expect(
       updatedApplication.admins.find(admin => admin.id === heir.id)
     ).not.toBe(null);

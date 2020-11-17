@@ -1,10 +1,10 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyAdmin } from "../../permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { getCompanyAssociationOrNotFound } from "../../database";
+import { checkIsCompanyAdmin } from "../../permissions";
 
 const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] = async (
   parent,
@@ -19,8 +19,10 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
     user: { id: userId },
     company: { id: company.id }
   });
-  await prisma.deleteCompanyAssociation({ id: companyAssociation.id });
-  return prisma.company({ siret });
+  await prisma.companyAssociation.delete({
+    where: { id: companyAssociation.id }
+  });
+  return prisma.company.findOne({ where: { siret } });
 };
 
 export default removeUserFromCompanyResolver;

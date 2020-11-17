@@ -2,7 +2,7 @@ import {
   Form,
   TemporaryStorageDetail,
   TransportSegment
-} from "../generated/prisma-client";
+} from "@prisma/client";
 
 /**
  * A Prisma Form with linked objects

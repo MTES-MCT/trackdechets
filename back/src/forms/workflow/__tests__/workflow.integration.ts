@@ -1,15 +1,15 @@
-import supertest from "supertest";
-import os from "os";
+import { User } from "@prisma/client";
 import fs from "fs";
+import { resetDatabase } from "integration-tests/helper";
+import os from "os";
 import path from "path";
+import supertest from "supertest";
 import { app } from "../../../server";
-import { companyFactory, userFactory } from "../../../__tests__/factories";
-import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   associateUserToCompany,
   createAccessToken
 } from "../../../users/database";
-import { User } from "../../../generated/prisma-client";
+import { companyFactory, userFactory } from "../../../__tests__/factories";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative

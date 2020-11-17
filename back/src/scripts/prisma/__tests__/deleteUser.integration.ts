@@ -1,12 +1,12 @@
-import { prisma } from "../../../generated/prisma-client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
-  userFactory,
-  userWithCompanyFactory,
-  userWithAccessTokenFactory,
   formFactory,
-  statusLogFactory
+  statusLogFactory,
+  userFactory,
+  userWithAccessTokenFactory,
+  userWithCompanyFactory
 } from "../../../__tests__/factories";
-import { resetDatabase } from "../../../../integration-tests/helper";
 import deleteUser from "../deleteUser";
 
 describe("deleteUser", () => {
@@ -17,7 +17,7 @@ describe("deleteUser", () => {
 
     await deleteUser(user);
 
-    const deletedUser = await prisma.user({ id: user.id });
+    const deletedUser = await prisma.user.findOne({ where: { id: user.id } });
     expect(deletedUser).toBe(null);
   });
 
@@ -54,7 +54,7 @@ describe("deleteUser", () => {
 
     // Change form owner
     const otherUser = await userFactory();
-    await prisma.updateForm({
+    await prisma.form.update({
       data: {
         owner: {
           connect: {
@@ -93,23 +93,25 @@ describe("deleteUser", () => {
   it("should remove user from their companies if there are other admins", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const otherUser = await userFactory();
-    await prisma.createCompanyAssociation({
-      role: "ADMIN",
-      user: {
-        connect: {
-          id: otherUser.id
-        }
-      },
-      company: {
-        connect: {
-          id: company.id
+    await prisma.companyAssociation.create({
+      data: {
+        role: "ADMIN",
+        user: {
+          connect: {
+            id: otherUser.id
+          }
+        },
+        company: {
+          connect: {
+            id: company.id
+          }
         }
       }
     });
 
     await deleteUser(user);
 
-    const companyAssociations = await prisma.companyAssociations({
+    const companyAssociations = await prisma.companyAssociation.findMany({
       where: {
         user: {
           id: user.id
@@ -121,16 +123,18 @@ describe("deleteUser", () => {
 
   it("should delete user activation hashes", async () => {
     const user = await userFactory();
-    await prisma.createUserActivationHash({
-      hash: "123456",
-      user: {
-        connect: { id: user.id }
+    await prisma.userActivationHash.create({
+      data: {
+        hash: "123456",
+        user: {
+          connect: { id: user.id }
+        }
       }
     });
 
     await deleteUser(user);
 
-    const activationHashes = await prisma.userActivationHashes({
+    const activationHashes = await prisma.userActivationHash.findMany({
       where: { user: { id: user.id } }
     });
     expect(activationHashes.length).toBe(0);
@@ -141,7 +145,7 @@ describe("deleteUser", () => {
 
     await deleteUser(user);
 
-    const accessTokens = await prisma.accessTokens({
+    const accessTokens = await prisma.accessToken.findMany({
       where: {
         user: {
           id: user.id
@@ -153,26 +157,28 @@ describe("deleteUser", () => {
 
   it("should delete user grants", async () => {
     const user = await userFactory();
-    await prisma.createGrant({
-      code: "",
-      redirectUri: "",
-      application: {
-        create: {
-          name: "",
-          clientSecret: ""
-        }
-      },
-      expires: 0,
-      user: {
-        connect: {
-          id: user.id
+    await prisma.grant.create({
+      data: {
+        code: "",
+        redirectUri: "",
+        application: {
+          create: {
+            name: "",
+            clientSecret: ""
+          }
+        },
+        expires: 0,
+        user: {
+          connect: {
+            id: user.id
+          }
         }
       }
     });
 
     await deleteUser(user);
 
-    const grants = await prisma.grants({
+    const grants = await prisma.grant.findMany({
       where: {
         user: {
           id: user.id
@@ -184,15 +190,17 @@ describe("deleteUser", () => {
 
   it("should return an error if user is the only admin of an application", async () => {
     const user = await userFactory();
-    const application = await prisma.createApplication({
-      name: "",
-      clientSecret: "",
-      admins: {
-        connect: [
-          {
-            id: user.id
-          }
-        ]
+    const application = await prisma.application.create({
+      data: {
+        name: "",
+        clientSecret: "",
+        admins: {
+          connect: [
+            {
+              id: user.id
+            }
+          ]
+        }
       }
     });
 
@@ -209,27 +217,29 @@ describe("deleteUser", () => {
   it("should remove user from their applications if there are other admins", async () => {
     const user = await userFactory();
     const otherUser = await userFactory();
-    await prisma.createApplication({
-      name: "",
-      clientSecret: "",
-      admins: {
-        connect: [
-          {
-            id: user.id
-          },
-          {
-            id: otherUser.id
-          }
-        ]
+    await prisma.application.create({
+      data: {
+        name: "",
+        clientSecret: "",
+        admins: {
+          connect: [
+            {
+              id: user.id
+            },
+            {
+              id: otherUser.id
+            }
+          ]
+        }
       }
     });
 
     await deleteUser(user);
 
-    const applications = await prisma.applications({
+    const applications = await prisma.application.findMany({
       where: {
-        admins_some: {
-          id: user.id
+        admins: {
+          some: { id: user.id }
         }
       }
     });

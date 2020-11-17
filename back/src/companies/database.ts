@@ -2,15 +2,16 @@
  * PRISMA HELPER FUNCTIONS
  */
 
+import prisma from "src/prisma";
 import {
   CompanyWhereUniqueInput,
-  prisma,
   User,
-  UserRole,
   TraderReceiptWhereUniqueInput,
   TransporterReceiptWhereUniqueInput,
-  Company
-} from "../generated/prisma-client";
+  Company,
+  TraderReceipt,
+  TransporterReceipt
+} from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -28,7 +29,9 @@ export async function getCompanyOrCompanyNotFound({
   if (!id && !siret) {
     throw new Error("You should specify an id or a siret");
   }
-  const company = await prisma.company(id ? { id } : { siret });
+  const company = await prisma.company.findOne({
+    where: id ? { id } : { siret }
+  });
   if (company == null) {
     throw new CompanyNotFound();
   }
@@ -45,8 +48,8 @@ export async function getCompanyOrCompanyNotFound({
  * @param siret
  */
 export function getInstallation(siret: string) {
-  return prisma
-    .installations({
+  return prisma.installation
+    .findMany({
       where: {
         OR: [
           { s3icNumeroSiret: siret },
@@ -68,7 +71,7 @@ export function getInstallation(siret: string) {
  */
 export function getRubriques(codeS3ic: string) {
   if (codeS3ic) {
-    return prisma.rubriques({ where: { codeS3ic } });
+    return prisma.rubrique.findMany({ where: { codeS3ic } });
   }
   return Promise.resolve([]);
 }
@@ -79,7 +82,7 @@ export function getRubriques(codeS3ic: string) {
  */
 export function getDeclarations(codeS3ic: string) {
   if (codeS3ic) {
-    return prisma.declarations({ where: { codeS3ic } });
+    return prisma.declaration.findMany({ where: { codeS3ic } });
   }
   return Promise.resolve([]);
 }
@@ -94,7 +97,7 @@ export function getDeclarations(codeS3ic: string) {
  * @param siret
  */
 export async function getUserRole(userId: string, siret: string) {
-  const associations = await prisma.companyAssociations({
+  const associations = await prisma.companyAssociation.findMany({
     where: { user: { id: userId }, company: { siret } }
   });
   if (associations.length > 0) {
@@ -108,11 +111,15 @@ export async function getUserRole(userId: string, siret: string) {
  * MEMBER or ADMIN role, false otherwise
  * @param user
  */
-export function isCompanyMember(user: User, company: Company) {
-  return prisma.$exists.companyAssociation({
-    user: { id: user.id },
-    company: { id: company.id }
+export async function isCompanyMember(user: User, company: Company) {
+  const count = await prisma.companyAssociation.count({
+    where: {
+      userId: user.id,
+      companyId: company.id
+    }
   });
+
+  return count >= 1;
 }
 
 /**
@@ -126,31 +133,13 @@ export async function getCompanyUsers(siret: string): Promise<CompanyMember[]> {
   return [...activeUsers, ...invitedUsers];
 }
 
-const companyMemberFragment = `
-fragment CompanyMember on CompanyAssociation {
-  role,
-  user {
-    id
-    isActive
-    name
-    email
-    phone
-  }
-}
-`;
-
-type CompanyMemberFragment = Pick<User, "id" | "email" | "name" | "isActive">;
-
 /**
  * Returns company members that already have an account in TD
  * @param siret
  */
 export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
-  return prisma
-    .companyAssociations({ where: { company: { siret } } })
-    .$fragment<{ user: CompanyMemberFragment; role: UserRole }[]>(
-      companyMemberFragment
-    )
+  return prisma.companyAssociation
+    .findMany({ where: { company: { siret } }, include: { user: true } })
     .then(associations =>
       associations.map(a => {
         return {
@@ -170,7 +159,7 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
 export async function getCompanyInvitedUsers(
   siret: string
 ): Promise<CompanyMember[]> {
-  const hashes = await prisma.userAccountHashes({
+  const hashes = await prisma.userAccountHash.findMany({
     where: { companySiret: siret, acceptedAt: null }
   });
   return hashes.map(h => {
@@ -198,7 +187,7 @@ export async function getCompanyAdminUsers(siret: string) {
 export async function getTraderReceiptOrNotFound({
   id
 }: TraderReceiptWhereUniqueInput) {
-  const receipt = await prisma.traderReceipt({ id });
+  const receipt = await prisma.traderReceipt.findOne({ where: { id } });
   if (receipt == null) {
     throw new TraderReceiptNotFound();
   }
@@ -208,9 +197,16 @@ export async function getTraderReceiptOrNotFound({
 export async function getTransporterReceiptOrNotFound({
   id
 }: TransporterReceiptWhereUniqueInput) {
-  const receipt = await prisma.transporterReceipt({ id });
+  const receipt = await prisma.transporterReceipt.findOne({ where: { id } });
   if (receipt == null) {
     throw new TransporterReceiptNotFound();
   }
   return receipt;
+}
+
+export function stringifyDates(obj: TraderReceipt | TransporterReceipt) {
+  return {
+    ...obj,
+    ...(obj.validityLimit && { validityLimit: obj.validityLimit.toISOString() })
+  };
 }
