@@ -41,6 +41,30 @@ describe("query favorites", () => {
     ]);
   });
 
+  it("should ignore drafts", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["COLLECTOR"]
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT"
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "EMITTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
   it("should return the user's company if it matches the favorite type", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
