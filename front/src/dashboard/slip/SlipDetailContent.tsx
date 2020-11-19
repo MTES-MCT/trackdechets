@@ -222,7 +222,10 @@ export default function SlipDetailContent({
         <div className={styles.detailContent}>
           <div className={`${styles.detailQRCodeIcon}`}>
             {form.status !== "DRAFT" && (
-              <QRCodeIcon value={form.readableId} size={96} />
+              <div className={styles.detailQRCode}>
+                <QRCodeIcon value={form.readableId} size={96} />
+                <span>Ce QR code contient le numéro du bordereau </span>
+              </div>
             )}
           </div>
           <div className={styles.detailGrid}>

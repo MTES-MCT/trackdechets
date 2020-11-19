@@ -21,6 +21,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Amélioration des suggestions d'entreprise lors de la création d'un BSD depuis l'interface, [PR 673](https://github.com/MTES-MCT/trackdechets/pull/673)
+- Légende du QR Code dans l'UI [PR 709](https://github.com/MTES-MCT/trackdechets/pull/709)
 
 #### :memo: Documentation
 
