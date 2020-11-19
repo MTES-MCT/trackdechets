@@ -7,7 +7,7 @@ import Duplicate from "dashboard/slips/slips-actions/Duplicate";
 import Delete from "dashboard/slips/slips-actions/Delete";
 import Edit from "dashboard/slips/slips-actions/Edit";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import { TransportSegment, Form } from "generated/graphql/types";
+import { TransportSegment, Form, FormCompany } from "generated/graphql/types";
 import { statusesWithDynamicActions } from "../constants";
 import {
   WarehouseDeliveryIcon,
@@ -30,130 +30,141 @@ import styles from "./Slip.module.scss";
 import { DateRow, DetailRow, YesNoRow, PackagingRow } from "./Components";
 import { useParams } from "react-router-dom";
 
-type Props = {
+type CompanyProps = {
+  company?: FormCompany | null;
+  label: string;
+};
+const Company = ({ company, label }: CompanyProps) => (
+  <>
+    <dt>{label}</dt> <dd>{company?.name}</dd>
+    <dt>Siret</dt> <dd>{company?.siret}</dd>
+    <dt>Adresse</dt> <dd>{company?.address}</dd>
+    <dt>Tél</dt> <dd>{company?.phone}</dd>
+    <dt>Mél</dt> <dd>{company?.mail}</dd>
+    <dt>Contact</dt> <dd>{company?.contact}</dd>
+  </>
+);
+
+type SegmentProps = {
   segment: TransportSegment;
 };
-const TransportSegmentDetail = ({ segment }: Props) => {
+const TransportSegmentDetail = ({ segment }: SegmentProps) => {
+  const label = !!segment.segmentNumber
+    ? `N° ${segment.segmentNumber + 1}`
+    : "";
   return (
     <div className={styles.detailGrid}>
-      <dt>
-        Transporteur
-        {!!segment.segmentNumber && `N° ${segment.segmentNumber + 1}`}
-      </dt>
-      <dd>{segment?.transporter?.company?.name}</dd>
-      <dt>Siret</dt> <dd>{segment?.transporter?.company?.siret}</dd>
-      <dt>Adresse</dt> <dd>{segment?.transporter?.company?.address}</dd>
-      <dt>Tél</dt> <dd>{segment?.transporter?.company?.phone}</dd>
-      <dt>Mél</dt> <dd>{segment?.transporter?.company?.mail}</dd>
-      <dt>Contact</dt> <dd>{segment?.transporter?.company?.contact}</dd>
+      <Company label={label} company={segment?.transporter?.company} />
+
       <DateRow value={segment?.takenOverAt} label="Pris en charge le" />
       <DetailRow value={segment?.takenOverBy} label="Pris en charge par" />
     </div>
   );
 };
 
-type SlipDetailContentProps = {
-  form: Form | null | undefined;
-  children?: React.ReactNode;
-  refetch?: () => void;
-};
-
-const TempStorage = ({ temporaryStorageDetail }) => (
-  <>
-    <div className={styles.detailColumns}>
-      <div className={styles.detailGrid}>
-        <DetailRow
-          value={temporaryStorageDetail?.wasteDetails?.code}
-          label="Code déchet"
-        />
-        <DetailRow
-          value={temporaryStorageDetail?.wasteDetails?.name}
-          label="Description déchet"
-        />
-        <DetailRow
-          value={temporaryStorageDetail?.wasteDetails?.onuCode}
-          label="Code Onu"
-        />
-
-        <PackagingRow
-          packagingInfos={temporaryStorageDetail?.wasteDetails?.packagingInfos}
-        />
-        <DetailRow
-          value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
-          label="Quantité reçue"
-        />
-        <DetailRow
-          value={getVerboseQuantityType(
-            temporaryStorageDetail?.temporaryStorer?.quantityType
-          )}
-          label="Quantité"
-        />
-        <DateRow
-          value={temporaryStorageDetail?.temporaryStorer?.receivedAt}
-          label="Reçu le"
-        />
-        <DetailRow
-          value={temporaryStorageDetail?.temporaryStorer?.receivedBy}
-          label="Reçu par"
-        />
-        <DetailRow
-          value={getVerboseAcceptationStatus(
-            temporaryStorageDetail?.temporaryStorer?.wasteAcceptationStatus
-          )}
-          label="Accepté"
-        />
-      </div>
-    </div>
-    <div className={styles.detailColumns}>
-      <div className={styles.detailGrid}>
-        <dt>Destination suivante</dt>
-        <dd>{temporaryStorageDetail?.destination?.company?.name}</dd>
-
-        <dt>Siret</dt>
-        <dd>{temporaryStorageDetail?.destination?.company?.siret}</dd>
-
-        <dt>Adresse</dt>
-        <dd>{temporaryStorageDetail?.destination?.company?.address}</dd>
-
-        <DetailRow
-          value={temporaryStorageDetail?.destination?.cap}
-          label="Numéro de CAP"
-        />
-
-        <DetailRow
-          value={temporaryStorageDetail?.destination?.processingOperation}
-          label="Opération de traitement prévue"
-        />
-      </div>
+const TempStorage = ({ form }) => {
+  const { temporaryStorageDetail } = form;
+  return (
+    <>
       <div className={styles.detailColumns}>
         <div className={styles.detailGrid}>
+          <DetailRow value={form?.recipient?.company.name} label="Nom" />
+          <DetailRow value={form?.recipient?.company.siret} label="Siret" />
           <DetailRow
-            value={temporaryStorageDetail?.transporter?.company?.name}
-            label="Transporteur"
+            value={temporaryStorageDetail?.wasteDetails?.code}
+            label="Code déchet"
+          />
+          <DetailRow
+            value={temporaryStorageDetail?.wasteDetails?.name}
+            label="Description déchet"
+          />
+          <DetailRow
+            value={temporaryStorageDetail?.wasteDetails?.onuCode}
+            label="Code Onu"
           />
 
-          <DetailRow
-            value={temporaryStorageDetail?.transporter?.company?.siret}
-            label="Siret"
-          />
-
-          <DetailRow
-            value={temporaryStorageDetail?.transporter?.company?.address}
-            label="Adresse"
+          <PackagingRow
+            packagingInfos={
+              temporaryStorageDetail?.wasteDetails?.packagingInfos
+            }
           />
           <DetailRow
-            value={temporaryStorageDetail?.transporter?.receipt}
-            label="Récépissé"
+            value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
+            label="Quantité reçue"
+          />
+          <DetailRow
+            value={getVerboseQuantityType(
+              temporaryStorageDetail?.temporaryStorer?.quantityType
+            )}
+            label="Quantité"
           />
           <DateRow
-            value={temporaryStorageDetail?.transporter?.validityLimit}
-            label="Date de validité"
+            value={temporaryStorageDetail?.temporaryStorer?.receivedAt}
+            label="Reçu le"
+          />
+          <DetailRow
+            value={temporaryStorageDetail?.temporaryStorer?.receivedBy}
+            label="Reçu par"
+          />
+          <DetailRow
+            value={getVerboseAcceptationStatus(
+              temporaryStorageDetail?.temporaryStorer?.wasteAcceptationStatus
+            )}
+            label="Accepté"
           />
         </div>
       </div>
-    </div>
-  </>
-);
+      <div className={styles.detailColumns}>
+        <div className={styles.detailGrid}>
+          <dt>Destination suivante</dt>
+          <dd>{temporaryStorageDetail?.destination?.company?.name}</dd>
+
+          <dt>Siret</dt>
+          <dd>{temporaryStorageDetail?.destination?.company?.siret}</dd>
+
+          <dt>Adresse</dt>
+          <dd>{temporaryStorageDetail?.destination?.company?.address}</dd>
+
+          <DetailRow
+            value={temporaryStorageDetail?.destination?.cap}
+            label="Numéro de CAP"
+          />
+
+          <DetailRow
+            value={temporaryStorageDetail?.destination?.processingOperation}
+            label="Opération de traitement prévue"
+          />
+        </div>
+        <div className={styles.detailColumns}>
+          <div className={styles.detailGrid}>
+            <DetailRow
+              value={temporaryStorageDetail?.transporter?.company?.name}
+              label="Transporteur"
+            />
+
+            <DetailRow
+              value={temporaryStorageDetail?.transporter?.company?.siret}
+              label="Siret"
+            />
+
+            <DetailRow
+              value={temporaryStorageDetail?.transporter?.company?.address}
+              label="Adresse"
+            />
+            <DetailRow
+              value={temporaryStorageDetail?.transporter?.receipt}
+              label="Récépissé"
+            />
+            <DateRow
+              value={temporaryStorageDetail?.transporter?.validityLimit}
+              label="Date de validité"
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 const Trader = ({ trader }) => (
   <>
     <div className={styles.detailColumns}>
@@ -192,13 +203,73 @@ const EcoOrganisme = ({ ecoOrganisme }) => (
     <dd>{ecoOrganisme?.siret}</dd>
   </div>
 );
+
+type SlipDetailContentProps = {
+  form: Form | null | undefined;
+  children?: React.ReactNode;
+  refetch?: () => void;
+};
+
+/**
+ * Handle recipient or destination in case of temp storage
+ */
+const Recipient = ({
+  form,
+  hasTempStorage,
+}: {
+  form: Form;
+  hasTempStorage: boolean;
+}) => {
+  const recipient = hasTempStorage
+    ? form.temporaryStorageDetail?.destination
+    : form.recipient;
+
+  return (
+    <>
+      {" "}
+      <div className={styles.detailGrid}>
+        <Company label="Destinataire" company={recipient?.company} />
+      </div>
+      <div className={styles.detailGrid}>
+        <dt>Numéro de CAP</dt> <dd>{recipient?.cap}</dd>
+        <DateRow value={form.receivedAt} label="Reçu le" />
+        <DetailRow value={form.receivedBy} label="Reçu par" />
+        <DetailRow
+          value={getVerboseAcceptationStatus(form?.wasteAcceptationStatus)}
+          label="Lot accepté"
+        />
+        <DetailRow
+          value={form?.quantityReceived && `${form?.quantityReceived} tonnes`}
+          label="Quantité reçue"
+        />
+        <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow
+          value={recipient?.processingOperation}
+          label="Opération de traitement prévue"
+        />
+        <DetailRow
+          value={form.processingOperationDone}
+          label="Traitement réalisé (code D/R)"
+        />
+        <DetailRow
+          value={form.processingOperationDescription}
+          label="Description de l'opération"
+        />
+        <DateRow value={form.processedAt} label="Traitement effectué le" />
+        <DetailRow value={form.processedBy} label="Traitement effectué par" />
+      </div>
+    </>
+  );
+};
+
 export default function SlipDetailContent({
   form,
   children = null,
   refetch,
 }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
-
   const isMultiModal: boolean = !!form?.transportSegments?.length;
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;
   if (!form) {
@@ -300,12 +371,8 @@ export default function SlipDetailContent({
           <TabPanel className={styles.detailTabPanel}>
             <div className={styles.detailColumns}>
               <div className={styles.detailGrid}>
-                <dt>Émetteur</dt> <dd>{form.emitter?.company?.name}</dd>
-                <dt>Siret</dt> <dd>{form.emitter?.company?.siret}</dd>
-                <dt>Adresse</dt> <dd>{form.emitter?.company?.address}</dd>
-                <dt>Tél</dt> <dd>{form.emitter?.company?.phone}</dd>
-                <dt>Mél</dt> <dd>{form.emitter?.company?.mail}</dd>
-                <dt>Contact</dt> <dd>{form.emitter?.company?.contact}</dd>
+                <Company label="Émetteur" company={form.emitter?.company} />
+
                 <DetailRow
                   value={form.emitter?.workSite?.name}
                   label="Chantier"
@@ -344,13 +411,10 @@ export default function SlipDetailContent({
           {/* Transporter tab panel */}
           <TabPanel className={styles.detailTabPanel}>
             <div className={`${styles.detailGrid} `}>
-              <dt>Transporteur {isMultiModal && <span>N°1</span>}</dt>{" "}
-              <dd>{form.transporter?.company?.name}</dd>
-              <dt>Siret</dt> <dd>{form.transporter?.company?.siret}</dd>
-              <dt>Adresse</dt> <dd>{form.transporter?.company?.address}</dd>
-              <dt>Tél</dt> <dd>{form.transporter?.company?.phone}</dd>
-              <dt>Mél</dt> <dd>{form.transporter?.company?.mail}</dd>
-              <dt>Contact</dt> <dd>{form.transporter?.company?.contact}</dd>
+              <Company
+                label={`Transporteur ${isMultiModal ? "N°1" : ""}`}
+                company={form.transporter?.company}
+              />
             </div>
             <div className={styles.detailGrid}>
               <YesNoRow
@@ -389,66 +453,14 @@ export default function SlipDetailContent({
           {/* Temp storage tab panel */}
           {hasTempStorage && (
             <TabPanel className={styles.detailTabPanel}>
-              <TempStorage
-                temporaryStorageDetail={form.temporaryStorageDetail}
-              />
+              <TempStorage form={form} />
             </TabPanel>
           )}
 
-          {/* Recipient tab panel */}
+          {/* Recipient  tab panel */}
           <TabPanel className={styles.detailTabPanel}>
             <div className={styles.detailColumns}>
-              <div className={styles.detailGrid}>
-                <dt>Destinataire</dt> <dd>{form.recipient?.company?.name}</dd>
-                <dt>Siret</dt> <dd>{form.recipient?.company?.siret}</dd>
-                <dt>Adresse</dt> <dd>{form.recipient?.company?.address}</dd>
-                <dt>Tél</dt> <dd>{form.recipient?.company?.phone}</dd>
-                <dt>Mél</dt> <dd>{form.recipient?.company?.mail}</dd>
-                <dt>Contact</dt> <dd>{form.recipient?.company?.contact}</dd>
-              </div>
-              <div className={styles.detailGrid}>
-                <dt>Numéro de CAP</dt> <dd>{form.recipient?.cap}</dd>
-                <DateRow value={form.receivedAt} label="Reçu le" />
-                <DetailRow value={form.receivedBy} label="Reçu par" />
-                <DetailRow
-                  value={getVerboseAcceptationStatus(
-                    form?.wasteAcceptationStatus
-                  )}
-                  label="Lot accepté"
-                />
-                <DetailRow
-                  value={
-                    form?.quantityReceived && `${form?.quantityReceived} tonnes`
-                  }
-                  label="Quantité reçue"
-                />
-                <DetailRow
-                  value={form.wasteRefusalReason}
-                  label="Motif de refus"
-                />
-              </div>
-              <div className={styles.detailGrid}>
-                <DetailRow
-                  value={form.recipient?.processingOperation}
-                  label="Opération de traitement prévue"
-                />
-                <DetailRow
-                  value={form.processingOperationDone}
-                  label="Traitement réalisé (code D/R)"
-                />
-                <DetailRow
-                  value={form.processingOperationDescription}
-                  label="Description de l'opération"
-                />
-                <DateRow
-                  value={form.processedAt}
-                  label="Traitement effectué le"
-                />
-                <DetailRow
-                  value={form.processedBy}
-                  label="Traitement effectué par"
-                />
-              </div>
+              <Recipient form={form} hasTempStorage={hasTempStorage} />
             </div>
           </TabPanel>
         </div>
