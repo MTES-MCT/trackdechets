@@ -239,6 +239,7 @@ describe("mutation / importPaperForm", () => {
       wasteDetailsQuantityType: "ESTIMATED",
       wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
       wasteDetailsConsistence: "SOLID",
+      wasteDetailsPop: false,
       wasteDetailsOnuCode: "ONU"
     };
 

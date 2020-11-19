@@ -321,6 +321,7 @@ export default function SlipDetailContent({
           <div className={styles.detailGrid}>
             <dt>Code onu</dt>
             <dd>{form?.wasteDetails?.onuCode}</dd>
+            <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
           </div>
 
           {form.ecoOrganisme && (

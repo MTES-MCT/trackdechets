@@ -73,6 +73,7 @@ const mockedForm = {
   transporterCompanyPhone: "06 18 76 02 96",
   recipientCompanyMail: "recipient@example.com",
   wasteDetailsConsistence: "SOLID",
+  wasteDetailsPop: false,
   traderCompanyPhone: "",
   noTraceability: null,
   emitterCompanySiret: "12343606600011",

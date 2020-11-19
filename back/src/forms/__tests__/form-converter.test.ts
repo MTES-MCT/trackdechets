@@ -148,6 +148,7 @@ test("expandFormFromDb", () => {
     ],
     wasteDetailsQuantityType: "ESTIMATED",
     wasteDetailsConsistence: "SOLID",
+    wasteDetailsPop: false,
     traderCompanyAddress: null,
     traderValidityLimit: null,
     traderCompanyContact: null,
@@ -226,7 +227,8 @@ test("expandFormFromDb", () => {
       numberOfPackages: 1,
       quantity: form.wasteDetailsQuantity,
       quantityType: form.wasteDetailsQuantityType,
-      consistence: form.wasteDetailsConsistence
+      consistence: form.wasteDetailsConsistence,
+      pop: form.wasteDetailsPop
     },
     trader: null,
     ecoOrganisme: null,
@@ -335,7 +337,8 @@ describe("flattenFormInput", () => {
       wasteDetailsPackagingInfos: null,
       wasteDetailsQuantity: null,
       wasteDetailsQuantityType: null,
-      wasteDetailsConsistence: null
+      wasteDetailsConsistence: null,
+      wasteDetailsPop: null
     };
 
     expect(flattened).toEqual(expected);

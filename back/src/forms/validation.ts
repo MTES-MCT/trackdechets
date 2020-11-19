@@ -69,6 +69,7 @@ type WasteDetails = Pick<
   | "wasteDetailsQuantity"
   | "wasteDetailsQuantityType"
   | "wasteDetailsConsistence"
+  | "wasteDetailsPop"
 >;
 
 type Transporter = Pick<
@@ -374,7 +375,8 @@ export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
       .required("Le type de quantité (réelle ou estimée) doit être précisé"),
     wasteDetailsConsistence: yup
       .mixed<Consistence>()
-      .required("La consistance du déchet doit être précisée")
+      .required("La consistance du déchet doit être précisée"),
+    wasteDetailsPop: yup.boolean()
   });
 
 // 8 - Collecteur-transporteur

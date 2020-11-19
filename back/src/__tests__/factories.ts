@@ -175,6 +175,7 @@ const formdata = {
   transporterCompanyPhone: "06 18 76 02 66",
   recipientCompanyMail: "recipient@td.io",
   wasteDetailsConsistence: "SOLID" as Consistence,
+  wasteDetailsPop: false,
   traderCompanyPhone: "",
   noTraceability: null,
   emitterCompanySiret: "15397456982146",

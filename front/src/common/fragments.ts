@@ -42,6 +42,7 @@ export const wasteDetailsFragment = gql`
     quantity
     quantityType
     consistence
+    pop
   }
 `;
 
