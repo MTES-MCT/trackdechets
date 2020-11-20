@@ -160,6 +160,10 @@ type AggregateAccessToken {
   count: Int!
 }
 
+type AggregateAnonymousCompany {
+  count: Int!
+}
+
 type AggregateApplication {
   count: Int!
 }
@@ -230,6 +234,209 @@ type AggregateUserAccountHash {
 
 type AggregateUserActivationHash {
   count: Int!
+}
+
+type AnonymousCompany {
+  id: ID!
+  siret: String!
+  name: String!
+  address: String!
+  codeNaf: String!
+  libelleNaf: String!
+  codeCommune: String!
+}
+
+type AnonymousCompanyConnection {
+  pageInfo: PageInfo!
+  edges: [AnonymousCompanyEdge]!
+  aggregate: AggregateAnonymousCompany!
+}
+
+input AnonymousCompanyCreateInput {
+  id: ID
+  siret: String!
+  name: String!
+  address: String!
+  codeNaf: String!
+  libelleNaf: String!
+  codeCommune: String!
+}
+
+type AnonymousCompanyEdge {
+  node: AnonymousCompany!
+  cursor: String!
+}
+
+enum AnonymousCompanyOrderByInput {
+  id_ASC
+  id_DESC
+  siret_ASC
+  siret_DESC
+  name_ASC
+  name_DESC
+  address_ASC
+  address_DESC
+  codeNaf_ASC
+  codeNaf_DESC
+  libelleNaf_ASC
+  libelleNaf_DESC
+  codeCommune_ASC
+  codeCommune_DESC
+}
+
+type AnonymousCompanyPreviousValues {
+  id: ID!
+  siret: String!
+  name: String!
+  address: String!
+  codeNaf: String!
+  libelleNaf: String!
+  codeCommune: String!
+}
+
+type AnonymousCompanySubscriptionPayload {
+  mutation: MutationType!
+  node: AnonymousCompany
+  updatedFields: [String!]
+  previousValues: AnonymousCompanyPreviousValues
+}
+
+input AnonymousCompanySubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: AnonymousCompanyWhereInput
+  AND: [AnonymousCompanySubscriptionWhereInput!]
+  OR: [AnonymousCompanySubscriptionWhereInput!]
+  NOT: [AnonymousCompanySubscriptionWhereInput!]
+}
+
+input AnonymousCompanyUpdateInput {
+  siret: String
+  name: String
+  address: String
+  codeNaf: String
+  libelleNaf: String
+  codeCommune: String
+}
+
+input AnonymousCompanyUpdateManyMutationInput {
+  siret: String
+  name: String
+  address: String
+  codeNaf: String
+  libelleNaf: String
+  codeCommune: String
+}
+
+input AnonymousCompanyWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  siret: String
+  siret_not: String
+  siret_in: [String!]
+  siret_not_in: [String!]
+  siret_lt: String
+  siret_lte: String
+  siret_gt: String
+  siret_gte: String
+  siret_contains: String
+  siret_not_contains: String
+  siret_starts_with: String
+  siret_not_starts_with: String
+  siret_ends_with: String
+  siret_not_ends_with: String
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  address: String
+  address_not: String
+  address_in: [String!]
+  address_not_in: [String!]
+  address_lt: String
+  address_lte: String
+  address_gt: String
+  address_gte: String
+  address_contains: String
+  address_not_contains: String
+  address_starts_with: String
+  address_not_starts_with: String
+  address_ends_with: String
+  address_not_ends_with: String
+  codeNaf: String
+  codeNaf_not: String
+  codeNaf_in: [String!]
+  codeNaf_not_in: [String!]
+  codeNaf_lt: String
+  codeNaf_lte: String
+  codeNaf_gt: String
+  codeNaf_gte: String
+  codeNaf_contains: String
+  codeNaf_not_contains: String
+  codeNaf_starts_with: String
+  codeNaf_not_starts_with: String
+  codeNaf_ends_with: String
+  codeNaf_not_ends_with: String
+  libelleNaf: String
+  libelleNaf_not: String
+  libelleNaf_in: [String!]
+  libelleNaf_not_in: [String!]
+  libelleNaf_lt: String
+  libelleNaf_lte: String
+  libelleNaf_gt: String
+  libelleNaf_gte: String
+  libelleNaf_contains: String
+  libelleNaf_not_contains: String
+  libelleNaf_starts_with: String
+  libelleNaf_not_starts_with: String
+  libelleNaf_ends_with: String
+  libelleNaf_not_ends_with: String
+  codeCommune: String
+  codeCommune_not: String
+  codeCommune_in: [String!]
+  codeCommune_not_in: [String!]
+  codeCommune_lt: String
+  codeCommune_lte: String
+  codeCommune_gt: String
+  codeCommune_gte: String
+  codeCommune_contains: String
+  codeCommune_not_contains: String
+  codeCommune_starts_with: String
+  codeCommune_not_starts_with: String
+  codeCommune_ends_with: String
+  codeCommune_not_ends_with: String
+  AND: [AnonymousCompanyWhereInput!]
+  OR: [AnonymousCompanyWhereInput!]
+  NOT: [AnonymousCompanyWhereInput!]
+}
+
+input AnonymousCompanyWhereUniqueInput {
+  id: ID
+  siret: String
 }
 
 type Application {
@@ -5372,6 +5579,12 @@ type Mutation {
   upsertAccessToken(where: AccessTokenWhereUniqueInput!, create: AccessTokenCreateInput!, update: AccessTokenUpdateInput!): AccessToken!
   deleteAccessToken(where: AccessTokenWhereUniqueInput!): AccessToken
   deleteManyAccessTokens(where: AccessTokenWhereInput): BatchPayload!
+  createAnonymousCompany(data: AnonymousCompanyCreateInput!): AnonymousCompany!
+  updateAnonymousCompany(data: AnonymousCompanyUpdateInput!, where: AnonymousCompanyWhereUniqueInput!): AnonymousCompany
+  updateManyAnonymousCompanies(data: AnonymousCompanyUpdateManyMutationInput!, where: AnonymousCompanyWhereInput): BatchPayload!
+  upsertAnonymousCompany(where: AnonymousCompanyWhereUniqueInput!, create: AnonymousCompanyCreateInput!, update: AnonymousCompanyUpdateInput!): AnonymousCompany!
+  deleteAnonymousCompany(where: AnonymousCompanyWhereUniqueInput!): AnonymousCompany
+  deleteManyAnonymousCompanies(where: AnonymousCompanyWhereInput): BatchPayload!
   createApplication(data: ApplicationCreateInput!): Application!
   updateApplication(data: ApplicationUpdateInput!, where: ApplicationWhereUniqueInput!): Application
   updateManyApplications(data: ApplicationUpdateManyMutationInput!, where: ApplicationWhereInput): BatchPayload!
@@ -5508,6 +5721,9 @@ type Query {
   accessToken(where: AccessTokenWhereUniqueInput!): AccessToken
   accessTokens(where: AccessTokenWhereInput, orderBy: AccessTokenOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [AccessToken]!
   accessTokensConnection(where: AccessTokenWhereInput, orderBy: AccessTokenOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AccessTokenConnection!
+  anonymousCompany(where: AnonymousCompanyWhereUniqueInput!): AnonymousCompany
+  anonymousCompanies(where: AnonymousCompanyWhereInput, orderBy: AnonymousCompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [AnonymousCompany]!
+  anonymousCompaniesConnection(where: AnonymousCompanyWhereInput, orderBy: AnonymousCompanyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AnonymousCompanyConnection!
   application(where: ApplicationWhereUniqueInput!): Application
   applications(where: ApplicationWhereInput, orderBy: ApplicationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Application]!
   applicationsConnection(where: ApplicationWhereInput, orderBy: ApplicationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ApplicationConnection!
@@ -6013,6 +6229,7 @@ input StatusLogWhereUniqueInput {
 
 type Subscription {
   accessToken(where: AccessTokenSubscriptionWhereInput): AccessTokenSubscriptionPayload
+  anonymousCompany(where: AnonymousCompanySubscriptionWhereInput): AnonymousCompanySubscriptionPayload
   application(where: ApplicationSubscriptionWhereInput): ApplicationSubscriptionPayload
   company(where: CompanySubscriptionWhereInput): CompanySubscriptionPayload
   companyAssociation(where: CompanyAssociationSubscriptionWhereInput): CompanyAssociationSubscriptionPayload

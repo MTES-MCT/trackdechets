@@ -17,6 +17,7 @@ export type Maybe<T> = T | undefined | null;
 
 export interface Exists {
   accessToken: (where?: AccessTokenWhereInput) => Promise<boolean>;
+  anonymousCompany: (where?: AnonymousCompanyWhereInput) => Promise<boolean>;
   application: (where?: ApplicationWhereInput) => Promise<boolean>;
   company: (where?: CompanyWhereInput) => Promise<boolean>;
   companyAssociation: (
@@ -85,6 +86,27 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => AccessTokenConnectionPromise;
+  anonymousCompany: (
+    where: AnonymousCompanyWhereUniqueInput
+  ) => AnonymousCompanyNullablePromise;
+  anonymousCompanies: (args?: {
+    where?: AnonymousCompanyWhereInput;
+    orderBy?: AnonymousCompanyOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<AnonymousCompany>;
+  anonymousCompaniesConnection: (args?: {
+    where?: AnonymousCompanyWhereInput;
+    orderBy?: AnonymousCompanyOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => AnonymousCompanyConnectionPromise;
   application: (
     where: ApplicationWhereUniqueInput
   ) => ApplicationNullablePromise;
@@ -475,6 +497,28 @@ export interface Prisma {
   deleteManyAccessTokens: (
     where?: AccessTokenWhereInput
   ) => BatchPayloadPromise;
+  createAnonymousCompany: (
+    data: AnonymousCompanyCreateInput
+  ) => AnonymousCompanyPromise;
+  updateAnonymousCompany: (args: {
+    data: AnonymousCompanyUpdateInput;
+    where: AnonymousCompanyWhereUniqueInput;
+  }) => AnonymousCompanyPromise;
+  updateManyAnonymousCompanies: (args: {
+    data: AnonymousCompanyUpdateManyMutationInput;
+    where?: AnonymousCompanyWhereInput;
+  }) => BatchPayloadPromise;
+  upsertAnonymousCompany: (args: {
+    where: AnonymousCompanyWhereUniqueInput;
+    create: AnonymousCompanyCreateInput;
+    update: AnonymousCompanyUpdateInput;
+  }) => AnonymousCompanyPromise;
+  deleteAnonymousCompany: (
+    where: AnonymousCompanyWhereUniqueInput
+  ) => AnonymousCompanyPromise;
+  deleteManyAnonymousCompanies: (
+    where?: AnonymousCompanyWhereInput
+  ) => BatchPayloadPromise;
   createApplication: (data: ApplicationCreateInput) => ApplicationPromise;
   updateApplication: (args: {
     data: ApplicationUpdateInput;
@@ -833,6 +877,9 @@ export interface Subscription {
   accessToken: (
     where?: AccessTokenSubscriptionWhereInput
   ) => AccessTokenSubscriptionPayloadSubscription;
+  anonymousCompany: (
+    where?: AnonymousCompanySubscriptionWhereInput
+  ) => AnonymousCompanySubscriptionPayloadSubscription;
   application: (
     where?: ApplicationSubscriptionWhereInput
   ) => ApplicationSubscriptionPayloadSubscription;
@@ -946,6 +993,22 @@ export type AccessTokenOrderByInput =
   | "isRevoked_DESC"
   | "lastUsed_ASC"
   | "lastUsed_DESC";
+
+export type AnonymousCompanyOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "siret_ASC"
+  | "siret_DESC"
+  | "name_ASC"
+  | "name_DESC"
+  | "address_ASC"
+  | "address_DESC"
+  | "codeNaf_ASC"
+  | "codeNaf_DESC"
+  | "libelleNaf_ASC"
+  | "libelleNaf_DESC"
+  | "codeCommune_ASC"
+  | "codeCommune_DESC";
 
 export type ApplicationOrderByInput =
   | "id_ASC"
@@ -2029,6 +2092,115 @@ export interface ApplicationWhereInput {
   AND?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
   OR?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
   NOT?: Maybe<ApplicationWhereInput[] | ApplicationWhereInput>;
+}
+
+export type AnonymousCompanyWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  siret?: Maybe<String>;
+}>;
+
+export interface AnonymousCompanyWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  siret?: Maybe<String>;
+  siret_not?: Maybe<String>;
+  siret_in?: Maybe<String[] | String>;
+  siret_not_in?: Maybe<String[] | String>;
+  siret_lt?: Maybe<String>;
+  siret_lte?: Maybe<String>;
+  siret_gt?: Maybe<String>;
+  siret_gte?: Maybe<String>;
+  siret_contains?: Maybe<String>;
+  siret_not_contains?: Maybe<String>;
+  siret_starts_with?: Maybe<String>;
+  siret_not_starts_with?: Maybe<String>;
+  siret_ends_with?: Maybe<String>;
+  siret_not_ends_with?: Maybe<String>;
+  name?: Maybe<String>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  address?: Maybe<String>;
+  address_not?: Maybe<String>;
+  address_in?: Maybe<String[] | String>;
+  address_not_in?: Maybe<String[] | String>;
+  address_lt?: Maybe<String>;
+  address_lte?: Maybe<String>;
+  address_gt?: Maybe<String>;
+  address_gte?: Maybe<String>;
+  address_contains?: Maybe<String>;
+  address_not_contains?: Maybe<String>;
+  address_starts_with?: Maybe<String>;
+  address_not_starts_with?: Maybe<String>;
+  address_ends_with?: Maybe<String>;
+  address_not_ends_with?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  codeNaf_not?: Maybe<String>;
+  codeNaf_in?: Maybe<String[] | String>;
+  codeNaf_not_in?: Maybe<String[] | String>;
+  codeNaf_lt?: Maybe<String>;
+  codeNaf_lte?: Maybe<String>;
+  codeNaf_gt?: Maybe<String>;
+  codeNaf_gte?: Maybe<String>;
+  codeNaf_contains?: Maybe<String>;
+  codeNaf_not_contains?: Maybe<String>;
+  codeNaf_starts_with?: Maybe<String>;
+  codeNaf_not_starts_with?: Maybe<String>;
+  codeNaf_ends_with?: Maybe<String>;
+  codeNaf_not_ends_with?: Maybe<String>;
+  libelleNaf?: Maybe<String>;
+  libelleNaf_not?: Maybe<String>;
+  libelleNaf_in?: Maybe<String[] | String>;
+  libelleNaf_not_in?: Maybe<String[] | String>;
+  libelleNaf_lt?: Maybe<String>;
+  libelleNaf_lte?: Maybe<String>;
+  libelleNaf_gt?: Maybe<String>;
+  libelleNaf_gte?: Maybe<String>;
+  libelleNaf_contains?: Maybe<String>;
+  libelleNaf_not_contains?: Maybe<String>;
+  libelleNaf_starts_with?: Maybe<String>;
+  libelleNaf_not_starts_with?: Maybe<String>;
+  libelleNaf_ends_with?: Maybe<String>;
+  libelleNaf_not_ends_with?: Maybe<String>;
+  codeCommune?: Maybe<String>;
+  codeCommune_not?: Maybe<String>;
+  codeCommune_in?: Maybe<String[] | String>;
+  codeCommune_not_in?: Maybe<String[] | String>;
+  codeCommune_lt?: Maybe<String>;
+  codeCommune_lte?: Maybe<String>;
+  codeCommune_gt?: Maybe<String>;
+  codeCommune_gte?: Maybe<String>;
+  codeCommune_contains?: Maybe<String>;
+  codeCommune_not_contains?: Maybe<String>;
+  codeCommune_starts_with?: Maybe<String>;
+  codeCommune_not_starts_with?: Maybe<String>;
+  codeCommune_ends_with?: Maybe<String>;
+  codeCommune_not_ends_with?: Maybe<String>;
+  AND?: Maybe<AnonymousCompanyWhereInput[] | AnonymousCompanyWhereInput>;
+  OR?: Maybe<AnonymousCompanyWhereInput[] | AnonymousCompanyWhereInput>;
+  NOT?: Maybe<AnonymousCompanyWhereInput[] | AnonymousCompanyWhereInput>;
 }
 
 export type ApplicationWhereUniqueInput = AtLeastOne<{
@@ -5082,6 +5254,34 @@ export interface AccessTokenUpdateManyMutationInput {
   lastUsed?: Maybe<DateTimeInput>;
 }
 
+export interface AnonymousCompanyCreateInput {
+  id?: Maybe<ID_Input>;
+  siret: String;
+  name: String;
+  address: String;
+  codeNaf: String;
+  libelleNaf: String;
+  codeCommune: String;
+}
+
+export interface AnonymousCompanyUpdateInput {
+  siret?: Maybe<String>;
+  name?: Maybe<String>;
+  address?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  libelleNaf?: Maybe<String>;
+  codeCommune?: Maybe<String>;
+}
+
+export interface AnonymousCompanyUpdateManyMutationInput {
+  siret?: Maybe<String>;
+  name?: Maybe<String>;
+  address?: Maybe<String>;
+  codeNaf?: Maybe<String>;
+  libelleNaf?: Maybe<String>;
+  codeCommune?: Maybe<String>;
+}
+
 export interface ApplicationUpdateInput {
   clientSecret?: Maybe<String>;
   name?: Maybe<String>;
@@ -8089,6 +8289,26 @@ export interface AccessTokenSubscriptionWhereInput {
   >;
 }
 
+export interface AnonymousCompanySubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<AnonymousCompanyWhereInput>;
+  AND?: Maybe<
+    | AnonymousCompanySubscriptionWhereInput[]
+    | AnonymousCompanySubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | AnonymousCompanySubscriptionWhereInput[]
+    | AnonymousCompanySubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | AnonymousCompanySubscriptionWhereInput[]
+    | AnonymousCompanySubscriptionWhereInput
+  >;
+}
+
 export interface ApplicationSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
@@ -8845,6 +9065,108 @@ export interface AggregateAccessTokenPromise
 
 export interface AggregateAccessTokenSubscription
   extends Promise<AsyncIterator<AggregateAccessToken>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface AnonymousCompany {
+  id: ID_Output;
+  siret: String;
+  name: String;
+  address: String;
+  codeNaf: String;
+  libelleNaf: String;
+  codeCommune: String;
+}
+
+export interface AnonymousCompanyPromise
+  extends Promise<AnonymousCompany>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  siret: () => Promise<String>;
+  name: () => Promise<String>;
+  address: () => Promise<String>;
+  codeNaf: () => Promise<String>;
+  libelleNaf: () => Promise<String>;
+  codeCommune: () => Promise<String>;
+}
+
+export interface AnonymousCompanySubscription
+  extends Promise<AsyncIterator<AnonymousCompany>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  siret: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  address: () => Promise<AsyncIterator<String>>;
+  codeNaf: () => Promise<AsyncIterator<String>>;
+  libelleNaf: () => Promise<AsyncIterator<String>>;
+  codeCommune: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AnonymousCompanyNullablePromise
+  extends Promise<AnonymousCompany | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  siret: () => Promise<String>;
+  name: () => Promise<String>;
+  address: () => Promise<String>;
+  codeNaf: () => Promise<String>;
+  libelleNaf: () => Promise<String>;
+  codeCommune: () => Promise<String>;
+}
+
+export interface AnonymousCompanyConnection {
+  pageInfo: PageInfo;
+  edges: AnonymousCompanyEdge[];
+}
+
+export interface AnonymousCompanyConnectionPromise
+  extends Promise<AnonymousCompanyConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<AnonymousCompanyEdge>>() => T;
+  aggregate: <T = AggregateAnonymousCompanyPromise>() => T;
+}
+
+export interface AnonymousCompanyConnectionSubscription
+  extends Promise<AsyncIterator<AnonymousCompanyConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<AnonymousCompanyEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateAnonymousCompanySubscription>() => T;
+}
+
+export interface AnonymousCompanyEdge {
+  node: AnonymousCompany;
+  cursor: String;
+}
+
+export interface AnonymousCompanyEdgePromise
+  extends Promise<AnonymousCompanyEdge>,
+    Fragmentable {
+  node: <T = AnonymousCompanyPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface AnonymousCompanyEdgeSubscription
+  extends Promise<AsyncIterator<AnonymousCompanyEdge>>,
+    Fragmentable {
+  node: <T = AnonymousCompanySubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateAnonymousCompany {
+  count: Int;
+}
+
+export interface AggregateAnonymousCompanyPromise
+  extends Promise<AggregateAnonymousCompany>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateAnonymousCompanySubscription
+  extends Promise<AsyncIterator<AggregateAnonymousCompany>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -11070,6 +11392,65 @@ export interface AccessTokenPreviousValuesSubscription
   lastUsed: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
+export interface AnonymousCompanySubscriptionPayload {
+  mutation: MutationType;
+  node: AnonymousCompany;
+  updatedFields: String[];
+  previousValues: AnonymousCompanyPreviousValues;
+}
+
+export interface AnonymousCompanySubscriptionPayloadPromise
+  extends Promise<AnonymousCompanySubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = AnonymousCompanyPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = AnonymousCompanyPreviousValuesPromise>() => T;
+}
+
+export interface AnonymousCompanySubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<AnonymousCompanySubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = AnonymousCompanySubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = AnonymousCompanyPreviousValuesSubscription>() => T;
+}
+
+export interface AnonymousCompanyPreviousValues {
+  id: ID_Output;
+  siret: String;
+  name: String;
+  address: String;
+  codeNaf: String;
+  libelleNaf: String;
+  codeCommune: String;
+}
+
+export interface AnonymousCompanyPreviousValuesPromise
+  extends Promise<AnonymousCompanyPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  siret: () => Promise<String>;
+  name: () => Promise<String>;
+  address: () => Promise<String>;
+  codeNaf: () => Promise<String>;
+  libelleNaf: () => Promise<String>;
+  codeCommune: () => Promise<String>;
+}
+
+export interface AnonymousCompanyPreviousValuesSubscription
+  extends Promise<AsyncIterator<AnonymousCompanyPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  siret: () => Promise<AsyncIterator<String>>;
+  name: () => Promise<AsyncIterator<String>>;
+  address: () => Promise<AsyncIterator<String>>;
+  codeNaf: () => Promise<AsyncIterator<String>>;
+  libelleNaf: () => Promise<AsyncIterator<String>>;
+  codeCommune: () => Promise<AsyncIterator<String>>;
+}
+
 export interface ApplicationSubscriptionPayload {
   mutation: MutationType;
   node: Application;
@@ -12680,6 +13061,10 @@ export const models: Model[] = [
   },
   {
     name: "Declaration",
+    embedded: false
+  },
+  {
+    name: "AnonymousCompany",
     embedded: false
   }
 ];

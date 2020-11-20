@@ -1,42 +1,12 @@
-import {
-  searchCompany as searchCompanyInsee,
-  searchCompanies as searchCompaniesInsee
-} from "./insee/client";
-import {
-  searchCompany as searchCompanyDataGouv,
-  searchCompanies as searchCompaniesDataGouv
-} from "./entreprise.data.gouv.fr/client";
+import decoratedSearchCompany from "./searchCompany";
+import decoratedSearchCompanies from "./searchCompanies";
 import { CompanySearchResult } from "../../generated/graphql/types";
-import { throttle } from "./ratelimit";
-import { redundant } from "./redundancy";
-import { cache } from "./cache";
 import { UserInputError } from "apollo-server-express";
+import { searchAnonymousCompany } from "./anonymous";
 
-const INSEE_THROTTLE_KEY = "insee_throttle";
-const DATA_GOUV_THROTTLE_KEY = "data_gouv_throttle";
-
-function throttleErrorMessage(apiType: string) {
-  return `Trop de requêtes sur l'API Sirene ${apiType}`;
-}
-
-/**
- * Apply throttle, redundant and cache decorators to searchCompany functions
- * We use INSEE API in priority and fall back to entreprise.data.gouv.fr
- */
-const decoratedSearchCompany = cache(
-  redundant(
-    throttle(searchCompanyInsee, {
-      cacheKey: INSEE_THROTTLE_KEY,
-      errorMessage: throttleErrorMessage("INSEE")
-    }),
-    throttle(searchCompanyDataGouv, {
-      cacheKey: DATA_GOUV_THROTTLE_KEY,
-      errorMessage: throttleErrorMessage("entreprise.data.gouv.fr")
-    })
-  )
-);
-
-export function searchCompany(siret: string): Promise<CompanySearchResult> {
+export async function searchCompany(
+  siret: string
+): Promise<CompanySearchResult> {
   if (siret.length !== 14) {
     throw new UserInputError("Le siret doit faire 14 caractères", {
       invalidArgs: ["siret"]
@@ -48,28 +18,28 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
     return Promise.resolve({});
   }
 
-  return decoratedSearchCompany(siret);
+  try {
+    const searchResult = await decoratedSearchCompany(siret);
+    return searchResult;
+  } catch (err) {
+    // The SIRET was not found by searching the API
+    // Try searching the companies with restricted access
+    const anonymousCompany = await searchAnonymousCompany(siret);
+    if (anonymousCompany) {
+      return anonymousCompany;
+    }
+    throw err;
+  }
 }
-
-/**
- * Apply throttle and redundant decorator to searchCompanies functions
- * We use entreprise.data.gouv.fr API in priority and fallback to INSEE
- * because fuzzy search is way better in entreprise.data.gouv.fr
- */
-const decoratedSearchCompanies = redundant(
-  throttle(searchCompaniesDataGouv, {
-    cacheKey: DATA_GOUV_THROTTLE_KEY,
-    errorMessage: throttleErrorMessage("entreprise.data.gouv.fr")
-  }),
-  throttle(searchCompaniesInsee, {
-    cacheKey: INSEE_THROTTLE_KEY,
-    errorMessage: throttleErrorMessage("INSEE")
-  })
-);
 
 export function searchCompanies(
   clue: string,
   department?: string
 ): Promise<CompanySearchResult[]> {
+  if (/[0-9]{14}/.test(clue)) {
+    // clue is formatted like a SIRET
+    // use search by siret instead of full text
+    return searchCompany(clue).then(c => [c]);
+  }
   return decoratedSearchCompanies(clue, department);
 }
