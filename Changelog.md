@@ -13,6 +13,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Suppression de la possibilité pour l'émetteur du bordereau de valider un enlèvement sans signature transporteur dans l'interface Trackdéchets. Cette fonctionnalité utilisait les mutations `markAsSent` et `markAsResent` de l'API qui sont dépréciées. [PR 704](https://github.com/MTES-MCT/trackdechets/pull/704)
+
 #### :bug: Corrections de bugs
 
 - Correction de la mutation `duplicateForm` pour dupliquer l'entreposage provisoire, [PR 700](https://github.com/)

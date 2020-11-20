@@ -4,7 +4,7 @@ export enum SlipTabs {
   DRAFTS,
   TO_SIGN,
   STATUS,
-  HISTORY
+  HISTORY,
 }
 
 export function getTabForms(
@@ -67,10 +67,6 @@ export function getNextStep(form: Form, currentSiret: string) {
 
   if (form.status === FormStatus.Draft) return FormStatus.Sealed;
 
-  if (currentUserIsEmitter) {
-    if (form.status === FormStatus.Sealed) return FormStatus.Sent;
-  }
-
   if (currentUserIsDestination) {
     if (form.status === FormStatus.Resent) return FormStatus.Received;
     if (form.status === FormStatus.Received) return FormStatus.Processed;
@@ -79,7 +75,6 @@ export function getNextStep(form: Form, currentSiret: string) {
   if (currentUserIsTempStorer) {
     if (form.status === FormStatus.Sent) return FormStatus.TempStored;
     if (form.status === FormStatus.TempStored) return FormStatus.Resealed;
-    if (form.status === FormStatus.Resealed) return FormStatus.Resent;
     return null;
   }
 
@@ -103,6 +98,6 @@ function isHistoryStatus(status: string) {
   return [
     FormStatus.Processed,
     FormStatus.NoTraceability,
-    FormStatus.Refused
+    FormStatus.Refused,
   ].includes(status as FormStatus);
 }

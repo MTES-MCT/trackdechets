@@ -19,9 +19,7 @@ import { getNextStep } from "./next-step";
 import Processed from "./Processed";
 import Received from "./Received";
 import Sealed from "./Sealed";
-import Sent from "./Sent";
 import Resealed from "./Resealed";
-import Resent from "./Resent";
 import mutations from "./slip-actions.mutations";
 import { NotificationError } from "common/components/Error";
 import { ChevronDown, ChevronUp } from "common/components/Icons";
@@ -185,11 +183,6 @@ const buttons = {
     icon: PaperWriteIcon,
     component: Sealed,
   },
-  SENT: {
-    title: "Valider l'enlèvement",
-    icon: DeliveryTruckClockIcon,
-    component: Sent,
-  },
   RECEIVED: {
     title: "Valider la réception",
     icon: WaterDamIcon,
@@ -209,10 +202,5 @@ const buttons = {
     title: "Compléter le BSD suite",
     icon: PaperWriteIcon,
     component: Resealed,
-  },
-  RESENT: {
-    title: "Valider l'enlèvement",
-    icon: DeliveryTruckClockIcon,
-    component: Resent,
   },
 };
