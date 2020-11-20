@@ -7,6 +7,7 @@ import {
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormsRightFilter } from "../../database";
+import { getConnectionsArgs } from "../../pagination";
 
 const PAGINATE_BY = 100;
 
@@ -88,12 +89,16 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 
   const formsFilter = getFormsRightFilter(selectedCompany.siret);
 
+  const connectionArgs = getConnectionsArgs({
+    cursorAfter,
+    cursorBefore,
+    defaultPaginateBy: PAGINATE_BY
+  });
+
   const statusLogsCx = await prisma
     .statusLogsConnection({
       orderBy: "loggedAt_DESC",
-      [cursorAfter ? "first" : "last"]: PAGINATE_BY,
-      after: cursorAfter,
-      before: cursorBefore,
+      ...connectionArgs,
       where: {
         loggedAt_not: null,
         loggedAt_gte: loggedAfter,

@@ -1496,7 +1496,7 @@ export type Query = {
   /**
    * Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
    * La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
-   * Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont retournés
+   * Seuls les changements de statut disposant d'un champ `loggedAt` non nul sont retournés
    */
   formsLifeCycle: FormsLifeCycleData;
   /**
