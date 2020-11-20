@@ -329,7 +329,9 @@ export default function TransportSignature({
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Conditionnement:</span>
-                    {values.packagingInfos?.map(p => p.type).join(", ")}
+                    {values.packagingInfos
+                      ?.map(p => `${p.quantity} ${p.type}`)
+                      .join(", ")}
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Poids total:</span>

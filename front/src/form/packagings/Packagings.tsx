@@ -1,3 +1,4 @@
+import Tooltip from "../../common/components/Tooltip";
 import { Close } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/custom-inputs/NumberInput";
@@ -106,6 +107,10 @@ export default function Packagings({
                         name={`${name}.${idx}.quantity`}
                         placeholder="Nombre de colis"
                         min="1"
+                        {...([
+                          PackagingsEnum.Citerne,
+                          PackagingsEnum.Benne,
+                        ].includes(p.type) && { max: 1 })}
                       />
                     </div>
                   </div>
@@ -137,19 +142,25 @@ export default function Packagings({
             >
               Ajouter un conditionnement
             </button>
+            <Tooltip
+              msg={`Les règles suivantes s'appliquent:
+              - si une benne est présente, aucun autre conditionnement ne peut être ajouté
+              - si une citerne est présente, aucun autre conditionnement ne peut être ajouté
+              - le nombre de citerne et de benne ne peut pas dépasser 1
+              - une seule ligne de conditionnement par type, sauf pour "Autre"`}
+            />
           </div>
         )}
       />
-      {value.length > 0 && (
+      {value?.length > 0 && (
         <div className="tw-mt-4">
-          Total :{" "}
+          Total : {value.reduce((prev, cur) => prev + cur.quantity, 0)} colis -{" "}
           {value
-            ?.map(v => {
+            .map(v => {
               const packaging = PACKAGINGS.find(p => p.value === v.type);
-              return `${v.quantity} ${packaging?.label}`;
+              return `${v.quantity} ${packaging?.label}(s)`;
             })
             .join(", ")}
-          .
         </div>
       )}
     </div>
