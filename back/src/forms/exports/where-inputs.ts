@@ -40,13 +40,16 @@ export function formsWhereInput(
   return { AND: whereInputs };
 }
 
+// exclude draft, sealed and canceled forms from exports
+const exludedStatuses = ["DRAFT", "SEALED", "CANCELED"];
+
 /**
  * Forms corresponding to outgoing wastes of a list of production companies
  */
 function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
     OR: [{ emitterCompanySiret_in: sirets }, { ecoOrganismeSiret_in: sirets }],
-    AND: [{ status_not_in: ["DRAFT", "SEALED"] }]
+    AND: [{ status_not_in: exludedStatuses }]
   };
 }
 
@@ -61,7 +64,7 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
         AND: [
           { recipientIsTempStorage: false },
           { recipientCompanySiret_in: sirets },
-          { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+          { status_not_in: [...exludedStatuses, "SENT"] }
         ]
       },
       {
@@ -72,7 +75,7 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
               {
                 AND: [
                   { recipientCompanySiret_in: sirets },
-                  { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+                  { status_not_in: [...exludedStatuses, "SENT"] }
                 ]
               },
               {
@@ -84,8 +87,7 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
                   },
                   {
                     status_not_in: [
-                      "DRAFT",
-                      "SEALED",
+                      ...exludedStatuses,
                       "SENT",
                       "TEMP_STORED",
                       "RESENT"
@@ -112,7 +114,7 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
         AND: [
           { recipientIsTempStorage: false },
           { transporterCompanySiret_in: sirets },
-          { status_not_in: ["DRAFT", "SEALED"] }
+          { status_not_in: exludedStatuses }
         ]
       },
       // temporary storage
@@ -124,7 +126,7 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
               transporterCompanySiret_in: sirets
             }
           },
-          { status_not_in: ["DRAFT", "SEALED", "SENT", "TEMP_STORED"] }
+          { status_not_in: [...exludedStatuses, "SENT", "TEMP_STORED"] }
         ]
       },
       // multi-modal
@@ -135,7 +137,7 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
               transporterCompanySiret_in: sirets
             }
           },
-          { status_not_in: ["DRAFT", "SEALED"] }
+          { status_not_in: exludedStatuses }
         ]
       }
     ]
@@ -149,7 +151,7 @@ function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
     AND: [
       {
-        status_not_in: ["DRAFT", "SEALED"]
+        status_not_in: exludedStatuses
       },
       { traderCompanySiret_in: sirets }
     ]
@@ -158,13 +160,13 @@ function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
 
 /**
  * Forms where a list of companies are present for any status
- * excepted DRAFT and SEALED
+ * excepted DRAFT, SEALED and CANCELED
  */
 function allWasteWhereInput(sirets: string[]): FormWhereInput {
   return {
     AND: [
       {
-        status_not_in: ["DRAFT", "SEALED"]
+        status_not_in: exludedStatuses
       },
       {
         OR: [

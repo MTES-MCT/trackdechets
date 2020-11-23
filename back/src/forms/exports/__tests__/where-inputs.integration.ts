@@ -41,7 +41,7 @@ describe("whereInputs", () => {
       }
     });
 
-    // DRAFT and SEALED forms
+    // DRAFT, SEALED and CANCELED forms
     // SHOULD NOT BE RETURNED
     await formFactory({
       ownerId: user.id,
@@ -56,6 +56,33 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "SEALED",
+        emitterCompanySiret: company.siret,
+        sentAt: "2020-03-01T00:00:00",
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        sentAt: "2020-03-01T00:00:00",
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        sentAt: "2020-03-01T00:00:00",
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "CANCELED",
         emitterCompanySiret: company.siret,
         sentAt: "2020-03-01T00:00:00",
         wasteDetailsCode: "06 01 01*"
@@ -190,7 +217,7 @@ describe("whereInputs", () => {
       }
     });
 
-    // DRAFT, SEALED and SENT forms
+    // DRAFT, SEALED, CANCELED and SENT forms
     // SHOULD NOT BE RETURNED
     await formFactory({
       ownerId: user.id,
@@ -205,6 +232,15 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "SEALED",
+        recipientCompanySiret: company.siret,
+        sentAt: "2020-03-01T00:00:00",
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "CANCELED",
         recipientCompanySiret: company.siret,
         sentAt: "2020-03-01T00:00:00",
         wasteDetailsCode: "06 01 01*"
