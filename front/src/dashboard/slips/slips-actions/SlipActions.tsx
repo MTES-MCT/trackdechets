@@ -5,15 +5,15 @@ import {
   WaterDamIcon,
   CogApprovedIcon,
   PaperWriteIcon,
-  DeliveryTruckClockIcon,
   WarehouseStorageIcon,
 } from "common/components/Icons";
-import { Form } from "generated/graphql/types";
+import { Form, FormStatus } from "generated/graphql/types";
 import "./SlipActions.scss";
 import Delete from "./Delete";
 import DownloadPdf from "./DownloadPdf";
 import Edit from "./Edit";
 import Duplicate from "./Duplicate";
+import Cancel from "./Cancel";
 import Quicklook from "./Quicklook";
 import { getNextStep } from "./next-step";
 import Processed from "./Processed";
@@ -55,6 +55,45 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
   };
   // Avoid warning and rerendering in granchild useEffect()
   const onClose = useCallback(() => _onClose(), []);
+
+  function getActions() {
+    const quicklook = (
+      <Quicklook
+        formId={form.id}
+        buttonClass="btn--no-style slips-actions__button"
+        onOpen={disableOutsideClick}
+        onClose={onClose}
+      />
+    );
+    const duplicate = <Duplicate formId={form.id} onClose={onClose} />;
+    if (form.status === FormStatus.Draft) {
+      return [
+        quicklook,
+        <Delete
+          formId={form.id}
+          onOpen={disableOutsideClick}
+          onClose={onClose}
+        />,
+        <Edit formId={form.id} />,
+        duplicate,
+      ];
+    } else {
+      const actions = [<DownloadPdf formId={form.id} onSuccess={onClose} />];
+      if (form.status === FormStatus.Sealed) {
+        actions.push(
+          <Cancel
+            formId={form.id}
+            onOpen={disableOutsideClick}
+            onClose={onClose}
+          />
+        );
+      }
+      return [quicklook, ...actions, duplicate];
+    }
+  }
+
+  const actions = getActions();
+
   return (
     <OutsideClickHandler
       useCapture={false}
@@ -79,36 +118,11 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
         {dropdownOpened && (
           <div className="slips-actions__content">
             <ul className="slips-actions__items">
-              <li className="slips-actions__item">
-                <Quicklook
-                  formId={form.id}
-                  buttonClass="btn--no-style slips-actions__button"
-                  onOpen={disableOutsideClick}
-                  onClose={onClose}
-                />
-              </li>
-
-              {form.status === "DRAFT" ? (
-                <>
-                  <li className="slips-actions__item">
-                    <Delete
-                      formId={form.id}
-                      onOpen={disableOutsideClick}
-                      onClose={onClose}
-                    />
-                  </li>
-                  <li className="slips-actions__item">
-                    <Edit formId={form.id} />
-                  </li>
-                </>
-              ) : (
-                <li className="slips-actions__item">
-                  <DownloadPdf formId={form.id} onSuccess={onClose} />
+              {actions.map((action, i) => (
+                <li key={i} className="slips-actions__item">
+                  {action}
                 </li>
-              )}
-              <li className="slips-actions__item">
-                <Duplicate formId={form.id} onClose={onClose} />
-              </li>
+              ))}
             </ul>
           </div>
         )}

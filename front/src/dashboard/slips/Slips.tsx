@@ -72,7 +72,7 @@ export default function Slips({
             {dynamicActions && <th>Mes actions</th>}
             <th></th>
           </tr>
-          <tr className=" td-table__head-tr td-table__tr">
+          <tr className="td-table__head-tr td-table__tr">
             {hiddenFields.indexOf("readableId") === -1 && (
               <th>
                 <input

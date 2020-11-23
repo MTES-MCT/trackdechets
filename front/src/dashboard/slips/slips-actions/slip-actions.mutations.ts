@@ -61,6 +61,14 @@ const DELETE_FORM = gql`
   }
 `;
 
+const CANCEL_FORM = gql`
+  mutation CancelForm($id: ID!) {
+    cancelForm(id: $id) {
+      id
+    }
+  }
+`;
+
 export default {
   SEALED: MARK_SEALED,
   RECEIVED: MARK_RECEIVED,
@@ -69,4 +77,5 @@ export default {
   RESEALED: MARK_RESEALED,
   DUPLICATE_FORM,
   DELETE_FORM,
+  CANCEL_FORM,
 };

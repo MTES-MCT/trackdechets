@@ -679,3 +679,31 @@ export const Question = ({
     />
   </svg>
 );
+
+export const CommonFileRemove = ({
+  color = WHITE,
+  size = DEFAULT_DIMENSION,
+}: IconProps) => (
+  <svg
+    viewBox="0 0 32 32"
+    xmlns="http://www.w3.org/2000/svg"
+    fillRule="evenodd"
+    clipRule="evenodd"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="0"
+    width={`${size}px`}
+    height={`${size}px`}
+  >
+    <g fill="none" stroke={color}>
+      <path
+        d="M15 23a8 8 0 1016 0 8 8 0 10-16 0zM26 20l-6 6M20 20l6 6"
+        strokeWidth="1.9999949999999997"
+      />
+      <path
+        d="M11 27H3a2 2 0 01-2-2V3a2 2 0 012-2h14.172a2 2 0 011.413.585l3.83 3.83A2 2 0 0123 6.828V11"
+        strokeWidth="1.9999949999999997"
+      />
+    </g>
+  </svg>
+);

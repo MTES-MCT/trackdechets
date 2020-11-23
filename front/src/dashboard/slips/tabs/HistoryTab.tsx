@@ -23,6 +23,7 @@ export default function HistoryTab() {
         FormStatus.Processed,
         FormStatus.NoTraceability,
         FormStatus.Refused,
+        FormStatus.Canceled,
       ],
     },
     notifyOnNetworkStatusChange: true,
