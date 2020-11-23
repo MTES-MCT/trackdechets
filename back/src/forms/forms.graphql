@@ -336,6 +336,11 @@ type Mutation {
   """
   markAsSealed("ID d'un BSD" id: ID!): Form
 
+  """
+  Annule un BSD en attente d'envoi (statut `SEALED`)
+  """
+  cancelForm("ID d'un BSD" id: ID!): Form
+
   "Valide l'envoi d'un BSD"
   markAsSent(
     "ID d'un BSD"
@@ -462,10 +467,15 @@ enum FormStatus {
   DRAFT
 
   """
-  BSD finalisé
+  BSD finalisé, en attente d'enlèvement
   Les champs sont validés pour détecter des valeurs manquantes ou erronnées
   """
   SEALED
+
+  """
+  BSD correspondant à un enlèvement annulé
+  """
+  CANCELED
 
   "BSD envoyé vers l'établissement de destination"
   SENT

@@ -665,10 +665,12 @@ export enum FormStatus {
    */
   Draft = 'DRAFT',
   /**
-   * BSD finalisé
+   * BSD finalisé, en attente d'enlèvement
    * Les champs sont validés pour détecter des valeurs manquantes ou erronnées
    */
   Sealed = 'SEALED',
+  /** BSD correspondant à un enlèvement annulé */
+  Canceled = 'CANCELED',
   /** BSD envoyé vers l'établissement de destination */
   Sent = 'SENT',
   /** BSD reçu par l'établissement de destination */
@@ -849,6 +851,8 @@ export type Mutation = {
    * en spécifiant le rôle accordé au nouvel utilisateur
    */
   acceptMembershipRequest: CompanyPrivate;
+  /** Annule un BSD en attente d'envoi (statut `SEALED`) */
+  cancelForm: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -1090,6 +1094,11 @@ export type Mutation = {
 export type MutationAcceptMembershipRequestArgs = {
   id: Scalars['ID'];
   role: UserRole;
+};
+
+
+export type MutationCancelFormArgs = {
+  id: Scalars['ID'];
 };
 
 

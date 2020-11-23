@@ -24,9 +24,11 @@ const machine = Machine<any, Event>(
               target: FormState.Sent
             }
           ],
-          [EventType.ImportPaperForm]: [{ target: FormState.Processed }]
+          [EventType.ImportPaperForm]: [{ target: FormState.Processed }],
+          [EventType.CancelForm]: [{ target: FormState.Canceled }]
         }
       },
+      [FormState.Canceled]: { type: "final" },
       [FormState.Sent]: {
         on: {
           [EventType.MarkAsTempStored]: [

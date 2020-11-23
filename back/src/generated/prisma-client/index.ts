@@ -1337,6 +1337,7 @@ export type RubriqueOrderByInput =
 export type Status =
   | "DRAFT"
   | "SEALED"
+  | "CANCELED"
   | "SENT"
   | "RECEIVED"
   | "PROCESSED"

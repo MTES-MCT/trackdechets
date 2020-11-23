@@ -5865,6 +5865,7 @@ enum Seveso {
 enum Status {
   DRAFT
   SEALED
+  CANCELED
   SENT
   RECEIVED
   PROCESSED

@@ -219,6 +219,7 @@ enum Consistence {
 enum Status {
   DRAFT
   SEALED
+  CANCELED
   SENT
   RECEIVED
   PROCESSED

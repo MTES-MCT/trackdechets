@@ -540,6 +540,24 @@ Renvoie des statistiques sur le volume de déchets entrant et sortant
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>cancelForm</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Annule un BSD en attente d'envoi (statut `SEALED`)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createForm</strong></td>
 <td valign="top"><a href="#form">Form</a>!</td>
 <td>
@@ -5786,8 +5804,16 @@ Des champs obligatoires peuvent manquer
 <td valign="top"><strong>SEALED</strong></td>
 <td>
 
-BSD finalisé
+BSD finalisé, en attente d'enlèvement
 Les champs sont validés pour détecter des valeurs manquantes ou erronnées
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>CANCELED</strong></td>
+<td>
+
+BSD correspondant à un enlèvement annulé
 
 </td>
 </tr>

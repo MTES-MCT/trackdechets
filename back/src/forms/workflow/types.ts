@@ -4,6 +4,7 @@ import { FormUpdateInput } from "../../generated/prisma-client";
 export enum FormState {
   Draft = "DRAFT",
   Sealed = "SEALED",
+  Canceled = "CANCELED",
   Sent = "SENT",
   Received = "RECEIVED",
   Refused = "REFUSED",
@@ -19,6 +20,7 @@ export enum FormState {
 // Xstate event type
 export enum EventType {
   MarkAsSealed = "MARK_AS_SEALED",
+  CancelForm = "CANCEL_FORM",
   MarkAsSent = "MARK_AS_SENT",
   SignedByTransporter = "SIGNED_BY_TRANSPORTER",
   MarkAsReceived = "MARK_AS_RECEIVED",

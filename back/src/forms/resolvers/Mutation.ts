@@ -6,6 +6,7 @@ import saveForm from "./mutations/saveForm";
 import deleteForm from "./mutations/deleteForm";
 import duplicateForm from "./mutations/duplicateForm";
 import markAsSealed from "./mutations/markAsSealed";
+import cancelForm from "./mutations/cancelForm";
 import markAsSent from "./mutations/markAsSent";
 import signedByTransporter from "./mutations/signedByTransporter";
 import markAsReceived from "./mutations/markAsReceived";
@@ -27,6 +28,7 @@ const Mutation: MutationResolvers = {
   deleteForm,
   duplicateForm,
   markAsSealed,
+  cancelForm,
   markAsSent,
   signedByTransporter,
   markAsReceived,

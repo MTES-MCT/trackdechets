@@ -661,10 +661,12 @@ export type FormStatus =
    */
   | 'DRAFT'
   /**
-   * BSD finalisé
+   * BSD finalisé, en attente d'enlèvement
    * Les champs sont validés pour détecter des valeurs manquantes ou erronnées
    */
   | 'SEALED'
+  /** BSD correspondant à un enlèvement annulé */
+  | 'CANCELED'
   /** BSD envoyé vers l'établissement de destination */
   | 'SENT'
   /** BSD reçu par l'établissement de destination */
@@ -842,6 +844,8 @@ export type Mutation = {
    * en spécifiant le rôle accordé au nouvel utilisateur
    */
   acceptMembershipRequest: CompanyPrivate;
+  /** Annule un BSD en attente d'envoi (statut `SEALED`) */
+  cancelForm?: Maybe<Form>;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -1083,6 +1087,11 @@ export type Mutation = {
 export type MutationAcceptMembershipRequestArgs = {
   id: Scalars['ID'];
   role: UserRole;
+};
+
+
+export type MutationCancelFormArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -2769,6 +2778,7 @@ export type MembershipRequestResolvers<ContextType = GraphQLContext, ParentType 
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   acceptMembershipRequest?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationAcceptMembershipRequestArgs, 'id' | 'role'>>;
+  cancelForm?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationCancelFormArgs, 'id'>>;
   changePassword?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'oldPassword' | 'newPassword'>>;
   createCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'companyInput'>>;
   createForm?: Resolver<ResolversTypes['Form'], ParentType, ContextType, RequireFields<MutationCreateFormArgs, 'createFormInput'>>;
