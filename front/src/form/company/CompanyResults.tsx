@@ -37,16 +37,18 @@ export default function CompanyResults<
               <p>
                 {item.siret} - {item.address}
               </p>
-              <p>
-                <a
-                  href={generatePath(routes.company, { siret: item.siret! })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link"
-                >
-                  Information sur l'entreprise
-                </a>
-              </p>
+              {item.siret && (
+                <p>
+                  <a
+                    href={generatePath(routes.company, { siret: item.siret })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link"
+                  >
+                    Information sur l'entreprise
+                  </a>
+                </p>
+              )}
             </div>
             <div className={styles.icon}>
               {selectedItem?.siret === item.siret ? (

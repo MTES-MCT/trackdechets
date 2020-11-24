@@ -17,6 +17,7 @@ import { isDangerous } from "generated/constants";
 import {
   PackagingInfo,
   Packagings,
+  Consistence,
   WasteAcceptationStatusInput as WasteAcceptationStatus,
 } from "generated/graphql/types";
 
@@ -171,7 +172,7 @@ export const formSchema = object().shape({
       "Le type de quantité (réelle ou estimée) doit être précisé"
     ),
     consistence: string().oneOf(
-      Object.values(Packagings),
+      Object.values(Consistence),
       "La consistance du déchet doit être précisée"
     ),
   }),
