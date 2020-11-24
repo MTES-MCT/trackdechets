@@ -91,17 +91,6 @@ services:
       VIRTUAL_HOST: $UI_HOST
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-  td-mail:
-    image: betagouv/trackdechets-mail:master
-    restart: always
-    environment:
-      MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
-      MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
-      SENDER_EMAIL_ADDRESS: $SENDER_EMAIL_ADDRESS
-      SENDER_NAME: $SENDER_NAME
-      X-OVH-TOKEN: $OVH_LOGS_TOKEN
-      facility: docker-td-mail
-    logging: *gelf-logging
   td-doc:
     image: betagouv/trackdechets-doc:master
     restart: always

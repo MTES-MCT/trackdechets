@@ -170,7 +170,7 @@ jest.mock("../../generated/prisma-client", () => ({
 const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
 // spies on axios get to capture calls to geo.api.gouv.fr
 const mockedAxiosGet = jest.spyOn(axios, "get");
-// spies on axios post to capture calls to td-mail
+// spies on axios post to capture calls to mail helpers
 const mockedAxiosPost = jest.spyOn(axios, "post");
 const mockedSendMail = jest.spyOn(mailing, "sendMail");
 
@@ -179,7 +179,7 @@ const mockedSendMail = jest.spyOn(mailing, "sendMail");
  * We check:
  *    searchCompany is called twice
  *    geo.api.gouv.fr is called twice
- *    td-mail is called 3 times with right params
+ *    mail helper is called 3 times with right params
  *    dreals from relevant departments are emailed
  */
 describe("mailWhenFormIsDeclined", () => {
@@ -234,7 +234,7 @@ describe("mailWhenFormIsDeclined", () => {
 
     // pdf from was attached
     expect(payload1.attachment.file).toEqual("base64xyz");
- 
+
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
     expect(payload1.cc[0].email).toEqual("recipient@example.com");
@@ -291,7 +291,7 @@ describe("mailWhenFormIsDeclined", () => {
 
     // pdf from was attached
     expect(payload1.attachment.file).toEqual("base64xyz");
- 
+
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
     expect(payload1.cc[0].email).toEqual("recipient@example.com");
