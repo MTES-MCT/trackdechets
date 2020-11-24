@@ -133,7 +133,10 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   // build pdf as a base64 string
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
-  const attachmentData = await pdfEmailAttachment(payload.node.id);
+  const attachmentData = {
+    file: await buildPdfBase64(form),
+    name: `${form.readableId}.pdf`
+  };
 
   const emitterCompanyAdmins = await getCompanyAdminUsers(
     form.emitterCompanySiret
