@@ -52,8 +52,16 @@ export default function SignupInfo() {
               👉
             </span>
             Pour recevoir nos emails sans encombres, vous pouvez d'ajouter
-            hello@trackdechets.beta.gouv.fr à votre carnet d'adresse
+            hello@trackdechets.beta.gouv.fr à votre liste de contacts
           </li>
+        </ul>
+        <p className="lead-text tw-mb-5">
+          Merci de noter que le message peut ne pas arriver pour les raisons
+          suivantes:
+        </p>
+        <ul className="tw-mb-4">
+          <li>- Adresse email erronée</li>
+          <li>- Antivirus ou suite logicielle de sécurité trop restrictifs</li>
         </ul>
         <p className="body-text">
           Afin de finaliser votre inscription, veuillez cliquer dans le lien qui
