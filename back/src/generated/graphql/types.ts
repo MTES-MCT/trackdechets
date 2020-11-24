@@ -1472,9 +1472,12 @@ export type Query = {
    * 
    * Vous pouvez filtrer:
    * - par rôle que joue votre entreprise sur le BSD via `role`
-   * - par date de dernière modification via `updatedBefore` / `updatedAfter`
+   * - par date de dernière modification via `updatedAfter`
+   * - par date d'envoi via `sentAfter`
    * - par statut du BSD via `status`
    * - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+   * - par code déchet via `wasteCode`
+   * - par SIRET d'une entreprise présente n'importe ou sur le bordereau via `siretPresentOnForm`
    * 
    * Par défaut:
    * - tous les BSD accessibles sont retournés
