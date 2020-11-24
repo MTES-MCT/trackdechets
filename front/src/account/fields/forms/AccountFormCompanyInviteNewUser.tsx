@@ -1,9 +1,8 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
-import gql from "graphql-tag";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountCompanyInviteNewUser.module.scss";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import AccountCompanyMember from "../../AccountCompanyMember";
 import { object, string } from "yup";
 import {

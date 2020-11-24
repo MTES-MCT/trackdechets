@@ -1,6 +1,5 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { Field } from "formik";
-import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React, { useState } from "react";
 import DownloadFileLink from "common/components/DownloadFileLink";

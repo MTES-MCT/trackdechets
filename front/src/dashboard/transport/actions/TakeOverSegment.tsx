@@ -1,7 +1,6 @@
 import "./TransportSignature.module.scss";
 
 import { Field, Form as FormikForm, Formik } from "formik";
-import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React, { useState } from "react";
 import {
@@ -12,7 +11,7 @@ import {
   FormRole,
   FormStatus,
 } from "generated/graphql/types";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import { updateApolloCache } from "common/helper";

@@ -1,5 +1,5 @@
 import React from "react";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
 import { useRouteMatch, Link } from "react-router-dom";

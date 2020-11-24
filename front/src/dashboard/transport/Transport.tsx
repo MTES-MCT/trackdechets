@@ -1,8 +1,7 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, NetworkStatus } from "@apollo/client";
 import Loader, { RefreshLoader } from "common/components/Loaders";
 import React from "react";
 import { MEDIA_QUERIES } from "common/config";
-import { NetworkStatus } from "apollo-client";
 import {
   Form,
   FormRole,

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import gql from "graphql-tag";
 import { generatePath, useHistory } from "react-router-dom";
 import routes from "common/routes";
 import { GET_ME } from "../dashboard/Dashboard";

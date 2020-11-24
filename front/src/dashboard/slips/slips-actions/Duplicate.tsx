@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import React from "react";
 import { DuplicateFile } from "common/components/Icons";

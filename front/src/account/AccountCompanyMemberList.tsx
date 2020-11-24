@@ -1,5 +1,5 @@
 import React from "react";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";

@@ -1,15 +1,11 @@
 import React from "react";
-import gql from "graphql-tag";
 import { Formik, Form, Field } from "formik";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import PasswordMeter from "common/components/PasswordMeter";
 import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
-import {
-  MutationChangePasswordArgs,
-  Mutation,
-} from "generated/graphql/types";
+import { MutationChangePasswordArgs, Mutation } from "generated/graphql/types";
 
 type Props = {
   toggleEdition: () => void;

@@ -1,7 +1,6 @@
 import React from "react";
-import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, gql } from "@apollo/client";
 import AccountMenu from "./AccountMenu";
 import {
   Route,

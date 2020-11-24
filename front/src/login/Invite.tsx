@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import gql from "graphql-tag";
 import * as yup from "yup";
 import { useLocation, Link } from "react-router-dom";
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery, gql } from "@apollo/client";
 import {
   Invitation,
   Mutation,

@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from "@apollo/react-hooks";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { Search } from "common/components/Icons";

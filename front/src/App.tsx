@@ -1,5 +1,5 @@
 import React from "react";
-import { ApolloProvider } from "@apollo/react-hooks";
+import { ApolloProvider } from "@apollo/client";
 import { BrowserRouter as Router } from "react-router-dom";
 import client from "./graphql-client";
 import LayoutContainer from "./layout/LayoutContainer";

@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { fullFormFragment, statusChangeFragment } from "common/fragments";
 
 const MARK_SEALED = gql`
