@@ -1,6 +1,5 @@
 NODE_ENV=test
-PRISMA_ENDPOINT=http://prisma:4467/default/staging
-PRISMA_SECRET=any_secret
+DATABASE_URL=postgresql://test:no_pass@postgres:5432/prisma?schema=default$default
 JWT_SECRET=any_secret
 SESSION_SECRET=any_secret
 API_HOST=api.trackdechets.local

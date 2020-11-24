@@ -10,13 +10,15 @@ export MSYS_NO_PATHCONV=1 # needed for windows
 EXIT_CODE=0
 
 startcontainers(){
-    echo ">> Starting containers..."
+    echo "🚀 >> Starting containers..."
     docker-compose up --build -d
-    echo ">> Deploy to prisma..."
+    echo "📑 >> Deploy DB..."
+    psql_container_id=$(docker ps -qf "name=integration_postgres")
+    docker cp ./db-deploy/. $psql_container_id:/tmp
+    docker exec -t $psql_container_id bash /tmp/deploy-db.sh
+    echo "🔮 >> Initialize @prisma/client "
     api_container_id=$(docker ps -qf "name=integration_td-api")
-    docker exec -t $api_container_id bash integration-tests/wait-for-prisma.sh
-    docker exec -t $api_container_id npx prisma deploy
-    docker exec -t $api_container_id npx prisma reset --force
+    docker exec -t $api_container_id npx prisma generate
 }
 
 stopcontainers(){
@@ -36,7 +38,13 @@ all(){
     stopcontainers
 }
 
-help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] -- trackdechets test runner
+generatemodel(){
+    root_psql_container_id=$(docker ps -qf "name=trackdechets_postgres")
+    docker exec -t $root_psql_container_id bash -c "pg_dump -U trackdechets -s -Fc -n 'default\$default' prisma > /tmp/db_model.dump"
+    docker cp $root_psql_container_id:/tmp/db_model.dump ./db-deploy
+}
+
+help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] [-g] -- trackdechets test runner
 
 where:
     -h show this help text
@@ -46,9 +54,11 @@ where:
         ./$(basename "$0") -r /docker-path/to/my/test
 
     -p spin up containers, run integration test(s) matching given path, down containers
-        ./$(basename "$0") -p /docker-path/to/my/test"
+        ./$(basename "$0") -p /docker-path/to/my/test
+        
+    -g generate new db_model.dump from current trackdechets DB"
 
-while getopts "hudp:r:" OPTION; do
+while getopts "hudgp:r:" OPTION; do
     case $OPTION in
     h)
         echo "$help"
@@ -67,9 +77,12 @@ while getopts "hudp:r:" OPTION; do
         runtest $OPTARG
           exit 1
         ;;
-
     p)
         all $OPTARG
+        exit 1
+        ;;
+    g)
+        generatemodel
         exit 1
         ;;
     *)
