@@ -68,18 +68,6 @@ services:
     volumes:
       - ./front/:/usr/src/front
 
-  td-pdf:
-    image: td-pdf
-    build:
-      context: ./pdf
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./pdf/src:/usr/src/app/src
-    ports:
-      - 3201:3201
-    environment:
-      PDF_WATERMARK: display
-
   td-mail:
     image: td-mail
     build:

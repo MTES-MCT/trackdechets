@@ -17,9 +17,9 @@ const drawText = ({
   page,
   yOffset = 0
 }) => {
-  let params = settings[fieldName];
+  const params = settings[fieldName];
   if (!!params) {
-    let fontSize = params.fontSize ? params.fontSize : 8;
+    const fontSize = params.fontSize ? params.fontSize : 8;
     let x = params.x;
 
     if (!!params.rightAlign) {
@@ -117,7 +117,7 @@ export const dateFmt = datestr => {
     return "";
   }
   const date = new Date(datestr);
-  let year = date.getFullYear();
+  const year = date.getFullYear();
   let month: number | string = date.getMonth() + 1;
   let day: number | string = date.getDate();
 
@@ -174,7 +174,7 @@ export const getWasteDetailsType = params => {
   if (!params.wasteDetailsQuantityType) {
     return {};
   }
-  let field = {
+  const field = {
     ESTIMATED: "wasteDetailsQuantityEstimated",
     REAL: "wasteDetailsQuantityReal"
   }[params.wasteDetailsQuantityType];
@@ -187,7 +187,7 @@ const getTempStorerWasteDetailsType = params => {
   if (!params.tempStorerQuantityType) {
     return {};
   }
-  let field = {
+  const field = {
     ESTIMATED: "tempStorerQuantityEstimated",
     REAL: "tempStorerQuantityReal"
   }[params.tempStorerQuantityType];
@@ -241,7 +241,7 @@ const getWasteDetailsPackagings = params => {
     return {};
   }
   return params.wasteDetailsPackagingInfos.reduce(function (acc, elem) {
-    let key = `wasteDetailsPackagings${capitalize(elem.type)}`;
+    const key = `wasteDetailsPackagings${capitalize(elem.type)}`;
     return {
       ...acc,
       [key]: true
@@ -269,8 +269,8 @@ const getWasteDetailsNumberOfPackages = params => {
  * Transform numbers as strings to be accepted by the pdf template
  */
 const stringifyNumberFields = <T>(params: T): T => {
-  let data = { ...params };
-  for (let [k, v] of Object.entries(data)) {
+  const data = { ...params };
+  for (const [k, v] of Object.entries(data)) {
     if (typeof v === "number") {
       data[k] = v.toString();
     }
@@ -349,7 +349,7 @@ interface MainFormParams {
   isImportedFromPaper?: boolean;
 }
 
-export function processMainFormParams(params: MainFormParams) {
+export function processMainFormParams(params) {
   params = { ...params, ...getWasteRefusalreason(params) }; // compute refused quantity before converting number to strings
   const data = stringifyNumberFields(params);
 
@@ -411,7 +411,7 @@ export function processSegment(segment) {
  */
 
 export const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
-  for (let [fieldName, content] of Object.entries(data)) {
+  for (const [fieldName, content] of Object.entries(data)) {
     if (content === true) {
       checkBox({
         fieldName,
@@ -421,15 +421,15 @@ export const fillFields = ({ data, settings, font, page, yOffset = 0 }) => {
         yOffset
       });
     } else {
-      content =
+      const cont =
         typeof content === "string"
           ? content
           : settings[fieldName]?.content?.(data);
 
-      if (typeof content === "string") {
+      if (typeof cont === "string") {
         drawText({
           fieldName,
-          content,
+          content: cont,
           settings: settings,
           font: font,
           page: page,

@@ -83,7 +83,7 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 3. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-pdf td-ui
+   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-ui
    ```
 
    Le démarrage du service `td-mail` est déconseillé en développement pour éviter des envois de courriels intempestifs mais vous pouvez l'activer pour le bon fonctionnement de certaines fonctionnalités (ex: validation de l'inscription, invitation à rejoindre un établissement, etc)
@@ -125,7 +125,7 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
 
 1. Démarrer les différents services
    ```
-   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-pdf td-api td-ui
+   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-api td-ui
    ```
 2. Faire tourner les tests back
    ```bash
