@@ -17,7 +17,7 @@ describe("<AccountField />", () => {
         name="username"
         label="Nom utilisateur"
         value="John Snow"
-        renderForm={() => <form role="form"></form>}
+        renderForm={() => <form></form>}
         tooltip="Le nom de l'utilisateur"
         modifier="Modifier"
       />
@@ -54,7 +54,7 @@ describe("<AccountField />", () => {
         label="Nom utilisateur"
         value="John Snow"
         renderForm={toggleEdition => (
-          <form role="form" onSubmit={() => toggleEdition()}>
+          <form onSubmit={() => toggleEdition()}>
             <button type="submit" data-test-id="submit-button" />
           </form>
         )}

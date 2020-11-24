@@ -51,10 +51,19 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js",
-    "build:tailwind": "tailwindcss build src/tailwind.css -o src/generated/css/tailwind.generated.css"
+    "build:tailwind": "tailwindcss build src/tailwind.css -o src/generated/css/tailwind.generated.css",
+    "lint": "eslint   --ext .ts --ext .tsx ./src"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "plugins": [
+      "no-only-tests",
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": "error",
+      "no-only-tests/no-only-tests": "error"
+    }
   },
   "devDependencies": {
     "@testing-library/dom": "^6.6.0",
