@@ -107,10 +107,14 @@ export default function Packagings({
                         name={`${name}.${idx}.quantity`}
                         placeholder="Nombre de colis"
                         min="1"
-                        {...([
-                          PackagingsEnum.Citerne,
-                          PackagingsEnum.Benne,
-                        ].includes(p.type) && { max: 1 })}
+                        max={
+                          [
+                            PackagingsEnum.Citerne,
+                            PackagingsEnum.Benne,
+                          ].includes(p.type)
+                            ? 1
+                            : undefined
+                        }
                       />
                     </div>
                   </div>
