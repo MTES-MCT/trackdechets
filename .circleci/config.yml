@@ -13,11 +13,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: npm install --prefix back
+          name: "back: Install dependencies"
+          command: npm ci --prefix back
       - run:
-          name: Run linter
+          name: "back: Run linter"
           command: npm run lint --prefix back
+      - run:
+          name: "front: Install dependencies"
+          command: npm ci --prefix front
+      - run:
+          name: "front: Run linter"
+          command: npm run lint --prefix front
 
   test:
     description: "Run tests"
