@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, Children } from "react";
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
 import styles from "./Slider.module.scss";
 import { NextButton, PreviousButton } from "common/components/Buttons";
 export default function Slider({ children, onClose }: any) {
   const [page, setPage] = useState(0);
 
-  const numberOfPages = React.Children.count(children) - 1;
-  const activePage = React.Children.toArray(children)[page];
+  const numberOfPages = Children.count(children) - 1;
+  const activePage = Children.toArray(children)[page];
 
   return (
     <div className={styles.sliderContainer}>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "whatwg-fetch";
 import { useLocation } from "react-router-dom";
 
 export interface AuthorizePayload {

@@ -6,6 +6,8 @@ import {
   CogApprovedIcon,
   PaperWriteIcon,
   WarehouseStorageIcon,
+  ChevronDown,
+  ChevronUp,
 } from "common/components/Icons";
 import { Form } from "generated/graphql/types";
 import "./SlipActions.scss";
@@ -21,7 +23,6 @@ import Sealed from "./Sealed";
 import Resealed from "./Resealed";
 import mutations from "./slip-actions.mutations";
 import { NotificationError } from "common/components/Error";
-import { ChevronDown, ChevronUp } from "common/components/Icons";
 import OutsideClickHandler from "react-outside-click-handler";
 import { COLORS } from "common/config";
 import TdModal from "common/components/Modal";

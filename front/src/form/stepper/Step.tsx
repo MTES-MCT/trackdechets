@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, createElement } from "react";
 import { Link } from "react-router-dom";
 import { NextButton, PreviousButton } from "common/components/Buttons";
 import "./Step.scss";
@@ -21,7 +21,7 @@ export interface IStepContainerProps {
 }
 export function StepContainer(props: IStepContainerProps) {
   return props.component
-    ? React.createElement(props.component)
+    ? createElement(props.component)
     : props.children
     ? props.children
     : null;

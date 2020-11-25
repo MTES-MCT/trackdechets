@@ -1,5 +1,5 @@
-import React from "react";
-import mapboxgl from "mapbox-gl";
+import * as React from "react";
+import * as mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./CompanyMap.scss";
 

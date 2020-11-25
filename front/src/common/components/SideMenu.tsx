@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 
-import useMedia from "use-media";
+import { useMedia } from "use-media";
 
 import { MEDIA_QUERIES } from "common/config";
 

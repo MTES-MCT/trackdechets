@@ -1,6 +1,5 @@
 import React from "react";
 
-import { statusLabels } from "dashboard/constants";
 import DownloadPdf from "dashboard/slips/slips-actions/DownloadPdf";
 import Duplicate from "dashboard/slips/slips-actions/Duplicate";
 
@@ -8,7 +7,7 @@ import Delete from "dashboard/slips/slips-actions/Delete";
 import Edit from "dashboard/slips/slips-actions/Edit";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { TransportSegment, Form, FormCompany } from "generated/graphql/types";
-import { statusesWithDynamicActions } from "../constants";
+import { statusesWithDynamicActions, statusLabels } from "../constants";
 import {
   WarehouseDeliveryIcon,
   WarehouseStorageIcon,

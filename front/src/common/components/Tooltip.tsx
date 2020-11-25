@@ -1,7 +1,7 @@
 import React from "react";
 import { Question } from "common/components/Icons";
 import { COLORS } from "common/config";
-import Tooltip from "@reach/tooltip";
+import { Tooltip } from "@reach/tooltip";
 import "@reach/tooltip/styles.css";
 import style from "./Tooltip.module.scss";
 

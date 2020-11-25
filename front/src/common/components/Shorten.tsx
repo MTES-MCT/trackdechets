@@ -1,5 +1,5 @@
 import React from "react";
-import Tooltip from "@reach/tooltip";
+import { Tooltip } from "@reach/tooltip";
 import "@reach/tooltip/styles.css";
 type Props = {
   content: string;
