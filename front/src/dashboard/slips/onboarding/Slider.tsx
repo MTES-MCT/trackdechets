@@ -12,16 +12,18 @@ export default function Slider({ children, onClose }: any) {
     <div className={styles.sliderContainer}>
       <div className={styles.slider}>
         <div
-          className={`${styles.sliderNavigation} ${page === 0 &&
-            styles.sliderNavigationHidden}`}
+          className={`${styles.sliderNavigation} ${
+            page === 0 && styles.sliderNavigationHidden
+          }`}
           onClick={() => setPage(Math.max(page - 1, 0))}
         >
           <FaArrowAltCircleLeft />
         </div>
         <div className="content">{activePage}</div>
         <div
-          className={`${styles.sliderNavigation} ${page === numberOfPages &&
-            styles.sliderNavigationHidden}`}
+          className={`${styles.sliderNavigation} ${
+            page === numberOfPages && styles.sliderNavigationHidden
+          }`}
           onClick={() => setPage(Math.min(page + 1, numberOfPages))}
         >
           <FaArrowAltCircleRight />

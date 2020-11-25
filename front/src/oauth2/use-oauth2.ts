@@ -22,7 +22,7 @@ export function useOAuth2() {
   const [error, setError] = useState<string | null>(null);
   const [
     authorizePayload,
-    setAuthorizePayload
+    setAuthorizePayload,
   ] = useState<AuthorizePayload | null>(null);
 
   const { REACT_APP_API_ENDPOINT } = process.env;
