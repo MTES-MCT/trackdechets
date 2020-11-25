@@ -10,7 +10,6 @@ type Props = {
 export default function LoadMore({ forms, fetchMore }: Props) {
   if (forms.length < ITEMS_PER_PAGE) {
     return null;
-
   }
 
   return (

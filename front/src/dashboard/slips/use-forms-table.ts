@@ -7,7 +7,7 @@ function getKey(object: any, key: string) {
 }
 
 function compareBy(key: string) {
-  return function(a: any, b: any) {
+  return function (a: any, b: any) {
     if (getKey(a, key) < getKey(b, key)) return -1;
     if (getKey(a, key) > getKey(b, key)) return 1;
     return 0;

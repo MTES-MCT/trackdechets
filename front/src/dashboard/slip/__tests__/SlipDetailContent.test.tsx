@@ -2,7 +2,7 @@ import React from "react";
 import SlipDetailContent from "../SlipDetailContent";
 import "@testing-library/jest-dom/extend-expect";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Router } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import {
   FormStatus,
   Form,
@@ -11,8 +11,7 @@ import {
   QuantityType,
   Consistence,
 } from "generated/graphql/types";
-import { MockedProvider } from "@apollo/react-testing";
-import { createMemoryHistory } from "history";
+import { MockedProvider } from "@apollo/client/testing";
 
 const simpleForm: Form = {
   id: "abcd",
@@ -371,12 +370,11 @@ const tempStorageForm: Form = {
 
 describe("<SlipDetailContent />", () => {
   it("should render a simple form", () => {
-    const history = createMemoryHistory();
     const { getByText } = render(
       <MockedProvider>
-        <Router history={history}>
+        <MemoryRouter>
           <SlipDetailContent form={simpleForm} />
-        </Router>
+        </MemoryRouter>
       </MockedProvider>
     );
     expect(screen.getByText(/TD-20-TCG6666/)).toBeInTheDocument();
@@ -417,12 +415,11 @@ describe("<SlipDetailContent />", () => {
   });
 
   it("should render a form with temp storage ", () => {
-    const history = createMemoryHistory();
     const { getByText } = render(
       <MockedProvider>
-        <Router history={history}>
+        <MemoryRouter>
           <SlipDetailContent form={tempStorageForm} />
-        </Router>
+        </MemoryRouter>
       </MockedProvider>
     );
     expect(screen.getByText(/TD-20-TCG5555/)).toBeInTheDocument();

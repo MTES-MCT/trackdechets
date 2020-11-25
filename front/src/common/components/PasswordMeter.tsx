@@ -13,7 +13,8 @@ export default function PasswordMeter({ password }: Props) {
 
   return (
     <span className={styles.passwordMeter}>
-      <FaAward /> <span>Difficulté du mot de passe: {createPasswordLabel(score)}</span>
+      <FaAward />{" "}
+      <span>Difficulté du mot de passe: {createPasswordLabel(score)}</span>
     </span>
   );
 }

@@ -5,7 +5,7 @@ import {
   Switch,
   Redirect,
   generatePath,
-} from "react-router";
+} from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
 import Loader from "common/components/Loaders";

@@ -44,8 +44,8 @@ export default function CompanySelector({
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
-  const [clue, setClue] = React.useState("");
-  const [department, setDepartement] = React.useState<null | string>(null);
+  const [clue, setClue] = useState("");
+  const [department, setDepartement] = useState<null | string>(null);
   const [
     searchCompaniesQuery,
     { loading: isLoadingSearch, data: searchData },

@@ -7,8 +7,8 @@ import {
   Route,
   Switch,
   useHistory,
-} from "react-router";
-import { useParams } from "react-router-dom";
+  useParams,
+} from "react-router-dom";
 import routes from "common/routes";
 import { InlineError } from "../common/components/Error";
 import Loader from "../common/components/Loaders";

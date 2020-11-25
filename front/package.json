@@ -52,10 +52,14 @@
     "eject": "react-scripts eject",
     "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js",
     "build:tailwind": "tailwindcss build src/tailwind.css -o src/generated/css/tailwind.generated.css",
-    "lint": "eslint   --ext .ts --ext .tsx ./src"
+    "lint": "eslint --ext .ts,.tsx ./src"
   },
   "eslintConfig": {
-    "extends": "react-app",
+    "extends": [
+      "react-app",
+      "plugin:import/recommended",
+      "plugin:import/typescript"
+    ],
     "plugins": [
       "no-only-tests",
       "prettier"
@@ -63,6 +67,11 @@
     "rules": {
       "prettier/prettier": "error",
       "no-only-tests/no-only-tests": "error"
+    },
+    "settings": {
+      "import/resolver": {
+        "typescript": {}
+      }
     }
   },
   "devDependencies": {
@@ -89,6 +98,7 @@
     "@typescript-eslint/parser": "^3.0.2",
     "browserslist-useragent-regexp": "^2.0.5",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-no-only-tests": "^2.4.0",
     "eslint-plugin-prettier": "^3.1.4",

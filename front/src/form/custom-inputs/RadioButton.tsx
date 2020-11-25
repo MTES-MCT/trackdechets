@@ -11,18 +11,18 @@ export function InlineRadioButton({
   return (
     <>
       <label className={styles.labelInline} htmlFor={cssId}>
-      <input
-        id={cssId}
-        name={name}
-        type="radio"
-        value={id}
-        checked={id === value}
-        onChange={onChange}
-        onBlur={onBlur}
-        className="td-radio"
-        {...props}
-      />
-    
+        <input
+          id={cssId}
+          name={name}
+          type="radio"
+          value={id}
+          checked={id === value}
+          onChange={onChange}
+          onBlur={onBlur}
+          className="td-radio"
+          {...props}
+        />
+
         {label}
       </label>
     </>

@@ -1,7 +1,7 @@
 import { useQuery, NetworkStatus } from "@apollo/client";
 import Loader, { RefreshLoader } from "common/components/Loaders";
 import React from "react";
-import { MEDIA_QUERIES } from "common/config";
+import { MEDIA_QUERIES, COLORS } from "common/config";
 import {
   Form,
   FormRole,
@@ -18,9 +18,7 @@ import routes from "common/routes";
 
 import { GET_TRANSPORT_SLIPS } from "./queries";
 import useLocalStorage from "common/hooks/useLocalStorage";
-import useMedia from "use-media";
-
-import { COLORS } from "common/config";
+import { useMedia } from "use-media";
 
 import { TransportTable } from "./TransportTable";
 import { TransportCards } from "./TransportCards";

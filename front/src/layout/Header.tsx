@@ -22,7 +22,7 @@ import { DashboardNav } from "dashboard/DashboardNavigation";
 import routes from "common/routes";
 import { MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
-import useMedia from "use-media";
+import { useMedia } from "use-media";
 
 export const GET_ME = gql`
   {

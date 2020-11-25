@@ -5,7 +5,7 @@ import { StepContainer } from "./stepper/Step";
 import StepList from "./stepper/StepList";
 import Transporter from "./Transporter";
 import WasteInfo from "./WasteInfo";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
 
 export default function FormContainer() {
   const { id } = useParams<{ id?: string }>();
