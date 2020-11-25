@@ -57,7 +57,6 @@ export function getTabForms(
 }
 
 export function getNextStep(form: Form, currentSiret: string) {
-  const currentUserIsEmitter = currentSiret === form.emitter?.company?.siret;
   const currentUserIsRecipient =
     currentSiret === form.recipient?.company?.siret;
   const currentUserIsTempStorer =

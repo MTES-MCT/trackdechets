@@ -5,7 +5,6 @@ import {
   WaterDamIcon,
   CogApprovedIcon,
   PaperWriteIcon,
-  DeliveryTruckClockIcon,
   WarehouseStorageIcon,
 } from "common/components/Icons";
 import { Form } from "generated/graphql/types";
