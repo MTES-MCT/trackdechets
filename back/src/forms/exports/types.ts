@@ -16,7 +16,7 @@ export type FormFlattened = Partial<Form> & {
   temporaryStorageTransporterCompanyAddress?: string;
   temporaryStorageTransporterIsExemptedOfReceipt?: boolean;
   temporaryStorageTransporterReceipt?: string;
-  temporaryStorageTransporterValidityLimit?: string;
+  temporaryStorageTransporterValidityLimit?: Date;
   temporaryStorageTransporterNumberPlate?: string;
   ecoOrganismeName?: string;
 };

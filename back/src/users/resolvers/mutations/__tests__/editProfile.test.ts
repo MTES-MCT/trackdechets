@@ -3,9 +3,7 @@ import { editProfileFn as editProfile } from "../editProfile";
 const mockUpdateUser = jest.fn();
 
 jest.mock("src/prisma", () => ({
-  prisma: {
-    user: { update: jest.fn((...args) => mockUpdateUser(...args)) }
-  }
+  user: { update: jest.fn((...args) => mockUpdateUser(...args)) }
 }));
 
 describe("editProfile", () => {

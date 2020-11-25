@@ -71,17 +71,17 @@ test("chain should optionnally chain data access", () => {
 });
 
 test("expandFormFromDb", () => {
-  const form: Form = {
+  const form: Partial<Form> = {
     id: "ckcejngdp00p00895cxaze1e8",
     readableId: "TD-61feb7d24fd67a5688e761eb1cbcb497",
     isImportedFromPaper: false,
     customId: null,
     isDeleted: false,
-    createdAt: "2020-07-09T08:43:23.434Z",
-    updatedAt: "2020-07-09T08:43:23.434Z",
+    createdAt: new Date("2020-07-09T08:43:23.434Z"),
+    updatedAt: new Date("2020-07-09T08:43:23.434Z"),
     signedByTransporter: true,
     status: "SENT",
-    sentAt: "2019-11-20T00:00:00.000Z",
+    sentAt: new Date("2019-11-20T00:00:00.000Z"),
     sentBy: "signe",
     isAccepted: null,
     wasteAcceptationStatus: null,
@@ -135,7 +135,7 @@ test("expandFormFromDb", () => {
     transporterCompanyMail: "transporter@td.io",
     transporterIsExemptedOfReceipt: false,
     transporterNumberPlate: "aa22",
-    transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+    transporterValidityLimit: new Date("2019-11-27T00:00:00.000Z"),
     transporterCompanyPhone: "06 18 76 02 66",
     currentTransporterSiret: null,
     nextTransporterSiret: null,
@@ -162,7 +162,7 @@ test("expandFormFromDb", () => {
     ecoOrganismeSiret: null
   };
 
-  const expanded = expandFormFromDb(form);
+  const expanded = expandFormFromDb(form as Form);
 
   const expected = {
     id: form.id,
@@ -213,7 +213,7 @@ test("expandFormFromDb", () => {
       isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
       receipt: form.transporterReceipt,
       department: form.transporterDepartment,
-      validityLimit: form.transporterValidityLimit,
+      validityLimit: form.transporterValidityLimit.toISOString(),
       numberPlate: form.transporterNumberPlate,
       customInfo: form.transporterCustomInfo
     },
@@ -232,11 +232,11 @@ test("expandFormFromDb", () => {
     },
     trader: null,
     ecoOrganisme: null,
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    createdAt: form.createdAt.toISOString(),
+    updatedAt: form.updatedAt.toISOString(),
     status: form.status,
     signedByTransporter: form.signedByTransporter,
-    sentAt: form.sentAt,
+    sentAt: form.sentAt.toISOString(),
     sentBy: form.sentBy,
     wasteAcceptationStatus: form.wasteAcceptationStatus,
     wasteRefusalReason: form.wasteRefusalReason,
@@ -329,7 +329,7 @@ describe("flattenFormInput", () => {
       transporterCompanyMail: null,
       transporterReceipt: input.transporter.receipt,
       transporterDepartment: input.transporter.department,
-      transporterValidityLimit: input.transporter.validityLimit,
+      transporterValidityLimit: new Date(input.transporter.validityLimit),
       transporterNumberPlate: input.transporter.numberPlate,
       wasteDetailsCode: null,
       wasteDetailsName: null,

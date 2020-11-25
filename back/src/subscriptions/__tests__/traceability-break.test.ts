@@ -14,10 +14,8 @@ const mockedForm = {
   recipientCompanyName: "recipient_name"
 };
 
-jest.mock("../../generated/prisma-client", () => ({
-  prisma: {
-    form: jest.fn(() => mockedForm)
-  }
+jest.mock("src/prisma", () => ({
+  form: { findOne: jest.fn(() => mockedForm) }
 }));
 
 describe("mailWhenFormTraceabilityIsBroken", () => {

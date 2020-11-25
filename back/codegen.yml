@@ -11,7 +11,7 @@ generates:
       enumsAsTypes: true
       scalars:
         DateTime: string
-        URL: string
+        URL: URL
       scalarDefaults:
         DateTime: new Date().toISOString()
         URL: "https://example.com"

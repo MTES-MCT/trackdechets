@@ -7,11 +7,9 @@ import { AccessToken, User } from "@prisma/client";
 import { GraphQLContext } from "../types";
 
 const updateAccessTokenMock = jest.fn();
-jest.mock("../generated/prisma-client", () => ({
-  prisma: {
-    accessToken: {
-      update: jest.fn((...args) => updateAccessTokenMock(...args))
-    }
+jest.mock("src/prisma", () => ({
+  accessToken: {
+    update: jest.fn((...args) => updateAccessTokenMock(...args))
   }
 }));
 
@@ -85,7 +83,7 @@ describe("updateAccessTokenLastUsed", () => {
 
 describe("applyAuthStrategies", () => {
   it("should keep user in context if auth strategy is allowed", () => {
-    const user: User = {
+    const user: Partial<User> = {
       id: "1",
       email: "john.snow@trackdechets.fr",
       password: "pass",
@@ -93,7 +91,7 @@ describe("applyAuthStrategies", () => {
       updatedAt: new Date()
     };
     const context: GraphQLContext = {
-      user: { ...user, auth: AuthType.Session },
+      user: { ...(user as User), auth: AuthType.Session },
       req: null,
       res: null
     };
@@ -102,7 +100,7 @@ describe("applyAuthStrategies", () => {
   });
 
   it("should remove user from context if auth strategy is not allowed", () => {
-    const user: User = {
+    const user: Partial<User> = {
       id: "1",
       email: "john.snow@trackdechets.fr",
       password: "pass",
@@ -110,7 +108,7 @@ describe("applyAuthStrategies", () => {
       updatedAt: new Date()
     };
     const context: GraphQLContext = {
-      user: { ...user, auth: AuthType.Bearer },
+      user: { ...(user as User), auth: AuthType.Bearer },
       req: null,
       res: null
     };

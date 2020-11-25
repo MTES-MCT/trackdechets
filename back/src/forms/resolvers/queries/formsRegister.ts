@@ -39,8 +39,8 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   const whereInput = formsWhereInput(
     args.exportType,
     args.sirets,
-    args.startDate,
-    args.endDate,
+    args.startDate ? new Date(args.startDate) : null,
+    args.endDate ? new Date(args.endDate) : null,
     args.wasteCode
   );
 

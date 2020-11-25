@@ -13,6 +13,7 @@ import {
 } from "../../errors";
 import { userMails } from "../../mails";
 import { checkIsCompanyAdmin } from "../../permissions";
+import { convertUrls } from "src/companies/database";
 
 const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipRequest"] = async (
   parent,
@@ -61,7 +62,8 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
   // notify requester of acceptance
   await sendMail(userMails.membershipRequestAccepted(requester, company));
 
-  return prisma.company.findOne({ where: { id: company.id } });
+  const dbCompany = await prisma.company.findOne({ where: { id: company.id } });
+  return convertUrls(dbCompany);
 };
 
 export default acceptMembershipRequestResolver;

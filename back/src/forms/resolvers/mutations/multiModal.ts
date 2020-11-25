@@ -136,6 +136,17 @@ function flattenSegmentForDb(
   return dbObject;
 }
 
+function datifySegmentForDb(transportSegment: Partial<PrismaTransportSegment>) {
+  return {
+    ...transportSegment,
+    ...(transportSegment.transporterValidityLimit && {
+      transporterValidityLimit: new Date(
+        transportSegment.transporterValidityLimit
+      )
+    })
+  };
+}
+
 /**
  *
  * Prepare a new transport segment
@@ -152,7 +163,9 @@ export async function prepareSegment(
   if (!currentUserSirets.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
-  const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
+  const nextSegmentPayload = datifySegmentForDb(
+    flattenSegmentForDb(nextSegmentInfo)
+  );
 
   if (!nextSegmentPayload.transporterCompanySiret) {
     throw new ForbiddenError("Le siret est obligatoire");
@@ -229,28 +242,6 @@ export async function prepareSegment(
 
   return expandTransportSegmentFromDb(segment);
 }
-
-type SegmentAndForm = {
-  id;
-  form;
-  transporterCompanySiret: string;
-  transporterCompanyName: string;
-  transporterCompanyAddress: string;
-  transporterCompanyContact: string;
-  transporterCompanyPhone: string;
-  transporterCompanyMail: string;
-  transporterIsExemptedOfReceipt: boolean;
-  transporterReceipt: string;
-  transporterDepartment: string;
-  transporterValidityLimit: string;
-  transporterNumberPlate: string;
-  mode: string;
-
-  readyToTakeOver: boolean;
-
-  takenOverAt: string;
-  takenOverBy: string;
-};
 
 export async function markSegmentAsReadyToTakeOver(
   { id }: MutationMarkSegmentAsReadyToTakeOverArgs,
@@ -360,10 +351,14 @@ export async function takeOverSegment(
       )}`
     );
   }
-
   const updatedSegment = await prisma.transportSegment.update({
-    where: { id: id },
-    data: takeOverInfo
+    where: { id },
+    data: {
+      ...takeOverInfo,
+      ...(takeOverInfo.takenOverAt && {
+        takenOverAt: new Date(takeOverInfo.takenOverAt)
+      })
+    }
   });
 
   await prisma.form.update({

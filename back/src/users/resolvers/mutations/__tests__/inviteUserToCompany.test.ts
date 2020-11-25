@@ -6,10 +6,8 @@ const userMock = jest.fn();
 const companyMock = jest.fn();
 
 jest.mock("src/prisma", () => ({
-  prisma: {
-    user: { findOne: jest.fn((...args) => userMock(...args)) },
-    company: { findOne: jest.fn((...args) => companyMock(...args)) }
-  }
+  user: { findOne: jest.fn((...args) => userMock(...args)) },
+  company: { findOne: jest.fn((...args) => companyMock(...args)) }
 }));
 
 const sendMailMock = jest.fn();

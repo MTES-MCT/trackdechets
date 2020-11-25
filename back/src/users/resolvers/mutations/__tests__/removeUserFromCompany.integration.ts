@@ -16,13 +16,14 @@ const REMOVE_USER_FROM_COMPANY = `mutation RemoveUserFromCompany($userId: ID!, $
 describe("mutation removeUserFromCompany", () => {
   afterEach(resetDatabase);
 
-  function isMemberFn(userId: string, siret: string) {
-    const elem = prisma.companyAssociation.findFirst({
+  async function isMemberFn(userId: string, siret: string) {
+    const elem = await prisma.companyAssociation.findFirst({
       where: {
         user: { id: userId },
         company: { siret }
       }
     });
+
     return elem != null;
   }
 

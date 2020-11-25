@@ -285,7 +285,7 @@ describe("{ mutation { markAsSent } }", () => {
     }
   );
 
-  test.each(["20201211", "junk", "2020 12 11", "2020-12-33"])(
+  test.each(["20201211", "junk", "2020-12-33"])(
     "sentAt must be a valid date, %p is not valid",
     async dateStr => {
       const { user, company: emitterCompany } = await userWithCompanyFactory(

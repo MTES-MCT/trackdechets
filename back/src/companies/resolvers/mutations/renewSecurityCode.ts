@@ -10,6 +10,7 @@ import {
 import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { randomNumber } from "../../../utils";
 import {
+  convertUrls,
   getCompanyActiveUsers,
   getCompanyOrCompanyNotFound
 } from "../../database";
@@ -65,7 +66,7 @@ export async function renewSecurityCodeFn(
   });
   sendMail(mail);
 
-  return updatedCompany;
+  return convertUrls(updatedCompany);
 }
 
 const renewSecurityCodeResolver: MutationResolvers["renewSecurityCode"] = async (

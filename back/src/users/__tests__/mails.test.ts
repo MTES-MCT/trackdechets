@@ -1,14 +1,14 @@
 import { userMails } from "../mails";
 import { Form } from "@prisma/client";
 
-const formWithTransporter: Form = {
+const formWithTransporter: Partial<Form> = {
   id: "abcd123",
   readableId: "TD-2019-XYZ",
   isImportedFromPaper: false,
   status: "REFUSED",
-  createdAt: "2019-01-17T08:44:29+0100",
-  updatedAt: "2019-01-17T08:44:29+0100",
-  receivedAt: "2019-01-17T10:22:00+0100",
+  createdAt: new Date("2019-01-17T08:44:29+0100"),
+  updatedAt: new Date("2019-01-17T08:44:29+0100"),
+  receivedAt: new Date("2019-01-17T10:22:00+0100"),
   wasteDetailsCode: "04 01 03*",
   wasteDetailsName: "Chiffonades",
   wasteDetailsQuantity: 32,
@@ -25,7 +25,7 @@ describe("userMails.formNotAccepted", () => {
     const { subject, title, to, body, attachment } = userMails.formNotAccepted(
       [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
       [],
-      formWithTransporter,
+      formWithTransporter as Form,
       "xyz"
     );
     expect(attachment).toEqual("xyz");
@@ -57,7 +57,7 @@ describe("userMails.formNotAccepted", () => {
     const { body } = userMails.formNotAccepted(
       [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
       [],
-      formExemptedOfReceipt,
+      formExemptedOfReceipt as Form,
       "xyz"
     );
 
@@ -80,7 +80,7 @@ describe("userMails.formPartiallyRefused", () => {
     } = userMails.formPartiallyRefused(
       [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
       [],
-      payload,
+      payload as Form,
       "xyz"
     );
     expect(attachment).toEqual("xyz");
@@ -115,7 +115,7 @@ describe("userMails.formPartiallyRefused", () => {
     const { body } = userMails.formPartiallyRefused(
       [{ email: "marcel@recyclator.fr", name: "Marcel Dubois" }],
       [],
-      formExemptedOfReceipt,
+      formExemptedOfReceipt as Form,
       "xyz"
     );
 

@@ -1,6 +1,4 @@
-import { Status, Form,
-  TemporaryStorageDetail,
-  User } from "@prisma/client";
+import { Status, Form, TemporaryStorageDetail, User } from "@prisma/client";
 import prisma from "src/prisma";
 
 import { expandFormFromDb } from "../../form-converter";
@@ -45,15 +43,20 @@ async function duplicateForm(
     transporterNumberPlate,
     transporterCustomInfo,
     currentTransporterSiret,
+    temporaryStorageDetailId,
+    appendix2RootFormId,
+    ownerId,
 
     ...rest
   }: Form
 ) {
-  return prisma.createForm({
-    ...rest,
-    readableId: await getReadableId(),
-    status: "DRAFT",
-    owner: { connect: { id: user.id } }
+  return prisma.form.create({
+    data: {
+      ...rest,
+      readableId: await getReadableId(),
+      status: "DRAFT",
+      owner: { connect: { id: user.id } }
+    }
   });
 }
 
@@ -83,7 +86,7 @@ function duplicateTemporaryStorageDetail(
     ...rest
   }: TemporaryStorageDetail
 ) {
-  return prisma.updateForm({
+  return prisma.form.update({
     where: {
       id: form.id
     },
@@ -131,6 +134,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
       form: { connect: { id: newForm.id } },
       user: { connect: { id: user.id } },
       status: newForm.status as Status,
+      authType: user.auth,
       updatedFields: {},
       loggedAt: new Date()
     }

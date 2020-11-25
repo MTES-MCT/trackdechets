@@ -8,19 +8,17 @@ import {
 
 // Let's mock prima DB
 jest.mock("src/prisma", () => ({
-  prisma: {
-    user: {
-      findMany: jest.fn(() => [
-        {
-          email: "user@example.com",
-          id: "xy123",
-          isActive: true,
-          name: "Rick Hunter",
-          password: "$2b$10$nabc",
-          phone: "06 18 12 34 56"
-        }
-      ])
-    }
+  user: {
+    findMany: jest.fn(() => [
+      {
+        email: "user@example.com",
+        id: "xy123",
+        isActive: true,
+        name: "Rick Hunter",
+        password: "$2b$10$nabc",
+        phone: "06 18 12 34 56"
+      }
+    ])
   }
 }));
 

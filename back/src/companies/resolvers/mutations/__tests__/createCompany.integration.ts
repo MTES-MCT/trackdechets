@@ -68,11 +68,10 @@ describe("Mutation.createCompany", () => {
       })) != null;
     expect(newCompanyExists).toBe(true);
 
-    const newCompanyAssociationExists = await prisma.companyAssociation.findFirst(
-      {
+    const newCompanyAssociationExists =
+      (await prisma.companyAssociation.findFirst({
         where: { company: { siret: companyInput.siret }, user: { id: user.id } }
-      }
-    );
+      })) != null;
     expect(newCompanyAssociationExists).toBe(true);
   });
 
@@ -100,7 +99,15 @@ describe("Mutation.createCompany", () => {
       }
     });
 
-    expect(data.createCompany.transporterReceipt).toEqual(transporterReceipt);
+    expect(data.createCompany.transporterReceipt.receiptNumber).toEqual(
+      transporterReceipt.receiptNumber
+    );
+    expect(data.createCompany.transporterReceipt.validityLimit).toEqual(
+      transporterReceipt.validityLimit.toISOString()
+    );
+    expect(data.createCompany.transporterReceipt.department).toEqual(
+      transporterReceipt.department
+    );
   });
 
   it("should link to a traderReceipt", async () => {
@@ -128,7 +135,15 @@ describe("Mutation.createCompany", () => {
     });
 
     // check the traderReceipt was created in db
-    expect(data.createCompany.traderReceipt).toEqual(traderReceipt);
+    expect(data.createCompany.traderReceipt.receiptNumber).toEqual(
+      traderReceipt.receiptNumber
+    );
+    expect(data.createCompany.traderReceipt.validityLimit).toEqual(
+      traderReceipt.validityLimit.toISOString()
+    );
+    expect(data.createCompany.traderReceipt.department).toEqual(
+      traderReceipt.department
+    );
   });
 
   it("should create document keys", async () => {

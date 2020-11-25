@@ -89,6 +89,7 @@ const createFormResolver = async (
       user: { connect: { id: context.user!.id } },
       status: newForm.status as Status,
       updatedFields: {},
+      authType: user.auth,
       loggedAt: new Date()
     }
   });

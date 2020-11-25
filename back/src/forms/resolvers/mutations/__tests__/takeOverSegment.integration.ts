@@ -73,7 +73,10 @@ describe("{ mutation { takeOverSegment } }", () => {
     const takenOverSegment = await prisma.transportSegment.findOne({
       where: { id: segment.id }
     });
-    expect(takenOverSegment.takenOverAt).toBe("2020-04-28T00:00:00.000Z");
+
+    expect(takenOverSegment.takenOverAt.toISOString()).toBe(
+      "2020-04-28T00:00:00.000Z"
+    );
     expect(takenOverSegment.takenOverBy).toBe("transporter suivant");
 
     // form next and currentTransporterSiret have been updated

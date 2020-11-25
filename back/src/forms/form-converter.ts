@@ -4,9 +4,7 @@ import {
   TransportSegment as PrismaTransportSegment,
   FormCreateInput,
   TemporaryStorageDetailCreateInput,
-  TemporaryStorageDetailUpdateInput,
-  Form,
-  TransportSegment
+  TemporaryStorageDetailUpdateInput
 } from "@prisma/client";
 import {
   Form as GraphQLForm,
@@ -37,7 +35,9 @@ import {
   ImportPaperFormInput,
   EcoOrganismeInput,
   PackagingInfo,
-  TransporterSignatureFormInput
+  TransporterSignatureFormInput,
+  SignatureFormInput,
+  ReceivedFormInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -100,6 +100,18 @@ export function safeInput<K>(obj: K): Partial<K> {
   }, {});
 }
 
+/**
+ * If the field is either null or undefined, return that same value
+ * Otherwise it's a Date, return its ISO string representation
+ * @param field a Date, null or undefined
+ */
+function isoStringDateOrNoop(field: Date | null | undefined) {
+  if (field === null) {
+    return null;
+  }
+
+  return field?.toISOString();
+}
 /**
  * Equivalent to a typescript optional chaining operator foo?.bar
  * except that it returns "null" instead of "undefined" if "null" is encountered in the chain
@@ -187,7 +199,9 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
     ),
     transporterReceipt: chain(input.transporter, t => t.receipt),
     transporterDepartment: chain(input.transporter, t => t.department),
-    transporterValidityLimit: chain(input.transporter, t => t.validityLimit),
+    transporterValidityLimit: chain(input.transporter, t =>
+      t.validityLimit ? new Date(t.validityLimit) : null
+    ),
     transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
     transporterCustomInfo: chain(input.transporter, t => t.customInfo)
   };
@@ -278,7 +292,9 @@ function flattenTraderInput(input: { trader?: TraderInput }) {
     traderCompanyMail: chain(input.trader, t => chain(t.company, c => c.mail)),
     traderReceipt: chain(input.trader, t => t.receipt),
     traderDepartment: chain(input.trader, t => t.department),
-    traderValidityLimit: chain(input.trader, t => t.validityLimit)
+    traderValidityLimit: chain(input.trader, t =>
+      t.validityLimit ? new Date(t.validityLimit) : null
+    )
   };
 }
 
@@ -375,9 +391,26 @@ export function flattenImportPaperFormInput(
     ...flattenTransporterInput(rest),
     ...flattenWasteDetailsInput(rest),
     ...flattenTraderInput(rest),
-    ...signingInfo,
-    ...receivedInfo,
+    ...flattenSigningInfo(signingInfo),
+    ...flattenReceivedInfo(receivedInfo),
     ...flattenProcessedFormInput(processedInfo)
+  });
+}
+
+function flattenSigningInfo(signingInfo: SignatureFormInput) {
+  return safeInput({
+    ...signingInfo,
+    ...(signingInfo.sentAt && { sentAt: new Date(signingInfo.sentAt) })
+  });
+}
+
+function flattenReceivedInfo(receivedInfo: ReceivedFormInput) {
+  return safeInput({
+    ...receivedInfo,
+    ...(receivedInfo.receivedAt && {
+      receivedAt: new Date(receivedInfo.receivedAt)
+    }),
+    ...(receivedInfo.signedAt && { signedAt: new Date(receivedInfo.signedAt) })
   });
 }
 
@@ -406,6 +439,8 @@ export function flattenResentFormInput(
     ...flattenTransporterInput(resentFormInput),
     signedBy: resentFormInput.signedBy,
     signedAt: resentFormInput.signedAt
+      ? new Date(resentFormInput.signedAt)
+      : null
   });
 }
 
@@ -471,7 +506,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
       receipt: form.transporterReceipt,
       department: form.transporterDepartment,
-      validityLimit: form.transporterValidityLimit?.toISOString(),
+      validityLimit: isoStringDateOrNoop(form.transporterValidityLimit),
       numberPlate: form.transporterNumberPlate,
       customInfo: form.transporterCustomInfo
     }),
@@ -500,23 +535,23 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       }),
       receipt: form.traderReceipt,
       department: form.traderDepartment,
-      validityLimit: form.traderValidityLimit?.toISOString()
+      validityLimit: isoStringDateOrNoop(form.traderValidityLimit)
     }),
     ecoOrganisme: nullIfNoValues<FormEcoOrganisme>({
       name: form.ecoOrganismeName,
       siret: form.ecoOrganismeSiret
     }),
-    createdAt: form.createdAt?.toISOString(),
-    updatedAt: form.updatedAt?.toISOString(),
+    createdAt: isoStringDateOrNoop(form.createdAt),
+    updatedAt: isoStringDateOrNoop(form.updatedAt),
     status: form.status as FormStatus,
     signedByTransporter: form.signedByTransporter,
-    sentAt: form.sentAt?.toISOString(),
+    sentAt: isoStringDateOrNoop(form.sentAt),
     sentBy: form.sentBy,
     wasteAcceptationStatus: form.wasteAcceptationStatus,
     wasteRefusalReason: form.wasteRefusalReason,
     receivedBy: form.receivedBy,
-    receivedAt: form.receivedAt?.toISOString(),
-    signedAt: form.signedAt?.toISOString(),
+    receivedAt: isoStringDateOrNoop(form.receivedAt),
+    signedAt: isoStringDateOrNoop(form.signedAt),
     quantityReceived: form.quantityReceived,
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
@@ -553,7 +588,9 @@ export function expandTemporaryStorageFromDb(
       wasteAcceptationStatus:
         temporaryStorageDetail.tempStorerWasteAcceptationStatus,
       wasteRefusalReason: temporaryStorageDetail.tempStorerWasteRefusalReason,
-      receivedAt: temporaryStorageDetail.tempStorerReceivedAt?.toISOString(),
+      receivedAt: isoStringDateOrNoop(
+        temporaryStorageDetail.tempStorerReceivedAt
+      ),
       receivedBy: temporaryStorageDetail.tempStorerReceivedBy
     }),
     destination: nullIfNoValues({
@@ -596,12 +633,14 @@ export function expandTemporaryStorageFromDb(
         temporaryStorageDetail.transporterIsExemptedOfReceipt,
       receipt: temporaryStorageDetail.transporterReceipt,
       department: temporaryStorageDetail.transporterDepartment,
-      validityLimit: temporaryStorageDetail.transporterValidityLimit?.toISOString(),
+      validityLimit: isoStringDateOrNoop(
+        temporaryStorageDetail.transporterValidityLimit
+      ),
       numberPlate: temporaryStorageDetail.transporterNumberPlate,
       customInfo: null
     }),
     signedBy: temporaryStorageDetail.signedBy,
-    signedAt: temporaryStorageDetail.signedAt?.toISOString()
+    signedAt: isoStringDateOrNoop(temporaryStorageDetail.signedAt)
   };
 }
 
@@ -623,12 +662,12 @@ export function expandTransportSegmentFromDb(
       isExemptedOfReceipt: segment.transporterIsExemptedOfReceipt,
       receipt: segment.transporterReceipt,
       department: segment.transporterDepartment,
-      validityLimit: segment.transporterValidityLimit?.toISOString(),
+      validityLimit: isoStringDateOrNoop(segment.transporterValidityLimit),
       numberPlate: segment.transporterNumberPlate,
       customInfo: null
     }),
     mode: segment.mode,
-    takenOverAt: segment.takenOverAt?.toISOString(),
+    takenOverAt: isoStringDateOrNoop(segment.takenOverAt),
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,
     segmentNumber: segment.segmentNumber

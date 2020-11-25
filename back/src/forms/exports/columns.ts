@@ -1,4 +1,4 @@
-import Excel from "exceljs";
+import * as Excel from "exceljs";
 import countries from "world-countries";
 import { Column, FormFlattened } from "./types";
 

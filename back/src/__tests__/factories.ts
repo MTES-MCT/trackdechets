@@ -290,6 +290,7 @@ export const statusLogFactory = async ({
       form: { connect: { id: formId } },
       user: { connect: { id: userId } },
       loggedAt: new Date(),
+      authType: "SESSION",
       status,
       updatedFields,
       ...opt

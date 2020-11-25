@@ -1,3 +1,4 @@
+import { AuthType } from "@prisma/client";
 import { createTestClient } from "apollo-server-integration-testing";
 import { server } from "../server";
 
@@ -12,7 +13,7 @@ function makeClient(user?: Express.User) {
   if (user) {
     setOptions({
       request: {
-        user
+        user: { ...user, auth: AuthType.SESSION }
       }
     });
   }

@@ -5,7 +5,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "src/prisma";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
@@ -260,8 +260,8 @@ describe("query favorites", () => {
         }
       }
     });
-    const temporaryStorageDetail = await prisma
-      .form({ id: form.id })
+    const temporaryStorageDetail = await prisma.form
+      .findOne({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });

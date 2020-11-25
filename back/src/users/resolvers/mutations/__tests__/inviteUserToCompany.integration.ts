@@ -35,10 +35,10 @@ describe("mutation inviteUserToCompany", () => {
     const { data } = await mutate(INVITE_USER_TO_COMPANY, {
       variables: { email: user.email, siret: company.siret, role: "MEMBER" }
     });
-    expect(data.inviteUserToCompany.users).toEqual([
-      { email: admin.email },
-      { email: user.email }
-    ]);
+    expect(data.inviteUserToCompany.users.length).toBe(2);
+    expect(data.inviteUserToCompany.users).toEqual(
+      expect.arrayContaining([{ email: admin.email }, { email: user.email }])
+    );
     const companyAssociations = await prisma.user
       .findOne({ where: { id: user.id } })
       .companyAssociations();

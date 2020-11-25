@@ -5,10 +5,8 @@ const countMock = jest.fn();
 const mailMock = jest.fn();
 
 jest.mock("src/prisma", () => ({
-  prisma: {
-    companyAssociation: {
-      count: countMock
-    }
+  companyAssociation: {
+    count: jest.fn((...args) => countMock(...args))
   }
 }));
 
@@ -18,12 +16,13 @@ jest.mock("../../../../mailer/mailing", () => ({
 
 describe("warnIfUserCreatesTooManyCompanies subscription", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    countMock.mockReset();
+    mailMock.mockReset();
   });
 
   test("should send mail if user has too much companies", async () => {
     // 10 > MAX
-    countMock.mockResolvedValue(10);
+    countMock.mockResolvedValue(100);
     await warnIfUserCreatesTooManyCompanies(
       { id: "id", name: "name" } as User,
       { name: "companyName", siret: "siret" } as Company

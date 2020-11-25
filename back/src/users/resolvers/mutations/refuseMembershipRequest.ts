@@ -1,3 +1,4 @@
+import { convertUrls } from "src/companies/database";
 import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
@@ -54,7 +55,8 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
     .user();
   await sendMail(userMails.membershipRequestRefused(requester, company));
 
-  return prisma.company.findOne({ where: { id: company.id } });
+  const dbCompany = await prisma.company.findOne({ where: { id: company.id } });
+  return convertUrls(dbCompany);
 };
 
 export default refuseMembershipRequestResolver;

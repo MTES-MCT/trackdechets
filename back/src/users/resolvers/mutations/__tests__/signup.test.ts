@@ -9,21 +9,21 @@ const userInfos = {
 };
 
 jest.mock("src/prisma", () => ({
-  prisma: {
-    user: {
-      create: jest.fn(() => Promise.resolve(userInfos)),
-      findFirst: jest.fn(() => Promise.resolve(null))
-    },
-    userActivationHash: {
-      create: jest.fn(() => Promise.resolve({ hash: "an hash" }))
-    },
-    userAccountHash: {
-      findMany: jest.fn(() => Promise.resolve([])),
-      updateMany: jest.fn(() => Promise.resolve())
-    },
-    companyAssociation: {
-      create: jest.fn(() => Promise.resolve())
-    }
+  user: {
+    create: jest.fn(() => Promise.resolve(userInfos)),
+    findFirst: jest.fn(() => Promise.resolve(null)),
+    findMany: jest.fn(() => Promise.resolve([])),
+    count: jest.fn(() => Promise.resolve(0))
+  },
+  userActivationHash: {
+    create: jest.fn(() => Promise.resolve({ hash: "an hash" }))
+  },
+  userAccountHash: {
+    findMany: jest.fn(() => Promise.resolve([])),
+    updateMany: jest.fn(() => Promise.resolve())
+  },
+  companyAssociation: {
+    create: jest.fn(() => Promise.resolve())
   }
 }));
 

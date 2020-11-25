@@ -7,7 +7,7 @@ import {
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCompanyOrCompanyNotFound } from "../../database";
+import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyAdmin } from "../../../users/permissions";
 
 export async function updateCompanyFn({
@@ -36,14 +36,20 @@ export async function updateCompanyFn({
       ? { traderReceipt: { connect: { id: traderReceiptId } } }
       : {}),
     ...(ecoOrganismeAgreements != null
-      ? { ecoOrganismeAgreements: { set: ecoOrganismeAgreements } }
+      ? {
+          ecoOrganismeAgreements: {
+            set: ecoOrganismeAgreements.map(a => a.toString())
+          }
+        }
       : {})
   };
 
-  return prisma.company.update({
+  const company = await prisma.company.update({
     where: { siret },
     data
   });
+
+  return convertUrls(company);
 }
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (

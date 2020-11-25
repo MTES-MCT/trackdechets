@@ -207,6 +207,21 @@ export async function getTransporterReceiptOrNotFound({
 export function stringifyDates(obj: TraderReceipt | TransporterReceipt) {
   return {
     ...obj,
-    ...(obj.validityLimit && { validityLimit: obj.validityLimit.toISOString() })
+    ...(obj?.validityLimit && {
+      validityLimit: obj.validityLimit.toISOString()
+    })
+  };
+}
+
+export function convertUrls<T extends Partial<Company>>(
+  company: T
+): T & { ecoOrganismeAgreements: URL[] } {
+  return {
+    ...company,
+    ...(company?.ecoOrganismeAgreements && {
+      ecoOrganismeAgreements: company.ecoOrganismeAgreements.map(
+        a => new URL(a)
+      )
+    })
   };
 }

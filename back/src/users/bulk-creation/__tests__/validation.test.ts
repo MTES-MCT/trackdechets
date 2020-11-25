@@ -6,10 +6,8 @@ const mockCompanyExists = jest.fn();
 const mockUserExists = jest.fn();
 
 jest.mock("src/prisma", () => ({
-  prisma: {
-    company: { findFirst: jest.fn(() => mockCompanyExists()) },
-    user: { findFirst: jest.fn(() => mockUserExists()) }
-  }
+  company: { findFirst: jest.fn(() => mockCompanyExists()) },
+  user: { findFirst: jest.fn(() => mockUserExists()) }
 }));
 
 const mockSirene = jest.fn();

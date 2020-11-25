@@ -1,4 +1,9 @@
-import { AccessToken, User as PrismaUser, User } from "@prisma/client";
+import {
+  AccessToken,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  User as PrismaUser,
+  User
+} from "@prisma/client";
 import { compare } from "bcrypt";
 import express from "express";
 import passport from "passport";

@@ -33,7 +33,7 @@ const form: Partial<Form> = {
   recipientCompanyMail: "d@d.fr",
   transporterReceipt: "sdfg",
   transporterDepartment: "82",
-  transporterValidityLimit: "2018-12-11T00:00:00.000Z",
+  transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
   transporterCompanyName: "A company 4",
   transporterCompanySiret: "XXXXXXXXXX0004",
   transporterCompanyAddress: "8 rue du Général de Gaulle",
@@ -302,7 +302,7 @@ describe("draftFormSchema", () => {
     recipientCompanyMail: "",
     wasteDetailsCode: "",
     transporterCompanyMail: "",
-    transporterValidityLimit: ""
+    transporterValidityLimit: new Date()
   };
 
   it("should be valid when passing empty strings", () => {

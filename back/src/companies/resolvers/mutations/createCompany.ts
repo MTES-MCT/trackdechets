@@ -1,5 +1,6 @@
 import { Company, CompanyCreateInput, User } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
+import { convertUrls } from "src/companies/database";
 import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
@@ -31,7 +32,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     traderReceiptId,
     documentKeys
   } = companyInput;
-  const ecoOrganismeAgreements = companyInput.ecoOrganismeAgreements || [];
+  const ecoOrganismeAgreements =
+    companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
   const siret = companyInput.siret.replace(/\s+/g, "");
 
   const existingCompany = await prisma.company
@@ -117,7 +119,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   await warnIfUserCreatesTooManyCompanies(user, company);
 
-  return company;
+  return convertUrls(company);
 };
 
 const NB_OF_COMPANIES_BEFORE_ALERT = 5;

@@ -15,7 +15,7 @@ export async function checkIsCompanyMember(
   { id }: { id: string },
   { siret }: { siret: string }
 ) {
-  const companyAssociation = await prisma.companyAssociation.findOne({
+  const companyAssociation = await prisma.companyAssociation.findFirst({
     where: {
       user: {
         id

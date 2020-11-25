@@ -119,9 +119,13 @@ export function getConnectionsArgs(args: PaginationArgs) {
 
   return {
     ...(args.skip ? { skip: args.skip } : {}),
-    ...(first ? { first } : {}),
-    ...(last ? { last } : {}),
-    ...(args.cursorAfter ? { after: args.cursorAfter } : {}),
-    ...(args.cursorBefore ? { before: args.cursorBefore } : {})
+    ...(first ? { take: first } : {}),
+    ...(last ? { take: -last } : {}),
+    ...(args.cursorAfter
+      ? { cursor: { id: args.cursorAfter }, skip: (args.skip ?? 0) + 1 }
+      : {}),
+    ...(args.cursorBefore
+      ? { cursor: { id: args.cursorBefore }, skip: (args.skip ?? 0) + 1 }
+      : {})
   };
 }

@@ -8,8 +8,8 @@ import { FormsRegisterExportType } from "../../generated/graphql/types";
 export function formsWhereInput(
   exportType: FormsRegisterExportType,
   sirets: string[],
-  startDate?: string,
-  endDate?: string,
+  startDate?: Date,
+  endDate?: Date,
   wasteCode?: string
 ): FormWhereInput {
   // build prisma where input
@@ -147,8 +147,10 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
       {
         AND: [
           {
-            transportSegments_some: {
-              transporterCompanySiret: { in: sirets }
+            transportSegments: {
+              some: {
+                transporterCompanySiret: { in: sirets }
+              }
             }
           },
           { status: { notIn: ["DRAFT", "SEALED"] } }
@@ -198,8 +200,10 @@ function allWasteWhereInput(sirets: string[]): FormWhereInput {
             temporaryStorageDetail: { transporterCompanySiret: { in: sirets } }
           },
           {
-            transportSegments_some: {
-              transporterCompanySiret: { in: sirets }
+            transportSegments: {
+              some: {
+                transporterCompanySiret: { in: sirets }
+              }
             }
           }
         ]

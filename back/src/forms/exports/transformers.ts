@@ -48,7 +48,8 @@ export function flattenForm(formExpanded: FormExpanded): FormFlattened {
       temporaryStorageDetail?.transporterIsExemptedOfReceipt;
     form.temporaryStorageTransporterReceipt =
       temporaryStorageDetail?.transporterReceipt;
-    form.temporaryStorageTransporterValidityLimit = temporaryStorageDetail?.transporterValidityLimit?.toISOString();
+    form.temporaryStorageTransporterValidityLimit =
+      temporaryStorageDetail?.transporterValidityLimit;
     form.temporaryStorageTransporterNumberPlate =
       temporaryStorageDetail?.transporterNumberPlate;
   }

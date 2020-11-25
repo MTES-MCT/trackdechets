@@ -3,7 +3,10 @@ import prisma from "src/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCompanyOrCompanyNotFound } from "../../../companies/database";
+import {
+  convertUrls,
+  getCompanyOrCompanyNotFound
+} from "../../../companies/database";
 import {
   CompanyPrivate,
   MutationInviteUserToCompanyArgs,
@@ -55,7 +58,7 @@ export async function inviteUserToCompanyFn(
     );
   }
 
-  return company;
+  return convertUrls(company);
 }
 
 const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] = async (

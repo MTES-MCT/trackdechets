@@ -114,8 +114,8 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "OUTGOING",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
     const forms = await prisma.form.findMany({ where: whereInput });
@@ -272,8 +272,8 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "INCOMING",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
     const forms = await prisma.form.findMany({ where: whereInput });
@@ -422,8 +422,8 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "TRANSPORTED",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
     const forms = await prisma.form.findMany({ where: whereInput });
@@ -513,8 +513,8 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "TRADED",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
     const forms = await prisma.form.findMany({ where: whereInput });
@@ -643,8 +643,8 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "ALL",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
     const forms = await prisma.form.findMany({ where: whereInput });

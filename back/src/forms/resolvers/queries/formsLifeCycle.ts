@@ -59,11 +59,15 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   const statusLogs = await prisma.statusLog.findMany({
     orderBy: { loggedAt: "desc" },
     ...connectionArgs,
-    take: parseInt(`${cursorAfter ? "+" : "-"}${PAGINATE_BY}`, 10),
-    cursor: { id: cursorAfter },
-    //TODO-PRISMA: before: cursorBefore,
+    take: parseInt(`${cursorBefore ? "-" : "+"}${PAGINATE_BY}`, 10),
+    ...(cursorAfter && { cursor: { id: cursorAfter } }),
+    ...(cursorBefore && { cursor: { id: cursorBefore } }),
     where: {
-      loggedAt: { not: null, gte: loggedAfter, lte: loggedBefore },
+      loggedAt: {
+        not: null,
+        ...(loggedAfter && { gte: new Date(loggedAfter) }),
+        ...(loggedBefore && { lte: new Date(loggedBefore) })
+      },
       form: { ...formsFilter, isDeleted: false, id: formId }
     },
     include: {
@@ -78,8 +82,12 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 
   const hasNextPage = true; // TODO-PRISMA
   const hasPreviousPage = true; // TODO-PRISMA
+
   return {
-    statusLogs: statusLogs,
+    statusLogs: statusLogs.map(sl => ({
+      ...sl,
+      loggedAt: sl.loggedAt?.toISOString()
+    })),
     pageInfo: {
       startCursor,
       endCursor,

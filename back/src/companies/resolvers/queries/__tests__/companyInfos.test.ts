@@ -9,14 +9,13 @@ jest.mock("../../../sirene", () => ({
 
 const companyMock = jest.fn();
 jest.mock("src/prisma", () => ({
-  prisma: {
-    company: companyMock
-  }
+  company: { findOne: jest.fn((...args) => companyMock(...args)) }
 }));
 
 const installationMock = jest.fn();
 jest.mock("../../../database", () => ({
-  getInstallation: jest.fn((...args) => installationMock(...args))
+  getInstallation: jest.fn((...args) => installationMock(...args)),
+  convertUrls: v => v
 }));
 
 describe("companyInfos", () => {

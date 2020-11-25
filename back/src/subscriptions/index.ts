@@ -21,21 +21,21 @@ const activeSubscriptions: AsyncIterator<any>[] = [];
 
 export function initSubscriptions() {
   // TODO-PRISMA
-  // subscriptions.map(async sub => {
-  //   try {
-  //     const asyncIterator = await sub.iterable();
-  //     activeSubscriptions.push(asyncIterator);
-  //     while (true) {
-  //       const payload = await asyncIterator.next();
-  //       if (payload.done) {
-  //         break;
-  //       }
-  //       sub.callback(payload.value);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error while setting up or triggering subscription", err);
-  //   }
-  // });
+  subscriptions.map(async _ => {
+    // try {
+    //   const asyncIterator = await sub.iterable();
+    //   activeSubscriptions.push(asyncIterator);
+    //   while (true) {
+    //     const payload = await asyncIterator.next();
+    //     if (payload.done) {
+    //       break;
+    //     }
+    //     sub.callback(payload.value);
+    //   }
+    // } catch (err) {
+    //   console.error("Error while setting up or triggering subscription", err);
+    // }
+  });
 }
 
 export function closeSubscriptions() {

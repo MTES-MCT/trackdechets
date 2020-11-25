@@ -163,10 +163,8 @@ jest.mock("../../companies/database", () => ({
 }));
 
 // Mock prima DB
-jest.mock("../../generated/prisma-client", () => ({
-  prisma: {
-    form: jest.fn(() => mockedForm)
-  }
+jest.mock("src/prisma", () => ({
+  form: { findOne: jest.fn(() => mockedForm) }
 }));
 
 // spies on searchCompany to capture calls to entreprise.data.gouv.fr

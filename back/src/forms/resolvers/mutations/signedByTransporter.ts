@@ -83,7 +83,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
       temporaryStorageDetail: {
         update: {
           signedBy: infos.sentBy,
-          signedAt: infos.sentAt,
+          signedAt: new Date(infos.sentAt),
           signedByTransporter: true,
           ...(hasWasteDetailsOverride && wasteDetails(infos))
         }
@@ -111,7 +111,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 
   const formUpdateInput = {
     signedByTransporter: true,
-    sentAt: infos.sentAt,
+    sentAt: new Date(infos.sentAt),
     sentBy: infos.sentBy,
     ...wasteDetails(infos),
     currentTransporterSiret: form.transporterCompanySiret

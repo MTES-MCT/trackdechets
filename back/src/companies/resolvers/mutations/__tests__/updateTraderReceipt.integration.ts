@@ -49,6 +49,8 @@ describe("{ mutation { updateTraderReceipt } }", () => {
     const { id, ...updated } = await prisma.traderReceipt.findOne({
       where: { id: createdReceipt.id }
     });
-    expect(updated).toEqual(update);
+    expect(updated.receiptNumber).toEqual(update.receiptNumber);
+    expect(updated.validityLimit.toISOString()).toEqual(update.validityLimit);
+    expect(updated.department).toEqual(update.department);
   });
 });

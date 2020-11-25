@@ -207,6 +207,6 @@ export async function getMembershipRequestOrNotFoundError(
 export function stringifyDates(obj: UserAccountHash) {
   return {
     ...obj,
-    ...(obj.acceptedAt && { acceptedAt: obj.acceptedAt.toISOString() })
+    ...(obj?.acceptedAt && { acceptedAt: obj.acceptedAt.toISOString() })
   };
 }

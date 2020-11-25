@@ -4,7 +4,7 @@ import {
   CompanyPublic,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import { getInstallation } from "../../database";
+import { convertUrls, getInstallation } from "../../database";
 import { searchCompany } from "../../sirene";
 /**
  * This function is used to return public company
@@ -51,7 +51,7 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
 
     ...companyIcpeInfo,
     ...sireneCompanyInfo,
-    ...trackdechetsCompanyInfo
+    ...convertUrls(trackdechetsCompanyInfo)
   };
 
   return company;

@@ -1,10 +1,10 @@
 import { Grant } from "@prisma/client";
-import oauth2orize, { TokenError } from "oauth2orize";
+import { createServer, grant, exchange, TokenError } from "oauth2orize";
 import prisma from "src/prisma";
 import { getUid } from "./utils";
 
 // Create OAuth 2.0 server
-export const oauth2server = oauth2orize.createServer();
+export const oauth2server = createServer();
 
 // Register serialization and deserialization functions.
 //
@@ -35,7 +35,7 @@ oauth2server.deserializeClient(async (id, done) => {
 // the application. The application issues a code, which is bound to these
 // values, and will be exchanged for an access token.
 oauth2server.grant(
-  oauth2orize.grant.code(async (client, redirectUri, user, _ares, done) => {
+  grant.code(async (client, redirectUri, user, _ares, done) => {
     const grant = await prisma.grant.create({
       data: {
         user: { connect: { id: user.id } },
@@ -63,7 +63,7 @@ export const tokenErrorMessages = {
 // code. The issued access token response can include a refresh token and
 // custom parameters by adding these to the `done()` call
 oauth2server.exchange(
-  oauth2orize.exchange.code(async (client, code, redirectUri, done) => {
+  exchange.code(async (client, code, redirectUri, done) => {
     const grant = await prisma.grant.findFirst({
       where: { code },
       include: { user: true, application: true }

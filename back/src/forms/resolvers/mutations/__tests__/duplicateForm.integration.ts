@@ -1,4 +1,3 @@
-import { Form } from "@prisma/client";
 import { resetDatabase } from "integration-tests/helper";
 import prisma from "src/prisma";
 import {
@@ -7,7 +6,6 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { cleanUpNotDuplicatableFieldsInForm } from "../../../form-converter";
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -114,7 +112,9 @@ describe("Mutation.duplicateForm", () => {
         id
       }
     });
-    const duplicatedForm = await prisma.form({ id: data.duplicateForm.id });
+    const duplicatedForm = await prisma.form.findOne({
+      where: { id: data.duplicateForm.id }
+    });
 
     expect(duplicatedForm).toMatchObject({
       customId: null,
@@ -124,7 +124,7 @@ describe("Mutation.duplicateForm", () => {
       status: "DRAFT",
       sentAt: null,
       sentBy: null,
-      isAccepted: null,
+      isAccepted: false,
       wasteAcceptationStatus: null,
       wasteRefusalReason: null,
       receivedBy: null,
@@ -235,7 +235,9 @@ describe("Mutation.duplicateForm", () => {
       transporterReceipt,
       transporterDepartment,
       transporterValidityLimit
-    } = await prisma.form({ id: form.id }).temporaryStorageDetail();
+    } = await prisma.form
+      .findOne({ where: { id: form.id } })
+      .temporaryStorageDetail();
 
     const { mutate } = makeClient(user);
     const { data } = await mutate(DUPLICATE_FORM, {
@@ -243,10 +245,14 @@ describe("Mutation.duplicateForm", () => {
         id: form.id
       }
     });
-    const duplicatedForm = await prisma.form({ id: data.duplicateForm.id });
-    const duplicatedTemporaryStorageDetail = await prisma
-      .form({
-        id: duplicatedForm.id
+    const duplicatedForm = await prisma.form.findOne({
+      where: { id: data.duplicateForm.id }
+    });
+    const duplicatedTemporaryStorageDetail = await prisma.form
+      .findOne({
+        where: {
+          id: duplicatedForm.id
+        }
       })
       .temporaryStorageDetail();
 

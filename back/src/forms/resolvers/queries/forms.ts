@@ -47,12 +47,13 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   });
 
   const queriedForms = await prisma.form.findMany({
-    // TODO-PRISMA
     ...connectionsArgs,
     orderBy: { createdAt: "desc" },
     where: {
-      updatedAt: { gte: rest.updatedAfter },
-      sentAt: { gte: rest.sentAfter },
+      ...(rest.updatedAfter && {
+        updatedAt: { gte: new Date(rest.updatedAfter) }
+      }),
+      ...(rest.sentAfter && { sentAt: { gte: new Date(rest.sentAfter) } }),
       wasteDetailsCode: rest.wasteCode,
       ...(status?.length && { status: { in: status } }),
       AND: [

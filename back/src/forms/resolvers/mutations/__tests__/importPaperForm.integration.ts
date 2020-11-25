@@ -295,10 +295,12 @@ describe("mutation / importPaperForm", () => {
 
       expect(updatedForm.status).toEqual("PROCESSED");
       expect(updatedForm.isImportedFromPaper).toEqual(true);
-      expect(updatedForm.sentAt).toEqual(importedData.signingInfo.sentAt);
+      expect(updatedForm.sentAt.toISOString()).toEqual(
+        importedData.signingInfo.sentAt
+      );
       expect(updatedForm.sentBy).toEqual(importedData.signingInfo.sentBy);
 
-      expect(updatedForm.receivedAt).toEqual(
+      expect(updatedForm.receivedAt.toISOString()).toEqual(
         importedData.receivedInfo.receivedAt
       );
       expect(updatedForm.receivedBy).toEqual(

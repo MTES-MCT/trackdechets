@@ -8,9 +8,9 @@ import {
   Company,
   CompanyType,
   FormWhereInput,
-  TemporaryStorageDetail
+  SortOrder
 } from "@prisma/client";
-import prisma from "src/prisma"
+import prisma from "src/prisma";
 import { searchCompany } from "../../sirene";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -65,8 +65,8 @@ async function getRecentPartners(
   type: FavoriteType
 ): Promise<CompanyFavorite[]> {
   const defaultArgs = {
-    orderBy: "updatedAt_DESC" as const,
-    first: 50
+    orderBy: { updatedAt: "desc" as SortOrder },
+    take: 50
   };
   const defaultWhere: FormWhereInput = {
     OR: [
@@ -80,14 +80,16 @@ async function getRecentPartners(
       },
       { transporterCompanySiret: siret },
       {
-        transportSegments_some: {
-          transporterCompanySiret: siret
+        transportSegments: {
+          some: {
+            transporterCompanySiret: siret
+          }
         }
       }
     ],
 
     // ignore drafts as they are likely to be incomplete
-    status_not: "DRAFT",
+    status: { not: "DRAFT" },
 
     isDeleted: false
   };
@@ -99,12 +101,7 @@ async function getRecentPartners(
         where: {
           ...defaultWhere,
           recipientIsTempStorage: true,
-          recipientCompanySiret_not: null,
-
-          // _not_in expects a list of string so we can't do
-          // _not_in: [null, ""]
-          // Note: this is a workaround until we have a chance to replace empty strings with null
-          recipientCompanySiret_not_in: [""]
+          recipientCompanySiret: { not: "" }
         }
       });
       return forms.map(form => ({
@@ -122,26 +119,22 @@ async function getRecentPartners(
         where: {
           ...defaultWhere,
           temporaryStorageDetail: {
-            destinationCompanySiret_not: null,
-
-            // _not_in expects a list of string so we can't do
-            // _not_in: [null, ""]
-            // Note: this is a workaround until we have a chance to replace empty strings with null
-            destinationCompanySiret_not_in: [""]
+            destinationCompanySiret: { not: "" }
+          }
+        },
+        select: {
+          temporaryStorageDetail: {
+            select: {
+              destinationCompanyName: true,
+              destinationCompanySiret: true,
+              destinationCompanyAddress: true,
+              destinationCompanyContact: true,
+              destinationCompanyPhone: true,
+              destinationCompanyMail: true
+            }
           }
         }
-      }).$fragment<
-        Array<{ temporaryStorageDetail: TemporaryStorageDetail }>
-      >(`fragment TemporaryStorageDetail on Form {
-        temporaryStorageDetail {
-          destinationCompanyName
-          destinationCompanySiret
-          destinationCompanyAddress
-          destinationCompanyContact
-          destinationCompanyPhone
-          destinationCompanyMail
-        }
-      }`);
+      });
       return forms.map(form => ({
         name: form.temporaryStorageDetail.destinationCompanyName,
         siret: form.temporaryStorageDetail.destinationCompanySiret,
@@ -161,12 +154,7 @@ async function getRecentPartners(
         ...defaultArgs,
         where: {
           ...defaultWhere,
-          [`${lowerType}CompanySiret_not`]: null,
-
-          // _not_in expects a list of string so we can't do
-          // _not_in: [null, ""]
-          // Note: this is a workaround until we have a chance to replace empty strings with null
-          [`${lowerType}CompanySiret_not_in`]: [""]
+          [`${lowerType}CompanySiret`]: { not: "" }
         }
       });
 

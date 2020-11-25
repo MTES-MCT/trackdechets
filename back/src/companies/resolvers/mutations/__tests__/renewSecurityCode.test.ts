@@ -5,11 +5,9 @@ import { companyMails } from "../../../mails";
 const companyMock = jest.fn();
 const updateCompanyMock = jest.fn();
 jest.mock("src/prisma", () => ({
-  prisma: {
-    company: {
-      findOne: jest.fn((...args) => companyMock(...args)),
-      update: jest.fn((...args) => updateCompanyMock(...args))
-    }
+  company: {
+    findOne: jest.fn((...args) => companyMock(...args)),
+    update: jest.fn((...args) => updateCompanyMock(...args))
   }
 }));
 const randomNumberMock = jest.fn();
@@ -27,7 +25,8 @@ jest.mock("../../../../mailer/mailing", () => ({
 const getCompanyActiveUsersMock = jest.fn();
 
 jest.mock("../../../database", () => ({
-  getCompanyActiveUsers: jest.fn(() => getCompanyActiveUsersMock())
+  getCompanyActiveUsers: jest.fn(() => getCompanyActiveUsersMock()),
+  convertUrls: v => v
 }));
 
 describe("renewSecurityCode", () => {

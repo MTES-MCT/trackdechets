@@ -1,5 +1,5 @@
 import { parseString } from "@fast-csv/parse";
-import Excel from "exceljs";
+import * as Excel from "exceljs";
 import fs, { createWriteStream } from "fs";
 import { resetDatabase } from "integration-tests/helper";
 import prisma from "src/prisma";
