@@ -11,7 +11,7 @@ import {
   QuantityType,
   Consistence,
 } from "generated/graphql/types";
-import { MockedProvider } from "@apollo/react-testing";
+import { MockedProvider } from "@apollo/client/testing";
 
 const simpleForm: Form = {
   id: "abcd",
