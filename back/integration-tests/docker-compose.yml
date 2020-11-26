@@ -45,6 +45,5 @@ services:
       PRISMA_ENDPOINT: $PRISMA_ENDPOINT
       PRISMA_SECRET: $PRISMA_SECRET
       EMAIL_BACKEND: "sendinblue"
-      DISABLE_EMAILING: "true"
       MAIN_TEMPLATE_ID: "9"
 

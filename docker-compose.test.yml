@@ -8,7 +8,6 @@ services:
     environment:
       JWT_SECRET: "xxx"
       EMAIL_BACKEND: "sendinblue"
-      DISABLE_EMAILING: "true"
       MAIN_TEMPLATE_ID: "9"
       ONBOARDING_TEMPLATE_ID: "8"
       SECOND_ONBOARDING_TEMPLATE_ID: "7"
