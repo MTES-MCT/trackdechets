@@ -2,8 +2,7 @@ import {
   Form,
   FormUpdateInput,
   Status,
-  prisma,
-  User
+  prisma
 } from "../../generated/prisma-client";
 import { Event } from "./types";
 import machine from "./machine";
@@ -17,7 +16,7 @@ import { formDiff } from "./diff";
  * logged in the StatusLogs table
  */
 export default async function transitionForm(
-  user: User,
+  user: Express.User,
   form: Form,
   event: Event
 ) {
@@ -66,6 +65,7 @@ export default async function transitionForm(
     user: { connect: { id: user.id } },
     form: { connect: { id: form.id } },
     status: nextStatus,
+    authType: user.auth,
     loggedAt: new Date(),
     updatedFields
   });

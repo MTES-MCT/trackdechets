@@ -32,9 +32,9 @@ declare global {
 }
 
 export enum AuthType {
-  Session = "session",
-  JWT = "jwt",
-  Bearer = "bearer"
+  Session = "SESSION",
+  JWT = "JWT",
+  Bearer = "BEARER"
 }
 
 // verbose error message and related errored field

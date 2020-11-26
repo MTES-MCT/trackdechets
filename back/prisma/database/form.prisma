@@ -236,6 +236,7 @@ enum Status {
 type StatusLog {
   id: ID! @id
   user: User!
+  authType: AuthType
   form: Form!
   status: Status!
   loggedAt: DateTime

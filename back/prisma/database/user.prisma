@@ -65,6 +65,18 @@ type MembershipRequest {
 }
 
 """
+Different types of authentication possible to Trackdechet's API
+"""
+enum AuthType {
+  # Session authentification from Trackdechets'UI
+  SESSION
+  # Bearer access token (stored in database)
+  BEARER
+  # JWT token
+  JWT
+}
+
+"""
 OAuth2 - Access token to a user resource
 https://tools.ietf.org/html/rfc6749#section-5
 """
