@@ -35,6 +35,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Migration du service td-etl dans un projet Github à part [PR 683](https://github.com/MTES-MCT/trackdechets/pull/683)
 - Intégration du service de génération de pdf en tant que module interne au backend [PR 172](https://github.com/MTES-MCT/trackdechets/pull/712)
 - Ajout du type d'authentification utilisé dans les logs de statut [PR 702](https://github.com/MTES-MCT/trackdechets/pull/702)
+- Réintégration du service mail au backend et implémentation de l'envoi d'emails via différents prestataires (https://github.com/MTES-MCT/trackdechets/pull/703)
 
 # [2020.10.1] 03/11/2020
 

@@ -1,5 +1,5 @@
 import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
-import { sendMail } from "../common/mails.helper";
+import { sendMail } from "../mailer/mailing";
 import { userMails } from "../users/mails";
 import { getCompanyAdminUsers } from "../companies/database";
 import { verifyPrestataire, anomalies } from "../companies/verif";
@@ -188,6 +188,7 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   }[payload.node.wasteAcceptationStatus];
 
   const mail = mailFunction(recipients, ccs, form, attachmentData);
+
   return sendMail(mail);
 }
 

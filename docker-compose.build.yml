@@ -9,10 +9,6 @@ services:
     build:
       context: ./front
 
-  td-mail:
-    build:
-      context: ./mail
-
   td-doc:
     build:
       context: ./doc

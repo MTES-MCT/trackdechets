@@ -68,19 +68,6 @@ services:
     volumes:
       - ./front/:/usr/src/front
 
-  td-mail:
-    image: td-mail
-    build:
-      context: ./mail
-      dockerfile: Dockerfile
-    ports:
-      - 82:80
-    environment:
-      MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
-      MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
-      MJ_SENDER_EMAIL_ADDRESS: $MJ_SENDER_EMAIL_ADDRESS
-      MJ_SENDER_NAME: $MJ_SENDER_NAME
-
   td-doc:
     image: td-doc
     build:

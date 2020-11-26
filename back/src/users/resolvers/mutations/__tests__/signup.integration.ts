@@ -1,4 +1,4 @@
-import * as mailsHelper from "../../../../common/mails.helper";
+import * as mailsHelper from "../../../../mailer/mailing";
 import { server } from "../../../../server";
 import { createTestClient } from "apollo-server-integration-testing";
 import { resetDatabase } from "../../../../../integration-tests/helper";

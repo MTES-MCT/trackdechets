@@ -14,7 +14,7 @@ jest.mock("../../../../generated/prisma-client", () => ({
 
 const sendMailMock = jest.fn();
 
-jest.mock("../../../../common/mails.helper", () => ({
+jest.mock("../../../../mailer/mailing", () => ({
   sendMail: jest.fn(mail => sendMailMock(mail))
 }));
 

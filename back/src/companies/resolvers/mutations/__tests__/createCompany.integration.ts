@@ -1,6 +1,6 @@
 import { userFactory, companyFactory } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import * as mailsHelper from "../../../../common/mails.helper";
+import * as mailsHelper from "../../../../mailer/mailing";
 import { prisma } from "../../../../generated/prisma-client";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
@@ -221,7 +221,7 @@ describe("Mutation.createCompany", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : emmanuel.flahaut@developpement-durable.gouv.fr"
+          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : hello@trackdechets.beta.gouv.fr"
       })
     ]);
   });

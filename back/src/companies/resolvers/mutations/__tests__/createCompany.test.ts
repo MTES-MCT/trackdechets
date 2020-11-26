@@ -12,7 +12,7 @@ jest.mock("../../../../generated/prisma-client", () => ({
   }
 }));
 
-jest.mock("../../../../common/mails.helper", () => ({
+jest.mock("../../../../mailer/mailing", () => ({
   sendMail: () => mailMock()
 }));
 

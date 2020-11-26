@@ -1,14 +1,14 @@
 import { escape } from "querystring";
 import { Company, Form, User } from "../generated/prisma-client";
-import { cleanupSpecialChars, toFrFormat } from "../common/mails.helper";
+import {
+  cleanupSpecialChars,
+  toFrFormat,
+  templateIds
+} from "../mailer/helpers";
 import { getUIBaseURL } from "../utils";
+import {} from "../mailer/mailing";
 
-const {
-  UI_HOST,
-  VIRTUAL_HOST,
-  MJ_FIRST_ONBOARDING_TEMPLATE_ID,
-  MJ_SECOND_ONBOARDING_TEMPLATE_ID
-} = process.env;
+const { UI_HOST, VIRTUAL_HOST } = process.env;
 
 const baseUrl = `https://${UI_HOST}`;
 
@@ -30,7 +30,7 @@ export const userMails = {
     <br>
     Pour rappel, Trackdéchets est un site en béta conçu par la Fabrique Numérique du Ministère de l'Ecologie et des Territoires.
     <br>
-    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.`
+    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:hello@trackdechets.beta.gouv.fr">hello@trackdechets.beta.gouv.fr</a>.`
   }),
   contentAwaitsGuest: (
     toEmail,
@@ -66,7 +66,7 @@ export const userMails = {
     <br>
     Si vous disposez de votre propre solution, vous continuez comme avant et la mise en place des connections (via API) permettra de transmettre des BSD dématérialisés à vos clients et prestataires. Pour en <a href="https://doc.trackdechets.fr/">savoir plus</a>.
     <br><br>
-    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">emmanuel.flahaut@developpement-durable.gouv.fr</a>.
+    Si vous avez la moindre interrogation, n’hésitez pas à nous contacter à l'email <a href="mailto:hello@trackdechets.beta.gouv.fr">hello@trackdechets.beta.gouv.fr</a>.
   `
   }),
   inviteUserToJoin: (toEmail, companyAdmin, companyName, hash) => ({
@@ -107,7 +107,7 @@ export const userMails = {
     Vous avez demandé à réinitialiser votre mot de passe sur Trackdéchets.<br>
     Vous pouvez désormais vous connecter avec votre nouveau mot de passe qui vient d'être généré: <strong>${password}</strong>.<br>
     Vous aurez la possibilité de modifier ce mot de passe sur la plateforme.<bt><br>
-    Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:emmanuel.flahaut@developpement-durable.gouv.fr">par mail.</a>
+    Si vous n'êtes pas à l'origine de cette demande, merci d'en informer l'équipe de Trackdéchets au plus vite <a href="mailto:hello@trackdechets.beta.gouv.fr">par mail.</a>
     `
   }),
   formNotAccepted: (recipients, ccs, form: Form, attachment) => ({
@@ -205,7 +205,7 @@ export const userMails = {
     subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
     body: "_",
-    templateId: parseInt(MJ_FIRST_ONBOARDING_TEMPLATE_ID, 10),
+    templateId: templateIds.FIRST_ONBOARDING,
     baseUrl
   }),
   onboardingSecondStep: (toEmail, toName) => ({
@@ -213,7 +213,7 @@ export const userMails = {
     subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
     body: "_",
-    templateId: parseInt(MJ_SECOND_ONBOARDING_TEMPLATE_ID, 10),
+    templateId: templateIds.SECOND_ONBOARDING,
     baseUrl
   }),
   formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({

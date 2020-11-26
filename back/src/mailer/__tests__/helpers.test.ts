@@ -1,4 +1,4 @@
-import { cleanupSpecialChars, toFrFormat } from "../mails.helper";
+import { cleanupSpecialChars, toFrFormat } from "../helpers";
 
 describe("cleanupSpecialChars", () => {
   it("should return name cleaned from some special chars", () => {

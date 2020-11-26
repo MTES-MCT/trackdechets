@@ -138,7 +138,7 @@ Vous pouvez filtrer:
 - par statut du BSD via `status`
 - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
 - par code déchet via `wasteCode`
-- par SIRET d'une entreprise présente n'importe ou sur le bordereau via `siretPresentOnForm`
+- par SIRET d'une entreprise présente n'importe où sur le bordereau via `siretPresentOnForm`
 
 Par défaut:
 - tous les BSD accessibles sont retournés

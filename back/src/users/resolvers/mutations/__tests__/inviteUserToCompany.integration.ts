@@ -80,8 +80,9 @@ describe("mutation inviteUserToCompany", () => {
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
     const postArgs = mockedAxiosPost.mock.calls[0];
+
     // to right endpoint
-    expect(postArgs[0]).toEqual("http://td-mail/send");
+    expect(postArgs[0]).toEqual("http://mailservice/smtp/email");
 
     // to right person
     expect(postArgs[1].to[0].email).toEqual(invitedUserEmail);
@@ -90,10 +91,10 @@ describe("mutation inviteUserToCompany", () => {
       "Vous avez été invité à rejoindre Trackdéchets"
     );
 
-    expect(postArgs[1].body).toContain(
+    expect(postArgs[1].params.body).toContain(
       "vous a invité à rejoindre Trackdéchets"
     );
     // Dnd right hash value
-    expect(postArgs[1].body).toContain(encodeURIComponent(hashValue));
+    expect(postArgs[1].params.body).toContain(encodeURIComponent(hashValue));
   });
 });

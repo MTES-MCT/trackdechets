@@ -1,5 +1,5 @@
 import { prisma, UserRole } from "../../../../generated/prisma-client";
-import * as mailsHelper from "../../../../common/mails.helper";
+import * as mailsHelper from "../../../../mailer/mailing";
 import { prepareRedis, prepareDB } from "../../../__tests__/helpers";
 import makeClient from "../../../../__tests__/testClient";
 import {

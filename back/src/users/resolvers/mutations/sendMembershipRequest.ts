@@ -1,5 +1,5 @@
 import { UserInputError } from "apollo-server-express";
-import { sendMail } from "../../../common/mails.helper";
+import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   getCompanyAdminUsers,

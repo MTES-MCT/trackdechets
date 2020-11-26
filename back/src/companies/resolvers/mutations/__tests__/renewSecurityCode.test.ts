@@ -18,7 +18,7 @@ jest.mock("../../../../utils", () => ({
 
 const sendMailMock = jest.fn();
 
-jest.mock("../../../../common/mails.helper", () => ({
+jest.mock("../../../../mailer/mailing", () => ({
   sendMail: jest.fn((...args) => sendMailMock(...args))
 }));
 
