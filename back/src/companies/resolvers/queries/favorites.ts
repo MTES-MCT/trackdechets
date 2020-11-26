@@ -7,6 +7,7 @@ import {
 import {
   Company,
   CompanyType,
+  FormWhereInput,
   prisma,
   TemporaryStorageDetail
 } from "../../../generated/prisma-client";
@@ -67,7 +68,7 @@ async function getRecentPartners(
     orderBy: "updatedAt_DESC" as const,
     first: 50
   };
-  const defaultWhere = {
+  const defaultWhere: FormWhereInput = {
     OR: [
       { owner: { id: userID } },
       { emitterCompanySiret: siret },
@@ -84,6 +85,10 @@ async function getRecentPartners(
         }
       }
     ],
+
+    // ignore drafts as they are likely to be incomplete
+    status_not: "DRAFT",
+
     isDeleted: false
   };
 
