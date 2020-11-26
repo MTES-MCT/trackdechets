@@ -14,9 +14,7 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
       omitTypename
     );
   }
-  return forward(operation).map(data => {
-    return data;
-  });
+  return forward(operation);
 });
 
 export default new ApolloClient({
