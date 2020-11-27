@@ -19,6 +19,7 @@ interface SignatureEmitterProps {
   onPrevious: () => void;
   onNext: () => void;
   error?: ApolloError;
+  isSubmitting: boolean;
 }
 
 export function SignatureEmitter({
@@ -27,6 +28,7 @@ export function SignatureEmitter({
   onPrevious,
   onNext,
   error,
+  isSubmitting,
 }: SignatureEmitterProps) {
   const { values } = useFormikContext<TransporterSignatureFormInput>();
 
@@ -169,6 +171,7 @@ export function SignatureEmitter({
           id="id_sentBy"
           name="sentBy"
           className="field__block td-input"
+          style={{ width: "350px" }}
         />
       </div>
       {error && <NotificationError apolloError={error} />}
@@ -181,11 +184,18 @@ export function SignatureEmitter({
         >
           Annuler
         </button>
-        <button type="submit" className="btn btn--primary">
-          Signer par{" "}
-          {values.signatureAuthor === SignatureAuthor.Emitter
-            ? `le ${emitterAlias}`
-            : "l'éco-organisme"}
+        <button
+          type="submit"
+          className="btn btn--primary"
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? "Signature en cours..."
+            : `Signer par ${
+                values.signatureAuthor === SignatureAuthor.Emitter
+                  ? `le ${emitterAlias}`
+                  : "l'éco-organisme"
+              }`}
         </button>
       </div>
     </form>

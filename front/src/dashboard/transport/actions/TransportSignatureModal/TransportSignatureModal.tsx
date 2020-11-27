@@ -105,7 +105,7 @@ export function TransportSignatureModal({
             })
           }
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, isSubmitting }) => (
             <Component
               form={form}
               onPrevious={() =>
@@ -123,6 +123,7 @@ export function TransportSignatureModal({
               }
               onCancel={onClose}
               error={error}
+              isSubmitting={isSubmitting}
             />
           )}
         </Formik>

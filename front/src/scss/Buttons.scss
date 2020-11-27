@@ -12,6 +12,12 @@
   line-height: 1rem;
   height: 2.5rem;
   cursor: pointer;
+
+  &[disabled] {
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
   &--primary {
     background-color: $blue;
     color: $white;
@@ -36,7 +42,7 @@
       color: $grey-dark;
     }
   }
-  &--sqr{
+  &--sqr {
     background-color: #18009f;
     color: #fff;
     border-radius: 0;
@@ -44,7 +50,7 @@
       background-color: #18009f;
     }
   }
-  &--sqr-outline{
+  &--sqr-outline {
     background-color: #fff;
     color: #18009f;
     border: 1px solid #18009f;
@@ -64,7 +70,6 @@
   }
   &--small-text {
     font-size: $fs-small;
- 
   }
   &--medium-text {
     font-size: $fs-medium;
@@ -88,6 +93,6 @@
     height: auto;
   }
 }
-.break-word{
+.break-word {
   overflow-wrap: break-word;
 }
