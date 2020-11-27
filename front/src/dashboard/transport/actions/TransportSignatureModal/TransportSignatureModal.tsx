@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Formik } from "formik";
-import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { useMutation, gql } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import {
   Form,

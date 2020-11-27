@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ApolloError } from "apollo-client";
+import { ApolloError } from "@apollo/client";
 import { Field, useFormikContext } from "formik";
 import {
   Form,
