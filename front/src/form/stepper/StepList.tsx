@@ -21,11 +21,12 @@ import {
   Query,
   QueryFormArgs,
   Mutation,
-  MutationSaveFormArgs,
   FormInput,
+  MutationUpdateFormArgs,
+  MutationCreateFormArgs,
 } from "generated/graphql/types";
 import { formSchema } from "../schema";
-import { GET_FORM, SAVE_FORM } from "./queries";
+import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./queries";
 import { IStepContainerProps, Step } from "./Step";
 import routes from "common/routes";
 import "common/components/WizardStepList.scss";
@@ -57,24 +58,40 @@ export default function StepList(props: IProps) {
     data,
   ]);
 
-  const [saveForm] = useMutation<
-    Pick<Mutation, "saveForm">,
-    MutationSaveFormArgs
-  >(SAVE_FORM, {
+  const [createForm] = useMutation<
+    Pick<Mutation, "createForm">,
+    MutationCreateFormArgs
+  >(CREATE_FORM, {
     update: (store, { data }) => {
-      if (!data?.saveForm) {
+      if (!data?.createForm) {
         return;
       }
-      const saveForm = data.saveForm;
+      const createdForm = data.createForm;
       updateApolloCache<{ forms: Form[] }>(store, {
         query: GET_SLIPS,
         variables: { siret, status: ["DRAFT"] },
         getNewData: data => ({
-          forms: [...data.forms.filter(f => f.id !== saveForm.id), saveForm],
+          forms: [
+            ...data.forms.filter(f => f.id !== createdForm.id),
+            createdForm,
+          ],
         }),
       });
     },
   });
+
+  const [updateForm] = useMutation<
+    Pick<Mutation, "updateForm">,
+    MutationUpdateFormArgs
+  >(UPDATE_FORM);
+
+  function saveForm(formInput: FormInput): Promise<any> {
+    return formState.id
+      ? updateForm({
+          variables: { updateFormInput: { ...formInput, id: formState.id } },
+        })
+      : createForm({ variables: { createFormInput: formInput } });
+  }
 
   useEffect(() => window.scrollTo(0, 0), [currentStep]);
 
@@ -164,9 +181,8 @@ export default function StepList(props: IProps) {
                   e.preventDefault();
                   // As we want to be able to save draft, we skip validation on submit
                   // and don't use the classic Formik mechanism
-                  saveForm({
-                    variables: { formInput },
-                  })
+
+                  saveForm(formInput)
                     .then(_ =>
                       history.push(
                         generatePath(routes.dashboard.slips.drafts, { siret })

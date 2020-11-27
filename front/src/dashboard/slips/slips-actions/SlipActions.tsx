@@ -88,7 +88,7 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
                 />
               </li>
 
-              {form.status === "DRAFT" ? (
+              {["DRAFT", "SEALED"].includes(form.status) ? (
                 <>
                   <li className="slips-actions__item">
                     <Delete
