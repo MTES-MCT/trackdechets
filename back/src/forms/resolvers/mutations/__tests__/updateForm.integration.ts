@@ -109,7 +109,7 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
-  it("should not be possible to update a non draft form", async () => {
+  it("should not be possible to update a signed form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await formFactory({
       ownerId: user.id,
@@ -132,7 +132,8 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Seuls les bordereaux en brouillon peuvent être modifiés",
+        message:
+          "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -149,6 +150,35 @@ describe("Mutation.updateForm", () => {
         opt: {
           status: "DRAFT",
           [`${role}CompanySiret`]: company.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const updateFormInput = {
+        id: form.id,
+        wasteDetails: {
+          code: "01 01 01"
+        }
+      };
+      const { data } = await mutate(UPDATE_FORM, {
+        variables: { updateFormInput }
+      });
+
+      expect(data.updateForm.wasteDetails).toMatchObject(
+        updateFormInput.wasteDetails
+      );
+    }
+  );
+
+  it.each(["emitter", "trader", "recipient", "transporter"])(
+    "should allow %p to update a sealed form",
+    async role => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          [`${role}CompanySiret`]: company.siret,
+          status: "SEALED"
         }
       });
 

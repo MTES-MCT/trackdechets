@@ -45,9 +45,9 @@ const updateFormResolver = async (
 
   await checkCanReadUpdateDeleteForm(user, existingForm);
 
-  if (existingForm.status != "DRAFT") {
+  if (!["DRAFT", "SEALED"].includes(existingForm.status)) {
     const errMessage =
-      "Seuls les bordereaux en brouillon peuvent être modifiés";
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés";
     throw new UserInputError(errMessage);
   }
 
