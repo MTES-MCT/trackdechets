@@ -1,9 +1,14 @@
-import { InMemoryCache, ApolloClient, ApolloLink } from "@apollo/client";
+import {
+  InMemoryCache,
+  ApolloClient,
+  ApolloLink,
+  createHttpLink,
+} from "@apollo/client";
 
 /**
  * Automatically erase `__typename` from variables
  * This enable devs to use objects fetched from the server
- * and not worry with the `__typename` potentially breaking a mutation
+ * and not worry about `__typename` potentially breaking a mutation
  */
 const cleanTypeNameLink = new ApolloLink((operation, forward) => {
   if (operation.variables) {
@@ -17,9 +22,12 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-export default new ApolloClient({
+const httpLink = createHttpLink({
   uri: process.env.REACT_APP_API_ENDPOINT,
-  cache: new InMemoryCache(),
   credentials: "include",
-  link: cleanTypeNameLink,
+});
+
+export default new ApolloClient({
+  cache: new InMemoryCache(),
+  link: ApolloLink.from([cleanTypeNameLink, httpLink]),
 });
