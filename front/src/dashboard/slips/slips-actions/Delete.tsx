@@ -7,6 +7,7 @@ import { GET_SLIPS } from "../query";
 import { useMutation } from "@apollo/client";
 import { updateApolloCache } from "common/helper";
 import {
+  FormStatus,
   Mutation,
   MutationDeleteFormArgs,
   Query,
@@ -44,6 +45,7 @@ export default function Delete({
         return;
       }
       const deleteForm = data.deleteForm;
+
       updateApolloCache<Pick<Query, "forms">>(cache, {
         query: GET_SLIPS,
         variables: { siret, status: ["DRAFT"] },
@@ -54,7 +56,7 @@ export default function Delete({
     },
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
-
+      !!onClose && onClose();
       if (redirectToDashboard) {
         history.push(
           generatePath(routes.dashboard.slips.drafts, {
