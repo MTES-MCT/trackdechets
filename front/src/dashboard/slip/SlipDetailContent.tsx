@@ -466,7 +466,7 @@ export default function SlipDetailContent({
       </Tabs>
       <div className={styles.detailActions}>
         <Duplicate formId={form.id} small={false} redirectToDashboard={true} />
-        {form.status === "DRAFT" ? (
+        {["DRAFT", "SEALED"].includes(form.status) ? (
           <>
             <Delete formId={form.id} small={false} redirectToDashboard={true} />
             <Edit formId={form.id} small={false} />
