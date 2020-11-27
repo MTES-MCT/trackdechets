@@ -51,6 +51,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret
       }
     });
@@ -79,6 +80,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret
       }
     });
@@ -107,13 +109,45 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
+  it("should not be possible to update a non draft form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        code: "01 01 01"
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Seuls les bordereaux en brouillon peuvent être modifiés",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it.each(["emitter", "trader", "recipient", "transporter"])(
-    "should allow %p to update a form",
+    "should allow %p to update a draft form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const form = await formFactory({
         ownerId: user.id,
         opt: {
+          status: "DRAFT",
           [`${role}CompanySiret`]: company.siret
         }
       });
@@ -149,6 +183,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         ecoOrganismeName: eo.name,
         ecoOrganismeSiret: eo.siret
       }
@@ -200,7 +235,8 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        status: "DRAFT"
       }
     });
 
@@ -243,6 +279,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret,
         ecoOrganismeName: originalEO.name,
         ecoOrganismeSiret: originalEO.siret
@@ -290,6 +327,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret,
         ecoOrganismeName: eo.name,
         ecoOrganismeSiret: eo.siret
@@ -314,6 +352,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret
       }
     });
@@ -338,6 +377,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret
       }
     });
@@ -370,6 +410,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret,
         recipientIsTempStorage: true,
         temporaryStorageDetail: {
@@ -405,6 +446,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret,
         temporaryStorageDetail: {
           create: {
@@ -433,6 +475,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret
       }
     });
@@ -464,6 +507,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret,
         recipientCompanySiret: originalRecipientCompany.siret
       }
@@ -496,6 +540,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        status: "DRAFT",
         emitterCompanySiret: company.siret,
         recipientCompanySiret: originalRecipientCompany.siret
       }
@@ -528,6 +573,7 @@ describe("Mutation.updateForm", () => {
       const form = await formFactory({
         ownerId: user.id,
         opt: {
+          status: "DRAFT",
           emitterCompanySiret: company.siret
         }
       });

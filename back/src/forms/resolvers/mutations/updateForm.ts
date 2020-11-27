@@ -15,6 +15,7 @@ import { checkCanReadUpdateDeleteForm } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema } from "../../validation";
+import { UserInputError } from "apollo-server-express";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -43,6 +44,12 @@ const updateFormResolver = async (
   const existingForm = await getFormOrFormNotFound({ id });
 
   await checkCanReadUpdateDeleteForm(user, existingForm);
+
+  if (existingForm.status != "DRAFT") {
+    const errMessage =
+      "Seuls les bordereaux en brouillon peuvent être modifiés";
+    throw new UserInputError(errMessage);
+  }
 
   const form = flattenFormInput(formContent);
 
