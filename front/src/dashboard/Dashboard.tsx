@@ -47,7 +47,6 @@ export default function Dashboard() {
 
   if (data) {
     const companies = data.me.companies;
-
     // if the user is not part of the company whose siret is in the url
     // redirect them to their first company or account if they're not part of any company
     if (!companies.find(company => company.siret === siret)) {
