@@ -3,7 +3,10 @@ import { Close } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps } from "formik";
-import { Packagings as PackagingsEnum } from "generated/graphql/types";
+import {
+  PackagingInfo,
+  Packagings as PackagingsEnum,
+} from "generated/graphql/types";
 import React, { InputHTMLAttributes, useMemo } from "react";
 import "./Packagings.scss";
 
@@ -20,9 +23,9 @@ export default function Packagings({
   form: { errors },
   id,
   ...props
-}: FieldProps & InputHTMLAttributes<HTMLInputElement>) {
+}: FieldProps<PackagingInfo[] | null> & InputHTMLAttributes<HTMLInputElement>) {
   const isAddButtonDisabled = useMemo(() => {
-    if (value?.length === 0) {
+    if (value == null || value.length === 0) {
       return false;
     }
 
