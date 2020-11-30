@@ -22,7 +22,6 @@ Le projet utilise `docker-compose` avec les différents services suivants:
 
 - `td-api` (`./back`) Serveur Express.js avec une API GraphQL (Node.js)
 - `td-ui` (`./front`) Single Page App pour la page d'accueil et le dashboard (React.js)
-- `td-etl` (`./etl`) Service interne de préparation des données de la base des ICPE (Python, Airflow)
 - `td-doc` (`./doc`) Documentation technique du projet (Docusaurus)
 
 La config `nginx` pour chaque container exposé est créee de façon automatique grâce à [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy)
