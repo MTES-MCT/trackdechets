@@ -98,10 +98,13 @@ async function getRecentPartners(
         ...defaultArgs,
         where: {
           ...defaultWhere,
-          AND: {
-            recipientIsTempStorage: true,
-            recipientCompanySiret_not: null
-          }
+          recipientIsTempStorage: true,
+          recipientCompanySiret_not: null,
+
+          // _not_in expects a list of string so we can't do
+          // _not_in: [null, ""]
+          // Note: this is a workaround until we have a chance to replace empty strings with null
+          recipientCompanySiret_not_in: [""]
         }
       });
       return forms.map(form => ({
@@ -119,7 +122,12 @@ async function getRecentPartners(
         where: {
           ...defaultWhere,
           temporaryStorageDetail: {
-            destinationCompanySiret_not: null
+            destinationCompanySiret_not: null,
+
+            // _not_in expects a list of string so we can't do
+            // _not_in: [null, ""]
+            // Note: this is a workaround until we have a chance to replace empty strings with null
+            destinationCompanySiret_not_in: [""]
           }
         }
       }).$fragment<
@@ -153,7 +161,12 @@ async function getRecentPartners(
         ...defaultArgs,
         where: {
           ...defaultWhere,
-          [`${lowerType}CompanySiret_not`]: null
+          [`${lowerType}CompanySiret_not`]: null,
+
+          // _not_in expects a list of string so we can't do
+          // _not_in: [null, ""]
+          // Note: this is a workaround until we have a chance to replace empty strings with null
+          [`${lowerType}CompanySiret_not_in`]: [""]
         }
       });
 
