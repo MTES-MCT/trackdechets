@@ -4,7 +4,7 @@ import { Updater, registerUpdater } from "./helper/helper";
 @registerUpdater(
   "Add the eco-organisme type",
   "Add the eco-organisme company type to the existing eco-organismes",
-  true
+  false
 )
 export class AddEcoOrganismeType implements Updater {
   async run() {
