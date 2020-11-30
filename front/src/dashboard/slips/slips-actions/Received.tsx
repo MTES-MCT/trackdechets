@@ -45,7 +45,17 @@ export default function Received(props: SlipActionProps) {
           ...(props.form.recipient?.isTempStorage &&
             props.form.status === FormStatus.Sent && { quantityType: "REAL" }),
         }}
-        onSubmit={values => props.onSubmit({ info: values })}
+        onSubmit={(values, { setFieldError }) => {
+          props.onSubmit({ info: values });
+        }}
+        validate={values => {
+          if (props.form.sentAt && values.receivedAt < props.form.sentAt) {
+            return {
+              receivedAt:
+                "La date de réception doit être supérieure à la date d'émission du déchet.",
+            };
+          }
+        }}
       >
         {({ values, errors, touched, handleReset, setFieldValue }) => {
           const hasErrors = !!Object.keys(errors).length;
