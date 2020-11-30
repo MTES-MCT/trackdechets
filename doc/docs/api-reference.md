@@ -763,8 +763,8 @@ Utiliser la mutation signedByTransporter permettant d'apposer les signatures du 
 <td valign="top"><a href="#form">Form</a></td>
 <td>
 
-Scelle un BSD
-Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+Finalise un BSD
+Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
 doivent avoir été renseignés au préalable
 
 ```
