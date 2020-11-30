@@ -255,13 +255,13 @@ const getWasteDetailsPackagings = params => {
  */
 const getWasteDetailsNumberOfPackages = params => {
   if (!params.wasteDetailsPackagingInfos) {
-    return 0;
+    return {};
   }
+
   return {
-    wasteDetailsNumberOfPackages: params.wasteDetailsPackagingInfos.reduce(
-      (acc, elem) => acc + elem.quantity,
-      0
-    )
+    wasteDetailsNumberOfPackages: params.wasteDetailsPackagingInfos
+      .reduce((acc, elem) => acc + elem.quantity, 0)
+      .toString()
   };
 };
 

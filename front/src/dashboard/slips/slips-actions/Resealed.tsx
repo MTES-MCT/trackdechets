@@ -285,6 +285,7 @@ const emptyState = {
   wasteDetails: {
     onuCode: "",
     packagings: [] as string[],
+    packagingInfos: [],
     otherPackaging: "",
     numberOfPackages: null,
     quantity: null,
