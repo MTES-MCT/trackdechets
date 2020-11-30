@@ -16,10 +16,11 @@ export default function Sealed(props: SlipActionProps) {
   return (
     <div>
       <p>
-        Cette action aura pour effet de finaliser votre bordereau, c'est à dire
-        qu'il ne sera plus éditable. Cette action est nécessaire pour générer un
-        bordereau PDF et permet au bordereau d'entrer dans le circuit de
-        validation.
+        Cette action aura pour effet de valider les données du bordereau et de
+        le faire apparaitre dans l'onglet "À collecter" du tableau de bord
+        transporteur. Un identifiant unique lui sera attribué et vous pourrez
+        générer un PDF. Le bordereau pourra cependant toujours être modifié ou
+        supprimé depuis l'onglet "Suivi".
       </p>
 
       <div className="td-modal-actions">
