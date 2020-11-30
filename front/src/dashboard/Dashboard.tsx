@@ -48,6 +48,11 @@ export default function Dashboard() {
   if (data) {
     const companies = data.me.companies;
 
+    companies.sort((a, b) => {
+      let aName = a.givenName ? a.givenName : a.name ? a.name : "";
+      let bName = b.givenName ? b.givenName : b.name ? b.name : "";
+      return aName.toLowerCase() > bName.toLowerCase() ? 1 : -1;
+    });
     // if the user is not part of the company whose siret is in the url
     // redirect them to their first company or account if they're not part of any company
     if (!companies.find(company => company.siret === siret)) {
