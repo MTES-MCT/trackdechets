@@ -16,6 +16,7 @@ import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { UserInputError } from "apollo-server-express";
+import { getUserCompanies } from "../../../users/database";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -55,7 +56,6 @@ const updateFormResolver = async (
 
   // Construct form update payload
   const formUpdateInput: FormUpdateInput = {
-    ...existingForm,
     ...form,
     appendix2Forms: { set: appendix2Forms }
   };
@@ -64,7 +64,23 @@ const updateFormResolver = async (
   if (existingForm.status === "DRAFT") {
     await draftFormSchema.validate(formUpdateInput);
   } else if (existingForm.status === "SEALED") {
-    await sealedFormSchema.validate(formUpdateInput);
+    const sealedForm = { ...existingForm, ...formUpdateInput };
+    await sealedFormSchema.validate(sealedForm);
+    // Make sure user's company is stil present on the form
+    const formInputSirets = [
+      sealedForm.emitterCompanySiret,
+      sealedForm.recipientCompanySiret,
+      sealedForm.traderCompanySiret,
+      sealedForm.transporterCompanySiret,
+      sealedForm.ecoOrganismeSiret
+    ];
+    const userCompanies = await getUserCompanies(user.id);
+    const userSirets = userCompanies.map(c => c.siret);
+    if (!formInputSirets.some(siret => userSirets.includes(siret))) {
+      throw new UserInputError(
+        "Vous ne pouvez pas enlever votre établissement du bordereau"
+      );
+    }
   }
 
   const isOrWillBeTempStorage =

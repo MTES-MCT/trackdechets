@@ -186,7 +186,7 @@ describe("Mutation.updateForm", () => {
       const updateFormInput = {
         id: form.id,
         wasteDetails: {
-          code: "01 01 01"
+          code: "08 01 11*"
         }
       };
       const { data } = await mutate(UPDATE_FORM, {
@@ -199,8 +199,68 @@ describe("Mutation.updateForm", () => {
     }
   );
 
-  it("should not be possible invalidate a sealed form", async () => {
-    expect(true).toBe(false);
+  it("should not be possible to invalidate a sealed form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SEALED"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      // try to set an empty siret
+      recipient: {
+        company: {
+          siret: ""
+        }
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toMatchObject([
+      expect.objectContaining({
+        extensions: { code: ErrorCode.BAD_USER_INPUT },
+        message: "Destinataire: Le siret de l'entreprise est obligatoire"
+      })
+    ]);
+  });
+
+  it("should not be possible to remove its own company from a sealed form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SEALED"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      // try to remove user's company from the form
+      emitter: {
+        company: {
+          siret: "11111111111111"
+        }
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toMatchObject([
+      expect.objectContaining({
+        extensions: { code: ErrorCode.BAD_USER_INPUT },
+        message: "Vous ne pouvez pas enlever votre établissement du bordereau"
+      })
+    ]);
   });
 
   it("should allow an eco-organisme to update a form", async () => {
