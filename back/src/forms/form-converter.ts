@@ -149,7 +149,9 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
   return {
     wasteDetailsCode: chain(input.wasteDetails, w => w.code),
     wasteDetailsOnuCode: chain(input.wasteDetails, w => w.onuCode),
-    wasteDetailsPackagingInfos: getProcessedPackagingInfos(input.wasteDetails),
+    wasteDetailsPackagingInfos: chain(input.wasteDetails, w =>
+      getProcessedPackagingInfos(w)
+    ),
     wasteDetailsQuantity: chain(input.wasteDetails, w => w.quantity),
     wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType),
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
@@ -653,30 +655,28 @@ function getDeprecatedPackagingApiFields(packagingInfos: PackagingInfo[]) {
  * @param wasteDetails
  */
 function getProcessedPackagingInfos(wasteDetails: Partial<WasteDetailsInput>) {
-  if (!wasteDetails) {
-    return wasteDetails; // To differentiate between null and undefined
-  }
+  // if deprecated `packagings` field is passed and `packagingInfos` is not passed
+  // convert old packagings to new packaging info
+  if (wasteDetails.packagings && !wasteDetails.packagingInfos) {
+    const packagings = wasteDetails.packagings;
+    const numberOfPackages = wasteDetails.numberOfPackages ?? 1;
+    const maxPackagesPerPackaging = Math.ceil(
+      numberOfPackages / packagings.length
+    );
 
-  // If we do have a `packagingInfos` just use that and ignore other properties
-  if (wasteDetails.packagingInfos) {
-    return wasteDetails.packagingInfos ?? [];
-  }
-
-  const packagings = wasteDetails.packagings ?? [];
-  const numberOfPackages = wasteDetails.numberOfPackages ?? 1;
-  const maxPackagesPerPackaging = Math.ceil(
-    numberOfPackages / packagings.length
-  );
-
-  return packagings.map((type, idx) => ({
-    type,
-    other: type === "AUTRE" ? wasteDetails.otherPackaging : null,
-    quantity: Math.max(
-      0,
-      Math.min(
-        maxPackagesPerPackaging,
-        numberOfPackages - maxPackagesPerPackaging * idx
+    return packagings.map((type, idx) => ({
+      type,
+      other: type === "AUTRE" ? wasteDetails.otherPackaging : null,
+      quantity: Math.max(
+        0,
+        Math.min(
+          maxPackagesPerPackaging,
+          numberOfPackages - maxPackagesPerPackaging * idx
+        )
       )
-    )
-  }));
+    }));
+  }
+
+  // otherwise return packagingInfos "as is". It can be null or undefined
+  return wasteDetails.packagingInfos;
 }
