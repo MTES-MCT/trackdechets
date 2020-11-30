@@ -199,6 +199,10 @@ describe("Mutation.updateForm", () => {
     }
   );
 
+  it("should not be possible invalidate a sealed form", async () => {
+    expect(true).toBe(false);
+  });
+
   it("should allow an eco-organisme to update a form", async () => {
     const { user, company: eo } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {

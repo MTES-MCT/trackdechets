@@ -14,7 +14,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanReadUpdateDeleteForm } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
-import { draftFormSchema } from "../../validation";
+import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { UserInputError } from "apollo-server-express";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -55,12 +55,17 @@ const updateFormResolver = async (
 
   // Construct form update payload
   const formUpdateInput: FormUpdateInput = {
+    ...existingForm,
     ...form,
     appendix2Forms: { set: appendix2Forms }
   };
 
   // Validate form input
-  await draftFormSchema.validate(formUpdateInput);
+  if (existingForm.status === "DRAFT") {
+    await draftFormSchema.validate(formUpdateInput);
+  } else if (existingForm.status === "SEALED") {
+    await sealedFormSchema.validate(formUpdateInput);
+  }
 
   const isOrWillBeTempStorage =
     (existingForm.recipientIsTempStorage &&
