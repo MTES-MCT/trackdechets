@@ -9,7 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "common/components/Icons";
-import { Form } from "generated/graphql/types";
+import { Form, FormStatus } from "generated/graphql/types";
 import "./SlipActions.scss";
 import Delete from "./Delete";
 import DownloadPdf from "./DownloadPdf";
@@ -88,7 +88,7 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
                 />
               </li>
 
-              {["DRAFT", "SEALED"].includes(form.status) ? (
+              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) ? (
                 <>
                   <li className="slips-actions__item">
                     <Delete

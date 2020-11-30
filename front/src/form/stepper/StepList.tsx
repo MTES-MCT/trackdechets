@@ -10,12 +10,7 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import {
-  useHistory,
-  useParams,
-  generatePath,
-  useLocation,
-} from "react-router-dom";
+import { useHistory, useParams, generatePath } from "react-router-dom";
 
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";

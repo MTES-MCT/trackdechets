@@ -57,6 +57,7 @@ const DELETE_FORM = gql`
   mutation DeleteForm($id: ID!) {
     deleteForm(id: $id) {
       id
+      status
     }
   }
 `;
