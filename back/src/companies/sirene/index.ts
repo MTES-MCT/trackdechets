@@ -42,6 +42,12 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
       invalidArgs: ["siret"]
     });
   }
+
+  if (process.env.NODE_ENV === "test") {
+    // do not call the APIs when running integration tests
+    return Promise.resolve({});
+  }
+
   return decoratedSearchCompany(siret);
 }
 

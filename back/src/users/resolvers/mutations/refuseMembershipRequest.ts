@@ -1,5 +1,5 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { sendMail } from "../../../common/mails.helper";
+import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";

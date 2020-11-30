@@ -30,6 +30,10 @@ Chaque BSD est associé à un identifiant opaque unique. Cet identifiant corresp
 
 Vous pouvez également ajouter un identifiant qui vous est propre pour faire le lien avec votre SI. Il vous faut pour cela utiliser le champ `customId`.
 
+:::tip
+Un QRCode généré dans l'interface utilisateur encode le champ `readableId`.
+:::
+
 ## États du BSD
 
 L'ensemble des champs du BSD numérique est décrit dans la [référence de l'API](api-reference.md#form). Au cours de son cycle de vie, un BSD numérique peut passer par différents états décrits [ici](api-reference.md#formstatus).

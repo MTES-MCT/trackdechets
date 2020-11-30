@@ -21,7 +21,6 @@ import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
 import { oauth2Router } from "./routers/oauth2-router";
 import { prisma } from "./generated/prisma-client";
-import { healthRouter } from "./health";
 import { userActivationHandler } from "./users/activation";
 import { typeDefs, resolvers } from "./schema";
 import { getUIBaseURL } from "./utils";
@@ -123,8 +122,15 @@ export const server = new ApolloServer({
     }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
-      NODE_ENV !== "dev"
+      NODE_ENV === "production"
     ) {
+      // Workaround for graphQL validation error displayed as internal server error
+      // when graphQL variables are of of invalid type
+      // See: https://github.com/apollographql/apollo-server/issues/3498
+      if (err.message && err.message.startsWith(`Variable "`)) {
+        err.extensions.code = "GRAPHQL_VALIDATION_FAILED";
+        return err;
+      }
       // Do not leak error for internal server error in production
       return new ApolloError("Erreur serveur", ErrorCode.INTERNAL_SERVER_ERROR);
     }
@@ -210,7 +216,6 @@ app.use(oauth2Router);
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);
 app.get("/download", downloadFileHandler);
-app.use("/health", healthRouter);
 
 // TODO Remove
 app.get("/pdf", (_, res) =>

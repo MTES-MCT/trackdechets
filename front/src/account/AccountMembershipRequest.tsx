@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import { InlineError, NotificationError } from "common/components/Error";
 import Loader from "common/components/Loaders";
 import {
@@ -8,7 +8,6 @@ import {
   Query,
   UserRole,
 } from "generated/graphql/types";
-import gql from "graphql-tag";
 import { useHistory, useParams } from "react-router-dom";
 import { FaHourglassHalf } from "react-icons/fa";
 import cogoToast from "cogo-toast";

@@ -4,12 +4,12 @@ import { COLORS } from "common/config";
 import { TrashIcon } from "common/components/Icons";
 import mutations from "./slip-actions.mutations";
 import { GET_SLIPS } from "../query";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 import { updateApolloCache } from "common/helper";
 import {
-  Form,
   Mutation,
   MutationDeleteFormArgs,
+  Query,
 } from "generated/graphql/types";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import cogoToast from "cogo-toast";
@@ -39,12 +39,12 @@ export default function Delete({
     MutationDeleteFormArgs
   >(mutations.DELETE_FORM, {
     variables: { id: formId },
-    update: (store, { data }) => {
+    update: (cache, { data }) => {
       if (!data?.deleteForm) {
         return;
       }
       const deleteForm = data.deleteForm;
-      updateApolloCache<{ forms: Form[] }>(store, {
+      updateApolloCache<Pick<Query, "forms">>(cache, {
         query: GET_SLIPS,
         variables: { siret, status: ["DRAFT"] },
         getNewData: data => ({

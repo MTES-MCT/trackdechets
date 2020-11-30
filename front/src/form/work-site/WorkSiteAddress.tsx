@@ -1,6 +1,5 @@
 import React, { useEffect, useReducer } from "react";
 
-
 import SearchInput from "common/components/SearchInput";
 import styles from "./WorkSiteAddress.module.scss";
 function init({ adress, city, postalCode }) {

@@ -8,11 +8,18 @@ import {
   setLocale,
   LocaleObject,
   StringSchema,
+  mixed,
+  ObjectSchema,
 } from "yup";
 import countries from "world-countries";
 
 import { isDangerous } from "generated/constants";
-import { WasteAcceptationStatusInput as WasteAcceptationStatus } from "generated/graphql/types";
+import {
+  PackagingInfo,
+  Packagings,
+  Consistence,
+  WasteAcceptationStatusInput as WasteAcceptationStatus,
+} from "generated/graphql/types";
 
 setLocale({
   mixed: {
@@ -44,7 +51,37 @@ const companySchema = object().shape({
     .required("L'email est obligatoire"),
 });
 
-const packagingSchema = string().matches(/(FUT|GRV|CITERNE|BENNE|AUTRE)/);
+const packagingInfo: ObjectSchema<PackagingInfo> = object().shape({
+  type: mixed<Packagings>().required(
+    "Le type de conditionnement doit être précisé."
+  ),
+  other: string().when("type", (type, schema) =>
+    type === "AUTRE"
+      ? schema.required(
+          "La description doit être précisée pour le conditionnement 'AUTRE'."
+        )
+      : schema
+          .nullable()
+          .max(
+            0,
+            "Le description du conditionnement ne peut être renseignée que lorsque le type de conditionnement est 'AUTRE'."
+          )
+  ),
+  quantity: number()
+    .required(
+      "Le nombre de colis associé au conditionnement doit être précisé."
+    )
+    .integer()
+    .min(1, "Le nombre de colis doit être supérieur à 0.")
+    .when("type", (type, schema) =>
+      ["CITERNE", "BENNE"].includes(type)
+        ? schema.max(
+            1,
+            "Le nombre de benne ou de citerne ne peut être supérieur à 1."
+          )
+        : schema
+    ),
+});
 
 export const formSchema = object().shape({
   id: string().required(),
@@ -105,19 +142,37 @@ export const formSchema = object().shape({
           ),
       otherwise: () => string().nullable(),
     }),
-    packagings: array().of(packagingSchema),
-    otherPackaging: string().nullable(true),
-    numberOfPackages: number()
-      .integer()
-      .min(1, "Le nombre de colis doit être supérieur à 0")
-      .nullable(true),
+    packagingInfos: array()
+      .required()
+      .of(packagingInfo)
+      .test(
+        "is-valid-packaging-infos",
+        "Le conditionnement ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
+        (infos: PackagingInfo[]) => {
+          const hasCiterne = infos?.find(i => i.type === "CITERNE") != null;
+          const hasBenne = infos?.find(i => i.type === "BENNE") != null;
+
+          if (hasCiterne && hasBenne) {
+            return false;
+          }
+
+          const hasOtherPackaging = infos?.find(
+            i => !["CITERNE", "BENNE"].includes(i.type)
+          );
+          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+            return false;
+          }
+
+          return true;
+        }
+      ),
     quantity: number().min(0, "La quantité doit être supérieure à 0"),
     quantityType: string().matches(
       /(REAL|ESTIMATED)/,
       "Le type de quantité (réelle ou estimée) doit être précisé"
     ),
-    consistence: string().matches(
-      /(SOLID|LIQUID|GASEOUS)/,
+    consistence: string().oneOf(
+      Object.values(Consistence),
       "La consistance du déchet doit être précisée"
     ),
   }),

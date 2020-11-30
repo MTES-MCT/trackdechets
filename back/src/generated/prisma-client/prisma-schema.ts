@@ -448,6 +448,12 @@ input ApplicationWhereUniqueInput {
   id: ID
 }
 
+enum AuthType {
+  SESSION
+  BEARER
+  JWT
+}
+
 type BatchPayload {
   count: Long!
 }
@@ -999,6 +1005,7 @@ enum Consistence {
   SOLID
   LIQUID
   GASEOUS
+  DOUGHY
 }
 
 scalar DateTime
@@ -1215,11 +1222,6 @@ input EcoOrganismeCreateInput {
   address: String!
 }
 
-input EcoOrganismeCreateOneInput {
-  create: EcoOrganismeCreateInput
-  connect: EcoOrganismeWhereUniqueInput
-}
-
 type EcoOrganismeEdge {
   node: EcoOrganisme!
   cursor: String!
@@ -1261,12 +1263,6 @@ input EcoOrganismeSubscriptionWhereInput {
   NOT: [EcoOrganismeSubscriptionWhereInput!]
 }
 
-input EcoOrganismeUpdateDataInput {
-  siret: String
-  name: String
-  address: String
-}
-
 input EcoOrganismeUpdateInput {
   siret: String
   name: String
@@ -1277,20 +1273,6 @@ input EcoOrganismeUpdateManyMutationInput {
   siret: String
   name: String
   address: String
-}
-
-input EcoOrganismeUpdateOneInput {
-  create: EcoOrganismeCreateInput
-  update: EcoOrganismeUpdateDataInput
-  upsert: EcoOrganismeUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-  connect: EcoOrganismeWhereUniqueInput
-}
-
-input EcoOrganismeUpsertNestedInput {
-  update: EcoOrganismeUpdateDataInput!
-  create: EcoOrganismeCreateInput!
 }
 
 input EcoOrganismeWhereInput {
@@ -1437,6 +1419,7 @@ type Form {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1452,7 +1435,6 @@ type Form {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganisme
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms(where: FormWhereInput, orderBy: FormOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Form!]
@@ -1536,6 +1518,7 @@ input FormCreateInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1551,7 +1534,6 @@ input FormCreateInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeCreateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
@@ -1649,6 +1631,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1664,7 +1647,6 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeCreateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
@@ -1741,6 +1723,7 @@ input FormCreateWithoutTransportSegmentsInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -1756,7 +1739,6 @@ input FormCreateWithoutTransportSegmentsInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeCreateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormCreateManyInput
@@ -1907,6 +1889,8 @@ enum FormOrderByInput {
   wasteDetailsName_DESC
   wasteDetailsOnuCode_ASC
   wasteDetailsOnuCode_DESC
+  wasteDetailsPackagingInfos_ASC
+  wasteDetailsPackagingInfos_DESC
   wasteDetailsPackagings_ASC
   wasteDetailsPackagings_DESC
   wasteDetailsOtherPackaging_ASC
@@ -2016,6 +2000,7 @@ type FormPreviousValues {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3148,6 +3133,7 @@ input FormUpdateDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3163,7 +3149,6 @@ input FormUpdateDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -3240,6 +3225,7 @@ input FormUpdateInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3255,7 +3241,6 @@ input FormUpdateInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -3331,6 +3316,7 @@ input FormUpdateManyDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3430,6 +3416,7 @@ input FormUpdateManyMutationInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3546,6 +3533,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3561,7 +3549,6 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -3637,6 +3624,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   wasteDetailsCode: String
   wasteDetailsName: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -3652,7 +3640,6 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   traderReceipt: String
   traderDepartment: String
   traderValidityLimit: DateTime
-  ecoOrganisme: EcoOrganismeUpdateOneInput
   ecoOrganismeName: String
   ecoOrganismeSiret: String
   appendix2Forms: FormUpdateManyInput
@@ -4653,7 +4640,6 @@ input FormWhereInput {
   traderValidityLimit_lte: DateTime
   traderValidityLimit_gt: DateTime
   traderValidityLimit_gte: DateTime
-  ecoOrganisme: EcoOrganismeWhereInput
   ecoOrganismeName: String
   ecoOrganismeName_not: String
   ecoOrganismeName_in: [String!]
@@ -5900,6 +5886,7 @@ enum Status {
 type StatusLog {
   id: ID!
   user: User!
+  authType: AuthType
   form: Form!
   status: Status!
   loggedAt: DateTime
@@ -5915,6 +5902,7 @@ type StatusLogConnection {
 input StatusLogCreateInput {
   id: ID
   user: UserCreateOneInput!
+  authType: AuthType
   form: FormCreateOneInput!
   status: Status!
   loggedAt: DateTime
@@ -5929,6 +5917,8 @@ type StatusLogEdge {
 enum StatusLogOrderByInput {
   id_ASC
   id_DESC
+  authType_ASC
+  authType_DESC
   status_ASC
   status_DESC
   loggedAt_ASC
@@ -5939,6 +5929,7 @@ enum StatusLogOrderByInput {
 
 type StatusLogPreviousValues {
   id: ID!
+  authType: AuthType
   status: Status!
   loggedAt: DateTime
   updatedFields: Json
@@ -5964,6 +5955,7 @@ input StatusLogSubscriptionWhereInput {
 
 input StatusLogUpdateInput {
   user: UserUpdateOneRequiredInput
+  authType: AuthType
   form: FormUpdateOneRequiredInput
   status: Status
   loggedAt: DateTime
@@ -5971,6 +5963,7 @@ input StatusLogUpdateInput {
 }
 
 input StatusLogUpdateManyMutationInput {
+  authType: AuthType
   status: Status
   loggedAt: DateTime
   updatedFields: Json
@@ -5992,6 +5985,10 @@ input StatusLogWhereInput {
   id_ends_with: ID
   id_not_ends_with: ID
   user: UserWhereInput
+  authType: AuthType
+  authType_not: AuthType
+  authType_in: [AuthType!]
+  authType_not_in: [AuthType!]
   form: FormWhereInput
   status: Status
   status_not: Status
@@ -6056,6 +6053,7 @@ type TemporaryStorageDetail {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6103,6 +6101,7 @@ input TemporaryStorageDetailCreateInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6148,6 +6147,7 @@ input TemporaryStorageDetailCreateWithoutFormInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6211,6 +6211,8 @@ enum TemporaryStorageDetailOrderByInput {
   destinationProcessingOperation_DESC
   wasteDetailsOnuCode_ASC
   wasteDetailsOnuCode_DESC
+  wasteDetailsPackagingInfos_ASC
+  wasteDetailsPackagingInfos_DESC
   wasteDetailsPackagings_ASC
   wasteDetailsPackagings_DESC
   wasteDetailsOtherPackaging_ASC
@@ -6270,6 +6272,7 @@ type TemporaryStorageDetailPreviousValues {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6328,6 +6331,7 @@ input TemporaryStorageDetailUpdateInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6367,6 +6371,7 @@ input TemporaryStorageDetailUpdateManyMutationInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int
@@ -6415,6 +6420,7 @@ input TemporaryStorageDetailUpdateWithoutFormDataInput {
   destinationCap: String
   destinationProcessingOperation: String
   wasteDetailsOnuCode: String
+  wasteDetailsPackagingInfos: Json
   wasteDetailsPackagings: Json
   wasteDetailsOtherPackaging: String
   wasteDetailsNumberOfPackages: Int

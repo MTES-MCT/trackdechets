@@ -1,5 +1,5 @@
 import React from "react";
-import { NetworkStatus } from "apollo-client";
+import { NetworkStatus } from "@apollo/client";
 import styles from "./Loader.module.scss";
 
 export default function Loader() {
@@ -17,9 +17,9 @@ export const ModalLoader = () => (
  * networkStatus comes from useQuery hook and tells apart first load, refetch and fetchmore events
  */
 export const RefreshLoader = ({
-  networkStatus
+  networkStatus,
 }: {
-  networkStatus: NetworkStatus ;
+  networkStatus: NetworkStatus;
 }) =>
   networkStatus === NetworkStatus.refetch ||
   networkStatus === NetworkStatus.fetchMore ? (

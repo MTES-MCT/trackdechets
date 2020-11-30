@@ -9,10 +9,10 @@ export default function OnBoarding() {
   useEffect(() => {
     const slideShowShown = window.localStorage.getItem("td-slideshow");
 
-      if (!slideShowShown) {
-        setIsOpen(true);
-        window.localStorage.setItem("td-slideshow", "DONE");
-      }
+    if (!slideShowShown) {
+      setIsOpen(true);
+      window.localStorage.setItem("td-slideshow", "DONE");
+    }
   }, []);
 
   return (

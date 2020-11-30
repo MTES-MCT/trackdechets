@@ -5,10 +5,10 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import DateInput from "./custom-inputs/DateInput";
 import TdSwitch from "common/components/Switch";
 
-import styles from  "./Transporter.module.scss";
+import styles from "./Transporter.module.scss";
 type Values = {
   transporter: { isExemptedOfReceipt: boolean };
-}; 
+};
 export default connect<{}, Values>(function Transporter(props) {
   return (
     <>

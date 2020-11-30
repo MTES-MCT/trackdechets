@@ -53,7 +53,7 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
 
     const postArgs = mockedAxiosPost.mock.calls[0];
 
-    expect(postArgs[0]).toEqual("http://td-mail/send");
+    expect(postArgs[0]).toEqual("http://mailservice/smtp/email"); // fake url for tests
 
     const payload = postArgs[1];
 
@@ -65,9 +65,9 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
     expect(payload.cc[0].name).toEqual(mockedForm.recipientCompanyContact);
 
     // check mail body infos
-    expect(payload.body).toContain(mockedForm.readableId);
-    expect(payload.body).toContain(mockedForm.recipientCompanyName);
-    expect(payload.body).toContain(mockedForm.wasteDetailsName);
-    expect(payload.body).toContain(mockedForm.wasteDetailsCode);
+    expect(payload.params.body).toContain(mockedForm.readableId);
+    expect(payload.params.body).toContain(mockedForm.recipientCompanyName);
+    expect(payload.params.body).toContain(mockedForm.wasteDetailsName);
+    expect(payload.params.body).toContain(mockedForm.wasteDetailsCode);
   });
 });

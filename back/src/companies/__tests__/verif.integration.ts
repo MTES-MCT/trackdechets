@@ -27,14 +27,14 @@ describe("verifyPrestataire", () => {
   });
 
   it("should return SIRET_UNKNOWN if siret does not exist", async () => {
-    const [_, anomaly] = await verifyPrestataire("12345678912345");
     mockSearchCompany.mockRejectedValue(new Error());
+    const [_, anomaly] = await verifyPrestataire("12345678912345");
     expect(anomaly).toEqual(anomalies.SIRET_UNKNOWN);
   });
 
   it("should return NOT_ICPE_27XX_35XX if not ICPE", async () => {
-    const [_, anomaly] = await verifyPrestataire("85001946400013");
     mockSearchCompany.mockResolvedValueOnce(company);
+    const [_, anomaly] = await verifyPrestataire("85001946400013");
     expect(anomaly).toEqual(anomalies.NOT_ICPE_27XX_35XX);
   });
 

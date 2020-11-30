@@ -1,14 +1,16 @@
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Formik, setNestedObjectValues } from "formik";
 import React, {
+  Children,
+  createElement,
   ReactElement,
   useEffect,
   useRef,
   useState,
   useMemo,
 } from "react";
-import { useHistory, useParams, generatePath } from "react-router";
+import { useHistory, useParams, generatePath } from "react-router-dom";
 
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
@@ -28,7 +30,6 @@ import { IStepContainerProps, Step } from "./Step";
 import routes from "common/routes";
 import "common/components/WizardStepList.scss";
 import "./StepList.scss";
-
 
 interface IProps {
   children: ReactElement<IStepContainerProps>[];
@@ -94,8 +95,8 @@ export default function StepList(props: IProps) {
     };
   });
 
-  const children = React.Children.map(props.children, (child, index) => {
-    return React.createElement(
+  const children = Children.map(props.children, (child, index) => {
+    return createElement(
       Step,
       {
         isActive: index === currentStep,
@@ -116,7 +117,7 @@ export default function StepList(props: IProps) {
   return (
     <div>
       <ul className="step-header">
-        {React.Children.map(props.children, (child, index) => (
+        {Children.map(props.children, (child, index) => (
           <li
             className={
               index === currentStep

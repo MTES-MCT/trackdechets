@@ -1,7 +1,7 @@
 import { FormStatus } from "generated/graphql/types";
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
-  SEALED: "En attente d'envoi",
+  SEALED: "En attente de collecte par le transporteur",
   SENT: "En attente de réception",
   RECEIVED: "Reçu, en attente de traitement",
   PROCESSED: "Traité",
@@ -11,7 +11,8 @@ export const statusLabels: { [key: string]: string } = {
   REFUSED: "Refusé",
   TEMP_STORED: "Entreposé temporairement ou en reconditionnement",
   RESENT: "En attente de réception pour traitement",
-  RESEALED: "En attente de départ de l'installation provisoire",
+  RESEALED:
+    "En attente de collecte par le transporteur après entreposage provisoire",
 };
 
 export const ITEMS_PER_PAGE = 50;
@@ -24,10 +25,8 @@ export const transportModeLabels: { [key: string]: string } = {
 };
 
 export const statusesWithDynamicActions = [
-  FormStatus.Sealed,
   FormStatus.Sent,
   FormStatus.Received,
   FormStatus.TempStored,
-  FormStatus.Resealed,
   FormStatus.Resent,
 ];

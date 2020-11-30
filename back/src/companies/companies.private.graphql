@@ -3,7 +3,12 @@ type Query {
   Renvoie les établissements favoris de l'utilisateur. C'est à dire les
   établissements qui font souvent partis des BSD édités
   """
-  favorites("type de favoris" type: FavoriteType!): [CompanyFavorite!]!
+  favorites(
+    "siret de l'entreprise pour laquelle retourner les favoris"
+    siret: String!
+    "type de favoris"
+    type: FavoriteType!
+  ): [CompanyFavorite!]!
 }
 
 type Mutation {
@@ -98,6 +103,17 @@ type Mutation {
     "type de fichier"
     fileType: String!
   ): UploadLink!
+}
+
+"Type d'établissement favoris"
+enum FavoriteType {
+  EMITTER
+  TRANSPORTER
+  RECIPIENT
+  TRADER
+  NEXT_DESTINATION
+  TEMPORARY_STORAGE_DETAIL
+  DESTINATION
 }
 
 """

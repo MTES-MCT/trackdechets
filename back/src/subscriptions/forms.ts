@@ -1,5 +1,5 @@
 import { FormSubscriptionPayload, prisma } from "../generated/prisma-client";
-import { sendMail } from "../common/mails.helper";
+import { sendMail } from "../mailer/mailing";
 import { userMails } from "../users/mails";
 import { getCompanyAdminUsers } from "../companies/database";
 import { verifyPrestataire, anomalies } from "../companies/verif";
@@ -9,11 +9,11 @@ import {
   createNotCompatibleRubriqueAlertCard,
   alertTypes
 } from "../common/trello";
-import { pdfEmailAttachment } from "../forms/pdf";
 import Dreals from "./dreals";
 import axios from "axios";
 import { trim } from "../common/strings";
 import { searchCompany } from "../companies/sirene";
+import { buildPdfBase64 } from "../forms/pdf/generator";
 
 export async function formsSubscriptionCallback(
   payload: FormSubscriptionPayload
@@ -133,7 +133,11 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   // build pdf as a base64 string
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
-  const attachmentData = await pdfEmailAttachment(payload.node.id);
+  const attachmentData = {
+    file: await buildPdfBase64(form),
+    name: `${form.readableId}.pdf`
+  };
+
   const emitterCompanyAdmins = await getCompanyAdminUsers(
     form.emitterCompanySiret
   );
@@ -184,6 +188,7 @@ export async function mailWhenFormIsDeclined(payload: FormSubscriptionPayload) {
   }[payload.node.wasteAcceptationStatus];
 
   const mail = mailFunction(recipients, ccs, form, attachmentData);
+
   return sendMail(mail);
 }
 

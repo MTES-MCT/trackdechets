@@ -7,12 +7,11 @@ services:
       dockerfile: Dockerfile.test
     environment:
       JWT_SECRET: "xxx"
-
-  td-pdf:
-    restart: "no"
-    build:
-      context: ./pdf
-      dockerfile: Dockerfile.test
+      EMAIL_BACKEND: "sendinblue"
+      MAIN_TEMPLATE_ID: "9"
+      ONBOARDING_TEMPLATE_ID: "8"
+      SECOND_ONBOARDING_TEMPLATE_ID: "7"
+      SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
 
   td-ui:
     restart: "no"

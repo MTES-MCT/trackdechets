@@ -1,7 +1,6 @@
-import { useQuery } from "@apollo/react-hooks/lib/useQuery";
-import gql from "graphql-tag";
+import { useQuery, gql } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import "./Company.scss";
 import CompanyActivity from "./CompanyActivity";

@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Formik, FormikHelpers } from "formik";
 import { NextButton, PreviousButton } from "common/components/Buttons";
 import "./WizardStepList.scss";

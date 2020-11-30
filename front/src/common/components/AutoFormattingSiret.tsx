@@ -11,7 +11,7 @@ export default function AutoFormattingSiret({ field, form, ...props }) {
       options={{ blocks: [3, 3, 3, 5] }}
       {...field}
       {...props}
-      className={`td-input ${styles.autoformattingSiret}`} 
+      className={`td-input ${styles.autoformattingSiret}`}
     />
   );
 }

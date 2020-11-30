@@ -39,14 +39,11 @@ services:
     env_file:
       - .integration-tests-env
     environment:
-      NODE_ENV: dev
+      NODE_ENV: test
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       PRISMA_ENDPOINT: $PRISMA_ENDPOINT
       PRISMA_SECRET: $PRISMA_SECRET
+      EMAIL_BACKEND: "sendinblue"
+      MAIN_TEMPLATE_ID: "9"
 
-  td-pdf:
-    image: td-pdf
-    build:
-      context: ../../pdf
-      dockerfile: Dockerfile.dev

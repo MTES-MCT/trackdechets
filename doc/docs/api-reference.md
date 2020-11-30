@@ -133,9 +133,12 @@ Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
 
 Vous pouvez filtrer:
 - par rôle que joue votre entreprise sur le BSD via `role`
-- par date de dernière modification via `updatedBefore` / `updatedAfter`
+- par date de dernière modification via `updatedAfter`
+- par date d'envoi via `sentAfter`
 - par statut du BSD via `status`
 - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+- par code déchet via `wasteCode`
+- par SIRET d'une entreprise présente n'importe où sur le bordereau via `siretPresentOnForm`
 
 Par défaut:
 - tous les BSD accessibles sont retournés
@@ -160,7 +163,9 @@ SIRET d'un établissement dont je suis membre
 <td>
 
 DEPRECATED - (Optionnel) PAGINATION
-Nombre d'éléments à ne pas récupérer en début de liste
+Nombre d'éléments à ne pas récupérer en début de liste dans le mode de pagination par "offset"
+Utiliser en conjonction avec `first` pour paginer "en avant" (des plus récents aux plus anciens)
+Utiliser en conjonction avec `last` pour paginer "en arrière" (des plus anciens aux plus récents)
 Défaut à 0
 
 </td>
@@ -171,9 +176,11 @@ Défaut à 0
 <td>
 
 (Optionnel) PAGINATION
+Permet en conjonction avec `first` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
 Curseur après lequel les bordereaux doivent être retournés
 Attend un identifiant (propriété `id`) de BSD
-Défaut à vide, pour retourner les "premiers" bordereaux
+Défaut à vide, pour retourner les bordereaux les plus récents
 Le BSD précisé dans le curseur ne fait pas partie du résultat
 
 </td>
@@ -184,9 +191,10 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 <td>
 
 (Optionnel) PAGINATION
+Permet en conjonction avec `cursorAfter` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
 Nombre de bordereaux retournés après le `cursorAfter`
 Défaut à 50, maximum à 500
-Ignoré si utilisé avec `cursorBefore`
 
 </td>
 </tr>
@@ -196,9 +204,11 @@ Ignoré si utilisé avec `cursorBefore`
 <td>
 
 (Optionnel) PAGINATION
+Permet en conjonction avec `last` de paginer "en arrière"
+(des bordereaux les plus anciens aux bordereaux les plus récents)
 Curseur avant lequel les bordereaux doivent être retournés
 Attend un identifiant (propriété `id`) de BSD
-Défaut à vide, pour retourner les "derniers" bordereaux
+Défaut à vide, pour retourner les bordereaux les plus anciens
 Le BSD précisé dans le curseur ne fait pas partie du résultat
 
 </td>
@@ -211,7 +221,6 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 (Optionnel) PAGINATION
 Nombre de bordereaux retournés avant le `cursorBefore`
 Défaut à 50, maximum à 500
-Ignoré si utilisé avec `cursorAfter`
 
 </td>
 </tr>
@@ -308,7 +317,7 @@ Défaut à vide.
 
 Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
 La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
-Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont retournés
+Seuls les changements de statut disposant d'un champ `loggedAt` non nul sont retournés
 
 </td>
 </tr>
@@ -344,7 +353,13 @@ Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont re
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-(Optionnel) PAGINATION - Curseur après lequel les changements de statut doivent être retournés
+(Optionnel) PAGINATION
+Permet de paginer les changements de statut "en avant"
+(des changements de statut les plus récents aux changements de statut les plus anciens)
+Curseur après lequel les changements de statut doivent être retournés
+Attend un identifiant (propriété `id`) d'un changement de statut
+Défaut à vide, pour retourner les changements de statut les plus récents
+Le changement de statut précisé dans le curseur ne fait pas partie du résultat
 
 </td>
 </tr>
@@ -353,7 +368,13 @@ Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont re
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-(Optionnel) PAGINATION - Curseur avant lequel les changements de statut doivent être retournés
+(Optionnel) PAGINATION
+Permet de paginer les changements de statut "en arrière"
+(des changements de statut les plus anciens aux changements de statut les plus récents)
+Curseur avant lequel les changements de statut doivent être retournés
+Attend un identifiant (propriété `id`) d'un changement de statut
+Défaut à vide, pour retourner les changements de statut les plus anciens
+Le changement de statut précisé dans le curseur ne fait pas partie du résultat
 
 </td>
 </tr>
@@ -2552,6 +2573,50 @@ Traitement prévue (code D/R)
 </tbody>
 </table>
 
+### PackagingInfo
+
+Informations sur le conditionnement
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#packagings">Packagings</a>!</td>
+<td>
+
+Type de conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Nombre de colis associés à ce conditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### Recipient
 
 Installation de destination ou d'entreprosage
@@ -2782,8 +2847,23 @@ Quantité la plus à jour
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td colspan="2" valign="top"><strong>packagings</strong> ⚠️</td>
 <td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
+<td>
+
+DEPRECATED Packaging le plus à jour
+
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser packagingInfos
+
+</blockquote>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfo">PackagingInfo</a>!]!</td>
 <td>
 
 Packaging le plus à jour
@@ -3565,30 +3645,57 @@ Code ONU
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>packagings</strong></td>
-<td valign="top">[<a href="#packagings">Packagings</a>!]!</td>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfo">PackagingInfo</a>!]</td>
 <td>
 
-Conditionnement
+Conditionnements
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>otherPackaging</strong></td>
+<td colspan="2" valign="top"><strong>packagings</strong> ⚠️</td>
+<td valign="top">[<a href="#packagings">Packagings</a>!]</td>
+<td>
+
+Conditionnement
+
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser `packagingInfos`
+
+</blockquote>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>otherPackaging</strong> ⚠️</td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
 Autre packaging (préciser)
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser `packagingInfos`
+
+</blockquote>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>numberOfPackages</strong></td>
+<td colspan="2" valign="top"><strong>numberOfPackages</strong> ⚠️</td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
 Nombre de colis
 
+<p>⚠️ <strong>DEPRECATED</strong></p>
+<blockquote>
+
+Utiliser `packagingInfos`
+
+</blockquote>
 </td>
 </tr>
 <tr>
@@ -4410,6 +4517,49 @@ Payload lié à l'ajout de segment de transport multimodal (case 20 à 21)
 </tbody>
 </table>
 
+### PackagingInfoInput
+
+Payload lié à un élément de conditionnement
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#packagings">Packagings</a>!</td>
+<td>
+
+Type de conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Nombre de colis associés à ce conditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### ProcessedFormInput
 
 Payload de traitement d'un BSD
@@ -5097,11 +5247,20 @@ Si oui on non le BSD a été signé par l'émetteur
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>packagings</strong></td>
-<td valign="top">[<a href="#packagings">Packagings</a>]!</td>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfoinput">PackagingInfoInput</a>!]</td>
 <td>
 
-Conditionnement
+Conditionnements
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#packagings">Packagings</a>]</td>
+<td>
+
+DEPRECATED - Conditionnement
 
 </td>
 </tr>
@@ -5281,11 +5440,20 @@ Code ONU
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfoinput">PackagingInfoInput</a>!]</td>
+<td>
+
+Conditionnements
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>packagings</strong></td>
 <td valign="top">[<a href="#packagings">Packagings</a>]</td>
 <td>
 
-Conditionnement
+DEPRECATED - Conditionnement
 
 </td>
 </tr>
@@ -5294,7 +5462,7 @@ Conditionnement
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Autre packaging (préciser)
+DEPRECATED - Autre packaging (préciser)
 
 </td>
 </tr>
@@ -5303,7 +5471,7 @@ Autre packaging (préciser)
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-Nombre de colis
+DEPRECATED - Nombre de colis
 
 </td>
 </tr>
@@ -5491,6 +5659,14 @@ Gazeux
 
 </td>
 </tr>
+<tr>
+<td valign="top"><strong>DOUGHY</strong></td>
+<td>
+
+Pâteux
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -5535,47 +5711,6 @@ Collecteur de petites quantités de déchets relevant de la même rubrique
 Personne ayant transformé ou réalisé un traitement dont la provenance des déchets reste identifiable
 
 </td>
-</tr>
-</tbody>
-</table>
-
-### FavoriteType
-
-Type d'établissement favoris
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>EMITTER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>RECIPIENT</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TRADER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>NEXT_DESTINATION</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>TEMPORARY_STORAGE_DETAIL</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>DESTINATION</strong></td>
-<td></td>
 </tr>
 </tbody>
 </table>

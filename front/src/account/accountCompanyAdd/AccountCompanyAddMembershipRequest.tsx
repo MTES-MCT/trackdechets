@@ -1,6 +1,5 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
-import gql from "graphql-tag";
 import React from "react";
 import { FaHourglassHalf } from "react-icons/fa";
 

@@ -22,7 +22,10 @@ export function arraysEqual(a, b) {
   if (a.length !== b.length) return false;
 
   for (let i = 0; i < a.length; ++i) {
-    if (a[i] !== b[i]) return false;
+    if (isObject(a[i])) {
+      const diff = objectDiff(a[i], b[i]);
+      if (Object.keys(diff).length > 0) return false;
+    } else if (a[i] !== b[i]) return false;
   }
   return true;
 }

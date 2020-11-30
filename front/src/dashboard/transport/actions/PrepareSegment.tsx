@@ -1,8 +1,7 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import { BusTransfer } from "common/components/Icons";
 import { DateTime } from "luxon";
-import gql from "graphql-tag";
 
 import React, { useState } from "react";
 

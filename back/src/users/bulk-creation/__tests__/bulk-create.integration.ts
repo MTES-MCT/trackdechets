@@ -1,4 +1,4 @@
-import * as mailsHelper from "../../../common/mails.helper";
+import * as mailsHelper from "../../../mailer/mailing";
 
 import { bulkCreate } from "../index";
 import { prisma } from "../../../generated/prisma-client";

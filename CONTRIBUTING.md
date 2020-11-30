@@ -83,10 +83,9 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 3. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-pdf td-ui
+   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-ui
    ```
-
-   Le démarrage du service `td-mail` est déconseillé en développement pour éviter des envois de courriels intempestifs mais vous pouvez l'activer pour le bon fonctionnement de certaines fonctionnalités (ex: validation de l'inscription, invitation à rejoindre un établissement, etc)
+   NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
    Vous pouvez également démarrer les services `td-doc`, `td-etl` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
 
@@ -113,8 +112,6 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
   - `back/src/generated/graphql/types.ts` pour le back
   - `front/src/generated/graphql/types.ts` pour le front
 
-[Linux/MacOS uniquement] Avant de pousser votre premier commit, il est recommandé d'installer un hook Github permettant de faire tourner eslint et prettier sur le code source back et front. `~/.githooks/install-hooks.sh` se chargera de l'installation. Si vous avez besoin de forcer un push sans vérifier les conventions de style, il est toujours possible de faire git push --no-verify.
-
 ## Tests unitaires
 
 La commande pour faire tourner tous les tests unitaires est la suivante :
@@ -127,7 +124,7 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
 
 1. Démarrer les différents services
    ```
-   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-pdf td-api td-ui
+   docker-compose -f docker-compose.dev.yml up postgres prisma redis td-api td-ui
    ```
 2. Faire tourner les tests back
    ```bash

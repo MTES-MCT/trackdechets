@@ -1,6 +1,5 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, gql } from "@apollo/client";
 import { useField, useFormikContext } from "formik";
-import gql from "graphql-tag";
 import React, { useState } from "react";
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";

@@ -13,8 +13,7 @@ import { trackEvent } from "tracker";
 import { localAuthService } from "login/auth.service";
 import { ProfileIcon, LeftArrowIcon, Close } from "common/components/Icons";
 import { AccountMenuContent } from "account/AccountMenu";
-import gql from "graphql-tag";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, gql } from "@apollo/client";
 import Loader from "common/components/Loaders";
 import { InlineError } from "common/components/Error";
 import { Query } from "generated/graphql/types";
@@ -23,7 +22,7 @@ import { DashboardNav } from "dashboard/DashboardNavigation";
 import routes from "common/routes";
 import { MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
-import useMedia from "use-media";
+import { useMedia } from "use-media";
 
 export const GET_ME = gql`
   {

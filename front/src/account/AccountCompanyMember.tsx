@@ -1,8 +1,7 @@
 import React from "react";
-import gql from "graphql-tag";
+import { gql, useMutation } from "@apollo/client";
 import { FaTimes, FaEnvelope } from "react-icons/fa";
 import styles from "./AccountCompanyMember.module.scss";
-import { useMutation } from "@apollo/react-hooks";
 import cogoToast from "cogo-toast";
 import {
   CompanyPrivate,

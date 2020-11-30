@@ -1,7 +1,6 @@
 import React from "react";
-import gql from "graphql-tag";
 import { filter } from "graphql-anywhere";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, gql } from "@apollo/client";
 import AccountMenu from "./AccountMenu";
 import {
   Route,
@@ -9,7 +8,7 @@ import {
   RouteComponentProps,
   Redirect,
   Switch,
-} from "react-router";
+} from "react-router-dom";
 import Loader from "common/components/Loaders";
 import { InlineError } from "common/components/Error";
 import AccountInfo from "./AccountInfo";

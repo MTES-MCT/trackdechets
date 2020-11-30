@@ -8,7 +8,7 @@ type Props = {
   onSelect?: (value: any) => void;
 };
 
-export default function({
+export default function ({
   open = false,
   onClose = () => null,
   onSelect = () => null,

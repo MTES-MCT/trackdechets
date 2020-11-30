@@ -1,8 +1,7 @@
 import React from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
 import { FaTrash } from "react-icons/fa";
-import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { useMutation, gql } from "@apollo/client";
 import { InlineError } from "common/components/Error";
 import styles from "./AccountForm.module.scss";
 

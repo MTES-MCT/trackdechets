@@ -15,12 +15,9 @@ describe("<Tooltip />", () => {
   it("shows help message when button is hovered", async () => {
     const helpMsg = "lorem";
 
-    const {
-      container,
-      queryByText,
-      getByRole,
-      getAllByText,
-    } = render(<Tooltip msg={helpMsg} />);
+    const { container, queryByText, getByRole, getAllByText } = render(
+      <Tooltip msg={helpMsg} />
+    );
 
     expect(container.querySelector("button")).toHaveClass("tdTooltip");
 

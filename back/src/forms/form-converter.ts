@@ -5,9 +5,7 @@ import {
   FormCreateInput,
   FormUpdateInput,
   TemporaryStorageDetailCreateInput,
-  TemporaryStorageDetailUpdateInput,
-  Form,
-  TransportSegment
+  TemporaryStorageDetailUpdateInput
 } from "../generated/prisma-client";
 import {
   Form as GraphQLForm,
@@ -36,7 +34,9 @@ import {
   TraderInput,
   NextDestinationInput,
   ImportPaperFormInput,
-  EcoOrganismeInput
+  EcoOrganismeInput,
+  PackagingInfo,
+  TransporterSignatureFormInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -149,14 +149,8 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
   return {
     wasteDetailsCode: chain(input.wasteDetails, w => w.code),
     wasteDetailsOnuCode: chain(input.wasteDetails, w => w.onuCode),
-    wasteDetailsPackagings: chain(input.wasteDetails, w => w.packagings),
-    wasteDetailsOtherPackaging: chain(
-      input.wasteDetails,
-      w => w.otherPackaging
-    ),
-    wasteDetailsNumberOfPackages: chain(
-      input.wasteDetails,
-      w => w.numberOfPackages
+    wasteDetailsPackagingInfos: chain(input.wasteDetails, w =>
+      getProcessedPackagingInfos(w)
     ),
     wasteDetailsQuantity: chain(input.wasteDetails, w => w.quantity),
     wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType),
@@ -413,6 +407,15 @@ export function flattenResentFormInput(
   });
 }
 
+export function flattenSignedByTransporterInput(
+  transporterSignatureFormInput: TransporterSignatureFormInput
+) {
+  return safeInput({
+    ...transporterSignatureFormInput,
+    packagingInfos: getProcessedPackagingInfos(transporterSignatureFormInput)
+  });
+}
+
 /**
  * Expand form data from db
  */
@@ -474,9 +477,9 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
       onuCode: form.wasteDetailsOnuCode,
-      packagings: form.wasteDetailsPackagings,
-      otherPackaging: form.wasteDetailsOtherPackaging,
-      numberOfPackages: form.wasteDetailsNumberOfPackages,
+      packagingInfos: form.wasteDetailsPackagingInfos,
+      // DEPRECATED - To remove with old packaging fields
+      ...getDeprecatedPackagingApiFields(form.wasteDetailsPackagingInfos),
       quantity: form.wasteDetailsQuantity,
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence
@@ -566,9 +569,11 @@ export function expandTemporaryStorageFromDb(
       code: null,
       name: null,
       onuCode: temporaryStorageDetail.wasteDetailsOnuCode,
-      packagings: temporaryStorageDetail.wasteDetailsPackagings,
-      otherPackaging: temporaryStorageDetail.wasteDetailsOtherPackaging,
-      numberOfPackages: temporaryStorageDetail.wasteDetailsNumberOfPackages,
+      packagingInfos: temporaryStorageDetail.wasteDetailsPackagingInfos,
+      // DEPRECATED - To remove with old packaging fields
+      ...getDeprecatedPackagingApiFields(
+        temporaryStorageDetail.wasteDetailsPackagingInfos
+      ),
       quantity: temporaryStorageDetail.wasteDetailsQuantity,
       quantityType: temporaryStorageDetail.wasteDetailsQuantityType,
       consistence: null
@@ -625,46 +630,53 @@ export function expandTransportSegmentFromDb(
   };
 }
 
-export function cleanUpNotDuplicatableFieldsInForm(form: Form): Partial<Form> {
-  const {
-    id,
-    createdAt,
-    updatedAt,
-    readableId,
-
-    transporterNumberPlate,
-
-    status,
-    sentAt,
-    sentBy,
-
-    isAccepted,
-    wasteAcceptationStatus,
-    wasteRefusalReason,
-    receivedBy,
-    receivedAt,
-    quantityReceived,
-    processingOperationDone,
-    currentTransporterSiret,
-    signedByTransporter,
-    transporterCustomInfo,
-    ...rest
-  } = form;
-
-  return rest;
+/**
+ * `packagings`, `otherPackaging` and `numberOfPackages` are DEPRECATED
+ * For retro compatibility, calculate their values by reading `packagingInfos`
+ * @param packagingInfos
+ */
+function getDeprecatedPackagingApiFields(packagingInfos: PackagingInfo[]) {
+  return {
+    packagings: chain(packagingInfos, pi => pi.map(pi => pi.type)),
+    otherPackaging: chain(
+      packagingInfos,
+      pi => pi.find(pi => pi.type === "AUTRE")?.other
+    ),
+    numberOfPackages: chain(packagingInfos, pi =>
+      pi.reduce((prev, cur) => prev + cur.quantity, 0)
+    )
+  };
 }
 
-export function cleanUpNonDuplicatableSegmentField(
-  segment: TransportSegment
-): Partial<TransportSegment> {
-  const {
-    id,
-    createdAt,
-    updatedAt,
-    takenOverAt,
-    takenOverBy,
-    ...rest
-  } = segment;
+/**
+ * `packagings`, `otherPackaging` and `numberOfPackages` are DEPRECATED
+ * But they can still be passed as input instead of `packagingInfos`
+ * So we calculate the `packagingInfos` to store in DB based on their values
+ * @param wasteDetails
+ */
+function getProcessedPackagingInfos(wasteDetails: Partial<WasteDetailsInput>) {
+  // if deprecated `packagings` field is passed and `packagingInfos` is not passed
+  // convert old packagings to new packaging info
+  if (wasteDetails.packagings && !wasteDetails.packagingInfos) {
+    const packagings = wasteDetails.packagings;
+    const numberOfPackages = wasteDetails.numberOfPackages ?? 1;
+    const maxPackagesPerPackaging = Math.ceil(
+      numberOfPackages / packagings.length
+    );
 
-  return rest;
+    return packagings.map((type, idx) => ({
+      type,
+      other: type === "AUTRE" ? wasteDetails.otherPackaging : null,
+      quantity: Math.max(
+        0,
+        Math.min(
+          maxPackagesPerPackaging,
+          numberOfPackages - maxPackagesPerPackaging * idx
+        )
+      )
+    }));
+  }
+
+  // otherwise return packagingInfos "as is". It can be null or undefined
+  return wasteDetails.packagingInfos;
 }

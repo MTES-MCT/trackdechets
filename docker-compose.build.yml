@@ -1,10 +1,6 @@
 version: "3.7"
 services:
 
-  postgres:
-    build:
-      context: ./postgres
-
   td-api:
     build:
       context: ./back
@@ -12,14 +8,6 @@ services:
   td-ui:
     build:
       context: ./front
-
-  td-pdf:
-    build:
-      context: ./pdf
-
-  td-mail:
-    build:
-      context: ./mail
 
   td-doc:
     build:
@@ -29,6 +17,3 @@ services:
     build:
       context: ./doc-redirect
 
-  td-etl:
-    build:
-      context: ./etl

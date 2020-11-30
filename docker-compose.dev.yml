@@ -18,16 +18,11 @@ services:
             migrations: true
 
   postgres:
-    image: td-postgres
-    build:
-      context: ./postgres
-      dockerfile: Dockerfile
+    image: postgres:10.5
     restart: always
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      AIRFLOW_POSTGRES_USER: $AIRFLOW_POSTGRES_USER
-      AIRFLOW_POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
     ports:
       - "5432:5432"
     volumes:
@@ -72,56 +67,6 @@ services:
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
     volumes:
       - ./front/:/usr/src/front
-
-  td-pdf:
-    image: td-pdf
-    build:
-      context: ./pdf
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./pdf/src:/usr/src/app/src
-    ports:
-      - 3201:3201
-    environment:
-      PDF_WATERMARK: display
-
-  td-mail:
-    image: td-mail
-    build:
-      context: ./mail
-      dockerfile: Dockerfile
-    ports:
-      - 82:80
-    environment:
-      MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
-      MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
-      MJ_SENDER_EMAIL_ADDRESS: $MJ_SENDER_EMAIL_ADDRESS
-      MJ_SENDER_NAME: $MJ_SENDER_NAME
-
-  td-etl:
-    image: td-etl
-    build:
-      context: ./etl
-      dockerfile: Dockerfile
-    environment:
-      VIRTUAL_HOST: $ETL_HOST
-      VIRTUAL_PORT: 8080
-      LOAD_EX: n
-      POSTGRES_HOST: $POSTGRES_HOST
-      POSTGRES_PORT: $POSTGRES_PORT
-      POSTGRES_USER: $AIRFLOW_POSTGRES_USER
-      POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
-      AIRFLOW__CORE__FERNET_KEY: $AIRFLOW_FERNET_KEY
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgres://$AIRFLOW_POSTGRES_USER:$AIRFLOW_POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/airflow
-      AIRFLOW_CONN_POSTGRES_ETL: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$ETL_DB
-      AIRFLOW_CONN_POSTGRES_PRISMA: postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/prisma
-    volumes:
-      - ./etl/code/dags:/usr/local/airflow/dags
-      - ./etl/code/data:/usr/local/airflow/data
-      - ./etl/code/embulk:/usr/local/airflow/embulk
-      - ./etl/code/sql:/usr/local/airflow/sql
-      - ./etl/code/tests:/usr/local/airflow/tests
 
   td-doc:
     image: td-doc

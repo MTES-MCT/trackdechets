@@ -1,20 +1,9 @@
-import gql from "graphql-tag";
-import {
-  fullFormFragment,
-  statusChangeFragment,
-} from "common/fragments";
+import { gql } from "@apollo/client";
+import { fullFormFragment, statusChangeFragment } from "common/fragments";
 
 const MARK_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {
     markAsSealed(id: $id) {
-      ...StatusChange
-    }
-  }
-  ${statusChangeFragment}
-`;
-const MARK_SENT = gql`
-  mutation MarkAsSent($id: ID!, $info: SentFormInput!) {
-    markAsSent(id: $id, sentInfo: $info) {
       ...StatusChange
     }
   }
@@ -55,15 +44,6 @@ const MARK_RESEALED = gql`
   ${statusChangeFragment}
 `;
 
-const MARK_RESENT = gql`
-  mutation MarkAsResent($id: ID!, $info: ResentFormInput!) {
-    markAsResent(id: $id, resentInfos: $info) {
-      ...StatusChange
-    }
-  }
-  ${statusChangeFragment}
-`;
-
 const DUPLICATE_FORM = gql`
   mutation DuplicateForm($id: ID!) {
     duplicateForm(id: $id) {
@@ -83,12 +63,10 @@ const DELETE_FORM = gql`
 
 export default {
   SEALED: MARK_SEALED,
-  SENT: MARK_SENT,
   RECEIVED: MARK_RECEIVED,
   PROCESSED: MARK_PROCESSED,
   TEMP_STORED: MARK_TEMP_STORED,
   RESEALED: MARK_RESEALED,
-  RESENT: MARK_RESENT,
   DUPLICATE_FORM,
   DELETE_FORM,
 };

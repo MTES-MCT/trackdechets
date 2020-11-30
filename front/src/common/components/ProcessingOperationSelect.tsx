@@ -5,7 +5,6 @@ import styles from "./ProcessingOperationSelect.module.scss";
 
 const ProcessingOperationSelect = ({ field: { value, name, onChange } }) => (
   <>
-   
     <label>Opération d’élimination / valorisation prévue (code D/R)</label>
     <select
       id="select"

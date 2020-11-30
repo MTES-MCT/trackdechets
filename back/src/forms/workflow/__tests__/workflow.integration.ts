@@ -184,10 +184,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             code: "06 05 02*"
             onuCode: "2003"
             name: "Boues"
-            packagings: [
-              BENNE
+            packagingInfos: [
+              { type: BENNE, quantity: 1 }
             ]
-            numberOfPackages: 1
             quantity: 1
             quantityType: ESTIMATED
             consistence: LIQUID
@@ -250,8 +249,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           signingInfo: {
             sentAt: "2020-04-03T14:48:00",
             quantity: 1,
-            packagings: [
-              BENNE
+            packagingInfos: [
+              { type: BENNE, quantity: 1 }
             ],
             sentBy: "Isabelle Guichard"
             onuCode: "xxxx",
@@ -502,10 +501,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
               code: "06 05 02*"
               onuCode: "2003"
               name: "Boues"
-              packagings: [
-                BENNE
+              packagingInfos: [
+                { type: BENNE, quantity: 1 }
               ]
-              numberOfPackages: 1
               quantity: 1
               quantityType: ESTIMATED
               consistence: LIQUID
@@ -766,10 +764,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
               code: "06 05 02*"
               onuCode: "2003"
               name: "Boues"
-              packagings: [
-                BENNE
+              packagingInfos: [
+                { type: BENNE, quantity: 1 }
               ]
-              numberOfPackages: 1
               quantity: 1
               quantityType: ESTIMATED
               consistence: LIQUID
@@ -846,8 +843,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           signingInfo: {
             sentAt: "2020-04-03T14:48:00",
             quantity: 1,
-            packagings: [
-              BENNE
+            packagingInfos: [
+              { type: BENNE, quantity: 1 }
             ],
             sentBy: "Isabelle Guichard"
             onuCode: "xxxx",
@@ -916,10 +913,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           id: "${form.id}"
           resealedInfos: {
             wasteDetails: {
-              packagings: [
-                BENNE
+              packagingInfos: [
+                { type: BENNE, quantity: 1 }
               ]
-              numberOfPackages: 1
               quantity: 1
               quantityType: ESTIMATED
             }
@@ -964,8 +960,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           signingInfo: {
             sentAt: "2020-08-03T10:00:00",
             quantity: 1,
-            packagings: [
-              BENNE
+            packagingInfos: [
+              { type: BENNE, quantity: 1 }
             ],
             sentBy: "Mr Provisoire"
             onuCode: "xxxx",
@@ -1115,9 +1111,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
               code: null,
               name: null,
               onuCode: null,
-              packagings: ["BENNE"],
-              otherPackaging: null,
+              packagingInfos: [{ type: "BENNE", quantity: 1 }],
               numberOfPackages: 1,
+              packagings: ["BENNE"],
               quantity: 1,
               quantityType: "ESTIMATED",
               consistence: null
@@ -1298,10 +1294,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             code: "06 05 02*"
             onuCode: "2003"
             name: "Boues"
-            packagings: [
-              BENNE
+            packagingInfos: [
+              { type: BENNE, quantity: 1 }
             ]
-            numberOfPackages: 1
             quantity: 1
             quantityType: ESTIMATED
             consistence: LIQUID
@@ -1364,8 +1359,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           signingInfo: {
             sentAt: "2020-04-03T14:48:00",
             quantity: 1,
-            packagings: [
-              BENNE
+            packagingInfos: [
+              { type: BENNE, quantity: 1 }
             ],
             sentBy: "Isabelle Guichard"
             onuCode: "xxxx",

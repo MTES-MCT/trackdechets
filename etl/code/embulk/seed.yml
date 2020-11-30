@@ -1,3 +1,0 @@
-in:
-  type: file
-  path_prefix: /Users/benoit/Workspace/trackdechets/etl/code/data/s3ic/rubriques/rubriques.csv

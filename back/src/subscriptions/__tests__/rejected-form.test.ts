@@ -3,6 +3,7 @@ import * as sirene from "../../companies/sirene";
 import { CompanySearchResult } from "../../companies/sirene/types";
 import { mailWhenFormIsDeclined } from "../forms";
 import { FormSubscriptionPayload } from "../../generated/prisma-client";
+import * as mailing from "../../mailer/mailing";
 
 // This form will be refused,
 const mockedForm = {
@@ -64,7 +65,7 @@ const mockedForm = {
   traderCompanySiret: "",
   transporterNumberPlate: "1",
   recipientProcessingOperation: "D 3",
-  wasteDetailsPackagings: ["BENNE"],
+  wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
   transporterValidityLimit: "2099-10-18T00:00:00.000Z",
   emitterCompanyContact: "aa",
   traderReceipt: "",
@@ -72,7 +73,6 @@ const mockedForm = {
   transporterCompanyPhone: "06 18 76 02 96",
   recipientCompanyMail: "recipient@example.com",
   wasteDetailsConsistence: "SOLID",
-  wasteDetailsNumberOfPackages: 1,
   traderCompanyPhone: "",
   noTraceability: null,
   emitterCompanySiret: "12343606600011",
@@ -149,10 +149,11 @@ const insee2: CompanySearchResult = {
   codeCommune: "77001"
 };
 
-// Mock pdf service
-jest.mock("../../forms/pdf", () => ({
-  pdfEmailAttachment: jest.fn(() => "base64xyz")
+// Mock pdf generator
+jest.mock("../../forms/pdf/generator", () => ({
+  buildPdfBase64: jest.fn(() => "base64xyz")
 }));
+
 // Mock a utils function that hits th db
 jest.mock("../../companies/database", () => ({
   getCompanyAdminUsers: jest.fn(siret => mockedCompanyAdmins[siret])
@@ -169,16 +170,16 @@ jest.mock("../../generated/prisma-client", () => ({
 const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
 // spies on axios get to capture calls to geo.api.gouv.fr
 const mockedAxiosGet = jest.spyOn(axios, "get");
-// spies on axios post to capture calls to td-mail
+// spies on axios post to capture calls to mail helpers
 const mockedAxiosPost = jest.spyOn(axios, "post");
+const mockedSendMail = jest.spyOn(mailing, "sendMail");
 
-const { MJ_MAIN_TEMPLATE_ID } = process.env;
 /**
  * Test mailWhenFormIsDeclined function
  * We check:
  *    searchCompany is called twice
  *    geo.api.gouv.fr is called twice
- *    td-mail is called 3 times with right params
+ *    mail helper is called 3 times with right params
  *    dreals from relevant departments are emailed
  */
 describe("mailWhenFormIsDeclined", () => {
@@ -195,6 +196,7 @@ describe("mailWhenFormIsDeclined", () => {
     searchCompanySpy.mockReset(); // removes calls, instances, returned values and implementations
     mockedAxiosPost.mockReset(); // removes calls, instances, returned values and implementations
     mockedAxiosGet.mockReset(); // removes calls, instances, returned values and implementations
+    mockedSendMail.mockReset();
   });
 
   it("should send mails if waste is refused", async () => {
@@ -212,7 +214,9 @@ describe("mailWhenFormIsDeclined", () => {
         data: { result: "ok" }
       })
     );
-
+    (mockedSendMail as jest.Mock<any>).mockImplementation(() =>
+      Promise.resolve()
+    );
     await mailWhenFormIsDeclined(formPayload("REFUSED"));
 
     // get called twice for entreprise.data.gouv.fr
@@ -222,17 +226,14 @@ describe("mailWhenFormIsDeclined", () => {
     expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
 
     // post called 1 time for mail sending
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedSendMail as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
-    const args = mockedAxiosPost.mock.calls;
-    // right service was called
+    const args = mockedSendMail.mock.calls;
 
-    expect(args[0][0]).toEqual("http://td-mail/send");
-
-    const payload1 = args[0][1];
+    const payload1 = args[0][0];
 
     // pdf from was attached
-    expect(payload1.attachment).toEqual("base64xyz");
+    expect(payload1.attachment.file).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
@@ -247,8 +248,7 @@ describe("mailWhenFormIsDeclined", () => {
     // check form readable id is in mail body
     expect(payload1.body).toContain("TD-19-AAA03488");
 
-    const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
-    expect(payload1.templateId).toEqual(templateId);
+    expect(payload1.templateId).toBeUndefined();
   });
 
   it("should send mails if waste is partially refused", async () => {
@@ -262,32 +262,35 @@ describe("mailWhenFormIsDeclined", () => {
     (mockedAxiosGet as jest.Mock<any>)
       .mockResolvedValueOnce({ data: { codeDepartement: "66" } })
       .mockResolvedValueOnce({ data: { codeDepartement: "77" } });
+
     (mockedAxiosPost as jest.Mock<any>).mockImplementation(() =>
       Promise.resolve({
         data: { result: "ok" }
       })
     );
 
+    (mockedSendMail as jest.Mock<any>).mockImplementation(() =>
+      Promise.resolve()
+    );
     await mailWhenFormIsDeclined(formPayload("PARTIALLY_REFUSED"));
 
     // get called 2 times for entreprise.data.gouv.fr
     expect(searchCompanySpy).toHaveBeenCalledTimes(2);
 
     // get called 2 times for geo.api.gouv.fr
-    // expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
+    expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(2);
 
     // post called 1 time for mail sending
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedSendMail as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
-    const args = mockedAxiosPost.mock.calls;
+    const args = mockedSendMail.mock.calls;
 
     // right service was called
-    expect(args[0][0]).toEqual("http://td-mail/send");
 
-    const payload1 = args[0][1];
+    const payload1 = args[0][0];
 
     // pdf from was attached
-    expect(payload1.attachment).toEqual("base64xyz");
+    expect(payload1.attachment.file).toEqual("base64xyz");
 
     // we have 3 recipients, emitter and 2 dreals matching 66 and 77 depts
     expect(payload1.to[0].email).toEqual("producer@example.com");
@@ -302,7 +305,6 @@ describe("mailWhenFormIsDeclined", () => {
     // check form readable id is in mail body
     expect(payload1.body).toContain("TD-19-AAA03488");
 
-    const templateId = parseInt(MJ_MAIN_TEMPLATE_ID, 10);
-    expect(payload1.templateId).toEqual(templateId);
+    expect(payload1.templateId).toBeUndefined();
   });
 });

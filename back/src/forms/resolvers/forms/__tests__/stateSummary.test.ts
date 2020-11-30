@@ -53,9 +53,7 @@ describe("stateSummary", () => {
         code: "oil-code",
         name: "Oil",
         onuCode: "oil-onu-code",
-        packagings: [],
-        otherPackaging: null,
-        numberOfPackages: 1,
+        packagingInfos: [],
         quantity: 2,
         quantityType: "ESTIMATED",
         consistence: "LIQUID"
@@ -75,7 +73,7 @@ describe("stateSummary", () => {
 
       expect(stateSummary).toMatchObject({
         quantity: FORM.wasteDetails?.quantity,
-        packagings: FORM.wasteDetails?.packagings,
+        packagingInfos: FORM.wasteDetails?.packagingInfos,
         onuCode: FORM.wasteDetails?.onuCode
       });
     });
@@ -86,9 +84,7 @@ describe("stateSummary", () => {
       code: "oil-code",
       name: "Oil",
       onuCode: "oil-onu-code",
-      packagings: [],
-      otherPackaging: null,
-      numberOfPackages: 1,
+      packagingInfos: [],
       quantity: 2,
       quantityType: "ESTIMATED",
       consistence: "LIQUID"
@@ -109,9 +105,8 @@ describe("stateSummary", () => {
     });
     const TEMPORARY_WASTE_DETAILS = createWasteDetailsMock({
       onuCode: "temporary-oil-onu-code",
-      packagings: [],
+      packagingInfos: [],
       otherPackaging: null,
-      numberOfPackages: 2,
       quantity: 4,
       quantityType: "REAL"
     });
@@ -121,10 +116,7 @@ describe("stateSummary", () => {
         Promise.resolve({
           id: "temporary-storage",
           wasteDetailsOnuCode: TEMPORARY_WASTE_DETAILS.onuCode,
-          wasteDetailsPackagings: TEMPORARY_WASTE_DETAILS.packagings,
-          wasteDetailsOtherPackaging: TEMPORARY_WASTE_DETAILS.otherPackaging,
-          wasteDetailsNumberOfPackages:
-            TEMPORARY_WASTE_DETAILS.numberOfPackages,
+          wasteDetailsPackagingInfos: TEMPORARY_WASTE_DETAILS.packagingInfos,
           wasteDetailsQuantity: TEMPORARY_WASTE_DETAILS.quantity,
           wasteDetailsQuantityType: TEMPORARY_WASTE_DETAILS.quantityType,
           destinationCompanyName: COLLECTOR.company?.name,
@@ -148,7 +140,7 @@ describe("stateSummary", () => {
 
       expect(stateSummary).toMatchObject({
         quantity: TEMPORARY_WASTE_DETAILS.quantity,
-        packagings: TEMPORARY_WASTE_DETAILS.packagings,
+        packagingInfos: TEMPORARY_WASTE_DETAILS.packagingInfos,
         onuCode: TEMPORARY_WASTE_DETAILS.onuCode
       });
     });

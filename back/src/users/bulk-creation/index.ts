@@ -6,7 +6,7 @@ import { sirenify } from "./sirene";
 import { hashPassword } from "../utils";
 import { randomNumber, getUIBaseURL } from "../../utils";
 import { groupBy } from "./utils";
-import { sendMail } from "../../common/mails.helper";
+import { sendMail } from "../../mailer/mailing";
 import { UserInputError } from "apollo-server-express";
 import {
   associateUserToCompany,

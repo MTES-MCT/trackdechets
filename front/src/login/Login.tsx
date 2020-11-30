@@ -1,5 +1,5 @@
 import React from "react";
-import queryString from "query-string";
+import * as queryString from "query-string";
 import {
   Link,
   RouteComponentProps,

@@ -1,12 +1,13 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/client";
 import React, { useState, useEffect, useCallback } from "react";
 
 import {
   WaterDamIcon,
   CogApprovedIcon,
   PaperWriteIcon,
-  DeliveryTruckClockIcon,
   WarehouseStorageIcon,
+  ChevronDown,
+  ChevronUp,
 } from "common/components/Icons";
 import { Form } from "generated/graphql/types";
 import "./SlipActions.scss";
@@ -19,12 +20,9 @@ import { getNextStep } from "./next-step";
 import Processed from "./Processed";
 import Received from "./Received";
 import Sealed from "./Sealed";
-import Sent from "./Sent";
 import Resealed from "./Resealed";
-import Resent from "./Resent";
 import mutations from "./slip-actions.mutations";
 import { NotificationError } from "common/components/Error";
-import { ChevronDown, ChevronUp } from "common/components/Icons";
 import OutsideClickHandler from "react-outside-click-handler";
 import { COLORS } from "common/config";
 import TdModal from "common/components/Modal";
@@ -185,11 +183,6 @@ const buttons = {
     icon: PaperWriteIcon,
     component: Sealed,
   },
-  SENT: {
-    title: "Valider l'enlèvement",
-    icon: DeliveryTruckClockIcon,
-    component: Sent,
-  },
   RECEIVED: {
     title: "Valider la réception",
     icon: WaterDamIcon,
@@ -209,10 +202,5 @@ const buttons = {
     title: "Compléter le BSD suite",
     icon: PaperWriteIcon,
     component: Resealed,
-  },
-  RESENT: {
-    title: "Valider l'enlèvement",
-    icon: DeliveryTruckClockIcon,
-    component: Resent,
   },
 };

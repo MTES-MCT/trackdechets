@@ -34,7 +34,7 @@ export default function WorkSite() {
         onChange={() => setShowWorkSite(!showWorkSite)}
         label="Je souhaite ajouter une adresse de chantier ou de collecte"
       />
- 
+
       {showWorkSite && (
         <>
           <h4 className="form__section-heading">Adresse chantier</h4>

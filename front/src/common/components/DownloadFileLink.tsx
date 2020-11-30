@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery } from "@apollo/client";
 import { DocumentNode } from "graphql";
 
 type Props = {

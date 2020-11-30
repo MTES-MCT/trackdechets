@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "whatwg-fetch";
 import { useLocation } from "react-router-dom";
 
 export interface AuthorizePayload {
@@ -22,7 +21,7 @@ export function useOAuth2() {
   const [error, setError] = useState<string | null>(null);
   const [
     authorizePayload,
-    setAuthorizePayload
+    setAuthorizePayload,
   ] = useState<AuthorizePayload | null>(null);
 
   const { REACT_APP_API_ENDPOINT } = process.env;

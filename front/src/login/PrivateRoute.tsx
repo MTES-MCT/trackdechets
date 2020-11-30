@@ -1,6 +1,6 @@
 import routes from "common/routes";
 import React from "react";
-import { Route, Redirect, RouteProps, useLocation } from "react-router";
+import { Route, Redirect, RouteProps, useLocation } from "react-router-dom";
 
 interface AuthProps {
   isAuthenticated: boolean;

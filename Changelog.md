@@ -5,7 +5,40 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2020.10.1] 03/11/2020
+# [2020.11.2] 30/11/2020
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un nouveau champ `packagingInfos` qui viendra remplacer `packagings`, `numberOfPackages` et `otherPackaging`. Ces champs sont encore supportés pour quelques temps mais marqué comme dépréciés. Nous vous invitons à migrer aussi vite que possible. [PR 600](https://github.com/MTES-MCT/trackdechets/pull/600)
+
+#### :boom: Breaking changes
+
+- Suppression de la possibilité pour l'émetteur du bordereau de valider un enlèvement sans signature transporteur dans l'interface Trackdéchets. Cette fonctionnalité utilisait les mutations `markAsSent` et `markAsResent` de l'API qui sont dépréciées. [PR 704](https://github.com/MTES-MCT/trackdechets/pull/704)
+
+#### :bug: Corrections de bugs
+
+- Correction de la mutation `duplicateForm` pour dupliquer l'entreposage provisoire, [PR 700](https://github.com/)
+- Correction d'un bug affichant une erreur serveur à la place d'une erreur de validation graphQL lorsque le typage des variables graphQL est erronée [PR 711](https://github.com/MTES-MCT/trackdechets/pull/711)
+- Correction d'un bug empêchant de paginer les bordereaux "en arrière" dans la query `forms` lorsque `cursorBefore` n'est pas précisé et amélioration de la validation des paramètres de pagination [PR 699](https://github.com/MTES-MCT/trackdechets/pull/699)
+- Correction de l'affichage de l'aperçu du bordereau avec entreposage provisoire, [PR 715](https://github.com/MTES-MCT/trackdechets/pull/715)
+- Correction d'un bug dans les entreprises proposées lors de la sélection d'une entreprise au moment de créer un BSD, [PR 713](https://github.com/MTES-MCT/trackdechets/pull/713)
+- Correction d'un bug permettant de modifier un BSD qui n'est pas en brouillon [PR 726](https://github.com/MTES-MCT/trackdechets/pull/726)
+
+#### :nail_care: Améliorations
+
+- Amélioration des suggestions d'entreprise lors de la création d'un BSD depuis l'interface, [PR 673](https://github.com/MTES-MCT/trackdechets/pull/673)
+- Légende du QR Code dans l'UI [PR 709](https://github.com/MTES-MCT/trackdechets/pull/709)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Migration du service td-etl dans un projet Github à part [PR 683](https://github.com/MTES-MCT/trackdechets/pull/683)
+- Intégration du service de génération de pdf en tant que module interne au backend [PR 172](https://github.com/MTES-MCT/trackdechets/pull/712)
+- Ajout du type d'authentification utilisé dans les logs de statut [PR 702](https://github.com/MTES-MCT/trackdechets/pull/702)
+- Réintégration du service mail au backend et implémentation de l'envoi d'emails via différents prestataires (https://github.com/MTES-MCT/trackdechets/pull/703)
+
+# [2020.11.1] 03/11/2020
 
 **Breaking changes**
 

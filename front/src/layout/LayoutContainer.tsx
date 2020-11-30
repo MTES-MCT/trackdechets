@@ -5,14 +5,13 @@ import {
   Switch,
   Redirect,
   generatePath,
-} from "react-router";
+} from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
 import Loader from "common/components/Loaders";
 import Layout from "./Layout";
 import routes from "common/routes";
-import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { useQuery, gql } from "@apollo/client";
 
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
 const Account = lazy(() => import("account/Account"));

@@ -1,5 +1,4 @@
-import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { useQuery, gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import React from "react";
 import {
@@ -8,8 +7,8 @@ import {
   Route,
   Switch,
   useHistory,
-} from "react-router";
-import { useParams } from "react-router-dom";
+  useParams,
+} from "react-router-dom";
 import routes from "common/routes";
 import { InlineError } from "../common/components/Error";
 import Loader from "../common/components/Loaders";

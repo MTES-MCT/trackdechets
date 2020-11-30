@@ -1,5 +1,4 @@
-import { useQuery } from "@apollo/react-hooks";
-import { NetworkStatus } from "apollo-client";
+import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
@@ -31,6 +30,9 @@ export default function FollowTab() {
       hasNextStep: false,
     },
     notifyOnNetworkStatusChange: true,
+    // workaround waiting for a way to append a sealed form to the cache
+    // after markAsSealed has been called
+    fetchPolicy: "no-cache",
   });
 
   if (networkStatus === NetworkStatus.loading) return <Loader />;

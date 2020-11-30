@@ -13,11 +13,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: npm install --prefix back
+          name: "back: Install dependencies"
+          command: npm ci --prefix back
       - run:
-          name: Run linter
+          name: "back: Run linter"
           command: npm run lint --prefix back
+      - run:
+          name: "front: Install dependencies"
+          command: npm ci --prefix front
+      - run:
+          name: "front: Run linter"
+          command: npm run lint --prefix front
 
   test:
     description: "Run tests"
@@ -96,7 +102,7 @@ jobs:
                 if [ "${CIRCLE_BRANCH}" == "dev" ]; then
                   docker-compose up -d postgres td-doc-redirect
                 fi
-                docker-compose up -d prisma redis td-api td-ui td-pdf td-mail td-doc
+                docker-compose up -d prisma redis td-api td-ui td-doc
                 docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
 
   integration-tests:

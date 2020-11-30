@@ -1024,7 +1024,7 @@ export type EmitterType = "PRODUCER" | "OTHER" | "APPENDIX1" | "APPENDIX2";
 
 export type QuantityType = "REAL" | "ESTIMATED";
 
-export type Consistence = "SOLID" | "LIQUID" | "GASEOUS";
+export type Consistence = "SOLID" | "LIQUID" | "GASEOUS" | "DOUGHY";
 
 export type TransportMode = "ROAD" | "RAIL" | "AIR" | "RIVER" | "SEA";
 
@@ -1165,6 +1165,8 @@ export type FormOrderByInput =
   | "wasteDetailsName_DESC"
   | "wasteDetailsOnuCode_ASC"
   | "wasteDetailsOnuCode_DESC"
+  | "wasteDetailsPackagingInfos_ASC"
+  | "wasteDetailsPackagingInfos_DESC"
   | "wasteDetailsPackagings_ASC"
   | "wasteDetailsPackagings_DESC"
   | "wasteDetailsOtherPackaging_ASC"
@@ -1332,6 +1334,8 @@ export type RubriqueOrderByInput =
   | "wasteType_ASC"
   | "wasteType_DESC";
 
+export type AuthType = "SESSION" | "BEARER" | "JWT";
+
 export type Status =
   | "DRAFT"
   | "SEALED"
@@ -1349,6 +1353,8 @@ export type Status =
 export type StatusLogOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "authType_ASC"
+  | "authType_DESC"
   | "status_ASC"
   | "status_DESC"
   | "loggedAt_ASC"
@@ -1393,6 +1399,8 @@ export type TemporaryStorageDetailOrderByInput =
   | "destinationProcessingOperation_DESC"
   | "wasteDetailsOnuCode_ASC"
   | "wasteDetailsOnuCode_DESC"
+  | "wasteDetailsPackagingInfos_ASC"
+  | "wasteDetailsPackagingInfos_DESC"
   | "wasteDetailsPackagings_ASC"
   | "wasteDetailsPackagings_DESC"
   | "wasteDetailsOtherPackaging_ASC"
@@ -3176,7 +3184,6 @@ export interface FormWhereInput {
   traderValidityLimit_lte?: Maybe<DateTimeInput>;
   traderValidityLimit_gt?: Maybe<DateTimeInput>;
   traderValidityLimit_gte?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeWhereInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeName_not?: Maybe<String>;
   ecoOrganismeName_in?: Maybe<String[] | String>;
@@ -4390,6 +4397,10 @@ export interface StatusLogWhereInput {
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
   user?: Maybe<UserWhereInput>;
+  authType?: Maybe<AuthType>;
+  authType_not?: Maybe<AuthType>;
+  authType_in?: Maybe<AuthType[] | AuthType>;
+  authType_not_in?: Maybe<AuthType[] | AuthType>;
   form?: Maybe<FormWhereInput>;
   status?: Maybe<Status>;
   status_not?: Maybe<Status>;
@@ -5284,6 +5295,7 @@ export interface FormCreateInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5299,7 +5311,6 @@ export interface FormCreateInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
@@ -5309,11 +5320,6 @@ export interface FormCreateInput {
   transportSegments?: Maybe<TransportSegmentCreateManyWithoutFormInput>;
   currentTransporterSiret?: Maybe<String>;
   nextTransporterSiret?: Maybe<String>;
-}
-
-export interface EcoOrganismeCreateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
 }
 
 export interface FormCreateManyInput {
@@ -5345,6 +5351,7 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5464,6 +5471,7 @@ export interface FormUpdateInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5479,7 +5487,6 @@ export interface FormUpdateInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -5489,26 +5496,6 @@ export interface FormUpdateInput {
   transportSegments?: Maybe<TransportSegmentUpdateManyWithoutFormInput>;
   currentTransporterSiret?: Maybe<String>;
   nextTransporterSiret?: Maybe<String>;
-}
-
-export interface EcoOrganismeUpdateOneInput {
-  create?: Maybe<EcoOrganismeCreateInput>;
-  update?: Maybe<EcoOrganismeUpdateDataInput>;
-  upsert?: Maybe<EcoOrganismeUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<EcoOrganismeWhereUniqueInput>;
-}
-
-export interface EcoOrganismeUpdateDataInput {
-  siret?: Maybe<String>;
-  name?: Maybe<String>;
-  address?: Maybe<String>;
-}
-
-export interface EcoOrganismeUpsertNestedInput {
-  update: EcoOrganismeUpdateDataInput;
-  create: EcoOrganismeCreateInput;
 }
 
 export interface FormUpdateManyInput {
@@ -5603,6 +5590,7 @@ export interface FormUpdateDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -5618,7 +5606,6 @@ export interface FormUpdateDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -5657,6 +5644,7 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7108,6 +7096,7 @@ export interface FormUpdateManyDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7195,6 +7184,7 @@ export interface FormUpdateManyMutationInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7369,6 +7359,7 @@ export interface RubriqueUpdateManyMutationInput {
 export interface StatusLogCreateInput {
   id?: Maybe<ID_Input>;
   user: UserCreateOneInput;
+  authType?: Maybe<AuthType>;
   form: FormCreateOneInput;
   status: Status;
   loggedAt?: Maybe<DateTimeInput>;
@@ -7382,6 +7373,7 @@ export interface FormCreateOneInput {
 
 export interface StatusLogUpdateInput {
   user?: Maybe<UserUpdateOneRequiredInput>;
+  authType?: Maybe<AuthType>;
   form?: Maybe<FormUpdateOneRequiredInput>;
   status?: Maybe<Status>;
   loggedAt?: Maybe<DateTimeInput>;
@@ -7401,6 +7393,7 @@ export interface FormUpsertNestedInput {
 }
 
 export interface StatusLogUpdateManyMutationInput {
+  authType?: Maybe<AuthType>;
   status?: Maybe<Status>;
   loggedAt?: Maybe<DateTimeInput>;
   updatedFields?: Maybe<Json>;
@@ -7426,6 +7419,7 @@ export interface TemporaryStorageDetailCreateInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7520,6 +7514,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7535,7 +7530,6 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
@@ -7563,6 +7557,7 @@ export interface TemporaryStorageDetailUpdateInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7660,6 +7655,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7675,7 +7671,6 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -7707,6 +7702,7 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   destinationCap?: Maybe<String>;
   destinationProcessingOperation?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7835,6 +7831,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7850,7 +7847,6 @@ export interface FormCreateWithoutTransportSegmentsInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeCreateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormCreateManyInput>;
@@ -7956,6 +7952,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   wasteDetailsCode?: Maybe<String>;
   wasteDetailsName?: Maybe<String>;
   wasteDetailsOnuCode?: Maybe<String>;
+  wasteDetailsPackagingInfos?: Maybe<Json>;
   wasteDetailsPackagings?: Maybe<Json>;
   wasteDetailsOtherPackaging?: Maybe<String>;
   wasteDetailsNumberOfPackages?: Maybe<Int>;
@@ -7971,7 +7968,6 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   traderReceipt?: Maybe<String>;
   traderDepartment?: Maybe<String>;
   traderValidityLimit?: Maybe<DateTimeInput>;
-  ecoOrganisme?: Maybe<EcoOrganismeUpdateOneInput>;
   ecoOrganismeName?: Maybe<String>;
   ecoOrganismeSiret?: Maybe<String>;
   appendix2Forms?: Maybe<FormUpdateManyInput>;
@@ -9280,6 +9276,7 @@ export interface Form {
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -9371,6 +9368,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -9386,7 +9384,6 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   traderReceipt: () => Promise<String>;
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
-  ecoOrganisme: <T = EcoOrganismePromise>() => T;
   ecoOrganismeName: () => Promise<String>;
   ecoOrganismeSiret: () => Promise<String>;
   appendix2Forms: <T = FragmentableArray<Form>>(args?: {
@@ -9484,6 +9481,7 @@ export interface FormSubscription
   wasteDetailsCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsName: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
@@ -9499,7 +9497,6 @@ export interface FormSubscription
   traderReceipt: () => Promise<AsyncIterator<String>>;
   traderDepartment: () => Promise<AsyncIterator<String>>;
   traderValidityLimit: () => Promise<AsyncIterator<DateTimeOutput>>;
-  ecoOrganisme: <T = EcoOrganismeSubscription>() => T;
   ecoOrganismeName: () => Promise<AsyncIterator<String>>;
   ecoOrganismeSiret: () => Promise<AsyncIterator<String>>;
   appendix2Forms: <T = Promise<AsyncIterator<FormSubscription>>>(args?: {
@@ -9599,6 +9596,7 @@ export interface FormNullablePromise
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -9614,7 +9612,6 @@ export interface FormNullablePromise
   traderReceipt: () => Promise<String>;
   traderDepartment: () => Promise<String>;
   traderValidityLimit: () => Promise<DateTimeOutput>;
-  ecoOrganisme: <T = EcoOrganismePromise>() => T;
   ecoOrganismeName: () => Promise<String>;
   ecoOrganismeSiret: () => Promise<String>;
   appendix2Forms: <T = FragmentableArray<Form>>(args?: {
@@ -9659,6 +9656,7 @@ export interface TemporaryStorageDetail {
   destinationCap?: String;
   destinationProcessingOperation?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -9702,6 +9700,7 @@ export interface TemporaryStorageDetailPromise
   destinationCap: () => Promise<String>;
   destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -9747,6 +9746,7 @@ export interface TemporaryStorageDetailSubscription
   destinationCap: () => Promise<AsyncIterator<String>>;
   destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
@@ -9790,6 +9790,7 @@ export interface TemporaryStorageDetailNullablePromise
   destinationCap: () => Promise<String>;
   destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -10418,6 +10419,7 @@ export interface AggregateRubriqueSubscription
 
 export interface StatusLog {
   id: ID_Output;
+  authType?: AuthType;
   status: Status;
   loggedAt?: DateTimeOutput;
   updatedFields?: Json;
@@ -10426,6 +10428,7 @@ export interface StatusLog {
 export interface StatusLogPromise extends Promise<StatusLog>, Fragmentable {
   id: () => Promise<ID_Output>;
   user: <T = UserPromise>() => T;
+  authType: () => Promise<AuthType>;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
   loggedAt: () => Promise<DateTimeOutput>;
@@ -10437,6 +10440,7 @@ export interface StatusLogSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   user: <T = UserSubscription>() => T;
+  authType: () => Promise<AsyncIterator<AuthType>>;
   form: <T = FormSubscription>() => T;
   status: () => Promise<AsyncIterator<Status>>;
   loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
@@ -10448,6 +10452,7 @@ export interface StatusLogNullablePromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   user: <T = UserPromise>() => T;
+  authType: () => Promise<AuthType>;
   form: <T = FormPromise>() => T;
   status: () => Promise<Status>;
   loggedAt: () => Promise<DateTimeOutput>;
@@ -11454,6 +11459,7 @@ export interface FormPreviousValues {
   wasteDetailsCode?: String;
   wasteDetailsName?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -11546,6 +11552,7 @@ export interface FormPreviousValuesPromise
   wasteDetailsCode: () => Promise<String>;
   wasteDetailsName: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -11638,6 +11645,7 @@ export interface FormPreviousValuesSubscription
   wasteDetailsCode: () => Promise<AsyncIterator<String>>;
   wasteDetailsName: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
@@ -11949,6 +11957,7 @@ export interface StatusLogSubscriptionPayloadSubscription
 
 export interface StatusLogPreviousValues {
   id: ID_Output;
+  authType?: AuthType;
   status: Status;
   loggedAt?: DateTimeOutput;
   updatedFields?: Json;
@@ -11958,6 +11967,7 @@ export interface StatusLogPreviousValuesPromise
   extends Promise<StatusLogPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  authType: () => Promise<AuthType>;
   status: () => Promise<Status>;
   loggedAt: () => Promise<DateTimeOutput>;
   updatedFields: () => Promise<Json>;
@@ -11967,6 +11977,7 @@ export interface StatusLogPreviousValuesSubscription
   extends Promise<AsyncIterator<StatusLogPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  authType: () => Promise<AsyncIterator<AuthType>>;
   status: () => Promise<AsyncIterator<Status>>;
   loggedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedFields: () => Promise<AsyncIterator<Json>>;
@@ -12016,6 +12027,7 @@ export interface TemporaryStorageDetailPreviousValues {
   destinationCap?: String;
   destinationProcessingOperation?: String;
   wasteDetailsOnuCode?: String;
+  wasteDetailsPackagingInfos?: Json;
   wasteDetailsPackagings?: Json;
   wasteDetailsOtherPackaging?: String;
   wasteDetailsNumberOfPackages?: Int;
@@ -12058,6 +12070,7 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   destinationCap: () => Promise<String>;
   destinationProcessingOperation: () => Promise<String>;
   wasteDetailsOnuCode: () => Promise<String>;
+  wasteDetailsPackagingInfos: () => Promise<Json>;
   wasteDetailsPackagings: () => Promise<Json>;
   wasteDetailsOtherPackaging: () => Promise<String>;
   wasteDetailsNumberOfPackages: () => Promise<Int>;
@@ -12102,6 +12115,7 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   destinationCap: () => Promise<AsyncIterator<String>>;
   destinationProcessingOperation: () => Promise<AsyncIterator<String>>;
   wasteDetailsOnuCode: () => Promise<AsyncIterator<String>>;
+  wasteDetailsPackagingInfos: () => Promise<AsyncIterator<Json>>;
   wasteDetailsPackagings: () => Promise<AsyncIterator<Json>>;
   wasteDetailsOtherPackaging: () => Promise<AsyncIterator<String>>;
   wasteDetailsNumberOfPackages: () => Promise<AsyncIterator<Int>>;
@@ -12606,6 +12620,10 @@ export const models: Model[] = [
   },
   {
     name: "MembershipRequest",
+    embedded: false
+  },
+  {
+    name: "AuthType",
     embedded: false
   },
   {

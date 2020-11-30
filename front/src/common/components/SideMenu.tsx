@@ -1,13 +1,12 @@
-import React, { FunctionComponent  } from "react";
+import React, { FunctionComponent } from "react";
 
-import useMedia from 'use-media';
+import { useMedia } from "use-media";
 
 import { MEDIA_QUERIES } from "common/config";
 
 const SideMenu: FunctionComponent = ({ children }) => {
- 
-  const isMobile = useMedia({maxWidth: MEDIA_QUERIES.handHeld});
- 
+  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
+
   if (isMobile) {
     return null;
   }

@@ -1,6 +1,5 @@
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, gql } from "@apollo/client";
 import { Field } from "formik";
-import gql from "graphql-tag";
 import { DateTime } from "luxon";
 import React, { useState } from "react";
 import DownloadFileLink from "common/components/DownloadFileLink";
@@ -163,7 +162,7 @@ export default function TransportSignature({
             signedByTransporter: false,
             signedByProducer: true,
             signatureAuthor: SignatureAuthor.Emitter,
-            packagings: form.stateSummary?.packagings,
+            packagingInfos: form.stateSummary?.packagingInfos,
             quantity: form.stateSummary?.quantity ?? "",
             onuCode: form.stateSummary?.onuCode ?? "",
           }}
@@ -212,9 +211,9 @@ export default function TransportSignature({
                     Conditionnement
                   </label>
                   <Field
-                    name="packagings"
-                    id="id_packagings"
+                    name="packagingInfos"
                     component={Packagings}
+                    id="id_packagings"
                   />
                 </div>
 
@@ -329,7 +328,9 @@ export default function TransportSignature({
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Conditionnement:</span>
-                    {values.packagings.join(", ")}
+                    {values.packagingInfos
+                      ?.map(p => `${p.quantity} ${p.type}`)
+                      .join(", ")}
                   </div>
                   <div className="form__row">
                     <span className={styles.label}>Poids total:</span>

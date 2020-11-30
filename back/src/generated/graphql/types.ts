@@ -260,7 +260,9 @@ export type Consistence =
   /** Liquide */
   | 'LIQUID'
   /** Gazeux */
-  | 'GASEOUS';
+  | 'GASEOUS'
+  /** Pâteux */
+  | 'DOUGHY';
 
 /** Payload de création d'un bordereau */
 export type CreateFormInput = {
@@ -1345,6 +1347,27 @@ export type NextSegmentInfoInput = {
   mode: TransportMode;
 };
 
+/** Informations sur le conditionnement */
+export type PackagingInfo = {
+  __typename?: 'PackagingInfo';
+  /** Type de conditionnement */
+  type: Packagings;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars['String']>;
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars['Int'];
+};
+
+/** Payload lié à un élément de conditionnement */
+export type PackagingInfoInput = {
+  /** Type de conditionnement */
+  type: Packagings;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars['String']>;
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars['Int'];
+};
+
 /** Type de packaging du déchet */
 export type Packagings = 
   /** Fut */
@@ -1449,9 +1472,12 @@ export type Query = {
    * 
    * Vous pouvez filtrer:
    * - par rôle que joue votre entreprise sur le BSD via `role`
-   * - par date de dernière modification via `updatedBefore` / `updatedAfter`
+   * - par date de dernière modification via `updatedAfter`
+   * - par date d'envoi via `sentAfter`
    * - par statut du BSD via `status`
    * - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+   * - par code déchet via `wasteCode`
+   * - par SIRET d'une entreprise présente n'importe où sur le bordereau via `siretPresentOnForm`
    * 
    * Par défaut:
    * - tous les BSD accessibles sont retournés
@@ -1464,7 +1490,7 @@ export type Query = {
   /**
    * Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
    * La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
-   * Seuls les changements de statuts disposant d'un champ `loggedAt` non nul sont retournés
+   * Seuls les changements de statut disposant d'un champ `loggedAt` non nul sont retournés
    */
   formsLifeCycle: FormsLifeCycleData;
   /**
@@ -1512,6 +1538,7 @@ export type QueryCompanyInfosArgs = {
 
 
 export type QueryFavoritesArgs = {
+  siret: Scalars['String'];
   type: FavoriteType;
 };
 
@@ -1742,8 +1769,13 @@ export type StateSummary = {
   __typename?: 'StateSummary';
   /** Quantité la plus à jour */
   quantity?: Maybe<Scalars['Float']>;
-  /** Packaging le plus à jour */
+  /**
+   * DEPRECATED Packaging le plus à jour
+   * @deprecated Utiliser packagingInfos
+   */
   packagings: Array<Packagings>;
+  /** Packaging le plus à jour */
+  packagingInfos: Array<PackagingInfo>;
   /** Code ONU le plus à jour */
   onuCode?: Maybe<Scalars['String']>;
   /** Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18) */
@@ -1968,8 +2000,10 @@ export type TransporterSignatureFormInput = {
   sentBy: Scalars['String'];
   /** Si oui on non le BSD a été signé par l'émetteur */
   signedByProducer: Scalars['Boolean'];
-  /** Conditionnement */
-  packagings: Array<Maybe<Packagings>>;
+  /** Conditionnements */
+  packagingInfos?: Maybe<Array<PackagingInfoInput>>;
+  /** DEPRECATED - Conditionnement */
+  packagings?: Maybe<Array<Maybe<Packagings>>>;
   /** Quantité en tonnes */
   quantity: Scalars['Float'];
   /** Code ONU */
@@ -2116,11 +2150,22 @@ export type WasteDetails = {
   name?: Maybe<Scalars['String']>;
   /** Code ONU */
   onuCode?: Maybe<Scalars['String']>;
-  /** Conditionnement */
-  packagings: Array<Packagings>;
-  /** Autre packaging (préciser) */
+  /** Conditionnements */
+  packagingInfos?: Maybe<Array<PackagingInfo>>;
+  /**
+   * Conditionnement
+   * @deprecated Utiliser `packagingInfos`
+   */
+  packagings?: Maybe<Array<Packagings>>;
+  /**
+   * Autre packaging (préciser)
+   * @deprecated Utiliser `packagingInfos`
+   */
   otherPackaging?: Maybe<Scalars['String']>;
-  /** Nombre de colis */
+  /**
+   * Nombre de colis
+   * @deprecated Utiliser `packagingInfos`
+   */
   numberOfPackages?: Maybe<Scalars['Int']>;
   /** Quantité en tonnes */
   quantity?: Maybe<Scalars['Float']>;
@@ -2155,11 +2200,13 @@ export type WasteDetailsInput = {
   name?: Maybe<Scalars['String']>;
   /** Code ONU */
   onuCode?: Maybe<Scalars['String']>;
-  /** Conditionnement */
+  /** Conditionnements */
+  packagingInfos?: Maybe<Array<PackagingInfoInput>>;
+  /** DEPRECATED - Conditionnement */
   packagings?: Maybe<Array<Maybe<Packagings>>>;
-  /** Autre packaging (préciser) */
+  /** DEPRECATED - Autre packaging (préciser) */
   otherPackaging?: Maybe<Scalars['String']>;
-  /** Nombre de colis */
+  /** DEPRECATED - Nombre de colis */
   numberOfPackages?: Maybe<Scalars['Int']>;
   /** Quantité en tonnes */
   quantity?: Maybe<Scalars['Float']>;
@@ -2283,6 +2330,7 @@ export type ResolversTypes = {
   Transporter: ResolverTypeWrapper<Transporter>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
   WasteDetails: ResolverTypeWrapper<WasteDetails>;
+  PackagingInfo: ResolverTypeWrapper<PackagingInfo>;
   Packagings: Packagings;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
@@ -2339,6 +2387,7 @@ export type ResolversTypes = {
   RecipientInput: RecipientInput;
   TransporterInput: TransporterInput;
   WasteDetailsInput: WasteDetailsInput;
+  PackagingInfoInput: PackagingInfoInput;
   TraderInput: TraderInput;
   AppendixFormInput: AppendixFormInput;
   EcoOrganismeInput: EcoOrganismeInput;
@@ -2389,6 +2438,7 @@ export type ResolversParentTypes = {
   Transporter: Transporter;
   DateTime: Scalars['DateTime'];
   WasteDetails: WasteDetails;
+  PackagingInfo: PackagingInfo;
   Packagings: Packagings;
   Int: Scalars['Int'];
   Float: Scalars['Float'];
@@ -2445,6 +2495,7 @@ export type ResolversParentTypes = {
   RecipientInput: RecipientInput;
   TransporterInput: TransporterInput;
   WasteDetailsInput: WasteDetailsInput;
+  PackagingInfoInput: PackagingInfoInput;
   TraderInput: TraderInput;
   AppendixFormInput: AppendixFormInput;
   EcoOrganismeInput: EcoOrganismeInput;
@@ -2770,12 +2821,19 @@ export type NextDestinationResolvers<ContextType = GraphQLContext, ParentType ex
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 
+export type PackagingInfoResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PackagingInfo'] = ResolversParentTypes['PackagingInfo']> = {
+  type?: Resolver<ResolversTypes['Packagings'], ParentType, ContextType>;
+  other?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: isTypeOfResolverFn<ParentType>;
+};
+
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   apiKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   appendixForms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryAppendixFormsArgs, 'siret'>>;
   companyInfos?: Resolver<ResolversTypes['CompanyPublic'], ParentType, ContextType, RequireFields<QueryCompanyInfosArgs, 'siret'>>;
   ecoOrganismes?: Resolver<Array<ResolversTypes['EcoOrganisme']>, ParentType, ContextType>;
-  favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'type'>>;
+  favorites?: Resolver<Array<ResolversTypes['CompanyFavorite']>, ParentType, ContextType, RequireFields<QueryFavoritesArgs, 'siret' | 'type'>>;
   form?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormArgs, never>>;
   formPdf?: Resolver<ResolversTypes['FileDownload'], ParentType, ContextType, RequireFields<QueryFormPdfArgs, never>>;
   forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<QueryFormsArgs, never>>;
@@ -2819,6 +2877,7 @@ export type StatResolvers<ContextType = GraphQLContext, ParentType extends Resol
 export type StateSummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StateSummary'] = ResolversParentTypes['StateSummary']> = {
   quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   packagings?: Resolver<Array<ResolversTypes['Packagings']>, ParentType, ContextType>;
+  packagingInfos?: Resolver<Array<ResolversTypes['PackagingInfo']>, ParentType, ContextType>;
   onuCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   transporter?: Resolver<Maybe<ResolversTypes['FormCompany']>, ParentType, ContextType>;
   transporterNumberPlate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -2945,7 +3004,8 @@ export type WasteDetailsResolvers<ContextType = GraphQLContext, ParentType exten
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   onuCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  packagings?: Resolver<Array<ResolversTypes['Packagings']>, ParentType, ContextType>;
+  packagingInfos?: Resolver<Maybe<Array<ResolversTypes['PackagingInfo']>>, ParentType, ContextType>;
+  packagings?: Resolver<Maybe<Array<ResolversTypes['Packagings']>>, ParentType, ContextType>;
   otherPackaging?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   numberOfPackages?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   quantity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -2988,6 +3048,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   MembershipRequest?: MembershipRequestResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NextDestination?: NextDestinationResolvers<ContextType>;
+  PackagingInfo?: PackagingInfoResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Recipient?: RecipientResolvers<ContextType>;
   Rubrique?: RubriqueResolvers<ContextType>;
@@ -3474,6 +3535,25 @@ export function createNextSegmentInfoInputMock(props: Partial<NextSegmentInfoInp
   };
 }
 
+export function createPackagingInfoMock(props: Partial<PackagingInfo>): PackagingInfo {
+  return {
+    __typename: "PackagingInfo",
+    type: "FUT",
+    other: null,
+    quantity: 0,
+    ...props,
+  };
+}
+
+export function createPackagingInfoInputMock(props: Partial<PackagingInfoInput>): PackagingInfoInput {
+  return {
+    type: "FUT",
+    other: null,
+    quantity: 0,
+    ...props,
+  };
+}
+
 export function createPrivateCompanyInputMock(props: Partial<PrivateCompanyInput>): PrivateCompanyInput {
   return {
     siret: "",
@@ -3611,6 +3691,7 @@ export function createStateSummaryMock(props: Partial<StateSummary>): StateSumma
     __typename: "StateSummary",
     quantity: null,
     packagings: [],
+    packagingInfos: [],
     onuCode: null,
     transporter: null,
     transporterNumberPlate: null,
@@ -3793,7 +3874,8 @@ export function createTransporterSignatureFormInputMock(props: Partial<Transport
     signatureAuthor: null,
     sentBy: "",
     signedByProducer: false,
-    packagings: [],
+    packagingInfos: null,
+    packagings: null,
     quantity: 0,
     onuCode: null,
     ...props,
@@ -3878,7 +3960,8 @@ export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetai
     code: null,
     name: null,
     onuCode: null,
-    packagings: [],
+    packagingInfos: null,
+    packagings: null,
     otherPackaging: null,
     numberOfPackages: null,
     quantity: null,
@@ -3893,6 +3976,7 @@ export function createWasteDetailsInputMock(props: Partial<WasteDetailsInput>): 
     code: null,
     name: null,
     onuCode: null,
+    packagingInfos: null,
     packagings: null,
     otherPackaging: null,
     numberOfPackages: null,

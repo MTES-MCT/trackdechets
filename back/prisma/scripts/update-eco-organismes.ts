@@ -96,6 +96,11 @@ const ecoOrganismes = [
     name: "APER PYRO",
     siret: "81761178300017",
     address: "PORT DE JAVEL 75015 PARIS"
+  },
+  {
+    name: "A.D.I VALOR",
+    siret: "43836840900043",
+    address: "68 CRS ALBERT THOMAS 69008 LYON"
   }
 ];
 

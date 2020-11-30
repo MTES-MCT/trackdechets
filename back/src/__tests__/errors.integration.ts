@@ -2,24 +2,37 @@ import { createTestClient } from "apollo-server-testing";
 import { UserInputError, ApolloError } from "apollo-server-express";
 import { readFileSync } from "fs";
 import { ValidationError } from "yup";
+import { ErrorCode } from "../common/errors";
 
-const mockHello = jest.fn();
+const mockFoo = jest.fn();
+const mockBar = jest.fn();
 
 jest.mock("../schema.ts", () => ({
   typeDefs: `
     type Query {
-        hello: String
-      }
+      foo: String
+    }
+    type Mutation {
+      bar(input: String!): String!
+    }
   `,
   resolvers: {
     Query: {
-      hello: () => mockHello()
+      foo: () => mockFoo()
+    },
+    Mutation: {
+      bar: () => mockBar()
     }
   },
   shieldRulesTree: {}
 }));
 
-const HELLO = `query { hello }`;
+const FOO = `query { foo }`;
+const BAR = `
+  mutation Bar($input: String!){
+    bar(input: $input)
+  }
+`;
 
 describe("Error handling", () => {
   const OLD_ENV = process.env;
@@ -31,27 +44,27 @@ describe("Error handling", () => {
 
   afterEach(() => {
     process.env = OLD_ENV;
-    mockHello.mockReset();
+    mockFoo.mockReset();
   });
 
   test("errors should be null if query resolve correctly", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockResolvedValueOnce("world");
-    const { errors, data } = await query({ query: HELLO });
+    mockFoo.mockResolvedValueOnce("bar");
+    const { errors, data } = await query({ query: FOO });
     expect(errors).toBeUndefined();
-    expect(data).toEqual({ hello: "world" });
+    expect(data).toEqual({ foo: "bar" });
   });
 
   test("subclasses of Apollo errors should be formatted correctly when thrown", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockImplementationOnce(() => {
+    mockFoo.mockImplementationOnce(() => {
       throw new UserInputError("Oups");
     });
-    const { errors } = await query({ query: HELLO });
+    const { errors } = await query({ query: FOO });
     expect(errors).toHaveLength(1);
     const error = errors[0];
     expect(error.message).toEqual("Oups");
@@ -62,10 +75,10 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockImplementationOnce(() => {
+    mockFoo.mockImplementationOnce(() => {
       return new UserInputError("Oups");
     });
-    const { errors } = await query({ query: HELLO });
+    const { errors } = await query({ query: FOO });
     expect(errors).toHaveLength(1);
     const error = errors[0];
     expect(error.message).toEqual("Oups");
@@ -76,10 +89,10 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockImplementationOnce(() => {
+    mockFoo.mockImplementationOnce(() => {
       throw new ApolloError("Bang");
     });
-    const { errors } = await query({ query: HELLO });
+    const { errors } = await query({ query: FOO });
     expect(errors).toHaveLength(1);
 
     const error = errors[0];
@@ -91,10 +104,10 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockImplementationOnce(() => {
+    mockFoo.mockImplementationOnce(() => {
       readFileSync("path/does/not/exist");
     });
-    const { errors } = await query({ query: HELLO });
+    const { errors } = await query({ query: FOO });
     expect(errors).toHaveLength(1);
 
     const error = errors[0];
@@ -106,10 +119,10 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockImplementationOnce(() => {
+    mockFoo.mockImplementationOnce(() => {
       return readFileSync("path/does/not/exist");
     });
-    const { errors } = await query({ query: HELLO });
+    const { errors } = await query({ query: FOO });
     expect(errors).toHaveLength(1);
 
     const error = errors[0];
@@ -121,10 +134,10 @@ describe("Error handling", () => {
     process.env.NODE_ENV = "dev";
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockImplementationOnce(() => {
+    mockFoo.mockImplementationOnce(() => {
       throw new Error("Bang");
     });
-    const { errors } = await query({ query: HELLO });
+    const { errors } = await query({ query: FOO });
     const error = errors[0];
     expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
     expect(error.message).toEqual("Bang");
@@ -134,12 +147,29 @@ describe("Error handling", () => {
   test("Yup validation errors should be displayed as an input error", async () => {
     const server = require("../server").server;
     const { query } = createTestClient(server);
-    mockHello.mockImplementationOnce(() => {
+    mockFoo.mockImplementationOnce(() => {
       throw new ValidationError("Bang", "Wrong value", "path");
     });
-    const { errors } = await query({ query: HELLO });
+    const { errors } = await query({ query: FOO });
     const error = errors[0];
     expect(error.extensions.code).toEqual("BAD_USER_INPUT");
     expect(error.message).toContain("Bang");
+  });
+
+  test("GRAPHQL_VALIDATION_FAILED should be returned when mutations variables are invalid", async () => {
+    process.env.NODE_ENV = "production";
+    const server = require("../server").server;
+    const { mutate } = createTestClient(server);
+    // invalid variable `toto` instead of `input`
+    const variables = { toto: "toto" };
+    const { errors } = await mutate({
+      mutation: BAR,
+      variables
+    });
+    const error = errors[0];
+    expect(error.extensions.code).toEqual(ErrorCode.GRAPHQL_VALIDATION_FAILED);
+    expect(error.message).toEqual(
+      'Variable "$input" of required type "String!" was not provided.'
+    );
   });
 });

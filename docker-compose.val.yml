@@ -2,13 +2,11 @@ version: "3.7"
 services:
 
   postgres:
-    image: betagouv/trackdechets-postgres:dev
+    image: postgres:10.5
     restart: always
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      AIRFLOW_POSTGRES_USER: $AIRFLOW_POSTGRES_USER
-      AIRFLOW_POSTGRES_PASSWORD: $AIRFLOW_POSTGRES_PASSWORD
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
@@ -21,14 +19,6 @@ services:
 
   td-ui:
     image: betagouv/trackdechets-ui:dev
-
-  td-pdf:
-    image: betagouv/trackdechets-pdf:dev
-    environment:
-      PDF_WATERMARK: display
-
-  td-mail:
-    image: betagouv/trackdechets-mail:dev
 
   td-doc:
     image: betagouv/trackdechets-doc:dev
@@ -43,7 +33,4 @@ services:
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
       DEVELOPERS_HOST: $DEVELOPERS_HOST
       DEVELOPERS_URL_SCHEME: $DEVELOPERS_URL_SCHEME
-
-  td-etl:
-    image: betagouv/trackdechets-etl:dev
 
