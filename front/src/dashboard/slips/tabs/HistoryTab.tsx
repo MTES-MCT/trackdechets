@@ -2,10 +2,10 @@ import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
-import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
-import { GET_SLIPS } from "../query";
+import { Query, QueryFormsArgs } from "generated/graphql/types";
+import { HISTORY_TAB_FORMS } from "./queries";
 import EmptyTab from "./EmptyTab";
-import Slips from "../Slips";
+import Slips, { SlipsColumn } from "../Slips";
 
 import TabContent from "./TabContent";
 import { useParams } from "react-router-dom";
@@ -15,14 +15,9 @@ export default function HistoryTab() {
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
-  >(GET_SLIPS, {
+  >(HISTORY_TAB_FORMS, {
     variables: {
       siret,
-      status: [
-        FormStatus.Processed,
-        FormStatus.NoTraceability,
-        FormStatus.Refused,
-      ],
     },
     notifyOnNetworkStatusChange: true,
   });
@@ -49,7 +44,20 @@ export default function HistoryTab() {
       forms={data.forms}
       fetchMore={fetchMore}
     >
-      <Slips siret={siret} forms={data.forms} />
+      <Slips
+        siret={siret}
+        forms={data.forms}
+        columns={[
+          SlipsColumn.READABLE_ID,
+          SlipsColumn.SENT_AT,
+          SlipsColumn.EMITTER_COMPANY_NAME,
+          SlipsColumn.RECIPIENT_COMPANY_NAME,
+          SlipsColumn.WASTE_DETAILS_CODE,
+          SlipsColumn.QUANTITY,
+          SlipsColumn.STATUS,
+          SlipsColumn.SLIPS_ACTIONS,
+        ]}
+      />
     </TabContent>
   );
 }

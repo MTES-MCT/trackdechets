@@ -1,14 +1,12 @@
 import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
-
 import { DuplicateFile } from "common/components/Icons";
 import { generatePath, Link, useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
-import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
-import { GET_SLIPS } from "../query";
-import Slips from "../Slips";
-
+import { Query, QueryFormsArgs } from "generated/graphql/types";
+import { DRAFT_TAB_FORMS } from "./queries";
+import Slips, { SlipsColumn } from "../Slips";
 import TabContent from "./TabContent";
 import { COLORS } from "common/config";
 import EmptyTab from "./EmptyTab";
@@ -19,8 +17,8 @@ export default function DraftsTab() {
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
-  >(GET_SLIPS, {
-    variables: { siret, status: [FormStatus.Draft] },
+  >(DRAFT_TAB_FORMS, {
+    variables: { siret },
     notifyOnNetworkStatusChange: true,
   });
 
@@ -58,9 +56,14 @@ export default function DraftsTab() {
       <Slips
         siret={siret}
         forms={data.forms}
-        hiddenFields={["status", "readableId", "sentAt"]}
-        dynamicActions={true}
-        refetch={refetch}
+        columns={[
+          SlipsColumn.EMITTER_COMPANY_NAME,
+          SlipsColumn.RECIPIENT_COMPANY_NAME,
+          SlipsColumn.WASTE_DETAILS_CODE,
+          SlipsColumn.QUANTITY,
+          SlipsColumn.WORKFLOW_ACTION,
+          SlipsColumn.SLIPS_ACTIONS,
+        ]}
       />
     </TabContent>
   );
