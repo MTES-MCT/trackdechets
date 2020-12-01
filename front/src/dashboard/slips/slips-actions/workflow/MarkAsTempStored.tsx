@@ -48,7 +48,7 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
               form={form}
               close={close}
               onSubmit={values => {
-                markAsTempStored({
+                return markAsTempStored({
                   variables: {
                     id: form.id,
                     tempStoredInfos: {

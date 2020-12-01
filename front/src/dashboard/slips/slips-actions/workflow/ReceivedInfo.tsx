@@ -54,7 +54,7 @@ export default function ReceivedInfo({
   onSubmit,
 }: {
   form: TdForm;
-  onSubmit: (values: ReceivedInfoValues) => void;
+  onSubmit: (values: ReceivedInfoValues) => Promise<any>;
   close: () => void;
 }) {
   return (
@@ -71,13 +71,39 @@ export default function ReceivedInfo({
             quantityType: QuantityType.Real,
           }),
       }}
-      onSubmit={onSubmit}
+      onSubmit={(values, { setSubmitting }) =>
+        onSubmit(values).finally(() => setSubmitting(false))
+      }
+      validate={values => {
+        return {
+          ...(values.wasteAcceptationStatus === null
+            ? {
+                wasteAcceptationStatus:
+                  "Le statut d'acceptation du lot est un champ requis",
+              }
+            : {}),
+          ...(values.quantityReceived === null
+            ? {
+                quantityReceived: "Le poids à l'arrivée est un champ requis",
+              }
+            : {}),
+          ...(values.receivedBy === ""
+            ? { receivedBy: "Le nom du responsable est un champ requis" }
+            : {}),
+          ...(values.receivedAt === ""
+            ? { receivedAt: "La date de présentation est un champ requis" }
+            : {}),
+          ...(values.signedAt === ""
+            ? { signedAt: "La date de signature est un champ requis" }
+            : {}),
+        };
+      }}
     >
       {({ values, isSubmitting, handleReset, setFieldValue }) => (
         <Form>
           <p className="form__row">
             <label>
-              Date d'arrivée
+              Date de présentation
               <Field
                 min={formatISO(parseDate(form.sentAt!), {
                   representation: "date",
@@ -140,6 +166,7 @@ export default function ReceivedInfo({
                   component={InlineRadioButton}
                 />
               </fieldset>
+              <RedErrorMessage name="wasteAcceptationStatus" />
             </div>
           </div>
           <p className="form__row">
