@@ -7,7 +7,7 @@ import EditSegment from "./actions/EditSegment";
 import Quicklook from "dashboard/slips/slips-actions/Quicklook";
 
 import TransporterInfoEdit from "./actions/TransporterInfoEdit";
-import TransportSignature from "./actions/TransportSignature";
+import { TransportSignatureModalToggle } from "./actions/TransportSignatureModal";
 import { useFormsTable } from "../slips/use-forms-table";
 import { Segments } from "./Segments";
 
@@ -73,11 +73,7 @@ export const TransportCards = ({ forms, userSiret, refetchQuery }) => {
               formId={form.id}
               buttonClass={`btn btn--no-style ${styles.cardActionsButton}`}
             />
-            <TransportSignature
-              form={form}
-              userSiret={userSiret}
-              inCard={true}
-            />
+            <TransportSignatureModalToggle form={form} variant="button" />
             <PrepareSegment form={form} userSiret={userSiret} inCard={true} />
             <MarkSegmentAsReadyToTakeOver
               form={form}

@@ -4,6 +4,7 @@ import "@reach/dialog/styles.css";
 import styles from "./Modal.module.scss";
 import React from "react";
 import classNames from "classnames";
+
 type TdModalProps = {
   onClose: () => any;
   children: React.ReactNode;
@@ -12,6 +13,7 @@ type TdModalProps = {
   ariaLabel: string;
   wide?: boolean;
 };
+
 export default function TdModal({
   onClose,
   isOpen,

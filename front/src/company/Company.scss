@@ -6,17 +6,14 @@ p {
   width: 100%;
   border-radius: 2px;
   border: 1px solid #c9d3df;
-  padding: 0.4em;
+  padding: 10px;
+  min-width: 0;
 }
 
 .columns {
   display: flex;
-  justify-content: "space-around";
-  margin: 10px 0;
-}
-
-.columns > div {
-  margin: 5px;
+  justify-content: space-around;
+  margin: 0 0 10px 0;
 }
 
 .section {
@@ -24,7 +21,6 @@ p {
 }
 
 .company__info {
-  margin-left: 50px;
 }
 
 .company__logo {

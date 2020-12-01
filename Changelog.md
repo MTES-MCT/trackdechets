@@ -28,6 +28,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Amélioration des suggestions d'entreprise lors de la création d'un BSD depuis l'interface, [PR 673](https://github.com/MTES-MCT/trackdechets/pull/673)
 - Légende du QR Code dans l'UI [PR 709](https://github.com/MTES-MCT/trackdechets/pull/709)
+- Amélioration de l'expérience utilisateur de la signature éco-organisme, [PR 693](https://github.com/MTES-MCT/trackdechets/pull/693)
 
 #### :memo: Documentation
 

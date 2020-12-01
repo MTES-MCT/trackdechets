@@ -10,11 +10,12 @@ import DownloadPdf from "dashboard/slips/slips-actions/DownloadPdf";
 import { useFormsTable } from "dashboard/slips/use-forms-table";
 
 import TransporterInfoEdit from "./actions/TransporterInfoEdit";
-import TransportSignature from "./actions/TransportSignature";
+import { TransportSignatureModalToggle } from "./actions/TransportSignatureModal";
 import styles from "./TransportTable.module.scss";
 import { Segments } from "./Segments";
 import Shorten from "common/components/Shorten";
 import Quicklook from "dashboard/slips/slips-actions/Quicklook";
+
 export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
   const [sortedForms, sortParams, sortBy, filter] = useFormsTable(forms);
 
@@ -139,7 +140,7 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
             </td>
             <td>
               <div className={styles.transportActions}>
-                <TransportSignature form={form} userSiret={userSiret} />
+                <TransportSignatureModalToggle form={form} />
 
                 <EditSegment form={form} userSiret={userSiret} />
 
