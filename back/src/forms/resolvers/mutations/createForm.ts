@@ -5,6 +5,7 @@ import {
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
+import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { GraphQLContext } from "../../../types";
 import { MissingTempStorageFlag } from "../../errors";
 import {
@@ -81,6 +82,13 @@ const createFormResolver = async (
   }
 
   const newForm = await prisma.form.create({ data: formCreateInput });
+
+  eventEmitter.emit(TDEvent.CreateForm, {
+    previousNode: null,
+    node: newForm,
+    updatedFields: {},
+    mutation: "CREATED"
+  });
 
   // create statuslog when and only when form is created
   await prisma.statusLog.create({

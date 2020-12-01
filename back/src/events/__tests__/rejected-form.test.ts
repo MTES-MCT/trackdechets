@@ -1,8 +1,9 @@
+import { Form } from "@prisma/client";
 import axios from "axios";
 import * as sirene from "../../companies/sirene";
 import { CompanySearchResult } from "../../companies/sirene/types";
+import { TDEventPayload } from "../emitter";
 import { mailWhenFormIsDeclined } from "../forms";
-import { FormSubscriptionPayload } from "../../generated/prisma-client";
 import * as mailing from "../../mailer/mailing";
 
 // This form will be refused,
@@ -104,34 +105,36 @@ const mockedCompanyAdmins = {
   ]
 };
 
-const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
+const formPayload = (
+  wasteAcceptationStatus
+): TDEventPayload<Form> => ({
   node: {
     id: "xyz12345",
     readableId: "TD-xxx",
     isImportedFromPaper: false,
     status: "REFUSED",
-    createdAt: "2019-10-16T07:45:13.959Z",
-    updatedAt: "2019-10-16T07:45:13.959Z",
+    createdAt: new Date("2019-10-16T07:45:13.959Z"),
+    updatedAt: new Date("2019-10-16T07:45:13.959Z"),
     wasteAcceptationStatus,
     wasteRefusalReason: "Non conforme",
     quantityReceived: 21.3,
     wasteDetailsPop: false
+  } as Form,
+  updatedFields: {
+    wasteAcceptationStatus: "<a value>",
+    wasteRefusalReason: "<a value>",
+    quantityReceived: "<a value>"
   },
-  updatedFields: [
-    "wasteAcceptationStatus",
-    "wasteRefusalReason",
-    "quantityReceived"
-  ],
   mutation: "UPDATED",
-  previousValues: {
+  previousNode: {
     id: "xyz12345",
     readableId: "TD-xxx",
     isImportedFromPaper: false,
     status: "SENT",
-    createdAt: "2019-10-16T07:45:13.959Z",
-    updatedAt: "2019-10-16T07:45:13.959Z",
+    createdAt: new Date("2019-10-16T07:45:13.959Z"),
+    updatedAt: new Date("2019-10-16T07:45:13.959Z"),
     wasteDetailsPop: false
-  }
+  } as Form
 });
 
 // entreprise.data.gouv responses, giving 66 and 77 departements for companies involved in the form

@@ -1,7 +1,8 @@
+import { Form } from "@prisma/client";
 import axios from "axios";
+import { TDEventPayload } from "../emitter";
 
-import { FormSubscriptionPayload } from "../../generated/prisma-client";
-import { formsSubscriptionCallback } from "../forms";
+import { formsEventCallback } from "../forms";
 
 const mockedForm = {
   readableId: "readable_id",
@@ -20,34 +21,34 @@ jest.mock("src/prisma", () => ({
 
 describe("mailWhenFormTraceabilityIsBroken", () => {
   it("should send a request to td mail service when form traceability is broken", async () => {
-    const formPayload: FormSubscriptionPayload = {
+    const formPayload: TDEventPayload<Form> = {
       node: {
         id: "xyz12345",
         readableId: "TD-xxx",
         isImportedFromPaper: false,
         status: "NO_TRACEABILITY",
-        createdAt: "2019-10-16T07:45:13.959Z",
-        updatedAt: "2019-10-16T07:45:13.959Z",
+        createdAt: new Date("2019-10-16T07:45:13.959Z"),
+        updatedAt: new Date("2019-10-16T07:45:13.959Z"),
         noTraceability: true,
         wasteDetailsPop: false
-      },
-      updatedFields: ["noTraceability"],
+      } as Form,
+      updatedFields: { noTraceability: "<a value>" },
       mutation: "UPDATED",
-      previousValues: {
+      previousNode: {
         id: "xyz12345",
         readableId: "TD-xxx",
         isImportedFromPaper: false,
         status: "RECEIVED",
-        createdAt: "2019-10-16T07:45:13.959Z",
-        updatedAt: "2019-10-16T07:45:13.959Z",
+        createdAt: new Date("2019-10-16T07:45:13.959Z"),
+        updatedAt: new Date("2019-10-16T07:45:13.959Z"),
         wasteDetailsPop: false
-      }
+      } as Form
     };
 
     const mockedAxiosPost = jest.spyOn(axios, "post");
     mockedAxiosPost.mockResolvedValue({} as any);
 
-    await formsSubscriptionCallback(formPayload);
+    await formsEventCallback(formPayload);
 
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
 

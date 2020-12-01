@@ -4,6 +4,7 @@ import { Event } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../errors";
 import { formDiff } from "./diff";
+import { eventEmitter, TDEvent } from "../../events/emitter";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -55,6 +56,13 @@ export default async function transitionForm(
     { ...form, temporaryStorageDetail },
     { ...updatedForm, temporaryStorageDetail: updatedTemporaryStorageDetail }
   );
+
+  eventEmitter.emit<Form>(TDEvent.TransitionForm, {
+    previousNode: form,
+    node: updatedForm,
+    updatedFields,
+    mutation: "UPDATED"
+  });
 
   // log status change
   await prisma.statusLog.create({

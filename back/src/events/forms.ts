@@ -1,21 +1,23 @@
+import { Form } from "@prisma/client";
+import axios from "axios";
 import prisma from "src/prisma";
 import { sendMail } from "../mailer/mailing";
-import { userMails } from "../users/mails";
-import { getCompanyAdminUsers } from "../companies/database";
-import { verifyPrestataire, anomalies } from "../companies/verif";
-import {
-  createSiretUnknownAlertCard,
-  createNotICPEAlertCard,
-  createNotCompatibleRubriqueAlertCard,
-  alertTypes
-} from "../common/trello";
-import Dreals from "./dreals";
-import axios from "axios";
 import { trim } from "../common/strings";
+import {
+  alertTypes,
+  createNotCompatibleRubriqueAlertCard,
+  createNotICPEAlertCard,
+  createSiretUnknownAlertCard
+} from "../common/trello";
+import { getCompanyAdminUsers } from "../companies/database";
 import { searchCompany } from "../companies/sirene";
+import { anomalies, verifyPrestataire } from "../companies/verif";
 import { buildPdfBase64 } from "../forms/pdf/generator";
+import { userMails } from "../users/mails";
+import Dreals from "./dreals";
+import { TDEventPayload } from "./emitter";
 
-export async function formsSubscriptionCallback(payload: any) {
+export async function formsEventCallback(payload: TDEventPayload<Form>) {
   await Promise.all([
     mailToInexistantRecipient(payload).catch(err =>
       console.error("Error on inexistant recipient subscription", err)
@@ -35,16 +37,13 @@ export async function formsSubscriptionCallback(payload: any) {
   ]);
 }
 
-async function mailToInexistantRecipient(payload: any) {
-  if (
-    (payload.updatedFields && payload.updatedFields.includes("isDeleted")) ||
-    !payload.node
-  ) {
+async function mailToInexistantRecipient(payload: TDEventPayload<Form>) {
+  if (payload.updatedFields?.hasOwnProperty("isDeleted") || !payload.node) {
     return;
   }
 
-  const previousRecipientSiret = payload.previousValues
-    ? payload.previousValues.recipientCompanySiret
+  const previousRecipientSiret = payload.previousNode
+    ? payload.previousNode.recipientCompanySiret
     : null;
   const recipientSiret = payload.node.recipientCompanySiret;
   const recipientMail = payload.node.recipientCompanyMail;
@@ -77,16 +76,13 @@ async function mailToInexistantRecipient(payload: any) {
   );
 }
 
-async function mailToInexistantEmitter(payload: any) {
-  if (
-    (payload.updatedFields && payload.updatedFields.includes("isDeleted")) ||
-    !payload.node
-  ) {
+async function mailToInexistantEmitter(payload: TDEventPayload<Form>) {
+  if (payload.updatedFields?.hasOwnProperty("isDeleted") || !payload.node) {
     return;
   }
 
-  const previousEmitterSiret = payload.previousValues
-    ? payload.previousValues.emitterCompanySiret
+  const previousEmitterSiret = payload.previousNode
+    ? payload.previousNode.emitterCompanySiret
     : null;
   const emitterSiret = payload.node.emitterCompanySiret;
   const emitterMail = payload.node.emitterCompanyMail;
@@ -120,10 +116,9 @@ async function mailToInexistantEmitter(payload: any) {
  * Dreal notification can be toggled with NOTIFY_DREAL_WHEN_FORM_DECLINED setting
  * @param payload
  */
-export async function mailWhenFormIsDeclined(payload: any) {
+export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
   if (
-    !payload.updatedFields ||
-    !payload.updatedFields.includes("wasteAcceptationStatus") ||
+    !payload.updatedFields?.hasOwnProperty("wasteAcceptationStatus") ||
     !payload.node ||
     !["REFUSED", "PARTIALLY_REFUSED"].includes(
       payload.node.wasteAcceptationStatus
@@ -194,7 +189,7 @@ export async function mailWhenFormIsDeclined(payload: any) {
   return sendMail(mail);
 }
 
-async function verifiyPresta(payload: any) {
+async function verifiyPresta(payload: TDEventPayload<Form>) {
   if (payload.mutation === "CREATED") {
     const bsd = payload.node;
     const siret = bsd.recipientCompanySiret;
@@ -230,10 +225,9 @@ async function verifiyPresta(payload: any) {
   }
 }
 
-async function mailWhenFormTraceabilityIsBroken(payload: any) {
+async function mailWhenFormTraceabilityIsBroken(payload: TDEventPayload<Form>) {
   if (
-    !payload.updatedFields ||
-    !payload.updatedFields.includes("noTraceability") ||
+    !payload.updatedFields?.hasOwnProperty("noTraceability") ||
     !payload.node ||
     !payload.node.noTraceability
   ) {

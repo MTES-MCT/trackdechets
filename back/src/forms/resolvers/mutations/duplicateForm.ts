@@ -7,6 +7,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanDuplicate } from "../../permissions";
+import { eventEmitter, TDEvent } from "../../../events/emitter";
 
 /**
  * Duplicate a form by stripping the properties that should not be copied.
@@ -127,6 +128,13 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   if (temporaryStorageDetail) {
     await duplicateTemporaryStorageDetail(newForm, temporaryStorageDetail);
   }
+
+  eventEmitter.emit(TDEvent.CreateForm, {
+    previousNode: null,
+    node: newForm,
+    updatedFields: {},
+    mutation: "CREATED"
+  });
 
   // create statuslog when form is created
   await prisma.statusLog.create({
