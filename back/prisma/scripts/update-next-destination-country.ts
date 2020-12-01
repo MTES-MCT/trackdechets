@@ -1,5 +1,5 @@
-import { Updater, registerUpdater } from "./helper/helper";
-import { prisma } from "../../src/generated/prisma-client";
+import prisma from "src/prisma";
+import { registerUpdater, Updater } from "./helper/helper";
 
 @registerUpdater(
   "Set default value of FR for next destination company country",
@@ -8,12 +8,12 @@ import { prisma } from "../../src/generated/prisma-client";
 )
 export class UpdateNextDestinationCountry implements Updater {
   async run() {
-    await prisma.updateManyForms({
+    await prisma.form.updateMany({
       data: {
         nextDestinationCompanyCountry: "FR"
       },
       where: {
-        nextDestinationCompanySiret_not: null,
+        nextDestinationCompanySiret: { not: null },
         nextDestinationCompanyCountry: null
       }
     });

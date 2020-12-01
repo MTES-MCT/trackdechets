@@ -105,9 +105,7 @@ const mockedCompanyAdmins = {
   ]
 };
 
-const formPayload = (
-  wasteAcceptationStatus
-): TDEventPayload<Form> => ({
+const formPayload = (wasteAcceptationStatus): TDEventPayload<Form> => ({
   node: {
     id: "xyz12345",
     readableId: "TD-xxx",

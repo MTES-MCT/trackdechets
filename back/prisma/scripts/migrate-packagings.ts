@@ -1,7 +1,7 @@
 import * as readline from "readline";
-import { Updater, registerUpdater } from "./helper/helper";
-import { prisma } from "../../src/generated/prisma-client";
-import { Packagings } from "../../src/generated/graphql/types";
+import { Packagings } from "src/generated/graphql/types";
+import prisma from "src/prisma";
+import { registerUpdater, Updater } from "./helper/helper";
 
 @registerUpdater(
   "Migrate packagings",
@@ -16,7 +16,7 @@ export class MigratePackagingsUpdater implements Updater {
 
     try {
       // Cannot do { where: {wasteDetailsPackagingInfos: null}} here :(
-      const forms = await prisma.forms();
+      const forms = await prisma.form.findMany();
       const notMigratedForms = forms.filter(
         f => f.wasteDetailsPackagingInfos == null
       );
@@ -27,7 +27,7 @@ export class MigratePackagingsUpdater implements Updater {
 
       const updateParams = notMigratedForms.map(form => {
         const { wasteDetailsNumberOfPackages: numberOfPackages } = form;
-        const packagings: Packagings[] = form.wasteDetailsPackagings ?? [];
+        const packagings = form.wasteDetailsPackagings as Packagings[] ?? [];
 
         // If numberOfPackages is 0 or less we obviously have corrupted data
         // So we "kind of uncorrupt" the data by assigning 0 to each
@@ -67,7 +67,7 @@ export class MigratePackagingsUpdater implements Updater {
         await Promise.all(
           updateParams
             .splice(0, BATCH_SIZE)
-            .map(param => prisma.updateForm(param))
+            .map(param => prisma.form.update(param))
         );
         counter++;
 
