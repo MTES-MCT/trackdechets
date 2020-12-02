@@ -31,7 +31,7 @@ import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import errorHandler from "./common/middlewares/errorHandler";
 
 const {
-  BACK_SENTRY_DSN,
+  SENTRY_DSN,
   SENTRY_ENVIRONMENT,
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
@@ -41,9 +41,9 @@ const {
   NODE_ENV
 } = process.env;
 
-if (BACK_SENTRY_DSN && SENTRY_ENVIRONMENT) {
+if (SENTRY_DSN) {
   Sentry.init({
-    dsn: BACK_SENTRY_DSN,
+    dsn: SENTRY_DSN,
     environment: SENTRY_ENVIRONMENT,
     integrations: [new CaptureConsole({ levels: ["error"] })]
   });
@@ -95,79 +95,79 @@ export const server = new ApolloServer({
     }
     return err;
   },
-  plugins:
-    BACK_SENTRY_DSN && SENTRY_ENVIRONMENT
-      ? [
-          {
-            requestDidStart(requestContext) {
-              return {
-                didEncounterErrors(errorContext) {
-                  if (!errorContext.operation) {
-                    // If we couldn't parse the operation, don't do anything here
-                    return;
-                  }
+  plugins: [
+    {
+      // The following plugin is mostly taken from:
+      // https://blog.sentry.io/2020/07/22/handling-graphql-errors-using-sentry
+      requestDidStart(requestContext) {
+        return {
+          didEncounterErrors(errorContext) {
+            if (!SENTRY_DSN) {
+              return;
+            }
 
-                  for (const err of errorContext.errors) {
-                    if (
-                      [
-                        ErrorCode.GRAPHQL_PARSE_FAILED,
-                        ErrorCode.GRAPHQL_VALIDATION_FAILED,
-                        ErrorCode.BAD_USER_INPUT,
-                        ErrorCode.UNAUTHENTICATED,
-                        ErrorCode.FORBIDDEN
-                      ].includes(err.extensions?.code)
-                    ) {
-                      // Ignore consumer errors
-                      continue;
-                    }
+            if (!errorContext.operation) {
+              // If we couldn't parse the operation, don't do anything here
+              return;
+            }
 
-                    Sentry.withScope(scope => {
-                      // Annotate whether failing operation was query/mutation/subscription
-                      scope.setTag("kind", errorContext.operation.operation);
+            for (const err of errorContext.errors) {
+              if (
+                [
+                  ErrorCode.GRAPHQL_PARSE_FAILED,
+                  ErrorCode.GRAPHQL_VALIDATION_FAILED,
+                  ErrorCode.BAD_USER_INPUT,
+                  ErrorCode.UNAUTHENTICATED,
+                  ErrorCode.FORBIDDEN
+                ].includes(err.extensions?.code)
+              ) {
+                // Ignore consumer errors
+                continue;
+              }
 
-                      scope.setExtra("query", errorContext.request.query);
-                      scope.setExtra(
-                        "variables",
-                        errorContext.request.variables
-                      );
+              Sentry.withScope(scope => {
+                // Annotate whether failing operation was query/mutation/subscription
+                scope.setTag("kind", errorContext.operation.operation);
 
-                      if (err.path) {
-                        scope.addBreadcrumb({
-                          category: "query-path",
-                          message: err.path.join(" > "),
-                          level: Sentry.Severity.Debug
-                        });
-                      }
+                scope.setExtra("query", errorContext.request.query);
+                scope.setExtra("variables", errorContext.request.variables);
 
-                      if (requestContext.context.user?.email) {
-                        scope.setUser({
-                          email: requestContext.context.user.email
-                        });
-                      }
-
-                      ["origin", "user-agent", "x-real-ip"].forEach(key => {
-                        if (errorContext.request.http?.headers.get(key)) {
-                          scope.setExtra(
-                            key,
-                            errorContext.request.http.headers.get(key)
-                          );
-                        }
-                      });
-
-                      Sentry.captureException(err);
-                    });
-                  }
+                if (err.path) {
+                  scope.addBreadcrumb({
+                    category: "query-path",
+                    message: err.path.join(" > "),
+                    level: Sentry.Severity.Debug
+                  });
                 }
-              };
+
+                if (requestContext.context.user?.email) {
+                  scope.setUser({
+                    email: requestContext.context.user.email
+                  });
+                }
+
+                ["origin", "user-agent", "x-real-ip"].forEach(key => {
+                  if (errorContext.request.http?.headers.get(key)) {
+                    scope.setExtra(
+                      key,
+                      errorContext.request.http.headers.get(key)
+                    );
+                  }
+                });
+
+                Sentry.captureException(err);
+              });
             }
           }
-        ]
-      : []
+        };
+      }
+    }
+  ]
 });
 
 export const app = express();
 
-if (BACK_SENTRY_DSN && SENTRY_ENVIRONMENT) {
+if (SENTRY_DSN) {
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler());
 }
@@ -280,10 +280,9 @@ server.applyMiddleware({
   path: graphQLPath
 });
 
-if (BACK_SENTRY_DSN && SENTRY_ENVIRONMENT) {
+if (SENTRY_DSN) {
   // The error handler must be before any other error middleware and after all controllers
   app.use(Sentry.Handlers.errorHandler());
 }
 
-// error handler
 app.use(errorHandler);

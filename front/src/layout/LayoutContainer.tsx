@@ -62,11 +62,7 @@ export default withRouter(function LayoutContainer({ history }) {
   });
 
   useEffect(() => {
-    if (
-      process.env.REACT_APP_SENTRY_DSN &&
-      process.env.REACT_APP_SENTRY_ENVIRONMENT &&
-      email
-    ) {
+    if (process.env.REACT_APP_SENTRY_DSN && email) {
       Sentry.setUser({ email });
     }
   }, [email]);

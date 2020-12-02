@@ -1,4 +1,3 @@
-// Polyfills
 import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 
@@ -10,12 +9,10 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 
-const { REACT_APP_SENTRY_DSN, REACT_APP_SENTRY_ENVIRONMENT } = process.env;
-
-if (REACT_APP_SENTRY_DSN && REACT_APP_SENTRY_ENVIRONMENT) {
+if (process.env.REACT_APP_SENTRY_DSN) {
   Sentry.init({
-    dsn: REACT_APP_SENTRY_DSN,
-    environment: REACT_APP_SENTRY_ENVIRONMENT,
+    dsn: process.env.REACT_APP_SENTRY_DSN,
+    environment: process.env.REACT_APP_SENTRY_ENVIRONMENT,
   });
 }
 
