@@ -6,7 +6,7 @@ import {
   TransportSegment,
   prisma
 } from "../generated/prisma-client";
-import { FullForm } from "./types";
+import { FormSirets, FullForm } from "./types";
 import { NotFormContributor, InvaliSecurityCode } from "./errors";
 import { getFullUser } from "../users/database";
 import { FullUser } from "../users/types";
@@ -17,7 +17,7 @@ function isFormOwner(user: User, form: { owner: User }) {
   return form.owner?.id === user.id;
 }
 
-function isFormEmitter(user: { companies: Company[] }, form: Form) {
+function isFormEmitter(user: { companies: Company[] }, form: FormSirets) {
   if (!form.emitterCompanySiret) {
     return false;
   }
@@ -25,7 +25,7 @@ function isFormEmitter(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.emitterCompanySiret);
 }
 
-function isFormRecipient(user: { companies: Company[] }, form: Form) {
+function isFormRecipient(user: { companies: Company[] }, form: FormSirets) {
   if (!form.recipientCompanySiret) {
     return false;
   }
@@ -33,7 +33,7 @@ function isFormRecipient(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.recipientCompanySiret);
 }
 
-function isFormTransporter(user: { companies: Company[] }, form: Form) {
+function isFormTransporter(user: { companies: Company[] }, form: FormSirets) {
   if (!form.transporterCompanySiret) {
     return false;
   }
@@ -41,7 +41,7 @@ function isFormTransporter(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.transporterCompanySiret);
 }
 
-function isFormTrader(user: { companies: Company[] }, form: Form) {
+function isFormTrader(user: { companies: Company[] }, form: FormSirets) {
   if (!form.traderCompanySiret) {
     return false;
   }
@@ -49,10 +49,7 @@ function isFormTrader(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.traderCompanySiret);
 }
 
-function isFormEcoOrganisme(
-  user: { companies: Company[] },
-  form: Pick<Form, "ecoOrganismeSiret">
-) {
+function isFormEcoOrganisme(user: { companies: Company[] }, form: FormSirets) {
   if (!form.ecoOrganismeSiret) {
     return false;
   }
@@ -62,33 +59,29 @@ function isFormEcoOrganisme(
 
 function isFormDestinationAfterTempStorage(
   user: { companies: Company[] },
-  form: {
-    temporaryStorage: TemporaryStorageDetail;
-  }
+  form: FormSirets
 ) {
-  if (!form.temporaryStorage) {
+  if (!form.temporaryStorageDetail) {
     return false;
   }
   const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.temporaryStorage.destinationCompanySiret);
+  return sirets.includes(form.temporaryStorageDetail.destinationCompanySiret);
 }
 
 function isFormTransporterAfterTempStorage(
   user: { companies: Company[] },
-  form: {
-    temporaryStorage: TemporaryStorageDetail;
-  }
+  form: FormSirets
 ) {
-  if (!form.temporaryStorage) {
+  if (!form.temporaryStorageDetail) {
     return false;
   }
   const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.temporaryStorage.transporterCompanySiret);
+  return sirets.includes(form.temporaryStorageDetail.transporterCompanySiret);
 }
 
 function isFormMultiModalTransporter(
   user: { companies: Company[] },
-  form: { transportSegments: TransportSegment[] }
+  form: FormSirets
 ) {
   const sirets = user.companies.map(c => c.siret);
   const transportSegmentSirets = form.transportSegments.map(
@@ -97,9 +90,9 @@ function isFormMultiModalTransporter(
   return transportSegmentSirets.some(s => sirets.includes(s));
 }
 
-export function isFormContributor(user: FullUser, form: FullForm) {
+export async function isFormContributor(user: User, form: FormSirets) {
+  const fullUser = await getFullUser(user);
   return [
-    isFormOwner,
     isFormEmitter,
     isFormRecipient,
     isFormTrader,
@@ -108,7 +101,7 @@ export function isFormContributor(user: FullUser, form: FullForm) {
     isFormTransporterAfterTempStorage,
     isFormDestinationAfterTempStorage,
     isFormMultiModalTransporter
-  ].some(isFormRole => isFormRole(user, form));
+  ].some(isFormRole => isFormRole(fullUser, form));
 }
 
 /**
@@ -116,13 +109,9 @@ export function isFormContributor(user: FullUser, form: FullForm) {
  * can read, update or delete it
  */
 export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
-  // user with companies
-  const fullUser = await getFullUser(user);
-
-  // form with linked objects (tempStorageDetail, transportSegment, owner, etc)
   const fullForm = await getFullForm(form);
 
-  if (!isFormContributor(fullUser, fullForm)) {
+  if (!(await isFormContributor(user, fullForm))) {
     throw new NotFormContributor();
   }
 

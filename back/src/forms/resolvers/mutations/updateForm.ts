@@ -8,10 +8,17 @@ import {
   ResolversParentTypes,
   MutationUpdateFormArgs
 } from "../../../generated/graphql/types";
-import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
+import {
+  MissingTempStorageFlag,
+  InvalidWasteCode,
+  NotFormContributor
+} from "../../errors";
 import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkCanReadUpdateDeleteForm } from "../../permissions";
+import {
+  checkCanReadUpdateDeleteForm,
+  isFormContributor
+} from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
@@ -75,6 +82,33 @@ const updateFormResolver = async (
   const existingTemporaryStorageDetail = await prisma
     .form({ id })
     .temporaryStorageDetail();
+
+  // make sure user will still be form contributor after update
+  const willBeFormContributor = await isFormContributor(user, {
+    ...existingForm,
+    ...{
+      emitterCompanySiret: form.emitterCompanySiret,
+      recipientCompanySiret: form.recipientCompanySiret,
+      transporterCompanySiret: form.transporterCompanySiret,
+      traderCompanySiret: form.traderCompanySiret,
+      ecoOrganismeSiret: form.ecoOrganismeSiret
+    },
+    temporaryStorageDetail: {
+      ...existingTemporaryStorageDetail,
+      ...(temporaryStorageDetail
+        ? {
+            destinationCompanySiret:
+              temporaryStorageDetail.destination?.company?.siret
+          }
+        : {})
+    }
+  });
+
+  if (!willBeFormContributor) {
+    throw new NotFormContributor(
+      "Vous ne pouvez pas enlever votre établissement du bordereau"
+    );
+  }
 
   if (
     existingTemporaryStorageDetail &&

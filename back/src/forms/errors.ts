@@ -29,9 +29,10 @@ export class MissingTempStorageFlag extends UserInputError {
 }
 
 export class NotFormContributor extends ForbiddenError {
-  constructor() {
+  constructor(msg?: string) {
     super(
-      "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas."
+      msg ??
+        "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas."
     );
   }
 }

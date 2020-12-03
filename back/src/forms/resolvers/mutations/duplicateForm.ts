@@ -120,16 +120,16 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   const fullUser = await getFullUser(user);
   const fullExistingForm = await getFullForm(existingForm);
 
-  if (!isFormContributor(fullUser, fullExistingForm)) {
+  if (!(await isFormContributor(fullUser, fullExistingForm))) {
     throw new NotFormContributor();
   }
 
   const newForm = await duplicateForm(user, existingForm);
 
-  if (fullExistingForm.temporaryStorage) {
+  if (fullExistingForm.temporaryStorageDetail) {
     await duplicateTemporaryStorageDetail(
       newForm,
-      fullExistingForm.temporaryStorage
+      fullExistingForm.temporaryStorageDetail
     );
   }
 

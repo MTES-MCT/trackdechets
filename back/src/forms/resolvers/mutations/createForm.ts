@@ -15,9 +15,9 @@ import {
 } from "../../../generated/graphql/types";
 import { MissingTempStorageFlag, NotFormContributor } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getUserCompanies } from "../../../users/database";
 import { GraphQLContext } from "../../../types";
 import { draftFormSchema } from "../../validation";
+import { isFormContributor } from "../../permissions";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -32,21 +32,28 @@ const createFormResolver = async (
     ...formContent
   } = createFormInput;
 
-  const formInputSirets = [
-    formContent.emitter?.company?.siret,
-    formContent.recipient?.company?.siret,
-    formContent.trader?.company?.siret,
-    formContent.transporter?.company?.siret,
-    formContent.ecoOrganisme?.siret
-  ];
+  const isContributor = await isFormContributor(user, {
+    emitterCompanySiret: formContent.emitter?.company?.siret,
+    recipientCompanySiret: formContent.recipient?.company?.siret,
+    transporterCompanySiret: formContent.trader?.company?.siret,
+    traderCompanySiret: formContent.trader?.company?.siret,
+    ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
+    ...(temporaryStorageDetail
+      ? {
+          destinationCompanySiret:
+            temporaryStorageDetail.destination?.company?.siret
+        }
+      : {})
+  });
 
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
-  if (!formInputSirets.some(siret => userSirets.includes(siret))) {
-    throw new NotFormContributor();
+  if (!isContributor) {
+    throw new NotFormContributor(
+      "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+    );
   }
 
   const form = flattenFormInput(formContent);
+
   const formCreateInput: FormCreateInput = {
     ...form,
     readableId: await getReadableId(),

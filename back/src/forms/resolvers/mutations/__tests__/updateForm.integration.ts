@@ -231,6 +231,38 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
+  it("should not be possible to remove its own company from a sealed form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SEALED"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      // try to remove user's company from the form
+      emitter: {
+        company: {
+          siret: "11111111111111"
+        }
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toMatchObject([
+      expect.objectContaining({
+        extensions: { code: ErrorCode.BAD_USER_INPUT },
+        message: "Vous ne pouvez pas enlever votre établissement du bordereau"
+      })
+    ]);
+  });
+
   it("should allow an eco-organisme to update a form", async () => {
     const { user, company: eo } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
