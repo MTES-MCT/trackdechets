@@ -64,23 +64,7 @@ const updateFormResolver = async (
   if (existingForm.status === "DRAFT") {
     await draftFormSchema.validate(formUpdateInput);
   } else if (existingForm.status === "SEALED") {
-    const sealedForm = { ...existingForm, ...formUpdateInput };
-    await sealedFormSchema.validate(sealedForm);
-    // Make sure user's company is stil present on the form
-    const formInputSirets = [
-      sealedForm.emitterCompanySiret,
-      sealedForm.recipientCompanySiret,
-      sealedForm.traderCompanySiret,
-      sealedForm.transporterCompanySiret,
-      sealedForm.ecoOrganismeSiret
-    ];
-    const userCompanies = await getUserCompanies(user.id);
-    const userSirets = userCompanies.map(c => c.siret);
-    if (!formInputSirets.some(siret => userSirets.includes(siret))) {
-      throw new UserInputError(
-        "Vous ne pouvez pas enlever votre établissement du bordereau"
-      );
-    }
+    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
   }
 
   const isOrWillBeTempStorage =
