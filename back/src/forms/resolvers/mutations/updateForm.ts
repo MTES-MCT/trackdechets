@@ -15,7 +15,11 @@ import {
 } from "../../errors";
 import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkCanUpdateForm, isFormContributor } from "../../permissions";
+import {
+  checkCanUpdateForm,
+  checkIsFormContributor,
+  isFormContributor
+} from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
@@ -95,13 +99,11 @@ const updateFormResolver = async (
     };
   }
 
-  const willBeFormContributor = await isFormContributor(user, nextFormSirets);
-
-  if (!willBeFormContributor) {
-    throw new NotFormContributor(
-      "Vous ne pouvez pas enlever votre établissement du bordereau"
-    );
-  }
+  await checkIsFormContributor(
+    user,
+    nextFormSirets,
+    "Vous ne pouvez pas enlever votre établissement du bordereau"
+  );
 
   if (
     existingTemporaryStorageDetail &&

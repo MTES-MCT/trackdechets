@@ -1,5 +1,5 @@
 import {
-  checkCanReadUpdateDeleteForm,
+  checkIsFormContributor,
   checkCanMarkAsSealed,
   checkCanSignedByTransporter,
   checkCanMarkAsReceived,
@@ -157,10 +157,11 @@ async function checkRandomUserPermission(
   return permission(user, form);
 }
 
-describe("checkCanReadUpdateDeleteForm", () => {
+describe("checkIsFormContributor", () => {
   afterAll(resetDatabase);
 
-  const permission = checkCanReadUpdateDeleteForm;
+  const permission = (user, form) =>
+    checkIsFormContributor(user, form, "Forbidden");
 
   it("should deny access to random user", async () => {
     expect.assertions(1);
@@ -169,11 +170,6 @@ describe("checkCanReadUpdateDeleteForm", () => {
     } catch (err) {
       expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
     }
-  });
-
-  it("should allow owner", async () => {
-    const check = await checkOwnerPermission(permission);
-    expect(check).toEqual(true);
   });
 
   it("should allow emitter", async () => {

@@ -17,7 +17,8 @@ import { MissingTempStorageFlag, NotFormContributor } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { draftFormSchema } from "../../validation";
-import { isFormContributor } from "../../permissions";
+import { checkIsFormContributor, isFormContributor } from "../../permissions";
+import { FormSirets } from "../../types";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -32,7 +33,7 @@ const createFormResolver = async (
     ...formContent
   } = createFormInput;
 
-  const isContributor = await isFormContributor(user, {
+  const formSirets: FormSirets = {
     emitterCompanySiret: formContent.emitter?.company?.siret,
     recipientCompanySiret: formContent.recipient?.company?.siret,
     transporterCompanySiret: formContent.transporter?.company?.siret,
@@ -44,13 +45,13 @@ const createFormResolver = async (
             temporaryStorageDetail.destination.company.siret
         }
       : {})
-  });
+  };
 
-  if (!isContributor) {
-    throw new NotFormContributor(
-      "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
-    );
-  }
+  await checkIsFormContributor(
+    user,
+    formSirets,
+    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+  );
 
   const form = flattenFormInput(formContent);
 

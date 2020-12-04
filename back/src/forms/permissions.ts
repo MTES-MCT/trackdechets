@@ -100,63 +100,57 @@ export async function isFormContributor(user: User, form: FormSirets) {
 }
 
 /**
+ * Check that at least one of user's company is present somewhere in the form
+ * or throw a ForbiddenError
+ * */
+export async function checkIsFormContributor(
+  user: User,
+  form: FormSirets,
+  errorMsg: string
+) {
+  const isContributor = await isFormContributor(user, form);
+
+  if (!isContributor) {
+    throw new NotFormContributor(errorMsg);
+  }
+
+  return true;
+}
+
+/**
  * Only owner of the form or users who belongs to a company that appears on the BSD
  * can read, update or delete it
  */
 export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
-  const fullForm = await getFullForm(form);
-
-  const isContributor = await isFormContributor(user, fullForm);
-  const isOwner = isFormOwner(user, fullForm);
-
-  if (!isContributor && !isOwner) {
-    throw new NotFormContributor(
-      "Vous n'êtes pas autorisé à lire, modifier ou supprimer ce bordereau"
-    );
-  }
-
-  return true;
+  return checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à lire, modifier ou supprimer ce bordereau"
+  );
 }
 
 export async function checkCanReadForm(user: User, form: Form) {
-  const fullForm = await getFullForm(form);
-
-  const isContributor = await isFormContributor(user, fullForm);
-  const isOwner = isFormOwner(user, fullForm);
-
-  if (!isContributor && !isOwner) {
-    throw new NotFormContributor(
-      "Vous n'êtes pas autorisé à accéder à ce bordereau"
-    );
-  }
-  return true;
+  return checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à accéder à ce bordereau"
+  );
 }
 
 export async function checkCanDuplicateForm(user: User, form: Form) {
-  const fullForm = await getFullForm(form);
-
-  const isContributor = await isFormContributor(user, fullForm);
-  const isOwner = isFormOwner(user, fullForm);
-
-  if (!isContributor && !isOwner) {
-    throw new NotFormContributor(
-      "Vous n'êtes pas autorisé à dupliquer ce bordereau"
-    );
-  }
-  return true;
+  return checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à dupliquer ce bordereau"
+  );
 }
 
 export async function checkCanUpdateForm(user: User, form: Form) {
-  const fullForm = await getFullForm(form);
-
-  const isContributor = await isFormContributor(user, fullForm);
-  const isOwner = isFormOwner(user, fullForm);
-
-  if (!isContributor && !isOwner) {
-    throw new NotFormContributor(
-      "Vous n'êtes pas autorisé à modifier ce bordereau"
-    );
-  }
+  await checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à dupliquer ce bordereau"
+  );
 
   if (!["DRAFT", "SEALED"].includes(form.status)) {
     throw new ForbiddenError(
@@ -168,24 +162,17 @@ export async function checkCanUpdateForm(user: User, form: Form) {
 }
 
 export async function checkCanDeleteForm(user: User, form: Form) {
-  const fullForm = await getFullForm(form);
-
-  const isContributor = await isFormContributor(user, fullForm);
-  const isOwner = isFormOwner(user, fullForm);
-
-  if (!isContributor && !isOwner) {
-    throw new NotFormContributor(
-      "Vous n'êtes pas autorisé à supprimer ce bordereau"
-    );
-  }
+  await checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à supprimer ce bordereau"
+  );
 
   if (!["DRAFT", "SEALED"].includes(form.status)) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
     );
   }
-
-  return true;
 }
 
 export async function checkCanUpdateTransporterFields(user: User, form: Form) {
