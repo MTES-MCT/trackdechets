@@ -10,7 +10,7 @@ import { getReadableId } from "../../readable-id";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound, getFullForm } from "../../database";
-import { isFormContributor } from "../../permissions";
+import { checkCanDuplicateForm, isFormContributor } from "../../permissions";
 import { NotFormContributor } from "../../errors";
 
 /**
@@ -116,23 +116,16 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  const fullExistingForm = await getFullForm(existingForm);
-
-  const isContributor = await isFormContributor(user, fullExistingForm);
-
-  if (!isContributor) {
-    throw new NotFormContributor(
-      "Vous ne pouvez pas dupliquer ce BSD car votre entreprise n'y apparait pas"
-    );
-  }
+  await checkCanDuplicateForm(user, existingForm);
 
   const newForm = await duplicateForm(user, existingForm);
 
-  if (fullExistingForm.temporaryStorageDetail) {
-    await duplicateTemporaryStorageDetail(
-      newForm,
-      fullExistingForm.temporaryStorageDetail
-    );
+  const temporaryStorageDetail = await prisma
+    .form({ id: existingForm.id })
+    .temporaryStorageDetail();
+
+  if (temporaryStorageDetail) {
+    await duplicateTemporaryStorageDetail(newForm, temporaryStorageDetail);
   }
 
   // create statuslog when form is created

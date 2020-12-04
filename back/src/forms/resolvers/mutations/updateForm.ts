@@ -15,10 +15,7 @@ import {
 } from "../../errors";
 import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  checkCanReadUpdateDeleteForm,
-  isFormContributor
-} from "../../permissions";
+import { checkCanUpdateForm, isFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
@@ -51,13 +48,7 @@ const updateFormResolver = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  await checkCanReadUpdateDeleteForm(user, existingForm);
-
-  if (!["DRAFT", "SEALED"].includes(existingForm.status)) {
-    const errMessage =
-      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés";
-    throw new UserInputError(errMessage);
-  }
+  await checkCanUpdateForm(user, existingForm);
 
   const form = flattenFormInput(formContent);
 

@@ -118,6 +118,76 @@ export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
   return true;
 }
 
+export async function checkCanReadForm(user: User, form: Form) {
+  const fullForm = await getFullForm(form);
+
+  const isContributor = await isFormContributor(user, fullForm);
+  const isOwner = isFormOwner(user, fullForm);
+
+  if (!isContributor && !isOwner) {
+    throw new NotFormContributor(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
+  }
+  return true;
+}
+
+export async function checkCanDuplicateForm(user: User, form: Form) {
+  const fullForm = await getFullForm(form);
+
+  const isContributor = await isFormContributor(user, fullForm);
+  const isOwner = isFormOwner(user, fullForm);
+
+  if (!isContributor && !isOwner) {
+    throw new NotFormContributor(
+      "Vous n'êtes pas autorisé à dupliquer ce bordereau"
+    );
+  }
+  return true;
+}
+
+export async function checkCanUpdateForm(user: User, form: Form) {
+  const fullForm = await getFullForm(form);
+
+  const isContributor = await isFormContributor(user, fullForm);
+  const isOwner = isFormOwner(user, fullForm);
+
+  if (!isContributor && !isOwner) {
+    throw new NotFormContributor(
+      "Vous n'êtes pas autorisé à modifier ce bordereau"
+    );
+  }
+
+  if (!["DRAFT", "SEALED"].includes(form.status)) {
+    throw new ForbiddenError(
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés"
+    );
+  }
+
+  return true;
+}
+
+export async function checkCanDeleteForm(user: User, form: Form) {
+  const fullForm = await getFullForm(form);
+
+  const isContributor = await isFormContributor(user, fullForm);
+  const isOwner = isFormOwner(user, fullForm);
+
+  if (!isContributor && !isOwner) {
+    throw new NotFormContributor(
+      "Vous n'êtes pas autorisé à supprimer ce bordereau"
+    );
+  }
+
+  if (!["DRAFT", "SEALED"].includes(form.status)) {
+    throw new ForbiddenError(
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
+    );
+  }
+
+  return true;
+}
+
 export async function checkCanUpdateTransporterFields(user: User, form: Form) {
   const fullUser = await getFullUser(user);
 

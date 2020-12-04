@@ -3,7 +3,7 @@ import { getFileDownloadToken } from "../../../common/file-download";
 import downloadPdf from "../../pdf/downloadPdf";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
-import { checkCanReadUpdateDeleteForm } from "../../permissions";
+import { checkCanReadForm } from "../../permissions";
 
 const TYPE = "form_pdf";
 
@@ -17,7 +17,7 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  await checkCanReadUpdateDeleteForm(user, form);
+  await checkCanReadForm(user, form);
 
   return getFileDownloadToken({ type: TYPE, params: { id } }, downloadPdf);
 };
