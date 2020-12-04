@@ -214,7 +214,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout de la possibilité de déclarer une rupture de tracabilité au traitement d'un déchet [PR #129](https://github.com/MTES-MCT/trackdechets/pull/129)
 - Ajout de liens dans le footer: statistiques, boite à outils communication ,forum technique, statut des applications
-- Notification email à tous les membres d'un établissement lors du renouvellement du code de sécurité
+- Notification email à tous les membres d'un établissement lors du renouvellement du code de signature
 - Renvoi et suppression d'invitations en attente [PR #132](https://github.com/MTES-MCT/trackdechets/pull/132) et [PR #137](https://github.com/MTES-MCT/trackdechets/pull/137)
 - Corrections de rendu pdf [PR #135](https://github.com/MTES-MCT/trackdechets/pull/135)
 
@@ -233,7 +233,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Évolution du compte client [PR #106](https://github.com/MTES-MCT/trackdechets/pull/106)
   - Amélioration de l'UX
   - Possibilité d'éditer l'identifiant GEREP d'un établissement
-  - Possibilité pour un admin de renouveller le code de sécurité d'un établissement
+  - Possibilité pour un admin de renouveller le code de signature d'un établissement
   - Possibilité d'éditer les informations de contact de la fiche entreprise
   - Correction d'un bug permettant d'inviter plusieurs fois le même utilisateur
 

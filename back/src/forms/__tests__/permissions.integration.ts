@@ -389,7 +389,7 @@ describe("checkSecurityCode", () => {
     const company = await companyFactory();
     const checkFn = () => checkSecurityCode(company.siret, 1258478956);
     expect(checkFn).rejects.toThrow(
-      "Le code de sécurité de l'émetteur du bordereau est invalide."
+      "Le code de signature de l'émetteur du bordereau est invalide."
     );
   });
 });

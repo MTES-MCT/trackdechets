@@ -968,9 +968,9 @@ Permet de transférer le déchet à un transporteur lors de la collecte initiale
 ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
 Cette mutation doit être appelée avec le token du collecteur-transporteur.
 L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
-grâce à son code de sécurité disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
+grâce à son code de signature disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
 D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
-renseigne le code de sécurité sur le terminal du collecteur-transporteur.
+renseigne le code de signature sur le terminal du collecteur-transporteur.
 Dans le cas où un éco-organisme figure sur le BSD, il est également possible de signer avec son code plutôt que celui de l'émetteur.
 Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est l'auteur de la signature (signingInfo.signatureAuthor doit valoir ECO_ORGANISME).
 
@@ -1235,7 +1235,7 @@ Identifiant GEREP
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
-Code de sécurité permettant de signer les BSD
+Code de signature permettant de signer les BSD
 
 </td>
 </tr>
@@ -5215,7 +5215,7 @@ Si oui ou non le BSD a été signé par un transporteur
 <td valign="top"><a href="#int">Int</a>!</td>
 <td>
 
-Code de sécurité permettant d'authentifier l'émetteur
+Code de signature permettant d'authentifier l'émetteur
 
 </td>
 </tr>
@@ -6167,7 +6167,7 @@ Les admins peuvent:
 * consulter/éditer les bordereaux
 * gérer les utilisateurs de l'établissement
 * éditer les informations de la fiche entreprise
-* demander le renouvellement du code de sécurité
+* demander le renouvellement du code de signature
 * Éditer les informations de la fiche entreprise
 
 Les membres peuvent:

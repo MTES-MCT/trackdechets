@@ -23,7 +23,7 @@ input TransporterSignatureFormInput {
   "Si oui ou non le BSD a été signé par un transporteur"
   signedByTransporter: Boolean!
 
-  "Code de sécurité permettant d'authentifier l'émetteur"
+  "Code de signature permettant d'authentifier l'émetteur"
   securityCode: Int!
 
   "Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur"
