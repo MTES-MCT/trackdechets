@@ -100,8 +100,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous n'êtes pas autorisé à lire, modifier ou supprimer ce bordereau",
+        message: "Vous n'êtes pas autorisé à modifier ce bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -135,7 +134,7 @@ describe("Mutation.updateForm", () => {
         message:
           "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés",
         extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+          code: ErrorCode.FORBIDDEN
         })
       })
     ]);

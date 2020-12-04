@@ -193,9 +193,7 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("the BSD can not be sealed if data do not validate", async () => {
-    const { user } = await userWithCompanyFactory("MEMBER");
-
-    const recipientCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
 
     let form = await formFactory({
       ownerId: user.id,
@@ -203,7 +201,7 @@ describe("Mutation.markAsSealed", () => {
         status: "DRAFT",
         emitterCompanySiret: "", // this field is required and will make the mutation fail
         emitterCompanyContact: "", // this field is required and will make the mutation fail
-        recipientCompanySiret: recipientCompany.siret
+        recipientCompanySiret: company.siret
       }
     });
 
@@ -339,14 +337,14 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("should mark appendix2 forms as grouped", async () => {
-    const user = await userFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: { status: "AWAITING_GROUP" }
     });
     const form = await formFactory({
       ownerId: user.id,
-      opt: { status: "DRAFT" }
+      opt: { status: "DRAFT", emitterCompanySiret: company.siret }
     });
     await prisma.updateForm({
       where: { id: form.id },

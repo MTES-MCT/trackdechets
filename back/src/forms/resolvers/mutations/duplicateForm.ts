@@ -9,9 +9,8 @@ import { expandFormFromDb } from "../../form-converter";
 import { getReadableId } from "../../readable-id";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
-import { checkCanDuplicateForm, isFormContributor } from "../../permissions";
-import { NotFormContributor } from "../../errors";
+import { getFormOrFormNotFound } from "../../database";
+import { checkCanDuplicate } from "../../permissions";
 
 /**
  * Duplicate a form by stripping the properties that should not be copied.
@@ -116,7 +115,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  await checkCanDuplicateForm(user, existingForm);
+  await checkCanDuplicate(user, existingForm);
 
   const newForm = await duplicateForm(user, existingForm);
 

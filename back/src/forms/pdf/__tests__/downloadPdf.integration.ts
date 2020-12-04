@@ -1,6 +1,9 @@
 import supertest from "supertest";
 import { app } from "../../../server";
-import { formFactory, userFactory } from "../../../__tests__/factories";
+import {
+  formFactory,
+  userWithCompanyFactory
+} from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { prisma } from "../../../generated/prisma-client";
 
@@ -17,12 +20,15 @@ query {
 describe("downloadPdf", () => {
   afterAll(resetDatabase);
   it("should download a pdf", async () => {
-    const user = await userFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
     const { token } = await prisma.createAccessToken({
       user: { connect: { id: user.id } },
       token: "token"
     });
-    const form = await formFactory({ ownerId: user.id });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: company.siret }
+    });
     const formPdfResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${token}`)

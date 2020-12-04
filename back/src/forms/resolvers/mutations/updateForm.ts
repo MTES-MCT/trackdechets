@@ -8,22 +8,13 @@ import {
   ResolversParentTypes,
   MutationUpdateFormArgs
 } from "../../../generated/graphql/types";
-import {
-  MissingTempStorageFlag,
-  InvalidWasteCode,
-  NotFormContributor
-} from "../../errors";
+import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
 import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  checkCanUpdateForm,
-  checkIsFormContributor,
-  isFormContributor
-} from "../../permissions";
+import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
-import { UserInputError } from "apollo-server-express";
 import { FormSirets } from "../../types";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -52,7 +43,7 @@ const updateFormResolver = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  await checkCanUpdateForm(user, existingForm);
+  await checkCanUpdate(user, existingForm);
 
   const form = flattenFormInput(formContent);
 

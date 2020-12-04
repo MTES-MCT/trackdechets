@@ -5,10 +5,6 @@ import { getFullUser } from "../users/database";
 import { getFullForm } from "./database";
 import { ForbiddenError } from "apollo-server-express";
 
-function isFormOwner(user: User, form: { owner: User }) {
-  return form.owner?.id === user.id;
-}
-
 function isFormEmitter(user: { companies: Company[] }, form: FormSirets) {
   if (!form.emitterCompanySiret) {
     return false;
@@ -117,19 +113,7 @@ export async function checkIsFormContributor(
   return true;
 }
 
-/**
- * Only owner of the form or users who belongs to a company that appears on the BSD
- * can read, update or delete it
- */
-export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
-  return checkIsFormContributor(
-    user,
-    await getFullForm(form),
-    "Vous n'êtes pas autorisé à lire, modifier ou supprimer ce bordereau"
-  );
-}
-
-export async function checkCanReadForm(user: User, form: Form) {
+export async function checkCanRead(user: User, form: Form) {
   return checkIsFormContributor(
     user,
     await getFullForm(form),
@@ -137,7 +121,7 @@ export async function checkCanReadForm(user: User, form: Form) {
   );
 }
 
-export async function checkCanDuplicateForm(user: User, form: Form) {
+export async function checkCanDuplicate(user: User, form: Form) {
   return checkIsFormContributor(
     user,
     await getFullForm(form),
@@ -145,13 +129,12 @@ export async function checkCanDuplicateForm(user: User, form: Form) {
   );
 }
 
-export async function checkCanUpdateForm(user: User, form: Form) {
+export async function checkCanUpdate(user: User, form: Form) {
   await checkIsFormContributor(
     user,
     await getFullForm(form),
-    "Vous n'êtes pas autorisé à dupliquer ce bordereau"
+    "Vous n'êtes pas autorisé à modifier ce bordereau"
   );
-
   if (!["DRAFT", "SEALED"].includes(form.status)) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés"
@@ -161,7 +144,7 @@ export async function checkCanUpdateForm(user: User, form: Form) {
   return true;
 }
 
-export async function checkCanDeleteForm(user: User, form: Form) {
+export async function checkCanDelete(user: User, form: Form) {
   await checkIsFormContributor(
     user,
     await getFullForm(form),
@@ -173,6 +156,8 @@ export async function checkCanDeleteForm(user: User, form: Form) {
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
     );
   }
+
+  return true;
 }
 
 export async function checkCanUpdateTransporterFields(user: User, form: Form) {
@@ -184,21 +169,11 @@ export async function checkCanUpdateTransporterFields(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsSealed(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
-  const fullForm = await getFullForm(form);
-  const isAuthorized = [
-    isFormOwner,
-    isFormEcoOrganisme,
-    isFormRecipient,
-    isFormTransporter,
-    isFormEmitter,
-    isFormTrader,
-    isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(fullUser, fullForm));
-  if (!isAuthorized) {
-    throw new ForbiddenError("Vous n'êtes pas autorisé à sceller ce bordereau");
-  }
-  return true;
+  return checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à sceller ce bordereau"
+  );
 }
 
 export async function checkCanMarkAsSent(user: User, form: Form) {

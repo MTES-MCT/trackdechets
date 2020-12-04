@@ -13,11 +13,11 @@ import {
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
-import { MissingTempStorageFlag, NotFormContributor } from "../../errors";
+import { MissingTempStorageFlag } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { draftFormSchema } from "../../validation";
-import { checkIsFormContributor, isFormContributor } from "../../permissions";
+import { checkIsFormContributor } from "../../permissions";
 import { FormSirets } from "../../types";
 
 const createFormResolver = async (

@@ -6,7 +6,7 @@ import { expandFormFromDb } from "../../form-converter";
 import { UserInputError } from "apollo-server-express";
 import { MissingIdOrReadableId } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkCanReadForm } from "../../permissions";
+import { checkCanRead } from "../../permissions";
 import { getFormOrFormNotFound } from "../../database";
 
 function validateArgs(args: QueryFormArgs) {
@@ -29,7 +29,7 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
 
   const form = await getFormOrFormNotFound(validArgs);
 
-  await checkCanReadForm(user, form);
+  await checkCanRead(user, form);
 
   return expandFormFromDb(form);
 };

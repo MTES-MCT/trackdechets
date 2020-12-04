@@ -2,7 +2,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "../../../generated/prisma-client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandFormFromDb } from "../../form-converter";
-import { checkCanDeleteForm } from "../../permissions";
+import { checkCanDelete } from "../../permissions";
 import { getFormOrFormNotFound } from "../../database";
 
 const deleteFormResolver: MutationResolvers["deleteForm"] = async (
@@ -14,7 +14,7 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  await checkCanDeleteForm(user, form);
+  await checkCanDelete(user, form);
 
   const deletedForm = await prisma.updateForm({
     where: { id },
