@@ -45,7 +45,7 @@ export default function Received(props: SlipActionProps) {
           ...(props.form.recipient?.isTempStorage &&
             props.form.status === FormStatus.Sent && { quantityType: "REAL" }),
         }}
-        onSubmit={(values, { setFieldError }) => {
+        onSubmit={values => {
           props.onSubmit({ info: values });
         }}
         validate={values => {
@@ -67,6 +67,14 @@ export default function Received(props: SlipActionProps) {
                 <label>
                   Date d'arrivée
                   <Field
+                    min={
+                      props.form.sentAt
+                        ? props.form.sentAt.replace(
+                            /(\d{4}-\d{2}-\d{2}).*/gi,
+                            "$1"
+                          )
+                        : ""
+                    }
                     component={DateInput}
                     name="receivedAt"
                     className="td-input"
