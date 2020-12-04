@@ -148,7 +148,7 @@ export function SignatureEmitter({
 
       <div className="form__row">
         <Label htmlFor="id_securityCode">
-          Code de sécurité{" "}
+          Code de signature{" "}
           {values.signatureAuthor === SignatureAuthor.Emitter
             ? `du ${emitterAlias}`
             : "de l'éco-organisme"}

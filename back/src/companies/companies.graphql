@@ -69,7 +69,7 @@ type CompanyPrivate {
   "Identifiant GEREP"
   gerepId: String
 
-  "Code de sécurité permettant de signer les BSD"
+  "Code de signature permettant de signer les BSD"
   securityCode: Int!
 
   "Email de contact (visible sur la fiche entreprise)"

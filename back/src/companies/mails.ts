@@ -10,7 +10,7 @@ export const companyMails = {
     company: { siret: string; name?: string }
   ) => ({
     to: recipients,
-    subject: "Renouvellement du code de sécurité sur Trackdéchets",
+    subject: "Renouvellement du code de signature sur Trackdéchets",
     title: "_",
     body: "_",
     templateId,
