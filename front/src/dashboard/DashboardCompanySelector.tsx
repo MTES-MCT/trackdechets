@@ -7,7 +7,7 @@ interface IProps {
   handleCompanyChange: (siret: string) => void;
 }
 
-const orderOptions = values => {
+const sortCompaniesByName = values => {
   return [...values].sort((a, b) => {
     const aName = a.givenName || a.name || "";
     const bName = b.givenName || b.name || "";
@@ -26,7 +26,7 @@ export default function DashboardCompanySelector({
     handleCompanyChange(siret);
   };
 
-  companies = orderOptions(companies);
+  const sortedCompanies = sortCompaniesByName(companies);
 
   return (
     <select
@@ -34,7 +34,7 @@ export default function DashboardCompanySelector({
       value={siret}
       onChange={e => handleChange(e.target.value)}
     >
-      {companies.map(c => (
+      {sortedCompanies.map(c => (
         <option key={c.siret} value={c.siret}>
           {c.givenName || c.name} ({c.siret})
         </option>
