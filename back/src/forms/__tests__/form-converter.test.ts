@@ -357,6 +357,7 @@ describe("flattenFormInput", () => {
       wasteDetailsName: null,
       wasteDetailsOnuCode: null,
       wasteDetailsPackagingInfos: null,
+      wasteDetailsPop: null,
       wasteDetailsQuantity: null,
       wasteDetailsQuantityType: null
     });
