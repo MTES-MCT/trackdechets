@@ -117,11 +117,14 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  const fullUser = await getFullUser(user);
   const fullExistingForm = await getFullForm(existingForm);
 
-  if (!(await isFormContributor(fullUser, fullExistingForm))) {
-    throw new NotFormContributor();
+  const isContributor = await isFormContributor(user, fullExistingForm);
+
+  if (!isContributor) {
+    throw new NotFormContributor(
+      "Vous ne pouvez pas dupliquer ce BSD car votre entreprise n'y apparait pas"
+    );
   }
 
   const newForm = await duplicateForm(user, existingForm);

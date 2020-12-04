@@ -24,6 +24,7 @@ import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { UserInputError } from "apollo-server-express";
 import { getUserCompanies } from "../../../users/database";
+import { FormSirets } from "../../types";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -84,25 +85,27 @@ const updateFormResolver = async (
     .temporaryStorageDetail();
 
   // make sure user will still be form contributor after update
-  const willBeFormContributor = await isFormContributor(user, {
-    ...existingForm,
-    ...{
-      emitterCompanySiret: form.emitterCompanySiret,
-      recipientCompanySiret: form.recipientCompanySiret,
-      transporterCompanySiret: form.transporterCompanySiret,
-      traderCompanySiret: form.traderCompanySiret,
-      ecoOrganismeSiret: form.ecoOrganismeSiret
-    },
-    temporaryStorageDetail: {
-      ...existingTemporaryStorageDetail,
-      ...(temporaryStorageDetail
-        ? {
-            destinationCompanySiret:
-              temporaryStorageDetail.destination?.company?.siret
-          }
-        : {})
-    }
-  });
+  const nextFormSirets: FormSirets = {
+    emitterCompanySiret:
+      form.emitterCompanySiret ?? existingForm.emitterCompanySiret,
+    recipientCompanySiret:
+      form.recipientCompanySiret ?? existingForm.recipientCompanySiret,
+    transporterCompanySiret:
+      form.transporterCompanySiret ?? existingForm.transporterCompanySiret,
+    traderCompanySiret:
+      form.traderCompanySiret ?? existingForm.traderCompanySiret,
+    ecoOrganismeSiret: form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
+  };
+
+  if (temporaryStorageDetail || existingTemporaryStorageDetail) {
+    nextFormSirets.temporaryStorageDetail = {
+      destinationCompanySiret:
+        temporaryStorageDetail?.destination?.company?.siret ??
+        existingTemporaryStorageDetail?.destinationCompanySiret
+    };
+  }
+
+  const willBeFormContributor = await isFormContributor(user, nextFormSirets);
 
   if (!willBeFormContributor) {
     throw new NotFormContributor(

@@ -83,6 +83,9 @@ function isFormMultiModalTransporter(
   user: { companies: Company[] },
   form: FormSirets
 ) {
+  if (!form.transportSegments) {
+    return false;
+  }
   const sirets = user.companies.map(c => c.siret);
   const transportSegmentSirets = form.transportSegments.map(
     segment => segment.transporterCompanySiret
@@ -105,14 +108,19 @@ export async function isFormContributor(user: User, form: FormSirets) {
 }
 
 /**
- * Only users who belongs to a company that appears on the BSD
+ * Only owner of the form or users who belongs to a company that appears on the BSD
  * can read, update or delete it
  */
 export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
   const fullForm = await getFullForm(form);
 
-  if (!(await isFormContributor(user, fullForm))) {
-    throw new NotFormContributor();
+  const isContributor = await isFormContributor(user, fullForm);
+  const isOwner = isFormOwner(user, fullForm);
+
+  if (!isContributor && !isOwner) {
+    throw new NotFormContributor(
+      "Vous n'êtes pas autorisé à lire, modifier ou supprimer ce bordereau"
+    );
   }
 
   return true;

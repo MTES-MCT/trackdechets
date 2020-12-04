@@ -101,7 +101,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas.",
+          "Vous n'êtes pas autorisé à lire, modifier ou supprimer ce bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -163,7 +163,6 @@ describe("Mutation.updateForm", () => {
       const { data } = await mutate(UPDATE_FORM, {
         variables: { updateFormInput }
       });
-
       expect(data.updateForm.wasteDetails).toMatchObject(
         updateFormInput.wasteDetails
       );
@@ -257,7 +256,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toMatchObject([
       expect.objectContaining({
-        extensions: { code: ErrorCode.BAD_USER_INPUT },
+        extensions: { code: ErrorCode.FORBIDDEN },
         message: "Vous ne pouvez pas enlever votre établissement du bordereau"
       })
     ]);

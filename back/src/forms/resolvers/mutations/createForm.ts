@@ -35,13 +35,13 @@ const createFormResolver = async (
   const isContributor = await isFormContributor(user, {
     emitterCompanySiret: formContent.emitter?.company?.siret,
     recipientCompanySiret: formContent.recipient?.company?.siret,
-    transporterCompanySiret: formContent.trader?.company?.siret,
+    transporterCompanySiret: formContent.transporter?.company?.siret,
     traderCompanySiret: formContent.trader?.company?.siret,
     ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
-    ...(temporaryStorageDetail
+    ...(temporaryStorageDetail?.destination?.company?.siret
       ? {
           destinationCompanySiret:
-            temporaryStorageDetail.destination?.company?.siret
+            temporaryStorageDetail.destination.company.siret
         }
       : {})
   });
