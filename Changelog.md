@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout de la mention "POP" (Polluants Organiques Persistants) au BSD, [PR 736](https://github.com/MTES-MCT/trackdechets/pull/736)
+
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
