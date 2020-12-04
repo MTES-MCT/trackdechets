@@ -10,7 +10,6 @@ import { getReadableId } from "../../readable-id";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound, getFullForm } from "../../database";
-import { getFullUser } from "../../../users/database";
 import { isFormContributor } from "../../permissions";
 import { NotFormContributor } from "../../errors";
 

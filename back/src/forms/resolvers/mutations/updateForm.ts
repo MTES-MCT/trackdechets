@@ -23,7 +23,6 @@ import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { UserInputError } from "apollo-server-express";
-import { getUserCompanies } from "../../../users/database";
 import { FormSirets } from "../../types";
 
 function validateArgs(args: MutationUpdateFormArgs) {
