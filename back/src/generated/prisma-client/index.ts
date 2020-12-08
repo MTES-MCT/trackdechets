@@ -9620,7 +9620,7 @@ export interface Form {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
-  wasteDetailsPop?: Boolean;
+  wasteDetailsPop: Boolean;
   traderCompanyName?: String;
   traderCompanySiret?: String;
   traderCompanyAddress?: String;
@@ -11866,7 +11866,7 @@ export interface FormPreviousValues {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
-  wasteDetailsPop?: Boolean;
+  wasteDetailsPop: Boolean;
   traderCompanyName?: String;
   traderCompanySiret?: String;
   traderCompanyAddress?: String;

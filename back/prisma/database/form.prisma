@@ -108,7 +108,7 @@ type Form {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
-  wasteDetailsPop: Boolean
+  wasteDetailsPop: Boolean! @default(value: false)
 
   # Trader fields
   traderCompanyName: String
