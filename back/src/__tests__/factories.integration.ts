@@ -30,7 +30,7 @@ describe("Test Factories", () => {
   test("should create a user with a company", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    const usr = await prisma.user.findOne({
+    const usr = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
         companyAssociations: {
@@ -61,7 +61,7 @@ describe("Test Factories", () => {
       companyTypes: { set: ["TRANSPORTER"] }
     });
 
-    const usr = await prisma.user.findOne({
+    const usr = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
         companyAssociations: {
@@ -154,7 +154,7 @@ test("should create a transport segment", async () => {
   expect(newTransportSegment.transporterCompanySiret).toEqual("1234");
   //check reverse access
   const segments = await prisma.form
-    .findOne({ where: { id: frm.id } })
+    .findUnique({ where: { id: frm.id } })
     .transportSegments();
   expect(segments.length).toEqual(1);
 });

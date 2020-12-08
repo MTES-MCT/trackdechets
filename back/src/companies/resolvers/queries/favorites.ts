@@ -4,12 +4,7 @@ import {
   FavoriteType,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import {
-  Company,
-  CompanyType,
-  FormWhereInput,
-  SortOrder
-} from "@prisma/client";
+import { Company, CompanyType, Prisma } from "@prisma/client";
 import prisma from "src/prisma";
 import { searchCompany } from "../../sirene";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -65,10 +60,10 @@ async function getRecentPartners(
   type: FavoriteType
 ): Promise<CompanyFavorite[]> {
   const defaultArgs = {
-    orderBy: { updatedAt: "desc" as SortOrder },
+    orderBy: { updatedAt: "desc" as Prisma.SortOrder },
     take: 50
   };
-  const defaultWhere: FormWhereInput = {
+  const defaultWhere: Prisma.FormWhereInput = {
     OR: [
       { owner: { id: userID } },
       { emitterCompanySiret: siret },

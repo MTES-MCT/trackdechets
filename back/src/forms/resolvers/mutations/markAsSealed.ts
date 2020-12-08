@@ -25,7 +25,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
 
   // mark appendix2Forms as GROUPED
   const appendix2Forms = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .appendix2Forms();
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {

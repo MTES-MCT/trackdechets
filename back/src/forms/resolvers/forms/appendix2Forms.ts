@@ -4,7 +4,7 @@ import { stringifyDates } from "src/forms/database";
 
 const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async form => {
   const appendix2Forms = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .appendix2Forms();
   return appendix2Forms.map(form => stringifyDates(form));
 };

@@ -1,4 +1,4 @@
-import { Form, FormUpdateInput, Status } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import prisma from "src/prisma";
 import { Event } from "./types";
 import machine from "./machine";
@@ -29,7 +29,7 @@ export default async function transitionForm(
 
   const nextStatus = nextState.value as Status;
 
-  const formUpdateInput: FormUpdateInput = {
+  const formUpdateInput: Prisma.FormUpdateInput = {
     status: nextStatus,
     ...event.formUpdateInput
   };
@@ -37,7 +37,7 @@ export default async function transitionForm(
   // retrieves temp storage before update
   // for diff calculation
   const temporaryStorageDetail = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   // update form
@@ -48,7 +48,7 @@ export default async function transitionForm(
 
   // retrieves updated temp storage
   const updatedTemporaryStorageDetail = await prisma.form
-    .findOne({ where: { id: updatedForm.id } })
+    .findUnique({ where: { id: updatedForm.id } })
     .temporaryStorageDetail();
 
   // calculates diff between initial form and updated form

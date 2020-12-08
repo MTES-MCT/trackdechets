@@ -6,10 +6,8 @@ import prisma from "src/prisma";
 import {
   User,
   UserRole,
-  UserAccountHashWhereInput,
-  CompanyAssociationWhereInput,
+  Prisma,
   Company,
-  MembershipRequestWhereUniqueInput,
   UserAccountHash
 } from "@prisma/client";
 import { FullUser } from "./types";
@@ -19,12 +17,12 @@ import { getUid, sanitizeEmail } from "../utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.user
-    .findOne({ where: { id: userId } })
+    .findUnique({ where: { id: userId } })
     .companyAssociations();
   return Promise.all(
     companyAssociations.map(association => {
       return prisma.companyAssociation
-        .findOne({ where: { id: association.id } })
+        .findUnique({ where: { id: association.id } })
         .company();
     })
   );
@@ -116,7 +114,7 @@ export async function associateUserToCompany(userId, siret, role) {
 }
 
 export async function getUserAccountHashOrNotFound(
-  where: UserAccountHashWhereInput
+  where: Prisma.UserAccountHashWhereInput
 ) {
   const userAccountHashes = await prisma.userAccountHash.findMany({
     where
@@ -128,7 +126,7 @@ export async function getUserAccountHashOrNotFound(
 }
 
 export async function getCompanyAssociationOrNotFound(
-  where: CompanyAssociationWhereInput
+  where: Prisma.CompanyAssociationWhereInput
 ) {
   const companyAssociations = await prisma.companyAssociation.findMany({
     where
@@ -195,9 +193,11 @@ export async function acceptNewUserCompanyInvitations(user: User) {
 }
 
 export async function getMembershipRequestOrNotFoundError(
-  where: MembershipRequestWhereUniqueInput
+  where: Prisma.MembershipRequestWhereUniqueInput
 ) {
-  const membershipRequest = await prisma.membershipRequest.findOne({ where });
+  const membershipRequest = await prisma.membershipRequest.findUnique({
+    where
+  });
   if (!membershipRequest) {
     throw new UserInputError("Cette demande de rattachement n'existe pas");
   }

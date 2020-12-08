@@ -56,19 +56,19 @@ describe("mutation sendMembershipRequest", () => {
     expect(sentTo).toEqual(["jo****@trackdechets.fr"]);
     expect(email).toEqual(requester.email);
     expect(siret).toEqual(company.siret);
-    const membershipRequest = await prisma.membershipRequest.findOne({
+    const membershipRequest = await prisma.membershipRequest.findUnique({
       where: { id }
     });
 
     // check relation to user was created
     const linkedUser = await prisma.membershipRequest
-      .findOne({ where: { id } })
+      .findUnique({ where: { id } })
       .user();
     expect(linkedUser.id).toEqual(requester.id);
 
     // check relation to company was created
     const linkedCompany = await prisma.membershipRequest
-      .findOne({ where: { id } })
+      .findUnique({ where: { id } })
       .company();
     expect(linkedCompany.id).toEqual(company.id);
 

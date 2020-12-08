@@ -8,7 +8,7 @@ const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
   parent,
   { email }
 ) => {
-  const user = await prisma.user.findOne({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
     throw new Error(`Cet email n'existe pas sur notre plateforme.`);
   }

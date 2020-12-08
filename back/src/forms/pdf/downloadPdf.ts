@@ -10,7 +10,7 @@ export default async function downloadPdf(res: Response, { id }) {
     res.status(500).send("Identifiant du bordereau manquant.");
   }
 
-  const form = await prisma.form.findOne({ where: { id } });
+  const form = await prisma.form.findUnique({ where: { id } });
 
   const date = new Date();
   const fileName = `BSD_${form.readableId}_${date.getDate()}-${

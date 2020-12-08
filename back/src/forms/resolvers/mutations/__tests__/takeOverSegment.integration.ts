@@ -70,7 +70,7 @@ describe("{ mutation { takeOverSegment } }", () => {
     );
 
     // segment take over fields are filled
-    const takenOverSegment = await prisma.transportSegment.findOne({
+    const takenOverSegment = await prisma.transportSegment.findUnique({
       where: { id: segment.id }
     });
 
@@ -80,7 +80,9 @@ describe("{ mutation { takeOverSegment } }", () => {
     expect(takenOverSegment.takenOverBy).toBe("transporter suivant");
 
     // form next and currentTransporterSiret have been updated
-    const udpatedForm = await prisma.form.findOne({ where: { id: form.id } });
+    const udpatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(udpatedForm.currentTransporterSiret).toBe(
       secondTransporterCompany.siret
     );

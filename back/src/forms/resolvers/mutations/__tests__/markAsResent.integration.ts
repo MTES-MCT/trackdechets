@@ -74,7 +74,9 @@ describe("Mutation markAsResent", () => {
       }
     });
 
-    const resealedForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("RESENT");
   });
 
@@ -115,7 +117,9 @@ describe("Mutation markAsResent", () => {
       "Destination prévue: Le siret de l'entreprise est obligatoire"
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-    const resealedForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("TEMP_STORER_ACCEPTED");
   });
 
@@ -157,7 +161,9 @@ describe("Mutation markAsResent", () => {
       }
     });
 
-    const resealedForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("RESENT");
   });
 });

@@ -24,7 +24,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedForm = await prisma.form.findOne({
+    const updatedForm = await prisma.form.findUnique({
       where: { id: form.id },
       include: { owner: { select: { id: true } } }
     });
@@ -43,7 +43,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedStatusLog = await prisma.statusLog.findOne({
+    const updatedStatusLog = await prisma.statusLog.findUnique({
       where: { id: statusLog.id },
       include: { user: { select: { id: true } } }
     });
@@ -95,7 +95,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedAccessToken = await prisma.accessToken.findOne({
+    const updatedAccessToken = await prisma.accessToken.findUnique({
       where: { id: accessToken.id },
       include: { user: { select: { id: true } } }
     });
@@ -121,7 +121,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedApplication = await prisma.application.findOne({
+    const updatedApplication = await prisma.application.findUnique({
       where: {
         id: application.id
       },

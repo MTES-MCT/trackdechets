@@ -25,7 +25,7 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
   await prisma.companyAssociation.delete({
     where: { id: companyAssociation.id }
   });
-  const dbCompany = await prisma.company.findOne({ where: { siret } });
+  const dbCompany = await prisma.company.findUnique({ where: { siret } });
 
   return convertUrls(dbCompany);
 };

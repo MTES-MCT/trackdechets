@@ -58,7 +58,9 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("SENT");
   });
 
@@ -94,7 +96,9 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("SENT");
   });
 
@@ -403,7 +407,9 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("RESENT");
   });
 });

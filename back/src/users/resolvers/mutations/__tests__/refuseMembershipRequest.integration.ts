@@ -126,7 +126,7 @@ describe("mutation refuseMembershipRequest", () => {
       variables: { id: membershipRequest.id }
     });
     expect(data.refuseMembershipRequest.users).toHaveLength(1);
-    const refusedMembershipRequest = await prisma.membershipRequest.findOne({
+    const refusedMembershipRequest = await prisma.membershipRequest.findUnique({
       where: {
         id: membershipRequest.id
       }

@@ -4,10 +4,8 @@
 
 import prisma from "src/prisma";
 import {
-  CompanyWhereUniqueInput,
   User,
-  TraderReceiptWhereUniqueInput,
-  TransporterReceiptWhereUniqueInput,
+  Prisma,
   Company,
   TraderReceipt,
   TransporterReceipt
@@ -25,11 +23,11 @@ import { CompanyMember } from "../generated/graphql/types";
 export async function getCompanyOrCompanyNotFound({
   id,
   siret
-}: CompanyWhereUniqueInput) {
+}: Prisma.CompanyWhereUniqueInput) {
   if (!id && !siret) {
     throw new Error("You should specify an id or a siret");
   }
-  const company = await prisma.company.findOne({
+  const company = await prisma.company.findUnique({
     where: id ? { id } : { siret }
   });
   if (company == null) {
@@ -186,8 +184,8 @@ export async function getCompanyAdminUsers(siret: string) {
 
 export async function getTraderReceiptOrNotFound({
   id
-}: TraderReceiptWhereUniqueInput) {
-  const receipt = await prisma.traderReceipt.findOne({ where: { id } });
+}: Prisma.TraderReceiptWhereUniqueInput) {
+  const receipt = await prisma.traderReceipt.findUnique({ where: { id } });
   if (receipt == null) {
     throw new TraderReceiptNotFound();
   }
@@ -196,8 +194,8 @@ export async function getTraderReceiptOrNotFound({
 
 export async function getTransporterReceiptOrNotFound({
   id
-}: TransporterReceiptWhereUniqueInput) {
-  const receipt = await prisma.transporterReceipt.findOne({ where: { id } });
+}: Prisma.TransporterReceiptWhereUniqueInput) {
+  const receipt = await prisma.transporterReceipt.findUnique({ where: { id } });
   if (receipt == null) {
     throw new TransporterReceiptNotFound();
   }

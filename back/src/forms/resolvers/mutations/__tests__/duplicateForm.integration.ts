@@ -112,7 +112,7 @@ describe("Mutation.duplicateForm", () => {
         id
       }
     });
-    const duplicatedForm = await prisma.form.findOne({
+    const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id }
     });
 
@@ -236,7 +236,7 @@ describe("Mutation.duplicateForm", () => {
       transporterDepartment,
       transporterValidityLimit
     } = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     const { mutate } = makeClient(user);
@@ -245,11 +245,11 @@ describe("Mutation.duplicateForm", () => {
         id: form.id
       }
     });
-    const duplicatedForm = await prisma.form.findOne({
+    const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id }
     });
     const duplicatedTemporaryStorageDetail = await prisma.form
-      .findOne({
+      .findUnique({
         where: {
           id: duplicatedForm.id
         }

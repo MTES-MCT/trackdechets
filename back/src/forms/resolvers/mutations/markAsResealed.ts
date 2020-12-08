@@ -24,7 +24,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const form = await getFormOrFormNotFound({ id });
 
   const temporaryStorageDetail = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   if (temporaryStorageDetail === null) {

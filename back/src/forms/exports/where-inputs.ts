@@ -1,4 +1,4 @@
-import { FormWhereInput } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { FormsRegisterExportType } from "../../generated/graphql/types";
 
 /**
@@ -11,9 +11,9 @@ export function formsWhereInput(
   startDate?: Date,
   endDate?: Date,
   wasteCode?: string
-): FormWhereInput {
+): Prisma.FormWhereInput {
   // build prisma where input
-  const whereInputs: FormWhereInput[] = [];
+  const whereInputs: Prisma.FormWhereInput[] = [];
 
   if (startDate) {
     whereInputs.push({ sentAt: { gte: startDate } });
@@ -43,7 +43,7 @@ export function formsWhereInput(
 /**
  * Forms corresponding to outgoing wastes of a list of production companies
  */
-function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
+function outgoingWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     OR: [
       { emitterCompanySiret: { in: sirets } },
@@ -57,7 +57,7 @@ function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
  * Forms corresponding to incoming wastes of a list of treatment or TTR companies
  * We need to handle cases whith a temp storage
  */
-function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
+function incomingWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     OR: [
       {
@@ -111,7 +111,7 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
  * Forms corresponding to transported wastes of a list of transporter companies
  * We need to handle cases of multiple transporters with temporary storage
  */
-function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
+function transportedWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     OR: [
       {
@@ -163,7 +163,7 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
 /**
  * Forms corresponding to traded waste of a list of trader companies
  */
-function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
+function tradedWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     AND: [
       {
@@ -178,7 +178,7 @@ function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
  * Forms where a list of companies are present for any status
  * excepted DRAFT and SEALED
  */
-function allWasteWhereInput(sirets: string[]): FormWhereInput {
+function allWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     AND: [
       {

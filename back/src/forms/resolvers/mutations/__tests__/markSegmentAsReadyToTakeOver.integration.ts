@@ -50,7 +50,7 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
         }`
     );
 
-    const readyToTakeOverSegment = await prisma.transportSegment.findOne({
+    const readyToTakeOverSegment = await prisma.transportSegment.findUnique({
       where: { id: segment.id }
     });
     expect(readyToTakeOverSegment.readyToTakeOver).toBe(true);

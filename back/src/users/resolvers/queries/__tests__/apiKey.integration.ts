@@ -13,7 +13,7 @@ describe("{ query { apiKey } }", () => {
     const { data } = await query("query { apiKey }");
     expect(data.apiKey).toHaveLength(40);
     // should have created an accessToken in db
-    const accessToken = await prisma.accessToken.findOne({
+    const accessToken = await prisma.accessToken.findUnique({
       where: {
         token: data.apiKey
       }

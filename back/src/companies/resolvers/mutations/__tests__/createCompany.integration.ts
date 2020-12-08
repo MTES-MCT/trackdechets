@@ -162,7 +162,7 @@ describe("Mutation.createCompany", () => {
       }
     });
 
-    const company = await prisma.company.findOne({
+    const company = await prisma.company.findUnique({
       where: { siret: companyInput.siret }
     });
     expect(company.documentKeys).toEqual(["key1", "key2"]);

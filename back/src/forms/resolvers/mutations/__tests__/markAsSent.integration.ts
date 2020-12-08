@@ -75,7 +75,7 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form.findOne({ where: { id: form.id } });
+    form = await prisma.form.findUnique({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
@@ -117,7 +117,7 @@ describe("{ mutation { markAsSent } }", () => {
 
     await mutate(mutation);
 
-    form = await prisma.form.findOne({ where: { id: form.id } });
+    form = await prisma.form.findUnique({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
@@ -153,7 +153,7 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form.findOne({ where: { id: form.id } });
+    form = await prisma.form.findUnique({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
@@ -192,7 +192,7 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form.findOne({ where: { id: form.id } });
+    form = await prisma.form.findUnique({ where: { id: form.id } });
 
     expect(form.status).toEqual("SENT");
 
@@ -230,7 +230,9 @@ describe("{ mutation { markAsSent } }", () => {
     });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toEqual("SEALED");
 
     expect(resultingForm.currentTransporterSiret).toBeNull();
@@ -269,7 +271,7 @@ describe("{ mutation { markAsSent } }", () => {
           "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
-      form = await prisma.form.findOne({ where: { id: form.id } });
+      form = await prisma.form.findUnique({ where: { id: form.id } });
 
       expect(form.status).toEqual("DRAFT");
 
@@ -314,7 +316,7 @@ describe("{ mutation { markAsSent } }", () => {
       expect(errors[0].message).toEqual(
         "La date d'envoi n'est pas formatée correctement"
       );
-      form = await prisma.form.findOne({ where: { id: form.id } });
+      form = await prisma.form.findUnique({ where: { id: form.id } });
 
       expect(form.status).toEqual("SEALED");
 
@@ -364,7 +366,7 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form.findOne({
+    const appendix2grouped = await prisma.form.findUnique({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("GROUPED");
@@ -406,7 +408,7 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form.findOne({
+    const appendix2grouped = await prisma.form.findUnique({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("GROUPED");

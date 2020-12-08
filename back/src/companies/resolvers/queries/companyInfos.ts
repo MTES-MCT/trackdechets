@@ -29,7 +29,7 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
 
   // retrieves trackdechets public CompanyInfo
   // it might be null if the company is not registered in TD
-  const trackdechetsCompanyInfo = await prisma.company.findOne({
+  const trackdechetsCompanyInfo = await prisma.company.findUnique({
     where: { siret },
     select: {
       contactEmail: true,

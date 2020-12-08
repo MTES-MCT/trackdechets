@@ -17,7 +17,7 @@ export const oauth2server = createServer();
 oauth2server.serializeClient((client, done) => done(null, client.id));
 
 oauth2server.deserializeClient(async (id, done) => {
-  const client = await prisma.application.findOne({ where: { id } });
+  const client = await prisma.application.findUnique({ where: { id } });
   return done(null, client);
 });
 

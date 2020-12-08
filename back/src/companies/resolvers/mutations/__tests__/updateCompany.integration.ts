@@ -55,7 +55,7 @@ describe("mutation updateCompany", () => {
     });
     expect(data.updateCompany.id).toEqual(company.id);
 
-    const updatedCompany = await prisma.company.findOne({
+    const updatedCompany = await prisma.company.findUnique({
       where: { id: company.id }
     });
     expect(updatedCompany).toMatchObject(variables);

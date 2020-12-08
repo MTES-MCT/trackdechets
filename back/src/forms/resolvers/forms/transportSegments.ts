@@ -4,7 +4,7 @@ import { expandTransportSegmentFromDb } from "../../form-converter";
 
 const transportSegmentResolver: FormResolvers["transportSegments"] = async form => {
   const segments = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .transportSegments({ orderBy: { segmentNumber: "asc" } });
   return segments.map(el => ({
     // TODO-PRISMA

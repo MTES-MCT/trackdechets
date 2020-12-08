@@ -261,7 +261,7 @@ describe("query favorites", () => {
       }
     });
     const temporaryStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });

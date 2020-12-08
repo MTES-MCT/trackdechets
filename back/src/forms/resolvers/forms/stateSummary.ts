@@ -119,7 +119,7 @@ function getQuantity(
 
 export async function getStateSummary(form: Form) {
   const temporaryStorageDetail = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   const packagingInfos =

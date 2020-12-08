@@ -31,13 +31,13 @@ const multimodalYOffset = 85;
  */
 export const buildPdf = async (form: Form) => {
   const appendix2Forms = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .appendix2Forms();
   const segments = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .transportSegments();
   const temporaryStorageDetail = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   const params = { ...form, appendix2Forms, temporaryStorageDetail };

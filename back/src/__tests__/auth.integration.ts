@@ -216,12 +216,14 @@ describe("Authentification with token", () => {
 
     // should create a new access token to make it revokable
     // next time this token is used, it will use passport bearer strategy
-    const accessToken = await prisma.accessToken.findOne({ where: { token } });
+    const accessToken = await prisma.accessToken.findUnique({
+      where: { token }
+    });
     expect(accessToken).toBeDefined();
     expect(accessToken.token).toEqual(token);
     expect(accessToken.lastUsed).not.toBeNull();
     const accessTokenUser = await prisma.accessToken
-      .findOne({ where: { token } })
+      .findUnique({ where: { token } })
       .user();
     expect(accessTokenUser.id).toEqual(user.id);
   });
@@ -247,7 +249,9 @@ describe("Authentification with token", () => {
     });
 
     // should update lastUsed field
-    const accessToken = await prisma.accessToken.findOne({ where: { token } });
+    const accessToken = await prisma.accessToken.findUnique({
+      where: { token }
+    });
     expect(accessToken.lastUsed).not.toBeNull();
   });
 });

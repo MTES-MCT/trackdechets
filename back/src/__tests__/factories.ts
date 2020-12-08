@@ -1,14 +1,11 @@
 import {
-  CompanyCreateInput,
   CompanyType,
   Consistence,
   EmitterType,
-  FormCreateInput,
   QuantityType,
   Status,
-  TemporaryStorageDetailCreateInput,
-  UserCreateInput,
-  UserRole
+  UserRole,
+  Prisma
 } from "@prisma/client";
 import { hash } from "bcrypt";
 import prisma from "src/prisma";
@@ -17,7 +14,9 @@ import prisma from "src/prisma";
  * Create a user with name and email
  * @param opt: extra parameters
  */
-export const userFactory = async (opt: Partial<UserCreateInput> = {}) => {
+export const userFactory = async (
+  opt: Partial<Prisma.UserCreateInput> = {}
+) => {
   const defaultPassword = await hash("pass", 10);
   const userIndex = (await prisma.user.count()) + 1;
   const data = {
@@ -54,7 +53,7 @@ function siretify(index) {
  * @param opt: extram parameters
  */
 export const companyFactory = async (
-  companyOpts: Partial<CompanyCreateInput> = {}
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
   const opts = companyOpts || {};
   const companyIndex = (await prisma.company.count()) + 1;
@@ -77,7 +76,7 @@ export const companyFactory = async (
  */
 export const userWithCompanyFactory = async (
   role,
-  companyOpts: Partial<CompanyCreateInput> = {}
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
   const company = await companyFactory(companyOpts);
 
@@ -185,7 +184,7 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
-export const tempStorageData: TemporaryStorageDetailCreateInput = {
+export const tempStorageData: Prisma.TemporaryStorageDetailCreateInput = {
   tempStorerQuantityType: "ESTIMATED",
   tempStorerQuantityReceived: 1,
   tempStorerWasteAcceptationStatus: "ACCEPTED",
@@ -249,7 +248,7 @@ export const formFactory = async ({
   opt = {}
 }: {
   ownerId: string;
-  opt?: Partial<FormCreateInput>;
+  opt?: Partial<Prisma.FormCreateInput>;
 }) => {
   const formParams = { ...formdata, ...opt };
   return prisma.form.create({
@@ -266,7 +265,7 @@ export const formWithTempStorageFactory = async ({
   opt = {}
 }: {
   ownerId: string;
-  opt?: Partial<FormCreateInput>;
+  opt?: Partial<Prisma.FormCreateInput>;
 }) => {
   return formFactory({
     ownerId,

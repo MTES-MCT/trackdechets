@@ -2,7 +2,7 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { Company } from "@prisma/client";
+import { Company, Status } from "@prisma/client";
 import prisma from "src/prisma";
 import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
@@ -78,7 +78,7 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
   const filter = {
     OR: [
       // DRAFT
-      { status: "DRAFT" },
+      { status: Status.DRAFT },
       // isTemporaryStorer && (RESENT || RECEIVED)
       {
         AND: [
@@ -89,9 +89,9 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           },
           {
             OR: [
-              { status: "RESENT" },
-              { status: "RECEIVED" },
-              { status: "ACCEPTED" }
+              { status: Status.RESENT },
+              { status: Status.RECEIVED },
+              { status: Status.ACCEPTED }
             ]
           }
         ]
@@ -104,10 +104,10 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           { recipientIsTempStorage: true },
           {
             OR: [
-              { status: "SENT" },
-              { status: "TEMP_STORED" },
-              { status: "TEMP_STORER_ACCEPTED" },
-              { status: "RESEALED" }
+              { status: Status.SENT },
+              { status: Status.TEMP_STORED },
+              { status: Status.TEMP_STORER_ACCEPTED },
+              { status: Status.RESEALED }
             ]
           }
         ]
@@ -119,10 +119,13 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           {
             OR: [
               {
-                AND: [{ status: "SENT" }, { recipientIsTempStorage: false }]
+                AND: [
+                  { status: Status.SENT },
+                  { recipientIsTempStorage: false }
+                ]
               },
-              { status: "RECEIVED" },
-              { status: "ACCEPTED" }
+              { status: Status.RECEIVED },
+              { status: Status.ACCEPTED }
             ]
           }
         ]

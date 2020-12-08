@@ -38,11 +38,11 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
   }
 
   const { email } = await prisma.membershipRequest
-    .findOne({ where: { id: invitationRequest.id } })
+    .findUnique({ where: { id: invitationRequest.id } })
     .user();
 
   const company = await prisma.membershipRequest
-    .findOne({ where: { id: invitationRequest.id } })
+    .findUnique({ where: { id: invitationRequest.id } })
     .company();
 
   // check user is requester or company admin

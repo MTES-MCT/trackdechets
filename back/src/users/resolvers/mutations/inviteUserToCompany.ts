@@ -23,9 +23,9 @@ export async function inviteUserToCompanyFn(
 ): Promise<CompanyPrivate> {
   const email = sanitizeEmail(unsafeEmail);
 
-  const existingUser = await prisma.user.findOne({ where: { email } });
+  const existingUser = await prisma.user.findUnique({ where: { email } });
 
-  const company = await prisma.company.findOne({ where: { siret } });
+  const company = await prisma.company.findUnique({ where: { siret } });
 
   if (existingUser) {
     // there is already an user with this email

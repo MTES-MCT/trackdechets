@@ -57,7 +57,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findOne({
+    const segment = await prisma.transportSegment.findUnique({
       where: { id: data.prepareSegment.id }
     });
 
@@ -106,7 +106,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findOne({
+    const segment = await prisma.transportSegment.findUnique({
       where: { id: data.prepareSegment.id }
     });
 

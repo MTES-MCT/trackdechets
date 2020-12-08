@@ -1,4 +1,4 @@
-import { FormUpdateInput } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import prisma from "src/prisma";
 import { PROCESSING_OPERATIONS } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -26,7 +26,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   await checkCanMarkAsProcessed(user, form);
 
-  const formUpdateInput: FormUpdateInput = flattenProcessedFormInput(
+  const formUpdateInput: Prisma.FormUpdateInput = flattenProcessedFormInput(
     processedInfo
   );
   await processedInfoSchema.validate(formUpdateInput);
@@ -55,7 +55,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   // mark appendix2Forms as PROCESSED
   const appendix2Forms = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .appendix2Forms();
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {

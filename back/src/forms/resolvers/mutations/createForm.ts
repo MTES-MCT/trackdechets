@@ -1,4 +1,4 @@
-import { FormCreateInput, Status } from "@prisma/client";
+import { Prisma, Status } from "@prisma/client";
 import prisma from "src/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -52,8 +52,7 @@ const createFormResolver = async (
   );
 
   const form = flattenFormInput(formContent);
-
-  const formCreateInput: FormCreateInput = {
+  const formCreateInput: Prisma.FormCreateInput = {
     ...form,
     readableId: await getReadableId(),
     owner: { connect: { id: user.id } },

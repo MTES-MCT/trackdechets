@@ -7,7 +7,7 @@ const updateUserMock = jest.fn();
 
 jest.mock("src/prisma", () => ({
   user: {
-    findOne: jest.fn((...args) => userMock(...args)),
+    findUnique: jest.fn((...args) => userMock(...args)),
     update: jest.fn((...args) => updateUserMock(...args))
   }
 }));

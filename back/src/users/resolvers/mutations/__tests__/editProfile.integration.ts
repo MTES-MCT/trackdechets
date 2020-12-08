@@ -23,7 +23,9 @@ describe("mutation editProfile", () => {
     const email = "newemail@trackdechets.fr";
     const phone = "01234567891";
     await mutate(EDIT_PROFILE, { variables: { name, email, phone } });
-    const updatedUser = await prisma.user.findOne({ where: { id: user.id } });
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
     expect(updatedUser.name).toEqual(name);
     expect(updatedUser.email).toEqual(email);
     expect(updatedUser.phone).toEqual(phone);

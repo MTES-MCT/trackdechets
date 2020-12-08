@@ -1,4 +1,4 @@
-import { Form as PrismaForm, FormCreateInput } from "@prisma/client";
+import { Form as PrismaForm, Prisma } from "@prisma/client";
 import { resetDatabase } from "integration-tests/helper";
 import {
   formFactory,
@@ -16,7 +16,9 @@ const GET_FORM_QUERY = `
   }
 `;
 
-async function createForm(opts: Partial<FormCreateInput>): Promise<PrismaForm> {
+async function createForm(
+  opts: Partial<Prisma.FormCreateInput>
+): Promise<PrismaForm> {
   const owner = await userFactory();
   const form = await formFactory({
     ownerId: owner.id,

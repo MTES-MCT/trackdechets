@@ -87,14 +87,14 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(2, 3, 4);
 
     // check fields are OK for first user
-    const john = await prisma.user.findOne({
+    const john = await prisma.user.findUnique({
       where: { email: "john.snow@trackdechets.fr" }
     });
     expect(john.name).toEqual("john.snow@trackdechets.fr");
     expect(john.isActive).toEqual(true);
 
     // check fields are OK for first company
-    const codeEnStock = await prisma.company.findOne({
+    const codeEnStock = await prisma.company.findUnique({
       where: { siret: "85001946400013" }
     });
     expect(codeEnStock.name).toEqual("NAME FROM SIRENE");
@@ -116,7 +116,7 @@ describe("bulk create users and companies from csv files", () => {
 
     // Code en stock should be untouched
     expect(
-      await prisma.company.findOne({ where: { siret: "85001946400013" } })
+      await prisma.company.findUnique({ where: { siret: "85001946400013" } })
     ).toEqual(codeEnStock);
   }, 10000);
 
@@ -130,7 +130,7 @@ describe("bulk create users and companies from csv files", () => {
 
     // john snow user should be untouched
     expect(
-      await prisma.user.findOne({
+      await prisma.user.findUnique({
         where: { email: "john.snow@trackdechets.fr" }
       })
     ).toEqual(john);
@@ -160,13 +160,13 @@ describe("bulk create users and companies from csv files", () => {
 
     await expectNumberOfRecords(2, 3, 4);
     // John Snow should be untouched
-    expect(await prisma.user.findOne({ where: { email: john.email } })).toEqual(
-      john
-    );
+    expect(
+      await prisma.user.findUnique({ where: { email: john.email } })
+    ).toEqual(john);
 
     // Code en Stock should be untouched
     expect(
-      await prisma.company.findOne({ where: { siret: codeEnStock.siret } })
+      await prisma.company.findUnique({ where: { siret: codeEnStock.siret } })
     ).toEqual(codeEnStock);
     // Association should be there
     const associations = await prisma.companyAssociation.findMany({
@@ -194,7 +194,7 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(3, 3, 5);
 
     // John Snow user should be created
-    const john = await prisma.user.findOne({
+    const john = await prisma.user.findUnique({
       where: { email: "john.snow@trackdechets.fr" }
     });
 
@@ -207,7 +207,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations[0].role).toEqual("MEMBER");
 
     // invitation should be marked as joined
-    const updatedInvitation = await prisma.userAccountHash.findOne({
+    const updatedInvitation = await prisma.userAccountHash.findUnique({
       where: {
         id: invitation.id
       }
@@ -230,7 +230,7 @@ describe("bulk create users and companies from csv files", () => {
     await bulkCreateIdempotent();
     await expectNumberOfRecords(2, 3, 4);
 
-    const john = await prisma.user.findOne({
+    const john = await prisma.user.findUnique({
       where: { email: "john.snow@trackdechets.fr" }
     });
 
@@ -242,7 +242,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations[0].role).toEqual("MEMBER");
 
     // invitation should be marked as joined
-    const updatedInvitation = await prisma.userAccountHash.findOne({
+    const updatedInvitation = await prisma.userAccountHash.findUnique({
       where: {
         id: invitation.id
       }

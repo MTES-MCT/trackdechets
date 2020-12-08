@@ -126,7 +126,7 @@ export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
   ) {
     return;
   }
-  const form = await prisma.form.findOne({ where: { id: payload.node.id } });
+  const form = await prisma.form.findUnique({ where: { id: payload.node.id } });
   // build pdf as a base64 string
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -234,7 +234,7 @@ async function mailWhenFormTraceabilityIsBroken(payload: TDEventPayload<Form>) {
     return;
   }
 
-  const form = await prisma.form.findOne({ where: { id: payload.node.id } });
+  const form = await prisma.form.findUnique({ where: { id: payload.node.id } });
   return sendMail(
     userMails.formTraceabilityBreak(
       form.emitterCompanyMail,

@@ -142,7 +142,7 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findOne({
+    const formAfterMutation = await prisma.form.findUnique({
       where: { id: form.id }
     });
 
@@ -190,7 +190,7 @@ describe("{ mutation { markAsTempStored } }", () => {
     });
 
     const updatedTemporaryStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
     expect(updatedTemporaryStorageDetail.tempStorerSignedAt).toBeNull();
   });
@@ -230,7 +230,7 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findOne({
+    const formAfterMutation = await prisma.form.findUnique({
       where: { id: form.id }
     });
 

@@ -32,7 +32,7 @@ const COLLECTOR = createRecipientMock({
 const temporaryStorageDetail = jest.fn(() => Promise.resolve(null));
 jest.mock("src/prisma", () => ({
   form: {
-    findOne: jest.fn(() => ({
+    findUnique: jest.fn(() => ({
       temporaryStorageDetail
     }))
   }

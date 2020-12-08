@@ -204,7 +204,7 @@ describe("query { formsRegister }", () => {
     });
 
     const tempStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     const { query } = makeClient(user);

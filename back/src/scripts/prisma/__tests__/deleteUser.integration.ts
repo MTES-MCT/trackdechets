@@ -17,7 +17,7 @@ describe("deleteUser", () => {
 
     await deleteUser(user);
 
-    const deletedUser = await prisma.user.findOne({ where: { id: user.id } });
+    const deletedUser = await prisma.user.findUnique({ where: { id: user.id } });
     expect(deletedUser).toBe(null);
   });
 

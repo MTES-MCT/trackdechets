@@ -16,7 +16,7 @@ export async function changePasswordFn(
   userId: string,
   { oldPassword, newPassword }: MutationChangePasswordArgs
 ) {
-  const user = await prisma.user.findOne({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId } });
   const passwordValid = await compare(oldPassword, user.password);
   if (!passwordValid) {
     throw new UserInputError("L'ancien mot de passe est incorrect.", {

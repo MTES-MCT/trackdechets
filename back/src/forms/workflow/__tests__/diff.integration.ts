@@ -1,4 +1,4 @@
-import { FormUpdateInput } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { resetDatabase } from "integration-tests/helper";
 import prisma from "src/prisma";
 import {
@@ -23,7 +23,7 @@ describe("formDiff", () => {
   it("should calculate diff between two different forms", async () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
-    const formUpdateInput: FormUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       emitterCompanyName: "Updated name", // nested field
       sentBy: "Mr Sender" // shallow field
     };
@@ -42,9 +42,9 @@ describe("formDiff", () => {
     const user = await userFactory();
     const form = await formWithTempStorageFactory({ ownerId: user.id });
     const temporaryStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
-    const formUpdateInput: FormUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       temporaryStorageDetail: {
         update: {
           transporterCompanyName: "New Transporter"
@@ -56,7 +56,7 @@ describe("formDiff", () => {
       data: formUpdateInput
     });
     const updatedTemporaryStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     const diff = formDiff(
@@ -80,9 +80,9 @@ describe("formDiff", () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
     const temporaryStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
-    const formUpdateInput: FormUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       temporaryStorageDetail: {
         create: tempStorageData
       }
@@ -92,7 +92,7 @@ describe("formDiff", () => {
       data: formUpdateInput
     });
     const updatedTemporaryStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
     const diff = formDiff(
       { ...form, temporaryStorageDetail },

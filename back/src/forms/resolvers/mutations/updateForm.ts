@@ -3,7 +3,7 @@ import {
   flattenTemporaryStorageDetailInput,
   expandFormFromDb
 } from "../../form-converter";
-import { FormUpdateInput } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import prisma from "src/prisma";
 import {
   ResolversParentTypes,
@@ -49,7 +49,7 @@ const updateFormResolver = async (
   const form = flattenFormInput(formContent);
 
   // Construct form update payload
-  const formUpdateInput: FormUpdateInput = {
+  const formUpdateInput: Prisma.FormUpdateInput = {
     ...form,
     appendix2Forms: { set: appendix2Forms }
   };
@@ -67,7 +67,7 @@ const updateFormResolver = async (
     formContent.recipient?.isTempStorage === true;
 
   const existingTemporaryStorageDetail = await prisma.form
-    .findOne({ where: { id } })
+    .findUnique({ where: { id } })
     .temporaryStorageDetail();
 
   // make sure user will still be form contributor after update

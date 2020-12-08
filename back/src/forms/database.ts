@@ -2,7 +2,7 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import { Form, FormWhereInput, FormWhereUniqueInput } from "@prisma/client";
+import { Form, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "src/prisma";
 import { FormRole } from "../generated/graphql/types";
@@ -16,10 +16,10 @@ import { FullForm } from "./types";
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
   const temporaryStorageDetail = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
   const transportSegments = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .transportSegments();
   return {
     ...form,
@@ -34,11 +34,11 @@ export async function getFullForm(form: Form): Promise<FullForm> {
 export async function getFormOrFormNotFound({
   id,
   readableId
-}: FormWhereUniqueInput) {
+}: Prisma.FormWhereUniqueInput) {
   if (!id && !readableId) {
     throw new UserInputError("You should specify an id or a readableId");
   }
-  const form = await prisma.form.findOne({
+  const form = await prisma.form.findUnique({
     where: id ? { id } : { readableId }
   });
   if (form == null || form.isDeleted == true) {
@@ -56,7 +56,9 @@ export async function getFormOrFormNotFound({
  * @param roles optional [FormRole] to refine filter
  */
 export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
-  const filtersByRole: { [key in FormRole]: Partial<FormWhereInput>[] } = {
+  const filtersByRole: {
+    [key in FormRole]: Partial<Prisma.FormWhereInput>[];
+  } = {
     ["RECIPIENT"]: [
       { recipientCompanySiret: siret },
       {

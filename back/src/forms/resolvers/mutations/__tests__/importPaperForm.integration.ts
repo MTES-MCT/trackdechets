@@ -1,4 +1,4 @@
-import { Form, FormCreateInput } from "@prisma/client";
+import { Form, Prisma } from "@prisma/client";
 import { resetDatabase } from "integration-tests/helper";
 import prisma from "src/prisma";
 import { ImportPaperFormInput } from "../../../../generated/graphql/types";
@@ -174,7 +174,7 @@ describe("mutation / importPaperForm", () => {
 
       expect(data.importPaperForm.status).toEqual("PROCESSED");
 
-      const updatedForm = await prisma.form.findOne({
+      const updatedForm = await prisma.form.findUnique({
         where: { id: data.importPaperForm.id }
       });
 
@@ -268,7 +268,7 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: FormCreateInput = {
+      const formCreateInput: Prisma.FormCreateInput = {
         ...baseData,
         readableId: getReadableId(),
         owner: {
@@ -291,7 +291,9 @@ describe("mutation / importPaperForm", () => {
           }
         }
       });
-      const updatedForm = await prisma.form.findOne({ where: { id: form.id } });
+      const updatedForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
 
       expect(updatedForm.status).toEqual("PROCESSED");
       expect(updatedForm.isImportedFromPaper).toEqual(true);
@@ -353,7 +355,7 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: FormCreateInput = {
+      const formCreateInput: Prisma.FormCreateInput = {
         ...baseData,
         readableId: getReadableId(),
         owner: {
@@ -383,7 +385,9 @@ describe("mutation / importPaperForm", () => {
           }
         }
       });
-      const updatedForm = await prisma.form.findOne({ where: { id: form.id } });
+      const updatedForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
       expect(updatedForm.status).toEqual("PROCESSED");
       expect(updatedForm.emitterCompanyName).toEqual(emitterCompanyName);
     });
@@ -393,7 +397,7 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: FormCreateInput = {
+      const formCreateInput: Prisma.FormCreateInput = {
         ...baseData,
         readableId: getReadableId(),
         owner: {
@@ -427,7 +431,7 @@ describe("mutation / importPaperForm", () => {
 
       const user = await userFactory();
 
-      const formCreateInput: FormCreateInput = {
+      const formCreateInput: Prisma.FormCreateInput = {
         ...baseData,
         readableId: getReadableId(),
         owner: {
@@ -460,7 +464,7 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: FormCreateInput = {
+      const formCreateInput: Prisma.FormCreateInput = {
         ...baseData,
         readableId: getReadableId(),
         owner: {
@@ -499,7 +503,7 @@ describe("mutation / importPaperForm", () => {
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const formCreateInput: FormCreateInput = {
+      const formCreateInput: Prisma.FormCreateInput = {
         ...baseData,
         readableId: getReadableId(),
         owner: {

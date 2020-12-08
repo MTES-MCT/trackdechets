@@ -78,7 +78,9 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("PROCESSED");
 
     // check relevant statusLog is created
@@ -154,7 +156,9 @@ describe("mutation.markAsProcessed", () => {
     expect(errors[0].message).toBe(
       "Cette opération d’élimination / valorisation n'existe pas."
     );
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("ACCEPTED");
 
     // no statusLog is created
@@ -202,7 +206,9 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("AWAITING_GROUP");
   });
 
@@ -274,7 +280,9 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
@@ -313,7 +321,9 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm).toMatchObject({
       status: "AWAITING_GROUP",
       nextDestinationCompanyCountry: "FR"
@@ -356,7 +366,9 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toBe("AWAITING_GROUP");
     expect(resultingForm.nextDestinationCompanyCountry).toBe("DE");
   });
@@ -440,7 +452,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form.findOne({
+    const appendix2grouped = await prisma.form.findUnique({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("PROCESSED");

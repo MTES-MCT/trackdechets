@@ -73,7 +73,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     await checkSecurityCode(form.recipientCompanySiret, securityCode);
 
     const temporaryStorageDetail = await prisma.form
-      .findOne({ where: { id } })
+      .findUnique({ where: { id } })
       .temporaryStorageDetail();
 
     const hasWasteDetailsOverride = !!temporaryStorageDetail.wasteDetailsQuantity;

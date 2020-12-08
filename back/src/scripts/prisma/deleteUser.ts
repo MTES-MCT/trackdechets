@@ -1,4 +1,4 @@
-import { User, UserRole } from "@prisma/client";
+import { User } from "@prisma/client";
 import prisma from "src/prisma";
 
 export default async function deleteUser(user: User) {
@@ -121,7 +121,7 @@ async function checkApplications(user: User): Promise<string[]> {
     }
   });
   for (const application of applications) {
-    const { admins } = await prisma.application.findOne({
+    const { admins } = await prisma.application.findUnique({
       where: { id: application.id },
       include: { admins: { select: { id: true } } }
     });

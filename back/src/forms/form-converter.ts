@@ -2,9 +2,7 @@ import {
   Form as PrismaForm,
   TemporaryStorageDetail as PrismaTemporaryStorageDetail,
   TransportSegment as PrismaTransportSegment,
-  FormCreateInput,
-  TemporaryStorageDetailCreateInput,
-  TemporaryStorageDetailUpdateInput
+  Prisma
 } from "@prisma/client";
 import {
   Form as GraphQLForm,
@@ -130,7 +128,7 @@ export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput;
-}): TemporaryStorageDetailCreateInput {
+}): Prisma.TemporaryStorageDetailCreateInput {
   return {
     destinationCompanyName: chain(input.destination, d =>
       chain(d.company, c => c.name)
@@ -348,7 +346,7 @@ export function flattenFormInput(
     | "trader"
     | "ecoOrganisme"
   >
-): Partial<FormCreateInput> {
+): Partial<Prisma.FormCreateInput> {
   return safeInput({
     customId: formInput.customId,
     ...flattenEmitterInput(formInput),
@@ -362,7 +360,7 @@ export function flattenFormInput(
 
 export function flattenProcessedFormInput(
   processedFormInput: ProcessedFormInput
-): Partial<FormCreateInput> {
+): Partial<Prisma.FormCreateInput> {
   const { nextDestination, ...rest } = processedFormInput;
   return safeInput({
     ...rest,
@@ -372,7 +370,7 @@ export function flattenProcessedFormInput(
 
 export function flattenImportPaperFormInput(
   input: ImportPaperFormInput
-): Partial<FormCreateInput> {
+): Partial<Prisma.FormCreateInput> {
   const {
     id,
     customId,
@@ -416,13 +414,13 @@ function flattenReceivedInfo(receivedInfo: ReceivedFormInput) {
 
 export function flattenTemporaryStorageDetailInput(
   tempStorageInput: TemporaryStorageDetailInput
-): TemporaryStorageDetailCreateInput {
+): Prisma.TemporaryStorageDetailCreateInput {
   return safeInput(flattenDestinationInput(tempStorageInput));
 }
 
 export function flattenResealedFormInput(
   resealedFormInput: ResealedFormInput
-): TemporaryStorageDetailUpdateInput {
+): Prisma.TemporaryStorageDetailUpdateInput {
   return safeInput({
     ...flattenDestinationInput(resealedFormInput),
     ...flattenWasteDetailsInput(resealedFormInput),
@@ -432,7 +430,7 @@ export function flattenResealedFormInput(
 
 export function flattenResentFormInput(
   resentFormInput: ResentFormInput
-): TemporaryStorageDetailUpdateInput {
+): Prisma.TemporaryStorageDetailUpdateInput {
   return safeInput({
     ...flattenDestinationInput(resentFormInput),
     ...flattenWasteDetailsInput(resentFormInput),

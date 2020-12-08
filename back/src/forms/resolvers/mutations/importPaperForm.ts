@@ -1,4 +1,4 @@
-import { Form, FormCreateInput, FormUpdateInput, User } from "@prisma/client";
+import { Form, Prisma, User } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "src/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -56,7 +56,7 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
     );
   }
 
-  const formUpdateInput: FormUpdateInput = {
+  const formUpdateInput: Prisma.FormUpdateInput = {
     ...flattenedFormInput,
     isImportedFromPaper: true,
     signedByTransporter: true
@@ -89,7 +89,7 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     );
   }
 
-  const formCreateInput: FormCreateInput = {
+  const formCreateInput: Prisma.FormCreateInput = {
     ...flattenedFormInput,
     readableId: await getReadableId(),
     owner: { connect: { id: user.id } },

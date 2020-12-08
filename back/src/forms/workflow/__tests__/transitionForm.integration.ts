@@ -1,5 +1,5 @@
 import { AuthType } from "../../../auth";
-import { FormUpdateInput } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { resetDatabase } from "integration-tests/helper";
 import prisma from "src/prisma";
 import { formFactory, userFactory } from "../../../__tests__/factories";
@@ -16,7 +16,7 @@ describe("transition form", () => {
       ownerId: owner.id,
       opt: { status: "SENT" }
     });
-    const formUpdateInput: FormUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       receivedBy: "Bill",
       receivedAt: "2019-01-17T09:22:00.000Z",
       signedAt: "2019-01-17T09:22:00.000Z",
@@ -27,7 +27,9 @@ describe("transition form", () => {
     const event = { type: EventType.MarkAsReceived, formUpdateInput };
     await transitionForm({ ...user, auth: AuthType.Bearer }, form, event);
 
-    const updatedForm = await prisma.form.findOne({ where: { id: form.id } });
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
 
     const nextStatus = "ACCEPTED";
 
@@ -37,10 +39,10 @@ describe("transition form", () => {
     expect(statusLogs).toHaveLength(1);
     const statusLog = statusLogs[0];
     const statusLogUser = await prisma.statusLog
-      .findOne({ where: { id: statusLog.id } })
+      .findUnique({ where: { id: statusLog.id } })
       .user();
     const statusLogForm = await prisma.statusLog
-      .findOne({ where: { id: statusLog.id } })
+      .findUnique({ where: { id: statusLog.id } })
       .form();
 
     expect(statusLog.status).toEqual(nextStatus);
@@ -58,7 +60,7 @@ describe("transition form", () => {
       ownerId: owner.id,
       opt: { status: "DRAFT" }
     });
-    const formUpdateInput: FormUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       receivedBy: "Bill",
       receivedAt: "2019-01-17T09:22:00.000Z",
       signedAt: "2019-01-17T09:22:00.000Z",

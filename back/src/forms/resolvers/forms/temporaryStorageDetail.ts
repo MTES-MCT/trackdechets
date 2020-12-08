@@ -4,7 +4,7 @@ import { expandTemporaryStorageFromDb } from "../../form-converter";
 
 const temporaryStorageDetailsResolver: FormResolvers["temporaryStorageDetail"] = async form => {
   const temporaryStorageDetail = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   return temporaryStorageDetail

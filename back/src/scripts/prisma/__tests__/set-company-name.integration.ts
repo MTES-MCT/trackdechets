@@ -59,19 +59,19 @@ describe.skip("setCompanyName", () => {
     await setCompanyName();
 
     // Frontier name was already set, it should be unchanged
-    const frontierUpdated = await prisma.company.findOne({
+    const frontierUpdated = await prisma.company.findUnique({
       where: { siret: frontier.siret }
     });
     expect(frontierUpdated.name).toEqual(frontier.name);
 
     // LP name should be set
-    const lpUpdated = await prisma.company.findOne({
+    const lpUpdated = await prisma.company.findUnique({
       where: { siret: lp.siret }
     });
     expect(lpUpdated.name).toEqual("LP");
 
     // Code en Stock name should be set
-    const codeEnStockUpdated = await prisma.company.findOne({
+    const codeEnStockUpdated = await prisma.company.findUnique({
       where: {
         siret: codeEnStock.siret
       }
@@ -79,7 +79,7 @@ describe.skip("setCompanyName", () => {
     expect(codeEnStockUpdated.name).toEqual("CODE EN STOCK");
 
     // Unknown company name should not be set
-    const unknownUpdated = await prisma.company.findOne({
+    const unknownUpdated = await prisma.company.findUnique({
       where: {
         siret: unknown.siret
       }

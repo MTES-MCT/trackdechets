@@ -24,7 +24,7 @@ describe("acceptPendingInvitations", () => {
         }
       });
       await acceptPendingInvitations();
-      const untouchedInvitation = await prisma.userAccountHash.findOne({
+      const untouchedInvitation = await prisma.userAccountHash.findUnique({
         where: {
           id: invitation.id
         }
@@ -48,7 +48,7 @@ describe("acceptPendingInvitations", () => {
         }
       });
       await acceptPendingInvitations();
-      const deletedInvitation = await prisma.userAccountHash.findOne({
+      const deletedInvitation = await prisma.userAccountHash.findUnique({
         where: {
           id: invitation.id
         }
@@ -72,7 +72,7 @@ describe("acceptPendingInvitations", () => {
         }
       });
       await acceptPendingInvitations();
-      const acceptedInvitation = await prisma.userAccountHash.findOne({
+      const acceptedInvitation = await prisma.userAccountHash.findUnique({
         where: {
           id: invitation.id
         }

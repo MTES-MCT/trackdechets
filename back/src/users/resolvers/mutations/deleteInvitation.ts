@@ -23,7 +23,7 @@ const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
     companySiret: siret
   });
   await prisma.userAccountHash.delete({ where: { id: hash.id } });
-  const dbCompany = await prisma.company.findOne({ where: { siret } });
+  const dbCompany = await prisma.company.findUnique({ where: { siret } });
   return convertUrls(dbCompany);
 };
 

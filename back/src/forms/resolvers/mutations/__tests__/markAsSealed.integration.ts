@@ -70,7 +70,7 @@ describe("Mutation.markAsSealed", () => {
         }
       });
 
-      form = await prisma.form.findOne({ where: { id: form.id } });
+      form = await prisma.form.findUnique({ where: { id: form.id } });
 
       expect(form.status).toEqual("SEALED");
 
@@ -123,7 +123,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    form = await prisma.form.findOne({ where: { id: form.id } });
+    form = await prisma.form.findUnique({ where: { id: form.id } });
 
     expect(form.status).toEqual("SEALED");
   });
@@ -192,7 +192,9 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
 
-    const resultingForm = await prisma.form.findOne({ where: { id: form.id } });
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resultingForm.status).toEqual("DRAFT");
   });
 
@@ -224,7 +226,7 @@ describe("Mutation.markAsSealed", () => {
       "Émetteur: Le contact dans l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
-    form = await prisma.form.findOne({ where: { id: form.id } });
+    form = await prisma.form.findUnique({ where: { id: form.id } });
     expect(form.status).toEqual("DRAFT");
 
     // no statusLog is created
@@ -265,7 +267,7 @@ describe("Mutation.markAsSealed", () => {
           "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
-      form = await prisma.form.findOne({ where: { id: form.id } });
+      form = await prisma.form.findUnique({ where: { id: form.id } });
 
       expect(form.status).toEqual("DRAFT");
 
@@ -361,7 +363,7 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    const appendix2grouped = await prisma.form.findOne({
+    const appendix2grouped = await prisma.form.findUnique({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("GROUPED");

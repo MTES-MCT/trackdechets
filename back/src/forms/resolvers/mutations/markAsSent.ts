@@ -42,7 +42,7 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
 
   // mark appendix2Forms as GROUPED
   const appendix2Forms = await prisma.form
-    .findOne({ where: { id: form.id } })
+    .findUnique({ where: { id: form.id } })
     .appendix2Forms({ where: { status: "AWAITING_GROUP" } });
 
   if (appendix2Forms.length > 0) {

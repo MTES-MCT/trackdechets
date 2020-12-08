@@ -4,7 +4,7 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 
 const meResolver: QueryResolvers["me"] = async (parent, args, context) => {
   const me = checkIsAuthenticated(context);
-  const user = await prisma.user.findOne({ where: { id: me.id } });
+  const user = await prisma.user.findUnique({ where: { id: me.id } });
 
   return {
     ...user,

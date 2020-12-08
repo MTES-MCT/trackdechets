@@ -39,7 +39,7 @@ describe("Mutation.deleteForm", () => {
         })
       })
     ]);
-    const intactForm = await prisma.form.findOne({ where: { id: form.id } });
+    const intactForm = await prisma.form.findUnique({ where: { id: form.id } });
     expect(intactForm.isDeleted).toBe(false);
   });
 
@@ -63,7 +63,7 @@ describe("Mutation.deleteForm", () => {
         })
       })
     ]);
-    const intactForm = await prisma.form.findOne({ where: { id: form.id } });
+    const intactForm = await prisma.form.findUnique({ where: { id: form.id } });
     expect(intactForm.isDeleted).toBe(false);
   });
 
@@ -88,7 +88,7 @@ describe("Mutation.deleteForm", () => {
       })
     ]);
 
-    const intactForm = await prisma.form.findOne({ where: { id: form.id } });
+    const intactForm = await prisma.form.findUnique({ where: { id: form.id } });
     expect(intactForm.isDeleted).toBe(false);
   });
 
@@ -109,7 +109,9 @@ describe("Mutation.deleteForm", () => {
 
       expect(data.deleteForm.id).toBeTruthy();
 
-      const deletedForm = await prisma.form.findOne({ where: { id: form.id } });
+      const deletedForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
       expect(deletedForm.isDeleted).toBe(true);
     }
   );

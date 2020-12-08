@@ -9,7 +9,7 @@ export const userActivationHandler = async (req, res) => {
   }
 
   const user = await prisma.userActivationHash
-    .findOne({ where: { hash } })
+    .findUnique({ where: { hash } })
     .user();
   if (user == null) {
     res.status(500).send("Hash invalide.");

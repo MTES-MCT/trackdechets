@@ -1,4 +1,4 @@
-import { User, UserRole } from "@prisma/client";
+import { User } from "@prisma/client";
 import prisma from "src/prisma";
 
 export default async function mergeUsers(user: User, heir: User) {

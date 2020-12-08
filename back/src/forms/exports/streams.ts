@@ -1,5 +1,5 @@
 import { Readable, Transform, ReadableOptions } from "stream";
-import { Form, FormWhereInput } from "@prisma/client";
+import { Form, Prisma } from "@prisma/client";
 import prisma from "src/prisma";
 import { flattenForm } from "./transformers";
 import { formatRow } from "./columns";
@@ -17,7 +17,7 @@ class FormReader extends Readable {
 }
 
 interface FormReaderArgs {
-  whereInput?: FormWhereInput;
+  whereInput?: Prisma.FormWhereInput;
   fieldsSelection?: Record<string, unknown>;
   chunk?: number;
 }

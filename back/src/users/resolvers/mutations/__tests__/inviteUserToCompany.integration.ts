@@ -40,12 +40,12 @@ describe("mutation inviteUserToCompany", () => {
       expect.arrayContaining([{ email: admin.email }, { email: user.email }])
     );
     const companyAssociations = await prisma.user
-      .findOne({ where: { id: user.id } })
+      .findUnique({ where: { id: user.id } })
       .companyAssociations();
     expect(companyAssociations).toHaveLength(1);
     expect(companyAssociations[0].role).toEqual("MEMBER");
     const userCompany = await prisma.companyAssociation
-      .findOne({
+      .findUnique({
         where: {
           id: companyAssociations[0].id
         }

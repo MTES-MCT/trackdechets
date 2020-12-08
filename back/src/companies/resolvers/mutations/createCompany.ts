@@ -1,4 +1,4 @@
-import { Company, CompanyCreateInput, User } from "@prisma/client";
+import { Company, Prisma, User } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { convertUrls } from "src/companies/database";
 import prisma from "src/prisma";
@@ -37,7 +37,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   const siret = companyInput.siret.replace(/\s+/g, "");
 
   const existingCompany = await prisma.company
-    .findOne({
+    .findUnique({
       where: {
         siret
       }
@@ -55,7 +55,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   if (companyTypes.includes("ECO_ORGANISME")) {
-    const ecoOrganismeExists = await prisma.ecoOrganisme.findOne({
+    const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({
       where: { siret }
     });
     if (!ecoOrganismeExists) {
@@ -75,7 +75,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     );
   }
 
-  const companyCreateInput: CompanyCreateInput = {
+  const companyCreateInput: Prisma.CompanyCreateInput = {
     siret,
     codeNaf,
     gerepId,

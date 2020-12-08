@@ -15,7 +15,7 @@ const loginResolver: MutationResolvers["login"] = async (
   parent,
   { email, password }
 ) => {
-  const user = await prisma.user.findOne({ where: { email: email.trim() } });
+  const user = await prisma.user.findUnique({ where: { email: email.trim() } });
   if (!user) {
     throw new UserInputError(`Aucun utilisateur trouvé avec l'email ${email}`, {
       invalidArgs: ["email"]

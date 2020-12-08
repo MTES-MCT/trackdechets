@@ -16,7 +16,7 @@ const mockedForm = {
 };
 
 jest.mock("src/prisma", () => ({
-  form: { findOne: jest.fn(() => mockedForm) }
+  form: { findUnique: jest.fn(() => mockedForm) }
 }));
 
 describe("mailWhenFormTraceabilityIsBroken", () => {

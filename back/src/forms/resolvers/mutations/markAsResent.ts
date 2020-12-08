@@ -24,7 +24,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
 
   if (form.status === "TEMP_STORER_ACCEPTED") {
     const temporaryStorageDetail = await prisma.form
-      .findOne({ where: { id: form.id } })
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     if (temporaryStorageDetail === null) {

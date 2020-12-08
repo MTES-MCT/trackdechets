@@ -80,7 +80,7 @@ describe("joinWithInvite mutation", () => {
     expect(data.joinWithInvite.email).toEqual(invitee);
 
     // should mark invitation as joined
-    const updatedInvitation = await prisma.userAccountHash.findOne({
+    const updatedInvitation = await prisma.userAccountHash.findUnique({
       where: {
         id: invitation.id
       }
@@ -129,14 +129,14 @@ describe("joinWithInvite mutation", () => {
       }
     });
 
-    const updatedInvitation2 = await prisma.userAccountHash.findOne({
+    const updatedInvitation2 = await prisma.userAccountHash.findUnique({
       where: {
         id: invitation2.id
       }
     });
     expect(updatedInvitation2.acceptedAt).not.toBeNull();
 
-    const user = await prisma.user.findOne({ where: { email: invitee } });
+    const user = await prisma.user.findUnique({ where: { email: invitee } });
     const companies = await getUserCompanies(user.id);
 
     expect(companies.length).toEqual(2);

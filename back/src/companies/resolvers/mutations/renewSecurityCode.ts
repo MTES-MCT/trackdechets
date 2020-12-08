@@ -31,7 +31,7 @@ export async function renewSecurityCodeFn(
     });
   }
 
-  const company = await prisma.company.findOne({ where: { siret } });
+  const company = await prisma.company.findUnique({ where: { siret } });
 
   if (!company) {
     throw new UserInputError(

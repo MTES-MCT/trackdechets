@@ -21,8 +21,8 @@ import deleteUser from "../prisma/deleteUser";
     return;
   }
 
-  const user = await prisma.user.findOne({ where: { id: userID } });
-  const heir = await prisma.user.findOne({ where: { id: heirUserID } });
+  const user = await prisma.user.findUnique({ where: { id: userID } });
+  const heir = await prisma.user.findUnique({ where: { id: heirUserID } });
 
   if (!user) {
     console.log(

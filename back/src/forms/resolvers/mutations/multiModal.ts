@@ -91,7 +91,7 @@ type FormSiretsAndSegments = {
 };
 
 const getForm = async formId => {
-  const form = await prisma.form.findOne({
+  const form = await prisma.form.findUnique({
     where: { id: formId },
     include: {
       owner: {
@@ -249,7 +249,7 @@ export async function markSegmentAsReadyToTakeOver(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentSegment = await prisma.transportSegment.findOne({
+  const currentSegment = await prisma.transportSegment.findUnique({
     where: { id },
     include: {
       form: {
@@ -306,7 +306,7 @@ export async function takeOverSegment(
     );
   }
 
-  const currentSegment = await prisma.transportSegment.findOne({
+  const currentSegment = await prisma.transportSegment.findUnique({
     where: { id },
     include: {
       form: {
@@ -386,7 +386,7 @@ export async function editSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentSegment = await prisma.transportSegment.findOne({
+  const currentSegment = await prisma.transportSegment.findUnique({
     where: { id },
     include: {
       form: {

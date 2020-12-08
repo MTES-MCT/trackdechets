@@ -25,7 +25,7 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
   const membershipRequest = await getMembershipRequestOrNotFoundError({ id });
 
   const company = await prisma.membershipRequest
-    .findOne({ where: { id: membershipRequest.id } })
+    .findUnique({ where: { id: membershipRequest.id } })
     .company();
 
   // check authenticated user is admin of the company
@@ -51,11 +51,13 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
 
   // notify requester of refusal
   const requester = await prisma.membershipRequest
-    .findOne({ where: { id } })
+    .findUnique({ where: { id } })
     .user();
   await sendMail(userMails.membershipRequestRefused(requester, company));
 
-  const dbCompany = await prisma.company.findOne({ where: { id: company.id } });
+  const dbCompany = await prisma.company.findUnique({
+    where: { id: company.id }
+  });
   return convertUrls(dbCompany);
 };
 

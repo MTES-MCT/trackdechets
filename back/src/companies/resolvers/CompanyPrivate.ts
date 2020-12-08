@@ -12,13 +12,13 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
   },
   transporterReceipt: async parent => {
     const transporterReceipt = await prisma.company
-      .findOne({ where: { siret: parent.siret } })
+      .findUnique({ where: { siret: parent.siret } })
       .transporterReceipt();
     return stringifyDates(transporterReceipt);
   },
   traderReceipt: async parent => {
     const traderReceipt = await prisma.company
-      .findOne({ where: { siret: parent.siret } })
+      .findUnique({ where: { siret: parent.siret } })
       .traderReceipt();
     return stringifyDates(traderReceipt);
   }

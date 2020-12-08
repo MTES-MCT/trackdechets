@@ -61,7 +61,7 @@ passport.use(
   new LocalStrategy(
     { usernameField: "email" },
     async (username, password, done) => {
-      const user = await prisma.user.findOne({
+      const user = await prisma.user.findUnique({
         where: { email: sanitizeEmail(username) }
       });
 
@@ -92,7 +92,7 @@ passport.serializeUser((user: User, done) => {
 
 passport.deserializeUser((id: string, done) => {
   prisma.user
-    .findOne({ where: { id } })
+    .findUnique({ where: { id } })
     .then(user => done(null, { ...user, auth: AuthType.Session }))
     .catch(err => done(err));
 });
@@ -108,14 +108,14 @@ passport.use(
     jwtOpts,
     async (req: express.Request, jwtPayload: { userId: string }, done) => {
       try {
-        const user = await prisma.user.findOne({
+        const user = await prisma.user.findUnique({
           where: { id: jwtPayload.userId }
         });
         if (user) {
           const token = jwtOpts.jwtFromRequest(req);
           // verify that the token has not been
           // converted to OAuth and revoked
-          const accessToken = await prisma.accessToken.findOne({
+          const accessToken = await prisma.accessToken.findUnique({
             where: { token }
           });
           if (accessToken && accessToken.isRevoked) {
@@ -157,7 +157,7 @@ export function updateAccessTokenLastUsed(accessToken: AccessToken) {
 passport.use(
   new BearerStrategy(async (token, done) => {
     try {
-      const accessToken = await prisma.accessToken.findOne({
+      const accessToken = await prisma.accessToken.findUnique({
         where: { token },
         include: { user: true }
       });
@@ -187,7 +187,7 @@ passport.use(
  */
 
 const verifyClient: VerifyFunction = async (clientId, clientSecret, done) => {
-  const application = await prisma.application.findOne({
+  const application = await prisma.application.findUnique({
     where: { id: clientId }
   });
   if (!application) {

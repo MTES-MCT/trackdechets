@@ -7,7 +7,7 @@ import { associateUserToCompany } from "../../users/database";
 export default async function acceptPendingInvitations() {
   const invitations = await prisma.userAccountHash.findMany();
   for (const invitation of invitations) {
-    const user = await prisma.user.findOne({
+    const user = await prisma.user.findUnique({
       where: { email: invitation.email }
     });
     if (user) {

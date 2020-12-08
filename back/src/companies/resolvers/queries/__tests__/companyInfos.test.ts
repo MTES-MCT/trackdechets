@@ -9,7 +9,7 @@ jest.mock("../../../sirene", () => ({
 
 const companyMock = jest.fn();
 jest.mock("src/prisma", () => ({
-  company: { findOne: jest.fn((...args) => companyMock(...args)) }
+  company: { findUnique: jest.fn((...args) => companyMock(...args)) }
 }));
 
 const installationMock = jest.fn();

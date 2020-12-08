@@ -21,7 +21,7 @@ import deleteUser from "../prisma/deleteUser";
     return;
   }
 
-  const user = await prisma.user.findOne({ where: { id: userID } });
+  const user = await prisma.user.findUnique({ where: { id: userID } });
 
   if (!user) {
     console.log(
