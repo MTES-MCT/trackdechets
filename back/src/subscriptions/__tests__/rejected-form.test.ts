@@ -114,7 +114,8 @@ const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
     updatedAt: "2019-10-16T07:45:13.959Z",
     wasteAcceptationStatus,
     wasteRefusalReason: "Non conforme",
-    quantityReceived: 21.3
+    quantityReceived: 21.3,
+    wasteDetailsPop: false
   },
   updatedFields: [
     "wasteAcceptationStatus",
@@ -128,7 +129,8 @@ const formPayload = (wasteAcceptationStatus): FormSubscriptionPayload => ({
     isImportedFromPaper: false,
     status: "SENT",
     createdAt: "2019-10-16T07:45:13.959Z",
-    updatedAt: "2019-10-16T07:45:13.959Z"
+    updatedAt: "2019-10-16T07:45:13.959Z",
+    wasteDetailsPop: false
   }
 });
 
