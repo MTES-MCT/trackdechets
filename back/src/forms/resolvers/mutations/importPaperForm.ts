@@ -100,7 +100,8 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     owner: { connect: { id: user.id } },
     status: "PROCESSED",
     isImportedFromPaper: true,
-    signedByTransporter: true
+    signedByTransporter: true,
+    wasteDetailsPop: false
   };
 
   const form = await prisma.createForm(formCreateInput);
