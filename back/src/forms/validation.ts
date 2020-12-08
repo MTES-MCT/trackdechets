@@ -376,7 +376,9 @@ export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
     wasteDetailsConsistence: yup
       .mixed<Consistence>()
       .required("La consistance du déchet doit être précisée"),
-    wasteDetailsPop: yup.boolean()
+    wasteDetailsPop: yup
+      .boolean()
+      .required("La présence (ou non) de POP doit être précisée")
   });
 
 // 8 - Collecteur-transporteur
