@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Unreleased
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Amélioration de la collecte des erreurs par Sentry, [PR 605](https://github.com/MTES-MCT/trackdechets/pull/605)
+
 # [2020.11.2] 30/11/2020
 
 #### :rocket: Nouvelles fonctionnalités

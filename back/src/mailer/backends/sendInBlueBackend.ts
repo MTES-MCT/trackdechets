@@ -12,13 +12,6 @@ const {
   NODE_ENV
 } = process.env;
 
-if (!!SENTRY_DSN) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    environment: NODE_ENV
-  });
-}
-
 const baseUrl =
   NODE_ENV === "production " ? SIB_BASE_URL : "http://mailservice"; // use a fake url for tests
 const SIB_SMTP_URL = `${baseUrl}/smtp/email`;
