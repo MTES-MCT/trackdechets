@@ -100,8 +100,7 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     owner: { connect: { id: user.id } },
     status: "PROCESSED",
     isImportedFromPaper: true,
-    signedByTransporter: true,
-    wasteDetailsPop: false
+    signedByTransporter: true
   };
 
   const form = await prisma.createForm(formCreateInput);
@@ -110,21 +109,26 @@ async function createForm(user: User, input: ImportPaperFormInput) {
 
 const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
   parent,
-  { input },
+  { input: { id, ...rest } },
   context
 ) => {
   const user = checkIsAuthenticated(context);
 
-  if (input.id) {
-    // update existing form
-    const { id, ...formInput } = input;
+  // add defaults values where needed/possible
+  const formInput: ImportPaperFormInput = {
+    ...rest,
+    wasteDetails: rest.wasteDetails
+      ? { pop: false, ...rest.wasteDetails }
+      : rest.wasteDetails
+  };
+
+  if (id) {
     const form = await getFormOrFormNotFound({ id });
     await checkCanImportForm(user, form);
     return updateForm(user, form, formInput);
-  } else {
-    // create new form
-    return createForm(user, input);
   }
+
+  return createForm(user, formInput);
 };
 
 export default importPaperFormResolver;
