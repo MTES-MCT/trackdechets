@@ -6,7 +6,12 @@ import Duplicate from "dashboard/slips/slips-actions/Duplicate";
 import Delete from "dashboard/slips/slips-actions/Delete";
 import Edit from "dashboard/slips/slips-actions/Edit";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import { TransportSegment, Form, FormCompany } from "generated/graphql/types";
+import {
+  TransportSegment,
+  Form,
+  FormCompany,
+  FormStatus,
+} from "generated/graphql/types";
 import { statusesWithDynamicActions, statusLabels } from "../constants";
 import {
   WarehouseDeliveryIcon,
@@ -466,9 +471,9 @@ export default function SlipDetailContent({
       </Tabs>
       <div className={styles.detailActions}>
         <Duplicate formId={form.id} small={false} redirectToDashboard={true} />
-        {form.status === "DRAFT" ? (
+        {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) ? (
           <>
-            <Delete formId={form.id} small={false} redirectToDashboard={true} />
+            <Delete formId={form.id} small={false} />
             <Edit formId={form.id} small={false} />
           </>
         ) : (

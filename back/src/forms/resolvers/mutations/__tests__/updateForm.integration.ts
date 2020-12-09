@@ -100,8 +100,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas.",
+        message: "Vous n'êtes pas autorisé à modifier ce bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -109,7 +108,7 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
-  it("should not be possible to update a non draft form", async () => {
+  it("should not be possible to update a signed form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await formFactory({
       ownerId: user.id,
@@ -132,9 +131,10 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Seuls les bordereaux en brouillon peuvent être modifiés",
+        message:
+          "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés",
         extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+          code: ErrorCode.FORBIDDEN
         })
       })
     ]);
@@ -162,12 +162,104 @@ describe("Mutation.updateForm", () => {
       const { data } = await mutate(UPDATE_FORM, {
         variables: { updateFormInput }
       });
+      expect(data.updateForm.wasteDetails).toMatchObject(
+        updateFormInput.wasteDetails
+      );
+    }
+  );
+
+  it.each(["emitter", "trader", "recipient", "transporter"])(
+    "should allow %p to update a sealed form",
+    async role => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          [`${role}CompanySiret`]: company.siret,
+          status: "SEALED"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const updateFormInput = {
+        id: form.id,
+        wasteDetails: {
+          code: "08 01 11*"
+        }
+      };
+      const { data } = await mutate(UPDATE_FORM, {
+        variables: { updateFormInput }
+      });
 
       expect(data.updateForm.wasteDetails).toMatchObject(
         updateFormInput.wasteDetails
       );
     }
   );
+
+  it("should not be possible to invalidate a sealed form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SEALED"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      // try to set an empty siret
+      recipient: {
+        company: {
+          siret: ""
+        }
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toMatchObject([
+      expect.objectContaining({
+        extensions: { code: ErrorCode.BAD_USER_INPUT },
+        message: "Destinataire: Le siret de l'entreprise est obligatoire"
+      })
+    ]);
+  });
+
+  it("should not be possible to remove its own company from a sealed form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SEALED"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      // try to remove user's company from the form
+      emitter: {
+        company: {
+          siret: "11111111111111"
+        }
+      }
+    };
+    const { errors } = await mutate(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toMatchObject([
+      expect.objectContaining({
+        extensions: { code: ErrorCode.FORBIDDEN },
+        message: "Vous ne pouvez pas enlever votre établissement du bordereau"
+      })
+    ]);
+  });
 
   it("should allow an eco-organisme to update a form", async () => {
     const { user, company: eo } = await userWithCompanyFactory("MEMBER", {

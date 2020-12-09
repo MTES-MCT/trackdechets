@@ -283,8 +283,8 @@ type Mutation {
   duplicateForm("ID d'un BSD" id: ID!): Form
 
   """
-  Scelle un BSD
-  Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+  Finalise un BSD
+  Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
   doivent avoir été renseignés au préalable
 
   ```

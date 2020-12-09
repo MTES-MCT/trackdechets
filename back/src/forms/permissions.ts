@@ -1,23 +1,11 @@
-import {
-  Form,
-  Company,
-  User,
-  TemporaryStorageDetail,
-  TransportSegment,
-  prisma
-} from "../generated/prisma-client";
-import { FullForm } from "./types";
+import { Form, Company, User, prisma } from "../generated/prisma-client";
+import { FormSirets } from "./types";
 import { NotFormContributor, InvaliSecurityCode } from "./errors";
 import { getFullUser } from "../users/database";
-import { FullUser } from "../users/types";
 import { getFullForm } from "./database";
 import { ForbiddenError } from "apollo-server-express";
 
-function isFormOwner(user: User, form: { owner: User }) {
-  return form.owner?.id === user.id;
-}
-
-function isFormEmitter(user: { companies: Company[] }, form: Form) {
+function isFormEmitter(user: { companies: Company[] }, form: FormSirets) {
   if (!form.emitterCompanySiret) {
     return false;
   }
@@ -25,7 +13,7 @@ function isFormEmitter(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.emitterCompanySiret);
 }
 
-function isFormRecipient(user: { companies: Company[] }, form: Form) {
+function isFormRecipient(user: { companies: Company[] }, form: FormSirets) {
   if (!form.recipientCompanySiret) {
     return false;
   }
@@ -33,7 +21,7 @@ function isFormRecipient(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.recipientCompanySiret);
 }
 
-function isFormTransporter(user: { companies: Company[] }, form: Form) {
+function isFormTransporter(user: { companies: Company[] }, form: FormSirets) {
   if (!form.transporterCompanySiret) {
     return false;
   }
@@ -41,7 +29,7 @@ function isFormTransporter(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.transporterCompanySiret);
 }
 
-function isFormTrader(user: { companies: Company[] }, form: Form) {
+function isFormTrader(user: { companies: Company[] }, form: FormSirets) {
   if (!form.traderCompanySiret) {
     return false;
   }
@@ -49,10 +37,7 @@ function isFormTrader(user: { companies: Company[] }, form: Form) {
   return sirets.includes(form.traderCompanySiret);
 }
 
-function isFormEcoOrganisme(
-  user: { companies: Company[] },
-  form: Pick<Form, "ecoOrganismeSiret">
-) {
+function isFormEcoOrganisme(user: { companies: Company[] }, form: FormSirets) {
   if (!form.ecoOrganismeSiret) {
     return false;
   }
@@ -62,34 +47,33 @@ function isFormEcoOrganisme(
 
 function isFormDestinationAfterTempStorage(
   user: { companies: Company[] },
-  form: {
-    temporaryStorage: TemporaryStorageDetail;
-  }
+  form: FormSirets
 ) {
-  if (!form.temporaryStorage) {
+  if (!form.temporaryStorageDetail) {
     return false;
   }
   const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.temporaryStorage.destinationCompanySiret);
+  return sirets.includes(form.temporaryStorageDetail.destinationCompanySiret);
 }
 
 function isFormTransporterAfterTempStorage(
   user: { companies: Company[] },
-  form: {
-    temporaryStorage: TemporaryStorageDetail;
-  }
+  form: FormSirets
 ) {
-  if (!form.temporaryStorage) {
+  if (!form.temporaryStorageDetail) {
     return false;
   }
   const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.temporaryStorage.transporterCompanySiret);
+  return sirets.includes(form.temporaryStorageDetail.transporterCompanySiret);
 }
 
 function isFormMultiModalTransporter(
   user: { companies: Company[] },
-  form: { transportSegments: TransportSegment[] }
+  form: FormSirets
 ) {
+  if (!form.transportSegments) {
+    return false;
+  }
   const sirets = user.companies.map(c => c.siret);
   const transportSegmentSirets = form.transportSegments.map(
     segment => segment.transporterCompanySiret
@@ -97,9 +81,9 @@ function isFormMultiModalTransporter(
   return transportSegmentSirets.some(s => sirets.includes(s));
 }
 
-export function isFormContributor(user: FullUser, form: FullForm) {
+export async function isFormContributor(user: User, form: FormSirets) {
+  const fullUser = await getFullUser(user);
   return [
-    isFormOwner,
     isFormEmitter,
     isFormRecipient,
     isFormTrader,
@@ -108,22 +92,69 @@ export function isFormContributor(user: FullUser, form: FullForm) {
     isFormTransporterAfterTempStorage,
     isFormDestinationAfterTempStorage,
     isFormMultiModalTransporter
-  ].some(isFormRole => isFormRole(user, form));
+  ].some(isFormRole => isFormRole(fullUser, form));
 }
 
 /**
- * Only users who belongs to a company that appears on the BSD
- * can read, update or delete it
- */
-export async function checkCanReadUpdateDeleteForm(user: User, form: Form) {
-  // user with companies
-  const fullUser = await getFullUser(user);
+ * Check that at least one of user's company is present somewhere in the form
+ * or throw a ForbiddenError
+ * */
+export async function checkIsFormContributor(
+  user: User,
+  form: FormSirets,
+  errorMsg: string
+) {
+  const isContributor = await isFormContributor(user, form);
 
-  // form with linked objects (tempStorageDetail, transportSegment, owner, etc)
-  const fullForm = await getFullForm(form);
+  if (!isContributor) {
+    throw new NotFormContributor(errorMsg);
+  }
 
-  if (!isFormContributor(fullUser, fullForm)) {
-    throw new NotFormContributor();
+  return true;
+}
+
+export async function checkCanRead(user: User, form: Form) {
+  return checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à accéder à ce bordereau"
+  );
+}
+
+export async function checkCanDuplicate(user: User, form: Form) {
+  return checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à dupliquer ce bordereau"
+  );
+}
+
+export async function checkCanUpdate(user: User, form: Form) {
+  await checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à modifier ce bordereau"
+  );
+  if (!["DRAFT", "SEALED"].includes(form.status)) {
+    throw new ForbiddenError(
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés"
+    );
+  }
+
+  return true;
+}
+
+export async function checkCanDelete(user: User, form: Form) {
+  await checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à supprimer ce bordereau"
+  );
+
+  if (!["DRAFT", "SEALED"].includes(form.status)) {
+    throw new ForbiddenError(
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
+    );
   }
 
   return true;
@@ -138,21 +169,11 @@ export async function checkCanUpdateTransporterFields(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsSealed(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
-  const fullForm = await getFullForm(form);
-  const isAuthorized = [
-    isFormOwner,
-    isFormEcoOrganisme,
-    isFormRecipient,
-    isFormTransporter,
-    isFormEmitter,
-    isFormTrader,
-    isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(fullUser, fullForm));
-  if (!isAuthorized) {
-    throw new ForbiddenError("Vous n'êtes pas autorisé à sceller ce bordereau");
-  }
-  return true;
+  return checkIsFormContributor(
+    user,
+    await getFullForm(form),
+    "Vous n'êtes pas autorisé à sceller ce bordereau"
+  );
 }
 
 export async function checkCanMarkAsSent(user: User, form: Form) {

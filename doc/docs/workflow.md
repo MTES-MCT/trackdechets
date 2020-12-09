@@ -39,7 +39,7 @@ Un QRCode généré dans l'interface utilisateur encode le champ `readableId`.
 L'ensemble des champs du BSD numérique est décrit dans la [référence de l'API](api-reference.md#form). Au cours de son cycle de vie, un BSD numérique peut passer par différents états décrits [ici](api-reference.md#formstatus).
 
 - `DRAFT` (brouillon): État initial à la création d'un BSD. Des champs obligatoires peuvent manquer.
-- `SEALED` (finalisé): BSD finalisé ou "scellé". Les informations ne sont plus modifiables.
+- `SEALED` (finalisé): BSD finalisé. Les données sont validées et un numéro de BSD `readableId` est affecté.
 - `SENT` (envoyé): BSD en transit vers l'installation de destination, d'entreposage ou de reconditionnement
 - `RECEIVED` (reçu): BSD reçu sur l'installation de destination, d'entreposage ou de reconditionnement
 - `REFUSED` (refusé): Déchet refusé
@@ -53,7 +53,7 @@ Chaque changement d'état s'effectue grâce à une mutation.
 | Mutation              | Transition                                                                                                                      | Données                                                                           | Permissions                                                                                                                                                                             |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `createForm`          | `-> DRAFT` <br />                                                                                                               | [FormInput](api-reference.md#forminput)                                           | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
-| `updateForm`          | `DRAFT -> DRAFT` <br />                                                                                                         | [FormInput](api-reference.md#forminput)                                           | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
+| `updateForm`          | `DRAFT -> DRAFT` <br />    `SEALED -> SEALED` <br />                                                                                                       | [FormInput](api-reference.md#forminput)                                           | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
 | `markAsSealed`        | `DRAFT -> SEALED`                                                                                                               |                                                                                   | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
 | `signedByTransporter` | <div><ul><li>`SEALED -> SENT`</li><li>`RESEALED -> RESENT`</li></ul></div>                                                      | [TransporterSignatureFormInput](api-reference.md#s#transportersignatureforminput) | Uniquement le collecteur-transporteur, l'émetteur ou le site d'entreposage provisoire/reconditionnement étant authentifié grâce au code de sécurité présent en paramètre de la mutation |
 | `markAsReceived`      | <div><ul><li>`SENT -> RECEIVED`</li><li>`SENT -> REFUSED`</li></ul></div>                                                       | [ReceivedFormInput](api-reference.md#receivedforminput)                           | Uniquement le destinataire du BSD                                                                                                                                                       |
@@ -71,6 +71,7 @@ Le diagramme ci dessous retrace le cycle de vie d'un BSD dans Trackdéchets:
 graph TD
 AO(NO STATE) -->|createForm| A
 A -->|updateForm| A
+B -->|updateForm| B
 A[DRAFT] -->|markAsSealed| B(SEALED)
 B -->|signedByTransporter| C(SENT)
 B -->|importPaperForm| E(PROCESSED)

@@ -26,6 +26,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un nouveau champ `packagingInfos` qui viendra remplacer `packagings`, `numberOfPackages` et `otherPackaging`. Ces champs sont encore supportés pour quelques temps mais marqué comme dépréciés. Nous vous invitons à migrer aussi vite que possible. [PR 600](https://github.com/MTES-MCT/trackdechets/pull/600)
+- Ajout de la possibilité de supprimer ou modifier un bordereau tant qu'aucune signature (transporteur ou producteur) n'a été apposée (statut `DRAFT` ou `SEALED`). [PR 720](https://github.com/MTES-MCT/trackdechets/pull/720)
 
 #### :boom: Breaking changes
 

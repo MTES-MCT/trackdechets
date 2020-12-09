@@ -812,7 +812,7 @@ export async function checkCanBeSealed(form: Form) {
     if (err.name === "ValidationError") {
       const stringifiedErrors = err.errors?.join("\n");
       throw new UserInputError(
-        `Erreur, impossible de sceller le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${stringifiedErrors}`
+        `Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\nErreur(s): ${stringifiedErrors}`
       );
     } else {
       throw err;

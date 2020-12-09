@@ -932,8 +932,8 @@ export type Mutation = {
    */
   markAsResent?: Maybe<Form>;
   /**
-   * Scelle un BSD
-   * Les champs suivants sont obligatoires pour pouvoir sceller un bordereau et
+   * Finalise un BSD
+   * Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
    * doivent avoir été renseignés au préalable
    * 
    * ```

@@ -1,6 +1,5 @@
 import {
   Form,
-  User,
   TemporaryStorageDetail,
   TransportSegment
 } from "../generated/prisma-client";
@@ -9,7 +8,22 @@ import {
  * A Prisma Form with linked objects
  */
 export interface FullForm extends Form {
-  owner: User;
-  temporaryStorage: TemporaryStorageDetail;
+  temporaryStorageDetail: TemporaryStorageDetail;
   transportSegments: TransportSegment[];
 }
+
+export type FormSirets = Pick<
+  Form,
+  | "emitterCompanySiret"
+  | "recipientCompanySiret"
+  | "transporterCompanySiret"
+  | "traderCompanySiret"
+  | "ecoOrganismeSiret"
+> & {
+  temporaryStorageDetail?: Pick<
+    TemporaryStorageDetail,
+    "transporterCompanySiret" | "destinationCompanySiret"
+  >;
+} & {
+  transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
+};
