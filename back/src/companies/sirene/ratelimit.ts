@@ -36,3 +36,10 @@ export function throttle<T>(
   };
   return rateLimited;
 }
+
+export function throttleErrorMessage(apiType: string) {
+  return `Trop de requêtes sur l'API Sirene ${apiType}`;
+}
+
+export const INSEE_THROTTLE_KEY = "insee_throttle";
+export const DATA_GOUV_THROTTLE_KEY = "data_gouv_throttle";

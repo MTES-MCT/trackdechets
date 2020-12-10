@@ -135,3 +135,22 @@ type Declaration {
   libDechet: String
   gerepType: GerepType
 }
+
+"""
+Companies with restricted diffusion of SIRENE information (police, army, etc)
+
+"Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique
+en vertu de l'article A123-96 du code du commerce. On parle d‘entreprise non diffusable.
+Dans ce cas les API SIRENE ne diffusent pas les informations de cette entreprise dans
+les résultats de recherche. Pour des raisons de sécurité, certaines associations et les
+organismes relevant du Ministère de la Défense ne sont pas diffusibles non plus."
+"""
+type AnonymousCompany {
+  id: ID! @id
+  siret: String! @unique
+  name: String!
+  address: String!
+  codeNaf: String!
+  libelleNaf: String!
+  codeCommune: String!
+}
