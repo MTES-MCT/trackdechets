@@ -1,5 +1,5 @@
 import { DialogOverlay, DialogContent } from "@reach/dialog";
-import { Close } from "./Icons";
+import { IconDelete1 } from "./Icons";
 import "@reach/dialog/styles.css";
 import styles from "./Modal.module.scss";
 import React, { useState } from "react";
@@ -35,13 +35,14 @@ export default function TdModal({
           [styles.tdModalPadding]: padding,
         })}
       >
-        <div className={styles.tdModalCloseMenu}>
-          <button onClick={onClose}>
-            <span aria-hidden>
-              <Close color="#000" />
-            </span>
-          </button>
-        </div>
+        <button
+          type="button"
+          className={styles.ModalCloseButton}
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <IconDelete1 aria-hidden />
+        </button>
         {children}
       </DialogContent>
     </DialogOverlay>

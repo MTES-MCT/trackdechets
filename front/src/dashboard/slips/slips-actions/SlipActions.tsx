@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { ChevronDown, ChevronUp } from "common/components/Icons";
+import { IconChevronDown, IconChevronUp } from "common/components/Icons";
 import { Form, FormStatus } from "generated/graphql/types";
 import "./SlipActions.scss";
 import Delete from "./Delete";
@@ -8,7 +8,6 @@ import Edit from "./Edit";
 import Duplicate from "./Duplicate";
 import Quicklook from "./Quicklook";
 import OutsideClickHandler from "react-outside-click-handler";
-import { COLORS } from "common/config";
 
 interface SlipActionsProps {
   form: Form;
@@ -47,9 +46,9 @@ export const SlipActions = ({ form }: SlipActionsProps) => {
         >
           <span>Actions</span>
           {dropdownOpened ? (
-            <ChevronUp size={18} color={COLORS.blueLight} />
+            <IconChevronUp size="18px" color="blueLight" />
           ) : (
-            <ChevronDown size={18} color={COLORS.blueLight} />
+            <IconChevronDown size="18px" color="blueLight" />
           )}
         </button>
         {dropdownOpened && (

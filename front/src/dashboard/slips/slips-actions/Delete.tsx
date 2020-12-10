@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { COLORS } from "common/config";
-import { TrashIcon } from "common/components/Icons";
+import { IconTrash } from "common/components/Icons";
 import { DRAFT_TAB_FORMS, FOLLOW_TAB_FORMS } from "../tabs/queries";
 import { gql, useMutation } from "@apollo/client";
 import { updateApolloCache } from "common/helper";
@@ -94,7 +93,7 @@ export default function Delete({
           onOpen && onOpen();
         }}
       >
-        <TrashIcon color={COLORS.blueLight} />
+        <IconTrash color="blueLight" size="24px" />
         <span>Supprimer</span>
       </button>
       <TdModal
@@ -115,7 +114,7 @@ export default function Delete({
             Annuler
           </button>
           <button className="btn btn--primary" onClick={() => deleteForm()}>
-            <TrashIcon />
+            <IconTrash />
             <span> Supprimer</span>
           </button>
         </div>

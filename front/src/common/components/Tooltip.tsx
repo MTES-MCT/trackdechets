@@ -1,6 +1,5 @@
 import React from "react";
-import { Question } from "common/components/Icons";
-import { COLORS } from "common/config";
+import { IconQuestionCircle } from "common/components/Icons";
 import { Tooltip } from "@reach/tooltip";
 import "@reach/tooltip/styles.css";
 import style from "./Tooltip.module.scss";
@@ -29,7 +28,7 @@ const TdTooltip = ({ msg }: Props) => {
       }}
     >
       <button className={style.tdTooltip} type="button">
-        <Question color={COLORS.blue} size={20} />
+        <IconQuestionCircle color="blue" size="20px" />
       </button>
     </Tooltip>
   ) : null;

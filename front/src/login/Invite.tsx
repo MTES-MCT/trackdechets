@@ -10,10 +10,15 @@ import {
   Query,
   User,
 } from "../generated/graphql/types";
+import {
+  IconEmailActionUnread,
+  IconLock1,
+  IconView,
+  IconSingleNeutralIdCard4,
+} from "common/components/Icons";
 import Loader from "common/components/Loaders";
 import { NotificationError } from "common/components/Error";
 import routes from "common/routes";
-import { FaEnvelope, FaEye, FaIdCard, FaLock } from "react-icons/fa";
 import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./Invite.module.scss";
@@ -201,7 +206,7 @@ export default function Invite() {
                       readOnly
                     />
                     <i>
-                      <FaEnvelope />
+                      <IconEmailActionUnread />
                     </i>
                   </div>
                   <RedErrorMessage name="email" />
@@ -212,7 +217,7 @@ export default function Invite() {
                   <div className="field-with-icon-wrapper">
                     <Field type="text" name="name" className="td-input" />
                     <i>
-                      <FaIdCard />
+                      <IconSingleNeutralIdCard4 />
                     </i>
                   </div>
 
@@ -233,7 +238,7 @@ export default function Invite() {
                               className="td-input"
                             />
                             <i>
-                              <FaLock />
+                              <IconLock1 />
                             </i>
                           </div>
                           <span
@@ -246,7 +251,7 @@ export default function Invite() {
                               )
                             }
                           >
-                            <FaEye /> <span>Afficher le mot de passe</span>
+                            <IconView /> <span>Afficher le mot de passe</span>
                           </span>
                           <PasswordMeter password={field.value} />
                         </>

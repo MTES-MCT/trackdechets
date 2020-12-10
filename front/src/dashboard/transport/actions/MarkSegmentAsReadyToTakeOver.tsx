@@ -18,7 +18,7 @@ import { NotificationError } from "common/components/Error";
 
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
-import { PaperWriteIcon } from "common/components/Icons";
+import { IconPaperWrite } from "common/components/Icons";
 
 export const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
@@ -115,9 +115,9 @@ export default function MarkSegmentAsReadyToTakeOver({
       ) : (
         <ActionButton
           title="Finaliser pour transférer"
-          icon={PaperWriteIcon}
+          icon={IconPaperWrite}
           onClick={() => setIsOpen(true)}
-          iconSize={32}
+          iconSize="32px"
         />
       )}
 

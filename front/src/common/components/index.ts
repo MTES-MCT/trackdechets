@@ -14,3 +14,5 @@ export {
 };
 export * from "./Breadcrumb";
 export * from "./Label";
+export * from "./Slideshow";
+export * from "./List";

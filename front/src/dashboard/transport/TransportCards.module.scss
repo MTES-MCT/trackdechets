@@ -47,9 +47,9 @@
 }
 
 .cardActionsButton {
-  border: 1px solid var(--dark-blue);
+  border: 1px solid $blue-dark;
   border-radius: $common-radius;
-  color: var(--dark-blue);
+  color: $blue-dark;
 
   display: inline-flex;
   flex-direction: row;

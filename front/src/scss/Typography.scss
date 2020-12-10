@@ -1,3 +1,5 @@
+@import "src/scss/Constants.scss";
+
 .h1 {
   font-size: $h1Size;
   line-height: 1.75rem;
@@ -31,14 +33,14 @@ a.link:visited,
 a.link:active {
   text-decoration: underline;
   color: #0053b3;
-  color: var(--theme-primary);
+  color: $blue;
 }
 
 a.link:hover {
   color: #003b80;
-  color: var(--dark-blue);
+  color: $blue-dark;
   background-color: #ebeff3;
-  background-color: var(--lighter-grey);
+  background-color: $grey-lighter;
   text-decoration: none;
 }
 .lead-text {

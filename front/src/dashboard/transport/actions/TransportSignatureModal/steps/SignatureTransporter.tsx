@@ -6,7 +6,7 @@ import Packagings from "form/packagings/Packagings";
 import NumberInput from "form/custom-inputs/NumberInput";
 import { RedErrorMessage, DownloadFileLink, Label } from "common/components";
 import { NextButton } from "common/components/Buttons";
-import { PdfIcon } from "common/components/Icons";
+import { IconPdf } from "common/components/Icons";
 import { CollectAddress } from "./CollectAddress";
 
 interface SignatureTransporterProps {
@@ -114,7 +114,7 @@ export function SignatureTransporter({
           className="tw-mt-4 link"
         >
           <span style={{ display: "inline-block", verticalAlign: "middle" }}>
-            <PdfIcon color="currentColor" />
+            <IconPdf color="currentColor" />
           </span>
           <span className="tw-ml-2">Version CERFA du bordereau</span>
         </DownloadFileLink>

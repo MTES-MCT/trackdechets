@@ -1,10 +1,12 @@
+@import "src/scss/Constants.scss";
+
 .field {
   width: 100%;
   display: flex;
   margin: auto;
   padding: 1em;
   justify-content: flex-start;
-  border-top: 1px solid var(--lighter-grey);
+  border-top: 1px solid $grey-lighter;
 
   table {
     border-collapse: collapse;
@@ -46,11 +48,11 @@
 }
 
 .field:last-of-type {
-  border-bottom: 1px solid var(--lighter-grey);
+  border-bottom: 1px solid $grey-lighter;
 }
 
 .editing {
-  border-left: 5px solid var(--theme-primary);
+  border-left: 5px solid $blue;
 }
 
 .field > label {
@@ -60,7 +62,7 @@
 }
 
 .modifier {
-  color: var(--blue);
+  color: $blue;
   margin-left: auto;
 }
 

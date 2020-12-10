@@ -13,7 +13,6 @@ import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import AccountCompanyAddEcoOrganisme from "./accountCompanyAdd/AccountCompanyAddEcoOrganisme";
 import AccountCompanyAddMembershipRequest from "./accountCompanyAdd/AccountCompanyAddMembershipRequest";
 import styles from "./AccountCompanyAdd.module.scss";
-import { FaHourglassHalf } from "react-icons/fa";
 import {
   Mutation,
   MutationCreateCompanyArgs,
@@ -509,7 +508,7 @@ export default function AccountCompanyAdd() {
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? <FaHourglassHalf /> : "Créer"}
+                  {isSubmitting ? "Création..." : "Créer"}
                 </button>
               </div>
               {/* // ERRORS */}

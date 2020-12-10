@@ -1,7 +1,6 @@
 import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import React from "react";
-import { FaHourglassHalf } from "react-icons/fa";
 
 const SEND_MEMBERSHIP_REQUEST = gql`
   mutation SendMembershipRequest($siret: String!) {
@@ -45,7 +44,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
           })
         }
       >
-        {loading ? <FaHourglassHalf /> : "Envoyer une demande de rattachement"}
+        {loading ? "Envoi..." : "Envoyer une demande de rattachement"}
       </button>
       {error && <NotificationError apolloError={error} />}
     </div>

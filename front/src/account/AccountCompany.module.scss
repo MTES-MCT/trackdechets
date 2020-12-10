@@ -1,3 +1,5 @@
+@import "src/scss/Constants.scss";
+
 .company {
   .title {
     display: flex;
@@ -11,7 +13,7 @@
     .admin {
       font-style: italic;
       font-weight: normal;
-      color: var(--darker-grey);
+      color: $grey-darker;
       svg {
         margin-left: 1em;
         vertical-align: sub;
@@ -29,18 +31,18 @@
     button {
       cursor: pointer;
       text-decoration: none;
-      color: var(--theme-dark-text);
+      color: $grey-darkest;
       margin-right: 1.5em;
     }
 
     button:hover {
       background: none;
-      color: var(--blue);
+      color: $blue;
     }
 
     button.active {
-      color: var(--blue);
-      border-bottom: var(--blue) solid 2px;
+      color: $blue;
+      border-bottom: $blue solid 2px;
     }
   }
 }
