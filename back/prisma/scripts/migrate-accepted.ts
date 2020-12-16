@@ -1,5 +1,5 @@
 import { Updater, registerUpdater } from "./helper/helper";
-import { prisma } from "../../src/generated/prisma-client";
+import prisma from "src/prisma";
 
 @registerUpdater(
   "Migrate the forms to received forms to the new accepted status",
@@ -8,14 +8,14 @@ import { prisma } from "../../src/generated/prisma-client";
 )
 export class MigrateAcceptedForms implements Updater {
   async run() {
-    await prisma.updateManyForms({
+    await prisma.form.updateMany({
       where: {
         status: "RECEIVED"
       },
       data: { status: "ACCEPTED" }
     });
 
-    await prisma.updateManyForms({
+    await prisma.form.updateMany({
       where: {
         status: "TEMP_STORED"
       },

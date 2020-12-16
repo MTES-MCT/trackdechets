@@ -1,8 +1,4 @@
-import {
-  Company,
-  Form,
-  User
-} from "@prisma/client";
+import { Company, Form, User } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 import prisma from "src/prisma";
 import { FormSirets } from "./types";

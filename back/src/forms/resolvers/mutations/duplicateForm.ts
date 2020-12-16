@@ -121,8 +121,8 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const newForm = await duplicateForm(user, existingForm);
 
-  const temporaryStorageDetail = await prisma
-    .form({ id: existingForm.id })
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: existingForm.id } })
     .temporaryStorageDetail();
 
   if (temporaryStorageDetail) {

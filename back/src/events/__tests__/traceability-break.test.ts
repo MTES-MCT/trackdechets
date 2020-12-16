@@ -1,5 +1,5 @@
 import { Form } from "@prisma/client";
-import axios from "axios";
+import * as mailing from "../../mailer/mailing";
 import { TDEventPayload } from "../emitter";
 
 import { formsEventCallback } from "../forms";
@@ -45,18 +45,15 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
       } as Form
     };
 
-    const mockedAxiosPost = jest.spyOn(axios, "post");
-    mockedAxiosPost.mockResolvedValue({} as any);
+    const mockedSendMail = jest.spyOn(mailing, "sendMail");
 
     await formsEventCallback(formPayload);
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedSendMail as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
-    const postArgs = mockedAxiosPost.mock.calls[0];
+    const postArgs = mockedSendMail.mock.calls[0];
 
-    expect(postArgs[0]).toEqual("http://mailservice/smtp/email"); // fake url for tests
-
-    const payload = postArgs[1];
+    const payload = postArgs[0];
 
     // Check To & Cc
     expect(payload.to[0].email).toEqual(mockedForm.emitterCompanyMail);
@@ -66,9 +63,9 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
     expect(payload.cc[0].name).toEqual(mockedForm.recipientCompanyContact);
 
     // check mail body infos
-    expect(payload.params.body).toContain(mockedForm.readableId);
-    expect(payload.params.body).toContain(mockedForm.recipientCompanyName);
-    expect(payload.params.body).toContain(mockedForm.wasteDetailsName);
-    expect(payload.params.body).toContain(mockedForm.wasteDetailsCode);
+    expect(payload.body).toContain(mockedForm.readableId);
+    expect(payload.body).toContain(mockedForm.recipientCompanyName);
+    expect(payload.body).toContain(mockedForm.wasteDetailsName);
+    expect(payload.body).toContain(mockedForm.wasteDetailsCode);
   });
 });

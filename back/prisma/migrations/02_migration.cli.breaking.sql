@@ -17,7 +17,7 @@ ALTER TABLE "default$default"."Form" ALTER COLUMN "wasteDetailsConsistence" SET 
 ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER COLUMN "tempStorerQuantityType" SET DATA TYPE "default$default"."QuantityType" using "tempStorerQuantityType"::"default$default"."QuantityType";
 ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER COLUMN "tempStorerWasteAcceptationStatus" SET DATA TYPE "default$default"."WasteAcceptationStatus" using "tempStorerWasteAcceptationStatus"::"default$default"."WasteAcceptationStatus";
 ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER COLUMN "wasteDetailsQuantityType" SET DATA TYPE "default$default"."QuantityType" using "wasteDetailsQuantityType"::"default$default"."QuantityType";
-CREATE TYPE "default$default"."Status" AS ENUM ('DRAFT', 'SEALED', 'SENT', 'RECEIVED', 'PROCESSED', 'AWAITING_GROUP', 'GROUPED', 'NO_TRACEABILITY', 'REFUSED', 'TEMP_STORED', 'RESEALED', 'RESENT');
+CREATE TYPE "default$default"."Status" AS ENUM ('DRAFT', 'SEALED', 'SENT', 'RECEIVED', 'ACCEPTED', 'PROCESSED', 'AWAITING_GROUP', 'GROUPED', 'NO_TRACEABILITY', 'REFUSED', 'TEMP_STORED', 'TEMP_STORER_ACCEPTED', 'RESEALED', 'RESENT');
 ALTER TABLE "default$default"."StatusLog" ALTER COLUMN "status" SET DATA TYPE "default$default"."Status" using "status"::"default$default"."Status";
 CREATE TYPE "default$default"."TransportMode" AS ENUM ('ROAD', 'RAIL', 'AIR', 'RIVER', 'SEA');
 ALTER TABLE "default$default"."TransportSegment" ALTER COLUMN "mode" SET DATA TYPE "default$default"."TransportMode" using "mode"::"default$default"."TransportMode";

@@ -65,6 +65,7 @@ enum Status {
   SEALED
   SENT
   RECEIVED
+  ACCEPTED
   PROCESSED
   AWAITING_GROUP
   GROUPED
@@ -73,6 +74,7 @@ enum Status {
 
   // Temporary storage status
   TEMP_STORED
+  TEMP_STORER_ACCEPTED
   RESEALED
   RESENT
 }
@@ -128,6 +130,8 @@ model Application {
   logoUrl      String?
   redirectUris String[]
   admins       User[]
+  AccessToken  AccessToken[]
+  Grant        Grant[]
 }
 
 model Company {
@@ -150,6 +154,25 @@ model Company {
   traderReceipt          TraderReceipt?       @relation(fields: [traderReceiptId], references: [id])
   transporterReceiptId   String?
   transporterReceipt     TransporterReceipt?  @relation(fields: [transporterReceiptId], references: [id])
+  CompanyAssociation     CompanyAssociation[]
+  MembershipRequest      MembershipRequest[]
+}
+
+// Companies with restricted diffusion of SIRENE information (police, army, etc)
+
+// "Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique
+// en vertu de l'article A123-96 du code du commerce. On parle d‘entreprise non diffusable.
+// Dans ce cas les API SIRENE ne diffusent pas les informations de cette entreprise dans
+// les résultats de recherche. Pour des raisons de sécurité, certaines associations et les
+// organismes relevant du Ministère de la Défense ne sont pas diffusibles non plus."
+model AnonymousCompany {
+  id          String @id @default(cuid())
+  siret       String @unique
+  name        String
+  address     String
+  codeNaf     String
+  libelleNaf  String
+  codeCommune String
 }
 
 model CompanyAssociation {
@@ -218,6 +241,7 @@ model Form {
   wasteDetailsNumberOfPackages       Int?
   wasteDetailsQuantity               Float?
   wasteDetailsQuantityType           QuantityType?
+  wasteDetailsPop                    Boolean                 @default(false)
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
   sentAt                             DateTime?
@@ -278,6 +302,7 @@ model Form {
   appendix2RootForm                  Form?                   @relation("FormToForm", fields: [appendix2RootFormId], references: [id])
   ownerId                            String
   owner                              User                    @relation(fields: [ownerId], references: [id])
+  StatusLog                          StatusLog[]
 }
 
 model Grant {
@@ -396,6 +421,7 @@ model TemporaryStorageDetail {
   signedByTransporter              Boolean?
   signedBy                         String?
   signedAt                         DateTime?
+  Form                             Form[]
 }
 
 model TraderReceipt {
@@ -403,6 +429,7 @@ model TraderReceipt {
   receiptNumber String
   validityLimit DateTime
   department    String
+  Company       Company[]
 }
 
 model TransporterReceipt {
@@ -410,6 +437,7 @@ model TransporterReceipt {
   receiptNumber String
   validityLimit DateTime
   department    String
+  Company       Company[]
 }
 
 model TransportSegment {
@@ -449,6 +477,12 @@ model User {
   applicationId       String?
   application         Application?         @relation(fields: [applicationId], references: [id])
   companyAssociations CompanyAssociation[]
+  AccessToken         AccessToken[]
+  Form                Form[]
+  Grant               Grant[]
+  MembershipRequest   MembershipRequest[]
+  StatusLog           StatusLog[]
+  UserActivationHash  UserActivationHash[]
 }
 
 model UserAccountHash {

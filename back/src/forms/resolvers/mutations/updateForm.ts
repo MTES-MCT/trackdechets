@@ -87,7 +87,9 @@ const updateFormResolver = async (
     nextFormSirets.temporaryStorageDetail = {
       destinationCompanySiret:
         temporaryStorageDetail?.destination?.company?.siret ??
-        existingTemporaryStorageDetail?.destinationCompanySiret
+        existingTemporaryStorageDetail?.destinationCompanySiret,
+      transporterCompanySiret:
+        existingTemporaryStorageDetail?.transporterCompanySiret
     };
   }
 

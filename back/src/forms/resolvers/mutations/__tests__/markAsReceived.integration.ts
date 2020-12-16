@@ -57,7 +57,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form({ id: form.id });
+    const frm = await prisma.form.findUnique({ where: { id: form.id } });
 
     expect(frm.status).toBe("RECEIVED");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -68,7 +68,7 @@ describe("Test Form reception", () => {
     expect(frm.currentTransporterSiret).toEqual("");
 
     // A StatusLog object is created
-    const logs = await prisma.statusLogs({
+    const logs = await prisma.statusLog.findMany({
       where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(1);
@@ -82,7 +82,7 @@ describe("Test Form reception", () => {
       recipientCompany,
       form: initialForm
     } = await prepareDB();
-    const form = await prisma.updateForm({
+    const form = await prisma.form.update({
       where: { id: initialForm.id },
       data: { currentTransporterSiret: "5678" }
     });

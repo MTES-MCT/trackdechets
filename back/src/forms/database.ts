@@ -98,6 +98,10 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
 }
 
 export function stringifyDates(obj: Form) {
+  if (!obj) {
+    return null;
+  }
+
   return {
     ...obj,
     ...(obj?.createdAt && { createdAt: obj.createdAt.toISOString() }),

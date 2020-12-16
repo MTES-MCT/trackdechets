@@ -1,22 +1,5 @@
 version: "3.7"
 services:
-  prisma:
-    image: prismagraphql/prisma:1.34.10
-    restart: always
-    ports:
-      - "4466:4466"
-    environment:
-      PRISMA_CONFIG: |
-        port: 4466
-        databases:
-          default:
-            connector: postgres
-            host: $POSTGRES_HOST
-            port: $POSTGRES_PORT
-            user: $POSTGRES_USER
-            password: $POSTGRES_PASSWORD
-            migrations: true
-
   postgres:
     image: postgres:10.5
     restart: always

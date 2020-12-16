@@ -1,5 +1,5 @@
 import axios from "axios";
-import { addContact } from "src/common/mails.helper";
+import { addContact } from "src/mailer/mailing";
 import prisma from "src/prisma";
 import { Updater, registerUpdater } from "./helper/helper";
 

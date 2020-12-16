@@ -203,6 +203,10 @@ export async function getTransporterReceiptOrNotFound({
 }
 
 export function stringifyDates(obj: TraderReceipt | TransporterReceipt) {
+  if (!obj) {
+    return null;
+  }
+
   return {
     ...obj,
     ...(obj?.validityLimit && {
@@ -214,6 +218,10 @@ export function stringifyDates(obj: TraderReceipt | TransporterReceipt) {
 export function convertUrls<T extends Partial<Company>>(
   company: T
 ): T & { ecoOrganismeAgreements: URL[] } {
+  if (!company) {
+    return null;
+  }
+
   return {
     ...company,
     ...(company?.ecoOrganismeAgreements && {

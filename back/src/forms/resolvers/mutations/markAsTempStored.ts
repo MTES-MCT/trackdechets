@@ -34,7 +34,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     tempStorerReceivedBy: tempStoredInfos.receivedBy,
     tempStorerSignedAt: tempStoredInfos.signedAt
       ? new Date(tempStoredInfos.signedAt)
-      : new Date()
+      : null
   };
 
   await tempStoredInfoSchema.validate(tempStorageUpdateInput);

@@ -1,5 +1,5 @@
-import * as Sentry from "@sentry/node";
 import { CaptureConsole } from "@sentry/integrations";
+import * as Sentry from "@sentry/node";
 import {
   ApolloError,
   ApolloServer,
@@ -24,10 +24,9 @@ import errorHandler from "./common/middlewares/errorHandler";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { redisClient } from "./common/redis";
-import {  } from "./routers/auth-router";
+import { authRouter } from "./routers/auth-router";
 import { oauth2Router } from "./routers/oauth2-router";
 import { resolvers, typeDefs } from "./schema";
-import { GraphQLContext } from "./types";
 import { userActivationHandler } from "./users/activation";
 import { getUIBaseURL } from "./utils";
 

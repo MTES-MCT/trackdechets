@@ -103,14 +103,14 @@ export default function AccountCompanyAdd() {
         }
         const { me } = getMeQuery;
 
-        const companies = me.companies || [];
-        companies.push(createCompany);
-
-        me.companies = companies;
-
         cache.writeQuery({
           query: GET_ME,
-          data: { me },
+          data: {
+            me: {
+              ...me,
+              companies: [...me.companies, createCompany],
+            },
+          },
         });
       }
     },

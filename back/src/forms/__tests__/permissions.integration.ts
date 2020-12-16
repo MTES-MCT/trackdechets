@@ -1,4 +1,4 @@
-import { Form, User } from "@prisma/client";
+import { Form, User, Status } from "@prisma/client";
 import prisma from "src/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { ErrorCode } from "../../common/errors";
@@ -25,7 +25,7 @@ import {
 
 async function checkEmitterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -38,7 +38,7 @@ async function checkEmitterPermission(
 
 async function checkRecipientPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -51,7 +51,7 @@ async function checkRecipientPermission(
 
 async function checkTransporterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -64,7 +64,7 @@ async function checkTransporterPermission(
 
 async function checkTraderPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -77,7 +77,7 @@ async function checkTraderPermission(
 
 async function checkEcoOrganismePermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -101,7 +101,7 @@ async function checkEcoOrganismePermission(
 
 async function checkTransporterAfterTempStoragePermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -123,7 +123,7 @@ async function checkTransporterAfterTempStoragePermission(
 
 async function checkDestinationAfterTempStoragePermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -145,7 +145,7 @@ async function checkDestinationAfterTempStoragePermission(
 
 async function checkMultiModalTransporterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -166,7 +166,7 @@ async function checkMultiModalTransporterPermission(
 
 async function checkRandomUserPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
-  formStatus = "DRAFT"
+  formStatus = Status.DRAFT
 ) {
   const owner = await userFactory();
   const user = await userFactory();

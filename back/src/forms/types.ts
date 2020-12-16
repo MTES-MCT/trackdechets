@@ -1,8 +1,4 @@
-import {
-  Form,
-  TemporaryStorageDetail,
-  TransportSegment
-} from "@prisma/client";
+import { Form, TemporaryStorageDetail, TransportSegment } from "@prisma/client";
 
 /**
  * A Prisma Form with linked objects

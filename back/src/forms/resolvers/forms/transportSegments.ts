@@ -7,8 +7,8 @@ const transportSegmentResolver: FormResolvers["transportSegments"] = async form 
     .findUnique({ where: { id: form.id } })
     .transportSegments({ orderBy: { segmentNumber: "asc" } });
   return segments.map(el => ({
-    // TODO-PRISMA
-    //...el,
+    ...el,
+    ...(el.takenOverAt && { takenOverAt: el.takenOverAt.toISOString() }),
     ...expandTransportSegmentFromDb(el)
   }));
 };

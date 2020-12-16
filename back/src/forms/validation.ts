@@ -474,6 +474,7 @@ export const signingInfoSchema: yup.ObjectSchema<Partial<
 export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
   .object()
   .shape({
+    isAccepted: yup.boolean(),
     receivedBy: yup
       .string()
       .ensure()
@@ -528,6 +529,7 @@ export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
 export const acceptedInfoSchema: yup.ObjectSchema<AcceptedInfo> = yup
   .object()
   .shape({
+    isAccepted: yup.boolean(),
     signedAt: validDatetime({
       verboseFieldName: "date d'acceptation"
     }),
@@ -749,6 +751,10 @@ export const tempStoredInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
 export const tempStorerAcceptedInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
   .object()
   .shape({
+    tempStorerReceivedAt: validDatetime({
+      verboseFieldName: "date de réception"
+    }),
+    tempStorerReceivedBy: yup.string(),
     tempStorerQuantityType: yup.mixed<QuantityType>().required(),
     tempStorerWasteAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()

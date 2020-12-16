@@ -1,6 +1,6 @@
 import { Mail, Contact } from "../types";
 import * as Sentry from "@sentry/node";
-import mailjet from "node-mailjet";
+import * as mailjet from "node-mailjet";
 import { templateIds } from "../helpers";
 
 const {

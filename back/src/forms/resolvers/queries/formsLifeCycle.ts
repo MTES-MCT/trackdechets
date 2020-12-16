@@ -56,20 +56,23 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
     defaultPaginateBy: PAGINATE_BY
   });
 
+  const where = {
+    loggedAt: {
+      not: null,
+      ...(loggedAfter && { gte: new Date(loggedAfter) }),
+      ...(loggedBefore && { lte: new Date(loggedBefore) })
+    },
+    form: { ...formsFilter, isDeleted: false, id: formId }
+  };
+
+  const count = await prisma.statusLog.count({ where });
   const statusLogs = await prisma.statusLog.findMany({
     orderBy: { loggedAt: "desc" },
     ...connectionArgs,
     take: parseInt(`${cursorBefore ? "-" : "+"}${PAGINATE_BY}`, 10),
     ...(cursorAfter && { cursor: { id: cursorAfter } }),
     ...(cursorBefore && { cursor: { id: cursorBefore } }),
-    where: {
-      loggedAt: {
-        not: null,
-        ...(loggedAfter && { gte: new Date(loggedAfter) }),
-        ...(loggedBefore && { lte: new Date(loggedBefore) })
-      },
-      form: { ...formsFilter, isDeleted: false, id: formId }
-    },
+    where,
     include: {
       form: { select: { id: true, readableId: true } },
       user: { select: { id: true, email: true } }
@@ -94,7 +97,7 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
       hasNextPage,
       hasPreviousPage
     },
-    count: 0 // TODO-PRISMA
+    count
   };
 };
 

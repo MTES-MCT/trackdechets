@@ -133,7 +133,9 @@ describe("Mutation.deleteForm", () => {
 
       expect(data.deleteForm.id).toBeTruthy();
 
-      const deletedForm = await prisma.form({ id: form.id });
+      const deletedForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
       expect(deletedForm.isDeleted).toBe(true);
     }
   );

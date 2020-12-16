@@ -1,5 +1,5 @@
 import { CompanySearchResult } from "../../generated/graphql/types";
-import { prisma } from "../../generated/prisma-client";
+import prisma from "src/prisma";
 
 /**
  * "Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique
@@ -14,7 +14,9 @@ import { prisma } from "../../generated/prisma-client";
 export async function searchAnonymousCompany(
   siret: string
 ): Promise<CompanySearchResult> {
-  const company = await prisma.anonymousCompany({ siret });
+  const company = await prisma.anonymousCompany.findUnique({
+    where: { siret }
+  });
   if (company) {
     return {
       ...company,
