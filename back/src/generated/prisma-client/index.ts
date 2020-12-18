@@ -1242,6 +1242,8 @@ export type FormOrderByInput =
   | "wasteDetailsQuantityType_DESC"
   | "wasteDetailsConsistence_ASC"
   | "wasteDetailsConsistence_DESC"
+  | "wasteDetailsPop_ASC"
+  | "wasteDetailsPop_DESC"
   | "traderCompanyName_ASC"
   | "traderCompanyName_DESC"
   | "traderCompanySiret_ASC"
@@ -3236,6 +3238,8 @@ export interface FormWhereInput {
   wasteDetailsConsistence_not?: Maybe<Consistence>;
   wasteDetailsConsistence_in?: Maybe<Consistence[] | Consistence>;
   wasteDetailsConsistence_not_in?: Maybe<Consistence[] | Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
+  wasteDetailsPop_not?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanyName_not?: Maybe<String>;
   traderCompanyName_in?: Maybe<String[] | String>;
@@ -5502,6 +5506,7 @@ export interface FormCreateInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -5678,6 +5683,7 @@ export interface FormUpdateInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -5797,6 +5803,7 @@ export interface FormUpdateDataInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -7044,6 +7051,8 @@ export interface FormScalarWhereInput {
   wasteDetailsConsistence_not?: Maybe<Consistence>;
   wasteDetailsConsistence_in?: Maybe<Consistence[] | Consistence>;
   wasteDetailsConsistence_not_in?: Maybe<Consistence[] | Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
+  wasteDetailsPop_not?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanyName_not?: Maybe<String>;
   traderCompanyName_in?: Maybe<String[] | String>;
@@ -7303,6 +7312,7 @@ export interface FormUpdateManyDataInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -7391,6 +7401,7 @@ export interface FormUpdateManyMutationInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -7721,6 +7732,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -7862,6 +7874,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -8038,6 +8051,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -8159,6 +8173,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   wasteDetailsQuantity?: Maybe<Float>;
   wasteDetailsQuantityType?: Maybe<QuantityType>;
   wasteDetailsConsistence?: Maybe<Consistence>;
+  wasteDetailsPop?: Maybe<Boolean>;
   traderCompanyName?: Maybe<String>;
   traderCompanySiret?: Maybe<String>;
   traderCompanyAddress?: Maybe<String>;
@@ -9605,6 +9620,7 @@ export interface Form {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
+  wasteDetailsPop: Boolean;
   traderCompanyName?: String;
   traderCompanySiret?: String;
   traderCompanyAddress?: String;
@@ -9697,6 +9713,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   wasteDetailsQuantity: () => Promise<Float>;
   wasteDetailsQuantityType: () => Promise<QuantityType>;
   wasteDetailsConsistence: () => Promise<Consistence>;
+  wasteDetailsPop: () => Promise<Boolean>;
   traderCompanyName: () => Promise<String>;
   traderCompanySiret: () => Promise<String>;
   traderCompanyAddress: () => Promise<String>;
@@ -9810,6 +9827,7 @@ export interface FormSubscription
   wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
   wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
   wasteDetailsConsistence: () => Promise<AsyncIterator<Consistence>>;
+  wasteDetailsPop: () => Promise<AsyncIterator<Boolean>>;
   traderCompanyName: () => Promise<AsyncIterator<String>>;
   traderCompanySiret: () => Promise<AsyncIterator<String>>;
   traderCompanyAddress: () => Promise<AsyncIterator<String>>;
@@ -9925,6 +9943,7 @@ export interface FormNullablePromise
   wasteDetailsQuantity: () => Promise<Float>;
   wasteDetailsQuantityType: () => Promise<QuantityType>;
   wasteDetailsConsistence: () => Promise<Consistence>;
+  wasteDetailsPop: () => Promise<Boolean>;
   traderCompanyName: () => Promise<String>;
   traderCompanySiret: () => Promise<String>;
   traderCompanyAddress: () => Promise<String>;
@@ -11847,6 +11866,7 @@ export interface FormPreviousValues {
   wasteDetailsQuantity?: Float;
   wasteDetailsQuantityType?: QuantityType;
   wasteDetailsConsistence?: Consistence;
+  wasteDetailsPop: Boolean;
   traderCompanyName?: String;
   traderCompanySiret?: String;
   traderCompanyAddress?: String;
@@ -11940,6 +11960,7 @@ export interface FormPreviousValuesPromise
   wasteDetailsQuantity: () => Promise<Float>;
   wasteDetailsQuantityType: () => Promise<QuantityType>;
   wasteDetailsConsistence: () => Promise<Consistence>;
+  wasteDetailsPop: () => Promise<Boolean>;
   traderCompanyName: () => Promise<String>;
   traderCompanySiret: () => Promise<String>;
   traderCompanyAddress: () => Promise<String>;
@@ -12033,6 +12054,7 @@ export interface FormPreviousValuesSubscription
   wasteDetailsQuantity: () => Promise<AsyncIterator<Float>>;
   wasteDetailsQuantityType: () => Promise<AsyncIterator<QuantityType>>;
   wasteDetailsConsistence: () => Promise<AsyncIterator<Consistence>>;
+  wasteDetailsPop: () => Promise<AsyncIterator<Boolean>>;
   traderCompanyName: () => Promise<AsyncIterator<String>>;
   traderCompanySiret: () => Promise<AsyncIterator<String>>;
   traderCompanyAddress: () => Promise<AsyncIterator<String>>;

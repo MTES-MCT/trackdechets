@@ -933,6 +933,9 @@ type WasteDetails {
 
   "Consistance"
   consistence: Consistence
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
 }
 
 "Négociant (case 7)"

@@ -3725,6 +3725,15 @@ Consistance
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>pop</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Contient des Polluants Organiques Persistants (POP) oui / non
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -5499,6 +5508,15 @@ Réelle ou estimée
 <td>
 
 Consistance
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>pop</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Contient des Polluants Organiques Persistants (POP) oui / non
 
 </td>
 </tr>

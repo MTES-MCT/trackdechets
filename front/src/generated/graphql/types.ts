@@ -2186,6 +2186,8 @@ export type WasteDetails = {
   quantityType: Maybe<QuantityType>;
   /** Consistance */
   consistence: Maybe<Consistence>;
+  /** Contient des Polluants Organiques Persistants (POP) oui / non */
+  pop: Maybe<Scalars['Boolean']>;
 };
 
 /** Payload lié au détails du déchet (case 3, 4, 5, 6) */
@@ -2227,6 +2229,8 @@ export type WasteDetailsInput = {
   quantityType: Maybe<QuantityType>;
   /** Consistance */
   consistence: Maybe<Consistence>;
+  /** Contient des Polluants Organiques Persistants (POP) oui / non */
+  pop: Maybe<Scalars['Boolean']>;
 };
 
 /** Type de déchets autorisé pour une rubrique */
@@ -3147,6 +3151,7 @@ export function createWasteDetailsMock(props: Partial<WasteDetails>): WasteDetai
     quantity: null,
     quantityType: null,
     consistence: null,
+    pop: null,
     ...props,
   };
 }
@@ -3163,6 +3168,7 @@ export function createWasteDetailsInputMock(props: Partial<WasteDetailsInput>): 
     quantity: null,
     quantityType: null,
     consistence: null,
+    pop: null,
     ...props,
   };
 }

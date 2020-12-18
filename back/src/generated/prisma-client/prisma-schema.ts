@@ -1633,6 +1633,7 @@ type Form {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean!
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -1732,6 +1733,7 @@ input FormCreateInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -1845,6 +1847,7 @@ input FormCreateWithoutTemporaryStorageDetailInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -1937,6 +1940,7 @@ input FormCreateWithoutTransportSegmentsInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -2110,6 +2114,8 @@ enum FormOrderByInput {
   wasteDetailsQuantityType_DESC
   wasteDetailsConsistence_ASC
   wasteDetailsConsistence_DESC
+  wasteDetailsPop_ASC
+  wasteDetailsPop_DESC
   traderCompanyName_ASC
   traderCompanyName_DESC
   traderCompanySiret_ASC
@@ -2214,6 +2220,7 @@ type FormPreviousValues {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean!
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -3074,6 +3081,8 @@ input FormScalarWhereInput {
   wasteDetailsConsistence_not: Consistence
   wasteDetailsConsistence_in: [Consistence!]
   wasteDetailsConsistence_not_in: [Consistence!]
+  wasteDetailsPop: Boolean
+  wasteDetailsPop_not: Boolean
   traderCompanyName: String
   traderCompanyName_not: String
   traderCompanyName_in: [String!]
@@ -3347,6 +3356,7 @@ input FormUpdateDataInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -3439,6 +3449,7 @@ input FormUpdateInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -3530,6 +3541,7 @@ input FormUpdateManyDataInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -3630,6 +3642,7 @@ input FormUpdateManyMutationInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -3747,6 +3760,7 @@ input FormUpdateWithoutTemporaryStorageDetailDataInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -3838,6 +3852,7 @@ input FormUpdateWithoutTransportSegmentsDataInput {
   wasteDetailsQuantity: Float
   wasteDetailsQuantityType: QuantityType
   wasteDetailsConsistence: Consistence
+  wasteDetailsPop: Boolean
   traderCompanyName: String
   traderCompanySiret: String
   traderCompanyAddress: String
@@ -4727,6 +4742,8 @@ input FormWhereInput {
   wasteDetailsConsistence_not: Consistence
   wasteDetailsConsistence_in: [Consistence!]
   wasteDetailsConsistence_not_in: [Consistence!]
+  wasteDetailsPop: Boolean
+  wasteDetailsPop_not: Boolean
   traderCompanyName: String
   traderCompanyName_not: String
   traderCompanyName_in: [String!]

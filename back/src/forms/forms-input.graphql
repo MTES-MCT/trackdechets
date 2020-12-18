@@ -446,6 +446,9 @@ input WasteDetailsInput {
 
   "Consistance"
   consistence: Consistence
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
 }
 
 input TempStoredFormInput {

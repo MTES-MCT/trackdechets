@@ -48,6 +48,7 @@ const outgoingWasteFragment = `
     processingOperationDone
     wasteDetailsCode
     wasteDetailsQuantity
+    wasteDetailsPop
     traderCompanyName
     traderCompanySiret
     traderReceipt
@@ -87,6 +88,7 @@ const incomingWasteFragment = `
     recipientIsTempStorage
     quantityReceived
     wasteDetailsCode
+    wasteDetailsPop
     traderCompanyName
     traderCompanySiret
     traderReceipt
@@ -166,6 +168,7 @@ const transportedWasteFragment = `
     recipientCompanyMail
     recipientProcessingOperation
     wasteDetailsCode
+    wasteDetailsPop
     transporterNumberPlate
     sentAt
     receivedAt
@@ -217,6 +220,7 @@ const tradedWasteFragment = `
     }
     wasteDetailsCode
     wasteDetailsQuantity
+    wasteDetailsPop
     traderCompanyName
     traderCompanySiret
     traderReceipt
@@ -283,6 +287,7 @@ const allWasteFragment = `
     }
     wasteDetailsCode
     wasteDetailsQuantity
+    wasteDetailsPop
     traderCompanyName
     traderCompanySiret
     traderReceipt

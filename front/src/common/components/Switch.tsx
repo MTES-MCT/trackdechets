@@ -1,17 +1,15 @@
-import React, { useState } from "react";
+import { FieldProps } from "formik";
+import React from "react";
 import ReactSwitch, { ReactSwitchProps } from "react-switch";
-import { v4 as uuidv4 } from "uuid";
-import "./Switch.scss";
+import styles from "./Switch.module.scss";
 
 interface SwitchProps extends ReactSwitchProps {
   label: string;
 }
 
 export default function Switch({ label, ...props }: SwitchProps) {
-  const [uniqId] = useState(() => uuidv4());
-
   return (
-    <div className="switch__container">
+    <label>
       <ReactSwitch
         {...props}
         uncheckedIcon={false}
@@ -21,12 +19,28 @@ export default function Switch({ label, ...props }: SwitchProps) {
         height={12}
         width={30}
         handleDiameter={20}
-        id={`switch-${uniqId}`}
+        className={styles.Switch}
       />
+      <span>{label}</span>
+    </label>
+  );
+}
 
-      <label htmlFor={`switch-${uniqId}`} className="tw-ml-2">
-        {label}
-      </label>
-    </div>
+type FieldSwitchProps = FieldProps & {
+  label: string;
+};
+
+// Compatilibty layer between the Switch and Formik's <Field />
+export function FieldSwitch({
+  field: { checked, onChange, ...field },
+  ...props
+}: FieldSwitchProps) {
+  return (
+    <Switch
+      {...field}
+      {...props}
+      onChange={(checked, event) => onChange(event)}
+      checked={Boolean(checked)}
+    />
   );
 }
