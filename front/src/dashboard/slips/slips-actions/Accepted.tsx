@@ -4,10 +4,7 @@ import { DateTime } from "luxon";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { SlipActionProps } from "./SlipActions";
-import {
-  InlineRadioButton,
-  RadioButton,
-} from "form/custom-inputs/RadioButton";
+import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   FormStatus,
@@ -15,7 +12,9 @@ import {
 import { textConfig } from "./Received";
 
 const FieldError = ({ fieldError }) =>
-  !!fieldError ? <p className="text-red tw-mt-0 tw-mb-0">{fieldError}</p> : null;
+  !!fieldError ? (
+    <p className="text-red tw-mt-0 tw-mb-0">{fieldError}</p>
+  ) : null;
 
 export default function Accepted(props: SlipActionProps) {
   return (

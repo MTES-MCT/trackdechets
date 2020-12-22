@@ -74,8 +74,10 @@ export function getNextStep(form: Form, currentSiret: string) {
 
   if (currentUserIsTempStorer) {
     if (form.status === FormStatus.Sent) return FormStatus.TempStored;
-    if (form.status === FormStatus.TempStored) return FormStatus.TempStorerAccepted;
-    if (form.status === FormStatus.TempStorerAccepted) return FormStatus.Resealed;
+    if (form.status === FormStatus.TempStored)
+      return FormStatus.TempStorerAccepted;
+    if (form.status === FormStatus.TempStorerAccepted)
+      return FormStatus.Resealed;
     return null;
   }
 

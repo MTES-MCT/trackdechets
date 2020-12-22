@@ -46,7 +46,10 @@ const MARK_TEMP_STORED = gql`
 `;
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
-  mutation MarkAsTempStorerAccepted($id: ID!, $info: TempStorerAcceptedFormInput!) {
+  mutation MarkAsTempStorerAccepted(
+    $id: ID!
+    $info: TempStorerAcceptedFormInput!
+  ) {
     markAsTempStorerAccepted(id: $id, tempStorerAcceptedInfo: $info) {
       ...StatusChange
     }

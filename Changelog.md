@@ -77,7 +77,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     }
   ```
   Vous n'êtes pas affecté si vous ne renseigniez pas l'éco-organisme via les mutations `createForm` ou `updateForm`.
-- Afin de pouvoir passer au statut `PROCESSED` un BSD doit désormais être `ACCEPTED` et non plus `RECEIVED`. Idem pour passer à `RESEALED`, il doit être `TEMP_STORER_ACCEPTED`. Si vous utilisez les mutations `markAsReceived` et `markAsTempStored` comme précédemment, ce la se fera automatiquement.
+- Afin de pouvoir passer au statut `PROCESSED` un BSD doit désormais être `ACCEPTED` et non plus `RECEIVED`. Idem pour passer à `RESEALED`, il doit être `TEMP_STORER_ACCEPTED`. Si vous utilisez les mutations `markAsReceived` et `markAsTempStored` comme précédemment, cela se fera automatiquement.
 
 **Changes**
 
