@@ -1,0 +1,67 @@
+input VhuFormInput {
+  isDraft: Boolean
+
+  emitter: VhuEmitterInput
+  wasteDetails: VhuWasteDetailsInput
+  recipient: VhuRecipientInput
+  transporter: VhuTransporterInput
+}
+
+input VhuEmitterInput {
+  agreement: String
+  validityLimit: DateTime
+
+  company: CompanyInput
+}
+
+input VhuWasteDetailsInput {
+  packagingType: VhuPackagingType
+  identificationNumbers: [String]
+  identificationType: VhuIdentificationType
+  quantity: Float
+  quantityUnit: VhuQuantityUnit
+}
+
+input VhuRecipientInput {
+  plannedOperation: String
+  agreement: String
+  validityLimit: DateTime
+  company: CompanyInput
+
+  acceptance: VhuAcceptanceInput
+  operation: VhuOperationInput
+}
+
+input VhuAcceptanceInput {
+  quantity: Float
+  status: WasteAcceptationStatusInput
+  refusalReason: String
+}
+
+input VhuOperationInput {
+  planned: String
+  done: String
+}
+
+input VhuTransporterInput {
+  agreement: String
+  receipt: String
+  department: String
+  validityLimit: DateTime
+  transportType: String
+
+  company: CompanyInput
+}
+
+input VhuSignatureInput {
+  type: SignatureTypeInput!
+  signedAt: DateTime
+  signedBy: String!
+}
+
+enum SignatureTypeInput {
+  SENT
+  TRANSPORT
+  ACCEPTANCE
+  OPERATION
+}

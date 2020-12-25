@@ -1016,6 +1016,7 @@ export type Mutation = {
    * Récupère une URL signé pour l'upload d'un fichier
    */
   createUploadLink: UploadLink;
+  createVhuForm: Maybe<VhuForm>;
   /**
    * USAGE INTERNE
    * Supprime un récépissé courtier
@@ -1047,6 +1048,7 @@ export type Mutation = {
   editProfile: User;
   /** Édite un segment existant */
   editSegment: Maybe<TransportSegment>;
+  editVhuForm: Maybe<VhuForm>;
   /**
    * Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
    * de traitement. Le BSD signé papier original doit être conservé à l'installation de destination qui doit
@@ -1191,6 +1193,7 @@ export type Mutation = {
    * l'établissement qui ont le choix de l'accepter ou de la refuser.
    */
   sendMembershipRequest: Maybe<MembershipRequest>;
+  signVhuForm: Maybe<VhuForm>;
   /**
    * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
    * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
@@ -1282,6 +1285,10 @@ export type MutationCreateUploadLinkArgs = {
   fileType: Scalars["String"];
 };
 
+export type MutationCreateVhuFormArgs = {
+  vhuFormInput: VhuFormInput;
+};
+
 export type MutationDeleteBrokerReceiptArgs = {
   input: DeleteBrokerReceiptInput;
 };
@@ -1317,6 +1324,11 @@ export type MutationEditSegmentArgs = {
   id: Scalars["ID"];
   siret: Scalars["String"];
   nextSegmentInfo: NextSegmentInfoInput;
+};
+
+export type MutationEditVhuFormArgs = {
+  id: Scalars["ID"];
+  vhuFormInput: VhuFormInput;
 };
 
 export type MutationImportPaperFormArgs = {
@@ -1422,6 +1434,11 @@ export type MutationSaveFormArgs = {
 
 export type MutationSendMembershipRequestArgs = {
   siret: Scalars["String"];
+};
+
+export type MutationSignVhuFormArgs = {
+  id: Scalars["ID"];
+  vhuSignatureInput: VhuSignatureInput;
 };
 
 export type MutationSignedByTransporterArgs = {
@@ -1679,6 +1696,8 @@ export type Query = {
   searchCompanies: Array<CompanySearchResult>;
   /** Renvoie des statistiques sur le volume de déchets entrant et sortant */
   stats: Array<CompanyStat>;
+  vhuForm: Maybe<VhuForm>;
+  vhuForms: Maybe<VhuForm>;
 };
 
 export type QueryAppendixFormsArgs = {
@@ -1750,6 +1769,14 @@ export type QueryMembershipRequestArgs = {
 export type QuerySearchCompaniesArgs = {
   clue: Scalars["String"];
   department: Maybe<Scalars["String"]>;
+};
+
+export type QueryVhuFormArgs = {
+  id: Scalars["ID"];
+};
+
+export type QueryVhuFormsArgs = {
+  siret: Maybe<Scalars["String"]>;
 };
 
 /** Payload de réception d'un BSD */
@@ -1864,6 +1891,12 @@ export type SentFormInput = {
   sentBy: Scalars["String"];
 };
 
+export type Signature = {
+  __typename?: "Signature";
+  signedAt: Maybe<Scalars["DateTime"]>;
+  signedBy: Maybe<Scalars["String"]>;
+};
+
 /** Dénomination de l'auteur de la signature */
 export enum SignatureAuthor {
   /** L'auteur de la signature est l'émetteur du déchet */
@@ -1879,6 +1912,13 @@ export type SignatureFormInput = {
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars["String"];
 };
+
+export enum SignatureTypeInput {
+  Sent = "SENT",
+  Transport = "TRANSPORT",
+  Acceptance = "ACCEPTANCE",
+  Operation = "OPERATION"
+}
 
 export type SignupInput = {
   /** Email de l'utilisateur */
@@ -2316,6 +2356,143 @@ export type VerifyCompanyInput = {
   siret: Scalars["String"];
   /** Le code de vérification de l'établissement envoyé par courrier */
   code: Scalars["String"];
+};
+
+export type VhuAcceptanceInput = {
+  quantity: Maybe<Scalars["Float"]>;
+  status: Maybe<WasteAcceptationStatusInput>;
+  refusalReason: Maybe<Scalars["String"]>;
+};
+
+export type VhuEmitter = {
+  __typename?: "VhuEmitter";
+  agreement: Maybe<Scalars["String"]>;
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  company: Maybe<FormCompany>;
+  signature: Maybe<Signature>;
+};
+
+export type VhuEmitterInput = {
+  agreement: Maybe<Scalars["String"]>;
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  company: Maybe<CompanyInput>;
+};
+
+export type VhuForm = {
+  __typename?: "VhuForm";
+  id: Scalars["ID"];
+  createdAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"];
+  isDeleted: Scalars["Boolean"];
+  isDraft: Scalars["Boolean"];
+  emitter: Maybe<VhuEmitter>;
+  wasteDetails: Maybe<VhuWasteDetails>;
+  recipient: Maybe<VhuRecipient>;
+  transporter: Maybe<VhuTransporter>;
+};
+
+export type VhuFormInput = {
+  isDraft: Maybe<Scalars["Boolean"]>;
+  emitter: Maybe<VhuEmitterInput>;
+  wasteDetails: Maybe<VhuWasteDetailsInput>;
+  recipient: Maybe<VhuRecipientInput>;
+  transporter: Maybe<VhuTransporterInput>;
+};
+
+export enum VhuIdentificationType {
+  VhuNumber = "VHU_NUMBER",
+  BundleNumber = "BUNDLE_NUMBER"
+}
+
+export type VhuOperationInput = {
+  planned: Maybe<Scalars["String"]>;
+  done: Maybe<Scalars["String"]>;
+};
+
+export enum VhuPackagingType {
+  Unit = "UNIT",
+  Bundle = "BUNDLE"
+}
+
+export enum VhuQuantityUnit {
+  Ton = "TON",
+  Number = "NUMBER"
+}
+
+export type VhuRecipient = {
+  __typename?: "VhuRecipient";
+  agreement: Maybe<Scalars["String"]>;
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  company: Maybe<FormCompany>;
+  acceptance: Maybe<VhuRecipientAcceptance>;
+  operation: Maybe<VhuRecipientOperation>;
+};
+
+export type VhuRecipientAcceptance = {
+  __typename?: "VhuRecipientAcceptance";
+  quantity: Maybe<Scalars["Float"]>;
+  status: Maybe<Scalars["String"]>;
+  refusalReason: Maybe<Scalars["String"]>;
+  signature: Maybe<Signature>;
+};
+
+export type VhuRecipientInput = {
+  plannedOperation: Maybe<Scalars["String"]>;
+  agreement: Maybe<Scalars["String"]>;
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  company: Maybe<CompanyInput>;
+  acceptance: Maybe<VhuAcceptanceInput>;
+  operation: Maybe<VhuOperationInput>;
+};
+
+export type VhuRecipientOperation = {
+  __typename?: "VhuRecipientOperation";
+  planned: Maybe<Scalars["String"]>;
+  done: Maybe<Scalars["String"]>;
+  signature: Maybe<Signature>;
+};
+
+export type VhuSignatureInput = {
+  type: SignatureTypeInput;
+  signedAt: Maybe<Scalars["DateTime"]>;
+  signedBy: Scalars["String"];
+};
+
+export type VhuTransporter = {
+  __typename?: "VhuTransporter";
+  agreement: Maybe<Scalars["String"]>;
+  receipt: Maybe<Scalars["String"]>;
+  department: Maybe<Scalars["String"]>;
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  transportType: Maybe<Scalars["String"]>;
+  company: Maybe<FormCompany>;
+  signature: Maybe<Signature>;
+};
+
+export type VhuTransporterInput = {
+  agreement: Maybe<Scalars["String"]>;
+  receipt: Maybe<Scalars["String"]>;
+  department: Maybe<Scalars["String"]>;
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  transportType: Maybe<Scalars["String"]>;
+  company: Maybe<CompanyInput>;
+};
+
+export type VhuWasteDetails = {
+  __typename?: "VhuWasteDetails";
+  packagingType: Maybe<VhuPackagingType>;
+  identificationNumbers: Maybe<Array<Maybe<Scalars["String"]>>>;
+  identificationType: Maybe<VhuIdentificationType>;
+  quantity: Maybe<Scalars["Float"]>;
+  quantityUnit: Maybe<VhuQuantityUnit>;
+};
+
+export type VhuWasteDetailsInput = {
+  packagingType: Maybe<VhuPackagingType>;
+  identificationNumbers: Maybe<Array<Maybe<Scalars["String"]>>>;
+  identificationType: Maybe<VhuIdentificationType>;
+  quantity: Maybe<Scalars["Float"]>;
+  quantityUnit: Maybe<VhuQuantityUnit>;
 };
 
 /** Statut d'acceptation d'un déchet */
@@ -3177,6 +3354,15 @@ export function createSentFormInputMock(
   };
 }
 
+export function createSignatureMock(props: Partial<Signature>): Signature {
+  return {
+    __typename: "Signature",
+    signedAt: null,
+    signedBy: null,
+    ...props
+  };
+}
+
 export function createSignatureFormInputMock(
   props: Partial<SignatureFormInput>
 ): SignatureFormInput {
@@ -3548,6 +3734,199 @@ export function createVerifyCompanyInputMock(
   return {
     siret: "",
     code: "",
+    ...props
+  };
+}
+
+export function createVhuAcceptanceInputMock(
+  props: Partial<VhuAcceptanceInput>
+): VhuAcceptanceInput {
+  return {
+    quantity: null,
+    status: null,
+    refusalReason: null,
+    ...props
+  };
+}
+
+export function createVhuEmitterMock(props: Partial<VhuEmitter>): VhuEmitter {
+  return {
+    __typename: "VhuEmitter",
+    agreement: null,
+    validityLimit: null,
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createVhuEmitterInputMock(
+  props: Partial<VhuEmitterInput>
+): VhuEmitterInput {
+  return {
+    agreement: null,
+    validityLimit: null,
+    company: null,
+    ...props
+  };
+}
+
+export function createVhuFormMock(props: Partial<VhuForm>): VhuForm {
+  return {
+    __typename: "VhuForm",
+    id: "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isDeleted: false,
+    isDraft: false,
+    emitter: null,
+    wasteDetails: null,
+    recipient: null,
+    transporter: null,
+    ...props
+  };
+}
+
+export function createVhuFormInputMock(
+  props: Partial<VhuFormInput>
+): VhuFormInput {
+  return {
+    isDraft: null,
+    emitter: null,
+    wasteDetails: null,
+    recipient: null,
+    transporter: null,
+    ...props
+  };
+}
+
+export function createVhuOperationInputMock(
+  props: Partial<VhuOperationInput>
+): VhuOperationInput {
+  return {
+    planned: null,
+    done: null,
+    ...props
+  };
+}
+
+export function createVhuRecipientMock(
+  props: Partial<VhuRecipient>
+): VhuRecipient {
+  return {
+    __typename: "VhuRecipient",
+    agreement: null,
+    validityLimit: null,
+    company: null,
+    acceptance: null,
+    operation: null,
+    ...props
+  };
+}
+
+export function createVhuRecipientAcceptanceMock(
+  props: Partial<VhuRecipientAcceptance>
+): VhuRecipientAcceptance {
+  return {
+    __typename: "VhuRecipientAcceptance",
+    quantity: null,
+    status: null,
+    refusalReason: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createVhuRecipientInputMock(
+  props: Partial<VhuRecipientInput>
+): VhuRecipientInput {
+  return {
+    plannedOperation: null,
+    agreement: null,
+    validityLimit: null,
+    company: null,
+    acceptance: null,
+    operation: null,
+    ...props
+  };
+}
+
+export function createVhuRecipientOperationMock(
+  props: Partial<VhuRecipientOperation>
+): VhuRecipientOperation {
+  return {
+    __typename: "VhuRecipientOperation",
+    planned: null,
+    done: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createVhuSignatureInputMock(
+  props: Partial<VhuSignatureInput>
+): VhuSignatureInput {
+  return {
+    type: SignatureTypeInput.Sent,
+    signedAt: null,
+    signedBy: "",
+    ...props
+  };
+}
+
+export function createVhuTransporterMock(
+  props: Partial<VhuTransporter>
+): VhuTransporter {
+  return {
+    __typename: "VhuTransporter",
+    agreement: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    transportType: null,
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createVhuTransporterInputMock(
+  props: Partial<VhuTransporterInput>
+): VhuTransporterInput {
+  return {
+    agreement: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    transportType: null,
+    company: null,
+    ...props
+  };
+}
+
+export function createVhuWasteDetailsMock(
+  props: Partial<VhuWasteDetails>
+): VhuWasteDetails {
+  return {
+    __typename: "VhuWasteDetails",
+    packagingType: null,
+    identificationNumbers: null,
+    identificationType: null,
+    quantity: null,
+    quantityUnit: null,
+    ...props
+  };
+}
+
+export function createVhuWasteDetailsInputMock(
+  props: Partial<VhuWasteDetailsInput>
+): VhuWasteDetailsInput {
+  return {
+    packagingType: null,
+    identificationNumbers: null,
+    identificationType: null,
+    quantity: null,
+    quantityUnit: null,
     ...props
   };
 }

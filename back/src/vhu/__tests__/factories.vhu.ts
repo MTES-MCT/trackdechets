@@ -1,0 +1,67 @@
+import {
+  IdentificationType,
+  PackagingType,
+  Prisma,
+  VhuQuantityUnit
+} from "@prisma/client";
+import prisma from "src/prisma";
+
+export const vhuFormFactory = async ({
+  ownerId,
+  opt = {}
+}: {
+  ownerId: string;
+  opt?: Partial<Prisma.VhuFormCreateInput>;
+}) => {
+  const formParams = { ...vhuFormdata, ...opt };
+  return prisma.vhuForm.create({
+    data: {
+      ...formParams,
+      owner: { connect: { id: ownerId } }
+    }
+  });
+};
+
+const vhuFormdata = {
+  emitterAgreement: "agreement",
+  emitterValidityLimit: "2019-11-27T00:00:00.000Z",
+  emitterCompanyName: "emitter company",
+  emitterCompanySiret: "15397456982146",
+  emitterCompanyAddress: "20 Avenue de l'Emitter, Emitter City",
+  emitterCompanyContact: "Marc Martin",
+  emitterCompanyPhone: "06 18 76 02 66",
+  emitterCompanyMail: "recipient@td.io",
+
+  recipientOperationPlanned: "R 4",
+  recipientAgreement: "agreement recipient",
+  recipientValidityLimit: "2019-11-27T00:00:00.000Z",
+  recipientCompanyName: "I reveive waste INC",
+  recipientCompanySiret: "13254678974589",
+  recipientCompanyAddress: "14 boulevard Recipient, Recipient City",
+  recipientCompanyContact: "André Recipient",
+  recipientCompanyPhone: "05 05 05 05 05",
+  recipientCompanyMail: "recipient@td.io",
+
+  wasteDetailsPackagingType: "UNIT" as PackagingType,
+  wasteDetailsIdentificationNumbers: ["1", "2", "3"],
+  wasteDetailsIdentificationType: "VHU_NUMBER" as IdentificationType,
+  wasteDetailsQuantity: 2,
+  wasteDetailsQuantityUnit: "TON" as VhuQuantityUnit,
+
+  transporterAgreement: "agreement transport",
+  transporterCompanyName: "Transport facile",
+  transporterCompanySiret: "12345678974589",
+  transporterCompanyAddress: "12 route du Transporter, Transporter City",
+  transporterCompanyContact: "Henri Transport",
+  transporterCompanyPhone: "06 06 06 06 06",
+  transporterCompanyMail: "transporter@td.io",
+  transporterReceipt: "a receipt",
+  transporterDepartment: "83",
+  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+  transporterTransportType: "Camion pardi",
+
+  recipientAcceptanceQuantity: null,
+  recipientAcceptanceStatus: null,
+  recipientAcceptanceRefusalReason: null,
+  recipientOperationDone: null
+};

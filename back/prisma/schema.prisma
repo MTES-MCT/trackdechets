@@ -543,3 +543,117 @@ model UserActivationHash {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 }
+
+// ----------------
+// VHU FORM
+// ----------------
+enum VhuStatus {
+  IN_PROGRESS
+  DONE
+}
+
+enum PackagingType {
+  UNIT
+  BUNDLE
+}
+
+enum IdentificationType {
+  VHU_NUMBER
+  BUNDLE_NUMBER
+}
+
+enum VhuQuantityUnit {
+  TON
+  NUMBER
+}
+
+model Signature {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  signatory   User     @relation(fields: [signatoryId], references: [id])
+  signatoryId String
+
+  signedAt DateTime @default(now())
+  signedBy String
+
+  // To disambiguate relations
+  // see https://www.prisma.io/docs/concepts/components/prisma-schema/relations#disambiguating-relations
+  emitterSignature             VhuForm? @relation("emitterSignature")
+  transporterSignature         VhuForm? @relation("transporterSignature")
+  recipientAcceptanceSignature VhuForm? @relation("recipientAcceptanceSignature")
+  recipientOperationSignature  VhuForm? @relation("recipientOperationSignature")
+}
+
+model VhuForm {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDraft   Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  status VhuStatus @default(IN_PROGRESS)
+
+  // Frame 1
+  emitterAgreement      String?
+  emitterValidityLimit  DateTime?
+  emitterCompanyName    String?
+  emitterCompanySiret   String?
+  emitterCompanyAddress String?
+  emitterCompanyContact String?
+  emitterCompanyPhone   String?
+  emitterCompanyMail    String?
+
+  // Frame 2
+  recipientOperationPlanned String?
+  recipientAgreement        String?
+  recipientValidityLimit    DateTime?
+  recipientCompanyName      String?
+  recipientCompanySiret     String?
+  recipientCompanyAddress   String?
+  recipientCompanyContact   String?
+  recipientCompanyPhone     String?
+  recipientCompanyMail      String?
+
+  // Frames 3, 4, 5
+  wasteDetailsPackagingType         PackagingType?
+  wasteDetailsIdentificationNumbers String[]
+  wasteDetailsIdentificationType    IdentificationType?
+  wasteDetailsQuantity              Int?
+  wasteDetailsQuantityUnit          VhuQuantityUnit?
+
+  // Frame 6
+  emitterSignature   Signature? @relation(name: "emitterSignature", fields: [emitterSignatureId], references: [id])
+  emitterSignatureId Int?
+
+  // Frame 7
+  transporterAgreement      String?
+  transporterCompanyName    String?
+  transporterCompanySiret   String?
+  transporterCompanyAddress String?
+  transporterCompanyContact String?
+  transporterCompanyPhone   String?
+  transporterCompanyMail    String?
+  transporterReceipt        String?
+  transporterDepartment     String?
+  transporterValidityLimit  DateTime?
+  transporterTransportType  String? // Mode de transport. String ou enum ?
+  transporterSignature      Signature? @relation(name: "transporterSignature", fields: [transporterSignatureId], references: [id])
+  transporterSignatureId    Int?
+
+  // Frame 8, 9, 10
+  // TODO
+
+  // Frame 11
+  // ...(data from frame 2)
+  recipientAcceptanceQuantity      Float?
+  recipientAcceptanceStatus        WasteAcceptationStatus?
+  recipientAcceptanceRefusalReason String?
+  recipientAcceptanceSignature     Signature?              @relation(name: "recipientAcceptanceSignature", fields: [recipientAcceptanceSignatureId], references: [id])
+  recipientAcceptanceSignatureId   Int?
+  recipientOperationDone           String? // Code normalisé. String ou enum ?
+  recipientOperationSignature      Signature?              @relation(name: "recipientOperationSignature", fields: [recipientOperationSignatureId], references: [id])
+  recipientOperationSignatureId    Int?
+}

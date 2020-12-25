@@ -15,12 +15,15 @@ export default function NumberInput({
   noSpin,
   ...props
 }: NumberInputProps) {
+  const value = field.value ?? "";
+
   return (
     <label>
       {label}
       <input
         min="0"
         {...field}
+        value={value}
         {...props}
         type="number"
         className={classNames(props.className, {

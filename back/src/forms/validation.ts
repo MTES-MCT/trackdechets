@@ -190,22 +190,26 @@ type FactorySchemaOf<T> = (isDraft: boolean) => SchemaOf<T>;
 // COMMON ERROR MESSAGES
 // *********************
 
-const MISSING_COMPANY_NAME = "Le nom de l'entreprise est obligatoire";
-const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
-const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
-const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
-const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
-const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
+export const MISSING_COMPANY_NAME = "Le nom de l'entreprise est obligatoire";
+export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
+export const MISSING_COMPANY_ADDRESS =
+  "L'adresse de l'entreprise est obligatoire";
+export const MISSING_COMPANY_CONTACT =
+  "Le contact dans l'entreprise est obligatoire";
+export const MISSING_COMPANY_PHONE =
+  "Le téléphone de l'entreprise est obligatoire";
+export const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
 
-const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
+export const INVALID_SIRET_LENGTH =
+  "Le SIRET doit faire 14 caractères numériques";
 
-const INVALID_PROCESSING_OPERATION =
+export const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas.";
 
-const INVALID_WASTE_CODE =
+export const INVALID_WASTE_CODE =
   "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
 
-const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
+export const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1

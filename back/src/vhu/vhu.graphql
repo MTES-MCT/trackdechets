@@ -1,0 +1,96 @@
+type Query {
+  vhuForm(id: ID!): VhuForm
+  vhuForms(siret: String): VhuForm
+}
+
+type Mutation {
+  createVhuForm(vhuFormInput: VhuFormInput!): VhuForm
+  editVhuForm(id: ID!, vhuFormInput: VhuFormInput!): VhuForm
+  signVhuForm(id: ID!, vhuSignatureInput: VhuSignatureInput!): VhuForm
+}
+
+type VhuForm {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  isDeleted: Boolean!
+  isDraft: Boolean!
+
+  emitter: VhuEmitter
+  wasteDetails: VhuWasteDetails
+  recipient: VhuRecipient
+  transporter: VhuTransporter
+}
+
+type VhuEmitter {
+  agreement: String
+  validityLimit: DateTime
+
+  company: FormCompany
+
+  signature: Signature
+}
+
+enum VhuPackagingType {
+  UNIT
+  BUNDLE
+}
+
+enum VhuIdentificationType {
+  VHU_NUMBER
+  BUNDLE_NUMBER
+}
+
+enum VhuQuantityUnit {
+  TON
+  NUMBER
+}
+
+type VhuWasteDetails {
+  packagingType: VhuPackagingType
+  identificationNumbers: [String]
+  identificationType: VhuIdentificationType
+  quantity: Float
+  quantityUnit: VhuQuantityUnit
+}
+
+type VhuTransporter {
+  agreement: String
+  receipt: String
+  department: String
+  validityLimit: DateTime
+  transportType: String
+
+  company: FormCompany
+
+  signature: Signature
+}
+
+type VhuRecipient {
+  agreement: String
+  validityLimit: DateTime
+  company: FormCompany
+
+  acceptance: VhuRecipientAcceptance
+  operation: VhuRecipientOperation
+}
+
+type VhuRecipientAcceptance {
+  quantity: Float
+  status: String
+  refusalReason: String
+
+  signature: Signature
+}
+
+type VhuRecipientOperation {
+  planned: String
+  done: String
+
+  signature: Signature
+}
+
+type Signature {
+  signedAt: DateTime
+  signedBy: String
+}

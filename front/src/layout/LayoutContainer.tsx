@@ -21,6 +21,7 @@ const AccountMembershipRequest = lazy(() =>
   import("account/AccountMembershipRequest")
 );
 const FormContainer = lazy(() => import("form/FormContainer"));
+const VhuFormContainer = lazy(() => import("vhuForm/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
