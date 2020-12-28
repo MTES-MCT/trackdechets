@@ -1126,6 +1126,8 @@ export type FormOrderByInput =
   | "receivedAt_DESC"
   | "signedAt_ASC"
   | "signedAt_DESC"
+  | "signedBy_ASC"
+  | "signedBy_DESC"
   | "quantityReceived_ASC"
   | "quantityReceived_DESC"
   | "processedBy_ASC"
@@ -1406,12 +1408,14 @@ export type Status =
   | "SEALED"
   | "SENT"
   | "RECEIVED"
+  | "ACCEPTED"
   | "PROCESSED"
   | "AWAITING_GROUP"
   | "GROUPED"
   | "NO_TRACEABILITY"
   | "REFUSED"
   | "TEMP_STORED"
+  | "TEMP_STORER_ACCEPTED"
   | "RESEALED"
   | "RESENT";
 
@@ -1444,6 +1448,8 @@ export type TemporaryStorageDetailOrderByInput =
   | "tempStorerReceivedBy_DESC"
   | "tempStorerSignedAt_ASC"
   | "tempStorerSignedAt_DESC"
+  | "tempStorerSignedBy_ASC"
+  | "tempStorerSignedBy_DESC"
   | "destinationIsFilledByEmitter_ASC"
   | "destinationIsFilledByEmitter_DESC"
   | "destinationCompanyName_ASC"
@@ -2544,6 +2550,20 @@ export interface FormWhereInput {
   signedAt_lte?: Maybe<DateTimeInput>;
   signedAt_gt?: Maybe<DateTimeInput>;
   signedAt_gte?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
+  signedBy_not?: Maybe<String>;
+  signedBy_in?: Maybe<String[] | String>;
+  signedBy_not_in?: Maybe<String[] | String>;
+  signedBy_lt?: Maybe<String>;
+  signedBy_lte?: Maybe<String>;
+  signedBy_gt?: Maybe<String>;
+  signedBy_gte?: Maybe<String>;
+  signedBy_contains?: Maybe<String>;
+  signedBy_not_contains?: Maybe<String>;
+  signedBy_starts_with?: Maybe<String>;
+  signedBy_not_starts_with?: Maybe<String>;
+  signedBy_ends_with?: Maybe<String>;
+  signedBy_not_ends_with?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   quantityReceived_not?: Maybe<Float>;
   quantityReceived_in?: Maybe<Float[] | Float>;
@@ -3508,6 +3528,20 @@ export interface TemporaryStorageDetailWhereInput {
   tempStorerSignedAt_lte?: Maybe<DateTimeInput>;
   tempStorerSignedAt_gt?: Maybe<DateTimeInput>;
   tempStorerSignedAt_gte?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
+  tempStorerSignedBy_not?: Maybe<String>;
+  tempStorerSignedBy_in?: Maybe<String[] | String>;
+  tempStorerSignedBy_not_in?: Maybe<String[] | String>;
+  tempStorerSignedBy_lt?: Maybe<String>;
+  tempStorerSignedBy_lte?: Maybe<String>;
+  tempStorerSignedBy_gt?: Maybe<String>;
+  tempStorerSignedBy_gte?: Maybe<String>;
+  tempStorerSignedBy_contains?: Maybe<String>;
+  tempStorerSignedBy_not_contains?: Maybe<String>;
+  tempStorerSignedBy_starts_with?: Maybe<String>;
+  tempStorerSignedBy_not_starts_with?: Maybe<String>;
+  tempStorerSignedBy_ends_with?: Maybe<String>;
+  tempStorerSignedBy_not_ends_with?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationIsFilledByEmitter_not?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
@@ -5448,6 +5482,7 @@ export interface FormCreateInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5546,6 +5581,7 @@ export interface TemporaryStorageDetailCreateWithoutFormInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -5625,6 +5661,7 @@ export interface FormUpdateInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5745,6 +5782,7 @@ export interface FormUpdateDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -5841,6 +5879,7 @@ export interface TemporaryStorageDetailUpdateWithoutFormDataInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -6357,6 +6396,20 @@ export interface FormScalarWhereInput {
   signedAt_lte?: Maybe<DateTimeInput>;
   signedAt_gt?: Maybe<DateTimeInput>;
   signedAt_gte?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
+  signedBy_not?: Maybe<String>;
+  signedBy_in?: Maybe<String[] | String>;
+  signedBy_not_in?: Maybe<String[] | String>;
+  signedBy_lt?: Maybe<String>;
+  signedBy_lte?: Maybe<String>;
+  signedBy_gt?: Maybe<String>;
+  signedBy_gte?: Maybe<String>;
+  signedBy_contains?: Maybe<String>;
+  signedBy_not_contains?: Maybe<String>;
+  signedBy_starts_with?: Maybe<String>;
+  signedBy_not_starts_with?: Maybe<String>;
+  signedBy_ends_with?: Maybe<String>;
+  signedBy_not_ends_with?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   quantityReceived_not?: Maybe<Float>;
   quantityReceived_in?: Maybe<Float[] | Float>;
@@ -7254,6 +7307,7 @@ export interface FormUpdateManyDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7343,6 +7397,7 @@ export interface FormUpdateManyMutationInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7620,6 +7675,7 @@ export interface TemporaryStorageDetailCreateInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -7674,6 +7730,7 @@ export interface FormCreateWithoutTemporaryStorageDetailInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7759,6 +7816,7 @@ export interface TemporaryStorageDetailUpdateInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -7816,6 +7874,7 @@ export interface FormUpdateWithoutTemporaryStorageDetailDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -7905,6 +7964,7 @@ export interface TemporaryStorageDetailUpdateManyMutationInput {
   tempStorerReceivedAt?: Maybe<DateTimeInput>;
   tempStorerReceivedBy?: Maybe<String>;
   tempStorerSignedAt?: Maybe<DateTimeInput>;
+  tempStorerSignedBy?: Maybe<String>;
   destinationIsFilledByEmitter?: Maybe<Boolean>;
   destinationCompanyName?: Maybe<String>;
   destinationCompanySiret?: Maybe<String>;
@@ -7993,6 +8053,7 @@ export interface FormCreateWithoutTransportSegmentsInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -8115,6 +8176,7 @@ export interface FormUpdateWithoutTransportSegmentsDataInput {
   receivedBy?: Maybe<String>;
   receivedAt?: Maybe<DateTimeInput>;
   signedAt?: Maybe<DateTimeInput>;
+  signedBy?: Maybe<String>;
   quantityReceived?: Maybe<Float>;
   processedBy?: Maybe<String>;
   processedAt?: Maybe<String>;
@@ -9562,6 +9624,7 @@ export interface Form {
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
   signedAt?: DateTimeOutput;
+  signedBy?: String;
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
@@ -9655,6 +9718,7 @@ export interface FormPromise extends Promise<Form>, Fragmentable {
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   signedAt: () => Promise<DateTimeOutput>;
+  signedBy: () => Promise<String>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -9769,6 +9833,7 @@ export interface FormSubscription
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signedBy: () => Promise<AsyncIterator<String>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
@@ -9885,6 +9950,7 @@ export interface FormNullablePromise
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   signedAt: () => Promise<DateTimeOutput>;
+  signedBy: () => Promise<String>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -9987,6 +10053,7 @@ export interface TemporaryStorageDetail {
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerReceivedBy?: String;
   tempStorerSignedAt?: DateTimeOutput;
+  tempStorerSignedBy?: String;
   destinationIsFilledByEmitter?: Boolean;
   destinationCompanyName?: String;
   destinationCompanySiret?: String;
@@ -10031,6 +10098,7 @@ export interface TemporaryStorageDetailPromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  tempStorerSignedBy: () => Promise<String>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
   destinationCompanySiret: () => Promise<String>;
@@ -10077,6 +10145,7 @@ export interface TemporaryStorageDetailSubscription
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  tempStorerSignedBy: () => Promise<AsyncIterator<String>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
   destinationCompanyName: () => Promise<AsyncIterator<String>>;
   destinationCompanySiret: () => Promise<AsyncIterator<String>>;
@@ -10121,6 +10190,7 @@ export interface TemporaryStorageDetailNullablePromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  tempStorerSignedBy: () => Promise<String>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
   destinationCompanySiret: () => Promise<String>;
@@ -11808,6 +11878,7 @@ export interface FormPreviousValues {
   receivedBy?: String;
   receivedAt?: DateTimeOutput;
   signedAt?: DateTimeOutput;
+  signedBy?: String;
   quantityReceived?: Float;
   processedBy?: String;
   processedAt?: String;
@@ -11902,6 +11973,7 @@ export interface FormPreviousValuesPromise
   receivedBy: () => Promise<String>;
   receivedAt: () => Promise<DateTimeOutput>;
   signedAt: () => Promise<DateTimeOutput>;
+  signedBy: () => Promise<String>;
   quantityReceived: () => Promise<Float>;
   processedBy: () => Promise<String>;
   processedAt: () => Promise<String>;
@@ -11996,6 +12068,7 @@ export interface FormPreviousValuesSubscription
   receivedBy: () => Promise<AsyncIterator<String>>;
   receivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   signedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  signedBy: () => Promise<AsyncIterator<String>>;
   quantityReceived: () => Promise<AsyncIterator<Float>>;
   processedBy: () => Promise<AsyncIterator<String>>;
   processedAt: () => Promise<AsyncIterator<String>>;
@@ -12420,6 +12493,7 @@ export interface TemporaryStorageDetailPreviousValues {
   tempStorerReceivedAt?: DateTimeOutput;
   tempStorerReceivedBy?: String;
   tempStorerSignedAt?: DateTimeOutput;
+  tempStorerSignedBy?: String;
   destinationIsFilledByEmitter?: Boolean;
   destinationCompanyName?: String;
   destinationCompanySiret?: String;
@@ -12463,6 +12537,7 @@ export interface TemporaryStorageDetailPreviousValuesPromise
   tempStorerReceivedAt: () => Promise<DateTimeOutput>;
   tempStorerReceivedBy: () => Promise<String>;
   tempStorerSignedAt: () => Promise<DateTimeOutput>;
+  tempStorerSignedBy: () => Promise<String>;
   destinationIsFilledByEmitter: () => Promise<Boolean>;
   destinationCompanyName: () => Promise<String>;
   destinationCompanySiret: () => Promise<String>;
@@ -12508,6 +12583,7 @@ export interface TemporaryStorageDetailPreviousValuesSubscription
   tempStorerReceivedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   tempStorerReceivedBy: () => Promise<AsyncIterator<String>>;
   tempStorerSignedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  tempStorerSignedBy: () => Promise<AsyncIterator<String>>;
   destinationIsFilledByEmitter: () => Promise<AsyncIterator<Boolean>>;
   destinationCompanyName: () => Promise<AsyncIterator<String>>;
   destinationCompanySiret: () => Promise<AsyncIterator<String>>;

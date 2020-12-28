@@ -68,25 +68,42 @@ enum WasteAcceptationStatusInput {
   PARTIALLY_REFUSED
 }
 
-"Payload de réception d'un BSD"
-input ReceivedFormInput {
+input AcceptedFormInput {
   "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
 
   "Raison du refus (case 10)"
   wasteRefusalReason: String
 
+  "Date à laquelle le déchet a été accepté ou refusé (case 10)"
+  signedAt: DateTime!
+
+  "Nom de la personne en charge de l'acceptation' du déchet (case 10)"
+  signedBy: String!
+
+  "Quantité réelle présentée (case 10)"
+  quantityReceived: Float!
+}
+
+"Payload de réception d'un BSD"
+input ReceivedFormInput {
   "Nom de la personne en charge de la réception du déchet (case 10)"
   receivedBy: String!
 
   "Date à laquelle le déchet a été reçu (case 10)"
   receivedAt: DateTime!
 
+  "Statut d'acceptation du déchet (case 10)"
+  wasteAcceptationStatus: WasteAcceptationStatusInput
+
+  "Raison du refus (case 10)"
+  wasteRefusalReason: String
+
   "Date à laquelle le déchet a été accepté ou refusé (case 10)"
   signedAt: DateTime
 
   "Quantité réelle présentée (case 10)"
-  quantityReceived: Float!
+  quantityReceived: Float
 }
 
 "Payload de traitement d'un BSD"
@@ -449,6 +466,26 @@ input WasteDetailsInput {
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
+}
+
+input TempStorerAcceptedFormInput {
+  "Date à laquelle le déchet a été accepté ou refusé (case 13)."
+  signedAt: DateTime!
+
+  "Nom de la personne en charge de l'acceptation du déchet (case 13)"
+  signedBy: String!
+
+  "Statut d'acceptation du déchet (case 13)"
+  wasteAcceptationStatus: WasteAcceptationStatusInput!
+
+  "Raison du refus (case 13)"
+  wasteRefusalReason: String
+
+  "Quantité réelle présentée (case 13)"
+  quantityReceived: Float!
+
+  "Réelle ou estimée"
+  quantityType: QuantityType!
 }
 
 input TempStoredFormInput {

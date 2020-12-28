@@ -77,9 +77,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     }
   ```
   Vous n'êtes pas affecté si vous ne renseigniez pas l'éco-organisme via les mutations `createForm` ou `updateForm`.
+- Afin de pouvoir passer au statut `PROCESSED` un BSD doit désormais être `ACCEPTED` et non plus `RECEIVED`. Idem pour passer à `RESEALED`, il doit être `TEMP_STORER_ACCEPTED`. Si vous utilisez les mutations `markAsReceived` et `markAsTempStored` comme précédemment, cela se fera automatiquement.
 
 **Changes**
 
+- Ajout des mutations `markAsAccepted` et `markAsTempStorerAccepted` qui permettent de séparer la réception d'un déchet de son acceptation. [PR 684](https://github.com/MTES-MCT/trackdechets/pull/684)
 - Refonte de l'interface utilisateur. [PR 469](https://github.com/MTES-MCT/trackdechets/pull/469)
 - Ajout du champ `customInfo` à `TransporterInput`, ce qui permet de renseigner cette information via les mutations `createForm`, `updateForm`, `markAsResent`, `markAsResealed`, [PR 417](https://github.com/MTES-MCT/trackdechets/pull/417)
 - Suppression du service metabase suite au basculement vers une instance metabase dédiée [PR 453](https://github.com/MTES-MCT/trackdechets/pull/453)

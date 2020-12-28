@@ -34,6 +34,7 @@ type Form {
   receivedBy: String
   receivedAt: DateTime
   signedAt: DateTime
+  signedBy: String
   quantityReceived: Float
 
   processedBy: String
@@ -148,6 +149,7 @@ type TemporaryStorageDetail {
   tempStorerReceivedAt: DateTime
   tempStorerReceivedBy: String
   tempStorerSignedAt: DateTime
+  tempStorerSignedBy: String
 
   # Frame 14
   destinationIsFilledByEmitter: Boolean @default(value: true)
@@ -222,6 +224,7 @@ enum Status {
   SEALED
   SENT
   RECEIVED
+  ACCEPTED
   PROCESSED
   AWAITING_GROUP
   GROUPED
@@ -230,6 +233,7 @@ enum Status {
 
   # Temporary storage status
   TEMP_STORED
+  TEMP_STORER_ACCEPTED
   RESEALED
   RESENT
 }

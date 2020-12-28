@@ -14,7 +14,7 @@ function getTransporter(
 
   if (
     temporaryStorageDetail &&
-    ["RESEALED", "TEMP_STORED"].includes(form.status)
+    ["RESEALED", "TEMP_STORED", "TEMP_STORER_ACCEPTED"].includes(form.status)
   ) {
     return {
       name: temporaryStorageDetail.transporterCompanyName,
@@ -56,7 +56,7 @@ function getEmitter(
 ) {
   if (
     temporaryStorageDetail &&
-    ["TEMP_STORED", "RESEALED"].includes(form.status)
+    ["TEMP_STORED", "TEMP_STORER_ACCEPTED", "RESEALED"].includes(form.status)
   ) {
     return form.recipient?.company;
   }
@@ -72,10 +72,12 @@ function getLastActionOn(
     case "SENT":
       return form.sentAt;
     case "RECEIVED":
+    case "ACCEPTED":
       return form.receivedAt;
     case "PROCESSED":
       return form.processedAt;
     case "TEMP_STORED":
+    case "TEMP_STORER_ACCEPTED":
     case "RESEALED":
       return temporaryStorageDetail.tempStorerReceivedAt;
     case "RESENT":

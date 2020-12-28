@@ -24,6 +24,19 @@ export type Scalars = {
   JSON: any;
 };
 
+export type AcceptedFormInput = {
+  /** Statut d'acceptation du déchet (case 10) */
+  wasteAcceptationStatus: WasteAcceptationStatusInput;
+  /** Raison du refus (case 10) */
+  wasteRefusalReason?: Maybe<Scalars['String']>;
+  /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
+  signedAt: Scalars['DateTime'];
+  /** Nom de la personne en charge de l'acceptation' du déchet (case 10) */
+  signedBy: Scalars['String'];
+  /** Quantité réelle présentée (case 10) */
+  quantityReceived: Scalars['Float'];
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -669,6 +682,8 @@ export type FormStatus =
   | 'SENT'
   /** BSD reçu par l'établissement de destination */
   | 'RECEIVED'
+  /** BSD accepté par l'établissement de destination */
+  | 'ACCEPTED'
   /** BSD dont les déchets ont été traités */
   | 'PROCESSED'
   /** BSD en attente de regroupement */
@@ -681,6 +696,8 @@ export type FormStatus =
   | 'REFUSED'
   /** Déchet arrivé sur le site d'entreposage ou reconditionnement */
   | 'TEMP_STORED'
+  /** Déchet accepté par le site d'entreposage ou reconditionnement */
+  | 'TEMP_STORER_ACCEPTED'
   /** Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site d'entreposage ou reconditionnement */
   | 'RESEALED'
   /** Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement */
@@ -920,6 +937,8 @@ export type Mutation = {
    * d'un utilisateur.
    */
   login: AuthPayload;
+  /** Valide l'acceptation du BSD */
+  markAsAccepted?: Maybe<Form>;
   /** Valide le traitement d'un BSD */
   markAsProcessed?: Maybe<Form>;
   /** Valide la réception d'un BSD */
@@ -994,6 +1013,8 @@ export type Mutation = {
   markAsSent?: Maybe<Form>;
   /** Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement */
   markAsTempStored?: Maybe<Form>;
+  /** Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement */
+  markAsTempStorerAccepted?: Maybe<Form>;
   /** Marque un segment de transport comme prêt à être emporté */
   markSegmentAsReadyToTakeOver?: Maybe<TransportSegment>;
   /** Prépare un nouveau segment de transport multimodal */
@@ -1183,6 +1204,12 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationMarkAsAcceptedArgs = {
+  id: Scalars['ID'];
+  acceptedInfo: AcceptedFormInput;
+};
+
+
 export type MutationMarkAsProcessedArgs = {
   id: Scalars['ID'];
   processedInfo: ProcessedFormInput;
@@ -1221,6 +1248,12 @@ export type MutationMarkAsSentArgs = {
 export type MutationMarkAsTempStoredArgs = {
   id: Scalars['ID'];
   tempStoredInfos: TempStoredFormInput;
+};
+
+
+export type MutationMarkAsTempStorerAcceptedArgs = {
+  id: Scalars['ID'];
+  tempStorerAcceptedInfo: TempStorerAcceptedFormInput;
 };
 
 
@@ -1609,18 +1642,18 @@ export type QuerySearchCompaniesArgs = {
 
 /** Payload de réception d'un BSD */
 export type ReceivedFormInput = {
-  /** Statut d'acceptation du déchet (case 10) */
-  wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 10) */
-  wasteRefusalReason?: Maybe<Scalars['String']>;
   /** Nom de la personne en charge de la réception du déchet (case 10) */
   receivedBy: Scalars['String'];
   /** Date à laquelle le déchet a été reçu (case 10) */
   receivedAt: Scalars['DateTime'];
+  /** Statut d'acceptation du déchet (case 10) */
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatusInput>;
+  /** Raison du refus (case 10) */
+  wasteRefusalReason?: Maybe<Scalars['String']>;
   /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
   signedAt?: Maybe<Scalars['DateTime']>;
   /** Quantité réelle présentée (case 10) */
-  quantityReceived: Scalars['Float'];
+  quantityReceived?: Maybe<Scalars['Float']>;
 };
 
 /**
@@ -1894,6 +1927,21 @@ export type TempStoredFormInput = {
   receivedAt: Scalars['DateTime'];
   /** Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui. */
   signedAt?: Maybe<Scalars['DateTime']>;
+  /** Quantité réelle présentée (case 13) */
+  quantityReceived: Scalars['Float'];
+  /** Réelle ou estimée */
+  quantityType: QuantityType;
+};
+
+export type TempStorerAcceptedFormInput = {
+  /** Date à laquelle le déchet a été accepté ou refusé (case 13). */
+  signedAt: Scalars['DateTime'];
+  /** Nom de la personne en charge de l'acceptation du déchet (case 13) */
+  signedBy: Scalars['String'];
+  /** Statut d'acceptation du déchet (case 13) */
+  wasteAcceptationStatus: WasteAcceptationStatusInput;
+  /** Raison du refus (case 13) */
+  wasteRefusalReason?: Maybe<Scalars['String']>;
   /** Quantité réelle présentée (case 13) */
   quantityReceived: Scalars['Float'];
   /** Réelle ou estimée */
@@ -2411,10 +2459,12 @@ export type ResolversTypes = {
   NextDestinationInput: NextDestinationInput;
   InternationalCompanyInput: InternationalCompanyInput;
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
+  AcceptedFormInput: AcceptedFormInput;
   ResealedFormInput: ResealedFormInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
+  TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
@@ -2519,10 +2569,12 @@ export type ResolversParentTypes = {
   NextDestinationInput: NextDestinationInput;
   InternationalCompanyInput: InternationalCompanyInput;
   AuthPayload: AuthPayload;
+  AcceptedFormInput: AcceptedFormInput;
   ResealedFormInput: ResealedFormInput;
   ResentFormInput: ResentFormInput;
   SentFormInput: SentFormInput;
   TempStoredFormInput: TempStoredFormInput;
+  TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
@@ -2793,6 +2845,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   inviteUserToCompany?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationInviteUserToCompanyArgs, 'email' | 'siret' | 'role'>>;
   joinWithInvite?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationJoinWithInviteArgs, 'inviteHash' | 'name' | 'password'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  markAsAccepted?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsAcceptedArgs, 'id' | 'acceptedInfo'>>;
   markAsProcessed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsProcessedArgs, 'id' | 'processedInfo'>>;
   markAsReceived?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsReceivedArgs, 'id' | 'receivedInfo'>>;
   markAsResealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsResealedArgs, 'id' | 'resealedInfos'>>;
@@ -2800,6 +2853,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   markAsSealed?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSealedArgs, 'id'>>;
   markAsSent?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsSentArgs, 'id' | 'sentInfo'>>;
   markAsTempStored?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStoredArgs, 'id' | 'tempStoredInfos'>>;
+  markAsTempStorerAccepted?: Resolver<Maybe<ResolversTypes['Form']>, ParentType, ContextType, RequireFields<MutationMarkAsTempStorerAcceptedArgs, 'id' | 'tempStorerAcceptedInfo'>>;
   markSegmentAsReadyToTakeOver?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationMarkSegmentAsReadyToTakeOverArgs, 'id'>>;
   prepareSegment?: Resolver<Maybe<ResolversTypes['TransportSegment']>, ParentType, ContextType, RequireFields<MutationPrepareSegmentArgs, 'id' | 'siret' | 'nextSegmentInfo'>>;
   refuseMembershipRequest?: Resolver<ResolversTypes['CompanyPrivate'], ParentType, ContextType, RequireFields<MutationRefuseMembershipRequestArgs, 'id'>>;
@@ -3083,6 +3137,17 @@ export type Resolvers<ContextType = GraphQLContext> = {
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
 export type IResolvers<ContextType = GraphQLContext> = Resolvers<ContextType>;
+
+export function createAcceptedFormInputMock(props: Partial<AcceptedFormInput>): AcceptedFormInput {
+  return {
+    wasteAcceptationStatus: "ACCEPTED",
+    wasteRefusalReason: null,
+    signedAt: new Date().toISOString(),
+    signedBy: "",
+    quantityReceived: 0,
+    ...props,
+  };
+}
 
 export function createAppendixFormInputMock(props: Partial<AppendixFormInput>): AppendixFormInput {
   return {
@@ -3588,12 +3653,12 @@ export function createProcessedFormInputMock(props: Partial<ProcessedFormInput>)
 
 export function createReceivedFormInputMock(props: Partial<ReceivedFormInput>): ReceivedFormInput {
   return {
-    wasteAcceptationStatus: "ACCEPTED",
-    wasteRefusalReason: null,
     receivedBy: "",
     receivedAt: new Date().toISOString(),
+    wasteAcceptationStatus: null,
+    wasteRefusalReason: null,
     signedAt: null,
-    quantityReceived: 0,
+    quantityReceived: null,
     ...props,
   };
 }
@@ -3795,6 +3860,18 @@ export function createTempStoredFormInputMock(props: Partial<TempStoredFormInput
     receivedBy: "",
     receivedAt: new Date().toISOString(),
     signedAt: null,
+    quantityReceived: 0,
+    quantityType: "REAL",
+    ...props,
+  };
+}
+
+export function createTempStorerAcceptedFormInputMock(props: Partial<TempStorerAcceptedFormInput>): TempStorerAcceptedFormInput {
+  return {
+    signedAt: new Date().toISOString(),
+    signedBy: "",
+    wasteAcceptationStatus: "ACCEPTED",
+    wasteRefusalReason: null,
     quantityReceived: 0,
     quantityType: "REAL",
     ...props,

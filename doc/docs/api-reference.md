@@ -661,6 +661,33 @@ d'un utilisateur.
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>markAsAccepted</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide l'acceptation du BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">acceptedInfo</td>
+<td valign="top"><a href="#acceptedforminput">AcceptedFormInput</a>!</td>
+<td>
+
+Informations liées à l'arrivée
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>markAsProcessed</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -878,6 +905,25 @@ Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement
 <tr>
 <td colspan="2" align="right" valign="top">tempStoredInfos</td>
 <td valign="top"><a href="#tempstoredforminput">TempStoredFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>markAsTempStorerAccepted</strong></td>
+<td valign="top"><a href="#form">Form</a></td>
+<td>
+
+Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">tempStorerAcceptedInfo</td>
+<td valign="top"><a href="#tempstoreracceptedforminput">TempStorerAcceptedFormInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -3852,6 +3898,65 @@ Nombre de changements de statuts renvoyés
 
 ## Inputs
 
+### AcceptedFormInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
+<td>
+
+Statut d'acceptation du déchet (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Raison du refus (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date à laquelle le déchet a été accepté ou refusé (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedBy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom de la personne en charge de l'acceptation' du déchet (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityReceived</strong></td>
+<td valign="top"><a href="#float">Float</a>!</td>
+<td>
+
+Quantité réelle présentée (case 10)
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### AppendixFormInput
 
 Payload de création d'une annexe 2
@@ -4654,24 +4759,6 @@ Payload de réception d'un BSD
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
-<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
-<td>
-
-Statut d'acceptation du déchet (case 10)
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Raison du refus (case 10)
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>receivedBy</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td>
@@ -4690,6 +4777,24 @@ Date à laquelle le déchet a été reçu (case 10)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></td>
+<td>
+
+Statut d'acceptation du déchet (case 10)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Raison du refus (case 10)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>signedAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
@@ -4700,7 +4805,7 @@ Date à laquelle le déchet a été accepté ou refusé (case 10)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>quantityReceived</strong></td>
-<td valign="top"><a href="#float">Float</a>!</td>
+<td valign="top"><a href="#float">Float</a></td>
 <td>
 
 Quantité réelle présentée (case 10)
@@ -5014,6 +5119,74 @@ Date à laquelle le déchet a été reçu (case 13)
 <td>
 
 Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityReceived</strong></td>
+<td valign="top"><a href="#float">Float</a>!</td>
+<td>
+
+Quantité réelle présentée (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a>!</td>
+<td>
+
+Réelle ou estimée
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### TempStorerAcceptedFormInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date à laquelle le déchet a été accepté ou refusé (case 13).
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedBy</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom de la personne en charge de l'acceptation du déchet (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
+<td>
+
+Statut d'acceptation du déchet (case 13)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteRefusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Raison du refus (case 13)
 
 </td>
 </tr>
@@ -5829,6 +6002,14 @@ BSD reçu par l'établissement de destination
 </td>
 </tr>
 <tr>
+<td valign="top"><strong>ACCEPTED</strong></td>
+<td>
+
+BSD accepté par l'établissement de destination
+
+</td>
+</tr>
+<tr>
 <td valign="top"><strong>PROCESSED</strong></td>
 <td>
 
@@ -5873,6 +6054,14 @@ Déchet refusé
 <td>
 
 Déchet arrivé sur le site d'entreposage ou reconditionnement
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TEMP_STORER_ACCEPTED</strong></td>
+<td>
+
+Déchet accepté par le site d'entreposage ou reconditionnement
 
 </td>
 </tr>

@@ -223,6 +223,21 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
   return true;
 }
 
+export async function checkCanMarkAsAccepted(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+  const isAuthorized = [
+    isFormRecipient,
+    isFormDestinationAfterTempStorage
+  ].some(isFormRole => isFormRole(fullUser, fullForm));
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
+    );
+  }
+  return true;
+}
+
 export async function checkCanMarkAsProcessed(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
@@ -239,6 +254,19 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsTempStored(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const fullForm = await getFullForm(form);
+
+  const isAuthorized = isFormRecipient(fullUser, fullForm);
+  if (!isAuthorized) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
+    );
+  }
+  return true;
+}
+
+export async function checkCanMarkAsTempStorerAccepted(user: User, form: Form) {
   const fullUser = await getFullUser(user);
   const fullForm = await getFullForm(form);
 

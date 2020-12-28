@@ -6,21 +6,20 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "../../../../generated/prisma-client";
-import { ErrorCode } from "../../../../common/errors";
 
-const MARK_AS_TEMP_STORED = `
-  mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
-    markAsTempStored(id: $id, tempStoredInfos: $tempStoredInfos){
-      id
-      status
+const MARK_AS_TEMP_STORER_ACCEPTED = `
+    mutation MarkAsTempStorerAccepted($id: ID!, $tempStorerAcceptedInfo: TempStorerAcceptedFormInput!){
+      markAsTempStorerAccepted(id: $id, tempStorerAcceptedInfo: $tempStorerAcceptedInfo){
+        id
+        status
+      }
     }
-  }
-`;
+  `;
 
-describe("{ mutation { markAsTempStored } }", () => {
+describe("{ mutation { markAsTempStorerAccepted } }", () => {
   afterAll(() => resetDatabase());
 
-  test("it fails when form is not SENT", async () => {
+  test("it fails when form is not TEMP_STORED", async () => {
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
@@ -40,15 +39,14 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+    const { errors } = await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
       variables: {
         id: form.id,
-        tempStoredInfos: {
+        tempStorerAcceptedInfo: {
           wasteAcceptationStatus: "ACCEPTED",
           wasteRefusalReason: "",
-          receivedBy: "John Doe",
-          receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
+          signedBy: "John Doe",
           quantityReceived: 2.4,
           quantityType: "REAL"
         }
@@ -70,25 +68,26 @@ describe("{ mutation { markAsTempStored } }", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "SENT",
+        status: "TEMP_STORED",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        temporaryStorageDetail: { create: {} },
+        receivedBy: "John Doe",
+        receivedAt: "2018-12-11T00:00:00.000Z"
       }
     });
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_TEMP_STORED, {
+    await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
       variables: {
         id: form.id,
-        tempStoredInfos: {
+        tempStorerAcceptedInfo: {
           wasteAcceptationStatus: "ACCEPTED",
           wasteRefusalReason: "",
-          receivedBy: "John Doe",
-          receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
+          signedBy: "John Doe",
           quantityReceived: 2.4,
           quantityType: "REAL"
         }
@@ -110,42 +109,6 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(statusLogs.length).toEqual(1);
   });
 
-  test("should leave the signature date empty when not provided", async () => {
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-    const emitterCompany = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "SENT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    await mutate(MARK_AS_TEMP_STORED, {
-      variables: {
-        id: form.id,
-        tempStoredInfos: {
-          wasteAcceptationStatus: "ACCEPTED",
-          receivedBy: "John Doe",
-          receivedAt: "2018-12-11T00:00:00.000Z",
-          quantityReceived: 2.4,
-          quantityType: "REAL"
-        }
-      }
-    });
-
-    const updatedTemporaryStorageDetail = await prisma
-      .form({ id: form.id })
-      .temporaryStorageDetail();
-    expect(updatedTemporaryStorageDetail.tempStorerSignedAt).toBeNull();
-  });
-
   test("the temp storer of the BSD can mark it as REFUSED", async () => {
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
       "MEMBER"
@@ -156,24 +119,25 @@ describe("{ mutation { markAsTempStored } }", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "SENT",
+        status: "TEMP_STORED",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        temporaryStorageDetail: { create: {} },
+        receivedBy: "John Doe",
+        receivedAt: "2018-12-11T00:00:00.000Z"
       }
     });
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_TEMP_STORED, {
+    await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
       variables: {
         id: form.id,
-        tempStoredInfos: {
+        tempStorerAcceptedInfo: {
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Thats isn't what I was expecting man !",
-          receivedBy: "John Doe",
-          receivedAt: "2018-12-11T00:00:00.000Z",
+          signedBy: "John Doe",
           signedAt: "2018-12-11T00:00:00.000Z",
           quantityReceived: 0,
           quantityType: "REAL"
@@ -194,48 +158,5 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
     expect(statusLogs.length).toEqual(1);
-  });
-
-  it("should not be possible to mark a BSD as temp stored if recipientIsTempStorage != true", async () => {
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-
-    const emitterCompany = await companyFactory();
-
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "SENT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: false,
-        temporaryStorageDetail: { create: {} }
-      }
-    });
-
-    const { mutate } = makeClient(user);
-
-    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
-      variables: {
-        id: form.id,
-        tempStoredInfos: {
-          wasteAcceptationStatus: "ACCEPTED",
-          wasteRefusalReason: "",
-          receivedBy: "John Doe",
-          receivedAt: "2018-12-11T00:00:00.000Z",
-          signedAt: "2018-12-11T00:00:00.000Z",
-          quantityReceived: 2.4,
-          quantityType: "REAL"
-        }
-      }
-    });
-
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toEqual(
-      "Ce bordereau ne peut pas être marqué comme entreposé provisoirement car le destinataire " +
-        "n'a pas été identifié comme étant une installation d'entreposage provisoire ou de reconditionnement"
-    );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 });

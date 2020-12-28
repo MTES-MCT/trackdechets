@@ -350,6 +350,14 @@ type Mutation {
       reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)"
     )
 
+  "Valide l'acceptation du BSD"
+  markAsAccepted(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées à l'arrivée"
+    acceptedInfo: AcceptedFormInput!
+  ): Form
+
   "Valide la réception d'un BSD"
   markAsReceived(
     "ID d'un BSD"
@@ -386,6 +394,9 @@ type Mutation {
 
   "Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement"
   markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form
+
+  "Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement"
+  markAsTempStorerAccepted(id: ID!, tempStorerAcceptedInfo: TempStorerAcceptedFormInput!): Form
 
   "Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement"
   markAsResealed(id: ID!, resealedInfos: ResealedFormInput!): Form
@@ -476,6 +487,9 @@ enum FormStatus {
   "BSD reçu par l'établissement de destination"
   RECEIVED
 
+  "BSD accepté par l'établissement de destination"
+  ACCEPTED
+
   "BSD dont les déchets ont été traités"
   PROCESSED
 
@@ -493,6 +507,9 @@ enum FormStatus {
 
   "Déchet arrivé sur le site d'entreposage ou reconditionnement"
   TEMP_STORED
+
+  "Déchet accepté par le site d'entreposage ou reconditionnement"
+  TEMP_STORER_ACCEPTED
 
   "Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site d'entreposage ou reconditionnement"
   RESEALED
