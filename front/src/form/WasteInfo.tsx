@@ -102,7 +102,10 @@ export default connect<{}, Values>(function WasteInfo(props) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Question color="currentColor" size={20} />
+          <Tooltip
+            msg="Le terme POP recouvre un ensemble de substances organiques qui
+        possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
+          />
         </a>
       </div>
 
