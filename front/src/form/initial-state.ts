@@ -50,6 +50,7 @@ export default {
     quantity: null,
     quantityType: "ESTIMATED",
     consistence: "SOLID",
+    pop: false,
   },
   appendix2Forms: [],
   ecoOrganisme: {
