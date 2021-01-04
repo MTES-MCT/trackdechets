@@ -15,6 +15,9 @@ generates:
       scalarDefaults:
         DateTime: new Date().toISOString()
         URL: "https://example.com"
+    hooks:
+      afterOneFileWrite:
+        - prettier --write
   front/generated/graphql/types.ts:
     plugins:
       - typescript
@@ -28,6 +31,9 @@ generates:
       scalarDefaults:
         DateTime: new Date().toISOString()
         URL: "https://example.com"
+    hooks:
+      afterOneFileWrite:
+        - prettier --write
   documentation/api-reference.md:
     schema: "!./src/**/*.private.graphql"
     plugins:
