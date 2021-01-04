@@ -45,6 +45,26 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <RedErrorMessage name="wasteDetails.name" />
       </div>
 
+      <div className="form__row" style={{ flexDirection: "row" }}>
+        <Field
+          type="checkbox"
+          component={FieldSwitch}
+          name="wasteDetails.pop"
+          label="Le déchet contient des polluants organiques persistants"
+        />
+        <a
+          className="link tw-ml-2"
+          href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Tooltip
+            msg="Le terme POP recouvre un ensemble de substances organiques qui
+        possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
+          />
+        </a>
+      </div>
+
       {values.emitter.type === "APPENDIX1" && <AppendixInfo />}
 
       {values.emitter.type === "APPENDIX2" && (
@@ -87,26 +107,6 @@ export default connect<{}, Values>(function WasteInfo(props) {
         </fieldset>
 
         <RedErrorMessage name="wasteDetails.consistence" />
-      </div>
-
-      <div className="form__row" style={{ flexDirection: "row" }}>
-        <Field
-          type="checkbox"
-          component={FieldSwitch}
-          name="wasteDetails.pop"
-          label="Le déchet contient des polluants organiques persistants"
-        />
-        <a
-          className="link tw-ml-2"
-          href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Tooltip
-            msg="Le terme POP recouvre un ensemble de substances organiques qui
-        possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
-          />
-        </a>
       </div>
 
       <h4 className="form__section-heading">Quantité en tonnes</h4>
