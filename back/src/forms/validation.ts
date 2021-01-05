@@ -336,6 +336,35 @@ const packagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
     )
 });
 
+const draftPackagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
+  type: yup.mixed<Packagings>().nullable(),
+  other: yup
+    .string()
+    .when("type", (type, schema) =>
+      type === "AUTRE"
+        ? schema.nullable()
+        : schema
+            .nullable()
+            .max(
+              0,
+              "${path} ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
+            )
+    ),
+  quantity: yup
+    .number()
+    .nullable()
+    .integer()
+    .min(1, "Le nombre de colis doit être supérieur à 0.")
+    .when("type", (type, schema) =>
+      ["CITERNE", "BENNE"].includes(type)
+        ? schema.max(
+            1,
+            "Le nombre de benne ou de citerne ne peut être supérieur à 1."
+          )
+        : schema
+    )
+});
+
 // 3 - Dénomination du déchet
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
@@ -898,6 +927,31 @@ export const draftFormSchema = yup
       .notRequired()
       .nullable()
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .nullable()
+      .of(draftPackagingInfo)
+      .test(
+        "is-valid-packaging-infos",
+        "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
+        (infos: PackagingInfo[]) => {
+          const hasCiterne = infos?.find(i => i.type === "CITERNE");
+          const hasBenne = infos?.find(i => i.type === "BENNE");
+
+          if (hasCiterne && hasBenne) {
+            return false;
+          }
+
+          const hasOtherPackaging = infos?.find(
+            i => !["CITERNE", "BENNE"].includes(i.type)
+          );
+          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+            return false;
+          }
+
+          return true;
+        }
+      ),
     transporterCompanySiret: yup
       .string()
       .notRequired()
