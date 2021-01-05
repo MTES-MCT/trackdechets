@@ -8,6 +8,7 @@
 - [Tests d'intégration](#tests-dintégration)
 - [Créer une PR](#créer-une-pr)
 - [Déploiement](#déploiement)
+- [Migrations](#migrations)
 - [Guides](#guides)
   - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
   - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
@@ -180,6 +181,17 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur sandbox et prod
 9. Merger la PR et suivre l'avancement du déploiement sur le CI
 10. Se connecter à l'instance de prod et faire tourner le script `npm run update` dans le container `td-api`. Faire de même sur l'instance sandbox.
+
+## Migrations
+
+Les migrations de base peuvent se faire soit en SQL, soit via des script TypeScript.
+Pour le SQL elles sont situées dans `back/prisma/migrations`. Les fichiers sont numérotés dans l'ordre croissant. Ils doivent être nommé `XX_any-namme.sql`.
+A noter que une fois que ces migrations ont été jouées, le contenu des fichiers est hashé dans la table migration et il ne faut donc surtout pas les modifier.
+
+Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
+Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
+
+Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)  
 
 ## Guides
 
