@@ -5079,7 +5079,7 @@ Payload de prise en charge de segment
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>wasteAcceptationStatus</strong></td>
-<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a>!</td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></td>
 <td>
 
 Statut d'acceptation du déchet (case 13)
