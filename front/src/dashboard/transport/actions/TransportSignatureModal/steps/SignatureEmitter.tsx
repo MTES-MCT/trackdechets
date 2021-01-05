@@ -191,10 +191,10 @@ export function SignatureEmitter({
         >
           {isSubmitting
             ? "Signature en cours..."
-            : `Signer par ${
+            : `Signer ${
                 values.signatureAuthor === SignatureAuthor.Emitter
-                  ? `le ${emitterAlias}`
-                  : "l'éco-organisme"
+                  ? `par le ${emitterAlias}`
+                  : "pour l'éco-organisme"
               }`}
         </button>
       </div>
