@@ -32,14 +32,17 @@ type FieldSwitchProps = FieldProps & {
 
 // Compatilibty layer between the Switch and Formik's <Field />
 export function FieldSwitch({
-  field: { checked, onChange, ...field },
+  field: { checked, ...field },
+  form: { setFieldValue },
   ...props
 }: FieldSwitchProps) {
   return (
     <Switch
       {...field}
       {...props}
-      onChange={(checked, event) => onChange(event)}
+      onChange={checked => {
+        setFieldValue(field.name, checked);
+      }}
       checked={Boolean(checked)}
     />
   );
