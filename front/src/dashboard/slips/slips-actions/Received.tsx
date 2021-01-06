@@ -1,5 +1,7 @@
 import React from "react";
+import { isBefore, formatISO } from "date-fns";
 import { Formik, Field, Form } from "formik";
+import { parseDate } from "common/datetime";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { SlipActionProps } from "./SlipActions";
@@ -48,10 +50,15 @@ export default function Received(props: SlipActionProps) {
           props.onSubmit({ info: values });
         }}
         validate={values => {
-          if (props.form.sentAt && values.receivedAt < props.form.sentAt) {
+          if (
+            isBefore(
+              parseDate(values.receivedAt),
+              parseDate(props.form.sentAt!)
+            )
+          ) {
             return {
               receivedAt:
-                "La date de réception doit être supérieure à la date d'émission du déchet.",
+                "La date de réception du déchet doit être postérieure à sa date d'émission.",
             };
           }
         }}
@@ -66,14 +73,9 @@ export default function Received(props: SlipActionProps) {
                 <label>
                   Date d'arrivée
                   <Field
-                    min={
-                      props.form.sentAt
-                        ? props.form.sentAt.replace(
-                            /(\d{4}-\d{2}-\d{2}).*/gi,
-                            "$1"
-                          )
-                        : ""
-                    }
+                    min={formatISO(parseDate(props.form.sentAt!), {
+                      representation: "date",
+                    })}
                     component={DateInput}
                     name="receivedAt"
                     className="td-input"

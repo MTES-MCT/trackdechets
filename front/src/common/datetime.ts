@@ -10,7 +10,7 @@ export function parseDate(date: Date | number | string): Date {
 }
 
 export function formatDate(date: Date | number | string): string {
-  return format(parseDate(date), "dd/MM/Y", {
+  return format(parseDate(date), "dd/MM/y", {
     locale: fr,
   });
 }
