@@ -2,6 +2,7 @@ import React from "react";
 import { isBefore, formatISO } from "date-fns";
 import { Formik, Field, Form } from "formik";
 import { parseDate } from "common/datetime";
+import { RedErrorMessage } from "common/components";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { SlipActionProps } from "./SlipActions";
@@ -27,10 +28,6 @@ export const textConfig = {
     refusalReasonText: "Motif du refus partiel",
   },
 };
-const FieldError = ({ fieldError }) =>
-  !!fieldError ? (
-    <p className="text-red tw-mt-0 tw-mb-0">{fieldError}</p>
-  ) : null;
 
 export default function Received(props: SlipActionProps) {
   return (
@@ -63,10 +60,7 @@ export default function Received(props: SlipActionProps) {
           }
         }}
       >
-        {({ values, errors, touched, handleReset, setFieldValue }) => {
-          const hasErrors = !!Object.keys(errors).length;
-          const isTouched = !!Object.keys(touched).length;
-
+        {({ values, isSubmitting, handleReset, setFieldValue }) => {
           return (
             <Form>
               <p className="form__row">
@@ -80,8 +74,8 @@ export default function Received(props: SlipActionProps) {
                     name="receivedAt"
                     className="td-input"
                   />
-                  <FieldError fieldError={errors.receivedAt} />
                 </label>
+                <RedErrorMessage name="receivedAt" />
               </p>
               <div className="form__row">
                 <div className="form__row">
@@ -136,12 +130,12 @@ export default function Received(props: SlipActionProps) {
                       WasteAcceptationStatus.Refused
                     }
                   />
-                  <FieldError fieldError={errors.quantityReceived} />
                   <span>
                     Poids indicatif émis: {props.form.stateSummary?.quantity}{" "}
                     tonnes
                   </span>
                 </label>
+                <RedErrorMessage name="quantityReceived" />
               </p>
               {props.form.recipient?.isTempStorage &&
                 props.form.status === FormStatus.Sent && (
@@ -173,8 +167,8 @@ export default function Received(props: SlipActionProps) {
                         .refusalReasonText
                     }
                     <Field name="wasteRefusalReason" className="td-input" />
-                    <FieldError fieldError={errors.wasteRefusalReason} />
                   </label>
+                  <RedErrorMessage name="wasteRefusalReason" />
                 </p>
               )}
               <p className="form__row">
@@ -186,8 +180,8 @@ export default function Received(props: SlipActionProps) {
                     placeholder="NOM Prénom"
                     className="td-input"
                   />
-                  <FieldError fieldError={errors.receivedBy} />
                 </label>
+                <RedErrorMessage name="receivedBy" />
               </p>
               <p className="form__row">
                 <label>
@@ -197,8 +191,8 @@ export default function Received(props: SlipActionProps) {
                     name="signedAt"
                     className="td-input"
                   />
-                  <FieldError fieldError={errors.signedAt} />
                 </label>
+                <RedErrorMessage name="signedAt" />
               </p>
               <p>
                 {values.wasteAcceptationStatus &&
@@ -218,12 +212,8 @@ export default function Received(props: SlipActionProps) {
 
                 <button
                   type="submit"
-                  className={
-                    hasErrors || !isTouched
-                      ? "btn btn--primary"
-                      : "btn btn--primary"
-                  }
-                  disabled={hasErrors || !isTouched}
+                  className="btn btn--primary"
+                  disabled={isSubmitting}
                 >
                   Je valide la réception
                 </button>
