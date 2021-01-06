@@ -58,7 +58,7 @@ const positiveInteger = yup
 export function getConnectionsArgs(args: PaginationArgs) {
   const maxPaginateBy = args.maxPaginateBy ?? 1000;
 
-  const validationSchema = yup.object().shape<PaginationArgs>({
+  const validationSchema = yup.object().shape({
     first: positiveInteger.max(
       maxPaginateBy,
       `\`first\` doit être inférieur à ${maxPaginateBy}`

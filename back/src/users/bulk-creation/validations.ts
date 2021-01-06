@@ -56,11 +56,9 @@ export const companyValidationSchema = yup.object().shape({
     .ensure()
     .compact()
     .required()
+    .min(1)
     .test("is-companyType", "${value} is not a valid company type", value => {
-      const isCompanyType = value.reduce((acc: boolean, curr: string) => {
-        return acc && COMPANY_TYPES.includes(curr);
-      }, true);
-      return isCompanyType;
+      return value.every(type => COMPANY_TYPES.includes(type));
     }),
   givenName: yup.string().notRequired(),
   contactEmail: yup.string().notRequired().email(),

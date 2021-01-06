@@ -192,7 +192,7 @@ describe("role validation", () => {
     { siret: "12345678901234", companyTypes: ["PRODUCER" as CompanyType] }
   ];
 
-  const validateRole = validateRoleGenerator(companies);
+  const validateRole = validateRoleGenerator(companies as any);
 
   test("valid role", async () => {
     const role = {

@@ -7,5 +7,17 @@ export default function configureYup() {
       required: "${path} est un champ requis et doit avoir une valeur",
       notType: "${path} ne peut pas être null"
     }
-  } as yup.LocaleObject);
+  });
+
+  yup.addMethod<yup.BaseSchema>(
+    yup.mixed,
+    "sealedRequired",
+    function sealedRequired(message?: string) {
+      return this.when("$isDraft", {
+        is: true,
+        then: s => s.nullable().notRequired(),
+        otherwise: s => s.nullable().required(message) // nullable to treat null as a missing value, not a type error
+      }).transform(val => (val === "" ? null : val));
+    }
+  );
 }

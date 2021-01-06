@@ -238,7 +238,7 @@ describe("{ mutation { markAsSent } }", () => {
     expect(resultingForm.currentTransporterSiret).toBeNull();
   });
 
-  test.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(
+  test.each(["toto", "lorem ipsum", "01 02 03", "101309*"])(
     "wrong waste code (%p) must invalidate mutation",
     async wrongWasteCode => {
       const { user, company: recipientCompany } = await userWithCompanyFactory(

@@ -202,12 +202,12 @@ const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne p
 // *************************************************************
 
 // 1 - Émetteur du bordereau
-export const emitterSchema: yup.ObjectSchema<Partial<
-  Emitter
->> = yup.object().shape({
+export const emitterSchema = yup.object().shape({
   emitterType: yup.mixed<EmitterType>().when("ecoOrganismeSiret", {
     is: ecoOrganismeSiret => !ecoOrganismeSiret,
-    then: yup.mixed().required(`Émetteur: Le type d'émetteur est obligatoire`),
+    then: yup
+      .mixed()
+      .sealedRequired(`Émetteur: Le type d'émetteur est obligatoire`),
     otherwise: yup
       .mixed()
       .oneOf(
@@ -218,29 +218,31 @@ export const emitterSchema: yup.ObjectSchema<Partial<
   emitterCompanyName: yup
     .string()
     .ensure()
-    .required(`Émetteur: ${MISSING_COMPANY_NAME}`),
+    .sealedRequired(`Émetteur: ${MISSING_COMPANY_NAME}`),
   emitterCompanySiret: yup
     .string()
     .ensure()
-    .required(`Émetteur: ${MISSING_COMPANY_SIRET}`)
-    .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`),
+    .sealedRequired(`Émetteur: ${MISSING_COMPANY_SIRET}`)
+    .matches(/^$|^\d{14}$/, {
+      message: `Émetteur: ${INVALID_SIRET_LENGTH}`
+    }),
   emitterCompanyAddress: yup
     .string()
     .ensure()
-    .required(`Émetteur: ${MISSING_COMPANY_ADDRESS}`),
+    .sealedRequired(`Émetteur: ${MISSING_COMPANY_ADDRESS}`),
   emitterCompanyContact: yup
     .string()
     .ensure()
-    .required(`Émetteur: ${MISSING_COMPANY_CONTACT}`),
+    .sealedRequired(`Émetteur: ${MISSING_COMPANY_CONTACT}`),
   emitterCompanyPhone: yup
     .string()
     .ensure()
-    .required(`Émetteur: ${MISSING_COMPANY_PHONE}`),
+    .sealedRequired(`Émetteur: ${MISSING_COMPANY_PHONE}`),
   emitterCompanyMail: yup
     .string()
     .email()
     .ensure()
-    .required(`Émetteur: ${MISSING_COMPANY_EMAIL}`)
+    .sealedRequired(`Émetteur: ${MISSING_COMPANY_EMAIL}`)
 });
 
 // Optional validation schema for eco-organisme appearing in frame 1
@@ -265,43 +267,43 @@ export const ecoOrganismeSchema = yup.object().shape({
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-export const recipientSchema: yup.ObjectSchema<Partial<
-  Recipient
->> = yup.object().shape({
+export const recipientSchema = yup.object().shape({
   recipientProcessingOperation: yup
     .string()
     .label("Opération d’élimination / valorisation")
     .ensure()
-    .required(),
+    .sealedRequired(),
   recipientCompanyName: yup
     .string()
     .ensure()
-    .required(`Destinataire: ${MISSING_COMPANY_NAME}`),
+    .sealedRequired(`Destinataire: ${MISSING_COMPANY_NAME}`),
   recipientCompanySiret: yup
     .string()
     .ensure()
-    .required(`Destinataire: ${MISSING_COMPANY_SIRET}`)
-    .length(14, `Destinataire: ${INVALID_SIRET_LENGTH}`),
+    .sealedRequired(`Destinataire: ${MISSING_COMPANY_SIRET}`)
+    .matches(/^$|^\d{14}$/, {
+      message: `Destinataire: ${INVALID_SIRET_LENGTH}`
+    }),
   recipientCompanyAddress: yup
     .string()
     .ensure()
-    .required(`Destinataire: ${MISSING_COMPANY_ADDRESS}`),
+    .sealedRequired(`Destinataire: ${MISSING_COMPANY_ADDRESS}`),
   recipientCompanyContact: yup
     .string()
     .ensure()
-    .required(`Destinataire: ${MISSING_COMPANY_CONTACT}`),
+    .sealedRequired(`Destinataire: ${MISSING_COMPANY_CONTACT}`),
   recipientCompanyPhone: yup
     .string()
     .ensure()
-    .required(`Destinataire: ${MISSING_COMPANY_PHONE}`),
+    .sealedRequired(`Destinataire: ${MISSING_COMPANY_PHONE}`),
   recipientCompanyMail: yup
     .string()
     .email()
     .ensure()
-    .required(`Destinataire: ${MISSING_COMPANY_EMAIL}`)
+    .sealedRequired(`Destinataire: ${MISSING_COMPANY_EMAIL}`)
 });
 
-const packagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
+const packagingInfo = yup.object().shape({
   type: yup
     .mixed<Packagings>()
     .required("Le type de conditionnement doit être précisé."),
@@ -309,7 +311,7 @@ const packagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
     .string()
     .when("type", (type, schema) =>
       type === "AUTRE"
-        ? schema.required(
+        ? schema.sealedRequired(
             "La description doit être précisée pour le conditionnement 'AUTRE'."
           )
         : schema
@@ -321,38 +323,9 @@ const packagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
     ),
   quantity: yup
     .number()
-    .required(
+    .sealedRequired(
       "Le nombre de colis associé au conditionnement doit être précisé."
     )
-    .integer()
-    .min(1, "Le nombre de colis doit être supérieur à 0.")
-    .when("type", (type, schema) =>
-      ["CITERNE", "BENNE"].includes(type)
-        ? schema.max(
-            1,
-            "Le nombre de benne ou de citerne ne peut être supérieur à 1."
-          )
-        : schema
-    )
-});
-
-const draftPackagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
-  type: yup.mixed<Packagings>().nullable(),
-  other: yup
-    .string()
-    .when("type", (type, schema) =>
-      type === "AUTRE"
-        ? schema.nullable()
-        : schema
-            .nullable()
-            .max(
-              0,
-              "${path} ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
-            )
-    ),
-  quantity: yup
-    .number()
-    .nullable()
     .integer()
     .min(1, "Le nombre de colis doit être supérieur à 0.")
     .when("type", (type, schema) =>
@@ -369,28 +342,25 @@ const draftPackagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
 // 6 - Quantité
-export const wasteDetailsSchema: yup.ObjectSchema<Partial<
-  WasteDetails
->> = yup.object().shape({
+export const wasteDetailsSchema = yup.object().shape({
   wasteDetailsCode: yup
     .string()
-    .ensure()
-    .required("Le code déchet est obligatoire")
-    .oneOf(WASTES_CODES, INVALID_WASTE_CODE),
+    .sealedRequired("Le code déchet est obligatoire")
+    .oneOf([...WASTES_CODES, null], INVALID_WASTE_CODE),
   wasteDetailsOnuCode: yup.string().when("wasteDetailsCode", {
     is: (wasteCode: string) => isDangerous(wasteCode || ""),
     then: () =>
       yup
         .string()
         .ensure()
-        .required(
+        .sealedRequired(
           `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
         ),
     otherwise: () => yup.string().nullable()
   }),
   wasteDetailsPackagingInfos: yup
     .array()
-    .required("Le détail du conditionnement est obligatoire")
+    .sealedRequired("Le détail du conditionnement est obligatoire")
     .of(packagingInfo)
     .test(
       "is-valid-packaging-infos",
@@ -415,49 +385,51 @@ export const wasteDetailsSchema: yup.ObjectSchema<Partial<
     ),
   wasteDetailsQuantity: yup
     .number()
-    .required("La quantité du déchet en tonnes est obligatoire")
+    .sealedRequired("La quantité du déchet en tonnes est obligatoire")
     .min(0, "La quantité doit être supérieure à 0"),
   wasteDetailsQuantityType: yup
     .mixed<QuantityType>()
-    .required("Le type de quantité (réelle ou estimée) doit être précisé"),
+    .sealedRequired(
+      "Le type de quantité (réelle ou estimée) doit être précisé"
+    ),
   wasteDetailsConsistence: yup
     .mixed<Consistence>()
-    .required("La consistance du déchet doit être précisée"),
+    .sealedRequired("La consistance du déchet doit être précisée"),
   wasteDetailsPop: yup
     .boolean()
-    .required("La présence (ou non) de POP doit être précisée")
+    .sealedRequired("La présence (ou non) de POP doit être précisée")
 });
 
 // 8 - Collecteur-transporteur
-export const transporterSchema: yup.ObjectSchema<Partial<
-  Transporter
->> = yup.object().shape({
+export const transporterSchema = yup.object().shape({
   transporterCompanyName: yup
     .string()
     .ensure()
-    .required(`Transporteur: ${MISSING_COMPANY_NAME}`),
+    .sealedRequired(`Transporteur: ${MISSING_COMPANY_NAME}`),
   transporterCompanySiret: yup
     .string()
     .ensure()
-    .required(`Transporteur: ${MISSING_COMPANY_SIRET}`)
-    .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`),
+    .sealedRequired(`Transporteur: ${MISSING_COMPANY_SIRET}`)
+    .matches(/^$|^\d{14}$/, {
+      message: `Transporteur: ${INVALID_SIRET_LENGTH}`
+    }),
   transporterCompanyAddress: yup
     .string()
     .ensure()
-    .required(`Transporteur: ${MISSING_COMPANY_ADDRESS}`),
+    .sealedRequired(`Transporteur: ${MISSING_COMPANY_ADDRESS}`),
   transporterCompanyContact: yup
     .string()
     .ensure()
-    .required(`Transporteur: ${MISSING_COMPANY_CONTACT}`),
+    .sealedRequired(`Transporteur: ${MISSING_COMPANY_CONTACT}`),
   transporterCompanyPhone: yup
     .string()
     .ensure()
-    .required(`Transporteur: ${MISSING_COMPANY_PHONE}`),
+    .sealedRequired(`Transporteur: ${MISSING_COMPANY_PHONE}`),
   transporterCompanyMail: yup
     .string()
     .email()
     .ensure()
-    .required(`Transporteur: ${MISSING_COMPANY_EMAIL}`),
+    .sealedRequired(`Transporteur: ${MISSING_COMPANY_EMAIL}`),
   transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
   transporterReceipt: yup
     .string()
@@ -466,7 +438,7 @@ export const transporterSchema: yup.ObjectSchema<Partial<
         ? schema.notRequired().nullable()
         : schema
             .ensure()
-            .required(
+            .sealedRequired(
               "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
             )
     ),
@@ -477,7 +449,7 @@ export const transporterSchema: yup.ObjectSchema<Partial<
         ? schema.notRequired().nullable()
         : schema
             .ensure()
-            .required("Le département du transporteur est obligatoire")
+            .sealedRequired("Le département du transporteur est obligatoire")
     ),
   transporterValidityLimit: validDatetime({
     verboseFieldName: "date de validité"
@@ -486,9 +458,7 @@ export const transporterSchema: yup.ObjectSchema<Partial<
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
-export const signingInfoSchema: yup.ObjectSchema<Partial<
-  SigningInfo
->> = yup.object().shape({
+export const signingInfoSchema = yup.object().shape({
   sentAt: validDatetime({
     verboseFieldName: "date d'envoi",
     required: true
@@ -500,111 +470,107 @@ export const signingInfoSchema: yup.ObjectSchema<Partial<
 });
 
 // 10 - Expédition reçue à l’installation de destination
-export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
-  .object()
-  .shape({
-    isAccepted: yup.boolean(),
-    receivedBy: yup
-      .string()
-      .ensure()
-      .required("Vous devez saisir un responsable de la réception."),
-    receivedAt: validDatetime({
-      verboseFieldName: "date de réception",
-      required: true
-    }),
-    signedAt: validDatetime({
-      verboseFieldName: "date d'acceptation"
-    }),
-    quantityReceived: yup
-      .number()
-      // if waste is refused, quantityReceived must be 0
-      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-        ["REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-zero",
-              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
-              v => v === 0
+export const receivedInfoSchema = yup.object().shape({
+  isAccepted: yup.boolean(),
+  receivedBy: yup
+    .string()
+    .ensure()
+    .required("Vous devez saisir un responsable de la réception."),
+  receivedAt: validDatetime({
+    verboseFieldName: "date de réception",
+    required: true
+  }),
+  signedAt: validDatetime({
+    verboseFieldName: "date d'acceptation"
+  }),
+  quantityReceived: yup
+    .number()
+    // if waste is refused, quantityReceived must be 0
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.test(
+            "is-zero",
+            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
+            v => v === 0
+          )
+        : schema
+    )
+    // if waste is partially or totally accepted, we check it is a positive value
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.test(
+            "is-strictly-positive",
+            "Vous devez saisir une quantité reçue supérieure à 0.",
+            v => v > 0
+          )
+        : schema
+    ),
+  wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
+  wasteRefusalReason: yup
+    .string()
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.ensure().required("Vous devez saisir un motif de refus")
+        : schema
+            .notRequired()
+            .nullable()
+            .test(
+              "is-empty",
+              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+              v => !v
             )
-          : schema
-      )
-      // if waste is partially or totally accepted, we check it is a positive value
-      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-strictly-positive",
-              "Vous devez saisir une quantité reçue supérieure à 0.",
-              v => v > 0
-            )
-          : schema
-      ),
-    wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
-    wasteRefusalReason: yup
-      .string()
-      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.ensure().required("Vous devez saisir un motif de refus")
-          : schema
-              .notRequired()
-              .nullable()
-              .test(
-                "is-empty",
-                "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                v => !v
-              )
-      )
-  });
+    )
+});
 
 // 10 - Expédition acceptée (ou refusée) à l’installation de destination
-export const acceptedInfoSchema: yup.ObjectSchema<AcceptedInfo> = yup
-  .object()
-  .shape({
-    isAccepted: yup.boolean(),
-    signedAt: validDatetime({
-      verboseFieldName: "date d'acceptation"
-    }),
-    signedBy: yup
-      .string()
-      .ensure()
-      .required("Vous devez saisir un responsable de la réception."),
-    quantityReceived: yup
-      .number()
-      .required()
-      // if waste is refused, quantityReceived must be 0
-      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-        ["REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-zero",
-              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
-              v => v === 0
+export const acceptedInfoSchema = yup.object().shape({
+  isAccepted: yup.boolean(),
+  signedAt: validDatetime({
+    verboseFieldName: "date d'acceptation"
+  }),
+  signedBy: yup
+    .string()
+    .ensure()
+    .required("Vous devez saisir un responsable de la réception."),
+  quantityReceived: yup
+    .number()
+    .required()
+    // if waste is refused, quantityReceived must be 0
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.test(
+            "is-zero",
+            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
+            v => v === 0
+          )
+        : schema
+    )
+    // if waste is partially or totally accepted, we check it is a positive value
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.test(
+            "is-strictly-positive",
+            "Vous devez saisir une quantité reçue supérieure à 0.",
+            v => v > 0
+          )
+        : schema
+    ),
+  wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
+  wasteRefusalReason: yup
+    .string()
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.ensure().required("Vous devez saisir un motif de refus")
+        : schema
+            .notRequired()
+            .nullable()
+            .test(
+              "is-empty",
+              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+              v => !v
             )
-          : schema
-      )
-      // if waste is partially or totally accepted, we check it is a positive value
-      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-strictly-positive",
-              "Vous devez saisir une quantité reçue supérieure à 0.",
-              v => v > 0
-            )
-          : schema
-      ),
-    wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
-    wasteRefusalReason: yup
-      .string()
-      .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.ensure().required("Vous devez saisir un motif de refus")
-          : schema
-              .notRequired()
-              .nullable()
-              .test(
-                "is-empty",
-                "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                v => !v
-              )
-      )
-  });
+    )
+});
 
 const withNextDestination = yup.object().shape({
   nextDestinationProcessingOperation: yup
@@ -717,133 +683,126 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 // *********************************************************************
 
 // 13 - Réception dans l’installation d’entreposage ou de reconditionnement
-export const tempStoredInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
-  .object()
-  .shape({
-    tempStorerReceivedBy: yup
-      .string()
-      .ensure()
-      .required("Vous devez saisir un responsable de la réception."),
-    tempStorerReceivedAt: validDatetime({
-      verboseFieldName: "date de réception",
-      required: true
-    }),
-    tempStorerSignedAt: validDatetime({
-      verboseFieldName: "date d'acceptation"
-    }),
-    tempStorerQuantityType: yup.mixed<QuantityType>(),
-    tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
-    tempStorerQuantityReceived: yup
-      .number()
-      // if waste is refused, quantityReceived must be 0
-      .when(
-        "tempStorerWasteAcceptationStatus",
-        (wasteAcceptationStatus, schema) =>
-          ["REFUSED"].includes(wasteAcceptationStatus)
-            ? schema.test(
-                "is-zero",
-                "Vous devez saisir une quantité reçue égale à 0.",
-                v => v === 0
+export const tempStoredInfoSchema = yup.object().shape({
+  tempStorerReceivedBy: yup
+    .string()
+    .ensure()
+    .required("Vous devez saisir un responsable de la réception."),
+  tempStorerReceivedAt: validDatetime({
+    verboseFieldName: "date de réception",
+    required: true
+  }),
+  tempStorerSignedAt: validDatetime({
+    verboseFieldName: "date d'acceptation"
+  }),
+  tempStorerQuantityType: yup.mixed<QuantityType>(),
+  tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
+  tempStorerQuantityReceived: yup
+    .number()
+    // if waste is refused, quantityReceived must be 0
+    .when(
+      "tempStorerWasteAcceptationStatus",
+      (wasteAcceptationStatus, schema) =>
+        ["REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.test(
+              "is-zero",
+              "Vous devez saisir une quantité reçue égale à 0.",
+              v => v === 0
+            )
+          : schema
+    )
+    // if waste is partially or totally accepted, we check it is a positive value
+    .when(
+      "tempStorerWasteAcceptationStatus",
+      (wasteAcceptationStatus, schema) =>
+        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.test(
+              "is-strictly-positive",
+              "Vous devez saisir une quantité reçue supérieure à 0.",
+              v => v > 0
+            )
+          : schema
+    ),
+  tempStorerWasteRefusalReason: yup
+    .string()
+    .when(
+      "tempStorerWasteAcceptationStatus",
+      (wasteAcceptationStatus, schema) =>
+        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.required("Vous devez renseigner la raison du refus")
+          : schema
+              .notRequired()
+              .nullable()
+              .test(
+                "is-empty",
+                "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+                v => !v
               )
-            : schema
-      )
-      // if waste is partially or totally accepted, we check it is a positive value
-      .when(
-        "tempStorerWasteAcceptationStatus",
-        (wasteAcceptationStatus, schema) =>
-          ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-            ? schema.test(
-                "is-strictly-positive",
-                "Vous devez saisir une quantité reçue supérieure à 0.",
-                v => v > 0
-              )
-            : schema
-      ),
-    tempStorerWasteRefusalReason: yup
-      .string()
-      .when(
-        "tempStorerWasteAcceptationStatus",
-        (wasteAcceptationStatus, schema) =>
-          ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-            ? schema.required("Vous devez renseigner la raison du refus")
-            : schema
-                .notRequired()
-                .nullable()
-                .test(
-                  "is-empty",
-                  "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                  v => !v
-                )
-      )
-  });
+    )
+});
 
-export const tempStorerAcceptedInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
-  .object()
-  .shape({
-    tempStorerReceivedAt: validDatetime({
-      verboseFieldName: "date de réception"
-    }),
-    tempStorerReceivedBy: yup.string(),
-    tempStorerQuantityType: yup.mixed<QuantityType>().required(),
-    tempStorerWasteAcceptationStatus: yup
-      .mixed<WasteAcceptationStatus>()
-      .required(),
-    tempStorerSignedBy: yup
-      .string()
-      .ensure()
-      .required("Vous devez saisir un responsable de l'acceptation."),
-    tempStorerSignedAt: validDatetime({
-      verboseFieldName: "date d'acceptation"
-    }),
-    tempStorerQuantityReceived: yup
-      .number()
-      .required()
-      // if waste is refused, quantityReceived must be 0
-      .when(
-        "tempStorerWasteAcceptationStatus",
-        (wasteAcceptationStatus, schema) =>
-          ["REFUSED"].includes(wasteAcceptationStatus)
-            ? schema.test(
-                "is-zero",
-                "Vous devez saisir une quantité reçue égale à 0.",
-                v => v === 0
+export const tempStorerAcceptedInfoSchema = yup.object().shape({
+  tempStorerReceivedAt: validDatetime({
+    verboseFieldName: "date de réception"
+  }),
+  tempStorerQuantityType: yup.mixed<QuantityType>().required(),
+  tempStorerWasteAcceptationStatus: yup
+    .mixed<WasteAcceptationStatus>()
+    .required(),
+  tempStorerSignedBy: yup
+    .string()
+    .ensure()
+    .required("Vous devez saisir un responsable de l'acceptation."),
+  tempStorerSignedAt: validDatetime({
+    verboseFieldName: "date d'acceptation"
+  }),
+  tempStorerQuantityReceived: yup
+    .number()
+    .required()
+    // if waste is refused, quantityReceived must be 0
+    .when(
+      "tempStorerWasteAcceptationStatus",
+      (wasteAcceptationStatus, schema) =>
+        ["REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.test(
+              "is-zero",
+              "Vous devez saisir une quantité reçue égale à 0.",
+              v => v === 0
+            )
+          : schema
+    )
+    // if waste is partially or totally accepted, we check it is a positive value
+    .when(
+      "tempStorerWasteAcceptationStatus",
+      (wasteAcceptationStatus, schema) =>
+        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.test(
+              "is-strictly-positive",
+              "Vous devez saisir une quantité reçue supérieure à 0.",
+              v => v > 0
+            )
+          : schema
+    ),
+  tempStorerWasteRefusalReason: yup
+    .string()
+    .when(
+      "tempStorerWasteAcceptationStatus",
+      (wasteAcceptationStatus, schema) =>
+        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+          ? schema.required("Vous devez renseigner la raison du refus")
+          : schema
+              .notRequired()
+              .nullable()
+              .test(
+                "is-empty",
+                "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+                v => !v
               )
-            : schema
-      )
-      // if waste is partially or totally accepted, we check it is a positive value
-      .when(
-        "tempStorerWasteAcceptationStatus",
-        (wasteAcceptationStatus, schema) =>
-          ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-            ? schema.test(
-                "is-strictly-positive",
-                "Vous devez saisir une quantité reçue supérieure à 0.",
-                v => v > 0
-              )
-            : schema
-      ),
-    tempStorerWasteRefusalReason: yup
-      .string()
-      .when(
-        "tempStorerWasteAcceptationStatus",
-        (wasteAcceptationStatus, schema) =>
-          ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-            ? schema.required("Vous devez renseigner la raison du refus")
-            : schema
-                .notRequired()
-                .nullable()
-                .test(
-                  "is-empty",
-                  "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                  v => !v
-                )
-      )
-  });
+    )
+});
 
 // 14 - Installation de destination prévue
-export const destinationAfterTempStorageSchema: yup.ObjectSchema<Partial<
-  DestinationAfterTempStorage
->> = yup.object().shape({
+export const destinationAfterTempStorageSchema = yup.object().shape({
   destinationCompanyName: yup
     .string()
     .ensure()
@@ -877,9 +836,7 @@ export const destinationAfterTempStorageSchema: yup.ObjectSchema<Partial<
 // 15 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 16 - Conditionnement
 // 17 - Quantité
-export const wasteRepackagingSchema: yup.ObjectSchema<Partial<
-  WasteRepackaging
->> = yup.object().shape({
+export const wasteRepackagingSchema = yup.object().shape({
   wasteDetailsNumberOfPackages: yup
     .number()
     .nullable()
@@ -894,78 +851,11 @@ export const wasteRepackagingSchema: yup.ObjectSchema<Partial<
 });
 
 // 18 - Collecteur-transporteur reconditionnement
-export const transporterAfterTempStorageSchema: yup.ObjectSchema<Partial<
-  TransporterAfterTempStorage
->> = transporterSchema;
+export const transporterAfterTempStorageSchema = transporterSchema;
 
 // *******************************************************************
 // COMPOSE VALIDATION SCHEMAS TO VALIDATE A FORM FOR A SPECIFIC STATUS
 // *******************************************************************
-
-// validation schema for a form in draft mode, all fields are nullable
-export const draftFormSchema = yup
-  .object()
-  .shape({
-    emitterCompanySiret: yup
-      .string()
-      .nullable()
-      .notRequired()
-      .matches(/^$|^\d{14}$/, {
-        message: `Émetteur: ${INVALID_SIRET_LENGTH}`
-      }),
-    emitterCompanyMail: yup.string().email().nullable().notRequired(),
-    recipientCompanySiret: yup
-      .string()
-      .notRequired()
-      .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Destinataire: ${INVALID_SIRET_LENGTH}`
-      }),
-    recipientCompanyMail: yup.string().notRequired().nullable().email(),
-    wasteDetailsCode: yup
-      .string()
-      .notRequired()
-      .nullable()
-      .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .nullable()
-      .of(draftPackagingInfo)
-      .test(
-        "is-valid-packaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        (infos: PackagingInfo[]) => {
-          const hasCiterne = infos?.find(i => i.type === "CITERNE");
-          const hasBenne = infos?.find(i => i.type === "BENNE");
-
-          if (hasCiterne && hasBenne) {
-            return false;
-          }
-
-          const hasOtherPackaging = infos?.find(
-            i => !["CITERNE", "BENNE"].includes(i.type)
-          );
-          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-            return false;
-          }
-
-          return true;
-        }
-      ),
-    transporterCompanySiret: yup
-      .string()
-      .notRequired()
-      .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Transporteur: ${INVALID_SIRET_LENGTH}`
-      }),
-    transporterCompanyMail: yup.string().notRequired().nullable().email(),
-    transporterValidityLimit: validDatetime({
-      verboseFieldName: "date de validité",
-      required: false
-    })
-  })
-  .concat(ecoOrganismeSchema);
 
 // validation schema for BSD before it can be sealed
 export const sealedFormSchema = emitterSchema

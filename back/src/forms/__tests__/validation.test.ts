@@ -2,8 +2,7 @@ import { Form } from "@prisma/client";
 import {
   sealedFormSchema,
   ecoOrganismeSchema,
-  receivedInfoSchema,
-  draftFormSchema
+  receivedInfoSchema
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
 
@@ -18,7 +17,7 @@ const form: Partial<Form> = {
   emitterWorkSitePostalCode: "",
   emitterWorkSiteInfos: "",
   emitterCompanyName: "A company 2",
-  emitterCompanySiret: "XXXXXXXXXX0002",
+  emitterCompanySiret: "00000000000002",
   emitterCompanyContact: "Emetteur",
   emitterCompanyPhone: "01",
   emitterCompanyAddress: "8 rue du Général de Gaulle",
@@ -26,7 +25,7 @@ const form: Partial<Form> = {
   recipientCap: "1234",
   recipientProcessingOperation: "D 6",
   recipientCompanyName: "A company 3",
-  recipientCompanySiret: "XXXXXXXXXX0003",
+  recipientCompanySiret: "00000000000003",
   recipientCompanyAddress: "8 rue du Général de Gaulle",
   recipientCompanyContact: "Destination",
   recipientCompanyPhone: "02",
@@ -35,7 +34,7 @@ const form: Partial<Form> = {
   transporterDepartment: "82",
   transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
   transporterCompanyName: "A company 4",
-  transporterCompanySiret: "XXXXXXXXXX0004",
+  transporterCompanySiret: "00000000000004",
   transporterCompanyAddress: "8 rue du Général de Gaulle",
   transporterCompanyContact: "Transporteur",
   transporterCompanyPhone: "03",
@@ -306,7 +305,9 @@ describe("draftFormSchema", () => {
   };
 
   it("should be valid when passing empty strings", () => {
-    const isValid = draftFormSchema.isValidSync(form);
+    const isValid = sealedFormSchema.isValidSync(form, {
+      context: { isDraft: true }
+    });
     expect(isValid).toBe(true);
   });
 
@@ -321,21 +322,31 @@ describe("draftFormSchema", () => {
       transporterCompanyMail: null,
       transporterValidityLimit: null
     };
-    const isValid = draftFormSchema.isValidSync(form);
+    const isValid = sealedFormSchema.isValidSync(form, {
+      context: { isDraft: true }
+    });
+
     expect(isValid).toBe(true);
   });
 
   it("should be valid when passing undefined values", () => {
-    const isValid = draftFormSchema.isValidSync({});
+    const isValid = sealedFormSchema.isValidSync(
+      {},
+      { context: { isDraft: true } }
+    );
+
     expect(isValid).toBe(true);
   });
 
   it("should not be valid when passing an invalid siret", async () => {
     const validateFn = () =>
-      draftFormSchema.validate({
-        ...form,
-        emitterCompanySiret: "this is not a siret"
-      });
+      sealedFormSchema.validate(
+        {
+          ...form,
+          emitterCompanySiret: "this is not a siret"
+        },
+        { context: { isDraft: true } }
+      );
 
     await expect(validateFn()).rejects.toThrow(
       "Émetteur: Le SIRET doit faire 14 caractères numériques"
@@ -344,10 +355,13 @@ describe("draftFormSchema", () => {
 
   it("should be invalid when passing an invalid waste code", async () => {
     const validateFn = () =>
-      draftFormSchema.validate({
-        ...form,
-        wasteDetailsCode: "this is not a waste cde"
-      });
+      sealedFormSchema.validate(
+        {
+          ...form,
+          wasteDetailsCode: "this is not a waste cde"
+        },
+        { context: { isDraft: true } }
+      );
 
     await expect(validateFn()).rejects.toThrow(
       "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
@@ -356,10 +370,13 @@ describe("draftFormSchema", () => {
 
   it("should be invalid when passing an invalid email", async () => {
     const validateFn = () =>
-      draftFormSchema.validate({
-        ...form,
-        emitterCompanyMail: "this is not an email"
-      });
+      sealedFormSchema.validate(
+        {
+          ...form,
+          emitterCompanyMail: "this is not an email"
+        },
+        { context: { isDraft: true } }
+      );
 
     await expect(validateFn()).rejects.toThrow(
       "emitterCompanyMail must be a valid email"
