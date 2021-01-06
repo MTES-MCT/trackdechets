@@ -1,7 +1,6 @@
 import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import { BusTransfer } from "common/components/Icons";
-import { DateTime } from "luxon";
 
 import React, { useState } from "react";
 
@@ -109,7 +108,7 @@ export default function PrepareSegment({
       isExemptedOfReceipt: false,
       receipt: "",
       department: "",
-      validityLimit: DateTime.local().toISODate(),
+      validityLimit: new Date().toISOString(),
       numberPlate: "",
     },
 

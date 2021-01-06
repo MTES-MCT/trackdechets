@@ -1,10 +1,16 @@
-import { DateTime } from "luxon";
+import { parseISO, format, toDate } from "date-fns";
+import fr from "date-fns/locale/fr";
 
-export const isoDate = (givenDate: string | null | undefined): string => {
-  if (!givenDate) {
-    return "";
+export function parseDate(date: Date | number | string): Date {
+  if (typeof date === "string") {
+    return parseISO(date);
   }
-  const parsed = DateTime.fromISO(givenDate);
 
-  return parsed.isValid ? parsed.toLocaleString() : "";
-};
+  return toDate(date);
+}
+
+export function formatDate(date: Date | number | string): string {
+  return format(parseDate(date), "dd/MM/Y", {
+    locale: fr,
+  });
+}

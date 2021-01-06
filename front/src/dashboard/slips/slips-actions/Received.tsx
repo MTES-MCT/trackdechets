@@ -1,6 +1,5 @@
 import React from "react";
 import { Formik, Field, Form } from "formik";
-import { DateTime } from "luxon";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { SlipActionProps } from "./SlipActions";
@@ -37,8 +36,8 @@ export default function Received(props: SlipActionProps) {
       <Formik
         initialValues={{
           receivedBy: "",
-          receivedAt: DateTime.local().toISODate(),
-          signedAt: DateTime.local().toISODate(),
+          receivedAt: new Date().toISOString(),
+          signedAt: new Date().toISOString(),
           quantityReceived: "",
           wasteAcceptationStatus: "",
           wasteRefusalReason: "",

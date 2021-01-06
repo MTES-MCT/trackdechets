@@ -1,7 +1,7 @@
+import React from "react";
 import { useQuery, gql } from "@apollo/client";
 import { useFormikContext } from "formik";
-import { DateTime } from "luxon";
-import React from "react";
+import { formatDate } from "common/datetime";
 import { InlineError } from "common/components/Error";
 import { Form, Query, QueryAppendixFormsArgs } from "generated/graphql/types";
 
@@ -99,7 +99,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
               {form.wasteDetails?.code} - {form.wasteDetails?.name}
             </td>
             <td>{form.emitter?.company?.name}</td>
-            <td>{DateTime.fromISO(form.receivedAt!).toLocaleString()}</td>
+            <td>{formatDate(form.receivedAt!)}</td>
             <td>{form.quantityReceived} tonnes</td>
             <td>{form.processingOperationDone}</td>
           </tr>

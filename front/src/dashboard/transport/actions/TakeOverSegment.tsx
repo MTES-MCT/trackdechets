@@ -1,5 +1,4 @@
 import { Field, Form as FormikForm, Formik } from "formik";
-import { DateTime } from "luxon";
 import React, { useState } from "react";
 import {
   Form,
@@ -96,7 +95,7 @@ export default function TakeOverSegment({
 
   const initialValues = {
     takenOverBy: "",
-    takenOverAt: DateTime.local().toISODate(),
+    takenOverAt: new Date().toISOString(),
   };
 
   if (!segment) {
