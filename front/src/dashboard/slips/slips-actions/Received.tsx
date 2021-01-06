@@ -35,8 +35,8 @@ export default function Received(props: SlipActionProps) {
       <Formik
         initialValues={{
           receivedBy: "",
-          receivedAt: new Date().toISOString(),
-          signedAt: new Date().toISOString(),
+          receivedAt: formatISO(new Date(), { representation: "date" }),
+          signedAt: formatISO(new Date(), { representation: "date" }),
           quantityReceived: "",
           wasteAcceptationStatus: "",
           wasteRefusalReason: "",
