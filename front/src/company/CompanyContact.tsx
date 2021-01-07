@@ -1,5 +1,4 @@
 import React from "react";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import "./CompanyContact.scss";
 import { CompanyPublic } from "generated/graphql/types";
 
@@ -16,7 +15,7 @@ type Props = {
 
 export default function CompanyContact({ company }: Props) {
   return (
-    <div className="box" style={{ flex: "3" }}>
+    <div className="box" style={{ flex: "1 1 auto" }}>
       <p style={{ fontSize: "1.2em", fontWeight: "bold" }}>Contact</p>
       <div className="company__item">
         <label className="company__item-key">Adresse </label>
@@ -52,12 +51,16 @@ export default function CompanyContact({ company }: Props) {
             Agrément(s) éco-organisme
           </p>
           <div className="company__item">
-            <ul>
+            <ul className="tw-list-disc tw-list-inside">
               {company.ecoOrganismeAgreements.map((agreement, index) => (
-                <li key={index}>
-                  <a href={agreement} target="_blank" rel="noopener noreferrer">
-                    <span className="url-ellipsis">{agreement}</span>
-                    <FaExternalLinkAlt />
+                <li key={index} className="url-ellipsis">
+                  <a
+                    href={agreement}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link"
+                  >
+                    {agreement}
                   </a>
                 </li>
               ))}

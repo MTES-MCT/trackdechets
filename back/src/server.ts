@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { CaptureConsole } from "@sentry/integrations";
 import {
   ApolloServer,
@@ -16,7 +17,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { applyMiddleware } from "graphql-middleware";
-import { sentry } from "graphql-middleware-sentry";
 import { authRouter } from "./routers/auth-router";
 import { downloadFileHandler } from "./common/file-download";
 import { oauth2Router } from "./routers/oauth2-router";
@@ -25,7 +25,6 @@ import { userActivationHandler } from "./users/activation";
 import { typeDefs, resolvers } from "./schema";
 import { getUIBaseURL } from "./utils";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
-import { GraphQLContext } from "./types";
 import { ErrorCode } from "./common/errors";
 import { redisClient } from "./common/redis";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
@@ -33,6 +32,7 @@ import errorHandler from "./common/middlewares/errorHandler";
 
 const {
   SENTRY_DSN,
+  SENTRY_ENVIRONMENT,
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
   SESSION_COOKIE_SECURE,
@@ -41,63 +41,22 @@ const {
   NODE_ENV
 } = process.env;
 
-const UI_BASE_URL = getUIBaseURL();
-
-/**
- * Custom report error for sentry middleware
- * It decides whether or not the error should be captured
- */
-export function reportError(res: Error | any) {
-  const whiteList = [
-    ErrorCode.GRAPHQL_PARSE_FAILED,
-    ErrorCode.GRAPHQL_VALIDATION_FAILED,
-    ErrorCode.BAD_USER_INPUT,
-    ErrorCode.UNAUTHENTICATED,
-    ErrorCode.FORBIDDEN
-  ];
-
-  if (res.extensions && whiteList.includes(res.extensions.code)) {
-    return false;
-  }
-  return true;
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    environment: SENTRY_ENVIRONMENT,
+    integrations: [new CaptureConsole({ levels: ["error"] })]
+  });
 }
 
-/**
- * Sentry configuration
- * Capture console.error statements
- */
-const sentryMiddleware = () =>
-  sentry<GraphQLContext>({
-    config: {
-      dsn: SENTRY_DSN,
-      environment: NODE_ENV,
-      integrations: [new CaptureConsole({ levels: ["error"] })]
-    },
-    forwardErrors: true,
-    withScope: (scope, error, context) => {
-      const reqUser = !!context.user ? context.user.email : "anonymous";
-      scope.setUser({
-        email: reqUser
-      });
-
-      scope.setExtra("body", context.req.body);
-      scope.setExtra("origin", context.req.headers.origin);
-      scope.setExtra("user-agent", context.req.headers["user-agent"]);
-      scope.setExtra("ip", context.req.headers["x-real-ip"]);
-      scope.setTag("service", "api");
-    },
-    reportError
-  });
+const UI_BASE_URL = getUIBaseURL();
 
 const schema = makeExecutableSchema({
   typeDefs,
   resolvers
 });
 
-export const schemaWithMiddleware = applyMiddleware(
-  schema,
-  ...[...(SENTRY_DSN ? [sentryMiddleware()] : [])]
-);
+export const schemaWithMiddleware = applyMiddleware(schema);
 
 // GraphQL endpoint
 const graphQLPath = "/";
@@ -135,10 +94,83 @@ export const server = new ApolloServer({
       return new ApolloError("Erreur serveur", ErrorCode.INTERNAL_SERVER_ERROR);
     }
     return err;
-  }
+  },
+  plugins: [
+    {
+      // The following plugin is mostly taken from:
+      // https://blog.sentry.io/2020/07/22/handling-graphql-errors-using-sentry
+      requestDidStart(requestContext) {
+        return {
+          didEncounterErrors(errorContext) {
+            if (!SENTRY_DSN) {
+              return;
+            }
+
+            if (!errorContext.operation) {
+              // If we couldn't parse the operation, don't do anything here
+              return;
+            }
+
+            for (const err of errorContext.errors) {
+              if (
+                [
+                  ErrorCode.GRAPHQL_PARSE_FAILED,
+                  ErrorCode.GRAPHQL_VALIDATION_FAILED,
+                  ErrorCode.BAD_USER_INPUT,
+                  ErrorCode.UNAUTHENTICATED,
+                  ErrorCode.FORBIDDEN
+                ].includes(err.extensions?.code)
+              ) {
+                // Ignore consumer errors
+                continue;
+              }
+
+              Sentry.withScope(scope => {
+                // Annotate whether failing operation was query/mutation/subscription
+                scope.setTag("kind", errorContext.operation.operation);
+
+                scope.setExtra("query", errorContext.request.query);
+                scope.setExtra("variables", errorContext.request.variables);
+
+                if (err.path) {
+                  scope.addBreadcrumb({
+                    category: "query-path",
+                    message: err.path.join(" > "),
+                    level: Sentry.Severity.Debug
+                  });
+                }
+
+                if (requestContext.context.user?.email) {
+                  scope.setUser({
+                    email: requestContext.context.user.email
+                  });
+                }
+
+                ["origin", "user-agent", "x-real-ip"].forEach(key => {
+                  if (errorContext.request.http?.headers.get(key)) {
+                    scope.setExtra(
+                      key,
+                      errorContext.request.http.headers.get(key)
+                    );
+                  }
+                });
+
+                Sentry.captureException(err);
+              });
+            }
+          }
+        };
+      }
+    }
+  ]
 });
 
 export const app = express();
+
+if (SENTRY_DSN) {
+  // The request handler must be the first middleware on the app
+  app.use(Sentry.Handlers.requestHandler());
+}
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const MAX_REQUESTS_PER_WINDOW = 1000;
@@ -248,5 +280,9 @@ server.applyMiddleware({
   path: graphQLPath
 });
 
-// error handler
+if (SENTRY_DSN) {
+  // The error handler must be before any other error middleware and after all controllers
+  app.use(Sentry.Handlers.errorHandler());
+}
+
 app.use(errorHandler);

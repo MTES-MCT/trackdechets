@@ -102,7 +102,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas.",
+          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

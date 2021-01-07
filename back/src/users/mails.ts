@@ -271,7 +271,7 @@ export const userMails = {
     Votre demande de rattachement à l’entreprise ${company.name} (${company.siret}) a été acceptée par l'administrateur de l’établissement.
 
     Vous pourrez à présent effectuer des actions pour le compte de l’entreprise
-    (créer / signer / suivre des BSD, accéder au registre, consulter les fiches entreprise, consulter le code de sécurité).
+    (créer / signer / suivre des BSD, accéder au registre, consulter les fiches entreprise, consulter le code de signature).
     `
   }),
   membershipRequestRefused: (user: User, company: Company) => ({

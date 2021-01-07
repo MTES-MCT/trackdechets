@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isoDate } from "common/datetime";
+import { formatDate } from "common/datetime";
 import { formatPackagings } from "./utils";
 import { PackagingInfo } from "generated/graphql/types";
 
@@ -35,7 +35,7 @@ export const DateRow = ({ value, label }) => {
   return (
     <>
       <dt>{label}</dt>
-      <dd>{isoDate(value)}</dd>
+      <dd>{formatDate(value)}</dd>
     </>
   );
 };

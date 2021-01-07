@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
+import * as Sentry from "@sentry/browser";
 import Loader from "common/components/Loaders";
 import Layout from "./Layout";
 import routes from "common/routes";
@@ -34,6 +35,7 @@ const GET_ME = gql`
   query GetMe {
     me {
       id
+      email
       companies {
         siret
       }
@@ -42,6 +44,12 @@ const GET_ME = gql`
 `;
 
 export default withRouter(function LayoutContainer({ history }) {
+  const { data, loading } = useQuery<{
+    me: { id: string; email: string; companies: Array<{ siret: string }> };
+  }>(GET_ME);
+  const isAuthenticated = !loading && data != null;
+  const email = data?.me?.email;
+
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") {
       return;
@@ -53,10 +61,11 @@ export default withRouter(function LayoutContainer({ history }) {
     return () => unlisten();
   });
 
-  const { data, loading } = useQuery<{
-    me: { id: string; companies: Array<{ siret: string }> };
-  }>(GET_ME);
-  const isAuthenticated = !loading && data != null;
+  useEffect(() => {
+    if (process.env.REACT_APP_SENTRY_DSN && email) {
+      Sentry.setUser({ email });
+    }
+  }, [email]);
 
   if (loading) {
     return <Loader />;

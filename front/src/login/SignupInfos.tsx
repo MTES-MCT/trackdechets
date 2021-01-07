@@ -51,7 +51,7 @@ export default function SignupInfo() {
             >
               👉
             </span>
-            Pour recevoir nos emails sans encombres, vous pouvez d'ajouter
+            Pour recevoir nos emails sans encombres, vous pouvez ajouter
             hello@trackdechets.beta.gouv.fr à votre liste de contacts
           </li>
         </ul>

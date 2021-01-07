@@ -57,8 +57,7 @@ describe("Mutation.deleteForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas.",
+        message: "Vous n'êtes pas autorisé à supprimer ce bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -68,11 +67,11 @@ describe("Mutation.deleteForm", () => {
     expect(intactForm.isDeleted).toBe(false);
   });
 
-  it("should not be possible de delete a non draft form", async () => {
-    const user = await userFactory();
+  it("should not be possible to delete a signed form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await formFactory({
       ownerId: user.id,
-      opt: { status: "SEALED" }
+      opt: { status: "SENT", emitterCompanySiret: company.siret }
     });
     const { mutate } = makeClient(user);
     const { errors } = await mutate(DELETE_FORM, {
@@ -81,9 +80,10 @@ describe("Mutation.deleteForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Seuls les BSD à l'état de brouillon peuvent être supprimés",
+        message:
+          "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés",
         extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+          code: ErrorCode.FORBIDDEN
         })
       })
     ]);
@@ -100,6 +100,28 @@ describe("Mutation.deleteForm", () => {
       const form = await formFactory({
         ownerId: owner.id,
         opt: { [`${role}CompanySiret`]: company.siret, status: "DRAFT" }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate(DELETE_FORM, {
+        variables: { id: form.id }
+      });
+
+      expect(data.deleteForm.id).toBeTruthy();
+
+      const deletedForm = await prisma.form({ id: form.id });
+      expect(deletedForm.isDeleted).toBe(true);
+    }
+  );
+
+  it.each(["emitter", "trader", "recipient", "transporter"])(
+    "should allow %p to soft delete a sealed form",
+    async role => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const owner = await userFactory();
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: { [`${role}CompanySiret`]: company.siret, status: "SEALED" }
       });
 
       const { mutate } = makeClient(user);

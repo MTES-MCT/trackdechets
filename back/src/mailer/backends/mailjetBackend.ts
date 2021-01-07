@@ -2,22 +2,15 @@ import { Mail, Contact } from "../types";
 import * as Sentry from "@sentry/node";
 import mailjet from "node-mailjet";
 import { templateIds } from "../helpers";
+
 const {
   MJ_APIKEY_PUBLIC,
   MJ_APIKEY_PRIVATE,
   SENDER_EMAIL_ADDRESS,
   SENDER_NAME,
-
-  SENTRY_DSN,
-  NODE_ENV
+  SENTRY_DSN
 } = process.env;
 
-if (!!SENTRY_DSN) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    environment: NODE_ENV
-  });
-}
 const mj = mailjet.connect(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE);
 
 const mailjetBackend = {

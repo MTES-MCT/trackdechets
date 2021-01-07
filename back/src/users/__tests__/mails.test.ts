@@ -16,7 +16,8 @@ const formWithTransporter: Form = {
   emitterCompanyAddress: "Rue de la Soif, Bretagne",
   wasteRefusalReason: "Non conforme",
   recipientCompanyName: "Traitement*SARL/",
-  transporterCompanyName: "Jason*Statham/"
+  transporterCompanyName: "Jason*Statham/",
+  wasteDetailsPop: false
 };
 
 describe("userMails.formNotAccepted", () => {

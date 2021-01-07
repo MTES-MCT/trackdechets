@@ -8,4 +8,4 @@ export const COLORS = {
   blue: "#0053b3",
 };
 
-export const tdContactEmail = process.env.REACT_TD_CONTACT_EMAIL;
+export const tdContactEmail = process.env.REACT_APP_CONTACT_EMAIL;

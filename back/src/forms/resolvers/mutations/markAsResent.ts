@@ -22,7 +22,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
 
   await checkCanMarkAsResent(user, form);
 
-  if (form.status === "TEMP_STORED") {
+  if (form.status === "TEMP_STORER_ACCEPTED") {
     const temporaryStorageDetail = await prisma
       .form({ id: form.id })
       .temporaryStorageDetail();

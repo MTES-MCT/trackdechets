@@ -84,7 +84,13 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
               destinationCompanySiret: siret
             }
           },
-          { OR: [{ status: "RESENT" }, { status: "RECEIVED" }] }
+          {
+            OR: [
+              { status: "RESENT" },
+              { status: "RECEIVED" },
+              { status: "ACCEPTED" }
+            ]
+          }
         ]
       },
       // isRecipient && isTempStorage == isTempStorer
@@ -94,11 +100,16 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           { recipientCompanySiret: siret },
           { recipientIsTempStorage: true },
           {
-            OR: [{ status: "SENT" }, { status: "TEMP_STORED" }]
+            OR: [
+              { status: "SENT" },
+              { status: "TEMP_STORED" },
+              { status: "TEMP_STORER_ACCEPTED" },
+              { status: "RESEALED" }
+            ]
           }
         ]
       },
-      // isRecipient && (RECEIVED || (SENT && noTemporaryStorage))
+      // isRecipient && (RECEIVED || ACCEPTED || (SENT && noTemporaryStorage))
       {
         AND: [
           { recipientCompanySiret: siret },
@@ -107,7 +118,8 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
               {
                 AND: [{ status: "SENT" }, { recipientIsTempStorage: false }]
               },
-              { status: "RECEIVED" }
+              { status: "RECEIVED" },
+              { status: "ACCEPTED" }
             ]
           }
         ]

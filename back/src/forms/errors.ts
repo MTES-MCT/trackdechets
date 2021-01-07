@@ -29,10 +29,8 @@ export class MissingTempStorageFlag extends UserInputError {
 }
 
 export class NotFormContributor extends ForbiddenError {
-  constructor() {
-    super(
-      "Vous n'êtes pas autorisé à accéder à un bordereau sur lequel votre entreprise n'apparait pas."
-    );
+  constructor(msg: string) {
+    super(msg);
   }
 }
 
@@ -60,7 +58,7 @@ export class CountryNotFound extends UserInputError {
 
 export class InvaliSecurityCode extends ForbiddenError {
   constructor() {
-    super("Le code de sécurité de l'émetteur du bordereau est invalide.");
+    super("Le code de signature de l'émetteur du bordereau est invalide.");
   }
 }
 

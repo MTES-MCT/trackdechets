@@ -1,0 +1,114 @@
+@import "src/scss/Breakpoints.scss";
+
+.Breadcrumb {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+  list-style: none;
+  margin: 0 0 1rem 0;
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+  z-index: 1;
+  padding: 15px 0;
+
+  @include xs-phone {
+    display: none;
+  }
+}
+
+.BreadcrumbItem {
+  outline: none;
+  cursor: pointer;
+  flex: 2;
+  position: relative;
+  padding: 0 0 14px 0;
+  line-height: 1.5;
+  color: #006be6;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: visible;
+  min-width: 0;
+  text-align: center;
+  border-bottom: 2px solid #ebeff3;
+
+  &:first-child,
+  &:last-child {
+    flex: 1;
+  }
+
+  &:first-child {
+    text-align: left;
+
+    &::before {
+      left: 0;
+    }
+  }
+  &:last-child {
+    text-align: right;
+
+    &::before {
+      right: 0;
+      left: auto;
+    }
+  }
+
+  &::before {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: #ebeff3;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    position: absolute;
+    left: calc(50% - 6px);
+    bottom: -7px;
+    z-index: 3;
+    transition: all 0.2s ease-in-out;
+  }
+}
+
+.BreadcrumbItemContent {
+  transition: opacity 0.3s ease-in-out;
+}
+.BreadcrumbItem:not(.BreadcrumbItemActive) .BreadcrumbItemContent {
+  opacity: 0.5;
+}
+
+.BreadcrumbItemComplete:not(:first-child)::after,
+.BreadcrumbItemActive:not(:first-child)::after {
+  content: "";
+  display: block;
+  width: 100%;
+  position: absolute;
+  bottom: -2px;
+  left: -50%;
+  z-index: 2;
+  border-bottom: 2px solid #006be6;
+}
+
+.BreadcrumbItemComplete:last-child::after,
+.BreadcrumbItemActive:last-child::after {
+  width: 200%;
+  left: -100%;
+}
+
+.BreadcrumbItemComplete::before {
+  background-color: #006be6;
+}
+
+.BreadcrumbItemActive::before,
+.BreadcrumbItem:focus::before,
+.BreadcrumbItem:hover::before {
+  background-color: #ebeff3;
+  border-color: #006be6;
+}
+.BreadcrumbItem:focus::before,
+.BreadcrumbItem:hover::before {
+  transform: scale(1.33);
+}
+.BreadcrumbItem:focus .BreadcrumbItemContent,
+.BreadcrumbItem:hover .BreadcrumbItemContent {
+  opacity: 1;
+}

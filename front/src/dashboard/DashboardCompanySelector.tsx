@@ -7,6 +7,14 @@ interface IProps {
   handleCompanyChange: (siret: string) => void;
 }
 
+const sortCompaniesByName = values => {
+  return [...values].sort((a, b) => {
+    const aName = a.givenName || a.name || "";
+    const bName = b.givenName || b.name || "";
+    return aName.localeCompare(bName);
+  });
+};
+
 export const SIRET_STORAGE_KEY = "td-selectedSiret";
 
 export default function DashboardCompanySelector({
@@ -18,13 +26,15 @@ export default function DashboardCompanySelector({
     handleCompanyChange(siret);
   };
 
+  const sortedCompanies = sortCompaniesByName(companies);
+
   return (
     <select
       className="td-select"
       value={siret}
       onChange={e => handleChange(e.target.value)}
     >
-      {companies.map(c => (
+      {sortedCompanies.map(c => (
         <option key={c.siret} value={c.siret}>
           {c.givenName || c.name} ({c.siret})
         </option>

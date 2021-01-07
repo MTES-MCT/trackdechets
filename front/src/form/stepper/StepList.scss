@@ -1,15 +1,7 @@
-@import "src/scss/Breakpoints.scss";
-
 .step-content {
   margin-bottom: 40px;
 
   form {
     max-width: none;
-  }
-}
-
-@include xs-phone {
-  .step-header {
-    display: none;
   }
 }

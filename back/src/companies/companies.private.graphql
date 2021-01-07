@@ -14,7 +14,7 @@ type Query {
 type Mutation {
   """
   USAGE INTERNE
-  Renouvelle le code de sécurité de l'établissement
+  Renouvelle le code de signature de l'établissement
   """
   renewSecurityCode(siret: String!): CompanyPrivate!
 

@@ -79,12 +79,8 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
               className={styles.input}
               type="password"
               name="oldPassword"
-            ></Field>
-            {props.errors["oldPassword"] && (
-              <RedErrorMessage name="oldPassword">
-                {props.errors["oldPassword"]}
-              </RedErrorMessage>
-            )}
+            />
+            <RedErrorMessage name="oldPassword" />
           </div>
           <div className="form__row">
             <label htmlFor="newPassword">Nouveau mot de passe:</label>
@@ -93,7 +89,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
               className={styles.input}
               type="password"
               name="newPassword"
-            ></Field>
+            />
             <PasswordMeter password={props.values.newPassword} />
           </div>
           <div className="form__row">
@@ -105,12 +101,8 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
               className={styles.input}
               type="password"
               name="newPasswordConfirmation"
-            ></Field>
-            {props.errors["newPasswordConfirmation"] && (
-              <RedErrorMessage name="newPasswordConfirmation">
-                {props.errors["newPasswordConfirmation"]}
-              </RedErrorMessage>
-            )}
+            />
+            <RedErrorMessage name="newPasswordConfirmation" />
           </div>
           {loading && <div>Envoi en cours...</div>}
 

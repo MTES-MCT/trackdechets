@@ -106,6 +106,11 @@ const columns: Column[] = [
     label: "Déchet quantité estimée (en tonnes)",
     format: identity
   },
+  {
+    field: "wasteDetailsPop",
+    label: "Contient des pop",
+    format: value => (value ? "Oui" : "Non")
+  },
   // cadre 7
   { field: "traderCompanySiret", label: "Négociant siret", format: identity },
   { field: "traderCompanyName", label: "Négociant nom", format: identity },

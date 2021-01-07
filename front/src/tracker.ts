@@ -13,8 +13,8 @@ window._paq.push(["enableLinkTracking"]);
 
 if (
   process.env.NODE_ENV === "production" &&
-  process.env.REACT_APP_MATOMO_TRACKER_SITE_ID != null &&
-  process.env.REACT_APP_MATOMO_TRACKER_URL != null
+  process.env.REACT_APP_MATOMO_TRACKER_SITE_ID &&
+  process.env.REACT_APP_MATOMO_TRACKER_URL
 ) {
   loadTracker();
 }

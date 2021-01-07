@@ -19,8 +19,7 @@ import { FormRole } from "../generated/graphql/types";
  * @param form
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
-  const owner = await prisma.form({ id: form.id }).owner();
-  const temporaryStorage = await prisma
+  const temporaryStorageDetail = await prisma
     .form({ id: form.id })
     .temporaryStorageDetail();
   const transportSegments = await prisma
@@ -28,8 +27,7 @@ export async function getFullForm(form: Form): Promise<FullForm> {
     .transportSegments();
   return {
     ...form,
-    owner,
-    temporaryStorage,
+    temporaryStorageDetail,
     transportSegments
   };
 }

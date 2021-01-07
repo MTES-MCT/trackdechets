@@ -1,7 +1,7 @@
 import React from "react";
-import { ErrorMessage } from "formik";
+import { ErrorMessage, ErrorMessageProps } from "formik";
 
-export default function RedErrorMessage(props: any) {
+export default function RedErrorMessage(props: ErrorMessageProps) {
   return (
     <ErrorMessage
       {...props}

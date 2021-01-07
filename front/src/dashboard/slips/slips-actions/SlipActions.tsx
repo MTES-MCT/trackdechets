@@ -9,7 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "common/components/Icons";
-import { Form } from "generated/graphql/types";
+import { Form, FormStatus } from "generated/graphql/types";
 import "./SlipActions.scss";
 import Delete from "./Delete";
 import DownloadPdf from "./DownloadPdf";
@@ -19,6 +19,7 @@ import Quicklook from "./Quicklook";
 import { getNextStep } from "./next-step";
 import Processed from "./Processed";
 import Received from "./Received";
+import Accepted from "./Accepted";
 import Sealed from "./Sealed";
 import Resealed from "./Resealed";
 import mutations from "./slip-actions.mutations";
@@ -88,7 +89,7 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
                 />
               </li>
 
-              {form.status === "DRAFT" ? (
+              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) ? (
                 <>
                   <li className="slips-actions__item">
                     <Delete
@@ -188,6 +189,11 @@ const buttons = {
     icon: WaterDamIcon,
     component: Received,
   },
+  ACCEPTED: {
+    title: "Valider l'acceptation",
+    icon: WaterDamIcon,
+    component: Accepted,
+  },
   PROCESSED: {
     title: "Valider le traitement",
     icon: CogApprovedIcon,
@@ -197,6 +203,11 @@ const buttons = {
     title: "Valider l'entreposage provisoire",
     icon: WarehouseStorageIcon,
     component: Received,
+  },
+  TEMP_STORER_ACCEPTED: {
+    title: "Valider l'acceptation de l'entreposage provisoire",
+    icon: WarehouseStorageIcon,
+    component: Accepted,
   },
   RESEALED: {
     title: "Compléter le BSD suite",

@@ -11,11 +11,11 @@ import {
 import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
 import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkCanReadUpdateDeleteForm } from "../../permissions";
+import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
-import { draftFormSchema } from "../../validation";
-import { UserInputError } from "apollo-server-express";
+import { draftFormSchema, sealedFormSchema } from "../../validation";
+import { FormSirets } from "../../types";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -43,13 +43,7 @@ const updateFormResolver = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  await checkCanReadUpdateDeleteForm(user, existingForm);
-
-  if (existingForm.status != "DRAFT") {
-    const errMessage =
-      "Seuls les bordereaux en brouillon peuvent être modifiés";
-    throw new UserInputError(errMessage);
-  }
+  await checkCanUpdate(user, existingForm);
 
   const form = flattenFormInput(formContent);
 
@@ -60,7 +54,11 @@ const updateFormResolver = async (
   };
 
   // Validate form input
-  await draftFormSchema.validate(formUpdateInput);
+  if (existingForm.status === "DRAFT") {
+    await draftFormSchema.validate(formUpdateInput);
+  } else if (existingForm.status === "SEALED") {
+    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
+  }
 
   const isOrWillBeTempStorage =
     (existingForm.recipientIsTempStorage &&
@@ -70,6 +68,33 @@ const updateFormResolver = async (
   const existingTemporaryStorageDetail = await prisma
     .form({ id })
     .temporaryStorageDetail();
+
+  // make sure user will still be form contributor after update
+  const nextFormSirets: FormSirets = {
+    emitterCompanySiret:
+      form.emitterCompanySiret ?? existingForm.emitterCompanySiret,
+    recipientCompanySiret:
+      form.recipientCompanySiret ?? existingForm.recipientCompanySiret,
+    transporterCompanySiret:
+      form.transporterCompanySiret ?? existingForm.transporterCompanySiret,
+    traderCompanySiret:
+      form.traderCompanySiret ?? existingForm.traderCompanySiret,
+    ecoOrganismeSiret: form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
+  };
+
+  if (temporaryStorageDetail || existingTemporaryStorageDetail) {
+    nextFormSirets.temporaryStorageDetail = {
+      destinationCompanySiret:
+        temporaryStorageDetail?.destination?.company?.siret ??
+        existingTemporaryStorageDetail?.destinationCompanySiret
+    };
+  }
+
+  await checkIsFormContributor(
+    user,
+    nextFormSirets,
+    "Vous ne pouvez pas enlever votre établissement du bordereau"
+  );
 
   if (
     existingTemporaryStorageDetail &&

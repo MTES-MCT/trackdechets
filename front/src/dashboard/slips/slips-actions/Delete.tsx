@@ -7,19 +7,18 @@ import { GET_SLIPS } from "../query";
 import { useMutation } from "@apollo/client";
 import { updateApolloCache } from "common/helper";
 import {
+  FormStatus,
   Mutation,
   MutationDeleteFormArgs,
   Query,
 } from "generated/graphql/types";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
-import routes from "common/routes";
 
 type Props = {
   formId: string;
   small?: boolean;
-  redirectToDashboard?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
 };
@@ -29,10 +28,8 @@ export default function Delete({
   small = true,
   onOpen,
   onClose,
-  redirectToDashboard,
 }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [deleteForm] = useMutation<
     Pick<Mutation, "deleteForm">,
@@ -44,24 +41,43 @@ export default function Delete({
         return;
       }
       const deleteForm = data.deleteForm;
-      updateApolloCache<Pick<Query, "forms">>(cache, {
-        query: GET_SLIPS,
-        variables: { siret, status: ["DRAFT"] },
-        getNewData: data => ({
-          forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
-        }),
-      });
+
+      if (deleteForm.status === FormStatus.Draft) {
+        // update draft tab
+        updateApolloCache<Pick<Query, "forms">>(cache, {
+          query: GET_SLIPS,
+          variables: { siret, status: [FormStatus.Draft] },
+          getNewData: data => ({
+            forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
+          }),
+        });
+      } else if (deleteForm.status === FormStatus.Sealed) {
+        // update follow tab
+        updateApolloCache<Pick<Query, "forms">>(cache, {
+          query: GET_SLIPS,
+          variables: {
+            siret,
+            status: [
+              FormStatus.Sealed,
+              FormStatus.Sent,
+              FormStatus.Received,
+              FormStatus.TempStored,
+              FormStatus.Resealed,
+              FormStatus.Resent,
+              FormStatus.AwaitingGroup,
+              FormStatus.Grouped,
+            ],
+            hasNextStep: false,
+          },
+          getNewData: data => ({
+            forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
+          }),
+        });
+      }
     },
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
-
-      if (redirectToDashboard) {
-        history.push(
-          generatePath(routes.dashboard.slips.drafts, {
-            siret,
-          })
-        );
-      }
+      !!onClose && onClose();
     },
     onError: () =>
       cogoToast.error("Le bordereau n'a pas pu être supprimé", {

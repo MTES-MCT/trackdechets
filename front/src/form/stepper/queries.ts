@@ -10,9 +10,18 @@ export const GET_FORM = gql`
   ${fullFormFragment}
 `;
 
-export const SAVE_FORM = gql`
-  mutation SaveForm($formInput: FormInput!) {
-    saveForm(formInput: $formInput) {
+export const CREATE_FORM = gql`
+  mutation CreateForm($createFormInput: CreateFormInput!) {
+    createForm(createFormInput: $createFormInput) {
+      ...FullForm
+    }
+  }
+  ${fullFormFragment}
+`;
+
+export const UPDATE_FORM = gql`
+  mutation UpdateForm($updateFormInput: UpdateFormInput!) {
+    updateForm(updateFormInput: $updateFormInput) {
       ...FullForm
     }
   }

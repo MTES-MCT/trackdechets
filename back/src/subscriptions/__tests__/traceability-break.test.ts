@@ -30,7 +30,8 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
         status: "NO_TRACEABILITY",
         createdAt: "2019-10-16T07:45:13.959Z",
         updatedAt: "2019-10-16T07:45:13.959Z",
-        noTraceability: true
+        noTraceability: true,
+        wasteDetailsPop: false
       },
       updatedFields: ["noTraceability"],
       mutation: "UPDATED",
@@ -40,7 +41,8 @@ describe("mailWhenFormTraceabilityIsBroken", () => {
         isImportedFromPaper: false,
         status: "RECEIVED",
         createdAt: "2019-10-16T07:45:13.959Z",
-        updatedAt: "2019-10-16T07:45:13.959Z"
+        updatedAt: "2019-10-16T07:45:13.959Z",
+        wasteDetailsPop: false
       }
     };
 
