@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Formik, Field, Form, useFormikContext } from "formik";
-import { DateTime } from "luxon";
+import { formatISO } from "date-fns";
 import {
   PROCESSING_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
@@ -155,7 +155,7 @@ export default function ProcessedWrapper(props: SlipActionProps) {
           processingOperationDone: "",
           processingOperationDescription: "",
           processedBy: "",
-          processedAt: DateTime.local().toISODate(),
+          processedAt: formatISO(new Date(), { representation: "date" }),
           nextDestination: null,
           noTraceability: false,
         }}

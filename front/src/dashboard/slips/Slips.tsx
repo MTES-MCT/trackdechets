@@ -1,5 +1,5 @@
 import React from "react";
-import { DateTime } from "luxon";
+import { formatDate } from "common/datetime";
 import { SlipActions, DynamicActions } from "./slips-actions/SlipActions";
 import { useFormsTable } from "./use-forms-table";
 import SortControl from "./SortableTableHeader";
@@ -126,9 +126,7 @@ export default function Slips({
                 </td>
               )}
               {hiddenFields.indexOf("sentAt") === -1 && (
-                <td>
-                  {!!s.sentAt && DateTime.fromISO(s.sentAt).toLocaleString()}
-                </td>
+                <td>{!!s.sentAt && formatDate(s.sentAt)}</td>
               )}
 
               <td>

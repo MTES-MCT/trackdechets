@@ -1,9 +1,9 @@
 import React from "react";
 import { gql } from "@apollo/client";
+import { formatDate } from "common/datetime";
 import AccountField from "./AccountField";
 import { CompanyPrivate } from "generated/graphql/types";
 import AccountFormCompanyTransporterReceipt from "./forms/AccountFormCompanyTransporterReceipt";
-import { DateTime } from "luxon";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "transporterReceipt">;
@@ -36,11 +36,7 @@ export default function AccountFieldCompanyTransporterReceipt({
         </tr>
         <tr>
           <td> Limite de validité </td>
-          <td>
-            {DateTime.fromISO(
-              company.transporterReceipt.validityLimit
-            ).toISODate()}
-          </td>
+          <td>{formatDate(company.transporterReceipt.validityLimit)}</td>
         </tr>
         <tr>
           <td> Département</td>
