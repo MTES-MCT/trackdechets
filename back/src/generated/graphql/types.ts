@@ -623,6 +623,42 @@ export type FormRole =
   /** Les BSD's dont je suis éco-organisme */
   | "ECO_ORGANISME";
 
+export type FormSearchResult = {
+  __typename?: "FormSearchResult";
+  id: Scalars["ID"];
+  readableId: Scalars["String"];
+  emitter?: Maybe<FormSearchResultEmitter>;
+  transporter?: Maybe<FormSearchResultTransporter>;
+  recipient?: Maybe<FormSearchResultRecipient>;
+  waste?: Maybe<FormSearchResultWaste>;
+  status?: Maybe<FormSearchResultStatus>;
+};
+
+export type FormSearchResultEmitter = {
+  __typename?: "FormSearchResultEmitter";
+  name: Scalars["String"];
+  siret: Scalars["String"];
+};
+
+export type FormSearchResultRecipient = {
+  __typename?: "FormSearchResultRecipient";
+  name: Scalars["String"];
+  siret: Scalars["String"];
+};
+
+export type FormSearchResultStatus = "SENT";
+
+export type FormSearchResultTransporter = {
+  __typename?: "FormSearchResultTransporter";
+  name: Scalars["String"];
+  siret: Scalars["String"];
+};
+
+export type FormSearchResultWaste = {
+  __typename?: "FormSearchResultWaste";
+  code: Scalars["String"];
+};
+
 /** Informations du cycle de vie des bordereaux */
 export type FormsLifeCycleData = {
   __typename?: "formsLifeCycleData";
@@ -1517,6 +1553,7 @@ export type Query = {
    * les résultats avec des informations provenant de Trackdéchets
    */
   searchCompanies: Array<CompanySearchResult>;
+  searchForms: Array<FormSearchResult>;
   /** Renvoie des statistiques sur le volume de déchets entrant et sortant */
   stats: Array<CompanyStat>;
 };
@@ -2414,6 +2451,12 @@ export type ResolversTypes = {
   MembershipRequest: ResolverTypeWrapper<MembershipRequest>;
   MembershipRequestStatus: MembershipRequestStatus;
   CompanySearchResult: ResolverTypeWrapper<CompanySearchResult>;
+  FormSearchResult: ResolverTypeWrapper<FormSearchResult>;
+  FormSearchResultEmitter: ResolverTypeWrapper<FormSearchResultEmitter>;
+  FormSearchResultTransporter: ResolverTypeWrapper<FormSearchResultTransporter>;
+  FormSearchResultRecipient: ResolverTypeWrapper<FormSearchResultRecipient>;
+  FormSearchResultWaste: ResolverTypeWrapper<FormSearchResultWaste>;
+  FormSearchResultStatus: FormSearchResultStatus;
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -2509,6 +2552,11 @@ export type ResolversParentTypes = {
   CompanyMember: CompanyMember;
   MembershipRequest: MembershipRequest;
   CompanySearchResult: CompanySearchResult;
+  FormSearchResult: FormSearchResult;
+  FormSearchResultEmitter: FormSearchResultEmitter;
+  FormSearchResultTransporter: FormSearchResultTransporter;
+  FormSearchResultRecipient: FormSearchResultRecipient;
+  FormSearchResultWaste: FormSearchResultWaste;
   CompanyStat: CompanyStat;
   Stat: Stat;
   Mutation: {};
@@ -3071,6 +3119,75 @@ export type FormEcoOrganismeResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type FormSearchResultResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["FormSearchResult"] = ResolversParentTypes["FormSearchResult"]
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  readableId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  emitter?: Resolver<
+    Maybe<ResolversTypes["FormSearchResultEmitter"]>,
+    ParentType,
+    ContextType
+  >;
+  transporter?: Resolver<
+    Maybe<ResolversTypes["FormSearchResultTransporter"]>,
+    ParentType,
+    ContextType
+  >;
+  recipient?: Resolver<
+    Maybe<ResolversTypes["FormSearchResultRecipient"]>,
+    ParentType,
+    ContextType
+  >;
+  waste?: Resolver<
+    Maybe<ResolversTypes["FormSearchResultWaste"]>,
+    ParentType,
+    ContextType
+  >;
+  status?: Resolver<
+    Maybe<ResolversTypes["FormSearchResultStatus"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FormSearchResultEmitterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["FormSearchResultEmitter"] = ResolversParentTypes["FormSearchResultEmitter"]
+> = {
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  siret?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FormSearchResultRecipientResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["FormSearchResultRecipient"] = ResolversParentTypes["FormSearchResultRecipient"]
+> = {
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  siret?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FormSearchResultTransporterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["FormSearchResultTransporter"] = ResolversParentTypes["FormSearchResultTransporter"]
+> = {
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  siret?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FormSearchResultWasteResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["FormSearchResultWaste"] = ResolversParentTypes["FormSearchResultWaste"]
+> = {
+  code?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type FormsLifeCycleDataResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["formsLifeCycleData"] = ResolversParentTypes["formsLifeCycleData"]
@@ -3555,6 +3672,11 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QuerySearchCompaniesArgs, "clue">
+  >;
+  searchForms?: Resolver<
+    Array<ResolversTypes["FormSearchResult"]>,
+    ParentType,
+    ContextType
   >;
   stats?: Resolver<
     Array<ResolversTypes["CompanyStat"]>,
@@ -4046,6 +4168,13 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Form?: FormResolvers<ContextType>;
   FormCompany?: FormCompanyResolvers<ContextType>;
   FormEcoOrganisme?: FormEcoOrganismeResolvers<ContextType>;
+  FormSearchResult?: FormSearchResultResolvers<ContextType>;
+  FormSearchResultEmitter?: FormSearchResultEmitterResolvers<ContextType>;
+  FormSearchResultRecipient?: FormSearchResultRecipientResolvers<ContextType>;
+  FormSearchResultTransporter?: FormSearchResultTransporterResolvers<
+    ContextType
+  >;
+  FormSearchResultWaste?: FormSearchResultWasteResolvers<ContextType>;
   formsLifeCycleData?: FormsLifeCycleDataResolvers<ContextType>;
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
@@ -4479,6 +4608,65 @@ export function createFormInputMock(props: Partial<FormInput>): FormInput {
     appendix2Forms: null,
     ecoOrganisme: null,
     temporaryStorageDetail: null,
+    ...props
+  };
+}
+
+export function createFormSearchResultMock(
+  props: Partial<FormSearchResult>
+): FormSearchResult {
+  return {
+    __typename: "FormSearchResult",
+    id: "",
+    readableId: "",
+    emitter: null,
+    transporter: null,
+    recipient: null,
+    waste: null,
+    status: null,
+    ...props
+  };
+}
+
+export function createFormSearchResultEmitterMock(
+  props: Partial<FormSearchResultEmitter>
+): FormSearchResultEmitter {
+  return {
+    __typename: "FormSearchResultEmitter",
+    name: "",
+    siret: "",
+    ...props
+  };
+}
+
+export function createFormSearchResultRecipientMock(
+  props: Partial<FormSearchResultRecipient>
+): FormSearchResultRecipient {
+  return {
+    __typename: "FormSearchResultRecipient",
+    name: "",
+    siret: "",
+    ...props
+  };
+}
+
+export function createFormSearchResultTransporterMock(
+  props: Partial<FormSearchResultTransporter>
+): FormSearchResultTransporter {
+  return {
+    __typename: "FormSearchResultTransporter",
+    name: "",
+    siret: "",
+    ...props
+  };
+}
+
+export function createFormSearchResultWasteMock(
+  props: Partial<FormSearchResultWaste>
+): FormSearchResultWaste {
+  return {
+    __typename: "FormSearchResultWaste",
+    code: "",
     ...props
   };
 }
