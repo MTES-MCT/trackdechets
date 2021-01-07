@@ -3,7 +3,7 @@ set -e
 
 # Wait for psql to be ready
 
-until PGPASSWORD="no_pass" psql -U "test" -c '\q'; do
+until PGPASSWORD="no_pass" psql -U "test" -c '\q' 2>/dev/null; do
   >&2 echo "⏳ Postgres is unavailable - sleeping"
   sleep 1
 done

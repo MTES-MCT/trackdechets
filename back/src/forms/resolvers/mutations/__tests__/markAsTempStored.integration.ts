@@ -92,12 +92,14 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form({ id: form.id });
+    const formAfterMutation = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
 
     expect(formAfterMutation.status).toEqual("TEMP_STORED");
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: {
         form: { id: form.id },
         user: { id: user.id },

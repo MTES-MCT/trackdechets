@@ -48,7 +48,7 @@ help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] [-g] -- trackdechets test runner
 
 where:
     -h show this help text
-    -u spin up containers and run prisma deploy
+    -u spin up containers and deploy DB
     -d down containers
     -r run integration test(s) matching given path, containers must be up
         ./$(basename "$0") -r /docker-path/to/my/test
