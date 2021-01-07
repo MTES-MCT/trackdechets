@@ -13,12 +13,8 @@ startcontainers(){
     echo "🚀 >> Starting containers..."
     docker-compose up --build -d
     echo "📑 >> Deploy DB..."
-    psql_container_id=$(docker ps -qf "name=integration_postgres")
-    docker cp ./db-deploy/. $psql_container_id:/tmp
-    docker exec -t $psql_container_id bash /tmp/deploy-db.sh
-    echo "🔮 >> Initialize @prisma/client "
-    api_container_id=$(docker ps -qf "name=integration_td-api")
-    docker exec -t $api_container_id npx prisma generate
+    chmod +x ./db-deploy/deploy-db.sh
+    ./db-deploy/deploy-db.sh
 }
 
 stopcontainers(){
@@ -38,13 +34,7 @@ all(){
     stopcontainers
 }
 
-generatemodel(){
-    root_psql_container_id=$(docker ps -qf "name=trackdechets_postgres")
-    docker exec -t $root_psql_container_id bash -c "pg_dump -U trackdechets -s -Fc -n 'default\$default' prisma > /tmp/db_model.dump"
-    docker cp $root_psql_container_id:/tmp/db_model.dump ./db-deploy
-}
-
-help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] [-g] -- trackdechets test runner
+help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] -- trackdechets test runner
 
 where:
     -h show this help text
@@ -54,11 +44,9 @@ where:
         ./$(basename "$0") -r /docker-path/to/my/test
 
     -p spin up containers, run integration test(s) matching given path, down containers
-        ./$(basename "$0") -p /docker-path/to/my/test
-        
-    -g generate new db_model.dump from current trackdechets DB"
+        ./$(basename "$0") -p /docker-path/to/my/test"
 
-while getopts "hudgp:r:" OPTION; do
+while getopts "hudp:r:" OPTION; do
     case $OPTION in
     h)
         echo "$help"
@@ -79,10 +67,6 @@ while getopts "hudgp:r:" OPTION; do
         ;;
     p)
         all $OPTARG
-        exit 1
-        ;;
-    g)
-        generatemodel
         exit 1
         ;;
     *)
