@@ -1,5 +1,5 @@
 import React from "react";
-import { isBefore, formatISO } from "date-fns";
+import { isBefore, startOfDay, formatISO } from "date-fns";
 import { Formik, Field, Form } from "formik";
 import { parseDate } from "common/datetime";
 import { RedErrorMessage } from "common/components";
@@ -47,15 +47,15 @@ export default function Received(props: SlipActionProps) {
           props.onSubmit({ info: values });
         }}
         validate={values => {
-          if (
-            isBefore(
-              parseDate(values.receivedAt),
-              parseDate(props.form.sentAt!)
-            )
-          ) {
+          // we only care about the day, not the exact time
+          // that's why we are setting both dates to the start of day
+          const receivedAt = startOfDay(parseDate(values.receivedAt));
+          const sentAt = startOfDay(parseDate(props.form.sentAt!));
+
+          if (isBefore(receivedAt, sentAt)) {
             return {
               receivedAt:
-                "La date de réception du déchet doit être postérieure à sa date d'émission.",
+                "La date de réception du déchet ne peut pas être antérieure à sa date d'émission.",
             };
           }
         }}
