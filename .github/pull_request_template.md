@@ -6,7 +6,7 @@
 
 - [ ] Mettre à jour la documentation
 - [ ] Mettre à jour le change log
-- [ ] Documenter les breaking changes dans le change log
+- [ ] Documenter les manipulations à faire lors de la mise en production (sur le ticket Trello de release)
 
 ---
 
