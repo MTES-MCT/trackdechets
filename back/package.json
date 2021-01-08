@@ -38,7 +38,7 @@
     "body-parser": "^1.19.0",
     "camel-case": "^4.1.1",
     "connect-redis": "^4.0.4",
-    "cookies": "^0.8.0",
+    "cookie": "^0.4.1",
     "cors": "^2.8.5",
     "csv-parser": "^2.3.3",
     "dataloader": "^1.4.0",
