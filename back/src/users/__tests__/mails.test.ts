@@ -3,7 +3,7 @@ import { Form } from "@prisma/client";
 
 const formWithTransporter: Partial<Form> = {
   id: "abcd123",
-  readableId: "TD-2019-XYZ",
+  readableId: "BSD-20210101-AAAAAAAA",
   isImportedFromPaper: false,
   status: "REFUSED",
   createdAt: new Date("2019-01-17T08:44:29+0100"),
@@ -37,7 +37,7 @@ describe("userMails.formNotAccepted", () => {
     expect(body).toContain(
       "la société Traitement SARL a refusé le 17 janvier 2019"
     );
-    expect(body).toContain("Numéro du BSD: TD-2019-XYZ");
+    expect(body).toContain("Numéro du BSD: BSD-20210101-AAAAAAAA");
     expect(body).toContain("Code déchet : 04 01 03*");
     expect(body).toContain("Quantité : 32 Tonnes refusées");
     expect(body).toContain("société Traitement SARL a refusé");
@@ -92,7 +92,7 @@ describe("userMails.formPartiallyRefused", () => {
     expect(body).toContain(
       "la société Traitement SARL a refusé partiellement le 17 janvier 2019"
     );
-    expect(body).toContain("Numéro du BSD : TD-2019-XYZ");
+    expect(body).toContain("Numéro du BSD : BSD-20210101-AAAAAAAA");
     expect(body).toContain("Code déchet : 04 01 03*");
     expect(body).toContain("Quantité refusée (estimée): 10.46 Tonnes");
     expect(body).toContain("Quantité acceptée: 21.54 Tonnes");

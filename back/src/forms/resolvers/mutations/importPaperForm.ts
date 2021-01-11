@@ -13,7 +13,7 @@ import {
   flattenImportPaperFormInput
 } from "../../form-converter";
 import { checkCanImportForm } from "../../permissions";
-import { getReadableId } from "../../readable-id";
+import getReadableId from "../../readableId";
 import { processedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -91,7 +91,7 @@ async function createForm(user: User, input: ImportPaperFormInput) {
 
   const formCreateInput: Prisma.FormCreateInput = {
     ...flattenedFormInput,
-    readableId: await getReadableId(),
+    readableId: getReadableId(),
     owner: { connect: { id: user.id } },
     status: "PROCESSED",
     isImportedFromPaper: true,

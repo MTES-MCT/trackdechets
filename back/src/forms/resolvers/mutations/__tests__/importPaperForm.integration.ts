@@ -1,13 +1,13 @@
 import { Form, Prisma } from "@prisma/client";
-import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ImportPaperFormInput } from "../../../../generated/graphql/types";
 import {
-  getReadableId,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import getReadableId from "../../../readableId";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 
 const IMPORT_PAPER_FORM = `
   mutation ImportPaperForm($input: ImportPaperFormInput!){

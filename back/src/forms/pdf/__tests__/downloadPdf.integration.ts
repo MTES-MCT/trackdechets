@@ -39,13 +39,8 @@ describe("downloadPdf", () => {
     const res = await request.get(`/download?token=${downloadToken}`);
     expect(res.status).toBe(200);
     expect(res.header["content-type"]).toBe("application/pdf");
-    const date = new Date();
-    const fileNameSuffix = `${date.getDate()}-${
-      date.getMonth() + 1
-    }-${date.getFullYear()}`;
-
     expect(res.header["content-disposition"]).toBe(
-      `attachment;filename=BSD_${form.readableId}_${fileNameSuffix}.pdf`
+      `attachment;filename=${form.readableId}.pdf`
     );
   });
 });
