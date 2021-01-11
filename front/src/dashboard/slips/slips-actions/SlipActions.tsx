@@ -88,8 +88,12 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
                   onClose={onClose}
                 />
               </li>
-
-              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) ? (
+              {form.status !== FormStatus.Draft && (
+                <li className="slips-actions__item">
+                  <DownloadPdf formId={form.id} onSuccess={onClose} />
+                </li>
+              )}
+              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
                 <>
                   <li className="slips-actions__item">
                     <Delete
@@ -102,10 +106,6 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
                     <Edit formId={form.id} />
                   </li>
                 </>
-              ) : (
-                <li className="slips-actions__item">
-                  <DownloadPdf formId={form.id} onSuccess={onClose} />
-                </li>
               )}
               <li className="slips-actions__item">
                 <Duplicate formId={form.id} onClose={onClose} />

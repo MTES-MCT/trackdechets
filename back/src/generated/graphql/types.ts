@@ -1868,7 +1868,7 @@ export type TemporaryStorer = {
 
 export type TempStoredFormInput = {
   /** Statut d'acceptation du déchet (case 13) */
-  wasteAcceptationStatus: WasteAcceptationStatusInput;
+  wasteAcceptationStatus?: Maybe<WasteAcceptationStatusInput>;
   /** Raison du refus (case 13) */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
   /** Nom de la personne en charge de la réception du déchet (case 13) */
@@ -4906,7 +4906,7 @@ export function createTempStoredFormInputMock(
   props: Partial<TempStoredFormInput>
 ): TempStoredFormInput {
   return {
-    wasteAcceptationStatus: "ACCEPTED",
+    wasteAcceptationStatus: null,
     wasteRefusalReason: null,
     receivedBy: "",
     receivedAt: new Date().toISOString(),

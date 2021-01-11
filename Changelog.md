@@ -5,18 +5,43 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2021.11.1] 07/01/2021
-
+# [2021.01.2] 11/01/2021
 #### :rocket: Nouvelles fonctionnalités
-
-- Ajout de l'attribut "POP" (Polluants Organiques Persistants) aux déchets, [PR 736](https://github.com/MTES-MCT/trackdechets/pull/736)
 
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
 
+- Correction d'un bug empêchant l'affichage du bouton "Télécharger le PDF" pour les bordereaux en attente de collecte (statut `SEALED`) [PR 757](https://github.com/MTES-MCT/trackdechets/pull/757)
+- Correction d'un bug rendant le champ `wasteAcceptationStatus` obligatoire lors de la réception d'un déchet à l'installation d'entreposage provisoire ou reconditionnement [PR 758](https://github.com/MTES-MCT/trackdechets/pull/758)
+
 #### :nail_care: Améliorations
 
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Mise à jour du template de PR Github [PR 756](https://github.com/MTES-MCT/trackdechets/pull/756)
+
+# [2021.01.1] 07/01/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout des mutations `markAsAccepted` et `markAsTempStorerAccepted` qui permettent de séparer la réception d'un déchet de son acceptation. [PR 684](https://github.com/MTES-MCT/trackdechets/pull/684)
+- Ajout de l'attribut "POP" (Polluants Organiques Persistants) aux déchets, [PR 736](https://github.com/MTES-MCT/trackdechets/pull/736)
+- Ajout de la possibilité de supprimer ou modifier un bordereau tant qu'aucune signature (transporteur ou producteur) n'a été apposée (statut `DRAFT` ou `SEALED`). [PR 720](https://github.com/MTES-MCT/trackdechets/pull/720)
+
+#### :boom: Breaking changes
+
+- Afin de pouvoir passer au statut `PROCESSED` un BSD doit désormais être `ACCEPTED` et non plus `RECEIVED`. Idem pour passer à `RESEALED`, il doit être `TEMP_STORER_ACCEPTED`. Si vous utilisez les mutations `markAsReceived` et `markAsTempStored` comme précédemment, cela se fera automatiquement.
+
+#### :bug: Corrections de bugs
+
+- Correction d'un bug de langue dans l'application front, pouvant provoquer une traduction erronée par le navigateur. [PR 737](https://github.com/MTES-MCT/trackdechets/pull/737)
+
+#### :nail_care: Améliorations
+
+- Validation de la date de réception d'un déchet dans l'application front, afin d'éviter les incohérences. [PR 739](https://github.com/MTES-MCT/trackdechets/pull/739)
 - Amélioration de l'expérience utilisateur de la signature éco-organisme, [PR 693](https://github.com/MTES-MCT/trackdechets/pull/693)
 - Intégration des établissements de la gendarmerie nationale dans une table interne destinée aux entreprises "non diffusables" de la base SIRENE. Il est donc désormais possible de créer ces établissements ou de les viser sur un BSDD à partir de la recherche par N°Siret dans l'interface Trackdéchets. [PR 718](https://github.com/MTES-MCT/trackdechets/pull/718)
 
@@ -26,14 +51,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Amélioration de la collecte des erreurs par Sentry, [PR 605](https://github.com/MTES-MCT/trackdechets/pull/605)
 - Désactivation de Matomo en dehors de l'environnement de production, [PR 736](https://github.com/MTES-MCT/trackdechets/pull/736)
-- Ajout d'un hook prettier dans graphql-codegen  [PR 744](https://github.com/MTES-MCT/trackdechets/pull/744)
+- Ajout d'un hook prettier dans graphql-codegen [PR 744](https://github.com/MTES-MCT/trackdechets/pull/744)
 
 # [2020.11.2] 30/11/2020
 
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un nouveau champ `packagingInfos` qui viendra remplacer `packagings`, `numberOfPackages` et `otherPackaging`. Ces champs sont encore supportés pour quelques temps mais marqué comme dépréciés. Nous vous invitons à migrer aussi vite que possible. [PR 600](https://github.com/MTES-MCT/trackdechets/pull/600)
-- Ajout de la possibilité de supprimer ou modifier un bordereau tant qu'aucune signature (transporteur ou producteur) n'a été apposée (statut `DRAFT` ou `SEALED`). [PR 720](https://github.com/MTES-MCT/trackdechets/pull/720)
 
 #### :boom: Breaking changes
 
@@ -78,11 +102,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     }
   ```
   Vous n'êtes pas affecté si vous ne renseigniez pas l'éco-organisme via les mutations `createForm` ou `updateForm`.
-- Afin de pouvoir passer au statut `PROCESSED` un BSD doit désormais être `ACCEPTED` et non plus `RECEIVED`. Idem pour passer à `RESEALED`, il doit être `TEMP_STORER_ACCEPTED`. Si vous utilisez les mutations `markAsReceived` et `markAsTempStored` comme précédemment, cela se fera automatiquement.
 
 **Changes**
 
-- Ajout des mutations `markAsAccepted` et `markAsTempStorerAccepted` qui permettent de séparer la réception d'un déchet de son acceptation. [PR 684](https://github.com/MTES-MCT/trackdechets/pull/684)
 - Refonte de l'interface utilisateur. [PR 469](https://github.com/MTES-MCT/trackdechets/pull/469)
 - Ajout du champ `customInfo` à `TransporterInput`, ce qui permet de renseigner cette information via les mutations `createForm`, `updateForm`, `markAsResent`, `markAsResealed`, [PR 417](https://github.com/MTES-MCT/trackdechets/pull/417)
 - Suppression du service metabase suite au basculement vers une instance metabase dédiée [PR 453](https://github.com/MTES-MCT/trackdechets/pull/453)
