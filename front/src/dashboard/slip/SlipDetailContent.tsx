@@ -471,14 +471,15 @@ export default function SlipDetailContent({
         </div>
       </Tabs>
       <div className={styles.detailActions}>
+        {form.status !== FormStatus.Draft && (
+          <DownloadPdf formId={form.id} small={false} />
+        )}
         <Duplicate formId={form.id} small={false} redirectToDashboard={true} />
-        {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) ? (
+        {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
           <>
             <Delete formId={form.id} small={false} />
             <Edit formId={form.id} small={false} />
           </>
-        ) : (
-          <DownloadPdf formId={form.id} small={false} />
         )}
         {statusesWithDynamicActions.includes(form.status) && (
           <DynamicActions siret={siret} form={form} refetch={refetch} />
