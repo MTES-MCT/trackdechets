@@ -6,7 +6,7 @@ import { Packagings } from "../../src/generated/graphql/types";
 @registerUpdater(
   "Migrate packagings",
   `Migrate from fields [packagings, otherPackaging, numberOfPackages] to packagingInfos`,
-  true
+  false
 )
 export class MigratePackagingsUpdater implements Updater {
   async run() {

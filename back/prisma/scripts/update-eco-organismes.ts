@@ -107,7 +107,7 @@ const ecoOrganismes = [
 @registerUpdater(
   "Update Eco-organismes",
   "Update the list of eco-organismes in the database",
-  true
+  false
 )
 export class UpdateEcoOrganismesUpdater implements Updater {
   async run() {

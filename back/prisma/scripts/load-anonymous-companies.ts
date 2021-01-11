@@ -5,7 +5,7 @@ import { prisma } from "../../src/generated/prisma-client";
 @registerUpdater(
   "Load anonymous companies",
   "Load anonymous SIRENE companies from file ./src/companies/sirene/fixtures/anonymousCompanies.json",
-  true
+  false
 )
 export class LoadAnonymousCompaniesUpdater implements Updater {
   async run() {
