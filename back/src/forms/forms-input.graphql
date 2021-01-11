@@ -490,7 +490,7 @@ input TempStorerAcceptedFormInput {
 
 input TempStoredFormInput {
   "Statut d'acceptation du déchet (case 13)"
-  wasteAcceptationStatus: WasteAcceptationStatusInput!
+  wasteAcceptationStatus: WasteAcceptationStatusInput
 
   "Raison du refus (case 13)"
   wasteRefusalReason: String

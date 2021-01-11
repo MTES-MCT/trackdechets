@@ -46,7 +46,7 @@ export type AppendixFormInput = {
   id: Maybe<Scalars["ID"]>;
   /**
    * N° de bordereau
-   *
+   * 
    * Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
    * Le readableId permet de le récupérer via la query form.
    */
@@ -559,7 +559,7 @@ export type FormCompany = {
   /**
    * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
    * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-   *
+   * 
    * Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
    */
   country: Maybe<Scalars["String"]>;
@@ -715,7 +715,7 @@ export enum FormStatus {
 
 /**
  * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
- *
+ * 
  * Mise à jour d'un BSD
  */
 export type FormSubscription = {
@@ -796,7 +796,7 @@ export type InternationalCompanyInput = {
   /**
    * Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
    * https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-   *
+   * 
    * En l'absence de code, l'entreprise est considérée comme résidant en France.
    */
   country: Maybe<Scalars["String"]>;
@@ -943,7 +943,7 @@ export type Mutation = {
   /**
    * DEPRECATED - La récupération de token pour le compte de tiers
    * doit s'effectuer avec le protocole OAuth2
-   *
+   * 
    * Récupére un token à partir de l'email et du mot de passe
    * d'un utilisateur.
    */
@@ -965,7 +965,7 @@ export type Mutation = {
    * Finalise un BSD
    * Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
    * doivent avoir été renseignés au préalable
-   *
+   * 
    * ```
    * emitter: {
    *   type
@@ -1471,7 +1471,7 @@ export type Query = {
    * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
    * préciser un SIRET
    * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-   *
+   * 
    * Vous pouvez filtrer:
    * - par rôle que joue votre entreprise sur le BSD via `role`
    * - par date de dernière modification via `updatedAfter`
@@ -1480,7 +1480,7 @@ export type Query = {
    * - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
    * - par code déchet via `wasteCode`
    * - par SIRET d'une entreprise présente n'importe où sur le bordereau via `siretPresentOnForm`
-   *
+   * 
    * Par défaut:
    * - tous les BSD accessibles sont retournés
    * - les BSD sont classés par date de création, de la plus récente à la plus vieille
@@ -1754,7 +1754,7 @@ export type Stat = {
  * - le bordereau peut naviguer entre plusieurs entreprises.
  * - quand le bordereau a-t-il été modifié pour la dernière fois ? (création, signature, traitement... ?)
  * - si c'est un bordereau avec conditionnement et qu'on attend un transporteur, quel est-il ?
- *
+ * 
  * Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
  */
 export type StateSummary = {
@@ -1824,7 +1824,7 @@ export type Subscription = {
   __typename?: "Subscription";
   /**
    * DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
-   *
+   * 
    * Permet de s'abonner aux changements de statuts d'un BSD
    */
   forms: Maybe<FormSubscription>;
@@ -1876,7 +1876,7 @@ export type TemporaryStorer = {
 
 export type TempStoredFormInput = {
   /** Statut d'acceptation du déchet (case 13) */
-  wasteAcceptationStatus: WasteAcceptationStatusInput;
+  wasteAcceptationStatus: Maybe<WasteAcceptationStatusInput>;
   /** Raison du refus (case 13) */
   wasteRefusalReason: Maybe<Scalars["String"]>;
   /** Nom de la personne en charge de la réception du déchet (case 13) */
@@ -2119,18 +2119,18 @@ export type User = {
 /**
  * Liste les différents rôles d'un utilisateur au sein
  * d'un établissement.
- *
+ * 
  * Les admins peuvent:
  * * consulter/éditer les bordereaux
  * * gérer les utilisateurs de l'établissement
  * * éditer les informations de la fiche entreprise
  * * demander le renouvellement du code de signature
  * * Éditer les informations de la fiche entreprise
- *
+ * 
  * Les membres peuvent:
  * * consulter/éditer les bordereaux
  * * consulter le reste des informations
- *
+ * 
  * Vous pouvez consulter [cette page](https://docs.google.com/spreadsheets/d/12K9Bd2k5l4uqXhS0h5uI00lNEzW7C-1t-NDOyxy8aKk/edit#gid=0)
  * pour le détail de chacun des rôles
  */
@@ -2190,18 +2190,18 @@ export type WasteDetailsInput = {
   /**
    * Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
    * https://aida.ineris.fr/consultation_document/10327
-   *
+   * 
    * Il doit être composé de 3 paires de deux chiffres séparés par un espace et se termine éventuellement par une astérisque.
-   *
+   * 
    * Un exemple de déchet non-dangereux valide (déchets provenant de l'extraction des minéraux métallifères) :
    * 01 01 01
-   *
+   * 
    * Ce même exemple, mais avec un format invalide :
    * 010101
-   *
+   * 
    * Un exemple de déchet dangereux valide (stériles acidogènes provenant de la transformation du sulfure) :
    * 01 03 04*
-   *
+   * 
    * Ce même exemple, mais avec un format invalide :
    * 010304 *
    */
@@ -3080,7 +3080,7 @@ export function createTempStoredFormInputMock(
   props: Partial<TempStoredFormInput>
 ): TempStoredFormInput {
   return {
-    wasteAcceptationStatus: WasteAcceptationStatusInput.Accepted,
+    wasteAcceptationStatus: null,
     wasteRefusalReason: null,
     receivedBy: "",
     receivedAt: new Date().toISOString(),
