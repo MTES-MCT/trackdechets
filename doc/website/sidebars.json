@@ -13,7 +13,8 @@
       "sirene",
       "registre",
       "roles",
-      "notifications"
+      "notifications",
+      "deployment-checklist"
     ],
     "Référence de l'API": ["api-reference", "changelog"]
   }
